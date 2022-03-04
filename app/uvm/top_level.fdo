@@ -1,0 +1,73 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Radek Iša <isa@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set FIRMWARE_BASE    "../.."
+set OFM_PATH         "$FIRMWARE_BASE/ndk/ofm/"
+set TB_FILE          "./testbench.sv"
+
+# RESET variable PACKAGES, MOD COMPONENTS
+set PACKAGES   ""
+set MOD        ""
+set COMPONENTS ""
+# SET COMPONENTS
+
+###################################
+# GENERATE PKG FILE
+###################################
+# Source common core const scripts
+source $OFM_PATH/build/targets.tcl
+source $OFM_PATH/build/VhdlPkgGen.tcl
+source $OFM_PATH/build/Shared.tcl
+
+set BOARD        "NONE"
+set CARD_NAME    "NONE"
+set DMA_ENABLE           true
+set ETH_ENABLE           true
+#VhdlPkgBegin
+#set PROJECT_NAME "APPLICATION_CORE-VER"
+#set DMA_RX_BLOCKING_MODE false
+#set DMA_CROX_CLK_SEL     0
+#set DMA_400G_DEMO        false
+#source ./config/user_const.tcl
+#source ./config/ndk_const.tcl
+#VhdlPkgBool DMA_400G_DEMO $DMA_400G_DEMO
+#
+#VhdlPkgFinish "./config/ndk_const.vhd" "combo_user_const"
+###################################
+# FINISH GENERATING PKG FILE
+###################################
+
+lappend PACKAGES   "./config/ndk_const.vhd"
+lappend COMPONENTS [list "DUT_ENTYTY" "$FIRMWARE_BASE/ndk/core/intel"  "APPLICATION_CORE_ENTYTY_ONLY"]
+lappend COMPONENTS [list "DUT_INTEL"  "../intel"  "FULL"]
+lappend COMPONENTS [list "VER"        "."         "FULL"]
+
+#SET TEST NAME
+#set TEST_NAME "test::full_speed"
+set TEST_NAME "test::base"
+
+# Enable Code Coverage
+set SIM_FLAGS(CODE_COVERAGE) "true"
+set SIM_FLAGS(EXTRA_VFLAGS) "+UVM_TESTNAME=$TEST_NAME -uvmcontrol=all +UVM_MAX_QUIT_COUNT=1"
+
+# Global include file for compilation
+source "$OFM_PATH/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Numeric Warnings - Disabled"
+set StdArithNoWarnings 1
+set NumericStdNoWarnings 1
+
+#run verification
+#nb_sim_run
+restart -f
+run -all
+
+# Reports
+# Uncomment lines below to generate html coce coverage report
+coverage save -instance /testbench/DUT -code bcefst -verbose -testname {*}$TEST_NAME actual.ucdb
+#coverage report -html -output cov_html -instance=/testbench/DUT -source -details -assert -directive -cvg -code bcefst -verbose -threshL 50 -threshH 90
+quit

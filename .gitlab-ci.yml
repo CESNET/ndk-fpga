@@ -1,0 +1,18 @@
+variables:
+  GIT_STRATEGY: clone
+  GIT_SUBMODULE_STRATEGY: recursive
+
+image: python:3.7-alpine
+
+pages:
+  stage: deploy
+  script:
+  - pip install -U sphinx
+  - pip install -U sphinx-rtd-theme
+  - pip install -U sphinx-vhdl
+  - sphinx-build -b html doc/source/ public
+  artifacts:
+    paths:
+    - public
+  only:
+  - main

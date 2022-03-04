@@ -1,0 +1,18 @@
+[submodule "ndk/ofm"]
+	path = ndk/ofm
+	url = ../ofm.git
+[submodule "ndk/cards/agi-fh400g"]
+	path = ndk/cards/agi-fh400g
+	url = ../ndk-card-agi-fh400g.git
+[submodule "ndk/modules/ndk-mod-dma-medusa"]
+	path = ndk/modules/ndk-mod-dma-medusa
+	url = ../ndk-mod-dma-medusa.git
+[submodule "ndk/core"]
+	path = ndk/core
+	url = ../ndk-core.git
+[submodule "ndk/cards/dk-dev-agi027res"]
+	path = ndk/cards/dk-dev-agi027res
+	url = ../ndk-card-dk-dev-agi027res.git
+[submodule "ndk/cards/dk-dev-1sdx-p"]
+	path = ndk/cards/dk-dev-1sdx-p
+	url = ../ndk-card-dk-dev-1sdx-p.git

@@ -1,0 +1,13 @@
+library 'liberouter'
+
+stagesFirmware(
+    dir: 'apps/nic/400g1',
+    target: '10g8',
+    tool: 'quartus',
+    project: 'agi-fh400g-nic-10g8',
+    pollscm: 'H H(0-11) * * 6',
+    rpms: false,
+    rename: false,
+    artifacts: 'agi-fh400g-nic-10g8',
+    lastBuilds: 2,
+)

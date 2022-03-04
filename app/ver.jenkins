@@ -1,0 +1,30 @@
+/*
+ * ver.jenkins: Jenkins configuration script
+ * Copyright (C) 2021 CESNET z. s. p. o.
+ * Author(s): Radek Iša <isa@cesnet.cz>
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+// Clean previous builds
+library 'liberouter'
+cleanBuilds()
+
+
+// /////////////////////////////////////////////////////////////////////////////
+// MULTI-VERIFICATION
+// /////////////////////////////////////////////////////////////////////////////
+//  [ 'name'             , 'path_to_ver'                             , 'fdo_file.fdo'       , 'test_pkg.sv/.vhd'   , 'settings.py'           ]
+//    ['FULL_SPEED'     , 'app/uvm' , 'top_level.fdo'      , 'test_pkg.vhd'  , 'ver_settings.py'       ],\
+def COMPONENTS_MULTIVER = [\
+    ['BASE'           , 'app/uvm' , 'top_level.fdo'      , 'test_pkg.sv'   , 'ver_settings.py'       ],\
+]
+// /////////////////////////////////////////////////////////////////////////////
+// Run component verifications using common script
+node('preklad') {
+    // fetch sources from GIT
+    checkout scm
+    def common_run = load "ndk/ofm/tests/jenkins/common.jenkins"
+    def root_path  = pwd()
+    common_run.commonPrekladMultiVerRun(COMPONENTS_MULTIVER, "$root_path/ndk/ofm")
+}

@@ -1,0 +1,25 @@
+# user_const.tcl: User parameters for XpressSX AGI-FH400G
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# DMA parameters:
+# ===============
+# If you do not have access to a non-public repository with DMA IP, set to false.
+# If the DMA module is disabled, loopback will be implemented instead.
+set DMA_ENABLE           true
+# The minimum number of RX/TX DMA channels for this card is 32.
+set DMA_RX_CHANNELS      32
+set DMA_TX_CHANNELS      32
+# In blocking mode, packets are dropped only when the RX DMA channel is off.
+# In non-blocking mode, packets are dropped whenever they cannot be sent.
+set DMA_RX_BLOCKING_MODE true
+
+# Other parameters:
+# =================
+
+set PROJECT_NAME "400G1"
+#if { $PORT0_MODE != 0 } {
+#    append PROJECT_NAME "_" [EthSpeed $PORT0_MODE] "GE"
+#}

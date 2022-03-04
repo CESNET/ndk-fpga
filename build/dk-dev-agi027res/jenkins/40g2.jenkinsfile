@@ -1,0 +1,13 @@
+library 'liberouter'
+
+stagesFirmware(
+    dir: 'build/dk-dev-agi027res',
+    target: '40g2',
+    tool: 'quartus',
+    project: 'dk-dev-agi027res-minimal-40g2',
+    pollscm: 'H H(0-11) * * 6',
+    rpms: false,
+    rename: false,
+    artifacts: 'dk-dev-agi027res-minimal-40g2',
+    lastBuilds: 2,
+)
