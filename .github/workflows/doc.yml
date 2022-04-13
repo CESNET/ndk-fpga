@@ -1,0 +1,24 @@
+name: documentation
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Sphinx Pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup and build
+        run: |
+          sudo apt-get install python3-pip
+          pip3 install sphinx sphinx-vhdl sphinx_rtd_theme
+          sphinx-build -M html doc/source public
+          touch public/html/.nojekyll
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: public/html
