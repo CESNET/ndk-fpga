@@ -10,11 +10,11 @@ The Minimal application serves as a simple example of how to build an FPGA appli
 
 - To build FPGA firmware, you must have Intel Quartus Prime Pro 21.4 installed, including a valid license.
 - Additional repositories (minimum - available as open-source) are needed to build the NDK design for the FPGA:
-    - [NDK Core](../../../../ndk-core/)
-    - [DK-DEV-1SDX-P card for NDK](../../../../ndk-card-dk-dev-1sdx-p/)
-    - [DK-DEV-AGI027RES card for NDK](../../../../ndk-card-dk-dev-agi027res/)
-    - [Open FPGA Modules](../../../../ofm/)
-- NDK Linux driver and SW tools
+    - [NDK Core](https://github.com/CESNET/ndk-core/)
+    - [DK-DEV-1SDX-P card for NDK](https://github.com/CESNET/ndk-card-dk-dev-1sdx-p/)
+    - [DK-DEV-AGI027RES card for NDK](https://github.com/CESNET/ndk-card-dk-dev-agi027res/)
+    - [Open FPGA Modules](https://github.com/CESNET/ofm/)
+- [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw)
 
 ### How to clone the necessary repositories
 
@@ -36,7 +36,8 @@ git clone --recursive git@gitlab.liberouter.org:ndk/ndk-app-minimal.git
 ## Documentation
 
 We use a documentation system based on the [Sphinx tool](https://www.sphinx-doc.org), which compiles complete documentation from source files in the [reStructuredText](https://docutils.sourceforge.io/rst.html) format. The documentation automatically build with each contribution to the devel branch and is available online here:
-- [**Minimal NDK Application Docs (private GitLab)**](https://ndk.gitlab.liberouter.org:5051/ndk-app-minimal/).
+- [**Minimal NDK Application Docs (public GitHub)**](https://cesnet.github.io/ofm/ndk-app-minimal/)
+- [**Minimal NDK Application Docs (private GitLab)**](https://ndk.gitlab.liberouter.org:5051/ndk-app-minimal/)
 
 ### How to manually build documentation
 
