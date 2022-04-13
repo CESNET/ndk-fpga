@@ -4,7 +4,7 @@ The Network Development Kit (NDK) allows users to quickly and easily develop new
  
 The Minimal application serves as a simple example of how to build an FPGA application using the Network Development Kit (NDK). It can also be used as a starting point for building your own application. The Minimal application does not process network packets in any way, it can only receive and send them. If the DMA module IP is enabled, the network packets are forwarded to the computer memory.
 
-**The DMA module IP is not part of the open-source NDK. If the DMA module IP is disabled, then it is replaced by a loopback. [You can get NDK including DMA Module IP and professional support through our partner BrnoLogic](https://support.brnologic.com/)**
+**The DMA module IP is not part of the open-source NDK. If the DMA module IP is disabled, then it is replaced by a loopback. [You can get NDK including DMA Module IP and professional support through our partner BrnoLogic](https://support.brnologic.com/).**
 
 ## Requirements
 
@@ -36,7 +36,7 @@ git clone --recursive git@gitlab.liberouter.org:ndk/ndk-app-minimal.git
 ## Documentation
 
 We use a documentation system based on the [Sphinx tool](https://www.sphinx-doc.org), which compiles complete documentation from source files in the [reStructuredText](https://docutils.sourceforge.io/rst.html) format. The documentation automatically build with each contribution to the devel branch and is available online here:
-- [**Minimal NDK Application Docs (public GitHub)**](https://cesnet.github.io/ofm/ndk-app-minimal/)
+- [**Minimal NDK Application Docs (public GitHub)**](https://cesnet.github.io/ndk-app-minimal/)
 - [**Minimal NDK Application Docs (private GitLab)**](https://ndk.gitlab.liberouter.org:5051/ndk-app-minimal/)
 
 ### How to manually build documentation
