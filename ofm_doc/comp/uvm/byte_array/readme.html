@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Byte Array agent &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Byte Array agent</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/ofm_doc/comp/uvm/byte_array/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="byte-array-agent">
+<span id="uvm-byte-array"></span><h1>Byte Array agent<a class="headerlink" href="#byte-array-agent" title="Permalink to this headline"></a></h1>
+<p>The main task of this agent is generate field of bytes which is then processed in low level agent. This agents does not contain driver because it is high level agent.
+Agent is used for connecting of all components (driver, monitor,…). Agent has his own configuration object which contains one parameter active (when is up then agent is active in other way is passive).
+When agent is active then sequencer is created. When is passive then only monitor is created.</p>
+<section id="byte-array-sequence-item">
+<h2>Byte Array sequence item<a class="headerlink" href="#byte-array-sequence-item" title="Permalink to this headline"></a></h2>
+<p>Sequence item contains randomized byte data field which is cut to smaller chunks in low level agent.</p>
+<p>There are three methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">do_copy</span></code> is used for copying of the transaction.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">do_compare</span></code> is used for comparing data of two transactions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">convert2string</span></code> is used for printing whole transaction.</p></li>
+</ul>
+<section id="byte-array-monitor">
+<h3>Byte Array monitor<a class="headerlink" href="#byte-array-monitor" title="Permalink to this headline"></a></h3>
+<p>Byte Array monitor is used for monitoring of traffic. There is only easy monitor which create analysis port and sequence item.</p>
+</section>
+<section id="byte-array-sequence">
+<h3>Byte Array Sequence<a class="headerlink" href="#byte-array-sequence" title="Permalink to this headline"></a></h3>
+<p>Byte Array Sequence is used for generation of transaction. NUMBER_OF_TRANSACTION say how many transactions will be generate. Length of transaction is generate in range from MIN_LENGTH to MAX_LENGTH. Data of this sequence are randomized.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

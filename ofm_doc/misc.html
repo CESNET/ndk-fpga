@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Miscellaneous &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CrossbarX" href="comp/base/misc/crossbarx/readme.html" />
+    <link rel="prev" title="Synchronous SR latch" href="comp/base/logic/sr_sync_latch/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="base.html">Basic Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="memory.html">Memory modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fifo.html">FIFO components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shift.html">Shift registers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logic.html">Basic logic elements</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Miscellaneous</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/misc/crossbarx/readme.html">CrossbarX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/misc/trans_sorter/readme.html">Transaction Sorter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/misc/packet_planner/readme.html">Packet Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/misc/event_counter/readme.html">Event Counter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/misc/pulse_short/readme.html">Pulse short</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="base.html">Basic Tools</a> &raquo;</li>
+      <li>Miscellaneous</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/ofm_doc/misc.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="miscellaneous">
+<h1>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline"></a></h1>
+<p><strong>ADC_SENSORS</strong> - Controller of the Temperature and Voltage ADC IPs for Intel Stratix 10 FPGA. It is controlled via the MI bus. <code class="docutils literal notranslate"><span class="pre">CANDIDATE</span> <span class="pre">FOR</span> <span class="pre">MOVE</span> <span class="pre">to</span> <span class="pre">CTRLs</span> <span class="pre">folder!</span></code></p>
+<p><strong>CLK_GEN</strong> - Old clock generator, is used in some simulation only. <code class="docutils literal notranslate"><span class="pre">CANDIDATE</span> <span class="pre">FOR</span> <span class="pre">REMOVAL!</span></code></p>
+<p><strong>CROSSBARX</strong> - This unit performs data transfer between two buffers connected on SRC_BUF and DST_BUF interfaces based on Transactions passed on the TRANS interface.
+Detailed <a class="reference internal" href="comp/base/misc/crossbarx/readme.html#crossbarx"><span class="std std-ref">documentation can be found here</span></a>.</p>
+<p><strong>DEFICIT_IDLE_COUNTER</strong> - Calculates gap sizes for each input packet while maintaining deficit idle count according to Ethernet specification.</p>
+<p><strong>EVENT_COUNTER</strong> - The Event Counter is a debuging unit for receiving statistics of occurence frequency of a certain event.
+It is made accessible through MI interface using the Event Counter MI Wrapper. Detailed <a class="reference internal" href="comp/base/misc/event_counter/readme.html#event-counter"><span class="std std-ref">documentation can be found here</span></a>.</p>
+<p><strong>FIFO_PIPE</strong> - Generic pipe implemented using registers and FIFO memory in almost full mode. <code class="docutils literal notranslate"><span class="pre">UNUSED,</span> <span class="pre">CANDIDATE</span> <span class="pre">FOR</span> <span class="pre">REMOVAL!</span></code></p>
+<p><strong>FIRST_ONE_DETECTOR</strong> - Old behavioral implementation of first one detector in vector. <code class="docutils literal notranslate"><span class="pre">CANDIDATE</span> <span class="pre">FOR</span> <span class="pre">REMOVAL!</span> <span class="pre">Use</span> <span class="pre">FIRST_ONE</span> <span class="pre">from</span> <span class="pre">base</span> <span class="pre">logic!</span></code></p>
+<p><strong>HYPER_PIPE</strong> - Generic hyper pipe implemented using registers, optimized for Intel Stratix 10 FPGA. <code class="docutils literal notranslate"><span class="pre">UNUSED,</span> <span class="pre">CANDIDATE</span> <span class="pre">FOR</span> <span class="pre">REMOVAL!</span></code></p>
+<p><strong>ID32</strong> - Identification component, is a small component, which is used to detect design inside FPGA. Informations are stored inside registers which are accessible through dedicated 32 bit interface.</p>
+<p><strong>INTERRUPT_MANAGER</strong> - Interrupt agregator module, TODO description.</p>
+<p><strong>PACKET_PLANNER</strong> - The Packet Planner processes input packet headers by assigning addresses to an outside buffer space to each packet,
+so that they are placed one after another with the needed inter-packet gaps and alignment. Detailed <a class="reference internal" href="comp/base/misc/packet_planner/readme.html#packet-planner"><span class="std std-ref">documentation can be found here</span></a>.</p>
+<p><strong>PIPE</strong> - Component for pipelining data paths with source and destination ready signals. Compatible with Xilinx and Intel FPGAs.</p>
+<p><strong>PULSE_SHORT</strong> - Component which is able to shorten arbitrary long pulses to one clock period of the output clock. Documentation can be found <a class="reference internal" href="comp/base/misc/pulse_short/readme.html#pulse-short"><span class="std std-ref">here</span></a>.</p>
+<p><strong>RESET_TREE_GEN</strong> - Simple wrapper of ASYNC_RESET for parallel reset synchronization. Compatible with Xilinx and Intel FPGAs.</p>
+<p><strong>RR_ARBITER</strong> - Generic arbitration controler uses round-robin algorithm. The arbitration result is ready in the same cycle as the request arrived.</p>
+<p><strong>SLR_CROSSING</strong> - Special pipe component to cross between super logic regions (slow wire) on some Xilinx FPGAs.</p>
+<p><strong>TRANS_SORTER</strong> - This unit converts out-of-order confirmations of transactions to the original order of the transactions.
+Detailed <a class="reference internal" href="comp/base/misc/trans_sorter/readme.html#trans-sorter"><span class="std std-ref">documentation can be found here</span></a>.</p>
+<p><strong>WATCHDOG</strong> - Data flow watchdog module, which checks whether the monitored bus is not stuck. TODO</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="comp/base/logic/sr_sync_latch/readme.html" class="btn btn-neutral float-left" title="Synchronous SR latch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="comp/base/misc/crossbarx/readme.html" class="btn btn-neutral float-right" title="CrossbarX" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

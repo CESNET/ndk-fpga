@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build System &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Device Tree" href="../../ndk_core/doc/devtree.html" />
+    <link rel="prev" title="Time Stamp Unit" href="../../ndk_core/intel/doc/tsu.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Build System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#hierarchy-description-in-modules-tcl">Hierarchy description in Modules.tcl</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#variables-in-modules-tcl-obtained-by-the-build-system">Variables in Modules.tcl obtained by the build system</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-of-properties-used-in-mod-variables">List of properties used in MOD variables</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-of-using-properties">Example of using properties</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#list-of-properties-used-in-sv-libs">List of properties used in SV_LIBS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-of-using-modules-tcl-variables">Example of using Modules.tcl variables</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#component-synthesis">Component synthesis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#advanced-synthesis-configuration">Advanced synthesis configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-of-makefile-for-component-synthesis">Example of Makefile for component synthesis</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#the-comp-target-in-makefile">The <code class="docutils literal notranslate"><span class="pre">comp</span></code> target in Makefile</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#chip-design-synthesis-and-implementation">Chip design synthesis and implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#synthesizeproject">SynthesizeProject</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#init-phase-setupdesign">1. Init phase (SetupDesign)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#file-add-phase-addinputfiles">2. File add phase (AddInputFiles)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#synthesis-and-implemenation-synthetizedesign-implementdesign">3. Synthesis and Implemenation (SynthetizeDesign, ImplementDesign)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#final-phase-savedesign">4. Final phase (SaveDesign)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#other-features-of-the-build-system">Other features of the build system</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#evalfile">EvalFile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batch-feature-in-evalfile">Batch feature in EvalFile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#makefile">Makefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-incomplete-list-of-synth-flags-array-items">The (incomplete) list of SYNTH_FLAGS array items</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug.html">Debug Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Build System</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/ofm_doc/build/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="build-system">
+<h1>Build System<a class="headerlink" href="#build-system" title="Permalink to this headline"></a></h1>
+<p>This build system has been developed for easier implementation and
+simulation of the large projects and individual components as well.
+The main idea is based on the uniform definition of components hierarchy,
+which is used for sythesis and simulation purposes.
+Translation system is mainly implemented using Makefile and Tcl scripts.
+The Tcl language is independent of target operation system and it is
+supported in the most of tools dedicated for hardware developement.</p>
+<section id="hierarchy-description-in-modules-tcl">
+<h2>Hierarchy description in Modules.tcl<a class="headerlink" href="#hierarchy-description-in-modules-tcl" title="Permalink to this headline"></a></h2>
+<p>The objective of hierarchy description is to define a structure of
+complex projects. Generally, a project is composed of several components
+and a component is recursively composed of several subcomponents and
+modules. Further, each subcomponent can occure in several instances and
+each subcomponent instance can use a different architecture.
+The Modules.tcl file describes all direct necessary dependencies (e.g. instantiated
+subcomponents or packages) for the component and the source
+file of the component itself. Sometimes it may also be appropriate to include
+more independent components into one Modules.tcl file as one bundle. In such
+cases, it is recomended to include only source files from the same directory
+as the Modules.tcl file, exceptionally from direct subdirectories.
+file.</p>
+<p>For the definition of a component structure two variables are reserved - <code class="docutils literal notranslate"><span class="pre">MOD</span></code> and
+<code class="docutils literal notranslate"><span class="pre">COMPONENTS</span></code>. The <code class="docutils literal notranslate"><span class="pre">MOD</span></code> variable specifies the list of modules (typically
+VHDL files in current directory) while the <code class="docutils literal notranslate"><span class="pre">COMPONENTS</span></code> variable specifies
+the subcomponent list of the component.</p>
+<section id="variables-in-modules-tcl-obtained-by-the-build-system">
+<h3>Variables in Modules.tcl obtained by the build system<a class="headerlink" href="#variables-in-modules-tcl-obtained-by-the-build-system" title="Permalink to this headline"></a></h3>
+<ul>
+<li><p><strong>PACKAGES</strong> defines the list of VHDL files, which serve as packages.
+These packages are usually used at the begining of VHDL files using command
+“use library.package_name.function”. Via this build system, packages are translated sooner than other
+VHDL modules and components. During translation, the order of files defined in
+variable is preserved. Common packages used by multiple sources are usually
+included in Modules.tcl for top-level, not in component’s Modules.tcl.</p></li>
+<li><p><strong>MOD</strong> variable defines the list of modules (VHDL or Verilog source files),
+which specify the component structure. It’s important to preserve
+the order of modules declared in this list. Module used by another module in
+current Modules.tcl scope has to be defined
+sooner in the list.</p></li>
+<li><p><strong>COMPONENTS</strong> defines the list of subcomponents, needed for the component.
+Each item of the list is also the list with following parameters:</p>
+<blockquote>
+<div><div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">[</span><span class="nb">list</span> ENTITY ENTITY_BASE ARCHGRP<span class="k">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li><p><em>ENTITY</em> specifies the entity name. It’s used by the Translation System to
+distinguish between several entities in the same directory, although it is not commonly used.</p></li>
+<li><p><em>ENTITY_BASE</em> defines the path to the subcomponent. It’s strongly recommended
+to specify this path relatively to another directory (mostly to the root folder of currently used
+git repository), the current <code class="docutils literal notranslate"><span class="pre">ENTITY_BASE</span></code> should be used for this purpose. Target path must
+contain the Modules.tcl file, which will be parsed.</p></li>
+<li><p><em>ARCHGRP</em> specifies the architecture (or more architectures) of a subcomponent.
+For example, architecture can be an empty implementation (string <code class="docutils literal notranslate"><span class="pre">EMPTY</span></code>) or a full implementation (string <code class="docutils literal notranslate"><span class="pre">FULL</span></code>),
+but the value can also be a list of specific configurations to its subcomponents.</p></li>
+</ul>
+</li>
+<li><p><strong>SV_LIB</strong> List of dynamic libraries used for SystemVerilog DPI verification.
+If the dynamic library file doesn’t exist, the build system requires existing
+Makefile in the same directory and executes make.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Do not include prefix (lib) nor suffix (.dll or .so) in the filename.</p>
+</div>
+<p>Variables <code class="docutils literal notranslate"><span class="pre">ENTITY</span></code>, <code class="docutils literal notranslate"><span class="pre">ENTITY_BASE</span></code> and <code class="docutils literal notranslate"><span class="pre">ARCHGRP</span></code> are predefined (provided) by the build system to be used in every Modules.tcl file. Their values are obtained from the respective <code class="docutils literal notranslate"><span class="pre">COMPONENT</span></code> list item of the ancestor’s Modules.tcl.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Prefer to use <code class="code tcl docutils literal notranslate"><span class="name builtin"><span class="pre">lappend</span></span> <span class="pre">MOD</span> <span class="literal string double"><span class="pre">&quot;myfile.vhd&quot;</span></span></code> instead of <code class="code tcl docutils literal notranslate"><span class="keyword"><span class="pre">set</span></span> <span class="pre">MOD</span> <span class="literal string double"><span class="pre">&quot;$MOD</span> <span class="pre">myfile.vhd&quot;</span></span></code>,
+because the <code class="docutils literal notranslate"><span class="pre">lappend</span></code> better express the operation and is faster.</p>
+</div>
+</section>
+<section id="list-of-properties-used-in-mod-variables">
+<span id="extra-file-properties"></span><h3>List of properties used in MOD variables<a class="headerlink" href="#list-of-properties-used-in-mod-variables" title="Permalink to this headline"></a></h3>
+<p>For translation, it is often required to specify more of the details about items (files)
+present in <code class="docutils literal notranslate"><span class="pre">MOD</span></code> and <code class="docutils literal notranslate"><span class="pre">PACKAGES</span></code> variables. In this case the translation
+system can get a list with property name and value pairs instead of a single item, e.g.:</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nb">lappend</span> MOD <span class="k">[</span><span class="nb">list</span> <span class="nv">$ENTITY_BASE</span><span class="o">/</span>myfile.vhd LIBRARY another_lib SIM_MODULE glbl<span class="k">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>LIBRARY</strong> specifies another library name than default <cite>work</cite> into which the module will be compiled.</p></li>
+<li><p><strong>TYPE</strong> overrides automatically selected file type which is otherwise based on the file extension. Currently supported types are:</p>
+<ul>
+<li><p><em>CONSTR_QUARTUS</em></p></li>
+<li><p><em>CONSTR_VIVADO</em></p></li>
+<li><p><em>VIVADO_IP_XACT</em> - automatically used for <em>xci</em> files</p></li>
+</ul>
+</li>
+<li><p><strong>SCOPED_TO_REF</strong> - only for the CONSTR_VIVADO type, calls <code class="docutils literal notranslate"><span class="pre">set_property</span> <span class="pre">SCOPED_TO_REF</span></code> for the file</p></li>
+<li><p><strong>PROCESSING_ORDER</strong> - only for the CONSTR_VIVADO type, calls <code class="docutils literal notranslate"><span class="pre">set_property</span> <span class="pre">PROCESSING_ORDER</span></code> for the file</p></li>
+<li><p><strong>USED_IN</strong> - only for the CONSTR_VIVADO type, calls <code class="docutils literal notranslate"><span class="pre">set_property</span> <span class="pre">USED_IN</span></code> for the file</p></li>
+<li><p><strong>VIVADO_SET_PROPERTY</strong> calls <code class="docutils literal notranslate"><span class="pre">set_property</span> <span class="pre">{*}$value</span></code> for the file</p></li>
+<li><p><strong>SIM_MODULE</strong> - the file uses another module for simulation, which must be simulated together like this: <code class="docutils literal notranslate"><span class="pre">vsim</span> <span class="pre">extra_module</span> <span class="pre">testbench</span></code></p></li>
+<li><p><strong>SIM_LIB</strong> - the file uses a simulation library which must be loaded like this: <code class="docutils literal notranslate"><span class="pre">vsim</span> <span class="pre">-L</span> <span class="pre">extra_library</span> <span class="pre">testbench</span></code></p></li>
+</ul>
+<section id="example-of-using-properties">
+<h4>Example of using properties<a class="headerlink" href="#example-of-using-properties" title="Permalink to this headline"></a></h4>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nb">lappend</span> MOD <span class="k">[</span><span class="nb">list</span> <span class="nv">$ENTITY_BASE</span><span class="o">/</span>dp_bmem_behav.vhd VIVADO_SET_PROPERTY <span class="k">[</span><span class="nb">list</span> <span class="o">-</span>quiet FILE_TYPE <span class="k">{</span><span class="nv">VHDL</span><span class="k">}]]</span> <span class="k">;</span><span class="c"># set the VHDL98 standard for this file</span>
+<span class="nb">lappend</span> MOD <span class="k">[</span><span class="nb">list</span> <span class="s2">&quot;$ENTITY_BASE/bus_handshake.xdc&quot;</span> TYPE <span class="s2">&quot;CONSTR_VIVADO&quot;</span> SCOPED_TO_REF <span class="s2">&quot;ASYNC_BUS_HANDSHAKE&quot;</span> PROCESSING_ORDER <span class="s2">&quot;LATE&quot;</span><span class="k">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="list-of-properties-used-in-sv-libs">
+<h3>List of properties used in SV_LIBS<a class="headerlink" href="#list-of-properties-used-in-sv-libs" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p><strong>MAKE_PARAMS</strong> - value will be passed to <code class="docutils literal notranslate"><span class="pre">make</span></code> command as the parameters</p></li>
+</ul>
+</section>
+<section id="example-of-using-modules-tcl-variables">
+<h3>Example of using Modules.tcl variables<a class="headerlink" href="#example-of-using-modules-tcl-variables" title="Permalink to this headline"></a></h3>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="c"># HFE top level entity</span>
+<span class="k">if</span> <span class="k">{</span><span class="nv">$ENTITY</span> <span class="o">==</span> <span class="s2">&quot;HFE_TOP&quot;</span><span class="k">}</span> <span class="k">{</span>
+   <span class="k">if</span> <span class="k">{</span><span class="nv">$ARCHGRP</span> <span class="o">==</span> <span class="s2">&quot;FULL&quot;</span><span class="k">}</span> <span class="k">{</span>
+      <span class="c"># This architecture relies on HFE component, which is located</span>
+      <span class="c"># in the same directory as current entity and shares this Modules.tcl file.</span>
+      <span class="nb">lappend</span> COMPONENTS <span class="k">[</span><span class="nb">list</span> HFE <span class="nv">$ENTITY_BASE</span> FULL<span class="k">]</span>
+
+      <span class="c"># This file will be compiled to library work</span>
+      <span class="nb">lappend</span> MOD <span class="nv">$ENTITY_BASE</span><span class="o">/</span>file_to_work.vhd
+
+      <span class="c"># This file will be compiled to library anotherlib</span>
+      <span class="nb">lappend</span> MOD <span class="k">[</span><span class="nb">list</span> <span class="nv">$ENTITY_BASE</span><span class="o">/</span>file_to_anotherlib.vhd LIBRARY anotherlib<span class="k">]</span>
+   <span class="k">}</span>
+
+   <span class="k">if</span> <span class="k">{</span><span class="nv">$ARCHGRP</span> <span class="o">==</span> <span class="s2">&quot;EMPTY&quot;</span><span class="k">}</span> <span class="k">{</span>
+      <span class="nb">lappend</span> MOD <span class="nv">$ENTITY_BASE</span><span class="o">/</span>hfe_empty.vhd
+   <span class="k">}</span>
+<span class="k">}</span>
+
+<span class="c"># HFE core entity</span>
+<span class="k">if</span> <span class="k">{</span><span class="nv">$ENTITY</span> <span class="o">==</span> <span class="s2">&quot;HFE&quot;</span><span class="k">}</span> <span class="k">{</span>
+   <span class="k">if</span> <span class="k">{</span><span class="nv">$ARCHGRP</span> <span class="o">==</span> <span class="s2">&quot;FULL&quot;</span><span class="k">}</span> <span class="k">{</span>
+      <span class="nb">lappend</span> MOD <span class="s2">&quot;$ENTITY_BASE/hfe_pipe.vhd&quot;</span>
+      <span class="nb">lappend</span> MOD <span class="s2">&quot;$ENTITY_BASE/hfe_parser.vhd&quot;</span>
+      <span class="nb">lappend</span> MOD <span class="s2">&quot;$ENTITY_BASE/hfe_full.vhd&quot;</span>
+   <span class="k">}</span> <span class="k">elseif</span> <span class="k">{</span><span class="nv">$ARCHGRP</span> <span class="o">==</span> <span class="s2">&quot;EMPTY&quot;</span><span class="k">}</span> <span class="k">{</span>
+      <span class="nb">lappend</span> MOD <span class="s2">&quot;$ENTITY_BASE/hfe_empty.vhd&quot;</span>
+   <span class="k">}</span>
+<span class="k">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="component-synthesis">
+<h2>Component synthesis<a class="headerlink" href="#component-synthesis" title="Permalink to this headline"></a></h2>
+<p>Synthesis of the component is typically handled by a simple user-created <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>.
+It can be located anywhere, but the recommendation is to use the <code class="docutils literal notranslate"><span class="pre">synth</span></code> subdirectory of the synthesized component.
+The <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> sets the <code class="docutils literal notranslate"><span class="pre">TOP_LEVEL_ENT</span></code> variable and calls the <code class="docutils literal notranslate"><span class="pre">comp</span></code> target
+from global <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> located in <code class="docutils literal notranslate"><span class="pre">$OFM_PATH/build/Makefile</span></code>, which must be <em>included</em>.
+After calling <code class="docutils literal notranslate"><span class="pre">make</span></code> the synthesis will be performed.</p>
+<section id="advanced-synthesis-configuration">
+<h3>Advanced synthesis configuration<a class="headerlink" href="#advanced-synthesis-configuration" title="Permalink to this headline"></a></h3>
+<p>User can specify those variables in <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
+<ul class="simple">
+<li><p>TOP_LEVEL_ENT - <em>required</em>.
+Name of the synthesized entity.</p></li>
+<li><p>TOP_LEVEL_PATH - <em>optional, default value is “..”</em>.
+Path to the Modules.tcl with the synthesized entity.</p></li>
+<li><p>TOP_LEVEL_ARCHGRP - <em>optional, default value is “FULL”</em>.</p></li>
+<li><p>CLK_PORTS - <em>optional, default value is CLK</em>.
+Name or list of space-separated names of component ports which serves as clock input.</p></li>
+<li><p>CLK_PERIOD - <em>optional, default value is 5.0</em>.
+One or more space-separated integer or float values. Clock constraints will be generated
+with this value in ns. If there are more CLK ports than period values,
+unspecified periods will be calculated with a simply formula (add 1.0 for each next clock).</p></li>
+<li><p>SYNTH - <em>optional, default value is “vivado”</em>.
+Synthesis tool can be {vivado, quartus}.
+For lazy users, there is a <code class="docutils literal notranslate"><span class="pre">vivado</span></code> / <code class="docutils literal notranslate"><span class="pre">quartus</span></code> target in global <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>,
+which sets this variable and calls <code class="docutils literal notranslate"><span class="pre">make</span></code> recursively with the default target.</p></li>
+</ul>
+<section id="example-of-makefile-for-component-synthesis">
+<h4>Example of Makefile for component synthesis<a class="headerlink" href="#example-of-makefile-for-component-synthesis" title="Permalink to this headline"></a></h4>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">TOP_LEVEL_ENT</span><span class="o">=</span>RX_MAC_LITE
+<span class="nv">TOP_LEVEL_PATH</span><span class="o">=</span>../../mac/rx
+
+<span class="nv">SYNTH</span><span class="o">=</span>quartus
+
+<span class="nv">CLK_PORTS</span><span class="o">=</span>RX_CLK TX_CLK MI_CLK
+<span class="nv">CLK_PERIOD</span><span class="o">=</span><span class="m">3</span>.500 <span class="m">2</span>.500 <span class="m">5</span>.000
+
+<span class="nf">.PHONY</span><span class="o">:</span> <span class="n">all</span>
+<span class="nf">all</span><span class="o">:</span> <span class="n">comp</span>
+
+<span class="cp">include ../../../../../build/Makefile</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="the-comp-target-in-makefile">
+<span id="comp-target"></span><h3>The <code class="docutils literal notranslate"><span class="pre">comp</span></code> target in Makefile<a class="headerlink" href="#the-comp-target-in-makefile" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">comp</span></code> runs the <code class="docutils literal notranslate"><span class="pre">comp_$(SYNTH).tcl</span></code> script located in <code class="docutils literal notranslate"><span class="pre">$OFM_PATH/build/targets/</span></code> with the synthesis tool.
+Script sets some default values for mandatory variables and fetches environment variables listed above.
+The script also tries to source <code class="docutils literal notranslate"><span class="pre">Vivado.inc.tcl</span></code> / <code class="docutils literal notranslate"><span class="pre">Quartust.inc.tcl</span></code> file (if it exists) in a current directory.
+This can be useful for overriding some variables, e.g. <code class="docutils literal notranslate"><span class="pre">SYNTH_FLAGS</span></code> or <code class="docutils literal notranslate"><span class="pre">CONSTR_TEXT</span></code>.</p>
+<p>User should override the <code class="docutils literal notranslate"><span class="pre">CONSTR_TEXT</span></code> variable in this file for example when the <code class="docutils literal notranslate"><span class="pre">TOP_LEVEL_ENT</span></code> has very specific clock/constraints requirements.
+The constraint file for current synthesis tool is generated from the <code class="docutils literal notranslate"><span class="pre">CONSTR_TEXT</span></code> variable at the end of the preparation.
+The file is overwritten only when needs to be updated, otherwise is leaved untouched, which is useful for typical <code class="docutils literal notranslate"><span class="pre">make</span></code> run: If all sources are unchanged from the last build,
+the targed file (synthesised project) is up-to-date and doesn’t need to rebuild.</p>
+<p>Finally, the script calls default Tcl target (proc <code class="docutils literal notranslate"><span class="pre">target_default</span></code>) which then passes to <code class="docutils literal notranslate"><span class="pre">SynthesizeProject</span></code> procedure documented below.</p>
+</section>
+</section>
+<section id="chip-design-synthesis-and-implementation">
+<h2>Chip design synthesis and implementation<a class="headerlink" href="#chip-design-synthesis-and-implementation" title="Permalink to this headline"></a></h2>
+<p>It is a good practice to split common functionality from application specific functionality:</p>
+<ol class="loweralpha simple">
+<li><p>top-level entity of card together with main constraints and build scripts,</p></li>
+<li><p>application entity for end user with minimum build scripts.</p></li>
+</ol>
+<p>In this scheme, the process basically starts at the user Vivado/Quartus.tcl file (the default value of <code class="docutils literal notranslate"><span class="pre">SYNTHFILES</span></code> variable in Makefile)
+where the user includes a common build script from a top-level entity.
+This fills the <code class="docutils literal notranslate"><span class="pre">HIERARCHY</span></code> array with varables <code class="docutils literal notranslate"><span class="pre">COMPONENTS</span></code> and <code class="docutils literal notranslate"><span class="pre">MOD</span></code> and sets up other neccessary values in <code class="docutils literal notranslate"><span class="pre">SYNTH_FLAGS</span></code> array.</p>
+<p>After Tcl interpreter goes back from common build script, the user tcl should add architecture (implementation) of application entity into the appropriate variables of <code class="docutils literal notranslate"><span class="pre">HIERARCHY</span></code> array, either <code class="docutils literal notranslate"><span class="pre">MOD</span></code> or <code class="docutils literal notranslate"><span class="pre">COMPONENTS</span></code>.
+User tcl can tune some values of SYNTH_FLAGS as well.</p>
+<p>Final step in user tcl file is to call the <code class="docutils literal notranslate"><span class="pre">nb_main</span></code> procedure, which passes to <a class="reference internal" href="#synthesizeproject">SynthesizeProject</a> procedure within <code class="docutils literal notranslate"><span class="pre">target_default</span></code> similarly as in the <a class="reference internal" href="#comp-target">comp target</a>.</p>
+</section>
+<section id="synthesizeproject">
+<span id="id1"></span><h2>SynthesizeProject<a class="headerlink" href="#synthesizeproject" title="Permalink to this headline"></a></h2>
+<section id="init-phase-setupdesign">
+<h3>1. Init phase (SetupDesign)<a class="headerlink" href="#init-phase-setupdesign" title="Permalink to this headline"></a></h3>
+<p>This creates a project within synthesis tool, sets the FPGA device type and does the necessary project setup before adding any source files.</p>
+</section>
+<section id="file-add-phase-addinputfiles">
+<h3>2. File add phase (AddInputFiles)<a class="headerlink" href="#file-add-phase-addinputfiles" title="Permalink to this headline"></a></h3>
+<p>In this stage, files and components are processed from HIERARCHY array and passed to procedure <a class="reference internal" href="#evalfile">EvalFile</a>.
+EvalFile is called for each entry in PACKAGES/MOD variables and should instruct the synthesis tool to compile source file including fine-tunnig of additional properties based on <a class="reference internal" href="#extra-file-properties">extra file properties</a></p>
+</section>
+<section id="synthesis-and-implemenation-synthetizedesign-implementdesign">
+<h3>3. Synthesis and Implemenation (SynthetizeDesign, ImplementDesign)<a class="headerlink" href="#synthesis-and-implemenation-synthetizedesign-implementdesign" title="Permalink to this headline"></a></h3>
+<p>Procedures configure rest of parameters of the project and run the main process: the synthesis and the implementation.</p>
+</section>
+<section id="final-phase-savedesign">
+<h3>4. Final phase (SaveDesign)<a class="headerlink" href="#final-phase-savedesign" title="Permalink to this headline"></a></h3>
+<p>In this step, the binary programming file is generated.</p>
+</section>
+</section>
+<section id="other-features-of-the-build-system">
+<h2>Other features of the build system<a class="headerlink" href="#other-features-of-the-build-system" title="Permalink to this headline"></a></h2>
+<section id="evalfile">
+<span id="id2"></span><h3>EvalFile<a class="headerlink" href="#evalfile" title="Permalink to this headline"></a></h3>
+<p>EvalFile procedure is specific for each synthesis tool and is being used as callback
+when the common code goes through hierarchy of modules. Procedure usually adds
+source files into the project and sets additional properties based on <a class="reference internal" href="#extra-file-properties">extra file
+properties</a>.</p>
+</section>
+<section id="batch-feature-in-evalfile">
+<h3>Batch feature in EvalFile<a class="headerlink" href="#batch-feature-in-evalfile" title="Permalink to this headline"></a></h3>
+<p>Although the EvalFile procedure receives one file for processing in each call,
+it can use the lazy evaluation mechanism, which processes a batch of source
+files in one command run. This mechanism is enabled in the simulation environment
+(Modelsim.inc.fdo file), where it has significantly positive impact on compilation time.</p>
+<p>Source files which have the same compile flags (e.g. same library name or -vhdl2008 parameter)
+are stored into the special variable together with the flags instead of being processed (compiled) immediately.
+When EvalFile gets a file with a different set of flags, the files stored inside the batch variable must be compiled immediately, the variable is then emptied and the newly evaluated file is inserted into it.
+At the end of the AddInputFiles phase, the last batch must be compiled explicitely.</p>
+</section>
+<section id="makefile">
+<h3>Makefile<a class="headerlink" href="#makefile" title="Permalink to this headline"></a></h3>
+<p>There are few mechanisms in the global Makefile which deserve an explanation.</p>
+<p>Some targets in the Makefile are aware of unchanged files. If none of the source files
+for such target has been modified and the target already exists, it will not be remade.
+This is handled by the <code class="docutils literal notranslate"><span class="pre">make</span></code> itself, but the build system must supply a list of source files.
+The list is generated by executing Tcl target called ‘makefile’, which goes through entire hierarchy of Modules.tcl,
+gathers filenames and writes the list in form of <code class="docutils literal notranslate"><span class="pre">target:</span> <span class="pre">prerequisites</span></code> into <code class="docutils literal notranslate"><span class="pre">$PROJECT.$SYNTH.mk</span></code> file,
+which is simply included in the main Makefile. This approach is not so simple and hides some caveats.
+Makefile doesn’t propagate <a class="reference external" href="https://www.gnu.org/software/make/manual/html_node/Target_002dspecific.html">target specific variables</a>
+to global scope and it is unreliable to get prerequisites for generated Makefile.
+Hence the generated Makefile is created (by shadowed target with same name) in the first <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">run</span></code> (only for concerned targets)
+and the real main target is launched in a recursive run of <code class="docutils literal notranslate"><span class="pre">make</span></code>.</p>
+<p>Environment variables available in <code class="docutils literal notranslate"><span class="pre">make</span></code> run aren’t exported to subprocess, except variables which are set using the <code class="docutils literal notranslate"><span class="pre">export</span></code> keyword.
+If the user needs to pass an environment variable into tclsh or synthesis tool, it’s better he uses the <code class="docutils literal notranslate"><span class="pre">USER_ENV</span></code> variable.
+It is a necessity to export user defined variable for targets which needs a generated makefile mentioned above.</p>
+<p>There are also targets, which can trigger an user defined procedure in Tcl: <code class="docutils literal notranslate"><span class="pre">ttarget_%</span></code> and <code class="docutils literal notranslate"><span class="pre">starget_%</span></code>.
+The user defines a Tcl procedure named for example <code class="docutils literal notranslate"><span class="pre">target_myproc</span></code>.
+Executing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">ttarget_myproc</span></code> will trigger the <a class="reference external" href="https://www.gnu.org/software/make/manual/html_node/Pattern-Intro.html">stem</a> target:
+either bare tclsh (ttarget) or synthesis tool (starget) is started, the <code class="docutils literal notranslate"><span class="pre">$SYNTHFILES</span></code> script
+is sourced and if the script includes common <code class="docutils literal notranslate"><span class="pre">build/[Vivado|Quartus|...].inc.tcl</span></code> script
+and runs nb_main (which is recommended for best integration with build system),
+the user defined procedure will be run.</p>
+<p>This is also used for generating a source files inside the Tcl from make target.
+Common used files are DevTree.dts/dtb/vhd and user_const.vhd.</p>
+</section>
+<section id="the-incomplete-list-of-synth-flags-array-items">
+<h3>The (incomplete) list of SYNTH_FLAGS array items<a class="headerlink" href="#the-incomplete-list-of-synth-flags-array-items" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p>PROJ_ONLY <em>{false, true}</em>: Only the project file will be created. Neither synthesis nor implementation will be run.</p></li>
+<li><p>SYNTH_ONLY <em>{false, true}</em>: Only the synthesis will be run, the implementation will be skipped.</p></li>
+<li><p>PHASE_SAVE <em>{true, false}</em>: Do not generate programming files and archives after implementation.</p></li>
+<li><p>DEVICE <em>{ULTRASCALE, VIRTEX7, STRATIX10, AGILEX}</em>: Sets the FPGA family. In the <a class="reference internal" href="#comp-target">comp target</a> is mapped to specific FPGA.</p></li>
+<li><p>FPGA <em>{xcvu7p-flvb2104-2-i, 1SD280PT2F55E1VG, …}</em>: Sets the FPGA part directly.</p></li>
+<li><dl class="simple">
+<dt>SETUP_FLAGS: List of specific flags for entire project:</dt><dd><ul>
+<li><p>USE_XPM_LIBRARIES: includes XPM_CDC XPM_MEMORY in Vivado projects</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>For other values and their purpose see the Vivado.inc.tcl or Quartus.inc.tcl file in the build directory.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../ndk_core/intel/doc/tsu.html" class="btn btn-neutral float-left" title="Time Stamp Unit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../ndk_core/doc/devtree.html" class="btn btn-neutral float-right" title="Device Tree" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

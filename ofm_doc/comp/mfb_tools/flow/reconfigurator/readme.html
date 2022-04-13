@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MFB Reconfigurator &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="MFB Packet Discard ASFIFO" href="../../storage/pd_asfifo/readme.html" />
+    <link rel="prev" title="MFB specification" href="../../readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Reconfigurator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#constraints-and-side-effects">Constraints and side-effects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data-shifting">Data shifting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../../mfb.html">MFB Tools</a> &raquo;</li>
+      <li>MFB Reconfigurator</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../../_sources/ofm_doc/comp/mfb_tools/flow/reconfigurator/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mfb-reconfigurator">
+<span id="id1"></span><h1>MFB Reconfigurator<a class="headerlink" href="#mfb-reconfigurator" title="Permalink to this headline"></a></h1>
+<p>MFB Reconfigurator reconfigures a MFB bus interface from an arbitrary configuration to another arbitrary configuration.
+This includes changing of <code class="docutils literal notranslate"><span class="pre">ITEM_WIDTH</span></code>, <code class="docutils literal notranslate"><span class="pre">BLOCK_SIZE</span></code>, <code class="docutils literal notranslate"><span class="pre">REGION_SIZE</span></code> and number of <code class="docutils literal notranslate"><span class="pre">REGIONS</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>All of the MFB parameteres (bot RX and TX) are required to be powers of 2.</p>
+</div>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline"></a></h2>
+<a class="reference internal image-reference" href="../../../../../_images/mfb_reconfigurator.svg" id="mfb-reconfigurator-diag"><img alt="" class="align-center" id="mfb-reconfigurator-diag" src="../../../../../_images/mfb_reconfigurator.svg" width="100%" /></a>
+<p>MFB Reconfigurator does not perform all the required transformations at once.
+Instead it consists of components, which modify partial attributes of the MFB bus.
+These components are connected to a pipeline to form a full power MFB Reconfigurator.</p>
+<p>The components included in the architecture are as follows:</p>
+<ol class="arabic">
+<li><p>MFB Item Reconfigurator</p>
+<blockquote>
+<div><p>Is cappable of dividing Items into smaller Items to increase their number <em>or</em> joining multiple Items in one Block to decrease their number.</p>
+</div></blockquote>
+</li>
+<li><p>MFB Block Reconfigurator</p>
+<blockquote>
+<div><p>Division of Blocks into smaller Blocks —
+the division is only done between Items; the component cannot split Items —
+<em>or</em> joining of multiple Blocks within the same Region into bigger Blocks.</p>
+</div></blockquote>
+</li>
+<li><p>MFB Region Reconfigurator</p>
+<blockquote>
+<div><p>Division of Regions into smaller Regions —
+the division is only done between Blocks; the component cannot split Blocks —
+<em>or</em> joining of multiple Regions within the word into bigger Regions.</p>
+</div></blockquote>
+</li>
+<li><p>MFB Transformer</p>
+<blockquote>
+<div><p>Division of Regions in one word into multiple words <em>or</em> joining of Regions from multiple words into one word.
+(In other words: changing MFB word size by adding or removing Regions.)</p>
+</div></blockquote>
+</li>
+</ol>
+<p>It is important to realize, that the components cannot be placed in the MFB Reconfigurator in an arbitrary order.
+In fact, as you can see in the diagram above, all of them appart from the MFB Transformer are required to be present <strong>twice</strong>.
+One of the 2 copies is needed when division is being done; the other when joining is done.
+The means, that <strong>there is allways one of these 2 copies, which is not needed, and is reduced to simple straight RX-to-TX connection</strong>.
+For example: when the <code class="docutils literal notranslate"><span class="pre">ITEM_WIDTH</span></code> is being lowered, the first copy of Item Reconfigurator is used to divide Items into smaller Items, while the second copy is not needed.
+When the <code class="docutils literal notranslate"><span class="pre">ITEM_WIDTH</span></code> is being increased, it is the other way around.
+If the respective MFB parameter is not changing at all, <strong>neither of the 2 copies are needed and both are reduced to straight conenctions</strong>.
+(If the RX MFB configuration is the same as the TX MFB configuration, the whole component is reduced to straight signal connections.)</p>
+<p>The reason for this are the constraints, which each of the components has in order to work.
+For example:
+Let’s say you have a MFB bus with 2 MFB Regions, 2 MFB Blocks each, 2 MFB Items each, 8 bits wide each (configuration <code class="docutils literal notranslate"><span class="pre">(2,2,2,8)</span></code>).
+And you want to reconfigure this but into a single MFB Item 128 bits wide <code class="docutils literal notranslate"><span class="pre">(1,1,1,128)</span></code>.
+Since the original bus was only 2*2*2*8 = 64 bits wide, you will need MFB Transformer to increase the word size.
+At the same time you cannot perform <em>any</em> transformations <em>before</em> the word is resized, because neither Items Reconfigurator, nor Block Reconfigurator, nor Region Reconfigurator can create an Item / BLock / Region, which is wider than the whole current word.
+This means, that the first 3 components will actualy be removed and the pipeline will start with the MFB Transformer.</p>
+</section>
+<section id="constraints-and-side-effects">
+<h2>Constraints and side-effects<a class="headerlink" href="#constraints-and-side-effects" title="Permalink to this headline"></a></h2>
+<p>The MFB Reconfigurator has a few constraints and side-effects concerning secondary MFB bus characteristics.</p>
+<p>First there are side-effects caused by the very nature of the MFB bus:</p>
+<p>If you are increasing the value <code class="docutils literal notranslate"><span class="pre">ITEM_WIDTH</span></code>, you are reducing the resolution of the <code class="docutils literal notranslate"><span class="pre">EOF_POS</span></code> value.
+This in turn means that you are reducing the resolution of the frame length information.
+In that case, Item Reconfigurator round the value of <code class="docutils literal notranslate"><span class="pre">EOF_POS</span></code> <strong>up</strong>, which will lead to invalid data appearing at the end of each previously unaligned frame.
+(e.g.: If there is a frame with the size of 1 MFB Item and we are doubling the <code class="docutils literal notranslate"><span class="pre">ITEM_WIDTH</span></code>, then the output frame will also have the size of 1 MFB Item, but it will be a larger MFB Item and only the beginig will contain valid data.)</p>
+<section id="data-shifting">
+<h3>Data shifting<a class="headerlink" href="#data-shifting" title="Permalink to this headline"></a></h3>
+<p>Some reconfigurations will require shifting of frame data within the data word.
+Data shifting is the most resource-consuming action of the MFB Reconfigurator.
+It also raises the component latency and, in case of a complicated MFB configuration, may lead to timing problems.
+Data shifting in the MFB Reconfigurator occurs when either of these two operations are required:</p>
+<ol class="arabic simple">
+<li><p>Blocks are being merged together (<code class="docutils literal notranslate"><span class="pre">BLOCK_SIZE</span> <span class="pre">*</span> <span class="pre">ITEM_WIDTH</span></code> is being increased).</p></li>
+<li><p>Reginos are being merged together (<code class="docutils literal notranslate"><span class="pre">REGION_SIZE</span> <span class="pre">*</span> <span class="pre">BLOCK_SIZE</span> <span class="pre">*</span> <span class="pre">ITEM_WIDTH</span></code> is being increased).</p></li>
+</ol>
+<p>In these two cases, a situation may occur, when multiple <code class="docutils literal notranslate"><span class="pre">SOFs</span></code> or <code class="docutils literal notranslate"><span class="pre">EOFs</span></code> occur in the same Region after the reconfiguration.
+This is not allowed on the MFB bus and data shifting is thus required.
+The user can prevent this by declaring, that such situation will not occur on the data bus using generics <code class="docutils literal notranslate"><span class="pre">FRAMES_OVER_TX_BLOCK</span></code> and <code class="docutils literal notranslate"><span class="pre">FRAMES_OVER_TX_REGION</span></code> respectively.</p>
+<p>When data shifting is required, the MFB Reconfigurator <strong>does not support shared Regions for TX MFB</strong>.
+(TX MFB interface will not contain any Regions with data from 2 different frames.)
+This is done in sake of logic complexity and implementation difficulty reduction.
+When data is being shifted, each output data block is dependent on all previous input data blocks.
+To support shared output Regions, the logic would also have to check for presence of double <code class="docutils literal notranslate"><span class="pre">SOF</span></code> or <code class="docutils literal notranslate"><span class="pre">EOF</span></code> in the output Region, which would add dependency on all othee <em>output</em> Blocks in the same Region.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../readme.html" class="btn btn-neutral float-left" title="MFB specification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../storage/pd_asfifo/readme.html" class="btn btn-neutral float-right" title="MFB Packet Discard ASFIFO" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

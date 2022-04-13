@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVB Specification &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="MVB Channel Router" href="flow/channel_router/readme.html" />
+    <link rel="prev" title="MVB Tools" href="../../mvb.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../mvb.html">MVB Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB Specification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#operation">Operation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generic-parameters">Generic parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#port-description">Port description</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples-of-various-vld-signal-values">Examples of various VLD signal values</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#timing-diagrams">Timing diagrams</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#scenario-1">Scenario 1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scenario-2">Scenario 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="flow/channel_router/readme.html">MVB Channel Router</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../mvb.html">MVB Tools</a> &raquo;</li>
+      <li>MVB Specification</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/ofm_doc/comp/mvb_tools/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mvb-specification">
+<span id="mvb-bus"></span><h1>MVB Specification<a class="headerlink" href="#mvb-specification" title="Permalink to this headline"></a></h1>
+<p>Multi-Value Bus (MVB) has been created as a communication channel able to
+process multiple data in one clock cycle. This bus is often used as a separate
+channel to transfer fixed length meta-data for the data transmitted on the
+<a class="reference internal" href="../mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB bus</span></a>. Therefore both of these buses are often used together
+as one communication channel.</p>
+<section id="operation">
+<h2>Operation<a class="headerlink" href="#operation" title="Permalink to this headline"></a></h2>
+<p>Data are transmitted in units called <em>words</em> which consist of the specified
+amount of items. The maximum amount of items, which can be transmitted in one
+clock cycle, is set during the creation of the bus. Not all items have to
+necessary contain valid data, the gap may occur between them. The data always
+occupy the whole item.</p>
+<p>To simplify the design of components which are participating in the
+communication process, the amount of items in the word have to be limited to
+specific values. Same rule applies also to the length of the items. Allowed
+values depend on the application being used.</p>
+</section>
+<section id="generic-parameters">
+<h2>Generic parameters<a class="headerlink" href="#generic-parameters" title="Permalink to this headline"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 13%" />
+<col style="width: 22%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Example value</p></th>
+<th class="head"><p>Note</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Amount of items in a word</p></td>
+</tr>
+<tr class="row-odd"><td><p>ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>Amount of bits within each item</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The length of a whole word is calculated as <cite>WORD_WIDTH = ITEMS * ITEM_WIDTH</cite>.
+This constant can be used to simplify declarations of some internal signals.</p>
+</div>
+<p>Items are distributed evenly within the word. This is described in bigger detail
+in the following picture (word parameters are set according to example values
+given in the table above) <a class="footnote-reference brackets" href="#id2" id="id1">1</a>:</p>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../../../_images/mvb_item_alignment.svg"><img alt="../../../_images/mvb_item_alignment.svg" src="../../../_images/mvb_item_alignment.svg" width="100%" /></a>
+<figcaption>
+<p><span class="caption-text">Example of the item arrangement within a word</span><a class="headerlink" href="#id3" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="port-description">
+<h2>Port description<a class="headerlink" href="#port-description" title="Permalink to this headline"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 12%" />
+<col style="width: 26%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Port name</p></th>
+<th class="head"><p>Bit length</p></th>
+<th class="head"><p>Direction</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DATA</p></td>
+<td><p>WORD_WIDTH</p></td>
+<td><p>Transmitter -&gt; Receiver</p></td>
+<td><p>Transmitted data</p></td>
+</tr>
+<tr class="row-odd"><td><p>VLD</p></td>
+<td><p>ITEMS</p></td>
+<td><p>Transmitter -&gt; Receiver</p></td>
+<td><p>Bit mask indicating validity of each item</p></td>
+</tr>
+<tr class="row-even"><td><p>SRC_RDY</p></td>
+<td><p>1</p></td>
+<td><p>Transmitter -&gt; Receiver</p></td>
+<td><p>Asserted when transmitter is ready to send data</p></td>
+</tr>
+<tr class="row-odd"><td><p>DST_RDY</p></td>
+<td><p>1</p></td>
+<td><p>Receiver -&gt; Transmitter</p></td>
+<td><p>Asserted when receiver is ready to accept data</p></td>
+</tr>
+</tbody>
+</table>
+<p>Following examples will be demonstrated on the configuration of <cite>ITEMS = 4</cite> and
+<cite>ITEM_WIDTH = 8</cite>. The assertion of a single bit inside the <cite>VLD</cite> signal
+signifies that there are valid data being transmitted within the respective
+item. On the other hand, the deassertion of a single bit inside the <cite>VLD</cite> signal
+stands that there are no valid data within the respective item. The <cite>DATA</cite> value
+in such item can be arbitrary.</p>
+<section id="examples-of-various-vld-signal-values">
+<h3>Examples of various VLD signal values<a class="headerlink" href="#examples-of-various-vld-signal-values" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p>The value of <cite>VLD = 1110</cite> means, that three valid items are transmitted in
+current word. Their indexes are 3, 2 and 1.</p></li>
+<li><p>The value of <cite>VLD = 0000</cite> means, that there are no valid items in the
+currently transmitted word (in this case, the <cite>SRC_RDY</cite> signal have to be
+deasserted, see below).</p></li>
+<li><p>The value of <cite>VLD = 0001</cite> means, that there is one valid item being
+transmitted whose index value is 0.</p></li>
+</ol>
+<p>Transmission of the data can take place only when both <cite>SRC_RDY</cite> and <cite>DST_RDY</cite>
+signals are asserted. The presence of these signals could be understood as the
+application of a simple handshaking mechanism.</p>
+</section>
+</section>
+<section id="timing-diagrams">
+<h2>Timing diagrams<a class="headerlink" href="#timing-diagrams" title="Permalink to this headline"></a></h2>
+<p>Two timing diagrams will be shown in this section. These diagrams describe how a
+MVB transmission is performed in terms of waveforms. Example of MVB
+transactions are shown in the following figure:</p>
+<figure class="align-center" id="id4">
+<a class="reference internal image-reference" href="../../../_images/mvb_transactions.svg"><img alt="../../../_images/mvb_transactions.svg" src="../../../_images/mvb_transactions.svg" width="100%" /></a>
+<figcaption>
+<p><span class="caption-text">Examples of MVB transactions</span><a class="headerlink" href="#id4" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<p>In next sections, two scenarios will be provided showing how these transactions
+can be transferred.</p>
+<section id="scenario-1">
+<h3>Scenario 1<a class="headerlink" href="#scenario-1" title="Permalink to this headline"></a></h3>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/mvb_tim_uninterrupted.svg"><img alt="../../../_images/mvb_tim_uninterrupted.svg" src="../../../_images/mvb_tim_uninterrupted.svg" width="100%" /></a>
+</figure>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>In this figure all transactions are transmitted consecutively without any idle
+or gap. Transmission starts when both <cite>SRC_RDY</cite> and <cite>DST_RDY</cite> are asserted.</p>
+</section>
+<section id="scenario-2">
+<h3>Scenario 2<a class="headerlink" href="#scenario-2" title="Permalink to this headline"></a></h3>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/mvb_tim_interrupted.svg"><img alt="../../../_images/mvb_tim_interrupted.svg" src="../../../_images/mvb_tim_interrupted.svg" width="100%" /></a>
+</figure>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>This figure shows how pauses in transmission could be conducted. The first pause
+takes place when <cite>DST_RDY</cite> signal is deasserted when data on the bus <cite>DATA</cite> are
+still valid. In second case the pause is performed via deassertion of the
+<cite>SRC_RDY</cite> signal when data on the <cite>DATA</cite> bus are considered invalid.</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>All bit vectors on this page are aligned from the MSB on the left to the
+LSB on the right. The same numbering is maintained for the items, i.e.
+the left most item has the highest index range whereas the right most has
+the lowest index range.</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../mvb.html" class="btn btn-neutral float-left" title="MVB Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="flow/channel_router/readme.html" class="btn btn-neutral float-right" title="MVB Channel Router" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

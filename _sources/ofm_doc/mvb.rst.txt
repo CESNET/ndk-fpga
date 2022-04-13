@@ -1,0 +1,13 @@
+MVB Tools
+=========
+
+This chapter contains the specifications of the MVB bus and a description of the components that use MVB bus.
+The MVB bus was developed to support multiple items/values in one clock cycle.
+Components using the MFB bus are typically located in the ``comp/mvb_tools/`` directory in the OFM repository.
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Content:
+
+   comp/mvb_tools/readme
+   comp/mvb_tools/flow/channel_router/readme

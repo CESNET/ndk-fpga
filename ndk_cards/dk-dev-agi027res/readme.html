@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agilex I-Series FPGA Development Kit &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Basic Tools" href="../../ofm_doc/base.html" />
+    <link rel="prev" title="Stratix 10 DX FPGA Development Kit" href="../dk-dev-1sdx-p/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Agilex I-Series FPGA Development Kit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#build-instructions">Build instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ethernet-interface">Ethernet Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pcie-interface">PCIe Interface</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Agilex I-Series FPGA Development Kit</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/ndk_cards/dk-dev-agi027res/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="agilex-i-series-fpga-development-kit">
+<span id="card-agi-dk"></span><h1>Agilex I-Series FPGA Development Kit<a class="headerlink" href="#agilex-i-series-fpga-development-kit" title="Permalink to this headline"></a></h1>
+<p>Agilex I-Series FPGA Development Kit (DK-DEV-AGI027RES) by Intel is supported in the NDK only with the primary goal of accelerating the debugging of the 400G NDK design for <span class="xref std std-ref">the XpressSX AGI-FH400G card</span>. Here is some important information about this card:</p>
+<ul class="simple">
+<li><p>Intel Agilex I-Series FPGA - AGIB027R29A1E2VR0 (1x F-Tile, 3x R-Tile)</p></li>
+<li><p><a class="reference external" href="https://www.intel.com/content/www/us/en/products/details/fpga/development-kits/agilex/i-series.html">Development Kit Website</a></p></li>
+<li><p><a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug-agilex-i-fpga-devl-kit.pdf">Development Kit User Guide</a></p></li>
+<li><p><a class="reference external" href="https://www.intel.com/content/dam/altera-www/global/en_US/support/boards-kits/agilex/agilex-agi027-devkit-schematic-reva1-apr2021.pdf">Development Kit Schematic</a></p></li>
+</ul>
+<section id="build-instructions">
+<h2>Build instructions<a class="headerlink" href="#build-instructions" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Go to <code class="docutils literal notranslate"><span class="pre">build/dk-dev-agi027res/</span></code> folder in application repository.</p></li>
+<li><p>Check or modify <code class="docutils literal notranslate"><span class="pre">user_const.tcl</span></code> file, where you can change the firmware configuration.</p></li>
+<li><dl class="simple">
+<dt>Run firmware build in Quartus by <code class="docutils literal notranslate"><span class="pre">make</span></code> command.</dt><dd><ul>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">400g1</span></code> command for firmware with 1x400GbE (default).</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">200g2</span></code> command for firmware with 2x200GbE.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g4</span></code> command for firmware with 4x100GbE.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">50g8</span></code> command for firmware with 8x50GbE.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">40g2</span></code> command for firmware with 2x40GbE.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">25g8</span></code> command for firmware with 8x25GbE.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">10g8</span></code> command for firmware with 8x10GbE.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>After the build is complete, you will find bitstream <code class="docutils literal notranslate"><span class="pre">my_bitstream.sof</span></code> in the same folder.</p></li>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">../../ndk/cards/dk-dev-agi027res/scripts/generate_pof.sh</span> <span class="pre">my_bitstream.sof</span></code> command to convert the bitstream file to .pof format for flash memory.</p></li>
+<li><p>On the server where the card is connected, write the new bitstream to the flash memory with the command <code class="docutils literal notranslate"><span class="pre">../../ndk/cards/dk-dev-agi027res/scripts/write_pof.sh</span> <span class="pre">my_bitstream.pof</span></code>.</p></li>
+<li><p>You must power off the server and power it on to completely power cycle and load new firmware.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To build firmware, you must have Quartus Prime Pro installed, including a valid license.</p>
+</div>
+</section>
+<section id="ethernet-interface">
+<h2>Ethernet Interface<a class="headerlink" href="#ethernet-interface" title="Permalink to this headline"></a></h2>
+<p>This card has two QSFP-DD cage (ports). However, our NDK design uses only one QSFP-DD port (QSFP-DD 1). It is connected to the FPGA via 8 high-speed serial lines supporting up to 56 Gbps (FGT). QSFP-DD cage is connected to an F-Tile that contains Ethernet Hard IP supporting the following speeds: <code class="docutils literal notranslate"><span class="pre">1x400GbE,</span> <span class="pre">2x200GbE,</span> <span class="pre">4x100GbE,</span> <span class="pre">8x50GbE,</span> <span class="pre">2x40GbE,</span> <span class="pre">8x25GbE,</span> <span class="pre">8x10GbE</span></code>. F-Tile Hard IPs are instantiated in Network Module, which provides Ethernet communication to and from the Application core. The architecture of the Network Module <a class="reference internal" href="../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">is described here</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not all Ethernet Hard IP configurations are already available or tested in NDK.</p>
+</div>
+</section>
+<section id="pcie-interface">
+<h2>PCIe Interface<a class="headerlink" href="#pcie-interface" title="Permalink to this headline"></a></h2>
+<p>This card has single PCIe Gen5 x16 edge connector (R-tile - 14C) and MCIO Connector (R-tile - 15C) which can be used to implement another PCIe interface with 16 lines. In our NDK design uses both R-Tile interfaces to implement 400 Gbps DMA solution (1x PCIe Gen5 x16/x8+x8 or 2x PCIe Gen4 x16/x8+x8). R-Tile Hard IPs are instantiated in PCIe Module, which provides PCIe communication to and from the Application core. The architecture of the PCIe Module <a class="reference internal" href="../../ndk_core/intel/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">is described here</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The DMA module IP is not part of the open-source NDK. If the DMA module IP is disabled, then it is replaced by a loopback.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../dk-dev-1sdx-p/readme.html" class="btn btn-neutral float-left" title="Stratix 10 DX FPGA Development Kit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../ofm_doc/base.html" class="btn btn-neutral float-right" title="Basic Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

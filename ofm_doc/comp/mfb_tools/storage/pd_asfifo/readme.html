@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MFB Packet Discard ASFIFO &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="Gen Loop Switch (GLS)" href="../../debug/gen_loop_switch/readme.html" />
+    <link rel="prev" title="MFB Reconfigurator" href="../../flow/reconfigurator/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Packet Discard ASFIFO</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-features">Additional Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#force-discard">Force Discard</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../../mfb.html">MFB Tools</a> &raquo;</li>
+      <li>MFB Packet Discard ASFIFO</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../../_sources/ofm_doc/comp/mfb_tools/storage/pd_asfifo/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mfb-packet-discard-asfifo">
+<span id="mfb-pd-asfifo"></span><h1>MFB Packet Discard ASFIFO<a class="headerlink" href="#mfb-packet-discard-asfifo" title="Permalink to this headline"></a></h1>
+<p>The Packet Discard ASFIFO is an asynchronous FIFO with the ability to erase (discard) MFB frames (packets).
+For each packet put inside, the user specifies if the packet is to be discarded (information valid with EOF).
+If so, the packet will not appear on the ASFIFO output.
+Because the information about discarding is only available with the EOF, the unit works in store-and-forward mode (each packet has to be stored completely before we can decide whether to propagate it further).</p>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline"></a></h2>
+<a class="reference internal image-reference" href="../../../../../_images/pd_asfifo.svg" id="mfb-pd-asfifo-basic"><img alt="" class="align-center" id="mfb-pd-asfifo-basic" src="../../../../../_images/pd_asfifo.svg" width="100%" /></a>
+<p>The internal architecture of the unit consists of multipe stages.</p>
+<p>If a packet has both SOF and EOF in the same data word (single-word packet), it can be discarded immidiately by masking of the SOF and EOF to 0.</p>
+<p>If the packet continues to the next word (there can only by 1 such packet in each data word), the unit starts storing its data into the Mark ASFIFO.
+At the same time, it “marks” the address possition of the SOF data word in the ASFIFO BRAM (WR PTR Marked).
+Once the data word with the EOF arrives (together with the information to discard / propagate the packet further), one of two things will happen:</p>
+<ol class="arabic simple">
+<li><p>If the packet is meant to be discarded, the WR PTR in the Mark ASFIFO resets back to the position of the WR PTR Marked (freeing the space in the buffer taken by the discarded packet).</p></li>
+<li><p>Otherwise the WR PTR stays the same and the WR PTR Marked is propagated to the read side, which enables propagation of the packet’s data to output.</p></li>
+</ol>
+<p>Since the data word where the packet started might contain valid data of another packet, it cannot be deleted and overwritten by the WR PTR shift.
+This data word is propagated to the output, but the last SOF in it must be masked.
+To be able to do this, the information about the multi-word packet discarding is propagated through the Masking ASFIFO.
+From this ASFIFO, the Mark ASFIFO reading logic knows, whether the SOF should be removed or not.</p>
+</section>
+<section id="additional-features">
+<h2>Additional Features<a class="headerlink" href="#additional-features" title="Permalink to this headline"></a></h2>
+<section id="force-discard">
+<h3>Force Discard<a class="headerlink" href="#force-discard" title="Permalink to this headline"></a></h3>
+<p>The Force Discard feature can be used to immidiately start discarding packets.
+When Force Discard is active, the currently processed packet is discarded as well as all following packets as long as the signal is active.
+Once the signal falls to 0, the next valid word <strong>must start with a SOF</strong>.
+If there is an EOF in the word before the SOF at this point, the user must set it to 0 himself.</p>
+<p>The feature is useful when the PD ASFIFO fills up, but the user logic before it has no DST_RDY to stop the incoming data.
+This way the user can continue sending new words to the full ASFIFO while having them all discarded.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../flow/reconfigurator/readme.html" class="btn btn-neutral float-left" title="MFB Reconfigurator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../debug/gen_loop_switch/readme.html" class="btn btn-neutral float-right" title="Gen Loop Switch (GLS)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
