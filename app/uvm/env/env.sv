@@ -198,7 +198,8 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
             m_resets_app.sync_connect(m_eth_mfb_rx[it].reset_sync);
             m_resets_app.sync_connect(m_eth_mvb_rx[it].reset_sync);
-        end
+            m_resets_app.sync_connect(m_eth_mfb_tx[it].reset_sync);
+       end
 
         for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
             string it_num;
@@ -210,6 +211,8 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
             m_resets_app.sync_connect(m_dma_mfb_rx[it].reset_sync);
             m_resets_app.sync_connect(m_dma_mvb_rx[it].reset_sync);
+            m_resets_app.sync_connect(m_dma_mfb_tx[it].reset_sync);
+            m_resets_app.sync_connect(m_dma_mvb_tx[it].reset_sync);
         end
     endfunction
 endclass
