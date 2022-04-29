@@ -54,16 +54,16 @@ module testbench;
     reset_if     reset_mem[test_pkg::MEM_PORTS](MEM_CLK);
 
     // ETHERNET I/O INTERFACE
-    mvb_if #(test_pkg::REGIONS,   test_pkg::ETH_RX_HDR_WIDTH)                                                    eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK, reset_app.RESET);
-    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) eth_rx_mfb[test_pkg::ETH_STREAMS](APP_CLK, reset_app.RESET);
-    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::ETH_TX_HDR_WIDTH) eth_tx_mfb[test_pkg::ETH_STREAMS](APP_CLK, reset_app.RESET);
+    mvb_if #(test_pkg::REGIONS,   test_pkg::ETH_RX_HDR_WIDTH)                                                                           eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
+    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0)                          eth_rx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
+    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::ETH_TX_HDR_WIDTH) eth_tx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
     // DMA I/O INTERFACE
     localparam DMA_RX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_TX_CHANNELS);
     localparam DMA_TX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_RX_CHANNELS) + 1;
-    mvb_if #(test_pkg::REGIONS,   DMA_RX_MVB_WIDTH)                                                            dma_rx_mvb[test_pkg::DMA_STREAMS](APP_CLK, reset_dma_x1.RESET);
-    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) dma_rx_mfb[test_pkg::DMA_STREAMS](APP_CLK, reset_dma_x1.RESET);
-    mvb_if #(test_pkg::REGIONS,   DMA_TX_MVB_WIDTH)                                                            dma_tx_mvb[test_pkg::DMA_STREAMS](APP_CLK, reset_dma_x1.RESET);
-    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) dma_tx_mfb[test_pkg::DMA_STREAMS](APP_CLK, reset_dma_x1.RESET);
+    mvb_if #(test_pkg::REGIONS,   DMA_RX_MVB_WIDTH)                                                            dma_rx_mvb[test_pkg::DMA_STREAMS](APP_CLK);
+    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) dma_rx_mfb[test_pkg::DMA_STREAMS](APP_CLK);
+    mvb_if #(test_pkg::REGIONS,   DMA_TX_MVB_WIDTH)                                                            dma_tx_mvb[test_pkg::DMA_STREAMS](APP_CLK);
+    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) dma_tx_mfb[test_pkg::DMA_STREAMS](APP_CLK);
 
     //CONFIGURE INTERFACE
     mi_if#(test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH) config_if(MI_CLK);
