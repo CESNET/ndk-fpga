@@ -360,349 +360,354 @@ DMA channels are statically and evenly mapped to all PCIe EPs</p></td>
 <tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_link_up"><td><p>ETH_RX_LINK_UP</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*ETH_CHANNELS-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Link Up flags of each Ethernet channel</p></td>
+<td><p>RX Link Up flags of each Ethernet channel</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mvb_data"><td><p>ETH_RX_MVB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_phy_rdy"><td><p>ETH_TX_PHY_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*ETH_CHANNELS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>TX PHY Ready flags of each Ethernet channel</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mvb_data"><td><p>ETH_RX_MVB_DATA</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH RX MVB streams: data word with MVB items (ETH RX headers see eth_hdr_pack)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mvb_vld"><td><p>ETH_RX_MVB_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mvb_vld"><td><p>ETH_RX_MVB_VLD</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH RX MVB streams: valid of each MVB item</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mvb_src_rdy"><td><p>ETH_RX_MVB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mvb_src_rdy"><td><p>ETH_RX_MVB_SRC_RDY</p></td>
 <td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH RX MVB streams: source ready of each MVB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mvb_dst_rdy"><td><p>ETH_RX_MVB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mvb_dst_rdy"><td><p>ETH_RX_MVB_DST_RDY</p></td>
 <td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ETH RX MVB streams: destination ready of each MVB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_data"><td><p>ETH_RX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_data"><td><p>ETH_RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH RX MFB streams: data word with frames (packets)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_sof"><td><p>ETH_RX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_sof"><td><p>ETH_RX_MFB_SOF</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH RX MFB streams: Start Of Frame (SOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_eof"><td><p>ETH_RX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_eof"><td><p>ETH_RX_MFB_EOF</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH RX MFB streams: End Of Frame (EOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_sof_pos"><td><p>ETH_RX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_sof_pos"><td><p>ETH_RX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH RX MFB streams: SOF position for each MFB region in MFB blocks</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_eof_pos"><td><p>ETH_RX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_eof_pos"><td><p>ETH_RX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH RX MFB streams: EOF position for each MFB region in MFB items</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_src_rdy"><td><p>ETH_RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_src_rdy"><td><p>ETH_RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH RX MFB streams: source ready of each MFB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_dst_rdy"><td><p>ETH_RX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_dst_rdy"><td><p>ETH_RX_MFB_DST_RDY</p></td>
 <td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ETH RX MFB streams: destination ready of each MFB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_data"><td><p>ETH_TX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_data"><td><p>ETH_TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ETH TX MFB streams: data word with frames (packets)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_hdr"><td><p>ETH_TX_MFB_HDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_hdr"><td><p>ETH_TX_MFB_HDR</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ETH TX MFB streams: header (see eth_hdr_pack) for each frame, is valid for each SOF</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_sof"><td><p>ETH_TX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_sof"><td><p>ETH_TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ETH TX MFB streams: Start Of Frame (SOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_eof"><td><p>ETH_TX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_eof"><td><p>ETH_TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ETH TX MFB streams: End Of Frame (EOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_sof_pos"><td><p>ETH_TX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_sof_pos"><td><p>ETH_TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ETH TX MFB streams: SOF position for each MFB region in MFB blocks</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_eof_pos"><td><p>ETH_TX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_eof_pos"><td><p>ETH_TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ETH TX MFB streams: EOF position for each MFB region in MFB items</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_src_rdy"><td><p>ETH_TX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_src_rdy"><td><p>ETH_TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ETH TX MFB streams: source ready of each MFB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_dst_rdy"><td><p>ETH_TX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_dst_rdy"><td><p>ETH_TX_MFB_DST_RDY</p></td>
 <td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ETH TX MFB streams: destination ready of each MFB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_len"><td><p>DMA_RX_MVB_LEN</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_len"><td><p>DMA_RX_MVB_LEN</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MVB streams: length of data packet in bytes</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_hdr_meta"><td><p>DMA_RX_MVB_HDR_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_hdr_meta"><td><p>DMA_RX_MVB_HDR_META</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MVB streams: user metadata for DMA header</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_channel"><td><p>DMA_RX_MVB_CHANNEL</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_channel"><td><p>DMA_RX_MVB_CHANNEL</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MVB streams: number of DMA channel</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_discard"><td><p>DMA_RX_MVB_DISCARD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_discard"><td><p>DMA_RX_MVB_DISCARD</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MVB streams: discard flag (when is set, packet is discarded in DMA module)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_vld"><td><p>DMA_RX_MVB_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_vld"><td><p>DMA_RX_MVB_VLD</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MVB streams: valid of each MVB item</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_src_rdy"><td><p>DMA_RX_MVB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_src_rdy"><td><p>DMA_RX_MVB_SRC_RDY</p></td>
 <td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MVB streams: source ready of each MVB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_dst_rdy"><td><p>DMA_RX_MVB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_dst_rdy"><td><p>DMA_RX_MVB_DST_RDY</p></td>
 <td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA RX MVB streams: destination ready of each MVB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_data"><td><p>DMA_RX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_data"><td><p>DMA_RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MFB streams: data word with frames (packets)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_sof"><td><p>DMA_RX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_sof"><td><p>DMA_RX_MFB_SOF</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MFB streams: Start Of Frame (SOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_eof"><td><p>DMA_RX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_eof"><td><p>DMA_RX_MFB_EOF</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MFB streams: End Of Frame (EOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_sof_pos"><td><p>DMA_RX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_sof_pos"><td><p>DMA_RX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MFB streams: SOF position for each MFB region in MFB blocks</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_eof_pos"><td><p>DMA_RX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_eof_pos"><td><p>DMA_RX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MFB streams: EOF position for each MFB region in MFB items</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_src_rdy"><td><p>DMA_RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_src_rdy"><td><p>DMA_RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA RX MFB streams: source ready of each MFB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_dst_rdy"><td><p>DMA_RX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_dst_rdy"><td><p>DMA_RX_MFB_DST_RDY</p></td>
 <td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA RX MFB streams: destination ready of each MFB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mvb_len"><td><p>DMA_TX_MVB_LEN</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mvb_len"><td><p>DMA_TX_MVB_LEN</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MVB streams: length of data packet in bytes</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mvb_hdr_meta"><td><p>DMA_TX_MVB_HDR_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mvb_hdr_meta"><td><p>DMA_TX_MVB_HDR_META</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MVB streams: user metadata for DMA header</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mvb_channel"><td><p>DMA_TX_MVB_CHANNEL</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mvb_channel"><td><p>DMA_TX_MVB_CHANNEL</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MVB streams: number of DMA channel</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mvb_vld"><td><p>DMA_TX_MVB_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mvb_vld"><td><p>DMA_TX_MVB_VLD</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MVB streams: valid of each MVB item</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mvb_src_rdy"><td><p>DMA_TX_MVB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mvb_src_rdy"><td><p>DMA_TX_MVB_SRC_RDY</p></td>
 <td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MVB streams: source ready of each MVB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mvb_dst_rdy"><td><p>DMA_TX_MVB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mvb_dst_rdy"><td><p>DMA_TX_MVB_DST_RDY</p></td>
 <td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA TX MVB streams: destination ready of each MVB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_data"><td><p>DMA_TX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_data"><td><p>DMA_TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MFB streams: data word with frames (packets)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_sof"><td><p>DMA_TX_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_sof"><td><p>DMA_TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MFB streams: Start Of Frame (SOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_eof"><td><p>DMA_TX_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_eof"><td><p>DMA_TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MFB streams: End Of Frame (EOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_sof_pos"><td><p>DMA_TX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_sof_pos"><td><p>DMA_TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MFB streams: SOF position for each MFB region in MFB blocks</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_eof_pos"><td><p>DMA_TX_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_eof_pos"><td><p>DMA_TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MFB streams: EOF position for each MFB region in MFB items</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_src_rdy"><td><p>DMA_TX_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_src_rdy"><td><p>DMA_TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>DMA TX MFB streams: source ready of each MFB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_dst_rdy"><td><p>DMA_TX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_dst_rdy"><td><p>DMA_TX_MFB_DST_RDY</p></td>
 <td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA TX MFB streams: destination ready of each MFB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_clk"><td><p>MEM_CLK</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_clk"><td><p>MEM_CLK</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Clock for each memory port</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_rst"><td><p>MEM_RST</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_rst"><td><p>MEM_RST</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Reset synchronized with MEM_CLK for each memory port</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_ready"><td><p>MEM_AVMM_READY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_ready"><td><p>MEM_AVMM_READY</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MEM Avalon-MM: ready for request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_read"><td><p>MEM_AVMM_READ</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_read"><td><p>MEM_AVMM_READ</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM Avalon-MM: read request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_write"><td><p>MEM_AVMM_WRITE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_write"><td><p>MEM_AVMM_WRITE</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM Avalon-MM: write request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_address"><td><p>MEM_AVMM_ADDRESS</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_address"><td><p>MEM_AVMM_ADDRESS</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_burstcount"><td><p>MEM_AVMM_BURSTCOUNT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_burstcount"><td><p>MEM_AVMM_BURSTCOUNT</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_BURST_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM Avalon-MM: burst count of read/write request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_writedata"><td><p>MEM_AVMM_WRITEDATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_writedata"><td><p>MEM_AVMM_WRITEDATA</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM Avalon-MM: write data, valid only with write request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_readdata"><td><p>MEM_AVMM_READDATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_readdata"><td><p>MEM_AVMM_READDATA</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MEM Avalon-MM: read data</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_readdatavalid"><td><p>MEM_AVMM_READDATAVALID</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_readdatavalid"><td><p>MEM_AVMM_READDATAVALID</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MEM Avalon-MM: read data valid flag</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-emif_rst_req"><td><p>EMIF_RST_REQ</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_rst_req"><td><p>EMIF_RST_REQ</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>EMIF local reset request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-emif_rst_done"><td><p>EMIF_RST_DONE</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_rst_done"><td><p>EMIF_RST_DONE</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF local reset done flag</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-emif_ecc_usr_int"><td><p>EMIF_ECC_USR_INT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_ecc_usr_int"><td><p>EMIF_ECC_USR_INT</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF ECC user interupt flag</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-emif_cal_success"><td><p>EMIF_CAL_SUCCESS</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_cal_success"><td><p>EMIF_CAL_SUCCESS</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF calibration success flag</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-emif_cal_fail"><td><p>EMIF_CAL_FAIL</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_cal_fail"><td><p>EMIF_CAL_FAIL</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF calibration fail flag</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: data from master to slave (write data)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: slave address</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: byte enable</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: read request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: write request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: ready of slave module</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: data from slave to master (read data)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: valid of MI_DRD data signal</p></td>
