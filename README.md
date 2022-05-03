@@ -6,7 +6,7 @@ The Minimal application serves as a simple example of how to build an FPGA appli
 
 **The DMA module IP is not part of the open-source NDK. If the DMA module IP is disabled, then it is replaced by a loopback. [You can get NDK including DMA Module IP and professional support through our partner BrnoLogic](https://support.brnologic.com/).**
 
-## Requirements
+## Requirements, clone and build
 
 - To build FPGA firmware, you must have Intel Quartus Prime Pro 21.4 installed, including a valid license.
 - Additional repositories (minimum - available as open-source) are needed to build the NDK design for the FPGA:
@@ -21,7 +21,7 @@ The Minimal application serves as a simple example of how to build an FPGA appli
 Anyone who wants to try the NDK-based Minimal application, which is available as open-source, must manually clone the repository with the selected (available) submodules:
 
 ```
-git clone https://github.com/cesnet/ndk-app-minimal.git
+git clone git@github.com:CESNET/ndk-app-minimal.git
 git submodule update --init ndk/ofm
 git submodule update --init ndk/core
 git submodule update --init ndk/cards/dk-dev-1sdx-p
@@ -32,6 +32,13 @@ CESNET developers who have access to closed-source repositories can use single c
 ```
 git clone --recursive git@gitlab.liberouter.org:ndk/ndk-app-minimal.git
 ```
+
+### How to build the FPGA firmware
+
+- Go to `build/your_card/` folder in this repository.
+- Check or modify `user_const.tcl` file, where you can change the firmware configuration.
+- If you do not have a DMA module IP (is not part of the open-source NDK), you must set the `DMA_ENABLE` parameter to `false`.
+- Run firmware build in Quartus by `make` command in the same folder.
 
 ## Documentation
 
