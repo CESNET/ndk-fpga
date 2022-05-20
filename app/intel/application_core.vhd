@@ -551,6 +551,11 @@ begin
                     X"457a2fb6bd25f1fa"
                 ),
             RANDOM_ADDR_SEED            => X"FEFE01FF",
+
+            REFR_REQ_BEFORE_TEST        => true,
+            REFR_PERIOD_WIDTH           => MEM_REFR_PERIOD_WIDTH,
+            DEF_REFR_PERIOD             => MEM_DEF_REFR_PERIOD(i),
+
             DEVICE                      => DEVICE
         )
         port map(
@@ -565,12 +570,17 @@ begin
             AMM_WRITE_DATA              => MEM_AVMM_WRITEDATA       (i),
             AMM_BURST_COUNT             => MEM_AVMM_BURSTCOUNT      (i),
             AMM_READ_DATA_VALID         => MEM_AVMM_READDATAVALID   (i),
-     
+
+            REFR_PERIOD                 => MEM_REFR_PERIOD          (i),
+            REFR_REQ                    => MEM_REFR_REQ             (i),
+            REFR_ACK                    => MEM_REFR_ACK             (i),
+
             EMIF_RST_REQ                => EMIF_RST_REQ             (i),
             EMIF_RST_DONE               => EMIF_RST_DONE            (i),
             EMIF_ECC_ISR                => EMIF_ECC_USR_INT         (i),
             EMIF_CAL_SUCCESS            => EMIF_CAL_SUCCESS         (i),
             EMIF_CAL_FAIL               => EMIF_CAL_FAIL            (i),
+            EMIF_AUTO_PRECHARGE         => EMIF_AUTO_PRECHARGE      (i),
      
             MI_CLK                      => APP_CLK, 
             MI_RST                      => APP_RESET                (0), -- TODO
