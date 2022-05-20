@@ -15,4 +15,4 @@ pages:
     paths:
     - public
   only:
-  - main
+  - devel
