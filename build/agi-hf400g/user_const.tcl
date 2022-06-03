@@ -42,10 +42,10 @@ set DMA_TX_CHANNELS      32
 set DMA_RX_BLOCKING_MODE true
 # ------------------------------------------------------------------------------
 
+# ==============================================================================
 # Other parameters:
-# =================
-
-set PROJECT_NAME "400G1"
-#if { $PORT0_MODE != 0 } {
-#    append PROJECT_NAME "_" [EthSpeed $PORT0_MODE] "GE"
-#}
+# ==============================================================================
+set PROJECT_NAME "NDK_MINIMAL"
+# Add Ethernet Speed/Ports info to project name...
+append PROJECT_NAME "_" $ETH_PORT_SPEED(0) "G" $ETH_PORTS
+# ------------------------------------------------------------------------------
