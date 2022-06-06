@@ -16,3 +16,6 @@
 [submodule "ndk/cards/dk-dev-1sdx-p"]
 	path = ndk/cards/dk-dev-1sdx-p
 	url = ../ndk-card-dk-dev-1sdx-p.git
+[submodule "ndk/cards/fb4cgg3"]
+	path = ndk/cards/fb4cgg3
+	url = ../ndk-card-fb4cgg3.git

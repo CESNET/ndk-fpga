@@ -1,0 +1,12 @@
+library 'liberouter'
+
+stagesFirmware(
+    dir: 'build/fb4cgg3',
+    target: '100g4',
+    project: 'fb4cgg3-minimal-100g4',
+    pollscm: 'H H(0-11) * * 6',
+    rpms: false,
+    rename: false,
+    artifacts: 'fb4cgg3-minimal-100g4',
+    lastBuilds: 2,
+)
