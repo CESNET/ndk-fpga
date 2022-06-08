@@ -17,7 +17,7 @@ The Minimal application serves as a simple example of how to build an FPGA appli
 
 .. note::
 
-    To build FPGA firmware, you must have Quartus Prime Pro 21.4 installed, including a valid license.
+    To build FPGA firmware, you must have Intel Quartus Prime Pro 22.1 or Xilinx Vivado 2019.1 (depending on the target card) installed, including a valid license.
 
 .. toctree::
     :maxdepth: 2
@@ -44,6 +44,7 @@ The Minimal application serves as a simple example of how to build an FPGA appli
     ndk_cards/agi-fh400g/readme
     ndk_cards/dk-dev-1sdx-p/readme
     ndk_cards/dk-dev-agi027res/readme
+    ndk_cards/fb4cgg3/readme
 
 .. toctree::
     :maxdepth: 2
@@ -58,3 +59,4 @@ The Minimal application serves as a simple example of how to build an FPGA appli
     ofm_doc/nic
     ofm_doc/pcie
     ofm_doc/debug
+    ofm_doc/ver

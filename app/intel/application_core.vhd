@@ -387,14 +387,14 @@ begin
         generic map(
             MERGER_INPUTS   => ETH_STREAMS,
             MVB_ITEMS       => MFB_REGIONS,
-            MVB_ITEM_WIDTH  => ETH_RX_HDR_WIDTH,
+            MVB_ITEM_WIDTH  => DMA_RX_ALL_META_W,
             MFB_REGIONS     => MFB_REGIONS,
             MFB_REG_SIZE    => MFB_REG_SIZE,
             MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
             MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
             INPUT_FIFO_SIZE => 8,
             RX_PAYLOAD_EN   => (others => true),
-            IN_PIPE_EN      => true,
+            IN_PIPE_EN      => false,
             OUT_PIPE_EN     => true,
             DEVICE          => DEVICE
         )
@@ -448,7 +448,7 @@ begin
         generic map(
             SPLITTER_OUTPUTS => ETH_STREAMS,
             MVB_ITEMS        => MFB_REGIONS,
-            MVB_ITEM_WIDTH   => ETH_RX_HDR_WIDTH,
+            MVB_ITEM_WIDTH   => DMA_TX_ALL_META_W,
             MFB_REGIONS      => MFB_REGIONS,
             MFB_REG_SIZE     => MFB_REG_SIZE,
             MFB_BLOCK_SIZE   => MFB_BLOCK_SIZE,

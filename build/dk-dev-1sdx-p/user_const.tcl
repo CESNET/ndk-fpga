@@ -45,9 +45,10 @@ set DMA_RX_BLOCKING_MODE true
 set DMA_400G_DEMO        false
 # ------------------------------------------------------------------------------
 
+# ==============================================================================
 # Other parameters:
-# =================
-set PROJECT_NAME "DK-DEV-1SDX-P"
-#if { $PORT0_MODE != 0 } {
-#    append PROJECT_NAME "_" [EthSpeed $PORT0_MODE] "GE"
-#}
+# ==============================================================================
+set PROJECT_NAME "NDK_MINIMAL"
+# Add Ethernet Speed/Ports info to project name...
+append PROJECT_NAME "_" $ETH_PORT_SPEED(0) "G" $ETH_PORTS
+# ------------------------------------------------------------------------------
