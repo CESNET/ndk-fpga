@@ -1,5 +1,12 @@
 proc dts_application {base eth_streams mem_ports} {
-    set mi_ports [expr $eth_streams + $mem_ports]
+    set mi_ports_raw [expr $eth_streams + $mem_ports]
+
+    # Round to nearest power of 2
+    set mi_ports 1
+    while {$mi_ports < $mi_ports_raw} {
+        set mi_ports [expr {$mi_ports * 2}]
+    }
+
     set subaddr_w [expr 0x02000000 / $mi_ports]
 
 	set ret ""

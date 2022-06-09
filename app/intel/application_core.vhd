@@ -18,7 +18,8 @@ architecture FULL of APPLICATION_CORE is
     -- MI bus signals distribution --
     -- (ETH_STREAMS - 1 downto 0          ) ... eth-signals
     -- (MEM_PORTS   - 1 downto ETH_STREAMS) ... mem-signals
-    constant MI_PORTS          : natural := ETH_STREAMS + MEM_PORTS;
+    constant MI_PORTS_RAW      : natural := ETH_STREAMS + MEM_PORTS;
+    constant MI_PORTS          : natural := 2 ** log2(MI_PORTS_RAW);
     constant DMA_RX_ALL_META_W : natural := log2(DMA_PKT_MTU+1) + DMA_HDR_META_WIDTH + log2(DMA_RX_CHANNELS) + 1;
     constant DMA_TX_ALL_META_W : natural := log2(DMA_PKT_MTU+1) + DMA_HDR_META_WIDTH + log2(DMA_TX_CHANNELS);
 
