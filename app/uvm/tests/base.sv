@@ -250,7 +250,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             void'(reset.randomize());
             reset.start(m_env.m_resets_gen.m_sequencer);
             event_reset = 1'b0;
-            for (int unsigned it = 0; it < 10; it++) begin
+            //for (int unsigned it = 0; it < 10; it++) begin
+            forever begin
                 //run.set_starting_phase(phase);
                 void'(run.randomize());
                 run.start(m_env.m_resets_gen.m_sequencer);
