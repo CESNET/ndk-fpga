@@ -11,7 +11,7 @@
 class regmodel #(STREAMS, CHANNELS, OUTPUT_CHANNELS) extends uvm_reg_block;
     `uvm_object_param_utils(app_core::regmodel #(STREAMS, CHANNELS, OUTPUT_CHANNELS))
 
-    rand channel_router::regmodel #(CHANNELS, OUTPUT_CHANNELS, 2) stream[STREAMS];
+    rand uvm_channel_router::regmodel #(CHANNELS, OUTPUT_CHANNELS, 2) stream[STREAMS];
 
     localparam MEM_TESTERS = 2;
 
@@ -33,7 +33,7 @@ class regmodel #(STREAMS, CHANNELS, OUTPUT_CHANNELS) extends uvm_reg_block;
             string it_num;
             it_num.itoa(it);
             //CREATE
-            stream[it] = channel_router::regmodel#(CHANNELS, OUTPUT_CHANNELS, 2)::type_id::create({"status_", it_num}, , get_full_name());
+            stream[it] = uvm_channel_router::regmodel#(CHANNELS, OUTPUT_CHANNELS, 2)::type_id::create({"status_", it_num}, , get_full_name());
             //BUILD and CONFIGURE register
             stream[it].build('h0, bus_width);
             stream[it].configure(this, {"status_", it_num});

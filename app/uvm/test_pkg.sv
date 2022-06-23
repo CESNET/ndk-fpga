@@ -32,6 +32,8 @@ package test_pkg;
     parameter MEM_ADDR_WIDTH       = 26;
     parameter MEM_BURST_WIDTH      = 7;
     parameter MEM_DATA_WIDTH       = 512;
+    parameter MEM_REFR_PERIOD_WIDTH = 32;
+    parameter logic [MEM_REFR_PERIOD_WIDTH-1:0] MEM_DEF_REFR_PERIOD[MEM_PORTS-1:0]  =  '{MEM_PORTS{128}};
     parameter MI_DATA_WIDTH        = 32;
     parameter MI_ADDR_WIDTH        = 32;
     parameter RESET_WIDTH          = 2;

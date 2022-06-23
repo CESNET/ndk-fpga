@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
-class mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends byte_array_mfb_env::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-  `uvm_object_param_utils(    test::mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-  `uvm_sequence_library_utils(test::mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, META_WIDTH) extends uvm_byte_array_mfb::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, META_WIDTH);
+  `uvm_object_param_utils(    test::mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, META_WIDTH))
+  `uvm_sequence_library_utils(test::mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, META_WIDTH))
 
     function new(string name = "mfb_rx_speed");
         super.new(name);
@@ -18,12 +18,12 @@ class mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) ex
     endfunction
 
     virtual function void init_sequence();
-        this.add_sequence(byte_array_mfb_env::sequence_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(byte_array_mfb_env::sequence_stop_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(uvm_byte_array_mfb::sequence_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, META_WIDTH)::get_type());
+        this.add_sequence(uvm_byte_array_mfb::sequence_stop_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, META_WIDTH)::get_type());
     endfunction
 endclass
 
-class mfb_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uvm_sequence_library#(mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
+class mfb_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uvm_sequence_library#(uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
   `uvm_object_param_utils(    test::mfb_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
   `uvm_sequence_library_utils(test::mfb_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
 
@@ -35,12 +35,12 @@ class mfb_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) exte
     // subclass can redefine and change run sequences
     // can be useful in specific tests
     virtual function void init_sequence();
-        this.add_sequence(mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(mfb::sequence_stop_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(uvm_mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(uvm_mfb::sequence_stop_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
     endfunction
 endclass
 
-class mvb_lib_tx#(ITEMS, ITEM_WIDTH) extends uvm_sequence_library#(mvb::sequence_item#(ITEMS, ITEM_WIDTH));
+class mvb_lib_tx#(ITEMS, ITEM_WIDTH) extends uvm_sequence_library#(uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH));
   `uvm_object_param_utils(    test::mvb_lib_tx#(ITEMS, ITEM_WIDTH))
   `uvm_sequence_library_utils(test::mvb_lib_tx#(ITEMS, ITEM_WIDTH))
 
@@ -52,8 +52,8 @@ class mvb_lib_tx#(ITEMS, ITEM_WIDTH) extends uvm_sequence_library#(mvb::sequence
     // subclass can redefine and change run sequences
     // can be useful in specific tests
     virtual function void init_sequence();
-        this.add_sequence(mvb::sequence_full_speed_tx#(ITEMS, ITEM_WIDTH)::get_type());
-        this.add_sequence(mvb::sequence_stop_tx#(ITEMS, ITEM_WIDTH)::get_type());
+        this.add_sequence(uvm_mvb::sequence_full_speed_tx#(ITEMS, ITEM_WIDTH)::get_type());
+        this.add_sequence(uvm_mvb::sequence_stop_tx#(ITEMS, ITEM_WIDTH)::get_type());
     endfunction
 endclass
 
@@ -72,7 +72,7 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
             string it_num;
             it_num.itoa(it);
 
-            byte_array_mfb_env::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(mfb_rx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
+            uvm_byte_array_mfb::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, 0)::type_id::set_inst_override(mfb_rx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, 0)::get_type(),
              {this.get_full_name(), ".m_env.m_eth_mfb_rx_", it_num ,".*"});
         end
 
@@ -80,7 +80,7 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
             string it_num;
             it_num.itoa(it);
 
-            byte_array_mfb_env::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(mfb_rx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
+            uvm_byte_array_mfb::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, 0)::type_id::set_inst_override(mfb_rx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, 0)::get_type(),
              {this.get_full_name(), ".m_env.m_dma_mfb_rx_", it_num,".*"});
             //.mfb_seq
         end
@@ -117,9 +117,9 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
     endtask
 
     virtual task eth_rx_sequence(uvm_phase phase, int unsigned index);
-        byte_array::sequence_lib mfb_seq;
+        uvm_byte_array::sequence_lib mfb_seq;
 
-        mfb_seq = byte_array::sequence_lib::type_id::create("mfb_rx_seq", this);
+        mfb_seq = uvm_byte_array::sequence_lib::type_id::create("mfb_rx_seq", this);
         mfb_seq.min_random_count = 10;
         mfb_seq.max_random_count = 20;
         mfb_seq.init_sequence();
@@ -161,9 +161,9 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
     endtask
 
     virtual task dma_rx_sequence(uvm_phase phase, int unsigned index);
-        byte_array::sequence_lib                                 mfb_seq;
+        uvm_byte_array::sequence_lib                                 mfb_seq;
 
-        mfb_seq = byte_array::sequence_lib::type_id::create("mfb_dma_rx_seq", this);
+        mfb_seq = uvm_byte_array::sequence_lib::type_id::create("mfb_dma_rx_seq", this);
         mfb_seq.init_sequence();
         mfb_seq.min_random_count = 10;
         mfb_seq.max_random_count = 20;

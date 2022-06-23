@@ -94,14 +94,14 @@ class scoreboard_channel_mfb #(type CLASS_TYPE) extends scoreboard_channel #(CLA
     endfunction
 endclass
 
-class scoreboard_channel_header #(HDR_WIDTH, META_WIDTH, CHANNELS, PKT_MTU) extends scoreboard_channel #(logic_vector::sequence_item#(HDR_WIDTH), packet_header #(META_WIDTH, CHANNELS, PKT_MTU));
+class scoreboard_channel_header #(HDR_WIDTH, META_WIDTH, CHANNELS, PKT_MTU) extends scoreboard_channel #(uvm_logic_vector::sequence_item#(HDR_WIDTH), packet_header #(META_WIDTH, CHANNELS, PKT_MTU));
     `uvm_component_param_utils(app_core::scoreboard_channel_header #(HDR_WIDTH, META_WIDTH, CHANNELS, PKT_MTU))
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
     endfunction
 
-    virtual function bit compare(logic_vector::sequence_item#(HDR_WIDTH) tr_dut, packet_header #(META_WIDTH, CHANNELS, PKT_MTU) tr_model);
+    virtual function bit compare(uvm_logic_vector::sequence_item#(HDR_WIDTH) tr_dut, packet_header #(META_WIDTH, CHANNELS, PKT_MTU) tr_model);
         bit   eq = 1;
         logic [META_WIDTH-1:0]meta = 'x;
         logic [$clog2(CHANNELS)-1:0] channel;
@@ -124,7 +124,7 @@ class scoreboard_channel_header #(HDR_WIDTH, META_WIDTH, CHANNELS, PKT_MTU) exte
         return eq;
     endfunction
 
-    virtual function string message(logic_vector::sequence_item#(HDR_WIDTH) tr_dut, packet_header #(META_WIDTH, CHANNELS, PKT_MTU) tr_model);
+    virtual function string message(uvm_logic_vector::sequence_item#(HDR_WIDTH) tr_dut, packet_header #(META_WIDTH, CHANNELS, PKT_MTU) tr_model);
         string error_msg; //ETH [%0d] header
         logic [META_WIDTH-1:0]meta = 'x;
         logic [$clog2(CHANNELS)-1:0] channel;

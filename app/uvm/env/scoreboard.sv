@@ -12,8 +12,8 @@ class mvb2logic#(ITEMS, ITEM_WIDTH) extends uvm_monitor;
     `uvm_component_param_utils(app_core::mvb2logic#(ITEMS, ITEM_WIDTH))
 
     typedef mvb2logic#(ITEMS, ITEM_WIDTH) this_type;
-    uvm_analysis_port #(logic_vector::sequence_item#(ITEM_WIDTH)) analysis_port;
-    uvm_analysis_imp #(mvb::sequence_item #(ITEMS, ITEM_WIDTH), this_type) analysis_export;
+    uvm_analysis_port #(uvm_logic_vector::sequence_item#(ITEM_WIDTH)) analysis_port;
+    uvm_analysis_imp #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH), this_type) analysis_export;
 
 
     function new (string name, uvm_component parent);
@@ -22,13 +22,13 @@ class mvb2logic#(ITEMS, ITEM_WIDTH) extends uvm_monitor;
         analysis_export = new("analysis_export", this);
     endfunction
 
-    virtual function void write(mvb::sequence_item #(ITEMS, ITEM_WIDTH) tr);
-        if (tr.SRC_RDY == 1'b1 && tr.DST_RDY == 1'b1) begin
+    virtual function void write(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH) tr);
+        if (tr.src_rdy == 1'b1 && tr.dst_rdy == 1'b1) begin
             for (int unsigned it = 0; it < ITEMS; it++) begin
-                if (tr.VLD[it] === 1'b1) begin
-                    logic_vector::sequence_item#(ITEM_WIDTH) send;
-                    send = logic_vector::sequence_item#(ITEM_WIDTH)::type_id::create("send");
-                    send.data = tr.DATA[it];
+                if (tr.vld[it] === 1'b1) begin
+                    uvm_logic_vector::sequence_item#(ITEM_WIDTH) send;
+                    send = uvm_logic_vector::sequence_item#(ITEM_WIDTH)::type_id::create("send");
+                    send.data = tr.data[it];
                     analysis_port.write(send);
                 end
             end
@@ -41,29 +41,29 @@ class scoreboard #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH
 
     //RESET --
     typedef scoreboard #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, REGIONS, MI_DATA_WIDTH, MI_ADDR_WIDTH) this_type;
-    uvm_analysis_imp_reset#(reset::sequence_item, this_type) analysis_imp_reset;
+    uvm_analysis_imp_reset#(uvm_reset::sequence_item, this_type) analysis_imp_reset;
 
     //// ETH I/O
     localparam ETH_TX_LENGTH_WIDTH  = 16;
     localparam ETH_TX_CHANNEL_WIDTH = 8;
-    uvm_analysis_export #(mvb::sequence_item#(REGIONS, ETH_RX_HDR_WIDTH))   eth_mvb_rx[ETH_STREAMS];
-    uvm_analysis_export #(byte_array::sequence_item)                        eth_mfb_rx[ETH_STREAMS];
-    uvm_analysis_export #(logic_vector::sequence_item#(ETH_TX_HDR_WIDTH))   eth_mvb_tx[ETH_STREAMS];
-    uvm_analysis_export #(byte_array::sequence_item)                        eth_mfb_tx[ETH_STREAMS];
+    uvm_analysis_export #(uvm_mvb::sequence_item#(REGIONS, ETH_RX_HDR_WIDTH))   eth_mvb_rx[ETH_STREAMS];
+    uvm_analysis_export #(uvm_byte_array::sequence_item)                        eth_mfb_rx[ETH_STREAMS];
+    uvm_analysis_export #(uvm_logic_vector::sequence_item#(ETH_TX_HDR_WIDTH))   eth_mvb_tx[ETH_STREAMS];
+    uvm_analysis_export #(uvm_byte_array::sequence_item)                        eth_mfb_tx[ETH_STREAMS];
     // DMA I/O
     localparam DMA_RX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_TX_CHANNELS);
     localparam DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS) + 1;
-    uvm_analysis_export #(mvb::sequence_item#(REGIONS, DMA_RX_MVB_WIDTH))   dma_mvb_rx[DMA_STREAMS];
-    uvm_analysis_export #(byte_array::sequence_item)                        dma_mfb_rx[DMA_STREAMS];
-    uvm_analysis_export #(mvb::sequence_item#(REGIONS, DMA_TX_MVB_WIDTH))   dma_mvb_tx[DMA_STREAMS];
-    uvm_analysis_export #(byte_array::sequence_item)                        dma_mfb_tx[DMA_STREAMS];
+    uvm_analysis_export #(uvm_mvb::sequence_item#(REGIONS, DMA_RX_MVB_WIDTH))   dma_mvb_rx[DMA_STREAMS];
+    uvm_analysis_export #(uvm_byte_array::sequence_item)                        dma_mfb_rx[DMA_STREAMS];
+    uvm_analysis_export #(uvm_mvb::sequence_item#(REGIONS, DMA_TX_MVB_WIDTH))   dma_mvb_tx[DMA_STREAMS];
+    uvm_analysis_export #(uvm_byte_array::sequence_item)                        dma_mfb_tx[DMA_STREAMS];
 
     //////////////////////////
     // CONNECTION to internal fifos
     scoreboard_channel_header#(ETH_TX_HDR_WIDTH, 0, 2**ETH_TX_CHANNEL_WIDTH, 2**ETH_TX_LENGTH_WIDTH-1) eth_mvb_cmp[ETH_STREAMS];
-    scoreboard_channel_mfb #(byte_array::sequence_item)                        eth_mfb_cmp[ETH_STREAMS];
+    scoreboard_channel_mfb #(uvm_byte_array::sequence_item)                        eth_mfb_cmp[ETH_STREAMS];
     scoreboard_channel_header#(DMA_TX_MVB_WIDTH, DMA_HDR_META_WIDTH, DMA_RX_CHANNELS, DMA_PKT_MTU) dma_mvb_cmp[DMA_STREAMS];
-    scoreboard_channel_mfb #(byte_array::sequence_item)                                            dma_mfb_cmp[DMA_STREAMS];
+    scoreboard_channel_mfb #(uvm_byte_array::sequence_item)                                            dma_mfb_cmp[DMA_STREAMS];
 
     /////////////////////////
     // MODEL
@@ -94,7 +94,7 @@ class scoreboard #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH
             eth_mvb_cmp[it] = scoreboard_channel_header#(ETH_TX_HDR_WIDTH, 0, 2**ETH_TX_CHANNEL_WIDTH, 2**ETH_TX_LENGTH_WIDTH-1)::type_id::create({"eth_mvb_cmp_", it_num}, this);
             eth_mvb_cmp[it].prefix_set({"ETH [", it_num, "] header "});
 
-            eth_mfb_cmp[it] = scoreboard_channel_mfb #(byte_array::sequence_item)::type_id::create({"eth_mfb_cmp_", it_num}, this);
+            eth_mfb_cmp[it] = scoreboard_channel_mfb #(uvm_byte_array::sequence_item)::type_id::create({"eth_mfb_cmp_", it_num}, this);
             eth_mfb_cmp[it].prefix_set({"ETH [", it_num, "] packet "});
         end
 
@@ -112,7 +112,7 @@ class scoreboard #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH
             dma_mvb_cmp[it] = app_core::scoreboard_channel_header#(DMA_TX_MVB_WIDTH, DMA_HDR_META_WIDTH, DMA_RX_CHANNELS, DMA_PKT_MTU)::type_id::create({"dma_mvb_cmp_", it_num}, this);
             dma_mvb_cmp[it].prefix_set({"DMA [", it_num, "] header "});
 
-            dma_mfb_cmp[it] = scoreboard_channel_mfb #(byte_array::sequence_item)::type_id::create({"dma_mfb_cmp_", it_num}, this);
+            dma_mfb_cmp[it] = scoreboard_channel_mfb #(uvm_byte_array::sequence_item)::type_id::create({"dma_mfb_cmp_", it_num}, this);
             dma_mfb_cmp[it].prefix_set({"DMA [", it_num, "] packet "});
 
             m_mvb2logic[it] = mvb2logic#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create({"m_mvb2logic_", it_num}, this);
@@ -155,7 +155,7 @@ class scoreboard #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH
         end
     endfunction
 
-    function void write_reset(reset::sequence_item tr);
+    function void write_reset(uvm_reset::sequence_item tr);
         static bit previs = 1;
         if (tr.reset === 1'b1) begin
             //print info

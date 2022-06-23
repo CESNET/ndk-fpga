@@ -72,21 +72,21 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             m_config.port_max = (it+1) * ETH_CHANNELS-1;
 
             uvm_config_db#(top_agent::mvb_config)::set(this, {"m_env.m_eth_mvb_rx_", it_num,".m_sequencer"}, "m_config",    m_config);
-            uvm_config_db#(mailbox#(byte_array::sequence_item))::set(this, {"m_env.m_eth_mvb_rx_", it_num,".m_sequencer"}, "hdr_export",    m_eth_agent[it].m_driver.header_export);
-            uvm_config_db#(mailbox#(byte_array::sequence_item))::set(this, {"m_env.m_eth_mfb_rx_", it_num,".m_byte_array_agent.m_sequencer"}, "packet_export", m_eth_agent[it].m_driver.byte_array_export);
+            uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::set(this, {"m_env.m_eth_mvb_rx_", it_num,".m_sequencer"}, "hdr_export",    m_eth_agent[it].m_driver.header_export);
+            uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::set(this, {"m_env.m_eth_mfb_rx_", it_num,".m_byte_array_agent.m_sequencer"}, "packet_export", m_eth_agent[it].m_driver.byte_array_export);
             m_env.m_resets_app.sync_connect(m_eth_agent[it].reset_sync);
         end
 
         for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
             string it_num;
             it_num.itoa(it);
-            uvm_config_db#(mailbox#(byte_array::sequence_item))::set(this, {"m_env.m_dma_mvb_rx_", it_num,".m_sequencer"}, "hdr_export",    m_dma_agent[it].m_driver.header_export);
-            uvm_config_db#(mailbox#(byte_array::sequence_item))::set(this, {"m_env.m_dma_mfb_rx_", it_num,".m_byte_array_agent.m_sequencer"}, "packet_export", m_dma_agent[it].m_driver.byte_array_export);
+            uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::set(this, {"m_env.m_dma_mvb_rx_", it_num,".m_sequencer"}, "hdr_export",    m_dma_agent[it].m_driver.header_export);
+            uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::set(this, {"m_env.m_dma_mfb_rx_", it_num,".m_byte_array_agent.m_sequencer"}, "packet_export", m_dma_agent[it].m_driver.byte_array_export);
             m_env.m_resets_app.sync_connect(m_dma_agent[it].reset_sync);
         end
     endfunction
 
-    task run_dma_meta(byte_array::sequencer sqr);
+    task run_dma_meta(uvm_byte_array::sequencer sqr);
         top_agent::mvb_sequence_lib#(REGIONS, DMA_RX_MVB_WIDTH)  mvb_seq;
 
         mvb_seq = top_agent::mvb_sequence_lib#(REGIONS, DMA_RX_MVB_WIDTH)::type_id::create("mvb_seq", this);
@@ -102,7 +102,7 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         end
     endtask
 
-    task run_eth_meta(byte_array::sequencer sqr);
+    task run_eth_meta(uvm_byte_array::sequencer sqr);
         top_agent::mvb_sequence_lib_eth#(REGIONS, ETH_RX_HDR_WIDTH)  mvb_seq;
 
         mvb_seq = top_agent::mvb_sequence_lib_eth#(REGIONS, ETH_RX_HDR_WIDTH)::type_id::create("mvb_seq", this);
@@ -118,7 +118,7 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         end
     endtask
 
-    task run_packet(byte_array::sequencer sqr);
+    task run_packet(uvm_byte_array::sequencer sqr);
         top_agent::byte_array_sequence_simple seq;
         seq = top_agent::byte_array_sequence_simple::type_id::create("seq", this);
         seq.randomize();
@@ -145,9 +145,9 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task eth_tx_sequence(uvm_phase phase, int unsigned index);
-        mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq;
+        uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq;
 
-        mfb_seq = mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("mfb_eth_tx_seq", this);
+        mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("mfb_eth_tx_seq", this);
         mfb_seq.init_sequence();
         mfb_seq.min_random_count = 5;
         mfb_seq.max_random_count = 13;
@@ -161,9 +161,9 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task eth_rx_sequence(uvm_phase phase, int unsigned index);
-        byte_array::sequence_lib mfb_seq;
+        uvm_byte_array::sequence_lib mfb_seq;
 
-        mfb_seq = byte_array::sequence_lib::type_id::create("mfb_rx_seq", this);
+        mfb_seq = uvm_byte_array::sequence_lib::type_id::create("mfb_rx_seq", this);
         mfb_seq.init_sequence();
         mfb_seq.min_random_count = 15;
         mfb_seq.max_random_count = 20;
@@ -178,15 +178,15 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task dma_tx_sequence(uvm_phase phase, int unsigned index);
-        mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_seq;
-        mvb::sequence_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)                                mvb_seq;
+        uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_seq;
+        uvm_mvb::sequence_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)                                mvb_seq;
 
-        mfb_seq = mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_dma_tx_seq", this);
+        mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_dma_tx_seq", this);
         mfb_seq.min_random_count = 5;
         mfb_seq.max_random_count = 13;
         mfb_seq.init_sequence();
 
-        mvb_seq = mvb::sequence_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("mvb_dma_tx_seq", this);
+        mvb_seq = uvm_mvb::sequence_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("mvb_dma_tx_seq", this);
         mvb_seq.min_random_count = 5;
         mvb_seq.max_random_count = 13;
         mvb_seq.init_sequence();
@@ -207,9 +207,9 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task dma_rx_sequence(uvm_phase phase, int unsigned index);
-        byte_array::sequence_lib                                 mfb_seq;
+        uvm_byte_array::sequence_lib                                 mfb_seq;
 
-        mfb_seq = byte_array::sequence_lib::type_id::create("mfb_dma_rx_seq", this);
+        mfb_seq = uvm_byte_array::sequence_lib::type_id::create("mfb_dma_rx_seq", this);
         mfb_seq.init_sequence();
         mfb_seq.min_random_count = 15;
         mfb_seq.max_random_count = 20;
@@ -235,11 +235,11 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task run_reset(uvm_phase phase);
-        reset::sequence_reset reset;
-        reset::sequence_run   run;
+        uvm_reset::sequence_reset reset;
+        uvm_reset::sequence_run   run;
 
-        reset = reset::sequence_reset::type_id::create("reset_reset");
-        run   = reset::sequence_run::type_id::create("reset_run");
+        reset = uvm_reset::sequence_reset::type_id::create("reset_reset");
+        run   = uvm_reset::sequence_run::type_id::create("reset_run");
         run.length_min = 1000;
         run.length_max = 2000;
 

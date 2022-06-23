@@ -246,6 +246,8 @@ module testbench;
         .MEM_ADDR_WIDTH    (test_pkg::MEM_ADDR_WIDTH),
         .MEM_BURST_WIDTH   (test_pkg::MEM_BURST_WIDTH),
         .MEM_DATA_WIDTH    (test_pkg::MEM_DATA_WIDTH),
+        .MEM_REFR_PERIOD_WIDTH (test_pkg::MEM_REFR_PERIOD_WIDTH),
+        .MEM_DEF_REFR_PERIOD (test_pkg::MEM_DEF_REFR_PERIOD),
         .MI_DATA_WIDTH     (test_pkg::MI_DATA_WIDTH),
         .MI_ADDR_WIDTH     (test_pkg::MI_ADDR_WIDTH),
         .RESET_WIDTH       (test_pkg::RESET_WIDTH),

@@ -9,15 +9,14 @@
 */
 
 class agent extends uvm_agent;
-
     // registration of component tools
     `uvm_component_utils(top_agent::agent)
 
     // -----------------------
     // Variables.
     // -----------------------
-    reset::sync_cbs       reset_sync;
-    byte_array::sequencer m_sequencer;
+    uvm_reset::sync_cbs       reset_sync;
+    uvm_byte_array::sequencer m_sequencer;
     driver                m_driver;
 
     // Contructor, where analysis port is created.
@@ -33,7 +32,7 @@ class agent extends uvm_agent;
         super.build_phase(phase);
 
         reset_sync  = new();
-        m_sequencer = byte_array::sequencer::type_id::create("m_sequencer", this);
+        m_sequencer = uvm_byte_array::sequencer::type_id::create("m_sequencer", this);
         m_driver    = driver::type_id::create("m_driver", this);
     endfunction
 
