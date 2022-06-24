@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LII agent &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,10 +14,13 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="LII agent" href="../lii_rx/readme.html" />
+    <link rel="prev" title="Common package" href="../common/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,7 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
@@ -61,6 +64,39 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../common/readme.html">Common package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">LII agent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lii-interface">LII interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lii-sequence-item">LII sequence item</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lii-monitor">LII monitor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lii-driver">LII driver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-interface">LII interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-monitor">LII monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-driver">LII driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mvb/readme.html">MVB agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mfb/readme.html">MFB Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -77,6 +113,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../ver.html">UVM Verification</a> &raquo;</li>
+          <li><a href="../componets.html">Components</a> &raquo;</li>
       <li>LII agent</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/ofm_doc/comp/uvm/lii/readme.rst.txt" rel="nofollow"> View page source</a>
@@ -88,25 +126,19 @@
            <div itemprop="articleBody">
              
   <section id="lii-agent">
-<span id="uvm-mii"></span><h1>LII agent<a class="headerlink" href="#lii-agent" title="Permalink to this headline"></a></h1>
+<span id="uvm-lii"></span><h1>LII agent<a class="headerlink" href="#lii-agent" title="Permalink to this heading"></a></h1>
 <p>Agent is used for connecting of all components (driver, monitor,…). Agent has his own configuration object which contains two parameters: active (when is up then agent is active in other way is passive) and interface which say name of the interface that is used.
 When agent is active then sequencer and driver are created amd connected to interface. When is passive then only monitor is created.</p>
 <section id="lii-interface">
-<h2>LII interface<a class="headerlink" href="#lii-interface" title="Permalink to this headline"></a></h2>
+<h2>LII interface<a class="headerlink" href="#lii-interface" title="Permalink to this heading"></a></h2>
 <p>LII (Media-independent interface) bus is interface which allows communication throught 10g low latency ethernet. There are asserts which check if EEOF is asserted right and if SOF and EOF are coming in right ordder. Link for detailed description of LII bus is here: <a class="reference external" href="https://gitlab.liberouter.org/ndk/hft/-/tree/friedl-feat-ethphy/comp/eth_phy/10ge/top">https://gitlab.liberouter.org/ndk/hft/-/tree/friedl-feat-ethphy/comp/eth_phy/10ge/top</a></p>
 <section id="lii-bus-description">
-<h3>LII bus description<a class="headerlink" href="#lii-bus-description" title="Permalink to this headline"></a></h3>
+<h3>LII bus description<a class="headerlink" href="#lii-bus-description" title="Permalink to this heading"></a></h3>
 <p>LII bus has these 5 ports + 2 ports optional (EEOF and EDB) which depends on parameter FAST_SOF. In verification interface are asserts which check these events.</p>
 </section>
 <section id="generics">
-<h3>Generics<a class="headerlink" href="#generics" title="Permalink to this headline"></a></h3>
+<h3>Generics<a class="headerlink" href="#generics" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 16%" />
-<col style="width: 11%" />
-<col style="width: 10%" />
-<col style="width: 63%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
 <th class="head"><p>Type</p></th>
@@ -129,14 +161,8 @@ When agent is active then sequencer and driver are created amd connected to inte
 </table>
 </section>
 <section id="ports">
-<h3>Ports<a class="headerlink" href="#ports" title="Permalink to this headline"></a></h3>
+<h3>Ports<a class="headerlink" href="#ports" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 12%" />
-<col style="width: 3%" />
-<col style="width: 17%" />
-<col style="width: 68%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
 <th class="head"><p>Dir</p></th>
@@ -185,7 +211,7 @@ When agent is active then sequencer and driver are created amd connected to inte
 </section>
 </section>
 <section id="lii-sequence-item">
-<h2>LII sequence item<a class="headerlink" href="#lii-sequence-item" title="Permalink to this headline"></a></h2>
+<h2>LII sequence item<a class="headerlink" href="#lii-sequence-item" title="Permalink to this heading"></a></h2>
 <p>Sequence item contains basic ports from interface, except EEOF and EDB which are only drived to interface by driver. All signals which are in sequence item are randomized.
 There are three methods:</p>
 <ul class="simple">
@@ -195,11 +221,11 @@ There are three methods:</p>
 </ul>
 </section>
 <section id="lii-monitor">
-<h2>LII monitor<a class="headerlink" href="#lii-monitor" title="Permalink to this headline"></a></h2>
+<h2>LII monitor<a class="headerlink" href="#lii-monitor" title="Permalink to this heading"></a></h2>
 <p>LII monitor is used for monitoring of traffic. There is only easy monitor which write whole transaction to analysis port when reset is not asserted.</p>
 </section>
 <section id="lii-driver">
-<h2>LII driver<a class="headerlink" href="#lii-driver" title="Permalink to this headline"></a></h2>
+<h2>LII driver<a class="headerlink" href="#lii-driver" title="Permalink to this heading"></a></h2>
 <p>LII driver is used for driving LII transactions to interface. There is used one parameter <code class="docutils literal notranslate"><span class="pre">FAST</span> <span class="pre">SOF</span></code>, when this parameter is asserted then driver driving <code class="docutils literal notranslate"><span class="pre">EEOF</span></code> and <code class="docutils literal notranslate"><span class="pre">EDB</span></code> to interface. <code class="docutils literal notranslate"><span class="pre">EEOF</span></code> and <code class="docutils literal notranslate"><span class="pre">EDB</span></code> is drived only when in the next transaction is asserted <code class="docutils literal notranslate"><span class="pre">EOF</span></code>, <code class="docutils literal notranslate"><span class="pre">EDB</span></code> must be same as <code class="docutils literal notranslate"><span class="pre">BYTES_VLD</span></code> in next transaction.</p>
 </section>
 </section>
@@ -207,7 +233,10 @@ There are three methods:</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../common/readme.html" class="btn btn-neutral float-left" title="Common package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../lii_rx/readme.html" class="btn btn-neutral float-right" title="LII agent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

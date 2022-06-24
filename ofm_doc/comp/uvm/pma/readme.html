@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PMA agent &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,10 +14,13 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Intel MAC SEG" href="../intel_mac_seg/readme.html" />
+    <link rel="prev" title="MI agent" href="../mi/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,7 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
@@ -61,6 +64,39 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../common/readme.html">Common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-interface">LII interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-monitor">LII monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-driver">LII driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mvb/readme.html">MVB agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mfb/readme.html">MFB Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">PMA agent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pma-interface">PMA interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pma-sequence-item">PMA sequence item</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pma-monitor">PMA monitor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pma-driver">PMA driver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -77,6 +113,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../ver.html">UVM Verification</a> &raquo;</li>
+          <li><a href="../componets.html">Components</a> &raquo;</li>
       <li>PMA agent</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/ofm_doc/comp/uvm/pma/readme.rst.txt" rel="nofollow"> View page source</a>
@@ -88,11 +126,11 @@
            <div itemprop="articleBody">
              
   <section id="pma-agent">
-<span id="uvm-pma"></span><h1>PMA agent<a class="headerlink" href="#pma-agent" title="Permalink to this headline"></a></h1>
+<span id="uvm-pma"></span><h1>PMA agent<a class="headerlink" href="#pma-agent" title="Permalink to this heading"></a></h1>
 <p>Agent is used for connecting of all components (driver, monitor,…). Agent has his own configuration object which contains two parameters: active (when is up then agent is active in other way is passive) and interface which say name of the interface that is used.
 When agent is active then sequencer and driver are created amd connected to interface. When is passive then only monitor is created.</p>
 <section id="pma-interface">
-<h2>PMA interface<a class="headerlink" href="#pma-interface" title="Permalink to this headline"></a></h2>
+<h2>PMA interface<a class="headerlink" href="#pma-interface" title="Permalink to this heading"></a></h2>
 <p>PMA (Physical Medium Attachment) bus is proprietary interface which is connected to tranascievers. Main task of this interface is took data from encoder, scramble them and send it to tranasciever. There could be two types of data (depends on header), control data or usable data. On this interface are encoded data from encoder, this data could have this formats:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">IDLE</span></code> this format contains: first eight bits which define type of frame (type <code class="docutils literal notranslate"><span class="pre">IDLE</span></code>) and others zeros which specify space between frames.</p></li>
@@ -101,18 +139,12 @@ When agent is active then sequencer and driver are created amd connected to inte
 <li><p><code class="docutils literal notranslate"><span class="pre">TERMINATE</span></code> this format contains: eight bits which define type of frame (type <code class="docutils literal notranslate"><span class="pre">TERMINATE</span></code>), position of type depends on amount of data which are sended with terminate. So there in the first place there are data bytes (amount depends on number of data valid bytes), then type and in last there are zeros (space between frames).</p></li>
 </ul>
 <section id="pma-bus-description">
-<h3>PMA bus description<a class="headerlink" href="#pma-bus-description" title="Permalink to this headline"></a></h3>
+<h3>PMA bus description<a class="headerlink" href="#pma-bus-description" title="Permalink to this heading"></a></h3>
 <p>PMA bus has these 5 ports which will be described below.</p>
 </section>
 <section id="generics">
-<h3>Generics<a class="headerlink" href="#generics" title="Permalink to this headline"></a></h3>
+<h3>Generics<a class="headerlink" href="#generics" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 20%" />
-<col style="width: 13%" />
-<col style="width: 12%" />
-<col style="width: 55%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
 <th class="head"><p>Type</p></th>
@@ -130,14 +162,8 @@ When agent is active then sequencer and driver are created amd connected to inte
 </table>
 </section>
 <section id="ports">
-<h3>Ports<a class="headerlink" href="#ports" title="Permalink to this headline"></a></h3>
+<h3>Ports<a class="headerlink" href="#ports" title="Permalink to this heading"></a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 12%" />
-<col style="width: 3%" />
-<col style="width: 17%" />
-<col style="width: 68%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
 <th class="head"><p>Dir</p></th>
@@ -176,7 +202,7 @@ When agent is active then sequencer and driver are created amd connected to inte
 </section>
 </section>
 <section id="pma-sequence-item">
-<h2>PMA sequence item<a class="headerlink" href="#pma-sequence-item" title="Permalink to this headline"></a></h2>
+<h2>PMA sequence item<a class="headerlink" href="#pma-sequence-item" title="Permalink to this heading"></a></h2>
 <p>Sequence item contains basic ports from interface. All signals which are in sequence item are randomized.
 There are three methods:</p>
 <ul class="simple">
@@ -186,11 +212,11 @@ There are three methods:</p>
 </ul>
 </section>
 <section id="pma-monitor">
-<h2>PMA monitor<a class="headerlink" href="#pma-monitor" title="Permalink to this headline"></a></h2>
+<h2>PMA monitor<a class="headerlink" href="#pma-monitor" title="Permalink to this heading"></a></h2>
 <p>PMA monitor is used for monitoring of traffic. There is only easy monitor which write whole transaction to analysis port.</p>
 </section>
 <section id="pma-driver">
-<h2>PMA driver<a class="headerlink" href="#pma-driver" title="Permalink to this headline"></a></h2>
+<h2>PMA driver<a class="headerlink" href="#pma-driver" title="Permalink to this heading"></a></h2>
 <p>PMA driver is used for driving PMA transactions to interface.</p>
 </section>
 </section>
@@ -198,7 +224,10 @@ There are three methods:</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../mi/readme.html" class="btn btn-neutral float-left" title="MI agent" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../intel_mac_seg/readme.html" class="btn btn-neutral float-right" title="Intel MAC SEG" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

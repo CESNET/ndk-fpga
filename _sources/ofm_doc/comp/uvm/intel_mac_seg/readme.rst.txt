@@ -4,12 +4,11 @@
 ..
 .. SPDX-License-Identifier: BSD-3-Clause
 
-.. MVB agent and MVB interface
-
-.. _uvm_mvb:
+.. intel mace seg agent
+.. _uvm_intel_mac_seg:
 
 *************
-Intel MAC SEQ
+Intel MAC SEG
 *************
 
 Interface

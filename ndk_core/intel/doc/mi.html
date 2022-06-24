@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MI bus interconnect &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -72,6 +73,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -100,7 +102,7 @@
            <div itemprop="articleBody">
              
   <section id="mi-bus-interconnect">
-<span id="ndk-intel-mi"></span><h1>MI bus interconnect<a class="headerlink" href="#mi-bus-interconnect" title="Permalink to this headline"></a></h1>
+<span id="ndk-intel-mi"></span><h1>MI bus interconnect<a class="headerlink" href="#mi-bus-interconnect" title="Permalink to this heading"></a></h1>
 <p>MI bus interconnection allows access to Control and Status Register (CSR).
 Communication via <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">the MI bus</span></a> is always initiated by the software via direct memory access to the PCIe device (FPGA card).
 The software sends a read or write PCIe transaction, which is then processed by <a class="reference internal" href="../../../ofm_doc/comp/pcie/mtc/readme.html#mtc"><span class="std std-ref">the MTC module</span></a> implemented in the FPGA.
@@ -112,16 +114,17 @@ See <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.ht
 <span class="mh">0x00000100</span><span class="o">-</span><span class="mh">0x00000FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
 <span class="mh">0x00001000</span><span class="o">-</span><span class="mh">0x000010FF</span> <span class="o">--</span> <span class="n">ADC</span> <span class="n">sensor</span> <span class="p">(</span><span class="n">FPGA</span> <span class="n">temperature</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
 <span class="mh">0x00001100</span><span class="o">-</span><span class="mh">0x00001FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
-<span class="mh">0x00002000</span><span class="o">-</span><span class="mh">0x000020FF</span> <span class="o">--</span> <span class="n">FPGA</span> <span class="p">(</span><span class="n">SDM</span><span class="p">)</span> <span class="n">controller</span>
-<span class="mh">0x00002100</span><span class="o">-</span><span class="mh">0x00003FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
+<span class="mh">0x00002000</span><span class="o">-</span><span class="mh">0x000020FF</span> <span class="o">--</span> <span class="n">FPGA</span> <span class="p">(</span><span class="n">SDM</span> <span class="ow">or</span> <span class="n">BOOT</span><span class="p">)</span> <span class="n">controller</span>
+<span class="mh">0x00002100</span><span class="o">-</span><span class="mh">0x00002FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
+<span class="mh">0x00003000</span><span class="o">-</span><span class="mh">0x00003FFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">PMD</span> <span class="p">(</span><span class="n">QSFP</span> <span class="n">controller</span><span class="p">)</span>
 <span class="mh">0x00004000</span><span class="o">-</span><span class="mh">0x000040FF</span> <span class="o">--</span> <span class="n">Timestamp</span> <span class="n">unit</span>
 <span class="mh">0x00004100</span><span class="o">-</span><span class="mh">0x00004FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
 <span class="mh">0x00005000</span><span class="o">-</span><span class="mh">0x00007FFF</span> <span class="o">--</span> <span class="n">Debug</span> <span class="n">Gen</span> <span class="n">Loop</span> <span class="n">modules</span>
-<span class="mh">0x00008000</span><span class="o">-</span><span class="mh">0x0000BFFF</span> <span class="o">--</span> <span class="n">Network</span> <span class="n">module</span>
+<span class="mh">0x00008000</span><span class="o">-</span><span class="mh">0x0000BFFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">MACs</span>
 <span class="mh">0x0000C000</span><span class="o">-</span><span class="mh">0x0000FFFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
 <span class="mh">0x00010000</span><span class="o">-</span><span class="mh">0x0001FFFF</span> <span class="o">--</span> <span class="n">Memory</span> <span class="n">controller</span> <span class="p">(</span><span class="n">TODO</span><span class="p">)</span>
 <span class="mh">0x00020000</span><span class="o">-</span><span class="mh">0x007FFFFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
-<span class="mh">0x00800000</span><span class="o">-</span><span class="mh">0x00FFFFFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">physical</span> <span class="n">layer</span>
+<span class="mh">0x00800000</span><span class="o">-</span><span class="mh">0x00FFFFFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">PCS</span><span class="o">/</span><span class="n">PMA</span>
 <span class="mh">0x01000000</span><span class="o">-</span><span class="mh">0x013FFFFF</span> <span class="o">--</span> <span class="n">DMA</span> <span class="n">space</span>
 <span class="mh">0x01400000</span><span class="o">-</span><span class="mh">0x01FFFFFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
 <span class="mh">0x02000000</span><span class="o">-</span><span class="mh">0x03FFFFFF</span> <span class="o">--</span> <span class="n">Application</span> <span class="n">core</span>

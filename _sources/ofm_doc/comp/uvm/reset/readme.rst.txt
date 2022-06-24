@@ -6,6 +6,9 @@
 ..
 .. SPDX-License-Identifier: BSD-3-Clause
 
+.. Reset
+.. _uvm_reset:
+
 
 ************
 RESET agent

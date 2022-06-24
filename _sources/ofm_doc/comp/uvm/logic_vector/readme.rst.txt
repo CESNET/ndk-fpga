@@ -9,3 +9,8 @@
 .. Logic vector agent
 .. _uvm_logic_vector:
 
+
+******************
+Logic vector agent
+******************
+

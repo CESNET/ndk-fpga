@@ -6,8 +6,8 @@
 ..
 .. SPDX-License-Identifier: BSD-3-Clause
 
-.. LII interface
-.. _uvm_mii:
+.. LII RX interface
+.. _uvm_lii_rx:
 
 LII agent
 ---------

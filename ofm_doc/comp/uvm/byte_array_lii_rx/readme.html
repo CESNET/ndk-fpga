@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Byte Array to LII convert enviroment &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,10 +14,13 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Common package" href="../common/readme.html" />
+    <link rel="prev" title="Byte Array to LII convert enviroment" href="../byte_array_lii/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,7 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
@@ -61,6 +64,37 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Byte Array to LII convert enviroment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#byte-array-to-lii-monitor">Byte Array to LII monitor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#byte-array-to-lii-sequence">Byte Array to LII Sequence</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../common/readme.html">Common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-interface">LII interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-monitor">LII monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-driver">LII driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mvb/readme.html">MVB agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mfb/readme.html">MFB Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -77,6 +111,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../ver.html">UVM Verification</a> &raquo;</li>
+          <li><a href="../componets.html">Components</a> &raquo;</li>
       <li>Byte Array to LII convert enviroment</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/ofm_doc/comp/uvm/byte_array_lii_rx/readme.rst.txt" rel="nofollow"> View page source</a>
@@ -88,14 +124,14 @@
            <div itemprop="articleBody">
              
   <section id="byte-array-to-lii-convert-enviroment">
-<span id="uvm-byte-array-mii"></span><h1>Byte Array to LII convert enviroment<a class="headerlink" href="#byte-array-to-lii-convert-enviroment" title="Permalink to this headline"></a></h1>
+<span id="uvm-byte-array-mii-rx"></span><h1>Byte Array to LII convert enviroment<a class="headerlink" href="#byte-array-to-lii-convert-enviroment" title="Permalink to this heading"></a></h1>
 <p>This enviroment serves for preparation of agents (configuration set and creation), their connection to right analysis export and starting sequence on the right sequencer. This enviroment connect Byte Array agent with LII agent in fact.</p>
 <section id="byte-array-to-lii-monitor">
-<h2>Byte Array to LII monitor<a class="headerlink" href="#byte-array-to-lii-monitor" title="Permalink to this headline"></a></h2>
+<h2>Byte Array to LII monitor<a class="headerlink" href="#byte-array-to-lii-monitor" title="Permalink to this heading"></a></h2>
 <p>This monitor take LII specified number (it depends on the Length of Byte Array transaction) of transaction, merge them to one Byte Array transaction and writes it to analysis port. For acumulation of LII transactions is used fifo which only store all those transactions to his own memory.</p>
 </section>
 <section id="byte-array-to-lii-sequence">
-<h2>Byte Array to LII Sequence<a class="headerlink" href="#byte-array-to-lii-sequence" title="Permalink to this headline"></a></h2>
+<h2>Byte Array to LII Sequence<a class="headerlink" href="#byte-array-to-lii-sequence" title="Permalink to this heading"></a></h2>
 <p>This sequence has one quest and that is cutting of Byte array sequence to bytes and set ports of LII request to right values. SOF will be asserted when first chunk of transaction arrive and EOF will be asserted when the last chunk of transaction arrive. If it is last chunk of transaction then it set to BYTES_VLD number of valid bytes of that chunk. At the end is sequence send to driver. There is also task which send empty sequence when frame is null.</p>
 </section>
 </section>
@@ -103,7 +139,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../byte_array_lii/readme.html" class="btn btn-neutral float-left" title="Byte Array to LII convert enviroment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../common/readme.html" class="btn btn-neutral float-right" title="Common package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

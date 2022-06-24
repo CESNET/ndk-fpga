@@ -7,7 +7,7 @@
 .. SPDX-License-Identifier: BSD-3-Clause
 
 .. LII interface
-.. _uvm_mii:
+.. _uvm_lii:
 
 
 ************

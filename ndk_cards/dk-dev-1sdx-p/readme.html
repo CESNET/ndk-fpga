@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stratix 10 DX FPGA Development Kit &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -68,6 +69,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -95,7 +97,7 @@
            <div itemprop="articleBody">
              
   <section id="stratix-10-dx-fpga-development-kit">
-<span id="card-s10dx-dk"></span><h1>Stratix 10 DX FPGA Development Kit<a class="headerlink" href="#stratix-10-dx-fpga-development-kit" title="Permalink to this headline"></a></h1>
+<span id="card-s10dx-dk"></span><h1>Stratix 10 DX FPGA Development Kit<a class="headerlink" href="#stratix-10-dx-fpga-development-kit" title="Permalink to this heading"></a></h1>
 <p>Stratix 10 DX FPGA Development Kit (DK-DEV-1SDX-P) by Intel was originally used in our team for testing DMA transfers via PCIe (up to 400 Gbps). Then we ported our whole NDK to this card as well. Here is some important information about this card:</p>
 <ul class="simple">
 <li><p>Intel Stratix 10 DX FPGA - 1SD280PT2F55E1VG (1x E-Tile, 4x P-Tile)</p></li>
@@ -104,7 +106,7 @@
 <li><p><a class="reference external" href="https://www.intel.com/content/dam/altera-www/global/en_US/support/boards-kits/stratix10/dx_fpga/dx-dev-kit-enpirion-051219-100719.pdf">Development Kit Schematic</a></p></li>
 </ul>
 <section id="build-instructions">
-<h2>Build instructions<a class="headerlink" href="#build-instructions" title="Permalink to this headline"></a></h2>
+<h2>Build instructions<a class="headerlink" href="#build-instructions" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>Go to <code class="docutils literal notranslate"><span class="pre">build/dk-dev-1sdx-p/</span></code> folder in application repository.</p></li>
 <li><p>Check or modify <code class="docutils literal notranslate"><span class="pre">user_const.tcl</span></code> file, where you can change the firmware configuration.</p></li>
@@ -128,11 +130,11 @@
 </div>
 </section>
 <section id="ethernet-interfaces">
-<h2>Ethernet Interfaces<a class="headerlink" href="#ethernet-interfaces" title="Permalink to this headline"></a></h2>
+<h2>Ethernet Interfaces<a class="headerlink" href="#ethernet-interfaces" title="Permalink to this heading"></a></h2>
 <p>This card has two QSFP slots (ports). Each is connected to the FPGA via 4 high-speed serial lines supporting up to 25 Gbps (alternatively, two lines with a speed of up to 56 Gbps are supported, but it is not used here). Both QSFP slots are connected to an E-Tile that supports Ethernet Hard IP with the following speeds: <code class="docutils literal notranslate"><span class="pre">1x100GE,</span> <span class="pre">4x25GE,</span> <span class="pre">4x10GE</span></code>. E-Tile Hard IPs are instanced in Network Module, which providing Ethernet communication to Application core. The architecture of the Network Module <a class="reference internal" href="../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">is described here</span></a>.</p>
 </section>
 <section id="pcie-interfaces">
-<h2>PCIe Interfaces<a class="headerlink" href="#pcie-interfaces" title="Permalink to this headline"></a></h2>
+<h2>PCIe Interfaces<a class="headerlink" href="#pcie-interfaces" title="Permalink to this heading"></a></h2>
 <p>This card has one PCIe Gen4 x16 edge connector. An additional PCIe connector can be added to the UPI interface using an expansion cable (used for 400G DMA demo only). The FPGA used contains 3x P-Tile, each of which contains PCIe Gen4 x16 Hard IP. In our firmware we use P-Tile in PCIe Gen4 x8+x8 (bifurcation) mode. This setting has worked best for us in terms of DMA transfer performance. P-Tile Hard IPs are instanced in PCIe Module, which providing PCIe communication for DMA module and MI bus (CSR registers). The architecture of the PCIe Module <a class="reference internal" href="../../ndk_core/intel/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">is described here</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

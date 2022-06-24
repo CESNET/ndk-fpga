@@ -7,9 +7,9 @@
 .. SPDX-License-Identifier: BSD-3-Clause
 
 
-************
-UVM MI agent
-************
+********
+MI agent
+********
 This package containts two UVM vrification agents which generate transaction to interface :ref:`MI bus specification<mi_bus>`. Slave agent is connet to slave DUT port. Master agent is connected to master DUT port.
 Both agents have three class parameters. ``DATA_WIDTH`` , ``ADDR_WIDTH`` and ``META_WIDHT``. ``META_WIDTH`` has default value set to 0.
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agilex I-Series FPGA Development Kit &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -68,6 +69,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -95,7 +97,7 @@
            <div itemprop="articleBody">
              
   <section id="agilex-i-series-fpga-development-kit">
-<span id="card-agi-dk"></span><h1>Agilex I-Series FPGA Development Kit<a class="headerlink" href="#agilex-i-series-fpga-development-kit" title="Permalink to this headline"></a></h1>
+<span id="card-agi-dk"></span><h1>Agilex I-Series FPGA Development Kit<a class="headerlink" href="#agilex-i-series-fpga-development-kit" title="Permalink to this heading"></a></h1>
 <p>Agilex I-Series FPGA Development Kit (DK-DEV-AGI027RES) by Intel is supported in the NDK only with the primary goal of accelerating the debugging of the 400G NDK design for <span class="xref std std-ref">the XpressSX AGI-FH400G card</span>. Here is some important information about this card:</p>
 <ul class="simple">
 <li><p>Intel Agilex I-Series FPGA - AGIB027R29A1E2VR0 (1x F-Tile, 3x R-Tile)</p></li>
@@ -104,7 +106,7 @@
 <li><p><a class="reference external" href="https://www.intel.com/content/dam/altera-www/global/en_US/support/boards-kits/agilex/agilex-agi027-devkit-schematic-reva1-apr2021.pdf">Development Kit Schematic</a></p></li>
 </ul>
 <section id="build-instructions">
-<h2>Build instructions<a class="headerlink" href="#build-instructions" title="Permalink to this headline"></a></h2>
+<h2>Build instructions<a class="headerlink" href="#build-instructions" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>Go to <code class="docutils literal notranslate"><span class="pre">build/dk-dev-agi027res/</span></code> folder in application repository.</p></li>
 <li><p>Check or modify <code class="docutils literal notranslate"><span class="pre">user_const.tcl</span></code> file, where you can change the firmware configuration.</p></li>
@@ -132,7 +134,7 @@
 </div>
 </section>
 <section id="ethernet-interface">
-<h2>Ethernet Interface<a class="headerlink" href="#ethernet-interface" title="Permalink to this headline"></a></h2>
+<h2>Ethernet Interface<a class="headerlink" href="#ethernet-interface" title="Permalink to this heading"></a></h2>
 <p>This card has two QSFP-DD cage (ports). However, our NDK design uses only one QSFP-DD port (QSFP-DD 1). It is connected to the FPGA via 8 high-speed serial lines supporting up to 56 Gbps (FGT). QSFP-DD cage is connected to an F-Tile that contains Ethernet Hard IP supporting the following speeds: <code class="docutils literal notranslate"><span class="pre">1x400GbE,</span> <span class="pre">2x200GbE,</span> <span class="pre">4x100GbE,</span> <span class="pre">8x50GbE,</span> <span class="pre">2x40GbE,</span> <span class="pre">8x25GbE,</span> <span class="pre">8x10GbE</span></code>. F-Tile Hard IPs are instantiated in Network Module, which provides Ethernet communication to and from the Application core. The architecture of the Network Module <a class="reference internal" href="../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">is described here</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -140,7 +142,7 @@
 </div>
 </section>
 <section id="pcie-interface">
-<h2>PCIe Interface<a class="headerlink" href="#pcie-interface" title="Permalink to this headline"></a></h2>
+<h2>PCIe Interface<a class="headerlink" href="#pcie-interface" title="Permalink to this heading"></a></h2>
 <p>This card has single PCIe Gen5 x16 edge connector (R-tile - 14C) and MCIO Connector (R-tile - 15C) which can be used to implement another PCIe interface with 16 lines. In our NDK design uses both R-Tile interfaces to implement 400 Gbps DMA solution (1x PCIe Gen5 x16/x8+x8 or 2x PCIe Gen4 x16/x8+x8). R-Tile Hard IPs are instantiated in PCIe Module, which provides PCIe communication to and from the Application core. The architecture of the PCIe Module <a class="reference internal" href="../../ndk_core/intel/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">is described here</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

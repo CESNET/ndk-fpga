@@ -6,8 +6,8 @@
 ..
 .. SPDX-License-Identifier: BSD-3-Clause
 
-.. Byte arry to lii convert enviroment
-.. _uvm_byte_array_mii:
+.. Byte arry to lii rx convert enviroment
+.. _uvm_byte_array_mii_rx:
 
 Byte Array to LII convert enviroment
 ------------------------------------

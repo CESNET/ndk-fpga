@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verifications &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  <title>UVM Verification &mdash; Minimal NDK Application Docs 1.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,10 +14,13 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Manual" href="comp/uvm/manual.html" />
+    <link rel="prev" title="MEM_TESTER Software" href="comp/debug/mem_tester/sw/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,7 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
@@ -61,6 +64,11 @@
 <li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">UVM Verification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="comp/uvm/manual.html">Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comp/uvm/componets.html">Components</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -77,7 +85,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Verifications</li>
+      <li>UVM Verification</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/ofm_doc/ver.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -87,33 +95,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="verifications">
-<h1>Verifications<a class="headerlink" href="#verifications" title="Permalink to this headline"></a></h1>
+  <section id="uvm-verification">
+<span id="uvm-ver"></span><h1>UVM Verification<a class="headerlink" href="#uvm-verification" title="Permalink to this heading"></a></h1>
+<p>New verifications should be written in UVM methodology. This directory contains common agents and environments. Only the highly specified code such as model should be in directory with component.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="comp/uvm/readme.html">UVM Verification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/byte_array/readme.html">Byte Array agent</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/common/readme.html">COMMON PACKAGE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/lii/readme.html">LII agent</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/mvb/readme.html">MVB agent</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/mi/readme.html">UVM MI agent</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/pma/readme.html">PMA agent</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/reset/readme.html">RESET agent</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#systemverilog-and-uvm-tutorial">SystemVerilog and UVM tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#basic-usage-of-uvm-methodology-in-ofm">Basic usage of UVM methodology in OFM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#layered-agents">Layered agents</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#common-environment">Common environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#request-response-agents">Request response Agents</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#reset">Reset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#coverage">Coverage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#verification-example">Verification example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#notes">NOTES</a></li>
-<li class="toctree-l2"><a class="reference internal" href="comp/uvm/readme.html#ofm-verification-environment">OFM verification environment</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="comp/uvm/manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/uvm/componets.html">Components</a></li>
 </ul>
 </div>
 </section>
@@ -121,7 +110,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="comp/debug/mem_tester/sw/readme.html" class="btn btn-neutral float-left" title="MEM_TESTER Software" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="comp/uvm/manual.html" class="btn btn-neutral float-right" title="Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

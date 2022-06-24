@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Intel MAC SEQ &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  <title>Intel MAC SEG &mdash; Minimal NDK Application Docs 1.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,10 +14,12 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="prev" title="PMA agent" href="../pma/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,7 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
@@ -61,6 +63,42 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../common/readme.html">Common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-interface">LII interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-monitor">LII monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-driver">LII driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mvb/readme.html">MVB agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mfb/readme.html">MFB Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Intel MAC SEG</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#interface">Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequence-item">Sequence item</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequence">Sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#driver">Driver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#monitor">Monitor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config">Config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#agent">Agent</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -77,7 +115,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Intel MAC SEQ</li>
+          <li><a href="../../../ver.html">UVM Verification</a> &raquo;</li>
+          <li><a href="../componets.html">Components</a> &raquo;</li>
+      <li>Intel MAC SEG</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/ofm_doc/comp/uvm/intel_mac_seg/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -87,35 +127,37 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="intel-mac-seq">
-<span id="uvm-mvb"></span><h1>Intel MAC SEQ<a class="headerlink" href="#intel-mac-seq" title="Permalink to this headline"></a></h1>
+  <section id="intel-mac-seg">
+<span id="uvm-intel-mac-seg"></span><h1>Intel MAC SEG<a class="headerlink" href="#intel-mac-seg" title="Permalink to this heading"></a></h1>
 <section id="interface">
-<h2>Interface<a class="headerlink" href="#interface" title="Permalink to this headline"></a></h2>
+<h2>Interface<a class="headerlink" href="#interface" title="Permalink to this heading"></a></h2>
 </section>
 <section id="sequence-item">
-<h2>Sequence item<a class="headerlink" href="#sequence-item" title="Permalink to this headline"></a></h2>
+<h2>Sequence item<a class="headerlink" href="#sequence-item" title="Permalink to this heading"></a></h2>
 </section>
 <section id="sequence">
-<h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline"></a></h2>
+<h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this heading"></a></h2>
 </section>
 <section id="driver">
-<h2>Driver<a class="headerlink" href="#driver" title="Permalink to this headline"></a></h2>
+<h2>Driver<a class="headerlink" href="#driver" title="Permalink to this heading"></a></h2>
 </section>
 <section id="monitor">
-<h2>Monitor<a class="headerlink" href="#monitor" title="Permalink to this headline"></a></h2>
+<h2>Monitor<a class="headerlink" href="#monitor" title="Permalink to this heading"></a></h2>
 </section>
 <section id="config">
-<h2>Config<a class="headerlink" href="#config" title="Permalink to this headline"></a></h2>
+<h2>Config<a class="headerlink" href="#config" title="Permalink to this heading"></a></h2>
 </section>
 <section id="agent">
-<h2>Agent<a class="headerlink" href="#agent" title="Permalink to this headline"></a></h2>
+<h2>Agent<a class="headerlink" href="#agent" title="Permalink to this heading"></a></h2>
 </section>
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../pma/readme.html" class="btn btn-neutral float-left" title="PMA agent" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 

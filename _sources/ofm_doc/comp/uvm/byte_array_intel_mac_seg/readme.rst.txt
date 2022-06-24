@@ -4,33 +4,14 @@
 ..
 .. SPDX-License-Identifier: BSD-3-Clause
 
-.. MVB agent and MVB interface
+.. Byte array to intel mac seg
+.. _byte_array_intel_mac_seg:
 
-.. _uvm_mvb:
+*********************
+byte array to MAC SEG
+*********************
 
-*************
-Intel MAC SEQ
-*************
-
-Interface
-^^^^^^^^^
+this agent is low level agent for MAC SEG
 
 
-Sequence item
-^^^^^^^^^^^^^
-
-Sequence
-^^^^^^^^
-
-Driver
-^^^^^^
-
-Monitor
-^^^^^^^
-
-Config
-^^^^^^
-
-Agent
-^^^^^
 

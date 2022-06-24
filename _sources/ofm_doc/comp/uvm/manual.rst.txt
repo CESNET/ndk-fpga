@@ -6,31 +6,13 @@
 ..
 .. SPDX-License-Identifier: BSD-3-Clause
 
-.. UVM verifikace
-
-
-.. _uvm_ver:
+.. UVM Manual
+.. _uvm_manual:
 
 ****************
-UVM Verification
+Manual
 ****************
-
-New verifications should be written in UVM methodology. This directory contains common agents and environments. Only the highly specified code such as model should be in directory with component.
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Components:
-
-    byte_array/readme
-    byte_array_lii/readme
-    byte_array_pma/readme
-    common/readme
-    lii/readme
-    mvb/readme
-    mi/readme
-    pma/readme
-    reset/readme
-
+This is manual how to write UVM verification in our enviroment.
 
 SystemVerilog and UVM tutorial
 ##############################
@@ -43,15 +25,15 @@ This documents describes how should be written the UVM verification of our compo
 - `Doulos coding guidelines <https://www.doulos.com/media/1277/easier-uvm-coding-guidelines-2016-06-24.pdf>`_
 - `Packing <https://www.amiq.com/consulting/2017/05/29/how-to-pack-data-using-systemverilog-streaming-operators/>`_
 - `Unpacking <https://www.amiq.com/consulting/2017/06/23/how-to-unpack-data-using-the-systemverilog-streaming-operators/>`_
-- `systemverilog Assertion <http://www.asic-world.com/systemverilog/assertions.html>`_
-- `systemverilog Assertion <https://www.einfochips.com/blog/system-verilog-assertions-simplified/>`_
+- `systemverilog Assertion (asic-world) <http://www.asic-world.com/systemverilog/assertions.html>`_
+- `systemverilog Assertion (einfochips) <https://www.einfochips.com/blog/system-verilog-assertions-simplified/>`_
 
 
 Basic usage of UVM methodology in OFM
 #####################################
 
 
-This document describes solution of some common verification problems. This documents doesn't have to describe best solution, but it describe best solution what we find out.
+This document describes one of the possible solutions of some common verification issues.
 
 
 
@@ -621,6 +603,10 @@ If the environment contains other environment like on previous picture, virtual 
     endclass
 
 
+Virtual sequence and synchronization
+====================================
+
+
 Scoreboard
 ====================
 
@@ -708,14 +694,49 @@ The first transaction is master and the second transaction is slave.
 Reset
 ###################################
 
-Monitor
+One possible solution to the problem when reset is generated in the middle of verification (not only at the start of verification) is to use the wait task to wait for all required
+inputs. An example is shown below showing this type of solution.
+The problem that can occur is if the process read input A and wait for input B then a reset happens and all data should be flush. After the reset process receives
+input B and model connects the wrong data. Input A receives before reset with input B after reset. This solution can be made as in scoreboard as in model.
+For more info see reset agent documentation.
+
+Scoreboard
 ====================
 
-Sequencer and sequence
-======================
+.. code-block:: systemverilog
 
-Model
-====================
+    class scoreboard uvm_scoreboard;
+        `uvm_component_utils(env::scoreboard)
+        uvm_analysis_imp_reset#(reset::sequence_item, scoreboard) analysis_imp_reset;
+        model m_model;
+
+        function new(string name, uvm_component parent = null);
+            super.new(name, parent);
+            analysis_imp_reset = new("analysis_imp_reset", this);
+        endfunction
+
+        function void write_reset(reset::sequence_item tr);
+            //RESET
+            dut_fifo.flush();
+            model_fifo.flush();
+            m_regmodel.reset();
+            m_model.reset();
+        endfunction
+
+        task run_phase(uvm_phase phase);
+            ...
+            forever begin
+                //wait for DUT and model transactions. Reset can erase all unfinished transactions
+                wait(dut_fifo.used() != 0 && model_fifo.used() != 0);
+
+                compared++;
+                if (dut_tr.compare(model_tr) == 0) begin
+                    `uvm_error(...);
+                end
+            end
+        endtask
+    endclass
+
 
 Coverage
 ###################################
@@ -815,7 +836,7 @@ The image show block connection of such verification.
 
 
 Byte_array_port environment
-==========================
+===========================
 
 Environment is used for grouping byte_array and port. Advantage of this solution is generating data for MVB and MFB in one roll.
 
@@ -1092,6 +1113,7 @@ interframe and between frame spaces. This adjustmens is add by UVM abstract fact
 example of full speed mfb sequence
 
 .. code-block:: systemverilog
+
     class sequence_rx_rdy extends uvm_sequencex(mfb::sequence_item)
         `uvm_object_utils(test::sequence_rx_rdy)
 
@@ -1163,6 +1185,10 @@ Properties contains interface protocols rules which have to DUT keep. Also it ca
 testbench
 ======================
 
+After the run_test command is required to put command $stop(). If you want to stop quitting ModelSim after drop_objection, you must
+set the variable finish_on_completion to zero. If you set the variable finish_on_completion to zero, verification doesn't have to stop.
+This problem is fixed by putting command $stop() after command run_test(); If you wish to generate coverage you have to set
+set variable finis_on_completion to zero.
 
 .. code-block:: systemverilog
 
@@ -1179,6 +1205,7 @@ testbench
 
         // Start of tests
         initial begin
+            uvm_root m_root;
             virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH) v_tx_mfb;
             v_tx_mfb = tx_mfb;
             // Configuration TX
@@ -1191,7 +1218,14 @@ testbench
             uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH))::set(null, "", "INPUT_MFB", rx_mfb);
             uvm_config_db#(virtual mvb_if #(REGIONS, MVB_ITEM_WIDTH))::set(null, "", "INPUT_MVB", rx_mfb);
             uvm_config_db#(virtual reset_if)::set(null, "", "RESET", rst);
+
+            m_root = uvm_root::get();           //get root component
+            m_root.finish_on_completion = 0;    //now finish on end. required stop command after run_test
+            //stop reporting ILEGALNAME when sequence in sequence library have been started
+            m_root.set_report_id_action_hier("ILLEGALNAME",UVM_NO_ACTION);
+
             run_test();
+            $stop(2);
         end
 
         // DUT modul

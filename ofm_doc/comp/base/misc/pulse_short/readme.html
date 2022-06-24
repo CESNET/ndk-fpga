@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pulse short &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -78,6 +79,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -107,7 +109,7 @@
            <div itemprop="articleBody">
              
   <section id="pulse-short">
-<span id="id1"></span><h1>Pulse short<a class="headerlink" href="#pulse-short" title="Permalink to this headline"></a></h1>
+<span id="id1"></span><h1>Pulse short<a class="headerlink" href="#pulse-short" title="Permalink to this heading"></a></h1>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-pulse_short">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">PULSE_SHORT</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-pulse_short" title="Permalink to this definition"></a></dt>
@@ -117,12 +119,6 @@ short pulse (driven by the <a class="reference internal" href="#vhdl-portsignal-
 Outuput pulse can be arbirarily delayed when <a class="reference internal" href="#vhdl-genconstant-pulse_short-delay_count"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">DELAY_COUNT</span></code></a> constant is set. Optional CDC could be applied on
 control inputs by setting specific bits in the <a class="reference internal" href="#vhdl-genconstant-pulse_short-async_mask"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ASYNC_MASK</span></code></a> generic constant.</p>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 70%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
 <th class="head"><p>Type</p></th>
@@ -150,12 +146,6 @@ bit 2 -&gt; TRIGGER</p></td>
 </tbody>
 </table>
 <span class="sig-name descname">Ports</span><table class="docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 70%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Port</p></th>
 <th class="head"><p>Type</p></th>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RESET agent &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,10 +14,13 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Logic vector agent" href="../logic_vector/readme.html" />
+    <link rel="prev" title="Components" href="../componets.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,7 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
@@ -61,6 +64,36 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">RESET agent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#simple-sychronous-reset-agents">simple sychronous RESET agents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../common/readme.html">Common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-interface">LII interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-monitor">LII monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-driver">LII driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mvb/readme.html">MVB agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mfb/readme.html">MFB Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -77,6 +110,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../ver.html">UVM Verification</a> &raquo;</li>
+          <li><a href="../componets.html">Components</a> &raquo;</li>
       <li>RESET agent</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/ofm_doc/comp/uvm/reset/readme.rst.txt" rel="nofollow"> View page source</a>
@@ -88,7 +123,7 @@
            <div itemprop="articleBody">
              
   <section id="reset-agent">
-<h1>RESET agent<a class="headerlink" href="#reset-agent" title="Permalink to this headline"></a></h1>
+<span id="uvm-reset"></span><h1>RESET agent<a class="headerlink" href="#reset-agent" title="Permalink to this heading"></a></h1>
 <p>This agent generate one bit signal which is never have undefined value. Primary use of this agent is generating reset signal in verification.</p>
 <dl class="simple">
 <dt>Package containt two major sequences.</dt><dd><p>sequence_simple - fist n random cicles generate reset and next m random cicles generates no reset. This pattern is repeating until end of simulation.
@@ -138,7 +173,7 @@ sequence_rand   - Reset randomly generated with some distribution. Reset is gene
 </pre></div>
 </div>
 <section id="simple-sychronous-reset-agents">
-<h2>simple sychronous RESET agents<a class="headerlink" href="#simple-sychronous-reset-agents" title="Permalink to this headline"></a></h2>
+<h2>simple sychronous RESET agents<a class="headerlink" href="#simple-sychronous-reset-agents" title="Permalink to this heading"></a></h2>
 <p>enviroment env#(RESETS) contain RESETS number of reset agents which generate synchronous reset for asynchronous clock domain. Synchronization mechanism is realy simple and cannot be used everyvhere.
 All resets agent read one value which is change ones per specified time. Time is specified in class env_config_item#(RESETS) in variable driver_delay. User have to setup up time to two times maximum of slowest reset time multiple of slowest clock.
 2*max(CLK[it]*RESET_TIME[it]). Enviroment work as agent. You can run any sequence on enviroment seqeuencer which can be ran on agent sequencer</p>
@@ -149,7 +184,10 @@ All resets agent read one value which is change ones per specified time. Time is
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../componets.html" class="btn btn-neutral float-left" title="Components" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../logic_vector/readme.html" class="btn btn-neutral float-right" title="Logic vector agent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

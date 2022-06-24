@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MI splitter plus gen &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -80,6 +81,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -108,7 +110,7 @@
            <div itemprop="articleBody">
              
   <section id="mi-splitter-plus-gen">
-<span id="id1"></span><h1>MI splitter plus gen<a class="headerlink" href="#mi-splitter-plus-gen" title="Permalink to this headline"></a></h1>
+<span id="id1"></span><h1>MI splitter plus gen<a class="headerlink" href="#mi-splitter-plus-gen" title="Permalink to this heading"></a></h1>
 <p>This is another splitter for the MI bus.
 MI transactions are routed out of a certain port, depending on how the splitter is set and on the transaction’s address.
 The most significant advantage of this splitter is the possibility for the user to choose the number of output ports, and for each output port a range (or ranges) of addresses that are routed to (and out of) this port.
@@ -116,7 +118,7 @@ These address ranges are specified by Address Bases (ABs), which are contained i
 There can be more ABs than there is output ports, which means that more than one AB can be assigned to a single output port.
 It doesn’t work the other way around though.</p>
 <section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline"></a></h2>
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading"></a></h2>
 <p>The splitter accepts standard MI transactions at its input.
 Output ports have a range(s) of addresses assigned and transactions addressed to this range are sent out of the according port.
 As was said before, the address ranges are defined by ABs.
@@ -129,7 +131,7 @@ Then address range associated with port 0 is from AB(0) up to AB(1)-1, range ass
 <a class="reference internal image-reference" href="../../../../_images/mi_splitter_exm1.svg"><img alt="../../../../_images/mi_splitter_exm1.svg" class="align-center" src="../../../../_images/mi_splitter_exm1.svg" width="50%" /></a>
 </section>
 <section id="examples-of-use">
-<h2>Examples of use<a class="headerlink" href="#examples-of-use" title="Permalink to this headline"></a></h2>
+<h2>Examples of use<a class="headerlink" href="#examples-of-use" title="Permalink to this heading"></a></h2>
 <p>The next 3 examples explain how to:</p>
 <ul class="simple">
 <li><p>set up ABs,</p></li>
@@ -137,12 +139,12 @@ Then address range associated with port 0 is from AB(0) up to AB(1)-1, range ass
 <li><p>map ABs to ports “abnormally”</p></li>
 </ul>
 <section id="example-1-setting-up-addr-base">
-<h3>Example 1 - setting up ADDR_BASE<a class="headerlink" href="#example-1-setting-up-addr-base" title="Permalink to this headline"></a></h3>
+<h3>Example 1 - setting up ADDR_BASE<a class="headerlink" href="#example-1-setting-up-addr-base" title="Permalink to this heading"></a></h3>
 <p>Perhaps we want to use the MI splitter with 7 outputs (as is in the figure above).
 We want transactions with addresses in range from 0x0 up to 0x3 to be routed out of port 0, addresses in range from 0x4 up to 0x7 to be routed out of port 1 an so on, just like the first 2 columns of table 1 show.
 Then we should set ABs like in the 3rd column of this table.
 Side note: generally, the ranges don’t have to be the same, but let’s keep it simple for now.</p>
-<table class="colwidths-given docutils align-center" id="id2">
+<table class="docutils align-center" id="id2">
 <caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 33%" />
@@ -193,7 +195,7 @@ If we wanted the last range of addresses to be the same as the previous ones (i.
 This is explained in the following example.</p>
 </section>
 <section id="example-2-masking-irrelevant-bits-of-the-address">
-<h3>Example 2 - masking irrelevant bits of the address<a class="headerlink" href="#example-2-masking-irrelevant-bits-of-the-address" title="Permalink to this headline"></a></h3>
+<h3>Example 2 - masking irrelevant bits of the address<a class="headerlink" href="#example-2-masking-irrelevant-bits-of-the-address" title="Permalink to this heading"></a></h3>
 <p>In this case, we want to choose the output port according to only a part of MI transaction’s address.
 If we want the port with highest associated AB to act as a default port (one that will  carry all transactions that don’t fall into any other range), we have to set ADDR_MASK to <cite>(others =&gt; ‘1’)</cite>, because we want to use all bits of the address.
 If we leave the mask in default state, all ABs are ORed together and interleaving ‘0’s are replaced by ‘1’s.
@@ -207,7 +209,7 @@ This is shown in the first two columns of table 2.
 According this, you can try to set the ADDR_BASE by yourselves and then compare it with the last column of table 2.
 In the third column are the same address ranges converted to binary.
 This makes it easier to determine, which bits of the mask have to be ‘1’s and which should be ‘0’s.</p>
-<table class="colwidths-given docutils align-center" id="id3">
+<table class="docutils align-center" id="id3">
 <caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id3" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 18%" />
@@ -270,7 +272,7 @@ So address mask should consist of ‘0’s from MSB down to bit at position 9, t
 The final form of ADDR_MASK is then: …0<strong>1 111111</strong>00.</p>
 </section>
 <section id="example-3-mapping-ports-to-differnt-abs">
-<h3>Example 3 - mapping ports to differnt ABs<a class="headerlink" href="#example-3-mapping-ports-to-differnt-abs" title="Permalink to this headline"></a></h3>
+<h3>Example 3 - mapping ports to differnt ABs<a class="headerlink" href="#example-3-mapping-ports-to-differnt-abs" title="Permalink to this heading"></a></h3>
 <p>In this advanced example, we would like to assign more ABs (i.e. more address ranges) to a single port.
 For that we’re gonna need to use PORT_MAPPING.
 Let’s take the first example we had.
@@ -299,7 +301,7 @@ According to the table, we want transactions with addresses in ranges from 0x0 u
 These ranges are associated with AB(0) and AB(6).
 So PORT_MAPPING(0) and PORT_MAPPING(6) should have both assigned (port number) 0.
 The same goes for all other indices; the final form of PORT_MAPPING should look like in table 3.</p>
-<table class="colwidths-given docutils align-center" id="id4">
+<table class="docutils align-center" id="id4">
 <caption><span class="caption-text">Tab. 3</span><a class="headerlink" href="#id4" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 50%" />

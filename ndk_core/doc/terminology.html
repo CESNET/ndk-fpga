@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Terminology &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -71,6 +72,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -98,33 +100,33 @@
            <div itemprop="articleBody">
              
   <section id="terminology">
-<span id="ndk-terminology"></span><h1>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline"></a></h1>
+<span id="ndk-terminology"></span><h1>Terminology<a class="headerlink" href="#terminology" title="Permalink to this heading"></a></h1>
 <p>This chapter explains frequently used terms.</p>
 <section id="ethernet-port">
-<h2>Ethernet Port<a class="headerlink" href="#ethernet-port" title="Permalink to this headline"></a></h2>
+<h2>Ethernet Port<a class="headerlink" href="#ethernet-port" title="Permalink to this heading"></a></h2>
 <p>In our terminology, the <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Port</span></code> corresponds to one physical network port, typically one optical cage (for example, QSFP28 or QSFP-DD).</p>
 </section>
 <section id="ethernet-lanes">
-<h2>Ethernet Lanes<a class="headerlink" href="#ethernet-lanes" title="Permalink to this headline"></a></h2>
+<h2>Ethernet Lanes<a class="headerlink" href="#ethernet-lanes" title="Permalink to this heading"></a></h2>
 <p>The term <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Lanes</span></code> refer to high-speed serial lines used in the physical layer of the Ethernet protocol.
 Each type of Ethernet Port can use a different number of <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Lanes</span></code> (for example, QSFP28 uses 4, and QSFP-DD uses 8).</p>
 </section>
 <section id="ethernet-channel">
-<h2>Ethernet Channel<a class="headerlink" href="#ethernet-channel" title="Permalink to this headline"></a></h2>
+<h2>Ethernet Channel<a class="headerlink" href="#ethernet-channel" title="Permalink to this heading"></a></h2>
 <p>Each Ethernet Port can use a different number of high-speed serial lines (Ethernet Lanes), typically 4 or 8. Different Ethernet standards (like 100 GbE, 25 GbE,…) require one or more of these lanes. For port QSFP28, where there are 4 lanes running at 28 Gbps, 100 GbE standard would take up all 4 lanes together forming one <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">channel</span></code>. For another Ethernet standard like 25 GbE, one lane is enough. Using all 4 lanes, we would get 4 separate 25 Gigabit <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">channels</span></code>.</p>
 </section>
 <section id="ethernet-stream">
-<h2>Ethernet Stream<a class="headerlink" href="#ethernet-stream" title="Permalink to this headline"></a></h2>
+<h2>Ethernet Stream<a class="headerlink" href="#ethernet-stream" title="Permalink to this heading"></a></h2>
 <p>An <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Stream</span></code> is a group of data interfaces (RX and TX) that transmits Ethernet packets from/to a selected number of Ethernet Channels.
 In our platform, the number of <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Streams</span></code> typically corresponds to the number of Ethernet Ports.</p>
 </section>
 <section id="dma-stream">
-<h2>DMA Stream<a class="headerlink" href="#dma-stream" title="Permalink to this headline"></a></h2>
+<h2>DMA Stream<a class="headerlink" href="#dma-stream" title="Permalink to this heading"></a></h2>
 <p>An <code class="docutils literal notranslate"><span class="pre">DMA</span> <span class="pre">Stream</span></code> is a group of data interfaces (RX and TX) that transmits DMA packets from/to DMA module.
 In our platform, the number of <code class="docutils literal notranslate"><span class="pre">DMA</span> <span class="pre">Streams</span></code> typically corresponds to the number of Ethernet Streams (and therefore Ethernet Ports).</p>
 </section>
 <section id="dma-channel">
-<h2>DMA Channel<a class="headerlink" href="#dma-channel" title="Permalink to this headline"></a></h2>
+<h2>DMA Channel<a class="headerlink" href="#dma-channel" title="Permalink to this heading"></a></h2>
 <p>The DMA controller supports data transmission in each direction (RX and TX) in multiple independent queues, which in our terminology we refer to as <code class="docutils literal notranslate"><span class="pre">DMA</span> <span class="pre">channels</span></code>.</p>
 </section>
 </section>

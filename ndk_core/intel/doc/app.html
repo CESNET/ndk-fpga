@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Application core &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -72,6 +73,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -100,7 +102,7 @@
            <div itemprop="articleBody">
              
   <section id="application-core">
-<span id="ndk-intel-app"></span><h1>Application core<a class="headerlink" href="#application-core" title="Permalink to this headline"></a></h1>
+<span id="ndk-intel-app"></span><h1>Application core<a class="headerlink" href="#application-core" title="Permalink to this heading"></a></h1>
 <p>NDK is designed for creating new network applications processing packets in a deep pipeline. The application core is a space that provides all the necessary resources for such an application.
 Depending on the selected card, there are several streams for receiving and sending Ethernet packets, several streams for sending a packet to the host CPU through the DMA module.
 There are also several Avalon-MM interfaces for accessing external memory (typically DDR4) and the MI interface (see <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus specification</span></a>) for accessing the CSR implemented in the application.
@@ -120,12 +122,6 @@ The application core allows you to assign the selected user clock to individual 
 <dt class="sig sig-object vhdl" id="vhdl-entity-application_core">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">APPLICATION_CORE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-application_core" title="Permalink to this definition"></a></dt>
 <dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 70%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
 <th class="head"><p>Type</p></th>
@@ -224,6 +220,16 @@ The application core allows you to assign the selected user clock to individual 
 <td><p>512</p></td>
 <td><p>MEM parameters: width of AVMM data signals</p></td>
 </tr>
+<tr class="row-even" id="vhdl-genconstant-application_core-mem_refr_period_width"><td><p>MEM_REFR_PERIOD_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>MEM parameters: width of user refresh period</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-genconstant-application_core-mem_def_refr_period"><td><p>MEM_DEF_REFR_PERIOD</p></td>
+<td><p>slv_array_t(MEM_PORTS - 1 downto 0)(MEM_REFR_PERIOD_WIDTH - 1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td><p>MEM parameters: default refresh periods for each interface</p></td>
+</tr>
 <tr class="row-even" id="vhdl-genconstant-application_core-amm_freq_khz"><td><p>AMM_FREQ_KHZ</p></td>
 <td><p>integer</p></td>
 <td><p>266660</p></td>
@@ -257,12 +263,6 @@ The application core allows you to assign the selected user clock to individual 
 </tbody>
 </table>
 <span class="sig-name descname">Ports</span><table class="docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 70%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Port</p></th>
 <th class="head"><p>Type</p></th>
@@ -625,7 +625,7 @@ DMA channels are statically and evenly mapped to all PCIe EPs</p></td>
 <tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_address"><td><p>MEM_AVMM_ADDRESS</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>MEM Avalon-MM: address of r/w request</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_burstcount"><td><p>MEM_AVMM_BURSTCOUNT</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_BURST_WIDTH-1 downto 0)</p></td>
@@ -647,30 +647,50 @@ DMA channels are statically and evenly mapped to all PCIe EPs</p></td>
 <td><p>in</p></td>
 <td><p>MEM Avalon-MM: read data valid flag</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-emif_rst_req"><td><p>EMIF_RST_REQ</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_refr_period"><td><p>MEM_REFR_PERIOD</p></td>
+<td><p>slv_array_t(MEM_PORTS - 1 downto 0)(MEM_REFR_PERIOD_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MEM parameter: user refresh period</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_refr_req"><td><p>MEM_REFR_REQ</p></td>
+<td><p>std_logic_vector(MEM_PORTS - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MEM parameter: user refresh request</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_refr_ack"><td><p>MEM_REFR_ACK</p></td>
+<td><p>std_logic_vector(MEM_PORTS - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MEM parameter: user refresh ack</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_rst_req"><td><p>EMIF_RST_REQ</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>EMIF local reset request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-emif_rst_done"><td><p>EMIF_RST_DONE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_rst_done"><td><p>EMIF_RST_DONE</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF local reset done flag</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-emif_ecc_usr_int"><td><p>EMIF_ECC_USR_INT</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_ecc_usr_int"><td><p>EMIF_ECC_USR_INT</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF ECC user interupt flag</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-emif_cal_success"><td><p>EMIF_CAL_SUCCESS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_cal_success"><td><p>EMIF_CAL_SUCCESS</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF calibration success flag</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-emif_cal_fail"><td><p>EMIF_CAL_FAIL</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_cal_fail"><td><p>EMIF_CAL_FAIL</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF calibration fail flag</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_auto_precharge"><td><p>EMIF_AUTO_PRECHARGE</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>EMIF auto precharge request</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-application_core-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>

@@ -19,16 +19,17 @@ A total of 26b address range is available, which is divided between the individu
     0x00000100-0x00000FFF -- Reserved space
     0x00001000-0x000010FF -- ADC sensor (FPGA temperature,...)
     0x00001100-0x00001FFF -- Reserved space
-    0x00002000-0x000020FF -- FPGA (SDM) controller
-    0x00002100-0x00003FFF -- Reserved space
+    0x00002000-0x000020FF -- FPGA (SDM or BOOT) controller
+    0x00002100-0x00002FFF -- Reserved space
+    0x00003000-0x00003FFF -- Ethernet PMD (QSFP controller)
     0x00004000-0x000040FF -- Timestamp unit
     0x00004100-0x00004FFF -- Reserved space
     0x00005000-0x00007FFF -- Debug Gen Loop modules
-    0x00008000-0x0000BFFF -- Network module
+    0x00008000-0x0000BFFF -- Ethernet MACs
     0x0000C000-0x0000FFFF -- Reserved space
     0x00010000-0x0001FFFF -- Memory controller (TODO)
     0x00020000-0x007FFFFF -- Reserved space
-    0x00800000-0x00FFFFFF -- Ethernet physical layer
+    0x00800000-0x00FFFFFF -- Ethernet PCS/PMA
     0x01000000-0x013FFFFF -- DMA space
     0x01400000-0x01FFFFFF -- Reserved space
     0x02000000-0x03FFFFFF -- Application core

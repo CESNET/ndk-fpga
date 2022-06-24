@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Event Counter &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -82,6 +83,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -111,7 +113,7 @@
            <div itemprop="articleBody">
              
   <section id="event-counter">
-<span id="id1"></span><h1>Event Counter<a class="headerlink" href="#event-counter" title="Permalink to this headline"></a></h1>
+<span id="id1"></span><h1>Event Counter<a class="headerlink" href="#event-counter" title="Permalink to this heading"></a></h1>
 <p>The Event Counter is a debuging unit for receiving statistics of occurence frequency of a certain event.
 It is made accessible through MI interface using the Event Counter MI Wrapper.
 The MI address space consists of 4 addresses which are configured by the user as generics.</p>
@@ -124,11 +126,11 @@ It is thus recomended to read the number of cycles from this register as the act
 <p>Once a whole interval has been counted, the events counter and the cycles counter are reset and the counting automatically continues to the next interval.
 From the view of the user this means, that the values read from the output register can change all the time.</p>
 <section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline"></a></h2>
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/event_counter.svg" id="event-counter-diagram"><img alt="" class="align-center" id="event-counter-diagram" src="../../../../../_images/event_counter.svg" width="100%" /></a>
 </section>
 <section id="capture-feature">
-<h2>Capture feature<a class="headerlink" href="#capture-feature" title="Permalink to this headline"></a></h2>
+<h2>Capture feature<a class="headerlink" href="#capture-feature" title="Permalink to this heading"></a></h2>
 <p>Sometimes it is useful to be able to see the evolution of the event’s occurence across time.
 The user can read the output counter register to get the rough idea.
 (e.g. NOW events are occuring a lot. A second later there are none.)

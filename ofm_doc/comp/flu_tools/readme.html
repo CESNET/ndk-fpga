@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FLU bus specification &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -61,6 +62,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -88,7 +90,7 @@
            <div itemprop="articleBody">
              
   <section id="flu-bus-specification">
-<span id="flu-bus-spec"></span><h1>FLU bus specification<a class="headerlink" href="#flu-bus-specification" title="Permalink to this headline"></a></h1>
+<span id="flu-bus-spec"></span><h1>FLU bus specification<a class="headerlink" href="#flu-bus-specification" title="Permalink to this heading"></a></h1>
 <p>This page describes the FrameLinkUnaligned (FLU) protocol, which is a successor of the FrameLink protocol. FrameLinkUnaligned (or FLU) is designed for wide data busses (256 bits and above) without wasting as much bandwidth as with FrameLink. Main differences:</p>
 <ul class="simple">
 <li><p>Adds support for unaligned start of packet. Fineness of the alignment is a protocol parameter (width of the <code class="docutils literal notranslate"><span class="pre">SOP_POS</span></code> signal).</p></li>
@@ -96,14 +98,9 @@
 <li><p>Uses positive logic. No <code class="docutils literal notranslate"><span class="pre">_N</span></code> suffixes.</p></li>
 </ul>
 <section id="table-of-generics">
-<h2>Table of generics<a class="headerlink" href="#table-of-generics" title="Permalink to this headline"></a></h2>
+<h2>Table of generics<a class="headerlink" href="#table-of-generics" title="Permalink to this heading"></a></h2>
 <p>These are generics of the modules using the FLU protocol.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 15%" />
-<col style="width: 41%" />
-<col style="width: 44%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic name</p></th>
 <th class="head"><p>Meaning</p></th>
@@ -123,14 +120,8 @@
 </table>
 </section>
 <section id="table-of-signals">
-<h2>Table of signals<a class="headerlink" href="#table-of-signals" title="Permalink to this headline"></a></h2>
+<h2>Table of signals<a class="headerlink" href="#table-of-signals" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 7%" />
-<col style="width: 4%" />
-<col style="width: 84%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Signal name</p></th>
 <th class="head"><p>Width</p></th>
@@ -178,7 +169,7 @@
 </table>
 </section>
 <section id="usage-guidelines">
-<h2>Usage guidelines<a class="headerlink" href="#usage-guidelines" title="Permalink to this headline"></a></h2>
+<h2>Usage guidelines<a class="headerlink" href="#usage-guidelines" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>Infrastructure module names (fifos, transformers etc.) should use the <code class="docutils literal notranslate"><span class="pre">flu_</span></code> prefix to distinguish between FrameLink and FrameLinkUnaligned. <code class="docutils literal notranslate"><span class="pre">fl_</span></code> prefix is forbidden.</p></li>
 <li><p>Signal ordering in simulation, signal and entity declaration and instantion should be as defined in the first table of this document. This is for easier copy-pasting in text editors.</p></li>
@@ -195,7 +186,7 @@
 </ul>
 </section>
 <section id="timing-diagram-example">
-<h2>Timing diagram example<a class="headerlink" href="#timing-diagram-example" title="Permalink to this headline"></a></h2>
+<h2>Timing diagram example<a class="headerlink" href="#timing-diagram-example" title="Permalink to this heading"></a></h2>
 <p>Example uses <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH=512</span></code> and <code class="docutils literal notranslate"><span class="pre">SOP_POS_WIDTH=3</span></code>:</p>
 <a class="reference internal image-reference" href="../../../_images/wave_flu.svg"><img alt="../../../_images/wave_flu.svg" class="align-center" src="../../../_images/wave_flu.svg" width="100%" /></a>
 <ul class="simple">
@@ -208,7 +199,7 @@
 </ul>
 </section>
 <section id="copy-paste-code-blocks">
-<h2>Copy-paste code blocks<a class="headerlink" href="#copy-paste-code-blocks" title="Permalink to this headline"></a></h2>
+<h2>Copy-paste code blocks<a class="headerlink" href="#copy-paste-code-blocks" title="Permalink to this heading"></a></h2>
 <p><strong>Entity</strong></p>
 <div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="c1">-- Frame Link Unaligned input interface</span>
 <span class="n">RX_DATA</span>    <span class="o">:</span> <span class="k">in</span>  <span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span> <span class="k">downto</span> <span class="mi">0</span><span class="p">);</span>

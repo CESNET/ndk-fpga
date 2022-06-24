@@ -7,7 +7,6 @@
 .. SPDX-License-Identifier: BSD-3-Clause
 
 .. MVB agent and MVB interface
-
 .. _uvm_mvb:
 
 ************

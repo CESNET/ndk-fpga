@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Network module &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -82,6 +83,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -110,7 +112,7 @@
            <div itemprop="articleBody">
              
   <section id="network-module">
-<span id="ndk-intel-net-mod"></span><h1>Network module<a class="headerlink" href="#network-module" title="Permalink to this headline"></a></h1>
+<span id="ndk-intel-net-mod"></span><h1>Network module<a class="headerlink" href="#network-module" title="Permalink to this heading"></a></h1>
 <p>Network module enables connection of the NDK platform to an Ethernet interface(s).
 The basic architecture is displayed below.</p>
 <a class="reference internal image-reference" href="../../../_images/network_module_arch.svg"><img alt="../../../_images/network_module_arch.svg" class="align-center" src="../../../_images/network_module_arch.svg" width="65%" /></a>
@@ -136,7 +138,7 @@ Another parameter that is available to the user is the number of ports (Ethernet
 Both of the previous diagrams illustrate a scenario with a single port.
 For a multi-port scenario, you can just imagine every block in the diagram above N times (Where N is the number of ports), with the exception of the QSFP control and the MI splitting logic (which is a virtual block described <a class="reference internal" href="#sw-access-mac-lites"><span class="std std-ref">below</span></a>).</p>
 <section id="network-module-core">
-<h2>Network module core<a class="headerlink" href="#network-module-core" title="Permalink to this headline"></a></h2>
+<h2>Network module core<a class="headerlink" href="#network-module-core" title="Permalink to this heading"></a></h2>
 <p>The so-called Network module core is a subcomponent of the Network module containing the required hard IP (I’ll get into that in a sec), appropriate adapters and an MI component for the communication with the reconfiguration interfaces of the hard IP.
 Right now, the Network module can use two different Ethernet hard IPs, the E-tile and the F-Tile.
 According to the selected NIC (and therefore the type of hard IP), the proper architecture of the Network module core (with the proper hard IP) is used.
@@ -144,10 +146,6 @@ It is connected directly to the serial (QSFP) pins of the FPGA.
 On the other (right) side, it is connected to the TX and RX MAC lites over MFB and to MI interconnect.
 Both architectures of the Network module core are displayed below.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/etile_network_module_core.svg"><img alt="../../../_images/etile_network_module_core.svg" class="align-center" src="../../../_images/etile_network_module_core.svg" width="80%" /></a>
 </td>
@@ -164,7 +162,7 @@ There is a pair of adapters for each channel.
 E-tile’s client interface is the Avalon Streaming (AVST) interface, F-tile can also utilize the AVST interface (for speeds up to 100 GE) or the MAC segmented interface (for all supported speeds).
 F-tile hard IP cores always utilize the MAC segmented interface in our designs.</p>
 <section id="sw-access-to-the-reconfiguration-interfaces">
-<span id="sw-access-reconfig-infs"></span><h3>SW access to the reconfiguration interfaces<a class="headerlink" href="#sw-access-to-the-reconfiguration-interfaces" title="Permalink to this headline"></a></h3>
+<span id="sw-access-reconfig-infs"></span><h3>SW access to the reconfiguration interfaces<a class="headerlink" href="#sw-access-to-the-reconfiguration-interfaces" title="Permalink to this heading"></a></h3>
 <p>Software access is provided via the MI indirect access component.
 This component’s main task is to preserve address space of the MI bus, as the reconfiguration interfaces take up a huge amount of it.
 A desription of the MI indirect access (and how it should be operated) is specified <a class="reference external" href="https://ndk.gitlab.liberouter.org:5051/ofm/comp/mi_tools/indirect_access/readme.html">here</a>.
@@ -183,7 +181,7 @@ The addresses of the available CSR registers in these interfaces are documented 
 </section>
 </section>
 <section id="mac-lites">
-<h2>MAC lites<a class="headerlink" href="#mac-lites" title="Permalink to this headline"></a></h2>
+<h2>MAC lites<a class="headerlink" href="#mac-lites" title="Permalink to this heading"></a></h2>
 <p>The Network module core is connected to <a class="reference external" href="https://ndk.gitlab.liberouter.org:5051/ofm/comp/nic/mac_lite/tx_mac_lite/readme.html">TX</a> and <a class="reference external" href="https://ndk.gitlab.liberouter.org:5051/ofm/comp/nic/mac_lite/rx_mac_lite/readme.html">RX</a> MAC lites.
 There is one MAC lite pair (TX + RX) for each Ethernet channel and they are connected one-on-one to apropriate adapters located in the Network module core.
 On the other side, TX MAC lites receive data from the MFB splitter which splits the incomming stream of MFB data into channels.
@@ -193,7 +191,7 @@ In the current setting, the clock signal in the left clock domain has twice the 
 That is because we want to avoid timing problems further in our designs.
 To achieve the same throughput in both clock domains, the width of MFB bus is doubled in the slower clock domain (the one on the right).</p>
 <section id="sw-access-to-the-mac-lites">
-<span id="sw-access-mac-lites"></span><h3>SW access to the MAC lites<a class="headerlink" href="#sw-access-to-the-mac-lites" title="Permalink to this headline"></a></h3>
+<span id="sw-access-mac-lites"></span><h3>SW access to the MAC lites<a class="headerlink" href="#sw-access-to-the-mac-lites" title="Permalink to this heading"></a></h3>
 <p>The MI splitting logic block shown in the diagram below is a virtual block that exists only for the purpose of explanation of the Network module (it ain’t a real component).
 There are more MAC lites than in the previous diagram of the Network module, because it aims to explain addressing even for multi-port configurations.
 The diagrams above always considered only one port.</p>
@@ -212,7 +210,7 @@ The second instance (Network module core (1)) is connected to the third output o
 <p class="admonition-title">Note</p>
 <p>To get a complete address of a register in one of the components of the Network module, you must also add the base address of the Network module (defined <a class="reference internal" href="mi.html#ndk-intel-mi"><span class="std std-ref">here</span></a>) as well as the address of the target register in that component.</p>
 </div>
-<table class="colwidths-given docutils align-center" id="id4">
+<table class="docutils align-center" id="id4">
 <caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id4" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 15%" />
@@ -263,7 +261,7 @@ The following outputs are connected to MAC lite pairs of all channels for port 1
 Each MAC lite in one port is offset by 0x200, MAC lites in different ports are additionally offset by 0x2000 (enough for 8 Ethernet channels as follows from example in table 2).
 There is an example for configuration 4x25GE with 2 ports.
 Notation: TX_MAC_LITE(port_id)(channel_id), RX_MAC_LITE(port_id)(channel_id).</p>
-<table class="colwidths-given docutils align-center" id="id5">
+<table class="docutils align-center" id="id5">
 <caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id5" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 25%" />

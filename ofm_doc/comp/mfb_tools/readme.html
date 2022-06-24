@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MFB specification &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -84,6 +85,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -112,13 +114,13 @@
            <div itemprop="articleBody">
              
   <section id="mfb-specification">
-<span id="mfb-bus"></span><h1>MFB specification<a class="headerlink" href="#mfb-specification" title="Permalink to this headline"></a></h1>
+<span id="mfb-bus"></span><h1>MFB specification<a class="headerlink" href="#mfb-specification" title="Permalink to this heading"></a></h1>
 <p>The Multi-Frame Bus (MFB) has been created on the basis of need to process
 multiple small frames in one clock cycle as well as frames of virtually any
 length. MFB features great versatility and is being used in the majority of
 our internal communication channels.</p>
 <section id="operation">
-<h2>Operation<a class="headerlink" href="#operation" title="Permalink to this headline"></a></h2>
+<h2>Operation<a class="headerlink" href="#operation" title="Permalink to this heading"></a></h2>
 <p>Transmitted data are organized into units called words. Each word is divided
 into regions where each region contains a specified number of blocks
 which are then composed of single items. Items are the smallest part of the word
@@ -153,14 +155,8 @@ incomplete.</p>
 simple and the throughput of the bus to stay high enough.</p>
 </section>
 <section id="generic-parameters">
-<h2>Generic parameters<a class="headerlink" href="#generic-parameters" title="Permalink to this headline"></a></h2>
+<h2>Generic parameters<a class="headerlink" href="#generic-parameters" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 17%" />
-<col style="width: 12%" />
-<col style="width: 20%" />
-<col style="width: 51%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
 <th class="head"><p>Type</p></th>
@@ -195,11 +191,6 @@ simple and the throughput of the bus to stay high enough.</p>
 <strong>MFB#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH)</strong>. From these parameters
 other internal constants are derived:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 21%" />
-<col style="width: 12%" />
-<col style="width: 67%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
 <th class="head"><p>Type</p></th>
@@ -226,14 +217,8 @@ ports of MFB. However in practice, constants can’t be used for port declaratio
 instead, they are used for things like signal declaration and such.</p>
 </section>
 <section id="port-description">
-<h2>Port description<a class="headerlink" href="#port-description" title="Permalink to this headline"></a></h2>
+<h2>Port description<a class="headerlink" href="#port-description" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 13%" />
-<col style="width: 21%" />
-<col style="width: 57%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Port name</p></th>
 <th class="head"><p>Bit length</p></th>
@@ -324,14 +309,14 @@ simultaneously.</p>
 <div class="line"><br /></div>
 </div>
 <section id="example-of-function-of-the-sof-pos-index">
-<h3>Example of function of the SOF_POS index<a class="headerlink" href="#example-of-function-of-the-sof-pos-index" title="Permalink to this headline"></a></h3>
+<h3>Example of function of the SOF_POS index<a class="headerlink" href="#example-of-function-of-the-sof-pos-index" title="Permalink to this heading"></a></h3>
 <p>Index length can be calculated from the given configuration as <cite>SOF_POS_WIDTH =
 4 * log2( 8 ) = 4 * 3</cite>, that is a three-bit index of a block in a region which
 is finally multiplied by the amount of regions. Those are 12 bits in total to
 address multiple SOFs in the whole word.</p>
 <ol class="arabic simple">
-<li><p><cite>SOF_POS = 101_000_000_000</cite> <a class="footnote-reference brackets" href="#id3" id="id1">1</a> signifies the beginning of a frame in the
-5th block <a class="footnote-reference brackets" href="#id4" id="id2">2</a> of the 3rd region. Position of the SOFs in the remaining
+<li><p><cite>SOF_POS = 101_000_000_000</cite> <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> signifies the beginning of a frame in the
+5th block <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> of the 3rd region. Position of the SOFs in the remaining
 regions is set to 0.</p></li>
 <li><p><cite>SOF_POS = 110_010_000_011</cite> points that one start of a frame can be found in
 the 3rd block of the zeroth region, one in the 0th block of the 1st region, one in the 2nd
@@ -339,7 +324,7 @@ block of the 2nd region and one in the 6th block of the 3rd region.</p></li>
 </ol>
 </section>
 <section id="example-of-function-of-the-eof-pos-index">
-<h3>Example of function of the EOF_POS index<a class="headerlink" href="#example-of-function-of-the-eof-pos-index" title="Permalink to this headline"></a></h3>
+<h3>Example of function of the EOF_POS index<a class="headerlink" href="#example-of-function-of-the-eof-pos-index" title="Permalink to this heading"></a></h3>
 <p>According to the configuration parameters given earlier, the <cite>EOF_POS_WIDTH</cite> can
 be calculated as <cite>4 * log2( 8 * 8 ) = 4 * 6</cite>, i.e. six-bit index for addressing an
 item in a region multiplied by the amount of regions. Altogether, that is 24 bits
@@ -371,7 +356,7 @@ indicated by the <cite>SRC_RDY</cite> signal.</p>
 </section>
 </section>
 <section id="timing-diagrams">
-<h2>Timing diagrams<a class="headerlink" href="#timing-diagrams" title="Permalink to this headline"></a></h2>
+<h2>Timing diagrams<a class="headerlink" href="#timing-diagrams" title="Permalink to this heading"></a></h2>
 <p>For the sake of simplicity, the function in the following diagrams will be
 demonstrated using bus configuration <strong>MFB#(4,4,2,8)</strong>. The first figure
 describes the indexation of each part of the word.</p>
@@ -397,7 +382,7 @@ written in the beginning of the vector value.</p>
 <p>Next, two scenarios will be provided showing how these transactions can be
 transferred.</p>
 <section id="scenario-1">
-<h3>Scenario 1<a class="headerlink" href="#scenario-1" title="Permalink to this headline"></a></h3>
+<h3>Scenario 1<a class="headerlink" href="#scenario-1" title="Permalink to this heading"></a></h3>
 <figure class="align-center">
 <a class="reference internal image-reference" href="../../../_images/mfb_waveform_scenario_1.svg"><img alt="../../../_images/mfb_waveform_scenario_1.svg" src="../../../_images/mfb_waveform_scenario_1.svg" width="100%" /></a>
 </figure>
@@ -405,7 +390,7 @@ transferred.</p>
 gap. Transmission starts when both <cite>SRC_RDY</cite> and <cite>DST_RDY</cite> are asserted.</p>
 </section>
 <section id="scenario-2">
-<h3>Scenario 2<a class="headerlink" href="#scenario-2" title="Permalink to this headline"></a></h3>
+<h3>Scenario 2<a class="headerlink" href="#scenario-2" title="Permalink to this heading"></a></h3>
 <figure class="align-center">
 <a class="reference internal image-reference" href="../../../_images/mfb_waveform_scenario_2.svg"><img alt="../../../_images/mfb_waveform_scenario_2.svg" src="../../../_images/mfb_waveform_scenario_2.svg" width="100%" /></a>
 </figure>
@@ -416,26 +401,26 @@ value of the data on the bus is undefined.</p>
 </section>
 </section>
 <section id="example-configurations">
-<h2>Example configurations<a class="headerlink" href="#example-configurations" title="Permalink to this headline"></a></h2>
+<h2>Example configurations<a class="headerlink" href="#example-configurations" title="Permalink to this heading"></a></h2>
 <p>Here are examples of some MFB configurations being used.</p>
 <ol class="arabic simple">
 <li><p>400G NDK -&gt; MFB#(4,8,8,8)</p></li>
 <li><p>100G NDK -&gt; MFB#(1,8,8,8)</p></li>
 <li><p>PCIe (P-Tile) -&gt; MFB#(2,1,8,32)</p></li>
 </ol>
-<dl class="footnote brackets">
-<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Underscore separates the whole vector to make it more clear which part
+<aside class="footnote brackets" id="id3" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Underscore separates the whole vector to make it more clear which part
 belongs to its corresponding region. This convention is being used only
 for the purposes of this document.</p>
-</dd>
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>All bit vectors on this page are aligned from the MSB on the left to the
+</aside>
+<aside class="footnote brackets" id="id4" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>All bit vectors on this page are aligned from the MSB on the left to the
 LSB on the right. The same numbering is maintained for the regions, i.e.
 the left most region has the highest index whereas the right most has
 the lowest index.</p>
-</dd>
-</dl>
+</aside>
 </section>
 </section>
 

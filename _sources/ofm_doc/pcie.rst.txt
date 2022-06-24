@@ -13,6 +13,5 @@ The DMA controllers are typically located in the ``comp/dma/`` directory in the 
    comp/pcie/mtc/readme
    comp/pcie/ptc/readme
    comp/pcie/ptc/comp/tag_manager/readme
-   comp/dma/medusa/readme
-          
+
 .. Add more references here...

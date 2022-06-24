@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RX MAC LITE &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,6 +14,7 @@
         <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -73,6 +74,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -101,12 +103,12 @@
            <div itemprop="articleBody">
              
   <section id="rx-mac-lite">
-<span id="id1"></span><h1>RX MAC LITE<a class="headerlink" href="#rx-mac-lite" title="Permalink to this headline"></a></h1>
+<span id="id1"></span><h1>RX MAC LITE<a class="headerlink" href="#rx-mac-lite" title="Permalink to this heading"></a></h1>
 <p>This component is used to implement the Ethernet MAC layer on the receiving side.
 Thanks to the modular architecture (RX MAC LITE + Adapter), it can be connected to a supported ETH Hard IP block or implement the MAC layer separately.
 The implementation may include differences from the Ethernet standard.</p>
 <section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline"></a></h2>
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading"></a></h2>
 <p>RX MAC LITE contains several components that analyze the received frame (CRC, MAC address, length) and check for errors. The Ethernet frame is stored in the buffer (store and forward), if it does not contain errors, it is sent to the output interface along with the metadata, otherwise the frame is discarded. Some of these components are optional. The whole module can be controlled by SW using MI registers (see chapter Register Map).</p>
 <a class="reference internal image-reference" href="../../../../../_images/rx_mac_lite_arch.svg"><img alt="../../../../../_images/rx_mac_lite_arch.svg" class="align-center" src="../../../../../_images/rx_mac_lite_arch.svg" width="100%" /></a>
 <p><strong>Description of RX MAC LITE submodules:</strong></p>
@@ -124,7 +126,7 @@ The implementation may include differences from the Ethernet standard.</p>
 </ul>
 </section>
 <section id="adapter">
-<h2>Adapter<a class="headerlink" href="#adapter" title="Permalink to this headline"></a></h2>
+<h2>Adapter<a class="headerlink" href="#adapter" title="Permalink to this heading"></a></h2>
 <p>The adapter allows you to connect the RX MAC LITE to various variants of the PCS/PMA layer of the Ethernet or various Ethernet Hard IPs.
 The main task of the adapter is to convert the selected input bus to the MFB bus.
 Currently, several variants of the adapter are implemented:</p>
@@ -136,7 +138,7 @@ Currently, several variants of the adapter are implemented:</p>
 </ul>
 </section>
 <section id="register-map">
-<h2>Register Map<a class="headerlink" href="#register-map" title="Permalink to this headline"></a></h2>
+<h2>Register Map<a class="headerlink" href="#register-map" title="Permalink to this heading"></a></h2>
 <p>It is possible to configure RX MAC LITE on the fly, but if you want to make changes atomically, you should disable RX MAC LITE first.
 You can set MAC check mode, RX MAC LITE error mask, minimal and maximal frame length.
 After you are done you can enable RX MAC LITE.
@@ -152,10 +154,6 @@ For this reason, it is necessary to strobe their actual values at the one moment
 Software tool is then able to read those registers.</p>
 </div>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 8%" />
-<col style="width: 92%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Offset</p></th>
 <th class="head"><p>Name of register</p></th>
@@ -221,13 +219,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Total Received Frames Counter - low part (TRFCL)</strong></p>
 <p>This is the low part of counter that holds number of all arrived frames including those being received at the moment. (TRFC = CFC + DFC)</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -248,13 +239,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Correct Frames Counter - low part (CFCL)</strong></p>
 <p>This is the low part of counter that holds number of frames that passed sampling and all controls (was found to be correct) and are forwarded to the RX MAC LITE’s output. (CFC = TRFC - DFC)</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -275,13 +259,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Discarded Frames Counter - low part (DFCL)</strong></p>
 <p>This is the low part of counter that holds number of frames that did NOT pass sampling or any control (was found to be NOT correct) and are NOT forwarded to the RX MAC LITE’s output. (DFC = TRFC - CFC)</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -302,13 +279,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Counter of frames discarded due to buffer overflow - low part (BODFCL)</strong></p>
 <p>This is the low part of counter that holds number of frames that were discarded due to buffer overflow.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -329,13 +299,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Total Received Frames Counter - high part (TRFCH)</strong></p>
 <p>This is the high part of counter that holds number of all arrived frames including those being received at the moment. (TRFC = CFC + DFC)</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -356,13 +319,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Correct Frames Counter - high part (CFCH)</strong></p>
 <p>This is the high part of counter that holds number of frames that passed sampling and all controls (was found to be correct) and are forwarded to the RX MAC LITE’s output. (CFC = TRFC - DFC)</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -383,13 +339,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Discarded Frames Counter - high part (DFCH)</strong></p>
 <p>This is the high part of counter that holds number of frames that did NOT pass sampling or any control (was found to be NOT correct) and are NOT forwarded to the RX MAC LITE’s output. (DFC = TRFC - CFC)</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -410,13 +359,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Counter of frames discarded due to buffer overflow - high part (BODFCH)</strong></p>
 <p>This is the high part of counter that holds number of frames that were discarded due to buffer overflow.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -437,13 +379,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Enable register</strong></p>
 <p>The value stored in this register determines whether the RX MAC LITE unit is enabled or not.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 2%" />
-<col style="width: 1%" />
-<col style="width: 5%" />
-<col style="width: 2%" />
-<col style="width: 89%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -470,13 +405,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Error mask register</strong></p>
 <p>This register specifies which controls will be done over incoming frames. The value stored in this register determines which kinds of errors cause the frame discarding.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 2%" />
-<col style="width: 2%" />
-<col style="width: 7%" />
-<col style="width: 3%" />
-<col style="width: 86%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -526,13 +454,6 @@ Software tool is then able to read those registers.</p>
 </table>
 <p><strong>Status register</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 3%" />
-<col style="width: 2%" />
-<col style="width: 9%" />
-<col style="width: 4%" />
-<col style="width: 82%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -600,13 +521,6 @@ Software tool is then able to read those registers.</p>
 </table>
 <p><strong>Command register</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 5%" />
-<col style="width: 21%" />
-<col style="width: 10%" />
-<col style="width: 57%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -639,13 +553,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Minimum frame length allowed</strong></p>
 <p>This register specifies the minimal frame length allowed (MINTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of &lt;data&gt; part of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 5%" />
-<col style="width: 22%" />
-<col style="width: 10%" />
-<col style="width: 56%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -672,13 +579,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Maximum frame length allowed</strong></p>
 <p>This register specifies the maximal frame length allowed (MTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of &lt;data&gt; part of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64. Default value is 1526.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 5%" />
-<col style="width: 22%" />
-<col style="width: 10%" />
-<col style="width: 56%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -705,13 +605,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>MAC address check mode</strong></p>
 <p>This register specifies the mode of MAC address checking.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 5%" />
-<col style="width: 23%" />
-<col style="width: 11%" />
-<col style="width: 54%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -745,13 +638,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Octets Received OK Counter - low part (OROCL)</strong></p>
 <p>This is the low part of counter that holds number of data octets in frames that were successfully received. This does not include octets in frames received with MAC, CRC, MINTU, MTU, CRC or CGMII errors according the settings of Error mask register. This counter is incremented when a new packet is successfully received and the length of the currently received packet is added. The counted length of the packets always includes the length of CRC and vice versa.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -772,13 +658,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Octets Received OK Counter - high part (OROCH)</strong></p>
 <p>This is the high part of counter that holds number of data octets in frames that were successfully received. This does not include octets in frames received with MAC, CRC, MINTU, MTU, CRC or CGMII errors according the settings of Error mask register. This counter is incremented when a new packet is successfully received and the length of the currently received packet is added. The counted length of the packets always includes the length of CRC and vice versa.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 13%" />
-<col style="width: 45%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -799,13 +678,6 @@ Software tool is then able to read those registers.</p>
 <p><strong>Memory of available MAC addresses</strong></p>
 <p>This memory contains all available MAC addresses for network interface.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 5%" />
-<col style="width: 21%" />
-<col style="width: 10%" />
-<col style="width: 57%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
 <th class="head"><p>To</p></th>
@@ -841,17 +713,11 @@ Only valid MAC addresses are used for matching.</p>
 </div>
 </section>
 <section id="ports-and-generics">
-<h2>Ports and Generics<a class="headerlink" href="#ports-and-generics" title="Permalink to this headline"></a></h2>
+<h2>Ports and Generics<a class="headerlink" href="#ports-and-generics" title="Permalink to this heading"></a></h2>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-rx_mac_lite">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">RX_MAC_LITE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-rx_mac_lite" title="Permalink to this definition"></a></dt>
 <dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 70%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
 <th class="head"><p>Type</p></th>
@@ -957,12 +823,6 @@ When is disable, resources are ~60% lower.</p></td>
 </tbody>
 </table>
 <span class="sig-name descname">Ports</span><table class="docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 70%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Port</p></th>
 <th class="head"><p>Type</p></th>

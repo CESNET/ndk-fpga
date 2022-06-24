@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AMM_PROBE &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -14,10 +14,12 @@
         <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="MEM_TESTER Software" href="../sw/readme.html" />
     <link rel="prev" title="AMM_GEN" href="../amm_gen/readme.html" /> 
 </head>
 
@@ -63,17 +65,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../debug.html">Debug Tools</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../readme.html">DDR4 Memory Tester</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="../readme.html#internal-architecture">Internal Architecture</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#internal-architecture">Internal Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#mi-bus-control">MI Bus Control</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../readme.html#sub-components">Sub-components</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../amm_gen/readme.html">AMM_GEN</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">AMM_PROBE</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#mi-bus-control">MI Bus Control</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#c-program-control">C Program Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#software">Software</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -103,34 +107,49 @@
            <div itemprop="articleBody">
              
   <section id="amm-probe">
-<span id="mem-tester-amm-probe"></span><h1>AMM_PROBE<a class="headerlink" href="#amm-probe" title="Permalink to this headline"></a></h1>
-<p>This component is used to listen to the AMM bus and measure:</p>
+<span id="id1"></span><h1>AMM_PROBE<a class="headerlink" href="#amm-probe" title="Permalink to this heading"></a></h1>
+<p>AMM_PROBE listens to the AMM bus and measures:</p>
 <ul class="simple">
 <li><p>Written / read AMM words and read requests count</p></li>
 <li><p>Number of ticks (CLK cycles) from the first to the last write request (same for read requests)</p></li>
 <li><p>Number of ticks (CLK cycles) of the whole communication (from the first r/w req to the last r/w req)</p></li>
-<li><p>Average, minimal and maximal latency of read requests - NOT DONE YET</p></li>
+<li><p>Average, minimal and maximal latency of read requests</p></li>
+<li><p>Latency histogram of read requests</p></li>
 </ul>
-<section id="internal-architecture">
-<h2>Internal Architecture<a class="headerlink" href="#internal-architecture" title="Permalink to this headline"></a></h2>
-</section>
 <section id="mi-bus-control">
-<h2>MI Bus Control<a class="headerlink" href="#mi-bus-control" title="Permalink to this headline"></a></h2>
+<h2>MI Bus Control<a class="headerlink" href="#mi-bus-control" title="Permalink to this heading"></a></h2>
 <p><strong>MI Address Space Definition</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x00</span> <span class="o">--</span> <span class="n">ctrl</span>
               <span class="mf">0.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">reset</span>
-              <span class="mf">1.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">write</span> <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
-              <span class="mf">2.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">read</span>  <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
-              <span class="mf">3.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">r</span><span class="o">/</span><span class="n">w</span>   <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
-              <span class="mf">4.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">write</span> <span class="n">words</span> <span class="n">overflow</span> <span class="n">occurred</span>
-              <span class="mf">5.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">read</span> <span class="n">words</span>  <span class="n">overflow</span> <span class="n">occurred</span>
-              <span class="mf">6.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">read</span> <span class="n">req</span>    <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">1.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">to</span> <span class="n">first</span> <span class="n">received</span> <span class="n">word</span>
+              <span class="mf">2.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">write</span> <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">3.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">read</span>  <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">4.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">r</span><span class="o">/</span><span class="n">w</span>   <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">5.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">write</span> <span class="n">words</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">6.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">read</span> <span class="n">words</span>  <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">7.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">read</span> <span class="n">req</span>    <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">8.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">9.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">counters</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">10.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="nb">sum</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">11.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">histogramer</span> <span class="n">counters</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">12.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">histogramer</span> <span class="ow">is</span> <span class="n">linear</span> <span class="n">occurred</span>
 <span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x04</span> <span class="o">--</span> <span class="n">write</span> <span class="n">ticks</span>
 <span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x08</span> <span class="o">--</span> <span class="n">read</span>  <span class="n">ticks</span>
 <span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x0C</span> <span class="o">--</span> <span class="n">r</span><span class="o">/</span><span class="n">w</span>   <span class="n">ticks</span>
 <span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x10</span> <span class="o">--</span> <span class="n">written</span> <span class="n">words</span>
 <span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x14</span> <span class="o">--</span> <span class="n">read</span>    <span class="n">words</span>
 <span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x18</span> <span class="o">--</span> <span class="n">read</span> <span class="n">request</span> <span class="n">made</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x1C</span> <span class="o">--</span> <span class="n">latency</span> <span class="nb">sum</span> <span class="p">(</span><span class="mi">2</span><span class="n">x</span> <span class="n">MI</span> <span class="n">registers</span><span class="p">)</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x24</span> <span class="o">--</span> <span class="n">latency</span> <span class="nb">min</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x28</span> <span class="o">--</span> <span class="n">latency</span> <span class="nb">max</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x2C</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">hist</span> <span class="n">cnt</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x20</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">hist</span> <span class="n">sel</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x34</span> <span class="o">--</span> <span class="n">AMM</span> <span class="n">data</span> <span class="n">width</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x38</span> <span class="o">--</span> <span class="n">AMM</span> <span class="n">address</span> <span class="n">width</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x3C</span> <span class="o">--</span> <span class="n">AMM</span> <span class="n">burst</span> <span class="n">width</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x40</span> <span class="o">--</span> <span class="n">AMM</span> <span class="n">freq</span> <span class="p">[</span><span class="n">kHz</span><span class="p">]</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x44</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">ticks</span> <span class="n">width</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x48</span> <span class="o">--</span> <span class="n">histogramer</span> <span class="n">counters</span> <span class="n">cnt</span>
 </pre></div>
 </div>
 </section>
@@ -141,6 +160,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../amm_gen/readme.html" class="btn btn-neutral float-left" title="AMM_GEN" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../sw/readme.html" class="btn btn-neutral float-right" title="MEM_TESTER Software" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
