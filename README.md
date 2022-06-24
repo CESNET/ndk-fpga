@@ -10,10 +10,11 @@ The Minimal application serves as a simple example of how to build an FPGA appli
 
 - To build FPGA firmware, you must have Intel Quartus Prime Pro 22.1 or Xilinx Vivado 2019.1 (depending on the target card) installed, including a valid license.
 - Additional repositories (minimum - available as open-source) are needed to build the NDK design for the FPGA:
+    - [Open FPGA Modules](https://github.com/CESNET/ofm/)
     - [NDK Core](https://github.com/CESNET/ndk-core/)
     - [DK-DEV-1SDX-P card for NDK](https://github.com/CESNET/ndk-card-dk-dev-1sdx-p/)
     - [DK-DEV-AGI027RES card for NDK](https://github.com/CESNET/ndk-card-dk-dev-agi027res/)
-    - [Open FPGA Modules](https://github.com/CESNET/ofm/)
+    - [FB4CGG3/FB2CGG3 card for NDK](https://github.com/CESNET/ndk-card-fb4cgg3/)
 - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw)
 
 ### How to clone the necessary repositories
@@ -26,6 +27,7 @@ git submodule update --init ndk/ofm
 git submodule update --init ndk/core
 git submodule update --init ndk/cards/dk-dev-1sdx-p
 git submodule update --init ndk/cards/dk-dev-agi027res
+git submodule update --init ndk/cards/fb4cgg3
 ```
 
 CESNET developers who have access to closed-source repositories can use single command to clone a repository, including submodules (private GitLab):
@@ -38,7 +40,7 @@ git clone --recursive git@gitlab.liberouter.org:ndk/ndk-app-minimal.git
 - Go to `build/your_card/` folder in this repository.
 - Check or modify `user_const.tcl` file, where you can change the firmware configuration.
 - If you do not have a DMA module IP (is not part of the open-source NDK), you must set the `DMA_ENABLE` parameter to `false`.
-- Run firmware build in Quartus by `make` command in the same folder.
+- Run firmware build in Quartus/Vivado by `make` command in the same folder.
 
 ## Documentation
 
