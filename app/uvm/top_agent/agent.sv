@@ -17,7 +17,7 @@ class agent extends uvm_agent;
     // -----------------------
     uvm_reset::sync_cbs       reset_sync;
     uvm_byte_array::sequencer m_sequencer;
-    driver                m_driver;
+    driver                    m_driver;
 
     // Contructor, where analysis port is created.
     function new(string name, uvm_component parent = null);

@@ -27,11 +27,23 @@ class byte_array_sequence_simple extends uvm_sequence #(uvm_byte_array::sequence
         if(!uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::get(p_sequencer, "", "packet_export", packet_export)) begin
             `uvm_fatal(p_sequencer.get_full_name(), "\n\tFailed to get packet msg box");
         end
+
         forever begin
             uvm_byte_array::sequence_item tmp_packet;
+
+            //wait to end reset
+            do begin
+                #40ns;
+            end while (p_sequencer.reset_sync.has_been_reset());
             packet_export.get(tmp_packet);
+
+            //generat new packet
             start_item(req);
-            req.copy(tmp_packet);
+            if (p_sequencer.reset_sync.has_been_reset()) begin
+                req.data = {};
+            end else begin
+                req.copy(tmp_packet);
+            end
             finish_item(req);
         end
     endtask
@@ -44,9 +56,9 @@ class mvb_config;
     int unsigned port_min = 0;
 endclass
 
-class mvb_sequence_simple_eth #(ITEMS, ITEM_WIDTH) extends uvm_sequence #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
-    `uvm_object_param_utils(top_agent::mvb_sequence_simple_eth  #(ITEMS, ITEM_WIDTH))
-    `uvm_declare_p_sequencer(uvm_mvb::sequencer#(ITEMS, ITEM_WIDTH));
+class logic_vector_sequence_simple_eth #(ITEM_WIDTH) extends uvm_sequence #(uvm_logic_vector::sequence_item #(ITEM_WIDTH));
+    `uvm_object_param_utils(top_agent::logic_vector_sequence_simple_eth  #(ITEM_WIDTH))
+    `uvm_declare_p_sequencer(uvm_logic_vector::sequencer#(ITEM_WIDTH));
 
     mailbox#(uvm_byte_array::sequence_item) header_export;
 
@@ -61,7 +73,7 @@ class mvb_sequence_simple_eth #(ITEMS, ITEM_WIDTH) extends uvm_sequence #(uvm_mv
 
     // ------------------------------------------------------------------------
     // Constructor
-    function new(string name = "Simple sequence rx");
+    function new(string name = "logic_vector_sequence_simple_eth");
         super.new(name);
     endfunction
 
@@ -70,7 +82,8 @@ class mvb_sequence_simple_eth #(ITEMS, ITEM_WIDTH) extends uvm_sequence #(uvm_mv
     task body();
         logic reset;
         // Generate transaction_count transactions
-        req = uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("req", p_sequencer);
+        req = uvm_logic_vector::sequence_item #(ITEM_WIDTH)::type_id::create("req", p_sequencer);
+
         if(!uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::get(p_sequencer, "", "hdr_export", header_export)) begin
             `uvm_fatal(p_sequencer.get_full_name(), "\n\tFailed to get packet msg box");
         end
@@ -80,42 +93,25 @@ class mvb_sequence_simple_eth #(ITEMS, ITEM_WIDTH) extends uvm_sequence #(uvm_mv
         end
 
         repeat(transaction_count) begin
+            uvm_byte_array::sequence_item tmp_packet;
             // Create a request for sequence item
-            $timeformat(-9, 2, " ns", 20);
-            start_item(req);
 
+            header_export.get(tmp_packet);
+
+            start_item(req);
             // Do not generate new data when SRC_RDY was 1 but the transaction does not transfare;
-            if (!req.randomize() with {src_rdy == 1'b1 -> $countones(vld) <= header_export.num(); header_export.num() == 0 -> src_rdy == 1'b0;
-                                       foreach(data[it]) { data[it][24-1:16] inside {[m_config.port_min:m_config.port_max]}; }}) begin
+            if (!req.randomize() with {data[24-1:16] inside {[m_config.port_min:m_config.port_max]};}) begin
                 `uvm_fatal(p_sequencer.get_full_name(), "\n\tSequence faile to randomize transaction.")
             end
-            if (req.src_rdy == 1'b1) begin
-                for (int unsigned it = 0; it < ITEMS; it++) begin
-                    if (req.vld[it] == 1'b1) begin
-                        uvm_byte_array::sequence_item tmp_packet;
-                        header_export.get(tmp_packet);
-                        req.data[it][16-1:0] = tmp_packet.size();
-                    end
-                end
-            end
+            req.data[16-1:0] = tmp_packet.size();
             finish_item(req);
-
-            // Get response from driver
-            get_response(rsp);
-
-            reset = p_sequencer.reset_sync.has_been_reset();
-            while (rsp.src_rdy != 0 && !rsp.dst_rdy && !reset) begin
-                start_item(req);
-                finish_item(req);
-                get_response(rsp);
-            end
         end
     endtask
 endclass
 
-class mvb_sequence_lib_eth #(ITEMS, ITEM_WIDTH) extends uvm_sequence_library#(uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH));
-  `uvm_object_param_utils(top_agent::mvb_sequence_lib_eth #(ITEMS, ITEM_WIDTH))
-  `uvm_sequence_library_utils(top_agent::mvb_sequence_lib_eth#(ITEMS, ITEM_WIDTH))
+class logic_vector_sequence_lib_eth #(ITEM_WIDTH) extends uvm_sequence_library#(uvm_logic_vector::sequence_item#(ITEM_WIDTH));
+  `uvm_object_param_utils(top_agent::logic_vector_sequence_lib_eth #(ITEM_WIDTH))
+  `uvm_sequence_library_utils(top_agent::logic_vector_sequence_lib_eth#(ITEM_WIDTH))
 
     function new(string name = "");
         super.new(name);
@@ -125,13 +121,13 @@ class mvb_sequence_lib_eth #(ITEMS, ITEM_WIDTH) extends uvm_sequence_library#(uv
     // subclass can redefine and change run sequences
     // can be useful in specific tests
     virtual function void init_sequence();
-        this.add_sequence(mvb_sequence_simple_eth #(ITEMS, ITEM_WIDTH)::get_type());
+        this.add_sequence(logic_vector_sequence_simple_eth #(ITEM_WIDTH)::get_type());
     endfunction
 endclass
 
-class mvb_sequence_simple #(ITEMS, ITEM_WIDTH) extends uvm_sequence #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
-    `uvm_object_param_utils(top_agent::mvb_sequence_simple #(ITEMS, ITEM_WIDTH))
-    `uvm_declare_p_sequencer(uvm_mvb::sequencer#(ITEMS, ITEM_WIDTH));
+class logic_vector_sequence_simple #(ITEM_WIDTH) extends uvm_sequence #(uvm_logic_vector::sequence_item #(ITEM_WIDTH));
+    `uvm_object_param_utils(top_agent::logic_vector_sequence_simple #(ITEM_WIDTH))
+    `uvm_declare_p_sequencer(uvm_logic_vector::sequencer#(ITEM_WIDTH));
 
     mailbox#(uvm_byte_array::sequence_item) header_export;
 
@@ -152,49 +148,33 @@ class mvb_sequence_simple #(ITEMS, ITEM_WIDTH) extends uvm_sequence #(uvm_mvb::s
     // ------------------------------------------------------------------------
     // Generates transactions
     task body();
-        logic reset;
         // Generate transaction_count transactions
-        req = uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("req", p_sequencer);
+        req = uvm_logic_vector::sequence_item #(ITEM_WIDTH)::type_id::create("req", p_sequencer);
         if(!uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::get(p_sequencer, "", "hdr_export", header_export)) begin
             `uvm_fatal(p_sequencer.get_full_name(), "\n\tFailed to get packet msg box");
         end
 
         repeat(transaction_count) begin
             // Create a request for sequence item
-            $timeformat(-9, 2, " ns", 20);
-            start_item(req);
+            uvm_byte_array::sequence_item tmp_packet;
+            
+            header_export.get(tmp_packet);
 
+            //generat new packet
+            start_item(req);
             // Do not generate new data when SRC_RDY was 1 but the transaction does not transfare;
-            if (!req.randomize() with {src_rdy == 1'b1 -> $countones(vld) <= header_export.num();  header_export.num() == 0 -> src_rdy == 1'b0;}) begin
+            if (!req.randomize()) begin
                 `uvm_fatal(p_sequencer.get_full_name(), "\n\tSequence faile to randomize transaction.")
             end
-            if (req.src_rdy == 1'b1) begin
-                for (int unsigned it = 0; it < ITEMS; it++) begin
-                    if (req.vld[it] == 1'b1) begin
-                        uvm_byte_array::sequence_item tmp_packet;
-                        header_export.get(tmp_packet);
-                        req.data[it][16-1:0] = tmp_packet.size();
-                    end
-                end
-            end
+            req.data[16-1:0] = tmp_packet.size();
             finish_item(req);
-
-            // Get response from driver
-            get_response(rsp);
-
-            reset = p_sequencer.reset_sync.has_been_reset();
-            while (rsp.src_rdy != 0 && !rsp.dst_rdy && !reset) begin
-                start_item(req);
-                finish_item(req);
-                get_response(rsp);
-            end
         end
     endtask
 endclass
 
-class mvb_sequence_lib#(ITEMS, ITEM_WIDTH) extends uvm_sequence_library#(uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH));
-  `uvm_object_param_utils(top_agent::mvb_sequence_lib#(ITEMS, ITEM_WIDTH))
-  `uvm_sequence_library_utils(top_agent::mvb_sequence_lib#(ITEMS, ITEM_WIDTH))
+class logic_vector_sequence_lib#(ITEM_WIDTH) extends uvm_sequence_library#(uvm_logic_vector::sequence_item#(ITEM_WIDTH));
+  `uvm_object_param_utils(top_agent::logic_vector_sequence_lib#(ITEM_WIDTH))
+  `uvm_sequence_library_utils(top_agent::logic_vector_sequence_lib#(ITEM_WIDTH))
 
     function new(string name = "");
         super.new(name);
@@ -204,7 +184,7 @@ class mvb_sequence_lib#(ITEMS, ITEM_WIDTH) extends uvm_sequence_library#(uvm_mvb
     // subclass can redefine and change run sequences
     // can be useful in specific tests
     virtual function void init_sequence();
-        this.add_sequence(mvb_sequence_simple #(ITEMS, ITEM_WIDTH)::get_type());
+        this.add_sequence(logic_vector_sequence_simple #(ITEM_WIDTH)::get_type());
     endfunction
 endclass
 

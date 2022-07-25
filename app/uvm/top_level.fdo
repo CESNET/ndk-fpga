@@ -46,6 +46,7 @@ lappend COMPONENTS [list "DUT_INTEL"  "../intel"  "FULL"]
 lappend COMPONENTS [list "VER"        "."         "FULL"]
 
 #SET TEST NAME
+set SIG_FILE  "./signals.fdo"
 #set TEST_NAME "test::full_speed"
 set TEST_NAME "test::base"
 
@@ -62,9 +63,9 @@ set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
 
 #run verification
-#nb_sim_run
-restart -f
-run -all
+#restart -f
+#run 1268ns
+nb_sim_run
 
 # Reports
 # Uncomment lines below to generate html coce coverage report

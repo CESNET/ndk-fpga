@@ -15,15 +15,15 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
     // ETHERNET I/O
-    uvm_mvb::agent_rx#(REGIONS, ETH_RX_HDR_WIDTH)                                                            m_eth_mvb_rx[ETH_STREAMS];
+    uvm_logic_vector_mvb::env_rx#(REGIONS, ETH_RX_HDR_WIDTH)                             m_eth_mvb_rx[ETH_STREAMS];
     uvm_byte_array_mfb::env_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, 0)                m_eth_mfb_rx[ETH_STREAMS];
     uvm_byte_array_mfb::env_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, ETH_TX_HDR_WIDTH) m_eth_mfb_tx[ETH_STREAMS];
     // DMA I/O
     localparam DMA_RX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_TX_CHANNELS);
     localparam DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS) + 1;
-    uvm_mvb::agent_rx#(REGIONS, DMA_RX_MVB_WIDTH)                                               m_dma_mvb_rx[DMA_STREAMS];
+    uvm_logic_vector_mvb::env_rx#(REGIONS, DMA_RX_MVB_WIDTH)                m_dma_mvb_rx[DMA_STREAMS];
     uvm_byte_array_mfb::env_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, 0)   m_dma_mfb_rx[DMA_STREAMS];
-    uvm_mvb::agent_tx#(REGIONS, DMA_TX_MVB_WIDTH)                               m_dma_mvb_tx[DMA_STREAMS];
+    uvm_logic_vector_mvb::env_tx#(REGIONS, DMA_TX_MVB_WIDTH)                m_dma_mvb_tx[DMA_STREAMS];
     uvm_byte_array_mfb::env_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, 0)   m_dma_mfb_tx[DMA_STREAMS];
     //RESET
     uvm_reset::env#(4)         m_resets_gen;
@@ -52,7 +52,7 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         ///////////////
         // ETH CONFIG
         for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
-            uvm_mvb::config_item                mvb_rx_config;
+            uvm_logic_vector_mvb::config_item mvb_rx_config;
             uvm_byte_array_mfb::config_item mfb_rx_config;
             uvm_byte_array_mfb::config_item mfb_tx_config;
             string it_num;
@@ -66,8 +66,8 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             mvb_rx_config = new();
             mvb_rx_config.active         = UVM_ACTIVE;
             mvb_rx_config.interface_name = {"ETH_RX_MVB_", it_num};
-            uvm_config_db#(uvm_mvb::config_item)::set(this, {"m_eth_mvb_rx_", it_num}, "m_config", mvb_rx_config);
-            m_eth_mvb_rx[it] = uvm_mvb::agent_rx#(REGIONS, ETH_RX_HDR_WIDTH)::type_id::create({"m_eth_mvb_rx_", it_num}, this);
+            uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, {"m_eth_mvb_rx_", it_num}, "m_config", mvb_rx_config);
+            m_eth_mvb_rx[it] = uvm_logic_vector_mvb::env_rx#(REGIONS, ETH_RX_HDR_WIDTH)::type_id::create({"m_eth_mvb_rx_", it_num}, this);
             // RX MFB
             mfb_rx_config = new();
             mfb_rx_config.active         = UVM_ACTIVE;
@@ -86,9 +86,9 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         ///////////////
         // DMA CONFIG
         for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
-            uvm_mvb::config_item                mvb_rx_config;
+            uvm_logic_vector_mvb::config_item   mvb_rx_config;
             uvm_byte_array_mfb::config_item mfb_rx_config;
-            uvm_mvb::config_item                mvb_tx_config;
+            uvm_logic_vector_mvb::config_item   mvb_tx_config;
             uvm_byte_array_mfb::config_item mfb_tx_config;
             string it_num;
             it_num.itoa(it);
@@ -97,8 +97,8 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             mvb_rx_config = new();
             mvb_rx_config.active         = UVM_ACTIVE;
             mvb_rx_config.interface_name = {"DMA_RX_MVB_", it_num};
-            uvm_config_db#(uvm_mvb::config_item)::set(this, {"m_dma_mvb_rx_", it_num}, "m_config", mvb_rx_config);
-            m_dma_mvb_rx[it] = uvm_mvb::agent_rx#(REGIONS, DMA_RX_MVB_WIDTH)::type_id::create({"m_dma_mvb_rx_", it_num}, this);
+            uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, {"m_dma_mvb_rx_", it_num}, "m_config", mvb_rx_config);
+            m_dma_mvb_rx[it] = uvm_logic_vector_mvb::env_rx#(REGIONS, DMA_RX_MVB_WIDTH)::type_id::create({"m_dma_mvb_rx_", it_num}, this);
             // RX MFB
             mfb_rx_config = new();
             mfb_rx_config.active         = UVM_ACTIVE;
@@ -109,8 +109,8 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             mvb_tx_config = new();
             mvb_tx_config.active         = UVM_ACTIVE;
             mvb_tx_config.interface_name = {"DMA_TX_MVB_", it_num};
-            uvm_config_db#(uvm_mvb::config_item)::set(this, {"m_dma_mvb_tx_", it_num}, "m_config", mvb_tx_config);
-            m_dma_mvb_tx[it] = uvm_mvb::agent_tx#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create({"m_dma_mvb_tx_", it_num}, this);
+            uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, {"m_dma_mvb_tx_", it_num}, "m_config", mvb_tx_config);
+            m_dma_mvb_tx[it] = uvm_logic_vector_mvb::env_tx#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create({"m_dma_mvb_tx_", it_num}, this);
             // TX MFB
             mfb_tx_config = new();
             mfb_tx_config.active         = UVM_ACTIVE;
@@ -196,8 +196,8 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             m_eth_mfb_tx[it].analysis_port_data.connect(m_scoreboard.eth_mfb_tx[it]);
             m_eth_mfb_tx[it].analysis_port_meta.connect(m_scoreboard.eth_mvb_tx[it]);
 
-            m_resets_app.sync_connect(m_eth_mfb_rx[it].reset_sync);
             m_resets_app.sync_connect(m_eth_mvb_rx[it].reset_sync);
+            m_resets_app.sync_connect(m_eth_mfb_rx[it].reset_sync);
             m_resets_app.sync_connect(m_eth_mfb_tx[it].reset_sync);
        end
 
