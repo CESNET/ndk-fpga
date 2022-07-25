@@ -13,7 +13,7 @@ virtual class scoreboard_channel #(type DUT_TYPE, MODEL_TYPE = DUT_TYPE) extends
 
     typedef scoreboard_channel#(DUT_TYPE, MODEL_TYPE) this_type;
     //
-    uvm_analysis_imp_dut#(DUT_TYPE, this_type)   analysis_imp_dut;
+    uvm_analysis_imp_dut#(DUT_TYPE, this_type)     analysis_imp_dut;
     uvm_analysis_imp_model#(MODEL_TYPE, this_type) analysis_imp_model;
 
     DUT_TYPE   data_dut[$];
@@ -52,7 +52,7 @@ virtual class scoreboard_channel #(type DUT_TYPE, MODEL_TYPE = DUT_TYPE) extends
         data_model.push_back(t);
     endfunction
 
-    pure virtual function bit compare(DUT_TYPE tr_dut, MODEL_TYPE tr_model);
+    pure virtual function bit    compare(DUT_TYPE tr_dut, MODEL_TYPE tr_model);
     pure virtual function string message(DUT_TYPE tr_dut, MODEL_TYPE tr_model);
 
     virtual task run_phase(uvm_phase phase);

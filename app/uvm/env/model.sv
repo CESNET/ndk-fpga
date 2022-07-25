@@ -34,21 +34,21 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
     //ETH
     localparam ETH_TX_LENGTH_WIDTH  = 16;
     localparam ETH_TX_CHANNEL_WIDTH = 8;
-    uvm_tlm_analysis_fifo #(uvm_mvb::sequence_item#(MVB_ITEMS, ETH_RX_HDR_WIDTH)) eth_mvb_rx[ETH_STREAMS];
+    uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item#(ETH_RX_HDR_WIDTH))   eth_mvb_rx[ETH_STREAMS];
     uvm_tlm_analysis_fifo #(uvm_byte_array::sequence_item)                        eth_mfb_rx[ETH_STREAMS];
     uvm_analysis_port     #(packet_header #(0, 2**ETH_TX_CHANNEL_WIDTH, 2**ETH_TX_LENGTH_WIDTH-1))    eth_mvb_tx[ETH_STREAMS];
     uvm_analysis_port     #(uvm_byte_array::sequence_item)                        eth_mfb_tx[ETH_STREAMS];
     //DMA
     localparam DMA_RX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_TX_CHANNELS);
-    uvm_tlm_analysis_fifo #(uvm_mvb::sequence_item#(MVB_ITEMS, DMA_RX_MVB_WIDTH)) dma_mvb_rx[DMA_STREAMS];
-    uvm_tlm_analysis_fifo #(uvm_byte_array::sequence_item)                        dma_mfb_rx[DMA_STREAMS];
+    uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item#(DMA_RX_MVB_WIDTH)) dma_mvb_rx[DMA_STREAMS];
+    uvm_tlm_analysis_fifo #(uvm_byte_array::sequence_item)                      dma_mfb_rx[DMA_STREAMS];
     uvm_analysis_port     #(packet_header #(DMA_HDR_META_WIDTH, DMA_RX_CHANNELS, DMA_PKT_MTU)) dma_mvb_tx[DMA_STREAMS];
-    uvm_analysis_port     #(uvm_byte_array::sequence_item)                        dma_mfb_tx[DMA_STREAMS];
+    uvm_analysis_port     #(uvm_byte_array::sequence_item)                      dma_mfb_tx[DMA_STREAMS];
 
     //LOCAL VARIABLES
     uvm_channel_router::model#(ETH_CHANNELS, DMA_RX_CHANNELS, 2, 1) eth_to_dma[ETH_STREAMS];
     //local int unsigned eth_to_dma_index[ETH_STREAMS] = '{ETH_STREAMS{0}};
-    local logic [DMA_RX_MVB_WIDTH-1:0] dma_header[ETH_STREAMS][$];
+    //local logic [DMA_RX_MVB_WIDTH-1:0] dma_header[ETH_STREAMS][$];
     //local int unsigned dma_to_eth_index[DMA_STREAMS] = '{DMA_STREAMS{0}};
 
     function new(string name, uvm_component parent = null);
@@ -92,8 +92,14 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
     function bit used();
         bit used = 0;
 
+        for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
+            used |= eth_mvb_rx[it].used() != 0;
+            used |= eth_mfb_rx[it].used() != 0;
+        end
+
         for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
-            used |= (dma_header[it].size() != 0);
+            used |= dma_mvb_rx[it].used() != 0;
+            used |= dma_mfb_rx[it].used() != 0;
         end
         return used;
     endfunction
@@ -102,11 +108,13 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
         if (tr.reset == 1'b1) begin
             for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
                 eth_to_dma[it].reset();
+                eth_mvb_rx[it].flush(); 
+                eth_mfb_rx[it].flush();
             end
 
             for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
-                dma_header[it].delete();
-                //dma_to_eth_index[it] = 0;
+                dma_mvb_rx[it].flush();
+                dma_mfb_rx[it].flush();
             end
         end
     endfunction
@@ -120,35 +128,26 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
         logic [4-1:0]  hitmac;
         logic [1-1:0]  timestamp_vld;
         logic [64-1:0] timestamp;
-        uvm_mvb::sequence_item#(MVB_ITEMS, ETH_RX_HDR_WIDTH) item;
-        logic [ETH_RX_HDR_WIDTH-1:0] header;
-        uvm_byte_array::sequence_item packet;
+        uvm_logic_vector::sequence_item#(ETH_RX_HDR_WIDTH) item;
         packet_header #(DMA_HDR_META_WIDTH, DMA_RX_CHANNELS, DMA_PKT_MTU) dma_hdr;
 
         forever begin
             eth_mvb_rx[index].get(item);
-            if (item.src_rdy === 1'b1 && item.dst_rdy === 1'b1) begin
-                for(int unsigned it = 0; it < MVB_ITEMS; it++) begin
-                    if (item.vld[it] == 1'b1) begin
-			            {timestamp, timestamp_vld, hitmac, hitmac_vld, multicast, error, port, length} = item.data[it];
-
-            			dma_hdr = new();
-            			dma_hdr.meta = '0;
-            			dma_hdr.channel     = eth_to_dma[index].port_get(port%ETH_CHANNELS);
-            			dma_hdr.packet_size = length;
-            			dma_hdr.discard     = 0;
-
-			            dma_mvb_tx[index].write(dma_hdr);
-                    end
-                end
-            end
+            {timestamp, timestamp_vld, hitmac, hitmac_vld, multicast, error, port, length} = item.data;
+            
+            dma_hdr = new();
+            dma_hdr.meta        = '0;
+            dma_hdr.channel     = eth_to_dma[index].port_get(port%ETH_CHANNELS);
+            dma_hdr.packet_size = length;
+            dma_hdr.discard     = 0;
+            
+            dma_mvb_tx[index].write(dma_hdr);
         end
     endtask
 
     task run_eth(int unsigned index);
-        logic [ETH_RX_HDR_WIDTH-1:0] header;
         uvm_byte_array::sequence_item packet;
-        packet_header #(DMA_HDR_META_WIDTH, DMA_RX_CHANNELS, DMA_PKT_MTU) dma_hdr;
+        //packet_header #(DMA_HDR_META_WIDTH, DMA_RX_CHANNELS, DMA_PKT_MTU) dma_hdr;
 
         forever begin
             eth_mfb_rx[index].get(packet);
@@ -156,20 +155,6 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
         end
     endtask
 
-    task run_dma_mvb(int unsigned index);
-        uvm_mvb::sequence_item#(MVB_ITEMS, DMA_RX_MVB_WIDTH) item;
-
-        forever begin
-            dma_mvb_rx[index].get(item);
-            if (item.src_rdy === 1'b1 && item.dst_rdy === 1'b1) begin
-                for(int unsigned it = 0; it < MVB_ITEMS; it++) begin
-                    if (item.vld[it] == 1'b1) begin
-                        dma_header[index].push_back(item.data[it]);
-                    end
-                end
-            end
-        end
-    endtask
 
     task run_dma(int unsigned index);
         int unsigned eth_stream_index;
@@ -177,12 +162,26 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
         logic [DMA_HDR_META_WIDTH-1:0]    meta;
         logic [$clog2(DMA_TX_CHANNELS)-1:0] channel;
 
-        uvm_byte_array::sequence_item packet;
+        uvm_logic_vector::sequence_item#(DMA_RX_MVB_WIDTH) header;
+        uvm_byte_array::sequence_item                      packet;
+
         packet_header #(0, 2**ETH_TX_CHANNEL_WIDTH, 2**ETH_TX_LENGTH_WIDTH-1) eth_hdr;
         forever begin
+            //wait(!dma_mvb_rx[index].is_empty() && !dma_mfb_rx[index].is_empty()); //this dosnt work. Probubly bug in Modelsim
+            do  begin
+               #(10ns);
+            end while(dma_mvb_rx[index].used() == 0 || dma_mfb_rx[index].used() == 0);
+
+            dma_mvb_rx[index].get(header);
             dma_mfb_rx[index].get(packet);
-            wait(dma_header[index].size() != 0); //wait for metainformation
-            {channel, meta, length} = dma_header[index].pop_front();
+
+            {channel, meta, length} = header.data;
+
+            if (length != packet.data.size()) begin
+                string msg;
+                $sformat(msg, "\n\tDMA TO ETH[%0d] Header is desynchronize from packet\n\t%s\n%s", index, header.convert2string(), packet.convert2string());
+                `uvm_fatal(this.get_full_name(), msg);
+            end
 
             //create DMA header
             eth_hdr = new();
@@ -210,7 +209,6 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
             fork
                 automatic int index = it;
                 run_dma(index);
-                run_dma_mvb(index);
             join_none;
         end
     endtask
