@@ -54,7 +54,7 @@ module testbench;
     reset_if     reset_mem[test_pkg::MEM_PORTS](MEM_CLK);
 
     // ETHERNET I/O INTERFACE
-    mvb_if #(test_pkg::REGIONS,   test_pkg::ETH_RX_HDR_WIDTH)                                                                           eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
+    mvb_if #(test_pkg::REGIONS,  test_pkg::ETH_RX_HDR_WIDTH)                                                                           eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
     mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0)                          eth_rx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
     mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::ETH_TX_HDR_WIDTH) eth_tx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
     // DMA I/O INTERFACE
