@@ -49,6 +49,5 @@ set DMA_400G_DEMO        false
 # Other parameters:
 # ==============================================================================
 set PROJECT_NAME "NDK_MINIMAL"
-# Add Ethernet Speed/Ports info to project name...
-append PROJECT_NAME "_" $ETH_PORT_SPEED(0) "G" $ETH_PORTS
+set PROJECT_VARIANT "$ETH_PORT_SPEED(0)G$ETH_PORTS"
 # ------------------------------------------------------------------------------
