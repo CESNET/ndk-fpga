@@ -43,6 +43,7 @@ architecture FULL of APPLICATION_CORE is
     signal app_dma_rx_mvb_channel_deser  : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
     signal app_dma_rx_mvb_discard_deser  : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal app_dma_rx_mvb_data_deser     : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*DMA_RX_ALL_META_W-1 downto 0);
+    signal app_dma_rx_mvb_payload_deser  : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal app_dma_rx_mvb_vld_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal app_dma_rx_mvb_src_rdy_deser  : std_logic_vector(ETH_STREAMS-1 downto 0);
     signal app_dma_rx_mvb_dst_rdy_deser  : std_logic_vector(ETH_STREAMS-1 downto 0);
@@ -69,6 +70,7 @@ architecture FULL of APPLICATION_CORE is
     signal dma_tx_mvb_channel_deser      : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
     signal dma_tx_mvb_data_deser         : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*DMA_TX_ALL_META_W-1 downto 0);
     signal dma_tx_mvb_switch_deser       : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(ETH_STREAMS)-1 downto 0);
+    signal dma_tx_mvb_payload_deser      : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal dma_tx_mvb_vld_deser          : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal dma_tx_mvb_src_rdy_deser      : std_logic_vector(DMA_STREAMS-1 downto 0);
     signal dma_tx_mvb_dst_rdy_deser      : std_logic_vector(DMA_STREAMS-1 downto 0);
@@ -370,19 +372,22 @@ begin
 
     -- merge each ETH stream to single DMA stream
     dma2app_one_g: if (DMA_STREAMS < ETH_STREAMS and DMA_STREAMS = 1) generate
-        dma_rx_mvb_data_g: for i in 0 to DMA_STREAMS-1 generate
-            dma_rx_mvb_data_g2: for r in 0 to MFB_REGIONS-1 generate
+
+        -- =========================================================================
+        -- APP2DMA PATH
+        -- =========================================================================
+
+        -- pack MVB data (APP2DMA)
+        app_dma_rx_mvb_data_g: for i in 0 to ETH_STREAMS-1 generate
+            app_dma_rx_mvb_data_g2: for r in 0 to MFB_REGIONS-1 generate
                 app_dma_rx_mvb_data_deser(i)(r*DMA_RX_ALL_META_W)                                                                                                 <= app_dma_rx_mvb_discard_deser(i)(r);
                 app_dma_rx_mvb_data_deser(i)(r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)-1 downto r*DMA_RX_ALL_META_W+1)                                          <= app_dma_rx_mvb_channel_deser(i)((r+1)*log2(DMA_RX_CHANNELS)-1 downto r*log2(DMA_RX_CHANNELS));
                 app_dma_rx_mvb_data_deser(i)(r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)+DMA_HDR_META_WIDTH-1 downto r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)) <= app_dma_rx_mvb_hdr_meta_deser(i)((r+1)*DMA_HDR_META_WIDTH-1 downto r*DMA_HDR_META_WIDTH);
                 app_dma_rx_mvb_data_deser(i)((r+1)*DMA_RX_ALL_META_W-1 downto r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)+DMA_HDR_META_WIDTH)                     <= app_dma_rx_mvb_len_deser(i)((r+1)*log2(DMA_PKT_MTU+1)-1 downto r*log2(DMA_PKT_MTU+1));
-
-                dma_rx_mvb_discard_deser(i)(r)                                                            <= dma_rx_mvb_data_deser(i)(r*DMA_RX_ALL_META_W);
-                dma_rx_mvb_channel_deser(i)((r+1)*log2(DMA_RX_CHANNELS)-1 downto r*log2(DMA_RX_CHANNELS)) <= dma_rx_mvb_data_deser(i)(r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)-1 downto r*DMA_RX_ALL_META_W+1);
-                dma_rx_mvb_hdr_meta_deser(i)((r+1)*DMA_HDR_META_WIDTH-1 downto r*DMA_HDR_META_WIDTH)      <= dma_rx_mvb_data_deser(i)(r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)+DMA_HDR_META_WIDTH-1 downto r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS));
-                dma_rx_mvb_len_deser(i)((r+1)*log2(DMA_PKT_MTU+1)-1 downto r*log2(DMA_PKT_MTU+1))         <= dma_rx_mvb_data_deser(i)((r+1)*DMA_RX_ALL_META_W-1 downto r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)+DMA_HDR_META_WIDTH);
             end generate;
         end generate;
+
+        app_dma_rx_mvb_payload_deser <= (others => (others => '1'));
 
         mfb_merger_tree_i : entity work.MFB_MERGER_GEN
         generic map(
@@ -393,7 +398,7 @@ begin
             MFB_REG_SIZE    => MFB_REG_SIZE,
             MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
             MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
-            INPUT_FIFO_SIZE => 8,
+            INPUT_FIFO_SIZE => 32,
             RX_PAYLOAD_EN   => (others => true),
             IN_PIPE_EN      => false,
             OUT_PIPE_EN     => true,
@@ -404,7 +409,7 @@ begin
             RESET           => APP_RESET(2),
                 
             RX_MVB_DATA     => app_dma_rx_mvb_data_deser,
-            RX_MVB_PAYLOAD  => (others => (others => '1')),
+            RX_MVB_PAYLOAD  => app_dma_rx_mvb_payload_deser,
             RX_MVB_VLD      => app_dma_rx_mvb_vld_deser,
             RX_MVB_SRC_RDY  => app_dma_rx_mvb_src_rdy_deser,
             RX_MVB_DST_RDY  => app_dma_rx_mvb_dst_rdy_deser,
@@ -431,6 +436,21 @@ begin
             TX_MFB_DST_RDY  => dma_rx_mfb_dst_rdy_deser(0)
         );
 
+        -- unpack MVB data (APP2DMA)
+        dma_rx_mvb_data_g: for i in 0 to DMA_STREAMS-1 generate
+            dma_rx_mvb_data_g2: for r in 0 to MFB_REGIONS-1 generate
+                dma_rx_mvb_discard_deser(i)(r)                                                            <= dma_rx_mvb_data_deser(i)(r*DMA_RX_ALL_META_W);
+                dma_rx_mvb_channel_deser(i)((r+1)*log2(DMA_RX_CHANNELS)-1 downto r*log2(DMA_RX_CHANNELS)) <= dma_rx_mvb_data_deser(i)(r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)-1 downto r*DMA_RX_ALL_META_W+1);
+                dma_rx_mvb_hdr_meta_deser(i)((r+1)*DMA_HDR_META_WIDTH-1 downto r*DMA_HDR_META_WIDTH)      <= dma_rx_mvb_data_deser(i)(r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)+DMA_HDR_META_WIDTH-1 downto r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS));
+                dma_rx_mvb_len_deser(i)((r+1)*log2(DMA_PKT_MTU+1)-1 downto r*log2(DMA_PKT_MTU+1))         <= dma_rx_mvb_data_deser(i)((r+1)*DMA_RX_ALL_META_W-1 downto r*DMA_RX_ALL_META_W+1+log2(DMA_RX_CHANNELS)+DMA_HDR_META_WIDTH);
+            end generate;
+        end generate;
+
+        -- =========================================================================
+        -- DMA2APP PATH
+        -- =========================================================================
+
+        -- pack MVB data (DMA2APP)
         dma_tx_mvb_data_g: for i in 0 to DMA_STREAMS-1 generate
             dma_tx_mvb_data_g2: for r in 0 to MFB_REGIONS-1 generate
                 dma_tx_mvb_data_deser(i)(r*DMA_TX_ALL_META_W+log2(DMA_TX_CHANNELS)-1 downto r*DMA_RX_ALL_META_W)                                          <= dma_tx_mvb_channel_deser(i)((r+1)*log2(DMA_TX_CHANNELS)-1 downto r*log2(DMA_TX_CHANNELS));
@@ -438,12 +458,10 @@ begin
                 dma_tx_mvb_data_deser(i)((r+1)*DMA_TX_ALL_META_W-1 downto r*DMA_RX_ALL_META_W+log2(DMA_TX_CHANNELS)+DMA_HDR_META_WIDTH)                   <= dma_tx_mvb_len_deser(i)((r+1)*log2(DMA_PKT_MTU+1)-1 downto r*log2(DMA_PKT_MTU+1));
 
                 dma_tx_mvb_switch_deser(i)((r+1)*log2(ETH_STREAMS)-1 downto r*log2(ETH_STREAMS)) <= dma_tx_mvb_channel_deser(i)((r+1)*log2(DMA_TX_CHANNELS)-1 downto (r+1)*log2(DMA_TX_CHANNELS)-log2(ETH_STREAMS));
-
-                app_dma_tx_mvb_channel_deser(i)((r+1)*log2(DMA_TX_CHANNELS)-1 downto r*log2(DMA_TX_CHANNELS)) <= app_dma_tx_mvb_data_deser(i)(r*DMA_TX_ALL_META_W+log2(DMA_TX_CHANNELS)-1 downto r*DMA_RX_ALL_META_W);
-                app_dma_tx_mvb_hdr_meta_deser(i)((r+1)*DMA_HDR_META_WIDTH-1 downto r*DMA_HDR_META_WIDTH)      <= app_dma_tx_mvb_data_deser(i)(r*DMA_TX_ALL_META_W+log2(DMA_TX_CHANNELS)+DMA_HDR_META_WIDTH-1 downto r*DMA_RX_ALL_META_W+log2(DMA_TX_CHANNELS));
-                app_dma_tx_mvb_len_deser(i)((r+1)*log2(DMA_PKT_MTU+1)-1 downto r*log2(DMA_PKT_MTU+1))         <= app_dma_tx_mvb_data_deser(i)((r+1)*DMA_TX_ALL_META_W-1 downto r*DMA_RX_ALL_META_W+log2(DMA_TX_CHANNELS)+DMA_HDR_META_WIDTH);
             end generate;
         end generate;
+
+        dma_tx_mvb_payload_deser <= (others => (others => '1'));
 
         mfb_splitter_tree_i : entity work.MFB_SPLITTER_GEN
         generic map(
@@ -454,7 +472,7 @@ begin
             MFB_REG_SIZE     => MFB_REG_SIZE,
             MFB_BLOCK_SIZE   => MFB_BLOCK_SIZE,
             MFB_ITEM_WIDTH   => MFB_ITEM_WIDTH,
-            OUTPUT_FIFO_SIZE => 8,
+            OUTPUT_FIFO_SIZE => 32,
             OUT_PIPE_EN      => true,
             DEVICE           => DEVICE
         )
@@ -464,7 +482,7 @@ begin
 
             RX_MVB_DATA     => dma_tx_mvb_data_deser(0),
             RX_MVB_SWITCH   => dma_tx_mvb_switch_deser(0),
-            RX_MVB_PAYLOAD  => (others => '1'),
+            RX_MVB_PAYLOAD  => dma_tx_mvb_payload_deser(0),
             RX_MVB_VLD      => dma_tx_mvb_vld_deser(0),
             RX_MVB_SRC_RDY  => dma_tx_mvb_src_rdy_deser(0),
             RX_MVB_DST_RDY  => dma_tx_mvb_dst_rdy_deser(0),
@@ -490,6 +508,15 @@ begin
             TX_MFB_SRC_RDY  => app_dma_tx_mfb_src_rdy_deser,
             TX_MFB_DST_RDY  => app_dma_tx_mfb_dst_rdy_deser
         );
+
+        -- unpack MVB data (DMA2APP)
+        app_dma_tx_mvb_data_g: for i in 0 to ETH_STREAMS-1 generate
+            app_dma_tx_mvb_data_g2: for r in 0 to MFB_REGIONS-1 generate
+                app_dma_tx_mvb_channel_deser(i)((r+1)*log2(DMA_TX_CHANNELS)-1 downto r*log2(DMA_TX_CHANNELS)) <= app_dma_tx_mvb_data_deser(i)(r*DMA_TX_ALL_META_W+log2(DMA_TX_CHANNELS)-1 downto r*DMA_RX_ALL_META_W);
+                app_dma_tx_mvb_hdr_meta_deser(i)((r+1)*DMA_HDR_META_WIDTH-1 downto r*DMA_HDR_META_WIDTH)      <= app_dma_tx_mvb_data_deser(i)(r*DMA_TX_ALL_META_W+log2(DMA_TX_CHANNELS)+DMA_HDR_META_WIDTH-1 downto r*DMA_RX_ALL_META_W+log2(DMA_TX_CHANNELS));
+                app_dma_tx_mvb_len_deser(i)((r+1)*log2(DMA_PKT_MTU+1)-1 downto r*log2(DMA_PKT_MTU+1))         <= app_dma_tx_mvb_data_deser(i)((r+1)*DMA_TX_ALL_META_W-1 downto r*DMA_RX_ALL_META_W+log2(DMA_TX_CHANNELS)+DMA_HDR_META_WIDTH);
+            end generate;
+        end generate;
     end generate;
 
     DMA_RX_MVB_LEN           <= slv_array_ser(dma_rx_mvb_len_deser);
