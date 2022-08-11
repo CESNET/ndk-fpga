@@ -57,6 +57,6 @@ The Minimal application serves as a simple example of how to build an FPGA appli
     ofm_doc/mfb
     ofm_doc/mvb
     ofm_doc/nic
-    ofm_doc/pcie
+    pcie
     ofm_doc/debug
     ofm_doc/ver
