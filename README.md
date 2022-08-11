@@ -8,7 +8,7 @@ The Minimal application serves as a simple example of how to build an FPGA appli
 
 ## Requirements, clone and build
 
-- To build FPGA firmware, you must have Intel Quartus Prime Pro 22.1 or Xilinx Vivado 2019.1 (depending on the target card) installed, including a valid license.
+- To build FPGA firmware, you must have Intel Quartus Prime Pro 22.2 or Xilinx Vivado 2019.1 (depending on the target card) installed, including a valid license.
 - Additional repositories (minimum - available as open-source) are needed to build the NDK design for the FPGA:
     - [Open FPGA Modules](https://github.com/CESNET/ofm/)
     - [NDK Core](https://github.com/CESNET/ndk-core/)
