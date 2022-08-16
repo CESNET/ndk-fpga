@@ -8,15 +8,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
-class regmodel #(STREAMS, CHANNELS, OUTPUT_CHANNELS) extends uvm_reg_block;
-    `uvm_object_param_utils(app_core::regmodel #(STREAMS, CHANNELS, OUTPUT_CHANNELS))
+
+class regmodel #(STREAMS, CHANNELS, OUTPUT_CHANNELS) extends uvm_app_core::regmodel #(STREAMS, CHANNELS, OUTPUT_CHANNELS);
+    `uvm_object_param_utils(uvm_app_core_minimal::regmodel #(STREAMS, CHANNELS, OUTPUT_CHANNELS))
 
     rand uvm_channel_router::regmodel #(CHANNELS, OUTPUT_CHANNELS, 2) stream[STREAMS];
 
     localparam MEM_TESTERS = 2;
 
     function new(string name = "reg_block");
-        super.new(name, build_coverage(UVM_NO_COVERAGE));
+        super.new(name);
     endfunction
 
     function void set_frontdoor(uvm_reg_frontdoor frontdoor);

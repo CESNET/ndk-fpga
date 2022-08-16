@@ -11,21 +11,19 @@
 `ifndef APPLICATTION_CORE_PKG
 `define APPLICATTION_CORE_PKG
 
-package app_core;
+package uvm_app_core_minimal;
 
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 
     `uvm_analysis_imp_decl(_reset)
-    `uvm_analysis_imp_decl(_model)
-    `uvm_analysis_imp_decl(_dut)
+    //`uvm_analysis_imp_decl(_model)
+    //`uvm_analysis_imp_decl(_dut)
 
     `include "regmodel.sv"
     `include "reg_sequnece.sv"
 
     `include "model.sv"
-    `include "scoreboard_cmp.sv"
-    `include "scoreboard.sv"
     `include "env.sv"
 
 endpackage

@@ -46,13 +46,13 @@ lappend COMPONENTS [list "DUT_INTEL"  "../intel"  "FULL"]
 lappend COMPONENTS [list "VER"        "."         "FULL"]
 
 #SET TEST NAME
-set SIG_FILE  "./signals.fdo"
+set SIG_FILE  "../../ndk/core/intel/uvm/signals.fdo"
 #set TEST_NAME "test::full_speed"
 set TEST_NAME "test::base"
 
 # Enable Code Coverage
-set SIM_FLAGS(CODE_COVERAGE) "true"
-set SIM_FLAGS(EXTRA_VFLAGS) "+UVM_TESTNAME=$TEST_NAME -uvmcontrol=all +UVM_MAX_QUIT_COUNT=1"
+set SIM_FLAGS(CODE_COVERAGE) "false"
+set SIM_FLAGS(EXTRA_VFLAGS) "+UVM_VERBOSITY=UVM_NONE +UVM_TESTNAME=$TEST_NAME -uvmcontrol=all +UVM_MAX_QUIT_COUNT=1"
 
 # Global include file for compilation
 source "$OFM_PATH/build/Modelsim.inc.fdo"
@@ -63,12 +63,13 @@ set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
 
 #run verification
-#restart -f
-#run 1268ns
 nb_sim_run
 
 # Reports
 # Uncomment lines below to generate html coce coverage report
-coverage save -instance /testbench/DUT -code bcefst -verbose -testname {*}$TEST_NAME actual.ucdb
-#coverage report -html -output cov_html -instance=/testbench/DUT -source -details -assert -directive -cvg -code bcefst -verbose -threshL 50 -threshH 90
+if {$SIM_FLAGS(CODE_COVERAGE)} {
+    coverage save -instance /testbench/DUT -code bcefst -verbose -testname {*}$TEST_NAME actual.ucdb
+    coverage report -html -output cov_html -instance=/testbench/DUT -source -details -assert -directive -cvg -code bcefst -verbose -threshL 50 -threshH 90
+}
+
 quit

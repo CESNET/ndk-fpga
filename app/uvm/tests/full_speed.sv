@@ -88,6 +88,11 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
         super.build_phase(phase);
     endfunction
 
+    function void connect_phase(uvm_phase phase);
+        super.connect_phase(phase);
+        m_env.delay_max_set(200ns);
+    endfunction
+
     static function type_id get_type();
         return type_id::get();
     endfunction
