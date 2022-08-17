@@ -17,10 +17,10 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     localparam DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS) + 1;
 
     //top env for sychnronization
-    top_agent::agent m_eth_agent[ETH_STREAMS];
-    top_agent::agent m_dma_agent[DMA_STREAMS];
+    uvm_app_core_top_agent::agent m_eth_agent[ETH_STREAMS];
+    uvm_app_core_top_agent::agent m_dma_agent[DMA_STREAMS];
 
-    app_core::env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
+    uvm_app_core_minimal::env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
             REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_env;
 
     bit   timeout;
@@ -46,24 +46,24 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             string it_num;
             it_num.itoa(it);
 
-            m_eth_agent[it] = top_agent::agent::type_id::create({"m_eth_agent_", it_num}, this);
+            m_eth_agent[it] = uvm_app_core_top_agent::agent::type_id::create({"m_eth_agent_", it_num}, this);
         end
 
         for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
             string it_num;
             it_num.itoa(it);
 
-            m_dma_agent[it] = top_agent::agent::type_id::create({"m_dma_agent_", it_num}, this);
+            m_dma_agent[it] = uvm_app_core_top_agent::agent::type_id::create({"m_dma_agent_", it_num}, this);
         end
 
-        m_env = app_core::env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
+        m_env = uvm_app_core_minimal::env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
             REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_env", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
         for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
             string it_num;
-            top_agent::mvb_config m_config;
+            uvm_app_core_top_agent::mvb_config m_config;
 
             it_num.itoa(it);
 
@@ -71,7 +71,7 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             m_config.port_min = it     * ETH_CHANNELS;
             m_config.port_max = (it+1) * ETH_CHANNELS-1;
 
-            uvm_config_db#(top_agent::mvb_config)::set(this, {"m_env.m_eth_mvb_rx_", it_num,".m_logic_vector_agent.m_sequencer"}, "m_config",    m_config);
+            uvm_config_db#(uvm_app_core_top_agent::mvb_config)::set(this, {"m_env.m_eth_mvb_rx_", it_num,".m_logic_vector_agent.m_sequencer"}, "m_config",    m_config);
             uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::set(this, {"m_env.m_eth_mvb_rx_", it_num,".m_logic_vector_agent.m_sequencer"}, "hdr_export",    m_eth_agent[it].m_driver.header_export);
             uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::set(this, {"m_env.m_eth_mfb_rx_", it_num,".m_byte_array_agent.m_sequencer"}, "packet_export", m_eth_agent[it].m_driver.byte_array_export);
             m_env.m_resets_app.sync_connect(m_eth_agent[it].reset_sync);
@@ -84,12 +84,13 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             uvm_config_db#(mailbox#(uvm_byte_array::sequence_item))::set(this, {"m_env.m_dma_mfb_rx_", it_num,".m_byte_array_agent.m_sequencer"}, "packet_export", m_dma_agent[it].m_driver.byte_array_export);
             m_env.m_resets_app.sync_connect(m_dma_agent[it].reset_sync);
         end
+        m_env.delay_max_set(1ms);
     endfunction
 
     task run_dma_meta(uvm_byte_array::sequencer sqr);
-        top_agent::logic_vector_sequence_lib#(DMA_RX_MVB_WIDTH)  mvb_seq;
+        uvm_app_core_top_agent::logic_vector_sequence_lib#(DMA_RX_MVB_WIDTH)  mvb_seq;
 
-        mvb_seq = top_agent::logic_vector_sequence_lib#(DMA_RX_MVB_WIDTH)::type_id::create("mvb_seq", this);
+        mvb_seq = uvm_app_core_top_agent::logic_vector_sequence_lib#(DMA_RX_MVB_WIDTH)::type_id::create("mvb_seq", this);
         mvb_seq.init_sequence();
         mvb_seq.min_random_count = 5;
         mvb_seq.max_random_count = 13;
@@ -103,9 +104,9 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     task run_eth_meta(uvm_byte_array::sequencer sqr);
-        top_agent::logic_vector_sequence_lib_eth#(ETH_RX_HDR_WIDTH)  mvb_seq;
+        uvm_app_core_top_agent::logic_vector_sequence_lib_eth#(ETH_RX_HDR_WIDTH)  mvb_seq;
 
-        mvb_seq = top_agent::logic_vector_sequence_lib_eth#(ETH_RX_HDR_WIDTH)::type_id::create("mvb_seq", this);
+        mvb_seq = uvm_app_core_top_agent::logic_vector_sequence_lib_eth#(ETH_RX_HDR_WIDTH)::type_id::create("mvb_seq", this);
         mvb_seq.init_sequence();
         mvb_seq.min_random_count = 5;
         mvb_seq.max_random_count = 13;
@@ -119,8 +120,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     task run_packet(uvm_byte_array::sequencer sqr);
-        top_agent::byte_array_sequence_simple seq;
-        seq = top_agent::byte_array_sequence_simple::type_id::create("seq", this);
+        uvm_app_core_top_agent::byte_array_sequence_simple seq;
+        seq = uvm_app_core_top_agent::byte_array_sequence_simple::type_id::create("seq", this);
         seq.randomize();
         seq.start(sqr);
     endtask
@@ -253,8 +254,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
             event_reset  = 1'b0;
             reset_repeat = $urandom_range(5,10);
-            for (int unsigned it = 0; it < reset_repeat; it++) begin
-            //forever begin
+            //for (int unsigned it = 0; it < reset_repeat; it++) begin
+            forever begin
                 void'(run.randomize());
                 run.start(m_env.m_resets_gen.m_sequencer);
             end
@@ -262,9 +263,9 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task dirver_sequence();
-        app_core::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS) seq;
+        uvm_app_core_minimal::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS) seq;
 
-        seq = app_core::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS)::type_id::create("seq", this);
+        seq = uvm_app_core_minimal::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS)::type_id::create("seq", this);
 
         seq.m_regmodel = m_env.m_regmodel.m_regmodel;
         seq.start(null);

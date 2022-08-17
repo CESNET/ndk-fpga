@@ -7,20 +7,18 @@
 lappend PACKAGES "$ENTITY_BASE/test_pkg.sv"
 
 #AGENTS
-lappend COMPONENTS [ list "COMMON"     "$OFM_PATH/comp/uvm/common"                    "FULL" ]
-lappend COMPONENTS [ list "RESET"      "$OFM_PATH/comp/uvm/reset"                     "FULL" ]
-#next line is hotfix please delete it.
-lappend COMPONENTS [ list "MVB"        "$OFM_PATH/comp/uvm/mvb"                       "FULL" ]
-lappend COMPONENTS [ list "MVB"        "$OFM_PATH/comp/uvm/logic_vector_mvb"          "FULL" ]
-lappend COMPONENTS [ list "MFB"        "$OFM_PATH/comp/uvm/byte_array_mfb"            "FULL" ]
-lappend COMPONENTS [ list "MI"         "$OFM_PATH/comp/uvm/mi"                        "FULL" ]
+#lappend COMPONENTS [ list "COMMON"     "$OFM_PATH/comp/uvm/common"                    "FULL" ]
+#lappend COMPONENTS [ list "RESET"      "$OFM_PATH/comp/uvm/reset"                     "FULL" ]
+#lappend COMPONENTS [ list "MVB"        "$OFM_PATH/comp/uvm/logic_vector_mvb"          "FULL" ]
+#lappend COMPONENTS [ list "MFB"        "$OFM_PATH/comp/uvm/byte_array_mfb"            "FULL" ]
+#lappend COMPONENTS [ list "MI"         "$OFM_PATH/comp/uvm/mi"                        "FULL" ]
 
 #MODELS
-lappend COMPONENTS [ list "CHANNEL_ROUTER_MODEL" "$OFM_PATH/comp/mvb_tools/flow/channel_router/uvm"  "FULL" ]
+#lappend COMPONENTS [ list "CHANNEL_ROUTER_MODEL" "$OFM_PATH/comp/mvb_tools/flow/channel_router/uvm"  "FULL" ]
 
 
-lappend MOD "$ENTITY_BASE/top_agent/pkg.sv"
+lappend COMPONENTS [ list "COMMON"     "../../ndk/core/intel/uvm"         "FULL" ]
+
+
 lappend MOD "$ENTITY_BASE/env/pkg.sv"
 lappend MOD "$ENTITY_BASE/tests/pkg.sv"
-lappend MOD "$ENTITY_BASE/property.sv"
-
