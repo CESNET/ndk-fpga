@@ -27,7 +27,7 @@ SETTINGS = {
         "MEM_DATA_WIDTH"       : 512,
         "MI_DATA_WIDTH"        : 32,
         "MI_ADDR_WIDTH"        : 32,
-        "RESET_WIDTH"          : 2,
+        "RESET_WIDTH"          : 4,
         "BOARD"                : "\\\"400G1\\\"",
         "DEVICE"               : "\\\"ULTRASCALE\\\"",
     },
@@ -49,9 +49,18 @@ SETTINGS = {
         "MFB_ITEM_WIDTH"       : 8,
     },
 
+    "mfb_1" : {
+        "REGIONS"              : 1,
+        "MFB_REG_SIZE"         : 8,
+        "MFB_BLOCK_SIZE"       : 8,
+        "MFB_ITEM_WIDTH"       : 8,
+    },
+
 
     "_combinations_" : (
     ("default",), # Works the same as '("default",),' as the "default" is applied in every combination
     ("eth_1", "dma_1", "mfb",),
+    ("dma_1", "mfb_1",),
+    ("dma_1", ),
     ),
 }

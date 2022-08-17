@@ -43,7 +43,7 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
     endfunction
 
     function bit used();
-        super.used();
+        return super.used();
     endfunction
 
     function void write_reset(uvm_reset::sequence_item tr);
@@ -84,7 +84,11 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
             dma_hdr.item.packet_size = length;
             dma_hdr.item.discard     = 0;
 
-            dma_mvb_tx[index].write(dma_hdr);
+            if (DMA_STREAMS == 1) begin
+                dma_mvb_tx[0].write(dma_hdr);
+            end else begin
+                dma_mvb_tx[index].write(dma_hdr);
+            end
         end
     endtask
 
@@ -93,7 +97,11 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
 
         forever begin
             eth_mfb_rx[index].get(packet);
-            dma_mfb_tx[index].write(packet);
+            if (DMA_STREAMS == 1) begin
+                dma_mfb_tx[0].write(packet);
+            end else begin
+                dma_mfb_tx[index].write(packet);
+            end
         end
     endtask
 
@@ -101,6 +109,7 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
         logic [$clog2(DMA_PKT_MTU+1)-1:0] length;
         logic [DMA_HDR_META_WIDTH-1:0]    meta;
         logic [$clog2(DMA_TX_CHANNELS)-1:0] channel;
+        int unsigned eth_channel;
 
         uvm_common::model_item#(uvm_logic_vector::sequence_item#(DMA_RX_MVB_WIDTH)) header;
         uvm_common::model_item#(uvm_app_core::packet_header #(0, 2**ETH_TX_CHANNEL_WIDTH, 2**ETH_TX_LENGTH_WIDTH-1)) eth_hdr;
@@ -109,23 +118,18 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
             dma_mvb_rx[index].get(header);
 
             {channel, meta, length} = header.item.data;
-
-            //if (length != packet.data.size()) begin
-            //    string msg;
-            //    $sformat(msg, "\n\tDMA TO ETH[%0d] Header is desynchronize from packet\n\t%s\n%s", index, header.convert2string(), packet.convert2string());
-            //    `uvm_fatal(this.get_full_name(), msg);
-            //end
+            eth_channel = ((index * DMA_TX_CHANNELS) + channel)/((DMA_STREAMS*DMA_TX_CHANNELS)/(ETH_STREAMS*ETH_CHANNELS));
 
             //create DMA header
             eth_hdr = new();
             eth_hdr.start = header.start;
             eth_hdr.item  = new();
             eth_hdr.item.packet_size = length;
-            eth_hdr.item.channel = index * ETH_CHANNELS + channel[$clog2(DMA_TX_CHANNELS)-1:$clog2(DMA_TX_CHANNELS)-$clog2(ETH_CHANNELS)]; //dma_to_eth_index[index] + index * ETH_CHANNELS);
+            eth_hdr.item.channel = eth_channel; 
             eth_hdr.item.discard = 1'b0;
 
             dma_hdr_fifo[index].push_back(header);
-            eth_mvb_tx[index].write(eth_hdr);
+            eth_mvb_tx[eth_channel/ETH_CHANNELS].write(eth_hdr);
         end
     endtask
 
@@ -133,6 +137,7 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
         logic [$clog2(DMA_PKT_MTU+1)-1:0] length;
         logic [DMA_HDR_META_WIDTH-1:0]    meta;
         logic [$clog2(DMA_TX_CHANNELS)-1:0] channel;
+        int unsigned eth_channel;
         uvm_common::model_item#(uvm_byte_array::sequence_item) packet;
         uvm_common::model_item#(uvm_logic_vector::sequence_item#(DMA_RX_MVB_WIDTH)) hdr;
 
@@ -142,6 +147,7 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
             wait(dma_hdr_fifo[index].size() != 0);
             hdr = dma_hdr_fifo[index].pop_front();
             {channel, meta, length} = hdr.item.data;
+            eth_channel = ((index * DMA_TX_CHANNELS) + channel)/((DMA_STREAMS*DMA_TX_CHANNELS)/(ETH_STREAMS*ETH_CHANNELS));
 
             if (length != packet.item.size()) begin
                 string msg;
@@ -149,7 +155,7 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
                 `uvm_fatal(this.get_full_name(), msg);
             end
 
-            eth_mfb_tx[index].write(packet);
+            eth_mfb_tx[eth_channel/ETH_CHANNELS].write(packet);
         end
     endtask
 
