@@ -166,8 +166,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         mfb_seq = uvm_byte_array::sequence_lib::type_id::create("mfb_rx_seq", this);
         mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 15;
-        mfb_seq.max_random_count = 20;
+        mfb_seq.min_random_count = 5;
+        mfb_seq.max_random_count = 13;
 
         //SEND PACKETS
         //mfb_seq.set_starting_phase(phase);
@@ -212,8 +212,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         mfb_seq = uvm_byte_array::sequence_lib::type_id::create("mfb_dma_rx_seq", this);
         mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 15;
-        mfb_seq.max_random_count = 20;
+        mfb_seq.min_random_count = 5;
+        mfb_seq.max_random_count = 13;
 
         //SEND PACKETS
         //mfb_seq.set_starting_phase(phase);
@@ -297,7 +297,7 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         join_none;
 
         ////configure egent
-        for (int unsigned it = 0; it < 3; it++) begin
+        for (int unsigned it = 0; it < 1; it++) begin
 
             event_eth_rx_end = '{ETH_STREAMS {1'b1}};
             event_dma_rx_end = '{DMA_STREAMS {1'b1}};
