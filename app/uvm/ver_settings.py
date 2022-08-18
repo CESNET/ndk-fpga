@@ -56,11 +56,15 @@ SETTINGS = {
         "MFB_ITEM_WIDTH"       : 8,
     },
 
+    "eth_ch1" : {
+        "ETH_CHANNELS"         : 1,
+    },
+
 
     "_combinations_" : (
     ("default",), # Works the same as '("default",),' as the "default" is applied in every combination
     ("eth_1", "dma_1", "mfb",),
-    ("dma_1", "mfb_1",),
-    ("dma_1", ),
+    ("dma_1", "eth_ch1", "mfb_1",),
+    ("dma_1", "eth_ch1",),
     ),
 }
