@@ -1,4 +1,4 @@
-# user_const.tcl: User parameters for fb4cgg3/fb2cgg3 card
+# user_const.tcl: User parameters for fb2cghh card
 # Copyright (C) 2022 CESNET z.s.p.o.
 # Author(s): David Beneš <benes.david2000@seznam.cz>
 #
@@ -22,6 +22,5 @@ set DMA_RX_BLOCKING_MODE true
 # Other parameters:
 # ==============================================================================
 set PROJECT_NAME "NDK_MINIMAL"
-# Add Ethernet Speed/Ports info to project name...
-append PROJECT_NAME "_" $ETH_PORT_SPEED(0) "G" $ETH_PORTS
+set PROJECT_VARIANT "$ETH_PORT_SPEED(0)G$ETH_PORTS"
 # ------------------------------------------------------------------------------
