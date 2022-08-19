@@ -17,6 +17,7 @@ jobs:
           git submodule update --init ndk/core
           git submodule update --init ndk/cards/dk-dev-1sdx-p
           git submodule update --init ndk/cards/dk-dev-agi027res
+          git submodule update --init ndk/cards/fb4cgg3
       - name: Setup and build
         run: |
           sudo apt-get install python3-pip
