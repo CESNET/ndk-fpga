@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MI bus interconnect &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -71,7 +71,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mfb.html">MFB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mvb.html">MVB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/debug.html">Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
 </ul>
@@ -112,10 +112,8 @@ See <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.ht
 <p>A total of 26b address range is available, which is divided between the individual parts of the design.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x00000000</span><span class="o">-</span><span class="mh">0x000000FF</span> <span class="o">--</span> <span class="n">Test</span> <span class="n">space</span> <span class="p">(</span><span class="n">debug</span> <span class="n">R</span><span class="o">/</span><span class="n">W</span> <span class="n">registers</span><span class="p">)</span>
 <span class="mh">0x00000100</span><span class="o">-</span><span class="mh">0x00000FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
-<span class="mh">0x00001000</span><span class="o">-</span><span class="mh">0x000010FF</span> <span class="o">--</span> <span class="n">ADC</span> <span class="n">sensor</span> <span class="p">(</span><span class="n">FPGA</span> <span class="n">temperature</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
-<span class="mh">0x00001100</span><span class="o">-</span><span class="mh">0x00001FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
-<span class="mh">0x00002000</span><span class="o">-</span><span class="mh">0x000020FF</span> <span class="o">--</span> <span class="n">FPGA</span> <span class="p">(</span><span class="n">SDM</span> <span class="ow">or</span> <span class="n">BOOT</span><span class="p">)</span> <span class="n">controller</span>
-<span class="mh">0x00002100</span><span class="o">-</span><span class="mh">0x00002FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
+<span class="mh">0x00001000</span><span class="o">-</span><span class="mh">0x00001FFF</span> <span class="o">--</span> <span class="n">SDM</span><span class="o">/</span><span class="n">SYSMON</span> <span class="n">controller</span> <span class="p">(</span><span class="n">FPGA</span> <span class="n">temp</span><span class="p">,</span> <span class="n">Intel</span> <span class="n">ASx4</span> <span class="n">boot</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
+<span class="mh">0x00002000</span><span class="o">-</span><span class="mh">0x00002FFF</span> <span class="o">--</span> <span class="n">BOOT</span> <span class="n">controller</span> <span class="p">(</span><span class="n">generic</span> <span class="n">flash</span> <span class="n">access</span><span class="p">)</span>
 <span class="mh">0x00003000</span><span class="o">-</span><span class="mh">0x00003FFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">PMD</span> <span class="p">(</span><span class="n">QSFP</span> <span class="n">controller</span><span class="p">)</span>
 <span class="mh">0x00004000</span><span class="o">-</span><span class="mh">0x000040FF</span> <span class="o">--</span> <span class="n">Timestamp</span> <span class="n">unit</span>
 <span class="mh">0x00004100</span><span class="o">-</span><span class="mh">0x00004FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>

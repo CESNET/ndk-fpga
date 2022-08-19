@@ -50,6 +50,7 @@ Variable          Description
 active            Set to UVM_ACTIVE if agent is active otherwise UVM_PASSIVE
 interface_name    name of interface under which you can find it in uvm config database
 meta_behave       Moment of Metadata signal is being generated and valid: 1 => valid with the SOF. 2 => valid with the EOF.
+seq_cfg           Configure low leve sequence which convert byte_array to mfb words
 ===============   ======================================================
 
 Top level of environment contains reset_sync class which is required for reset synchronization. The example shows how to connect the reset to byte_array_mfb environment and basic configuration.
@@ -74,7 +75,9 @@ Top level of environment contains reset_sync class which is required for reset s
              m_cfg.active = UVM_ACTIVE;
              m_cfg.interface_name = "MFB_IF";
              m_cfg.meta_behav     = 1;
-              uvm_config_db#(byte_array_mfb_env::config_item)::set(this, "m_eth", "m_config", m_cfg);
+             m_cfg.cfg = new();
+             m_cfg.cfg.space_size_set(128, 1024);
+             uvm_config_db#(byte_array_mfb_env::config_item)::set(this, "m_eth", "m_config", m_cfg);
              m_env = byte_arra_mfb::env_rx#(...)::type_id::create("m_env", this);
         endfunction
 
@@ -83,6 +86,18 @@ Top level of environment contains reset_sync class which is required for reset s
          endfunction
     endclass
 
+
+Low sequence configuration
+--------------------------
+
+configuration object `config_sequence` contain two function.
+
+=========================  ======================  ======================================================
+Function                   Type                    Description
+=========================  ======================  ======================================================
+probability_set(min, max)  [percentige]            set probability of no inframe gap. probability_set(100,100) => no inframe gap
+space_size_set(min, max)   [bytes]                 set min and max space between two packets.
+=========================  ======================  ======================================================
 
 
 RX Inner sequences

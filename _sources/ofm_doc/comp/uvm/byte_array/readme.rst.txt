@@ -60,7 +60,28 @@ sequence_simple_inc                  size of byte array is increasing in every g
 sequence_simple_dec                  size of byte array is decreasing in every generated transactions
 ==========================           ======================================================
 
+
 The last sequence is ``sequence_lib``, which picks N random sequences from the list above
 and run consecutively run then on sequencer
+
+
+Sequence configuration
+^^^^^^^^^^^^^^^^^^^^^^
+
+Configuration object `config_sequence` contain one configuration function.
+
+=========================  ======================  ======================================================
+Function                   Type                    Description
+=========================  ======================  ======================================================
+array_size_set(min, max)   [bytes]                 Set minimum and maximum array size.
+
+.. code-block:: systemverilog
+
+    sequence_lib seq;
+
+    seq = sequence_lib::type_id::create("seq");
+    seq.cfg = new();
+    //set maximum and minimum packet size
+    seq.cfg.array_size_set(64, 128);
 
 

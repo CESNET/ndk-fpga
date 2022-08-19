@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Logic vector agent &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -19,7 +19,7 @@
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="Byte Array agent" href="../byte_array/readme.html" />
+    <link rel="next" title="logic_vector_array_mfb environment" href="../logic_vector_array_mfb/readme.html" />
     <link rel="prev" title="RESET agent" href="../reset/readme.html" /> 
 </head>
 
@@ -62,17 +62,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">SystemVerilog and UVM tutorial</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Logic vector agent</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Logic vector agent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#logic-vector-array-sequence-item">Logic Vector Array sequence item</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logic-vector-array-monitor">Logic Vector Array monitor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logic-vector-array-sequence">Logic Vector Array Sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequence-configuration">Sequence configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_mfb/readme.html">logic_vector_array_mfb environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../byte_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mii/readme.html">Byte array to MII transitional environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../common/readme.html">Common package</a></li>
@@ -121,6 +129,75 @@
              
   <section id="logic-vector-agent">
 <span id="uvm-logic-vector"></span><h1>Logic vector agent<a class="headerlink" href="#logic-vector-agent" title="Permalink to this heading"></a></h1>
+<p>The main task of this agent is to generate field of logic vector[ITEM_WIDTH-1:0] which can be sent to DUT through the lower level agent. This agents does not contains a driver because it is higher level agent.
+Agent is used for connecting of all components (driver, monitor,…). Agent has his own configuration object which contains one parameter active (when is up then agent is active in other way is passive).
+When agent is active then sequencer is created. When is passive then only monitor is created.</p>
+<section id="logic-vector-array-sequence-item">
+<h2>Logic Vector Array sequence item<a class="headerlink" href="#logic-vector-array-sequence-item" title="Permalink to this heading"></a></h2>
+<p>Sequence item contains only one randomizable item.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">logic</span> <span class="pre">[ITEM_WIDTH-1:0]</span> <span class="pre">data[]</span></code> sequence_item randomizable variable</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">do_copy</span></code> is used for copying of the transaction.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">do_compare</span></code> is used for comparing data of two transactions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">convert2string</span></code> is used for printing whole transaction.</p></li>
+</ul>
+</section>
+<section id="logic-vector-array-monitor">
+<h2>Logic Vector Array monitor<a class="headerlink" href="#logic-vector-array-monitor" title="Permalink to this heading"></a></h2>
+<p>Logic vector array monitor is base class used for monitoring of traffic.
+This is only simple monitor which creates analysis port and sequence item
+and must be subclassed to particular lower level interface.</p>
+<blockquote>
+<div><p>See the ligc_vector_array_mfb environment for example of ligic vector Array to MFB conversion.</p>
+</div></blockquote>
+</section>
+<section id="logic-vector-array-sequence">
+<h2>Logic Vector Array Sequence<a class="headerlink" href="#logic-vector-array-sequence" title="Permalink to this heading"></a></h2>
+<p>This package contains some interesting predefined sequences. Sequences generate N random transactions.
+The number of transactions is randomly selected when the sequence is randomized. Transactions contain a randomizable
+logic_vector array. The major difference between the sequences is the boundary of the randomized size of a logic vector array.
+Every sequence has its setting which set a boundary for randomization. The following table shows
+a simplified description of those sequences. The description describes properties of logic vector array in transactions.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Sequence</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>sequence_simple</p></td>
+<td><p>size of logic vector array is randomly distributed by uniform distribution</p></td>
+</tr>
+<tr class="row-odd"><td><p>sequence_simple_const</p></td>
+<td><p>size of logic vector array is same for all transactions in sequence</p></td>
+</tr>
+<tr class="row-even"><td><p>sequence_simple_gauss</p></td>
+<td><p>size of logic vector array is randomly distributed by normal distribution</p></td>
+</tr>
+<tr class="row-odd"><td><p>sequence_simple_inc</p></td>
+<td><p>size of logic vector array is increasing in every generated transactions</p></td>
+</tr>
+<tr class="row-even"><td><p>sequence_simple_dec</p></td>
+<td><p>size of logic vector array is decreasing in every generated transactions</p></td>
+</tr>
+</tbody>
+</table>
+<p>The last sequence is <code class="docutils literal notranslate"><span class="pre">sequence_lib</span></code>, which picks N random sequences from the list above
+and run consecutively run then on sequencer</p>
+</section>
+<section id="sequence-configuration">
+<h2>Sequence configuration<a class="headerlink" href="#sequence-configuration" title="Permalink to this heading"></a></h2>
+<p>Configuration object <cite>config_sequence</cite> contain one configuration function.</p>
+<p>array_size_set(min, max)   [bytes]                 Set minimum and maximum array size.</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="n">sequence_lib</span> <span class="n">seq</span><span class="p">;</span>
+
+<span class="n">seq</span> <span class="o">=</span> <span class="n">sequence_lib</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;seq&quot;</span><span class="p">);</span>
+<span class="n">seq</span><span class="p">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="k">new</span><span class="p">();</span>
+<span class="c1">//set maximum and minimum packet size</span>
+<span class="n">seq</span><span class="p">.</span><span class="n">cfg</span><span class="p">.</span><span class="n">array_size_set</span><span class="p">(</span><span class="mh">64</span><span class="p">,</span> <span class="mh">128</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -128,7 +205,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../reset/readme.html" class="btn btn-neutral float-left" title="RESET agent" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../byte_array/readme.html" class="btn btn-neutral float-right" title="Byte Array agent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../logic_vector_array_mfb/readme.html" class="btn btn-neutral float-right" title="logic_vector_array_mfb environment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

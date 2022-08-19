@@ -17,10 +17,8 @@ A total of 26b address range is available, which is divided between the individu
 
     0x00000000-0x000000FF -- Test space (debug R/W registers)
     0x00000100-0x00000FFF -- Reserved space
-    0x00001000-0x000010FF -- ADC sensor (FPGA temperature,...)
-    0x00001100-0x00001FFF -- Reserved space
-    0x00002000-0x000020FF -- FPGA (SDM or BOOT) controller
-    0x00002100-0x00002FFF -- Reserved space
+    0x00001000-0x00001FFF -- SDM/SYSMON controller (FPGA temp, Intel ASx4 boot,...)
+    0x00002000-0x00002FFF -- BOOT controller (generic flash access)
     0x00003000-0x00003FFF -- Ethernet PMD (QSFP controller)
     0x00004000-0x000040FF -- Timestamp unit
     0x00004100-0x00004FFF -- Reserved space

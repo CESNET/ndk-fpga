@@ -13,5 +13,6 @@ Components using the MFB bus are typically located in the ``comp/mfb_tools/`` di
    comp/mfb_tools/flow/reconfigurator/readme
    comp/mfb_tools/storage/pd_asfifo/readme
    comp/mfb_tools/debug/gen_loop_switch/readme
+   comp/mfb_tools/debug/generator/readme
 
 .. Add more references here...

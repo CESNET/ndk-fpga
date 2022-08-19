@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MFB specification &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -79,11 +79,12 @@
 <li class="toctree-l2"><a class="reference internal" href="flow/reconfigurator/readme.html">MFB Reconfigurator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug/generator/readme.html">MFB Generator</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
 </ul>
@@ -408,6 +409,7 @@ value of the data on the bus is undefined.</p>
 <li><p>100G NDK -&gt; MFB#(1,8,8,8)</p></li>
 <li><p>PCIe (P-Tile) -&gt; MFB#(2,1,8,32)</p></li>
 </ol>
+<aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id3" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Underscore separates the whole vector to make it more clear which part
@@ -420,6 +422,7 @@ for the purposes of this document.</p>
 LSB on the right. The same numbering is maintained for the regions, i.e.
 the left most region has the highest index whereas the right most has
 the lowest index.</p>
+</aside>
 </aside>
 </section>
 </section>
