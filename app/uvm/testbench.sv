@@ -445,6 +445,9 @@ module testbench;
         m_root.finish_on_completion = 0;
         m_root.set_report_id_action_hier("ILLEGALNAME",UVM_NO_ACTION);
 
+        uvm_config_db#(int)            ::set(null, "", "recording_detail", 0);
+        uvm_config_db#(uvm_bitstream_t)::set(null, "", "recording_detail", 0);
+
         run_test();
 
         $stop(2);

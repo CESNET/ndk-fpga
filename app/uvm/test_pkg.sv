@@ -36,7 +36,7 @@ package test_pkg;
     parameter logic [MEM_REFR_PERIOD_WIDTH-1:0] MEM_DEF_REFR_PERIOD[MEM_PORTS-1:0]  =  '{MEM_PORTS{128}};
     parameter MI_DATA_WIDTH        = 32;
     parameter MI_ADDR_WIDTH        = 32;
-    parameter RESET_WIDTH          = 2;
+    parameter RESET_WIDTH          = 4;
     parameter BOARD                = "400G1";
     parameter DEVICE               = "ULTRASCALE";
 
