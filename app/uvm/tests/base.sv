@@ -92,8 +92,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         mvb_seq = uvm_app_core_top_agent::logic_vector_sequence_lib#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)::type_id::create("mvb_seq", this);
         mvb_seq.init_sequence();
-        mvb_seq.min_random_count = 5;
-        mvb_seq.max_random_count = 13;
+        mvb_seq.min_random_count = 50;
+        mvb_seq.max_random_count = 150;
         mvb_seq.init_sequence();
 
         forever begin
@@ -108,8 +108,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         mvb_seq = uvm_app_core_top_agent::logic_vector_sequence_lib_eth#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("mvb_seq", this);
         mvb_seq.init_sequence();
-        mvb_seq.min_random_count = 5;
-        mvb_seq.max_random_count = 13;
+        mvb_seq.min_random_count = 50;
+        mvb_seq.max_random_count = 150;
         mvb_seq.init_sequence();
 
         forever begin
@@ -150,8 +150,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("mfb_eth_tx_seq", this);
         mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 5;
-        mfb_seq.max_random_count = 13;
+        mfb_seq.min_random_count = 50;
+        mfb_seq.max_random_count = 150;
 
         //RUN ETH
         forever begin
@@ -166,8 +166,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         mfb_seq = uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)::type_id::create("mfb_rx_seq", this);
         mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 15;
-        mfb_seq.max_random_count = 20;
+        mfb_seq.min_random_count = 40;
+        mfb_seq.max_random_count = 60;
 
         //SEND PACKETS
         //mfb_seq.set_starting_phase(phase);
@@ -183,13 +183,13 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         uvm_mvb::sequence_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)                                mvb_seq;
 
         mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_dma_tx_seq", this);
-        mfb_seq.min_random_count = 5;
-        mfb_seq.max_random_count = 13;
+        mfb_seq.min_random_count = 50;
+        mfb_seq.max_random_count = 150;
         mfb_seq.init_sequence();
 
         mvb_seq = uvm_mvb::sequence_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("mvb_dma_tx_seq", this);
-        mvb_seq.min_random_count = 5;
-        mvb_seq.max_random_count = 13;
+        mvb_seq.min_random_count = 50;
+        mvb_seq.max_random_count = 150;
         mvb_seq.init_sequence();
 
         //RUN ETH
@@ -212,8 +212,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         mfb_seq = uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)::type_id::create("mfb_dma_rx_seq", this);
         mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 15;
-        mfb_seq.max_random_count = 20;
+        mfb_seq.min_random_count = 40;
+        mfb_seq.max_random_count = 60;
 
         //SEND PACKETS
         //mfb_seq.set_starting_phase(phase);
