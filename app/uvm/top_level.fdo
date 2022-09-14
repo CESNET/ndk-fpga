@@ -51,7 +51,7 @@ set SIG_FILE  "../../ndk/core/intel/uvm/signals.fdo"
 set TEST_NAME "test::base"
 
 # Enable Code Coverage
-set SIM_FLAGS(CODE_COVERAGE) "false"
+set SIM_FLAGS(CODE_COVERAGE) false
 set SIM_FLAGS(EXTRA_VFLAGS) "+UVM_VERBOSITY=UVM_NONE +UVM_TESTNAME=$TEST_NAME -uvmcontrol=all +UVM_MAX_QUIT_COUNT=1"
 
 # Global include file for compilation
