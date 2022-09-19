@@ -50,4 +50,5 @@ set DMA_400G_DEMO        false
 # ==============================================================================
 set PROJECT_NAME "NDK_MINIMAL"
 set PROJECT_VARIANT "$ETH_PORT_SPEED(0)G$ETH_PORTS"
+set PROJECT_VERSION [exec cat ../../VERSION]
 # ------------------------------------------------------------------------------
