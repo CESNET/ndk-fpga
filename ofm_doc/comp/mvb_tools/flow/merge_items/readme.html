@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
     <link rel="next" title="Network Tools" href="../../../../nic.html" />
-    <link rel="prev" title="MVB Channel Router" href="../channel_router/readme.html" /> 
+    <link rel="prev" title="MVB DISCARD" href="../discard/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -51,6 +51,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
@@ -64,6 +65,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../readme.html">MVB Specification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../channel_router/readme.html">MVB Channel Router</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../discard/readme.html">MVB DISCARD</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MVB Merge Items</a></li>
 </ul>
 </li>
@@ -151,7 +153,12 @@ differently. TX MVB has same item aligment as RX0 MVB input.</p>
 <td><p>32</p></td>
 <td><p>Depth of FIFOs on inputs</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mvb_merge_items-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-genconstant-mvb_merge_items-output_reg"><td><p>OUTPUT_REG</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>Enable output register on TX MVB</p></td>
+</tr>
+<tr class="row-even" id="vhdl-genconstant-mvb_merge_items-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device string (required for FIFOs)</p></td>
@@ -257,7 +264,7 @@ differently. TX MVB has same item aligment as RX0 MVB input.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../channel_router/readme.html" class="btn btn-neutral float-left" title="MVB Channel Router" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../discard/readme.html" class="btn btn-neutral float-left" title="MVB DISCARD" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../../../../nic.html" class="btn btn-neutral float-right" title="Network Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

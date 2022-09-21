@@ -10,50 +10,48 @@
 **************************
 Byte_array_mfb environment
 **************************
-This enviroment have two high level agents. First agents is byte array and it is care about data. Second high level acent is logic vector wchich care about metadata.
-This package containt two enviroment. Enviroment RX sending data to DUT. It generatest data and metadata which is send to DUT. Enviroment TX generatest DST_RDY and
-observed interface.
+This environment has two high-level agents. The first one is a byte array agent and it works with data. The second one is a logic vector agent which works with metadata.
+This package contains two environments. Environment RX generates data and metadata and sends them to the DUT. Environment TX generates the DST_RDY signal and
+observes the TX interface.
 
 .. image:: ../docs/byte_array_mfb_env.svg
     :align: center
     :alt: byte array mfb schema
 
 
-The environment is configured by four parameters: For more information see :ref:`mfb documentation<mfb_bus>`.
+The environment is configured by these four parameters: :ref:`mfb documentation<mfb_bus>`.
 
-============== =
-Parameter
-============== =
-REGIONS
-REGIONS_SIZE
-BLOCK_SIZE
-META_WIDTH
-============== =
+- REGIONS
+- REGIONS_SIZE
+- BLOCK_SIZE
+- META_WIDTH
 
 Top sequencers and sequences
 ------------------------------
-In the RX direction there are two sequencers: the first is Byte Array sequencer and handles MFB_DATA, the second is logic vector sequencer and handles MFB_METADATA. Both sequencers pulls the data from sequences together.
+In the RX direction, there are two sequencers: the first is a Byte Array sequencer that handles MFB_DATA.
+The second is a Logic Vector sequencer that handles MFB_METADATA. Both sequencers pull the data from sequences together.
 
-In the TX direction there is one sequencer of type mfb::sequencer #() which generate DST_RDY signal.
+In the TX direction, there is one sequencer of type mfb::sequencer #(), which generates the DST_RDY signal.
 
-Both directions have two analysis_exports. One export is for Byte Array transactions. Second is for logic vector (metadata) transactions.
+Both directions have two analysis_exports. One export is for the Byte Array transactions, and the second is for the Logic Vector (metadata) transactions.
 
 
 Configuration
 ------------------------------
 
-config class have 3 variables.
+The config class has three variables.
 
 ===============   ======================================================
 Variable          Description
 ===============   ======================================================
-active            Set to UVM_ACTIVE if agent is active otherwise UVM_PASSIVE
-interface_name    name of interface under which you can find it in uvm config database
-meta_behave       Moment of Metadata signal is being generated and valid: 1 => valid with the SOF. 2 => valid with the EOF.
-seq_cfg           Configure low leve sequence which convert byte_array to mfb words
+active            Set to UVM_ACTIVE if the agent is active, otherwise set to UVM_PASSIVE.
+interface_name    The name of the interface under which you can find it in the UVM config database.
+meta_behave       The moment when the metadata are being generated and valid: config_item::META_SOF => valid with the SOF, config_item::META_EOF => valid with the EOF.
+seq_cfg           Configure a low-level sequence that converts byte_array to MFB words.
 ===============   ======================================================
 
-Top level of environment contains reset_sync class which is required for reset synchronization. The example shows how to connect the reset to byte_array_mfb environment and basic configuration.
+The top level the environment contains the reset_sync class, which is required for reset synchronization. The example shows how to connect the reset to the byte_array_mfb environment and basic configuration.
+
 
 .. code-block:: systemverilog
 
@@ -74,7 +72,7 @@ Top level of environment contains reset_sync class which is required for reset s
              m_cfg = new();
              m_cfg.active = UVM_ACTIVE;
              m_cfg.interface_name = "MFB_IF";
-             m_cfg.meta_behav     = 1;
+             m_cfg.meta_behav     = config_item::META_SOF;
              m_cfg.cfg = new();
              m_cfg.cfg.space_size_set(128, 1024);
              uvm_config_db#(byte_array_mfb_env::config_item)::set(this, "m_eth", "m_config", m_cfg);
@@ -118,19 +116,20 @@ state_packet_space_new        Randomize new space size before new packet
 ==========================    ======================================================
 
 
-The environment have three sequences. Table below describes them. In default RX env runs sequence_lib_rx.
+The environment has three sequences. The table below describes them. In the default, the RX env runs sequence_lib_rx.
 
 ==========================       ======================================================
 Sequence                         Description
 ==========================       ======================================================
-sequence_simple_rx               base random sequence. This sequence is behavioral very variably.
-sequence_full_speed_rx           if sequence get data then send them as quicky as possible.
-sequence_stop_rx                 Sequence dosnt send any data. Sumulate no data on interface.
-sequence_lib_rx                  randomly run pick and run previous sequences
+sequence_simple_rx               A basic random sequence. This sequence behaves very variably.
+sequence_full_speed_rx           The sequence gets data and then sends them as quickly as possible.
+sequence_stop_rx                 This sequence doesn't send any data. There are no data on the interface.
+sequence_lib_rx                  Repetitively randomly choose one of the sequences above and run it.
 ==========================       ======================================================
 
 
-    An example below shows how to change the inner sequence to test maximal throughput. Environment run the sequence_full_speed_rx instead of the sequence_lib_rx.
+    The example below shows how to change the inner sequence to test the maximum throughput. The environment runs the sequence_full_speed_rx instead of the sequence_lib_rx.
+
 
 .. code-block:: systemverilog
 
@@ -141,7 +140,12 @@ sequence_lib_rx                  randomly run pick and run previous sequences
             init_sequence_library();
         endfunction
 
-        virtual function void init_sequence();
+        virtual function void init_sequence(config_sequence param_cfg = null);
+            if (param_cfg == null) begin
+                this.cfg = new();
+            end else begin
+                this.cfg = param_cfg;
+            end
             this.add_sequence(byte_array_mfb_env::sequence_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
         endfunction
     endclass

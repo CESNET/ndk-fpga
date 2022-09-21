@@ -1,15 +1,15 @@
+.. readme.rst: Documentation of single component
+.. Copyright (C) 2022 CESNET z. s. p. o.
+.. Author(s): Daniel Kondys <kondys@cesnet.cz>
+..
+.. SPDX-License-Identifier: BSD-3-Clause
+
 .. _mi_splitter_plus_gen:
 
-
-MI splitter plus gen
+MI Splitter Plus Gen
 --------------------
 
-This is another splitter for the MI bus.
-MI transactions are routed out of a certain port, depending on how the splitter is set and on the transaction's address.
-The most significant advantage of this splitter is the possibility for the user to choose the number of output ports, and for each output port a range (or ranges) of addresses that are routed to (and out of) this port.
-These address ranges are specified by Address Bases (ABs), which are contained in generic ADDR_BASE.
-There can be more ABs than there is output ports, which means that more than one AB can be assigned to a single output port.
-It doesn't work the other way around though.
+.. vhdl:autoentity:: MI_SPLITTER_PLUS_GEN
 
 Architecture
 ^^^^^^^^^^^^

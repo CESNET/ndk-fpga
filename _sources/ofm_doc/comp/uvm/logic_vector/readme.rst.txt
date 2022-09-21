@@ -71,11 +71,11 @@ Sequence configuration
 
 Configuration object `config_sequence` contain one configuration function.
 
-=========================  ======================  ======================================================
-Function                   Type                    Description
-=========================  ======================  ======================================================
-array_size_set(min, max)   [bytes]                 Set minimum and maximum array size.
-
+=========================  =======  ===================================
+Function                   Type     Description
+=========================  =======  ===================================
+array_size_set(min, max)   [bytes]  Set minimum and maximum array size.
+=========================  =======  ===================================
 
 .. code-block:: systemverilog
 

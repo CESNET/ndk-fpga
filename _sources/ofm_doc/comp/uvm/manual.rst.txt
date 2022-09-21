@@ -329,7 +329,7 @@ A creation of the sequence library:
 
 .. code-block:: systemverilog
 
-    class sequence_lib extends uvm_sequence_library #(sequence_item);
+    class sequence_lib extends uvm_common::sequence_library #(config_sequence, sequence_item);
         `uvm_object_utils(example::sequence_lib)
         `uvm_sequence_library_utils(example::sequence_lib)
 
@@ -340,7 +340,12 @@ A creation of the sequence library:
 
         // subclass can redefine and change run sequences
         // can be useful in specific tests
-        virtual function init_sequence();
+        virtual function init_sequence(config_sequence param_cfg = null);
+            if (param_cfg == null) begin
+                this.cfg = new();
+            end else begin
+                this.cfg = param_cfg;
+            end
             this.add_sequence(sequence_packet_large::get_type());
             this.add_sequence(sequence_packet_small::get_type());
         endfunction
@@ -358,7 +363,7 @@ Run the sequence in the environment or the test:
         task run_phase(uvm_phase phase);
 
             sequence_lib seq = sequence_lib::type_id::create("sequence_lib");
-            sequence_lib.init_sequence();
+            sequence_lib.init_sequence(cfg.seq_cfg);
 
             if(!sequence_lib.randomize())
                 `uvm_fatal (...);
@@ -624,7 +629,12 @@ to improve the coverage.
             init_sequence_library();
         endfunction
 
-        virtual function init_sequence();
+        virtual function init_sequence(config_sequence param_cfg = null);
+            if (param_cfg == null) begin
+                this.cfg = new();
+            end else begin
+                this.cfg = param_cfg;
+            end
             //run only this sequence
             this.add_sequence(test::sequence_packet_small::get_type());
             this.add_sequence(test::sequence_packet_mid::get_type());
@@ -654,7 +664,12 @@ environment from the Test.
             init_sequence_library();
         endfunction
 
-        virtual function init_sequence();
+        virtual function init_sequence(config_sequence param_cfg = null);
+            if (param_cfg == null) begin
+                this.cfg = new();
+            end else begin
+                this.cfg = param_cfg;
+            end
             //run only this sequence
             this.add_sequence(test::sequence_packet_large::get_type());
        endfunction
@@ -1568,9 +1583,12 @@ generate coverage.
 
             m_root                          = uvm_root::get();           //get root component
             m_root.finish_on_completion     = 0;    //now finish on end. required stop command after run_test
-
             //stop reporting ILLEGALNAME when sequence in sequence library have been started
             m_root.set_report_id_action_tier("ILLEGALNAME",UVM_NO_ACTION);
+
+            // Stop reporting for us unusefull information
+            uvm_config_db#(int)            ::set(null, "", "recording_detail", 0);
+            uvm_config_db#(uvm_bitstream_t)::set(null, "", "recording_detail", 0);
 
             run_test();
             $stop(2);

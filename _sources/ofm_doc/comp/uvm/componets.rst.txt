@@ -39,5 +39,7 @@ Library of commonly used agents and enviroments in UVM verification
     mi/readme
     pma/readme
     intel_mac_seg/readme
+    axi/readme
+    logic_vector_array_axi/readme
 
 

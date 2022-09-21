@@ -10,51 +10,50 @@
 **********************************
 logic_vector_array_mfb environment
 **********************************
-This enviroment have two high level agents. First agents is logic vector array and it is care about data. Second high level acent is logic vector wchich care about metadata.
-This package containt two enviroment. Enviroment RX sending data to DUT. It generatest data and metadata which is send to DUT. Enviroment TX generatest DST_RDY and
-observed interface.
+This environment has two high-level agents. The first one is a logic vector array agent and it works with data. The second one is a logic vector agent which works with metadata.
+This package contains two environments. Environment RX generates data and metadata and sends them to the DUT. Environment TX generates the DST_RDY signal and
+observes the TX interface.
+
 
 .. image:: ../docs/byte_array_mfb_env.svg
     :align: center
     :alt: logic_vector_array_mfb schema
 
 
-The environment is configured by four parameters: For more information see :ref:`mfb documentation<mfb_bus>`.
+The environment is configured by these four parameters: For more information see :ref:`mfb documentation<mfb_bus>`.
 
-============== =
-Parameter
-============== =
-REGIONS
-REGIONS_SIZE
-BLOCK_SIZE
-ITEM_SIZE
-META_WIDTH
-============== =
+- REGIONS
+- REGIONS_SIZE
+- BLOCK_SIZE
+- ITEM_SIZE
+- META_WIDTH
 
-Top sequencers and sequences
+op sequencers and sequences
 ------------------------------
-In the RX direction there are two sequencers: the first is Logic vector array sequencer and handles MFB_DATA, the second is logic vector sequencer and handles MFB_METADATA. Both sequencers pulls the data from sequences together.
+In the RX direction, there are two sequencers: the first is a Logic vector array sequencer that handles MFB_DATA.
+The second is a logic vector sequencer that handles MFB_METADATA. Both sequencers pull the data from sequences together.
 
-In the TX direction there is one sequencer of type mfb::sequencer #() which generate DST_RDY signal.
+In the TX direction, there is one sequencer of type mfb::sequencer #(), which generates the DST_RDY signal.
 
-Both directions have two analysis_exports. One export is for logic vector array transactions. Second is for logic vector (metadata) transactions.
+Both directions have two analysis_exports. One export is for the logic vector array transactions, and the second is for the logic vector (metadata) transactions.
 
 
 Configuration
 ------------------------------
 
-config class have 3 variables.
+The config class has three variables.
 
 ===============   ======================================================
 Variable          Description
 ===============   ======================================================
-active            Set to UVM_ACTIVE if agent is active otherwise UVM_PASSIVE
-interface_name    name of interface under which you can find it in uvm config database
-meta_behave       Moment of Metadata signal is being generated and valid: 1 => valid with the SOF. 2 => valid with the EOF.
-seq_cfg           Configure low leve sequence which convert logic_vector_array to mfb words
+active            Set to UVM_ACTIVE if the agent is active, otherwise set to UVM_PASSIVE.
+interface_name    The name of the interface under which you can find it in the UVM config database.
+meta_behave       The moment when the metadata are being generated and are valid: config_item::META_SOF => valid with the SOF, config_item::META_EOF => valid with the EOF.
+seq_cfg           Configure a low-level sequence that converts logic_vector_array to MFB words.
 ===============   ======================================================
 
-Top level of environment contains reset_sync class which is required for reset synchronization. The example shows how to connect the reset to logic_vector_array_mfb environment and basic configuration.
+The top level of the environment contains the reset_sync class, which is required for reset synchronization. The example shows how to connect the reset to the logic_vector_array_mfb environment and basic configuration.
+
 
 .. code-block:: systemverilog
 
@@ -75,7 +74,7 @@ Top level of environment contains reset_sync class which is required for reset s
              m_cfg = new();
              m_cfg.active = UVM_ACTIVE;
              m_cfg.interface_name = "MFB_IF";
-             m_cfg.meta_behav     = 1;
+             m_cfg.meta_behav     = config_item::META_SOF;
              m_cfg.cfg = new();
              m_cfg.cfg.space_size_set(128, 1024);
              uvm_config_db#(logic_vector_array_mfb_env::config_item)::set(this, "m_eth", "m_config", m_cfg);
@@ -91,47 +90,47 @@ Top level of environment contains reset_sync class which is required for reset s
 Low sequence configuration
 --------------------------
 
-configuration object `config_sequence` contain two function.
+The configuration object `config_sequence` contains two functions.
 
 =========================  ======================  ======================================================
 Variable                   Type                    Description
 =========================  ======================  ======================================================
-probability_set(min, max)  [percentige]            set probability of no inframe gap. probability_set(100,100) => no inframe gap
-space_size_set(min, max)   [bytes]                 set min and max space between two packets.
+probability_set(min, max)  [percentage]            Set the probability of no inframe gap: probability_set(100,100) => no inframe gap at all.
+space_size_set(min, max)   [bytes]                 Set min and max space between two packets.
 =========================  ======================  ======================================================
 
 
 RX Inner sequences
 ------------------------------
 
-For the RX direction exists one base sequence class "sequence_simple_rx_base" which simplifies creating others sequences. It processes the reset signal and exports virtual
-function create_sequence_item. In this function can child create mfb::sequence_item what they like. Other important function in "sequence_simple_rx_base" class is try_get() which
-downloads required data from base array agent. It is also important to note that the base class is state oriented. Following table describes internal states.
+For the RX direction, there is one basic sequence class called the "sequence_simple_rx_base" which simplifies creating other sequences. It processes the reset signal and exports the virtual
+function create_sequence_item. In this function, a child can create mfb::sequence_items as they like. Another important function in the "sequence_simple_rx_base" class is try_get() which
+gets the required data from the base array agent. It is also important to note that the base class is state-oriented. The following table describes internal states.
 
 ==========================    ======================================================
 State                         Description
 ==========================    ======================================================
-state_packet_none             No data for packet
-state_packet_new              new packet has been read by function try_get
-state_packet_data             process is somewhere in middle of packet
-state_pakcet_space            Process send all data and generate space before new packet
-state_packet_space_new        Randomize new space size before new packet
+state_packet_none             No data for the packet.
+state_packet_new              The try_get function has read a new packet.
+state_packet_data             The process is somewhere in the middle of a packet.
+state_pakcet_space            The process sends all data and generates a space before the new packet.
+state_packet_space_new        Randomize a new space size before the new packet.
 ==========================    ======================================================
 
 
-The environment have three sequences. Table below describes them. In default RX env runs sequence_lib_rx.
+The environment has three sequences. The table below describes them. In the default state, the RX env runs sequence_lib_rx.
 
 ==========================       ======================================================
 Sequence                         Description
 ==========================       ======================================================
-sequence_simple_rx               base random sequence. This sequence is behavioral very variably.
-sequence_full_speed_rx           if sequence get data then send them as quicky as possible.
-sequence_stop_rx                 Sequence dosnt send any data. Sumulate no data on interface.
-sequence_lib_rx                  randomly run pick and run previous sequences
+sequence_simple_rx               A basic random sequence. This sequence behaves very variably.
+sequence_full_speed_rx           The sequence gets data and then sends them as quickly as possible.
+sequence_stop_rx                 This sequence doesn't send any data. There are no data on the interface.
+sequence_lib_rx                  Repetitively Randomly choose one of the sequences above and run it.
 ==========================       ======================================================
 
 
-    An example below shows how to change the inner sequence to test maximal throughput. Environment run the sequence_full_speed_rx instead of the sequence_lib_rx.
+    The example below shows how to change the inner sequence to test the maximum throughput. The environment runs the sequence_full_speed_rx sequence instead of the sequence_lib_rx.
 
 .. code-block:: systemverilog
 
@@ -142,7 +141,12 @@ sequence_lib_rx                  randomly run pick and run previous sequences
             init_sequence_library();
         endfunction
 
-        virtual function void init_sequence();
+        virtual function void init_sequence(config_sequence param_cfg = null);
+            if (param_cfg == null) begin
+                this.cfg = new();
+            end else begin
+                this.cfg = param_cfg;
+            end
             this.add_sequence(logic_vector_array_mfb_env::sequence_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
         endfunction
     endclass
