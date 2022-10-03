@@ -33,6 +33,9 @@ The Minimal application serves as a simple example of how to build an FPGA appli
 
     ndk_core/doc/terminology
     ndk_core/intel/readme
+    ndk_core/doc/core_configuration
+    ndk_core/doc/card_configuration
+    ndk_core/doc/app_configuration
     ofm_doc/build/readme
     ndk_core/doc/devtree
 
