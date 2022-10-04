@@ -4,6 +4,9 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+# converting input list to associative array (uncomment when needed)
+# array set ARCHGRP_ARR $ARCHGRP
+
 # Component paths
 set MI_ASYNC_BASE       "$OFM_PATH/comp/mi_tools/async"
 set MI_SPLITTER_BASE    "$OFM_PATH/comp/mi_tools/splitter_plus_gen"

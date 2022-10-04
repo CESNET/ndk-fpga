@@ -13,9 +13,15 @@ source $env(CARD_BASE)/src/Quartus.inc.tcl
 # "1" ... project composition only for further dedesign flow in GUI
 set SYNTH_FLAGS(PROJ_ONLY) "0"
 
+# Initialization of associative array to which user parameters should be added.
+array set APP_ARCHGRP {}
+
+# Convert associative array to list
+set APP_ARCHGRP_L [array get APP_ARCHGRP]
+
 # ----- Add application core to main component list ---------------------------
 lappend HIERARCHY(COMPONENTS) \
-    [list "APPLICATION_CORE" "../../app/intel" "FULL"]
+    [list "APPLICATION_CORE" "../../app/intel" $APP_ARCHGRP_L]
 
 # Call main function which handle targets
 nb_main
