@@ -9,7 +9,7 @@
 
 COMBO_BASE = ../..
 CARD_BASE = $(COMBO_BASE)/ndk/cards/fb4cgg3
-USER_CONST = user_const.tcl
+APP_CONF = app_conf.tcl
 OUTPUT_NAME = fb4cgg3-minimal
 
 .PHONY: all 100g2 100g4

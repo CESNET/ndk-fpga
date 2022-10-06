@@ -9,7 +9,7 @@
 
 COMBO_BASE = ../..
 CARD_BASE = $(COMBO_BASE)/ndk/cards/dk-dev-1sdx-p
-USER_CONST = user_const.tcl
+APP_CONF = app_conf.tcl
 OUTPUT_NAME = dk-dev-1sdx-p-minimal
 
 .PHONY: all 100g2 25g8 10g8

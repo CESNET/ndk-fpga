@@ -9,7 +9,7 @@
 
 COMBO_BASE = ../..
 CARD_BASE = $(COMBO_BASE)/ndk/cards/dk-dev-agi027res
-USER_CONST = user_const.tcl
+APP_CONF = app_conf.tcl
 OUTPUT_NAME = dk-dev-agi027res-minimal
 
 .PHONY: all 400g1 200g2 100g4 50g8 40g2 25g8 10g8

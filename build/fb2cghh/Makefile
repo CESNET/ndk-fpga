@@ -9,7 +9,7 @@
 
 COMBO_BASE = ../..
 CARD_BASE = $(COMBO_BASE)/ndk/cards/fb2cghh
-USER_CONST = user_const.tcl
+APP_CONF = app_conf.tcl
 OUTPUT_NAME = fb2cghh-minimal
 
 .PHONY: all 100g2
