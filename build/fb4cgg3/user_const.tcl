@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 # ==============================================================================
+# NOTE: The detailed description of the usage of this file can be viewed in the
+# Parametrizing section of the NDK-CORE documentation.
+
 # DMA parameters:
 # ==============================================================================
 # If you do not have access to a non-public repository with DMA IP, set to false.

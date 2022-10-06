@@ -4,6 +4,9 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+# NOTE: Usage of the configuration parameters in this file is described
+# in the Parametrization section of the NDK-CORE documentation.
+
 COMBO_BASE = ../..
 CARD_BASE = $(COMBO_BASE)/ndk/cards/fb4cgg3
 USER_CONST = user_const.tcl

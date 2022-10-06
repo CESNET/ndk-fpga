@@ -4,7 +4,11 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-# ==============================================================================
+# NOTE: The detailed description of the usage of this file can be viewed in the
+# Parametrizing section of the NDK-CORE documentation.
+
+# ------------------------------------------------------------------------------
+>>>>>>> 53154d7 (dk-dev-1sdx-p/app_conf [MAINTENANCE]: added reference to docs):build/dk-dev-1sdx-p/app_conf.tcl
 # PCIe parameters (not all combinations work):
 # ==============================================================================
 # Supported combinations for this card:

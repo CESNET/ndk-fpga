@@ -4,6 +4,9 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+# NOTE: The purpose of this file is described in the Parametrization section of
+# the NDK-CORE documentation.
+
 # ----- Setting basic synthesis options ---------------------------------------
 # NDK & user constants
 source $env(CARD_BASE)/src/Vivado.inc.tcl
