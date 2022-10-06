@@ -1,6 +1,7 @@
 # Makefile: Makefile for DK-DEV-AGI027RES card
-# Copyright (C) 2021 CESNET z. s. p. o.
+# Copyright (C) 2022 CESNET z. s. p. o.
 # Author(s): Jakub Cabal cabal@cesnet.cz
+# 			Vladislav Valek <valekv@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

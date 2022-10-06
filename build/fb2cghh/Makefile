@@ -1,6 +1,7 @@
 # Makefile: Makefile for fb2cghh card
 # Copyright (C) 2022 CESNET z.s.p.o.
 # Author(s): David Beneš <benes.david2000@seznam.cz>
+# 			Vladislav Valek <valekv@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

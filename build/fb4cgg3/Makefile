@@ -1,6 +1,7 @@
 # Makefile: Makefile for fb4cgg3/fb2cgg3 card
 # Copyright (C) 2022 CESNET z.s.p.o.
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
+# 			Vladislav Valek <valekv@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

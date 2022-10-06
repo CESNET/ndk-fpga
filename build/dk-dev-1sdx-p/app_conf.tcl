@@ -1,6 +1,7 @@
-# user_const.tcl: User parameters for DK-DEV-1SDX-P card
-# Copyright (C) 2020 CESNET z. s. p. o.
+# app_conf.tcl: User parameters for DK-DEV-1SDX-P card
+# Copyright (C) 2022 CESNET z. s. p. o.
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
+#           Vladislav Valek <valekv@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
