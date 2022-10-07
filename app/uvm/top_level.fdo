@@ -40,8 +40,14 @@ set ETH_ENABLE           true
 # FINISH GENERATING PKG FILE
 ###################################
 
+# add element to ARCHGRP array
+set ARCHGRP_UVM(APPLICATION_CORE_ENTITY_ONLY) true
+
+# convert array to list
+set ARCHGRP_L [array get ARCHGRP_UVM]
+
 lappend PACKAGES   "./config/ndk_const.vhd"
-lappend COMPONENTS [list "DUT_ENTITY" "$FIRMWARE_BASE/ndk/core/intel"  "APPLICATION_CORE_ENTITY_ONLY"]
+lappend COMPONENTS [list "DUT_ENTITY" "$FIRMWARE_BASE/ndk/core/intel"  $ARCHGRP_L]
 lappend COMPONENTS [list "DUT_INTEL"  "../intel"  "FULL"]
 lappend COMPONENTS [list "VER"        "."         "FULL"]
 
