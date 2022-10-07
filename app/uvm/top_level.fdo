@@ -41,7 +41,7 @@ set ETH_ENABLE           true
 ###################################
 
 lappend PACKAGES   "./config/ndk_const.vhd"
-lappend COMPONENTS [list "DUT_ENTYTY" "$FIRMWARE_BASE/ndk/core/intel"  "APPLICATION_CORE_ENTYTY_ONLY"]
+lappend COMPONENTS [list "DUT_ENTITY" "$FIRMWARE_BASE/ndk/core/intel"  "APPLICATION_CORE_ENTITY_ONLY"]
 lappend COMPONENTS [list "DUT_INTEL"  "../intel"  "FULL"]
 lappend COMPONENTS [list "VER"        "."         "FULL"]
 

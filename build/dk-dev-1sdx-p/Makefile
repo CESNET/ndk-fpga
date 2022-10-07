@@ -1,12 +1,16 @@
 # Makefile: Makefile for DK-DEV-1SDX-P card
-# Copyright (C) 2020 CESNET z. s. p. o.
+# Copyright (C) 2022 CESNET z. s. p. o.
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
+# 			Vladislav Valek <valekv@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+# NOTE: Usage of the configuration parameters in this file is described
+# in the Parametrization section of the NDK-CORE documentation.
+
 COMBO_BASE = ../..
 CARD_BASE = $(COMBO_BASE)/ndk/cards/dk-dev-1sdx-p
-USER_CONST = user_const.tcl
+APP_CONF = app_conf.tcl
 OUTPUT_NAME = dk-dev-1sdx-p-minimal
 
 .PHONY: all 100g2 25g8 10g8

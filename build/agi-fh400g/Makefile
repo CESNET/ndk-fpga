@@ -1,12 +1,13 @@
 # Makefile: Makefile for XpressSX AGI-FH400G card
-# Copyright (C) 2021 CESNET z. s. p. o.
+# Copyright (C) 2022 CESNET z. s. p. o.
 # Author(s): Jakub Cabal cabal@cesnet.cz
+#           Vladislav Valek <valekv@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 COMBO_BASE = ../..
 CARD_BASE = $(COMBO_BASE)/ndk/cards/agi-fh400g
-USER_CONST = user_const.tcl
+APP_CONF = app_conf.tcl
 OUTPUT_NAME = agi-fh400g-minimal
 
 .PHONY: all 400g1 200g2 100g4 50g8 40g2 25g8 10g8
