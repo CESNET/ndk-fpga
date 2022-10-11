@@ -27,10 +27,13 @@ proc dts_application {base eth_streams mem_ports} {
 }
 
 proc dts_app_minimal_core {index base reg_size} {
+    global ETH_PORT_CHAN
+
 	set ret ""
 	append ret "app_core_minimal_$index {"
 	append ret "reg = <$base $reg_size>;"
     append ret "compatible = \"cesnet,minimal,app_core\";"
+    append ret [dts_mvb_channel_router "rx_chan_router" $base $ETH_PORT_CHAN($index)]
     append ret "};"
 	return $ret
 }
