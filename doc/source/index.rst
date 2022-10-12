@@ -31,6 +31,7 @@ The Minimal application serves as a simple example of how to build an FPGA appli
     :caption: Network Development Kit:
     :hidden:
 
+    ndk_core/doc/how_to_start
     ndk_core/doc/terminology
     ndk_core/intel/readme
     ndk_core/doc/configuration
