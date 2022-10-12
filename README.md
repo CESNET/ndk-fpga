@@ -18,11 +18,11 @@ Before you get started, there are a few requirements that you need to have. Amon
     - [NDK Core](https://github.com/CESNET/ndk-core/)
 - Supported FPGA cards in the NDK framework (at least one repository of the supported card must be used for the build to succeed):
     - [ReflexCES XpressSX AGI-FH400G card](https://github.com/CESNET/ndk-card-agi-fh400g/)
-    - [Intel DK-DEV-1SDX-P card](https://github.com/CESNET/ndk-card-dk-dev-1sdx-p/)
-    - [Intel DK-DEV-AGI027RES card](https://github.com/CESNET/ndk-card-dk-dev-agi027res/)
-    - [Silicom FB4CGG3/FB2CGG3 card](https://github.com/CESNET/ndk-card-fb4cgg3/)
+    - [Intel Stratix 10 DX FPGA Development Kit (DK-DEV-1SDX-P)](https://github.com/CESNET/ndk-card-dk-dev-1sdx-p/)
+    - [Intel Agilex I-Series FPGA Development Kit (DK-DEV-AGI027RES)](https://github.com/CESNET/ndk-card-dk-dev-agi027res/)
+    - [Silicom fb4CGg3@VU9P card (also in variant fb2CGg3@VU9P)](https://github.com/CESNET/ndk-card-fb4cgg3/)
 - Other supported FPGA cards in the NDK framework but not available as open-source:
-    - Silicom FB2CGHH card
+    - Silicom fb2CGhh@KU15P card
 - To control an FPGA card with an application based on the NDK framework, you also need:
     - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw)
 
