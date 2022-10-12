@@ -15,5 +15,6 @@ The DMA Medusa IP is located in the ``ndk/modules/ndk-mod-dma-medusa/`` director
    ofm_doc/comp/pcie/ptc/comp/tag_manager/readme
    ofm_doc/comp/pcie/common/readme
    ndk_mod/ndk-mod-dma-medusa/readme
+   ofm_doc/comp/pcie/dma_calypte/readme
 
 .. Add more references here...
