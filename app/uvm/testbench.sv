@@ -228,10 +228,8 @@ module testbench;
 
 
     APPLICATION_CORE  #(
-        .ETH_PORTS         (test_pkg::ETH_PORTS),
         .ETH_CHANNELS      (test_pkg::ETH_CHANNELS),
         .ETH_STREAMS       (test_pkg::ETH_STREAMS),
-        .ETH_PKT_MTU       (test_pkg::ETH_PKT_MTU),
         .PCIE_ENDPOINTS    (test_pkg::PCIE_ENDPOINTS),
         .DMA_STREAMS       (test_pkg::DMA_STREAMS),
         .DMA_RX_CHANNELS   (test_pkg::DMA_RX_CHANNELS),
