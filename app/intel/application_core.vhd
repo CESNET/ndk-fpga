@@ -36,7 +36,7 @@ architecture FULL of APPLICATION_CORE is
     signal eth_rx_mvb_data_deser         : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
     signal eth_rx_mvb_vld_deser          : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
 
-    signal app_dma_rx_mvb_len_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0);
+    signal app_dma_rx_mvb_len_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0);
     signal app_dma_rx_mvb_hdr_meta_deser : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
     signal app_dma_rx_mvb_channel_deser  : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
     signal app_dma_rx_mvb_discard_deser  : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
@@ -44,14 +44,14 @@ architecture FULL of APPLICATION_CORE is
     signal app_dma_rx_mvb_src_rdy_deser  : std_logic_vector(ETH_STREAMS-1 downto 0);
     signal app_dma_rx_mvb_dst_rdy_deser  : std_logic_vector(ETH_STREAMS-1 downto 0);
 
-    signal app_dma_tx_mvb_len_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0);
+    signal app_dma_tx_mvb_len_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_FRAME_SIZE_MAX+1)-1 downto 0);
     signal app_dma_tx_mvb_hdr_meta_deser : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
     signal app_dma_tx_mvb_channel_deser  : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
     signal app_dma_tx_mvb_vld_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal app_dma_tx_mvb_src_rdy_deser  : std_logic_vector(ETH_STREAMS-1 downto 0);
     signal app_dma_tx_mvb_dst_rdy_deser  : std_logic_vector(ETH_STREAMS-1 downto 0);
 
-    signal dma_rx_mvb_len_deser          : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0);
+    signal dma_rx_mvb_len_deser          : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0);
     signal dma_rx_mvb_hdr_meta_deser     : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
     signal dma_rx_mvb_channel_deser      : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
     signal dma_rx_mvb_discard_deser      : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
@@ -59,7 +59,7 @@ architecture FULL of APPLICATION_CORE is
     signal dma_rx_mvb_src_rdy_deser      : std_logic_vector(DMA_STREAMS-1 downto 0);
     signal dma_rx_mvb_dst_rdy_deser      : std_logic_vector(DMA_STREAMS-1 downto 0);
 
-    signal dma_tx_mvb_len_deser          : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0);
+    signal dma_tx_mvb_len_deser          : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_FRAME_SIZE_MAX+1)-1 downto 0);
     signal dma_tx_mvb_hdr_meta_deser     : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
     signal dma_tx_mvb_channel_deser      : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
     signal dma_tx_mvb_vld_deser          : slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
@@ -134,8 +134,14 @@ architecture FULL of APPLICATION_CORE is
 begin
 
     assert ((DMA_STREAMS = ETH_STREAMS) or (DMA_STREAMS < ETH_STREAMS and DMA_STREAMS = 1))
-        report "The number of DMA_STREAMS must be equal to ETH_STREAMS, or DMA_STREAMS must be 1 and DMA_STREAMS < ETH_STREAMS!"
+        report "APPLICATION: The number of DMA_STREAMS must be equal to ETH_STREAMS, or DMA_STREAMS must be 1 and DMA_STREAMS < ETH_STREAMS!"
         severity failure;
+
+    mtu_assert_g: for p in 0 to ETH_PORTS-1 generate
+        assert ((DMA_RX_FRAME_SIZE_MAX = ETH_PORT_RX_MTU(p)) and (DMA_TX_FRAME_SIZE_MAX = ETH_PORT_TX_MTU(p)) and (DMA_RX_FRAME_SIZE_MAX = DMA_TX_FRAME_SIZE_MAX))
+            report "APPLICATION: The maximum frame size for RX/TX DMA and RX/TX ETH must be the same or the user must implement the conversion of frames with incompatible sizes in their own application logic!"
+            severity failure;
+    end generate;
 
     -- =========================================================================
     --  CLOCK AND RESETS DEFINED BY USER
@@ -249,7 +255,7 @@ begin
             MI_DATA_WIDTH      => MI_DATA_WIDTH,
             SUBCORE_ID         => i,
             ETH_CHANNELS       => ETH_CHANNELS,
-            USR_PKT_SIZE_MAX   => DMA_PKT_MTU,
+            USR_PKT_SIZE_MAX   => DMA_RX_FRAME_SIZE_MAX,
             DMA_RX_CHANNELS    => DMA_RX_CHANNELS,
             DMA_TX_CHANNELS    => DMA_TX_CHANNELS,
             DMA_HDR_META_WIDTH => DMA_HDR_META_WIDTH,
@@ -335,7 +341,7 @@ begin
         MFB_REG_SIZE       => MFB_REG_SIZE,
         MFB_BLOCK_SIZE     => MFB_BLOCK_SIZE,
         MFB_ITEM_WIDTH     => MFB_ITEM_WIDTH,
-        DMA_PKT_MTU        => DMA_PKT_MTU,
+        DMA_PKT_MTU        => DMA_RX_FRAME_SIZE_MAX,
         DMA_RX_CHANNELS    => DMA_RX_CHANNELS,
         DMA_TX_CHANNELS    => DMA_TX_CHANNELS,
         DMA_HDR_META_WIDTH => DMA_HDR_META_WIDTH,
