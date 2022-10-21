@@ -14,7 +14,9 @@ set MFB_PIPE_BASE       "$OFM_PATH/comp/mfb_tools/flow/pipe"
 set MFB_META_INS_BASE   "$OFM_PATH/comp/mfb_tools/flow/metadata_insertor"
 set MVB_PIPE_BASE       "$OFM_PATH/comp/mvb_tools/flow/pipe"
 set MVB_CHDIST_BASE     "$OFM_PATH/comp/mvb_tools/flow/channel_router"
-set STREAMS_MERGER_BASE "$OFM_PATH/../core/intel/src/comp/app_core_utils/dma_streams_merger"
+set APP_CORE_UTILS_BASE "$OFM_PATH/../core/intel/src/comp/app_core_utils"
+set STREAMS_MERGER_BASE "$APP_CORE_UTILS_BASE/dma_streams_merger"
+set DMA_CHAN_MOD_BASE   "$APP_CORE_UTILS_BASE/dma_chan_mod"
 set MEM_TESTER_BASE     "$OFM_PATH/comp/debug/mem_tester"
 
 # Packages
@@ -29,6 +31,7 @@ lappend COMPONENTS [ list "MFB_META_INS"   $MFB_META_INS_BASE   "FULL" ]
 lappend COMPONENTS [ list "MFB_PIPE"       $MFB_PIPE_BASE       "FULL" ]
 lappend COMPONENTS [ list "MVB_PIPE"       $MVB_PIPE_BASE       "FULL" ]
 lappend COMPONENTS [ list "STREAMS_MERGER" $STREAMS_MERGER_BASE "FULL" ]
+lappend COMPONENTS [ list "DMA_CHAN_MOD"   $DMA_CHAN_MOD_BASE   "FULL" ]
 lappend COMPONENTS [ list "MVB_CHDIST"     $MVB_CHDIST_BASE     "FULL" ]
 lappend COMPONENTS [ list "MEM_TESTER"     $MEM_TESTER_BASE     "FULL" ]
 

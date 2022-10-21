@@ -15,6 +15,10 @@ use work.combo_user_const.all;
 
 architecture FULL of APPLICATION_CORE is
 
+    constant APP_ST_PER_DMA_ST : natural := ETH_STREAMS/DMA_STREAMS;
+    constant CORE_DMA_RX_CHAN  : natural := DMA_RX_CHANNELS/APP_ST_PER_DMA_ST;
+    constant CORE_DMA_TX_CHAN  : natural := DMA_TX_CHANNELS/APP_ST_PER_DMA_ST;
+
     -- MI bus signals distribution --
     -- (ETH_STREAMS - 1 downto 0          ) ... eth-signals
     -- (MEM_PORTS   - 1 downto ETH_STREAMS) ... mem-signals
@@ -39,6 +43,7 @@ architecture FULL of APPLICATION_CORE is
     signal app_dma_rx_mvb_len_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0);
     signal app_dma_rx_mvb_hdr_meta_deser : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
     signal app_dma_rx_mvb_channel_deser  : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
+    signal app_dma_rx_mvb_channel_mod    : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(CORE_DMA_RX_CHAN)-1 downto 0);
     signal app_dma_rx_mvb_discard_deser  : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal app_dma_rx_mvb_vld_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal app_dma_rx_mvb_src_rdy_deser  : std_logic_vector(ETH_STREAMS-1 downto 0);
@@ -47,6 +52,7 @@ architecture FULL of APPLICATION_CORE is
     signal app_dma_tx_mvb_len_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_FRAME_SIZE_MAX+1)-1 downto 0);
     signal app_dma_tx_mvb_hdr_meta_deser : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
     signal app_dma_tx_mvb_channel_deser  : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
+    signal app_dma_tx_mvb_channel_mod    : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*log2(CORE_DMA_TX_CHAN)-1 downto 0);
     signal app_dma_tx_mvb_vld_deser      : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal app_dma_tx_mvb_src_rdy_deser  : std_logic_vector(ETH_STREAMS-1 downto 0);
     signal app_dma_tx_mvb_dst_rdy_deser  : std_logic_vector(ETH_STREAMS-1 downto 0);
@@ -225,7 +231,7 @@ begin
     );
 
     -- =========================================================================
-    --  APPLICATION STREAMS
+    --  APPLICATION CORES
     -- =========================================================================
 
     eth_rx_mvb_data_deser <= slv_array_deser(ETH_RX_MVB_DATA,ETH_STREAMS);
@@ -244,8 +250,8 @@ begin
     ETH_TX_MFB_SOF     <= slv_array_ser(eth_tx_mfb_sof_deser);
     ETH_TX_MFB_EOF     <= slv_array_ser(eth_tx_mfb_eof_deser);
 
-    subcore_g : for i in ETH_STREAMS-1 downto 0 generate
-        subcore_i : entity work.APP_SUBCORE
+    core_g : for i in ETH_STREAMS-1 downto 0 generate
+        core_i : entity work.APP_SUBCORE
         generic map(
             MFB_REGIONS        => MFB_REGIONS,
             MFB_REG_SIZE       => MFB_REG_SIZE,
@@ -256,8 +262,8 @@ begin
             SUBCORE_ID         => i,
             ETH_CHANNELS       => ETH_CHANNELS,
             USR_PKT_SIZE_MAX   => DMA_RX_FRAME_SIZE_MAX,
-            DMA_RX_CHANNELS    => DMA_RX_CHANNELS,
-            DMA_TX_CHANNELS    => DMA_TX_CHANNELS,
+            DMA_RX_CHANNELS    => CORE_DMA_RX_CHAN,
+            DMA_TX_CHANNELS    => CORE_DMA_TX_CHAN,
             DMA_HDR_META_WIDTH => DMA_HDR_META_WIDTH,
             DEVICE             => DEVICE
         )
@@ -267,7 +273,7 @@ begin
 
             DMA_RX_MVB_LEN          => app_dma_rx_mvb_len_deser(i),
             DMA_RX_MVB_HDR_META     => app_dma_rx_mvb_hdr_meta_deser(i),
-            DMA_RX_MVB_CHANNEL      => app_dma_rx_mvb_channel_deser(i),
+            DMA_RX_MVB_CHANNEL      => app_dma_rx_mvb_channel_mod(i),
             DMA_RX_MVB_DISCARD      => app_dma_rx_mvb_discard_deser(i),
             DMA_RX_MVB_VLD          => app_dma_rx_mvb_vld_deser(i),
             DMA_RX_MVB_SRC_RDY      => app_dma_rx_mvb_src_rdy_deser(i),
@@ -283,7 +289,7 @@ begin
 
             DMA_TX_MVB_LEN          => app_dma_tx_mvb_len_deser(i),
             DMA_TX_MVB_HDR_META     => app_dma_tx_mvb_hdr_meta_deser(i),
-            DMA_TX_MVB_CHANNEL      => app_dma_tx_mvb_channel_deser(i),
+            DMA_TX_MVB_CHANNEL      => app_dma_tx_mvb_channel_mod(i),
             DMA_TX_MVB_VLD          => app_dma_tx_mvb_vld_deser(i),
             DMA_TX_MVB_SRC_RDY      => app_dma_tx_mvb_src_rdy_deser(i),
             DMA_TX_MVB_DST_RDY      => app_dma_tx_mvb_dst_rdy_deser(i),
@@ -327,25 +333,48 @@ begin
             MI_ARDY                 => split_mi_ardy(i),
             MI_DRDY                 => split_mi_drdy(i)
         );
+
+        -- In the case of 1 DMA Stream and multiple APP streams (typically ETH
+        -- streams), APP_DMA_CHAN_MOD divides the DMA channels between the APP
+        -- streams and adjusts signal widths accordingly.
+        chan_mod_i : entity work.APP_DMA_CHAN_MOD
+        generic map(
+            MFB_REGIONS     => MFB_REGIONS,
+            DMA_RX_CHANNELS => DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS => DMA_TX_CHANNELS,
+            DIVIDER         => APP_ST_PER_DMA_ST,
+            STREAM_ID       => i,
+            ENABLE_MOD      => (CORE_DMA_RX_CHAN /= DMA_RX_CHANNELS)
+        )
+        port map(
+            APP_RX_MVB_CHANNEL => app_dma_rx_mvb_channel_mod(i),
+            DMA_RX_MVB_CHANNEL => app_dma_rx_mvb_channel_deser(i),
+            APP_TX_MVB_CHANNEL => app_dma_tx_mvb_channel_mod(i),
+            DMA_TX_MVB_CHANNEL => app_dma_tx_mvb_channel_deser(i)
+        );
     end generate;
 
     -- =========================================================================
     --  DMA MODULE(S) CONNECTION
     -- =========================================================================
 
+    -- Implements splitting multiple APP streams (typically ETH streams) into
+    -- one RX DMA stream and splitting one TX stream between multiple APP
+    -- streams according to the upper bits of the DMA channel number.
     streams_merger_i : entity work.APP_DMA_STREAMS_MERGER
     generic map(
-        APP_STREAMS        => ETH_STREAMS,
-        DMA_STREAMS        => DMA_STREAMS,
-        MFB_REGIONS        => MFB_REGIONS,
-        MFB_REG_SIZE       => MFB_REG_SIZE,
-        MFB_BLOCK_SIZE     => MFB_BLOCK_SIZE,
-        MFB_ITEM_WIDTH     => MFB_ITEM_WIDTH,
-        DMA_PKT_MTU        => DMA_RX_FRAME_SIZE_MAX,
-        DMA_RX_CHANNELS    => DMA_RX_CHANNELS,
-        DMA_TX_CHANNELS    => DMA_TX_CHANNELS,
-        DMA_HDR_META_WIDTH => DMA_HDR_META_WIDTH,
-        DEVICE             => DEVICE
+        APP_STREAMS           => ETH_STREAMS,
+        DMA_STREAMS           => DMA_STREAMS,
+        MFB_REGIONS           => MFB_REGIONS,
+        MFB_REG_SIZE          => MFB_REG_SIZE,
+        MFB_BLOCK_SIZE        => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH        => MFB_ITEM_WIDTH,
+        DMA_RX_FRAME_SIZE_MAX => DMA_RX_FRAME_SIZE_MAX,
+        DMA_TX_FRAME_SIZE_MAX => DMA_TX_FRAME_SIZE_MAX,
+        DMA_RX_CHANNELS       => DMA_RX_CHANNELS,
+        DMA_TX_CHANNELS       => DMA_TX_CHANNELS,
+        DMA_HDR_META_WIDTH    => DMA_HDR_META_WIDTH,
+        DEVICE                => DEVICE
     )
     port map(
         CLK                     => APP_CLK,
