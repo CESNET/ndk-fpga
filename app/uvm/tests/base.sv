@@ -263,9 +263,9 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task dirver_sequence();
-        uvm_app_core_minimal::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS) seq;
+        uvm_app_core_minimal::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) seq;
 
-        seq = uvm_app_core_minimal::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS)::type_id::create("seq", this);
+        seq = uvm_app_core_minimal::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS)::type_id::create("seq", this);
 
         seq.m_regmodel = m_env.m_regmodel.m_regmodel;
         seq.start(null);

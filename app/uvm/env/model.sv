@@ -27,7 +27,8 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
 
 
     //LOCAL VARIABLES
-    protected uvm_channel_router::model#(ETH_CHANNELS, DMA_RX_CHANNELS, 2, 1) eth_to_dma[ETH_STREAMS];
+    localparam APP_RX_CHANNELS = DMA_RX_CHANNELS/(ETH_STREAMS/DMA_STREAMS);
+    protected uvm_channel_router::model#(ETH_CHANNELS, APP_RX_CHANNELS, 2, 1) eth_to_dma[ETH_STREAMS];
     protected uvm_common::model_item#(uvm_logic_vector::sequence_item#(DMA_RX_MVB_WIDTH)) dma_hdr_fifo[DMA_STREAMS][$];
 
     function new(string name, uvm_component parent = null);
@@ -40,7 +41,7 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
         for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
             string it_num;
             it_num.itoa(it);
-            eth_to_dma[it] = uvm_channel_router::model#(ETH_CHANNELS, DMA_RX_CHANNELS, 2, 1)::type_id::create({"eth_to_dma_index_", it_num}, this);
+            eth_to_dma[it] = uvm_channel_router::model#(ETH_CHANNELS, APP_RX_CHANNELS, 2, 1)::type_id::create({"eth_to_dma_index_", it_num}, this);
         end
 
         for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
@@ -84,10 +85,10 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
 
 
     virtual function void regmodel_set(uvm_app_core::regmodel #(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS) m_regmodel_base);
-        uvm_app_core_minimal::regmodel #(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS) m_regmodel;
+        uvm_app_core_minimal::regmodel #(ETH_STREAMS, ETH_CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) m_regmodel;
 
         if ($cast(m_regmodel, m_regmodel_base) != 1) begin
-            `uvm_fatal(this.get_full_name(), "\n\tCanno convet reg model to correct type");
+            `uvm_fatal(this.get_full_name(), "\n\tCannot convert reg model to correct type");
         end
 
         for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
@@ -135,7 +136,11 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
             dma_hdr.time_array_add(item.start);
             dma_hdr.item = new();
             dma_hdr.item.meta        = '0;
-            dma_hdr.item.channel     = eth_to_dma[index].port_get(port%ETH_CHANNELS);
+            if (DMA_STREAMS != ETH_STREAMS) begin
+                dma_hdr.item.channel = (index*APP_RX_CHANNELS) + eth_to_dma[index].port_get(port%ETH_CHANNELS);
+            end else begin
+                dma_hdr.item.channel = eth_to_dma[index].port_get(port%ETH_CHANNELS);
+            end
             dma_hdr.item.packet_size = length;
             dma_hdr.item.discard     = 0;
 

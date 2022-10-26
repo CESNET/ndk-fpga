@@ -20,7 +20,7 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
     function void build_phase(uvm_phase phase);
 
-        uvm_app_core::regmodel#(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS)::type_id::set_inst_override(regmodel#(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS)::get_type(), {this.get_full_name() ,".m_regmodel.*"});
+        uvm_app_core::regmodel#(ETH_STREAMS, ETH_CHANNELS, DMA_RX_CHANNELS)::type_id::set_inst_override(regmodel#(ETH_STREAMS, ETH_CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS)::get_type(), {this.get_full_name() ,".m_regmodel.*"});
 
         uvm_app_core::model#(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, REGIONS, MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::set_inst_override(
         model#(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, REGIONS, MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type(), {this.get_full_name() ,".m_scoreboard.m_model"});
