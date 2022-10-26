@@ -21,8 +21,7 @@ Before you get started, there are a few requirements that you need to have. Amon
     - [Intel Stratix 10 DX FPGA Development Kit (DK-DEV-1SDX-P)](https://github.com/CESNET/ndk-card-dk-dev-1sdx-p/)
     - [Intel Agilex I-Series FPGA Development Kit (DK-DEV-AGI027RES)](https://github.com/CESNET/ndk-card-dk-dev-agi027res/)
     - [Silicom fb4CGg3@VU9P card (also in variant fb2CGg3@VU9P)](https://github.com/CESNET/ndk-card-fb4cgg3/)
-- Other supported FPGA cards in the NDK framework but not available as open-source:
-    - Silicom fb2CGhh@KU15P card
+    - [Silicom fb2CGhh@KU15P card](https://github.com/CESNET/ndk-card-fb2cghh/)
 - To control an FPGA card with an application based on the NDK framework, you also need:
     - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw)
 
@@ -39,6 +38,7 @@ git submodule update --init ndk/cards/agi-fh400g
 git submodule update --init ndk/cards/dk-dev-1sdx-p
 git submodule update --init ndk/cards/dk-dev-agi027res
 git submodule update --init ndk/cards/fb4cgg3
+git submodule update --init ndk/cards/fb2cghh
 ```
 
 CESNET developers who have access to closed-source repositories can use a single command to clone the repository, including its submodules (from private GitLab):
