@@ -1,0 +1,35 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Radek Iša <isa@fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+
+add_wave "-noupdate -color yellow -label CLK"     "/testbench/APP_CLK"
+add_wave "-noupdate -color yellow -label RESET"   "/testbench/reset_app/RESET"
+
+
+for {set it 0} {$it < 4} {incr it} {
+
+    add_wave -noupdate -group "RX" -group "ETH\[$it\]" -group "MVB" "/testbench/eth_rx_mvb\[$it\]/*"
+    add_wave -noupdate -group "RX" -group "ETH\[$it\]" -group "MFB" "/testbench/eth_rx_mfb\[$it\]/*"
+
+    add_wave -noupdate -group "TX" -group "ETH\[$it\]" -group "MFB" "/testbench/eth_tx_mfb\[$it\]/*"
+}
+
+
+for {set it 0} {$it < 4} {incr it} {
+    add_wave -noupdate -group "RX" -group "DMA\[$it\]" -group "MVB" "/testbench/dma_rx_mvb\[$it\]/*"
+    add_wave -noupdate -group "RX" -group "DMA\[$it\]" -group "MFB" "/testbench/dma_rx_mfb\[$it\]/*"
+
+    add_wave -noupdate -group "TX" -group "DMA\[$it\]" -group "MVB" "/testbench/dma_tx_mvb\[$it\]/*"
+    add_wave -noupdate -group "TX" -group "DMA\[$it\]" -group "MFB" "/testbench/dma_tx_mfb\[$it\]/*"
+}
+
+#for {set it 0} {$it < 4} {incr it} {
+#    add_wave -noupdate -group "CORE\[$it\]" "/testbench/DUT/core_g($it)/core_i/*"
+#    add_wave -noupdate -group "CHAN_DIST\[$it\]" "/testbench/DUT/core_g($it)/core_i/chan_dist_i/*"
+#}

@@ -9,8 +9,10 @@
 */
 
 
-class reg_sequence#(STREAMS, CHANNELS, DMA_RX_CHANNELS) extends uvm_sequence;
-    `uvm_object_param_utils(uvm_app_core_minimal::reg_sequence#(STREAMS, CHANNELS, DMA_RX_CHANNELS))
+class reg_sequence#(STREAMS, CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) extends uvm_sequence;
+    `uvm_object_param_utils(uvm_app_core_minimal::reg_sequence#(STREAMS, CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS))
+
+    localparam APP_RX_CHANNELS = DMA_RX_CHANNELS/(STREAMS/DMA_STREAMS);
 
     uvm_app_core::regmodel #(STREAMS, CHANNELS, DMA_RX_CHANNELS) m_regmodel;
 
@@ -19,7 +21,7 @@ class reg_sequence#(STREAMS, CHANNELS, DMA_RX_CHANNELS) extends uvm_sequence;
     endfunction
 
     task body();
-        regmodel #(STREAMS, CHANNELS, DMA_RX_CHANNELS) m_regmodel_minimal;
+        regmodel #(STREAMS, CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) m_regmodel_minimal;
         string msg;
         uvm_status_e   status;
         uvm_reg_data_t data;
@@ -31,7 +33,7 @@ class reg_sequence#(STREAMS, CHANNELS, DMA_RX_CHANNELS) extends uvm_sequence;
 
         for (int unsigned it = 0; it < STREAMS; it++) begin
             for (int unsigned jt = 0; jt < CHANNELS; jt++) begin
-                if(!m_regmodel_minimal.stream[it].channel[jt].randomize() with {ch_min.value <= ch_max.value; ch_max.value < DMA_RX_CHANNELS; incr.value dist {[0:5] :/ 30, [6:255] :/ 1};
+                if(!m_regmodel_minimal.stream[it].channel[jt].randomize() with {ch_min.value <= ch_max.value; ch_max.value < APP_RX_CHANNELS; incr.value dist {[0:5] :/ 30, [6:255] :/ 1};
                 $countones(ch_max.value-ch_min.value+1) <= 1;}) begin
                     `uvm_fatal(m_regmodel_minimal.get_full_name(), "\n\treg_sequence cannot randomize");
                 end
