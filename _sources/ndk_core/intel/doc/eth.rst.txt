@@ -124,7 +124,7 @@ The network module cores follow in the same fashion, the first instance (Network
 The second instance (Network module core (1)) is connected to the third output of the MI splitter (PHY) and its base address is 0x0002000 (=> address range 0x00002000 - 0x00002FFF) and so on via table 1.
 
 .. note::
-    To get a complete address of a register in one of the components of the Network module, you must also add the base address of the Network module (defined :ref:`here <ndk_intel_mi>`) as well as the address of the target register in that component.
+    To get a complete address of a register in one of the components of the Network module, you must also add the base address of the Network module (defined :ref:`here <ndk_mi>`) as well as the address of the target register in that component.
 
 .. list-table:: Tab. 1
     :align: center

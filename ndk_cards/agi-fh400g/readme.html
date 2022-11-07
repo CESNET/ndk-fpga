@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>XpressSX AGI-FH400G (400G1) &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  <title>ReflexCES XpressSX AGI-FH400G &mdash; Minimal NDK Application Docs 1.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,10 +16,11 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Stratix 10 DX FPGA Development Kit" href="../dk-dev-1sdx-p/readme.html" />
+    <link rel="next" title="Intel Stratix 10 DX FPGA DK" href="../dk-dev-1sdx-p/readme.html" />
     <link rel="prev" title="Device Tree" href="../../ndk_core/doc/devtree.html" /> 
 </head>
 
@@ -44,22 +45,25 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">XpressSX AGI-FH400G (400G1)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#build-instructions">Build instructions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ReflexCES XpressSX AGI-FH400G</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#board-test-scripts">Board Test Scripts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#ethernet-interface">Ethernet Interface</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
@@ -87,8 +91,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>XpressSX AGI-FH400G (400G1)</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">ReflexCES XpressSX AGI-FH400G</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/ndk_cards/agi-fh400g/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -98,31 +102,50 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="xpresssx-agi-fh400g-400g1">
-<span id="card-400g1"></span><h1>XpressSX AGI-FH400G (400G1)<a class="headerlink" href="#xpresssx-agi-fh400g-400g1" title="Permalink to this heading"></a></h1>
+  <section id="reflexces-xpresssx-agi-fh400g">
+<span id="card-400g1"></span><h1>ReflexCES XpressSX AGI-FH400G<a class="headerlink" href="#reflexces-xpresssx-agi-fh400g" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><dl class="simple">
-<dt>XpressSX AGI-FH400G by CESNET &amp; REFLEX CES</dt><dd><ul>
-<li><p>Intel Agilex I-Series FPGA (1x F-Tile, 3x R-Tile)</p></li>
-<li><p>FPGA Part Number (ES Silicon) = <code class="docutils literal notranslate"><span class="pre">AGIB027R29A1E2VR0</span></code></p></li>
-<li><p>FPGA Part Number (Production Silicon) = <code class="docutils literal notranslate"><span class="pre">AGIB027R29A1E2V</span></code></p></li>
-<li><p><a class="reference external" href="https://www.reflexces.com/pcie-boards/intel-agilex-soc/xpresssx-agi-fh400g-agilex-soc-full-height-half-length-pcie-board">XpressSX AGI-FH400G Website</a></p></li>
+<dt>Card information:</dt><dd><ul>
+<li><p>Vendor: ReflexCES in cooperation with CESNET</p></li>
+<li><p>Name: XpressSX AGI-FH400G</p></li>
+<li><p>Ethernet ports: 1x QSFP-DD</p></li>
+<li><p>PCIe conectors: Edge connector + optional HSI connectors</p></li>
+<li><p><a class="reference external" href="https://www.reflexces.com/pcie-boards/intel-agilex-soc/xpresssx-agi-fh400g-agilex-soc-full-height-half-length-pcie-board">FPGA Card Website</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>FPGA specification:</dt><dd><ul>
+<li><p>FPGA part number: <code class="docutils literal notranslate"><span class="pre">AGIB027R29A1E2VR0</span></code></p></li>
+<li><p>Ethernet Hard IP: F-Tile (up to 400G Ethernet)</p></li>
+<li><p>PCIe Hard IP: R-Tile (up to PCIe Gen5 x16)</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This page is still work in progress!</p>
-</div>
-<section id="build-instructions">
-<h2>Build instructions<a class="headerlink" href="#build-instructions" title="Permalink to this heading"></a></h2>
+<section id="ndk-firmware-support">
+<h2>NDK firmware support<a class="headerlink" href="#ndk-firmware-support" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p>Go to <code class="docutils literal notranslate"><span class="pre">build/agi-fh400g/</span></code> folder in application repository.</p></li>
-<li><p>Check or modify <code class="docutils literal notranslate"><span class="pre">user_const.tcl</span></code> file, where you can change the firmware configuration.</p></li>
 <li><dl class="simple">
-<dt>Run firmware build in Quartus by <code class="docutils literal notranslate"><span class="pre">make</span></code> command.</dt><dd><ul>
+<dt>Ethernet cores that are supported in the NDK firmware:</dt><dd><ul>
+<li><p><a class="reference internal" href="../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">F-Tile in the Network Module</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>PCIe cores that are supported in the NDK firmware:</dt><dd><ul>
+<li><p><a class="reference internal" href="../../ndk_core/intel/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">R-Tile in the PCIe Module</span></a></p></li>
+<li><p>See the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory&gt;/ndk/card/agi-fh400g/config/card_conf.tcl</span></code> file for supported PCIe configurations.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):</dt><dd><ul>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">400g1</span></code> command for firmware with 1x400GbE (default).</p></li>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">200g2</span></code> command for firmware with 2x200GbE.</p></li>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g4</span></code> command for firmware with 4x100GbE.</p></li>
@@ -134,41 +157,39 @@
 </dd>
 </dl>
 </li>
-<li><p>After the build is complete, you will find bitstream <code class="docutils literal notranslate"><span class="pre">my_bitstream.sof</span></code> in the same folder.</p></li>
+<li><dl class="simple">
+<dt>Support for booting the NDK firmware using the nfb-boot tool:</dt><dd><ul>
+<li><p>YES, starting with the nfb-framework version 6.16.3.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To build firmware, you must have Quartus Prime Pro installed, including a valid license.</p>
+<p>To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro installed, including a valid license.</p>
 </div>
 </section>
 <section id="board-test-scripts">
 <h2>Board Test Scripts<a class="headerlink" href="#board-test-scripts" title="Permalink to this heading"></a></h2>
-<p>The NDK design enables easy testing of the FPGA card. The design includes several generators and switchable loopback paths (usually part of <a class="reference internal" href="../../ofm_doc/comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">the Gen Loop Switch (GLS)</span></a> unit). A simplified diagram showing the testing capabilities can be found below.</p>
+<p>The NDK firmware enables easy testing of the FPGA card. The firmware includes several generators and switchable loopback paths (usually part of the <a class="reference internal" href="../../ofm_doc/comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">the Gen Loop Switch (GLS)</span></a> module). A simplified diagram showing the testing capabilities can be found below.</p>
 <a class="reference internal image-reference" href="../../_images/ndk_loopback.drawio.svg"><img alt="../../_images/ndk_loopback.drawio.svg" class="align-center" src="../../_images/ndk_loopback.drawio.svg" width="100%" /></a>
 <p><strong>Prerequisites</strong></p>
 <ul class="simple">
-<li><p>The card must be connected to a linux server.</p></li>
-<li><p>The NDK software package must be installed on this server.</p></li>
-<li><p>NDK driver must be in debug mode (mi_debug).</p></li>
-<li><p>The FPGA card must boot the NDK firmware.</p></li>
-<li><p>You must have Python 3 including the pytest framework installed: <code class="docutils literal notranslate"><span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">--user</span> <span class="pre">pytest</span> <span class="pre">pytest-depends</span> <span class="pre">pytest-html</span></code></p></li>
+<li><p>The card must be connected to a Linux server.</p></li>
+<li><p>The nfb-framework package must be installed on this server.</p></li>
+<li><p>The NDK driver must be in debug mode (mi_debug - see the warning at the bottom of this readme).</p></li>
+<li><p>The NDK firmware must be loaded in the FPGA card.</p></li>
+<li><p>You must have Python 3 including the pytest framework installed: <code class="docutils literal notranslate"><span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">--user</span> <span class="pre">pytest</span> <span class="pre">pytest-depends</span> <span class="pre">pytest-html</span></code>.</p></li>
 </ul>
-<p>The test scripts themselves are written in <a class="reference external" href="https://www.python.org/">Python 3</a> and use <a class="reference external" href="https://docs.pytest.org/en/stable/">the Pytest framework</a>. This makes it possible to run the test with a single command, see example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pytest --html<span class="o">=</span>test_pcie.html --self-contained-html card/400g1/bts/test_pcie.py
+<p>The test scripts themselves are written in <a class="reference external" href="https://www.python.org/">Python 3</a> and use the <a class="reference external" href="https://docs.pytest.org/en/stable/">Pytest framework</a>. This makes it possible to run the test with a single command, see example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pytest --html<span class="o">=</span>test_pcie.html --self-contained-html ndk/cards/agi-fh400g/bts/test_pcie.py
 </pre></div>
 </div>
-<p>The whole test takes approximately 14 minutes. The test script displays test results and generates an html file containing a detailed description of the test results.</p>
+<p>The whole test takes approximately 14 minutes. The test script displays test results and generates an HTML file containing a detailed description of the test results.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The test script requires an NDK driver in debug mode! To enable debug mode, you must first remove the driver with the command “sudo modprobe -r nfb” and then add it with the correct flag: “sudo modprobe nfb mi_debug=1”.</p>
-</div>
-</section>
-<section id="ethernet-interface">
-<h2>Ethernet Interface<a class="headerlink" href="#ethernet-interface" title="Permalink to this heading"></a></h2>
-<p>This card has one QSFP-DD cage (ports). It is connected to the FPGA via 8 high-speed serial lines supporting up to 56 Gbps. QSFP-DD cage is connected to an F-Tile that contains Ethernet Hard IP supporting the following speeds: <code class="docutils literal notranslate"><span class="pre">1x400GbE,</span> <span class="pre">2x200GbE,</span> <span class="pre">4x100GbE,</span> <span class="pre">8x50GbE,</span> <span class="pre">2x40GbE,</span> <span class="pre">8x25GbE,</span> <span class="pre">8x10GbE</span></code>. F-Tile Hard IPs are instantiated in Network Module, which provides Ethernet communication to and from the Application core. The architecture of the Network Module <a class="reference internal" href="../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">is described here</span></a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Not all Ethernet Hard IP configurations are already available or tested in NDK.</p>
+<p>The test script requires an NDK driver in debug mode! To enable the debug mode, you must first remove the driver with the command “sudo modprobe -r nfb” and then add it with the correct flag: “sudo modprobe nfb mi_debug=1”.</p>
 </div>
 </section>
 </section>
@@ -178,7 +199,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../../ndk_core/doc/devtree.html" class="btn btn-neutral float-left" title="Device Tree" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../dk-dev-1sdx-p/readme.html" class="btn btn-neutral float-right" title="Stratix 10 DX FPGA Development Kit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../dk-dev-1sdx-p/readme.html" class="btn btn-neutral float-right" title="Intel Stratix 10 DX FPGA DK" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

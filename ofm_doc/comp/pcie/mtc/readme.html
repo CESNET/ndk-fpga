@@ -16,6 +16,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -69,6 +74,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../ptc/readme.html">PTC (PCIe Transaction Controller)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../common/readme.html">PCI_EXT_CAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dma/dma_calypte/readme.html">DMA Calypte</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
@@ -88,9 +94,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../pcie.html">PCIe Tools</a> &raquo;</li>
-      <li>MI Transaction Controler (MTC)</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../pcie.html">PCIe Tools</a></li>
+      <li class="breadcrumb-item active">MI Transaction Controler (MTC)</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/ofm_doc/comp/pcie/mtc/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -129,122 +135,127 @@ requires additional logic to ensure PCIe credits are handled.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-mtc-axi_data_width"><td><p>AXI_DATA_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-axi_data_width"><td><p>AXI_DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
 <td><p>AXI bus: width of data word in bits</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-axi_cquser_width"><td><p>AXI_CQUSER_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-axi_cquser_width"><td><p>AXI_CQUSER_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>183</p></td>
 <td><p>AXI bus: width of CQ user word in bits</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-axi_ccuser_width"><td><p>AXI_CCUSER_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-axi_ccuser_width"><td><p>AXI_CCUSER_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>81</p></td>
 <td><p>AXI bus: width of CC user word in bits</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-mfb_regions"><td><p>MFB_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td><p>MFB bus: number of regions in word</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>MFB bus: number of blocks in region, must be 1</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>MFB bus: number of items in block, must be 8</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>MFB bus: width of one item in bits, must be 32 (dword)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-mfb_cq_meta_width"><td><p>MFB_CQ_META_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-mfb_cq_meta_width"><td><p>MFB_CQ_META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>3+32+128</p></td>
 <td><p>MFB bus: width of CQ meta item in bits (BAR index + PCIe Prefix + PCIe Header)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-mfb_cc_meta_width"><td><p>MFB_CC_META_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-mfb_cq_user_meta_width"><td><p>MFB_CQ_USER_META_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>3+32+128+4+4+1+2+8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-mfb_cc_meta_width"><td><p>MFB_CC_META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32+128</p></td>
 <td><p>MFB bus: width of CQ meta item in bits (PCIe Prefix + PCIe Header)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-mfb_region_width"><td><p>MFB_REGION_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-mfb_region_width"><td><p>MFB_REGION_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH</p></td>
 <td><p>MFB bus: width of single data region in bits, auxiliary parameter, do not change value!</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-bar0_base_addr"><td><p>BAR0_BASE_ADDR</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-bar0_base_addr"><td><p>BAR0_BASE_ADDR</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>X”01000000”</p></td>
 <td><p>BAR0 base address for PCIE-&gt;MI32 transalation</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-bar1_base_addr"><td><p>BAR1_BASE_ADDR</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-bar1_base_addr"><td><p>BAR1_BASE_ADDR</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>X”02000000”</p></td>
 <td><p>BAR1 base address for PCIE-&gt;MI32 transalation</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-bar2_base_addr"><td><p>BAR2_BASE_ADDR</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-bar2_base_addr"><td><p>BAR2_BASE_ADDR</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>X”03000000”</p></td>
 <td><p>BAR2 base address for PCIE-&gt;MI32 transalation</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-bar3_base_addr"><td><p>BAR3_BASE_ADDR</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-bar3_base_addr"><td><p>BAR3_BASE_ADDR</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>X”04000000”</p></td>
 <td><p>BAR3 base address for PCIE-&gt;MI32 transalation</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-bar4_base_addr"><td><p>BAR4_BASE_ADDR</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-bar4_base_addr"><td><p>BAR4_BASE_ADDR</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>X”05000000”</p></td>
 <td><p>BAR4 base address for PCIE-&gt;MI32 transalation</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-bar5_base_addr"><td><p>BAR5_BASE_ADDR</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-bar5_base_addr"><td><p>BAR5_BASE_ADDR</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>X”06000000”</p></td>
 <td><p>BAR5 base address for PCIE-&gt;MI32 transalation</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-exp_rom_base_addr"><td><p>EXP_ROM_BASE_ADDR</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-exp_rom_base_addr"><td><p>EXP_ROM_BASE_ADDR</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>X”0A000000”</p></td>
 <td><p>Expansion ROM base address for PCIE-&gt;MI32 transalation</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-cc_pipe"><td><p>CC_PIPE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-cc_pipe"><td><p>CC_PIPE</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable Pipe component on CC interface</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-cq_pipe"><td><p>CQ_PIPE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-cq_pipe"><td><p>CQ_PIPE</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable Pipe component on CQ interface</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-mi_pipe"><td><p>MI_PIPE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-mi_pipe"><td><p>MI_PIPE</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable Pipe component on MI32 interface</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>MI bus: width of data word in bits, must be 32.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>MI bus: width of address word in bits, must be 32.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mtc-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
 <td><p>Select correct FPGA device: “ULTRASCALE”, “STRATIX10”, “AGILEX”</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mtc-endpoint_type"><td><p>ENDPOINT_TYPE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mtc-endpoint_type"><td><p>ENDPOINT_TYPE</p></td>
 <td><p>string</p></td>
 <td><p>“H_TILE”</p></td>
 <td><p>Intel PCIe endpoint type (Intel only): “H_TILE”, “P_TILE”, “R_TILE”</p></td>
@@ -271,17 +282,27 @@ Must be used clock from PCIe Hard IP!</p></td>
 <td><p>in</p></td>
 <td><p>Reset synchronized with CLK.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-ctl_max_payload_size"><td><p>CTL_MAX_PAYLOAD_SIZE</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Configuration Status Interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mtc-ctl_max_payload_size"><td><p>CTL_MAX_PAYLOAD_SIZE</p></td>
 <td><p>std_logic_vector(2 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Maximum allowed size of completion payload: 000b = 128 bytes;
 001b = 256 bytes; 010b = 512 bytes; 011b = 1024 bytes</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-ctl_bar_aperture"><td><p>CTL_BAR_APERTURE</p></td>
+<tr class="row-even" id="vhdl-portsignal-mtc-ctl_bar_aperture"><td><p>CTL_BAR_APERTURE</p></td>
 <td><p>std_logic_vector(5 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>BAR aperture value (Intel FPGA only). Defines the size of the address
 space of BAR in the number of usable address bits.</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MFB Completer Request Interface (CQ) - Intel FPGA Only</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mtc-cq_mfb_data"><td><p>CQ_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_WIDTH-1 downto 0)</p></td>
@@ -294,35 +315,65 @@ space of BAR in the number of usable address bits.</p></td>
 <td><p>CQ_MFB: meta word with metadata for each frame. In each region
 from LSB: 128b PCIe Header, 32b PCIe Prefix, 3b BAR index.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-cq_mfb_sof"><td><p>CQ_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mtc-cq_tph_present"><td><p>CQ_TPH_PRESENT</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>This bit indicates presence of Transaction Processing Hint (TPH)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mtc-cq_tph_type"><td><p>CQ_TPH_TYPE</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*2-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>These two bits provide the value of the PH field associated with the hint</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mtc-cq_tph_st_tag"><td><p>CQ_TPH_ST_TAG</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>This output provides the 8-bit Steering Tag associated with the hint</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mtc-cq_fbe"><td><p>CQ_FBE</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*4-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Byte enables for the first DWORD</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mtc-cq_lbe"><td><p>CQ_LBE</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*4-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Byte enables for the last DWORD</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mtc-cq_mfb_sof"><td><p>CQ_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>CQ_MFB: Start Of Frame (SOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-cq_mfb_eof"><td><p>CQ_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mtc-cq_mfb_eof"><td><p>CQ_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>CQ_MFB: End Of Frame (EOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-cq_mfb_sof_pos"><td><p>CQ_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mtc-cq_mfb_sof_pos"><td><p>CQ_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>CQ_MFB: SOF position for each MFB region in MFB blocks</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-cq_mfb_eof_pos"><td><p>CQ_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mtc-cq_mfb_eof_pos"><td><p>CQ_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>CQ_MFB: EOF position for each MFB region in MFB items</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-cq_mfb_src_rdy"><td><p>CQ_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mtc-cq_mfb_src_rdy"><td><p>CQ_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>CQ_MFB: source ready of each MFB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-cq_mfb_dst_rdy"><td><p>CQ_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mtc-cq_mfb_dst_rdy"><td><p>CQ_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>CQ_MFB: destination ready of each MFB bus</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MFB Completer Completion Interface (CC) - Intel FPGA Only</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mtc-cc_mfb_data"><td><p>CC_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_WIDTH-1 downto 0)</p></td>
@@ -365,117 +416,52 @@ from LSB: 128b PCIe Header, 32b PCIe Prefix.</p></td>
 <td><p>in</p></td>
 <td><p>CC_MFB: destination ready of each MFB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-cq_axi_data"><td><p>CQ_AXI_DATA</p></td>
-<td><p>std_logic_vector(AXI_DATA_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>CQ_AXI: Data word. For detailed specifications, see Xilinx PG213.</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MI32 interface (master)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-cq_axi_user"><td><p>CQ_AXI_USER</p></td>
-<td><p>std_logic_vector(AXI_CQUSER_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>CQ_AXI: Set of signals with sideband information about trasferred
-transaction. For detailed specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-cq_axi_last"><td><p>CQ_AXI_LAST</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td><p>CQ_AXI: Indication of the last word of a transaction. For detailed
-specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-cq_axi_keep"><td><p>CQ_AXI_KEEP</p></td>
-<td><p>std_logic_vector(AXI_DATA_WIDTH/32-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>CQ_AXI: Indication of valid data: each bit determines validity of
-different Dword. For detailed specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-cq_axi_valid"><td><p>CQ_AXI_VALID</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td><p>CQ_AXI: Indication of valid data: i.e. completer is ready to send a
-transaction. For detailed specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-cq_axi_ready"><td><p>CQ_AXI_READY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td><p>CQ_AXI: User application is ready to receive a transaction.
-For detailed specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-cc_axi_data"><td><p>CC_AXI_DATA</p></td>
-<td><p>std_logic_vector(AXI_DATA_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>CC_AXI: Data word. For detailed specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-cc_axi_user"><td><p>CC_AXI_USER</p></td>
-<td><p>std_logic_vector(AXI_CCUSER_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>CC_AXI: Set of signals with sideband information about trasferred
-transaction. For detailed specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-cc_axi_last"><td><p>CC_AXI_LAST</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td><p>CC_AXI: Indication of the last word of a transaction. For detailed
-specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-cc_axi_keep"><td><p>CC_AXI_KEEP</p></td>
-<td><p>std_logic_vector(AXI_DATA_WIDTH/32-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>CC_AXI: Indication of valid data: each bit determines validity of
-different Dword. For detailed specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-cc_axi_valid"><td><p>CC_AXI_VALID</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td><p>CC_AXI: Indication of valid data: i.e. completer is ready to send a
-transaction. For detailed specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-cc_axi_ready"><td><p>CC_AXI_READY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td><p>CC_AXI: User application is ready to receive a transaction.
-For detailed specifications, see Xilinx PG213.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-mi_function"><td><p>MI_FUNCTION</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mtc-mi_function"><td><p>MI_FUNCTION</p></td>
 <td><p>std_logic_vector(7 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: PCIe function number that generated the current MI request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-even" id="vhdl-portsignal-mtc-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: data from master to slave (write data)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mtc-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: slave address</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-even" id="vhdl-portsignal-mtc-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(3 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: byte enable</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mtc-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: read request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-even" id="vhdl-portsignal-mtc-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: write request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mtc-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: ready of slave module</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mtc-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mtc-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(31 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: data from slave to master (read data)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mtc-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mtc-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: valid of MI_DRD data signal</p></td>

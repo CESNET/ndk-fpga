@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -98,10 +103,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../base.html">Basic Tools</a> &raquo;</li>
-          <li><a href="../../../../fifo.html">FIFO components</a> &raquo;</li>
-      <li>ASFIFOX</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../base.html">Basic Tools</a></li>
+          <li class="breadcrumb-item"><a href="../../../../fifo.html">FIFO components</a></li>
+      <li class="breadcrumb-item active">ASFIFOX</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/base/fifo/asfifox/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -128,18 +133,18 @@ Intel FPGA = 32 items, distributed memory in Xilinx FPGA = 64 items).</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-asfifox-data_width"><td><p>DATA_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-asfifox-data_width"><td><p>DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
 <td><p>Data word width in bits.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-asfifox-items"><td><p>ITEMS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-asfifox-items"><td><p>ITEMS</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
 <td><p>FIFO depth in number of data words, must be a power of two!
 Minimum value is 2.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-asfifox-ram_type"><td><p>RAM_TYPE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-asfifox-ram_type"><td><p>RAM_TYPE</p></td>
 <td><p>string</p></td>
 <td><p>“BRAM”</p></td>
 <td><p>Select memory implementation. Options:</p>
@@ -149,18 +154,18 @@ Minimum value is 2.</p></td>
 </ul>
 </td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-asfifox-fwft_mode"><td><p>FWFT_MODE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-asfifox-fwft_mode"><td><p>FWFT_MODE</p></td>
 <td><p>boolean</p></td>
 <td><p>True</p></td>
 <td><p>First Word Fall Through mode. If FWFT_MODE=True, valid data will be
 ready at the ASFIFOX output without RD_EN requests.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-asfifox-output_reg"><td><p>OUTPUT_REG</p></td>
+<tr class="row-even" id="vhdl-gengeneric-asfifox-output_reg"><td><p>OUTPUT_REG</p></td>
 <td><p>boolean</p></td>
 <td><p>True</p></td>
 <td><p>Enabled output registers allow better timing for a few flip-flops.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-asfifox-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-asfifox-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
 <td><p>The DEVICE parameter allows the correct selection of the RAM
@@ -174,15 +179,15 @@ implementation according to the FPGA used. Supported values are:</p>
 </ul>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-asfifox-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
+<tr class="row-even" id="vhdl-gengeneric-asfifox-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
 <td><p>natural</p></td>
 <td><p>ITEMS/2</p></td>
 <td><p>Determines how few data words must be left free for
 <a class="reference internal" href="#vhdl-portsignal-asfifox-wr_afull"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">WR_AFULL</span></code></a> to be triggered.</p>
-<p>(<code class="docutils literal notranslate"><span class="pre">currently_stored</span> <span class="pre">&gt;=</span> <span class="pre">(</span></code> <a class="reference internal" href="#vhdl-genconstant-asfifox-items"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code></a> <code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">ALMOST_FULL_OFFSET)</span></code></p>
+<p>(<code class="docutils literal notranslate"><span class="pre">currently_stored</span> <span class="pre">&gt;=</span> <span class="pre">(</span></code> <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code> <code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">ALMOST_FULL_OFFSET)</span></code></p>
 </td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-asfifox-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-asfifox-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
 <td><p>natural</p></td>
 <td><p>ITEMS/2</p></td>
 <td><p>Determines how few data words must be stored for
@@ -201,43 +206,53 @@ implementation according to the FPGA used. Supported values are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-asfifox-wr_clk"><td><p>WR_CLK</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>WRITE INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_clk"><td><p>WR_CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Clock for write interface</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_rst"><td><p>WR_RST</p></td>
+<tr class="row-even" id="vhdl-portsignal-asfifox-wr_rst"><td><p>WR_RST</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Reset for write interface. Does not affect reset on read side</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-asfifox-wr_data"><td><p>WR_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_data"><td><p>WR_DATA</p></td>
 <td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Data to be written; must be valid when <code class="docutils literal notranslate"><span class="pre">WR_EN</span> <span class="pre">=</span> <span class="pre">'1'</span></code></p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_en"><td><p>WR_EN</p></td>
+<tr class="row-even" id="vhdl-portsignal-asfifox-wr_en"><td><p>WR_EN</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Indicates the validity of <code class="docutils literal notranslate"><span class="pre">WR_DATA</span></code>. Can be connected as SRC_RDY.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-asfifox-wr_full"><td><p>WR_FULL</p></td>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_full"><td><p>WR_FULL</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Writing is accepted only when WR_FULL=0, otherwise it is ignored.
 Can be connected as “not DST_RDY”.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_afull"><td><p>WR_AFULL</p></td>
+<tr class="row-even" id="vhdl-portsignal-asfifox-wr_afull"><td><p>WR_AFULL</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Set to <code class="docutils literal notranslate"><span class="pre">'1'</span></code> when less than
-<a class="reference internal" href="#vhdl-genconstant-asfifox-almost_full_offset"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ALMOST_FULL_OFFSET</span></code></a>
+<code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ALMOST_FULL_OFFSET</span></code>
 space is left for writing items.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-asfifox-wr_status"><td><p>WR_STATUS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_status"><td><p>WR_STATUS</p></td>
 <td><p>std_logic_vector(log2(ITEMS) downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Indicates the number of items currently stored in the FIFO</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>READ INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-asfifox-rd_clk"><td><p>RD_CLK</p></td>
 <td><p>std_logic</p></td>
@@ -270,7 +285,7 @@ Can be connected as “not SRC_RDY”.</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Set to <code class="docutils literal notranslate"><span class="pre">'1'</span></code> when less than
-<a class="reference internal" href="#vhdl-genconstant-asfifox-almost_empty_offset"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ALMOST_EMPTY_OFFSET</span></code></a>
+<code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ALMOST_EMPTY_OFFSET</span></code>
 items are left for reading.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-asfifox-rd_status"><td><p>RD_STATUS</p></td>

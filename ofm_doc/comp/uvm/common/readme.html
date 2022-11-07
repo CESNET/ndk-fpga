@@ -16,6 +16,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -71,6 +76,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_mvb/readme.html">logic_vector_mvb environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array/readme.html">Logic Vector Array agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_mfb/readme.html">logic_vector_array_mfb environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
@@ -116,10 +122,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../ver.html">UVM Verification</a> &raquo;</li>
-          <li><a href="../componets.html">Components</a> &raquo;</li>
-      <li>Common package</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../ver.html">UVM Verification</a></li>
+          <li class="breadcrumb-item"><a href="../componets.html">Components</a></li>
+      <li class="breadcrumb-item active">Common package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/ofm_doc/comp/uvm/common/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -141,37 +147,37 @@ generates rdy signal. Second class generate number reprezenting length.</p>
 to generate better randomization. Class rand_rdy and rand_length is common interface.</p>
 <p>Folowing example show commonly used for generating space between packet and interfame gaps</p>
 <div class="highlight-SystemVerilog notranslate"><div class="highlight"><pre><span></span><span class="c1">//simple sequence</span>
-<span class="k">class</span> <span class="n">sequence_simple</span> <span class="k">extends</span> <span class="n">uvm_sequence</span><span class="p">#(</span><span class="n">sequence_item</span><span class="p">);</span>
-    <span class="no">`uvm_object_utils</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">sequence_simple</span><span class="p">);</span>
-    <span class="n">uvm_common</span><span class="o">::</span><span class="n">rand_rdy</span>    <span class="n">rdy</span><span class="p">;</span>    <span class="c1">//inter frame gabs</span>
-    <span class="n">uvm_common</span><span class="o">::</span><span class="n">rand_length</span> <span class="n">space</span><span class="p">;</span>  <span class="c1">//space between frames</span>
-    <span class="k">function</span> <span class="k">new</span><span class="p">(</span><span class="k">string</span> <span class="n">name</span><span class="p">,</span> <span class="n">uvm_component</span> <span class="n">parent</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
-        <span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="p">);</span>
-        <span class="n">rdy</span>   <span class="o">=</span> <span class="n">uvm_common</span><span class="o">::</span><span class="n">rand_rdy_rand</span><span class="o">::</span><span class="k">new</span><span class="p">();</span>
-        <span class="n">space</span> <span class="o">=</span> <span class="n">uvm_common</span><span class="o">::</span><span class="n">rand_length_rand</span><span class="o">::</span><span class="k">new</span><span class="p">();</span>
-    <span class="k">endfunction</span>
-    <span class="k">task</span> <span class="n">body</span><span class="p">();</span>
-        <span class="k">forever</span> <span class="k">begin</span>
-            <span class="c1">// generate space between frames</span>
-            <span class="n">space</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span>
-            <span class="k">for</span><span class="p">(</span><span class="k">int</span> <span class="k">unsigned</span> <span class="n">it</span> <span class="o">=</span> <span class="mh">0</span><span class="p">;</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="n">space</span><span class="p">.</span><span class="n">m_value</span><span class="p">;</span> <span class="n">it</span><span class="o">++</span><span class="p">)</span> <span class="k">begin</span>
-                <span class="n">send_empty_frame</span><span class="p">();</span>
-            <span class="k">end</span>
-            <span class="c1">//send transaction</span>
-            <span class="n">hl_sequencer</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">hl_transaction</span><span class="p">);</span>
-            <span class="k">for</span> <span class="p">(</span><span class="k">int</span> <span class="k">unsigned</span> <span class="n">it</span> <span class="o">=</span> <span class="mh">0</span><span class="p">;</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="n">hl_transaction</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">it</span><span class="o">++</span><span class="p">)</span> <span class="k">begin</span>
-                <span class="c1">//send space inside frames</span>
-                <span class="n">rdy</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span>
-                <span class="k">while</span> <span class="p">(</span><span class="n">rdy</span><span class="p">.</span><span class="n">m_value</span> <span class="o">==</span> <span class="mh">0</span><span class="p">)</span> <span class="n">beign</span>
-                    <span class="n">send_empty_frame</span><span class="p">();</span>
-                <span class="k">end</span>
-                <span class="c1">//send frames</span>
-                <span class="n">send_frame</span><span class="p">(</span><span class="n">hl_transaction</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">it</span><span class="p">],</span> <span class="n">it</span><span class="p">);</span>
-            <span class="k">end</span>
-        <span class="k">end</span>
-    <span class="k">endtask</span>
-    <span class="p">...</span>
-<span class="k">endclass</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">sequence_simple</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_sequence</span><span class="p">#(</span><span class="n">sequence_item</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="no">`uvm_object_utils</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">sequence_simple</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">uvm_common</span><span class="o">::</span><span class="n">rand_rdy</span><span class="w">    </span><span class="n">rdy</span><span class="p">;</span><span class="w">    </span><span class="c1">//inter frame gabs</span>
+<span class="w">    </span><span class="n">uvm_common</span><span class="o">::</span><span class="n">rand_length</span><span class="w"> </span><span class="n">space</span><span class="p">;</span><span class="w">  </span><span class="c1">//space between frames</span>
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">rdy</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_common</span><span class="o">::</span><span class="n">rand_rdy_rand</span><span class="o">::</span><span class="k">new</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="n">space</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_common</span><span class="o">::</span><span class="n">rand_length_rand</span><span class="o">::</span><span class="k">new</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">endfunction</span><span class="w"></span>
+<span class="w">    </span><span class="k">task</span><span class="w"> </span><span class="n">body</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="k">forever</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// generate space between frames</span>
+<span class="w">            </span><span class="n">space</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">space</span><span class="p">.</span><span class="n">m_value</span><span class="p">;</span><span class="w"> </span><span class="n">it</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<span class="w">                </span><span class="n">send_empty_frame</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="k">end</span><span class="w"></span>
+<span class="w">            </span><span class="c1">//send transaction</span>
+<span class="w">            </span><span class="n">hl_sequencer</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">hl_transaction</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">hl_transaction</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="n">it</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<span class="w">                </span><span class="c1">//send space inside frames</span>
+<span class="w">                </span><span class="n">rdy</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span><span class="w"></span>
+<span class="w">                </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">rdy</span><span class="p">.</span><span class="n">m_value</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">beign</span><span class="w"></span>
+<span class="w">                    </span><span class="n">send_empty_frame</span><span class="p">();</span><span class="w"></span>
+<span class="w">                </span><span class="k">end</span><span class="w"></span>
+<span class="w">                </span><span class="c1">//send frames</span>
+<span class="w">                </span><span class="n">send_frame</span><span class="p">(</span><span class="n">hl_transaction</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">it</span><span class="p">],</span><span class="w"> </span><span class="n">it</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">end</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"></span>
+<span class="w">    </span><span class="k">endtask</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+<span class="kd">endclass</span><span class="w"></span>
 </pre></div>
 </div>
 </section>

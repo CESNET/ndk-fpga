@@ -16,6 +16,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -42,17 +43,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
@@ -80,8 +85,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Cocotb toplevel simulation core</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Cocotb toplevel simulation core</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/ndk_core/intel/cocotb/README.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -92,15 +97,15 @@
            <div itemprop="articleBody">
              
   <section id="cocotb-toplevel-simulation-core">
-<h1>Cocotb toplevel simulation core<a class="headerlink" href="#cocotb-toplevel-simulation-core" title="Permalink to this heading"></a></h1>
+<span id="cocotb-sim"></span><h1>Cocotb toplevel simulation core<a class="headerlink" href="#cocotb-toplevel-simulation-core" title="Permalink to this heading"></a></h1>
 <section id="quick-start">
 <h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h2>
 <ol class="arabic simple">
 <li><p>Install python packages with ‘pip install -r requirements.txt’</p></li>
 <li><p>Copy example files to your project card build directory</p></li>
+<li><p>Let create generated files (e.g. by ‘make’ with PROJ_ONLY)</p></li>
+<li><p>Run ‘make cocotb’</p></li>
 </ol>
-<p>3. Let create generated files (e.g. by ‘make’ with PROJ_ONLY)
-4  Run ‘make cocotb’</p>
 </section>
 </section>
 

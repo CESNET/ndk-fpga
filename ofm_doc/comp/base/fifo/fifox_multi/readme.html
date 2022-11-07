@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -99,10 +104,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../base.html">Basic Tools</a> &raquo;</li>
-          <li><a href="../../../../fifo.html">FIFO components</a> &raquo;</li>
-      <li>FIFOX Multi</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../base.html">Basic Tools</a></li>
+          <li class="breadcrumb-item"><a href="../../../../fifo.html">FIFO components</a></li>
+      <li class="breadcrumb-item active">FIFOX Multi</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/base/fifo/fifox_multi/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -130,12 +135,12 @@ internally (multiple, when required).</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-fifox_multi-data_width"><td><p>DATA_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-fifox_multi-data_width"><td><p>DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
 <td><p>Width of data word stored in FIFO, in bits.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-fifox_multi-items"><td><p>ITEMS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-fifox_multi-items"><td><p>ITEMS</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
 <td><p>Number of data words to fit in the FIFO.</p>
@@ -145,36 +150,36 @@ registers</p>
 power of two if it is not.</p>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-fifox_multi-write_ports"><td><p>WRITE_PORTS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-fifox_multi-write_ports"><td><p>WRITE_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>Number of write ports</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-fifox_multi-read_ports"><td><p>READ_PORTS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-fifox_multi-read_ports"><td><p>READ_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td><p>Number of read ports</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-fifox_multi-ram_type"><td><p>RAM_TYPE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-fifox_multi-ram_type"><td><p>RAM_TYPE</p></td>
 <td><p>string</p></td>
 <td><p>“AUTO”</p></td>
 <td><p>See <a class="reference internal" href="../fifox/readme.html#vhdl-enum-fifox_ram_type"><code class="xref vhdl vhdl-type docutils literal notranslate"><span class="pre">FIFOX_RAM_TYPE</span></code></a></p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-fifox_multi-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-fifox_multi-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
 <td><p>See the documentation of the <code class="docutils literal notranslate"><span class="pre">DEVICE</span></code> generic on the <a class="reference internal" href="../fifox/readme.html#vhdl-entity-fifox"><code class="xref vhdl vhdl-entity docutils literal notranslate"><span class="pre">FIFOX</span></code></a> entity instead.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-fifox_multi-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
+<tr class="row-even" id="vhdl-gengeneric-fifox_multi-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Determines how few data words must be left free for
 <a class="reference internal" href="#vhdl-portsignal-fifox_multi-afull"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">AFULL</span></code></a> to be triggered.</p>
-<p>(<code class="docutils literal notranslate"><span class="pre">currently_stored</span></code> &gt;= <code class="docutils literal notranslate"><span class="pre">(</span></code> <a class="reference internal" href="#vhdl-genconstant-fifox_multi-items"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code></a> <code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">ALMOST_FULL_OFFSET)</span></code></p>
+<p>(<code class="docutils literal notranslate"><span class="pre">currently_stored</span></code> &gt;= <code class="docutils literal notranslate"><span class="pre">(</span></code> <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code> <code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">ALMOST_FULL_OFFSET)</span></code></p>
 <p>For architecture SHAKEDOWN counts number of cycles spent reading, not ITEMS!</p>
 </td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-fifox_multi-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-fifox_multi-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Determines how few data words must be stored for
@@ -183,7 +188,7 @@ power of two if it is not.</p>
 <p>For architecture SHAKEDOWN counts number of cycles spent writing, not ITEMS!</p>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-fifox_multi-allow_single_fifo"><td><p>ALLOW_SINGLE_FIFO</p></td>
+<tr class="row-even" id="vhdl-gengeneric-fifox_multi-allow_single_fifo"><td><p>ALLOW_SINGLE_FIFO</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Allow instancing of a simple single FIFOX when <code class="docutils literal notranslate"><span class="pre">WRITE_PORTS==READ_PORTS==1</span></code></p>
@@ -191,7 +196,7 @@ power of two if it is not.</p>
 but will also <strong>lower the component’s latency</strong>.</p>
 </td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-fifox_multi-safe_read_mode"><td><p>SAFE_READ_MODE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-fifox_multi-safe_read_mode"><td><p>SAFE_READ_MODE</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>In safe read mode it is safe to attempt reading (setting <code class="docutils literal notranslate"><span class="pre">RD</span></code> to <code class="docutils literal notranslate"><span class="pre">'1'</span></code>)
@@ -220,25 +225,35 @@ from ports, that are currently empty.</p>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-fifox_multi-di"><td><p>DI</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>WRITE INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-fifox_multi-di"><td><p>DI</p></td>
 <td><p>std_logic_vector(WRITE_PORTS*DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Data input</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-fifox_multi-wr"><td><p>WR</p></td>
+<tr class="row-even" id="vhdl-portsignal-fifox_multi-wr"><td><p>WR</p></td>
 <td><p>std_logic_vector(WRITE_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Write enable for each input item</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-fifox_multi-full"><td><p>FULL</p></td>
+<tr class="row-odd" id="vhdl-portsignal-fifox_multi-full"><td><p>FULL</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Full flag</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-fifox_multi-afull"><td><p>AFULL</p></td>
+<tr class="row-even" id="vhdl-portsignal-fifox_multi-afull"><td><p>AFULL</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Almost full flag</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>READ INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-fifox_multi-do"><td><p>DO</p></td>
 <td><p>std_logic_vector(READ_PORTS*DATA_WIDTH-1 downto 0)</p></td>
@@ -270,13 +285,13 @@ from ports, that are currently empty.</p>
 </section>
 <section id="write-interface-behavior">
 <h2>Write interface behavior<a class="headerlink" href="#write-interface-behavior" title="Permalink to this heading"></a></h2>
-<p>The write interface allows you to write <code class="docutils literal notranslate"><span class="pre">0</span></code> to <a class="reference internal" href="#vhdl-genconstant-fifox_multi-write_ports"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">WRITE_PORTS</span></code></a> items in each clock cycle. Valid input items are marked by setting the corresponding bit of <a class="reference internal" href="#vhdl-portsignal-fifox_multi-wr"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">WR</span></code></a> to <code class="docutils literal notranslate"><span class="pre">'1'</span></code>.</p>
+<p>The write interface allows you to write <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">WRITE_PORTS</span></code> items in each clock cycle. Valid input items are marked by setting the corresponding bit of <a class="reference internal" href="#vhdl-portsignal-fifox_multi-wr"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">WR</span></code></a> to <code class="docutils literal notranslate"><span class="pre">'1'</span></code>.</p>
 <p>The write requests are only performed when signal <a class="reference internal" href="#vhdl-portsignal-fifox_multi-full"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">FULL</span></code></a> has value <code class="docutils literal notranslate"><span class="pre">'0'</span></code>. When <code class="docutils literal notranslate"><span class="pre">FULL</span></code> is <code class="docutils literal notranslate"><span class="pre">'0'</span></code>, no items can be written.</p>
 <p>In case of multiple simultaneous writes the item on port <code class="docutils literal notranslate"><span class="pre">0</span></code> will be placed as the first in the FIFO and the item on port <code class="docutils literal notranslate"><span class="pre">WRITE_PORTS-1</span></code> as the last.</p>
 </section>
 <section id="read-interface-behavior">
 <h2>Read interface behavior<a class="headerlink" href="#read-interface-behavior" title="Permalink to this heading"></a></h2>
-<p>The read interface allows you to read <code class="docutils literal notranslate"><span class="pre">0</span></code> to <a class="reference internal" href="#vhdl-genconstant-fifox_multi-read_ports"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">READ_PORTS</span></code></a> items in each clock cycle.
+<p>The read interface allows you to read <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">READ_PORTS</span></code> items in each clock cycle.
 <strong>Simultaneous read requests must be continuous from index 0 up. You cannot read items out-of-order.</strong></p>
 <dl class="simple">
 <dt>Example::</dt><dd><p>For <code class="docutils literal notranslate"><span class="pre">READ_PORTS</span> <span class="pre">==</span> <span class="pre">4</span></code>, <code class="docutils literal notranslate"><span class="pre">RD[4-1</span> <span class="pre">:</span> <span class="pre">0]</span></code> supports values <code class="docutils literal notranslate"><span class="pre">&quot;0000&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;0001&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;0011&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;0111&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;1111&quot;</span></code>.
@@ -284,8 +299,8 @@ All other permutations of <code class="docutils literal notranslate"><span class
 </dd>
 </dl>
 <p>Port <a class="reference internal" href="#vhdl-portsignal-fifox_multi-empty"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">EMPTY</span></code></a> works as a “not valid” flag for each output Item.</p>
-<p><strong>When generic</strong> <a class="reference internal" href="#vhdl-genconstant-fifox_multi-safe_read_mode"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">SAFE_READ_MODE</span></code></a> <strong>is set to</strong> <code class="docutils literal notranslate"><span class="pre">false</span></code> <strong>, the user can only read from read ports, where</strong> <code class="docutils literal notranslate"><span class="pre">EMPTY[i]</span> <span class="pre">==</span> <span class="pre">'0'</span></code> <strong>.</strong></p>
-<p>When generic <a class="reference internal" href="#vhdl-genconstant-fifox_multi-safe_read_mode"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">SAFE_READ_MODE</span></code></a> is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, reading from an empty port will have no effect.</p>
+<p><strong>When generic</strong> <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">SAFE_READ_MODE</span></code> <strong>is set to</strong> <code class="docutils literal notranslate"><span class="pre">false</span></code> <strong>, the user can only read from read ports, where</strong> <code class="docutils literal notranslate"><span class="pre">EMPTY[i]</span> <span class="pre">==</span> <span class="pre">'0'</span></code> <strong>.</strong></p>
+<p>When generic <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">SAFE_READ_MODE</span></code> is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, reading from an empty port will have no effect.</p>
 </section>
 </section>
 

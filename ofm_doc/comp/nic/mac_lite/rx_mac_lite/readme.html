@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -93,9 +98,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../nic.html">Network Tools</a> &raquo;</li>
-      <li>RX MAC LITE</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../nic.html">Network Tools</a></li>
+      <li class="breadcrumb-item active">RX MAC LITE</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/nic/mac_lite/rx_mac_lite/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -729,47 +734,52 @@ Only valid MAC addresses are used for matching.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-rx_mac_lite-rx_regions"><td><p>RX_REGIONS</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB CONFIGURATION:</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-rx_regions"><td><p>RX_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>RX MFB: number of regions in word, must be power of 2</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-rx_mac_lite-rx_region_size"><td><p>RX_REGION_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-rx_region_size"><td><p>RX_REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>RX MFB: number of blocks in region, must be power of 2</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-rx_mac_lite-rx_block_size"><td><p>RX_BLOCK_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-rx_block_size"><td><p>RX_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>RX MFB: number of items in block, must be &gt;= 4 and power of 2</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-rx_mac_lite-rx_item_width"><td><p>RX_ITEM_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-rx_item_width"><td><p>RX_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>RX MFB: width of one item in bits, must be 8</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-rx_mac_lite-tx_regions"><td><p>TX_REGIONS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-tx_regions"><td><p>TX_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>RX_REGIONS</p></td>
 <td><p>TX MFB: number of regions in word, by default same as RX</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-rx_mac_lite-tx_region_size"><td><p>TX_REGION_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-tx_region_size"><td><p>TX_REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>RX_REGION_SIZE</p></td>
 <td><p>TX MFB: number of blocks in region, by default same as RX</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-rx_mac_lite-tx_block_size"><td><p>TX_BLOCK_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-tx_block_size"><td><p>TX_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>RX_BLOCK_SIZE</p></td>
 <td><p>TX MFB: number of items in block, by default same as RX</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-rx_mac_lite-tx_item_width"><td><p>TX_ITEM_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-tx_item_width"><td><p>TX_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>RX_ITEM_WIDTH</p></td>
 <td><p>TX MFB: width of one item in bits, by default same as RX</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-rx_mac_lite-resize_buffer"><td><p>RESIZE_BUFFER</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-resize_buffer"><td><p>RESIZE_BUFFER</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>If true, the MFB bus doubles data width (number of regions) before
@@ -777,48 +787,53 @@ the packet buffer (on RX_CLK). RESIZE_BUFFER feature is allowed only
 when the MFB bus increases (TX MFB width &gt;= 2x RX MFB width) and the
 following conditions must apply: RX_BLOCK_SIZE=TX_BLOCK_SIZE, RX_ITEM_WIDTH=TX_ITEM_WIDTH</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-rx_mac_lite-network_port_id"><td><p>NETWORK_PORT_ID</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>OTHERS CONFIGURATION:</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-network_port_id"><td><p>NETWORK_PORT_ID</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>ID of this network port, it is inserted into the packet metadata.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-rx_mac_lite-pkt_mtu_bytes"><td><p>PKT_MTU_BYTES</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-pkt_mtu_bytes"><td><p>PKT_MTU_BYTES</p></td>
 <td><p>natural</p></td>
 <td><p>16384</p></td>
 <td><p>Maximum allowed size of packet in bytes.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-rx_mac_lite-crc_is_received"><td><p>CRC_IS_RECEIVED</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-crc_is_received"><td><p>CRC_IS_RECEIVED</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Set true when CRC is part of frames in RX MFB bus.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-rx_mac_lite-crc_check_en"><td><p>CRC_CHECK_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-crc_check_en"><td><p>CRC_CHECK_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable of CRC checking, CRC_IS_RECEIVED must be true.
 When is disable, resources are ~60% lower.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-rx_mac_lite-crc_remove_en"><td><p>CRC_REMOVE_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-crc_remove_en"><td><p>CRC_REMOVE_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable of CRC removing, CRC_IS_RECEIVED must be true.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-rx_mac_lite-mac_check_en"><td><p>MAC_CHECK_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-mac_check_en"><td><p>MAC_CHECK_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable of MAC checking.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-rx_mac_lite-mac_count"><td><p>MAC_COUNT</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-mac_count"><td><p>MAC_COUNT</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>Number of maximum MAC address in CAM memory, maximum value is 16.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-rx_mac_lite-timestamp_en"><td><p>TIMESTAMP_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-timestamp_en"><td><p>TIMESTAMP_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable of timestamping frames.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-rx_mac_lite-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>Select correct FPGA device.</p></td>
@@ -834,25 +849,35 @@ When is disable, resources are ~60% lower.</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-rx_clk"><td><p>RX_CLK</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>CLOCK AND RESET</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-rx_clk"><td><p>RX_CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Clock for RX MFB interface</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-rx_reset"><td><p>RX_RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-rx_reset"><td><p>RX_RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Reset synchronized with RX_CLK</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_clk"><td><p>TX_CLK</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_clk"><td><p>TX_CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Clock for TX MFB interface</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_reset"><td><p>TX_RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_reset"><td><p>TX_RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Reset synchronized with TX_CLK</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX MAC LITE ADAPTER INTERFACES</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-rx_mac_lite-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(RX_REGIONS*RX_REGION_SIZE*RX_BLOCK_SIZE*RX_ITEM_WIDTH-1 downto 0)</p></td>
@@ -894,15 +919,25 @@ When is disable, resources are ~60% lower.</p></td>
 <td><p>in</p></td>
 <td><p>Link Up flag input, active when link is up</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>INPUT TIMESTAMP INTERFACE (FROM TSU)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
 <td><p>std_logic_vector(64-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Timestamp in nanosecond (new) format, more info in TSU.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tsu_ts_dv"><td><p>TSU_TS_DV</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tsu_ts_dv"><td><p>TSU_TS_DV</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Valid flag of timestamp.</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX INTERFACES</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(TX_REGIONS*TX_REGION_SIZE*TX_BLOCK_SIZE*TX_ITEM_WIDTH-1 downto 0)</p></td>
@@ -959,15 +994,25 @@ When is disable, resources are ~60% lower.</p></td>
 <td><p>in</p></td>
 <td><p>TX MVB: destination ready of each MVB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-link_up"><td><p>LINK_UP</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>OUTPUT LINK STATUS INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-link_up"><td><p>LINK_UP</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Active when link is up</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-incoming_frame"><td><p>INCOMING_FRAME</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-incoming_frame"><td><p>INCOMING_FRAME</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Active while receiving a frame</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MI32 INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_clk"><td><p>MI_CLK</p></td>
 <td><p>std_logic</p></td>

@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -99,10 +104,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../base.html">Basic Tools</a> &raquo;</li>
-          <li><a href="../../../../logic.html">Basic logic elements</a> &raquo;</li>
-      <li>N_LOOP_OP</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../base.html">Basic Tools</a></li>
+          <li class="breadcrumb-item"><a href="../../../../logic.html">Basic logic elements</a></li>
+      <li class="breadcrumb-item active">N_LOOP_OP</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/base/logic/n_loop_op/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -188,43 +193,43 @@ OP_META - Here will the <em>Iset</em> interfaces propagate the value to which it
 Generaly, the N_LOOP_OP expects all the operators to be the same block of asynchronous logic.
 The input of this logic is the <code class="docutils literal notranslate"><span class="pre">OP_IN_</span></code> interface and the output is the <code class="docutils literal notranslate"><span class="pre">OP_OUT_DATA</span></code>.
 Such implementation for this example could look something like this:</p>
-<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="c1">-- Pseudo-VHDL, data type compatibility ignored.</span>
+<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="c1">-- Pseudo-VHDL, data type compatibility ignored.</span><span class="w"></span>
 
-<span class="n">operators_pr</span> <span class="o">:</span> <span class="k">process</span> <span class="p">(</span><span class="n">OP_IN_SEL</span><span class="p">,</span> <span class="n">OP_IN_SRC</span><span class="p">,</span> <span class="n">OP_IN_OPS</span><span class="p">,</span> <span class="n">OP_IN_DATA</span><span class="p">,</span> <span class="n">OP_IN_META</span><span class="p">)</span>
-    <span class="k">variable</span> <span class="n">tmp</span> <span class="o">:</span> <span class="kt">integer</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="k">begin</span>
+<span class="n">operators_pr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">process</span><span class="w"> </span><span class="p">(</span><span class="n">OP_IN_SEL</span><span class="p">,</span><span class="w"> </span><span class="n">OP_IN_SRC</span><span class="p">,</span><span class="w"> </span><span class="n">OP_IN_OPS</span><span class="p">,</span><span class="w"> </span><span class="n">OP_IN_DATA</span><span class="p">,</span><span class="w"> </span><span class="n">OP_IN_META</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">variable</span><span class="w"> </span><span class="n">tmp</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">integer</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="k">begin</span><span class="w"></span>
 
-    <span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="mi">0</span> <span class="k">to</span> <span class="mi">4</span><span class="o">-</span><span class="mi">1</span> <span class="k">loop</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">loop</span><span class="w"></span>
 
-        <span class="c1">-- default behavior</span>
-        <span class="n">OP_OUT_DATA</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">OP_IN_DATA</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">-- default behavior</span><span class="w"></span>
+<span class="w">        </span><span class="n">OP_OUT_DATA</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">OP_IN_DATA</span><span class="p">(</span><span class="n">i</span><span class="p">);</span><span class="w"></span>
 
-        <span class="n">tmp</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">tmp</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
 
-        <span class="c1">-- Increment</span>
-        <span class="k">for</span> <span class="n">e</span> <span class="k">in</span> <span class="mi">0</span> <span class="k">to</span> <span class="mi">3</span><span class="o">-</span><span class="mi">1</span> <span class="k">loop</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">OP_IN_OPS</span><span class="p">(</span><span class="n">i</span><span class="p">)(</span><span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="sc">&#39;1&#39;</span><span class="p">)</span> <span class="k">then</span>
-                <span class="n">tmp</span> <span class="o">:=</span> <span class="n">tmp</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
-            <span class="k">end</span> <span class="k">if</span><span class="p">;</span>
-        <span class="k">end</span> <span class="k">loop</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">-- Increment</span><span class="w"></span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="mi">3</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">loop</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">OP_IN_OPS</span><span class="p">(</span><span class="n">i</span><span class="p">)(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;1&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
+<span class="w">                </span><span class="n">tmp</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">tmp</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">end</span><span class="w"> </span><span class="k">if</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"> </span><span class="k">loop</span><span class="p">;</span><span class="w"></span>
 
-        <span class="c1">-- Decrement</span>
-        <span class="k">for</span> <span class="n">e</span> <span class="k">in</span> <span class="mi">3</span> <span class="k">to</span> <span class="mi">6</span><span class="o">-</span><span class="mi">1</span> <span class="k">loop</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">OP_IN_OPS</span><span class="p">(</span><span class="n">i</span><span class="p">)(</span><span class="n">e</span><span class="p">)</span> <span class="o">=</span> <span class="sc">&#39;1&#39;</span><span class="p">)</span> <span class="k">then</span>
-                <span class="n">tmp</span> <span class="o">:=</span> <span class="n">tmp</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-            <span class="k">end</span> <span class="k">if</span><span class="p">;</span>
-        <span class="k">end</span> <span class="k">loop</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">-- Decrement</span><span class="w"></span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="mi">6</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">loop</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">OP_IN_OPS</span><span class="p">(</span><span class="n">i</span><span class="p">)(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;1&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
+<span class="w">                </span><span class="n">tmp</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">tmp</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">end</span><span class="w"> </span><span class="k">if</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"> </span><span class="k">loop</span><span class="p">;</span><span class="w"></span>
 
-        <span class="n">OP_DATA_OUT</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">OP_DATA_IN</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="n">tmp</span><span class="p">;</span>
+<span class="w">        </span><span class="n">OP_DATA_OUT</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">OP_DATA_IN</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tmp</span><span class="p">;</span><span class="w"></span>
 
-        <span class="c1">-- Set (has overwrites any previous increment or decrement)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">OP_IN_OPS</span><span class="p">(</span><span class="n">i</span><span class="p">)(</span><span class="mi">6</span><span class="p">)</span> <span class="o">=</span> <span class="sc">&#39;1&#39;</span><span class="p">)</span> <span class="k">then</span>
-            <span class="n">OP_DATA_OUT</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">OP_IN_META</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
-        <span class="k">end</span> <span class="k">if</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">-- Set (has overwrites any previous increment or decrement)</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">OP_IN_OPS</span><span class="p">(</span><span class="n">i</span><span class="p">)(</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;1&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
+<span class="w">            </span><span class="n">OP_DATA_OUT</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">OP_IN_META</span><span class="p">(</span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"> </span><span class="k">if</span><span class="p">;</span><span class="w"></span>
 
-    <span class="k">end</span> <span class="k">loop</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span><span class="w"> </span><span class="k">loop</span><span class="p">;</span><span class="w"></span>
 
-<span class="k">end</span> <span class="k">process</span><span class="p">;</span>
+<span class="k">end</span><span class="w"> </span><span class="k">process</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p>When a collision is detected between multiple ports, the N_LOOP_OP joins all the requested operations to that port with the lowest index.

@@ -21,7 +21,7 @@ Both agents have three class parameters. ``DATA_WIDTH`` , ``ADDR_WIDTH`` and ``M
 
 Sequence_item
 ^^^^^^^^^^^^^^^^^^
-There is two sequence item. First sequence_item_request is for generating request and second sequence_item_respons is for respons.
+There is two sequence item. First sequence_item_request is for generating request and second sequence_item_response is for response.
 
 Sequence_item_request
 

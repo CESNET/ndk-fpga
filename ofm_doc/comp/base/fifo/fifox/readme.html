@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -99,10 +104,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../base.html">Basic Tools</a> &raquo;</li>
-          <li><a href="../../../../fifo.html">FIFO components</a> &raquo;</li>
-      <li>FIFOX</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../base.html">Basic Tools</a></li>
+          <li class="breadcrumb-item"><a href="../../../../fifo.html">FIFO components</a></li>
+      <li class="breadcrumb-item active">FIFOX</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/base/fifo/fifox/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -134,22 +139,22 @@ two clock cycles before it can be read.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-fifox-data_width"><td><p>DATA_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-fifox-data_width"><td><p>DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>16</p></td>
 <td><p>Data word width in bits.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-fifox-items"><td><p>ITEMS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-fifox-items"><td><p>ITEMS</p></td>
 <td><p>natural</p></td>
 <td><p>16</p></td>
 <td><p>FIFO depth in number of data words</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-fifox-ram_type"><td><p>RAM_TYPE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-fifox-ram_type"><td><p>RAM_TYPE</p></td>
 <td><p>string</p></td>
 <td><p>“AUTO”</p></td>
 <td><p>See <a class="reference internal" href="#vhdl-enum-fifox_ram_type"><code class="xref vhdl vhdl-type docutils literal notranslate"><span class="pre">FIFOX_RAM_TYPE</span></code></a></p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-fifox-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-fifox-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
 <td><p>Defines what architecture the FIFO is implemented on</p>
@@ -163,15 +168,15 @@ two clock cycles before it can be read.</p>
 </ul>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-fifox-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
+<tr class="row-even" id="vhdl-gengeneric-fifox-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Determines how few data words must be left free for
 <a class="reference internal" href="#vhdl-portsignal-fifox-afull"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">AFULL</span></code></a> to be triggered.</p>
-<p>(<code class="docutils literal notranslate"><span class="pre">currently_stored</span> <span class="pre">&gt;=</span> <span class="pre">(</span></code> <a class="reference internal" href="#vhdl-genconstant-fifox-items"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code></a> <code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">ALMOST_FULL_OFFSET)</span></code></p>
+<p>(<code class="docutils literal notranslate"><span class="pre">currently_stored</span> <span class="pre">&gt;=</span> <span class="pre">(</span></code> <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code> <code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">ALMOST_FULL_OFFSET)</span></code></p>
 </td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-fifox-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-fifox-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Determines how few data words must be stored for
@@ -179,7 +184,7 @@ two clock cycles before it can be read.</p>
 <p>( <code class="docutils literal notranslate"><span class="pre">currently_stored</span> <span class="pre">&lt;=</span> <span class="pre">ALMOST_EMPTY_OFFSET</span></code> )</p>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-fifox-fake_fifo"><td><p>FAKE_FIFO</p></td>
+<tr class="row-even" id="vhdl-gengeneric-fifox-fake_fifo"><td><p>FAKE_FIFO</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Disables the FIFO implementation and replaces it with straight wires.</p></td>
@@ -196,14 +201,14 @@ values of this type are actually used instead.</p>
 <dl class="vhdl enumval">
 <dt class="sig sig-object vhdl">
 <span class="sig-name descname"><span class="pre">LUT</span></span></dt>
-<dd><p>Recommended when <a class="reference internal" href="../asfifox/readme.html#vhdl-genconstant-asfifox-items"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code></a> ≤ 64 (
+<dd><p>Recommended when <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code> ≤ 64 (
 respectively ≤ 32 on Intel FPGAs)</p>
 </dd></dl>
 
 <dl class="vhdl enumval">
 <dt class="sig sig-object vhdl">
 <span class="sig-name descname"><span class="pre">BRAM</span></span></dt>
-<dd><p>Recommended when <a class="reference internal" href="../asfifox/readme.html#vhdl-genconstant-asfifox-items"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code></a> &gt; 64 (
+<dd><p>Recommended when <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code> &gt; 64 (
 respectively &gt; 32 on Intel FPGAs). Check out <code class="xref vhdl vhdl-entity docutils literal notranslate"><span class="pre">example1</span></code></p>
 </dd></dl>
 
@@ -214,23 +219,23 @@ respectively &gt; 32 on Intel FPGAs). Check out <code class="xref vhdl vhdl-enti
 <p class="admonition-title">Important</p>
 <p>Xilinx Ultrascale(+) only!</p>
 </div>
-<p>Recommended when <a class="reference internal" href="../asfifox/readme.html#vhdl-genconstant-asfifox-data_width"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code></a> ≥ 72
-and <a class="reference internal" href="../asfifox/readme.html#vhdl-genconstant-asfifox-items"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code></a> *
-<a class="reference internal" href="../asfifox/readme.html#vhdl-genconstant-asfifox-data_width"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code></a> ≥ <code class="docutils literal notranslate"><span class="pre">288</span> <span class="pre">000</span></code></p>
+<p>Recommended when <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> ≥ 72
+and <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code> *
+<code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> ≥ <code class="docutils literal notranslate"><span class="pre">288</span> <span class="pre">000</span></code></p>
 </dd></dl>
 
 <dl class="vhdl enumval">
 <dt class="sig sig-object vhdl">
 <span class="sig-name descname"><span class="pre">SHIFT</span></span></dt>
-<dd><p>Recommended when <a class="reference internal" href="../asfifox/readme.html#vhdl-genconstant-asfifox-items"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code></a> ≤ 16.</p>
+<dd><p>Recommended when <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code> ≤ 16.</p>
 </dd></dl>
 
 <dl class="vhdl enumval">
 <dt class="sig sig-object vhdl">
 <span class="sig-name descname"><span class="pre">AUTO</span></span></dt>
 <dd><p>Choose an implementation automatically based on
-<a class="reference internal" href="../asfifox/readme.html#vhdl-genconstant-asfifox-items"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code></a> and
-<a class="reference internal" href="../../../../../ndk_core/intel/doc/app.html#vhdl-genconstant-application_core-device"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">DEVICE</span></code></a>.</p>
+<code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code> and
+<code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">DEVICE</span></code>.</p>
 </dd></dl>
 
 </dd></dl>
@@ -254,30 +259,40 @@ and <a class="reference internal" href="../asfifox/readme.html#vhdl-genconstant-
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-fifox-di"><td><p>DI</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>WRITE INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-fifox-di"><td><p>DI</p></td>
 <td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Data input</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-fifox-wr"><td><p>WR</p></td>
+<tr class="row-even" id="vhdl-portsignal-fifox-wr"><td><p>WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Write enable</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-fifox-full"><td><p>FULL</p></td>
+<tr class="row-odd" id="vhdl-portsignal-fifox-full"><td><p>FULL</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Full flag</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-fifox-afull"><td><p>AFULL</p></td>
+<tr class="row-even" id="vhdl-portsignal-fifox-afull"><td><p>AFULL</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Almost full flag</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-fifox-status"><td><p>STATUS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-fifox-status"><td><p>STATUS</p></td>
 <td><p>std_logic_vector(MAX(log2(ITEMS),1) downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Items in memory</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>READ INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-fifox-do"><td><p>DO</p></td>
 <td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>

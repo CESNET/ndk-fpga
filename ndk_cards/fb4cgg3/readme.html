@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FB4CGG3/FB2CGG3 cards &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  <title>Silicom fb4CGg3@VU9P &mdash; Minimal NDK Application Docs 1.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,11 +16,12 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Basic Tools" href="../../ofm_doc/base.html" />
-    <link rel="prev" title="Agilex I-Series FPGA Development Kit" href="../dk-dev-agi027res/readme.html" /> 
+    <link rel="next" title="Silicom fb2CGhh@KU15P" href="../fb2cghh/readme.html" />
+    <link rel="prev" title="Intel Agilex I-Series FPGA DK" href="../dk-dev-agi027res/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,23 +45,24 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">FB4CGG3/FB2CGG3 cards</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#build-instructions">Build instructions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#boot-instructions">Boot instructions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#ethernet-interface">Ethernet Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#pcie-interface">PCIe Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Silicom fb4CGg3&#64;VU9P</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
@@ -88,8 +90,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>FB4CGG3/FB2CGG3 cards</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Silicom fb4CGg3&#64;VU9P</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/ndk_cards/fb4cgg3/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -99,61 +101,68 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="fb4cgg3-fb2cgg3-cards">
-<span id="card-fb4cgg3"></span><h1>FB4CGG3/FB2CGG3 cards<a class="headerlink" href="#fb4cgg3-fb2cgg3-cards" title="Permalink to this heading"></a></h1>
-<p>FB4CGG3/FB2CGG3 cards by Silicom are supported in the NDK.</p>
-<section id="build-instructions">
-<h2>Build instructions<a class="headerlink" href="#build-instructions" title="Permalink to this heading"></a></h2>
+  <section id="silicom-fb4cgg3-vu9p">
+<span id="card-fb4cgg3"></span><h1>Silicom fb4CGg3&#64;VU9P<a class="headerlink" href="#silicom-fb4cgg3-vu9p" title="Permalink to this heading"></a></h1>
 <ul class="simple">
-<li><p>Go to <code class="docutils literal notranslate"><span class="pre">build/fb4cgg3/</span></code> folder in application repository.</p></li>
-<li><p>Check or modify <code class="docutils literal notranslate"><span class="pre">user_const.tcl</span></code> file, where you can change the firmware configuration.</p></li>
 <li><dl class="simple">
-<dt>Run firmware build in Vivado by <code class="docutils literal notranslate"><span class="pre">make</span></code> command.</dt><dd><ul>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g2</span></code> command for firmware with 2x100GbE for FB2CGG3 card (default).</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g4</span></code> command for firmware with 4x100GbE for FB4CGG3 card.</p></li>
+<dt>Card information:</dt><dd><ul>
+<li><p>Vendor: Silicom</p></li>
+<li><p>Name: fb4CGg3&#64;VU9P also in variant fb2CGg3&#64;VU9P</p></li>
+<li><p>Ethernet ports: 4x QSFP28 (fb4CGg3) or 2x QSFP28 (fb2CGg3)</p></li>
+<li><p>PCIe conectors: Edge connector</p></li>
+<li><p><a class="reference external" href="https://www.silicom-usa.com/pr/server-adapters/programmable-fpga-server-adapter/fpga-xilinx-based-2/fb4cgg3vu-100-gigabit-xilinx-virtex-ultrascale/">FPGA Card Website</a></p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><p>After the build is complete, you will find bitstream in the same folder.</p></li>
+<li><dl class="simple">
+<dt>FPGA specification:</dt><dd><ul>
+<li><p>FPGA part number: <code class="docutils literal notranslate"><span class="pre">xcvu9p-flgb2104-2-i</span></code></p></li>
+<li><p>Ethernet Hard IP: CMAC (100G Ethernet)</p></li>
+<li><p>PCIe Hard IP: USP (up to PCIe Gen3 x16)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="ndk-firmware-support">
+<h2>NDK firmware support<a class="headerlink" href="#ndk-firmware-support" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Ethernet cores that are supported in the NDK firmware:</dt><dd><ul>
+<li><p><a class="reference internal" href="../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">CMAC in the Network Module</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>PCIe cores that are supported in the NDK firmware:</dt><dd><ul>
+<li><p><a class="reference internal" href="../../ndk_core/intel/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">USP in the PCIe Module</span></a></p></li>
+<li><p>See the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory&gt;/ndk/card/fb4cgg3/config/card_conf.tcl</span></code> file for supported PCIe configurations.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):</dt><dd><ul>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g2</span></code> command for firmware with 2x100GbE for fb2CGg3 card only (default).</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g4</span></code> command for firmware with 4x100GbE for fb4CGg3 card only.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Support for booting the NDK firmware using the nfb-boot tool:</dt><dd><ul>
+<li><p>YES.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To build firmware, you must have Xilinx Vivado installed, including a valid license.</p>
+<p>To build the NDK firmware for this card, you must have the Xilinx Vivado installed, including a valid license.</p>
 </div>
-</section>
-<section id="boot-instructions">
-<h2>Boot instructions<a class="headerlink" href="#boot-instructions" title="Permalink to this heading"></a></h2>
-<ul class="simple">
-<li><dl class="simple">
-<dt>To boot design on specific card you have to follow these steps:</dt><dd><ul>
-<li><p>Copy .nfw file into current directory</p></li>
-<li><dl class="simple">
-<dt>Boot design by using <code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-f</span> <span class="pre">0</span></code> command in directory where .nfw file is located.</dt><dd><ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-f</span> <span class="pre">0</span> <span class="pre">fb2cgg3-minimal-100g2.nfw</span></code> command for 2x100GbE firmware</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-f</span> <span class="pre">0</span> <span class="pre">fb4cgg3-minimal-100g4.nfw</span></code> command for 4x100GbE firmware</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>To confirm that design is booted correctly use <code class="docutils literal notranslate"><span class="pre">nfb-info</span></code> command</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>To see boot options use command <code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-h</span></code>.</p>
-</div>
-</section>
-<section id="ethernet-interface">
-<h2>Ethernet Interface<a class="headerlink" href="#ethernet-interface" title="Permalink to this heading"></a></h2>
-<p>This card has four (FB4CGG3) or two (FB2CGG3) QSFP ports. Each port is connected to the FPGA via 4 high-speed serial lines supporting up to 25 Gbps. Each of these ports is connected to CMAC core with speed of <code class="docutils literal notranslate"><span class="pre">1x100GE</span></code>. The architecture of network module <a class="reference internal" href="../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">is described here</span></a>.</p>
-</section>
-<section id="pcie-interface">
-<h2>PCIe Interface<a class="headerlink" href="#pcie-interface" title="Permalink to this heading"></a></h2>
-<p>This card has single PCIe Gen3 x16 edge connector. The throughput available to the user is approximately 100 Gbps and is depend on DMA solution. The architecture of the PCIe Module <a class="reference internal" href="../../ndk_core/intel/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">is described here</span></a>.</p>
 </section>
 </section>
 
@@ -161,8 +170,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../dk-dev-agi027res/readme.html" class="btn btn-neutral float-left" title="Agilex I-Series FPGA Development Kit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../../ofm_doc/base.html" class="btn btn-neutral float-right" title="Basic Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../dk-dev-agi027res/readme.html" class="btn btn-neutral float-left" title="Intel Agilex I-Series FPGA DK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../fb2cghh/readme.html" class="btn btn-neutral float-right" title="Silicom fb2CGhh@KU15P" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -1,24 +1,28 @@
 .. _card_400g1:
 
-XpressSX AGI-FH400G (400G1)
----------------------------
+ReflexCES XpressSX AGI-FH400G
+-----------------------------
 
-- XpressSX AGI-FH400G by CESNET & REFLEX CES
-    - Intel Agilex I-Series FPGA (1x F-Tile, 3x R-Tile)
-    - FPGA Part Number (ES Silicon) = ``AGIB027R29A1E2VR0``
-    - FPGA Part Number (Production Silicon) = ``AGIB027R29A1E2V``
-    - `XpressSX AGI-FH400G Website <https://www.reflexces.com/pcie-boards/intel-agilex-soc/xpresssx-agi-fh400g-agilex-soc-full-height-half-length-pcie-board>`_
+- Card information:
+    - Vendor: ReflexCES in cooperation with CESNET
+    - Name: XpressSX AGI-FH400G
+    - Ethernet ports: 1x QSFP-DD
+    - PCIe conectors: Edge connector + optional HSI connectors
+    - `FPGA Card Website <https://www.reflexces.com/pcie-boards/intel-agilex-soc/xpresssx-agi-fh400g-agilex-soc-full-height-half-length-pcie-board>`_
+- FPGA specification:
+    - FPGA part number: ``AGIB027R29A1E2VR0``
+    - Ethernet Hard IP: F-Tile (up to 400G Ethernet)
+    - PCIe Hard IP: R-Tile (up to PCIe Gen5 x16)
 
-.. warning::
+NDK firmware support
+^^^^^^^^^^^^^^^^^^^^
 
-   This page is still work in progress!
-
-Build instructions
-^^^^^^^^^^^^^^^^^^
-
-- Go to ``build/agi-fh400g/`` folder in application repository.
-- Check or modify ``user_const.tcl`` file, where you can change the firmware configuration.
-- Run firmware build in Quartus by ``make`` command.
+- Ethernet cores that are supported in the NDK firmware:
+    - :ref:`F-Tile in the Network Module <ndk_intel_net_mod>`
+- PCIe cores that are supported in the NDK firmware:
+    - :ref:`R-Tile in the PCIe Module <ndk_intel_pcie_mod>`
+    - See the ``<NDK-APP_root_directory>/ndk/card/agi-fh400g/config/card_conf.tcl`` file for supported PCIe configurations.
+- Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):
     - Use ``make 400g1`` command for firmware with 1x400GbE (default).
     - Use ``make 200g2`` command for firmware with 2x200GbE.
     - Use ``make 100g4`` command for firmware with 4x100GbE.
@@ -26,16 +30,17 @@ Build instructions
     - Use ``make 40g2`` command for firmware with 2x40GbE.
     - Use ``make 25g8`` command for firmware with 8x25GbE.
     - Use ``make 10g8`` command for firmware with 8x10GbE.
-- After the build is complete, you will find bitstream ``my_bitstream.sof`` in the same folder.
+- Support for booting the NDK firmware using the nfb-boot tool:
+    - YES, starting with the nfb-framework version 6.16.3.
 
 .. note::
 
-    To build firmware, you must have Quartus Prime Pro installed, including a valid license.
+    To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro installed, including a valid license.
 
 Board Test Scripts
 ^^^^^^^^^^^^^^^^^^
 
-The NDK design enables easy testing of the FPGA card. The design includes several generators and switchable loopback paths (usually part of :ref:`the Gen Loop Switch (GLS) <gls_debug>` unit). A simplified diagram showing the testing capabilities can be found below.
+The NDK firmware enables easy testing of the FPGA card. The firmware includes several generators and switchable loopback paths (usually part of the :ref:`the Gen Loop Switch (GLS) <gls_debug>` module). A simplified diagram showing the testing capabilities can be found below.
 
 .. image:: doc/ndk_loopback.drawio.svg
     :align: center
@@ -43,29 +48,20 @@ The NDK design enables easy testing of the FPGA card. The design includes severa
 
 **Prerequisites**
 
-- The card must be connected to a linux server.
-- The NDK software package must be installed on this server.
-- NDK driver must be in debug mode (mi_debug).
-- The FPGA card must boot the NDK firmware.
-- You must have Python 3 including the pytest framework installed: ``pip3 install --user pytest pytest-depends pytest-html``
+- The card must be connected to a Linux server.
+- The nfb-framework package must be installed on this server.
+- The NDK driver must be in debug mode (mi_debug - see the warning at the bottom of this readme).
+- The NDK firmware must be loaded in the FPGA card.
+- You must have Python 3 including the pytest framework installed: ``pip3 install --user pytest pytest-depends pytest-html``.
 
-The test scripts themselves are written in `Python 3 <https://www.python.org/>`_ and use `the Pytest framework <https://docs.pytest.org/en/stable/>`_. This makes it possible to run the test with a single command, see example:
+The test scripts themselves are written in `Python 3 <https://www.python.org/>`_ and use the `Pytest framework <https://docs.pytest.org/en/stable/>`_. This makes it possible to run the test with a single command, see example:
 
 .. code:: bash
 
-    $ pytest --html=test_pcie.html --self-contained-html card/400g1/bts/test_pcie.py
+    $ pytest --html=test_pcie.html --self-contained-html ndk/cards/agi-fh400g/bts/test_pcie.py
 
-The whole test takes approximately 14 minutes. The test script displays test results and generates an html file containing a detailed description of the test results.
+The whole test takes approximately 14 minutes. The test script displays test results and generates an HTML file containing a detailed description of the test results.
 
 .. warning::
 
-    The test script requires an NDK driver in debug mode! To enable debug mode, you must first remove the driver with the command “sudo modprobe -r nfb” and then add it with the correct flag: “sudo modprobe nfb mi_debug=1”.
-
-Ethernet Interface
-^^^^^^^^^^^^^^^^^^
-
-This card has one QSFP-DD cage (ports). It is connected to the FPGA via 8 high-speed serial lines supporting up to 56 Gbps. QSFP-DD cage is connected to an F-Tile that contains Ethernet Hard IP supporting the following speeds: ``1x400GbE, 2x200GbE, 4x100GbE, 8x50GbE, 2x40GbE, 8x25GbE, 8x10GbE``. F-Tile Hard IPs are instantiated in Network Module, which provides Ethernet communication to and from the Application core. The architecture of the Network Module :ref:`is described here <ndk_intel_net_mod>`.
-
-.. note::
-
-    Not all Ethernet Hard IP configurations are already available or tested in NDK.
+    The test script requires an NDK driver in debug mode! To enable the debug mode, you must first remove the driver with the command “sudo modprobe -r nfb” and then add it with the correct flag: “sudo modprobe nfb mi_debug=1”.

@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -97,10 +102,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../base.html">Basic Tools</a> &raquo;</li>
-          <li><a href="../../../../misc.html">Miscellaneous</a> &raquo;</li>
-      <li>Pulse short</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../base.html">Basic Tools</a></li>
+          <li class="breadcrumb-item"><a href="../../../../misc.html">Miscellaneous</a></li>
+      <li class="breadcrumb-item active">Pulse short</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/base/misc/pulse_short/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -118,8 +123,8 @@
 <dd><p>This component allows to shorten arbitrary long pulse on the input
 <a class="reference internal" href="#vhdl-portsignal-pulse_short-trigger"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">TRIGGER</span></code></a> to only one clock period
 short pulse (driven by the <a class="reference internal" href="#vhdl-portsignal-pulse_short-bclk"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">BCLK</span></code></a>).
-Outuput pulse can be arbirarily delayed when <a class="reference internal" href="#vhdl-genconstant-pulse_short-delay_count"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">DELAY_COUNT</span></code></a> constant is set. Optional CDC could be applied on
-control inputs by setting specific bits in the <a class="reference internal" href="#vhdl-genconstant-pulse_short-async_mask"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ASYNC_MASK</span></code></a> generic constant.</p>
+Outuput pulse can be arbirarily delayed when <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">DELAY_COUNT</span></code> constant is set. Optional CDC could be applied on
+control inputs by setting specific bits in the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ASYNC_MASK</span></code> generic constant.</p>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -129,14 +134,14 @@ control inputs by setting specific bits in the <a class="reference internal" hre
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-pulse_short-delay_count"><td><p>DELAY_COUNT</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pulse_short-delay_count"><td><p>DELAY_COUNT</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Controls for how much clock cycles should the output be delayed.
 Maximum value is 1 048 575 because I don’t think you need to
 delay one pulse even for that long</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-pulse_short-async_mask"><td><p>ASYNC_MASK</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pulse_short-async_mask"><td><p>ASYNC_MASK</p></td>
 <td><p>std_logic_vector(2 downto 0)</p></td>
 <td><p>“000”</p></td>
 <td><p>controls whether specific input should be connected throgh clock

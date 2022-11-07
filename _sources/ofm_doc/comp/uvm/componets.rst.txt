@@ -22,6 +22,7 @@ Library of commonly used agents and enviroments in UVM verification
 
     reset/readme
     logic_vector/readme
+    logic_vector_mvb/readme
     logic_vector_array/readme
     logic_vector_array_mfb/readme
     byte_array/readme

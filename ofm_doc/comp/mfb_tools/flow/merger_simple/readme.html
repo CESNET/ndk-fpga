@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -93,9 +98,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../mfb.html">MFB Tools</a> &raquo;</li>
-      <li>MFB Merger Simple</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mfb.html">MFB Tools</a></li>
+      <li class="breadcrumb-item active">MFB Merger Simple</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/mfb_tools/flow/merger_simple/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -112,7 +117,7 @@
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_MERGER_SIMPLE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_merger_simple" title="Permalink to this definition"></a></dt>
 <dd><p>This component merges two MFB streams into a single one.
 It starts merging from Input 0.
-After <a class="reference internal" href="#vhdl-genconstant-mfb_merger_simple-cnt_max"><code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">CNT_MAX</span></code></a> clock cycles,
+After <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">CNT_MAX</span></code> clock cycles,
 it tries to switch to the other input.
 If there are no valid data on the other input, it stays on the current one
 and waits for the same number of clock cycles before checking again.</p>
@@ -125,37 +130,37 @@ and waits for the same number of clock cycles before checking again.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-mfb_merger_simple-regions"><td><p>REGIONS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_simple-regions"><td><p>REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td><p>Number of Regions in a data word.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mfb_merger_simple-region_size"><td><p>REGION_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_simple-region_size"><td><p>REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Number of Blocks in a Region.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mfb_merger_simple-block_size"><td><p>BLOCK_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_simple-block_size"><td><p>BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Number of Items in a Block.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mfb_merger_simple-item_width"><td><p>ITEM_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_simple-item_width"><td><p>ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Number of bits in an Item.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mfb_merger_simple-meta_width"><td><p>META_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_simple-meta_width"><td><p>META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Number of bits for metadata in a single Region.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mfb_merger_simple-masking_en"><td><p>MASKING_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_simple-masking_en"><td><p>MASKING_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>True</p></td>
 <td><p>Enable masking SOF and EOF due to switch to the other input.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mfb_merger_simple-cnt_max"><td><p>CNT_MAX</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_simple-cnt_max"><td><p>CNT_MAX</p></td>
 <td><p>integer</p></td>
 <td><p>64</p></td>
 <td><p>Maximum amount of clock periods with destination ready before it tries to switch to the other input.</p></td>
@@ -171,15 +176,25 @@ and waits for the same number of clock cycles before checking again.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-clk"><td><p>CLK</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-rst"><td><p>RST</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rst"><td><p>RST</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX interface 0</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rx_mfb0_data"><td><p>RX_MFB0_DATA</p></td>
 <td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
@@ -221,45 +236,55 @@ and waits for the same number of clock cycles before checking again.</p>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_data"><td><p>RX_MFB1_DATA</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX interface 1</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_data"><td><p>RX_MFB1_DATA</p></td>
 <td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_meta"><td><p>RX_MFB1_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_meta"><td><p>RX_MFB1_META</p></td>
 <td><p>std_logic_vector(REGIONS*META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_sof"><td><p>RX_MFB1_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_sof"><td><p>RX_MFB1_SOF</p></td>
 <td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_sof_pos"><td><p>RX_MFB1_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_sof_pos"><td><p>RX_MFB1_SOF_POS</p></td>
 <td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_eof"><td><p>RX_MFB1_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_eof"><td><p>RX_MFB1_EOF</p></td>
 <td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_eof_pos"><td><p>RX_MFB1_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_eof_pos"><td><p>RX_MFB1_EOF_POS</p></td>
 <td><p>std_logic_vector(REGIONS*log2(REGION_SIZE*BLOCK_SIZE)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_src_rdy"><td><p>RX_MFB1_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_src_rdy"><td><p>RX_MFB1_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_dst_rdy"><td><p>RX_MFB1_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-rx_mfb1_dst_rdy"><td><p>RX_MFB1_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger_simple-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>

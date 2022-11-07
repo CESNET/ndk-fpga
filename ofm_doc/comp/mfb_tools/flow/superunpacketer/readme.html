@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -93,9 +98,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../mfb.html">MFB Tools</a> &raquo;</li>
-      <li>SuperUnPacketer</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mfb.html">MFB Tools</a></li>
+      <li class="breadcrumb-item active">SuperUnPacketer</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/mfb_tools/flow/superunpacketer/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -142,32 +147,32 @@ gaps between them.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-superunpacketer-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-superunpacketer-mfb_regions"><td><p>MFB_REGIONS</p></td>
 <td><p>natural</p></td>
-<td><p>1</p></td>
+<td><p>4</p></td>
 <td><p>Number of Regions within a data word, must be power of 2.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-superunpacketer-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-superunpacketer-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
-<td><p>2</p></td>
+<td><p>8</p></td>
 <td><p>Region size (in Blocks).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-superunpacketer-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-superunpacketer-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Block size (in Items), must be 8.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-superunpacketer-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-superunpacketer-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Item width (in bits), must be 8.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-superunpacketer-out_meta_width"><td><p>OUT_META_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-superunpacketer-out_meta_width"><td><p>OUT_META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>2*8*8-1</p></td>
 <td><p>Output metadata width (in bits), header (16B) - the Next bit.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-superunpacketer-out_meta_mode"><td><p>OUT_META_MODE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-superunpacketer-out_meta_mode"><td><p>OUT_META_MODE</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><dl class="simple">
@@ -180,12 +185,12 @@ gaps between them.</p>
 </dl>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-superunpacketer-pkt_mtu"><td><p>PKT_MTU</p></td>
+<tr class="row-even" id="vhdl-gengeneric-superunpacketer-pkt_mtu"><td><p>PKT_MTU</p></td>
 <td><p>natural</p></td>
-<td><p>2**15</p></td>
+<td><p>2**12</p></td>
 <td><p>Maximum size of a packet (in Items).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-superunpacketer-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-superunpacketer-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
@@ -201,15 +206,25 @@ gaps between them.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-superunpacketer-clk"><td><p>CLK</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-superunpacketer-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-superunpacketer-reset"><td><p>RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-superunpacketer-reset"><td><p>RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX MFB STREAM (SuperPackets)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-superunpacketer-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
@@ -246,45 +261,55 @@ gaps between them.</p>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-superunpacketer-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX MFB STREAM (individual packets)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-superunpacketer-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-superunpacketer-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-superunpacketer-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*OUT_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-superunpacketer-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-superunpacketer-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-superunpacketer-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-superunpacketer-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-superunpacketer-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-superunpacketer-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-superunpacketer-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-superunpacketer-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-superunpacketer-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-superunpacketer-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-superunpacketer-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-superunpacketer-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>TX MVB Headers</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-superunpacketer-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*OUT_META_WIDTH-1 downto 0)</p></td>

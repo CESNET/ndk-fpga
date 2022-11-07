@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -88,9 +93,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../mvb.html">MVB Tools</a> &raquo;</li>
-      <li>MVB Channel Router</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mvb.html">MVB Tools</a></li>
+      <li class="breadcrumb-item active">MVB Channel Router</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/mvb_tools/flow/channel_router/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -166,27 +171,27 @@ according to the following algorithm independently for each source channel:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-mvb_channel_router_mi-items"><td><p>ITEMS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_channel_router_mi-items"><td><p>ITEMS</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>MVB parameters: number of items in word</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mvb_channel_router_mi-item_width"><td><p>ITEM_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_channel_router_mi-item_width"><td><p>ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>MVB parameters: width of item in bits</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mvb_channel_router_mi-src_channels"><td><p>SRC_CHANNELS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_channel_router_mi-src_channels"><td><p>SRC_CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>Total number of source channels, max value = DST_CHANNELS</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mvb_channel_router_mi-dst_channels"><td><p>DST_CHANNELS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_channel_router_mi-dst_channels"><td><p>DST_CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>16</p></td>
 <td><p>Total number of destination channels, max value = 256</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mvb_channel_router_mi-default_mode"><td><p>DEFAULT_MODE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_channel_router_mi-default_mode"><td><p>DEFAULT_MODE</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Default routing mode: 0 = stay on source channel;
@@ -194,23 +199,23 @@ according to the following algorithm independently for each source channel:</p>
 2 = all DST channels are divided into separate groups for each SRC channel,
 there is round-robin routing in each group (SRC channel);</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mvb_channel_router_mi-opt_mode"><td><p>OPT_MODE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_channel_router_mi-opt_mode"><td><p>OPT_MODE</p></td>
 <td><p>boolean</p></td>
 <td><p>False</p></td>
 <td><p>Optimized mode for better timing (best for high ITEMS) with limited
 configuration: (ch_max-ch_min+1) must be power of two</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mvb_channel_router_mi-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_channel_router_mi-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>MI parameters: width of data signals, min value is 32</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mvb_channel_router_mi-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_channel_router_mi-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>MI parameters: width of address signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mvb_channel_router_mi-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_channel_router_mi-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
 <td><p>Name of FPGA device</p></td>
@@ -226,15 +231,25 @@ configuration: (ch_max-ch_min+1) must be power of two</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-mvb_channel_router_mi-clk"><td><p>CLK</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>CLOCK AND RESET</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_channel_router_mi-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>clock input</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_channel_router_mi-reset"><td><p>RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_channel_router_mi-reset"><td><p>RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>reset input synchronized with CLK, minimum length is 4 cycles</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MI INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mvb_channel_router_mi-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
@@ -276,30 +291,40 @@ configuration: (ch_max-ch_min+1) must be power of two</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: valid of MI_DRD data signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_channel_router_mi-rx_data"><td><p>RX_DATA</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>INPUT MVB INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_channel_router_mi-rx_data"><td><p>RX_DATA</p></td>
 <td><p>std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>RX MVB: data word with MVB items</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_channel_router_mi-rx_channel"><td><p>RX_CHANNEL</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_channel_router_mi-rx_channel"><td><p>RX_CHANNEL</p></td>
 <td><p>std_logic_vector(ITEMS*log2(SRC_CHANNELS)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>RX MVB: channel word with MVB items (SRC channel per each MVB item)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_channel_router_mi-rx_vld"><td><p>RX_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_channel_router_mi-rx_vld"><td><p>RX_VLD</p></td>
 <td><p>std_logic_vector(ITEMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>RX MVB: valid of each MVB item</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_channel_router_mi-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_channel_router_mi-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>RX MVB: source ready</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_channel_router_mi-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_channel_router_mi-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>RX MVB: destination ready</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>OUTPUT MVB INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mvb_channel_router_mi-tx_data"><td><p>TX_DATA</p></td>
 <td><p>std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0)</p></td>

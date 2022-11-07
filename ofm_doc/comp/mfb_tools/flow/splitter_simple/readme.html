@@ -16,6 +16,7 @@
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -93,9 +98,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../../mfb.html">MFB Tools</a> &raquo;</li>
-      <li>MFB Splitter Simple Gen</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mfb.html">MFB Tools</a></li>
+      <li class="breadcrumb-item active">MFB Splitter Simple Gen</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../../_sources/ofm_doc/comp/mfb_tools/flow/splitter_simple/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -121,37 +126,37 @@ It consists of numerous 1:2 MFB splitters in <code class="docutils literal notra
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-mfb_splitter_simple_gen-splitter_outputs"><td><p>SPLITTER_OUTPUTS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_simple_gen-splitter_outputs"><td><p>SPLITTER_OUTPUTS</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
 <td><p>Number of splitter outputs.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mfb_splitter_simple_gen-regions"><td><p>REGIONS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_simple_gen-regions"><td><p>REGIONS</p></td>
 <td><p>integer</p></td>
 <td><p>4</p></td>
 <td><p>Number of Regions in a word.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mfb_splitter_simple_gen-region_size"><td><p>REGION_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_simple_gen-region_size"><td><p>REGION_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
 <td><p>Number of Blocks in a Region.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mfb_splitter_simple_gen-block_size"><td><p>BLOCK_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_simple_gen-block_size"><td><p>BLOCK_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
 <td><p>Number of Items in a Block.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mfb_splitter_simple_gen-item_width"><td><p>ITEM_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_simple_gen-item_width"><td><p>ITEM_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
 <td><p>Width  of one Item (in bits).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mfb_splitter_simple_gen-meta_width"><td><p>META_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_simple_gen-meta_width"><td><p>META_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>1</p></td>
 <td><p>Width of MFB metadata (in bits).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mfb_splitter_simple_gen-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_simple_gen-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
@@ -167,15 +172,25 @@ It consists of numerous 1:2 MFB splitters in <code class="docutils literal notra
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-clk"><td><p>CLK</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-reset"><td><p>RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-reset"><td><p>RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-rx_mfb_sel"><td><p>RX_MFB_SEL</p></td>
 <td><p>std_logic_vector(REGIONS*max(1,log2(SPLITTER_OUTPUTS))-1 downto 0)</p></td>
@@ -223,42 +238,47 @@ Expected to be valid with SOF!</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
 <td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(REGIONS*META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Valid whenever, metadata is split by words</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic_vector(SPLITTER_OUTPUTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_simple_gen-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic_vector(SPLITTER_OUTPUTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>

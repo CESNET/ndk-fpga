@@ -16,6 +16,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -94,9 +99,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../mi.html">MI Tools</a> &raquo;</li>
-      <li>MI bus specification</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../mi.html">MI Tools</a></li>
+      <li class="breadcrumb-item active">MI bus specification</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/ofm_doc/comp/mi_tools/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -112,21 +117,21 @@
 <section id="mi-bus-description">
 <h2>MI bus description<a class="headerlink" href="#mi-bus-description" title="Permalink to this heading"></a></h2>
 <p>MI bus has these 8 ports + 1 port optional divided into two channels (<em>the port directions in example are valid for slave MI components</em>):</p>
-<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="c1">-- ===========================================================================</span>
-<span class="c1">-- Ports of MI bus request channel (master to slave):</span>
-<span class="c1">-- ===========================================================================</span>
-<span class="n">ADDR</span> <span class="o">:</span> <span class="k">in</span>  <span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">ADDR_WIDTH</span><span class="o">-</span><span class="mi">1</span> <span class="k">downto</span> <span class="mi">0</span><span class="p">);</span>   <span class="c1">-- ADDRess</span>
-<span class="n">DWR</span>  <span class="o">:</span> <span class="k">in</span>  <span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span> <span class="k">downto</span> <span class="mi">0</span><span class="p">);</span>   <span class="c1">-- Data WRite</span>
-<span class="n">MWR</span>  <span class="o">:</span> <span class="k">in</span>  <span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">META_WIDTH</span><span class="o">-</span><span class="mi">1</span> <span class="k">downto</span> <span class="mi">0</span><span class="p">);</span>   <span class="c1">-- Metadata WRite (optional)</span>
-<span class="n">BE</span>   <span class="o">:</span> <span class="k">in</span>  <span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">/</span><span class="mi">8</span><span class="o">-</span><span class="mi">1</span> <span class="k">downto</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">-- Byte Enable</span>
-<span class="n">WR</span>   <span class="o">:</span> <span class="k">in</span>  <span class="kt">std_logic</span><span class="p">;</span>                                 <span class="c1">-- WRite</span>
-<span class="n">RD</span>   <span class="o">:</span> <span class="k">in</span>  <span class="kt">std_logic</span><span class="p">;</span>                                 <span class="c1">-- ReaD</span>
-<span class="n">ARDY</span> <span class="o">:</span> <span class="k">out</span> <span class="kt">std_logic</span><span class="p">;</span>                                 <span class="c1">-- Address ReaDY</span>
-<span class="c1">-- ===========================================================================</span>
-<span class="c1">-- Ports of MI bus response channel (slave to master):</span>
-<span class="c1">-- ===========================================================================</span>
-<span class="n">DRD</span>  <span class="o">:</span> <span class="k">out</span> <span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span> <span class="k">downto</span> <span class="mi">0</span><span class="p">);</span>   <span class="c1">-- Data ReaD</span>
-<span class="n">DRDY</span> <span class="o">:</span> <span class="k">out</span> <span class="kt">std_logic</span><span class="p">;</span>                                 <span class="c1">-- Data ReaDY</span>
+<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="c1">-- ===========================================================================</span><span class="w"></span>
+<span class="c1">-- Ports of MI bus request channel (master to slave):</span><span class="w"></span>
+<span class="c1">-- ===========================================================================</span><span class="w"></span>
+<span class="n">ADDR</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">ADDR_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">-- ADDRess</span><span class="w"></span>
+<span class="n">DWR</span><span class="w">  </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">-- Data WRite</span><span class="w"></span>
+<span class="n">MWR</span><span class="w">  </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">META_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">-- Metadata WRite (optional)</span><span class="w"></span>
+<span class="n">BE</span><span class="w">   </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">/</span><span class="mi">8</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c1">-- Byte Enable</span><span class="w"></span>
+<span class="n">WR</span><span class="w">   </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic</span><span class="p">;</span><span class="w">                                 </span><span class="c1">-- WRite</span><span class="w"></span>
+<span class="n">RD</span><span class="w">   </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic</span><span class="p">;</span><span class="w">                                 </span><span class="c1">-- ReaD</span><span class="w"></span>
+<span class="n">ARDY</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">std_logic</span><span class="p">;</span><span class="w">                                 </span><span class="c1">-- Address ReaDY</span><span class="w"></span>
+<span class="c1">-- ===========================================================================</span><span class="w"></span>
+<span class="c1">-- Ports of MI bus response channel (slave to master):</span><span class="w"></span>
+<span class="c1">-- ===========================================================================</span><span class="w"></span>
+<span class="n">DRD</span><span class="w">  </span><span class="o">:</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">-- Data ReaD</span><span class="w"></span>
+<span class="n">DRDY</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">std_logic</span><span class="p">;</span><span class="w">                                 </span><span class="c1">-- Data ReaDY</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Address and data widths are determined by respective generic parameters. It is not surprising, that <code class="docutils literal notranslate"><span class="pre">ADDR_WIDTH</span></code> states the width of addresses and can be any positive integer, while <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> states the width of the transferred data and it’s value can only be a multiple of 8. The <code class="docutils literal notranslate"><span class="pre">META_WIDTH</span></code> states the width of the transferred metadata.</p>

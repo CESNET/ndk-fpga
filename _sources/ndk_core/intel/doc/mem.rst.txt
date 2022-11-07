@@ -4,7 +4,7 @@ Memory controller (EMIF)
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 To access external memory (typically DDR4) on an Intel FPGA, our platform uses standard External Memory Interface (EMIF) Hard IP blocks.
-These are suitably configured, and their Avalon-MM user interface is integrated into :ref:`the application core <ndk_intel_app>`.
+These are suitably configured, and their Avalon-MM user interface is integrated into :ref:`the application core <ndk_app>`.
 Please read the EMIF user guide and Avalon-MM bus specifications.
 
 .. note::

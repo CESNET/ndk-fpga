@@ -16,6 +16,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -99,9 +104,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../mi.html">MI Tools</a> &raquo;</li>
-      <li>MI Splitter Plus Gen</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../mi.html">MI Tools</a></li>
+      <li class="breadcrumb-item active">MI Splitter Plus Gen</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/ofm_doc/comp/mi_tools/splitter_plus_gen/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -136,61 +141,61 @@ other way around though.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-genconstant-mi_splitter_plus_gen-addr_width"><td><p>ADDR_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-addr_width"><td><p>ADDR_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>32</p></td>
 <td><p>Width of MI address.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mi_splitter_plus_gen-data_width"><td><p>DATA_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-data_width"><td><p>DATA_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>32</p></td>
 <td><p>Width of MI data.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mi_splitter_plus_gen-meta_width"><td><p>META_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-meta_width"><td><p>META_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>2</p></td>
 <td><p>Width of MI meta.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mi_splitter_plus_gen-ports"><td><p>PORTS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-ports"><td><p>PORTS</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
 <td><p>Number of output ports.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mi_splitter_plus_gen-pipe_out"><td><p>PIPE_OUT</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-pipe_out"><td><p>PIPE_OUT</p></td>
 <td><p>b_array_t(PORTS-1 downto 0)</p></td>
 <td><p>(others =&gt; true)</p></td>
 <td><p>Output pipeline.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mi_splitter_plus_gen-pipe_type"><td><p>PIPE_TYPE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-pipe_type"><td><p>PIPE_TYPE</p></td>
 <td><p>string</p></td>
 <td><p>“SHREG”</p></td>
 <td><p>Output pipelines type (see entity of PIPE).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mi_splitter_plus_gen-pipe_outreg"><td><p>PIPE_OUTREG</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-pipe_outreg"><td><p>PIPE_OUTREG</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Output pipelines output register enable.
 Only for PIPE_TYPE = “SHREG”!</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mi_splitter_plus_gen-addr_bases"><td><p>ADDR_BASES</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-addr_bases"><td><p>ADDR_BASES</p></td>
 <td><p>integer</p></td>
 <td><p>PORTS</p></td>
 <td><p>Number of considered address bases (might be higher or equal to PORTS).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mi_splitter_plus_gen-addr_base"><td><p>ADDR_BASE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-addr_base"><td><p>ADDR_BASE</p></td>
 <td><p>slv_array_t(ADDR_BASES-1 downto 0)(ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>init_addr_base_downto(ADDR_BASES, ADDR_WIDTH)</p></td>
 <td><p>Bases of address spaces (base 0 is 0x00000000).
 Default: Random Bases.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mi_splitter_plus_gen-addr_mask"><td><p>ADDR_MASK</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-addr_mask"><td><p>ADDR_MASK</p></td>
 <td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>init_addr_mask_downto(ADDR_BASE, ADDR_WIDTH)</p></td>
 <td><p>Bits of address that are needed to determine output port.
 The chain of ‘1’s must be continuous -&gt; no ‘0’s in-between!
 Default: OR combination of all Address Bases with any ‘0’s between the ‘1’s replaced by ‘1’s.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-genconstant-mi_splitter_plus_gen-port_mapping"><td><p>PORT_MAPPING</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-port_mapping"><td><p>PORT_MAPPING</p></td>
 <td><p>i_array_t(ADDR_BASES-1 downto 0)</p></td>
 <td><p>init_port_mapping_downto(ADDR_BASES, PORTS)</p></td>
 <td><p>How Address Bases are mapped to ports.
@@ -198,7 +203,7 @@ Constains target port index for each Address Base.
 Multiple Address Bases might target the same port.
 Default: Each Address Base is mapped to the Port on the same index (expects ADDR_BASES = PORTS).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-genconstant-mi_splitter_plus_gen-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>Target FPGA.</p></td>
@@ -214,15 +219,25 @@ Default: Each Address Base is mapped to the Port on the same index (expects ADDR
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-clk"><td><p>CLK</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-reset"><td><p>RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-reset"><td><p>RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Input MI interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-rx_dwr"><td><p>RX_DWR</p></td>
 <td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
@@ -269,47 +284,52 @@ Default: Each Address Base is mapped to the Port on the same index (expects ADDR
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_dwr"><td><p>TX_DWR</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Output MI interfaces</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_dwr"><td><p>TX_DWR</p></td>
 <td><p>slv_array_t     (PORTS-1 downto 0)(DATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_mwr"><td><p>TX_MWR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_mwr"><td><p>TX_MWR</p></td>
 <td><p>slv_array_t     (PORTS-1 downto 0)(META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_addr"><td><p>TX_ADDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_addr"><td><p>TX_ADDR</p></td>
 <td><p>slv_array_t     (PORTS-1 downto 0)(ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_be"><td><p>TX_BE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_be"><td><p>TX_BE</p></td>
 <td><p>slv_array_t     (PORTS-1 downto 0)(DATA_WIDTH/8-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_rd"><td><p>TX_RD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_rd"><td><p>TX_RD</p></td>
 <td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_wr"><td><p>TX_WR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_wr"><td><p>TX_WR</p></td>
 <td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_ardy"><td><p>TX_ARDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_ardy"><td><p>TX_ARDY</p></td>
 <td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_drd"><td><p>TX_DRD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_drd"><td><p>TX_DRD</p></td>
 <td><p>slv_array_t     (PORTS-1 downto 0)(DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_drdy"><td><p>TX_DRDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_drdy"><td><p>TX_DRDY</p></td>
 <td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>

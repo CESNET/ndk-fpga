@@ -16,11 +16,12 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Device Tree" href="../../ndk_core/doc/devtree.html" />
-    <link rel="prev" title="Time Stamp Unit" href="../../ndk_core/intel/doc/tsu.html" /> 
+    <link rel="prev" title="NDK testing" href="../../ndk_core/doc/testing.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,8 +45,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Build System</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#hierarchy-description-in-modules-tcl">Hierarchy description in Modules.tcl</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#variables-in-modules-tcl-obtained-by-the-build-system">Variables in Modules.tcl obtained by the build system</a></li>
@@ -86,10 +90,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
@@ -117,8 +122,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Build System</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Build System</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/ofm_doc/build/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -129,7 +134,7 @@
            <div itemprop="articleBody">
              
   <section id="build-system">
-<h1>Build System<a class="headerlink" href="#build-system" title="Permalink to this heading"></a></h1>
+<span id="ofm-build-system"></span><h1>Build System<a class="headerlink" href="#build-system" title="Permalink to this heading"></a></h1>
 <p>This build system has been developed for easier implementation and
 simulation of the large projects and individual components as well.
 The main idea is based on the uniform definition of components hierarchy,
@@ -172,7 +177,7 @@ sooner in the list.</p></li>
 <li><p><strong>COMPONENTS</strong> defines the list of subcomponents, needed for the component.
 Each item of the list is also the list with following parameters:</p>
 <blockquote>
-<div><div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">[</span><span class="nb">list</span> ENTITY ENTITY_BASE ARCHGRP<span class="k">]</span>
+<div><div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">[</span><span class="nb">list</span><span class="w"> </span>ENTITY<span class="w"> </span>ENTITY_BASE<span class="w"> </span>ARCHGRP<span class="k">]</span><span class="w"></span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -199,7 +204,7 @@ Makefile in the same directory and executes make.</p></li>
 <p>Variables <code class="docutils literal notranslate"><span class="pre">ENTITY</span></code>, <code class="docutils literal notranslate"><span class="pre">ENTITY_BASE</span></code> and <code class="docutils literal notranslate"><span class="pre">ARCHGRP</span></code> are predefined (provided) by the build system to be used in every Modules.tcl file. Their values are obtained from the respective <code class="docutils literal notranslate"><span class="pre">COMPONENT</span></code> list item of the ancestor’s Modules.tcl.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Prefer to use <code class="code highlight tcl docutils literal highlight-tcl"><span class="nb">lappend</span> MOD <span class="s2">&quot;myfile.vhd&quot;</span></code> instead of <code class="code highlight tcl docutils literal highlight-tcl"><span class="k">set</span> MOD <span class="s2">&quot;$MOD myfile.vhd&quot;</span></code>,
+<p>Prefer to use <code class="code highlight tcl docutils literal highlight-tcl"><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="s2">&quot;myfile.vhd&quot;</span></code> instead of <code class="code highlight tcl docutils literal highlight-tcl"><span class="k">set</span><span class="w"> </span>MOD<span class="w"> </span><span class="s2">&quot;$MOD myfile.vhd&quot;</span></code>,
 because the <code class="docutils literal notranslate"><span class="pre">lappend</span></code> better express the operation and is faster.</p>
 </div>
 </section>
@@ -208,7 +213,7 @@ because the <code class="docutils literal notranslate"><span class="pre">lappend
 <p>For translation, it is often required to specify more of the details about items (files)
 present in <code class="docutils literal notranslate"><span class="pre">MOD</span></code> and <code class="docutils literal notranslate"><span class="pre">PACKAGES</span></code> variables. In this case the translation
 system can get a list with property name and value pairs instead of a single item, e.g.:</p>
-<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nb">lappend</span> MOD <span class="k">[</span><span class="nb">list</span> <span class="nv">$ENTITY_BASE</span><span class="o">/</span>myfile.vhd LIBRARY another_lib SIM_MODULE glbl<span class="k">]</span>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="k">[</span><span class="nb">list</span><span class="w"> </span><span class="nv">$ENTITY_BASE</span><span class="o">/</span>myfile.vhd<span class="w"> </span>LIBRARY<span class="w"> </span>another_lib<span class="w"> </span>SIM_MODULE<span class="w"> </span>glbl<span class="k">]</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -229,8 +234,8 @@ system can get a list with property name and value pairs instead of a single ite
 </ul>
 <section id="example-of-using-properties">
 <h4>Example of using properties<a class="headerlink" href="#example-of-using-properties" title="Permalink to this heading"></a></h4>
-<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nb">lappend</span> MOD <span class="k">[</span><span class="nb">list</span> <span class="nv">$ENTITY_BASE</span><span class="o">/</span>dp_bmem_behav.vhd VIVADO_SET_PROPERTY <span class="k">[</span><span class="nb">list</span> <span class="o">-</span>quiet FILE_TYPE <span class="k">{</span><span class="nv">VHDL</span><span class="k">}]]</span> <span class="k">;</span><span class="c"># set the VHDL98 standard for this file</span>
-<span class="nb">lappend</span> MOD <span class="k">[</span><span class="nb">list</span> <span class="s2">&quot;$ENTITY_BASE/bus_handshake.xdc&quot;</span> TYPE <span class="s2">&quot;CONSTR_VIVADO&quot;</span> SCOPED_TO_REF <span class="s2">&quot;ASYNC_BUS_HANDSHAKE&quot;</span> PROCESSING_ORDER <span class="s2">&quot;LATE&quot;</span><span class="k">]</span>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="k">[</span><span class="nb">list</span><span class="w"> </span><span class="nv">$ENTITY_BASE</span><span class="o">/</span>dp_bmem_behav.vhd<span class="w"> </span>VIVADO_SET_PROPERTY<span class="w"> </span><span class="k">[</span><span class="nb">list</span><span class="w"> </span><span class="o">-</span>quiet<span class="w"> </span>FILE_TYPE<span class="w"> </span><span class="k">{</span><span class="nv">VHDL</span><span class="k">}]]</span><span class="w"> </span><span class="k">;</span><span class="c"># set the VHDL98 standard for this file</span>
+<span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="k">[</span><span class="nb">list</span><span class="w"> </span><span class="s2">&quot;$ENTITY_BASE/bus_handshake.xdc&quot;</span><span class="w"> </span>TYPE<span class="w"> </span><span class="s2">&quot;CONSTR_VIVADO&quot;</span><span class="w"> </span>SCOPED_TO_REF<span class="w"> </span><span class="s2">&quot;ASYNC_BUS_HANDSHAKE&quot;</span><span class="w"> </span>PROCESSING_ORDER<span class="w"> </span><span class="s2">&quot;LATE&quot;</span><span class="k">]</span>
 </pre></div>
 </div>
 </section>
@@ -244,33 +249,33 @@ system can get a list with property name and value pairs instead of a single ite
 <section id="example-of-using-modules-tcl-variables">
 <h3>Example of using Modules.tcl variables<a class="headerlink" href="#example-of-using-modules-tcl-variables" title="Permalink to this heading"></a></h3>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="c"># HFE top level entity</span>
-<span class="k">if</span> <span class="k">{</span><span class="nv">$ENTITY</span> <span class="o">==</span> <span class="s2">&quot;HFE_TOP&quot;</span><span class="k">}</span> <span class="k">{</span>
-   <span class="k">if</span> <span class="k">{</span><span class="nv">$ARCHGRP</span> <span class="o">==</span> <span class="s2">&quot;FULL&quot;</span><span class="k">}</span> <span class="k">{</span>
-      <span class="c"># This architecture relies on HFE component, which is located</span>
-      <span class="c"># in the same directory as current entity and shares this Modules.tcl file.</span>
-      <span class="nb">lappend</span> COMPONENTS <span class="k">[</span><span class="nb">list</span> HFE <span class="nv">$ENTITY_BASE</span> FULL<span class="k">]</span>
+<span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="nv">$ENTITY</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;HFE_TOP&quot;</span><span class="k">}</span><span class="w"> </span><span class="k">{</span><span class="w"></span>
+<span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="nv">$ARCHGRP</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;FULL&quot;</span><span class="k">}</span><span class="w"> </span><span class="k">{</span><span class="w"></span>
+<span class="w">      </span><span class="c"># This architecture relies on HFE component, which is located</span>
+<span class="w">      </span><span class="c"># in the same directory as current entity and shares this Modules.tcl file.</span>
+<span class="w">      </span><span class="nb">lappend</span><span class="w"> </span>COMPONENTS<span class="w"> </span><span class="k">[</span><span class="nb">list</span><span class="w"> </span>HFE<span class="w"> </span><span class="nv">$ENTITY_BASE</span><span class="w"> </span>FULL<span class="k">]</span>
 
-      <span class="c"># This file will be compiled to library work</span>
-      <span class="nb">lappend</span> MOD <span class="nv">$ENTITY_BASE</span><span class="o">/</span>file_to_work.vhd
+<span class="w">      </span><span class="c"># This file will be compiled to library work</span>
+<span class="w">      </span><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="nv">$ENTITY_BASE</span><span class="o">/</span>file_to_work.vhd
 
-      <span class="c"># This file will be compiled to library anotherlib</span>
-      <span class="nb">lappend</span> MOD <span class="k">[</span><span class="nb">list</span> <span class="nv">$ENTITY_BASE</span><span class="o">/</span>file_to_anotherlib.vhd LIBRARY anotherlib<span class="k">]</span>
-   <span class="k">}</span>
+<span class="w">      </span><span class="c"># This file will be compiled to library anotherlib</span>
+<span class="w">      </span><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="k">[</span><span class="nb">list</span><span class="w"> </span><span class="nv">$ENTITY_BASE</span><span class="o">/</span>file_to_anotherlib.vhd<span class="w"> </span>LIBRARY<span class="w"> </span>anotherlib<span class="k">]</span>
+<span class="w">   </span><span class="k">}</span>
 
-   <span class="k">if</span> <span class="k">{</span><span class="nv">$ARCHGRP</span> <span class="o">==</span> <span class="s2">&quot;EMPTY&quot;</span><span class="k">}</span> <span class="k">{</span>
-      <span class="nb">lappend</span> MOD <span class="nv">$ENTITY_BASE</span><span class="o">/</span>hfe_empty.vhd
-   <span class="k">}</span>
+<span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="nv">$ARCHGRP</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;EMPTY&quot;</span><span class="k">}</span><span class="w"> </span><span class="k">{</span><span class="w"></span>
+<span class="w">      </span><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="nv">$ENTITY_BASE</span><span class="o">/</span>hfe_empty.vhd
+<span class="w">   </span><span class="k">}</span>
 <span class="k">}</span>
 
 <span class="c"># HFE core entity</span>
-<span class="k">if</span> <span class="k">{</span><span class="nv">$ENTITY</span> <span class="o">==</span> <span class="s2">&quot;HFE&quot;</span><span class="k">}</span> <span class="k">{</span>
-   <span class="k">if</span> <span class="k">{</span><span class="nv">$ARCHGRP</span> <span class="o">==</span> <span class="s2">&quot;FULL&quot;</span><span class="k">}</span> <span class="k">{</span>
-      <span class="nb">lappend</span> MOD <span class="s2">&quot;$ENTITY_BASE/hfe_pipe.vhd&quot;</span>
-      <span class="nb">lappend</span> MOD <span class="s2">&quot;$ENTITY_BASE/hfe_parser.vhd&quot;</span>
-      <span class="nb">lappend</span> MOD <span class="s2">&quot;$ENTITY_BASE/hfe_full.vhd&quot;</span>
-   <span class="k">}</span> <span class="k">elseif</span> <span class="k">{</span><span class="nv">$ARCHGRP</span> <span class="o">==</span> <span class="s2">&quot;EMPTY&quot;</span><span class="k">}</span> <span class="k">{</span>
-      <span class="nb">lappend</span> MOD <span class="s2">&quot;$ENTITY_BASE/hfe_empty.vhd&quot;</span>
-   <span class="k">}</span>
+<span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="nv">$ENTITY</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;HFE&quot;</span><span class="k">}</span><span class="w"> </span><span class="k">{</span><span class="w"></span>
+<span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="nv">$ARCHGRP</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;FULL&quot;</span><span class="k">}</span><span class="w"> </span><span class="k">{</span><span class="w"></span>
+<span class="w">      </span><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="s2">&quot;$ENTITY_BASE/hfe_pipe.vhd&quot;</span>
+<span class="w">      </span><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="s2">&quot;$ENTITY_BASE/hfe_parser.vhd&quot;</span>
+<span class="w">      </span><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="s2">&quot;$ENTITY_BASE/hfe_full.vhd&quot;</span>
+<span class="w">   </span><span class="k">}</span><span class="w"> </span><span class="k">elseif</span><span class="w"> </span><span class="k">{</span><span class="nv">$ARCHGRP</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;EMPTY&quot;</span><span class="k">}</span><span class="w"> </span><span class="k">{</span><span class="w"></span>
+<span class="w">      </span><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="s2">&quot;$ENTITY_BASE/hfe_empty.vhd&quot;</span>
+<span class="w">   </span><span class="k">}</span>
 <span class="k">}</span>
 </pre></div>
 </div>
@@ -439,7 +444,7 @@ Common used files are DevTree.dts/dtb/vhd and user_const.vhd.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../../ndk_core/intel/doc/tsu.html" class="btn btn-neutral float-left" title="Time Stamp Unit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../ndk_core/doc/testing.html" class="btn btn-neutral float-left" title="NDK testing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../../ndk_core/doc/devtree.html" class="btn btn-neutral float-right" title="Device Tree" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

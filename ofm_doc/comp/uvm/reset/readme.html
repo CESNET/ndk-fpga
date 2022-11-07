@@ -16,6 +16,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -44,17 +45,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture (Intel FPGA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">XpressSX AGI-FH400G (400G1)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Stratix 10 DX FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Agilex I-Series FPGA Development Kit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">FB4CGG3/FB2CGG3 cards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -74,6 +79,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_mvb/readme.html">logic_vector_mvb environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array/readme.html">Logic Vector Array agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_mfb/readme.html">logic_vector_array_mfb environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
@@ -116,10 +122,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../../ver.html">UVM Verification</a> &raquo;</li>
-          <li><a href="../componets.html">Components</a> &raquo;</li>
-      <li>RESET agent</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../ver.html">UVM Verification</a></li>
+          <li class="breadcrumb-item"><a href="../componets.html">Components</a></li>
+      <li class="breadcrumb-item active">RESET agent</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/ofm_doc/comp/uvm/reset/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -144,39 +150,39 @@ sequence_rand   - Reset randomly generated with some distribution. Reset is gene
 <p>Example of connection</p>
 <a class="reference internal image-reference" href="../../../../_images/reset.svg"><img alt="../../../../_images/reset.svg" class="align-center" src="../../../../_images/reset.svg" width="50%" /></a>
 <div class="highlight-SystemVerilog notranslate"><div class="highlight"><pre><span></span><span class="c1">//connect reset syncrhonization object</span>
-<span class="n">reset_agent</span><span class="p">.</span><span class="n">sync_connect</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">reset_sync</span><span class="p">);</span>
+<span class="n">reset_agent</span><span class="p">.</span><span class="n">sync_connect</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">reset_sync</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="highlight-SystemVerilog notranslate"><div class="highlight"><pre><span></span><span class="c1">//example of processing in low lewer sequence</span>
-<span class="k">task</span> <span class="n">send_transaction</span><span class="p">(</span><span class="n">byte_array</span> <span class="n">hl_tr</span><span class="p">);</span>
-    <span class="k">int</span> <span class="k">unsigned</span> <span class="n">it</span> <span class="o">=</span> <span class="mh">0</span><span class="p">;</span>
-    <span class="k">bit</span> <span class="n">reset</span> <span class="o">=</span> <span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
-    <span class="k">while</span> <span class="p">(</span><span class="n">reset</span> <span class="o">!=</span> <span class="mh">1</span><span class="mb">&#39;b0</span> <span class="o">&amp;&amp;</span> <span class="n">it</span> <span class="o">&lt;</span>  <span class="n">hl_tr</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">())</span> <span class="k">begin</span>
-        <span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-        <span class="n">req</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span>
-        <span class="n">req</span><span class="p">.</span><span class="n">sof</span> <span class="o">=</span> <span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
-        <span class="n">req</span><span class="p">.</span><span class="n">eof</span> <span class="o">=</span> <span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
-        <span class="n">req</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">hl_tr</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">it</span><span class="p">];</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">it</span> <span class="o">==</span> <span class="mh">0</span><span class="p">)</span> <span class="n">beign</span>
-            <span class="n">req</span><span class="p">.</span><span class="n">sof</span> <span class="o">=</span> <span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
-        <span class="k">end</span>
-        <span class="n">it</span><span class="o">++</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">it</span> <span class="o">==</span> <span class="n">hl_tr</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">())</span> <span class="k">begin</span>
-            <span class="n">req</span><span class="p">.</span><span class="n">eof</span> <span class="o">=</span> <span class="mh">1</span><span class="mb">&#39;b1</span><span class="p">;</span>
-        <span class="k">end</span>
-        <span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-        <span class="n">sync_reset</span><span class="p">.</span><span class="n">is_reset</span><span class="p">(</span><span class="n">reset</span><span class="p">);</span>
-    <span class="k">end</span>
-    <span class="c1">//send empty frame until reset is done</span>
-    <span class="k">while</span><span class="p">(</span><span class="n">reset</span><span class="p">)</span> <span class="k">begin</span>
-        <span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-        <span class="n">req</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span>
-        <span class="n">req</span><span class="p">.</span><span class="n">sof</span> <span class="o">=</span> <span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
-        <span class="n">req</span><span class="p">.</span><span class="n">eof</span> <span class="o">=</span> <span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">;</span>
-        <span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-        <span class="n">sync_reset</span><span class="p">.</span><span class="n">is_reset</span><span class="p">(</span><span class="n">reset</span><span class="p">);</span>
-    <span class="k">end</span>
-<span class="k">endtask</span>
+<span class="k">task</span><span class="w"> </span><span class="n">send_transaction</span><span class="p">(</span><span class="n">byte_array</span><span class="w"> </span><span class="n">hl_tr</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">bit</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">reset</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">&lt;</span><span class="w">  </span><span class="n">hl_tr</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">())</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<span class="w">        </span><span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">sof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">eof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hl_tr</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">it</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">it</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">beign</span><span class="w"></span>
+<span class="w">            </span><span class="n">req</span><span class="p">.</span><span class="n">sof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"></span>
+<span class="w">        </span><span class="n">it</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">it</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">hl_tr</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">())</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<span class="w">            </span><span class="n">req</span><span class="p">.</span><span class="n">eof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"></span>
+<span class="w">        </span><span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">sync_reset</span><span class="p">.</span><span class="n">is_reset</span><span class="p">(</span><span class="n">reset</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//send empty frame until reset is done</span>
+<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">reset</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<span class="w">        </span><span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">sof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">eof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">sync_reset</span><span class="p">.</span><span class="n">is_reset</span><span class="p">(</span><span class="n">reset</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+<span class="k">endtask</span><span class="w"></span>
 </pre></div>
 </div>
 <section id="simple-sychronous-reset-agents">

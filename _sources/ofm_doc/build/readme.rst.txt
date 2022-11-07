@@ -1,3 +1,5 @@
+.. _ofm_build_system:
+
 Build System
 ==================
 
