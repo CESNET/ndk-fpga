@@ -9,7 +9,7 @@
 */
 
 
-class regmodel #(ETH_STREAMS, CHANNELS, DMA_STREAMS, OUTPUT_CHANNELS) extends uvm_app_core::regmodel #(ETH_STREAMS, CHANNELS, OUTPUT_CHANNELS);
+class regmodel #(ETH_STREAMS, CHANNELS, DMA_STREAMS, OUTPUT_CHANNELS) extends uvm_app_core::regmodel;
     `uvm_object_param_utils(uvm_app_core_minimal::regmodel #(ETH_STREAMS, CHANNELS, DMA_STREAMS, OUTPUT_CHANNELS))
 
     localparam APP_RX_CHANNELS = OUTPUT_CHANNELS/(ETH_STREAMS/DMA_STREAMS);
