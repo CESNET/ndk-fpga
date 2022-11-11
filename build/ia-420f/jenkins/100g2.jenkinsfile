@@ -1,0 +1,13 @@
+library 'liberouter'
+
+stagesFirmware(
+    dir: 'build/ia-420f',
+    target: '100g2',
+    tool: 'quartus',
+    project: 'ia-420f-minimal-100g2',
+    pollscm: 'H H(0-11) * * 6',
+    rpms: false,
+    rename: false,
+    artifacts: 'ia-420f-minimal-100g2',
+    lastBuilds: 2,
+)
