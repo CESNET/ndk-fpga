@@ -14,7 +14,7 @@ class reg_sequence#(STREAMS, CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) extends uvm
 
     localparam APP_RX_CHANNELS = DMA_RX_CHANNELS/(STREAMS/DMA_STREAMS);
 
-    uvm_app_core::regmodel #(STREAMS, CHANNELS, DMA_RX_CHANNELS) m_regmodel;
+    uvm_app_core::regmodel m_regmodel;
 
     function new (string name = "reg_sequence");
         super.new(name);
