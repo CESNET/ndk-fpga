@@ -22,3 +22,6 @@
 [submodule "ndk/cards/fb2cghh"]
 	path = ndk/cards/fb2cghh
 	url = ../ndk-card-fb2cghh.git
+[submodule "ndk/cards/ia-420f"]
+	path = ndk/cards/ia-420f
+	url = ../ndk-card-ia-420f.git
