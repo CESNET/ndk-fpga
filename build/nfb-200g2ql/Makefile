@@ -2,6 +2,7 @@
 # Copyright (C) 2022 CESNET z.s.p.o.
 # Author(s): Daniel Kriz <danielkriz@cesnet.cz>
 #
+# SPDX-License-Identifier: BSD-3-Clause
 
 # NOTE: Usage of the configuration parameters in this file is described
 # in the Parametrization section of the NDK-CORE documentation.
