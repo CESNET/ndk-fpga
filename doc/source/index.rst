@@ -49,6 +49,7 @@ The Minimal application serves as a simple example of how to build an FPGA appli
     ndk_cards/dk-dev-agi027res/readme
     ndk_cards/fb4cgg3/readme
     ndk_cards/fb2cghh/readme
+    ndk_cards/ia-420f/readme
 
 .. toctree::
     :maxdepth: 2
