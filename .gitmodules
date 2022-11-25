@@ -25,3 +25,6 @@
 [submodule "ndk/cards/ia-420f"]
 	path = ndk/cards/ia-420f
 	url = ../ndk-card-ia-420f.git
+[submodule "ndk/cards/nfb-200g2ql"]
+	path = ndk/cards/nfb-200g2ql
+	url = ../ndk-card-nfb-200g2ql.git
