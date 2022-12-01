@@ -506,7 +506,7 @@ begin
 
             REFR_REQ_BEFORE_TEST        => true,
             REFR_PERIOD_WIDTH           => MEM_REFR_PERIOD_WIDTH,
-            DEF_REFR_PERIOD             => MEM_DEF_REFR_PERIOD(i),
+            DEF_REFR_PERIOD             => std_logic_vector(to_unsigned(MEM_DEF_REFR_PERIOD, MEM_REFR_PERIOD_WIDTH)),
 
             DEVICE                      => DEVICE
         )
