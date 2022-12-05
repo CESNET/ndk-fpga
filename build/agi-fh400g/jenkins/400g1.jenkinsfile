@@ -11,3 +11,12 @@ stagesFirmware(
     artifacts: 'agi-fh400g-minimal-400g1',
     lastBuilds: 2,
 )
+
+stagesNdkTest(
+    card: '400g1',
+    mode: '400g1',
+    project: 'app-minimal',
+    fw_name: 'agi-fh400g-minimal-400g1.nfw',
+    testbranch: 'friedl-feat-400g1'
+)
+
