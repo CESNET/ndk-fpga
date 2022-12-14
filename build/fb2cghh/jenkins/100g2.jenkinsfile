@@ -10,3 +10,11 @@ stagesFirmware(
     artifacts: 'fb2cghh-minimal-100g2',
     lastBuilds: 2,
 )
+
+stagesNdkTest(
+    card: 'tivoli',
+    mode: '100g2',
+    project: 'minimal',
+    fw_name: 'fb2cghh-minimal-100g2.nfw',
+    testbranch: 'friedl-feat-ndk_app_minimal'
+)

@@ -10,3 +10,11 @@ stagesFirmware(
     artifacts: 'nfb-200g2ql-minimal-100g2',
     lastBuilds: 2,
 )
+
+stagesNdkTest(
+    card: '200g2ql',
+    mode: '100g2',
+    project: 'nic',
+    fw_name: 'nfb-200g2ql-minimal-100g2.nfw',
+    testbranch: 'friedl-feat-ndk_app_minimal'
+)
