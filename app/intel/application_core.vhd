@@ -478,7 +478,7 @@ begin
     --  MEMORY TESTERS
     -- =========================================================================
 
-    mem_testers_g : for i in MEM_PORTS -1 downto 0 generate
+    mem_testers_g : for i in MEM_PORTS-1 downto 0 generate
         mem_tester_i : entity work.MEM_TESTER
         generic map (
             AMM_DATA_WIDTH              => MEM_DATA_WIDTH,
@@ -503,8 +503,9 @@ begin
                     X"457a2fb6bd25f1fa"
                 ),
             RANDOM_ADDR_SEED            => X"FEFE01FF",
-
-            REFR_REQ_BEFORE_TEST        => true,
+            -- REFR_REQ_BEFORE_TEST - Requires support for manual memory refresh
+            -- control, experimental function only!
+            REFR_REQ_BEFORE_TEST        => false,
             REFR_PERIOD_WIDTH           => MEM_REFR_PERIOD_WIDTH,
             DEF_REFR_PERIOD             => std_logic_vector(to_unsigned(MEM_DEF_REFR_PERIOD, MEM_REFR_PERIOD_WIDTH)),
 
