@@ -1,10 +1,10 @@
 # NDK Minimal Application
 
-This repository contains a minimal (reference) application (NDK-APP-Minimal) built on top of the Network Development Kit (NDK) platform for FPGA acceleration cards. The NDK allows users to quickly and easily develop new network applications based on FPGA acceleration cards. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet.
+This repository contains a minimal (reference) application (NDK-APP-Minimal) built on top of the Network Development Kit (NDK) for FPGA acceleration cards. The NDK allows users to quickly and easily develop new network applications based on FPGA acceleration cards. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet.
  
 The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your own NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-APP-Minimal documentation here](https://cesnet.github.io/ndk-app-minimal/).
 
-**The DMA IP is not part of the open-source NDK. If the DMA IP is disabled, it is replaced by a loopback. [You can get the NDK, including the DMA IP and professional support, through our partner BrnoLogic](https://support.brnologic.com/).**
+**The DMA Medusa IP is not part of the open-source NDK. If the DMA IP is disabled, it is replaced by a loopback. [You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic](https://support.brnologic.com/).**
 
 ## How to start
 
@@ -51,7 +51,7 @@ git clone --recursive git@gitlab.liberouter.org:ndk/ndk-app-minimal.git
 
 ### Next steps
 
-The [NDK-APP-Minimal documentation in chapter "How to start"](https://cesnet.github.io/ndk-app-minimal/) lists further steps for building the FPGA firmware, loading it into the FPGA card and also using it.
+The [NDK-APP-Minimal documentation in chapter "How to start"](https://cesnet.github.io/ndk-app-minimal/ndk_core/doc/how_to_start.html) lists further steps for building the FPGA firmware, loading it into the FPGA card and also using it.
 
 ## Documentation
 
@@ -75,6 +75,12 @@ $ make html
 ```
 
 The output is in the `doc/build/index.html` file.
+
+## Related publications
+
+- J. Cabal, J. Sikora, Š. Friedl, M. Špinler and J. Kořenek, "FPL Demo: 400G FPGA Packet Capture Based on Network Development Kit," in *32nd International Conference on Field Programmable Logic and Applications (FPL)*, Belfast, UK, 2022.
+- J. Kubálek, J. Cabal, M. Špinler and R. Iša, "[DMA Medusa: A Vendor-Independent FPGA-Based Architecture for 400 Gbps DMA Transfers](https://ieeexplore.ieee.org/document/9444087)," *2021 IEEE 29th Annual International Symposium on Field-Programmable Custom Computing Machines (FCCM)*, 2021, pp. 258-258, doi: 10.1109/FCCM51124.2021.00045.
+- L. Kekely, J. Cabal, V. Puš and J. Kořenek, "[Multi Buses: Theory and Practical Considerations of Data Bus Width Scaling in FPGAs](https://ieeexplore.ieee.org/document/9217811)," *2020 23rd Euromicro Conference on Digital System Design (DSD)*, 2020, pp. 49-56, doi: 10.1109/DSD51259.2020.00020.
 
 ## License
 
