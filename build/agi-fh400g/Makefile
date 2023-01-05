@@ -8,7 +8,12 @@
 COMBO_BASE = ../..
 CARD_BASE = $(COMBO_BASE)/ndk/cards/agi-fh400g
 APP_CONF = app_conf.tcl
+
+ifeq ($(BOARD_REV),0)
 OUTPUT_NAME = agi-fh400g-minimal
+else
+OUTPUT_NAME = agi-fh400g-minimal-rev$(BOARD_REV)
+endif
 
 .PHONY: all 400g1 200g2 100g4 50g8 40g2 25g8 10g8
 
