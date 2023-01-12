@@ -1,77 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>The PCIe module &mdash; Minimal NDK Application Docs  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="The Memory Controller" href="mem.html" />
     <link rel="prev" title="The DMA module" href="dma.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                Git branch: devel, <br> Git hash: e1412a82
+                Git branch: cabal_sphinx_fix, <br> Git hash: 9a5d2178
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +41,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
@@ -143,75 +94,33 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">Minimal NDK Application Docs</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../readme.html">NDK architecture</a> &raquo;</li>
-        
-      <li>The PCIe module</li>
-    
-    
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../readme.html">NDK architecture</a></li>
+      <li class="breadcrumb-item active">The PCIe module</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../../../_sources/ndk_core/intel/doc/pcie.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <section id="the-pcie-module">
-<span id="ndk-intel-pcie-mod"></span><span id="ndk-pcie-mod"></span><h1>The PCIe module<a class="headerlink" href="#the-pcie-module" title="Permalink to this heading">¶</a></h1>
+<span id="ndk-intel-pcie-mod"></span><span id="ndk-pcie-mod"></span><h1>The PCIe module<a class="headerlink" href="#the-pcie-module" title="Permalink to this heading"></a></h1>
 <p>The PCIe module handles all PCIe communication. Its task is to forward/transform PCIe transactions for the DMA controller and the <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a>. The architecture of the PCIe module is divided into two main parts: PCIE_CORE and PCIE_CTRL. Its diagram is shown below.</p>
 <a class="reference internal image-reference" href="../../../_images/pcie_module_arch.drawio.svg"><img alt="../../../_images/pcie_module_arch.drawio.svg" class="align-center" src="../../../_images/pcie_module_arch.drawio.svg" width="100%" /></a>
 <div class="admonition note">
@@ -219,10 +128,10 @@
 <p>The PCIe module can support more than one PCIe endpoint. In this case, the individual parts of the PCIe module are appropriately duplicated for each PCIe endpoint. There is also bifurcation support for some PCIe HARD IPs.</p>
 </div>
 <section id="the-pcie-core-pcie-core">
-<h2>The PCIe Core (PCIE_CORE)<a class="headerlink" href="#the-pcie-core-pcie-core" title="Permalink to this heading">¶</a></h2>
+<h2>The PCIe Core (PCIE_CORE)<a class="headerlink" href="#the-pcie-core-pcie-core" title="Permalink to this heading"></a></h2>
 <p>The PCIe Core varies according to the PCIe Hard IP or FPGA used. The PCIe Core contains the instance(s) of the used PCIe Hard IP, an adapter for converting the AXI/Avalon-ST buses to the <a class="reference internal" href="../../../ofm_doc/comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB buses</span></a>, the Vendor-Specific Extension Capability (VSEC) registers (implemented in the <a class="reference internal" href="../../../ofm_doc/comp/pcie/common/readme.html#pci-ext-cap"><span class="std std-ref">PCI_EXT_CAP module</span></a>) containing mainly the <a class="reference internal" href="../../doc/devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a> firmware description and additional configuration logic. Thus, the main purpose of the PCIe Core is to unify the buses and provide the necessary information about the active PCIe link.</p>
 <section id="supported-pcie-hard-ip">
-<h3>Supported PCIe Hard IP<a class="headerlink" href="#supported-pcie-hard-ip" title="Permalink to this heading">¶</a></h3>
+<h3>Supported PCIe Hard IP<a class="headerlink" href="#supported-pcie-hard-ip" title="Permalink to this heading"></a></h3>
 <p>A list of the supported PCIe Hard IPs is below. You can select the target architecture by setting the NDK parameter <code class="docutils literal notranslate"><span class="pre">PCIE_MOD_ARCH</span></code>. According to this parameter, the correct PCIE_CORE module variant is used and the VHDL generic <code class="docutils literal notranslate"><span class="pre">PCIE_ENDPOINT_TYPE</span></code> is set appropriately.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">R_TILE</span></code> - <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/683501/">R-Tile Avalon Streaming Intel FPGA IP for PCI Express</a></p></li>
@@ -232,7 +141,7 @@
 </section>
 </section>
 <section id="the-pcie-control-unit-pcie-ctrl">
-<h2>The PCIe Control unit (PCIE_CTRL)<a class="headerlink" href="#the-pcie-control-unit-pcie-ctrl" title="Permalink to this heading">¶</a></h2>
+<h2>The PCIe Control unit (PCIE_CTRL)<a class="headerlink" href="#the-pcie-control-unit-pcie-ctrl" title="Permalink to this heading"></a></h2>
 <p>The PCIe Control unit always includes the <a class="reference internal" href="../../../ofm_doc/comp/pcie/mtc/readme.html#mtc"><span class="std std-ref">MI Transaction Controller (MTC)</span></a>, which transforms the associated PCIe memory transactions into read or write requests on the MI bus. In the case of a read request, the MI response is also transformed back into a PCIe completition transaction and sent back to the host PC. PCIe transactions from the BAR0 address space are allocated to the MTC module. If the NDK uses a DMA controller that requires its own BAR, the PCIe transactions from the DMA-BAR address space (BAR2) are routed directly to the DMA module. This functionality must be enabled via the <code class="docutils literal notranslate"><span class="pre">DMA_BAR_ENABLE</span></code> parameter.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -241,11 +150,17 @@
 <p>By default, this unit also contains the <a class="reference internal" href="../../../ofm_doc/comp/pcie/ptc/readme.html#ptc"><span class="std std-ref">PTC module</span></a>, which transforms memory requests (in a simplified format) coming from the DMA into the desired PCIe format and vice versa. The PTC module also implements a completion buffer and handles the allocation of the PCIe TAGs, etc. The PTC can be disabled using the <code class="docutils literal notranslate"><span class="pre">PTC_DISABLE</span></code> parameter, in which case the DMA requests (in the PCIe transaction format) are directly forwarded to the PCIe Hard IP and vice versa.</p>
 </section>
 <section id="the-pcie-module-entity">
-<h2>The PCIe module entity<a class="headerlink" href="#the-pcie-module-entity" title="Permalink to this heading">¶</a></h2>
+<h2>The PCIe module entity<a class="headerlink" href="#the-pcie-module-entity" title="Permalink to this heading"></a></h2>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-pcie">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">PCIE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-pcie" title="Permalink to this definition">¶</a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">PCIE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-pcie" title="Permalink to this definition"></a></dt>
 <dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 77%" />
+</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
 <th class="head"><p>Type</p></th>
@@ -448,6 +363,12 @@ the PCIe IP RQ and RC interfaces.</p></td>
 </tbody>
 </table>
 <span class="sig-name descname">Ports</span><table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 77%" />
+</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Port</p></th>
 <th class="head"><p>Type</p></th>
@@ -868,50 +789,33 @@ and requires that the first transaction in a word starts at byte 0.</p></td>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="mem.html" class="btn btn-neutral float-right" title="The Memory Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="dma.html" class="btn btn-neutral float-left" title="The DMA module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mem.html" class="btn btn-neutral float-right" title="The Memory Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2023, CESNET z.s.p.o..
-
-    </p>
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

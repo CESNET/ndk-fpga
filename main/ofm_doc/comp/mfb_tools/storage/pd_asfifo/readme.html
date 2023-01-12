@@ -1,73 +1,36 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>MFB Packet Discard ASFIFO &mdash; Minimal NDK Application Docs 1.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
         <script src="../../../../../_static/sphinx_highlight.js"></script>
-    
-    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
     <link rel="next" title="Gen Loop Switch (GLS)" href="../../debug/gen_loop_switch/readme.html" />
     <link rel="prev" title="CrossbarX Stream" href="../../logic/crossbarx_stream/readme.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,18 +38,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../app-minimal.html">Minimal NDK application</a></li>
@@ -140,81 +92,39 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../../index.html">Minimal NDK Application Docs</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../../../../mfb.html">MFB Tools</a> &raquo;</li>
-        
-      <li>MFB Packet Discard ASFIFO</li>
-    
-    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mfb.html">MFB Tools</a></li>
+      <li class="breadcrumb-item active">MFB Packet Discard ASFIFO</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../../../../../_sources/ofm_doc/comp/mfb_tools/storage/pd_asfifo/readme.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <section id="mfb-packet-discard-asfifo">
-<span id="mfb-pd-asfifo"></span><h1>MFB Packet Discard ASFIFO<a class="headerlink" href="#mfb-packet-discard-asfifo" title="Permalink to this heading">¶</a></h1>
+<span id="mfb-pd-asfifo"></span><h1>MFB Packet Discard ASFIFO<a class="headerlink" href="#mfb-packet-discard-asfifo" title="Permalink to this heading"></a></h1>
 <p>The Packet Discard ASFIFO is an asynchronous FIFO with the ability to erase (discard) MFB frames (packets).
 For each packet put inside, the user specifies if the packet is to be discarded (information valid with EOF).
 If so, the packet will not appear on the ASFIFO output.
 Because the information about discarding is only available with the EOF, the unit works in store-and-forward mode (each packet has to be stored completely before we can decide whether to propagate it further).</p>
 <section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading">¶</a></h2>
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/pd_asfifo.svg" id="mfb-pd-asfifo-basic"><img alt="" class="align-center" id="mfb-pd-asfifo-basic" src="../../../../../_images/pd_asfifo.svg" width="100%" /></a>
 <p>The internal architecture of the unit consists of multipe stages.</p>
 <p>If a packet has both SOF and EOF in the same data word (single-word packet), it can be discarded immidiately by masking of the SOF and EOF to 0.</p>
@@ -231,9 +141,9 @@ To be able to do this, the information about the multi-word packet discarding is
 From this ASFIFO, the Mark ASFIFO reading logic knows, whether the SOF should be removed or not.</p>
 </section>
 <section id="additional-features">
-<h2>Additional Features<a class="headerlink" href="#additional-features" title="Permalink to this heading">¶</a></h2>
+<h2>Additional Features<a class="headerlink" href="#additional-features" title="Permalink to this heading"></a></h2>
 <section id="force-discard">
-<h3>Force Discard<a class="headerlink" href="#force-discard" title="Permalink to this heading">¶</a></h3>
+<h3>Force Discard<a class="headerlink" href="#force-discard" title="Permalink to this heading"></a></h3>
 <p>The Force Discard feature can be used to immidiately start discarding packets.
 When Force Discard is active, the currently processed packet is discarded as well as all following packets as long as the signal is active.
 Once the signal falls to 0, the next valid word <strong>must start with a SOF</strong>.
@@ -246,50 +156,33 @@ This way the user can continue sending new words to the full ASFIFO while having
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../../debug/gen_loop_switch/readme.html" class="btn btn-neutral float-right" title="Gen Loop Switch (GLS)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../../logic/crossbarx_stream/readme.html" class="btn btn-neutral float-left" title="CrossbarX Stream" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../debug/gen_loop_switch/readme.html" class="btn btn-neutral float-right" title="Gen Loop Switch (GLS)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2022, CESNET z.s.p.o..
-
-    </p>
+    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

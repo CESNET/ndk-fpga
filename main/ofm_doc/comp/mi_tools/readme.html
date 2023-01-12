@@ -1,73 +1,36 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>MI bus specification &mdash; Minimal NDK Application Docs 1.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="MI ASYNC" href="async/readme.html" />
     <link rel="prev" title="MI Tools" href="../../mi.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,18 +38,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
@@ -134,78 +86,36 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">Minimal NDK Application Docs</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../../mi.html">MI Tools</a> &raquo;</li>
-        
-      <li>MI bus specification</li>
-    
-    
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../mi.html">MI Tools</a></li>
+      <li class="breadcrumb-item active">MI bus specification</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../../../_sources/ofm_doc/comp/mi_tools/readme.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <section id="mi-bus-specification">
-<span id="mi-bus"></span><h1>MI bus specification<a class="headerlink" href="#mi-bus-specification" title="Permalink to this heading">¶</a></h1>
+<span id="mi-bus"></span><h1>MI bus specification<a class="headerlink" href="#mi-bus-specification" title="Permalink to this heading"></a></h1>
 <p>MI (Memory Interface) bus realizes software access to firmware components. These components (usually some control, state or statistics registers) can be either configured by <strong>write</strong> requests, or  their current data can be determined by <strong>read</strong> requests. These components are accessed by their addresses that are sent along with the requests. The default width used in this project is 32 bits for both, data and addresses. That is why the name MI32 is often used for this bus.</p>
 <section id="mi-bus-description">
-<h2>MI bus description<a class="headerlink" href="#mi-bus-description" title="Permalink to this heading">¶</a></h2>
+<h2>MI bus description<a class="headerlink" href="#mi-bus-description" title="Permalink to this heading"></a></h2>
 <p>MI bus has these 8 ports + 1 port optional divided into two channels (<em>the port directions in example are valid for slave MI components</em>):</p>
 <div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="c1">-- ===========================================================================</span>
 <span class="c1">-- Ports of MI bus request channel (master to slave):</span>
@@ -235,7 +145,7 @@
 <p><code class="docutils literal notranslate"><span class="pre">BE</span></code> is there to define which bytes of the transferred data (<code class="docutils literal notranslate"><span class="pre">DWR</span></code> or <code class="docutils literal notranslate"><span class="pre">DRD</span></code>) are valid and should be worked with and which bytes should be ignored. Each bit validates one byte of the data, that is why it is <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH/8</span></code> bits wide. Usually, it is used in write transactions, but it may also be used in read transactions.</p>
 </section>
 <section id="a-few-timing-diagrams">
-<h2>A few timing diagrams<a class="headerlink" href="#a-few-timing-diagrams" title="Permalink to this heading">¶</a></h2>
+<h2>A few timing diagrams<a class="headerlink" href="#a-few-timing-diagrams" title="Permalink to this heading"></a></h2>
 <p>to make sure you really understand, how the MI bus works. The optional <code class="docutils literal notranslate"><span class="pre">MWR</span></code> signal is not used in these examples.</p>
 <p><strong>A) Simple write transaction &amp; the ARDY occurrences</strong></p>
 <a class="reference internal image-reference" href="../../../_images/wave_simple_write.svg"><img alt="A simple write transaction and ARDY" class="align-center" src="../../../_images/wave_simple_write.svg" width="100%" /></a>
@@ -262,50 +172,33 @@
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="async/readme.html" class="btn btn-neutral float-right" title="MI ASYNC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../../mi.html" class="btn btn-neutral float-left" title="MI Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="async/readme.html" class="btn btn-neutral float-right" title="MI ASYNC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2022, CESNET z.s.p.o..
-
-    </p>
+    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
