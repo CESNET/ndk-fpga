@@ -7,10 +7,14 @@ image: python:3.7-alpine
 pages:
   stage: deploy
   script:
+  - apk add git
   - pip install -U GitPython
   - pip install -U sphinx
   - pip install -U sphinx-rtd-theme
   - pip install -U sphinx-vhdl
+  - echo "Hotfix detached head, causing trouble in GitPython:"
+  - git checkout $CI_COMMIT_BRANCH
+  - git status
   - sphinx-build -b html doc/source/ public
   artifacts:
     paths:
