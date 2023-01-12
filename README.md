@@ -1,8 +1,8 @@
 # NDK Minimal Application
 
-This repository contains a minimal (reference) application (NDK-APP-Minimal) built on top of the Network Development Kit (NDK) for FPGA acceleration cards. The NDK allows users to quickly and easily develop new network applications based on FPGA acceleration cards. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet.
+This repository contains a minimal (reference) application (NDK-APP-Minimal) built on top of the Network Development Kit (NDK) for FPGA acceleration cards. The NDK allows users to quickly and easily develop FPGA-accelerated network applications. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet.
  
-The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your own NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-APP-Minimal documentation here](https://cesnet.github.io/ndk-app-minimal/).
+The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-APP-Minimal documentation here](https://cesnet.github.io/ndk-app-minimal/).
 
 **The DMA Medusa IP is not part of the open-source NDK. If the DMA IP is disabled, it is replaced by a loopback. [You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic](https://support.brnologic.com/).**
 
