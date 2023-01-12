@@ -7,6 +7,7 @@ image: python:3.7-alpine
 pages:
   stage: deploy
   script:
+  - pip install -U GitPython
   - pip install -U sphinx
   - pip install -U sphinx-rtd-theme
   - pip install -U sphinx-vhdl

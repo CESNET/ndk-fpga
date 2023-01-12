@@ -5,15 +5,21 @@ sys.path.append(os.path.abspath("./_ext"))
 
 import sphinx_rtd_theme
 from pathlib import Path
+from datetime import date
+from git import Repo
+
+current_year = date.today().year
+git_repo = Repo(search_parent_directories=True)
+git_branch = git_repo.active_branch.name
+git_sha = git_repo.head.object.hexsha
+git_sha_short = git_repo.git.rev_parse(git_sha, short=8)
 
 # -- Project information -----------------------------------------------------
 
 project = 'Minimal NDK Application Docs'
-copyright = '2022, CESNET z.s.p.o.'
+copyright = str(current_year) + ', CESNET z.s.p.o.'
 author = 'CESNET TMC'
-
-# The full version, including alpha/beta/rc tags
-release = '1.0'
+version = 'Git branch: ' + str(git_branch) + ', <br> Git hash: ' + str(git_sha_short)
 
 # -- General configuration ---------------------------------------------------
 
@@ -48,6 +54,7 @@ html_theme_options = {
     'sticky_navigation': True,
     'navigation_depth': 4,
     'includehidden': True,
+    'display_version': True,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

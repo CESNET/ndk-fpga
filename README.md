@@ -2,7 +2,7 @@
 
 This repository contains a minimal (reference) application (NDK-APP-Minimal) built on top of the Network Development Kit (NDK) for FPGA acceleration cards. The NDK allows users to quickly and easily develop FPGA-accelerated network applications. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet.
  
-The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-APP-Minimal documentation here](https://cesnet.github.io/ndk-app-minimal/).
+The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-APP-Minimal documentation (main branch) here](https://cesnet.github.io/ndk-app-minimal/).
 
 **The DMA Medusa IP is not part of the open-source NDK. If the DMA IP is disabled, it is replaced by a loopback. [You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic](https://support.brnologic.com/).**
 
@@ -51,18 +51,19 @@ git clone --recursive git@gitlab.liberouter.org:ndk/ndk-app-minimal.git
 
 ### Next steps
 
-The [NDK-APP-Minimal documentation in chapter "How to start"](https://cesnet.github.io/ndk-app-minimal/ndk_core/doc/how_to_start.html) lists further steps for building the FPGA firmware, loading it into the FPGA card and also using it.
+The [NDK-APP-Minimal documentation (main branch) in chapter "How to start"](https://cesnet.github.io/ndk-app-minimal/main/ndk_core/doc/how_to_start.html) lists further steps for building the FPGA firmware, loading it into the FPGA card and also using it.
 
 ## Documentation
 
 We use a documentation system based on the [Sphinx tool](https://www.sphinx-doc.org), which compiles complete documentation from source files in the [reStructuredText](https://docutils.sourceforge.io/rst.html) format. We also use the [Sphinx-vhdl](https://github.com/CESNET/sphinx-vhdl) for generating documentation from the VHDL code. The documentation automatically builds with each contribution to the devel/main branch and is available online here:
-- [**NDK-APP-Minimal documentation (public GitHub - built from the main branch)**](https://cesnet.github.io/ndk-app-minimal/)
-- [**NDK-APP-Minimal documentation (private GitLab - built from the devel branch)**](https://ndk.gitlab.liberouter.org:5051/ndk-app-minimal/)
+- [**NDK-APP-Minimal documentation (main branch)**](https://cesnet.github.io/ndk-app-minimal/main/)
+- [**NDK-APP-Minimal documentation (devel branch)**](https://cesnet.github.io/ndk-app-minimal/devel/)
 
 ### How to manually build documentation
 
-First, you need to install the sphinx package and theme in python:
+First, you need to install a few Python packages:
 ```
+$ pip3 install --user GitPython
 $ pip3 install --user sphinx
 $ pip3 install --user sphinx-vhdl
 $ pip3 install --user sphinx_rtd_theme
