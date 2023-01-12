@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Minimal NDK application &mdash; Minimal NDK Application Docs  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="How to start" href="ndk_core/doc/how_to_start.html" />
+    <link rel="prev" title="Documentation of Minimal NDK Application" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Minimal NDK Application Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Git branch: cabal_github_ci, <br> Git hash: d2b6e3ad
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Minimal NDK application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-memory-testers">The Memory Testers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-example-of-mi-offsets">The example of MI offsets</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ofm_doc/ver.html">UVM Verification</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Minimal NDK Application Docs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Minimal NDK application</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/app-minimal.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="minimal-ndk-application">
+<span id="ndk-app-minimal"></span><h1>Minimal NDK application<a class="headerlink" href="#minimal-ndk-application" title="Permalink to this heading">¶</a></h1>
+<p>The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled (see the <a class="reference internal" href="ndk_core/intel/doc/dma.html#ndk-dma"><span class="std std-ref">DMA Module chapter</span></a>), then it forwards the network packets to and from the computer memory.</p>
+<p>The top-level application provides the Ethernet, DMA, and <a class="reference internal" href="ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI configuration bus</span></a> connections to the individual APP subcore. One independent APP subcore is instantiated for each Ethernet stream. The Ethernet and DMA streams are implemented using the <a class="reference internal" href="ofm_doc/comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB buses</span></a> and the <a class="reference internal" href="ofm_doc/comp/mvb_tools/readme.html#mvb-bus"><span class="std std-ref">MVB buses</span></a>. The block diagram below shows the connection of the Minimal application.</p>
+<a class="reference internal image-reference" href="_images/app_core.drawio.svg"><img alt="_images/app_core.drawio.svg" class="align-center" src="_images/app_core.drawio.svg" width="100%" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In case there is just one DMA stream and the number of ETH streams (= number of APP subcores) is more than one, the DMA Streams Merger and DMA Chan Mod modules provide the splitting/merging of the DMA streams and DMA channels for each APP subcore. In this case, the DMA channels available within the single DMA stream are evenly divided between all APP subcores.</p>
+</div>
+<p>In each subcore in the TX direction (DMA to ETH) the DMA channels are statically mapped to Ethernet channels (if there is more than one) according to the MSBs of the DMA channel number. For example, if there are 4 Ethernet channels and 32 DMA channels, the ETH channel number (2 bits) is taken from bits 4 and 3 of the DMA channel number. So packets from DMA channels 0-7 would all be routed to ETH channel 0, packets from DMA channels 8-15 would all be routed to ETH channel 1, etc.</p>
+<p>In the RX direction (again, for each subcore), the mapping of Ethernet channels to DMA channels is configurable by the user. The mapping is performed by the <a class="reference internal" href="ofm_doc/comp/mvb_tools/flow/channel_router/readme.html#mvb-channel-router"><span class="std std-ref">MVB Channel Router</span></a>. By default, each Ethernet channel has a portion of the available DMA channels to which it can send packets. And in the default state, it sends packets to the available DMA channels in  the round-robin mode.```</p>
+<section id="the-memory-testers">
+<h2>The Memory Testers<a class="headerlink" href="#the-memory-testers" title="Permalink to this heading">¶</a></h2>
+<p>The NDK-based Minimal application also contains <a class="reference internal" href="ofm_doc/comp/debug/mem_tester/readme.html#mem-tester"><span class="std std-ref">Memory Tester</span></a> modules connected to external memory controllers. These modules make it easy to test the operation of external memories and measure their properties (throughput, latency). The Avalon-MM bus is used to access the external memory, see <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/683091/">Avalon Interface Specifications</a>.</p>
+<p>The source code for the Memory Tester control tool is available in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/ofm/comp/debug/mem_tester/sw</span></code> folder.</p>
+<ul class="simple">
+<li><p>First, the source code must be compiled using the <code class="docutils literal notranslate"><span class="pre">make</span></code> command.</p></li>
+<li><p>Then all external memory tests can be run using the <code class="docutils literal notranslate"><span class="pre">./mem_tester</span> <span class="pre">-t</span> <span class="pre">all</span></code> command.</p></li>
+<li><p>You can also run tests with the Python helper script and generate a PDF report with the test results: <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">report_gen.py</span></code>.</p></li>
+</ul>
+</section>
+<section id="the-example-of-mi-offsets">
+<h2>The example of MI offsets<a class="headerlink" href="#the-example-of-mi-offsets" title="Permalink to this heading">¶</a></h2>
+<p>This example assumes that the Minimal application consists of two subcores and also contains two Memory tester modules.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x0000000</span><span class="o">-</span><span class="mh">0x07FFFFF</span> <span class="o">--</span> <span class="n">APP</span> <span class="n">subcore</span> <span class="mi">0</span> <span class="p">(</span><span class="n">registers</span> <span class="n">of</span> <span class="n">DMA</span> <span class="n">channel</span> <span class="n">distribution</span> <span class="o">+</span> <span class="n">reserved</span> <span class="n">space</span><span class="p">)</span>
+<span class="mh">0x0800000</span><span class="o">-</span><span class="mh">0x0FFFFFF</span> <span class="o">--</span> <span class="n">APP</span> <span class="n">subcore</span> <span class="mi">1</span> <span class="p">(</span><span class="n">registers</span> <span class="n">of</span> <span class="n">DMA</span> <span class="n">channel</span> <span class="n">distribution</span> <span class="o">+</span> <span class="n">reserved</span> <span class="n">space</span><span class="p">)</span>
+<span class="mh">0x1000000</span><span class="o">-</span><span class="mh">0x17FFFFF</span> <span class="o">--</span> <span class="n">Memory</span> <span class="n">Tester</span> <span class="mi">0</span>
+<span class="mh">0x1800000</span><span class="o">-</span><span class="mh">0x1FFFFFF</span> <span class="o">--</span> <span class="n">Memory</span> <span class="n">Tester</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The final MI address is obtained by summing the base address and the offset. If the base address of the application core is <code class="docutils literal notranslate"><span class="pre">0x02000000</span></code>, then the final address of APP subcore 1 will be <code class="docutils literal notranslate"><span class="pre">0x02000000</span> <span class="pre">+</span> <span class="pre">0x0800000</span> <span class="pre">=</span> <span class="pre">0x02800000</span></code>.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="ndk_core/doc/how_to_start.html" class="btn btn-neutral float-right" title="How to start" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Documentation of Minimal NDK Application" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2023, CESNET z.s.p.o..
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

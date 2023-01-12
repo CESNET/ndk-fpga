@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>ASFIFOX &mdash; Minimal NDK Application Docs  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="FIFOX" href="../fifox/readme.html" />
+    <link rel="prev" title="FIFO components" href="../../../../fifo.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Git branch: cabal_github_ci, <br> Git hash: d2b6e3ad
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../base.html">Basic Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../async.html">Asynchronous modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../memory.html">Memory modules</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../fifo.html">FIFO components</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../fifo.html#dual-clock-asynchronous-fifos">Dual clock (asynchronous) FIFOs</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">ASFIFOX</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../fifo.html#single-clock-fifos">Single clock FIFOs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../fifo.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dsp.html">DSP components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../shift.html">Shift registers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../logic.html">Basic logic elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../misc.html">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Minimal NDK Application Docs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../base.html">Basic Tools</a> &raquo;</li>
+        
+          <li><a href="../../../../fifo.html">FIFO components</a> &raquo;</li>
+        
+      <li>ASFIFOX</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../../../../_sources/ofm_doc/comp/base/fifo/asfifox/readme.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="asfifox">
+<span id="id1"></span><h1>ASFIFOX<a class="headerlink" href="#asfifox" title="Permalink to this heading">¶</a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-asfifox">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">ASFIFOX</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-asfifox" title="Permalink to this definition">¶</a></dt>
+<dd><p>A universal asynchronous (dual clock) FIFO, suitable both for Xilinx and Intel
+(Altera) FPGA. Can be parametrically implemented in BRAM or LUTRAM (MLAB on
+Intel FPGA = 32 items, distributed memory in Xilinx FPGA = 64 items).</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-asfifox-data_width"><td><p>DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Data word width in bits.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-asfifox-items"><td><p>ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>FIFO depth in number of data words, must be a power of two!
+Minimum value is 2.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-asfifox-ram_type"><td><p>RAM_TYPE</p></td>
+<td><p>string</p></td>
+<td><p>“BRAM”</p></td>
+<td><p>Select memory implementation. Options:</p>
+<ul class="simple">
+<li><p>“LUT”  - effective for shallow FIFO (approx. ITEMS &lt;= 64),</p></li>
+<li><p>“BRAM” - effective for deep FIFO (approx. ITEMS &gt; 64).</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-asfifox-fwft_mode"><td><p>FWFT_MODE</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>First Word Fall Through mode. If FWFT_MODE=True, valid data will be
+ready at the ASFIFOX output without RD_EN requests.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-asfifox-output_reg"><td><p>OUTPUT_REG</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>Enabled output registers allow better timing for a few flip-flops.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-asfifox-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>The DEVICE parameter allows the correct selection of the RAM
+implementation according to the FPGA used. Supported values are:</p>
+<ul class="simple">
+<li><p>“7SERIES”</p></li>
+<li><p>“ULTRASCALE”</p></li>
+<li><p>“STRATIX10”</p></li>
+<li><p>“ARRIA10”</p></li>
+<li><p>“AGILEX”</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-asfifox-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>ITEMS/2</p></td>
+<td><p>Determines how few data words must be left free for
+<a class="reference internal" href="#vhdl-portsignal-asfifox-wr_afull"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">WR_AFULL</span></code></a> to be triggered.</p>
+<p>(<code class="docutils literal notranslate"><span class="pre">currently_stored</span> <span class="pre">&gt;=</span> <span class="pre">(</span></code> <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ITEMS</span></code> <code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">ALMOST_FULL_OFFSET)</span></code></p>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-asfifox-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>ITEMS/2</p></td>
+<td><p>Determines how few data words must be stored for
+<a class="reference internal" href="#vhdl-portsignal-asfifox-rd_aempty"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RD_AEMPTY</span></code></a> to be triggered.</p>
+<p>( <code class="docutils literal notranslate"><span class="pre">currently_stored</span> <span class="pre">&lt;=</span> <span class="pre">ALMOST_EMPTY_OFFSET</span></code> )</p>
+</td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>WRITE INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_clk"><td><p>WR_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Clock for write interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-asfifox-wr_rst"><td><p>WR_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Reset for write interface. Does not affect reset on read side</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_data"><td><p>WR_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Data to be written; must be valid when <code class="docutils literal notranslate"><span class="pre">WR_EN</span> <span class="pre">=</span> <span class="pre">'1'</span></code></p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-asfifox-wr_en"><td><p>WR_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Indicates the validity of <code class="docutils literal notranslate"><span class="pre">WR_DATA</span></code>. Can be connected as SRC_RDY.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_full"><td><p>WR_FULL</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Writing is accepted only when WR_FULL=0, otherwise it is ignored.
+Can be connected as “not DST_RDY”.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-asfifox-wr_afull"><td><p>WR_AFULL</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Set to <code class="docutils literal notranslate"><span class="pre">'1'</span></code> when less than
+<code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ALMOST_FULL_OFFSET</span></code>
+space is left for writing items.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-wr_status"><td><p>WR_STATUS</p></td>
+<td><p>std_logic_vector(log2(ITEMS) downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Indicates the number of items currently stored in the FIFO</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>READ INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-rd_clk"><td><p>RD_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Clock for read interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-asfifox-rd_rst"><td><p>RD_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Reset for read interface. Does not affect reset on write side</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-rd_data"><td><p>RD_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Data available for reading; valid when <code class="docutils literal notranslate"><span class="pre">RD_EMPTY</span> <span class="pre">=</span> <span class="pre">'0'</span></code></p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-asfifox-rd_en"><td><p>RD_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Set to <code class="docutils literal notranslate"><span class="pre">'1'</span></code> to request or accept valid data on RD_DATA.
+Can be connected as DST_RDY.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-rd_empty"><td><p>RD_EMPTY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>When in <code class="docutils literal notranslate"><span class="pre">'0'</span></code> indicates valid data on <code class="docutils literal notranslate"><span class="pre">RD_DATA</span></code>.
+Can be connected as “not SRC_RDY”.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-asfifox-rd_aempty"><td><p>RD_AEMPTY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Set to <code class="docutils literal notranslate"><span class="pre">'1'</span></code> when less than
+<code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">ALMOST_EMPTY_OFFSET</span></code>
+items are left for reading.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-asfifox-rd_status"><td><p>RD_STATUS</p></td>
+<td><p>std_logic_vector(log2(ITEMS) downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Indicates the number of items currently stored in the FIFO. Items in
+output registers are also included in the calculation. There may be
+cases where <code class="docutils literal notranslate"><span class="pre">RD_STATUS</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> and data are not yet available at the
+output (<code class="docutils literal notranslate"><span class="pre">RD_EMPTY</span> <span class="pre">=</span> <span class="pre">'1'</span></code>).</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<section id="block-diagram">
+<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading">¶</a></h2>
+<a class="reference internal image-reference" href="../../../../../_images/asfifox.svg"><img alt="../../../../../_images/asfifox.svg" src="../../../../../_images/asfifox.svg" width="100%" /></a>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../fifox/readme.html" class="btn btn-neutral float-right" title="FIFOX" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../../../../fifo.html" class="btn btn-neutral float-left" title="FIFO components" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2023, CESNET z.s.p.o..
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

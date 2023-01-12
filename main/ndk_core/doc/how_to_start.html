@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>How to start &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Terminology" href="terminology.html" />
+    <link rel="prev" title="Minimal NDK application" href="../../app-minimal.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-build-an-fpga-firmware-with-an-ndk-based-application">How to build an FPGA firmware with an NDK-based application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-prepare-the-fpga-card-and-the-host-pc">How to prepare the FPGA card and the host PC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-load-the-firmware-to-an-fpga-card">How to load the firmware to an FPGA card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-check-the-ndk-firmware-in-the-fpga">How to check the NDK firmware in the FPGA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#further-work-with-the-ndk">Further work with the NDK</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ver.html">UVM Verification</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Minimal NDK Application Docs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>How to start</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/ndk_core/doc/how_to_start.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="how-to-start">
+<span id="ndk-how-to-start"></span><h1>How to start<a class="headerlink" href="#how-to-start" title="Permalink to this heading">¶</a></h1>
+<p>This chapter describes steps for building the FPGA firmware, loading it into the FPGA card, and using it.</p>
+<section id="how-to-build-an-fpga-firmware-with-an-ndk-based-application">
+<h2>How to build an FPGA firmware with an NDK-based application<a class="headerlink" href="#how-to-build-an-fpga-firmware-with-an-ndk-based-application" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Go to the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/build/&lt;your_card&gt;/</span></code> directory.</p></li>
+<li><p>Check or modify the <code class="docutils literal notranslate"><span class="pre">app_conf.tcl</span></code> file, where you can change the firmware configuration.</p></li>
+<li><p>Build the FPGA firmware with Quartus/Vivado by the <code class="docutils literal notranslate"><span class="pre">make</span></code> command in the same folder.</p></li>
+<li><p>If you do not have a DMA IP (it is not part of the open-source NDK), you must use the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">DMA_TYPE=0</span></code> command to disable the DMA and create a loopback instead.</p></li>
+<li><p>Wait until the FPGA firmware build successfully finishes.</p></li>
+<li><p>The FPGA firmware file (bitstream) is in the same directory in the NDK format (.nfw) or the Quartus/Vivado format (.sof/.bit).</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To build the FPGA firmware, you must have Intel Quartus Prime Pro or Xilinx Vivado (depending on the target card) installed, including a valid license.</p>
+</div>
+</section>
+<section id="how-to-prepare-the-fpga-card-and-the-host-pc">
+<h2>How to prepare the FPGA card and the host PC<a class="headerlink" href="#how-to-prepare-the-fpga-card-and-the-host-pc" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>The target FPGA card may require proper switch settings. Check the card manufacturer’s instructions.</p></li>
+<li><p>Plug the target FPGA card into the PCIe slot of the host PC.</p></li>
+<li><p>Install <a class="reference external" href="https://github.com/CESNET/ndk-sw">the NDK drivers and tools</a> on the host PC. <a class="reference external" href="https://github.com/CESNET/ndk-sw/releases">The pre-built .rpm and .deb packages can be found here</a>.</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The FPGA card and its firmware are designed for a specific PCIe generation and a specific number of PCIe lines. If you plug an FPGA card into a slot that does not support such PCIe configuration, you may experience slower data transfer over the PCIe interface or a general malfunction.</p>
+</div>
+</section>
+<section id="how-to-load-the-firmware-to-an-fpga-card">
+<h2>How to load the firmware to an FPGA card<a class="headerlink" href="#how-to-load-the-firmware-to-an-fpga-card" title="Permalink to this heading">¶</a></h2>
+<p>The NDK platform uses the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-boot.html">nfb-boot tool</a> to load the new firmware into the FPGA (booting). You can find an example of how to use it to load firmware into an FPGA card below.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The nfb-boot tool expects that some NDK firmware is already loaded in the FPGA. If this is not your case, follow the FPGA card manufacturer’s instructions for loading the FPGA firmware.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The method of booting the FPGA firmware may vary from card to card;  the nfb-boot tool does not support all cards. Please refer to your card’s documentation for more detailed information. For example, <a class="reference internal" href="../../ndk_cards/dk-dev-1sdx-p/readme.html#card-s10dx-dk"><span class="std std-ref">the firmware can be uploaded to the Intel Stratix 10 DX FPGA Development Kit using Quartus and prepared scripts</span></a>.</p>
+</div>
+<ul class="simple">
+<li><p>Copy the <code class="docutils literal notranslate"><span class="pre">your_ndk_firmware.nfw</span></code> file into the host PC with your connected card (if it is not already there).</p></li>
+<li><p>Boot the NDK firmware by using the <code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-f0</span> <span class="pre">your_ndk_firmware.nfw</span></code> command.</p></li>
+<li><p>Wait until the NDK firmware boot successfully finishes.</p></li>
+</ul>
+</section>
+<section id="how-to-check-the-ndk-firmware-in-the-fpga">
+<h2>How to check the NDK firmware in the FPGA<a class="headerlink" href="#how-to-check-the-ndk-firmware-in-the-fpga" title="Permalink to this heading">¶</a></h2>
+<p>The NDK platform uses the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-info.html">nfb-info tool</a> to read the basic information about the NDK firmware from the FPGA card. Using this tool, we can check that our NDK firmware has booted correctly. An example of the output of the nfb-info tool can be seen below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>nfb-info
+---------------------------------------<span class="w"> </span>Board<span class="w"> </span>info<span class="w"> </span>----
+Network<span class="w"> </span>interfaces<span class="w">         </span>:<span class="w"> </span><span class="m">2</span>
+------------------------------------<span class="w"> </span>Firmware<span class="w"> </span>info<span class="w"> </span>----
+Project<span class="w"> </span>name<span class="w">               </span>:<span class="w"> </span>NDK_MINIMAL
+Built<span class="w"> </span>at<span class="w">                   </span>:<span class="w"> </span><span class="m">2022</span>-09-24<span class="w"> </span><span class="m">00</span>:44:19
+Build<span class="w"> </span>tool<span class="w">                 </span>:<span class="w"> </span>Quartus<span class="w"> </span>Version<span class="w"> </span><span class="m">22</span>.2.0<span class="w"> </span>Build<span class="w"> </span><span class="m">94</span><span class="w"> </span><span class="m">06</span>/08/2022<span class="w"> </span>SC<span class="w"> </span>Pro<span class="w"> </span>Edition
+Build<span class="w"> </span>author<span class="w">               </span>:<span class="w"> </span>no-reply@liberouter.org
+RX<span class="w"> </span>queues<span class="w">                  </span>:<span class="w"> </span><span class="m">16</span>
+TX<span class="w"> </span>queues<span class="w">                  </span>:<span class="w"> </span><span class="m">16</span>
+ETH<span class="w"> </span>channels<span class="w">               </span>:<span class="w"> </span><span class="m">2</span>
+--------------------------------------<span class="w"> </span>System<span class="w"> </span>info<span class="w"> </span>----
+PCIe<span class="w"> </span>Endpoint<span class="w"> </span><span class="m">0</span>:
+*<span class="w"> </span>PCI<span class="w"> </span>slot<span class="w">                </span>:<span class="w"> </span><span class="m">0000</span>:82:00.0
+*<span class="w"> </span>PCI<span class="w"> </span>speed<span class="w">               </span>:<span class="w"> </span><span class="m">16</span><span class="w"> </span>GT/s
+*<span class="w"> </span>PCI<span class="w"> </span>link<span class="w"> </span>width<span class="w">          </span>:<span class="w"> </span>x8
+*<span class="w"> </span>NUMA<span class="w"> </span>node<span class="w">               </span>:<span class="w"> </span><span class="m">1</span>
+PCIe<span class="w"> </span>Endpoint<span class="w"> </span><span class="m">1</span>:
+*<span class="w"> </span>PCI<span class="w"> </span>slot<span class="w">                </span>:<span class="w"> </span><span class="m">0000</span>:81:00.0
+*<span class="w"> </span>PCI<span class="w"> </span>speed<span class="w">               </span>:<span class="w"> </span><span class="m">16</span><span class="w"> </span>GT/s
+*<span class="w"> </span>PCI<span class="w"> </span>link<span class="w"> </span>width<span class="w">          </span>:<span class="w"> </span>x8
+*<span class="w"> </span>NUMA<span class="w"> </span>node<span class="w">               </span>:<span class="w"> </span><span class="m">1</span>
+</pre></div>
+</div>
+</section>
+<section id="further-work-with-the-ndk">
+<h2>Further work with the NDK<a class="headerlink" href="#further-work-with-the-ndk" title="Permalink to this heading">¶</a></h2>
+<p>After you have completed the first steps with the NDK firmware, you may want to learn more about the NDK architecture or start testing the NDK firmware.
+The following references provide the information to do just that.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="terminology.html#ndk-terminology"><span class="std std-ref">Here, you can read about frequently used terms in NDK firmware</span></a>.</p></li>
+<li><p><a class="reference internal" href="../intel/readme.html#ndk-intel"><span class="std std-ref">Here, you can find detailed information about the NDK firmware architecture</span></a>.</p></li>
+<li><p><a class="reference internal" href="configuration.html#ndk-configuration"><span class="std std-ref">Here, you can find detailed information about the NDK configuration files and parameters</span></a>.</p></li>
+<li><p><a class="reference internal" href="testing.html#ndk-testing"><span class="std std-ref">Here, you can learn how to test R/W requests to the registers in the NDK firmware or what other tests are available and how to utilize them</span></a>.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="terminology.html" class="btn btn-neutral float-right" title="Terminology" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../../app-minimal.html" class="btn btn-neutral float-left" title="Minimal NDK application" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, CESNET z.s.p.o..
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

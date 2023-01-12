@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>AMM_PROBE &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="MEM_TESTER Software" href="../sw/readme.html" />
+    <link rel="prev" title="AMM_GEN" href="../amm_gen/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../debug.html">Debug Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../readme.html">DDR4 Memory Tester</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#internal-architecture">Internal Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#mi-bus-control">MI Bus Control</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../readme.html#sub-components">Sub-components</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../amm_gen/readme.html">AMM_GEN</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">AMM_PROBE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#software">Software</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Minimal NDK Application Docs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../debug.html">Debug Tools</a> &raquo;</li>
+        
+          <li><a href="../readme.html">DDR4 Memory Tester</a> &raquo;</li>
+        
+      <li>AMM_PROBE</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../../../../_sources/ofm_doc/comp/debug/mem_tester/amm_probe/readme.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="amm-probe">
+<span id="id1"></span><h1>AMM_PROBE<a class="headerlink" href="#amm-probe" title="Permalink to this heading">¶</a></h1>
+<p>AMM_PROBE listens to the AMM bus and measures:</p>
+<ul class="simple">
+<li><p>Written / read AMM words and read requests count</p></li>
+<li><p>Number of ticks (CLK cycles) from the first to the last write request (same for read requests)</p></li>
+<li><p>Number of ticks (CLK cycles) of the whole communication (from the first r/w req to the last r/w req)</p></li>
+<li><p>Average, minimal and maximal latency of read requests</p></li>
+<li><p>Latency histogram of read requests</p></li>
+</ul>
+<section id="mi-bus-control">
+<h2>MI Bus Control<a class="headerlink" href="#mi-bus-control" title="Permalink to this heading">¶</a></h2>
+<p><strong>MI Address Space Definition</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x00</span> <span class="o">--</span> <span class="n">ctrl</span>
+              <span class="mf">0.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">reset</span>
+              <span class="mf">1.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">to</span> <span class="n">first</span> <span class="n">received</span> <span class="n">word</span>
+              <span class="mf">2.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">write</span> <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">3.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">read</span>  <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">4.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">r</span><span class="o">/</span><span class="n">w</span>   <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">5.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">write</span> <span class="n">words</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">6.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">read</span> <span class="n">words</span>  <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">7.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">read</span> <span class="n">req</span>    <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">8.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">ticks</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">9.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">counters</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">10.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="nb">sum</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">11.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">histogramer</span> <span class="n">counters</span> <span class="n">overflow</span> <span class="n">occurred</span>
+              <span class="mf">12.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">histogramer</span> <span class="ow">is</span> <span class="n">linear</span> <span class="n">occurred</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x04</span> <span class="o">--</span> <span class="n">write</span> <span class="n">ticks</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x08</span> <span class="o">--</span> <span class="n">read</span>  <span class="n">ticks</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x0C</span> <span class="o">--</span> <span class="n">r</span><span class="o">/</span><span class="n">w</span>   <span class="n">ticks</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x10</span> <span class="o">--</span> <span class="n">written</span> <span class="n">words</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x14</span> <span class="o">--</span> <span class="n">read</span>    <span class="n">words</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x18</span> <span class="o">--</span> <span class="n">read</span> <span class="n">request</span> <span class="n">made</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x1C</span> <span class="o">--</span> <span class="n">latency</span> <span class="nb">sum</span> <span class="p">(</span><span class="mi">2</span><span class="n">x</span> <span class="n">MI</span> <span class="n">registers</span><span class="p">)</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x24</span> <span class="o">--</span> <span class="n">latency</span> <span class="nb">min</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x28</span> <span class="o">--</span> <span class="n">latency</span> <span class="nb">max</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x2C</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">hist</span> <span class="n">cnt</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x20</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">hist</span> <span class="n">sel</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x34</span> <span class="o">--</span> <span class="n">AMM</span> <span class="n">data</span> <span class="n">width</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x38</span> <span class="o">--</span> <span class="n">AMM</span> <span class="n">address</span> <span class="n">width</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x3C</span> <span class="o">--</span> <span class="n">AMM</span> <span class="n">burst</span> <span class="n">width</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x40</span> <span class="o">--</span> <span class="n">AMM</span> <span class="n">freq</span> <span class="p">[</span><span class="n">kHz</span><span class="p">]</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x44</span> <span class="o">--</span> <span class="n">latency</span> <span class="n">ticks</span> <span class="n">width</span>
+<span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x48</span> <span class="o">--</span> <span class="n">histogramer</span> <span class="n">counters</span> <span class="n">cnt</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../sw/readme.html" class="btn btn-neutral float-right" title="MEM_TESTER Software" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../amm_gen/readme.html" class="btn btn-neutral float-left" title="AMM_GEN" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, CESNET z.s.p.o..
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

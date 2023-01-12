@@ -1,0 +1,15 @@
+/* Read The Docs theme customization */
+@import 'theme.css';
+
+@media screen {
+
+    /* Change maximum size of content column but no images */
+    .wy-nav-content{max-width: 1200px; }
+    .rst-content img{max-width: 800px; }
+
+    /* Change maximum size of tables*/
+    .wy-table-responsive table td { white-space: normal; }
+    .wy-table-responsive { overflow: auto; }
+    .rst-content table.docutils caption { text-align: left; font-size: 100%; }
+
+}

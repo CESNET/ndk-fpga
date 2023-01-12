@@ -1,0 +1,426 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>MI ASYNC &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="MI indirect access" href="../indirect_access/readme.html" />
+    <link rel="prev" title="MI bus specification" href="../readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../mi.html">MI Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../readme.html">MI bus specification</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MI ASYNC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../indirect_access/readme.html">MI indirect access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reconf/readme.html">MI Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter_plus_gen/readme.html">MI Splitter Plus Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../converters/mi2avmm/readme.html">MI2AVMM</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Minimal NDK Application Docs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../mi.html">MI Tools</a> &raquo;</li>
+        
+      <li>MI ASYNC</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../../../_sources/ofm_doc/comp/mi_tools/async/readme.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="mi-async">
+<span id="id1"></span><h1>MI ASYNC<a class="headerlink" href="#mi-async" title="Permalink to this heading">¶</a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mi_async">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MI_ASYNC</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mi_async" title="Permalink to this definition">¶</a></dt>
+<dd><p>The MI_ASYNC implements the MI bus transition between two clock domains.
+Asynchronous FIFO memory is used to implement the cross-domain crossing.
+The MI_ASYNC component also contains logic that can ensure the correct
+behavior of the MI bus in the event of an unexpected reset in only one clock
+domain (see RESET_LOGIC generic).</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-mi_async-data_width"><td><p>DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Data word width in bits, must be power of 2.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mi_async-addr_width"><td><p>ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Address word width in bits.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mi_async-meta_width"><td><p>META_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Meta word width in bits.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mi_async-ram_type"><td><p>RAM_TYPE</p></td>
+<td><p>string</p></td>
+<td><p>“LUT”</p></td>
+<td><p>Select memory implementation. Options: “LUT” or “BRAM”</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mi_async-reset_logic"><td><p>RESET_LOGIC</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>RESET_LOGIC provides additional logic for safe asynchronous reset of the component
+when one or both of the sides are in reset state, without violating MI protocol</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mi_async-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>The DEVICE parameter allows the correct selection of the RAM
+implementation according to the FPGA used.</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-mi_async-clk_m"><td><p>CLK_M</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Master interface: Clock</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-reset_m"><td><p>RESET_M</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Master interface: Reset</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-mi_m_dwr"><td><p>MI_M_DWR</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Master interface: MI Write Data</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-mi_m_mwr"><td><p>MI_M_MWR</p></td>
+<td><p>std_logic_vector(META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Master interface: MI Write Metadata</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-mi_m_addr"><td><p>MI_M_ADDR</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Master interface: MI Address</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-mi_m_rd"><td><p>MI_M_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Master interface: MI Read Request</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-mi_m_wr"><td><p>MI_M_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Master interface: MI Write Request</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-mi_m_be"><td><p>MI_M_BE</p></td>
+<td><p>std_logic_vector((DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Master interface: Byte Enable</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-mi_m_drd"><td><p>MI_M_DRD</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Master interface: MI Read Data</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-mi_m_ardy"><td><p>MI_M_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Master interface: MI Address Ready</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-mi_m_drdy"><td><p>MI_M_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Master interface: MI Read Data Ready</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-clk_s"><td><p>CLK_S</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Slave interface: Clock</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-reset_s"><td><p>RESET_S</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Slave interface: Reset</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-mi_s_dwr"><td><p>MI_S_DWR</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Slave interface: MI Write Data</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-mi_s_mwr"><td><p>MI_S_MWR</p></td>
+<td><p>std_logic_vector(META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Slave interface: MI Write Metadata</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-mi_s_addr"><td><p>MI_S_ADDR</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Slave interface: MI Address</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-mi_s_rd"><td><p>MI_S_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Slave interface: MI Read Request</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-mi_s_wr"><td><p>MI_S_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Slave interface: MI Write Request</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-mi_s_be"><td><p>MI_S_BE</p></td>
+<td><p>std_logic_vector((DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Slave interface: Byte Enable</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-mi_s_drd"><td><p>MI_S_DRD</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Slave interface: MI Read Data</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_async-mi_s_ardy"><td><p>MI_S_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Slave interface: MI Address Ready</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_async-mi_s_drdy"><td><p>MI_S_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Slave interface: MI Read Data Ready</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../indirect_access/readme.html" class="btn btn-neutral float-right" title="MI indirect access" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../readme.html" class="btn btn-neutral float-left" title="MI bus specification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, CESNET z.s.p.o..
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

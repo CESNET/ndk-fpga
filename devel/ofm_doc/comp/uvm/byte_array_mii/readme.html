@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Byte array to MII transitional environment &mdash; Minimal NDK Application Docs  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Byte Array to LII convert enviroment" href="../byte_array_lii/readme.html" />
+    <link rel="prev" title="Byte array to pma convert enviroment" href="../byte_array_pma/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Git branch: cabal_github_ci, <br> Git hash: d2b6e3ad
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">SystemVerilog and UVM tutorial</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_mvb/readme.html">logic_vector_mvb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array/readme.html">Logic Vector Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_mfb/readme.html">logic_vector_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Byte array to MII transitional environment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#monitor-sv">monitor.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequencer-sv">sequencer.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#env-sv">env.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequence-rx-base-sv">sequence_rx_base.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequence-tx-base-sv">sequence_tx_base.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ce-generator-sv">ce_generator.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#wrapper-sv">wrapper.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ipg-generator-sv">ipg_generator.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#channel-align-sv">channel_align.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-buffer-sv">data_buffer.sv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequence-rx-sv-and-sequence-tx-sv">sequence_rx.sv and sequence_tx.sv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../common/readme.html">Common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-interface">LII interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-monitor">LII monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-driver">LII driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mvb/readme.html">MVB agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mfb/readme.html">MFB Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Minimal NDK Application Docs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../ver.html">UVM Verification</a> &raquo;</li>
+        
+          <li><a href="../componets.html">Components</a> &raquo;</li>
+        
+      <li>Byte array to MII transitional environment</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../../../_sources/ofm_doc/comp/uvm/byte_array_mii/readme.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="byte-array-to-mii-transitional-environment">
+<h1>Byte array to MII transitional environment<a class="headerlink" href="#byte-array-to-mii-transitional-environment" title="Permalink to this heading">¶</a></h1>
+<p>The purpose of this environment is to create MII and Byte array agents, set them up correctly, introduce randomness to data generation, and guarantee, that this data will be sent and read as standard defines. This environment allows to use multi-channel xMII bus and one cannot verify components that are using the MII bus, without this high-level environment.</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<p>There are two types of environment: RX and TX. To use the RX environment, instantiate it, and run byte_array sequence on the high-level agent (if active). To use the TX environment, just instantiate it, no need to run any sequences.</p>
+</section>
+<section id="monitor-sv">
+<h2>monitor.sv<a class="headerlink" href="#monitor-sv" title="Permalink to this heading">¶</a></h2>
+<p>The monitor takes low-level xMII transactions and extracts data from them. It creates one byte_array transaction for a frame transmitted.</p>
+</section>
+<section id="sequencer-sv">
+<h2>sequencer.sv<a class="headerlink" href="#sequencer-sv" title="Permalink to this heading">¶</a></h2>
+<p>This sequencer contains a reference to a high-level sequencer.</p>
+</section>
+<section id="env-sv">
+<h2>env.sv<a class="headerlink" href="#env-sv" title="Permalink to this heading">¶</a></h2>
+<p>This file contains RX and TX environments. RX environment, if active, takes high-level transactions from the byte_array agent, transforms them to low-level xMII transactions and sends them to the interface. TX environment, if active, drives the CLK_EN signal.</p>
+</section>
+<section id="sequence-rx-base-sv">
+<h2>sequence_rx_base.sv<a class="headerlink" href="#sequence-rx-base-sv" title="Permalink to this heading">¶</a></h2>
+<p>This file contains a base class for all RX sequences. It is recommended for all RX sequences to inherit from them. They can be modified by creating specific instances of classes described below.</p>
+</section>
+<section id="sequence-tx-base-sv">
+<h2>sequence_tx_base.sv<a class="headerlink" href="#sequence-tx-base-sv" title="Permalink to this heading">¶</a></h2>
+<p>This file contains a base class for all TX sequences. It is recommended for all TX sequences to inherit from them. They can be modified by creating specific instances of classes described below.</p>
+</section>
+<section id="ce-generator-sv">
+<h2>ce_generator.sv<a class="headerlink" href="#ce-generator-sv" title="Permalink to this heading">¶</a></h2>
+<p>Classes in this file take care of generating clock enable signal.</p>
+</section>
+<section id="wrapper-sv">
+<h2>wrapper.sv<a class="headerlink" href="#wrapper-sv" title="Permalink to this heading">¶</a></h2>
+<p>This class takes an array (FIFO, to make implementation easier) of bytes as input and adds the start of frame delimiter and preamble to the beginning of data, and appends the end of frame delimiter to the end. It also creates control logic array for the whole wrapped array of bytes</p>
+</section>
+<section id="ipg-generator-sv">
+<h2>ipg_generator.sv<a class="headerlink" href="#ipg-generator-sv" title="Permalink to this heading">¶</a></h2>
+<p>This class appends a random number (between idle_count_min and idle_count_max) of idle octets to the wrapped frame and control array.</p>
+</section>
+<section id="channel-align-sv">
+<h2>channel_align.sv<a class="headerlink" href="#channel-align-sv" title="Permalink to this heading">¶</a></h2>
+<p>This class appends as many idle octets to the array as needed to make sure, that the next frame starts on lane 0 of any channel. In other words, it fills the remaining free bytes of the current channel with idle octets.</p>
+</section>
+<section id="data-buffer-sv">
+<h2>data_buffer.sv<a class="headerlink" href="#data-buffer-sv" title="Permalink to this heading">¶</a></h2>
+<p>This class accumulates data generated in pipeline (byte array -&gt; wrapper -&gt; ipg_generator -&gt; channel_align -&gt; data_buffer) until low-level transaction can be generated. In case, when more than one low-level transaction can be generated, it informs the user about it and one can retrieve data from it until no low-level transaction can be generated. In case no more high-level transactions will be generated, it can generate idle octets until one, last low-level transaction can be generated (flush).</p>
+<p>As the last step, low-level transactions are distributed accordingly to channels.</p>
+</section>
+<section id="sequence-rx-sv-and-sequence-tx-sv">
+<h2>sequence_rx.sv and sequence_tx.sv<a class="headerlink" href="#sequence-rx-sv-and-sequence-tx-sv" title="Permalink to this heading">¶</a></h2>
+<p>These files contain sequences specific by different speeds (amount of idle octets) and clock enable patterns.</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../byte_array_lii/readme.html" class="btn btn-neutral float-right" title="Byte Array to LII convert enviroment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../byte_array_pma/readme.html" class="btn btn-neutral float-left" title="Byte array to pma convert enviroment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2023, CESNET z.s.p.o..
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

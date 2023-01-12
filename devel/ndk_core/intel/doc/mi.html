@@ -1,0 +1,292 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>The MI bus interconnect &mdash; Minimal NDK Application Docs  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="The Network Module" href="eth.html" />
+    <link rel="prev" title="The Application" href="app.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                Git branch: cabal_github_ci, <br> Git hash: d2b6e3ad
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../readme.html">NDK architecture</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="app.html">The Application</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">The MI bus interconnect</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-main-allocation-of-the-mi-address-space">The main allocation of the MI address space</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eth.html">The Network Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dma.html">The DMA module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pcie.html">The PCIe module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mem.html">The Memory Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tsu.html">Time Stamp Unit</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Minimal NDK Application Docs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../readme.html">NDK architecture</a> &raquo;</li>
+        
+      <li>The MI bus interconnect</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../../_sources/ndk_core/intel/doc/mi.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="the-mi-bus-interconnect">
+<span id="ndk-mi"></span><h1>The MI bus interconnect<a class="headerlink" href="#the-mi-bus-interconnect" title="Permalink to this heading">¶</a></h1>
+<p>The NDK provides the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-bus.html#nfb-bus">nfb-bus tool</a> and an <a class="reference external" href="https://cesnet.github.io/ndk-sw/libnfb-quick-start-registers.html">API for generating read/write memory requests</a>. These requests are transferred via the <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> in the NDK firmware. This memory-oriented bus is wired throughout the NDK firmware and each part has an allocated address space. The components accessible over the MI bus and their specific address spaces are described in the NDK using a <a class="reference internal" href="../../doc/devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a>.</p>
+<p>The MI bus interconnection allows easy access to implemented Control/Status Registers (CSR). Communication via the <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> is always initiated by the software via direct memory access to the PCIe device (FPGA card) memory space. The software sends a read or write PCIe transaction, which is then processed by the <a class="reference internal" href="../../../ofm_doc/comp/pcie/mtc/readme.html#mtc"><span class="std std-ref">MTC module</span></a> implemented in the FPGA. The MTC module acts as a Master point on the MI bus. It translates requests from the PCIe bus to the MI bus and handles their execution.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A read request to a non-existent/non-implemented memory space in the FPGA can deadlock the NDK firmware or the entire PCIe communication.</p>
+</div>
+<section id="the-main-allocation-of-the-mi-address-space">
+<h2>The main allocation of the MI address space<a class="headerlink" href="#the-main-allocation-of-the-mi-address-space" title="Permalink to this heading">¶</a></h2>
+<p>An address range of 26 bits is available for the whole NDK firmware. It is divided between the individual parts of the design. The main allocation of the MI address space must be identically described in the VHDL package <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/core/intel/src/mi_addr_space_pkg.vhd</span></code> and in the DeviceTree file of the NDK-CORE <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/core/intel/src/DevTree.tcl</span></code>. This allocation can also be found below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x00000000</span><span class="o">-</span><span class="mh">0x000000FF</span> <span class="o">--</span> <span class="n">Test</span> <span class="n">space</span> <span class="p">(</span><span class="n">debug</span> <span class="n">R</span><span class="o">/</span><span class="n">W</span> <span class="n">registers</span><span class="p">)</span>
+<span class="mh">0x00000100</span><span class="o">-</span><span class="mh">0x00000FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
+<span class="mh">0x00001000</span><span class="o">-</span><span class="mh">0x00001FFF</span> <span class="o">--</span> <span class="n">SDM</span><span class="o">/</span><span class="n">SYSMON</span> <span class="n">controller</span> <span class="p">(</span><span class="n">FPGA</span> <span class="n">temp</span><span class="p">,</span> <span class="n">Intel</span> <span class="n">ASx4</span> <span class="n">boot</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
+<span class="mh">0x00002000</span><span class="o">-</span><span class="mh">0x00002FFF</span> <span class="o">--</span> <span class="n">BOOT</span> <span class="n">controller</span> <span class="p">(</span><span class="n">generic</span> <span class="n">flash</span> <span class="n">access</span><span class="p">)</span>
+<span class="mh">0x00003000</span><span class="o">-</span><span class="mh">0x00003FFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">PMD</span> <span class="p">(</span><span class="n">QSFP</span> <span class="n">controller</span><span class="p">)</span>
+<span class="mh">0x00004000</span><span class="o">-</span><span class="mh">0x000040FF</span> <span class="o">--</span> <span class="n">Timestamp</span> <span class="n">unit</span>
+<span class="mh">0x00004100</span><span class="o">-</span><span class="mh">0x00004FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
+<span class="mh">0x00005000</span><span class="o">-</span><span class="mh">0x00007FFF</span> <span class="o">--</span> <span class="n">Debug</span> <span class="n">GLS</span> <span class="n">modules</span>
+<span class="mh">0x00008000</span><span class="o">-</span><span class="mh">0x0000BFFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">MACs</span>
+<span class="mh">0x0000C000</span><span class="o">-</span><span class="mh">0x0000FFFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
+<span class="mh">0x00010000</span><span class="o">-</span><span class="mh">0x0001FFFF</span> <span class="o">--</span> <span class="n">DRAFT</span><span class="p">:</span> <span class="n">Memory</span> <span class="n">controller</span>
+<span class="mh">0x00020000</span><span class="o">-</span><span class="mh">0x007FFFFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
+<span class="mh">0x00800000</span><span class="o">-</span><span class="mh">0x00FFFFFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">PCS</span><span class="o">/</span><span class="n">PMA</span>
+<span class="mh">0x01000000</span><span class="o">-</span><span class="mh">0x013FFFFF</span> <span class="o">--</span> <span class="n">DMA</span> <span class="n">controller</span>
+<span class="mh">0x01400000</span><span class="o">-</span><span class="mh">0x01FFFFFF</span> <span class="o">--</span> <span class="n">DRAFT</span><span class="p">:</span> <span class="n">MSIX</span> <span class="n">controller</span>
+<span class="mh">0x02000000</span><span class="o">-</span><span class="mh">0x03FFFFFF</span> <span class="o">--</span> <span class="n">The</span> <span class="n">Application</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A module with an allocated address space can further divide it among its subcomponents. A description of the address space allocation must be included in DevTree.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="eth.html" class="btn btn-neutral float-right" title="The Network Module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="app.html" class="btn btn-neutral float-left" title="The Application" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2023, CESNET z.s.p.o..
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

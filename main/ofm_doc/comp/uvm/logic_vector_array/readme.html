@@ -1,0 +1,396 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Logic Vector Array agent &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="logic_vector_array_mfb environment" href="../logic_vector_array_mfb/readme.html" />
+    <link rel="prev" title="logic_vector_mvb environment" href="../logic_vector_mvb/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">SystemVerilog and UVM tutorial</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_mvb/readme.html">logic_vector_mvb environment</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Logic Vector Array agent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#logic-vector-array-sequence-item">Logic Vector Array sequence item</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logic-vector-array-monitor">Logic Vector Array monitor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logic-vector-array-sequence">Logic Vector Array Sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequence-configuration">Sequence configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_mfb/readme.html">logic_vector_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mii/readme.html">Byte array to MII transitional environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../common/readme.html">Common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-interface">LII interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-monitor">LII monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-driver">LII driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mvb/readme.html">MVB agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mfb/readme.html">MFB Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Minimal NDK Application Docs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../ver.html">UVM Verification</a> &raquo;</li>
+        
+          <li><a href="../componets.html">Components</a> &raquo;</li>
+        
+      <li>Logic Vector Array agent</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../../../_sources/ofm_doc/comp/uvm/logic_vector_array/readme.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="logic-vector-array-agent">
+<span id="uvm-logic-vector-array"></span><h1>Logic Vector Array agent<a class="headerlink" href="#logic-vector-array-agent" title="Permalink to this heading">¶</a></h1>
+<p>The main task of this agent is to generate a field of logic vectors that can be sent to the DUT through a lower-level agent. This agent does not contain a driver because it is a higher-level agent.
+However, it connects all components like the driver, monitor, etc., together. It has its own configuration object which contains one parameter: active (the agent is active when it is set, else it is passive).
+When the agent is active, a sequencer is created. When it is passive, only a monitor is created.</p>
+<section id="logic-vector-array-sequence-item">
+<h2>Logic Vector Array sequence item<a class="headerlink" href="#logic-vector-array-sequence-item" title="Permalink to this heading">¶</a></h2>
+<p>A sequence item contains only one randomizable item.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">logic[ITEM_WIDTH-1</span> <span class="pre">:</span> <span class="pre">0]</span> <span class="pre">data[]</span></code> sequence_item randomizable variable</p></li>
+</ul>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">do_copy</span></code></p></li>
+</ul>
+</td>
+<td><p>Is used for copying of the transaction.</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">do_compare</span></code></p></li>
+</ul>
+</td>
+<td><p>Is used for comparing data of two transactions.</p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">convert2string</span></code></p></li>
+</ul>
+</td>
+<td><p>Is used for printing the whole transaction.</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">convert2block</span></code></p></li>
+</ul>
+</td>
+<td><p>Is used for printing the whole transaction which is divided into blocks.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="logic-vector-array-monitor">
+<h2>Logic Vector Array monitor<a class="headerlink" href="#logic-vector-array-monitor" title="Permalink to this heading">¶</a></h2>
+<p>Logic Vector Array monitor is a basic class used to monitor traffic.
+This is only a simple monitor which creates an analysis port and a sequence item
+and must be subclassed to a particular lower-level interface.</p>
+<blockquote>
+<div><p>See, for example, the logic_vector_array_mfb environment of Logic Vector Array to MFB conversion.</p>
+</div></blockquote>
+</section>
+<section id="logic-vector-array-sequence">
+<h2>Logic Vector Array Sequence<a class="headerlink" href="#logic-vector-array-sequence" title="Permalink to this heading">¶</a></h2>
+<p>This package contains some interesting predefined sequences. Sequences generate N random transactions.
+The number of transactions is randomly selected when the sequence is randomized. Transactions contain a randomizable
+byte array. The major difference between the sequences is the boundary of the randomized size of a byte array.
+Every sequence has its own setting which sets a boundary for the randomization process. The following table shows
+a simplified description of these sequences. It describes the properties of byte arrays in transactions.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Sequence</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>sequence_simple</p></td>
+<td><p>the size of the byte array is randomly distributed by a uniform distribution,</p></td>
+</tr>
+<tr class="row-odd"><td><p>sequence_simple_const</p></td>
+<td><p>the size of the byte array is the same for all transactions in the sequence,</p></td>
+</tr>
+<tr class="row-even"><td><p>sequence_simple_gauss</p></td>
+<td><p>the size of the byte array is randomly distributed by a normal distribution,</p></td>
+</tr>
+<tr class="row-odd"><td><p>sequence_simple_inc</p></td>
+<td><p>the size of the byte array is increased for every generated transaction,</p></td>
+</tr>
+<tr class="row-even"><td><p>sequence_simple_dec</p></td>
+<td><p>the size of the byte array is decreased for every generated transaction</p></td>
+</tr>
+</tbody>
+</table>
+<p>The last sequence is the <code class="docutils literal notranslate"><span class="pre">sequence_lib</span></code>, which picks N random sequences from the list above
+and runs them consecutively on the sequencer</p>
+</section>
+<section id="sequence-configuration">
+<h2>Sequence configuration<a class="headerlink" href="#sequence-configuration" title="Permalink to this heading">¶</a></h2>
+<p>The configuration object <cite>config_sequence</cite> contains a single configuration function.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>array_size_set(min, max)</p></td>
+<td><p>[bytes]</p></td>
+<td><p>Set minimum and maximum array size</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="n">sequence_lib</span><span class="w"> </span><span class="n">seq</span><span class="p">;</span>
+
+<span class="n">seq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence_lib</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;seq&quot;</span><span class="p">);</span>
+<span class="n">seq</span><span class="p">.</span><span class="n">cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="c1">//set maximum and minimum packet size</span>
+<span class="n">seq</span><span class="p">.</span><span class="n">cfg</span><span class="p">.</span><span class="n">array_size_set</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../logic_vector_array_mfb/readme.html" class="btn btn-neutral float-right" title="logic_vector_array_mfb environment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../logic_vector_mvb/readme.html" class="btn btn-neutral float-left" title="logic_vector_mvb environment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, CESNET z.s.p.o..
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

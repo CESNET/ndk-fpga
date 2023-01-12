@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Terminology &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="NDK architecture" href="../intel/readme.html" />
+    <link rel="prev" title="How to start" href="how_to_start.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="how_to_start.html">How to start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Terminology</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ethernet-port">Ethernet Port</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ethernet-lanes">Ethernet Lanes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ethernet-channel">Ethernet Channel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ethernet-stream">Ethernet Stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dma-stream">DMA Stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dma-channel">DMA Channel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ver.html">UVM Verification</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Minimal NDK Application Docs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Terminology</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/ndk_core/doc/terminology.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="terminology">
+<span id="ndk-terminology"></span><h1>Terminology<a class="headerlink" href="#terminology" title="Permalink to this heading">¶</a></h1>
+<p>This chapter explains frequently used terms.</p>
+<section id="ethernet-port">
+<h2>Ethernet Port<a class="headerlink" href="#ethernet-port" title="Permalink to this heading">¶</a></h2>
+<p>In our terminology, the <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Port</span></code> corresponds to one physical network port, typically one optical cage (for example, QSFP28 or QSFP-DD).</p>
+</section>
+<section id="ethernet-lanes">
+<h2>Ethernet Lanes<a class="headerlink" href="#ethernet-lanes" title="Permalink to this heading">¶</a></h2>
+<p>The term <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Lanes</span></code> refer to high-speed serial lines used in the physical layer of the Ethernet protocol.
+Each type of Ethernet Port can use a different number of <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Lanes</span></code> (for example, QSFP28 uses 4, and QSFP-DD uses 8).</p>
+</section>
+<section id="ethernet-channel">
+<h2>Ethernet Channel<a class="headerlink" href="#ethernet-channel" title="Permalink to this heading">¶</a></h2>
+<p>Each Ethernet Port can use a different number of high-speed serial lines (Ethernet Lanes), typically 4 or 8. Different Ethernet standards (like 100 GbE, 25 GbE,…) require one or more of these lanes. For port QSFP28, where there are 4 lanes running at 28 Gbps, 100 GbE standard would take up all 4 lanes together forming one <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">channel</span></code>. For another Ethernet standard like 25 GbE, one lane is enough. Using all 4 lanes, we would get 4 separate 25 Gigabit <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">channels</span></code>.</p>
+</section>
+<section id="ethernet-stream">
+<h2>Ethernet Stream<a class="headerlink" href="#ethernet-stream" title="Permalink to this heading">¶</a></h2>
+<p>An <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Stream</span></code> is a group of data interfaces (RX and TX) that transmits Ethernet packets from/to a selected number of Ethernet Channels.
+In our platform, the number of <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">Streams</span></code> typically corresponds to the number of Ethernet Ports.</p>
+</section>
+<section id="dma-stream">
+<h2>DMA Stream<a class="headerlink" href="#dma-stream" title="Permalink to this heading">¶</a></h2>
+<p>An <code class="docutils literal notranslate"><span class="pre">DMA</span> <span class="pre">Stream</span></code> is a group of data interfaces (RX and TX) that transmits DMA packets from/to DMA module.
+In our platform, the number of <code class="docutils literal notranslate"><span class="pre">DMA</span> <span class="pre">Streams</span></code> typically corresponds to the number of Ethernet Streams (and therefore Ethernet Ports).</p>
+</section>
+<section id="dma-channel">
+<h2>DMA Channel<a class="headerlink" href="#dma-channel" title="Permalink to this heading">¶</a></h2>
+<p>The DMA controller supports data transmission in each direction (RX and TX) in multiple independent queues, which in our terminology we refer to as <code class="docutils literal notranslate"><span class="pre">DMA</span> <span class="pre">channels</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../intel/readme.html" class="btn btn-neutral float-right" title="NDK architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="how_to_start.html" class="btn btn-neutral float-left" title="How to start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, CESNET z.s.p.o..
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
