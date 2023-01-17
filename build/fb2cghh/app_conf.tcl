@@ -8,17 +8,7 @@
 # NOTE: The detailed description of the usage of this file can be viewed in the
 # Parametrizing section of the NDK-CORE documentation.
 
-# ------------------------------------------------------------------------------
-# PCIe parameters (not all combinations work):
-# ------------------------------------------------------------------------------
-# Supported combinations for this card:
-# 1x PCIe Gen3 x16 -- PCIE_ENDPOINT_MODE=0 (Note: default configuration)
-# 1x PCIe Gen3 x8  -- PCIE_ENDPOINT_MODE=2 (Low-latency configuration)
-# ------------------------------------------------------------------------------
-# PCIe endpoint mode (possible values: 0, 2):
-# 0 = 1x16 lanes
-# 2 = 1x8 Low-latency (Xilinx USP only)
-set PCIE_ENDPOINT_MODE 0
+# NOTE: Use the PCIE_CONF make parameter to select the PCIe configuration.
 
 # ------------------------------------------------------------------------------
 # DMA parameters:

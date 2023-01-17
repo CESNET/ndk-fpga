@@ -5,25 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-# ------------------------------------------------------------------------------
-# PCIe parameters (not all combinations work):
-# ------------------------------------------------------------------------------
-# Supported combinations for this card:
-# 1x PCIe Gen5 x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1
-# 2x PCIe Gen4 x8x8 -- PCIE_GEN=4, PCIE_ENDPOINTS=4, PCIE_ENDPOINT_MODE=1 (Note: default configuration)
-# 1x PCIe Gen4 x8x8 -- PCIE_GEN=4, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1 (Note: limited DMA performance)
-# ------------------------------------------------------------------------------
-# PCIe Generation (possible values: 4, 5):
-# 4 = PCIe Gen4 (Stratix 10 with P-Tile or Agilex)
-# 5 = PCIe Gen5 (Agilex with R-Tile)
-set PCIE_GEN           4
-# PCIe endpoints (possible values: 2, 4):
-# 2 = 2x PCIe x16 in two slot OR 2x PCIe x8 in one slot (bifurcation x8+x8)
-# 4 = 4x PCIe x8 in two slots (bifurcation x8+x8)
-set PCIE_ENDPOINTS     4
-# PCIe endpoint mode (possible values: 1):
-# 1 = 2x8 lanes (bifurcation x8+x8)
-set PCIE_ENDPOINT_MODE 1
+# NOTE: Use the PCIE_CONF make parameter to select the PCIe configuration.
 
 # ------------------------------------------------------------------------------
 # DMA parameters:

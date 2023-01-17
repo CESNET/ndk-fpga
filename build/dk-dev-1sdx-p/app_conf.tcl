@@ -8,26 +8,7 @@
 # NOTE: The detailed description of the usage of this file can be viewed in the
 # Parametrizing section of the NDK-CORE documentation.
 
-# ------------------------------------------------------------------------------
-# PCIe parameters (not all combinations work):
-# ------------------------------------------------------------------------------
-# Supported combinations for this card:
-# 1x PCIe Gen4 x8x8 -- PCIE_GEN=4, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1 (Note: default configuration)
-# 1x PCIe Gen4 x16  -- PCIE_GEN=4, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0 (Note: worse DMA performance)
-# 2x PCIe Gen4 x8x8 -- PCIE_GEN=4, PCIE_ENDPOINTS=4, PCIE_ENDPOINT_MODE=1 (Note: only for DMA_400G_DEMO)
-# ------------------------------------------------------------------------------
-# PCIe Generation (possible values: 4):
-# 4 = PCIe Gen4 (Stratix 10 with P-Tile or Agilex)
-set PCIE_GEN           4
-# PCIe endpoints (possible values: 1, 2, 4):
-# 1 = 1x PCIe x16 in one slot
-# 2 = 2x PCIe x16 in two slot OR 2x PCIe x8 in one slot (bifurcation x8+x8)
-# 4 = 4x PCIe x8 in two slots (bifurcation x8+x8)
-set PCIE_ENDPOINTS     2
-# PCIe endpoint mode (possible values: 0, 1):
-# 0 = 1x16 lanes
-# 1 = 2x8 lanes (bifurcation x8+x8)
-set PCIE_ENDPOINT_MODE 1
+# NOTE: Use the PCIE_CONF make parameter to select the PCIe configuration.
 
 # ------------------------------------------------------------------------------
 # DMA parameters:

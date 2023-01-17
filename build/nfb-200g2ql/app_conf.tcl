@@ -7,18 +7,7 @@
 # NOTE: The detailed description of the usage of this file can be viewed in the
 # Parametrizing section of the NDK-CORE documentation.
 
-# ------------------------------------------------------------------------------
-# PCIe parameters:
-# ------------------------------------------------------------------------------
-# Supported combinations for this card:
-# 1x PCIe Gen3 x16 -- PCIE_GEN=3, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0
-# 2x PCIe Gen3 x16 -- PCIE_GEN=3, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=0 (Note: default configuration)
-# ------------------------------------------------------------------------------
-# PCIe endpoints (possible values: 1, 2):
-# 1 = 1x PCIe x16 in one slot
-# 2 = 2x PCIe x16 in two slot
-set PCIE_ENDPOINTS 2
-# Other PCIe parameters are fixed.
+# NOTE: Use the PCIE_CONF make parameter to select the PCIe configuration.
 
 # ------------------------------------------------------------------------------
 # DMA parameters:
