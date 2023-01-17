@@ -13,6 +13,18 @@ The PCIe module handles all PCIe communication. Its task is to forward/transform
 .. NOTE::
     The PCIe module can support more than one PCIe endpoint. In this case, the individual parts of the PCIe module are appropriately duplicated for each PCIe endpoint. There is also bifurcation support for some PCIe HARD IPs.
 
+Selecting a PCIe configuration
+******************************
+
+Before running the FPGA firmware compilation, the target PCIe configuration can be selected using the makefile parameter ``PCIE_CONF``. Without this parameter, the card default configuration is automatically selected. Only some FPGA cards support multiple PCIe configurations. If you enter an unsupported value (for example: ``PCIE_CONF=1xGen1x16``), the console will list the supported configurations on the target FPGA card.
+
+**Examples of some allowed configurations:**
+
+- ``PCIE_CONF=1xGen3x16``  -- Single PCIe slot in Gen3 x16 mode.
+- ``PCIE_CONF=2xGen4x8x8`` -- Two PCIe slots in Gen4 x8x8 (bifuracation) mode.
+- ``PCIE_CONF=2xGen5x8x8`` -- Two PCIe slots in Gen5 x8x8 (bifuracation) mode.
+- ``PCIE_CONF=1xGen3x8LL`` -- Single PCIe slot in Gen3 x8 Low-Latency mode (for Xilinx UltraScale+ only).
+
 The PCIe Core (PCIE_CORE)
 *************************
 

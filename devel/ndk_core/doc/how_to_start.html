@@ -32,7 +32,7 @@
             <a href="../../index.html" class="icon icon-home"> Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c46d9853
+                Git branch: devel, <br> Git hash: 25149766
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -50,7 +50,10 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">How to start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#what-dependencies-are-needed-to-build-an-fpga-firmware">What dependencies are needed to build an FPGA firmware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#how-to-build-an-fpga-firmware-with-an-ndk-based-application">How to build an FPGA firmware with an NDK-based application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-build-an-fpga-firmware-with-an-ndk-based-application">How to build an FPGA firmware with an NDK-based application</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#list-of-make-parameters">List of make parameters:</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-prepare-the-fpga-card-and-the-host-pc">How to prepare the FPGA card and the host PC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-load-the-firmware-to-an-fpga-card">How to load the firmware to an FPGA card</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-check-the-ndk-firmware-in-the-fpga">How to check the NDK firmware in the FPGA</a></li>
@@ -131,6 +134,14 @@
 <li><p>Wait until the FPGA firmware build successfully finishes.</p></li>
 <li><p>The FPGA firmware file (bitstream) is in the same directory in the NDK format (.nfw) or the Quartus/Vivado format (.sof/.bit).</p></li>
 </ul>
+<section id="list-of-make-parameters">
+<h3>List of make parameters:<a class="headerlink" href="#list-of-make-parameters" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF</span></code> – Allows you to set the PCIe configuration, for example: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">PCIE_CONF=1xGen4x16</span></code>. More information can be found in the <a class="reference internal" href="../intel/doc/pcie.html#ndk-pcie-mod"><span class="std std-ref">documentation of the PCIe module</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE</span></code>  – Allows you to select the DMA controller, for example <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">DMA_TYPE=0</span></code>. More information and allowed values can be found in the <a class="reference internal" href="../intel/doc/dma.html#ndk-dma"><span class="std std-ref">documentation of the DMA module</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BOARD_REV</span></code> – Allows you to set the board revision number, for correct firmware settings. This parameter is not available for all FPGA cards. You can find the allowed values in the NDK documentation for the specific card.</p></li>
+</ul>
+</section>
 </section>
 <section id="how-to-prepare-the-fpga-card-and-the-host-pc">
 <h2>How to prepare the FPGA card and the host PC<a class="headerlink" href="#how-to-prepare-the-fpga-card-and-the-host-pc" title="Permalink to this heading"></a></h2>

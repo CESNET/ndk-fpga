@@ -32,7 +32,7 @@
             <a href="../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c46d9853
+                Git branch: devel, <br> Git hash: 25149766
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -56,6 +56,7 @@
 <li class="toctree-l2"><a class="reference internal" href="eth.html">The Network Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dma.html">The DMA module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">The PCIe module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#selecting-a-pcie-configuration">Selecting a PCIe configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#the-pcie-core-pcie-core">The PCIe Core (PCIE_CORE)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#supported-pcie-hard-ip">Supported PCIe Hard IP</a></li>
 </ul>
@@ -127,6 +128,17 @@
 <p class="admonition-title">Note</p>
 <p>The PCIe module can support more than one PCIe endpoint. In this case, the individual parts of the PCIe module are appropriately duplicated for each PCIe endpoint. There is also bifurcation support for some PCIe HARD IPs.</p>
 </div>
+<section id="selecting-a-pcie-configuration">
+<h2>Selecting a PCIe configuration<a class="headerlink" href="#selecting-a-pcie-configuration" title="Permalink to this heading"></a></h2>
+<p>Before running the FPGA firmware compilation, the target PCIe configuration can be selected using the makefile parameter <code class="docutils literal notranslate"><span class="pre">PCIE_CONF</span></code>. Without this parameter, the card default configuration is automatically selected. Only some FPGA cards support multiple PCIe configurations. If you enter an unsupported value (for example: <code class="docutils literal notranslate"><span class="pre">PCIE_CONF=1xGen1x16</span></code>), the console will list the supported configurations on the target FPGA card.</p>
+<p><strong>Examples of some allowed configurations:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF=1xGen3x16</span></code>  – Single PCIe slot in Gen3 x16 mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF=2xGen4x8x8</span></code> – Two PCIe slots in Gen4 x8x8 (bifuracation) mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF=2xGen5x8x8</span></code> – Two PCIe slots in Gen5 x8x8 (bifuracation) mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF=1xGen3x8LL</span></code> – Single PCIe slot in Gen3 x8 Low-Latency mode (for Xilinx UltraScale+ only).</p></li>
+</ul>
+</section>
 <section id="the-pcie-core-pcie-core">
 <h2>The PCIe Core (PCIE_CORE)<a class="headerlink" href="#the-pcie-core-pcie-core" title="Permalink to this heading"></a></h2>
 <p>The PCIe Core varies according to the PCIe Hard IP or FPGA used. The PCIe Core contains the instance(s) of the used PCIe Hard IP, an adapter for converting the AXI/Avalon-ST buses to the <a class="reference internal" href="../../../ofm_doc/comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB buses</span></a>, the Vendor-Specific Extension Capability (VSEC) registers (implemented in the <a class="reference internal" href="../../../ofm_doc/comp/pcie/common/readme.html#pci-ext-cap"><span class="std std-ref">PCI_EXT_CAP module</span></a>) containing mainly the <a class="reference internal" href="../../doc/devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a> firmware description and additional configuration logic. Thus, the main purpose of the PCIe Core is to unify the buses and provide the necessary information about the active PCIe link.</p>

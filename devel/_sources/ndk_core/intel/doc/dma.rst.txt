@@ -24,10 +24,10 @@ The DMA module optionally includes a :ref:`Gen Loop Switch (GLS) module <gls_deb
 Selecting a DMA controller
 **************************
 
-Before running the FPGA firmware compilation, the desired DMA controller can be selected using the makefile parameter ``DMA_TYPE``. These are the allowed values:
+Before running the FPGA firmware compilation, the desired DMA controller can be selected using the makefile parameter ``DMA_TYPE``. Without this parameter, the default DMA controller is automatically selected. These are the allowed values:
 
 - ``DMA_TYPE=0`` -- No DMA IP is instantiated. DMA IP is replaced by a loopback.
-- ``DMA_TYPE=3`` -- DMA Medusa IP
+- ``DMA_TYPE=3`` -- DMA Medusa IP (default DMA controller)
 - ``DMA_TYPE=4`` -- DMA Calypte IP
 
 DMA Medusa IP notes

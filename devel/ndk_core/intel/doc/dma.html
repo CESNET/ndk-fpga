@@ -32,7 +32,7 @@
             <a href="../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c46d9853
+                Git branch: devel, <br> Git hash: 25149766
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -131,10 +131,10 @@
 <a class="reference internal image-reference" href="../../../_images/dma_module.drawio.svg"><img alt="../../../_images/dma_module.drawio.svg" class="align-center" src="../../../_images/dma_module.drawio.svg" width="100%" /></a>
 <section id="selecting-a-dma-controller">
 <h2>Selecting a DMA controller<a class="headerlink" href="#selecting-a-dma-controller" title="Permalink to this heading"></a></h2>
-<p>Before running the FPGA firmware compilation, the desired DMA controller can be selected using the makefile parameter <code class="docutils literal notranslate"><span class="pre">DMA_TYPE</span></code>. These are the allowed values:</p>
+<p>Before running the FPGA firmware compilation, the desired DMA controller can be selected using the makefile parameter <code class="docutils literal notranslate"><span class="pre">DMA_TYPE</span></code>. Without this parameter, the default DMA controller is automatically selected. These are the allowed values:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=0</span></code> – No DMA IP is instantiated. DMA IP is replaced by a loopback.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=3</span></code> – DMA Medusa IP</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=3</span></code> – DMA Medusa IP (default DMA controller)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=4</span></code> – DMA Calypte IP</p></li>
 </ul>
 </section>

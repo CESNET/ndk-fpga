@@ -32,7 +32,7 @@
             <a href="../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c46d9853
+                Git branch: devel, <br> Git hash: 25149766
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -140,17 +140,17 @@
              
   <section id="mi-agent">
 <h1>MI agent<a class="headerlink" href="#mi-agent" title="Permalink to this heading"></a></h1>
-<p>This package containts two UVM vrification agents which generate transaction to interface <a class="reference internal" href="../../mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus specification</span></a>. Slave agent is connet to slave DUT port. Master agent is connected to master DUT port.
-Both agents have three class parameters. <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> , <code class="docutils literal notranslate"><span class="pre">ADDR_WIDTH</span></code> and <code class="docutils literal notranslate"><span class="pre">META_WIDHT</span></code>. <code class="docutils literal notranslate"><span class="pre">META_WIDTH</span></code> has default value set to 0.</p>
+<p>This package contains two UVM verification agents which generate transactions to the :ref:MI&lt;mi_bus&gt; interface. The slave agent is connected to the slave DUT port but acts as the master of this communication (the slave agent generates the requests for the DUT). The master agent is connected to the master DUT port but acts as the slave of this communication (it accepts the requests from the DUT).
+Both agents have three class parameters. <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> , <code class="docutils literal notranslate"><span class="pre">ADDR_WIDTH</span></code> and <code class="docutils literal notranslate"><span class="pre">META_WIDTH</span></code>. <code class="docutils literal notranslate"><span class="pre">META_WIDTH</span></code> has default value set to 0.</p>
 <a class="reference internal image-reference" href="../../../../_images/MI_agent.svg"><img alt="../../../../_images/MI_agent.svg" class="align-center" src="../../../../_images/MI_agent.svg" width="50%" /></a>
 <section id="sequence-item">
 <h2>Sequence_item<a class="headerlink" href="#sequence-item" title="Permalink to this heading"></a></h2>
-<p>There is two sequence item. First sequence_item_request is for generating request and second sequence_item_response is for response.</p>
+<p>There are two sequence items. The sequence_item_request is for generating requests, and the sequence_item_response is for responses.</p>
 <p>Sequence_item_request</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 8%" />
-<col style="width: 8%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
 <col style="width: 85%" />
 </colgroup>
 <thead>
@@ -162,31 +162,31 @@ Both agents have three class parameters. <code class="docutils literal notransla
 <tbody>
 <tr class="row-even"><td><p>addr</p></td>
 <td><p>yes</p></td>
-<td><p>Requested adress. Variable is logic vector widht <code class="docutils literal notranslate"><span class="pre">ADDR_WIDTH</span></code></p></td>
+<td><p>Requested address. Variable is the logic vector width <code class="docutils literal notranslate"><span class="pre">ADDR_WIDTH</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>meta</p></td>
 <td><p>yes</p></td>
-<td><p>Metadata. Variables is logic vector width <code class="docutils literal notranslate"><span class="pre">META_WIDTH</span></code></p></td>
+<td><p>Metadata. Variable is the logic vector width <code class="docutils literal notranslate"><span class="pre">META_WIDTH</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p>be</p></td>
 <td><p>yes</p></td>
-<td><p>Byte enable for reading or writing data. Variable is logic vector width <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH/8</span></code></p></td>
+<td><p>Byte enable for reading or writing data. Variable is the logic vector width <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH/8</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>wr</p></td>
 <td><p>yes</p></td>
-<td><p>Write requeste. It cannot be assert when signal rd is assert</p></td>
+<td><p>Write request. It cannot be asserted when signal rd is asserted.</p></td>
 </tr>
 <tr class="row-even"><td><p>dwr</p></td>
 <td><p>yes</p></td>
-<td><p>Written data. Variable is logic vector width <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code></p></td>
+<td><p>Written data. Variable is the logic vector width <a href="#id1"><span class="problematic" id="id2">``</span></a>DATA_WIDTH <a href="#id3"><span class="problematic" id="id4">``</span></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>rd</p></td>
 <td><p>yes</p></td>
-<td><p>Read request. It cannot be sserted when signal wr is asserted</p></td>
+<td><p>Read request. It cannot be asserted when signal wr is asserted.</p></td>
 </tr>
 <tr class="row-even"><td><p>ardy</p></td>
 <td><p>no</p></td>
-<td><p>Driver send response in this signal if reqeust have been accepted DUT.</p></td>
+<td><p>Driver sends a response in this signal if the request has been accepted DUT.</p></td>
 </tr>
 </tbody>
 </table>
@@ -195,7 +195,7 @@ Both agents have three class parameters. <code class="docutils literal notransla
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 10%" />
-<col style="width: 79%" />
+<col style="width: 80%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -206,7 +206,7 @@ Both agents have three class parameters. <code class="docutils literal notransla
 <tbody>
 <tr class="row-even"><td><p>drd</p></td>
 <td><p>yes</p></td>
-<td><p>Responded data. Variables is logic vector width <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code></p></td>
+<td><p>Responded data. Variable is the logic vector width <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>drdy</p></td>
 <td><p>yes</p></td>
@@ -214,21 +214,26 @@ Both agents have three class parameters. <code class="docutils literal notransla
 </tr>
 <tr class="row-even"><td><p>ardy</p></td>
 <td><p>yes</p></td>
-<td><p>accepting request</p></td>
+<td><p>Acception of the request.</p></td>
 </tr>
 </tbody>
 </table>
-<p>Slave agent use only sequence_item_request with extension of ardy. which is set to 1 when request is accepted by DUT.</p>
-<p>Master agent use two sequence_item. Sequence_item_request and sequence_item_response. When response is generated and send to DUT driver response with sequence_item_request.
-Master driver cannot reply in same clock thick as response. This create hole in functional verification which should be covered in future implementation. But it made comunication protocal
-more complicated and depends on clock. Currenty comunication between master_driver and master_sequence work like. Firstly is send response which would be exposted to interface.
-After clock event master driver read request from interface and send it to sequence. This mean response have to be send to driver earlier that request is known.
-This would be improve in future.</p>
-<p>There is five prepared sequences for slave agent.</p>
+<p>The slave agent uses only the sequence_item_request with the extension of ardy, which is set to 1 when the DUT accepts a request.
+The master agent uses two sequence items: sequence_item_request and sequence_item_response.
+When a response is generated and sent to the DUT, the driver responds with a sequence_item_request.
+The master driver cannot reply at the same clock cycle as the response.
+This creates a hole in the functional verification which should be fixed in the future.
+But it made communication protocol more complicated and depended on the clock.
+Currently, the communication between master_driver and master_sequence works like this.
+First, the master_driver sends a request to the master_sequence to get an “invalid” response that is not sent to the DUT, it just starts off the communication between them.
+The sequence replies with a request that is actually the first response for the DUT MI master.
+This means that a response must be sent to the driver before the request is known.
+This would be improved in future.</p>
+<p>There are six prepared sequences for the slave agent.</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 12%" />
-<col style="width: 88%" />
+<col style="width: 11%" />
+<col style="width: 89%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -237,28 +242,30 @@ This would be improve in future.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>sequence_slave</p></td>
-<td><p>generate random 10-200 mi transactions</p></td>
+<td><p>generate random 10-200 MI transactions</p></td>
 </tr>
 <tr class="row-odd"><td><p>sequence_slave_same_addr</p></td>
-<td><p>generate random 10-200 mi transaction to random pick adrres</p></td>
+<td><p>generate random 10-200 MI transactions to random addresses</p></td>
 </tr>
 <tr class="row-even"><td><p>sequence_slave_incr_addr</p></td>
-<td><p>genearte random 10-200 mi transaction. Ewery transaction is on different addres. When sequence is randomized then is randomly          pick first adress, random increment size and if sequence increment or decrement adress.</p></td>
+<td><p>generate random 10-200 MI transactions. Every transaction is to a different address. When the sequence is randomized, then the first address is random, the increment/decrement size, and whether the address is incremented or decremented.</p></td>
 </tr>
 <tr class="row-odd"><td><p>sequence_slave_slave_burst</p></td>
-<td><p>generate random 10-200 mi transaction. Sequence randomly chose burst mode. There is four burst mode (NO_OPERATION, ONLY READ, ONLY WRITE, RANDOM READ WRITE).</p></td>
+<td><p>generate random 10-200 MI transactions. Sequence randomly selects burst mode. There are four burst modes (NO_OPERATION, ONLY READ, ONLY WRITE, RANDOM READ WRITE).</p></td>
 </tr>
-<tr class="row-even"><td><p>sequence_slave_library</p></td>
-<td><p>Run random number of mi slave sequence’s on mi mequencer. The number of sequence’s is in bounds from 100 to 500.”</p></td>
+<tr class="row-even"><td><p>sequence_slave_sim</p></td>
+<td><p>generate user-defined MI transactions. There are three tasks, mi_write (for MI write transactions), mi_read (for MI read transactions), and create_sequence_item (A virtual task where the user can define a set of custom MI transactions).</p></td>
 </tr>
 </tbody>
 </table>
-<p>There is four prepared sequences for master agent. Sequence_master contain taks set_rd which read response and check if reset have been asserted. Then add request to sequencer if there is.
-If reset is set then all request is delete from sequencer.</p>
+<p>There are four prepared sequences for the master agent.
+A sequence_master contains a task set_rd which reads the response and checks if reset has been asserted.
+Then it adds a request to the sequencer if there is one.
+If reset is set, then all requests are deleted from the sequencer.</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 9%" />
-<col style="width: 91%" />
+<col style="width: 8%" />
+<col style="width: 92%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -267,16 +274,16 @@ If reset is set then all request is delete from sequencer.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>sequence_master</p></td>
-<td><p>generate random 10-200 mi transactions</p></td>
+<td><p>generate random 10-200 MI transactions</p></td>
 </tr>
 <tr class="row-odd"><td><p>sequence_master_burst</p></td>
-<td><p>generate random 10-200 mi transaction to random pick adrres. When sequece is randomized then is randomly pick bust mode. (NO ARDY and DRDY, ONLY ARDY, ONLY DRDY, ARDY And DRDY). DRDY is generated only when enought reqeusted for reading have beend received.</p></td>
+<td><p>generate random 10-200 MI transaction to random addresses. When the sequence is randomized, then a burst mode is randomly selected. (NO ARDY and DRDY, ONLY ARDY, ONLY DRDY, ARDY and DRDY). DRDY is generated only when enough requests for reading have been received.</p></td>
 </tr>
 <tr class="row-even"><td><p>sequence_master_max</p></td>
-<td><p>genearte random 10-200 mi transaction. Ardy is asserted always. Drdy have one clock thick delay. this is implementation limitation.</p></td>
+<td><p>generate random 10-200 MI transaction. Ardy is always asserted. Drdy has one clock cycle delay. This is the implementation’s limitation.</p></td>
 </tr>
 <tr class="row-odd"><td><p>sequence_slave_library</p></td>
-<td><p>Random run mi sequence_slave sequence 100 - 500 on mi sequencer.</p></td>
+<td><p>Randomly run MI sequence_slave 100 - 500 sequences on the MI sequencer.</p></td>
 </tr>
 </tbody>
 </table>
