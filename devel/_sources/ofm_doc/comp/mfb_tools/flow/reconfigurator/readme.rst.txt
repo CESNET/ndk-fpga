@@ -30,11 +30,16 @@ The components included in the architecture are as follows:
 
     Is cappable of dividing Items into smaller Items to increase their number *or* joining multiple Items in one Block to decrease their number.
 
+    .. vhdl:autoentity:: MFB_ITEM_RECONFIGURATOR
+
 #. MFB Block Reconfigurator
 
     Division of Blocks into smaller Blocks ---
     the division is only done between Items; the component cannot split Items ---
     *or* joining of multiple Blocks within the same Region into bigger Blocks.
+
+    .. vhdl:autoentity:: MFB_BLOCK_RECONFIGURATOR
+
 
 #. MFB Region Reconfigurator
 
@@ -42,10 +47,9 @@ The components included in the architecture are as follows:
     the division is only done between Blocks; the component cannot split Blocks ---
     *or* joining of multiple Regions within the word into bigger Regions.
 
-#. MFB Transformer
+    .. vhdl:autoentity:: MFB_REGION_RECONFIGURATOR
 
-    Division of Regions in one word into multiple words *or* joining of Regions from multiple words into one word.
-    (In other words: changing MFB word size by adding or removing Regions.)
+#. :ref:`MFB Transformer<mfb_transformer>`
 
 It is important to realize, that the components cannot be placed in the MFB Reconfigurator in an arbitrary order.
 In fact, as you can see in the diagram above, all of them appart from the MFB Transformer are required to be present **twice**.
