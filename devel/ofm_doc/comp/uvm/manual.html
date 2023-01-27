@@ -20,7 +20,7 @@
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Components" href="componets.html" />
+    <link rel="next" title="UVM simulation" href="sim_manual.html" />
     <link rel="prev" title="UVM Verification" href="../../ver.html" /> 
 </head>
 
@@ -32,7 +32,7 @@
             <a href="../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: df6e7977
+                Git branch: devel, <br> Git hash: 8cd70899
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -120,10 +120,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#testbench">Testbench</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#uvm-simulation">UVM simulation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">NOTES</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#uvm-error-vs-uvm-fatal">UVM_error vs UVM_fatal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parametrized-object">Parametrized object</a></li>
@@ -137,6 +133,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="sim_manual.html">UVM simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="componets.html">Components</a></li>
 </ul>
 </li>
@@ -1622,191 +1619,6 @@ generate coverage.</p>
 </div>
 </section>
 </section>
-<section id="uvm-simulation">
-<h2>UVM simulation<a class="headerlink" href="#uvm-simulation" title="Permalink to this heading"></a></h2>
-<p>UVM simulation is a tool that can be used by FW developers to create baseline tests for their components.
-This section will explain how to create a UVM simulation.</p>
-<section id="examples">
-<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h3>
-<p>This section contains examples of the UVM simulation.
-Every example is located in the uvm_sim folder.
-All examples contain only the most necessary files (UVM components).
-Out of the components described earlier, only the Environment, Virtual Sequencer, Virtual Sequence, DUT, Testbench, and Test are used.
-Finally, for each UVM simulation, there is a <code class="docutils literal notranslate"><span class="pre">sequence_tb.sv</span></code> file, which is different for each component.
-This file contains a sequence for every interface (MFB, MVB, MI).
-The developer defines a set of transactions in each sequence he wants to generate.
-The following three examples are for the most commonly used combinations of interfaces: MFB + MI, MVB + MI, and MFB + META/MVB.
-The following subsections will describe what the sequences look like and how to modify them to use them for another component.</p>
-<section id="mfb-mi">
-<h4>MFB + MI<a class="headerlink" href="#mfb-mi" title="Permalink to this heading"></a></h4>
-<p>The first example is a simulation of the <a class="reference external" href="https://gitlab.liberouter.org/ndk/ofm/-/tree/devel/comp/mfb_tools/logic/speed_meter">Speed Meter</a> component that uses MFB and MI interfaces.
-There are two sequences in the <code class="docutils literal notranslate"><span class="pre">sequence_tb.sv</span></code> file, <code class="docutils literal notranslate"><span class="pre">sequence_mi.sv</span></code> for the MI interface and <code class="docutils literal notranslate"><span class="pre">sequence_mfb_data.sv</span></code> for the MFB interface.
-The first one inherits from the <code class="docutils literal notranslate"><span class="pre">sequence_mi_sim</span></code>, which is located in the uvm_mi pkg (for more information see, the <span class="xref std std-ref">UVM MI documentation</span>).
-There is a defined set of MI commands that controls the component.</p>
-<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">virtual</span><span class="w"> </span><span class="k">task</span><span class="w"> </span><span class="n">create_sequence_item</span><span class="p">();</span>
-<span class="w">    </span><span class="p">#(</span><span class="mi">50</span><span class="o">*</span><span class="n">CLK_PERIOD</span><span class="p">)</span>
-<span class="w">    </span><span class="c1">// Read ticks counter</span>
-<span class="w">    </span><span class="c1">// Read request</span>
-<span class="w">    </span><span class="c1">//       RD    ADDR   BE</span>
-<span class="w">    </span><span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">10&#39;h0</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="w">    </span><span class="c1">// Read max ticks counter</span>
-<span class="w">    </span><span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">10&#39;h4</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="w">    </span><span class="c1">// Read bytes counter</span>
-<span class="w">    </span><span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">10&#39;h8</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-
-<span class="w">    </span><span class="p">#(</span><span class="mi">50</span><span class="o">*</span><span class="n">CLK_PERIOD</span><span class="p">)</span>
-<span class="w">    </span><span class="c1">// Read ticks counter</span>
-<span class="w">    </span><span class="c1">// Read request</span>
-<span class="w">    </span><span class="c1">//       RD    ADDR   BE</span>
-<span class="w">    </span><span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">10&#39;h0</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="w">    </span><span class="c1">// Read max ticks counter</span>
-<span class="w">    </span><span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">10&#39;h4</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="w">    </span><span class="c1">// Read bytes counter</span>
-<span class="w">    </span><span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">10&#39;h8</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="w">    </span><span class="c1">// Clear counter</span>
-<span class="w">    </span><span class="c1">// Write request</span>
-<span class="w">    </span><span class="c1">//       WR    DATA   ADDR   BE</span>
-<span class="w">    </span><span class="n">mi_write</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">32&#39;h1</span><span class="p">,</span><span class="w"> </span><span class="mh">10&#39;hc</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="k">endtask</span>
-</pre></div>
-</div>
-<p>The second one creates a data array for the MFB interface.
-It is possible to define the structure of the MFB packet (e.g., create a custom header).
-For example, if you want to construct a packet with random values, where you want to define its size, you can use the <code class="docutils literal notranslate"><span class="pre">uvm_do_with</span></code> macro with only the size defined.</p>
-<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// Send random data with specific size</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">137</span><span class="p">;</span><span class="w">  </span><span class="p">});</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">62</span><span class="p">;</span><span class="w">   </span><span class="p">});</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">74</span><span class="p">;</span><span class="w">   </span><span class="p">});</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">256</span><span class="p">;</span><span class="w">  </span><span class="p">});</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1024</span><span class="p">;</span><span class="w"> </span><span class="p">});</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">500</span><span class="p">;</span><span class="w">  </span><span class="p">});</span>
-</pre></div>
-</div>
-<p>The second example shows how to create a packet that contains a header at its start.</p>
-<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// Send random data with specific header</span>
-<span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="n">m_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">[</span><span class="mi">136</span><span class="p">];</span>
-<span class="n">std</span><span class="o">::</span><span class="n">randomize</span><span class="p">(</span><span class="n">m_data</span><span class="p">);</span>
-<span class="c1">// Header contains only data size</span>
-<span class="n">header</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">m_data</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-<span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">[</span><span class="n">m_data</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="o">+</span><span class="n">header_width</span><span class="o">/</span><span class="n">ITEM_WIDTH</span><span class="p">];</span>
-<span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">header</span><span class="p">,</span><span class="w"> </span><span class="n">m_data</span><span class="p">};</span>
-<span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>The third example shows how to create a packet with specific data.</p>
-<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// Send specific data with specific size</span>
-<span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mh">8&#39;h04</span><span class="p">,</span><span class="w"> </span><span class="mh">8&#39;h4c</span><span class="p">,</span><span class="w"> </span><span class="mh">8&#39;h1f</span><span class="p">,</span><span class="w"> </span><span class="mh">8&#39;hfe</span><span class="p">,</span><span class="w"> </span><span class="mh">8&#39;hf0</span><span class="p">,</span><span class="w"> </span><span class="mh">8&#39;h50</span><span class="p">,</span><span class="w"> </span><span class="mh">8&#39;h7a</span><span class="p">,</span><span class="w"> </span><span class="mh">8&#39;h02</span><span class="p">};</span>
-<span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-
-<span class="c1">// Send specific data with specific size different way</span>
-<span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
-<span class="c1">// Divide data word to ITEM_WIDTH chunks and insert them to array</span>
-<span class="p">{</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="p">{</span><span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="p">}}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">&#39;hf404f404f404f404</span><span class="p">;</span>
-<span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-</pre></div>
-</div>
-</section>
-<section id="mfb-meta-mvb">
-<h4>MFB + META/MVB<a class="headerlink" href="#mfb-meta-mvb" title="Permalink to this heading"></a></h4>
-<p>The second example is a simulation of the <a class="reference external" href="https://gitlab.liberouter.org/ndk/ofm/-/tree/devel/comp/mfb_tools/flow/dropper">Dropper</a> component that uses the MFB interface with metadata.
-There are two sequences in the <code class="docutils literal notranslate"><span class="pre">sequence_tb.sv</span></code> file, <code class="docutils literal notranslate"><span class="pre">sequence_mfb_data.sv</span></code> for the MFB interface and <code class="docutils literal notranslate"><span class="pre">sequence_meta.sv</span></code> for metadata.
-The first one is the same as in the previous example, and the second one generates random metadata and drop signal.
-The number of metadata transactions have to be same as number of MFB transactions.
-In other case, the simluation will stuck.</p>
-<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// Send random meta with asserted drop signal</span>
-<span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="kt">void</span><span class="p">&#39;(</span><span class="n">std</span><span class="o">::</span><span class="n">randomize</span><span class="p">(</span><span class="n">m_meta</span><span class="p">));</span>
-<span class="n">drop</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b1</span><span class="p">;</span>
-<span class="c1">// In the DUT the drop and metadata will be in one signal</span>
-<span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">drop</span><span class="p">,</span><span class="w"> </span><span class="n">m_meta</span><span class="p">};</span>
-<span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-
-<span class="c1">// Send random meta with deasserted drop signal</span>
-<span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="kt">void</span><span class="p">&#39;(</span><span class="n">std</span><span class="o">::</span><span class="n">randomize</span><span class="p">(</span><span class="n">m_meta</span><span class="p">));</span>
-<span class="n">drop</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span>
-<span class="c1">// In the DUT the drop and metadata will be in one signal</span>
-<span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">drop</span><span class="p">,</span><span class="w"> </span><span class="n">m_meta</span><span class="p">};</span>
-<span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-
-<span class="c1">// Send random meta with deasserted drop signal</span>
-<span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="kt">void</span><span class="p">&#39;(</span><span class="n">std</span><span class="o">::</span><span class="n">randomize</span><span class="p">(</span><span class="n">m_meta</span><span class="p">));</span>
-<span class="n">drop</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span>
-<span class="c1">// In the DUT the drop and metadata will be in one signal</span>
-<span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">drop</span><span class="p">,</span><span class="w"> </span><span class="n">m_meta</span><span class="p">};</span>
-<span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-
-<span class="c1">// Send random meta with asserted drop signal</span>
-<span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="kt">void</span><span class="p">&#39;(</span><span class="n">std</span><span class="o">::</span><span class="n">randomize</span><span class="p">(</span><span class="n">m_meta</span><span class="p">));</span>
-<span class="n">drop</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b1</span><span class="p">;</span>
-<span class="c1">// In the DUT the drop and metadata will be in one signal</span>
-<span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">drop</span><span class="p">,</span><span class="w"> </span><span class="n">m_meta</span><span class="p">};</span>
-<span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-</pre></div>
-</div>
-</section>
-<section id="mvb-mi">
-<h4>MVB + MI<a class="headerlink" href="#mvb-mi" title="Permalink to this heading"></a></h4>
-<p>The last example is a simulation of the <a class="reference external" href="https://gitlab.liberouter.org/ndk/ofm/-/tree/devel/comp/mvb_tools/storage/lookup_table">Lookup Table</a> component that uses MVB interface with MI.
-There are two sequences in the <code class="docutils literal notranslate"><span class="pre">sequence_tb.sv</span></code> file, <code class="docutils literal notranslate"><span class="pre">sequence_mvb_data.sv</span></code> for the MVB interface and <code class="docutils literal notranslate"><span class="pre">sequence_mi.sv</span></code> for the MI interface.
-The first one generates data for MVB transactions.
-For this purpose, the <code class="docutils literal notranslate"><span class="pre">uvm_do_with</span></code> macro is used, where the data are user-defined.</p>
-<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">10&#39;d0</span><span class="p">;</span><span class="w">  </span><span class="p">});</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">10&#39;d4</span><span class="p">;</span><span class="w">  </span><span class="p">});</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">10&#39;d8</span><span class="p">;</span><span class="w">  </span><span class="p">});</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">10&#39;d12</span><span class="p">;</span><span class="w"> </span><span class="p">});</span>
-<span class="no">`uvm_do_with</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">10&#39;d16</span><span class="p">;</span><span class="w"> </span><span class="p">});</span>
-</pre></div>
-</div>
-<p>The second sequence is the same as in the first example but contains different MI commands.</p>
-<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// Write request</span>
-<span class="c1">//       WR    DATA          ADDR     BE</span>
-<span class="n">mi_write</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">32&#39;hda7a5407</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d0</span><span class="p">,</span><span class="w">   </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_write</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">32&#39;hda7a5411</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d512</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_write</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">32&#39;heb7ab8cc</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d4</span><span class="p">,</span><span class="w">   </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_write</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">32&#39;hda7a54cc</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d516</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_write</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">32&#39;h6fbaaa52</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d8</span><span class="p">,</span><span class="w">   </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_write</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">32&#39;h2474b6ac</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d12</span><span class="p">,</span><span class="w">  </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_write</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mh">32&#39;hc4d1ce40</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d16</span><span class="p">,</span><span class="w">  </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="p">#(</span><span class="mi">50</span><span class="o">*</span><span class="n">CLK_PERIOD</span><span class="p">)</span>
-<span class="c1">// Read request</span>
-<span class="c1">//      RD    ADDR    BE</span>
-<span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d0</span><span class="p">,</span><span class="w">  </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d4</span><span class="p">,</span><span class="w">  </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d8</span><span class="p">,</span><span class="w">  </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d12</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-<span class="n">mi_read</span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="mi">10&#39;d16</span><span class="p">,</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">);</span>
-</pre></div>
-</div>
-</section>
-<section id="how-to-use-the-uvm-simulation">
-<h4>How to use the UVM simulation<a class="headerlink" href="#how-to-use-the-uvm-simulation" title="Permalink to this heading"></a></h4>
-<p>So that was a brief description with a few examples.
-Now, if you want to use these examples for a component of your choice, here is a list of steps you have to do:</p>
-<ol class="arabic simple">
-<li><p>Copy an appropriate example (meaning with the right interfaces) to the folder with your simulation</p></li>
-<li><p>Change instance of the component in the dut.sv file to the right one</p></li>
-<li><p>Change parameters of the verification to your desires</p></li>
-<li><dl class="simple">
-<dt>In case your component has more interfaces similar to the ones in the examples, do:</dt><dd><ul class="simple">
-<li><p>Add appropriate verification interfaces to the dut.sv and testbench.sv files</p></li>
-<li><p>Add their environments to the env.sv file</p></li>
-<li><p>Add appropriate sequences to the sequence_tb.sv file</p></li>
-<li><p>Add appropriate sequencers to the sequencer.sv file</p></li>
-<li><p>Run these sequences in a virtual sequence in the same way as the others</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ol>
-</section>
-</section>
-</section>
 <section id="notes">
 <h2>NOTES<a class="headerlink" href="#notes" title="Permalink to this heading"></a></h2>
 <section id="uvm-error-vs-uvm-fatal">
@@ -1945,7 +1757,7 @@ using the “-c” switch :</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../../ver.html" class="btn btn-neutral float-left" title="UVM Verification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="componets.html" class="btn btn-neutral float-right" title="Components" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="sim_manual.html" class="btn btn-neutral float-right" title="UVM simulation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

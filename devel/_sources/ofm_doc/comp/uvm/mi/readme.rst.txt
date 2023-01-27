@@ -1,3 +1,12 @@
+.. readme.rst: Documentation of single component
+.. Copyright (C) 2021 CESNET z. s. p. o.
+.. Author(s): Radek Iša   <isa@cesnet.cz>
+..
+.. SPDX-License-Identifier: BSD-3-Clause
+
+.. UVM MI
+.. _uvm_mi:
+
 MI agent
 ********
 This package contains two UVM verification agents which generate transactions to the :ref:MI<mi_bus> interface. The slave agent is connected to the slave DUT port but acts as the master of this communication (the slave agent generates the requests for the DUT). The master agent is connected to the master DUT port but acts as the slave of this communication (it accepts the requests from the DUT).
@@ -56,7 +65,7 @@ sequence_slave                generate random 10-200 MI transactions
 sequence_slave_same_addr      generate random 10-200 MI transactions to random addresses
 sequence_slave_incr_addr      generate random 10-200 MI transactions. Every transaction is to a different address. When the sequence is randomized, then the first address is random, the increment/decrement size, and whether the address is incremented or decremented.
 sequence_slave_slave_burst    generate random 10-200 MI transactions. Sequence randomly selects burst mode. There are four burst modes (NO_OPERATION, ONLY READ, ONLY WRITE, RANDOM READ WRITE).
-sequence_slave_sim            generate user-defined MI transactions. There are three tasks, mi_write (for MI write transactions), mi_read (for MI read transactions), and create_sequence_item (A virtual task where the user can define a set of custom MI transactions).
+sequence_slave_sim            generate user-defined MI transactions. There are three tasks, mi_write (for MI write transactions), mi_read (for MI read transactions), get_rsp (to get MI read response) and create_sequence_item (A virtual task where the user can define a set of custom MI transactions).
 ============================= ================================================
 
 There are four prepared sequences for the master agent.
