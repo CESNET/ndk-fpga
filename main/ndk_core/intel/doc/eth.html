@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Network module &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -29,11 +29,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -106,7 +110,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../readme.html">NDK architecture</a></li>
       <li class="breadcrumb-item active">Network module</li>
       <li class="wy-breadcrumbs-aside">
@@ -153,10 +157,6 @@ It is connected directly to the serial (QSFP) pins of the FPGA.
 On the other (right) side, it is connected to the TX and RX MAC lites over MFB and to MI interconnect.
 Both architectures of the Network module core are displayed below.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/etile_network_module_core.svg"><img alt="../../../_images/etile_network_module_core.svg" class="align-center" src="../../../_images/etile_network_module_core.svg" width="80%" /></a>
 </td>
@@ -221,7 +221,7 @@ The second instance (Network module core (1)) is connected to the third output o
 <p class="admonition-title">Note</p>
 <p>To get a complete address of a register in one of the components of the Network module, you must also add the base address of the Network module (defined <a class="reference internal" href="mi.html#ndk-mi"><span class="std std-ref">here</span></a>) as well as the address of the target register in that component.</p>
 </div>
-<table class="colwidths-given docutils align-center" id="id4">
+<table class="docutils align-center" id="id4">
 <caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id4" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 15%" />
@@ -272,7 +272,7 @@ The following outputs are connected to MAC lite pairs of all channels for port 1
 Each MAC lite in one port is offset by 0x200, MAC lites in different ports are additionally offset by 0x2000 (enough for 8 Ethernet channels as follows from example in table 2).
 There is an example for configuration 4x25GE with 2 ports.
 Notation: TX_MAC_LITE(port_id)(channel_id), RX_MAC_LITE(port_id)(channel_id).</p>
-<table class="colwidths-given docutils align-center" id="id5">
+<table class="docutils align-center" id="id5">
 <caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id5" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 25%" />

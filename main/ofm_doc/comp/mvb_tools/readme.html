@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MVB Specification &mdash; Minimal NDK Application Docs 1.0 documentation</title>
@@ -29,11 +29,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -106,7 +110,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../mvb.html">MVB Tools</a></li>
       <li class="breadcrumb-item active">MVB Specification</li>
       <li class="wy-breadcrumbs-aside">
@@ -140,12 +144,6 @@ values depend on the application being used.</p>
 <section id="generic-parameters">
 <h2>Generic parameters<a class="headerlink" href="#generic-parameters" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 17%" />
-<col style="width: 13%" />
-<col style="width: 22%" />
-<col style="width: 48%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
 <th class="head"><p>Type</p></th>
@@ -173,7 +171,7 @@ This constant can be used to simplify declarations of some internal signals.</p>
 </div>
 <p>Items are distributed evenly within the word. This is described in bigger detail
 in the following picture (word parameters are set according to example values
-given in the table above) <a class="footnote-reference brackets" href="#id2" id="id1">1</a>:</p>
+given in the table above) <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
 <figure class="align-center" id="id3">
 <a class="reference internal image-reference" href="../../../_images/mvb_item_alignment.svg"><img alt="../../../_images/mvb_item_alignment.svg" src="../../../_images/mvb_item_alignment.svg" width="100%" /></a>
 <figcaption>
@@ -184,12 +182,6 @@ given in the table above) <a class="footnote-reference brackets" href="#id2" id=
 <section id="port-description">
 <h2>Port description<a class="headerlink" href="#port-description" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 11%" />
-<col style="width: 12%" />
-<col style="width: 26%" />
-<col style="width: 51%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Port name</p></th>
 <th class="head"><p>Bit length</p></th>
@@ -278,14 +270,15 @@ or gap. Transmission starts when both <cite>SRC_RDY</cite> and <cite>DST_RDY</ci
 takes place when <cite>DST_RDY</cite> signal is deasserted when data on the bus <cite>DATA</cite> are
 still valid. In second case the pause is performed via deassertion of the
 <cite>SRC_RDY</cite> signal when data on the <cite>DATA</cite> bus are considered invalid.</p>
-<dl class="footnote brackets">
-<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>All bit vectors on this page are aligned from the MSB on the left to the
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>All bit vectors on this page are aligned from the MSB on the left to the
 LSB on the right. The same numbering is maintained for the items, i.e.
 the left most item has the highest index range whereas the right most has
 the lowest index range.</p>
-</dd>
-</dl>
+</aside>
+</aside>
 </section>
 </section>
 </section>

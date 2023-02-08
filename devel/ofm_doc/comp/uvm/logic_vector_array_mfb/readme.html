@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>logic_vector_array_mfb environment &mdash; Minimal NDK Application Docs  documentation</title>
@@ -29,14 +29,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../../index.html" class="icon icon-home"> Minimal NDK Application Docs
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: fbf488d0
+                Git branch: devel, <br> Git hash: da75fc70
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -63,6 +67,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -129,7 +134,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../ver.html">UVM Verification</a></li>
           <li class="breadcrumb-item"><a href="../componets.html">Components</a></li>
       <li class="breadcrumb-item active">logic_vector_array_mfb environment</li>
@@ -166,10 +171,6 @@ The second is a logic vector sequencer that handles MFB_METADATA. Both sequencer
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
 <p>The config class has three variables.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 91%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Variable</p></th>
 <th class="head"><p>Description</p></th>
@@ -226,11 +227,6 @@ The second is a logic vector sequencer that handles MFB_METADATA. Both sequencer
 <h2>Low sequence configuration<a class="headerlink" href="#low-sequence-configuration" title="Permalink to this heading"></a></h2>
 <p>The configuration object <cite>config_sequence</cite> contains two functions.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 18%" />
-<col style="width: 16%" />
-<col style="width: 65%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Variable</p></th>
 <th class="head"><p>Type</p></th>
@@ -255,10 +251,6 @@ The second is a logic vector sequencer that handles MFB_METADATA. Both sequencer
 function create_sequence_item. In this function, a child can create mfb::sequence_items as they like. Another important function in the “sequence_simple_rx_base” class is try_get() which
 gets the required data from the base array agent. It is also important to note that the base class is state-oriented. The following table describes internal states.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 27%" />
-<col style="width: 73%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>State</p></th>
 <th class="head"><p>Description</p></th>
@@ -284,10 +276,6 @@ gets the required data from the base array agent. It is also important to note t
 </table>
 <p>The environment has three sequences. The table below describes them. In the default state, the RX env runs sequence_lib_rx.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 27%" />
-<col style="width: 73%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Sequence</p></th>
 <th class="head"><p>Description</p></th>
