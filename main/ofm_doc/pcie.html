@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PCIe Tools &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  <title>PCIe Tools &mdash; Minimal NDK Application Docs  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,9 @@
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MTC (MI Transaction Controller)" href="comp/pcie/mtc/readme.html" />
+    <link rel="prev" title="MFB -&gt; LBUS reconfigurator (TX LBUS)" href="comp/nic/mac_lite/tx_mac_lite/comp/adapters/lbus/reconf/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -33,6 +35,9 @@
           <a href="../index.html" class="icon icon-home">
             Minimal NDK Application Docs
           </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: bef7f4ea
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -62,16 +67,27 @@
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PCIe Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="comp/pcie/mtc/readme.html">MTC (MI Transaction Controller)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comp/pcie/ptc/readme.html">PTC (PCIe Transaction Controller)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comp/pcie/ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comp/pcie/common/readme.html">PCI_EXT_CAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comp/pcie/logic/byte_count/readme.html">PCIE Byte Count</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comp/pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comp/pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comp/dma/dma_calypte/readme.html">DMA Calypte</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ver.html">UVM Verification</a></li>
 </ul>
@@ -102,18 +118,16 @@
              
   <section id="pcie-tools">
 <h1>PCIe Tools<a class="headerlink" href="#pcie-tools" title="Permalink to this heading"></a></h1>
-<p>This chapter describes the components that are used for communication via the PCIe interface.
-A description of DMA controllers is also included.
-The PCIe components are typically located in the <code class="docutils literal notranslate"><span class="pre">comp/pcie/</span></code> directory in the OFM repository.
-The DMA controllers are typically located in the <code class="docutils literal notranslate"><span class="pre">comp/dma/</span></code> directory in the OFM repository.</p>
+<p>This chapter describes the components that are used for communication via the PCIe interface. A description of DMA controllers is also included. The PCIe components are typically located in the <code class="docutils literal notranslate"><span class="pre">comp/pcie/</span></code> directory in the OFM repository. DMA Calypte is located in the <code class="docutils literal notranslate"><span class="pre">comp/dma/</span></code> directory. Closed-source DMA Medusa IP is located in a separate submodule.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Content:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="comp/pcie/mtc/readme.html">MI Transaction Controler (MTC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/pcie/mtc/readme.html">MTC (MI Transaction Controller)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comp/pcie/ptc/readme.html">PTC (PCIe Transaction Controller)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comp/pcie/ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comp/pcie/common/readme.html">PCI_EXT_CAP</a></li>
-<li class="toctree-l1"><a class="reference internal" href="comp/pcie/others/hdr_gen/readme.html">PCIE HEADER PROCESSING</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/pcie/logic/byte_count/readme.html">PCIE Byte Count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comp/pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comp/dma/dma_calypte/readme.html">DMA Calypte</a></li>
 </ul>
@@ -123,12 +137,15 @@ The DMA controllers are typically located in the <code class="docutils literal n
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="comp/nic/mac_lite/tx_mac_lite/comp/adapters/lbus/reconf/readme.html" class="btn btn-neutral float-left" title="MFB -&gt; LBUS reconfigurator (TX LBUS)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="comp/pcie/mtc/readme.html" class="btn btn-neutral float-right" title="MTC (MI Transaction Controller)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

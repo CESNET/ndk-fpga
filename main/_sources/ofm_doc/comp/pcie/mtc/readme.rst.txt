@@ -1,6 +1,6 @@
 .. _mtc:
 
-MI Transaction Controler (MTC)
-------------------------------
+MTC (MI Transaction Controller)
+-------------------------------
 
 .. vhdl:autoentity:: MTC

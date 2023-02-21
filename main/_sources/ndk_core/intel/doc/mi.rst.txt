@@ -1,7 +1,7 @@
 .. _ndk_mi:
 
-MI bus interconnect
-^^^^^^^^^^^^^^^^^^^
+The MI bus interconnect
+=======================
 
 The NDK provides the `nfb-bus tool <https://cesnet.github.io/ndk-sw/tools/nfb-bus.html#nfb-bus>`_ and an `API for generating read/write memory requests <https://cesnet.github.io/ndk-sw/libnfb-quick-start-registers.html>`_. These requests are transferred via the :ref:`MI bus <mi_bus>` in the NDK firmware. This memory-oriented bus is wired throughout the NDK firmware and each part has an allocated address space. The components accessible over the MI bus and their specific address spaces are described in the NDK using a :ref:`DeviceTree <ndk_devtree>`. 
 
@@ -10,7 +10,8 @@ The MI bus interconnection allows easy access to implemented Control/Status Regi
 .. WARNING::
     A read request to a non-existent/non-implemented memory space in the FPGA can deadlock the NDK firmware or the entire PCIe communication.
 
-**The main allocation of the MI address space**
+The main allocation of the MI address space
+*******************************************
 
 An address range of 26 bits is available for the whole NDK firmware. It is divided between the individual parts of the design. The main allocation of the MI address space must be identically described in the VHDL package ``<NDK-APP-XXX_root_directory>/ndk/core/intel/src/mi_addr_space_pkg.vhd`` and in the DeviceTree file of the NDK-CORE ``<NDK-APP-XXX_root_directory>/ndk/core/intel/src/DevTree.tcl``. This allocation can also be found below:
 
@@ -34,5 +35,4 @@ An address range of 26 bits is available for the whole NDK firmware. It is divid
     0x02000000-0x03FFFFFF -- The Application
 
 .. NOTE::
-    A module with an allocated address space can further divide it among its subcomponents.
-    A description of the address space allocation must be included in DevTree.
+    A module with an allocated address space can further divide it among its subcomponents. A description of the address space allocation must be included in DevTree.

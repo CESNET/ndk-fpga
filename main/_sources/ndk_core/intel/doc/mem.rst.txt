@@ -1,18 +1,17 @@
+.. _ndk_mem:
 .. _ndk_intel_mem:
 
-Memory controller (EMIF)
-^^^^^^^^^^^^^^^^^^^^^^^^
+The Memory Controller
+=====================
 
-To access external memory (typically DDR4) on an Intel FPGA, our platform uses standard External Memory Interface (EMIF) Hard IP blocks.
-These are suitably configured, and their Avalon-MM user interface is integrated into :ref:`the application core <ndk_app>`.
-Please read the EMIF user guide and Avalon-MM bus specifications.
+Many FPGA cards include external memory (very often DDR4) and the NDK is ready to support them. Depending on the FPGA type and the specific FPGA card, an external memory controller is instantiated in the top-level of the NDK firmware. Currently, three memory controller IPs are supported in the NDK:
+
+- `Intel Stratix 10 EMIF IP for DDR4 <https://www.intel.com/content/www/us/en/docs/programmable/683741/>`_
+- `Intel Agilex EMIF IP for DDR4 <https://www.intel.com/content/www/us/en/docs/programmable/683216/>`_
+- `UltraScale Architecture-Based FPGAs Memory IP for DDR4 <https://docs.xilinx.com/v/u/en-US/pg150-ultrascale-memory-ip>`_
+
+Each supported controller uses a slightly different user interface (Intel EMIF uses Avalon-MM, Xilinx UltraScale Memory IP uses AXI4). The NDK uses only the Avalon-MM to keep the access from the user application to the external memory simple (see the `Avalon Interface Specifications <https://www.intel.com/content/www/us/en/docs/programmable/683091/>`_). In the case where the Xilinx UltraScale Memory IP is instantiated, the AXI4 to Avalon-MM bus converter is automatically instantiated as well.
 
 .. note::
 
-    The prepared basic application core then contains :ref:`debug modules <mem_tester>` that can test communication with these memories and measure their basic properties (throughput, latency).
-
-**References**
-
-- `External Memory Interfaces Intel Stratix 10 FPGA IP User Guide (external) <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/stratix-10/ug-s10-emi.pdf>`_
-- `External Memory Interfaces Intel Agilex FPGA IP User Guide (external) <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/agilex/ug-ag-emi.pdf>`_
-- `Avalon Interface Specifications (external) <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/mnl_avalon_spec.pdf>`_
+    The NDK-based reference application (ndk-app-minimal) contains a module :ref:`Mem Tester <mem_tester>` in the Application space for testing communication with external memory and measure their basic properties (throughput, latency).

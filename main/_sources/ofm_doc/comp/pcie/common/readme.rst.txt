@@ -1,3 +1,5 @@
+.. _pci_ext_cap:
+
 PCI_EXT_CAP
 ------------
 

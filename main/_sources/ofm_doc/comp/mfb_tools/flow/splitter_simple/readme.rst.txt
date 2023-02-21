@@ -6,6 +6,11 @@
 
 .. _mfb_splitter_simple_gen:
 
+MFB Splitter Simple
+-------------------
+
+.. vhdl:autoentity:: MFB_SPLITTER_SIMPLE
+
 MFB Splitter Simple Gen
 -----------------------
 

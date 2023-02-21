@@ -2,7 +2,10 @@
 
 Configuration files and parameters
 **********************************
-This chapter describes the NDK configuration files and parameters. The configuration has three levels: the CORE, the card, and the user application. A detailed description of each level is below.
+This chapter describes the NDK configuration files and parameters. The
+configuration has three levels: the CORE, the card, and the user application. A
+detailed description of each level is below (the abreviated version is provided
+via the :ref:`following link <ndk_conf_tldr>`).
 
 .. _ndk_core_configuration:
 
@@ -56,29 +59,32 @@ parameters specific for the chosen card type. Passing TCL parameters to VHDL
 constants is a specific use case described in the :ref:`core_config_vhdl_pkg_const`
 section below.
 
-Another purpose to insert parameter in this file is when its value
-depends on the value of another constant, but only if they are relevant to
-the NDK-CORE design. Conditionally assigned parameters that are for a specific
+The second purpose of this file is when the value of a parameter
+depends on the value of another NDK CORE constant.
+Conditionally assigned parameters that are for a specific
 card type should be located in a corresponding :ref:`card_conf_card_const_tcl`
-file. Example a conditional assignments follows:
+file. An example of a conditional assignment follows:
 
 .. code-block:: tcl
 
-    # disabling of the PTC module when specific PCI Express configuration is used
-    if {$PCIE_ENDPOINTS == 3 && $PCIE_ENDPOINT_MODE == 2} {
-        set PTC_DISABLE true
-    } else {
-        # always insert default value
-        set PTC_DISABLE false
+    set PCIE_LANES 16
+
+    # setting the number of PCIE_LANES to 8 when specific PCIe configuration is used
+    if {$PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 2} {
+        set PCIE_LANES 8
     }
+
+The third purpose of this file is to implement statements that check compatible
+combinations of parameters. When an incompatible combination is detected, the
+TCL shell will raise an error and stop the compilation process. You should
+implement these checks only for the parameters used in the NDK-CORE.
 
 .. _core_mk_include:
 
 core.mk
 ^^^^^^^
 This file contains default values for the parameters specified in the Makefile.
-The allowed values of each parameter are
-provided in the comments. The user of the
+The allowed values of each parameter are provided in the comments. The user of the
 design can change these values freely.
 
 core_bootstrap.tcl
@@ -106,7 +112,7 @@ Passing through Modules.tcl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 As described in the :ref:`ofm_build_system` section, the Modules.tcl files allow
 for modular and hierarchical organization of VHDL source files. The Modules.tcl files
-provide an ARCHGRP list to pass specific constants across the source file hierarchy. Each
+provide an *ARCHGRP* list to pass specific constants across the source file hierarchy. Each
 Modules.tcl file obtains such a list from its parent Modules.tcl file. It allows further
 adjustments of the ARCHGRP list(s) of its descendant(s).
 
@@ -167,9 +173,12 @@ The file structure is similar to the one described in the configuration of the
 
 card_conf.tcl
 ^^^^^^^^^^^^^
-This file lists user-configurable parameters and their possible
-values in the comments. The purpose of this file is the same as of the
-``core_conf.tcl`` file in the `NDK-CORE` repository. The only difference is that it has a higher priority.
+This file lists user-configurable parameters and their possible values in the
+comments. The file contains parameters relevant to a specific card. Those
+parameters are mostly tied to the underlying hardware, like the number of Ethernet
+ports or the PCIe generation of the used PCIe core. The purpose of this file is the
+same as that of the ``core_conf.tcl`` file in the `NDK-CORE` repository. The only
+difference is that it has a higher priority.
 
 .. _card_conf_card_const_tcl:
 
@@ -179,10 +188,19 @@ card_const.tcl
    This file contains features for development. It is not recommended for the user to change
    the parameters in this file.
 
-This file contains card-specific parameters which mostly depend on the features
-of the physical hardware (the target card). It should also implement a check for
-the configuration parameters whether their values are valid and compatible with
-the values of other parameters.
+To ensure that the values of the configuration parameters are valid and
+compatible with the values of other parameters, they need to be checked. And
+that is done here, making this file similar to the `core_const.tcl`. The only
+difference is that the checking considers only the used card. For example, if
+the given card supports two QSFP transceivers at most, the corresponding
+parameter should be set to either 1 or 2.
+
+It is also possible to add a constant for a specific card to the VHDL package.
+This package is also included in the `fpga.vhd` top-level component (this
+component is card-specific too).
+
+The third way is to add conditionally assigned parameters, which is the same way
+they are used in the `core_const.tcl` file.
 
 card.mk
 ^^^^^^^
@@ -219,8 +237,7 @@ are visible in the `*.inc.tcl` files and can be added to the array.
 
 Adding constants to the VHDL package
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-It is recommended to add constants to the ``combo_user_const`` VHDL package in
-It is recommended to add card-specific constants to the ``combo_user_const`` VHDL 
+It is recommended to add card-specific constants to the ``combo_user_const`` VHDL
 package in `card_const.tcl` file. The way of adding these constants was described in 
 the :ref:`core_config_vhdl_pkg_const` section in the documentation of NDK-CORE
 configuration.
@@ -230,7 +247,7 @@ configuration.
 Parametrizing the user application
 ==================================
 The user application can also be parametrized using specific configuration
-files. Configuration parameters are handed to the subcomponents of the
+files. Configuration parameters can be handed to the subcomponents of the
 ``APPLICATION_CORE`` design entity. It also allows the user to choose one of,
 sometimes, multiple configurations for a specific card before launching the
 build process.
@@ -288,4 +305,139 @@ build/<card_name>/app_conf.tcl
 This file has the highest priority of all user-configurable
 constants (for more details, refer to the :ref:`fig_const_hierarchy`). The user
 can change the parameters specified in this file or add others according to
-their needs.
+their needs. Adding a parameter to the VHDL package is also possible because the
+`combo_user_const` is also included in the `APPLICATION_CORE` entity.
+
+.. _ndk_conf_tldr:
+
+TL;DR
+=====
+This section contains specific recipes for achieving specific goals.
+
+I need to include specific component in CORE depending on a given parameter value
+---------------------------------------------------------------------------------
+1. First, you should write your parameter to the
+   ``core/intel/config/core_conf.tcl`` with a specific value (if the parameter
+   stays only in the ``core/intel/config/core_conf.tcl``) or with a default
+   value (if the parameter will be set in other configuration files).
+2. Then add this parameter to the *CORE_ARCHGRP* array in the
+   ``core/intel/common.inc.tcl`` file.
+
+.. code-block:: tcl
+
+    set CORE_ARCHGRP(DMA_TYPE)                      $DMA_TYPE
+    set CORE_ARCHGRP(APPLICATION_CORE_ENTITY_ONLY)  false
+    # adding two custom parameters
+    set CODE_ARCHGRP(MY_PARAM_1)                    $MY_PARAM_1
+    set CODE_ARCHGRP(MY_PARAM_2)                    $MY_PARAM_2
+
+.. NOTE::
+   The name of the constant added to the array should be the same as the name of
+   the parameter, thus ``set CORE_ARCHGRP(MY_PARAM) $MY_PARAM``.
+
+3. The build system then converts the array to a list which is propagated as ``ARCHGRP`` through the
+   ``Modules.tcl`` file of the ``fpga.vhd`` component to the ``Modules.tcl`` of
+   the ``fpga_common.vhd``.
+
+.. NOTE::
+   Notice that the ``fpga.vhd`` component is dependent on a specific card but already contains
+   all propagated parameters of the CORE design.
+
+4. The ``ARCHGRP`` can be propagated to other subcomponents when added as the
+   third element of a subcomponent list. This is shown in the following snippet.
+
+.. code-block:: tcl
+
+    lappend COMPONENTS [list "<entity_name_1>" "<path_to_entity_1>" $ARCHGRP]
+    # "FULL" is the default value for the ARCHGRP field
+    lappend COMPONENTS [list "<entity_name_2>" "<path_to_entity_2>" "FULL"  ]
+
+5. When a constant from the ``ARCHGRP`` is needed, the list has to be
+   converted back to an array:
+
+.. code-block:: tcl
+
+    array set ARCHGRP_ARR $ARCHGRP
+
+6. The values from the ``ARCHGRP_ARR`` can then be accessed in a similar way in
+   which they were added to the array.
+
+.. code-block:: tcl
+
+    if { $ARCHGRP_ARR(MY_PARAM_1) == 3 } {
+        # do one thing
+    } elseif { $ARCHGRP_ARR(MY_PARAM_1) == 4 } {
+        # do other thing
+    }
+
+What can I do with the `core_conf.tcl` file
+-------------------------------------------
+* You can declare new configuration parameters (and assign their default
+  values) so they would be visible across all supported cards. These default
+  values can be overwritten in the `card_conf.tcl` file of each card.
+* Write allowed values of parameters to the commentary above each declaration.
+  Especially when new configuration parameter or parameter value is added.
+
+What can I do with the `core_const.tcl` file
+--------------------------------------------
+* You can add a dependent parameter (the value of such a parameter depends on
+  the value of another parameter). The developer should add CORE-specific
+  parameters only. (Those are the ones that are common across all supported
+  cards.)
+
+.. code-block:: tcl
+
+    if {$PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 2} {
+        set MY_PARAM_2 8
+    } else {
+        set MY_PARAM_2 16
+    }
+
+* You can check combinations of different parameters. This allows you to avoid various
+  incompatibilities which may (or may not) crash the synthesis. An unsuccessful check
+  stops the compilation process.
+
+.. code-block:: tcl
+
+    if { $MY_PARAM_1 != 3 && $MY_PARAM_1 != 4 } {
+        error "Unsupported value of MY_PARAM_1: $MY_PARAM_1!"
+    }
+
+* You can add a parameter value to the generated VHDL package, which is then icluded in
+  the `fpga.vhd` and `fpga_common.vhd` components:
+
+.. code-block:: tcl
+
+    VhdlPkgInt  PCIE_GEN             $PCIE_GEN
+    VhdlPkgInt  DMA_TYPE             $DMA_TYPE
+    VhdlPkgBool DMA_RX_BLOCKING_MODE $DMA_RX_BLOCKING_MODE
+    VhdlPkgInt  MY_PARAM_1           $MY_PARAM_1
+
+What can I do with the `card_conf.tcl` file
+-------------------------------------------
+You can change parameters specified in the `core_conf.tcl` file for a specific
+card type (because some parameters are directly dependent on an underlying
+hardware), e.g., the number of Ethernet ports or Ethernet channels.
+
+What can I do with the `card_const.tcl` file
+--------------------------------------------
+* You can add a dependent parameter when a card requiers it. CORE specific
+  parameters belong to the `core_const.tcl`.
+* You can check the parameter values to see if they adhere to the selected card.
+* You can add a parameter to the VHDL package which will be used in the card's
+  `fpga.vhd` top-level component.
+
+What can I do with the `app_conf.tcl` file
+------------------------------------------
+* You can add parameters for the given application (component
+  `application_core.vhd`).
+* You can change parameters specified in the `core_conf.tcl` and `card_conf.tcl`
+  files with respect to the application.
+* You can add a parameter to the VHDL package, which is used in the
+  `application_core.vhd` component (the same package as in the `card_const.tcl`
+  and `core_const.tcl`).
+
+Contact for author
+==================
+Send suggestions regarding missing information or unanswered questions to
+`valekv@cesnet.cz`.

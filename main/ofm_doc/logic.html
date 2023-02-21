@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Basic logic elements &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  <title>Basic logic elements &mdash; Minimal NDK Application Docs  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,6 +35,9 @@
           <a href="../index.html" class="icon icon-home">
             Minimal NDK Application Docs
           </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: bef7f4ea
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -64,6 +67,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -71,10 +75,13 @@
 <li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous modules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="memory.html">Memory modules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fifo.html">FIFO components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dsp.html">DSP components</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shift.html">Shift registers</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Basic logic elements</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="comp/base/logic/n_loop_op/readme.html">N_LOOP_OP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comp/base/logic/sr_sync_latch/readme.html">Synchronous SR latch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/logic/barrel_shifter/readme.html">Barrel Shifter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/logic/cnt_multi_memx/readme.html">Multi MEMx Counter</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
@@ -85,7 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ver.html">UVM Verification</a></li>
 </ul>
@@ -120,7 +127,7 @@
 <p><strong>AFTER_ONE</strong> - The unit sets all output bits to high if they have a higher index than the first one in the input vector. Example: DI=”00100000” =&gt; DO=”11000000”.</p>
 <p><strong>ALU</strong> - ALU implementation based on Xilinx 7-Series DSP slices.</p>
 <p><strong>AND</strong> - Behavioral implementation of generic AND.</p>
-<p><strong>BARREL_SHIFTER</strong> - Generic barrel shifter. You can set data width and shift direction.</p>
+<p><strong>BARREL_SHIFTER</strong> - Generic barrel shifter. You can set data width and shift direction. Documentation can be found <a class="reference internal" href="comp/base/logic/barrel_shifter/readme.html#barrel-shifter"><span class="std std-ref">here</span></a>.</p>
 <p><strong>BARREL_SHIFTER_DSP</strong> - Barrel shifter implementation based on Xilinx 7-Series DSP slices.</p>
 <p><strong>BEFORE_ONE</strong> - The unit sets all output bits to high if they have a lower index than the first one in the input vector. Example: DI=”00100000” =&gt; DO=”00011111”.</p>
 <p><strong>BIN2HOT</strong> - Behavioral implementation of binary to one-hot converter with enable.</p>
@@ -131,7 +138,7 @@ Solves problem in synthesis of standard counter in Leonardo.</p>
 <p><strong>CNT_DIST</strong> - Array of counters in distributed memory. Useful for saving resources when many and big counters are needed.
 Counters are stored in distributed memory and increased (or cleared) sequentialy.
 Cannot be used where increasing of counters is needed in one period.</p>
-<p><strong>CNT_MULTI_MEMX</strong> - Statistics counters for multiple channels implemented using SDP_MEMX.</p>
+<p><strong>CNT_MULTI_MEMX</strong> - Statistics counters for multiple channels implemented using SDP_MEMX. Documentation can be found <a class="reference internal" href="comp/base/logic/cnt_multi_memx/readme.html#cnt-multi-memx"><span class="std std-ref">here</span></a>.</p>
 <p><strong>COUNT</strong> - Generic implementation of counter. It contains behavioral variant and also DSP variant based on Xilinx 7-Series DSP slices.</p>
 <p><strong>DEC1FN</strong> - Decoder 1 from N is a generic component that converts input vector in binary code into the code 1 from N (one-hot).
 There is also a variant with an enable signal and a variant with a reverse coding direction (one-hot to binary converter).</p>
@@ -178,7 +185,7 @@ Tries to use as simple adders as the set latency allows. It has a valid bit for 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -10,6 +10,7 @@ Components using the MI bus are typically located in the ``comp/mi_tools/`` dire
    
    comp/mi_tools/readme
    comp/mi_tools/async/readme
+   comp/mi_tools/pipe/readme
    comp/mi_tools/indirect_access/readme
    comp/mi_tools/reconf/readme
    comp/mi_tools/splitter_plus_gen/readme

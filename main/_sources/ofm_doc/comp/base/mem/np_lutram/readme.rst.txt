@@ -1,6 +1,6 @@
 .. _np_lutram:
 
-NP_LUTRAM
-=========
+NP LUT RAM
+==========
 
 .. vhdl:autoentity:: np_lutram

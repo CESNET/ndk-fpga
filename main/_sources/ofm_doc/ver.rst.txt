@@ -18,4 +18,5 @@ New verifications should be written in UVM methodology. This directory contains 
    :caption: Contents:
 
    comp/uvm/manual
+   comp/uvm/sim_manual
    comp/uvm/componets

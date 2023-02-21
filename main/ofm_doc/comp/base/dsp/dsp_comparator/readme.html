@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DSP Comparator &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="Shift registers" href="../../../../shift.html" />
+    <link rel="prev" title="DSP components" href="../../../../dsp.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: bef7f4ea
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../base.html">Basic Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../async.html">Asynchronous modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../memory.html">Memory modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../fifo.html">FIFO components</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../dsp.html">DSP components</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">DSP Comparator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../shift.html">Shift registers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../logic.html">Basic logic elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../misc.html">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../base.html">Basic Tools</a></li>
+          <li class="breadcrumb-item"><a href="../../../../dsp.html">DSP components</a></li>
+      <li class="breadcrumb-item active">DSP Comparator</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../../_sources/ofm_doc/comp/base/dsp/dsp_comparator/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dsp-comparator">
+<span id="id1"></span><h1>DSP Comparator<a class="headerlink" href="#dsp-comparator" title="Permalink to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-dsp_comparator">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">DSP_COMPARATOR</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-dsp_comparator" title="Permalink to this definition"></a></dt>
+<dd><p>This is a  comparator that can use DSP bloks on different Devices but can also be implemented in
+common logic.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Default and recommended latency for comparator using DSPs is 2 clock cycles,
+latency of 1 clock cycle is achieved when input registers are disabled.</p>
+</div>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-dsp_comparator-input_data_width"><td><p>INPUT_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>25</p></td>
+<td><p>The width of inputs; maximum width of 25 bits applies only in modes “&gt;= ” or “&lt;= ” when
+using DSP blocks, “unlimited” in other cases</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-dsp_comparator-input_regs_en"><td><p>INPUT_REGS_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Enable input registers</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-dsp_comparator-mode"><td><p>MODE</p></td>
+<td><p>string</p></td>
+<td><p>“&gt;= “</p></td>
+<td><p>This option allows user to choose the function of the comparator (the space after “&gt;=”
+or “&lt;=” is necessary!):</p>
+<ul class="simple">
+<li><p>“&gt;&lt;=” is the default mode which outputs results as specified above the RESULT port</p></li>
+<li><p>“&gt;= ” outputs result in form of ‘11’ if the 1st number is larger or equal than the 2nd
+number, else ‘00’  - in this mode, only one DSP block is used (when enabled)</p></li>
+<li><p>“&lt;= ” outputs result in form of ‘11’ if the 1st number is smaller or equal than the
+2nd number, else ‘00’ - in this mode, only one DSP block is used (when enabled)</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-dsp_comparator-dsp_enable"><td><p>DSP_ENABLE</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Set True to use DSP(s) for the comparator</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-dsp_comparator-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“AGILEX”</p></td>
+<td><p>Target FPGA, the allowed options are:</p>
+<ul class="simple">
+<li><p>“STRATIX10”</p></li>
+<li><p>“AGILEX”</p></li>
+<li><p>“ULTRASCALE”</p></li>
+<li><p>“7SERIES”</p></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-dsp_comparator-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dsp_comparator-clk_en"><td><p>CLK_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dsp_comparator-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dsp_comparator-input_1"><td><p>INPUT_1</p></td>
+<td><p>std_logic_vector(INPUT_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>The 1st number for comparison</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dsp_comparator-input_2"><td><p>INPUT_2</p></td>
+<td><p>std_logic_vector(INPUT_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>The 2nd number for comparison</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dsp_comparator-result"><td><p>RESULT</p></td>
+<td><p>std_logic_vector(1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>The final value of the comparator, the RESULT will be:</p>
+<ul class="simple">
+<li><p>“01” (1 in dec) when the 1st number (INPUT_1) &gt; 2nd number (INPUT_2) - applies only for mode “&gt;&lt;=”</p></li>
+<li><p>“10” (2 in dec) when the 2nd number (INPUT_2) &gt; 1st number (INPUT_1) - applies only for mode “&gt;&lt;=”</p></li>
+<li><p>“00” when both numbers are equal                                     - applies only for mode “&gt;&lt;=”</p></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../../../dsp.html" class="btn btn-neutral float-left" title="DSP components" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../../shift.html" class="btn btn-neutral float-right" title="Shift registers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

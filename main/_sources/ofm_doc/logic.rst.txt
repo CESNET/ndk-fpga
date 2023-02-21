@@ -7,7 +7,7 @@ Basic logic elements
 
 **AND** - Behavioral implementation of generic AND.
 
-**BARREL_SHIFTER** - Generic barrel shifter. You can set data width and shift direction.
+**BARREL_SHIFTER** - Generic barrel shifter. You can set data width and shift direction. Documentation can be found :ref:`here <barrel_shifter>`.
 
 **BARREL_SHIFTER_DSP** - Barrel shifter implementation based on Xilinx 7-Series DSP slices.
 
@@ -26,7 +26,7 @@ Solves problem in synthesis of standard counter in Leonardo.
 Counters are stored in distributed memory and increased (or cleared) sequentialy.
 Cannot be used where increasing of counters is needed in one period.
 
-**CNT_MULTI_MEMX** - Statistics counters for multiple channels implemented using SDP_MEMX.
+**CNT_MULTI_MEMX** - Statistics counters for multiple channels implemented using SDP_MEMX. Documentation can be found :ref:`here <cnt_multi_memx>`.
 
 **COUNT** - Generic implementation of counter. It contains behavioral variant and also DSP variant based on Xilinx 7-Series DSP slices.
 
@@ -92,6 +92,8 @@ Tries to use as simple adders as the set latency allows. It has a valid bit for 
           
    comp/base/logic/n_loop_op/readme
    comp/base/logic/sr_sync_latch/readme
+   comp/base/logic/barrel_shifter/readme
+   comp/base/logic/cnt_multi_memx/readme
 ..  comp/base/logic/<something>
 ..  Add more references here...
 

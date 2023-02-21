@@ -1,3 +1,4 @@
+.. _ndk_arch:
 .. _ndk_intel:
 
 NDK architecture
@@ -12,9 +13,6 @@ The Network Development Kit (NDK) is available for the selected card based on FP
 As you can see in the image above, the top level architecture consists of several building blocks:
 
 - MI bus interconnection (MI Splitter,...) allows access to Control and Status Register (CSR)
-- Network module provides transmission and receiving of Ethernet packets
-- The DMA module controls the high-speed packet data transfer to the guest PC's memory
-- The PCIe module mediates communication via the PCIe interface for the DMA module and for MI transactions, it also contains a ROM with a description of the firmware
 - The Network module provides transmission and reception of Ethernet packets to/from the network.
 - The DMA module controls the high-speed packet data transfer to the memory of the host PC.
 - The PCIe module mediates the communication via the PCIe interface for the DMA module and MI transactions. It also contains a ROM with a description of the loaded firmware.
@@ -22,10 +20,6 @@ As you can see in the image above, the top level architecture consists of severa
 - Time Stamp Unit (TSU) is used to generate accurate time stamps for Network module and Application core
 - The Memory controller provides data transfer between the external memory and the FPGA
 - The FPGA controller allows access to the QSPI flash memory and request a reboot of the FPGA
-
-.. warning::
-
-    The DMA module IP is not part of the open-source NDK. If the DMA module IP is disabled, then it is replaced by a loopback. `You can get NDK including DMA Module IP and professional support through our partner BrnoLogic <https://support.brnologic.com/>`_
 
 .. note::
 

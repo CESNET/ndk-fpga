@@ -347,6 +347,6 @@ The (incomplete) list of SYNTH_FLAGS array items
 - DEVICE *{ULTRASCALE, VIRTEX7, STRATIX10, AGILEX}*: Sets the FPGA family. In the `comp target`_ is mapped to specific FPGA.
 - FPGA *{xcvu7p-flvb2104-2-i, 1SD280PT2F55E1VG, ...}*: Sets the FPGA part directly.
 - SETUP_FLAGS: List of specific flags for entire project:
-   - USE_XPM_LIBRARIES: includes XPM_CDC XPM_MEMORY in Vivado projects
+   - USE_XPM_LIBRARIES: includes XPM_CDC XPM_MEMORY XPM_FIFO in Vivado projects
 
 For other values and their purpose see the Vivado.inc.tcl or Quartus.inc.tcl file in the build directory.

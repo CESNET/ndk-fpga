@@ -3,21 +3,17 @@ Documentation of Minimal NDK Application
 
 **Welcome to documentation of Minimal NDK Application!**
 
-The Network Development Kit (NDK) allows users to quickly and easily develop new network appliances based on FPGA acceleration cards. The NDK is optimized for high throughput and scalable to support 10, 100 and 400 Gigabit Ethernet.
+The NDK-APP-Minimal is a reference application based on the Network Development Kit (NDK) for FPGAs. The NDK allows users to quickly and easily develop FPGA-accelerated network applications. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet.
 
 .. image:: img/liberouter_logo.svg
     :align: center
     :width: 50 %
- 
-The Minimal application serves as a simple example of how to build an FPGA application using the Network Development Kit (NDK). It can also be used as a starting point for building your own application. The Minimal application does not process network packets in any way, it can only receive and send them. If the DMA module IP is enabled, the network packets are forwarded to the computer memory.
+
+The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled (see the :ref:`DMA Module chapter <ndk_dma>`), then it forwards the network packets to and from the computer memory.
 
 .. warning::
 
-    The DMA module IP is not part of the open-source NDK. If the DMA module IP is disabled, then it is replaced by a loopback. `You can get NDK including DMA Module IP and professional support through our partner BrnoLogic <https://support.brnologic.com/>`_.
-
-.. note::
-
-    To build FPGA firmware, you must have Intel Quartus Prime Pro 22.2 or Xilinx Vivado 2019.1 (depending on the target card) installed, including a valid license.
+    The DMA Medusa IP is not part of the open-source NDK. `You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic. <https://support.brnologic.com/>`_
 
 .. toctree::
     :maxdepth: 2
@@ -49,6 +45,8 @@ The Minimal application serves as a simple example of how to build an FPGA appli
     ndk_cards/dk-dev-agi027res/readme
     ndk_cards/fb4cgg3/readme
     ndk_cards/fb2cghh/readme
+    ndk_cards/ia-420f/readme
+    ndk_cards/nfb-200g2ql/readme
 
 .. toctree::
     :maxdepth: 2
@@ -61,6 +59,6 @@ The Minimal application serves as a simple example of how to build an FPGA appli
     ofm_doc/mfb
     ofm_doc/mvb
     ofm_doc/nic
-    pcie
+    ofm_doc/pcie
     ofm_doc/debug
     ofm_doc/ver

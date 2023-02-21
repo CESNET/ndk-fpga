@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuration files and parameters &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  <title>Configuration files and parameters &mdash; Minimal NDK Application Docs  documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,6 +35,9 @@
           <a href="../../index.html" class="icon icon-home">
             Minimal NDK Application Docs
           </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: bef7f4ea
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -91,6 +94,16 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#tl-dr">TL;DR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value">I need to include specific component in CORE depending on a given parameter value</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-core-conf-tcl-file">What can I do with the <cite>core_conf.tcl</cite> file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-core-const-tcl-file">What can I do with the <cite>core_const.tcl</cite> file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-card-conf-tcl-file">What can I do with the <cite>card_conf.tcl</cite> file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-card-const-tcl-file">What can I do with the <cite>card_const.tcl</cite> file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-app-conf-tcl-file">What can I do with the <cite>app_conf.tcl</cite> file</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#contact-for-author">Contact for author</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
@@ -104,6 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
@@ -113,7 +127,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mfb.html">MFB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mvb.html">MVB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ver.html">UVM Verification</a></li>
 </ul>
@@ -144,7 +158,10 @@
              
   <section id="configuration-files-and-parameters">
 <span id="ndk-configuration"></span><h1>Configuration files and parameters<a class="headerlink" href="#configuration-files-and-parameters" title="Permalink to this heading"></a></h1>
-<p>This chapter describes the NDK configuration files and parameters. The configuration has three levels: the CORE, the card, and the user application. A detailed description of each level is below.</p>
+<p>This chapter describes the NDK configuration files and parameters. The
+configuration has three levels: the CORE, the card, and the user application. A
+detailed description of each level is below (the abreviated version is provided
+via the <a class="reference internal" href="#ndk-conf-tldr"><span class="std std-ref">following link</span></a>).</p>
 <section id="parametrizing-ndk-core-design">
 <span id="ndk-core-configuration"></span><h2>Parametrizing NDK-CORE design<a class="headerlink" href="#parametrizing-ndk-core-design" title="Permalink to this heading"></a></h2>
 <p>The files in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/config</span></code> directory and the
@@ -189,26 +206,28 @@ specified in the <code class="docutils literal notranslate"><span class="pre">co
 parameters specific for the chosen card type. Passing TCL parameters to VHDL
 constants is a specific use case described in the <a class="reference internal" href="#core-config-vhdl-pkg-const"><span class="std std-ref">Adding constants to the VHDL package</span></a>
 section below.</p>
-<p>Another purpose to insert parameter in this file is when its value
-depends on the value of another constant, but only if they are relevant to
-the NDK-CORE design. Conditionally assigned parameters that are for a specific
+<p>The second purpose of this file is when the value of a parameter
+depends on the value of another NDK CORE constant.
+Conditionally assigned parameters that are for a specific
 card type should be located in a corresponding <a class="reference internal" href="#card-conf-card-const-tcl"><span class="std std-ref">card_const.tcl</span></a>
-file. Example a conditional assignments follows:</p>
-<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="c"># disabling of the PTC module when specific PCI Express configuration is used</span>
-<span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="nv">$PCIE_ENDPOINTS</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">3</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$PCIE_ENDPOINT_MODE</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="k">}</span><span class="w"> </span><span class="k">{</span>
-<span class="w">    </span><span class="k">set</span><span class="w"> </span>PTC_DISABLE<span class="w"> </span>true
-<span class="k">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">{</span>
-<span class="w">    </span><span class="c"># always insert default value</span>
-<span class="w">    </span><span class="k">set</span><span class="w"> </span>PTC_DISABLE<span class="w"> </span>false
+file. An example of a conditional assignment follows:</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">set</span><span class="w"> </span>PCIE_LANES<span class="w"> </span><span class="mi">16</span>
+
+<span class="c"># setting the number of PCIE_LANES to 8 when specific PCIe configuration is used</span>
+<span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="nv">$PCIE_ENDPOINTS</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$PCIE_ENDPOINT_MODE</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>PCIE_LANES<span class="w"> </span><span class="mi">8</span>
 <span class="k">}</span>
 </pre></div>
 </div>
+<p>The third purpose of this file is to implement statements that check compatible
+combinations of parameters. When an incompatible combination is detected, the
+TCL shell will raise an error and stop the compilation process. You should
+implement these checks only for the parameters used in the NDK-CORE.</p>
 </section>
 <section id="core-mk">
 <span id="core-mk-include"></span><h4>core.mk<a class="headerlink" href="#core-mk" title="Permalink to this heading"></a></h4>
 <p>This file contains default values for the parameters specified in the Makefile.
-The allowed values of each parameter are
-provided in the comments. The user of the
+The allowed values of each parameter are provided in the comments. The user of the
 design can change these values freely.</p>
 </section>
 <section id="core-bootstrap-tcl">
@@ -238,7 +257,7 @@ TCL shell to affect the final VHDL design.</p>
 <h4>Passing through Modules.tcl<a class="headerlink" href="#passing-through-modules-tcl" title="Permalink to this heading"></a></h4>
 <p>As described in the <a class="reference internal" href="../../ofm_doc/build/readme.html#ofm-build-system"><span class="std std-ref">Build System</span></a> section, the Modules.tcl files allow
 for modular and hierarchical organization of VHDL source files. The Modules.tcl files
-provide an ARCHGRP list to pass specific constants across the source file hierarchy. Each
+provide an <em>ARCHGRP</em> list to pass specific constants across the source file hierarchy. Each
 Modules.tcl file obtains such a list from its parent Modules.tcl file. It allows further
 adjustments of the ARCHGRP list(s) of its descendant(s).</p>
 <p>The parameters specified in the NDK-CORE repository are passed using the
@@ -294,9 +313,12 @@ The system provides mechanism to configure card specific parameters.</p>
 <cite>NDK-CORE</cite> design.</p>
 <section id="card-conf-tcl">
 <h4>card_conf.tcl<a class="headerlink" href="#card-conf-tcl" title="Permalink to this heading"></a></h4>
-<p>This file lists user-configurable parameters and their possible
-values in the comments. The purpose of this file is the same as of the
-<code class="docutils literal notranslate"><span class="pre">core_conf.tcl</span></code> file in the <cite>NDK-CORE</cite> repository. The only difference is that it has a higher priority.</p>
+<p>This file lists user-configurable parameters and their possible values in the
+comments. The file contains parameters relevant to a specific card. Those
+parameters are mostly tied to the underlying hardware, like the number of Ethernet
+ports or the PCIe generation of the used PCIe core. The purpose of this file is the
+same as that of the <code class="docutils literal notranslate"><span class="pre">core_conf.tcl</span></code> file in the <cite>NDK-CORE</cite> repository. The only
+difference is that it has a higher priority.</p>
 </section>
 <section id="card-const-tcl">
 <span id="card-conf-card-const-tcl"></span><h4>card_const.tcl<a class="headerlink" href="#card-const-tcl" title="Permalink to this heading"></a></h4>
@@ -305,10 +327,17 @@ values in the comments. The purpose of this file is the same as of the
 <p>This file contains features for development. It is not recommended for the user to change
 the parameters in this file.</p>
 </div>
-<p>This file contains card-specific parameters which mostly depend on the features
-of the physical hardware (the target card). It should also implement a check for
-the configuration parameters whether their values are valid and compatible with
-the values of other parameters.</p>
+<p>To ensure that the values of the configuration parameters are valid and
+compatible with the values of other parameters, they need to be checked. And
+that is done here, making this file similar to the <cite>core_const.tcl</cite>. The only
+difference is that the checking considers only the used card. For example, if
+the given card supports two QSFP transceivers at most, the corresponding
+parameter should be set to either 1 or 2.</p>
+<p>It is also possible to add a constant for a specific card to the VHDL package.
+This package is also included in the <cite>fpga.vhd</cite> top-level component (this
+component is card-specific too).</p>
+<p>The third way is to add conditionally assigned parameters, which is the same way
+they are used in the <cite>core_const.tcl</cite> file.</p>
 </section>
 <section id="card-mk">
 <h4>card.mk<a class="headerlink" href="#card-mk" title="Permalink to this heading"></a></h4>
@@ -347,8 +376,7 @@ are visible in the <cite>*.inc.tcl</cite> files and can be added to the array.</
 </section>
 <section id="id4">
 <h4>Adding constants to the VHDL package<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h4>
-<p>It is recommended to add constants to the <code class="docutils literal notranslate"><span class="pre">combo_user_const</span></code> VHDL package in
-It is recommended to add card-specific constants to the <code class="docutils literal notranslate"><span class="pre">combo_user_const</span></code> VHDL
+<p>It is recommended to add card-specific constants to the <code class="docutils literal notranslate"><span class="pre">combo_user_const</span></code> VHDL
 package in <cite>card_const.tcl</cite> file. The way of adding these constants was described in
 the <a class="reference internal" href="#core-config-vhdl-pkg-const"><span class="std std-ref">Adding constants to the VHDL package</span></a> section in the documentation of NDK-CORE
 configuration.</p>
@@ -358,7 +386,7 @@ configuration.</p>
 <section id="parametrizing-the-user-application">
 <span id="ndk-app-configuration"></span><h2>Parametrizing the user application<a class="headerlink" href="#parametrizing-the-user-application" title="Permalink to this heading"></a></h2>
 <p>The user application can also be parametrized using specific configuration
-files. Configuration parameters are handed to the subcomponents of the
+files. Configuration parameters can be handed to the subcomponents of the
 <code class="docutils literal notranslate"><span class="pre">APPLICATION_CORE</span></code> design entity. It also allows the user to choose one of,
 sometimes, multiple configurations for a specific card before launching the
 build process.</p>
@@ -408,9 +436,153 @@ are visible here and can be added to the array as well.</p>
 <p>This file has the highest priority of all user-configurable
 constants (for more details, refer to the <a class="reference internal" href="#fig-const-hierarchy"><span class="std std-ref">Hierarchy diagram</span></a>). The user
 can change the parameters specified in this file or add others according to
-their needs.</p>
+their needs. Adding a parameter to the VHDL package is also possible because the
+<cite>combo_user_const</cite> is also included in the <cite>APPLICATION_CORE</cite> entity.</p>
 </section>
 </section>
+</section>
+<section id="tl-dr">
+<span id="ndk-conf-tldr"></span><h2>TL;DR<a class="headerlink" href="#tl-dr" title="Permalink to this heading"></a></h2>
+<p>This section contains specific recipes for achieving specific goals.</p>
+<section id="i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value">
+<h3>I need to include specific component in CORE depending on a given parameter value<a class="headerlink" href="#i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value" title="Permalink to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>First, you should write your parameter to the
+<code class="docutils literal notranslate"><span class="pre">core/intel/config/core_conf.tcl</span></code> with a specific value (if the parameter
+stays only in the <code class="docutils literal notranslate"><span class="pre">core/intel/config/core_conf.tcl</span></code>) or with a default
+value (if the parameter will be set in other configuration files).</p></li>
+<li><p>Then add this parameter to the <em>CORE_ARCHGRP</em> array in the
+<code class="docutils literal notranslate"><span class="pre">core/intel/common.inc.tcl</span></code> file.</p></li>
+</ol>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">set</span><span class="w"> </span>CORE_ARCHGRP<span class="k">(</span><span class="nv">DMA_TYPE</span><span class="k">)</span><span class="w">                      </span><span class="nv">$DMA_TYPE</span>
+<span class="k">set</span><span class="w"> </span>CORE_ARCHGRP<span class="k">(</span><span class="nv">APPLICATION_CORE_ENTITY_ONLY</span><span class="k">)</span><span class="w">  </span>false
+<span class="c"># adding two custom parameters</span>
+<span class="k">set</span><span class="w"> </span>CODE_ARCHGRP<span class="k">(</span><span class="nv">MY_PARAM_1</span><span class="k">)</span><span class="w">                    </span><span class="nv">$MY_PARAM_1</span>
+<span class="k">set</span><span class="w"> </span>CODE_ARCHGRP<span class="k">(</span><span class="nv">MY_PARAM_2</span><span class="k">)</span><span class="w">                    </span><span class="nv">$MY_PARAM_2</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The name of the constant added to the array should be the same as the name of
+the parameter, thus <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">CORE_ARCHGRP(MY_PARAM)</span> <span class="pre">$MY_PARAM</span></code>.</p>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>The build system then converts the array to a list which is propagated as <code class="docutils literal notranslate"><span class="pre">ARCHGRP</span></code> through the
+<code class="docutils literal notranslate"><span class="pre">Modules.tcl</span></code> file of the <code class="docutils literal notranslate"><span class="pre">fpga.vhd</span></code> component to the <code class="docutils literal notranslate"><span class="pre">Modules.tcl</span></code> of
+the <code class="docutils literal notranslate"><span class="pre">fpga_common.vhd</span></code>.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Notice that the <code class="docutils literal notranslate"><span class="pre">fpga.vhd</span></code> component is dependent on a specific card but already contains
+all propagated parameters of the CORE design.</p>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ARCHGRP</span></code> can be propagated to other subcomponents when added as the
+third element of a subcomponent list. This is shown in the following snippet.</p></li>
+</ol>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nb">lappend</span><span class="w"> </span>COMPONENTS<span class="w"> </span><span class="k">[</span><span class="nb">list</span><span class="w"> </span><span class="s2">&quot;&lt;entity_name_1&gt;&quot;</span><span class="w"> </span><span class="s2">&quot;&lt;path_to_entity_1&gt;&quot;</span><span class="w"> </span><span class="nv">$ARCHGRP</span><span class="k">]</span>
+<span class="c"># &quot;FULL&quot; is the default value for the ARCHGRP field</span>
+<span class="nb">lappend</span><span class="w"> </span>COMPONENTS<span class="w"> </span><span class="k">[</span><span class="nb">list</span><span class="w"> </span><span class="s2">&quot;&lt;entity_name_2&gt;&quot;</span><span class="w"> </span><span class="s2">&quot;&lt;path_to_entity_2&gt;&quot;</span><span class="w"> </span><span class="s2">&quot;FULL&quot;</span><span class="w">  </span><span class="k">]</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>When a constant from the <code class="docutils literal notranslate"><span class="pre">ARCHGRP</span></code> is needed, the list has to be
+converted back to an array:</p></li>
+</ol>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">array</span><span class="w"> </span>set<span class="w"> </span>ARCHGRP_ARR<span class="w"> </span><span class="nv">$ARCHGRP</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li><p>The values from the <code class="docutils literal notranslate"><span class="pre">ARCHGRP_ARR</span></code> can then be accessed in a similar way in
+which they were added to the array.</p></li>
+</ol>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="w"> </span><span class="nv">$ARCHGRP_ARR</span><span class="k">(</span><span class="nv">MY_PARAM_1</span><span class="k">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">3</span><span class="w"> </span><span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="c"># do one thing</span>
+<span class="k">}</span><span class="w"> </span><span class="k">elseif</span><span class="w"> </span><span class="k">{</span><span class="w"> </span><span class="nv">$ARCHGRP_ARR</span><span class="k">(</span><span class="nv">MY_PARAM_1</span><span class="k">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">4</span><span class="w"> </span><span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="c"># do other thing</span>
+<span class="k">}</span>
+</pre></div>
+</div>
+</section>
+<section id="what-can-i-do-with-the-core-conf-tcl-file">
+<h3>What can I do with the <cite>core_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-conf-tcl-file" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>You can declare new configuration parameters (and assign their default
+values) so they would be visible across all supported cards. These default
+values can be overwritten in the <cite>card_conf.tcl</cite> file of each card.</p></li>
+<li><p>Write allowed values of parameters to the commentary above each declaration.
+Especially when new configuration parameter or parameter value is added.</p></li>
+</ul>
+</section>
+<section id="what-can-i-do-with-the-core-const-tcl-file">
+<h3>What can I do with the <cite>core_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-const-tcl-file" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>You can add a dependent parameter (the value of such a parameter depends on
+the value of another parameter). The developer should add CORE-specific
+parameters only. (Those are the ones that are common across all supported
+cards.)</p></li>
+</ul>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="nv">$PCIE_ENDPOINTS</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$PCIE_ENDPOINT_MODE</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>MY_PARAM_2<span class="w"> </span><span class="mi">8</span>
+<span class="k">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>MY_PARAM_2<span class="w"> </span><span class="mi">16</span>
+<span class="k">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>You can check combinations of different parameters. This allows you to avoid various
+incompatibilities which may (or may not) crash the synthesis. An unsuccessful check
+stops the compilation process.</p></li>
+</ul>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="w"> </span><span class="nv">$MY_PARAM_1</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nv">3</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$MY_PARAM_1</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="k">error</span><span class="w"> </span><span class="s2">&quot;Unsupported value of MY_PARAM_1: $MY_PARAM_1!&quot;</span>
+<span class="k">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>You can add a parameter value to the generated VHDL package, which is then icluded in
+the <cite>fpga.vhd</cite> and <cite>fpga_common.vhd</cite> components:</p></li>
+</ul>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nv">VhdlPkgInt</span><span class="w">  </span>PCIE_GEN<span class="w">             </span><span class="nv">$PCIE_GEN</span>
+<span class="nv">VhdlPkgInt</span><span class="w">  </span>DMA_TYPE<span class="w">             </span><span class="nv">$DMA_TYPE</span>
+<span class="nv">VhdlPkgBool</span><span class="w"> </span>DMA_RX_BLOCKING_MODE<span class="w"> </span><span class="nv">$DMA_RX_BLOCKING_MODE</span>
+<span class="nv">VhdlPkgInt</span><span class="w">  </span>MY_PARAM_1<span class="w">           </span><span class="nv">$MY_PARAM_1</span>
+</pre></div>
+</div>
+</section>
+<section id="what-can-i-do-with-the-card-conf-tcl-file">
+<h3>What can I do with the <cite>card_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-conf-tcl-file" title="Permalink to this heading"></a></h3>
+<p>You can change parameters specified in the <cite>core_conf.tcl</cite> file for a specific
+card type (because some parameters are directly dependent on an underlying
+hardware), e.g., the number of Ethernet ports or Ethernet channels.</p>
+</section>
+<section id="what-can-i-do-with-the-card-const-tcl-file">
+<h3>What can I do with the <cite>card_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-const-tcl-file" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>You can add a dependent parameter when a card requiers it. CORE specific
+parameters belong to the <cite>core_const.tcl</cite>.</p></li>
+<li><p>You can check the parameter values to see if they adhere to the selected card.</p></li>
+<li><p>You can add a parameter to the VHDL package which will be used in the card’s
+<cite>fpga.vhd</cite> top-level component.</p></li>
+</ul>
+</section>
+<section id="what-can-i-do-with-the-app-conf-tcl-file">
+<h3>What can I do with the <cite>app_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-app-conf-tcl-file" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>You can add parameters for the given application (component
+<cite>application_core.vhd</cite>).</p></li>
+<li><p>You can change parameters specified in the <cite>core_conf.tcl</cite> and <cite>card_conf.tcl</cite>
+files with respect to the application.</p></li>
+<li><p>You can add a parameter to the VHDL package, which is used in the
+<cite>application_core.vhd</cite> component (the same package as in the <cite>card_const.tcl</cite>
+and <cite>core_const.tcl</cite>).</p></li>
+</ul>
+</section>
+</section>
+<section id="contact-for-author">
+<h2>Contact for author<a class="headerlink" href="#contact-for-author" title="Permalink to this heading"></a></h2>
+<p>Send suggestions regarding missing information or unanswered questions to
+<cite>valekv&#64;cesnet.cz</cite>.</p>
 </section>
 </section>
 
@@ -425,7 +597,7 @@ their needs.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -11,6 +11,7 @@ The basic components are typically located in the ``comp/base/`` directory in th
    async
    memory
    fifo
+   dsp
    shift
    logic
    misc

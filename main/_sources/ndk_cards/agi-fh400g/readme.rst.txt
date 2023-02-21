@@ -10,7 +10,7 @@ ReflexCES XpressSX AGI-FH400G
     - PCIe conectors: Edge connector + optional HSI connectors
     - `FPGA Card Website <https://www.reflexces.com/pcie-boards/intel-agilex-soc/xpresssx-agi-fh400g-agilex-soc-full-height-half-length-pcie-board>`_
 - FPGA specification:
-    - FPGA part number: ``AGIB027R29A1E2VR0``
+    - FPGA part number: ``AGIB027R29A1E2VR0`` or ``AGIB027R29A1E2VR3``
     - Ethernet Hard IP: F-Tile (up to 400G Ethernet)
     - PCIe Hard IP: R-Tile (up to PCIe Gen5 x16)
 
@@ -36,6 +36,22 @@ NDK firmware support
 .. note::
 
     To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro installed, including a valid license.
+
+Board Revision
+^^^^^^^^^^^^^^
+
+This card exists in multiple revisions. The default revision for the firmware build is BOARD_REV=0.
+The correct revision for the firmware build can be selected using the Makefile parameter BOARD_REV, for example as follows:
+
+.. code::
+
+    $ cd <NDK-APP_root_directory>/build/agi-fh400g
+    $ make BOARD_REV=1
+
+**Allowed values of BOARD_REV parameter**
+
+- ``BOARD_REV=0`` - The first prototypes use FPGA part number ``AGIB027R29A1E2VR0``.
+- ``BOARD_REV=1`` - The second board revision uses FPGA part number ``AGIB027R29A1E2VR3``.
 
 Board Test Scripts
 ^^^^^^^^^^^^^^^^^^

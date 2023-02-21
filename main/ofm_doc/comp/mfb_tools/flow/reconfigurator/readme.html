@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MFB Reconfigurator &mdash; Minimal NDK Application Docs 1.0 documentation</title>
+  <title>MFB Reconfigurator &mdash; Minimal NDK Application Docs  documentation</title>
       <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -35,6 +35,9 @@
           <a href="../../../../../index.html" class="icon icon-home">
             Minimal NDK Application Docs
           </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: bef7f4ea
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -64,6 +67,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -81,17 +85,32 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../superunpacketer/readme.html">SuperUnPacketer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html">MFB Merger Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html#id1">MFB Merger Simple GEN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cutter_simple/readme.html">MFB Cutter Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dropper/readme.html">MFB Dropper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metadata_insertor/readme.html">Metadata Insertor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformer/readme.html">MFB Trasformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipe/readme.html">MFB PIPE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger/readme.html">MFB Merger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html">MFB Splitter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html#id1">MFB Splitter Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enabler/readme.html">MFB Enabler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MFB ASFIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MFB FIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../debug/generator/readme.html">MFB Generator</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
 </ul>
@@ -140,6 +159,184 @@ These components are connected to a pipeline to form a full power MFB Reconfigur
 <li><p>MFB Item Reconfigurator</p>
 <blockquote>
 <div><p>Is cappable of dividing Items into smaller Items to increase their number <em>or</em> joining multiple Items in one Block to decrease their number.</p>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_item_reconfigurator">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_ITEM_RECONFIGURATOR</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_item_reconfigurator" title="Permalink to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB Configuration</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_item_reconfigurator-regions"><td><p>REGIONS</p></td>
+<td><p>integer</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_item_reconfigurator-region_size"><td><p>REGION_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_item_reconfigurator-rx_block_size"><td><p>RX_BLOCK_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_item_reconfigurator-tx_block_size"><td><p>TX_BLOCK_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_item_reconfigurator-rx_item_width"><td><p>RX_ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_item_reconfigurator-meta_width"><td><p>META_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Others</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_item_reconfigurator-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>Target device</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_item_reconfigurator-tx_item_width"><td><p>TX_ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>RX_ITEM_WIDTH*RX_BLOCK_SIZE/TX_BLOCK_SIZE</p></td>
+<td><p>Derived parameters
+DO NOT CHANGE!</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-mfb_item_reconfigurator-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_item_reconfigurator-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB input interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_item_reconfigurator-rx_data"><td><p>RX_DATA</p></td>
+<td><p>std_logic_vector(REGIONS*REGION_SIZE*RX_BLOCK_SIZE*RX_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_item_reconfigurator-rx_meta"><td><p>RX_META</p></td>
+<td><p>std_logic_vector(REGIONS*META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_item_reconfigurator-rx_sof"><td><p>RX_SOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_item_reconfigurator-rx_eof"><td><p>RX_EOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_item_reconfigurator-rx_sof_pos"><td><p>RX_SOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_item_reconfigurator-rx_eof_pos"><td><p>RX_EOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*RX_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_item_reconfigurator-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_item_reconfigurator-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MFB output interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_item_reconfigurator-tx_data"><td><p>TX_DATA</p></td>
+<td><p>std_logic_vector(REGIONS*REGION_SIZE*TX_BLOCK_SIZE*TX_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_item_reconfigurator-tx_meta"><td><p>TX_META</p></td>
+<td><p>std_logic_vector(REGIONS*META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_item_reconfigurator-tx_sof"><td><p>TX_SOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_item_reconfigurator-tx_eof"><td><p>TX_EOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_item_reconfigurator-tx_sof_pos"><td><p>TX_SOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_item_reconfigurator-tx_eof_pos"><td><p>TX_EOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*TX_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_item_reconfigurator-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_item_reconfigurator-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div></blockquote>
 </li>
 <li><p>MFB Block Reconfigurator</p>
@@ -147,6 +344,217 @@ These components are connected to a pipeline to form a full power MFB Reconfigur
 <div><p>Division of Blocks into smaller Blocks —
 the division is only done between Items; the component cannot split Items —
 <em>or</em> joining of multiple Blocks within the same Region into bigger Blocks.</p>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_block_reconfigurator">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_BLOCK_RECONFIGURATOR</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_block_reconfigurator" title="Permalink to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB Configuration</p></td>
+<td><p>=====</p></td>
+<td><p>INEFFICIENCY WARNING (for FRAME_ALIGN == 0):
+When RX_REGION_SIZE &gt; TX_REGION_SIZE all TX Frames are generated
+with SOF aligned to Region.
+Might decrease throughput due to unnessesary gaps.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_block_reconfigurator-regions"><td><p>REGIONS</p></td>
+<td><p>integer</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_block_reconfigurator-rx_region_size"><td><p>RX_REGION_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_block_reconfigurator-tx_region_size"><td><p>TX_REGION_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_block_reconfigurator-rx_block_size"><td><p>RX_BLOCK_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_block_reconfigurator-item_width"><td><p>ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_block_reconfigurator-meta_width"><td><p>META_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Others</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_block_reconfigurator-meta_mode"><td><p>META_MODE</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td><dl class="simple">
+<dt>Metadata validity mode</dt><dd><ul class="simple">
+<li><p>0 -&gt; with SOF</p></li>
+<li><p>1 -&gt; with EOF</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_block_reconfigurator-fifo_size"><td><p>FIFO_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>Input FIFO size (in number of MFB words)
+Only applies when RX_REGION_SIZE &gt; TX_REGION_SIZE</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_block_reconfigurator-frame_align"><td><p>FRAME_ALIGN</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td><dl class="simple">
+<dt>Frame alignment mode (Only applies when RX_REGION_SIZE &gt; TX_REGION_SIZE)</dt><dd><ul class="simple">
+<li><p>0 - align to start of Region</p></li>
+<li><p>1 - align to start of Block (ONLY SUPPORTED WHEN ALL FRAMES ARE BIGGER THAN TX MFB BLOCK)</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_block_reconfigurator-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>Target device</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_block_reconfigurator-tx_block_size"><td><p>TX_BLOCK_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>RX_BLOCK_SIZE*RX_REGION_SIZE/TX_REGION_SIZE</p></td>
+<td><p>Derived parameters
+DO NOT CHANGE!</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-mfb_block_reconfigurator-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_block_reconfigurator-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB input interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_block_reconfigurator-rx_data"><td><p>RX_DATA</p></td>
+<td><p>std_logic_vector(REGIONS*RX_REGION_SIZE*RX_BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_block_reconfigurator-rx_meta"><td><p>RX_META</p></td>
+<td><p>std_logic_vector(REGIONS*META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_block_reconfigurator-rx_sof"><td><p>RX_SOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_block_reconfigurator-rx_eof"><td><p>RX_EOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_block_reconfigurator-rx_sof_pos"><td><p>RX_SOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(RX_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_block_reconfigurator-rx_eof_pos"><td><p>RX_EOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(RX_REGION_SIZE*RX_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_block_reconfigurator-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_block_reconfigurator-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MFB output interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_block_reconfigurator-tx_data"><td><p>TX_DATA</p></td>
+<td><p>std_logic_vector(REGIONS*TX_REGION_SIZE*TX_BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_block_reconfigurator-tx_meta"><td><p>TX_META</p></td>
+<td><p>std_logic_vector(REGIONS*META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_block_reconfigurator-tx_sof"><td><p>TX_SOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_block_reconfigurator-tx_eof"><td><p>TX_EOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_block_reconfigurator-tx_sof_pos"><td><p>TX_SOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(TX_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_block_reconfigurator-tx_eof_pos"><td><p>TX_EOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(TX_REGION_SIZE*TX_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_block_reconfigurator-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_block_reconfigurator-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div></blockquote>
 </li>
 <li><p>MFB Region Reconfigurator</p>
@@ -154,14 +562,225 @@ the division is only done between Items; the component cannot split Items —
 <div><p>Division of Regions into smaller Regions —
 the division is only done between Blocks; the component cannot split Blocks —
 <em>or</em> joining of multiple Regions within the word into bigger Regions.</p>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_region_reconfigurator">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_REGION_RECONFIGURATOR</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_region_reconfigurator" title="Permalink to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB Configuration</p></td>
+<td><p>=====</p></td>
+<td><p>INEFFICIENCY WARNING (for FRAME_ALIGN == 0):
+When TX_REGIONS &lt; RX_REGIONS all TX Frames are generated
+with SOF aligned to start of a Region. This might decrease
+throughput due to unnessesary gaps.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_region_reconfigurator-rx_regions"><td><p>RX_REGIONS</p></td>
+<td><p>integer</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_region_reconfigurator-tx_regions"><td><p>TX_REGIONS</p></td>
+<td><p>integer</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_region_reconfigurator-rx_region_size"><td><p>RX_REGION_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_region_reconfigurator-block_size"><td><p>BLOCK_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_region_reconfigurator-item_width"><td><p>ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_region_reconfigurator-meta_width"><td><p>META_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Others</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_region_reconfigurator-meta_mode"><td><p>META_MODE</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td><dl class="simple">
+<dt>Metadata validity mode</dt><dd><ul class="simple">
+<li><p>0 -&gt; with SOF</p></li>
+<li><p>1 -&gt; with EOF</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_region_reconfigurator-fifo_size"><td><p>FIFO_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>Input FIFO size (in number of MFB words)
+Only applies when RX_REGIONS &gt; TX_REGIONS</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_region_reconfigurator-frame_align"><td><p>FRAME_ALIGN</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td><dl class="simple">
+<dt>Frame alignment mode (Only applies when TX_REGIONS &lt; RX_REGIONS)</dt><dd><ul class="simple">
+<li><p>0 - align to start of Region (requires more resources)</p></li>
+<li><p>1 - align to start of Block (ONLY SUPPORTED WHEN ALL FRAMES ARE BIGGER THAN TX MFB REGION)</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_region_reconfigurator-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>Target device</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_region_reconfigurator-tx_region_size"><td><p>TX_REGION_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>RX_REGION_SIZE*RX_REGIONS/TX_REGIONS</p></td>
+<td><p>Derived parameters
+DO NOT CHANGE!</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_region_reconfigurator-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_region_reconfigurator-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MFB input interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_region_reconfigurator-rx_data"><td><p>RX_DATA</p></td>
+<td><p>std_logic_vector(RX_REGIONS*RX_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_region_reconfigurator-rx_meta"><td><p>RX_META</p></td>
+<td><p>std_logic_vector(RX_REGIONS*META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_region_reconfigurator-rx_sof"><td><p>RX_SOF</p></td>
+<td><p>std_logic_vector(RX_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_region_reconfigurator-rx_eof"><td><p>RX_EOF</p></td>
+<td><p>std_logic_vector(RX_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_region_reconfigurator-rx_sof_pos"><td><p>RX_SOF_POS</p></td>
+<td><p>std_logic_vector(RX_REGIONS*max(1,log2(RX_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_region_reconfigurator-rx_eof_pos"><td><p>RX_EOF_POS</p></td>
+<td><p>std_logic_vector(RX_REGIONS*max(1,log2(RX_REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_region_reconfigurator-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_region_reconfigurator-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB output interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_region_reconfigurator-tx_data"><td><p>TX_DATA</p></td>
+<td><p>std_logic_vector(TX_REGIONS*TX_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_region_reconfigurator-tx_meta"><td><p>TX_META</p></td>
+<td><p>std_logic_vector(TX_REGIONS*META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_region_reconfigurator-tx_sof"><td><p>TX_SOF</p></td>
+<td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_region_reconfigurator-tx_eof"><td><p>TX_EOF</p></td>
+<td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_region_reconfigurator-tx_sof_pos"><td><p>TX_SOF_POS</p></td>
+<td><p>std_logic_vector(TX_REGIONS*max(1,log2(TX_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_region_reconfigurator-tx_eof_pos"><td><p>TX_EOF_POS</p></td>
+<td><p>std_logic_vector(TX_REGIONS*max(1,log2(TX_REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_region_reconfigurator-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_region_reconfigurator-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div></blockquote>
 </li>
-<li><p>MFB Transformer</p>
-<blockquote>
-<div><p>Division of Regions in one word into multiple words <em>or</em> joining of Regions from multiple words into one word.
-(In other words: changing MFB word size by adding or removing Regions.)</p>
-</div></blockquote>
-</li>
+<li><p><a class="reference internal" href="../transformer/readme.html#mfb-transformer"><span class="std std-ref">MFB Transformer</span></a></p></li>
 </ol>
 <p>It is important to realize, that the components cannot be placed in the MFB Reconfigurator in an arbitrary order.
 In fact, as you can see in the diagram above, all of them appart from the MFB Transformer are required to be present <strong>twice</strong>.
@@ -220,7 +839,7 @@ To support shared output Regions, the logic would also have to check for presenc
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, CESNET z.s.p.o..</p>
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
