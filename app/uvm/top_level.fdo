@@ -48,7 +48,7 @@ set ARCHGRP_L [array get ARCHGRP_UVM]
 
 lappend PACKAGES   "./config/ndk_const.vhd"
 lappend COMPONENTS [list "DUT_ENTITY" "$FIRMWARE_BASE/ndk/core/intel"  $ARCHGRP_L]
-lappend COMPONENTS [list "DUT_INTEL"  "../intel"  "FULL"]
+lappend COMPONENTS [list "DUT_INTEL"  "../top"  "FULL"]
 lappend COMPONENTS [list "VER"        "."         "FULL"]
 
 #SET TEST NAME
