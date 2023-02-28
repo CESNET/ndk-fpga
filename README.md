@@ -80,9 +80,9 @@ The output is in the `doc/build/index.html` file.
 
 ## Related publications
 
-- J. Cabal, J. Sikora, Š. Friedl, M. Špinler and J. Kořenek, "FPL Demo: 400G FPGA Packet Capture Based on Network Development Kit," in *32nd International Conference on Field Programmable Logic and Applications (FPL)*, Belfast, UK, 2022.
-- J. Kubálek, J. Cabal, M. Špinler and R. Iša, "[DMA Medusa: A Vendor-Independent FPGA-Based Architecture for 400 Gbps DMA Transfers](https://ieeexplore.ieee.org/document/9444087)," *2021 IEEE 29th Annual International Symposium on Field-Programmable Custom Computing Machines (FCCM)*, 2021, pp. 258-258, doi: 10.1109/FCCM51124.2021.00045.
-- L. Kekely, J. Cabal, V. Puš and J. Kořenek, "[Multi Buses: Theory and Practical Considerations of Data Bus Width Scaling in FPGAs](https://ieeexplore.ieee.org/document/9217811)," *2020 23rd Euromicro Conference on Digital System Design (DSD)*, 2020, pp. 49-56, doi: 10.1109/DSD51259.2020.00020.
+- J. Cabal, J. Sikora, Š. Friedl, M. Špinler and J. Kořenek, "[FPL Demo: 400G FPGA Packet Capture Based on Network Development Kit](https://ieeexplore.ieee.org/document/10035175)," 2022 32nd International Conference on Field-Programmable Logic and Applications (FPL), Belfast, United Kingdom, 2022, pp. 474-474, doi: [10.1109/FPL57034.2022.00090](https://doi.org/10.1109/FPL57034.2022.00090).
+- J. Kubálek, J. Cabal, M. Špinler and R. Iša, "[DMA Medusa: A Vendor-Independent FPGA-Based Architecture for 400 Gbps DMA Transfers](https://ieeexplore.ieee.org/document/9444087)," *2021 IEEE 29th Annual International Symposium on Field-Programmable Custom Computing Machines (FCCM)*, 2021, pp. 258-258, doi: [10.1109/FCCM51124.2021.00045](https://doi.org/10.1109/FCCM51124.2021.00045).
+- L. Kekely, J. Cabal, V. Puš and J. Kořenek, "[Multi Buses: Theory and Practical Considerations of Data Bus Width Scaling in FPGAs](https://ieeexplore.ieee.org/document/9217811)," *2020 23rd Euromicro Conference on Digital System Design (DSD)*, 2020, pp. 49-56, doi: [10.1109/DSD51259.2020.00020](https://doi.org/10.1109/DSD51259.2020.00020).
 
 ## License
 
