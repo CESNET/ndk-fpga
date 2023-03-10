@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 95991d1e
+                Git branch: devel, <br> Git hash: c0132cc1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -97,6 +97,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Common package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#random">Random</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#comparer">Comparer</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../lii/readme.html">LII agent</a></li>
@@ -186,6 +187,141 @@ to generate better randomization. Class rand_rdy and rand_length is common inter
 <span class="w">        </span><span class="k">end</span>
 <span class="w">    </span><span class="k">endtask</span>
 <span class="w">    </span><span class="p">...</span>
+<span class="kd">endclass</span>
+</pre></div>
+</div>
+</section>
+<section id="comparer">
+<h2>Comparer<a class="headerlink" href="#comparer" title="Permalink to this heading"></a></h2>
+<p>These components compare transactions from the DUT with transactions from the model.
+There are three major classes. All classes have one required parameter and one optional parameter.
+The first parameter is the type of model’s transactions. The second parameter is the type of DUT transactions.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">comparer classes</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>class</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>uvm_common::comparer_base_ordered#(type MODEL_ITEM, DUT_ITEM = MODEL_ITEM)</p></td>
+<td><p>The DUT output has to produce transactions in the same order as the model</p></td>
+</tr>
+<tr class="row-odd"><td><p>uvm_common::comparer_base_disordered#(type MODEL_ITEM, DUT_ITEM = MODEL_ITEM)</p></td>
+<td><p>The DUT output doesn’t have to produce transactions in the same order as the model</p></td>
+</tr>
+<tr class="row-even"><td><p>uvm_common::comparer_base_tagged#(type MODEL_ITEM, DUT_ITEM = MODEL_ITEM)</p></td>
+<td><p>The Dut output has to produce transactions in the same order as the model only for each tag. In other words, if the transactions were split per tag into separate streams (one stream for each tag), they must be in order within each stream.</p></td>
+</tr>
+</tbody>
+</table>
+<p>If the type of the model and DUT transactions are the same, then a predefined comparer component can be used.
+This component has only one parameter - the transaction type.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">comparer classes</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>class</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>comparer_ordered #(type CLASS_TYPE)</p></td>
+</tr>
+<tr class="row-odd"><td><p>comparer_disordered #(type CLASS_TYPE)</p></td>
+</tr>
+<tr class="row-even"><td><p>comparer_taged #(type CLASS_TYPE)</p></td>
+</tr>
+</tbody>
+</table>
+<p>All comparers contain a watchdog. You can set up the maximum waiting time for the model and DUT transactions.
+Maximum waiting time for the model transactions may be necessary if the DUT can create results from partial input.</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">comparer classes</span><a class="headerlink" href="#id3" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>function</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>dut_tr_timeout_set(time timeout)</p></td>
+<td><p>How much can the DUT transactions be delayed after the model’s transactions (due to the DUT processing time)</p></td>
+</tr>
+<tr class="row-odd"><td><p>model_tr_timeout_set(time timeout)</p></td>
+<td><p>How much can the model’s transactions be delayed after the DUT transactions (due to a partial calculation)</p></td>
+</tr>
+</tbody>
+</table>
+<p>The classes contain two analysis ports. The model’s output is connected to the <code class="docutils literal notranslate"><span class="pre">analysis_imp_model</span></code> port.
+The DUT’s output is connected to the <code class="docutils literal notranslate"><span class="pre">analysis_imp_dut</span></code> port.
+Anything else should be done by classes.</p>
+<p>Also, there is the possibility of creating your own comparable algorithm and messages.
+You can do this by reimplementing pure virtual functions:
+<code class="docutils literal notranslate"><span class="pre">virtual</span> <span class="pre">function</span> <span class="pre">int</span> <span class="pre">unsigned</span> <span class="pre">compare(MODEL_TYPE</span> <span class="pre">tr_model,</span> <span class="pre">DUT_TYPE</span> <span class="pre">tr_dut);</span></code> and
+<code class="docutils literal notranslate"><span class="pre">virtual</span> <span class="pre">function</span> <span class="pre">void</span> <span class="pre">message(MODEL_TYPE</span> <span class="pre">tr_model,</span> <span class="pre">DUT_TYPE</span> <span class="pre">tr_dut);</span></code>.
+<code class="docutils literal notranslate"><span class="pre">virtual</span> <span class="pre">function</span> <span class="pre">void</span> <span class="pre">message(MODEL_TYPE</span> <span class="pre">tr_model,</span> <span class="pre">DUT_TYPE</span> <span class="pre">tr_dut);</span></code> The code below provides an example.</p>
+<div class="highlight-SystemVerilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// The class extends a specified model and dut type of transactions.</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">scoreboard_channel_header</span><span class="w"> </span><span class="p">#(</span><span class="n">HDR_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">META_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">CHANNELS</span><span class="p">,</span><span class="w"> </span><span class="n">PKT_MTU</span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_common</span><span class="o">::</span><span class="n">comparer_base_tagged</span><span class="w"> </span><span class="p">#(</span><span class="n">packet_header</span><span class="w"> </span><span class="p">#(</span><span class="n">META_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">CHANNELS</span><span class="p">,</span><span class="w"> </span><span class="n">PKT_MTU</span><span class="p">),</span><span class="w"> </span><span class="n">uvm_logic_vector</span><span class="o">::</span><span class="n">sequence_item</span><span class="p">#(</span><span class="n">HDR_WIDTH</span><span class="p">));</span>
+<span class="w">    </span><span class="no">`uvm_component_param_utils</span><span class="p">(</span><span class="n">uvm_app_core</span><span class="o">::</span><span class="n">scoreboard_channel_header</span><span class="w"> </span><span class="p">#(</span><span class="n">HDR_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">META_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">CHANNELS</span><span class="p">,</span><span class="w"> </span><span class="n">PKT_MTU</span><span class="p">))</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="c1">// This method implements a comparison of these two types.</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">compare</span><span class="p">(</span><span class="n">packet_header</span><span class="w"> </span><span class="p">#(</span><span class="n">META_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">CHANNELS</span><span class="p">,</span><span class="w"> </span><span class="n">PKT_MTU</span><span class="p">)</span><span class="w"> </span><span class="n">tr_model</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_logic_vector</span><span class="o">::</span><span class="n">sequence_item</span><span class="p">#(</span><span class="n">HDR_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">tr_dut</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">META_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">&#39;x</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="p">[$</span><span class="n">clog2</span><span class="p">(</span><span class="n">CHANNELS</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">channel</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="p">[$</span><span class="n">clog2</span><span class="p">(</span><span class="n">PKT_MTU</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span><span class="w"> </span><span class="n">packet_size</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="n">discard</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">META_WIDTH</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="p">{</span><span class="n">discard</span><span class="p">,</span><span class="w"> </span><span class="n">channel</span><span class="p">,</span><span class="w"> </span><span class="n">packet_size</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tr_dut</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="p">{</span><span class="n">discard</span><span class="p">,</span><span class="w"> </span><span class="n">channel</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">packet_size</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tr_dut</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+
+<span class="w">        </span><span class="n">eq</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="p">(</span><span class="n">discard</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="n">tr_model</span><span class="p">.</span><span class="n">discard</span><span class="p">);</span>
+<span class="w">        </span><span class="n">eq</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="p">(</span><span class="n">channel</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="n">tr_model</span><span class="p">.</span><span class="n">channel</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">META_WIDTH</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">eq</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="p">(</span><span class="n">meta</span><span class="w">    </span><span class="o">===</span><span class="w"> </span><span class="n">tr_model</span><span class="p">.</span><span class="n">meta</span><span class="p">);</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">eq</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="p">(</span><span class="n">packet_size</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="n">tr_model</span><span class="p">.</span><span class="n">packet_size</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">eq</span><span class="p">;</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="c1">// This method implements error message printing when an error occurs.</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="n">message</span><span class="p">(</span><span class="n">packet_header</span><span class="w"> </span><span class="p">#(</span><span class="n">META_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">CHANNELS</span><span class="p">,</span><span class="w"> </span><span class="n">PKT_MTU</span><span class="p">)</span><span class="w"> </span><span class="n">tr_model</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_logic_vector</span><span class="o">::</span><span class="n">sequence_item</span><span class="p">#(</span><span class="n">HDR_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">tr_dut</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">string</span><span class="w"> </span><span class="n">error_msg</span><span class="p">;</span><span class="w"> </span><span class="c1">//ETH [%0d] header</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">META_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">&#39;x</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="p">[$</span><span class="n">clog2</span><span class="p">(</span><span class="n">CHANNELS</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">channel</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="p">[$</span><span class="n">clog2</span><span class="p">(</span><span class="n">PKT_MTU</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span><span class="w"> </span><span class="n">packet_size</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="n">discard</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">META_WIDTH</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="p">{</span><span class="n">discard</span><span class="p">,</span><span class="w"> </span><span class="n">channel</span><span class="p">,</span><span class="w"> </span><span class="n">packet_size</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tr_dut</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="p">{</span><span class="n">discard</span><span class="p">,</span><span class="w"> </span><span class="n">channel</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">packet_size</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tr_dut</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="p">$</span><span class="n">swrite</span><span class="p">(</span><span class="n">error_msg</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n\t\t</span><span class="s">          [DUT model]&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="p">$</span><span class="n">swrite</span><span class="p">(</span><span class="n">error_msg</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s</span><span class="se">\n\t\t</span><span class="s">discard [%b %b]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">error_msg</span><span class="p">,</span><span class="w"> </span><span class="n">discard</span><span class="p">,</span><span class="w"> </span><span class="n">tr_model</span><span class="p">.</span><span class="n">discard</span><span class="p">);</span>
+<span class="w">        </span><span class="p">$</span><span class="n">swrite</span><span class="p">(</span><span class="n">error_msg</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s</span><span class="se">\n\t\t</span><span class="s">channel [%0d %0d]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">error_msg</span><span class="p">,</span><span class="w"> </span><span class="n">channel</span><span class="p">,</span><span class="w"> </span><span class="n">tr_model</span><span class="p">.</span><span class="n">channel</span><span class="p">);</span>
+<span class="w">        </span><span class="p">$</span><span class="n">swrite</span><span class="p">(</span><span class="n">error_msg</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s</span><span class="se">\n\t\t</span><span class="s">meta    [%h %h]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">error_msg</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">tr_model</span><span class="p">.</span><span class="n">meta</span><span class="p">);</span>
+<span class="w">        </span><span class="p">$</span><span class="n">swrite</span><span class="p">(</span><span class="n">error_msg</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s</span><span class="se">\n\t\t</span><span class="s">packet_size [%0d %0d]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">error_msg</span><span class="p">,</span><span class="w"> </span><span class="n">packet_size</span><span class="p">,</span><span class="w"> </span><span class="n">tr_model</span><span class="p">.</span><span class="n">packet_size</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">error_msg</span><span class="p">;</span>
+<span class="w">    </span><span class="k">endfunction</span>
 <span class="kd">endclass</span>
 </pre></div>
 </div>
