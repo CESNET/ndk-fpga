@@ -24,7 +24,7 @@ set APP_ARCHGRP_L [array get APP_ARCHGRP]
 
 # ----- Add application core to main component list ---------------------------
 lappend HIERARCHY(COMPONENTS) \
-    [list "APPLICATION_CORE" "../../app/intel" $APP_ARCHGRP_L]
+    [list "APPLICATION_CORE" "../../app/top" $APP_ARCHGRP_L]
 
 # Call main function which handle targets
 nb_main
