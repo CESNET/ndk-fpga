@@ -1618,6 +1618,33 @@ generate coverage.
 NOTES
 *****
 
+
+UVM_info
+======================
+
+Please use this macro to print information about the verification. The following table
+lists the available log levels in the UVM and the specific information they provide
+
+.. list-table:: uvm_info
+   :widths: 10 400
+   :header-rows: 1
+
+   * - uvm_info level
+     - What information is printed
+   * - UVM_NONE
+     - Statistics and verification results at the end of the verification
+   * - UVM_LOW
+     - Statistics during the verification run.
+   * - UVM_MEDIUM
+     - The model's configuration, if it is configured.
+   * - UVM_HIGH
+     - Model output transactions.
+   * - UVM_FULL
+     - Model output transactions + all data from which the output transaction is calculated (for example, hash algorithm)
+   * - UVM_DEBUG
+     - The sequence name when the sequence is started and other debug information.
+
+
 UVM_error vs UVM_fatal
 ======================
 
