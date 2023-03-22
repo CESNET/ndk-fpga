@@ -22,7 +22,8 @@ architecture FULL of APPLICATION_CORE is
     -- MI bus signals distribution --
     -- (ETH_STREAMS - 1 downto 0          ) ... eth-signals
     -- (MEM_PORTS   - 1 downto ETH_STREAMS) ... mem-signals
-    constant MI_PORTS_RAW      : natural := ETH_STREAMS + MEM_PORTS;
+    -- (MEM_PORTS*2 - 1 downto MEM_PORTS + ETH_STREAMS) ... mem-logger-signals
+    constant MI_PORTS_RAW      : natural := ETH_STREAMS + MEM_PORTS * 2;
     constant MI_PORTS          : natural := 2 ** log2(MI_PORTS_RAW);
 
     function mi_addr_base_f return slv_array_t is
@@ -136,6 +137,15 @@ architecture FULL of APPLICATION_CORE is
     signal split_mi_ardy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');
     signal split_mi_drd                  : slv_array_t     (MI_PORTS-1 downto 0)(MI_DATA_WIDTH-1 downto 0);
     signal split_mi_drdy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');
+
+    signal mem_mi_dwr                    : slv_array_t     (MEM_PORTS-1 downto 0)(MI_DATA_WIDTH-1 downto 0);
+    signal mem_mi_addr                   : slv_array_t     (MEM_PORTS-1 downto 0)(MI_ADDR_WIDTH-1 downto 0);
+    signal mem_mi_be                     : slv_array_t     (MEM_PORTS-1 downto 0)(MI_DATA_WIDTH/8-1 downto 0);
+    signal mem_mi_rd                     : std_logic_vector(MEM_PORTS-1 downto 0);                          
+    signal mem_mi_wr                     : std_logic_vector(MEM_PORTS-1 downto 0);                          
+    signal mem_mi_drd                    : slv_array_t     (MEM_PORTS-1 downto 0)(MI_DATA_WIDTH-1 downto 0);
+    signal mem_mi_ardy                   : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');       
+    signal mem_mi_drdy                   : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');       
 
 begin
 
@@ -545,6 +555,71 @@ begin
             MI_ARDY                     => split_mi_ardy            (i + ETH_STREAMS),
             MI_DRD                      => split_mi_drd             (i + ETH_STREAMS),
             MI_DRDY                     => split_mi_drdy            (i + ETH_STREAMS)
+        );
+
+        mem_logger_i : entity work.MEM_LOGGER
+        generic map (    
+            MEM_DATA_WIDTH          => MEM_DATA_WIDTH       ,
+            MEM_ADDR_WIDTH          => MEM_ADDR_WIDTH       ,
+            MEM_BURST_COUNT_WIDTH   => MEM_BURST_WIDTH      ,
+            MEM_FREQ_KHZ            => AMM_FREQ_KHZ         ,
+            MI_DATA_WIDTH           => MI_DATA_WIDTH        ,
+            MI_ADDR_WIDTH           => MI_ADDR_WIDTH
+        )
+        port map (    
+            CLK                     => MEM_CLK                  (i),
+            RST                     => MEM_RST                  (i),
+            --RST_DONE                => rst_done           ,
+        
+            MEM_READY               => MEM_AVMM_READY           (i),
+            MEM_READ                => MEM_AVMM_READ            (i),
+            MEM_WRITE               => MEM_AVMM_WRITE           (i),
+            MEM_ADDRESS             => MEM_AVMM_ADDRESS         (i),
+            MEM_READ_DATA           => MEM_AVMM_READDATA        (i),
+            MEM_WRITE_DATA          => MEM_AVMM_WRITEDATA       (i),
+            MEM_BURST_COUNT         => MEM_AVMM_BURSTCOUNT      (i),
+            MEM_READ_DATA_VALID     => MEM_AVMM_READDATAVALID   (i),
+        
+            MI_DWR                  => mem_mi_dwr               (i),
+            MI_ADDR                 => mem_mi_addr              (i),
+            MI_BE                   => mem_mi_be                (i),
+            MI_RD                   => mem_mi_rd                (i),
+            MI_WR                   => mem_mi_wr                (i),
+            MI_ARDY                 => mem_mi_ardy              (i),
+            MI_DRD                  => mem_mi_drd               (i),
+            MI_DRDY                 => mem_mi_drdy              (i)
+        );
+
+        mi_async_i : entity work.MI_ASYNC
+        generic map(
+            ADDR_WIDTH => MI_ADDR_WIDTH,
+            DATA_WIDTH => MI_DATA_WIDTH,
+            DEVICE     => DEVICE
+        )
+        port map(
+            -- Master interface
+            CLK_M     => APP_CLK,
+            RESET_M   => APP_RESET                (0),
+            MI_M_DWR  => split_mi_dwr             (i + ETH_STREAMS + MEM_PORTS),
+            MI_M_ADDR => split_mi_addr            (i + ETH_STREAMS + MEM_PORTS),
+            MI_M_RD   => split_mi_rd              (i + ETH_STREAMS + MEM_PORTS),
+            MI_M_WR   => split_mi_wr              (i + ETH_STREAMS + MEM_PORTS),
+            MI_M_BE   => split_mi_be              (i + ETH_STREAMS + MEM_PORTS),
+            MI_M_DRD  => split_mi_drd             (i + ETH_STREAMS + MEM_PORTS),
+            MI_M_ARDY => split_mi_ardy            (i + ETH_STREAMS + MEM_PORTS),
+            MI_M_DRDY => split_mi_drdy            (i + ETH_STREAMS + MEM_PORTS),
+
+            -- Slave interface
+            CLK_S     => MEM_CLK                    (i),
+            RESET_S   => MEM_RST                    (i),
+            MI_S_DWR  => mem_mi_dwr                 (i),
+            MI_S_ADDR => mem_mi_addr                (i),
+            MI_S_RD   => mem_mi_rd                  (i),
+            MI_S_WR   => mem_mi_wr                  (i),
+            MI_S_BE   => mem_mi_be                  (i),
+            MI_S_DRD  => mem_mi_drd                 (i),
+            MI_S_ARDY => mem_mi_ardy                (i),
+            MI_S_DRDY => mem_mi_drdy                (i)
         );
     end generate;
 
