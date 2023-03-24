@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 1fefa7dd
+                Git branch: devel, <br> Git hash: fffe7328
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
@@ -252,47 +252,52 @@ transactions).</p>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_meta_byte_count"><td><p>USR_MFB_META_BYTE_COUNT</p></td>
-<td><p>slv_array_t(CHANNELS -1 downto 0)(13 -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_meta_is_dma_hdr"><td><p>USR_MFB_META_IS_DMA_HDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_meta_is_dma_hdr"><td><p>USR_MFB_META_IS_DMA_HDR</p></td>
 <td><p>std_logic_vector(CHANNELS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_meta_fbe"><td><p>USR_MFB_META_FBE</p></td>
+<td><p>slv_array_t(CHANNELS -1 downto 0)(4 -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_meta_lbe"><td><p>USR_MFB_META_LBE</p></td>
+<td><p>slv_array_t(CHANNELS -1 downto 0)(4 -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
 <td><p>slv_array_t(CHANNELS -1 downto 0)(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_sof"><td><p>USR_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_sof"><td><p>USR_MFB_SOF</p></td>
 <td><p>slv_array_t(CHANNELS -1 downto 0)(PCIE_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_eof"><td><p>USR_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_eof"><td><p>USR_MFB_EOF</p></td>
 <td><p>slv_array_t(CHANNELS -1 downto 0)(PCIE_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_sof_pos"><td><p>USR_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_sof_pos"><td><p>USR_MFB_SOF_POS</p></td>
 <td><p>slv_array_t(CHANNELS -1 downto 0)(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_eof_pos"><td><p>USR_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_eof_pos"><td><p>USR_MFB_EOF_POS</p></td>
 <td><p>slv_array_t(CHANNELS -1 downto 0)(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_src_rdy"><td><p>USR_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_src_rdy"><td><p>USR_MFB_SRC_RDY</p></td>
 <td><p>std_logic_vector(CHANNELS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_dst_rdy"><td><p>USR_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_splitter-usr_mfb_dst_rdy"><td><p>USR_MFB_DST_RDY</p></td>
 <td><p>std_logic_vector(CHANNELS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>

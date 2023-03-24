@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 1fefa7dd
+                Git branch: devel, <br> Git hash: fffe7328
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
@@ -258,162 +258,167 @@ to the <a class="reference internal" href="../../../../../../base/fifo/fifox/rea
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_meta_seg_size"><td><p>PCIE_MFB_META_SEG_SIZE</p></td>
-<td><p>std_logic_vector(13 -1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>number of valid DWs in the current PCIe transaction, NOT a whole packet</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_meta_is_dma_hdr"><td><p>PCIE_MFB_META_IS_DMA_HDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_meta_is_dma_hdr"><td><p>PCIE_MFB_META_IS_DMA_HDR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>One-bit information if current transaction contains the DMA header</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_data"><td><p>PCIE_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_meta_fbe"><td><p>PCIE_MFB_META_FBE</p></td>
+<td><p>std_logic_vector(4 -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Byte enable of the first and last DWord in the incoming transaction, valid with SOF</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_meta_lbe"><td><p>PCIE_MFB_META_LBE</p></td>
+<td><p>std_logic_vector(4 -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_data"><td><p>PCIE_MFB_DATA</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_sof"><td><p>PCIE_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_sof"><td><p>PCIE_MFB_SOF</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_eof"><td><p>PCIE_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_eof"><td><p>PCIE_MFB_EOF</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_sof_pos"><td><p>PCIE_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_sof_pos"><td><p>PCIE_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_eof_pos"><td><p>PCIE_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_eof_pos"><td><p>PCIE_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_src_rdy"><td><p>PCIE_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_src_rdy"><td><p>PCIE_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_dst_rdy"><td><p>PCIE_MFB_DST_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>Output MFB interface</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_meta_pkt_size"><td><p>USR_MFB_META_PKT_SIZE</p></td>
-<td><p>std_logic_vector(log2(PKT_SIZE_MAX + 1) -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Length of the output packet in bytes</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_meta_hdr_meta"><td><p>USR_MFB_META_HDR_META</p></td>
-<td><p>std_logic_vector(HDR_META_WIDTH -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Metadata information from the DMA header</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
-<td><p>std_logic_vector(USR_MFB_REGIONS*USR_MFB_REGION_SIZE*USR_MFB_BLOCK_SIZE*USR_MFB_ITEM_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_sof"><td><p>USR_MFB_SOF</p></td>
-<td><p>std_logic_vector(USR_MFB_REGIONS -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_eof"><td><p>USR_MFB_EOF</p></td>
-<td><p>std_logic_vector(USR_MFB_REGIONS -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_sof_pos"><td><p>USR_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(USR_MFB_REGIONS*max(1, log2(USR_MFB_REGION_SIZE)) -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_eof_pos"><td><p>USR_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(USR_MFB_REGIONS*max(1, log2(USR_MFB_REGION_SIZE*USR_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_src_rdy"><td><p>USR_MFB_SRC_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_dst_rdy"><td><p>USR_MFB_DST_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>Start/stop interface from the TX_DMA_SW_MANAGER</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-start_req_vld"><td><p>START_REQ_VLD</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-start_req_ack"><td><p>START_REQ_ACK</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-stop_req_vld"><td><p>STOP_REQ_VLD</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-stop_req_ack"><td><p>STOP_REQ_ACK</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pcie_mfb_dst_rdy"><td><p>PCIE_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>Status information about taken capacity of internal FIFOs</p></td>
+<td><p>Output MFB interface</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-data_fifo_status"><td><p>DATA_FIFO_STATUS</p></td>
-<td><p>std_logic_vector(log2(FIFO_DEPTH) downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_meta_pkt_size"><td><p>USR_MFB_META_PKT_SIZE</p></td>
+<td><p>std_logic_vector(log2(PKT_SIZE_MAX + 1) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Length of the output packet in bytes</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_meta_hdr_meta"><td><p>USR_MFB_META_HDR_META</p></td>
+<td><p>std_logic_vector(HDR_META_WIDTH -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Metadata information from the DMA header</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
+<td><p>std_logic_vector(USR_MFB_REGIONS*USR_MFB_REGION_SIZE*USR_MFB_BLOCK_SIZE*USR_MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-hdr_fifo_status"><td><p>HDR_FIFO_STATUS</p></td>
-<td><p>std_logic_vector(log2(FIFO_DEPTH) downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_sof"><td><p>USR_MFB_SOF</p></td>
+<td><p>std_logic_vector(USR_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_eof"><td><p>USR_MFB_EOF</p></td>
+<td><p>std_logic_vector(USR_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_sof_pos"><td><p>USR_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(USR_MFB_REGIONS*max(1, log2(USR_MFB_REGION_SIZE)) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_eof_pos"><td><p>USR_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(USR_MFB_REGIONS*max(1, log2(USR_MFB_REGION_SIZE*USR_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_src_rdy"><td><p>USR_MFB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-usr_mfb_dst_rdy"><td><p>USR_MFB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Start/stop interface from the TX_DMA_SW_MANAGER</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-start_req_vld"><td><p>START_REQ_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-start_req_ack"><td><p>START_REQ_ACK</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-stop_req_vld"><td><p>STOP_REQ_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-stop_req_ack"><td><p>STOP_REQ_ACK</p></td>
+<td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
+<td><p>Status information about taken capacity of internal FIFOs</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-data_fifo_status"><td><p>DATA_FIFO_STATUS</p></td>
+<td><p>std_logic_vector(log2(FIFO_DEPTH) downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-hdr_fifo_status"><td><p>HDR_FIFO_STATUS</p></td>
+<td><p>std_logic_vector(log2(FIFO_DEPTH) downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>Control signals for packet counters</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pkt_sent_inc"><td><p>PKT_SENT_INC</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pkt_sent_inc"><td><p>PKT_SENT_INC</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pkt_sent_size"><td><p>PKT_SENT_SIZE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pkt_sent_size"><td><p>PKT_SENT_SIZE</p></td>
 <td><p>std_logic_vector(log2(PKT_SIZE_MAX+1) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pkt_disc_inc"><td><p>PKT_DISC_INC</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pkt_disc_inc"><td><p>PKT_DISC_INC</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_channel_core-pkt_disc_size"><td><p>PKT_DISC_SIZE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_channel_core-pkt_disc_size"><td><p>PKT_DISC_SIZE</p></td>
 <td><p>std_logic_vector(log2(PKT_SIZE_MAX+1) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>

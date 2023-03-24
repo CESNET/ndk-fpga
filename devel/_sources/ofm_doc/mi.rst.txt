@@ -15,5 +15,6 @@ Components using the MI bus are typically located in the ``comp/mi_tools/`` dire
    comp/mi_tools/reconf/readme
    comp/mi_tools/splitter_plus_gen/readme
    comp/mi_tools/converters/mi2avmm/readme
+   comp/mi_tools/converters/mi2axi4/readme
 
 .. Add more references here...
