@@ -18,6 +18,7 @@ set APP_CORE_UTILS_BASE "$OFM_PATH/../core/intel/src/comp/app_core_utils"
 set STREAMS_MERGER_BASE "$APP_CORE_UTILS_BASE/dma_streams_merger"
 set DMA_CHAN_MOD_BASE   "$APP_CORE_UTILS_BASE/dma_chan_mod"
 set MEM_TESTER_BASE     "$OFM_PATH/comp/debug/mem_tester"
+set MEM_LOGGER_BASE     "$OFM_PATH/comp/debug/data_logger/mem_logger"
 
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
@@ -34,6 +35,7 @@ lappend COMPONENTS [ list "STREAMS_MERGER" $STREAMS_MERGER_BASE "FULL" ]
 lappend COMPONENTS [ list "DMA_CHAN_MOD"   $DMA_CHAN_MOD_BASE   "FULL" ]
 lappend COMPONENTS [ list "MVB_CHDIST"     $MVB_CHDIST_BASE     "FULL" ]
 lappend COMPONENTS [ list "MEM_TESTER"     $MEM_TESTER_BASE     "FULL" ]
+lappend COMPONENTS [ list "MEM_LOGGER"     $MEM_LOGGER_BASE     "FULL" ]
 
 # Files
 lappend MOD "$ENTITY_BASE/app_subcore.vhd"
