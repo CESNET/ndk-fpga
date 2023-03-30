@@ -791,7 +791,8 @@ useful in automatic testing frameworks like *Jenkins*, etc.
 Verification should check if the design is not stuck. For example, the DUT can
 set all *RDY* or *VLD* signals to zero and not change them till the end of the
 verification. This means that no packet passes through the design, which should
-be reported by the verification.
+be reported by the verification. This check is prowided by systemverilog component
+**uvm_common::comparer_**
 
 A Model should be implemented as an independent class. The example below shows
 how should the Scoreboard and Model cooperate. The scoreboard only checks the
@@ -818,11 +819,9 @@ prints an error message through the UVM_error macro.
         uvm_analysis_export #(packet::sequence_item)    analysis_export_tx;
 
         //output fifos
-        uvm_tlm_analysis_fifo #(packet::sequence_item)  model_fifo;
-        uvm_tlm_analysis_fifo #(packet::sequence_item)  dut_fifo;
-
+        protected uvm_common::comparer_ordered#(packet::sequence_item) m_comparer;
         //models
-        model   m_model;
+        protected model   m_model;
 
         function new(string name, uvm_component parent = null);
 
@@ -830,37 +829,29 @@ prints an error message through the UVM_error macro.
 
           analysis_export_rx    = new("analysis_imp_rx", this);
           analysis_export_tx    = new("analysis_imp_tx", this);
+        endfunction
 
-          model_fifo    = new("model_fifo", this);
-          dut_fifo      = new("dut_fifo", this);
-
+        function void build_phase(uvm_phase phase);
+            m_comparer = uvm_common::comparer_ordered#(packet::sequence_item)::type_id::create("m_comparer", this);
+            m_model    = model::type_id::create("m_model", this);
+            //lot of dut connection between components isnt 1 to 1 but with small change. with this fifos
+            //it can be made with models too.
+            m_model.input = fifo_model_input#(packet::sequence_item)::type_id::create("input", m_model);
         endfunction
 
         function void connect_phase(uvm_phase phase);
+            fifo_model_input#(packet::sequence_item) model_in;
 
-            analysis_export_rx.connect(m_model.input.anlysis_export);
-            analysis_export_tx.connect(dut_fifo.analysis_export);
-            m_model.output.connect(model_fifo.analysis_export);
+            $cast(model_in, m_model.input);
+            analysis_export_rx.connect(model_in.anlysis_export);
+            analysis_export_tx.connect(m_comparer.analysis_imp_dut);
+            m_model.output.connect(m_comparer.analysis_imp_model);
 
         endfunction
 
-        task run_phase();
-
-            forever begin
-                model_fifo.get(tr_model);
-                dut_fifo.get(tr_dut);
-
-                if (tr_model.compare(tr_dut) == 0) begin
-                    `uvm_error(...);
-                end
-
-            end
-
-        endtask
-
         virtual function void report_phase(uvm_phase phase);
 
-            if (this.success() && dut_output.used() == 0 && model_output.used() ==0) begin
+            if (m_comparer.success() == 1 && m_comparer.used() == 0) begin
                 `uvm_info(get_type_name(), "\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", UVM_NONE)
             end else begin
                 `uvm_info(get_type_name(), "\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------", UVM_NONE)
@@ -904,7 +895,8 @@ Scoreboard
         `uvm_component_utils(env::scoreboard)
 
         uvm_analysis_imp_reset#(reset::sequence_item, scoreboard)   analysis_imp_reset;
-        model                                                       m_model;
+        protected model                                             m_model;
+        protected uvm_common::comparer_ordered#(packet::sequence_item) m_comparer;
 
         function new(string name, uvm_component parent = null);
             super.new(name, parent);
@@ -914,31 +906,10 @@ Scoreboard
         function void write_reset(reset::sequence_item tr);
 
             //RESET
-            dut_fifo.flush();
-            model_fifo.flush();
+            m_comparer.flush();
             m_regmodel.reset();
             m_model.reset();
-
         endfunction
-
-        task run_phase(uvm_phase phase);
-
-            ...
-
-            forever begin
-
-                //wait for DUT and model transactions. Reset can erase all unfinished transactions
-                wait(dut_fifo.used() != 0 && model_fifo.used() != 0);
-
-                compared++;
-
-                if (dut_tr.compare(model_tr) == 0) begin
-                    `uvm_error(...);
-                end
-            end
-
-        endtask
-
     endclass
 
 
@@ -1074,6 +1045,10 @@ Byte_array_port environment
 
 The environment is used for grouping the byte_array and the port. The advantage of this
 approach lies in generating data for the MVB and the MFB in one roll.
+
+.. note::
+   Please always use uvm_logic_vector_array instead byte_array
+
 
 .. code-block:: systemverilog
 
@@ -1239,55 +1214,147 @@ Model
 
 Inputs and outputs of the model are implemented by the Transaction Level Model
 (TLM) in the UVM where the *uvm_analysis_\**, *uvm_tlm_analysis_\** macros are used.
-The model has the same outputs and inputs as the DUT. This approach was chosen
-because models can be easily connected together to create a larger model.
 
-Sometimes it is required to pass meta-information through models. An example can
-be when we have one model that contains other models and one of the internal
-models can discard packets. We cannot simply add some meta information such as
-the time when a packet enters the DUT to count the delay of the DUT. This
-information can be used to measure only the maximum delay of the DUT. One
-solution is to reimplement all internal models but this approach is quite
-time-consuming. Another solution is to assume that the DUT discards the packets
+The model can have a slightly different output and input than the DUT. The reason for this
+is better code readability. For the model, you don't always need variables of the same width,
+so you can use integers instead logic [10:0] and have better structures. This approach
+has one disadvantage. You cannot simply have two models because they can have slightly different
+outputs and inputs. This can make it impossible to connect two models. For this reason,
+the model should use the uvm_common::fifo#(FIFO_TYPE) component for the inputs. The model doesn't create
+the FIFO, it just creates a value, and the FIFO will be created by a higher component. More info
+is in the components documentation in the FIFO section. :ref:`uvm_common::fifo<_uvm_common#fifo>`
+
+Sometimes it is required to pass meta-information through models. The uvm_common::model_item#(TYPE_ITEM)
+class is created for some information. This class provides three variables.
+The first variable, `start,` is an associative array where the input time of each
+source transaction can be stored. This is very useful for an HDL developer. The second
+variable is a tag that contains a string tag. Tag is useful when merging two streams into one.
+Then the merged output can be **out** of order, but data from one stream have to be **in** order.
+Then in the tag, the name of the input interface can be stored. More info can be found in the component documentation
+in the `comparer` (tagged) section. The third variable is the required transaction.
+Another problem can be when we have one model that contains other models, one of which should discard packets. One approach is to create the discarding logic. However, this might be quite difficult in some cases. A different approach is to assume that the DUT discards the packets
 correctly. Then we can tap the inner discard signal of the DUT and use its
-values to discard the packets in the model. This is used in the verification of
-the `Network Module Logic
+values to discard the packets in the model.
+
+Verification of
+`Network Module Logic
 <https://github.com/CESNET/ndk-core/tree/main/intel/src/comp/network_mod/comp/network_mod_logic/uvm>`_.
+is example of how you can impement model.
 
 .. code-block:: systemverilog
+
+    class  model_item extends uvm_sequence_item;
+        `uvm_object_utils(packet_splitter::model_item)
+        uvm_logic_vector_array::sequence_item#(8) data;
+        int unsigned port;
+
+        ...
+    endclass
 
     class model#(PORTS) extends uvm_component;
         `uvm_component_param_utils(packet_splitter::model#(PORTS))
 
-        uvm_tlm_analysis_fifo#(byte_array_port_env::sequence_item, model)   analysis_imp_rx;
-        uvm_analysis_port#(byte_array::sequence_item)                       analysis_port_tx[PORTS];
+        uvm_common::fifo#(uvm_common::model_item#(model_item))   input;
+        uvm_analysis_port#(uvm_common::model_item#(uvm_logic_vector_array::sequence_item#(8)))   output[PORTS];
 
         function new (string name, uvm_component parent = null);
             super.new(name, parent);
 
-            analysis_imp_rx = new ("analysis_imp_rx", this);
+            input = null;
 
             for (int unsigned it = 0; it < PORTS; it++) begin
                 string it_num;
                 it_num.itoa(it);
-                analysis_port_tx[it] = new({"sc_output_", it_num}, this);
+                output[it] = new({"sc_output_", it_num}, this);
             end
 
         endfunction
 
         task run_phase(uvm_phase);
 
-            byte_array_port_env::sequence_item tr;
+            uvm_common::model_item#(model_item) tr;
+            uvm_common::model_item#(uvm_logic_vector_array::sequence_item#(8)) tr_out;
 
             forever begin
-                analysis_imp_rx.get(tr);
+                input.get(tr);
 
+                tr_out = uvm_common::model_item#(uvm_logic_vector_array::sequence_item#(8))::type_id::create("tr_out", this);
+                tr_out.item = uvm_logic_vector_array::sequence_item#(8)::type_id::create("tr_out.item", this);
+                tr_out.start = tr.start;
+                tr_out.tag   = tr.tag;
+                tr_out.item  = tr.item.data
                 //model write packet to output
-                analysis_port_tx[tr.port].write(tr.packet);
+                output[tr.item.port].write(tr.packet);
             end
 
         endtask
 
+    endclass
+
+Create model input fifo
+=======================
+
+.. code-block:: systemverilog
+
+    `uvm_analysis_imp_decl(_data)
+    `uvm_analysis_imp_decl(_meta)
+
+    class model_input_fifo#(ITEM_WIDTH, META_WIDTH) extends uvm_common::fifo#(uvm_common::model_item#(model_data#(ITEM_WIDTH, META_WIDTH)));
+        `uvm_component_param_utils(net_mod_logic_env::model_input_fifo#(ITEM_WIDTH, META_WIDTH))
+
+        typedef model_input_fifo#(ITEM_WIDTH, META_WIDTH) this_type;
+        uvm_analysis_imp_data#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH), this_type) analysis_export_data;
+        uvm_analysis_imp_meta#(uvm_logic_vector::sequence_item#(META_WIDTH),       this_type) analysis_export_meta;
+
+        typedef struct {
+            uvm_logic_vector_array::sequence_item#(ITEM_WIDTH) input_item;
+            time  input_time;
+        } data_item;
+
+        typedef struct {
+            uvm_logic_vector::sequence_item#(META_WIDTH) input_item;
+            time  input_time;
+        } meta_item;
+
+        protected data_item tmp_data[$];
+        protected meta_item tmp_meta[$];
+
+        function new(string name, uvm_component parent = null);
+            super.new(name, parent);
+            analysis_export_data = new("analysis_export_data", this);
+            analysis_export_meta = new("analysis_export_meta", this);
+        endfunction
+
+        function void write_data(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH) t);
+            tmp_data.push_back('{t, $time()});
+        endfunction
+
+        function void write_meta(uvm_logic_vector::sequence_item#(META_WIDTH) t);
+            tmp_meta.push_back('{t, $time()});
+        endfunction
+
+        task run_phase(uvm_phase phase);
+            uvm_common::model_item#(model_data#(ITEM_WIDTH, META_WIDTH)) item;
+
+            forever begin
+                data_item data;
+                meta_item meta;
+
+                wait (tmp_meta.size() != 0 && tmp_data.size() != 0);
+                data = tmp_data.pop_front();
+                meta = tmp_meta.pop_front();
+
+                item = uvm_common::model_item#(model_data#(ITEM_WIDTH, META_WIDTH))::type_id::create("item", this);
+                item.item = model_data#(ITEM_WIDTH, META_WIDTH)::type_id::create("item.item", this);
+                item.item.data = data.input_item;
+                item.item.meta = meta.input_item;
+                item.tag  = "USER_TO_CORE";
+                item.start[{item.tag, " DATA"}] = data.input_time;
+                item.start[{item.tag, " META"}] = meta.input_time;
+
+                this.push_back(item);
+            end
+        endtask
     endclass
 
 
@@ -1296,92 +1363,176 @@ Scoreboard
 
 .. code-block:: systemverilog
 
-    class scoreboard #(PORTS, REGIONS) extends uvm_scoreboard;
-        `uvm_component_param_utils(packet_splitter::scoreboard#(PORTS, REGIONS))
-
-        //INPUT FROM DUT
-        uvm_analysis_export#(byte_array_port_env::sequence_item)    analysis_export_rx_packet;
-        uvm_analysis_export#(byte_array::sequence_item)             analysis_export_tx_packet[PORTS];
-
-        //OUTPUT TO SCOREBOARD
-        uvm_tlm_analysis_fifo#(byte_array::sequence_item)   dut_output[PORTS];
-        uvm_tlm_analysis_fifo#(byte_array::sequence_item)   model_output[PORTS];
-
-        //internal components
-        packet_splitter::model #(PORTS) m_model;
+    class comparer_meta #(ITEM_WIDTH, META_WIDTH) extends uvm_common::comparer_base_tagged#(model_data#(ITEM_WIDTH, META_WIDTH), uvm_logic_vector::sequence_item#(META_WIDTH));
+        `uvm_component_param_utils(net_mod_logic_env::comparer_meta#(ITEM_WIDTH, META_WIDTH))
 
         function new(string name, uvm_component parent = null);
             super.new(name, parent);
+        endfunction
 
-            analysis_export_rx_packet = new ("analysis_export_rx_packet", this);
+        virtual function int unsigned compare(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
+            //return tr_model.meta.compare(tr_dut);
+            return (tr_dut.data[24-1:0] == tr_model.meta.data[24-1:0]);
+        endfunction
 
-            for (int unsigned it = 0; it < PORTS; it++) begin
+        virtual function string message(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
+            string msg = "";
+            $swrite(msg, "%s\n\tDUT PACKET %s\n\n",   msg, tr_dut.convert2string());
+            $swrite(msg, "%s\n\tMODEL PACKET%s\n\n",  msg, tr_model.meta.convert2string());
+            return msg;
+        endfunction
+    endclass
 
-                string it_num;
-                it_num.itoa(it);
+    class comparer_data #(ITEM_WIDTH, META_WIDTH) extends uvm_common::comparer_base_tagged#(model_data#(ITEM_WIDTH, META_WIDTH), uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
+        `uvm_component_param_utils(net_mod_logic_env::comparer_data#(ITEM_WIDTH, META_WIDTH))
 
-                analysis_export_tx_packet[it]   = new({"analysis_export_tx_packet_", it_num}, this);
-                dut_output[it]                  = new({"dut_output_", it_num}, this);
-                model_output[it]                = new({"model_output_", it_num}, this);
+        function new(string name, uvm_component parent = null);
+            super.new(name, parent);
+        endfunction
+
+        virtual function int unsigned compare(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
+            return tr_model.data.compare(tr_dut);
+        endfunction
+
+        virtual function string message(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
+            string msg = "";
+            $swrite(msg, "%s\n\tDUT PACKET %s\n\n",   msg, tr_dut.convert2string());
+            $swrite(msg, "%s\n\tMODEL PACKET%s\n\n",  msg, tr_model.data.convert2string());
+            return msg;
+        endfunction
+    endclass
+
+    class scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_LITE_REGIONS) extends uvm_scoreboard;
+        `uvm_component_param_utils(net_mod_logic_env::scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_LITE_REGIONS))
+
+        // TX path
+        uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))         tx_input_data;
+        uvm_analysis_export #(uvm_logic_vector::sequence_item #(META_WIDTH))              tx_input_meta;
+
+        uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))         tx_out[CHANNELS];
+        //comparesrs
+        protected uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) tx_compare[CHANNELS];
+
+        // RX path
+        uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))        rx_input_data[CHANNELS]; // data for model
+
+        uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))        rx_out_data; // MFB data from DUT
+        uvm_analysis_export #(uvm_logic_vector::sequence_item#(HDR_WIDTH))               rx_out_hdr; // MVB headers used to identify channel
+
+        //comparers
+        // Thing about comparer. Comparing have to be same as because output have to be tagged same.
+        protected comparer_data #(ITEM_WIDTH, HDR_WIDTH) rx_compare_data;
+        protected comparer_meta #(ITEM_WIDTH, HDR_WIDTH) rx_compare_meta;
+
+        // MVB discard
+        uvm_analysis_export #(uvm_logic_vector::sequence_item#(1)) mvb_discard[CHANNELS];
+        protected model #(CHANNELS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH) m_model;
+
+        function new(string name, uvm_component parent);
+            super.new(name, parent);
+
+            // TX path
+            tx_input_data = new("tx_input_data", this);
+            tx_input_meta = new("tx_input_meta", this);
+
+            // RX path
+            for (int unsigned it = 0; it < CHANNELS; it++) begin
+                string it_str;
+                it_str.itoa(it);
+
+                tx_out[it] = new({"tx_out_", it_str}, this);
+
+                rx_input_data[it]   = new({"rx_input_data_", it_str}, this);
+                mvb_discard[it]     = new({"mvb_discard_", it_str}, this);
             end
-
+            rx_out_data     = new("rx_out_data", this);
+            rx_out_hdr      = new("rx_out_hdr", this);
         endfunction
 
         function void build_phase(uvm_phase phase);
-            m_model = model::packet_splitter#(PORTS)::type_id::create("m_model", this);
+    
+            m_model          = model #(CHANNELS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH)::type_id::create("m_model", this);
+            m_model.tx_input = model_input_fifo#(ITEM_WIDTH, META_WIDTH)::type_id::create("tx_input" , m_model);
+            for (int it = 0; it < CHANNELS; it++) begin
+                string it_string;
+                it_string.itoa(it);
+    
+                tx_compare[it] = uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create({"tx_compare_", it_string}, this);
+    
+                m_model.rx_input[it]   = uvm_common::fifo_model_input#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create({"rx_input_data_", it_string} , m_model);
+                m_model.rx_discard[it] = uvm_common::fifo_model_input#(uvm_logic_vector::sequence_item #(1))::type_id::create({"rx_discard_", it_string} , m_model);
+            end
+    
+            rx_compare_data = comparer_data #(ITEM_WIDTH, HDR_WIDTH)::type_id::create("rx_compare_data", this);
+            rx_compare_meta = comparer_meta #(ITEM_WIDTH, HDR_WIDTH)::type_id::create("rx_compare_meta", this);
         endfunction
-
+    
         function void connect_phase(uvm_phase phase);
-
-            analysis_export_rx_packet.connect(m_model.analysis_imp_rx.analysis_export);
-
-            for (int unsigned it = 0; it < PORTS; it++) begin
-                 analysis_export_tx_packet[it].connect(dut_output[it].analysis_export);
-                 m_model.analysis_port_tx[it].connect(model_output[it].analysis_export);
+            model_input_fifo#(ITEM_WIDTH, META_WIDTH) tx_input;
+            uvm_common::fifo_model_input#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) rx_input;
+            uvm_common::fifo_model_input#(uvm_logic_vector::sequence_item #(1))               rx_discard;
+    
+            //TX INPUT
+            $cast(tx_input, m_model.tx_input);
+            tx_input_data.connect(tx_input.analysis_export_data);
+            tx_input_meta.connect(tx_input.analysis_export_meta);
+            //RX INPUT
+            for (int unsigned it = 0; it < CHANNELS; it++) begin
+                m_model.tx_output[it].connect(tx_compare[it].analysis_imp_model);
+                tx_out[it].connect(tx_compare[it].analysis_imp_dut);
+    
+                $cast(rx_input, m_model.rx_input[it]);
+                rx_input_data[it].connect(rx_input.analysis_export);
+                $cast(rx_discard, m_model.rx_discard[it]);
+                mvb_discard[it].connect(rx_discard.analysis_export);
             end
-
+    
+            m_model.rx_output.connect(rx_compare_data.analysis_imp_model);
+            m_model.rx_output.connect(rx_compare_meta.analysis_imp_model);
+            rx_out_data.connect(rx_compare_data.analysis_imp_dut);
+            rx_out_hdr.connect(rx_compare_meta.analysis_imp_dut);
         endfunction
-
-        task run_phase_port(uvm_phase phase, int unsigned port);
-
-            forever begin
-
-                dut_output.get(tr_out);
-                model_output.get(tr_model);
-
-                if (tr_out.compare(tr_model) != 1)
-                    `uvm_error(...);
+    
+        function int unsigned used();
+            int unsigned ret = 0;
+            ret |= m_model.used();
+            for (int unsigned it = 0; it < CHANNELS; it++) begin
+                ret |= tx_compare[it].used();
             end
-
-        end
-
-        task run_phase(uvm_phase phase);
-
-            ...
-
-            fork
-                run_phase_port(phase, it);
-            join
-
-        endtask
-
+            ret |= rx_compare_data.used();
+            ret |= rx_compare_meta.used();
+            return ret;
+        endfunction
+    
+        function int unsigned success();
+            int unsigned ret = 1;
+            for (int unsigned it = 0; it < CHANNELS; it++) begin
+                ret &= tx_compare[it].success();
+            end
+            ret &= rx_compare_data.success();
+            ret &= rx_compare_meta.success();
+            return ret;
+        endfunction
+    
         function void report_phase(uvm_phase phase);
-
-            //print statistics
-            m_model.display();
-
-            if (this.success() && dut_output.used() == 0 && model_output.used() == 0) begin
-                `uvm_info(get_type_name(), "---------------------------------------", UVM_NONE)
-                `uvm_info(get_type_name(), "----     VERIFICATION SUCCESS      ----", UVM_NONE)
-                `uvm_info(get_type_name(), "---------------------------------------", UVM_NONE)
-            end else begin
-                `uvm_info(get_type_name(), "---------------------------------------", UVM_NONE)
-                `uvm_info(get_type_name(), "----     VERIFICATION FAIL         ----", UVM_NONE)
-                `uvm_info(get_type_name(), "---------------------------------------", UVM_NONE)
+            int unsigned total_errors = 0;
+            string msg = "";
+    
+            // TX path
+            for (int unsigned it = 0; it < CHANNELS; it++) begin
+                $swrite(msg, "%s\n\tTX path OUTPUT [%0d]: %s", msg, it, tx_compare[it].info());
             end
-
+            $swrite(msg, "%s\n\t---------------------------------------", msg);
+            $swrite(msg, "%s\n\tRX path OUTPUT DATA : %s", msg,  rx_compare_data.info());
+            $swrite(msg, "%s\n\tRX path OUTPUT META : %s", msg,  rx_compare_meta.info());
+    
+            if (this.success() == 1 && this.used() == 0) begin
+                `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            end else begin
+                `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            end
         endfunction
-
+    
     endclass
 
 
@@ -1806,4 +1957,4 @@ using the "-c" switch :
 
     vsim -do top_level.fdo -c
 
-A
+

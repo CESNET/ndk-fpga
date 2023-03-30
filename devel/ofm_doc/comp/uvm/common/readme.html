@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: fffe7328
+                Git branch: devel, <br> Git hash: 18dc4d05
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -98,6 +98,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Common package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#random">Random</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#comparer">Comparer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fifo">fifo</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../lii/readme.html">LII agent</a></li>
@@ -322,6 +323,167 @@ You can do this by reimplementing pure virtual functions:
 
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">error_msg</span><span class="p">;</span>
 <span class="w">    </span><span class="k">endfunction</span>
+<span class="kd">endclass</span>
+</pre></div>
+</div>
+</section>
+<section id="fifo">
+<h2>fifo<a class="headerlink" href="#fifo" title="Permalink to this heading"></a></h2>
+<p>This component has been created for connecting models. The problem is when there is an output value of one model changes before entering another model.
+A common example is when the same model is used in the verification multiple times, and each time, its input(s) are modified differently. Such a scenario is displayed in the example below.</p>
+<div class="highlight-VHDL notranslate"><div class="highlight"><pre><span></span><span class="n">ENTITY_i</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">entity</span><span class="w"> </span><span class="nc">work</span><span class="p">.</span><span class="n">ENTITY_A</span>
+<span class="k">port</span><span class="w"> </span><span class="k">map</span><span class="p">(</span>
+<span class="w">    </span><span class="n">CLK</span><span class="w">    </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">RX_CLK</span><span class="p">,</span>
+<span class="w">    </span><span class="n">RESET</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">RX_RESET</span><span class="p">,</span>
+
+<span class="w">    </span><span class="n">DO</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">ea_do</span>
+<span class="p">);</span>
+
+<span class="n">eb1_di</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">ea_do</span><span class="w"> </span><span class="o">+</span><span class="mi">10</span><span class="p">;</span>
+<span class="n">ENTITY_B1_i</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">entity</span><span class="w"> </span><span class="nc">work</span><span class="p">.</span><span class="n">ENTITY_B</span>
+<span class="k">port</span><span class="w"> </span><span class="k">map</span><span class="p">(</span>
+<span class="w">    </span><span class="n">CLK</span><span class="w">    </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">RX_CLK</span><span class="p">,</span>
+<span class="w">    </span><span class="n">RESET</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">RX_RESET</span><span class="p">,</span>
+
+<span class="w">    </span><span class="n">DI</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">eb1_di</span>
+<span class="w">    </span><span class="n">DO</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">eb1_do</span>
+<span class="p">);</span>
+
+<span class="n">eb2_di</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">ea_do</span><span class="w"> </span><span class="o">+</span><span class="mi">20</span><span class="p">;</span>
+<span class="n">ENTITY_B2_i</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">entity</span><span class="w"> </span><span class="nc">work</span><span class="p">.</span><span class="n">ENTITY_B</span>
+<span class="k">port</span><span class="w"> </span><span class="k">map</span><span class="p">(</span>
+<span class="w">    </span><span class="n">CLK</span><span class="w">    </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">RX_CLK</span><span class="p">,</span>
+<span class="w">    </span><span class="n">RESET</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">RX_RESET</span><span class="p">,</span>
+
+<span class="w">    </span><span class="n">DI</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">eb2_di</span>
+<span class="w">    </span><span class="n">DO</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">eb2_do</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The code below shows the scoreboard for the model connection.</p>
+<div class="highlight-SystemVerilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">fifo_en1_input</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_common</span><span class="o">::</span><span class="n">fifo</span><span class="p">#(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)));</span>
+<span class="w">    </span><span class="no">`uvm_component_utils</span><span class="p">(</span><span class="n">fifo_en1_input</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">uvm_analysis_imp_export</span><span class="p">#(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)),</span><span class="w"> </span><span class="n">fifo_en1_input</span><span class="p">)</span><span class="w"> </span><span class="n">analysis_export</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">        </span><span class="n">analysis_export</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;analysis_expoert&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">write</span><span class="p">(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">))</span><span class="w"> </span><span class="n">t</span><span class="p">);</span>
+<span class="w">        </span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">))</span><span class="w"> </span><span class="n">item</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">item</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">))</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;item&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">        </span><span class="n">item</span><span class="p">.</span><span class="n">item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;item&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">item</span><span class="p">.</span><span class="n">tag</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">tag</span><span class="p">;</span>
+<span class="w">        </span><span class="n">item</span><span class="p">.</span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">start</span><span class="p">;</span>
+<span class="w">        </span><span class="n">item</span><span class="p">.</span><span class="n">item</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">item</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">item</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+<span class="kd">endclass</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">fifo_en2_input</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_common</span><span class="o">::</span><span class="n">fifo</span><span class="p">#(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)));</span>
+<span class="w">    </span><span class="no">`uvm_component_utils</span><span class="p">(</span><span class="n">fifo_en1_input</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">uvm_analysis_imp_export</span><span class="p">#(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)),</span><span class="w"> </span><span class="n">fifo_en2_input</span><span class="p">)</span><span class="w"> </span><span class="n">analysis_export</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">        </span><span class="n">analysis_export</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;analysis_expoert&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">write</span><span class="p">(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">))</span><span class="w"> </span><span class="n">t</span><span class="p">);</span>
+<span class="w">        </span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">))</span><span class="w"> </span><span class="n">item</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">item</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">))</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;item&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">        </span><span class="n">item</span><span class="p">.</span><span class="n">item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;item&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">item</span><span class="p">.</span><span class="n">tag</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">tag</span><span class="p">;</span>
+<span class="w">        </span><span class="n">item</span><span class="p">.</span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">start</span><span class="p">;</span>
+<span class="w">        </span><span class="n">item</span><span class="p">.</span><span class="n">item</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">item</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">item</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+<span class="kd">endclass</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">model_entityb</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_component</span><span class="p">;</span>
+<span class="w">    </span><span class="no">`uvm_component_utils</span><span class="p">(</span><span class="n">model_entityb</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">uvm_common</span><span class="o">::</span><span class="n">fifo</span><span class="p">#(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)))</span><span class="w"> </span><span class="n">in</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">        </span><span class="n">in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">;</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="p">....</span>
+<span class="kd">endclass</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">scoreboard</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_scoreboard</span><span class="p">;</span>
+<span class="w">    </span><span class="no">`uvm_component_utils</span><span class="p">(</span><span class="n">scoreboard</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">model_A</span><span class="w"> </span><span class="n">m_model_a</span><span class="p">;</span>
+<span class="w">    </span><span class="n">model_B</span><span class="w"> </span><span class="n">m_model_b1</span><span class="p">;</span>
+<span class="w">    </span><span class="n">model_B</span><span class="w"> </span><span class="n">m_model_b2</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">        </span><span class="n">m_model_a</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">model_A</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_model_a&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">        </span><span class="n">m_model_b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model_B</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_model_b1&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">        </span><span class="n">m_model_b1</span><span class="p">.</span><span class="n">in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fifo_en1_input</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;in&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_model_b1</span><span class="p">);</span>
+<span class="w">        </span><span class="n">m_model_b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model_B</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_model_b2&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">        </span><span class="n">m_model_b2</span><span class="p">.</span><span class="n">in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fifo_en2_input</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;in&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_model_b2</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">connect_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">        </span><span class="n">fifo_en1_input</span><span class="w"> </span><span class="n">mb1_in</span><span class="p">;</span>
+<span class="w">        </span><span class="n">fifo_en2_input</span><span class="w"> </span><span class="n">mb2_in</span><span class="p">;</span>
+
+<span class="w">        </span><span class="p">$</span><span class="n">cast</span><span class="p">(</span><span class="n">mb1_in</span><span class="p">,</span><span class="w"> </span><span class="n">m_model_b1</span><span class="p">.</span><span class="n">in</span><span class="p">);</span>
+<span class="w">        </span><span class="n">m_model_a</span><span class="p">.</span><span class="k">do</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">mb1_in</span><span class="p">.</span><span class="n">analysis_export</span><span class="p">);</span>
+<span class="w">        </span><span class="p">$</span><span class="n">cast</span><span class="p">(</span><span class="n">mb2_in</span><span class="p">,</span><span class="w"> </span><span class="n">m_model_b2</span><span class="p">.</span><span class="n">in</span><span class="p">);</span>
+<span class="w">        </span><span class="n">m_model_a</span><span class="p">.</span><span class="k">do</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">mb2_in</span><span class="p">.</span><span class="n">analysis_export</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+<span class="kd">endclass</span>
+</pre></div>
+</div>
+<p>Also, there is the possibility of merging two inputs into one. When something. The code below shows an example of an input FIFO which merges two inputs into one.</p>
+<div class="highlight-SystemVerilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">m_fifo_input</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_common</span><span class="o">::</span><span class="n">fifo</span><span class="p">#(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)));</span>
+<span class="w">    </span><span class="no">`uvm_component_utils</span><span class="p">(</span><span class="n">m_fifo_input</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">uvm_tlm_analysis_fifo</span><span class="p">#(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">16</span><span class="p">)),</span><span class="w"> </span><span class="n">m_fifo_input</span><span class="p">)</span><span class="w"> </span><span class="n">in_a</span><span class="p">;</span>
+<span class="w">    </span><span class="n">uvm_tlm_analysis_fifo</span><span class="p">#(</span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">16</span><span class="p">)),</span><span class="w"> </span><span class="n">m_fifo_input</span><span class="p">)</span><span class="w"> </span><span class="n">in_b</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">        </span><span class="n">in_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;in_a&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">        </span><span class="n">in_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;in_b&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="k">task</span><span class="w"> </span><span class="n">run_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="p">);</span>
+<span class="w">        </span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">16</span><span class="p">))</span><span class="w"> </span><span class="n">tr_in_a</span><span class="p">;</span>
+<span class="w">        </span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">16</span><span class="p">))</span><span class="w"> </span><span class="n">tr_in_b</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">))</span><span class="w"> </span><span class="n">tr_out</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">forever</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">in_a</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">tr_in_a</span><span class="p">);</span>
+<span class="w">            </span><span class="n">in_b</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">tr_in_b</span><span class="p">);</span>
+
+<span class="w">            </span><span class="n">tr_out</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">model_item</span><span class="p">#(</span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;tr_out&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">            </span><span class="n">tr_out</span><span class="p">.</span><span class="n">item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector</span><span class="p">#(</span><span class="mi">32</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;tr_out.item&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">            </span><span class="n">tr_out</span><span class="p">.</span><span class="n">time_array_add</span><span class="p">(</span><span class="n">tr_in_a</span><span class="p">.</span><span class="n">start</span><span class="p">);</span>
+<span class="w">            </span><span class="n">tr_out</span><span class="p">.</span><span class="n">time_array_add</span><span class="p">(</span><span class="n">tr_in_b</span><span class="p">.</span><span class="n">start</span><span class="p">);</span>
+<span class="w">            </span><span class="n">tr_out</span><span class="p">.</span><span class="n">tag</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;M1_&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tr_in_b</span><span class="p">.</span><span class="n">tag</span><span class="p">};</span>
+<span class="w">            </span><span class="n">tr_out</span><span class="p">.</span><span class="n">item</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">tr_in_b</span><span class="p">.</span><span class="n">item</span><span class="p">.</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">tr_in_a</span><span class="p">.</span><span class="n">item</span><span class="p">.</span><span class="n">data</span><span class="p">};</span>
+<span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">tr_out</span><span class="p">);</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">    </span><span class="k">endtask</span>
 <span class="kd">endclass</span>
 </pre></div>
 </div>
