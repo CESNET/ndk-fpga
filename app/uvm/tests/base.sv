@@ -304,7 +304,7 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
             //RUN RIVER SEQUENCE ONLY IF RESET IS NOT SET
             wait(event_reset == 1'b0);
-            #(200ns)
+            #(2000ns)
             dirver_sequence();
             #(200ns)
 
