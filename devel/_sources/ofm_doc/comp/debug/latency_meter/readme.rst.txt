@@ -1,26 +1,26 @@
 .. _latency_meter:
 
 Latency meter
-------------------
+-------------
 
 Latency meter is used to measure the duration of a specific event.
 
 Key features
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
 
 * Measures the number of ticks between the start and the end of a given event
 * Multiple parallel events can be measured 
 * Zero latency events can be measured (start and end occurs at the same time)
 
 Component port and generics description
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. vhdl:autoentity:: LATENCY_METER
    :noautogenerics:
 
 Instance template
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 .. code-block::
 

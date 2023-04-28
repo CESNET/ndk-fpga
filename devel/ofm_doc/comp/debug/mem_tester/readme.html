@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 66eaa732
+                Git branch: devel, <br> Git hash: 256ea1ba
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -89,6 +89,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#mi-bus-control">MI Bus Control</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sub-components">Sub-components</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="amm_gen/readme.html">AMM_GEN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="amm_probe/readme.html">AMM_PROBE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sw/readme.html">MEM_TESTER Software</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
@@ -240,53 +242,58 @@ For alowed values se LFSR_SIMPLE_RANDOM_GEN (4, 8, 16, 20, 24, 26, 32, 64)</p></
 <td><p>UNDEFINED</p></td>
 <td><p>Random data generator seed</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mem_tester-random_addr_seed"><td><p>RANDOM_ADDR_SEED</p></td>
-<td><p>std_logic_vector(RAND_GEN_ADDR_WIDTH - 1 downto 0)</p></td>
-<td><p>std_logic_vector(to_unsigned(66844679,RAND_GEN_ADDR_WIDTH))</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mem_tester-"><td><p></p></td>
+<td><p>= UNDEFINED</p></td>
+<td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mem_tester-refr_req_before_test"><td><p>REFR_REQ_BEFORE_TEST</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mem_tester-random_addr_seed"><td><p>RANDOM_ADDR_SEED</p></td>
+<td><p>std_logic_vector(RAND_GEN_ADDR_WIDTH - 1 downto 0)</p></td>
+<td><p>resize(X”3FBF807”, RAND_GEN_ADDR_WIDTH)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mem_tester-refr_req_before_test"><td><p>REFR_REQ_BEFORE_TEST</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Manual refresh enable</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mem_tester-refr_period_width"><td><p>REFR_PERIOD_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mem_tester-refr_period_width"><td><p>REFR_PERIOD_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>MI_DATA_WIDTH</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mem_tester-def_refr_period"><td><p>DEF_REFR_PERIOD</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mem_tester-def_refr_period"><td><p>DEF_REFR_PERIOD</p></td>
 <td><p>std_logic_vector(REFR_PERIOD_WIDTH - 1 downto 0)</p></td>
 <td><p>(others =&gt; ‘0’)</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mem_tester-amm_probe_en"><td><p>AMM_PROBE_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mem_tester-amm_probe_en"><td><p>AMM_PROBE_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enable AMM probe for measurement (depreciated)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mem_tester-histogram_boxes"><td><p>HISTOGRAM_BOXES</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mem_tester-histogram_boxes"><td><p>HISTOGRAM_BOXES</p></td>
 <td><p>integer</p></td>
 <td><p>256</p></td>
 <td><p>Latency histogram precision for AMM probe (depreciated)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mem_tester-default_burst_cnt"><td><p>DEFAULT_BURST_CNT</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mem_tester-default_burst_cnt"><td><p>DEFAULT_BURST_CNT</p></td>
 <td><p>integer</p></td>
 <td><p>4</p></td>
 <td><p>Default memory burst count</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mem_tester-default_addr_limit"><td><p>DEFAULT_ADDR_LIMIT</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mem_tester-default_addr_limit"><td><p>DEFAULT_ADDR_LIMIT</p></td>
 <td><p>integer</p></td>
 <td><p>2**AMM_ADDR_WIDTH - 2 ** AMM_BURST_COUNT_WIDTH</p></td>
 <td><p>Until which address should be test done (to reduce simulation resources)
 Shoud be power of 2</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mem_tester-debug_rand_addr"><td><p>DEBUG_RAND_ADDR</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mem_tester-debug_rand_addr"><td><p>DEBUG_RAND_ADDR</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Force random address generator to generate in range 0 to DEFAULT_ADDR_LIMIT (for simulation)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mem_tester-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mem_tester-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
@@ -729,6 +736,8 @@ wait for either <code class="docutils literal notranslate"><span class="pre">cal
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="amm_gen/readme.html">AMM_GEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="amm_probe/readme.html">AMM_PROBE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sw/readme.html">MEM_TESTER Software</a></li>
 </ul>
 </div>
 </section>

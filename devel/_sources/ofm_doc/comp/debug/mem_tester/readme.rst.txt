@@ -7,7 +7,7 @@ DDR4 Memory Tester
 
 
 Key features
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
 
 * Memory interface is compatible with AMM (Avalon-Memory-Mapped) interface and Intel EMIF Hard IP
 * Basic test workflow:
@@ -41,7 +41,7 @@ Key features
 
 
 Component port and generics description
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. vhdl:autoentity:: MEM_TESTER
    :noautogenerics:
@@ -49,7 +49,7 @@ Component port and generics description
 
 
 Control SW
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^
 
 Because the measurement is handled by `MEM_LOGGER` (`DATA_LOGGER` wrap) you need to install its package:
 
@@ -192,7 +192,7 @@ Example output:
 
 
 Pytest SW
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^
 
 You can also use automated testing using pytest framework:
 
@@ -209,7 +209,7 @@ You can also use automated testing using pytest framework:
 
 
 PDF report generator SW
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Additionally you can run `report_gen.py` script that will run `MEM_TESTER` with different configurations
 and will generate PDF or Markdown report with measured graphs.
@@ -325,10 +325,12 @@ Sub-components
     :maxdepth: 1
 
     amm_gen/readme
+    amm_probe/readme
+    sw/readme
 
 
 References
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^
 
 * `External Memory Interfaces Intel Stratix 10 FPGA IP User Guide (external) <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/stratix-10/ug-s10-emi.pdf>`_
 * `External Memory Interfaces Intel Agilex FPGA IP User Guide (external) <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/agilex/ug-ag-emi.pdf>`_

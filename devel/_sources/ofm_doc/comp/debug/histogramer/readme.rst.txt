@@ -1,12 +1,12 @@
 .. _histogramer:
 
 Histogramer
-------------------
+-----------
 
 Histogramer is used to manage a histogram.
 
 Key features
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
 
 * Histogram boxes are stored inside Block RAM
 * Each box will be sequentially cleared after the reset 
@@ -18,14 +18,14 @@ Key features
 * Collisions during read-modify-write access to Block RAM are handled
 
 Component port and generics description
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. vhdl:autoentity:: HISTOGRAMER
    :noautogenerics:
 
 
 Instance template
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 .. code-block::
 

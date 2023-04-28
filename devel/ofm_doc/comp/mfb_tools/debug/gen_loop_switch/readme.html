@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 66eaa732
+                Git branch: devel, <br> Git hash: 256ea1ba
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -149,8 +149,8 @@ These generators have their own part of MI32 address space.</p>
 <p><strong>Connection diagram:</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                      <span class="o">+--------+</span>  <span class="o">+---</span>\
                       <span class="o">|</span> <span class="n">RX</span> <span class="n">Gen</span> <span class="o">+--+</span> <span class="mi">1</span>  \             <span class="o">+---</span>\
-<span class="n">ETH_RX</span>                <span class="o">+--------+</span>  <span class="o">|</span> <span class="n">MUX</span> <span class="o">+------------+</span> <span class="mi">0</span>  \   <span class="o">+------+</span> <span class="n">DMA_RX</span>
-<span class="o">&gt;--------------------------+------+</span> <span class="mi">0</span>  <span class="o">/</span>             <span class="o">|</span> <span class="n">MUX</span> <span class="o">+--+</span> <span class="n">FIFO</span> <span class="o">+------&gt;</span>
+<span class="n">ETH_RX</span>                <span class="o">+--------+</span>  <span class="o">|</span><span class="n">MUX_C</span><span class="o">+------------+</span> <span class="mi">0</span>  \   <span class="o">+------+</span> <span class="n">DMA_RX</span>
+<span class="o">&gt;--------------------------+------+</span> <span class="mi">0</span>  <span class="o">/</span>             <span class="o">|</span><span class="n">MUX_A</span><span class="o">+--+</span> <span class="n">FIFO</span> <span class="o">+------&gt;</span>
                            <span class="o">|</span>      <span class="o">+---/</span>          <span class="o">+---+</span> <span class="mi">1</span>  <span class="o">/</span>   <span class="o">+------+</span>
                            <span class="o">|</span>                     <span class="o">|</span>   <span class="o">+---/</span>
                            <span class="o">|</span>                     <span class="o">|</span>
@@ -158,23 +158,26 @@ These generators have their own part of MI32 address space.</p>
                            <span class="o">|</span>                     <span class="o">|</span>
                    <span class="o">/---+</span>   <span class="o">|</span>                     <span class="o">|</span>
        <span class="o">+------+</span>   <span class="o">/</span>  <span class="mi">1</span> <span class="o">+---+</span>          <span class="o">/---+</span>      <span class="o">|</span>
-<span class="o">&lt;------+</span> <span class="n">FIFO</span> <span class="o">+--+</span> <span class="n">MUX</span> <span class="o">|</span>             <span class="o">/</span>  <span class="mi">0</span> <span class="o">+------+--------------------------&lt;</span>
-<span class="n">ETH_TX</span> <span class="o">+------+</span>   \  <span class="mi">0</span> <span class="o">+------------+</span> <span class="n">MUX</span> <span class="o">|</span>  <span class="o">+--------+</span>                <span class="n">DMA_TX</span>
-                   \<span class="o">---+</span>             \  <span class="mi">1</span> <span class="o">+--+</span> <span class="n">TX</span> <span class="n">Gen</span> <span class="o">|</span>
-                                      \<span class="o">---+</span>  <span class="o">+--------+</span>
+<span class="o">&lt;------+</span> <span class="n">FIFO</span> <span class="o">+--+</span><span class="n">MUX_B</span><span class="o">|</span>             <span class="o">/</span>  <span class="mi">0</span> <span class="o">+------+--------------------------&lt;</span>
+<span class="n">ETH_TX</span> <span class="o">+------+</span>   \  <span class="mi">0</span> <span class="o">+------------+</span><span class="n">MUX_D</span><span class="o">|</span>  <span class="o">+-----------------+</span>       <span class="n">DMA_TX</span>
+                   \<span class="o">---+</span>             \  <span class="mi">1</span> <span class="o">+--+</span> <span class="n">TX</span> <span class="n">Gen</span> <span class="o">/</span> <span class="n">Player</span> <span class="o">|</span>
+                                      \<span class="o">---+</span>  <span class="o">+-----------------+</span>
 </pre></div>
 </div>
 <p><strong>MI address offsets:</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x00</span>      <span class="o">--</span> <span class="n">RX</span> <span class="n">loopback</span> <span class="n">MUX</span>  <span class="p">(</span><span class="mi">0</span> <span class="o">-&gt;</span> <span class="n">RX</span> <span class="n">stream</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">stream</span> <span class="n">loopback</span><span class="p">)</span>
-<span class="mh">0x04</span>      <span class="o">--</span> <span class="n">TX</span> <span class="n">loopback</span> <span class="n">MUX</span>  <span class="p">(</span><span class="mi">0</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">stream</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">RX</span> <span class="n">stream</span> <span class="n">loopback</span><span class="p">)</span>
-<span class="mh">0x08</span>      <span class="o">--</span> <span class="n">RX</span> <span class="n">generator</span> <span class="n">MUX</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-&gt;</span> <span class="n">RX</span> <span class="n">stream</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">RX</span> <span class="n">generator</span><span class="p">)</span>
-<span class="mh">0x0C</span>      <span class="o">--</span> <span class="n">TX</span> <span class="n">generator</span> <span class="n">MUX</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">stream</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">generator</span><span class="p">)</span>
-<span class="mh">0x40</span><span class="o">-</span><span class="mh">0x4C</span> <span class="o">--</span> <span class="n">DMA</span> <span class="n">RX</span> <span class="n">MFB</span> <span class="n">speed</span> <span class="n">meter</span> <span class="p">(</span><span class="mh">0x0</span> <span class="o">-</span> <span class="n">tics</span><span class="p">,</span> <span class="mh">0x4</span> <span class="o">-</span> <span class="n">status</span><span class="p">,</span> <span class="mh">0x8</span> <span class="o">-</span> <span class="n">items</span><span class="p">,</span> <span class="mh">0xC</span> <span class="o">-</span> <span class="n">clear</span><span class="p">)</span>
-<span class="mh">0x50</span><span class="o">-</span><span class="mh">0x5C</span> <span class="o">--</span> <span class="n">DMA</span> <span class="n">TX</span> <span class="n">MFB</span> <span class="n">speed</span> <span class="n">meter</span> <span class="p">(</span><span class="mh">0x0</span> <span class="o">-</span> <span class="n">tics</span><span class="p">,</span> <span class="mh">0x4</span> <span class="o">-</span> <span class="n">status</span><span class="p">,</span> <span class="mh">0x8</span> <span class="o">-</span> <span class="n">items</span><span class="p">,</span> <span class="mh">0xC</span> <span class="o">-</span> <span class="n">clear</span><span class="p">)</span>
-<span class="mh">0x60</span><span class="o">-</span><span class="mh">0x6C</span> <span class="o">--</span> <span class="n">ETH</span> <span class="n">RX</span> <span class="n">MFB</span> <span class="n">speed</span> <span class="n">meter</span> <span class="p">(</span><span class="mh">0x0</span> <span class="o">-</span> <span class="n">tics</span><span class="p">,</span> <span class="mh">0x4</span> <span class="o">-</span> <span class="n">status</span><span class="p">,</span> <span class="mh">0x8</span> <span class="o">-</span> <span class="n">items</span><span class="p">,</span> <span class="mh">0xC</span> <span class="o">-</span> <span class="n">clear</span><span class="p">)</span>
-<span class="mh">0x70</span><span class="o">-</span><span class="mh">0x7C</span> <span class="o">--</span> <span class="n">ETH</span> <span class="n">TX</span> <span class="n">MFB</span> <span class="n">speed</span> <span class="n">meter</span> <span class="p">(</span><span class="mh">0x0</span> <span class="o">-</span> <span class="n">tics</span><span class="p">,</span> <span class="mh">0x4</span> <span class="o">-</span> <span class="n">status</span><span class="p">,</span> <span class="mh">0x8</span> <span class="o">-</span> <span class="n">items</span><span class="p">,</span> <span class="mh">0xC</span> <span class="o">-</span> <span class="n">clear</span><span class="p">)</span>
-<span class="mh">0x80</span><span class="o">-</span><span class="mh">0xBF</span> <span class="o">--</span> <span class="n">RX</span> <span class="n">generator</span> <span class="n">address</span> <span class="n">space</span>
-<span class="mh">0xC0</span><span class="o">-</span><span class="mh">0xFF</span> <span class="o">--</span> <span class="n">TX</span> <span class="n">generator</span> <span class="n">address</span> <span class="n">space</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x000</span>      <span class="o">--</span> <span class="n">RX</span> <span class="n">loopback</span> <span class="n">MUX_A</span>  <span class="p">(</span><span class="mi">0</span> <span class="o">-&gt;</span> <span class="n">RX</span> <span class="n">stream</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">stream</span> <span class="n">loopback</span><span class="p">)</span>
+<span class="mh">0x004</span>      <span class="o">--</span> <span class="n">TX</span> <span class="n">loopback</span> <span class="n">MUX_B</span>  <span class="p">(</span><span class="mi">0</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">stream</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">RX</span> <span class="n">stream</span> <span class="n">loopback</span><span class="p">)</span>
+<span class="mh">0x008</span>      <span class="o">--</span> <span class="n">RX</span> <span class="n">generator</span> <span class="n">MUX_C</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-&gt;</span> <span class="n">RX</span> <span class="n">stream</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">RX</span> <span class="n">generator</span><span class="p">)</span>
+<span class="mh">0x00C</span>      <span class="o">--</span> <span class="n">TX</span> <span class="n">generator</span> <span class="n">MUX_D</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">stream</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">generator</span><span class="p">,</span> <span class="mi">2</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">Frame</span> <span class="n">Player</span><span class="p">)</span>
+<span class="mh">0x040</span><span class="o">-</span><span class="mh">0x04C</span> <span class="o">--</span> <span class="n">DMA</span> <span class="n">RX</span> <span class="n">MFB</span> <span class="n">speed</span> <span class="n">meter</span> <span class="p">(</span><span class="mh">0x0</span> <span class="o">-</span> <span class="n">tics</span><span class="p">,</span> <span class="mh">0x4</span> <span class="o">-</span> <span class="n">status</span><span class="p">,</span> <span class="mh">0x8</span> <span class="o">-</span> <span class="n">items</span><span class="p">,</span> <span class="mh">0xC</span> <span class="o">-</span> <span class="n">clear</span><span class="p">)</span>
+<span class="mh">0x050</span><span class="o">-</span><span class="mh">0x05C</span> <span class="o">--</span> <span class="n">DMA</span> <span class="n">TX</span> <span class="n">MFB</span> <span class="n">speed</span> <span class="n">meter</span> <span class="p">(</span><span class="mh">0x0</span> <span class="o">-</span> <span class="n">tics</span><span class="p">,</span> <span class="mh">0x4</span> <span class="o">-</span> <span class="n">status</span><span class="p">,</span> <span class="mh">0x8</span> <span class="o">-</span> <span class="n">items</span><span class="p">,</span> <span class="mh">0xC</span> <span class="o">-</span> <span class="n">clear</span><span class="p">)</span>
+<span class="mh">0x060</span><span class="o">-</span><span class="mh">0x06C</span> <span class="o">--</span> <span class="n">ETH</span> <span class="n">RX</span> <span class="n">MFB</span> <span class="n">speed</span> <span class="n">meter</span> <span class="p">(</span><span class="mh">0x0</span> <span class="o">-</span> <span class="n">tics</span><span class="p">,</span> <span class="mh">0x4</span> <span class="o">-</span> <span class="n">status</span><span class="p">,</span> <span class="mh">0x8</span> <span class="o">-</span> <span class="n">items</span><span class="p">,</span> <span class="mh">0xC</span> <span class="o">-</span> <span class="n">clear</span><span class="p">)</span>
+<span class="mh">0x070</span><span class="o">-</span><span class="mh">0x07C</span> <span class="o">--</span> <span class="n">ETH</span> <span class="n">TX</span> <span class="n">MFB</span> <span class="n">speed</span> <span class="n">meter</span> <span class="p">(</span><span class="mh">0x0</span> <span class="o">-</span> <span class="n">tics</span><span class="p">,</span> <span class="mh">0x4</span> <span class="o">-</span> <span class="n">status</span><span class="p">,</span> <span class="mh">0x8</span> <span class="o">-</span> <span class="n">items</span><span class="p">,</span> <span class="mh">0xC</span> <span class="o">-</span> <span class="n">clear</span><span class="p">)</span>
+<span class="mh">0x080</span><span class="o">-</span><span class="mh">0x0BF</span> <span class="o">--</span> <span class="n">RX</span> <span class="n">generator</span> <span class="n">address</span> <span class="n">space</span>
+<span class="mh">0x0C0</span><span class="o">-</span><span class="mh">0x0FF</span> <span class="o">--</span> <span class="n">TX</span> <span class="n">generator</span> <span class="n">address</span> <span class="n">space</span>
+<span class="n">free</span> <span class="n">address</span> <span class="n">space</span> <span class="kn">from</span> <span class="mh">0x100</span><span class="o">-</span><span class="mh">0x17F</span>
+<span class="mh">0x180</span><span class="o">-</span><span class="mh">0x1BF</span> <span class="o">--</span> <span class="n">RX</span> <span class="n">Frame</span> <span class="n">Player</span> <span class="n">address</span> <span class="n">space</span>
+<span class="mh">0x1C0</span><span class="o">-</span><span class="mh">0x1FF</span> <span class="o">--</span> <span class="n">TX</span> <span class="n">Frame</span> <span class="n">Player</span> <span class="n">address</span> <span class="n">space</span>
 
 <span class="n">Notes</span><span class="p">:</span>
 <span class="o">-</span> <span class="n">Only</span> <span class="n">the</span> <span class="n">lowest</span> <span class="mi">8</span> <span class="n">bits</span> <span class="n">of</span> <span class="n">address</span> <span class="n">considered</span><span class="o">.</span>
@@ -240,30 +243,35 @@ must not be greater than BLOCK_SIZE*ITEM_WIDTH/8</p></td>
 <td><p>12</p></td>
 <td><p>Width of User Header Metadata information</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-gen_loop_switch-rx_hdr_ins_en"><td><p>RX_HDR_INS_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-gen_loop_switch-player_fifo_depth"><td><p>PLAYER_FIFO_DEPTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Depth of FIFO memory in MFB FRAME PLAYERs</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-gen_loop_switch-rx_hdr_ins_en"><td><p>RX_HDR_INS_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>enable inserting generated NPP Header
 at the start of each MFB frame in RX generator</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-gen_loop_switch-same_clk"><td><p>SAME_CLK</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-gen_loop_switch-same_clk"><td><p>SAME_CLK</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>MI_CLK and CLK are the same
 set this to True to remove MI asynch conversion</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-gen_loop_switch-mi_pipe_en"><td><p>MI_PIPE_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-gen_loop_switch-mi_pipe_en"><td><p>MI_PIPE_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>MI PIPE enable</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-gen_loop_switch-fake_switch"><td><p>FAKE_SWITCH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-gen_loop_switch-fake_switch"><td><p>FAKE_SWITCH</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Setting this to True will disable the component and create direct
 connection from DMA interfaces to ETH interfaces</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-gen_loop_switch-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-gen_loop_switch-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device string</p></td>

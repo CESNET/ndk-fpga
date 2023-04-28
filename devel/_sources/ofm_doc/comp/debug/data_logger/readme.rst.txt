@@ -1,13 +1,13 @@
 .. _data_logger:
 
 Data logger
-------------------
+-----------
 
 Data logger is used to log statistics about a specific events and make them available on the MI bus.
 Simple usage can be seen in :ref:`MEM_LOGGER<mem_logger>` component.
 
 Key features
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
 
 * Counter interface 
 
@@ -44,7 +44,7 @@ Key features
 
 
 Data logger warping component
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. toctree::
    :maxdepth: 1
@@ -53,7 +53,7 @@ Data logger warping component
 
 
 Component port and generics description
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. vhdl:autoentity:: DATA_LOGGER
@@ -61,7 +61,7 @@ Component port and generics description
 
 
 Instance template (simple usage)
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block::
 
@@ -78,8 +78,8 @@ Instance template (simple usage)
         RST                 => RST     ,
 
         CNTERS_INCR         => (
-            cnter_incr_2 &
-            cnter_incr_1 &
+            cnter_incr_2,
+            cnter_incr_1,
             cnter_incr_0
         ),
 
@@ -94,7 +94,7 @@ Instance template (simple usage)
     );
 
 Instance template (full usage)
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block::
 
@@ -131,8 +131,8 @@ Instance template (full usage)
         CTRLI               => ctrli   ,
 
         CNTERS_INCR         => (
-            cnter_incr_2 &
-            cnter_incr_1 &
+            cnter_incr_2,
+            cnter_incr_1,
             cnter_incr_0
         ),
         CNTERS_DIFF         => (
@@ -141,14 +141,14 @@ Instance template (full usage)
             cnter_diff_0
         ),
         CNTERS_SUBMIT       => (
-            cnter_submit_2 &
-            cnter_submit_1 &
+            cnter_submit_2,
+            cnter_submit_1,
             cnter_submit_0
         ),
 
         VALUES_VLD          => (
-            value_vld_2 &
-            value_vld_1 &
+            value_vld_2,
+            value_vld_1,
             value_vld_0
         ),
         VALUES              => (
@@ -169,7 +169,7 @@ Instance template (full usage)
 
 
 Control SW
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^
 
 Folder ``data_logger/sw/`` contains ``Python3`` package that provides:
 
@@ -190,7 +190,7 @@ Package can be installed using this command:
 
 
 MI address space
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 .. code-block::
 
@@ -228,7 +228,7 @@ MI address space
     * ``12``... ``ctrli``
     * ``13``... ``cnter value (i)``
 
-        * Also use for value interface counters (``CNTER_CNT + VALUE_CNT```counters)
+        * Also use for value interface counters (``CNTER_CNT + VALUE_CNT`` counters)
 
     * ``14``... ``value min  (i)``
     * ``15``... ``value max  (i)``

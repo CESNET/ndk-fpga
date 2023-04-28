@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 66eaa732
+                Git branch: devel, <br> Git hash: 256ea1ba
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -430,8 +430,8 @@ the number of occurrences of a specific event, the number of clock cycles of a e
     <span class="n">RST</span>                 <span class="o">=&gt;</span> <span class="n">RST</span>     <span class="p">,</span>
 
     <span class="n">CNTERS_INCR</span>         <span class="o">=&gt;</span> <span class="p">(</span>
-        <span class="n">cnter_incr_2</span> <span class="o">&amp;</span>
-        <span class="n">cnter_incr_1</span> <span class="o">&amp;</span>
+        <span class="n">cnter_incr_2</span><span class="p">,</span>
+        <span class="n">cnter_incr_1</span><span class="p">,</span>
         <span class="n">cnter_incr_0</span>
     <span class="p">),</span>
 
@@ -482,8 +482,8 @@ the number of occurrences of a specific event, the number of clock cycles of a e
     <span class="n">CTRLI</span>               <span class="o">=&gt;</span> <span class="n">ctrli</span>   <span class="p">,</span>
 
     <span class="n">CNTERS_INCR</span>         <span class="o">=&gt;</span> <span class="p">(</span>
-        <span class="n">cnter_incr_2</span> <span class="o">&amp;</span>
-        <span class="n">cnter_incr_1</span> <span class="o">&amp;</span>
+        <span class="n">cnter_incr_2</span><span class="p">,</span>
+        <span class="n">cnter_incr_1</span><span class="p">,</span>
         <span class="n">cnter_incr_0</span>
     <span class="p">),</span>
     <span class="n">CNTERS_DIFF</span>         <span class="o">=&gt;</span> <span class="p">(</span>
@@ -492,14 +492,14 @@ the number of occurrences of a specific event, the number of clock cycles of a e
         <span class="n">cnter_diff_0</span>
     <span class="p">),</span>
     <span class="n">CNTERS_SUBMIT</span>       <span class="o">=&gt;</span> <span class="p">(</span>
-        <span class="n">cnter_submit_2</span> <span class="o">&amp;</span>
-        <span class="n">cnter_submit_1</span> <span class="o">&amp;</span>
+        <span class="n">cnter_submit_2</span><span class="p">,</span>
+        <span class="n">cnter_submit_1</span><span class="p">,</span>
         <span class="n">cnter_submit_0</span>
     <span class="p">),</span>
 
     <span class="n">VALUES_VLD</span>          <span class="o">=&gt;</span> <span class="p">(</span>
-        <span class="n">value_vld_2</span> <span class="o">&amp;</span>
-        <span class="n">value_vld_1</span> <span class="o">&amp;</span>
+        <span class="n">value_vld_2</span><span class="p">,</span>
+        <span class="n">value_vld_1</span><span class="p">,</span>
         <span class="n">value_vld_0</span>
     <span class="p">),</span>
     <span class="n">VALUES</span>              <span class="o">=&gt;</span> <span class="p">(</span>
@@ -581,7 +581,7 @@ the number of occurrences of a specific event, the number of clock cycles of a e
 <li><p><code class="docutils literal notranslate"><span class="pre">13</span></code>… <code class="docutils literal notranslate"><span class="pre">cnter</span> <span class="pre">value</span> <span class="pre">(i)</span></code></p>
 <blockquote>
 <div><ul class="simple">
-<li><p>Also use for value interface counters (<a href="#id2"><span class="problematic" id="id3">``</span></a>CNTER_CNT + VALUE_CNT```counters)</p></li>
+<li><p>Also use for value interface counters (<code class="docutils literal notranslate"><span class="pre">CNTER_CNT</span> <span class="pre">+</span> <span class="pre">VALUE_CNT</span></code> counters)</p></li>
 </ul>
 </div></blockquote>
 </li>

@@ -3,7 +3,11 @@
 AMM_PROBE
 ---------
 
-AMM_PROBE is now depreciated and :ref:`MEM_LOGGER<mem_logger>` should be used!
+.. warning::
+
+    AMM_PROBE is now depreciated and :ref:`MEM_LOGGER<mem_logger>` should be used!
+
+
 AMM_PROBE listens to the AMM bus and measures:
 
 - Written / read AMM words and read requests count

@@ -3,6 +3,11 @@
 MEM_TESTER Software
 -------------------
 
+.. warning::
+
+    mem_tester C SW is now depreciated - use python version
+
+
 C Program
 ^^^^^^^^^
 

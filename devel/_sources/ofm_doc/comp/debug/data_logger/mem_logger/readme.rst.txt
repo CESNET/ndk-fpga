@@ -1,13 +1,13 @@
 .. _mem_logger:
 
 Mem logger
-------------------
+----------
 
 Mem logger is wrap around :ref:`DATA_LOGGER<data_logger>` that is able to log common statistics about memory interface.
 Example usage can be found in :ref:`MEM_TESTER<mem_tester>` component.
 
 Key features
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
 
 * Measured statistics
 
@@ -21,14 +21,14 @@ Key features
 
 
 Component port and generics description
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. vhdl:autoentity:: MEM_LOGGER
    :noautogenerics:
 
 
 Instance template (simple usage)
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block::
 
@@ -68,7 +68,7 @@ Instance template (simple usage)
 
 
 Control SW
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^
 
 First install ``DATA_LOGGER`` package
 
