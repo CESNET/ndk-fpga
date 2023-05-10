@@ -25,6 +25,7 @@ Before you get started, there are a few requirements that you need to have. Amon
     - [Bittware IA-420F card](https://github.com/CESNET/ndk-card-ia-420f/)
 - Other supported FPGA cards in the NDK framework but not available as open-source:
     - Netcope NFB-200G2QL card
+    - Silicom N6010 card
 - To control an FPGA card with an application based on the NDK framework, you also need:
     - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw)
 

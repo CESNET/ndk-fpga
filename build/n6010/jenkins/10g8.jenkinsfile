@@ -1,0 +1,13 @@
+library 'liberouter'
+
+stagesFirmware(
+    dir: 'build/n6010',
+    target: '10g8',
+    tool: 'quartus',
+    project: 'n6010-minimal-10g8',
+    pollscm: 'H H(0-11) * * 6',
+    rpms: false,
+    rename: false,
+    artifacts: 'n6010-minimal-10g8',
+    lastBuilds: 2,
+)
