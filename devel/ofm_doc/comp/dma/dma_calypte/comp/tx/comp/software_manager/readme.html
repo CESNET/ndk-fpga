@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../../../search.html" />
     <link rel="next" title="Debug Tools" href="../../../../../../../debug.html" />
-    <link rel="prev" title="Channel Splitter" href="../channel_splitter/readme.html" /> 
+    <link rel="prev" title="Transaction buffer" href="../pcie_trans_buffer/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 6ee08d68
+                Git branch: devel, <br> Git hash: 40089cd4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
@@ -83,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/common/readme.html">PCI_EXT_CAP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/logic/byte_count/readme.html">PCIE Byte Count</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/logic/byte_en_decoder/readme.html">PCIe Byte Enable Decoder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
@@ -176,15 +177,16 @@ channels is requested, the channels are started/stopped one after anoter, not al
 <td><p>64</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_sw_manager-mfb_width"><td><p>MFB_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_sw_manager-data_pointer_width"><td><p>DATA_POINTER_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>256</p></td>
-<td><p>value is a product of MFB_REGIONS,MFB_REGION_SIZE, MFB_BLOCK_SIZE and MFB_ITEM_WIDTH</p></td>
+<td><p>14</p></td>
+<td><p>Width of the pointer to data and DMA header buffers
+signify depth of the internal buffers in the CHANNEL_CORE</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_sw_manager-dma_fifo_depth"><td><p>DMA_FIFO_DEPTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_sw_manager-dma_hdr_pointer_width"><td><p>DMA_HDR_POINTER_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>512</p></td>
-<td><p>depth of the internal buffers in the CHANNEL_CORE</p></td>
+<td><p>9</p></td>
+<td></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_sw_manager-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
 <td><p>natural</p></td>
@@ -346,33 +348,32 @@ channels is requested, the channels are started/stopped one after anoter, not al
 <td><p>out</p></td>
 <td><p>general vector of all channels with their activity</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-data_fifo_status_chan"><td><p>DATA_FIFO_STATUS_CHAN</p></td>
-<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-hdp_wr_chan"><td><p>HDP_WR_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS)-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>status signals indicate how many data bytes are stored in the buffer of each channel</p></td>
+<td><p>Hardware pointers writing interface</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-data_fifo_status_data"><td><p>DATA_FIFO_STATUS_DATA</p></td>
-<td><p>std_logic_vector(log2((DMA_FIFO_DEPTH*MFB_WIDTH)/8) downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-hdp_wr_data"><td><p>HDP_WR_DATA</p></td>
+<td><p>std_logic_vector(DATA_POINTER_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-data_fifo_status_we"><td><p>DATA_FIFO_STATUS_WE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-hdp_wr_en"><td><p>HDP_WR_EN</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-hdr_fifo_status_chan"><td><p>HDR_FIFO_STATUS_CHAN</p></td>
-<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>status interface of the header FIFO for each channel, indicates how many headers (items) are
-still stored</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-hdr_fifo_status_data"><td><p>HDR_FIFO_STATUS_DATA</p></td>
-<td><p>std_logic_vector(log2(DMA_FIFO_DEPTH) downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-hhp_wr_chan"><td><p>HHP_WR_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-hdr_fifo_status_we"><td><p>HDR_FIFO_STATUS_WE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-hhp_wr_data"><td><p>HHP_WR_DATA</p></td>
+<td><p>std_logic_vector(DMA_HDR_POINTER_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-hhp_wr_en"><td><p>HHP_WR_EN</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
@@ -396,7 +397,7 @@ still stored</p></td>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../channel_splitter/readme.html" class="btn btn-neutral float-left" title="Channel Splitter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../pcie_trans_buffer/readme.html" class="btn btn-neutral float-left" title="Transaction buffer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../../../../../../../debug.html" class="btn btn-neutral float-right" title="Debug Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple dual-port BRAM &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="FIFO components" href="../../../../fifo.html" />
+    <link rel="prev" title="NP LUT RAM" href="../np_lutram/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: devel, <br> Git hash: 40089cd4
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../base.html">Basic Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../async.html">Asynchronous modules</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../memory.html">Memory modules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../np_lutram/readme.html">NP LUT RAM</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Simple dual-port BRAM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../memory.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../fifo.html">FIFO components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dsp.html">DSP components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../shift.html">Shift registers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../logic.html">Basic logic elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../misc.html">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../base.html">Basic Tools</a></li>
+          <li class="breadcrumb-item"><a href="../../../../memory.html">Memory modules</a></li>
+      <li class="breadcrumb-item active">Simple dual-port BRAM</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../../_sources/ofm_doc/comp/base/mem/sdp_bram/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simple-dual-port-bram">
+<span id="sdp-bram"></span><h1>Simple dual-port BRAM<a class="headerlink" href="#simple-dual-port-bram" title="Permalink to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-sdp_bram">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">SDP_BRAM</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-sdp_bram" title="Permalink to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-sdp_bram-data_width"><td><p>DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>64</p></td>
+<td><p>Data word width in bits. If BLOCK_ENABLE is True then DATA_WIDTH must
+be N*BLOCK_WIDTH.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-sdp_bram-items"><td><p>ITEMS</p></td>
+<td><p>integer</p></td>
+<td><p>512</p></td>
+<td><p>Depth of BRAM in number of the data words.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-sdp_bram-block_enable"><td><p>BLOCK_ENABLE</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>Enable masking of WR_DATA signal per BLOCK_WIDTH.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-sdp_bram-block_width"><td><p>BLOCK_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>Width of one data block. Allowed values are 8 or 9. The parameter is
+ignored when BLOCK_ENABLE=False.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-sdp_bram-common_clock"><td><p>COMMON_CLOCK</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>Designate whether read port and write port are clocked with a common
+clock or with independent clocks. Possible values:</p>
+<ul class="simple">
+<li><p>True = clock write port and read port with WR_CLK</p></li>
+<li><p>False = clock write port with WR_CLK and read port with RD_CLK</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-sdp_bram-output_reg"><td><p>OUTPUT_REG</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>Output directly from BRAM or throw register (better timing).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-sdp_bram-metadata_width"><td><p>METADATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td><p>Width of read metadata signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-sdp_bram-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>The DEVICE parameter allows the correct selection of the RAM
+implementation according to the FPGA used. Supported values are:</p>
+<ul class="simple">
+<li><p>“7SERIES”</p></li>
+<li><p>“ULTRASCALE”</p></li>
+<li><p>“STRATIX10”</p></li>
+<li><p>“ARRIA10”</p></li>
+<li><p>“AGILEX”</p></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>WRITE PORT</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram-wr_clk"><td><p>WR_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Clock signal for write port. Also clock signal for read port when
+parameter COMMON_CLOCK = True.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram-wr_rst"><td><p>WR_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Reset signal synchronous with WR_CLK. Used only when parameter
+COMMON_CLOCK = True for resetting valid bit of read data.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram-wr_en"><td><p>WR_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Enable of write port.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram-wr_be"><td><p>WR_BE</p></td>
+<td><p>std_logic_vector(max((DATA_WIDTH/BLOCK_WIDTH),1)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Block enable of written data, used only when BLOCK_ENABLE = True.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram-wr_addr"><td><p>WR_ADDR</p></td>
+<td><p>std_logic_vector(log2(ITEMS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Write address.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram-wr_data"><td><p>WR_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Write data input.</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>READ PORT</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram-rd_clk"><td><p>RD_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Clock signal for read port when parameter COMMON_CLOCK = False.
+Unused when COMMON_CLOCK = True.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram-rd_rst"><td><p>RD_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Reset signal synchronous with RD_CLK. Used only when parameter
+COMMON_CLOCK = False for resetting valid bit of read data.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram-rd_en"><td><p>RD_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Read enable signal, it is only used to generate RD_DATA_VLD.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram-rd_pipe_en"><td><p>RD_PIPE_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Clock enable of read port.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram-rd_meta_in"><td><p>RD_META_IN</p></td>
+<td><p>std_logic_vector(METADATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Metadata propagated when RD_PIPE_EN==’1’ (valid on RD_EN)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram-rd_addr"><td><p>RD_ADDR</p></td>
+<td><p>std_logic_vector(log2(ITEMS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Read address.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram-rd_data"><td><p>RD_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Read data output.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram-rd_meta_out"><td><p>RD_META_OUT</p></td>
+<td><p>std_logic_vector(METADATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Metadata propagated when RD_PIPE_EN==’1’ (valid on RD_DATA_VLD)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram-rd_data_vld"><td><p>RD_DATA_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Valid bit of output read data.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="simple-dual-port-bram-with-byte-enable">
+<h1>Simple dual-port BRAM with Byte Enable<a class="headerlink" href="#simple-dual-port-bram-with-byte-enable" title="Permalink to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-sdp_bram_be">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">SDP_BRAM_BE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-sdp_bram_be" title="Permalink to this definition"></a></dt>
+<dd><p>A wrapper for SDP_BRAM to abstract Block Enable signal.
+(Byte Enable with arbitrary width.)</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-sdp_bram_be-block_enable"><td><p>BLOCK_ENABLE</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>Use Block Enable</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-sdp_bram_be-block_width"><td><p>BLOCK_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Width of Block enabled by signal WR_BE
+Use multiples of 8 or 9 for highest effectivness</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Other SDP_BRAM generics</p></td>
+<td><p>=====</p></td>
+<td><p>See entity of SDP_BRAM for more detail</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-sdp_bram_be-data_width"><td><p>DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>64</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-sdp_bram_be-items"><td><p>ITEMS</p></td>
+<td><p>integer</p></td>
+<td><p>512</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-sdp_bram_be-common_clock"><td><p>COMMON_CLOCK</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-sdp_bram_be-output_reg"><td><p>OUTPUT_REG</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-sdp_bram_be-metadata_width"><td><p>METADATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-sdp_bram_be-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>SDP_BRAM ports</p></td>
+<td><p>=====</p></td>
+<td><p>See entity of SDP_BRAM for more detail</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram_be-wr_clk"><td><p>WR_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram_be-wr_rst"><td><p>WR_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram_be-wr_en"><td><p>WR_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram_be-wr_be"><td><p>WR_BE</p></td>
+<td><p>std_logic_vector(DATA_WIDTH/BLOCK_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram_be-wr_addr"><td><p>WR_ADDR</p></td>
+<td><p>std_logic_vector(log2(ITEMS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram_be-wr_data"><td><p>WR_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram_be-rd_clk"><td><p>RD_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram_be-rd_rst"><td><p>RD_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram_be-rd_en"><td><p>RD_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram_be-rd_pipe_en"><td><p>RD_PIPE_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram_be-rd_meta_in"><td><p>RD_META_IN</p></td>
+<td><p>std_logic_vector(METADATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram_be-rd_addr"><td><p>RD_ADDR</p></td>
+<td><p>std_logic_vector(log2(ITEMS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram_be-rd_data"><td><p>RD_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-sdp_bram_be-rd_meta_out"><td><p>RD_META_OUT</p></td>
+<td><p>std_logic_vector(METADATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-sdp_bram_be-rd_data_vld"><td><p>RD_DATA_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../np_lutram/readme.html" class="btn btn-neutral float-left" title="NP LUT RAM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../../fifo.html" class="btn btn-neutral float-right" title="FIFO components" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

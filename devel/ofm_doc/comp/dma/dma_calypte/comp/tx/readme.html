@@ -20,7 +20,7 @@
     <script src="../../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../search.html" />
-    <link rel="next" title="Channel Core" href="comp/channel_core/readme.html" />
+    <link rel="next" title="Metadata Extractor" href="comp/metadata_extractor/readme.html" />
     <link rel="prev" title="Software Manager" href="../rx/comp/software_manager/readme.html" /> 
 </head>
 
@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 6ee08d68
+                Git branch: devel, <br> Git hash: 40089cd4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
@@ -83,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../pcie/ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../pcie/common/readme.html">PCI_EXT_CAP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../pcie/logic/byte_count/readme.html">PCIE Byte Count</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../pcie/logic/byte_en_decoder/readme.html">PCIe Byte Enable Decoder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../readme.html">DMA Calypte</a><ul class="current">
@@ -136,25 +137,20 @@
 <p>The Completer Completion interface is not supported yet. Calypte Controller
 supports only Memory Write PCIe transactions.</p>
 </div>
-<p>This is transmitting part of the DMA Calypte core. The major structure can be
-changed by setting the CHANNEL_ARBITER_EN generic parameter to either true or
-false. This parameter enables/disables the CHANNEL_ARBITER component which
-merges streams from all CHANNEL_CORE components. The output interface with
-enabled arbiter remains the same but valid data are transmitted on the
-interface no. 0 only. When CHANNEL_ARBITER is disabled, each CHANNEL_CORE has
-its own separate output. The block scheme of the TX DMA Calypte controller is
-provided in two following figures (<cite>N = &lt;number of channels&gt; - 1</cite>):</p>
-<figure class="align-center" id="id2">
-<a class="reference internal image-reference" href="../../../../../../_images/tx_calypte_block_chan_arb.svg"><img alt="../../../../../../_images/tx_calypte_block_chan_arb.svg" height="2273" src="../../../../../../_images/tx_calypte_block_chan_arb.svg" width="7296" /></a>
-<figcaption>
-<p><span class="caption-text">Block scheme of TX DMA Calypte controller with CHANNEL_ARBITER enabled</span><a class="headerlink" href="#id2" title="Permalink to this image"></a></p>
-</figcaption>
-</figure>
-<figure class="align-center" id="id3">
-<a class="reference internal image-reference" href="../../../../../../_images/tx_calypte_block_dis_chan_arb.svg"><img alt="../../../../../../_images/tx_calypte_block_dis_chan_arb.svg" height="2273" src="../../../../../../_images/tx_calypte_block_dis_chan_arb.svg" width="6255" /></a>
-<figcaption>
-<p><span class="caption-text">Block scheme of TX DMA Calypte controller with CHANNEL_ARBITER disabled</span><a class="headerlink" href="#id3" title="Permalink to this image"></a></p>
-</figcaption>
+<p>This is the transmitting part of the DMA Calypte core. TX direction behaves
+similarly to the RX DMA Calypte. Data buffers are provided in the hardware to
+which the data can be stored. The frames are output on the <em>USR_TX_</em> side and
+PCI Express transactions are accepted on the <em>PCIE_CQ_</em> side. Output frame
+can constist out of multiple PCIe transactions. Each such frame is delimited
+by the DMA header which provides the size of the frame as well as the channel
+to which the frame is designated and an address of the first byte of the
+frame. PCIe transactions can be send on the unsorted series of adresses. The
+DMA header then serves as delimiting block where, after its acceptance,
+the frame on the output is read continuously from the address of the first
+byte. The block scheme of the TX DMA Calypte controller is provided in the
+following figure:</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../../../../_images/tx_calypte_block-tx_dma_calypte_top.svg"><img alt="../../../../../../_images/tx_calypte_block-tx_dma_calypte_top.svg" height="2223" src="../../../../../../_images/tx_calypte_block-tx_dma_calypte_top.svg" width="8497" /></a>
 </figure>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
@@ -251,52 +247,43 @@ provided in two following figures (<cite>N = &lt;number of channels&gt; - 1</cit
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>Setting of internal parameters of CHANNEL_CORE</p></td>
+<td><p>Setting of internal components</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-fifo_depth"><td><p>FIFO_DEPTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-data_pointer_width"><td><p>DATA_POINTER_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>512</p></td>
-<td><p>FIFO depth in number of items stored. The overall capacity in bytes can be obtained when
-this number is multiplied by the width of the PCIe CQ bus in bytes. The FIFO should fit
-at least one packet of the PKT_SIZE_MAX size. Otherwise a halt of the whole controller
-can occur.</p></td>
+<td><p>14</p></td>
+<td><p>Pointer width for data and hdr buffers. The data pointer points to bytes of the packet.
+The header pointer points to the header of a current packet.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-channels"><td><p>CHANNELS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-dma_hdr_pointer_width"><td><p>DMA_HDR_POINTER_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>8</p></td>
-<td><p>Set the number of DMA channels, each channel is controlled by one CHANNEL_CORE component.</p></td>
-</tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>Enabling of CHANNEL_ARBITER component</p></td>
-<td><p>=====</p></td>
-<td><p>This component merges output streams from all CHANNEL_CORE components. When enabled, the
-valid data occur only on the 0th USR_TX_MFB interface. Then disabled, each channel has
-its own output.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-channel_arbiter_en"><td><p>CHANNEL_ARBITER_EN</p></td>
-<td><p>boolean</p></td>
-<td><p>FALSE</p></td>
+<td><p>9</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-channels"><td><p>CHANNELS</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>Set the number of DMA channels, each channel has its separate buffer</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>Others</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-cntrs_width"><td><p>CNTRS_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-cntrs_width"><td><p>CNTRS_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>64</p></td>
 <td><p>Set the width of counters of packets for each channel which are there to provide some
 entry level statistics.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-hdr_meta_width"><td><p>HDR_META_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-hdr_meta_width"><td><p>HDR_META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>24</p></td>
 <td><p>Width of the metadata in bits which are stored in the DMA header.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
 <td><p>natural</p></td>
 <td><p>2**14</p></td>
 <td><p>Size of the largest packets that can be transmitted on the USR_TX_MFB interface.</p></td>
@@ -325,63 +312,62 @@ entry level statistics.</p></td>
 <tr class="row-even"><td><p>=====</p></td>
 <td><p>User MFB signals</p></td>
 <td><p>=====</p></td>
-<td><p>Each channel has its own output unless CHANNEL_ARBITER is enabled. In that case, only
-line number 0 is used.</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_meta_pkt_size"><td><p>USR_TX_MFB_META_PKT_SIZE</p></td>
-<td><p>slv_array_t(CHANNELS -1 downto 0)(log2(PKT_SIZE_MAX + 1) -1 downto 0)</p></td>
+<td><p>std_logic_vector(log2(PKT_SIZE_MAX + 1) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_meta_chan"><td><p>USR_TX_MFB_META_CHAN</p></td>
-<td><p>slv_array_t(CHANNELS -1 downto 0)(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_meta_hdr_meta"><td><p>USR_TX_MFB_META_HDR_META</p></td>
-<td><p>slv_array_t(CHANNELS -1 downto 0)(HDR_META_WIDTH -1 downto 0)</p></td>
+<td><p>std_logic_vector(HDR_META_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_data"><td><p>USR_TX_MFB_DATA</p></td>
-<td><p>slv_array_t(CHANNELS -1 downto 0)(USR_TX_MFB_REGIONS*USR_TX_MFB_REGION_SIZE*USR_TX_MFB_BLOCK_SIZE*USR_TX_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(USR_TX_MFB_REGIONS*USR_TX_MFB_REGION_SIZE*USR_TX_MFB_BLOCK_SIZE*USR_TX_MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_sof"><td><p>USR_TX_MFB_SOF</p></td>
-<td><p>slv_array_t(CHANNELS -1 downto 0)(USR_TX_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(USR_TX_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_eof"><td><p>USR_TX_MFB_EOF</p></td>
-<td><p>slv_array_t(CHANNELS -1 downto 0)(USR_TX_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(USR_TX_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_sof_pos"><td><p>USR_TX_MFB_SOF_POS</p></td>
-<td><p>slv_array_t(CHANNELS -1 downto 0)(USR_TX_MFB_REGIONS*max(1, log2(USR_TX_MFB_REGION_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(USR_TX_MFB_REGIONS*max(1, log2(USR_TX_MFB_REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_eof_pos"><td><p>USR_TX_MFB_EOF_POS</p></td>
-<td><p>slv_array_t(CHANNELS -1 downto 0)(USR_TX_MFB_REGIONS*max(1, log2(USR_TX_MFB_REGION_SIZE*USR_TX_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(USR_TX_MFB_REGIONS*max(1, log2(USR_TX_MFB_REGION_SIZE*USR_TX_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_src_rdy"><td><p>USR_TX_MFB_SRC_RDY</p></td>
-<td><p>std_logic_vector(CHANNELS -1 downto 0)</p></td>
+<td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-usr_tx_mfb_dst_rdy"><td><p>USR_TX_MFB_DST_RDY</p></td>
-<td><p>std_logic_vector(CHANNELS -1 downto 0)</p></td>
+<td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
 <td><p>PCIe Completer Request MFB interface</p></td>
 <td><p>=====</p></td>
-<td><p>Accepts write and read requests</p></td>
+<td><p>Accepts PCIe write and read requests</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-pcie_cq_mfb_data"><td><p>PCIE_CQ_MFB_DATA</p></td>
 <td><p>std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_MFB_REGION_SIZE*PCIE_CQ_MFB_BLOCK_SIZE*PCIE_CQ_MFB_ITEM_WIDTH-1 downto 0)</p></td>
@@ -520,20 +506,17 @@ line number 0 is used.</p></td>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Specific subcomponents</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="comp/channel_core/readme.html">Channel Core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="comp/channel_splitter/readme.html">Channel Splitter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/metadata_extractor/readme.html">Metadata Extractor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/chan_start_stop_ctrl/readme.html">Channel Start/stop control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/packet_dispatcher/readme.html">Packet Dispatcher</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/pcie_trans_buffer/readme.html">Transaction buffer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comp/software_manager/readme.html">Software Manager</a></li>
 </ul>
 </div>
 <section id="general-subcomponents">
 <h2>General subcomponents<a class="headerlink" href="#general-subcomponents" title="Permalink to this heading"></a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>For the sake of basic functionality, the <cite>CHANNEL_ARBITER</cite> is now replaced by
-the <cite>MFB_MERGER_SIMPLE_GEN</cite> component.</p>
-</div>
 <ul class="simple">
-<li><p><a class="reference internal" href="../../../../mfb_tools/flow/merger_simple/readme.html#mfb-merger-simple-gen"><span class="std std-ref">MFB Merger Simple</span></a></p></li>
+<li><p><a class="reference internal" href="../../../../mvb_tools/storage/fifox/readme.html#mvb-fifox"><span class="std std-ref">MVB FIFOX</span></a></p></li>
 </ul>
 </section>
 </section>
@@ -543,7 +526,7 @@ the <cite>MFB_MERGER_SIMPLE_GEN</cite> component.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../rx/comp/software_manager/readme.html" class="btn btn-neutral float-left" title="Software Manager" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="comp/channel_core/readme.html" class="btn btn-neutral float-right" title="Channel Core" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="comp/metadata_extractor/readme.html" class="btn btn-neutral float-right" title="Metadata Extractor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

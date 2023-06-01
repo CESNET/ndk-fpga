@@ -9,14 +9,12 @@ TX DMA Calypte
    :maxdepth: 1
    :caption: Specific subcomponents
 
-   comp/channel_core/readme
-   comp/channel_splitter/readme
+   comp/metadata_extractor/readme
+   comp/chan_start_stop_ctrl/readme
+   comp/packet_dispatcher/readme
+   comp/pcie_trans_buffer/readme
    comp/software_manager/readme
 
 General subcomponents
 ---------------------
-.. NOTE::
-   For the sake of basic functionality, the `CHANNEL_ARBITER` is now replaced by
-   the `MFB_MERGER_SIMPLE_GEN` component.
-
-* :ref:`mfb_merger_simple_gen`
+* :ref:`mvb_fifox`

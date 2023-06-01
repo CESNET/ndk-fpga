@@ -12,6 +12,7 @@ This chapter describes the components that are used for communication via the PC
    comp/pcie/ptc/comp/tag_manager/readme
    comp/pcie/common/readme
    comp/pcie/logic/byte_count/readme
+   comp/pcie/logic/byte_en_decoder/readme
    comp/pcie/others/hdr_gen/readme
    comp/pcie/convertors/readme
    ./../ndk_mod/ndk-mod-dma-medusa/readme
