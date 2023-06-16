@@ -13,14 +13,20 @@ CARD_BASE = $(COMBO_BASE)/ndk/cards/fb2cghh
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = fb2cghh-minimal
 
-.PHONY: all 100g2
+.PHONY: all 100g2 40g2
 
-all: 100g2
+all: 100g2 40g2
 
 100g2: ETH_PORTS=2
 100g2: ETH_PORT_SPEED=100
 100g2: ETH_PORT_CHAN=1
 100g2: OUTPUT_NAME:=fb2cghh-minimal-100g2
 100g2: build
+
+40g2: ETH_PORTS=2
+40g2: ETH_PORT_SPEED=40
+40g2: ETH_PORT_CHAN=1
+40g2: OUTPUT_NAME:=$(OUTPUT_NAME)-40g2
+40g2: build
 
 include $(CARD_BASE)/src/card.mk
