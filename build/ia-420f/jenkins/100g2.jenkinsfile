@@ -11,3 +11,12 @@ stagesFirmware(
     artifacts: 'ia-420f-minimal-100g2',
     lastBuilds: 2,
 )
+
+stagesNdkTest(
+    card: 'ia-420f',
+    mode: '100g2',
+    project: 'minimal',
+    fw_name: 'ia-420f-minimal-100g2.nfw',
+    testbranch: 'friedl-feat-ndk_app_minimal'
+)
+
