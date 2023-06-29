@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: cc12f250
+                Git branch: devel, <br> Git hash: e9bae346
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -142,6 +142,10 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=3</span></code> – DMA Medusa IP (default DMA controller)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=4</span></code> – DMA Calypte IP</p></li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If DMA IP is replaced by a loopback (<code class="docutils literal notranslate"><span class="pre">DMA_TYPE=0</span></code>), packets sent from the user application to the DMA input are immediately forwarded to the DMA output and then continue back to the user application.</p>
+</div>
 </section>
 <section id="dma-medusa-ip-notes">
 <h2>DMA Medusa IP notes<a class="headerlink" href="#dma-medusa-ip-notes" title="Permalink to this heading"></a></h2>

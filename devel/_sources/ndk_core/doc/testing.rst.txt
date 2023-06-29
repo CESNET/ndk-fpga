@@ -62,6 +62,10 @@ Some tests require an available DMA controller; others require an external QSFP 
 
     Some Ethernet Hard IPs (especially E-Tile and F-tile) may not receive data for transmission if they do not detect the Ethernet link. The test will not work in this case, so we recommend connecting an external QSFP loopback.
 
+.. note::
+
+    If you do not have an external QSFP loopback available, you can simply enable the Ethernet PMA loopback directly in the FPGA using the nfb-eth tool: ``nfb-eth -Pc "+PMA local loopback"``.
+
 If an external QSFP loopback is connected, the transmitted packets are received back into the FPGA, where the script measures the receiving speed. In this test, packets pass through the application core so that the measured throughput corresponds with the throughput of the implemented application. The throughput calculation considers L2 packets from the destination MAC address to the end of the payload. Below is an example of the script output after running test 1:
 
 .. code-block::

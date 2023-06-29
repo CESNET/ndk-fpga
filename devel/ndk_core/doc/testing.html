@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: cc12f250
+                Git branch: devel, <br> Git hash: e9bae346
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -159,6 +159,10 @@ Supported modes:
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Some Ethernet Hard IPs (especially E-Tile and F-tile) may not receive data for transmission if they do not detect the Ethernet link. The test will not work in this case, so we recommend connecting an external QSFP loopback.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you do not have an external QSFP loopback available, you can simply enable the Ethernet PMA loopback directly in the FPGA using the nfb-eth tool: <code class="docutils literal notranslate"><span class="pre">nfb-eth</span> <span class="pre">-Pc</span> <span class="pre">&quot;+PMA</span> <span class="pre">local</span> <span class="pre">loopback&quot;</span></code>.</p>
 </div>
 <p>If an external QSFP loopback is connected, the transmitted packets are received back into the FPGA, where the script measures the receiving speed. In this test, packets pass through the application core so that the measured throughput corresponds with the throughput of the implemented application. The throughput calculation considers L2 packets from the destination MAC address to the end of the payload. Below is an example of the script output after running test 1:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 gls_mod.py 1
