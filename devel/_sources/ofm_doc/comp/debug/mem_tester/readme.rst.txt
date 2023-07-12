@@ -207,6 +207,7 @@ You can also use automated testing using pytest framework:
     # -x ... end after first failure
     # -tb ... show only assertion message
 
+If you need to use different device, edit `device` variable in test_mem_tester.py
 
 PDF report generator SW
 ^^^^^^^^^^^^^^^^^^^^^^^
