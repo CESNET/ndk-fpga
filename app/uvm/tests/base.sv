@@ -88,9 +88,9 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endfunction
 
     task run_dma_meta(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr);
-        uvm_app_core_top_agent::logic_vector_sequence_lib#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)  mvb_seq;
+        uvm_app_core_top_agent::logic_vector_sequence_lib#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH, DMA_PKT_MTU)  mvb_seq;
 
-        mvb_seq = uvm_app_core_top_agent::logic_vector_sequence_lib#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)::type_id::create("mvb_seq", this);
+        mvb_seq = uvm_app_core_top_agent::logic_vector_sequence_lib#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH, DMA_PKT_MTU)::type_id::create("mvb_seq", this);
         mvb_seq.init_sequence();
         mvb_seq.min_random_count = 50;
         mvb_seq.max_random_count = 150;
