@@ -39,12 +39,16 @@ However, the more stages there are, the more resources the Frame Unpacker consum
 .. _warning:
     SuperPackets containing more frames than the UNPACKING_STAGES value will result in an undefined behavior!
 
+After the unpacking process, the headers of the individual packets are extracted and concatenated with the MVB headers from the FIFOX_MULTI.
+These are then forwarded to the output on MVB or are inserted as metadata to the corresponding packets.
+At the end of the pipeline, the headers of the individual packets are cut off (which does not happen during their extraction).
+
 Block diagram
 ~~~~~~~~~~~~~
 
 .. _frame_unpacker_schematic:
 
-.. image:: img/frame_unpacker.drawio.svg
+.. image:: img/frame_unpacker_diagram.drawio.svg
       :align: center
       :width: 100 %
       :alt:

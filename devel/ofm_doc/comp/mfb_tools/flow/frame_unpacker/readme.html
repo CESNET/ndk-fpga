@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: b6b297bd
+                Git branch: devel, <br> Git hash: d21acd45
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -97,6 +97,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html#id1">MFB Splitter Gen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../enabler/readme.html">MFB Enabler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rate_limiter/readme.html">Rate Limiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../packet_delayer/readme.html">Packet Delayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../timestamp_limiter/readme.html">Timestamp Limiter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../loopback/readme.html">MFB Loopback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
@@ -198,11 +200,21 @@ a few Items behind the EOF POS of the individual frame).</p>
 <td><p>8</p></td>
 <td><p>Item width (in bits), must be 8.</p></td>
 </tr>
+<tr class="row-even" id="vhdl-gengeneric-frame_unpacker-mvb_items"><td><p>MVB_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>MFB_REGIONS</p></td>
+<td><p>Number of MVB headers.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-frame_unpacker-mvb_item_width"><td><p>MVB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>16</p></td>
+<td><p>Width of each MVB header (in bits).</p></td>
+</tr>
 <tr class="row-even" id="vhdl-gengeneric-frame_unpacker-header_length"><td><p>HEADER_LENGTH</p></td>
 <td><p>natural</p></td>
 <td><p>16</p></td>
 <td><p>Length of the prepended header (in Items).
-The minimum is 16, because the Length field is necesary for the unpacking.</p></td>
+The minimum is 2 Items (16b), which are for the Length field that is necesary for the unpacking process.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-frame_unpacker-unpacking_stages"><td><p>UNPACKING_STAGES</p></td>
 <td><p>natural</p></td>
@@ -218,7 +230,7 @@ Must be greater than 0!</p></td>
 <dt>The extracted Header is output as:</dt><dd><ul class="simple">
 <li><p>Insert header to output metadata with SOF (MODE 0),</p></li>
 <li><p>Insert header to output metadata with EOF (MODE 1),</p></li>
-<li><p>Insert header on MVB (MODE 2)</p></li>
+<li><p>Insert header on MVB (MODE 2).</p></li>
 </ul>
 </dd>
 </dl>
@@ -261,111 +273,137 @@ Must be greater than 0!</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX MVB Headers (per each SuperPacket)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-rx_mvb_data"><td><p>RX_MVB_DATA</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>RX MFB STREAM (SuperPackets)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>TX MFB STREAM (unpacked frames)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*HEADER_LENGTH*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*(MVB_ITEM_WIDTH+HEADER_LENGTH*MFB_ITEM_WIDTH)-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Valid with SOF, EOF, or not valid at all.
+Contains concatenated MVB header and extracted SuperPacket header (RX_MVB_DATA &amp; getit_indv_hdr_data).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>TX MVB Headers</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX MVB Headers (MVB and SuperPacket headers)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*HEADER_LENGTH*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*(MVB_ITEM_WIDTH+HEADER_LENGTH*MFB_ITEM_WIDTH)-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-frame_unpacker-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-frame_unpacker-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
@@ -398,10 +436,13 @@ During the unpacking process, all lengths of the individual frames are accumulat
 That is independent of the individual frame’s length and applies even when multiple individual frames are in a single word.
 Therefore, the UNPACKING_STAGES value indicates the maximum amount of frames that can be unpacked from a single SuperPacket.
 However, the more stages there are, the more resources the Frame Unpacker consumes.</p>
+<p>After the unpacking process, the headers of the individual packets are extracted and concatenated with the MVB headers from the FIFOX_MULTI.
+These are then forwarded to the output on MVB or are inserted as metadata to the corresponding packets.
+At the end of the pipeline, the headers of the individual packets are cut off (which does not happen during their extraction).</p>
 </section>
 <section id="block-diagram">
 <h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading"></a></h2>
-<a class="reference internal image-reference" href="ofm_doc/comp/mfb_tools/flow/frame_unpacker/img/frame_unpacker.drawio.svg" id="frame-unpacker-schematic"><img alt="" class="align-center" id="frame-unpacker-schematic" src="ofm_doc/comp/mfb_tools/flow/frame_unpacker/img/frame_unpacker.drawio.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="../../../../../_images/frame_unpacker_diagram.drawio.svg" id="frame-unpacker-schematic"><img alt="" class="align-center" id="frame-unpacker-schematic" src="../../../../../_images/frame_unpacker_diagram.drawio.svg" width="100%" /></a>
 </section>
 <section id="subcomponents">
 <h2>Subcomponents<a class="headerlink" href="#subcomponents" title="Permalink to this heading"></a></h2>

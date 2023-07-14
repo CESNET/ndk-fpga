@@ -23,6 +23,8 @@ Components using the MFB bus are typically located in the ``comp/mfb_tools/`` di
    comp/mfb_tools/flow/splitter/readme
    comp/mfb_tools/flow/enabler/readme
    comp/mfb_tools/flow/rate_limiter/readme
+   comp/mfb_tools/flow/packet_delayer/readme
+   comp/mfb_tools/flow/timestamp_limiter/readme
    comp/mfb_tools/flow/loopback/readme
    comp/mfb_tools/flow/crossbarx_stream2/readme
    comp/mfb_tools/logic/crossbarx_stream/readme
