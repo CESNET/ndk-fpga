@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: d21acd45
+                Git branch: devel, <br> Git hash: af67b2da
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -96,6 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../flow/timestamp_limiter/readme.html">Timestamp Limiter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/loopback/readme.html">MFB Loopback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/frame_masker/readme.html">MFB Frame Masker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../crossbarx_stream/readme.html">CrossbarX Stream</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Checksum Calculator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
@@ -177,22 +178,27 @@ This dis/enabling of the checksum results in propagating the inverted value of t
 <td><p>8</p></td>
 <td><p>Item width (in bits), must be 8.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-checksum_calculator-pkt_mtu"><td><p>PKT_MTU</p></td>
+<tr class="row-even" id="vhdl-gengeneric-checksum_calculator-mfb_meta_width"><td><p>MFB_META_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>0</p></td>
+<td><p>Metadata width (in bits), valid with SOF.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-checksum_calculator-pkt_mtu"><td><p>PKT_MTU</p></td>
 <td><p>natural</p></td>
 <td><p>2**14</p></td>
 <td><p>Maximum size of a packet (in Items).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-checksum_calculator-offset_width"><td><p>OFFSET_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-checksum_calculator-offset_width"><td><p>OFFSET_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>7</p></td>
 <td><p>Width of each Offset signal in the in the RX_OFFSET vector.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-checksum_calculator-length_width"><td><p>LENGTH_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-checksum_calculator-length_width"><td><p>LENGTH_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>9</p></td>
 <td><p>Width of each Length signal in the in the RX_LENGTH vector.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-checksum_calculator-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-checksum_calculator-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device name.
@@ -238,60 +244,70 @@ Options: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-checksum_calculator-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-checksum_calculator-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-checksum_calculator-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-checksum_calculator-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-checksum_calculator-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-checksum_calculator-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_offset"><td><p>RX_OFFSET</p></td>
+<tr class="row-even" id="vhdl-portsignal-checksum_calculator-rx_offset"><td><p>RX_OFFSET</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*OFFSET_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Header offset from SOF POS, valid with SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-checksum_calculator-rx_length"><td><p>RX_LENGTH</p></td>
+<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_length"><td><p>RX_LENGTH</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*LENGTH_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Header length, valid with SOF.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-rx_chsum_en"><td><p>RX_CHSUM_EN</p></td>
+<tr class="row-even" id="vhdl-portsignal-checksum_calculator-rx_chsum_en"><td><p>RX_CHSUM_EN</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Enable checksum calculation, valid with SOF.</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>TX MVB STREAM</p></td>
 <td><p>=====</p></td>
 <td><p>Calculated checksums.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-checksum_calculator-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*16-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>The calculated checksum.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-checksum_calculator-tx_mvb_meta"><td><p>TX_MVB_META</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-checksum_calculator-tx_chsum_bypass"><td><p>TX_CHSUM_BYPASS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
