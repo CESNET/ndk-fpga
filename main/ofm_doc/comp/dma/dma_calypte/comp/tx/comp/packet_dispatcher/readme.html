@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Packet Dispatcher &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" href="../../../../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../../../../" id="documentation_options" src="../../../../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../../../../_static/jquery.js"></script>
+        <script src="../../../../../../../../_static/underscore.js"></script>
+        <script src="../../../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../../../../_static/doctools.js"></script>
+        <script src="../../../../../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../search.html" />
+    <link rel="next" title="Transaction buffer" href="../pcie_trans_buffer/readme.html" />
+    <link rel="prev" title="Channel Start/stop control" href="../chan_start_stop_ctrl/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: af67b2da
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../../pcie.html">PCIe Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/mtc/readme.html">MTC (MI Transaction Controller)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/ptc/readme.html">PTC (PCIe Transaction Controller)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/common/readme.html">PCI_EXT_CAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/logic/byte_count/readme.html">PCIE Byte Count</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/logic/byte_en_decoder/readme.html">PCIe Byte Enable Decoder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#provided-dma-configurations">Provided DMA configurations</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#subcomponents">Subcomponents</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../rx/readme.html">RX DMA Calypte</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">TX DMA Calypte</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../../../../pcie.html">PCIe Tools</a></li>
+          <li class="breadcrumb-item"><a href="../../../../readme.html">DMA Calypte</a></li>
+          <li class="breadcrumb-item"><a href="../../readme.html">TX DMA Calypte</a></li>
+      <li class="breadcrumb-item active">Packet Dispatcher</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../../../../../_sources/ofm_doc/comp/dma/dma_calypte/comp/tx/comp/packet_dispatcher/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="packet-dispatcher">
+<span id="tx-dma-pkt-dispatcher"></span><h1>Packet Dispatcher<a class="headerlink" href="#packet-dispatcher" title="Permalink to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-tx_dma_pkt_dispatcher">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">TX_DMA_PKT_DISPATCHER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-tx_dma_pkt_dispatcher" title="Permalink to this definition"></a></dt>
+<dd><p>This component dispatches the frames from data buffers accoring to available DMA Headers. Frames
+are dispatched from all channels in order in which DMA headers did come from the PCI Express.
+After dispatching a frame, the component issues an update of header and data pointers. If a channel
+is already stopped and DMA header for this channel occurs on the input of this component, this
+DMA header is dropped and no frame data are dispatched to the output as well as no update of
+pointers is issued.</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-channels"><td><p>CHANNELS</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-hdr_meta_width"><td><p>HDR_META_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>24</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
+<td><p>natural</p></td>
+<td><p>2**16 -1</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-data_pointer_width"><td><p>DATA_POINTER_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>16</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-dma_hdr_pointer_width"><td><p>DMA_HDR_POINTER_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>9)</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Outuput MFB interface to user logic</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_meta_hdr_meta"><td><p>USR_MFB_META_HDR_META</p></td>
+<td><p>std_logic_vector(HDR_META_WIDTH -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_meta_chan"><td><p>USR_MFB_META_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_meta_pkt_size"><td><p>USR_MFB_META_PKT_SIZE</p></td>
+<td><p>std_logic_vector(log2(PKT_SIZE_MAX+1) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_sof"><td><p>USR_MFB_SOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_eof"><td><p>USR_MFB_EOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_sof_pos"><td><p>USR_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_eof_pos"><td><p>USR_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_src_rdy"><td><p>USR_MFB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-usr_mfb_dst_rdy"><td><p>USR_MFB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Input interface from header buffer</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-hdr_buff_addr"><td><p>HDR_BUFF_ADDR</p></td>
+<td><p>std_logic_vector(62 -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>This is not an address for reading interface of the buffer, but the addres on which the
+current header has been written.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-hdr_buff_chan"><td><p>HDR_BUFF_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-hdr_buff_data"><td><p>HDR_BUFF_DATA</p></td>
+<td><p>std_logic_vector(DMA_HDR_WIDTH -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-hdr_buff_src_rdy"><td><p>HDR_BUFF_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-hdr_buff_dst_rdy"><td><p>HDR_BUFF_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Reading interface to the data buffer</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-buff_rd_chan"><td><p>BUFF_RD_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-buff_rd_data"><td><p>BUFF_RD_DATA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-buff_rd_addr"><td><p>BUFF_RD_ADDR</p></td>
+<td><p>std_logic_vector(DATA_POINTER_WIDTH -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-buff_rd_en"><td><p>BUFF_RD_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Interface to the software manager</p></td>
+<td><p>=====</p></td>
+<td><p>For pointer update and incrementing of packet counter.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-pkt_sent_chan"><td><p>PKT_SENT_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-pkt_sent_inc"><td><p>PKT_SENT_INC</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-pkt_sent_bytes"><td><p>PKT_SENT_BYTES</p></td>
+<td><p>std_logic_vector(log2(PKT_SIZE_MAX+1) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-enabled_chans"><td><p>ENABLED_CHANS</p></td>
+<td><p>std_logic_vector(CHANNELS -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-upd_hdp_chan"><td><p>UPD_HDP_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-upd_hdp_data"><td><p>UPD_HDP_DATA</p></td>
+<td><p>std_logic_vector(DATA_POINTER_WIDTH -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-upd_hdp_en"><td><p>UPD_HDP_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-upd_hhp_chan"><td><p>UPD_HHP_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-upd_hhp_data"><td><p>UPD_HHP_DATA</p></td>
+<td><p>std_logic_vector(DMA_HDR_POINTER_WIDTH -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-upd_hhp_en"><td><p>UPD_HHP_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../chan_start_stop_ctrl/readme.html" class="btn btn-neutral float-left" title="Channel Start/stop control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../pcie_trans_buffer/readme.html" class="btn btn-neutral float-right" title="Transaction buffer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: bef7f4ea
+                Git branch: main, <br> Git hash: af67b2da
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -69,7 +69,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Bittware IA-420F</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#boot-instructions">Boot instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#boot-instructions-initial">Boot instructions (initial)</a></li>
 </ul>
 </li>
 </ul>
@@ -163,7 +163,7 @@
 </li>
 <li><dl class="simple">
 <dt>Support for booting the NDK firmware using the nfb-boot tool:</dt><dd><ul>
-<li><p>NO, see booting instructions bellow.</p></li>
+<li><p>YES, starting with the nfb-framework version 6.17.1.</p></li>
 </ul>
 </dd>
 </dl>
@@ -174,11 +174,12 @@
 <p>To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro installed, including a valid license.</p>
 </div>
 </section>
-<section id="boot-instructions">
-<h2>Boot instructions<a class="headerlink" href="#boot-instructions" title="Permalink to this heading"></a></h2>
+<section id="boot-instructions-initial">
+<h2>Boot instructions (initial)<a class="headerlink" href="#boot-instructions-initial" title="Permalink to this heading"></a></h2>
+<p>Before you can use the nfb-boot tool, you must write the initial NDK firmware to flash memory using a regular JTAG programmer.</p>
 <ul class="simple">
 <li><p>After the NDK firmware build is complete, you will have a bitstream file called <code class="docutils literal notranslate"><span class="pre">my_bitstream.sof</span></code>.</p></li>
-<li><p>Use the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory&gt;/ndk/cards/ia-420f/scripts/generate_jic.sh</span> <span class="pre">my_bitstream.sof</span></code> command to convert the bitstream file to .jic format for flash memory.</p></li>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory&gt;/ndk/cards/ia-420f/scripts/generate_jic.sh</span> <span class="pre">my_bitstream.sof</span> <span class="pre">my_bitstream.sof</span></code> command to convert the two bitstream files to .jic format for flash memory.</p></li>
 <li><p>On the host PC where the card is connected, write the .jic bitstream to the flash memory with the command <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory&gt;/ndk/cards/ia-420f/scripts/write_jic.sh</span> <span class="pre">my_bitstream.jic</span></code>.</p></li>
 <li><p>You must power off and on the PC to power cycle it completely. Only then is the new NDK firmware loaded into the FPGA.</p></li>
 </ul>

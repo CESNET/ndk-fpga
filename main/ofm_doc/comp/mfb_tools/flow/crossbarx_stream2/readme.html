@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CROSSBARX STREAM2 &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="MFB Frame Masker" href="../frame_masker/readme.html" />
+    <link rel="prev" title="MFB Loopback" href="../loopback/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: af67b2da
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html">MFB Merger Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html#id1">MFB Merger Simple GEN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cutter_simple/readme.html">MFB Cutter Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dropper/readme.html">MFB Dropper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metadata_insertor/readme.html">Metadata Insertor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformer/readme.html">MFB Trasformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipe/readme.html">MFB PIPE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger/readme.html">MFB Merger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html">MFB Splitter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html#id1">MFB Splitter Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enabler/readme.html">MFB Enabler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rate_limiter/readme.html">Rate Limiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../packet_delayer/readme.html">Packet Delayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../timestamp_limiter/readme.html">Timestamp Limiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../loopback/readme.html">MFB Loopback</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CROSSBARX STREAM2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_masker/readme.html">MFB Frame Masker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MFB ASFIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MFB FIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debug/generator/readme.html">MFB Generator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mfb.html">MFB Tools</a></li>
+      <li class="breadcrumb-item active">CROSSBARX STREAM2</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../../_sources/ofm_doc/comp/mfb_tools/flow/crossbarx_stream2/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="crossbarx-stream2">
+<span id="mfb-crossbarx-stream2"></span><h1>CROSSBARX STREAM2<a class="headerlink" href="#crossbarx-stream2" title="Permalink to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_crossbarx_stream2">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_CROSSBARX_STREAM2</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_crossbarx_stream2" title="Permalink to this definition"></a></dt>
+<dd><p>The MFB_CROSSBARX_STREAM2 module uses data copying between two buffers to
+rearrange packets on the MFB bus. It modifies
+(extends/trims at the beginning or end) and discards selected packets.
+The user must ensure that the final packet length is not less than 60B.
+Future features include the support for multiple input streams (merging)
+and packet duplication.</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-mfb_crossbarx_stream2-in_streams"><td><p>IN_STREAMS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>IN_STREAMS must be 1 for now!!!</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_crossbarx_stream2-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>The number of MFB regions</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_crossbarx_stream2-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>MFB region size in blocks, must be power of two</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_crossbarx_stream2-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>MFB block size in items, must be 8</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_crossbarx_stream2-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>MFB item size in bits, must be 8</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_crossbarx_stream2-pkt_mtu"><td><p>PKT_MTU</p></td>
+<td><p>natural</p></td>
+<td><p>2**14</p></td>
+<td><p>Maximum size of a MFB frame (in bytes)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_crossbarx_stream2-pkt_id_width"><td><p>PKT_ID_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>10</p></td>
+<td><p>The width determines the total number of packet IDs
+that the component can handle simultaneously</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_crossbarx_stream2-mod_width"><td><p>MOD_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>7</p></td>
+<td><p>The width determines the maximum size of packet modifications</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_crossbarx_stream2-usermeta_width"><td><p>USERMETA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Width of User Metadata information</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_crossbarx_stream2-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“AGILEX”</p></td>
+<td><p>Target device: AGILEX, STRATIX10, ULTRASCALE,…</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Resets inputs</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-clk_x2"><td><p>CLK_X2</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX MFB+MVB interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_usermeta"><td><p>RX_MVB_USERMETA</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*USERMETA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_discard"><td><p>RX_MVB_DISCARD</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Flag specifying packets to drop</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_mod_sof_size"><td><p>RX_MVB_MOD_SOF_SIZE</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MOD_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Size of packet SOF expansion/truncation in MFB items, valid with <code class="docutils literal notranslate"><span class="pre">RX_MVB_MOD_SOF_EN</span></code></p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_mod_sof_type"><td><p>RX_MVB_MOD_SOF_TYPE</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>SOF packet modification type: 0 = expansion, 1 = truncation, valid with <code class="docutils literal notranslate"><span class="pre">RX_MVB_MOD_SOF_EN</span></code></p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_mod_sof_en"><td><p>RX_MVB_MOD_SOF_EN</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Enable modification of Start of Packet (SOF)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_mod_eof_size"><td><p>RX_MVB_MOD_EOF_SIZE</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MOD_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Size of packet EOF expansion/truncation in MFB items, valid with <code class="docutils literal notranslate"><span class="pre">RX_MVB_MOD_EOF_EN</span></code></p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_mod_eof_type"><td><p>RX_MVB_MOD_EOF_TYPE</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>EOF packet modification type: 0 = expansion, 1 = truncation, valid with <code class="docutils literal notranslate"><span class="pre">RX_MVB_MOD_EOF_EN</span></code></p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_mod_eof_en"><td><p>RX_MVB_MOD_EOF_EN</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Enable modification of End of Packet (EOF)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(IN_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(IN_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<td><p>slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(IN_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(IN_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX MFB+MVB interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mvb_usermeta"><td><p>TX_MVB_USERMETA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_crossbarx_stream2-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../loopback/readme.html" class="btn btn-neutral float-left" title="MFB Loopback" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../frame_masker/readme.html" class="btn btn-neutral float-right" title="MFB Frame Masker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

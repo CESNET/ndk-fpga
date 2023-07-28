@@ -23,11 +23,66 @@ The Memory Testers
 
 The NDK-based Minimal application also contains :ref:`Memory Tester <mem_tester>` modules connected to external memory controllers. These modules make it easy to test the operation of external memories and measure their properties (throughput, latency). The Avalon-MM bus is used to access the external memory, see `Avalon Interface Specifications <https://www.intel.com/content/www/us/en/docs/programmable/683091/>`_.
 
-The source code for the Memory Tester control tool is available in the ``<NDK-APP-XXX_root_directory>/ndk/ofm/comp/debug/mem_tester/sw`` folder.
+**How to run Memory Tester:**
 
-- First, the source code must be compiled using the ``make`` command.
-- Then all external memory tests can be run using the ``./mem_tester -t all`` command.
-- You can also run tests with the Python helper script and generate a PDF report with the test results: ``python3 report_gen.py``.
+- The RPM package ``python3-nfb`` is required and you can obtain it from the `@CESNET/nfb-framework COPR repository <https://copr.fedorainfracloud.org/coprs/g/CESNET/nfb-framework/>`_.
+- Install ``data_logger`` python package from source code using the following commands...
+- ``cd <NDK-APP-XXX_root_directory>/ndk/ofm/comp/debug/data_logger/sw``
+- ``python3 setup.py install --user``
+- Then go to the mem tester tool directory...
+- ``cd <NDK-APP-XXX_root_directory>/ndk/ofm/comp/debug/mem_tester/sw``
+- Then external memory test can be run using the ``python3 mem_tester.py`` command.
+
+**Example output of Memory Tester:**
+
+.. code-block::
+
+    $ python3 mem_tester.py
+    || ------------------- ||
+    || TEST WAS SUCCESSFUL ||
+    || ------------------- ||
+
+    Mem_logger statistics:
+    ----------------------
+    write requests       33554431        
+      write words        134217724       
+    read requests        33554431        
+      requested words    134217724       
+      received words     134217724       
+    Flow:
+      write               160.78 [Gb/s]
+      read                161.68 [Gb/s]
+      total               161.23 [Gb/s]
+    Time:
+      write               427.42 [ms]
+      read                425.04 [ms]
+      total               852.46 [ms]
+    Latency:
+      min                 96.00 [ns]
+      max                 555.00 [ns]
+      avg                 131.56 [ns]
+      histogram [ns]:
+        93.4 - 117.5 ... 12613618        
+        117.5 - 141.6 ... 13893635        
+        141.6 - 165.7 ... 6618217         
+        503.0 - 527.1 ... 74899           
+        527.1 - 551.2 ... 265549          
+        551.2 - 575.3 ... 88513           
+    Errors:
+      zero burst count   0               
+      simultaneous r+w   0               
+    Paralel reads count:
+      min                0               
+      max                13              
+      avg                 10.83 
+        0.0 -   4.0 ... 4               
+        4.0 -   8.0 ... 27238           
+        8.0 -  12.0 ... 4294967295      
+        12.0 -  16.0 ... 13345442        
+
+.. note::
+
+    See the :ref:`Memory Tester <mem_tester>` module documentation for a more detailed description.
 
 The example of MI offsets
 *************************

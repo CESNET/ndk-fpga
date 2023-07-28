@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data logger &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Mem logger" href="mem_logger/readme.html" />
+    <link rel="prev" title="Latency meter" href="../latency_meter/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: af67b2da
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../debug.html">Debug Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../mem_tester/readme.html">DDR4 Memory Tester</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../histogramer/readme.html">Histogramer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../latency_meter/readme.html">Latency meter</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data logger</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#key-features">Key features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-logger-warping-component">Data logger warping component</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mem_logger/readme.html">Mem logger</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#component-port-and-generics-description">Component port and generics description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instance-template-simple-usage">Instance template (simple usage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instance-template-full-usage">Instance template (full usage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#control-sw">Control SW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mi-address-space">MI address space</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../debug.html">Debug Tools</a></li>
+      <li class="breadcrumb-item active">Data logger</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/ofm_doc/comp/debug/data_logger/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-logger">
+<span id="id1"></span><h1>Data logger<a class="headerlink" href="#data-logger" title="Permalink to this heading"></a></h1>
+<p>Data logger is used to log statistics about a specific events and make them available on the MI bus.
+Simple usage can be seen in <a class="reference internal" href="mem_logger/readme.html#mem-logger"><span class="std std-ref">MEM_LOGGER</span></a> component.</p>
+<section id="key-features">
+<h2>Key features<a class="headerlink" href="#key-features" title="Permalink to this heading"></a></h2>
+<ul>
+<li><p>Counter interface</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Each counter interface contains a counter that can count
+the number of occurrences of a specific event, the number of clock cycles of a event, …</p></li>
+<li><p>The number of used counter interfaces is set via generic parameters</p></li>
+<li><p>Width is common for every counter and can be set to any value (even larger than MI bus width)</p></li>
+<li><p>If the counter should overflow, it will stay at the maximum possible value</p></li>
+<li><p>Custom increment value can be used (default: 1)</p></li>
+<li><p>Counter submit signal can be used to submit (save) counter value at a specific time
+(for example if you can’t determine when the event ends)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Value interface</p>
+<blockquote>
+<div><ul>
+<li><p>Each value interface can calculate:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Minimal and maximal occurred value</p></li>
+<li><p>Sum and count of all occurred values (SW can then calculate average value)</p></li>
+<li><p>Histogram with custom box count and box with (see <a class="reference internal" href="../histogramer/readme.html#histogramer"><span class="std std-ref">HISTOGRAMER</span></a>)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>The number of used value interfaces is set via generic parameters</p></li>
+<li><p>Each value interface can have different width</p></li>
+<li><p>Each statistic can be enabled or disabled separately for each interface (to reduce resources)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Control interface</p>
+<blockquote>
+<div><ul>
+<li><p>Can be used for custom configuration or status flags and values</p></li>
+<li><p>There is a control output interface and a control input interface</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>CTRLO = output from <cite>DATA_LOGGER</cite></p></li>
+<li><p>CTRLI = input to <cite>DATA_LOGGER</cite></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Each interface can have a custom width (for width 0 is disabled)</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="data-logger-warping-component">
+<h2>Data logger warping component<a class="headerlink" href="#data-logger-warping-component" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mem_logger/readme.html">Mem logger</a></li>
+</ul>
+</div>
+</section>
+<section id="component-port-and-generics-description">
+<h2>Component port and generics description<a class="headerlink" href="#component-port-and-generics-description" title="Permalink to this heading"></a></h2>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-data_logger">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">DATA_LOGGER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-data_logger" title="Permalink to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-data_logger-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-data_logger-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-data_logger-cnter_cnt"><td><p>CNTER_CNT</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-data_logger-value_cnt"><td><p>VALUE_CNT</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-data_logger-ctrlo_width"><td><p>CTRLO_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-data_logger-ctrli_width"><td><p>CTRLI_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-data_logger-cnter_width"><td><p>CNTER_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>MI_DATA_WIDTH</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-data_logger-value_width"><td><p>VALUE_WIDTH</p></td>
+<td><p>i_array_t(max(VALUE_CNT - 1, 0) downto 0)</p></td>
+<td><p>(others =&gt; 0)</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-data_logger-min_en"><td><p>MIN_EN</p></td>
+<td><p>b_array_t(max(VALUE_CNT - 1, 0) downto 0)</p></td>
+<td><p>(others =&gt; true)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-data_logger-max_en"><td><p>MAX_EN</p></td>
+<td><p>b_array_t(max(VALUE_CNT - 1, 0) downto 0)</p></td>
+<td><p>(others =&gt; true)</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-data_logger-sum_en"><td><p>SUM_EN</p></td>
+<td><p>b_array_t(max(VALUE_CNT - 1, 0) downto 0)</p></td>
+<td><p>(others =&gt; true)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-data_logger-hist_en"><td><p>HIST_EN</p></td>
+<td><p>b_array_t(max(VALUE_CNT - 1, 0) downto 0)</p></td>
+<td><p>(others =&gt; false)</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-data_logger-sum_extra_width"><td><p>SUM_EXTRA_WIDTH</p></td>
+<td><p>i_array_t(max(VALUE_CNT - 1, 0) downto 0)</p></td>
+<td><p>(others =&gt; 16)</p></td>
+<td><p>How many bits add to VALUE_WIDTH to form SUM register width</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-data_logger-hist_box_cnt"><td><p>HIST_BOX_CNT</p></td>
+<td><p>i_array_t(max(VALUE_CNT - 1, 0) downto 0)</p></td>
+<td><p>(others =&gt; 0)</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-data_logger-hist_box_width"><td><p>HIST_BOX_WIDTH</p></td>
+<td><p>i_array_t(max(VALUE_CNT - 1, 0) downto 0)</p></td>
+<td><p>(others =&gt; 0)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-data_logger-ctrlo_default"><td><p>CTRLO_DEFAULT</p></td>
+<td><p>std_logic_vector(max(CTRLO_WIDTH - 1, 0) downto 0)</p></td>
+<td><p>(others =&gt; ‘0’)</p></td>
+<td><p>Default value of control output instrface</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-data_logger-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-data_logger-rst"><td><p>RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-data_logger-rst_done"><td><p>RST_DONE</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-data_logger-sw_rst"><td><p>SW_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>SW reset was performed on data_logger</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>CONTROL INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-data_logger-ctrlo"><td><p>CTRLO</p></td>
+<td><p>std_logic_vector(max(CTRLO_WIDTH - 1, 0) downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-data_logger-ctrli"><td><p>CTRLI</p></td>
+<td><p>std_logic_vector(max(CTRLI_WIDTH - 1, 0) downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>COUNTERS INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-data_logger-cnters_incr"><td><p>CNTERS_INCR</p></td>
+<td><p>std_logic_vector(max(CNTER_CNT - 1, 0) downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-data_logger-cnters_submit"><td><p>CNTERS_SUBMIT</p></td>
+<td><p>std_logic_vector(max(CNTER_CNT - 1, 0) downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Cnt is incremented in the TMP reg and is submited only when SUMBIT = 1</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-data_logger-cnters_diff"><td><p>CNTERS_DIFF</p></td>
+<td><p>slv_array_t(max(CNTER_CNT - 1, 0) downto 0)(CNTER_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>VALUE INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-data_logger-values_vld"><td><p>VALUES_VLD</p></td>
+<td><p>std_logic_vector(max(VALUE_CNT - 1, 0) downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-data_logger-values"><td><p>VALUES</p></td>
+<td><p>std_logic_vector(max(sum(VALUE_WIDTH) - 1, 0) downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MI bus interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-data_logger-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-data_logger-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(MI_ADDR_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-data_logger-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH / 8 - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-data_logger-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-data_logger-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-data_logger-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-data_logger-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-data_logger-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="instance-template-simple-usage">
+<h2>Instance template (simple usage)<a class="headerlink" href="#instance-template-simple-usage" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_logger_i</span> <span class="p">:</span> <span class="n">entity</span> <span class="n">work</span><span class="o">.</span><span class="n">DATA_LOGGER</span>
+<span class="n">generic</span> <span class="nb">map</span> <span class="p">(</span>
+    <span class="n">MI_DATA_WIDTH</span>       <span class="o">=&gt;</span> <span class="n">MI_DATA_WIDTH</span>  <span class="p">,</span>
+    <span class="n">MI_ADDR_WIDTH</span>       <span class="o">=&gt;</span> <span class="n">MI_ADDR_WIDTH</span>  <span class="p">,</span>
+
+    <span class="n">CNTER_CNT</span>           <span class="o">=&gt;</span> <span class="n">CNTER_CNT</span>      <span class="p">,</span>
+    <span class="n">CNTER_WIDTH</span>         <span class="o">=&gt;</span> <span class="n">CNTER_WIDTH</span>
+<span class="p">)</span>
+<span class="n">port</span> <span class="nb">map</span> <span class="p">(</span>
+    <span class="n">CLK</span>                 <span class="o">=&gt;</span> <span class="n">CLK</span>     <span class="p">,</span>
+    <span class="n">RST</span>                 <span class="o">=&gt;</span> <span class="n">RST</span>     <span class="p">,</span>
+
+    <span class="n">CNTERS_INCR</span>         <span class="o">=&gt;</span> <span class="p">(</span>
+        <span class="n">cnter_incr_2</span><span class="p">,</span>
+        <span class="n">cnter_incr_1</span><span class="p">,</span>
+        <span class="n">cnter_incr_0</span>
+    <span class="p">),</span>
+
+    <span class="n">MI_DWR</span>              <span class="o">=&gt;</span> <span class="n">mi_dwr</span>  <span class="p">,</span>
+    <span class="n">MI_ADDR</span>             <span class="o">=&gt;</span> <span class="n">mi_addr</span> <span class="p">,</span>
+    <span class="n">MI_BE</span>               <span class="o">=&gt;</span> <span class="n">mi_be</span>   <span class="p">,</span>
+    <span class="n">MI_RD</span>               <span class="o">=&gt;</span> <span class="n">mi_rd</span>   <span class="p">,</span>
+    <span class="n">MI_WR</span>               <span class="o">=&gt;</span> <span class="n">mi_wr</span>   <span class="p">,</span>
+    <span class="n">MI_ARDY</span>             <span class="o">=&gt;</span> <span class="n">mi_ardy</span> <span class="p">,</span>
+    <span class="n">MI_DRD</span>              <span class="o">=&gt;</span> <span class="n">mi_drd</span>  <span class="p">,</span>
+    <span class="n">MI_DRDY</span>             <span class="o">=&gt;</span> <span class="n">mi_drdy</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="instance-template-full-usage">
+<h2>Instance template (full usage)<a class="headerlink" href="#instance-template-full-usage" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_logger_i</span> <span class="p">:</span> <span class="n">entity</span> <span class="n">work</span><span class="o">.</span><span class="n">DATA_LOGGER</span>
+<span class="n">generic</span> <span class="nb">map</span> <span class="p">(</span>
+    <span class="n">MI_DATA_WIDTH</span>       <span class="o">=&gt;</span> <span class="n">MI_DATA_WIDTH</span>  <span class="p">,</span>
+    <span class="n">MI_ADDR_WIDTH</span>       <span class="o">=&gt;</span> <span class="n">MI_ADDR_WIDTH</span>  <span class="p">,</span>
+
+    <span class="n">CNTER_CNT</span>           <span class="o">=&gt;</span> <span class="n">CNTER_CNT</span>      <span class="p">,</span>
+    <span class="n">VALUE_CNT</span>           <span class="o">=&gt;</span> <span class="n">VALUE_CNT</span>      <span class="p">,</span>
+
+    <span class="n">CTRLO_WIDTH</span>         <span class="o">=&gt;</span> <span class="n">CTRLO_WIDTH</span>    <span class="p">,</span>
+    <span class="n">CTRLI_WIDTH</span>         <span class="o">=&gt;</span> <span class="n">CTRLI_WIDTH</span>    <span class="p">,</span>
+    <span class="n">CNTER_WIDTH</span>         <span class="o">=&gt;</span> <span class="n">CNTER_WIDTH</span>    <span class="p">,</span>
+    <span class="n">VALUE_WIDTH</span>         <span class="o">=&gt;</span> <span class="n">VALUE_WIDTH</span>    <span class="p">,</span>
+
+    <span class="n">MIN_EN</span>              <span class="o">=&gt;</span> <span class="n">MIN_EN</span>         <span class="p">,</span>
+    <span class="n">MAX_EN</span>              <span class="o">=&gt;</span> <span class="n">MAX_EN</span>         <span class="p">,</span>
+    <span class="n">SUM_EN</span>              <span class="o">=&gt;</span> <span class="n">SUM_EN</span>         <span class="p">,</span>
+    <span class="n">HIST_EN</span>             <span class="o">=&gt;</span> <span class="n">HIST_EN</span>        <span class="p">,</span>
+
+    <span class="n">SUM_EXTRA_WIDTH</span>     <span class="o">=&gt;</span> <span class="n">SUM_EXTRA_WIDTH</span><span class="p">,</span>
+    <span class="n">HIST_BOX_CNT</span>        <span class="o">=&gt;</span> <span class="n">HIST_BOX_CNT</span>   <span class="p">,</span>
+    <span class="n">HIST_BOX_WIDTH</span>      <span class="o">=&gt;</span> <span class="n">HIST_BOX_WIDTH</span> <span class="p">,</span>
+    <span class="n">CTRLO_DEFAULT</span>       <span class="o">=&gt;</span> <span class="n">CTRLO_DEFAULT</span>
+<span class="p">)</span>
+<span class="n">port</span> <span class="nb">map</span> <span class="p">(</span>
+    <span class="n">CLK</span>                 <span class="o">=&gt;</span> <span class="n">CLK</span>     <span class="p">,</span>
+    <span class="n">RST</span>                 <span class="o">=&gt;</span> <span class="n">RST</span>     <span class="p">,</span>
+    <span class="n">RST_DONE</span>            <span class="o">=&gt;</span> <span class="n">rst_done</span><span class="p">,</span>
+    <span class="n">SW_RST</span>              <span class="o">=&gt;</span> <span class="n">sw_rst</span>  <span class="p">,</span>
+
+    <span class="n">CTRLO</span>               <span class="o">=&gt;</span> <span class="n">ctrlo</span>   <span class="p">,</span>
+    <span class="n">CTRLI</span>               <span class="o">=&gt;</span> <span class="n">ctrli</span>   <span class="p">,</span>
+
+    <span class="n">CNTERS_INCR</span>         <span class="o">=&gt;</span> <span class="p">(</span>
+        <span class="n">cnter_incr_2</span><span class="p">,</span>
+        <span class="n">cnter_incr_1</span><span class="p">,</span>
+        <span class="n">cnter_incr_0</span>
+    <span class="p">),</span>
+    <span class="n">CNTERS_DIFF</span>         <span class="o">=&gt;</span> <span class="p">(</span>
+        <span class="n">cnter_diff_2</span> <span class="o">&amp;</span>
+        <span class="n">cnter_diff_1</span> <span class="o">&amp;</span>
+        <span class="n">cnter_diff_0</span>
+    <span class="p">),</span>
+    <span class="n">CNTERS_SUBMIT</span>       <span class="o">=&gt;</span> <span class="p">(</span>
+        <span class="n">cnter_submit_2</span><span class="p">,</span>
+        <span class="n">cnter_submit_1</span><span class="p">,</span>
+        <span class="n">cnter_submit_0</span>
+    <span class="p">),</span>
+
+    <span class="n">VALUES_VLD</span>          <span class="o">=&gt;</span> <span class="p">(</span>
+        <span class="n">value_vld_2</span><span class="p">,</span>
+        <span class="n">value_vld_1</span><span class="p">,</span>
+        <span class="n">value_vld_0</span>
+    <span class="p">),</span>
+    <span class="n">VALUES</span>              <span class="o">=&gt;</span> <span class="p">(</span>
+        <span class="n">value_2</span> <span class="o">&amp;</span>
+        <span class="n">value_1</span> <span class="o">&amp;</span>
+        <span class="n">value_0</span>
+    <span class="p">),</span>
+
+    <span class="n">MI_DWR</span>              <span class="o">=&gt;</span> <span class="n">mi_dwr</span>  <span class="p">,</span>
+    <span class="n">MI_ADDR</span>             <span class="o">=&gt;</span> <span class="n">mi_addr</span> <span class="p">,</span>
+    <span class="n">MI_BE</span>               <span class="o">=&gt;</span> <span class="n">mi_be</span>   <span class="p">,</span>
+    <span class="n">MI_RD</span>               <span class="o">=&gt;</span> <span class="n">mi_rd</span>   <span class="p">,</span>
+    <span class="n">MI_WR</span>               <span class="o">=&gt;</span> <span class="n">mi_wr</span>   <span class="p">,</span>
+    <span class="n">MI_ARDY</span>             <span class="o">=&gt;</span> <span class="n">mi_ardy</span> <span class="p">,</span>
+    <span class="n">MI_DRD</span>              <span class="o">=&gt;</span> <span class="n">mi_drd</span>  <span class="p">,</span>
+    <span class="n">MI_DRDY</span>             <span class="o">=&gt;</span> <span class="n">mi_drdy</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="control-sw">
+<h2>Control SW<a class="headerlink" href="#control-sw" title="Permalink to this heading"></a></h2>
+<p>Folder <code class="docutils literal notranslate"><span class="pre">data_logger/sw/</span></code> contains <code class="docutils literal notranslate"><span class="pre">Python3</span></code> package that provides:</p>
+<ul class="simple">
+<li><p>Module for basic interaction with <code class="docutils literal notranslate"><span class="pre">DATA_LOGGER</span></code></p></li>
+<li><p>Modules for <code class="docutils literal notranslate"><span class="pre">DATA_LOGGER</span></code> wraps like <code class="docutils literal notranslate"><span class="pre">MEM_LOGGER</span></code></p></li>
+<li><p>Simple graph generator based on <cite>matplotlib</cite> library</p></li>
+<li><p>Simple PDF / Markdown report generator</p></li>
+<li><p>Common tools</p></li>
+</ul>
+<p>Package can be installed using this command:</p>
+<ul class="simple">
+<li><p>You also need to install <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">nfb</span></code> package</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">data_logger</span><span class="o">/</span><span class="n">sw</span>
+<span class="n">python3</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span>
+</pre></div>
+</div>
+</section>
+<section id="mi-address-space">
+<h2>MI address space<a class="headerlink" href="#mi-address-space" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x0000</span><span class="p">:</span> <span class="n">CTRL</span> <span class="n">REG</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="n">sw</span> <span class="n">rst</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="n">rst</span> <span class="n">done</span>
+<span class="mh">0x0004</span><span class="p">:</span> <span class="n">STATS</span> <span class="n">REG</span>
+<span class="mh">0x0008</span><span class="p">:</span> <span class="n">INDEX</span> <span class="n">REG</span>
+<span class="mh">0x000C</span><span class="p">:</span> <span class="n">SLICE</span> <span class="n">REG</span>
+<span class="mh">0x0010</span><span class="p">:</span> <span class="n">HIST</span> <span class="n">REG</span>
+<span class="mh">0x0014</span><span class="p">:</span> <span class="n">VALUE</span> <span class="n">REG</span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">CTRL</span> <span class="pre">REG</span></code> … configuration bits</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATS</span> <span class="pre">REG</span></code> … selects statistics</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code> … <code class="docutils literal notranslate"><span class="pre">CNTER_CNT</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> … <code class="docutils literal notranslate"><span class="pre">VALUE_CNT</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code> … <code class="docutils literal notranslate"><span class="pre">MI_DATA_WIDTH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">3</span></code> … <code class="docutils literal notranslate"><span class="pre">CTRLO_WIDTH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">4</span></code> … <code class="docutils literal notranslate"><span class="pre">CTRLI_WIDTH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">5</span></code> … <code class="docutils literal notranslate"><span class="pre">CNTER_WIDTH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">6</span></code> … <code class="docutils literal notranslate"><span class="pre">VALUE_WIDTH</span> <span class="pre">(i)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">7</span></code> … <code class="docutils literal notranslate"><span class="pre">VALUE_ENs</span> <span class="pre">(i)</span></code></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>…. <code class="docutils literal notranslate"><span class="pre">MIN_EN</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code>…. <code class="docutils literal notranslate"><span class="pre">MAX_EN</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">2</span></code>…. <code class="docutils literal notranslate"><span class="pre">SUM_EN</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">3</span></code>…. <code class="docutils literal notranslate"><span class="pre">HIST_EN</span></code></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> … <code class="docutils literal notranslate"><span class="pre">SUM_EXTRA_WIDTH</span> <span class="pre">(i)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">9</span></code> … <code class="docutils literal notranslate"><span class="pre">HIST_BOX_CNT</span> <span class="pre">(i)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">10</span></code>… <code class="docutils literal notranslate"><span class="pre">HIST_BOX_WIDTH</span> <span class="pre">(i)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">11</span></code>… <code class="docutils literal notranslate"><span class="pre">ctrlo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">12</span></code>… <code class="docutils literal notranslate"><span class="pre">ctrli</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">13</span></code>… <code class="docutils literal notranslate"><span class="pre">cnter</span> <span class="pre">value</span> <span class="pre">(i)</span></code></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Also use for value interface counters (<code class="docutils literal notranslate"><span class="pre">CNTER_CNT</span> <span class="pre">+</span> <span class="pre">VALUE_CNT</span></code> counters)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">14</span></code>… <code class="docutils literal notranslate"><span class="pre">value</span> <span class="pre">min</span>&#160; <span class="pre">(i)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">15</span></code>… <code class="docutils literal notranslate"><span class="pre">value</span> <span class="pre">max</span>&#160; <span class="pre">(i)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code>… <code class="docutils literal notranslate"><span class="pre">value</span> <span class="pre">sum</span>&#160; <span class="pre">(i)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">17</span></code>… <code class="docutils literal notranslate"><span class="pre">value</span> <span class="pre">hist</span> <span class="pre">(i)</span></code></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">INDEX</span> <span class="pre">REG</span></code>… selects value for multi-value statistics <cite>(i)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SLICE</span> <span class="pre">REG</span></code>… selects MI width slice for statistics with larger data width</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HIST</span> <span class="pre">REG</span></code>… selects histogram box (write to this register will initiate read request to <cite>HISTOGRAMMER</cite>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VALUE</span> <span class="pre">REG</span></code>… register with the requested value</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../latency_meter/readme.html" class="btn btn-neutral float-left" title="Latency meter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mem_logger/readme.html" class="btn btn-neutral float-right" title="Mem logger" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

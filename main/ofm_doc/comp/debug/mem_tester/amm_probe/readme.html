@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: bef7f4ea
+                Git branch: main, <br> Git hash: af67b2da
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -80,16 +80,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../debug.html">Debug Tools</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../readme.html">DDR4 Memory Tester</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#key-features">Key features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#component-port-and-generics-description">Component port and generics description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#control-sw">Control SW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#pytest-sw">Pytest SW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#pdf-report-generator-sw">PDF report generator SW</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readme.html#internal-architecture">Internal Architecture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readme.html#mi-bus-control">MI Bus Control</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../readme.html#sub-components">Sub-components</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../amm_gen/readme.html">AMM_GEN</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">AMM_PROBE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../sw/readme.html">MEM_TESTER Software</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#software">Software</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../histogramer/readme.html">Histogramer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../latency_meter/readme.html">Latency meter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../data_logger/readme.html">Data logger</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
@@ -123,6 +132,10 @@
              
   <section id="amm-probe">
 <span id="id1"></span><h1>AMM_PROBE<a class="headerlink" href="#amm-probe" title="Permalink to this heading"></a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>AMM_PROBE is now depreciated and <a class="reference internal" href="../../data_logger/mem_logger/readme.html#mem-logger"><span class="std std-ref">MEM_LOGGER</span></a> should be used!</p>
+</div>
 <p>AMM_PROBE listens to the AMM bus and measures:</p>
 <ul class="simple">
 <li><p>Written / read AMM words and read requests count</p></li>

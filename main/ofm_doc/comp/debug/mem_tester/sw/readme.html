@@ -20,7 +20,7 @@
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
-    <link rel="next" title="UVM Verification" href="../../../../ver.html" />
+    <link rel="next" title="Histogramer" href="../../histogramer/readme.html" />
     <link rel="prev" title="AMM_PROBE" href="../amm_probe/readme.html" /> 
 </head>
 
@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: bef7f4ea
+                Git branch: main, <br> Git hash: af67b2da
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -80,15 +80,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../debug.html">Debug Tools</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../readme.html">DDR4 Memory Tester</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#key-features">Key features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#component-port-and-generics-description">Component port and generics description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#control-sw">Control SW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#pytest-sw">Pytest SW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#pdf-report-generator-sw">PDF report generator SW</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readme.html#internal-architecture">Internal Architecture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../readme.html#mi-bus-control">MI Bus Control</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#sub-components">Sub-components</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../readme.html#software">Software</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../readme.html#sub-components">Sub-components</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../amm_gen/readme.html">AMM_GEN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../amm_probe/readme.html">AMM_PROBE</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">MEM_TESTER Software</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../readme.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../histogramer/readme.html">Histogramer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../latency_meter/readme.html">Latency meter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../data_logger/readme.html">Data logger</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
@@ -122,6 +132,10 @@
              
   <section id="mem-tester-software">
 <span id="mem-tester-sw"></span><h1>MEM_TESTER Software<a class="headerlink" href="#mem-tester-software" title="Permalink to this heading"></a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>mem_tester C SW is now depreciated - use python version</p>
+</div>
 <section id="c-program">
 <h2>C Program<a class="headerlink" href="#c-program" title="Permalink to this heading"></a></h2>
 <p><strong>Most Need Arguments</strong></p>
@@ -179,7 +193,7 @@ including raw data and graphs: <code class="docutils literal notranslate"><span 
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../amm_probe/readme.html" class="btn btn-neutral float-left" title="AMM_PROBE" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../../../../ver.html" class="btn btn-neutral float-right" title="UVM Verification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../../histogramer/readme.html" class="btn btn-neutral float-right" title="Histogramer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

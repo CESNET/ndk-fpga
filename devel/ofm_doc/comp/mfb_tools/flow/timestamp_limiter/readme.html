@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: af67b2da
+                Git branch: devel, <br> Git hash: c0ae043c
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -152,6 +152,28 @@
 The incoming packets are split into queues (e.g., per each DMA Channel), where the order of packets is kept the same.
 Then in each Queue, the MFB Packet Delayer component outputs each packet when the time is right.
 Finally, the packets from all Queues are merged back into a single stream (no order is kept here).</p>
+<p>The MI interface enables the user to reset Time in the Packet Delayers.
+This is useful when using the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">Timestamp</span> <span class="pre">format</span> <span class="pre">1</span></code>,
+where the time is being incremented in each clock cycle since the very first packet after boot/reset passes through.
+You can simply reset all Packet Delayers (all Queues) by setting the MI_RESET_REG register, or you can
+select specific Queues by setting the MI_SEL_QUEUE_REG register before setting the MI_RESET_REG register.
+After writing a <strong>1</strong> to the MI_RESET_REG register to issue the reset, its value automatically returns back to <strong>0</strong>.</p>
+<p><strong>MI address space</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address offset</p></th>
+<th class="head"><p>MI Register</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0x00</p></td>
+<td><p>Reset register (write only)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x04</p></td>
+<td><p>Select Queues for reset register</p></td>
+</tr>
+</tbody>
+</table>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -186,9 +208,19 @@ Finally, the packets from all Queues are merged back into a single stream (no or
 <td><p>0</p></td>
 <td><p>Metadata width (in bits).</p></td>
 </tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-clk_frequency"><td><p>CLK_FREQUENCY</p></td>
 <td><p>natural</p></td>
-<td><p>322265625</p></td>
+<td><p>200000000</p></td>
 <td><p>Freq of the CLK signal (in Hz).</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-timestamp_width"><td><p>TIMESTAMP_WIDTH</p></td>
@@ -202,28 +234,21 @@ Finally, the packets from all Queues are merged back into a single stream (no or
 <td><p>Format of Timestamps. Options:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">0</span></code> number of NS between individual packets,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> number of NS from RESET. WIP, not used yet</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> number of NS from RESET.</p></li>
 </ul>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-autoreset_timeout"><td><p>AUTORESET_TIMEOUT</p></td>
-<td><p>natural</p></td>
-<td><p>1000000</p></td>
-<td><p>Number of NS(?) in IDLE state until scheduling an autoreset.
-Autoreset (Only for TS_FORMAT=1?) will reset accumulated time from the prev RESET with the next SOF.
-WIP, not used yet</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-buffer_size"><td><p>BUFFER_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-buffer_size"><td><p>BUFFER_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>2048</p></td>
 <td><p>Number of Items in the Packet Delayer’s RX FIFO (the main buffer).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-queues"><td><p>QUEUES</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-queues"><td><p>QUEUES</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>The number of Queues (DMA Channels).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
@@ -354,10 +379,66 @@ WIP, not used yet</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MI INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Not supported!</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 </dd></dl>
 
+<span class="sig-name descname">Constants</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Constant</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
 <section id="block-diagram">
 <h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/timestamp_limiter_diagram.drawio.svg" id="timestamp-limiter-diagram"><img alt="" class="align-center" id="timestamp-limiter-diagram" src="../../../../../_images/timestamp_limiter_diagram.drawio.svg" width="60%" /></a>

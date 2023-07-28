@@ -56,6 +56,7 @@ Allows setting type of memory (LUT, BRAM, URAM) or automatic mode. Optimized for
    :hidden:
           
    comp/base/mem/np_lutram/readme
+   comp/base/mem/sdp_bram/readme
 ..   comp/base/mem/<something>
              
 References

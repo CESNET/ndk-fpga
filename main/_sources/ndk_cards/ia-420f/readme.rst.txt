@@ -27,17 +27,19 @@ NDK firmware support
     - Use ``make 25g8`` command for firmware with 8x25GE.
     - Use ``make 10g8`` command for firmware with 8x10GE.
 - Support for booting the NDK firmware using the nfb-boot tool:
-    - NO, see booting instructions bellow.
+    - YES, starting with the nfb-framework version 6.17.1.
 
 .. note::
 
     To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro installed, including a valid license.
 
-Boot instructions
-^^^^^^^^^^^^^^^^^
+Boot instructions (initial)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Before you can use the nfb-boot tool, you must write the initial NDK firmware to flash memory using a regular JTAG programmer.
 
 - After the NDK firmware build is complete, you will have a bitstream file called ``my_bitstream.sof``.
-- Use the ``<NDK-APP_root_directory>/ndk/cards/ia-420f/scripts/generate_jic.sh my_bitstream.sof`` command to convert the bitstream file to .jic format for flash memory.
+- Use the ``<NDK-APP_root_directory>/ndk/cards/ia-420f/scripts/generate_jic.sh my_bitstream.sof my_bitstream.sof`` command to convert the two bitstream files to .jic format for flash memory.
 - On the host PC where the card is connected, write the .jic bitstream to the flash memory with the command ``<NDK-APP_root_directory>/ndk/cards/ia-420f/scripts/write_jic.sh my_bitstream.jic``.
 - You must power off and on the PC to power cycle it completely. Only then is the new NDK firmware loaded into the FPGA.
 

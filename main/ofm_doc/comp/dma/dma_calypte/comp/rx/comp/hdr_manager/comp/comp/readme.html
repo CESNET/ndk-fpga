@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: bef7f4ea
+                Git branch: main, <br> Git hash: af67b2da
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../../../search.html" method="get">
@@ -83,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../../../pcie/ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../../../pcie/common/readme.html">PCI_EXT_CAP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../../../pcie/logic/byte_count/readme.html">PCIE Byte Count</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../pcie/logic/byte_en_decoder/readme.html">PCIe Byte Enable Decoder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../../../readme.html">DMA Calypte</a><ul class="current">
@@ -282,87 +283,6 @@ only manage constant size data.</p>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</section>
-<section id="pcie-header-generator">
-<span id="rx-dma-pcie-hdr-gen"></span><h1>PCIe Header Generator<a class="headerlink" href="#pcie-header-generator" title="Permalink to this heading"></a></h1>
-<dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-pcie_hdr_gen">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">PCIE_HDR_GEN</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-pcie_hdr_gen" title="Permalink to this definition"></a></dt>
-<dd><p>This component generates pcie headers depending on a device.</p>
-<span class="sig-name descname">Generics</span><table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Generic</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Default</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even" id="vhdl-gengeneric-pcie_hdr_gen-device"><td><p>DEVICE</p></td>
-<td><p>string</p></td>
-<td><p>“ULTRASCALE”</p></td>
-<td><p>Supported devices:</p>
-<ul class="simple">
-<li><p>ULTRASCALE</p></li>
-<li><p>STRATIX10</p></li>
-<li><p>AGILEX</p></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<span class="sig-name descname">Ports</span><table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Port</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Mode</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>REQUIRED DATA FOR PCIE HEADERS</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_hdr_gen-addr"><td><p>ADDR</p></td>
-<td><p>std_logic_vector(64-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_hdr_gen-dword_count"><td><p>DWORD_COUNT</p></td>
-<td><p>std_logic_vector(11-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_hdr_gen-tag"><td><p>TAG</p></td>
-<td><p>std_logic_vector(8-1  downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>GENERATED PCIE HEADER</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_hdr_gen-pcie_hdr"><td><p>PCIE_HDR</p></td>
-<td><p>std_logic_vector(128-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_hdr_gen-pcie_hdr_size"><td><p>PCIE_HDR_SIZE</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td><ul class="simple">
-<li><p>0 =&gt; PCIE_HDR(3*32-1 downto 0) bits are valid,</p></li>
-<li><p>1 =&gt; PCIE_HDR(4*32-1 downto 0) bits are valid</p></li>
-</ul>
-</td>
 </tr>
 </tbody>
 </table>

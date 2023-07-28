@@ -30,6 +30,10 @@ Before running the FPGA firmware compilation, the desired DMA controller can be 
 - ``DMA_TYPE=3`` -- DMA Medusa IP (default DMA controller)
 - ``DMA_TYPE=4`` -- DMA Calypte IP
 
+.. note::
+
+    If DMA IP is replaced by a loopback (``DMA_TYPE=0``), packets sent from the user application to the DMA input are immediately forwarded to the DMA output and then continue back to the user application.
+
 DMA Medusa IP notes
 *******************
 

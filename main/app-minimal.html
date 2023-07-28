@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: bef7f4ea
+                Git branch: main, <br> Git hash: af67b2da
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -124,12 +124,65 @@
 <section id="the-memory-testers">
 <h2>The Memory Testers<a class="headerlink" href="#the-memory-testers" title="Permalink to this heading"></a></h2>
 <p>The NDK-based Minimal application also contains <a class="reference internal" href="ofm_doc/comp/debug/mem_tester/readme.html#mem-tester"><span class="std std-ref">Memory Tester</span></a> modules connected to external memory controllers. These modules make it easy to test the operation of external memories and measure their properties (throughput, latency). The Avalon-MM bus is used to access the external memory, see <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/683091/">Avalon Interface Specifications</a>.</p>
-<p>The source code for the Memory Tester control tool is available in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/ofm/comp/debug/mem_tester/sw</span></code> folder.</p>
+<p><strong>How to run Memory Tester:</strong></p>
 <ul class="simple">
-<li><p>First, the source code must be compiled using the <code class="docutils literal notranslate"><span class="pre">make</span></code> command.</p></li>
-<li><p>Then all external memory tests can be run using the <code class="docutils literal notranslate"><span class="pre">./mem_tester</span> <span class="pre">-t</span> <span class="pre">all</span></code> command.</p></li>
-<li><p>You can also run tests with the Python helper script and generate a PDF report with the test results: <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">report_gen.py</span></code>.</p></li>
+<li><p>The RPM package <code class="docutils literal notranslate"><span class="pre">python3-nfb</span></code> is required and you can obtain it from the <a class="reference external" href="https://copr.fedorainfracloud.org/coprs/g/CESNET/nfb-framework/">&#64;CESNET/nfb-framework COPR repository</a>.</p></li>
+<li><p>Install <code class="docutils literal notranslate"><span class="pre">data_logger</span></code> python package from source code using the following commands…</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/ofm/comp/debug/data_logger/sw</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">install</span> <span class="pre">--user</span></code></p></li>
+<li><p>Then go to the mem tester tool directory…</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/ofm/comp/debug/mem_tester/sw</span></code></p></li>
+<li><p>Then external memory test can be run using the <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">mem_tester.py</span></code> command.</p></li>
 </ul>
+<p><strong>Example output of Memory Tester:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 mem_tester.py
+|| ------------------- ||
+|| TEST WAS SUCCESSFUL ||
+|| ------------------- ||
+
+Mem_logger statistics:
+----------------------
+write requests       33554431
+  write words        134217724
+read requests        33554431
+  requested words    134217724
+  received words     134217724
+Flow:
+  write               160.78 [Gb/s]
+  read                161.68 [Gb/s]
+  total               161.23 [Gb/s]
+Time:
+  write               427.42 [ms]
+  read                425.04 [ms]
+  total               852.46 [ms]
+Latency:
+  min                 96.00 [ns]
+  max                 555.00 [ns]
+  avg                 131.56 [ns]
+  histogram [ns]:
+    93.4 - 117.5 ... 12613618
+    117.5 - 141.6 ... 13893635
+    141.6 - 165.7 ... 6618217
+    503.0 - 527.1 ... 74899
+    527.1 - 551.2 ... 265549
+    551.2 - 575.3 ... 88513
+Errors:
+  zero burst count   0
+  simultaneous r+w   0
+Paralel reads count:
+  min                0
+  max                13
+  avg                 10.83
+    0.0 -   4.0 ... 4
+    4.0 -   8.0 ... 27238
+    8.0 -  12.0 ... 4294967295
+    12.0 -  16.0 ... 13345442
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the <a class="reference internal" href="ofm_doc/comp/debug/mem_tester/readme.html#mem-tester"><span class="std std-ref">Memory Tester</span></a> module documentation for a more detailed description.</p>
+</div>
 </section>
 <section id="the-example-of-mi-offsets">
 <h2>The example of MI offsets<a class="headerlink" href="#the-example-of-mi-offsets" title="Permalink to this heading"></a></h2>

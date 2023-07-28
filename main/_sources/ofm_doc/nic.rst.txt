@@ -11,5 +11,6 @@ The network components are typically located in the ``comp/nic/`` directory in t
    comp/nic/mac_lite/rx_mac_lite/readme
    comp/nic/mac_lite/tx_mac_lite/readme
    comp/nic/mac_lite/tx_mac_lite/comp/adapters/lbus/reconf/readme
+   comp/nic/eth_phy/40ge/readme
 
 .. Add more references here...

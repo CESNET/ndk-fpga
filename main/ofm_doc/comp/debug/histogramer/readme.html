@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Histogramer &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Latency meter" href="../latency_meter/readme.html" />
+    <link rel="prev" title="MEM_TESTER Software" href="../mem_tester/sw/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: af67b2da
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/ia-420f/readme.html">Bittware IA-420F</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../debug.html">Debug Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../mem_tester/readme.html">DDR4 Memory Tester</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Histogramer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#key-features">Key features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#component-port-and-generics-description">Component port and generics description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instance-template">Instance template</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../latency_meter/readme.html">Latency meter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data_logger/readme.html">Data logger</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../debug.html">Debug Tools</a></li>
+      <li class="breadcrumb-item active">Histogramer</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/ofm_doc/comp/debug/histogramer/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="histogramer">
+<span id="id1"></span><h1>Histogramer<a class="headerlink" href="#histogramer" title="Permalink to this heading"></a></h1>
+<p>Histogramer is used to manage a histogram.</p>
+<section id="key-features">
+<h2>Key features<a class="headerlink" href="#key-features" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Histogram boxes are stored inside Block RAM</p></li>
+<li><p>Each box will be sequentially cleared after the reset</p></li>
+<li><p>A new input request will increment the histogram box based on an input value</p></li>
+<li><p>Read request will read the content of a given box</p></li>
+<li><p>Read requests can be set to clear box content after execution</p></li>
+<li><p>Input or read request priority can be set</p></li>
+<li><p>A new read or write request can be processed in every clock cycle</p></li>
+<li><p>Collisions during read-modify-write access to Block RAM are handled</p></li>
+</ul>
+</section>
+<section id="component-port-and-generics-description">
+<h2>Component port and generics description<a class="headerlink" href="#component-port-and-generics-description" title="Permalink to this heading"></a></h2>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-histogramer">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">HISTOGRAMER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-histogramer" title="Permalink to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-histogramer-input_width"><td><p>INPUT_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>UNDEFINED</p></td>
+<td><p>Width of input values</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-histogramer-box_width"><td><p>BOX_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>UNDEFINED</p></td>
+<td><p>Width of one histogram box (number of values in a given range)
+Box probably overflowed when its value equals 2**BOX_WIDTH-1</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-histogramer-box_cnt"><td><p>BOX_CNT</p></td>
+<td><p>integer</p></td>
+<td><p>UNDEFINED</p></td>
+<td><p>Number of histogram boxes (defines histogram precision)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-histogramer-read_prior"><td><p>READ_PRIOR</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Defines if read or write should occur when both happen at the same time</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-histogramer-clear_by_read"><td><p>CLEAR_BY_READ</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Defines if read should erase box content</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-histogramer-clear_by_rst"><td><p>CLEAR_BY_RST</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Defines if BRAM should be sequentially erased after reset</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-histogramer-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-histogramer-rst"><td><p>RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-histogramer-rst_done"><td><p>RST_DONE</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Input interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-histogramer-input_vld"><td><p>INPUT_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-histogramer-input"><td><p>INPUT</p></td>
+<td><p>std_logic_vector(INPUT_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Read interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-histogramer-read_req"><td><p>READ_REQ</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Request to read box specified by READ_ADDR</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-histogramer-read_addr"><td><p>READ_ADDR</p></td>
+<td><p>std_logic_vector(log2(BOX_CNT) - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Box adress</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-histogramer-read_box_vld"><td><p>READ_BOX_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>The requested box is valid</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-histogramer-read_box"><td><p>READ_BOX</p></td>
+<td><p>std_logic_vector(BOX_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Requested box</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="instance-template">
+<h2>Instance template<a class="headerlink" href="#instance-template" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">histogrammer_i</span> <span class="p">:</span> <span class="n">entity</span> <span class="n">work</span><span class="o">.</span><span class="n">HISTOGRAMER</span>
+<span class="n">generic</span> <span class="nb">map</span><span class="p">(</span>
+    <span class="n">INPUT_WIDTH</span>             <span class="o">=&gt;</span> <span class="n">INPUT_WIDTH</span><span class="p">,</span>
+    <span class="n">BOX_WIDTH</span>               <span class="o">=&gt;</span> <span class="n">BOX_WIDTH</span><span class="p">,</span>
+    <span class="n">BOX_CNT</span>                 <span class="o">=&gt;</span> <span class="n">BOX_CNT</span><span class="p">,</span>
+    <span class="n">READ_PRIOR</span>              <span class="o">=&gt;</span> <span class="n">READ_PRIOR</span><span class="p">,</span>
+    <span class="n">CLEAR_BY_READ</span>           <span class="o">=&gt;</span> <span class="n">CLEAR_BY_READ</span><span class="p">,</span>
+    <span class="n">CLEAR_BY_RST</span>            <span class="o">=&gt;</span> <span class="n">CLEAR_BY_RST</span>
+<span class="p">)</span>
+<span class="n">port</span> <span class="nb">map</span><span class="p">(</span>
+    <span class="n">CLK</span>                     <span class="o">=&gt;</span> <span class="n">CLK</span><span class="p">,</span>
+    <span class="n">RST</span>                     <span class="o">=&gt;</span> <span class="n">RST</span><span class="p">,</span>
+    <span class="n">RST_DONE</span>                <span class="o">=&gt;</span> <span class="n">rst_done</span><span class="p">,</span>
+
+    <span class="n">INPUT</span>                   <span class="o">=&gt;</span> <span class="nb">input</span><span class="p">,</span>
+    <span class="n">INPUT_VLD</span>               <span class="o">=&gt;</span> <span class="n">input_vld</span><span class="p">,</span>
+
+    <span class="n">READ_REQ</span>                <span class="o">=&gt;</span> <span class="n">read_req</span><span class="p">,</span>
+    <span class="n">READ_ADDR</span>               <span class="o">=&gt;</span> <span class="n">read_addr</span><span class="p">,</span>
+    <span class="n">READ_BOX_VLD</span>            <span class="o">=&gt;</span> <span class="n">read_box_vld</span><span class="p">,</span>
+    <span class="n">READ_BOX</span>                <span class="o">=&gt;</span> <span class="n">read_box</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../mem_tester/sw/readme.html" class="btn btn-neutral float-left" title="MEM_TESTER Software" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../latency_meter/readme.html" class="btn btn-neutral float-right" title="Latency meter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
