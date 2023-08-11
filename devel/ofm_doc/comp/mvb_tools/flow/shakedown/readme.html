@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c0ae043c
+                Git branch: devel, <br> Git hash: c9104140
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -53,7 +53,7 @@
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
@@ -158,19 +158,17 @@ Items can be read independetly and in order (out of order is not tested, UVM ver
 <td><p>Shake ports, when 1, <code class="docutils literal notranslate"><span class="pre">RX_ITEMS</span></code> must be read from TX interface to accept next transaction
 on RX MVB. When 2, <code class="docutils literal notranslate"><span class="pre">RX_ITEMS/2</span></code> must be read, etc. Scale this number carefully, consumes
 lot of resources. When one needs value of 3, consider using <code class="docutils literal notranslate"><span class="pre">MULTI_FIFOX</span></code> for such use case.
-Ingored when using <em>SHIFT_REG</em> implemetation.</p></td>
+Ingored when using <em>MUX</em> implemetation.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_shakedown-use_shift_regs"><td><p>USE_SHIFT_REGS</p></td>
-<td><p>boolean</p></td>
-<td><p>True</p></td>
-<td><p>Used only when TX_ITEMS=1, you can set it to <cite>true</cite> and MVB_SHAKEDOWN will be implemented using shift registers,
-resulting in much lower resources consumption. For more savings, see <code class="docutils literal notranslate"><span class="pre">SHIFT_USE_SHAKEDOWN</span></code>.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_shakedown-shift_use_shakedown"><td><p>SHIFT_USE_SHAKEDOWN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_shakedown-use_mux_impl"><td><p>USE_MUX_IMPL</p></td>
 <td><p>boolean</p></td>
 <td><p>False</p></td>
-<td><p>When using shift register implementation, you can set this parameter to increase throughput to 100% of output MVB,
-however, setting this to <code class="docutils literal notranslate"><span class="pre">true</span></code> will increase resources used slightly.</p></td>
+<td><p>Resource optimized N to 1 implementation using only one multiplexer</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_shakedown-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“AGILEX”</p></td>
+<td></td>
 </tr>
 </tbody>
 </table>

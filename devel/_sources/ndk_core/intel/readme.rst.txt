@@ -6,11 +6,12 @@ NDK architecture
 
 The Network Development Kit (NDK) is available for the selected card based on FPGA. The NDK allows users to quickly and easily develop new network appliances based on FPGA acceleration cards. The NDK is optimized for high throughput and scalable to support 10, 100 and 400 Gigabit Ethernet.
 
-.. image:: doc/img/fpga_arch.svg
+.. image:: doc/img/card_with_ndk.drawio.svg
     :align: center
     :width: 100 %
 
-As you can see in the image above, the top level architecture consists of several building blocks:
+The diagram above shows a simplified NDK architecture on a generic FPGA board.
+The NDK top level architecture consists of several building blocks:
 
 - MI bus interconnection (MI Splitter,...) allows access to Control and Status Register (CSR)
 - The Network module provides transmission and reception of Ethernet packets to/from the network.

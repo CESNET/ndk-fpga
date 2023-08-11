@@ -1,7 +1,7 @@
 .. _ndk_terminology:
 
-Terminology
------------
+NDK Terminology
+---------------
 
 This chapter explains frequently used terms.
 

@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c0ae043c
+                Git branch: devel, <br> Git hash: c9104140
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -53,7 +53,7 @@
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
@@ -214,12 +214,14 @@
 <tr class="row-odd" id="vhdl-gengeneric-rate_limiter-section_length"><td><p>SECTION_LENGTH</p></td>
 <td><p>natural</p></td>
 <td><p>1000</p></td>
-<td><p>Default section length (in number of clock cycles)</p></td>
+<td><p>Default section length (in number of clock cycles)
+Maximum: 2**MI_DATA_WIDTH</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-rate_limiter-interval_length"><td><p>INTERVAL_LENGTH</p></td>
 <td><p>natural</p></td>
 <td><p>40</p></td>
-<td><p>Default interval length (in number of sections)</p></td>
+<td><p>Default interval length (in number of sections)
+Maximum: 2**MI_DATA_WIDTH</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-rate_limiter-interval_count"><td><p>INTERVAL_COUNT</p></td>
 <td><p>natural</p></td>
