@@ -10,12 +10,15 @@
 # ------------------------------------------------------------------------------
 # DMA parameters:
 # ------------------------------------------------------------------------------
-# The minimum number of RX/TX DMA channels for this card is 16.
-set DMA_RX_CHANNELS      16
-set DMA_TX_CHANNELS      16
+set DMA_RX_CHANNELS      2
+set DMA_TX_CHANNELS      2
 # In blocking mode, packets are dropped only when the RX DMA channel is off.
 # In non-blocking mode, packets are dropped whenever they cannot be sent.
 set DMA_RX_BLOCKING_MODE true
+
+set DMA_RX_FRAME_SIZE_MAX 8191
+set DMA_TX_FRAME_SIZE_MAX 8191
+set DMA_TX_DATA_PTR_W 13
 
 # ------------------------------------------------------------------------------
 # Other parameters:
