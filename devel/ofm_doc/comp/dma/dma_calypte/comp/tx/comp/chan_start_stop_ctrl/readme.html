@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c9104140
+                Git branch: devel, <br> Git hash: c8d7805a
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
@@ -197,6 +197,11 @@ works vice versa when a start request comes and a frame is dropped on a single c
 <td><p>2**16 - 1</p></td>
 <td><p>Largest packet (in bytes) which can come out of USR_MFB interface</p></td>
 </tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-dbg_signal_width"><td><p>DBG_SIGNAL_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 <span class="sig-name descname">Ports</span><table class="docutils align-default">
@@ -229,7 +234,7 @@ works vice versa when a start request comes and a frame is dropped on a single c
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-pcie_mfb_meta"><td><p>PCIE_MFB_META</p></td>
-<td><p>std_logic_vector((PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1-1 downto 0)</p></td>
+<td><p>std_logic_vector(13 + (PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -360,6 +365,21 @@ works vice versa when a start request comes and a frame is dropped on a single c
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-pkt_disc_bytes"><td><p>PKT_DISC_BYTES</p></td>
 <td><p>std_logic_vector(log2(PKT_SIZE_MAX+1) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Debug signals</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-st_sp_dbg_chan"><td><p>ST_SP_DBG_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-st_sp_dbg_meta"><td><p>ST_SP_DBG_META</p></td>
+<td><p>std_logic_vector(DBG_SIGNAL_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>

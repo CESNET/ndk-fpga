@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c9104140
+                Git branch: devel, <br> Git hash: c8d7805a
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
@@ -259,12 +259,12 @@ The header pointer points to the header of a current packet.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-dma_hdr_pointer_width"><td><p>DMA_HDR_POINTER_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>9</p></td>
+<td><p>11</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-channels"><td><p>CHANNELS</p></td>
 <td><p>natural</p></td>
-<td><p>8</p></td>
+<td><p>32</p></td>
 <td><p>Set the number of DMA channels, each channel has its separate buffer</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
@@ -283,9 +283,14 @@ entry level statistics.</p></td>
 <td><p>24</p></td>
 <td><p>Width of the metadata in bits which are stored in the DMA header.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
 <td><p>natural</p></td>
-<td><p>2**14</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
+<td><p>natural</p></td>
+<td><p>2**11</p></td>
 <td><p>Size of the largest packets that can be transmitted on the USR_TX_MFB interface.</p></td>
 </tr>
 </tbody>
@@ -455,46 +460,61 @@ entry level statistics.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
+<td><p>Debugging signals</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-st_sp_dbg_chan"><td><p>ST_SP_DBG_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-st_sp_dbg_meta"><td><p>ST_SP_DBG_META</p></td>
+<td><p>std_logic_vector(ST_SP_DBG_SIGNAL_W -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>Control MI bus</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(MI_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(MI_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(MI_WIDTH/8 -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(MI_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
