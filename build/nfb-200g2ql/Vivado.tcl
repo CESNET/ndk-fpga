@@ -16,8 +16,9 @@ source $env(CARD_BASE)/src/Vivado.inc.tcl
 # "1" ... project composition only for further dedesign flow in GUI
 set SYNTH_FLAGS(PROJ_ONLY) "0"
 
-# Initialization of associative array to which user parameters should be added.
-array set APP_ARCHGRP {}
+# Associative array which is propagated to APPLICATION_CORE, add other
+# parameters if necessary.
+set APP_ARCHGRP(APP_CORE_ENABLE) $APP_CORE_ENABLE
 
 # Convert associative array to list
 set APP_ARCHGRP_L [array get APP_ARCHGRP]
