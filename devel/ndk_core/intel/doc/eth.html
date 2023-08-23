@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: e224a3bb
+                Git branch: devel, <br> Git hash: 6ad42c86
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -420,27 +420,34 @@ The only difference is the address offset, which is 0x2000.</p>
 <p>The so-called Network Module Core is a subcomponent of the Network Module.
 It contains the required hard IP(s), appropriate adapters, and an MI component for reconfiguring the hard IP(s).
 Right now, the Network Module can use three different Ethernet hard IPs, for Intel FPGA, it is the E-tile or the F-Tile, and for the Xilinx FPGA, it is the CMAC.
-According to the selected NIC (and therefore the type of hard IP), one of the three architectures of the Network Module Core (with the proper hard IP) is used.
+For the F-Tile, there are two variants of IP core: it is F-Tile and F-Tile_Multirate, which support different speeds for implemented IP.
+For the F-Tile_Multirate reconfiguration, use Dynamic Reconfiguration Controller.
+According to the selected NIC (and therefore the type of hard IP), one of the four architectures of the Network Module Core (with the proper hard IP) is used.
 The hard IP is connected directly to the FPGA’s serial QSFP pins (left side of the diagram).
 On the right side, it is connected to the Network Module Logic.
-All three architectures of the Network Module Core are displayed below.</p>
+All four architectures of the Network Module Core are displayed below.</p>
 <table class="docutils align-default">
 <tbody>
-<tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/etile_network_module_core.svg"><img alt="../../../_images/etile_network_module_core.svg" class="align-center" src="../../../_images/etile_network_module_core.svg" width="80%" /></a>
+<tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/etile_network_module_core.svg"><img alt="../../../_images/etile_network_module_core.svg" class="align-center" src="../../../_images/etile_network_module_core.svg" width="100%" /></a>
 </td>
 <td><a class="reference internal image-reference" href="../../../_images/ftile_network_module_core.svg"><img alt="../../../_images/ftile_network_module_core.svg" class="align-center" src="../../../_images/ftile_network_module_core.svg" width="100%" /></a>
 </td>
 </tr>
+<tr class="row-even"><td><a class="reference internal image-reference" href="ndk_core/intel/doc/img/ftile_multirate_network_module_core.svg"><img alt="ndk_core/intel/doc/img/ftile_multirate_network_module_core.svg" class="align-center" src="ndk_core/intel/doc/img/ftile_multirate_network_module_core.svg" width="100%" /></a>
+</td>
+<td><a class="reference internal image-reference" href="../../../_images/cmac_network_module_core.svg"><img alt="../../../_images/cmac_network_module_core.svg" class="align-center" src="../../../_images/cmac_network_module_core.svg" width="100%" /></a>
+</td>
+</tr>
 </tbody>
 </table>
-<a class="reference internal image-reference" href="../../../_images/cmac_network_module_core.svg"><img alt="../../../_images/cmac_network_module_core.svg" class="align-center" src="../../../_images/cmac_network_module_core.svg" width="40%" /></a>
-<p>All three architectures contain the same parts in slightly different forms.
-The first two architectures are for Intel FPGAs (due to the instantiated hard IPs).
+<p>All four architectures contain the same parts in slightly different forms.
+The first three architectures are for Intel FPGAs (due to the instantiated hard IPs).
 The E-Tile hard IP core is always just one instance, no matter the number of Ethernet channels or their speed.
 That means that the instantiated hard IP always has four QSFP interfaces and four XCVR reconfiguration interfaces.</p>
-<p>The F-Tile hard IP core is instantiated once per each Ethernet channel.
+<p>The F-Tile hard IP core is instantiated once per each Ethernet channel. The same goes for the F-Tile_Multirate, but it also contains a single Dynamic Reconfiguration Controller, which is used to reconfigurate the IP’s parameters such as speed, type of FEC, etc.
 The QSFP interfaces (as well as the XCVR reconfiguration interfaces) are distributed evenly among the hard IPs.
-There are eight interfaces altogether, so each hard IP has 8/number_of_channels interfaces.</p>
+There are eight interfaces altogether, so each hard IP has 8/number_of_channels interfaces.
+For more information about the F-Tile Multirate, use <a class="reference internal" href="../src/comp/network_mod/comp/network_mod_core/doc/f-tile_multirate_ip.html#ndk-f-tile-multirate"><span class="std std-ref">F-Tile_Multirate</span></a>.</p>
 <p>The CMAC architecture contains the Xilinx CMAC hard IP.
 Same as E-Tile, it has just one instance of the hard IP with four QSFP interfaces and four DRP reconfiguration interfaces.
 However, the CMAC is instantiated only in one variant: with one 100 GE channel.</p>
@@ -464,6 +471,8 @@ The addresses of the available CSR registers in reconfiguration interfaces are r
 <li><p><a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug_etile_xcvr_phy.pdf">Intel E-Tile Transceiver PHY User Guide</a></p></li>
 <li><p><a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug20313.pdf">Intel F-tile Ethernet Hard IP User Guide</a></p></li>
 <li><p><a class="reference external" href="https://cdrdv2.intel.com/v1/dl/getContent/637401">Intel F-Tile Ethernet Intel FPGA Hard IP Register Map</a></p></li>
+<li><p><a class="reference external" href="https://cdrdv2-public.intel.com/773503/ug-714307-773503.pdf">Intel F-Tile Ethernet Multirate Intel FPGA IP User Guide</a></p></li>
+<li><p><a class="reference external" href="https://www.intel.com/programmable/technical-pdfs/711009.pdf">Intel F-Tile Dynamic Reconfiguration Suite Intel FPGA IP User Guide</a></p></li>
 <li><p><a class="reference external" href="https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/cmac_usplus/v3_1/pg203-cmac-usplus.pdf">Xilinx Ultrascale+ CMAC Ethernet Intel FPGA Hard IP User Guide</a></p></li>
 </ol>
 </section>

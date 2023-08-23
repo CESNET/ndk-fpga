@@ -180,34 +180,39 @@ Network Module Core
 
 The so-called Network Module Core is a subcomponent of the Network Module.
 It contains the required hard IP(s), appropriate adapters, and an MI component for reconfiguring the hard IP(s).
-Right now, the Network Module can use three different Ethernet hard IPs, for Intel FPGA, it is the E-tile or the F-Tile, and for the Xilinx FPGA, it is the CMAC.
-According to the selected NIC (and therefore the type of hard IP), one of the three architectures of the Network Module Core (with the proper hard IP) is used.
+Right now, the Network Module can use three different Ethernet hard IPs, for Intel FPGA, it is the E-tile or the F-Tile, and for the Xilinx FPGA, it is the CMAC. 
+For the F-Tile, there are two variants of IP core: it is F-Tile and F-Tile_Multirate, which support different speeds for implemented IP.
+For the F-Tile_Multirate reconfiguration, use Dynamic Reconfiguration Controller.
+According to the selected NIC (and therefore the type of hard IP), one of the four architectures of the Network Module Core (with the proper hard IP) is used.
 The hard IP is connected directly to the FPGA's serial QSFP pins (left side of the diagram).
 On the right side, it is connected to the Network Module Logic.
-All three architectures of the Network Module Core are displayed below.
+All four architectures of the Network Module Core are displayed below.
+
 
 .. list-table:: 
 
     * - .. image:: img/etile_network_module_core.svg
             :align: center
-            :width: 80 %
-
+            :width: 100 %
       - .. image:: img/ftile_network_module_core.svg
             :align: center
             :width: 100 %
+    * - .. image:: img/ftile_multirate_network_module_core.svg
+            :align: center
+            :width: 100 %
+      - .. image:: img/cmac_network_module_core.svg
+            :align: center
+            :width: 100 %
 
-.. image:: img/cmac_network_module_core.svg
-    :align: center
-    :width: 40 %
-
-All three architectures contain the same parts in slightly different forms.
-The first two architectures are for Intel FPGAs (due to the instantiated hard IPs).
+All four architectures contain the same parts in slightly different forms.
+The first three architectures are for Intel FPGAs (due to the instantiated hard IPs).
 The E-Tile hard IP core is always just one instance, no matter the number of Ethernet channels or their speed.
 That means that the instantiated hard IP always has four QSFP interfaces and four XCVR reconfiguration interfaces.
 
-The F-Tile hard IP core is instantiated once per each Ethernet channel.
+The F-Tile hard IP core is instantiated once per each Ethernet channel. The same goes for the F-Tile_Multirate, but it also contains a single Dynamic Reconfiguration Controller, which is used to reconfigurate the IP's parameters such as speed, type of FEC, etc.
 The QSFP interfaces (as well as the XCVR reconfiguration interfaces) are distributed evenly among the hard IPs.
 There are eight interfaces altogether, so each hard IP has 8/number_of_channels interfaces.
+For more information about the F-Tile Multirate, use :ref:`F-Tile_Multirate <ndk_f-tile_multirate>`.
 
 The CMAC architecture contains the Xilinx CMAC hard IP.
 Same as E-Tile, it has just one instance of the hard IP with four QSFP interfaces and four DRP reconfiguration interfaces.
@@ -238,7 +243,9 @@ The addresses of the available CSR registers in reconfiguration interfaces are r
 2. `Intel E-Tile Transceiver PHY User Guide <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug_etile_xcvr_phy.pdf>`_
 3. `Intel F-tile Ethernet Hard IP User Guide <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug20313.pdf>`_
 4. `Intel F-Tile Ethernet Intel FPGA Hard IP Register Map <https://cdrdv2.intel.com/v1/dl/getContent/637401>`_
-5. `Xilinx Ultrascale+ CMAC Ethernet Intel FPGA Hard IP User Guide <https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/cmac_usplus/v3_1/pg203-cmac-usplus.pdf>`_
+5. `Intel F-Tile Ethernet Multirate Intel FPGA IP User Guide <https://cdrdv2-public.intel.com/773503/ug-714307-773503.pdf>`_
+6. `Intel F-Tile Dynamic Reconfiguration Suite Intel FPGA IP User Guide <https://www.intel.com/programmable/technical-pdfs/711009.pdf>`_
+7. `Xilinx Ultrascale+ CMAC Ethernet Intel FPGA Hard IP User Guide <https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/cmac_usplus/v3_1/pg203-cmac-usplus.pdf>`_
 
 
 .. _newtwork_module_logic:
