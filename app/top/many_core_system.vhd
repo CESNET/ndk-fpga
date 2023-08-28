@@ -194,8 +194,8 @@ signal all_cores_done_reg: std_logic_vector(NUM_CORES - 1 downto 0);
 signal results_count: integer range 0 to NUM_JOBS;
 
 -- signals for job dispatcher 
-signal job_count: positive range 0 to NUM_JOBS;
-signal core_index, core_index_1, core_index_2: positive range 0 to NUM_CORES - 1;
+signal job_count:natural range 0 to NUM_JOBS;
+signal core_index, core_index_1, core_index_2: natural range 0 to NUM_CORES - 1;
 signal wr_en, wr_en_1,wr_en_2: std_logic;
 
 attribute keep : string;
