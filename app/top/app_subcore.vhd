@@ -13,6 +13,9 @@ use work.type_pack.all;
 use work.eth_hdr_pack.all;
 use work.combo_user_const.all;
 
+use WORK.many_core_package.ALL;
+use WORK.RISCV_package.ALL;
+
 entity APP_SUBCORE is
     generic (
         MI_WIDTH : natural := 32;
@@ -126,8 +129,6 @@ signal wr_data_in, buffer_data_32bit: DATA_TYPE;
 signal valid, all_cores_done: std_logic; 
 signal wr_en: std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM  
 
--- signal for all core done
-signal all_cores_done: std_logic;
 
 -- signals for PCI
 signal packed_data: std_logic_vector(511 downto 0);
@@ -161,7 +162,7 @@ begin
                             reset => reset,
                             o_data_valid => valid,                          
                             o_data_out => wr_data_in,
-                            all_cores_done => all_cores_done);
+                            o_all_cores_done => all_cores_done);
                             
 -- Code specific to many_core_system testing Mandelbrot Set Computation
 -- We need a frame buffer of size 16384 elements,each 16 bits wide -- too big to fit into one BRAM!
@@ -172,7 +173,7 @@ gen_frame_buffer:   for i in 0 to 7 generate
                                         generic map (   SIZE => 2048,
                                                         ADDR_WIDTH => 11,
                                                         COL_WIDTH => 8,
-                                                        NB_COL => 2)
+                                                        NB_COL => 4)
                                         port map (  clka => CLK,
                                                     ena => ena_arr(i),
                                                     wea => wr_en, 
@@ -188,19 +189,19 @@ gen_frame_buffer:   for i in 0 to 7 generate
                         end generate gen_frame_buffer;
                         
     wr_en <= (others => '1') when (valid = '1') else (others => '0') ; -- write 4 individual bytes in BRAM                  
-    -- wr_addr <= data_out((9 + JOB_ID_BIT_WIDTH) downto 10); -- location in BRAM, iteration counter for Mandelbrot is 10 bits wide          
+    wr_addr <= wr_data_in((9 + JOB_ID_BIT_WIDTH) downto 10); -- location in BRAM, iteration counter for Mandelbrot is 10 bits wide          
           
 -- select the correct BRAM for writing
-BRAM_wr_proc:   process(wr_addr)
+BRAM_wr_proc:   process(all)
                     begin
                         for i in 0 to 7 loop
-							wr_addr <= wr_addr + 1; -- increment wr_addr in BRAM sequentially, values are stored in the order they come
                             if (wr_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
                                 ena_arr(i) <='1';
                             else 
                                 ena_arr(i) <='0';
                             end if;
-                        end loop;                          
+                        end loop;      
+                 
                     end process; 
                
 -- read from frame buffer and send to PCI interface logic                                                                                                                                                                                      
@@ -246,14 +247,15 @@ BRAM_wr_proc:   process(wr_addr)
 										DMA_RX_MFB_EOF_POS <= (others => '1');
 										DMA_RX_MFB_SRC_RDY <= '1';
 										ready_to_send <= '0';
-										send_first_half <= '1';																												
+										send_first_half <= '1';	
+								    end if;																											
 								else
 									next_read_buffer <= '0';
 								end if;    
-                            elsif ( (enable_PCI = '1') and (packed_data_counter <= packed_data_counter'high) and (ready_to_send = '0') ) then  
+                            elsif ( (enable_PCI = '1') and (packed_data_counter <= 15) and (ready_to_send = '0') ) then  
 								packed_data((packed_data_counter*32 - 1) downto 0) <= buffer_data_32bit;
                                 packed_data_counter <= packed_data_counter + 1;
-                                if (packed_data_counter = packed_data_counter'high then
+                                if (packed_data_counter = 15) then
 									ready_to_send <= '1';
 								end if;								  
                             end if;

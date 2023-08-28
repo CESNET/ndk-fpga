@@ -14,8 +14,8 @@ set MFB_META_EXT_BASE   "$OFM_PATH/comp/mfb_tools/flow/metadata_extractor"
 set APP_CORE_UTILS_BASE "$OFM_PATH/../core/intel/src/comp/app_core_utils"
 
 # Packages
-lappend PACKAGES "$OFM_PATH/comp/base/pkg/many_core_package.vhd"
-lappend PACKAGES "$OFM_PATH/comp/base/pkg/RISCV_package.vhd"
+lappend PACKAGES "$ENTITY_BASE/many_core_package.vhd"
+lappend PACKAGES "$ENTITY_BASE/RISCV_package.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/eth_hdr_pack.vhd"
