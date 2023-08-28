@@ -14,6 +14,8 @@ set MFB_META_EXT_BASE   "$OFM_PATH/comp/mfb_tools/flow/metadata_extractor"
 set APP_CORE_UTILS_BASE "$OFM_PATH/../core/intel/src/comp/app_core_utils"
 
 # Packages
+lappend PACKAGES "$OFM_PATH/comp/base/pkg/many_core_package.vhd"
+lappend PACKAGES "$OFM_PATH/comp/base/pkg/RISCV_package.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/eth_hdr_pack.vhd"
@@ -25,8 +27,22 @@ if {$ARCHGRP_ARR(APP_CORE_ENABLE)} {
     lappend COMPONENTS [ list "MFB_METADATA_EXTRACTOR"  $MFB_META_EXT_BASE   "FULL" ]
 
     # Files
+    lappend MOD "$ENTITY_BASE/mult.xci"
+    lappend MOD "$ENTITY_BASE/barrel_core_variant_1.vhd"
+    lappend MOD "$ENTITY_BASE/barrel_core_variant_1_mult.vhd"
+    lappend MOD "$ENTITY_BASE/barrel_core_variant_2.vhd"
+    lappend MOD "$ENTITY_BASE/barrel_core_variant_2_mult.vhd"
+    lappend MOD "$ENTITY_BASE/barrel_core_variant_3.vhd"
+    lappend MOD "$ENTITY_BASE/barrel_core_variant_3_mult.vhd"
+    lappend MOD "$ENTITY_BASE/instr_rom.vhd"
+    lappend MOD "$ENTITY_BASE/instr_data_mem_combi.vhd"
+    lappend MOD "$ENTITY_BASE/fifo.vhd"
+    lappend MOD "$ENTITY_BASE/dual_port_byte_en_RAM.vhd"
+    lappend MOD "$ENTITY_BASE/many_core_system.vhd"
     lappend MOD "$ENTITY_BASE/app_subcore.vhd"
+    lappend MOD "$ENTITY_BASE/app_subcore_tb.vhd"
     lappend MOD "$ENTITY_BASE/application_core.vhd"
+    
 } else {
     lappend MOD "$APP_CORE_UTILS_BASE/app_core_empty_arch.vhd"
 }
