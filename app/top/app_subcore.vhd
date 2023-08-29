@@ -135,11 +135,24 @@ signal packed_data: std_logic_vector(511 downto 0);
 signal packed_data_counter: integer range 0 to 15;
 signal next_read_buffer, enable_PCI, ready_to_send, send_first_half: std_logic;
 
+signal manycore_rst : std_logic;
 begin
 
-    MI_DRD  <= (others => '0');
-    MI_ARDY <= MI_RD or MI_WR;
-    MI_DRDY <= MI_RD;
+    barrel_proc_debug_core_i : entity work.BARREL_PROC_DEBUG_CORE
+        generic map (
+            MI_WIDTH => MI_WIDTH)
+        port map (
+            CLK       => CLK,
+            RESET     => RESET,
+            RESET_OUT => manycore_rst,
+            MI_ADDR   => MI_ADDR,
+            MI_DWR    => MI_DWR,
+            MI_BE     => MI_BE,
+            MI_RD     => MI_RD,
+            MI_WR     => MI_WR,
+            MI_DRD    => MI_DRD,
+            MI_ARDY   => MI_ARDY,
+            MI_DRDY   => MI_DRDY);
 
  /*   DMA_RX_MFB_META_PKT_SIZE <= DMA_TX_MFB_META_PKT_SIZE;
     DMA_RX_MFB_META_HDR_META <= DMA_TX_MFB_META_HDR_META;
@@ -159,7 +172,7 @@ begin
     
     many_core:  many_core_system 
                 port map (  clk => clk,
-                            reset => reset,
+                            reset => RESET or manycore_rst,
                             o_data_valid => valid,                          
                             o_data_out => wr_data_in,
                             o_all_cores_done => all_cores_done);
@@ -208,7 +221,7 @@ BRAM_wr_proc:   process(all)
  transfer_to_PCI:   process(clk)
                     begin
                         if (rising_edge(clk)) then
-                            if (reset = '1') then
+                            if (RESET = '1' or manycore_rst = '1') then
                                 packed_data_counter <= 1;
                                 DMA_RX_MFB_SRC_RDY <= '0';
                                 next_read_buffer <= '1';

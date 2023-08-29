@@ -39,6 +39,7 @@ if {$ARCHGRP_ARR(APP_CORE_ENABLE)} {
     lappend MOD "$ENTITY_BASE/fifo.vhd"
     lappend MOD "$ENTITY_BASE/dual_port_byte_en_RAM.vhd"
     lappend MOD "$ENTITY_BASE/many_core_system.vhd"
+    lappend MOD "$ENTITY_BASE/barrel_proc_debug_core.vhd"
     lappend MOD "$ENTITY_BASE/app_subcore.vhd"
     lappend MOD "$ENTITY_BASE/app_subcore_tb.vhd"
     lappend MOD "$ENTITY_BASE/application_core.vhd"
