@@ -8,6 +8,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+use work.math_pack.all;
+
 entity many_core_system is
     generic (NUM_ELEMENTS: positive := 1);
     port (  clk: in std_logic;
@@ -191,18 +193,18 @@ signal data_mem_addr: data_mem_addr_array;
 
 -- signal for all core done
 signal all_cores_done_reg: std_logic_vector(NUM_CORES - 1 downto 0);
-signal results_count: integer range 0 to NUM_JOBS;
+signal results_count: unsigned(log2(NUM_JOBS) downto 0);
 
 -- signals for job dispatcher 
-signal job_count:natural range 0 to NUM_JOBS;
-signal core_index, core_index_1, core_index_2: natural range 0 to NUM_CORES - 1;
+signal job_count: unsigned(log2(NUM_JOBS)  downto 0);
+signal core_index, core_index_1, core_index_2: unsigned(log2(NUM_CORES) - 1 downto 0);
 signal wr_en, wr_en_1,wr_en_2: std_logic;
 
-attribute keep : string;
-attribute keep of data_to_mem, data_mem_wr_en, data_mem_addr, core_dispatch_en, core_index, core_index_1, core_index_2, wr_en, wr_en_1, wr_en_2, job_count, job_value, result_value, job_request, job_done: signal is "true";
-attribute keep of core_id: signal is "true";
-attribute keep of fifo_read, fifo_write, fifo_empty, fifo_full, data_to_fifo, data_out_of_fifo: signal is "true";
-attribute keep of results_count, o_all_cores_done, all_cores_done_reg, fifo_read_local_final, fifo_read_local_final_1: signal is "true";
+--attribute keep : string;
+--attribute keep of data_to_mem, data_mem_wr_en, data_mem_addr, core_dispatch_en, core_index, core_index_1, core_index_2, wr_en, wr_en_1, wr_en_2, job_count, job_value, result_value, job_request, job_done: signal is "true";
+--attribute keep of core_id: signal is "true";
+--attribute keep of fifo_read, fifo_write, fifo_empty, fifo_full, data_to_fifo, data_out_of_fifo: signal is "true";
+--attribute keep of results_count, o_all_cores_done, all_cores_done_reg, fifo_read_local_final, fifo_read_local_final_1: signal is "true";
              
 begin
 
@@ -452,17 +454,17 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                         begin
                                             if rising_edge(clk) then
                                                 if (reset = '0') then
-                                                    job_count <= 0;
-                                                    core_index <= 0;
+                                                    job_count <= (others => '0');
+                                                    core_index <= (others => '0');
                                                     core_dispatch_en <= (others => '0');  
                                                 -- enable dispatch for this core
                                                 else
                                                     core_dispatch_en <= (others => '0');
                                                     -- enable dispatch for this core
-                                                    if ( (job_count < NUM_JOBS) and (job_request(core_index) = '1') ) then
-                                                        core_dispatch_en(core_index) <= '1';  
+                                                    if ( (to_integer(job_count )< NUM_JOBS) and (job_request(to_integer(core_index)) = '1') ) then
+                                                        core_dispatch_en(to_integer(core_index)) <= '1';  
                                                         job_count <= job_count + 1;                   
-                                                        job_value(core_index) <= std_logic_vector(to_unsigned(job_count, DATA_WIDTH));                                                 
+                                                        job_value(to_integer(core_index)) <= func_zero_ext(std_logic_vector(job_count), DATA_WIDTH);                                                 
                                                     end if;
                                                                                                 
                                                     -- go through each core sequentially
@@ -478,26 +480,26 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                         begin
                                             if rising_edge(clk) then
                                                 if (reset = '0') then
-                                                    job_count <= 0;
-                                                    core_index <= 0;
-                                                    core_index_1 <= 0;
+                                                    job_count <= (others => '0');
+                                                    core_index <= (others => '0');
+                                                    core_index_1 <= (others => '0');
                                                     wr_en <= '0';
-                                                    results_count <= 0;
+                                                    results_count <= (others => '0');
                                                 else
                                                     core_dispatch_en <= (others => '0');
                                                     core_result_en <= (others => '0');
                                                     
                                                     -- enable dispatch for this core
-                                                    if ((job_count < NUM_JOBS) and (job_request(core_index) = '1')) then  
-                                                        core_dispatch_en(core_index) <= '1';  
+                                                    if ((to_integer(job_count) < NUM_JOBS) and (job_request(to_integer(core_index)) = '1')) then  
+                                                        core_dispatch_en(to_integer(core_index)) <= '1';  
                                                         job_count <= job_count + 1;                   
-                                                        job_value(core_index) <= std_logic_vector(to_unsigned(job_count, DATA_WIDTH));                                                         
+                                                        job_value(to_integer(core_index)) <= func_zero_ext(std_logic_vector(job_count), DATA_WIDTH);                                                          
                                                     end if;
                                                     
                                                     -- enable collect result for this core
                                                     if (results_count < NUM_JOBS) then
-                                                        core_result_en(core_index) <= '1';
-                                                        if (job_done(core_index_2) = '1') then
+                                                        core_result_en(to_integer(core_index)) <= '1';
+                                                        if (job_done(to_integer(core_index_2)) = '1') then
                                                             results_count <= results_count + 1;                                                                                                                                                          
                                                             wr_en <= '1';  
                                                         else
@@ -517,7 +519,7 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                                     
                                                     if (wr_en_2 = '1') then 
                                                         o_data_valid <= '1'; -- indicate data is valid
-                                                        o_data_out <= result_value(core_index_1);               
+                                                        o_data_out <= result_value(to_integer(core_index_1));               
                                                     else
                                                         o_data_valid <= '0'; 
                                                     end if;                                                                                                     
@@ -585,7 +587,7 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                 
                                   collect_wr_proc:  process (clk)
                                                     variable ptr: integer range 0 to (NUM_CORES + NUM_COLLECT_FIFOS - 1) := 0;
-                                                    attribute keep of ptr: variable is "true";
+                                                    --attribute keep of ptr: variable is "true";
                                                     begin                                              
                                                         if rising_edge(clk) then
                                                             ptr := to_integer(unsigned(std_logic_vector(to_unsigned(i, NUM_CORES_BIT_WIDTH)) and MASK_COLLECT_FIFO));
@@ -706,7 +708,7 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                            if (reset = '0') then
                                                 fifo_read_local_final <= '0';
                                                 fifo_read_local_final_1 <= '0';
-                                                results_count <= 0;
+                                                results_count <= (others =>'0');
                                            else 
                                                 if (fifo_empty(NUM_CORES + NUM_COLLECT_FIFOS - 1) = '0') then
                                                     fifo_read_local_final <= '1';

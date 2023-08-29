@@ -14,7 +14,7 @@ architecture app_subcore_tb_arch of app_subcore_tb is
 
 constant MI_WIDTH : natural := 32;
 constant MFB_REGIONS : integer := 1;
-constant MFB_REGION_SIZE : integer := 8; 
+constant MFB_REGION_SIZE : integer := 4; 
 constant MFB_BLOCK_SIZE  : integer := 8;
 constant MFB_ITEM_WIDTH  : integer := 8;
 constant USR_PKT_SIZE_MAX : natural := 2**12;
@@ -100,12 +100,14 @@ begin
     
     stimulus: process
     begin
-        reset_tb <= '1'; -- reset
-        wait for CLOCK_PERIOD;
         reset_tb <= '0'; -- reset
         wait for CLOCK_PERIOD;
         reset_tb <= '1'; -- reset
         wait for CLOCK_PERIOD;
+        reset_tb <= '0'; -- reset
+        wait for CLOCK_PERIOD;
+        
+        rx_mfb_dst_rdy <= '1';
         
         wait for 400000*CLOCK_PERIOD;
         stop_the_clock <= true;

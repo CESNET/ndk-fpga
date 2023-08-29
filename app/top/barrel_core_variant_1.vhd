@@ -3,12 +3,14 @@
 -- data mem is also implemented in the lower half of regFile 2 BRAM (no external data mem)
 -- NO multiplier
 
-use WORK.RISCV_package.ALL;
-use WORK.many_core_package.ALL;
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+
+use work.math_pack.all;
+
+use WORK.RISCV_package.ALL;
+use WORK.many_core_package.ALL;
 
 entity barrel_core_variant_1 is
     port(   clk, reset: in std_logic;
@@ -49,11 +51,11 @@ component dual_port_byte_en_RAM is
 end component;
                                   
 --cycle count used for stall due until first instr comes from instr mem
-signal cycle_counter: natural := 0; 
+signal cycle_counter: unsigned(DATA_WIDTH - 1 downto 0) := (others => '0'); 
 
 -- signals for barrel logic, instruction fetch, program counter
-signal current_thread_id, next_thread_id, thread_id_pipe_0, thread_id_pipe_1, thread_id_pipe_2: integer range 0 to 7;
-signal thread_id_pipe_3, thread_id_pipe_4, thread_id_pipe_5, thread_id_pipe_6: integer range 0 to 7;
+signal current_thread_id, next_thread_id, thread_id_pipe_0, thread_id_pipe_1, thread_id_pipe_2: unsigned(2 downto 0);
+signal thread_id_pipe_3, thread_id_pipe_4, thread_id_pipe_5, thread_id_pipe_6: unsigned(2 downto 0);
 signal pc_pipe_0, pc_pipe_1, pc_pipe_2: std_logic_vector(INSTR_MEM_ADDR_WIDTH - 1 downto 0);
 signal barrel_pc: PC_ARRAY;
 
@@ -150,59 +152,59 @@ signal data_wb: DATA_TYPE;
 signal loaded_mem_mapped_data, loaded_mem_mapped_data_pipe_5, loaded_mem_mapped_data_pipe_6: DATA_TYPE;
 
 -- registers for interacting with send_recv_msg
-type thread_ID_queue_type is array ((NUM_THREADS - 1) downto 0) of integer range 0 to 7; 
+type thread_ID_queue_type is array ((NUM_THREADS - 1) downto 0) of unsigned(2 downto 0);
 type data_reg_type is array ((NUM_THREADS - 1) downto 0) of DATA_TYPE; 
 signal job_request_queue, job_done_queue: thread_ID_queue_type;
 signal job_value_reg, job_result_reg: data_reg_type;
 signal job_request_reg, job_done_reg: std_logic_vector(NUM_THREADS - 1 downto 0);
-signal thread_ptr_new_request, thread_ptr_to_allocate, thread_ptr_new_result, thread_ptr_result_sent: integer range 0 to 7;
-signal num_incoming_requests, num_requests_allocated, num_pending_requests, num_incoming_results, num_results_sent, num_pending_results: integer range 0 to NUM_JOBS;
+signal thread_ptr_new_request, thread_ptr_to_allocate, thread_ptr_new_result, thread_ptr_result_sent: unsigned(2 downto 0);
+signal num_incoming_requests, num_requests_allocated, num_pending_requests, num_incoming_results, num_results_sent, num_pending_results: unsigned(0 to log2(NUM_JOBS));
 
 -- signal when all threads are done, the core is done
 signal threads_per_core_done_reg: std_logic_vector(NUM_THREADS - 1 downto 0) := (others => '1');
 
-attribute keep : string;
-attribute keep of i_instr, cycle_counter, thread_ptr_new_request, thread_ptr_to_allocate, thread_ptr_new_result, thread_ptr_result_sent: signal is "true";
-attribute keep of next_instr_addr: signal is "true";
-attribute keep of imm_val, imm_val_12, imm_val_pipe_1, imm_val_pipe_2, imm_val_pipe_3,imm_val_pipe_4, imm_val_pipe_5, imm_val_pipe_6 : signal is "true";
-attribute keep of current_thread_id, thread_id_pipe_0: signal is "true";
-attribute keep of thread_id_pipe_1, thread_id_pipe_2, thread_id_pipe_3, thread_id_pipe_4, thread_id_pipe_5, thread_id_pipe_6: signal is "true";
-attribute keep of next_thread_id : signal is "true";
-attribute keep of next_pc : signal is "true";
-attribute keep of pc_pipe_0 : signal is "true";
-attribute keep of src1_addr : signal is "true";
-attribute keep of src2_addr : signal is "true";
-attribute keep of dest_addr, dest_addr_pipe_1,  dest_addr_pipe_2, dest_addr_pipe_3, dest_addr_pipe_4, dest_addr_pipe_5, dest_addr_pipe_6: signal is "true";
-attribute keep of reg_wr_back_data : signal is "true";
-attribute keep of next_pc_before_jump_pipe_0 : signal is "true";
-attribute keep of reg1 : signal is "true";
-attribute keep of reg2 : signal is "true";
-attribute keep of alu_operand_1, alu_operand_1_pipe_3, alu_operand_2_pipe_3  : signal is "true";
-attribute keep of alu_operand_2 : signal is "true";
-attribute keep of alu_opcode : signal is "true";
-attribute keep of alu_result, alu_result_final, alu_result_1, alu_result_2, alu_result_pipe_4, alu_result_pipe_5, alu_result_add, alu_result_add_pipe_4 : signal is "true";
-attribute keep of alu_operand_1_sel : signal is "true";
-attribute keep of alu_operand_2_sel : signal is "true";
-attribute keep of reg_wb_sel, reg_wb_sel_pipe_3, reg_wb_sel_pipe_4, reg_wb_sel_pipe_5, reg_wb_sel_tmp : signal is "true";
-attribute keep of reg_wr_en, reg_wr_en_BRAM, reg_wr_en_pipe_6: signal is "true";
-attribute keep of pc_sel_jmp : signal is "true";
-attribute keep of pc_sel_br, pc_sel_br_pipe_3, pc_sel_br_pipe_4 : signal is "true";
-attribute keep of func_opcode : signal is "true";
-attribute keep of br_unsigned : signal is "true";
-attribute keep of br_eq : signal is "true";
-attribute keep of br_lt : signal is "true";
-attribute keep of is_load_instr, is_store_instr : signal is "true";
-attribute keep of is_add_op, is_add_op_pipe_3, is_add_op_pipe_4, alu_group,  alu_group_pipe_3: signal is "true";
-attribute keep of alu_result_1_tmp_1, alu_result_1_tmp_2, alu_result_1_tmp_3, alu_result_1_tmp_4,  alu_result_1_tmp_5: signal is "true";
-attribute keep of reg_value_to_store_pipe_3, reg_value_to_store_pipe_4, reg_value_to_store_pipe_5, reg_value_to_store_pipe_6: signal is "true";
-attribute keep of rd_addr_BRAM_1, rd_addr_BRAM_2, wr_addr_BRAM: signal is "true";
-attribute keep of is_load_1_instr, is_load_1_instr_pipe_1, is_load_1_instr_pipe_2: signal is "true";
-attribute keep of is_store_1_instr, is_store_1_instr_pipe_1, is_store_1_instr_pipe_2, is_store_1_instr_pipe_3: signal is "true";
-attribute keep of is_store_1_instr_pipe_4, is_store_1_instr_pipe_5, is_store_1_instr_pipe_6: signal is "true";
-attribute keep of is_mem_mapped_store_instr, is_mem_mapped_store_instr_pipe_5, is_mem_mapped_store_instr_pipe_6: signal is "true";
-attribute keep of data_from_mem_BRAM_pipe_3, data_from_mem_BRAM_pipe_4, data_from_mem_BRAM_pipe_5, data_from_mem_BRAM_pipe_6: signal is "true";
-attribute keep of data_wb: signal is "true";
-attribute keep of data_to_fifo, data_to_fifo_pipe_5, data_to_fifo_pipe_6, fifo_write, fifo_write_pipe_5, fifo_write_pipe_6: signal is "true";
+--attribute keep : string;
+--attribute keep of i_instr, cycle_counter, thread_ptr_new_request, thread_ptr_to_allocate, thread_ptr_new_result, thread_ptr_result_sent: signal is "true";
+--attribute keep of next_instr_addr: signal is "true";
+--attribute keep of imm_val, imm_val_12, imm_val_pipe_1, imm_val_pipe_2, imm_val_pipe_3,imm_val_pipe_4, imm_val_pipe_5, imm_val_pipe_6 : signal is "true";
+--attribute keep of current_thread_id, thread_id_pipe_0: signal is "true";
+--attribute keep of thread_id_pipe_1, thread_id_pipe_2, thread_id_pipe_3, thread_id_pipe_4, thread_id_pipe_5, thread_id_pipe_6: signal is "true";
+--attribute keep of next_thread_id : signal is "true";
+--attribute keep of next_pc : signal is "true";
+--attribute keep of pc_pipe_0 : signal is "true";
+--attribute keep of src1_addr : signal is "true";
+--attribute keep of src2_addr : signal is "true";
+--attribute keep of dest_addr, dest_addr_pipe_1,  dest_addr_pipe_2, dest_addr_pipe_3, dest_addr_pipe_4, dest_addr_pipe_5, dest_addr_pipe_6: signal is "true";
+--attribute keep of reg_wr_back_data : signal is "true";
+--attribute keep of next_pc_before_jump_pipe_0 : signal is "true";
+--attribute keep of reg1 : signal is "true";
+--attribute keep of reg2 : signal is "true";
+--attribute keep of alu_operand_1, alu_operand_1_pipe_3, alu_operand_2_pipe_3  : signal is "true";
+--attribute keep of alu_operand_2 : signal is "true";
+--attribute keep of alu_opcode : signal is "true";
+--attribute keep of alu_result, alu_result_final, alu_result_1, alu_result_2, alu_result_pipe_4, alu_result_pipe_5, alu_result_add, alu_result_add_pipe_4 : signal is "true";
+--attribute keep of alu_operand_1_sel : signal is "true";
+--attribute keep of alu_operand_2_sel : signal is "true";
+--attribute keep of reg_wb_sel, reg_wb_sel_pipe_3, reg_wb_sel_pipe_4, reg_wb_sel_pipe_5, reg_wb_sel_tmp : signal is "true";
+--attribute keep of reg_wr_en, reg_wr_en_BRAM, reg_wr_en_pipe_6: signal is "true";
+--attribute keep of pc_sel_jmp : signal is "true";
+--attribute keep of pc_sel_br, pc_sel_br_pipe_3, pc_sel_br_pipe_4 : signal is "true";
+--attribute keep of func_opcode : signal is "true";
+--attribute keep of br_unsigned : signal is "true";
+--attribute keep of br_eq : signal is "true";
+--attribute keep of br_lt : signal is "true";
+--attribute keep of is_load_instr, is_store_instr : signal is "true";
+--attribute keep of is_add_op, is_add_op_pipe_3, is_add_op_pipe_4, alu_group,  alu_group_pipe_3: signal is "true";
+--attribute keep of alu_result_1_tmp_1, alu_result_1_tmp_2, alu_result_1_tmp_3, alu_result_1_tmp_4,  alu_result_1_tmp_5: signal is "true";
+--attribute keep of reg_value_to_store_pipe_3, reg_value_to_store_pipe_4, reg_value_to_store_pipe_5, reg_value_to_store_pipe_6: signal is "true";
+--attribute keep of rd_addr_BRAM_1, rd_addr_BRAM_2, wr_addr_BRAM: signal is "true";
+--attribute keep of is_load_1_instr, is_load_1_instr_pipe_1, is_load_1_instr_pipe_2: signal is "true";
+--attribute keep of is_store_1_instr, is_store_1_instr_pipe_1, is_store_1_instr_pipe_2, is_store_1_instr_pipe_3: signal is "true";
+--attribute keep of is_store_1_instr_pipe_4, is_store_1_instr_pipe_5, is_store_1_instr_pipe_6: signal is "true";
+--attribute keep of is_mem_mapped_store_instr, is_mem_mapped_store_instr_pipe_5, is_mem_mapped_store_instr_pipe_6: signal is "true";
+--attribute keep of data_from_mem_BRAM_pipe_3, data_from_mem_BRAM_pipe_4, data_from_mem_BRAM_pipe_5, data_from_mem_BRAM_pipe_6: signal is "true";
+--attribute keep of data_wb: signal is "true";
+--attribute keep of data_to_fifo, data_to_fifo_pipe_5, data_to_fifo_pipe_6, fifo_write, fifo_write_pipe_5, fifo_write_pipe_6: signal is "true";
 
 begin  
     -- cycle count to allow for first instr fetch latency and possibly for measurement purposes
@@ -210,7 +212,7 @@ begin
     begin 
         if rising_edge(clk) then -- rising edge
             if (reset = '0') then     
-                cycle_counter <= 0;             
+                cycle_counter <= (others => '0');              
             else
                 cycle_counter <= cycle_counter + 1;
             end if;
@@ -222,8 +224,8 @@ begin
                     begin 
                         if rising_edge(clk) then -- rising edge
                             if (reset = '0') then   
-                                current_thread_id <= 0; -- start with thread 0
-                                thread_id_pipe_0 <= 0;
+                                current_thread_id <= (others => '0'); -- start with thread 0
+                                thread_id_pipe_0 <= (others => '0');
                             -- cycle_counter > 0 because instr mem has a latency of 1 cycle
                             -- otherwise thread ID will be incremented but the instr is not yet available
                             elsif (cycle_counter > 0) then
@@ -236,7 +238,7 @@ begin
      
     -- compute the next PC within each thread, this value is not sent to mem to overcome latency
     -- but instead saved as the next pc for the current thread because the next thread will now run
-    next_pc <= std_logic_vector(unsigned(barrel_pc(current_thread_id)) + 4) when (cycle_counter > 0) else (others => '0'); 
+    next_pc <= std_logic_vector(unsigned(barrel_pc(to_integer(current_thread_id))) + 4) when (cycle_counter > 0) else (others => '0'); 
                                       
     -- prepare for fetching the next instr 
     next_thread_id <= current_thread_id + 1;    
@@ -252,16 +254,16 @@ begin
                     barrel_pc(index) <= (others => '0'); -- the others are 0 because they will be sent to memory early enough             
                 end loop;
             else
-                pc_pipe_0 <= barrel_pc(current_thread_id);
-                barrel_pc(current_thread_id) <= next_pc;
-                next_instr_addr <= barrel_pc(next_thread_id);
+                pc_pipe_0 <= barrel_pc(to_integer(current_thread_id));
+                barrel_pc(to_integer(current_thread_id)) <= next_pc;
+                next_instr_addr <= barrel_pc(to_integer(next_thread_id));
                 -- address of the next instr BEFORE the jump is taken - passed down the pipeline
-                next_pc_before_jump_pipe_0 <= std_logic_vector(unsigned(barrel_pc(current_thread_id)) + 4);
+                next_pc_before_jump_pipe_0 <= std_logic_vector(unsigned(barrel_pc(to_integer(current_thread_id))) + 4);
             end if;
             -- update the barrel pc for that thread ID
             -- the alu result is the target address for a branch or a jump coming from EX-Stage
             if ((pc_sel_pipe_4 = '1') or (pc_sel_br_pipe_4 = '1')) then
-                barrel_pc(thread_id_pipe_4) <= alu_result_add_pipe_4(INSTR_MEM_ADDR_WIDTH - 1 downto 0);
+                barrel_pc(to_integer(thread_id_pipe_4)) <= alu_result_add_pipe_4(INSTR_MEM_ADDR_WIDTH - 1 downto 0);
             end if;            
         end if;
     end process;
@@ -499,18 +501,18 @@ begin
     -- the effective address is the immediate value + base address for data mem in the BRAM
     -- for 512 elements allocated for BRAM, base address = 512 (10 0000 0000)
     -- the 2 LSB are discarded because the addr is a byte-addr but we need an index for each word of 4 bytes for the array   
-    rd_addr_BRAM_1 <= "00" & std_logic_vector(to_unsigned(thread_id_pipe_0, 3)) & src1_addr;    
+    rd_addr_BRAM_1 <= "00" & std_logic_vector(thread_id_pipe_0) & src1_addr;    
     
-    rd_addr_BRAM_2 <= "10" & std_logic_vector(to_unsigned(thread_id_pipe_0, 3)) & imm_val_12(6 downto 2) 
+    rd_addr_BRAM_2 <= "10" & std_logic_vector(thread_id_pipe_0) & imm_val_12(6 downto 2) 
                                 when (is_load_1_instr = '1') else
-                                "00" & std_logic_vector(to_unsigned(thread_id_pipe_0, 3)) & src2_addr;  
+                                "00" & std_logic_vector(thread_id_pipe_0) & src2_addr;  
     
     -- addr for write port
     -- dest addr forregFile implemented in distributed memory - dest_addr provided by decoder 
     -- if it is a move into mem, use the addr for data mem in BRAM built from the immediate value
-    wr_addr_BRAM <= "10" & std_logic_vector(to_unsigned(thread_id_pipe_6, 3)) & imm_val_pipe_6(6 downto 2) 
+    wr_addr_BRAM <= "10" & std_logic_vector(thread_id_pipe_6) & imm_val_pipe_6(6 downto 2) 
                             when (is_store_1_instr_pipe_6 = '1') else
-                            "00" & std_logic_vector(to_unsigned(thread_id_pipe_6, 3)) & dest_addr_pipe_6;                               
+                            "00" & std_logic_vector(thread_id_pipe_6) & dest_addr_pipe_6;                               
     
     -- regFile write enable provided by decoder 
     -- but set to 0000 if the dest register is 0 and it is a NOT a load/store for BRAM, except for memory mapped addresses
@@ -525,7 +527,7 @@ begin
             begin 
                 if rising_edge(clk) then
                     if (reset = '0') then
-                        thread_id_pipe_1 <= 0;
+                        thread_id_pipe_1 <= (others => '0'); 
                         pc_pipe_1 <= (others => '0'); 
                         pc_sel_pipe_1 <= '0';
                         func_opcode_pipe_1 <= (others => '0'); 
@@ -571,7 +573,7 @@ begin
                     begin 
                         if (clk'event and clk = '1') then
                             if (reset = '0') then
-                                thread_id_pipe_2 <= 0;
+                                thread_id_pipe_2 <= (others => '0'); 
                                 pc_pipe_2 <= (others => '0'); 
                                 pc_sel_pipe_2 <= '0';
                                 func_opcode_pipe_2 <= (others => '0'); 
@@ -681,7 +683,7 @@ begin
                 begin 
                     if (clk'event and clk = '1') then
                         if (reset = '0') then
-                            thread_id_pipe_3 <= 0;
+                            thread_id_pipe_3 <= (others => '0'); 
                             pc_sel_pipe_3 <= '0';
                             pc_sel_br_pipe_3 <='0'; 
                             is_load_instr_pipe_3 <='0';
@@ -811,7 +813,7 @@ begin
             begin 
                 if (clk'event and clk = '1') then
                     if (reset = '0') then
-                        thread_id_pipe_4 <= 0;
+                        thread_id_pipe_4 <= (others => '0'); 
                         pc_sel_pipe_4 <= '0';                        
                         pc_sel_br_pipe_4 <= '0';
                         is_load_instr_pipe_4 <= '0';
@@ -873,10 +875,10 @@ begin
                                                 (alu_result_add_pipe_4 = job_done_addr)  ) and (is_store_instr_pipe_4 = '1')) else '0' ;                                                        
             
     loaded_mem_mapped_data <= (others => '0') when (is_load_instr_pipe_4 = '0') else
-                                std_logic_vector(to_unsigned(thread_id_pipe_4, DATA_WIDTH)) when (alu_result_add_pipe_4 = thread_id_addr)  else 
-                                x"0000000" & "000" & job_request_reg(thread_id_pipe_4) when (alu_result_add_pipe_4 = job_request_addr) else
-                                x"0000000" & "000" & job_done_reg(thread_id_pipe_4) when (alu_result_add_pipe_4 = job_done_addr) else
-                                job_value_reg(thread_id_pipe_4) when (alu_result_add_pipe_4 = job_value_addr) else
+                                std_logic_vector(func_zero_ext(thread_id_pipe_4, DATA_WIDTH)) when (alu_result_add_pipe_4 = thread_id_addr)  else 
+                                x"0000000" & "000" & job_request_reg(to_integer(thread_id_pipe_4)) when (alu_result_add_pipe_4 = job_request_addr) else
+                                x"0000000" & "000" & job_done_reg(to_integer(thread_id_pipe_4)) when (alu_result_add_pipe_4 = job_done_addr) else
+                                job_value_reg(to_integer(thread_id_pipe_4)) when (alu_result_add_pipe_4 = job_value_addr) else
                                 func_zero_ext(i_id, DATA_WIDTH) when (alu_result_add_pipe_4 = core_id_addr) else
                                 (others => '0');       
     
@@ -890,20 +892,20 @@ begin
 if_gen_collect:     
         if (COLLECT_MODE = '0') generate
            gen_fifo:    process (clk)    
-                        variable var_thread_id_1, var_thread_id_2: integer range 0 to 7;              
+                        variable var_thread_id_1, var_thread_id_2: unsigned(2 downto 0);            
                         begin 
                             if rising_edge(clk) then -- rising edge
                                 if (reset = '0') then
-                                    thread_ptr_new_request <= 0;
-                                    thread_ptr_to_allocate <= 0;
-                                    num_incoming_requests <= 0;
-                                    num_requests_allocated <= 0;
-                                    num_pending_requests <= 0;
-                                    num_incoming_results <= 0;
-                                    num_results_sent <= 0;
-                                    num_pending_results <= 0;
-                                    thread_ptr_new_result <= 0;
-                                    thread_ptr_result_sent <= 0;
+                                    thread_ptr_new_request <= (others => '0');
+                                    thread_ptr_to_allocate <= (others => '0');
+                                    num_incoming_requests <= (others => '0');
+                                    num_requests_allocated <= (others => '0');
+                                    num_pending_requests <= (others => '0');
+                                    num_incoming_results <= (others => '0');
+                                    num_results_sent <= (others => '0');
+                                    num_pending_results <= (others => '0');
+                                    thread_ptr_new_result <= (others => '0');
+                                    thread_ptr_result_sent <= (others => '0');
                                     for index in 0 to NUM_THREADS - 1 loop
                                         job_request_reg(index) <= '0'; 
                                         job_done_reg(index) <= '0'; 
@@ -912,20 +914,20 @@ if_gen_collect:
                                     end loop;
                                 else                                   
                                     -- a new job is available from send/recv  
-                                    var_thread_id_1 := job_request_queue(thread_ptr_to_allocate);                                     
+                                    var_thread_id_1 := job_request_queue(to_integer(thread_ptr_to_allocate));                                     
                                     if (i_core_dispatch_en = '1') then                                                                       
                                         thread_ptr_to_allocate <= thread_ptr_to_allocate + 1; -- move pointer forward for the next request
                                         num_requests_allocated <= num_requests_allocated + 1; -- decrease num of pending requests
-                                        job_value_reg(var_thread_id_1) <= i_job_value(DATA_WIDTH - 1 downto 0); -- save parameter in param reg for index thread id            
-                                        job_request_reg(var_thread_id_1) <= '0'; -- so that the thread waiting for this request can go ahead
+                                        job_value_reg(to_integer(var_thread_id_1)) <= i_job_value(DATA_WIDTH - 1 downto 0); -- save parameter in param reg for index thread id            
+                                        job_request_reg(to_integer(var_thread_id_1)) <= '0'; -- so that the thread waiting for this request can go ahead
                                     end if;  
                                                                         
                                     -- write job request to job request register if a thread makes a request
                                     if ((alu_result_add_pipe_4 = job_request_addr) and (is_store_instr_pipe_4 = '1')) then                                                                             
-                                        job_request_queue(thread_ptr_new_request) <= thread_id_pipe_4;  
+                                        job_request_queue(to_integer(thread_ptr_new_request)) <= thread_id_pipe_4;  
                                         thread_ptr_new_request <= thread_ptr_new_request + 1;
                                         num_incoming_requests <= num_incoming_requests + 1; -- increase num of pending requests
-                                        job_request_reg(thread_id_pipe_4) <= '1';       
+                                        job_request_reg(to_integer(thread_id_pipe_4)) <= '1';       
                                     end if;
                                     
                                     num_pending_requests <= num_incoming_requests - num_requests_allocated;
@@ -945,20 +947,20 @@ if_gen_collect:
                                 
     elsif (COLLECT_MODE = '1') generate
            gen_poll:    process (clk)    
-                        variable var_thread_id_1, var_thread_id_2: integer range 0 to 7;              
+                        variable var_thread_id_1, var_thread_id_2:  unsigned(2 downto 0);                
                         begin 
                             if rising_edge(clk) then -- rising edge
                                 if (reset = '0') then
-                                    thread_ptr_new_request <= 0;
-                                    thread_ptr_to_allocate <= 0;
-                                    num_incoming_requests <= 0;
-                                    num_requests_allocated <= 0;
-                                    num_pending_requests <= 0;
-                                    num_incoming_results <= 0;
-                                    num_results_sent <= 0;
-                                    num_pending_results <= 0;
-                                    thread_ptr_new_result <= 0;
-                                    thread_ptr_result_sent <= 0;
+                                    thread_ptr_new_request <= (others => '0');
+                                    thread_ptr_to_allocate <= (others => '0');
+                                    num_incoming_requests <= (others => '0');
+                                    num_requests_allocated <= (others => '0');
+                                    num_pending_requests <= (others => '0');
+                                    num_incoming_results <= (others => '0');
+                                    num_results_sent <= (others => '0');
+                                    num_pending_results <= (others => '0');
+                                    thread_ptr_new_result <= (others => '0');
+                                    thread_ptr_result_sent <= (others => '0');
                                     for index in 0 to NUM_THREADS - 1 loop
                                         job_request_reg(index) <= '0'; 
                                         job_done_reg(index) <= '0'; 
@@ -968,19 +970,19 @@ if_gen_collect:
                                 else   
                                     -- write job request to job request register if a thread makes a request
                                     if ((alu_result_add_pipe_4 = job_request_addr) and (is_store_instr_pipe_4 = '1')) then                                                                             
-                                        job_request_queue(thread_ptr_new_request) <= thread_id_pipe_4;  
+                                        job_request_queue(to_integer(thread_ptr_new_request)) <= thread_id_pipe_4;  
                                         thread_ptr_new_request <= thread_ptr_new_request + 1;
                                         num_incoming_requests <= num_incoming_requests + 1; -- increase num of pending requests
-                                        job_request_reg(thread_id_pipe_4) <= '1';       
+                                        job_request_reg(to_integer(thread_id_pipe_4)) <= '1';       
                                     end if;   
                                                                  
                                     -- a new job is allocated
-                                    var_thread_id_1 := job_request_queue(thread_ptr_to_allocate);                                     
+                                    var_thread_id_1 := job_request_queue(to_integer(thread_ptr_to_allocate));                                     
                                     if (i_core_dispatch_en = '1') and (num_pending_requests > 0) then                                                                       
                                         thread_ptr_to_allocate <= thread_ptr_to_allocate + 1; -- move pointer forward for the next request
                                         num_requests_allocated <= num_requests_allocated + 1; -- decrease num of pending requests
-                                        job_value_reg(var_thread_id_1) <= i_job_value(DATA_WIDTH - 1 downto 0); -- save parameter in param reg for index thread id            
-                                        job_request_reg(var_thread_id_1) <= '0'; -- so that the thread waiting for this request can go ahead
+                                        job_value_reg(to_integer(var_thread_id_1)) <= i_job_value(DATA_WIDTH - 1 downto 0); -- save parameter in param reg for index thread id            
+                                        job_request_reg(to_integer(var_thread_id_1)) <= '0'; -- so that the thread waiting for this request can go ahead
                                     end if;  
                                                                                                              
                                     num_pending_requests <= num_incoming_requests - num_requests_allocated;
@@ -993,20 +995,20 @@ if_gen_collect:
                                     
                                 -- result is ready from a thread, insert in done queue and write job_value_reg
                                 if ((alu_result_add_pipe_4 = job_result_addr) and (is_store_instr_pipe_4 = '1')) then
-                                    job_done_queue(thread_ptr_new_result) <= thread_id_pipe_4; 
-                                    job_result_reg(thread_id_pipe_4) <= reg_value_to_store_pipe_4;
+                                    job_done_queue(to_integer(thread_ptr_new_result)) <= thread_id_pipe_4; 
+                                    job_result_reg(to_integer(thread_id_pipe_4)) <= reg_value_to_store_pipe_4;
                                     thread_ptr_new_result <= thread_ptr_new_result + 1;
                                     num_incoming_results <= num_incoming_results + 1; -- increment num of new results avaiilable
-                                    job_done_reg(thread_id_pipe_4) <= '1'; 
+                                    job_done_reg(to_integer(thread_id_pipe_4)) <= '1'; 
                                 end if;
                 
                                 -- pass the result to the dispatcher
-                                var_thread_id_2 := job_done_queue(thread_ptr_result_sent);                                        
+                                var_thread_id_2 := job_done_queue(to_integer(thread_ptr_result_sent));                                        
                                 if ( (i_core_result_en = '1') and (num_pending_results > 0) ) then                                                                    
-                                    o_job_result <= job_result_reg(var_thread_id_2); -- result to be sent out to the port                                      
+                                    o_job_result <= job_result_reg(to_integer(var_thread_id_2)); -- result to be sent out to the port                                      
                                     thread_ptr_result_sent <= thread_ptr_result_sent + 1; -- move pointer forward for the next result to be sent
                                     num_results_sent <= num_results_sent + 1; -- increment num of results sent   
-                                    job_done_reg(var_thread_id_2) <= '0';
+                                    job_done_reg(to_integer(var_thread_id_2)) <= '0';
                                     o_job_done <= '1'; 
                                 else
                                     o_job_done <= '0';              
@@ -1017,7 +1019,7 @@ if_gen_collect:
                                 
                                 -- a thread is done with its job
                                 if ((alu_result_add_pipe_4 = thread_per_core_done_addr) and (is_store_instr_pipe_4 = '1'))  then
-                                    threads_per_core_done_reg(thread_id_pipe_4) <= '0';   
+                                    threads_per_core_done_reg(to_integer(thread_id_pipe_4)) <= '0';   
                                 end if;
                                                                              
                             end if;
@@ -1034,7 +1036,7 @@ if_gen_collect:
             begin 
                 if (clk'event and clk = '1') then
                     if (reset = '0') then
-                        thread_id_pipe_5 <= 0;
+                        thread_id_pipe_5 <= (others => '0');  
                         is_load_1_instr_pipe_5 <= '0'; 
                         is_store_1_instr_pipe_5 <= '0';
                         is_mem_mapped_store_instr_pipe_5 <= '0'; 
@@ -1074,7 +1076,7 @@ if_gen_collect:
             begin
                 if (clk'event and clk = '1') then
                     if (reset = '0') then
-                        thread_id_pipe_6 <= 0;
+                        thread_id_pipe_6 <= (others => '0');  
                         is_load_1_instr_pipe_6 <= '0'; 
                         is_store_1_instr_pipe_6 <= '0'; 
                         is_mem_mapped_store_instr_pipe_6 <= '0'; 

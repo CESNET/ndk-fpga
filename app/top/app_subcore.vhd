@@ -129,13 +129,16 @@ signal wr_data_in, buffer_data_32bit: DATA_TYPE;
 signal valid, all_cores_done: std_logic; 
 signal wr_en: std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM  
 
-
 -- signals for PCI
 signal packed_data: std_logic_vector(511 downto 0);
-signal packed_data_counter: integer range 0 to 15;
-signal next_read_buffer, enable_PCI, ready_to_send, send_first_half: std_logic;
+signal packed_data_counter, packed_data_counter_next: unsigned(3 downto 0);
+signal rd_addr_next: std_logic_vector(13 downto 0);
+
+type transfer_fsm_state_type is (IDLE, PACKING, SENDING_1_HALF, SENDING_2_HALF);
+signal transfer_state, transfer_next_state : transfer_fsm_state_type := IDLE;
 
 signal manycore_rst : std_logic;
+
 begin
 
     barrel_proc_debug_core_i : entity work.BARREL_PROC_DEBUG_CORE
@@ -154,13 +157,13 @@ begin
             MI_ARDY   => MI_ARDY,
             MI_DRDY   => MI_DRDY);
 
-    DMA_RX_MFB_META_PKT_SIZE <= std_logic_vector(to_unsigned(256, DMA_RX_MFB_META_PKT_SIZE'length));
+    DMA_RX_MFB_META_PKT_SIZE <= std_logic_vector(to_unsigned(64, DMA_RX_MFB_META_PKT_SIZE'length));
     DMA_RX_MFB_META_HDR_META <= (others => '0');
     DMA_RX_MFB_META_CHAN <= (others => '0');
     
     many_core:  many_core_system 
                 port map (  clk => clk,
-                            reset => RESET or manycore_rst,
+                            reset => (not RESET) and (not manycore_rst),
                             o_data_valid => valid,                          
                             o_data_out => wr_data_in,
                             o_all_cores_done => all_cores_done);
@@ -204,63 +207,95 @@ BRAM_wr_proc:   process(all)
                         end loop;      
                  
                     end process; 
-               
--- read from frame buffer and send to PCI interface logic                                                                                                                                                                                      
- transfer_to_PCI:   process(clk)
+                    
+ -- select the correct BRAM for reading
+BRAM_rd_proc:   process(all)
                     begin
-                        if (rising_edge(clk)) then
-                            if (RESET = '1' or manycore_rst = '1') then
-                                packed_data_counter <= 1;
-                                DMA_RX_MFB_SRC_RDY <= '0';
-                                next_read_buffer <= '1';
-                                ready_to_send <= '0';
-                                enable_PCI <= '0';
-                                send_first_half <= '1';
-                            elsif ( (all_cores_done = '1') and (unsigned(rd_addr) < NUM_JOBS) and (next_read_buffer = '1') ) then 
-								for i in 0 to 7 loop
-									if (rd_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
-										enb_arr(i) <='1';
-										enable_PCI <= '1';
-										buffer_data_32bit <= rd_data_arr(i);
-									else 
-										enb_arr(i) <= '0';
-										enable_PCI <= '0';
-									end if;
-								end loop; 
-								rd_addr <= std_logic_vector(unsigned(rd_addr) + 1);  		
-                            elsif (ready_to_send = '1') then                                                                     
-                                if (DMA_TX_MFB_DST_RDY = '1') then
-									if(send_first_half = '1') then										
-										DMA_RX_MFB_DATA    <= packed_data(255 downto 0);
-										DMA_RX_MFB_SOF     <= "1";
-										DMA_RX_MFB_EOF     <= "0";
-										DMA_RX_MFB_SOF_POS <= (others => '0');
-										DMA_RX_MFB_EOF_POS <= (others => '1');
-										DMA_RX_MFB_SRC_RDY <= '1';
-										ready_to_send <= '1';
-										next_read_buffer <= '1';
-										send_first_half <= '0';		
-									else									
-										DMA_RX_MFB_DATA    <= packed_data(511 downto 256);
-										DMA_RX_MFB_SOF     <= "0";
-										DMA_RX_MFB_EOF     <= "1";
-										DMA_RX_MFB_SOF_POS <= (others => '0');
-										DMA_RX_MFB_EOF_POS <= (others => '1');
-										DMA_RX_MFB_SRC_RDY <= '1';
-										ready_to_send <= '0';
-										send_first_half <= '1';	
-								    end if;																											
-								else
-									next_read_buffer <= '0';
-								end if;    
-                            elsif ( (enable_PCI = '1') and (packed_data_counter <= 15) and (ready_to_send = '0') ) then  
-								packed_data((packed_data_counter*32 - 1) downto 0) <= buffer_data_32bit;
-                                packed_data_counter <= packed_data_counter + 1;
-                                if (packed_data_counter = 15) then
-									ready_to_send <= '1';
-								end if;								  
+                        for i in 0 to 7 loop
+                            if (rd_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
+                                enb_arr(i) <='1';
+                                buffer_data_32bit <= rd_data_arr(i);   
+                            else 
+                                enb_arr(i) <='0';
                             end if;
-                        end if;                   
-                    end process;   
+                        end loop;      
+                 
+                    end process;                    
+
+-- read from frame buffer and send to PCI interface logic  
+-- FSM for transferring data to PCI interface                    
+reset_fsm_state_reg:    process (CLK) is
+                        begin
+                            if (rising_edge(CLK)) then
+                                if (RESET = '1' or manycore_rst = '1') then
+                                    transfer_state <= IDLE;
+                                    packed_data_counter <= (others => '0');
+                                    rd_addr <= (others => '0');
+                                else
+                                    transfer_state <= transfer_next_state ;
+                                    packed_data_counter <= packed_data_counter_next;
+                                    rd_addr <= rd_addr_next;
+                                end if;
+                            end if;
+                        end process;
+
+reset_fsm_nst_logic :   process (all) is
+                        begin
+                            transfer_next_state <= transfer_state; 
+                            packed_data_counter_next <= packed_data_counter; 
+                            rd_addr_next <= rd_addr;
+                            DMA_RX_MFB_DATA    <= (others => '0');
+                            DMA_RX_MFB_SOF     <= (others => '0');
+                            DMA_RX_MFB_EOF     <= (others => '0');
+                            DMA_RX_MFB_SOF_POS <= (others => '0');
+                            DMA_RX_MFB_EOF_POS <= (others => '0');
+                            DMA_RX_MFB_SRC_RDY <= '0';   
+                                
+                            case transfer_state is
+                                when IDLE =>
+                                    DMA_RX_MFB_SRC_RDY <= '0';
+                                    if (all_cores_done = '1' and unsigned(rd_addr) < NUM_JOBS) then
+                                        transfer_next_state <= PACKING;
+                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1); 
+                                    end if;
+                                    
+                                when PACKING =>
+                                    if (unsigned(rd_addr) <= NUM_JOBS) then 
+                                        packed_data(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= buffer_data_32bit;                                        
+                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);  
+                                        packed_data_counter_next <= packed_data_counter + 1;
+                                        if (packed_data_counter = 15) then
+                                            transfer_next_state <= SENDING_1_HALF;                                    
+                                        end if;			 	
+                                    end if;	
+                                    
+                                when SENDING_1_HALF =>
+                                    if (DMA_RX_MFB_DST_RDY = '1') then																		
+										transfer_next_state <= SENDING_2_HALF;
+									end if;
+									
+                                    DMA_RX_MFB_DATA    <= packed_data(255 downto 0);
+                                    DMA_RX_MFB_SOF     <= "1";
+                                    DMA_RX_MFB_EOF     <= "0";
+                                    DMA_RX_MFB_SOF_POS <= (others => '0');
+                                    DMA_RX_MFB_EOF_POS <= (others => '1');
+                                    DMA_RX_MFB_SRC_RDY <= '1';
+                                
+                                when SENDING_2_HALF =>
+                                    if (DMA_RX_MFB_DST_RDY = '1') then		
+										transfer_next_state <= PACKING;
+								    end if;
+								    
+                                    DMA_RX_MFB_DATA    <= packed_data(511 downto 256);
+                                    DMA_RX_MFB_SOF     <= "0";
+                                    DMA_RX_MFB_EOF     <= "1";
+                                    DMA_RX_MFB_SOF_POS <= (others => '0');
+                                    DMA_RX_MFB_EOF_POS <= (others => '1');
+                                    DMA_RX_MFB_SRC_RDY <= '1';
+								
+								when others => null;
+										
+                           end case;
+                        end process;
     
 end architecture;
