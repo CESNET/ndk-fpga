@@ -62,6 +62,8 @@ package RISCV_package is
     -- Function prototypes for zero and sign extension
     function func_zero_ext(I: std_logic_vector; L: natural) return std_logic_vector;
     function func_sign_ext(I: std_logic_vector; L: natural) return std_logic_vector;
+    function func_zero_ext(I: unsigned; L: natural) return unsigned;
+    function func_sign_ext(I: unsigned; L: natural) return unsigned;
 
 end RISCV_package;
  
@@ -87,6 +89,28 @@ function func_sign_ext (I : std_logic_vector; L : natural) return std_logic_vect
             var_result(index) := I(I'length - 1);
         end loop;
         return var_result;
-    end func_sign_ext;  
+    end func_sign_ext; 
+    
+    -- Zero extension input to L bits (L must be larger than I'length):
+function func_zero_ext (I : unsigned; L : natural) return unsigned is 
+    variable var_result: unsigned(L-1 downto 0);
+    begin
+        var_result(I'length - 1 downto 0) := I;
+        for index in L-1 downto I'length loop
+            var_result(index) := '0';
+        end loop;
+        return var_result;
+    end func_zero_ext;
+
+-- Sign extension input to L bits (L must be larger than I'length):
+function func_sign_ext (I : unsigned; L : natural) return unsigned is 
+    variable var_result: unsigned(L-1 downto 0);
+    begin
+        var_result(I'length-1 downto 0) := I;
+        for index in L-1 downto I'length loop
+            var_result(index) := I(I'length - 1);
+        end loop;
+        return var_result;
+    end func_sign_ext;   
     
 end RISCV_package;
