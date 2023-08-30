@@ -7,23 +7,20 @@ use IEEE.NUMERIC_STD.ALL;
 package many_core_package is
     -- CONSTANTS 
 --    constant NUM_CORES : positive := 16; -- number of cores
---    constant NUM_CORES_SQUARE_ROOT : positive := 4; -- needed for instantiation in 2 dimensions
 --    constant NUM_COLLECT_FIFOS : positive := 5; -- number of extra fifos required to collect results from each group of 4 fifos recursively
 --    constant NUM_CORES_BIT_WIDTH : positive := 5; -- number of cores bis size  
-    constant NUM_CORES : positive := 4; -- number of cores
-    constant NUM_CORES_SQUARE_ROOT : positive := 2; -- needed for instantiation in 2 dimensions
-    constant NUM_COLLECT_FIFOS : positive := 1; -- number of extra fifos required to collect results from each group of 4 fifos recursively
-    constant NUM_CORES_BIT_WIDTH : positive := 3; -- number of cores bis size  
+    constant NUM_CORES : positive := 16; -- number of cores
+    constant NUM_COLLECT_FIFOS : positive := 5; -- number of extra fifos required to collect results from each group of 4 fifos recursively
+    constant NUM_CORES_BIT_WIDTH : positive := 5; -- number of cores bis size  
 
-    constant NUM_JOBS : positive := 64; -- number of jobs
-    constant JOB_ID_BIT_WIDTH : integer := 14; -- job ID bit size if used
+    constant NUM_JOBS : positive := 16384; -- number of jobs
  
     -- constant for checking if all cores are done, they are done when all elements of the vector are 1
     constant all_ones : std_logic_vector(NUM_CORES - 1 downto 0) := (others => '1');
 --    -- constant for finding the 4 fifos from which a give collect fifos gets its data (16 cores)
 --    constant MASK_COLLECT_FIFO : std_logic_vector(NUM_CORES_BIT_WIDTH - 1 downto 0) := "01111";
     -- constant for finding the 4 fifos from which a give collect fifos gets its data (4cores)
-    constant MASK_COLLECT_FIFO : std_logic_vector(NUM_CORES_BIT_WIDTH - 1 downto 0) := "001";
+    constant MASK_COLLECT_FIFO : std_logic_vector(NUM_CORES_BIT_WIDTH - 1 downto 0) := "01111";
    
     -- OPTIONS for conditional generate of core variants   
     -- implementation of regFile 1 either in BRAM or in distributed memory 
