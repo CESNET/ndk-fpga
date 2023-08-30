@@ -125,12 +125,12 @@ type rd_data_type is array(0 to 7) of DATA_TYPE;
 signal rd_data_arr: rd_data_type;
 signal wr_addr, rd_addr: std_logic_vector(13 downto 0);
 signal ena_arr, enb_arr: std_logic_vector(0 to 7);
-signal wr_data_in, buffer_data_32bit: DATA_TYPE;
+signal wr_data_in: DATA_TYPE;
 signal valid, all_cores_done: std_logic; 
 signal wr_en: std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM  
 
 -- signals for PCI
-signal packed_data: std_logic_vector(511 downto 0);
+signal packed_data, packed_data_next: std_logic_vector(511 downto 0);
 signal packed_data_counter, packed_data_counter_next: unsigned(3 downto 0);
 signal rd_addr_next: std_logic_vector(13 downto 0);
 
@@ -193,7 +193,7 @@ gen_frame_buffer:   for i in 0 to 7 generate
                         end generate gen_frame_buffer;
                         
     wr_en <= (others => '1') when (valid = '1') else (others => '0') ; -- write 4 individual bytes in BRAM                  
-    wr_addr <= wr_data_in((9 + JOB_ID_BIT_WIDTH) downto 10); -- location in BRAM, iteration counter for Mandelbrot is 10 bits wide          
+    wr_addr <= wr_data_in(23 downto 10); -- location in BRAM, iteration counter for Mandelbrot is 10 bits wide          
           
 -- select the correct BRAM for writing
 BRAM_wr_proc:   process(all)
@@ -214,7 +214,6 @@ BRAM_rd_proc:   process(all)
                         for i in 0 to 7 loop
                             if (rd_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
                                 enb_arr(i) <='1';
-                                buffer_data_32bit <= rd_data_arr(i);   
                             else 
                                 enb_arr(i) <='0';
                             end if;
@@ -229,12 +228,14 @@ reset_fsm_state_reg:    process (CLK) is
                             if (rising_edge(CLK)) then
                                 if (RESET = '1' or manycore_rst = '1') then
                                     transfer_state <= IDLE;
-                                    packed_data_counter <= (others => '0');
                                     rd_addr <= (others => '0');
+                                    packed_data_counter <= (others => '0');
+                                    packed_data <= (others => '0'); 
                                 else
-                                    transfer_state <= transfer_next_state ;
-                                    packed_data_counter <= packed_data_counter_next;
+                                    transfer_state <= transfer_next_state;
                                     rd_addr <= rd_addr_next;
+                                    packed_data_counter <= packed_data_counter_next;
+                                    packed_data <= packed_data_next;
                                 end if;
                             end if;
                         end process;
@@ -242,8 +243,9 @@ reset_fsm_state_reg:    process (CLK) is
 reset_fsm_nst_logic :   process (all) is
                         begin
                             transfer_next_state <= transfer_state; 
-                            packed_data_counter_next <= packed_data_counter; 
                             rd_addr_next <= rd_addr;
+                            packed_data_counter_next <= packed_data_counter; 
+                            packed_data_next <= packed_data;
                             DMA_RX_MFB_DATA    <= (others => '0');
                             DMA_RX_MFB_SOF     <= (others => '0');
                             DMA_RX_MFB_EOF     <= (others => '0');
@@ -260,10 +262,10 @@ reset_fsm_nst_logic :   process (all) is
                                     end if;
                                     
                                 when PACKING =>
-                                    if (unsigned(rd_addr) <= NUM_JOBS) then 
-                                        packed_data(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= buffer_data_32bit;                                        
+                                    if (unsigned(rd_addr) <= NUM_JOBS) then                                     
                                         rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);  
                                         packed_data_counter_next <= packed_data_counter + 1;
+                                        packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= rd_data_arr(to_integer(unsigned(rd_addr(13 downto 11))));                                         
                                         if (packed_data_counter = 15) then
                                             transfer_next_state <= SENDING_1_HALF;                                    
                                         end if;			 	
