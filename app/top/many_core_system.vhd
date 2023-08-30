@@ -172,7 +172,7 @@ component fifo is
               full : out std_logic); -- set as '1' when the queue is full
 end component;
 
-type core_id_matrix is array (0 to NUM_CORES_SQUARE_ROOT - 1, 0 to NUM_CORES_SQUARE_ROOT - 1) of std_logic_vector(NUM_CORES_BIT_WIDTH - 1 downto 0);
+type core_id_matrix is array (0 to log2(NUM_CORES) - 1, 0 to log2(NUM_CORES) - 1) of std_logic_vector(NUM_CORES_BIT_WIDTH - 1 downto 0);
 type fifo_array is array (0 to NUM_CORES + NUM_COLLECT_FIFOS - 1) of DATA_TYPE;
 type instr_addr_array is array (0 to NUM_CORES - 1) of std_logic_vector(INSTR_MEM_ADDR_WIDTH - 1 downto 0);
 type data_mem_addr_array is array (0 to NUM_CORES - 1) of std_logic_vector(DATA_MEM_ADDR_WIDTH - 1 downto 0); 
@@ -213,195 +213,195 @@ init_proc:  process(clk)
             begin
                 if rising_edge(clk) then
                     if (reset = '0') then
-                        for i in 0 to NUM_CORES_SQUARE_ROOT - 1 loop
-                            for j in 0 to NUM_CORES_SQUARE_ROOT - 1 loop
-                                core_id(i, j) <= std_logic_vector(to_unsigned(NUM_CORES_SQUARE_ROOT*i + j, NUM_CORES_BIT_WIDTH)); 
+                        for i in 0 to log2(NUM_CORES) - 1 loop
+                            for j in 0 to log2(NUM_CORES) - 1 loop
+                                core_id(i, j) <= std_logic_vector(to_unsigned(log2(NUM_CORES)*i + j, NUM_CORES_BIT_WIDTH)); 
                             end loop;
                         end loop; 
                     end if;
                 end if;
             end process;
 
--- instantiation barrel core system in 2 dimensions - size NUM_CORES_SQUARE_ROOT in each dimension 
+-- instantiation barrel core system in 2 dimensions - size log2(NUM_CORES) in each dimension 
 
 -- regFile 1 and 2 in BRAM, data mem in BRAM with regFile2, instr mem distributed, no multiplier
 if_gen_core:    if ( (REGFILE_1_SELECT = '1') and (REGFILE_2_SELECT = '1') and (DATA_MEM_SELECT = '1') and (INSTR_MEM_SELECT = '0') and (MULTIPLIER_SELECT = '0') ) generate 
-                    gen_i:  for i in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate          
+                    gen_i:  for i in 0 to (log2(NUM_CORES) - 1) generate          
                             begin   
-                            gen_j:  for j in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate
+                            gen_j:  for j in 0 to (log2(NUM_CORES) - 1) generate
                                     begin
                                         -- instantiation core
                                         C: barrel_core_variant_1 port map (
                                                         clk => clk,
                                                         reset => reset,
                                                         i_id => core_id(i,j),
-                                                        i_core_dispatch_en => core_dispatch_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_core_result_en => core_result_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_job_value => job_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        i_instr => instr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_next_instr_addr => instr_addr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_fifo_write => fifo_write(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_to_fifo => data_to_fifo(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_request => job_request(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_done => job_done(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_result => result_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        o_core_done => all_cores_done_reg(NUM_CORES_SQUARE_ROOT*i + j));  
+                                                        i_core_dispatch_en => core_dispatch_en(log2(NUM_CORES)*i + j),
+                                                        i_core_result_en => core_result_en(log2(NUM_CORES)*i + j),
+                                                        i_job_value => job_value(log2(NUM_CORES)*i + j), 
+                                                        i_instr => instr(log2(NUM_CORES)*i + j),
+                                                        o_next_instr_addr => instr_addr(log2(NUM_CORES)*i + j),
+                                                        o_fifo_write => fifo_write(log2(NUM_CORES)*i + j),
+                                                        o_data_to_fifo => data_to_fifo(log2(NUM_CORES)*i + j),
+                                                        o_job_request => job_request(log2(NUM_CORES)*i + j),
+                                                        o_job_done => job_done(log2(NUM_CORES)*i + j),
+                                                        o_job_result => result_value(log2(NUM_CORES)*i + j), 
+                                                        o_core_done => all_cores_done_reg(log2(NUM_CORES)*i + j));  
                                     end generate gen_j;                                     
                             end generate gen_i;                             
 
  -- regFile 2 in BRAM, data mem in BRAM with regFile2, regFile1 distributed, instr mem distributed, no multiplier                                
                 elsif ( (REGFILE_1_SELECT = '0') and (REGFILE_2_SELECT = '1') and (DATA_MEM_SELECT = '1') and (INSTR_MEM_SELECT = '0') and (MULTIPLIER_SELECT = '0') ) generate 
-                    gen_i:  for i in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate          
+                    gen_i:  for i in 0 to (log2(NUM_CORES) - 1) generate          
                             begin   
-                            gen_j:  for j in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate
+                            gen_j:  for j in 0 to (log2(NUM_CORES) - 1) generate
                                     begin
                                         -- instantiation core
                                         C: barrel_core_variant_2 port map (
                                                         clk => clk,
                                                         reset => reset,
                                                         i_id => core_id(i,j),
-                                                        i_core_dispatch_en => core_dispatch_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_core_result_en => core_result_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_job_value => job_value(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_instr => instr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_next_instr_addr => instr_addr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_fifo_write => fifo_write(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_to_fifo => data_to_fifo(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_request => job_request(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_done => job_done(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_result => result_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        o_core_done => all_cores_done_reg(NUM_CORES_SQUARE_ROOT*i + j));    
+                                                        i_core_dispatch_en => core_dispatch_en(log2(NUM_CORES)*i + j),
+                                                        i_core_result_en => core_result_en(log2(NUM_CORES)*i + j),
+                                                        i_job_value => job_value(log2(NUM_CORES)*i + j),
+                                                        i_instr => instr(log2(NUM_CORES)*i + j),
+                                                        o_next_instr_addr => instr_addr(log2(NUM_CORES)*i + j),
+                                                        o_fifo_write => fifo_write(log2(NUM_CORES)*i + j),
+                                                        o_data_to_fifo => data_to_fifo(log2(NUM_CORES)*i + j),
+                                                        o_job_request => job_request(log2(NUM_CORES)*i + j),
+                                                        o_job_done => job_done(log2(NUM_CORES)*i + j),
+                                                        o_job_result => result_value(log2(NUM_CORES)*i + j), 
+                                                        o_core_done => all_cores_done_reg(log2(NUM_CORES)*i + j));    
                                     end generate gen_j;                                     
                             end generate gen_i;   
                                                   
  -- regFile 1 and 2 distributed mem, instr mem and data mem combi in BRAM, no multiplier                                
                 elsif ( (REGFILE_1_SELECT = '0') and (REGFILE_2_SELECT = '0') and (DATA_MEM_SELECT = '0') and (INSTR_MEM_SELECT = '1') and (MULTIPLIER_SELECT = '0') ) generate 
-                    gen_i:  for i in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate          
+                    gen_i:  for i in 0 to (log2(NUM_CORES) - 1) generate          
                             begin   
-                            gen_j:  for j in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate
+                            gen_j:  for j in 0 to (log2(NUM_CORES) - 1) generate
                                     begin
                                         -- instantiation core
                                         C: barrel_core_variant_3 port map (
                                                         clk => clk,
                                                         reset => reset,
                                                         i_id => core_id(i,j),
-                                                        i_job_value => job_value(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_core_dispatch_en => core_dispatch_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_core_result_en => core_result_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_instr => instr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_data_from_mem => data_from_mem(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_next_instr_addr => instr_addr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_mem_wr_en => data_mem_wr_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_mem_addr => data_mem_addr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_to_mem => data_to_mem(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_fifo_write => fifo_write(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_to_fifo => data_to_fifo(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_request => job_request(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_done => job_done(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_result => result_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        o_core_done => all_cores_done_reg(NUM_CORES_SQUARE_ROOT*i + j));   
+                                                        i_job_value => job_value(log2(NUM_CORES)*i + j),
+                                                        i_core_dispatch_en => core_dispatch_en(log2(NUM_CORES)*i + j),
+                                                        i_core_result_en => core_result_en(log2(NUM_CORES)*i + j),
+                                                        i_instr => instr(log2(NUM_CORES)*i + j),
+                                                        i_data_from_mem => data_from_mem(log2(NUM_CORES)*i + j),
+                                                        o_next_instr_addr => instr_addr(log2(NUM_CORES)*i + j),
+                                                        o_data_mem_wr_en => data_mem_wr_en(log2(NUM_CORES)*i + j),
+                                                        o_data_mem_addr => data_mem_addr(log2(NUM_CORES)*i + j),
+                                                        o_data_to_mem => data_to_mem(log2(NUM_CORES)*i + j),
+                                                        o_fifo_write => fifo_write(log2(NUM_CORES)*i + j),
+                                                        o_data_to_fifo => data_to_fifo(log2(NUM_CORES)*i + j),
+                                                        o_job_request => job_request(log2(NUM_CORES)*i + j),
+                                                        o_job_done => job_done(log2(NUM_CORES)*i + j),
+                                                        o_job_result => result_value(log2(NUM_CORES)*i + j), 
+                                                        o_core_done => all_cores_done_reg(log2(NUM_CORES)*i + j));   
                                 end generate gen_j;                                     
                             end generate gen_i;   
                                                                 
  -- regFile 1 and 2 in BRAM, data mem in BRAM with regFile2, instr mem distributed, WITH multiplier                                                                                       
                  elsif ( (REGFILE_1_SELECT = '1') and (REGFILE_2_SELECT = '1') and (DATA_MEM_SELECT = '1') and (INSTR_MEM_SELECT = '0') and (MULTIPLIER_SELECT = '1') ) generate 
-                    gen_i:  for i in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate          
+                    gen_i:  for i in 0 to (log2(NUM_CORES) - 1) generate          
                             begin   
-                            gen_j:  for j in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate
+                            gen_j:  for j in 0 to (log2(NUM_CORES) - 1) generate
                                     begin
                                         -- instantiation core
                                       C: barrel_core_variant_1_mult port map (
                                                         clk => clk,
                                                         reset => reset,
                                                         i_id => core_id(i,j),
-                                                        i_core_dispatch_en => core_dispatch_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_core_result_en => core_result_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_job_value => job_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        i_instr => instr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_next_instr_addr => instr_addr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_fifo_write => fifo_write(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_to_fifo => data_to_fifo(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_request => job_request(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_done => job_done(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_result => result_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        o_core_done => all_cores_done_reg(NUM_CORES_SQUARE_ROOT*i + j));  
+                                                        i_core_dispatch_en => core_dispatch_en(log2(NUM_CORES)*i + j),
+                                                        i_core_result_en => core_result_en(log2(NUM_CORES)*i + j),
+                                                        i_job_value => job_value(log2(NUM_CORES)*i + j), 
+                                                        i_instr => instr(log2(NUM_CORES)*i + j),
+                                                        o_next_instr_addr => instr_addr(log2(NUM_CORES)*i + j),
+                                                        o_fifo_write => fifo_write(log2(NUM_CORES)*i + j),
+                                                        o_data_to_fifo => data_to_fifo(log2(NUM_CORES)*i + j),
+                                                        o_job_request => job_request(log2(NUM_CORES)*i + j),
+                                                        o_job_done => job_done(log2(NUM_CORES)*i + j),
+                                                        o_job_result => result_value(log2(NUM_CORES)*i + j), 
+                                                        o_core_done => all_cores_done_reg(log2(NUM_CORES)*i + j));  
                                     end generate gen_j;                                     
                             end generate gen_i;                                      
                                     
  -- regFile 2 in BRAM, data mem in BRAM with regFile2, regFile1 distributed, instr mem distributed, WITH multiplier                                
                 elsif ( (REGFILE_1_SELECT = '0') and (REGFILE_2_SELECT = '1') and (DATA_MEM_SELECT = '1') and (INSTR_MEM_SELECT = '0') and (MULTIPLIER_SELECT = '1') ) generate 
-                    gen_i:  for i in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate          
+                    gen_i:  for i in 0 to (log2(NUM_CORES) - 1) generate          
                             begin   
-                            gen_j:  for j in 0 to NUM_CORES_SQUARE_ROOT - 1 generate
+                            gen_j:  for j in 0 to log2(NUM_CORES) - 1 generate
                                     begin
                                         -- instantiation core
                                         C: barrel_core_variant_2_mult port map (
                                                         clk => clk,
                                                         reset => reset,
                                                         i_id => core_id(i,j),
-                                                        i_core_dispatch_en => core_dispatch_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_core_result_en => core_result_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_job_value => job_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        i_instr => instr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_next_instr_addr => instr_addr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_fifo_write => fifo_write(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_to_fifo => data_to_fifo(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_request => job_request(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_done => job_done(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_result => result_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        o_core_done => all_cores_done_reg(NUM_CORES_SQUARE_ROOT*i + j));     
+                                                        i_core_dispatch_en => core_dispatch_en(log2(NUM_CORES)*i + j),
+                                                        i_core_result_en => core_result_en(log2(NUM_CORES)*i + j),
+                                                        i_job_value => job_value(log2(NUM_CORES)*i + j), 
+                                                        i_instr => instr(log2(NUM_CORES)*i + j),
+                                                        o_next_instr_addr => instr_addr(log2(NUM_CORES)*i + j),
+                                                        o_fifo_write => fifo_write(log2(NUM_CORES)*i + j),
+                                                        o_data_to_fifo => data_to_fifo(log2(NUM_CORES)*i + j),
+                                                        o_job_request => job_request(log2(NUM_CORES)*i + j),
+                                                        o_job_done => job_done(log2(NUM_CORES)*i + j),
+                                                        o_job_result => result_value(log2(NUM_CORES)*i + j), 
+                                                        o_core_done => all_cores_done_reg(log2(NUM_CORES)*i + j));     
                                    end generate gen_j;                                     
                              end generate gen_i;    
                                                       
  -- regFile 1 and 2 distributed mem, instr mem and data mem combi in BRAM, WITH multiplier                                
                 elsif ( (REGFILE_1_SELECT = '0') and (REGFILE_2_SELECT = '0') and (DATA_MEM_SELECT = '0') and (INSTR_MEM_SELECT = '1') and (MULTIPLIER_SELECT = '1') ) generate 
-                    gen_i:  for i in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate          
+                    gen_i:  for i in 0 to (log2(NUM_CORES) - 1) generate          
                             begin   
-                            gen_j:  for j in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate
+                            gen_j:  for j in 0 to (log2(NUM_CORES) - 1) generate
                                     begin
                                         -- instantiation core
                                         C: barrel_core_variant_3_mult port map (
                                                         clk => clk,
                                                         reset => reset,
                                                         i_id => core_id(i,j),
-                                                        i_core_dispatch_en => core_dispatch_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_core_result_en => core_result_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_job_value => job_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        i_instr => instr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        i_data_from_mem => data_from_mem(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_next_instr_addr => instr_addr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_mem_wr_en => data_mem_wr_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_mem_addr => data_mem_addr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_to_mem => data_to_mem(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_fifo_write => fifo_write(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_data_to_fifo => data_to_fifo(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_request => job_request(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_done => job_done(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        o_job_result => result_value(NUM_CORES_SQUARE_ROOT*i + j), 
-                                                        o_core_done => all_cores_done_reg(NUM_CORES_SQUARE_ROOT*i + j));                                                                                                                                                                                                                                                                                            
+                                                        i_core_dispatch_en => core_dispatch_en(log2(NUM_CORES)*i + j),
+                                                        i_core_result_en => core_result_en(log2(NUM_CORES)*i + j),
+                                                        i_job_value => job_value(log2(NUM_CORES)*i + j), 
+                                                        i_instr => instr(log2(NUM_CORES)*i + j),
+                                                        i_data_from_mem => data_from_mem(log2(NUM_CORES)*i + j),
+                                                        o_next_instr_addr => instr_addr(log2(NUM_CORES)*i + j),
+                                                        o_data_mem_wr_en => data_mem_wr_en(log2(NUM_CORES)*i + j),
+                                                        o_data_mem_addr => data_mem_addr(log2(NUM_CORES)*i + j),
+                                                        o_data_to_mem => data_to_mem(log2(NUM_CORES)*i + j),
+                                                        o_fifo_write => fifo_write(log2(NUM_CORES)*i + j),
+                                                        o_data_to_fifo => data_to_fifo(log2(NUM_CORES)*i + j),
+                                                        o_job_request => job_request(log2(NUM_CORES)*i + j),
+                                                        o_job_done => job_done(log2(NUM_CORES)*i + j),
+                                                        o_job_result => result_value(log2(NUM_CORES)*i + j), 
+                                                        o_core_done => all_cores_done_reg(log2(NUM_CORES)*i + j));                                                                                                                                                                                                                                                                                            
                                     end generate gen_j;                                     
                             end generate gen_i;    
                 end generate if_gen_core; 
                
  -- instantiation of instr mem and data mem
 if_gen_instr_data_mem:  if ( (DATA_MEM_SELECT = '1') and (INSTR_MEM_SELECT = '0') ) generate      
-                            gen_IM_i:   for i in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate          
+                            gen_IM_i:   for i in 0 to (log2(NUM_CORES) - 1) generate          
                                         begin   
-                                            gen_IM_j:  for j in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate
+                                            gen_IM_j:  for j in 0 to (log2(NUM_CORES) - 1) generate
                                                         begin                                                                                   
                                                             IM: instr_rom port map(
                                                                     clk => clk, 
-                                                                    addr => instr_addr(NUM_CORES_SQUARE_ROOT*i + j), -- address output from riscv core                                  
-                                                                    data => instr(NUM_CORES_SQUARE_ROOT*i + j));    
+                                                                    addr => instr_addr(log2(NUM_CORES)*i + j), -- address output from riscv core                                  
+                                                                    data => instr(log2(NUM_CORES)*i + j));    
                                                         end generate gen_IM_j;                                     
                                         end generate gen_IM_i; 
                                 
                         --  instr mem and data mem combi              
                         elsif ( (DATA_MEM_SELECT = '0') and (INSTR_MEM_SELECT = '1') ) generate 
                         -- instr and data mem in 1 BRAM  
-                            gen_DM_i:   for i in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate          
+                            gen_DM_i:   for i in 0 to (log2(NUM_CORES) - 1) generate          
                                         begin   
-                                            gen_DM_j:  for j in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate
+                                            gen_DM_j:  for j in 0 to (log2(NUM_CORES) - 1) generate
                                                        begin                                                              
                                                             DM: instr_data_mem_combi                                      
                                                                     generic map (   SIZE => 1024,
@@ -411,34 +411,34 @@ if_gen_instr_data_mem:  if ( (DATA_MEM_SELECT = '1') and (INSTR_MEM_SELECT = '0'
                                                                     port map (  clka => clk,
                                                                                 ena => '1',
                                                                                 wea => (others => '0'),
-                                                                                addra => instr_addr(NUM_CORES_SQUARE_ROOT*i + j),
+                                                                                addra => instr_addr(log2(NUM_CORES)*i + j),
                                                                                 dina => (others => '0'),
-                                                                                douta => instr(NUM_CORES_SQUARE_ROOT*i + j),
+                                                                                douta => instr(log2(NUM_CORES)*i + j),
                                                                                 clkb => clk,
                                                                                 enb => '1',
-                                                                                web => data_mem_wr_en(NUM_CORES_SQUARE_ROOT*i + j),
-                                                                                addrb => data_mem_addr(NUM_CORES_SQUARE_ROOT*i + j),
-                                                                                dinb => data_to_mem(NUM_CORES_SQUARE_ROOT*i + j),
-                                                                                doutb => data_from_mem(NUM_CORES_SQUARE_ROOT*i + j));      
+                                                                                web => data_mem_wr_en(log2(NUM_CORES)*i + j),
+                                                                                addrb => data_mem_addr(log2(NUM_CORES)*i + j),
+                                                                                dinb => data_to_mem(log2(NUM_CORES)*i + j),
+                                                                                doutb => data_from_mem(log2(NUM_CORES)*i + j));      
                                                         end generate gen_DM_j;                                     
                                          end generate gen_DM_i;        
                         end generate if_gen_instr_data_mem;
                         
 -- generation of FIFOs for each core only when using collect FIFOs
 if_gen_FIFO:    if (COLLECT_MODE = '0') generate                     
-            gen_FIFO_i: for i in 0 to (NUM_CORES_SQUARE_ROOT - 1) generate          
+            gen_FIFO_i: for i in 0 to (log2(NUM_CORES) - 1) generate          
                         begin   
-                        gen_FIFO_i:  for j in 0 to NUM_CORES_SQUARE_ROOT - 1 generate
+                        gen_FIFO_i:  for j in 0 to log2(NUM_CORES) - 1 generate
                                 begin                                                                                            
                                     F: fifo generic map (depth => 16, width => 32)
                                             port map (  clk => clk,
                                                         reset => reset,
-                                                        din => data_to_fifo(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        wr_en => fifo_write(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        rd_en => fifo_read(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        dout => data_out_of_fifo(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        full => fifo_full(NUM_CORES_SQUARE_ROOT*i + j),
-                                                        empty => fifo_empty(NUM_CORES_SQUARE_ROOT*i + j));                            
+                                                        din => data_to_fifo(log2(NUM_CORES)*i + j),
+                                                        wr_en => fifo_write(log2(NUM_CORES)*i + j),
+                                                        rd_en => fifo_read(log2(NUM_CORES)*i + j),
+                                                        dout => data_out_of_fifo(log2(NUM_CORES)*i + j),
+                                                        full => fifo_full(log2(NUM_CORES)*i + j),
+                                                        empty => fifo_empty(log2(NUM_CORES)*i + j));                            
                                 end generate gen_FIFO_i;                                     
                         end generate gen_FIFO_i;                                                                                                                                                                                           
                 end generate if_gen_FIFO;
