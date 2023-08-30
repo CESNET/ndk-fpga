@@ -130,7 +130,8 @@ signal valid, all_cores_done: std_logic;
 signal wr_en: std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM  
 
 -- signals for PCI
-signal packed_data, packed_data_next: std_logic_vector(511 downto 0);
+signal packed_data: std_logic_vector(511 downto 0);
+signal packed_data_next: std_logic_vector(511 downto 0);
 signal packed_data_counter, packed_data_counter_next: unsigned(3 downto 0);
 signal rd_addr_next: std_logic_vector(13 downto 0);
 
@@ -244,7 +245,7 @@ reset_fsm_nst_logic :   process (all) is
                         begin
                             transfer_next_state <= transfer_state; 
                             rd_addr_next <= rd_addr;
-                            packed_data_counter_next <= packed_data_counter; 
+                            packed_data_counter_next <= packed_data_counter;
                             packed_data_next <= packed_data;
                             DMA_RX_MFB_DATA    <= (others => '0');
                             DMA_RX_MFB_SOF     <= (others => '0');
@@ -262,8 +263,8 @@ reset_fsm_nst_logic :   process (all) is
                                     end if;
                                     
                                 when PACKING =>
-                                    if (unsigned(rd_addr) <= NUM_JOBS) then                                     
-                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);  
+                                    if (unsigned(rd_addr) <= NUM_JOBS) then
+                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);
                                         packed_data_counter_next <= packed_data_counter + 1;
                                         packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= rd_data_arr(to_integer(unsigned(rd_addr(13 downto 11))));                                         
                                         if (packed_data_counter = 15) then
