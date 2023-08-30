@@ -27,6 +27,9 @@ proc dts_application {base eth_streams mem_ports} {
         append ret "mem_logger_$i:" [data_logger $mem_logger_base $i "mem_logger"]
     }
 
+    set multicore_debug_base [expr $base]
+    append ret [dts_multicore_debug_core 0 $multicore_debug_base $subaddr_w]
+
 	append ret "};"
 	return $ret
 }
@@ -39,6 +42,15 @@ proc dts_app_minimal_core {index base reg_size} {
 	append ret "reg = <$base $reg_size>;"
     append ret "compatible = \"cesnet,minimal,app_core\";"
     append ret [dts_mvb_channel_router "rx_chan_router" $base $ETH_PORT_CHAN($index)]
+    append ret "};"
+	return $ret
+}
+
+proc dts_multicore_debug_core {index base reg_size} {
+	set ret ""
+	append ret "multicore_debug_core$index {"
+    append ret "compatible = \"ziti,minimal,multicore_debug_core\";"
+	append ret "reg = <$base $reg_size>;"
     append ret "};"
 	return $ret
 }
