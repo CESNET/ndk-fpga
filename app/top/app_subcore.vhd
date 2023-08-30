@@ -126,7 +126,7 @@ signal rd_data_arr: rd_data_type;
 signal wr_addr, rd_addr: std_logic_vector(13 downto 0);
 signal ena_arr, enb_arr: std_logic_vector(0 to 7);
 signal wr_data_in: DATA_TYPE;
-signal valid, all_cores_done: std_logic; 
+signal valid, all_cores_done: std_logic;
 signal wr_en: std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM  
 
 -- signals for PCI
@@ -215,7 +215,7 @@ BRAM_rd_proc:   process(all)
                         for i in 0 to 7 loop
                             if (rd_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
                                 enb_arr(i) <='1';
-                            else 
+                            else
                                 enb_arr(i) <='0';
                             end if;
                         end loop;      
