@@ -4,6 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 use work.math_pack.all;
 use work.type_pack.all;
+use ieee.math_real.all;
 
 use WORK.many_core_package.ALL;
 
@@ -35,7 +36,9 @@ signal rx_mfb_eof: std_logic_vector(MFB_REGIONS -1 downto 0);
 signal rx_mfb_sof_pos: std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
 signal rx_mfb_eof_pos: std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
 signal rx_mfb_src_rdy: std_logic;
-signal rx_mfb_dst_rdy: std_logic;
+signal rx_mfb_dst_rdy: std_logic := '0';
+
+signal rand_num : integer := 0;
 
 begin
 
@@ -105,14 +108,25 @@ begin
         reset_tb <= '1'; -- reset
         wait for CLOCK_PERIOD;
         reset_tb <= '0'; -- reset
-        wait for CLOCK_PERIOD;
-        
-        rx_mfb_dst_rdy <= '1';
+        wait for CLOCK_PERIOD;        
         
         wait for 400000*CLOCK_PERIOD;
         stop_the_clock <= true;
 
         wait;  
     end process;
+    
+   dst_rdy_random:  process
+                    variable seed1, seed2: positive;   -- seed values for random generator
+                    variable rand: real;   -- random real-number value in range 0 to 1.0  
+                    variable range_of_rand : real := 10.0;    -- the range of random values created will be 0 to +1000.
+                    begin
+                        uniform(seed1, seed2, rand);   -- generate random number
+                        rand_num <= integer(rand*range_of_rand);  -- rescale to 0..1000, convert integer part 
+                        for i in 0 to rand_num loop
+                            wait until rising_edge(clk_tb);
+                        end loop;
+                        rx_mfb_dst_rdy <= not rx_mfb_dst_rdy;
+                    end process;
 
 end app_subcore_tb_arch;
