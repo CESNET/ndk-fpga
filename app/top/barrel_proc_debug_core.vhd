@@ -52,6 +52,17 @@ architecture FULL of BARREL_PROC_DEBUG_CORE is
     signal rst_cntr_pst : unsigned(9 downto 0);
     signal rst_cntr_nst : unsigned(9 downto 0);
 
+    attribute mark_debug                           : string;
+    attribute mark_debug of rst_fsm_trigg        : signal is "true";
+    attribute mark_debug of rst_pst        : signal is "true";
+    attribute mark_debug of rst_cntr_pst        : signal is "true";
+    attribute mark_debug of MI_ADDR        : signal is "true";
+    attribute mark_debug of MI_DWR        : signal is "true";
+    attribute mark_debug of MI_RD        : signal is "true";
+    attribute mark_debug of MI_WR        : signal is "true";
+    attribute mark_debug of MI_DRD        : signal is "true";
+    attribute mark_debug of MI_ARDY        : signal is "true";
+    attribute mark_debug of MI_DRDY        : signal is "true";
 begin
 
     MI_ARDY <= MI_RD or MI_WR;
