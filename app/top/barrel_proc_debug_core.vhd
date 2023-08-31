@@ -60,8 +60,6 @@ architecture FULL of BARREL_PROC_DEBUG_CORE is
     attribute mark_debug of MI_DWR        : signal is "true";
     attribute mark_debug of MI_RD        : signal is "true";
     attribute mark_debug of MI_WR        : signal is "true";
-    attribute mark_debug of MI_DRD        : signal is "true";
-    attribute mark_debug of MI_ARDY        : signal is "true";
     attribute mark_debug of MI_DRDY        : signal is "true";
 begin
 
@@ -72,8 +70,7 @@ begin
     -- =============================================================================================
     -- Resetting FSM
     -- =============================================================================================
-    rst_fsm_trigg <= '1' when (MI_WR = '1' and MI_ADDR = std_logic_vector(to_unsigned(16#00#,MI_WIDTH)) and MI_DWR(0) = '1') else '0';
-
+    rst_fsm_trigg <= '1' when (MI_WR = '1' and MI_ADDR(1 downto 0) = std_logic_vector(to_unsigned(16#00#,2)) and MI_DWR(0) = '1') else '0';
     reset_fsm_state_reg : process (CLK) is
     begin
         if (rising_edge(CLK)) then
