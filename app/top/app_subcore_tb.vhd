@@ -24,6 +24,8 @@ constant DMA_TX_CHANNELS : integer := 2;
 constant DMA_HDR_META_WIDTH : natural := 12;
 constant DEVICE: string :=  "ULTRASCALE";
 
+constant sof_pos_const: std_logic_vector(MFB_REGIONS -1 downto 0) := (others => '1');
+
 signal clk_tb,  reset_tb: std_logic;
 constant CLOCK_PERIOD: time := 10 ns;
 signal stop_the_clock: boolean := false;
@@ -39,6 +41,7 @@ signal rx_mfb_src_rdy: std_logic;
 signal rx_mfb_dst_rdy: std_logic := '0';
 
 signal rand_num : integer := 0;
+signal pkt_counter : unsigned(14 downto 0);
 
 begin
 
@@ -89,8 +92,8 @@ begin
 				MI_WR => '0',
 				MI_DRD => open,
 				MI_ARDY => open,
-				MI_DRDY => open);
-				
+				MI_DRDY => open);				    
+								
     -- Clock
     clocking: process
     begin
@@ -127,6 +130,18 @@ begin
                             wait until rising_edge(clk_tb);
                         end loop;
                         rx_mfb_dst_rdy <= not rx_mfb_dst_rdy;
+                        
                     end process;
+                    
+   cntr_p : process(clk_tb)
+   begin
+     if (rising_edge(clk_tb)) then
+        if (reset_tb = '1') then
+            pkt_counter <= (others => '0'); 
+        elsif (rx_mfb_sof = "1" and rx_mfb_src_rdy = '1' and rx_mfb_dst_rdy = '1') then
+            pkt_counter <= pkt_counter + 1;
+        end if;
+     end if;
+   end process;
 
 end app_subcore_tb_arch;
