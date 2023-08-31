@@ -123,7 +123,8 @@ end component;
 --signals for 8 BRAMs generated for frame buffer 
 type rd_data_type is array(0 to 7) of DATA_TYPE;
 signal rd_data_arr: rd_data_type;
-signal wr_addr, rd_addr: std_logic_vector(13 downto 0);
+signal wr_addr: std_logic_vector(13 downto 0);
+signal rd_addr: std_logic_vector(14 downto 0);
 signal ena_arr, enb_arr: std_logic_vector(0 to 7);
 signal wr_data_in: DATA_TYPE;
 signal valid, all_cores_done: std_logic;
@@ -133,12 +134,30 @@ signal wr_en: std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM
 signal packed_data: std_logic_vector(511 downto 0);
 signal packed_data_next: std_logic_vector(511 downto 0);
 signal packed_data_counter, packed_data_counter_next: unsigned(3 downto 0);
-signal rd_addr_next: std_logic_vector(13 downto 0);
+signal rd_addr_next: std_logic_vector(14 downto 0);
 
 type transfer_fsm_state_type is (IDLE, PACKING, SENDING_1_HALF, SENDING_2_HALF);
 signal transfer_state, transfer_next_state : transfer_fsm_state_type := IDLE;
 
 signal manycore_rst : std_logic;
+
+attribute mark_debug                           : string;
+attribute mark_debug of manycore_rst        : signal is "true";
+
+attribute mark_debug of DMA_RX_MFB_DATA: signal is "true";
+attribute mark_debug of DMA_RX_MFB_SOF: signal is "true";
+attribute mark_debug of DMA_RX_MFB_EOF: signal is "true";
+attribute mark_debug of DMA_RX_MFB_SOF_POS: signal is "true";
+attribute mark_debug of DMA_RX_MFB_EOF_POS: signal is "true";
+attribute mark_debug of DMA_RX_MFB_SRC_RDY: signal is "true";
+attribute mark_debug of DMA_RX_MFB_DST_RDY: signal is "true";
+attribute mark_debug of packed_data_counter: signal is "true";
+attribute mark_debug of rd_addr: signal is "true";
+attribute mark_debug of wr_addr: signal is "true";
+attribute mark_debug of ena_arr: signal is "true";
+attribute mark_debug of enb_arr: signal is "true";
+attribute mark_debug of all_cores_done: signal is "true";
+attribute mark_debug of transfer_state: signal is "true";
 
 begin
 
