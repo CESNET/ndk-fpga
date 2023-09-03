@@ -276,20 +276,22 @@ reset_fsm_nst_logic :   process (all) is
                             case transfer_state is
                                 when IDLE =>
                                     DMA_RX_MFB_SRC_RDY <= '0';
-                                    if (all_cores_done = '1' and unsigned(rd_addr) < NUM_JOBS) then
+                                    if (all_cores_done = '1' and unsigned(rd_addr) <= NUM_JOBS) then
+                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);  
                                         transfer_next_state <= PACKING;
-                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1); 
                                     end if;
                                     
                                 when PACKING =>
                                     if (unsigned(rd_addr) <= NUM_JOBS) then
-                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);  
-                                        packed_data_counter_next <= packed_data_counter + 1;
-                                        packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= rd_data_arr(to_integer(unsigned(rd_addr(13 downto 11))));                                         
+                                            packed_data_counter_next <= packed_data_counter + 1;
+                                            packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= rd_data_arr(to_integer(unsigned(rd_addr(13 downto 11)))); 
                                         if (packed_data_counter = 15) then
-                                            transfer_next_state <= SENDING_1_HALF;                                    
+                                            transfer_next_state <= SENDING_1_HALF;     
+                                        else
+                                            rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);                                 
                                         end if;			 	
                                     end if;	
+                                
                                     
                                 when SENDING_1_HALF =>
                                     if (DMA_RX_MFB_DST_RDY = '1') then																		
@@ -306,6 +308,7 @@ reset_fsm_nst_logic :   process (all) is
                                 when SENDING_2_HALF =>
                                     if (DMA_RX_MFB_DST_RDY = '1') then		
 										transfer_next_state <= PACKING;
+										rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1); 
 								    end if;
 								    
                                     DMA_RX_MFB_DATA    <= packed_data(511 downto 256);

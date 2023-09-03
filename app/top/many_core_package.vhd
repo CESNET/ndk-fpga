@@ -25,13 +25,13 @@ package many_core_package is
     -- OPTIONS for conditional generate of core variants   
     -- implementation of regFile 1 either in BRAM or in distributed memory 
     -- when only 1 regFile should be in distributed memory, then it has to regFile 1
-    constant REGFILE_1_SELECT : std_logic := '0'; -- '1' for BRAM, '0' for distributed memory
+    constant REGFILE_1_SELECT : std_logic := '1'; -- '1' for BRAM, '0' for distributed memory
     -- implementation of regFile 2 either in BRAM or in distributed memory 
-    constant REGFILE_2_SELECT : std_logic := '0'; -- '1' for BRAM, '0' for distributed memory
+    constant REGFILE_2_SELECT : std_logic := '1'; -- '1' for BRAM, '0' for distributed memory
     -- implementation of data memory either in stand-alone BRAM or in the BRAM in which regFile 1 is located 
-    constant DATA_MEM_SELECT : std_logic := '0'; -- '1' for BRAM, '0' with instr mem 
+    constant DATA_MEM_SELECT : std_logic := '1'; -- '1' for BRAM, '0' with instr mem 
     -- implementation of instr memory either in BRAM together with data memory or in distributed memory  
-    constant INSTR_MEM_SELECT : std_logic := '1'; -- '1' for BRAM , '0' for distributed memory 
+    constant INSTR_MEM_SELECT : std_logic := '0'; -- '1' for BRAM , '0' for distributed memory 
     -- availability of multiplier 
     constant MULTIPLIER_SELECT : std_logic := '1'; -- '1' for multiplier, '0' for no multiplier
     -- collect the data either with FIFOs or using the message ring

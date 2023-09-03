@@ -762,7 +762,7 @@ begin
                                                 (alu_result_add_pipe_4 = job_done_addr)  ) and (is_store_instr_pipe_4 = '1')) else '0' ;                                                         
             
     loaded_mem_mapped_data <= (others => '0') when (is_load_instr_pipe_4 = '0') else
-                                std_logic_vector(thread_id_pipe_4) when (alu_result_add_pipe_4 = thread_id_addr)  else 
+                                std_logic_vector(func_zero_ext(thread_id_pipe_4, DATA_WIDTH)) when (alu_result_add_pipe_4 = thread_id_addr)  else 
                                 x"0000000" & "000" & job_request_reg(to_integer(thread_id_pipe_4)) when (alu_result_add_pipe_4 = job_request_addr) else
                                 x"0000000" & "000" & job_done_reg(to_integer(thread_id_pipe_4)) when (alu_result_add_pipe_4 = job_done_addr) else
                                 job_value_reg(to_integer(thread_id_pipe_4)) when (alu_result_add_pipe_4 = job_value_addr) else
