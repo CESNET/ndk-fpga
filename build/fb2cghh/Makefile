@@ -9,7 +9,7 @@
 # in the Parametrization section of the NDK-CORE documentation.
 
 COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/fb2cghh
+CARD_BASE = $(COMBO_BASE)/ndk/cards/silicom/fb2cghh
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = fb2cghh-minimal
 

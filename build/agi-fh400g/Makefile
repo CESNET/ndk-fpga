@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/agi-fh400g
+CARD_BASE = $(COMBO_BASE)/ndk/cards/reflexces/agi-fh400g
 APP_CONF = app_conf.tcl
 
 ifndef BOARD_REV

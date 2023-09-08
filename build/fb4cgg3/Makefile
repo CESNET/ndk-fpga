@@ -9,7 +9,7 @@
 # in the Parametrization section of the NDK-CORE documentation.
 
 COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/fb4cgg3
+CARD_BASE = $(COMBO_BASE)/ndk/cards/silicom/fb4cgg3
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = fb4cgg3-minimal
 

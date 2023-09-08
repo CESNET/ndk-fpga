@@ -9,7 +9,7 @@
 # in the Parametrization section of the NDK-CORE documentation.
 
 COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/dk-dev-agi027res
+CARD_BASE = $(COMBO_BASE)/ndk/cards/intel/dk-dev-agi027res
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = dk-dev-agi027res-minimal
 
