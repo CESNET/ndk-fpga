@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 02caad17
+                Git branch: devel, <br> Git hash: 4f10ceb1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -80,6 +80,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../channel_router/readme.html">MVB Channel Router</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../discard/readme.html">MVB DISCARD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merge_items/readme.html">MVB Merge Items</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merge_streams/readme.html">MVB Merge Streams</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../demux/readme.html">MVB DEMUX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mux/readme.html">MVB MUX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merge_n_to_m/readme.html">SHAKEDOWN</a></li>
@@ -160,12 +161,7 @@ on RX MVB. When 2, <code class="docutils literal notranslate"><span class="pre">
 lot of resources. When one needs value of 3, consider using <code class="docutils literal notranslate"><span class="pre">MULTI_FIFOX</span></code> for such use case.
 Ingored when using <em>MUX</em> implemetation.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_shakedown-use_mux_impl"><td><p>USE_MUX_IMPL</p></td>
-<td><p>boolean</p></td>
-<td><p>False</p></td>
-<td><p>Resource optimized N to 1 implementation using only one multiplexer</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_shakedown-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_shakedown-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td></td>

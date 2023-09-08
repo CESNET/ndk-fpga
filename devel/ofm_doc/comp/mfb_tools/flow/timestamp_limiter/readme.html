@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 02caad17
+                Git branch: devel, <br> Git hash: 4f10ceb1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -149,9 +149,16 @@
 <dt class="sig sig-object vhdl" id="vhdl-entity-mfb_timestamp_limiter">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_TIMESTAMP_LIMITER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_timestamp_limiter" title="Permalink to this definition"></a></dt>
 <dd><p>This component limits output speed according to given Timestamps via the <a class="reference internal" href="#vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_timestamp"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RX_MFB_TIMESTAMP</span></code></a> port.
+There are 2 Timestamp formats that are currently supported (see the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">TIMESTAMP_FORMAT</span></code> generic).
 The incoming packets are split into queues (e.g., per each DMA Channel), where the order of packets is kept the same.
 Then in each Queue, the <a class="reference internal" href="../packet_delayer/readme.html#mfb-packet-delayer"><span class="std std-ref">MFB Packet Delayer component</span></a> outputs each packet when the time is right.
 Finally, the packets from all Queues are merged back into a single stream (no order is kept here).</p>
+<p>The Packet Delayers use a time source, according to which they calculate the time that has passed and whether a packet is due to be sent.
+The default is to use the so-called Time Counter (see diagram below), which is basically a counter that increments its value by the duration of one clock period derived from the
+value of the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">CLK_FREQUENCY</span></code> generic.
+Another option is to use an external time source, for example, the TSU (for better precision).
+In this case, set the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">EXTERNAL_TIME_SRC</span></code> generic to <code class="docutils literal notranslate"><span class="pre">True</span></code> and connect your time source to the
+<a class="reference internal" href="#vhdl-portsignal-mfb_timestamp_limiter-external_time"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">EXTERNAL_TIME</span></code></a> port.</p>
 <p>The MI interface enables the user to reset Time in the Packet Delayers.
 This is useful when using the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">Timestamp</span> <span class="pre">format</span> <span class="pre">1</span></code>,
 where the time is being incremented in each clock cycle since the very first packet after boot/reset passes through.
@@ -290,7 +297,7 @@ False (default) - internal “Time Counter” with increment given by CLK_FREQUE
 <tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-external_time"><td><p>EXTERNAL_TIME</p></td>
 <td><p>std_logic_vector(64-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Connect your own Time source to this port (used when the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">EXTERNAL_TIME_SRC</span></code> generic is <code class="docutils literal notranslate"><span class="pre">True</span></code>).</p></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
 <td><p>RX MFB STREAM</p></td>

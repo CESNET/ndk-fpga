@@ -27,7 +27,7 @@ Library of commonly used agents and enviroments in UVM verification
     logic_vector_array_mfb/readme
     byte_array/readme
     byte_array_mfb/readme
-    byte_array_intel_mac_seg/readme
+    logic_vector_array_intel_mac_seg/readme
     byte_array_pma/readme
     byte_array_mii/readme
     byte_array_lii/readme
