@@ -8,7 +8,7 @@
 # in the Parametrization section of the NDK-CORE documentation.
 
 COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/nfb-200g2ql
+CARD_BASE = $(COMBO_BASE)/ndk/cards_private/nfb-200g2ql
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = nfb-200g2ql-minimal
 

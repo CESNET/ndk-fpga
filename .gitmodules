@@ -1,33 +1,15 @@
 [submodule "ndk/ofm"]
 	path = ndk/ofm
 	url = ../ofm.git
-[submodule "ndk/cards/agi-fh400g"]
-	path = ndk/cards/agi-fh400g
-	url = ../ndk-card-agi-fh400g.git
-[submodule "ndk/modules/ndk-mod-dma-medusa"]
-	path = ndk/modules/ndk-mod-dma-medusa
-	url = ../ndk-mod-dma-medusa.git
 [submodule "ndk/core"]
 	path = ndk/core
 	url = ../ndk-core.git
-[submodule "ndk/cards/dk-dev-agi027res"]
-	path = ndk/cards/dk-dev-agi027res
-	url = ../ndk-card-dk-dev-agi027res.git
-[submodule "ndk/cards/dk-dev-1sdx-p"]
-	path = ndk/cards/dk-dev-1sdx-p
-	url = ../ndk-card-dk-dev-1sdx-p.git
-[submodule "ndk/cards/fb4cgg3"]
-	path = ndk/cards/fb4cgg3
-	url = ../ndk-card-fb4cgg3.git
-[submodule "ndk/cards/fb2cghh"]
-	path = ndk/cards/fb2cghh
-	url = ../ndk-card-fb2cghh.git
-[submodule "ndk/cards/ia-420f"]
-	path = ndk/cards/ia-420f
-	url = ../ndk-card-ia-420f.git
-[submodule "ndk/cards/nfb-200g2ql"]
-	path = ndk/cards/nfb-200g2ql
+[submodule "ndk/cards"]
+	path = ndk/cards
+	url = ../ndk-cards-open.git
+[submodule "ndk/modules/ndk-mod-dma-medusa"]
+	path = ndk/modules/ndk-mod-dma-medusa
+	url = ../ndk-mod-dma-medusa.git
+[submodule "ndk/cards_private/nfb-200g2ql"]
+	path = ndk/cards_private/nfb-200g2ql
 	url = ../ndk-card-nfb-200g2ql.git
-[submodule "ndk/cards/n6010"]
-	path = ndk/cards/n6010
-	url = ../ndk-card-n6010.git

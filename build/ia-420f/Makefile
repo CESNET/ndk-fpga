@@ -8,7 +8,7 @@
 # in the Parametrization section of the NDK-CORE documentation.
 
 COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/ia-420f
+CARD_BASE = $(COMBO_BASE)/ndk/cards/bittware/ia-420f
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = ia-420f-minimal
 

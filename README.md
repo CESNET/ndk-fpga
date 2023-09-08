@@ -16,16 +16,17 @@ Before you get started, there are a few requirements that you need to have. Amon
 - Basic additional repositories which are needed to build the NDK-based Minimal application:
     - [Open FPGA Modules](https://github.com/CESNET/ofm/)
     - [NDK Core](https://github.com/CESNET/ndk-core/)
-- Supported FPGA cards in the NDK framework (at least one repository of the supported card must be used for the build to succeed):
-    - [ReflexCES XpressSX AGI-FH400G card](https://github.com/CESNET/ndk-card-agi-fh400g/)
-    - [Intel Stratix 10 DX FPGA Development Kit (DK-DEV-1SDX-P)](https://github.com/CESNET/ndk-card-dk-dev-1sdx-p/)
-    - [Intel Agilex I-Series FPGA Development Kit (DK-DEV-AGI027RES)](https://github.com/CESNET/ndk-card-dk-dev-agi027res/)
-    - [Silicom fb4CGg3@VU9P card (also in variant fb2CGg3@VU9P)](https://github.com/CESNET/ndk-card-fb4cgg3/)
-    - [Silicom fb2CGhh@KU15P card](https://github.com/CESNET/ndk-card-fb2cghh/)
-    - [Bittware IA-420F card](https://github.com/CESNET/ndk-card-ia-420f/)
+    - [FPGA cards files for the NDK](https://github.com/CESNET/ndk-cards-open/) (available as open-source)
+- Supported FPGA cards in the NDK framework available as open-source:
+    - ReflexCES XpressSX AGI-FH400G card
+    - Intel Stratix 10 DX FPGA Development Kit (DK-DEV-1SDX-P)
+    - Intel Agilex I-Series FPGA Development Kit (DK-DEV-AGI027RES)
+    - Silicom fb4CGg3@VU9P card (also in variant fb2CGg3@VU9P)
+    - Silicom fb2CGhh@KU15P card
+    - Silicom N6010 card
+    - Bittware IA-420F card
 - Other supported FPGA cards in the NDK framework but not available as open-source:
     - Netcope NFB-200G2QL card
-    - Silicom N6010 card
 - To control an FPGA card with an application based on the NDK framework, you also need:
     - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw)
 
@@ -38,12 +39,7 @@ git clone https://github.com/CESNET/ndk-app-minimal.git
 cd ndk-app-minimal
 git submodule update --init ndk/ofm
 git submodule update --init ndk/core
-git submodule update --init ndk/cards/agi-fh400g
-git submodule update --init ndk/cards/dk-dev-1sdx-p
-git submodule update --init ndk/cards/dk-dev-agi027res
-git submodule update --init ndk/cards/fb4cgg3
-git submodule update --init ndk/cards/fb2cghh
-git submodule update --init ndk/cards/ia-420f
+git submodule update --init ndk/cards
 ```
 
 CESNET developers who have access to closed-source repositories can use a single command to clone the repository, including its submodules (from private GitLab):
