@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Silicom fb4CGg3@VU9P &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Silicom fb2CGhh@KU15P" href="../fb2cghh/readme.html" />
+    <link rel="prev" title="Intel Agilex I-Series FPGA DK" href="../../intel/dk-dev-agi027res/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: devel, <br> Git hash: b12b7d06
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Silicom fb4CGg3&#64;VU9P</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Silicom fb4CGg3&#64;VU9P</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/ndk_cards/silicom/fb4cgg3/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="silicom-fb4cgg3-vu9p">
+<span id="card-fb4cgg3"></span><h1>Silicom fb4CGg3&#64;VU9P<a class="headerlink" href="#silicom-fb4cgg3-vu9p" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Card information:</dt><dd><ul>
+<li><p>Vendor: Silicom</p></li>
+<li><p>Name: fb4CGg3&#64;VU9P also in variant fb2CGg3&#64;VU9P</p></li>
+<li><p>Ethernet ports: 4x QSFP28 (fb4CGg3) or 2x QSFP28 (fb2CGg3)</p></li>
+<li><p>PCIe conectors: Edge connector</p></li>
+<li><p><a class="reference external" href="https://www.silicom-usa.com/pr/server-adapters/programmable-fpga-server-adapter/fpga-xilinx-based-2/fb4cgg3vu-100-gigabit-xilinx-virtex-ultrascale/">FPGA Card Website</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>FPGA specification:</dt><dd><ul>
+<li><p>FPGA part number: <code class="docutils literal notranslate"><span class="pre">xcvu9p-flgb2104-2-i</span></code></p></li>
+<li><p>Ethernet Hard IP: CMAC (100G Ethernet)</p></li>
+<li><p>PCIe Hard IP: USP (up to PCIe Gen3 x16)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="ndk-firmware-support">
+<h2>NDK firmware support<a class="headerlink" href="#ndk-firmware-support" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Ethernet cores that are supported in the NDK firmware:</dt><dd><ul>
+<li><p><a class="reference internal" href="../../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">CMAC in the Network Module</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>PCIe cores that are supported in the NDK firmware:</dt><dd><ul>
+<li><p><a class="reference internal" href="../../../ndk_core/intel/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">USP in the PCIe Module</span></a></p></li>
+<li><p>See the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory&gt;/ndk/card/fb4cgg3/config/card_conf.tcl</span></code> file for supported PCIe configurations.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):</dt><dd><ul>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g2</span></code> command for firmware with 2x100GbE for fb2CGg3 card only (default).</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g4</span></code> command for firmware with 4x100GbE for fb4CGg3 card only.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Support for booting the NDK firmware using the nfb-boot tool:</dt><dd><ul>
+<li><p>YES.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To build the NDK firmware for this card, you must have the Xilinx Vivado installed, including a valid license.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../intel/dk-dev-agi027res/readme.html" class="btn btn-neutral float-left" title="Intel Agilex I-Series FPGA DK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../fb2cghh/readme.html" class="btn btn-neutral float-right" title="Silicom fb2CGhh@KU15P" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
