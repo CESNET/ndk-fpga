@@ -1,6 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use std.textio.all;
 
 use work.math_pack.all;
 use work.type_pack.all;
@@ -42,6 +43,9 @@ signal rx_mfb_dst_rdy: std_logic := '0';
 
 signal rand_num : integer := 0;
 signal pkt_counter : unsigned(14 downto 0);
+                                                           
+-- writing to packed data to file                                     
+file packed_data_file: text open write_mode is "packed_data_file.txt";
 
 begin
 
@@ -134,14 +138,21 @@ begin
                     end process;
                     
    cntr_p : process(clk_tb)
+             variable row: line;
    begin
      if (rising_edge(clk_tb)) then
         if (reset_tb = '1') then
             pkt_counter <= (others => '0'); 
-        elsif (rx_mfb_sof = "1" and rx_mfb_src_rdy = '1' and rx_mfb_dst_rdy = '1') then
-            pkt_counter <= pkt_counter + 1;
+        elsif (rx_mfb_sof = "1" and rx_mfb_eof = "0"  and rx_mfb_src_rdy = '1' and rx_mfb_dst_rdy = '1') then
+            hwrite(row, rx_mfb_data);
+            writeline(packed_data_file, row); 
+        elsif (rx_mfb_sof = "0" and rx_mfb_eof = "1" and rx_mfb_src_rdy = '1' and rx_mfb_dst_rdy = '1') then
+            hwrite(row, rx_mfb_data);
+            writeline(packed_data_file, row); 
+			pkt_counter <= pkt_counter + 1;
         end if;
+
      end if;
    end process;
-
+        
 end app_subcore_tb_arch;

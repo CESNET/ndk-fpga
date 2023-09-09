@@ -14,7 +14,7 @@ use WORK.many_core_package.ALL;
 
 entity barrel_core_variant_1 is
     port(   clk, reset: in std_logic;
-            i_id: in std_logic_vector(NUM_CORES_BIT_WIDTH - 1 downto 0);
+            i_id: in std_logic_vector(log2(NUM_CORES) - 1 downto 0);
             i_core_dispatch_en: in std_logic; -- this core is currently enabled by dispatcher to dispatch job
             i_core_result_en: in std_logic; -- this core is currently enabled by dispatcher to collect job result
             i_job_value: in std_logic_vector(DATA_WIDTH - 1 downto 0); -- incoming job incl. param
@@ -162,6 +162,10 @@ signal num_incoming_requests, num_requests_allocated, num_pending_requests, num_
 
 -- signal when all threads are done, the core is done
 signal threads_per_core_done_reg: std_logic_vector(NUM_THREADS - 1 downto 0) := (others => '1');
+
+---- to ensure that the register fle is implemented with LUTRAM
+attribute ram_style : string;
+attribute ram_style of barrel_regFile_array : signal is "distributed";
 
 --attribute keep : string;
 --attribute keep of i_instr, cycle_counter, thread_ptr_new_request, thread_ptr_to_allocate, thread_ptr_new_result, thread_ptr_result_sent: signal is "true";
@@ -330,7 +334,8 @@ begin
                                     when "110" => -- or
                                        alu_opcode <= "0110"; -- ALU opcode or
                                     when "111" => -- and
-                                       alu_opcode <= "0111"; -- ALU opcode and                     
+                                       alu_opcode <= "0111"; -- ALU opcode and   
+                                    when others => null;                  
                                 end case;                        
                             
                             -- Load I-type, load for BRAM instead of mem
@@ -880,7 +885,7 @@ begin
                                 x"0000000" & "000" & job_done_reg(to_integer(thread_id_pipe_4)) when (alu_result_add_pipe_4 = job_done_addr) else
                                 job_value_reg(to_integer(thread_id_pipe_4)) when (alu_result_add_pipe_4 = job_value_addr) else
                                 func_zero_ext(i_id, DATA_WIDTH) when (alu_result_add_pipe_4 = core_id_addr) else
-                                (others => '0');       
+                                (others => '0');                                     
     
     -- FIFO_addr = x"0000FFFF" is a memory mapped addr for FIFO
     fifo_write <= '1' when ((alu_result_add_pipe_4 = FIFO_addr) and (is_store_instr_pipe_4 = '1')) else '0'; 
@@ -1050,7 +1055,7 @@ if_gen_collect:
                         fifo_write_pipe_5 <= '0'; 
                         data_to_fifo_pipe_5 <= (others => '0');
                         data_from_mem_BRAM_pipe_5 <= (others => '0'); 
-                        loaded_mem_mapped_data_pipe_6 <= (others => '0');                    
+                        loaded_mem_mapped_data_pipe_5 <= (others => '0');                    
                     else                 
                         thread_id_pipe_5 <= thread_id_pipe_4;
                         is_load_1_instr_pipe_5 <= is_load_1_instr_pipe_4; 
@@ -1066,7 +1071,7 @@ if_gen_collect:
                         fifo_write_pipe_5 <= fifo_write; 
                         data_to_fifo_pipe_5 <= data_to_fifo;
                         data_from_mem_BRAM_pipe_5 <= data_from_mem_BRAM_pipe_4; 
-                        loaded_mem_mapped_data_pipe_6 <= loaded_mem_mapped_data_pipe_5; 
+                        loaded_mem_mapped_data_pipe_5 <= loaded_mem_mapped_data; 
                     end if;  
                 end if;              
             end process;                      
@@ -1089,7 +1094,8 @@ if_gen_collect:
                         reg_value_to_store_pipe_6 <= (others => '0');
                         fifo_write_pipe_6 <= '0'; 
                         data_to_fifo_pipe_6 <= (others => '0');
-                        data_from_mem_BRAM_pipe_6 <= (others => '0');    
+                        data_from_mem_BRAM_pipe_6 <= (others => '0'); 
+                        loaded_mem_mapped_data_pipe_6 <= (others => '0');   
                     else
                         thread_id_pipe_6 <= thread_id_pipe_5;
                         is_load_1_instr_pipe_6 <= is_load_1_instr_pipe_5;
@@ -1105,6 +1111,7 @@ if_gen_collect:
                         fifo_write_pipe_6 <= fifo_write_pipe_5; 
                         data_to_fifo_pipe_6 <= data_to_fifo_pipe_5;
                         data_from_mem_BRAM_pipe_6 <= data_from_mem_BRAM_pipe_5;  
+                        loaded_mem_mapped_data_pipe_6 <= loaded_mem_mapped_data_pipe_5; 
                     end if;                           
                 end if;                        
             end process;                  

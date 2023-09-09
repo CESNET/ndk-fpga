@@ -14,7 +14,7 @@ use WORK.many_core_package.ALL;
 
 entity barrel_core_variant_1_mult is
     port(   clk, reset: in std_logic;
-            i_id: in std_logic_vector(NUM_CORES_BIT_WIDTH - 1 downto 0);
+            i_id: in std_logic_vector(log2(NUM_CORES) - 1 downto 0);
             i_core_dispatch_en: in std_logic; -- this core is currently enabled by dispatcher to dispatch job
             i_core_result_en: in std_logic; -- this core is currently enabled by dispatcher to collect job result
             i_job_value: in std_logic_vector(DATA_WIDTH - 1 downto 0); -- incoming job incl. param
@@ -174,6 +174,10 @@ signal num_incoming_requests, num_requests_allocated, num_pending_requests, num_
 
 -- signal when all threads are done, the core is done
 signal threads_per_core_done_reg: std_logic_vector(NUM_THREADS - 1 downto 0) := (others => '1');
+
+---- to ensure that the register fle is implemented with LUTRAM
+attribute ram_style : string;
+attribute ram_style of barrel_regFile_array : signal is "distributed";
 
 --attribute keep : string;
 --attribute keep of job_request_queue, job_done_queue, i_core_dispatch_en, i_core_result_en, i_instr, cycle_counter, thread_ptr_new_request, thread_ptr_to_allocate, 
@@ -350,7 +354,9 @@ begin
                                     when "110" => -- or
                                        alu_opcode <= "0110"; -- ALU opcode or
                                     when "111" => -- and
-                                       alu_opcode <= "0111"; -- ALU opcode and                     
+                                       alu_opcode <= "0111"; -- ALU opcode and    
+                                    -- default
+                                    when others => null;                 
                                 end case;                        
                             
                             -- Load I-type, load for BRAM instead of mem

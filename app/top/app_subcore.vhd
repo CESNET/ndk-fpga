@@ -141,23 +141,23 @@ signal transfer_state, transfer_next_state : transfer_fsm_state_type := IDLE;
 
 signal manycore_rst : std_logic;
 
-attribute mark_debug                           : string;
-attribute mark_debug of manycore_rst        : signal is "true";
+--attribute mark_debug                           : string;
+--attribute mark_debug of manycore_rst        : signal is "true";
 
-attribute mark_debug of DMA_RX_MFB_DATA: signal is "true";
-attribute mark_debug of DMA_RX_MFB_SOF: signal is "true";
-attribute mark_debug of DMA_RX_MFB_EOF: signal is "true";
-attribute mark_debug of DMA_RX_MFB_SOF_POS: signal is "true";
-attribute mark_debug of DMA_RX_MFB_EOF_POS: signal is "true";
-attribute mark_debug of DMA_RX_MFB_SRC_RDY: signal is "true";
-attribute mark_debug of DMA_RX_MFB_DST_RDY: signal is "true";
-attribute mark_debug of packed_data_counter: signal is "true";
-attribute mark_debug of rd_addr: signal is "true";
-attribute mark_debug of wr_addr: signal is "true";
-attribute mark_debug of ena_arr: signal is "true";
-attribute mark_debug of enb_arr: signal is "true";
-attribute mark_debug of all_cores_done: signal is "true";
-attribute mark_debug of transfer_state: signal is "true";
+--attribute mark_debug of DMA_RX_MFB_DATA: signal is "true";
+--attribute mark_debug of DMA_RX_MFB_SOF: signal is "true";
+--attribute mark_debug of DMA_RX_MFB_EOF: signal is "true";
+--attribute mark_debug of DMA_RX_MFB_SOF_POS: signal is "true";
+--attribute mark_debug of DMA_RX_MFB_EOF_POS: signal is "true";
+--attribute mark_debug of DMA_RX_MFB_SRC_RDY: signal is "true";
+--attribute mark_debug of DMA_RX_MFB_DST_RDY: signal is "true";
+--attribute mark_debug of packed_data_counter: signal is "true";
+--attribute mark_debug of rd_addr: signal is "true";
+--attribute mark_debug of wr_addr: signal is "true";
+--attribute mark_debug of ena_arr: signal is "true";
+--attribute mark_debug of enb_arr: signal is "true";
+--attribute mark_debug of all_cores_done: signal is "true";
+--attribute mark_debug of transfer_state: signal is "true";
 
 begin
 
@@ -239,7 +239,7 @@ BRAM_rd_proc:   process(all)
                             end if;
                         end loop;      
                  
-                    end process;                    
+                    end process;       
 
 -- read from frame buffer and send to PCI interface logic  
 -- FSM for transferring data to PCI interface                    
@@ -277,19 +277,18 @@ reset_fsm_nst_logic :   process (all) is
                                 when IDLE =>
                                     DMA_RX_MFB_SRC_RDY <= '0';
                                     if (all_cores_done = '1' and unsigned(rd_addr) <= NUM_JOBS) then
-                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);  
+                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1); 
                                         transfer_next_state <= PACKING;
                                     end if;
                                     
                                 when PACKING =>
                                     if (unsigned(rd_addr) <= NUM_JOBS) then
                                             packed_data_counter_next <= packed_data_counter + 1;
-                                            packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= rd_data_arr(to_integer(unsigned(rd_addr(13 downto 11)))); 
-                                        if (packed_data_counter = 15) then
+                                            packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= rd_data_arr(to_integer(unsigned(rd_addr(13 downto 11))));   
+											--packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= func_sign_ext(rd_addr_next, 32);
                                             transfer_next_state <= SENDING_1_HALF;     
                                         else
-                                            rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);                                 
-                                        end if;			 	
+                                            rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);                             	 	
                                     end if;	
                                 
                                     
