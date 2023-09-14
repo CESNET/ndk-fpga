@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: b12b7d06
+                Git branch: devel, <br> Git hash: f350fc57
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -117,15 +117,10 @@
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-tsu_gen">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">TSU_GEN</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-tsu_gen" title="Permalink to this definition"></a></dt>
-<dd><p>The TimeStamp Unit is used to generate accurate 64b timestamps in two different
-formats (see the description of the <a class="reference internal" href="#vhdl-portsignal-tsu_gen-ts"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">TS</span></code></a>
-and <a class="reference internal" href="#vhdl-portsignal-tsu_gen-ts_ns"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">TS_NS</span></code></a> ports). Conversion to another
-format, where the whole Timestamp represented as a number of nanoseconds, is
-available with the <a class="reference internal" href="../tsu_format_to_ns/readme.html#tsu-format-to-ns"><span class="std std-ref">TSU_FORMAT_TO_NS component</span></a>
-(one directory above).</p>
-<p>The TSU supports a pulse per second (PPS) external signal, for example, from
-a precision GPS receiver. The TSU must be properly configured and activated
-to start. Configuration is performed by the software tool via the MI interface.</p>
+<dd><p>Timestamp unit is used to generate accurate 64b timestamps. It supports
+a pulse per second (PPS) external signal, for example from a precision GPS
+receiver. The TSU must be properly configured and activated to start.
+Configuration is performed by the software tool via the MI interface.</p>
 <p><strong>MI address space:</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Registers</span> <span class="n">accessible</span> <span class="n">directly</span> <span class="n">via</span> <span class="n">the</span> <span class="n">MI</span> <span class="n">bus</span><span class="p">:</span>
 <span class="o">=============================================</span>
