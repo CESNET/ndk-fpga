@@ -13,8 +13,8 @@ use work.type_pack.all;
 use work.eth_hdr_pack.all;
 use work.combo_user_const.all;
 
-use WORK.many_core_package.ALL;
-use WORK.RISCV_package.ALL;
+use WORK.many_core_package.all;
+use WORK.RISCV_package.all;
 
 entity APP_SUBCORE is
     generic (
@@ -92,72 +92,72 @@ end entity;
 
 architecture FULL of APP_SUBCORE is
 
-component many_core_system is
-    generic (NUM_ELEMENTS: positive := 1);
-    port (  clk: in std_logic;
-            reset: in std_logic;
-            o_data_valid: out std_logic;
-            o_data_out: out std_logic_vector (NUM_ELEMENTS*32 - 1 downto 0);  -- data out
-            o_all_cores_done: out std_logic);
-end component;
+    component many_core_system is
+        generic (NUM_ELEMENTS : positive := 1);
+        port (clk              : in  std_logic;
+              reset            : in  std_logic;
+              o_data_valid     : out std_logic;
+              o_data_out       : out std_logic_vector (NUM_ELEMENTS*32 - 1 downto 0);  -- data out
+              o_all_cores_done : out std_logic);
+    end component;
 
-component dual_port_byte_en_RAM is
-    generic (   SIZE: integer := 1024;
-                ADDR_WIDTH: integer := 10;
-                COL_WIDTH: integer := 8;
-                NB_COL: integer := 4);
-    port (  clka: in std_logic;
-            ena: in std_logic;
-            wea: in std_logic_vector(NB_COL - 1 downto 0);
-            addra: in std_logic_vector(ADDR_WIDTH - 1 downto 0);
-            dina: in std_logic_vector(NB_COL*COL_WIDTH - 1 downto 0);
-            douta: out std_logic_vector(NB_COL*COL_WIDTH - 1 downto 0);
-            clkb: in std_logic;
-            enb: in std_logic;
-            web: in std_logic_vector(NB_COL - 1 downto 0);
-            addrb: in std_logic_vector(ADDR_WIDTH - 1 downto 0);
-            dinb: in std_logic_vector(NB_COL*COL_WIDTH - 1 downto 0);
-            doutb : out std_logic_vector(NB_COL*COL_WIDTH - 1 downto 0));
-end component;
+    component dual_port_byte_en_RAM is
+        generic (SIZE       : integer := 1024;
+                 ADDR_WIDTH : integer := 10;
+                 COL_WIDTH  : integer := 8;
+                 NB_COL     : integer := 4);
+        port (clka  : in  std_logic;
+              ena   : in  std_logic;
+              wea   : in  std_logic_vector(NB_COL - 1 downto 0);
+              addra : in  std_logic_vector(ADDR_WIDTH - 1 downto 0);
+              dina  : in  std_logic_vector(NB_COL*COL_WIDTH - 1 downto 0);
+              douta : out std_logic_vector(NB_COL*COL_WIDTH - 1 downto 0);
+              clkb  : in  std_logic;
+              enb   : in  std_logic;
+              web   : in  std_logic_vector(NB_COL - 1 downto 0);
+              addrb : in  std_logic_vector(ADDR_WIDTH - 1 downto 0);
+              dinb  : in  std_logic_vector(NB_COL*COL_WIDTH - 1 downto 0);
+              doutb : out std_logic_vector(NB_COL*COL_WIDTH - 1 downto 0));
+    end component;
 
---signals for 8 BRAMs generated for frame buffer 
-type rd_data_type is array(0 to 7) of DATA_TYPE;
-signal rd_data_arr: rd_data_type;
-signal wr_addr: std_logic_vector(13 downto 0);
-signal rd_addr: std_logic_vector(14 downto 0);
-signal ena_arr, enb_arr: std_logic_vector(0 to 7);
-signal wr_data_in: DATA_TYPE;
-signal valid, all_cores_done: std_logic;
-signal wr_en: std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM  
+    --signals for 8 BRAMs generated for frame buffer
+    type rd_data_type is array(0 to 7) of DATA_TYPE;
+    signal rd_data_arr           : rd_data_type;
+    signal wr_addr               : std_logic_vector(13 downto 0);
+    signal rd_addr               : std_logic_vector(14 downto 0);
+    signal ena_arr, enb_arr      : std_logic_vector(0 to 7);
+    signal wr_data_in            : DATA_TYPE;
+    signal valid, all_cores_done : std_logic;
+    signal wr_en                 : std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM
 
--- signals for PCI
-signal packed_data: std_logic_vector(511 downto 0);
-signal packed_data_next: std_logic_vector(511 downto 0);
-signal packed_data_counter, packed_data_counter_next: unsigned(3 downto 0);
-signal rd_addr_next: std_logic_vector(14 downto 0);
+    -- signals for PCI
+    signal packed_data, packed_data_next                 : std_logic_vector(511 downto 0);
+    signal packed_data_counter, packed_data_counter_next : unsigned(3 downto 0);
+    signal rd_addr_next                                  : std_logic_vector(14 downto 0);
 
-type transfer_fsm_state_type is (IDLE, PACKING, SENDING_1_HALF, SENDING_2_HALF);
-signal transfer_state, transfer_next_state : transfer_fsm_state_type := IDLE;
+    type transfer_fsm_state_type is (IDLE, PACKING, SENDING_1_HALF, SENDING_2_HALF);
+    signal transfer_state, transfer_next_state : transfer_fsm_state_type := IDLE;
 
-signal manycore_rst : std_logic;
+    signal manycore_rst : std_logic;
 
---attribute mark_debug                           : string;
---attribute mark_debug of manycore_rst        : signal is "true";
+    attribute mark_debug : string;
+    --attribute mark_debug of manycore_rst        : signal is "true";
 
---attribute mark_debug of DMA_RX_MFB_DATA: signal is "true";
---attribute mark_debug of DMA_RX_MFB_SOF: signal is "true";
---attribute mark_debug of DMA_RX_MFB_EOF: signal is "true";
---attribute mark_debug of DMA_RX_MFB_SOF_POS: signal is "true";
---attribute mark_debug of DMA_RX_MFB_EOF_POS: signal is "true";
---attribute mark_debug of DMA_RX_MFB_SRC_RDY: signal is "true";
---attribute mark_debug of DMA_RX_MFB_DST_RDY: signal is "true";
---attribute mark_debug of packed_data_counter: signal is "true";
---attribute mark_debug of rd_addr: signal is "true";
---attribute mark_debug of wr_addr: signal is "true";
---attribute mark_debug of ena_arr: signal is "true";
---attribute mark_debug of enb_arr: signal is "true";
---attribute mark_debug of all_cores_done: signal is "true";
---attribute mark_debug of transfer_state: signal is "true";
+    attribute mark_debug of DMA_RX_MFB_DATA    : signal is "true";
+    attribute mark_debug of DMA_RX_MFB_SOF     : signal is "true";
+    attribute mark_debug of DMA_RX_MFB_EOF     : signal is "true";
+    attribute mark_debug of DMA_RX_MFB_SOF_POS : signal is "true";
+    attribute mark_debug of DMA_RX_MFB_EOF_POS : signal is "true";
+    attribute mark_debug of DMA_RX_MFB_SRC_RDY : signal is "true";
+    attribute mark_debug of DMA_RX_MFB_DST_RDY : signal is "true";
+
+    -- attribute mark_debug of packed_data_counter: signal is "true";
+    -- attribute mark_debug of rd_addr: signal is "true";
+    -- attribute mark_debug of wr_addr: signal is "true";
+    -- attribute mark_debug of ena_arr: signal is "true";
+    -- attribute mark_debug of enb_arr: signal is "true";
+    -- attribute mark_debug of all_cores_done: signal is "true";
+    -- attribute mark_debug of transfer_state: signal is "true";
 
 begin
 
@@ -179,147 +179,146 @@ begin
 
     DMA_RX_MFB_META_PKT_SIZE <= std_logic_vector(to_unsigned(64, DMA_RX_MFB_META_PKT_SIZE'length));
     DMA_RX_MFB_META_HDR_META <= (others => '0');
-    DMA_RX_MFB_META_CHAN <= (others => '0');
-    
-    many_core:  many_core_system 
-                port map (  clk => clk,
-                            reset => (not RESET) and (not manycore_rst),
-                            o_data_valid => valid,                          
-                            o_data_out => wr_data_in,
-                            o_all_cores_done => all_cores_done);
-                            
--- Code specific to many_core_system testing Mandelbrot Set Computation
--- We need a frame buffer of size 16384 elements,each 16 bits wide -- too big to fit into one BRAM!
--- We need to instantiate 8 BRAMs                          
-gen_frame_buffer:   for i in 0 to 7 generate
-                    begin
-                        gen_BRAM:   dual_port_byte_en_RAM 
-                                        generic map (   SIZE => 2048,
-                                                        ADDR_WIDTH => 11,
-                                                        COL_WIDTH => 8,
-                                                        NB_COL => 4)
-                                        port map (  clka => CLK,
-                                                    ena => ena_arr(i),
-                                                    wea => wr_en, 
-                                                    addra => wr_addr(10 downto 0),
-                                                    dina => wr_data_in,
-                                                    douta => open,
-                                                    clkb => CLK,
-                                                    enb => enb_arr(i),
-                                                    web => (others =>'0'),
-                                                    addrb => rd_addr(10 downto 0),
-                                                    dinb => (others => '0'),
-                                                    doutb => rd_data_arr(i));       
-                        end generate gen_frame_buffer;
-                        
-    wr_en <= (others => '1') when (valid = '1') else (others => '0') ; -- write 4 individual bytes in BRAM                  
-    wr_addr <= wr_data_in(23 downto 10); -- location in BRAM, iteration counter for Mandelbrot is 10 bits wide          
-          
--- select the correct BRAM for writing
-BRAM_wr_proc:   process(all)
-                    begin
-                        for i in 0 to 7 loop
-                            if (wr_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
-                                ena_arr(i) <='1';
-                            else 
-                                ena_arr(i) <='0';
-                            end if;
-                        end loop;      
-                 
-                    end process; 
-                    
- -- select the correct BRAM for reading
-BRAM_rd_proc:   process(all)
-                    begin
-                        for i in 0 to 7 loop
-                            if (rd_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
-                                enb_arr(i) <='1';
-                            else
-                                enb_arr(i) <='0';
-                            end if;
-                        end loop;      
-                 
-                    end process;       
+    DMA_RX_MFB_META_CHAN     <= (others => '0');
 
--- read from frame buffer and send to PCI interface logic  
--- FSM for transferring data to PCI interface                    
-reset_fsm_state_reg:    process (CLK) is
-                        begin
-                            if (rising_edge(CLK)) then
-                                if (RESET = '1' or manycore_rst = '1') then
-                                    transfer_state <= IDLE;
-                                    rd_addr <= (others => '0');
-                                    packed_data_counter <= (others => '0');
-                                    packed_data <= (others => '0'); 
-                                else
-                                    transfer_state <= transfer_next_state;
-                                    rd_addr <= rd_addr_next;
-                                    packed_data_counter <= packed_data_counter_next;
-                                    packed_data <= packed_data_next;
-                                end if;
-                            end if;
-                        end process;
+    many_core : many_core_system
+        port map (
+            clk              => clk,
+            reset            => (not RESET) and (not manycore_rst),
+            o_data_valid     => valid,
+            o_data_out       => wr_data_in,
+            o_all_cores_done => all_cores_done);
 
-reset_fsm_nst_logic :   process (all) is
-                        begin
-                            transfer_next_state <= transfer_state; 
-                            rd_addr_next <= rd_addr;
-                            packed_data_counter_next <= packed_data_counter;
-                            packed_data_next <= packed_data;
-                            DMA_RX_MFB_DATA    <= (others => '0');
-                            DMA_RX_MFB_SOF     <= (others => '0');
-                            DMA_RX_MFB_EOF     <= (others => '0');
-                            DMA_RX_MFB_SOF_POS <= (others => '0');
-                            DMA_RX_MFB_EOF_POS <= (others => '0');
-                            DMA_RX_MFB_SRC_RDY <= '0';   
-                                
-                            case transfer_state is
-                                when IDLE =>
-                                    DMA_RX_MFB_SRC_RDY <= '0';
-                                    if (all_cores_done = '1' and unsigned(rd_addr) <= NUM_JOBS) then
-                                        rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1); 
-                                        transfer_next_state <= PACKING;
-                                    end if;
-                                    
-                                when PACKING =>
-                                    if (unsigned(rd_addr) <= NUM_JOBS) then
-                                            packed_data_counter_next <= packed_data_counter + 1;
-                                            packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= rd_data_arr(to_integer(unsigned(rd_addr(13 downto 11))));   
-											--packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= func_sign_ext(rd_addr_next, 32);
-                                            transfer_next_state <= SENDING_1_HALF;     
-                                        else
-                                            rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);                             	 	
-                                    end if;	
-                                
-                                    
-                                when SENDING_1_HALF =>
-                                    if (DMA_RX_MFB_DST_RDY = '1') then																		
-										transfer_next_state <= SENDING_2_HALF;
-									end if;
-									
-                                    DMA_RX_MFB_DATA    <= packed_data(255 downto 0);
-                                    DMA_RX_MFB_SOF     <= "1";
-                                    DMA_RX_MFB_EOF     <= "0";
-                                    DMA_RX_MFB_SOF_POS <= (others => '0');
-                                    DMA_RX_MFB_EOF_POS <= (others => '1');
-                                    DMA_RX_MFB_SRC_RDY <= '1';
-                                
-                                when SENDING_2_HALF =>
-                                    if (DMA_RX_MFB_DST_RDY = '1') then		
-										transfer_next_state <= PACKING;
-										rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1); 
-								    end if;
-								    
-                                    DMA_RX_MFB_DATA    <= packed_data(511 downto 256);
-                                    DMA_RX_MFB_SOF     <= "0";
-                                    DMA_RX_MFB_EOF     <= "1";
-                                    DMA_RX_MFB_SOF_POS <= (others => '0');
-                                    DMA_RX_MFB_EOF_POS <= (others => '1');
-                                    DMA_RX_MFB_SRC_RDY <= '1';
-								
-								when others => null;
-										
-                           end case;
-                        end process;
-    
+    -- Code specific to many_core_system testing Mandelbrot Set Computation
+    -- We need a frame buffer of size 16384 elements,each 16 bits wide -- too big to fit into one BRAM!
+    -- We need to instantiate 8 BRAMs
+    gen_frame_buffer : for i in 0 to 7 generate
+    begin
+        gen_BRAM : dual_port_byte_en_RAM
+            generic map (
+                SIZE       => 2048,
+                ADDR_WIDTH => 11,
+                COL_WIDTH  => 8,
+                NB_COL     => 4)
+            port map (
+                clka  => CLK,
+                ena   => ena_arr(i),
+                wea   => wr_en,
+                addra => wr_addr(10 downto 0),
+                dina  => wr_data_in,
+                douta => open,
+                clkb  => CLK,
+                enb   => enb_arr(i),
+                web   => (others => '0'),
+                addrb => rd_addr(10 downto 0),
+                dinb  => (others => '0'),
+                doutb => rd_data_arr(i));
+    end generate;
+
+    wr_en   <= (others => '1') when (valid = '1') else (others => '0');  -- write 4 individual bytes in BRAM
+    wr_addr <= wr_data_in(23 downto 10);  -- location in BRAM, iteration counter for Mandelbrot is 10 bits wide
+
+    -- select the correct BRAM for writing
+    BRAM_wr_proc : process(all)
+    begin
+        for i in 0 to 7 loop
+            if (wr_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
+                ena_arr(i) <= '1';
+            else
+                ena_arr(i) <= '0';
+            end if;
+        end loop;
+    end process;
+
+    -- select the correct BRAM for reading
+    BRAM_rd_proc : process(all)
+    begin
+        for i in 0 to 7 loop
+            if (rd_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
+                enb_arr(i) <= '1';
+            else
+                enb_arr(i) <= '0';
+            end if;
+        end loop;
+    end process;
+
+    -- read from frame buffer and send to PCI interface logic
+    -- FSM for transferring data to PCI interface
+    reset_fsm_state_reg : process (CLK) is
+    begin
+        if (rising_edge(CLK)) then
+            if (RESET = '1' or manycore_rst = '1') then
+                transfer_state      <= IDLE;
+                rd_addr             <= (others => '0');
+                packed_data_counter <= (others => '0');
+                packed_data         <= (others => '0');
+            else
+                transfer_state      <= transfer_next_state;
+                rd_addr             <= rd_addr_next;
+                packed_data_counter <= packed_data_counter_next;
+                packed_data         <= packed_data_next;
+            end if;
+        end if;
+    end process;
+
+    reset_fsm_nst_logic : process (all) is
+    begin
+        transfer_next_state      <= transfer_state;
+        rd_addr_next             <= rd_addr;
+        packed_data_counter_next <= packed_data_counter;
+        packed_data_next         <= packed_data;
+        DMA_RX_MFB_DATA          <= (others => '0');
+        DMA_RX_MFB_SOF           <= (others => '0');
+        DMA_RX_MFB_EOF           <= (others => '0');
+        DMA_RX_MFB_SOF_POS       <= (others => '0');
+        DMA_RX_MFB_EOF_POS       <= (others => '0');
+        DMA_RX_MFB_SRC_RDY       <= '0';
+
+        case transfer_state is
+            when IDLE =>
+                DMA_RX_MFB_SRC_RDY                             <= '0';
+                if (all_cores_done = '1' and unsigned(rd_addr) <= NUM_JOBS) then
+                    rd_addr_next        <= std_logic_vector(unsigned(rd_addr) + 1);
+                    transfer_next_state <= PACKING;
+                end if;
+
+            when PACKING =>
+                if (unsigned(rd_addr) <= NUM_JOBS) then
+                    packed_data_counter_next                                                                                      <= packed_data_counter + 1;
+                    packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= rd_data_arr(to_integer(unsigned(rd_addr(13 downto 11))));
+                    --packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32)) <= func_sign_ext(rd_addr_next, 32);
+                    transfer_next_state                                                                                           <= SENDING_1_HALF;
+                else
+                    rd_addr_next <= std_logic_vector(unsigned(rd_addr) + 1);
+                end if;
+
+
+            when SENDING_1_HALF =>
+                if (DMA_RX_MFB_DST_RDY = '1') then
+                    transfer_next_state <= SENDING_2_HALF;
+                end if;
+
+                DMA_RX_MFB_DATA    <= packed_data(255 downto 0);
+                DMA_RX_MFB_SOF     <= "1";
+                DMA_RX_MFB_EOF     <= "0";
+                DMA_RX_MFB_SOF_POS <= (others => '0');
+                DMA_RX_MFB_EOF_POS <= (others => '1');
+                DMA_RX_MFB_SRC_RDY <= '1';
+
+            when SENDING_2_HALF =>
+                if (DMA_RX_MFB_DST_RDY = '1') then
+                    transfer_next_state <= PACKING;
+                    rd_addr_next        <= std_logic_vector(unsigned(rd_addr) + 1);
+                end if;
+
+                DMA_RX_MFB_DATA    <= packed_data(511 downto 256);
+                DMA_RX_MFB_SOF     <= "0";
+                DMA_RX_MFB_EOF     <= "1";
+                DMA_RX_MFB_SOF_POS <= (others => '0');
+                DMA_RX_MFB_EOF_POS <= (others => '1');
+                DMA_RX_MFB_SRC_RDY <= '1';
+
+            when others => null;
+        end case;
+    end process;
 end architecture;
