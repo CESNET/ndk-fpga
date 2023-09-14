@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 3aa16b24
+                Git branch: devel, <br> Git hash: 9f9d3916
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -105,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo_simple/readme.html">MFB PD ASFIFO SIMPLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MFB ASFIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MFB FIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
@@ -150,9 +151,38 @@
 <dt class="sig sig-object vhdl" id="vhdl-entity-mfb_timestamp_limiter">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_TIMESTAMP_LIMITER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_timestamp_limiter" title="Permalink to this definition"></a></dt>
 <dd><p>This component limits output speed according to given Timestamps via the <a class="reference internal" href="#vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_timestamp"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RX_MFB_TIMESTAMP</span></code></a> port.
+There are 2 Timestamp formats that are currently supported (see the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">TIMESTAMP_FORMAT</span></code> generic).
 The incoming packets are split into queues (e.g., per each DMA Channel), where the order of packets is kept the same.
-Then in each Queue, the MFB Packet Delayer component outputs each packet when the time is right.
+Then in each Queue, the <a class="reference internal" href="../packet_delayer/readme.html#mfb-packet-delayer"><span class="std std-ref">MFB Packet Delayer component</span></a> outputs each packet when the time is right.
 Finally, the packets from all Queues are merged back into a single stream (no order is kept here).</p>
+<p>The Packet Delayers use a time source, according to which they calculate the time that has passed and whether a packet is due to be sent.
+The default is to use the so-called Time Counter (see diagram below), which is basically a counter that increments its value by the duration of one clock period derived from the
+value of the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">CLK_FREQUENCY</span></code> generic.
+Another option is to use an external time source, for example, the TSU (for better precision).
+In this case, set the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">EXTERNAL_TIME_SRC</span></code> generic to <code class="docutils literal notranslate"><span class="pre">True</span></code> and connect your time source to the
+<a class="reference internal" href="#vhdl-portsignal-mfb_timestamp_limiter-external_time"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">EXTERNAL_TIME</span></code></a> port.</p>
+<p>The MI interface enables the user to reset Time in the Packet Delayers.
+This is useful when using the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">Timestamp</span> <span class="pre">format</span> <span class="pre">1</span></code>,
+where the time is being incremented in each clock cycle since the very first packet after boot/reset passes through.
+You can simply reset all Packet Delayers (all Queues) by setting the MI_RESET_REG register, or you can
+select specific Queues by setting the MI_SEL_QUEUE_REG register before setting the MI_RESET_REG register.
+After writing a <strong>1</strong> to the MI_RESET_REG register to issue the reset, its value automatically returns back to <strong>0</strong>.</p>
+<p><strong>MI address space</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address offset</p></th>
+<th class="head"><p>MI Register</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0x00</p></td>
+<td><p>Reset register (write only)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x04</p></td>
+<td><p>Select Queues for reset register</p></td>
+</tr>
+</tbody>
+</table>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -187,9 +217,19 @@ Finally, the packets from all Queues are merged back into a single stream (no or
 <td><p>0</p></td>
 <td><p>Metadata width (in bits).</p></td>
 </tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-clk_frequency"><td><p>CLK_FREQUENCY</p></td>
 <td><p>natural</p></td>
-<td><p>322265625</p></td>
+<td><p>200000000</p></td>
 <td><p>Freq of the CLK signal (in Hz).</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-timestamp_width"><td><p>TIMESTAMP_WIDTH</p></td>
@@ -203,16 +243,17 @@ Finally, the packets from all Queues are merged back into a single stream (no or
 <td><p>Format of Timestamps. Options:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">0</span></code> number of NS between individual packets,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> number of NS from RESET. WIP, not used yet</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code> number of NS from RESET.</p></li>
 </ul>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-autoreset_timeout"><td><p>AUTORESET_TIMEOUT</p></td>
-<td><p>natural</p></td>
-<td><p>1000000</p></td>
-<td><p>Number of NS(?) in IDLE state until scheduling an autoreset.
-Autoreset (Only for TS_FORMAT=1?) will reset accumulated time from the prev RESET with the next SOF.
-WIP, not used yet</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-external_time_src"><td><p>EXTERNAL_TIME_SRC</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>Select Time source. Options:</p>
+<p>True - use external source of time (port <a class="reference internal" href="#vhdl-portsignal-mfb_timestamp_limiter-external_time"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">EXTERNAL_TIME</span></code></a>),
+False (default) - internal “Time Counter” with increment given by CLK_FREQUENCY.</p>
+</td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-buffer_size"><td><p>BUFFER_SIZE</p></td>
 <td><p>natural</p></td>
@@ -255,110 +296,171 @@ WIP, not used yet</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-external_time"><td><p>EXTERNAL_TIME</p></td>
+<td><p>std_logic_vector(64-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Connect your own Time source to this port (used when the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">EXTERNAL_TIME_SRC</span></code> generic is <code class="docutils literal notranslate"><span class="pre">True</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>RX MFB STREAM</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_queue"><td><p>RX_MFB_QUEUE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_queue"><td><p>RX_MFB_QUEUE</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(QUEUES))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ID of the packet’s DMA channel or queue.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_timestamp"><td><p>RX_MFB_TIMESTAMP</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_timestamp"><td><p>RX_MFB_TIMESTAMP</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*TIMESTAMP_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Timestamps are valid with each SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>TX MFB STREAM</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MI INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Not supported!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
+<span class="sig-name descname">Constants</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Constant</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
 <section id="block-diagram">
 <h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/timestamp_limiter_diagram.drawio.svg" id="timestamp-limiter-diagram"><img alt="" class="align-center" id="timestamp-limiter-diagram" src="../../../../../_images/timestamp_limiter_diagram.drawio.svg" width="60%" /></a>

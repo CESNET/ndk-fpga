@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 3aa16b24
+                Git branch: devel, <br> Git hash: 9f9d3916
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
@@ -273,37 +273,42 @@ output are chosen according their usefullness later in the design.</p>
 <td><p>Byte enable for every MFB word where frame is transmitted. Calculated from Byte Enable
 signals of the PCIe transaction.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_meta_byte_cnt"><td><p>USR_MFB_META_BYTE_CNT</p></td>
+<td><p>std_logic_vector(13 -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Size of current transaction in bytes</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_sof"><td><p>USR_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_sof"><td><p>USR_MFB_SOF</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_eof"><td><p>USR_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_eof"><td><p>USR_MFB_EOF</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_sof_pos"><td><p>USR_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_sof_pos"><td><p>USR_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_eof_pos"><td><p>USR_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_eof_pos"><td><p>USR_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_src_rdy"><td><p>USR_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_src_rdy"><td><p>USR_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_dst_rdy"><td><p>USR_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_dst_rdy"><td><p>USR_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>

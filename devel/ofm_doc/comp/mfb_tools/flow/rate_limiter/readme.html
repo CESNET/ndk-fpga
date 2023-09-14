@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 3aa16b24
+                Git branch: devel, <br> Git hash: 9f9d3916
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -108,6 +108,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo_simple/readme.html">MFB PD ASFIFO SIMPLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MFB ASFIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MFB FIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
@@ -215,12 +216,14 @@
 <tr class="row-odd" id="vhdl-gengeneric-rate_limiter-section_length"><td><p>SECTION_LENGTH</p></td>
 <td><p>natural</p></td>
 <td><p>1000</p></td>
-<td><p>Default section length (in number of clock cycles)</p></td>
+<td><p>Default section length (in number of clock cycles)
+Maximum: 2**MI_DATA_WIDTH</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-rate_limiter-interval_length"><td><p>INTERVAL_LENGTH</p></td>
 <td><p>natural</p></td>
 <td><p>40</p></td>
-<td><p>Default interval length (in number of sections)</p></td>
+<td><p>Default interval length (in number of sections)
+Maximum: 2**MI_DATA_WIDTH</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-rate_limiter-interval_count"><td><p>INTERVAL_COUNT</p></td>
 <td><p>natural</p></td>

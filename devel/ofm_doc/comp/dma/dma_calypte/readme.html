@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 3aa16b24
+                Git branch: devel, <br> Git hash: 9f9d3916
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -295,9 +295,9 @@ the maximum is 2**16 - 1</p></td>
 <td><p>Total number of TX DMA Channels
 Minimum value: TX_SEL_CHANNELS*DMA_ENDPOINTS</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_fifo_depth"><td><p>TX_FIFO_DEPTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_ptr_width"><td><p>TX_PTR_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>16</p></td>
+<td><p>14</p></td>
 <td><p>Width of Software and Hardware Descriptor Pointer
 Defines width of signals used for these values in DMA Module
 Affects logic complexity
@@ -310,31 +310,30 @@ Maximum value: 32 (restricted by size of SDP and HDP MI register)</p></td>
 Defines width of Packet length signals.
 the maximum is 2**16 - 1</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-channel_arbiter_en"><td><p>CHANNEL_ARBITER_EN</p></td>
-<td><p>boolean</p></td>
-<td><p>TRUE</p></td>
-<td><p>Enables the component which merges the outputs of all channel cores to
-one output interface (interface number 0)</p></td>
-</tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>Optional settings</p></td>
 <td><p>=====</p></td>
 <td><p>Settings for testing and debugging, settings usually left unchanged
 at entity-area constants.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-dsp_cnt_width"><td><p>DSP_CNT_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-dsp_cnt_width"><td><p>DSP_CNT_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>64</p></td>
 <td><p>Width of DSP packet and byte statistics counters</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-rx_gen_en"><td><p>RX_GEN_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-rx_gen_en"><td><p>RX_GEN_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
 <td><p>Enable generation of RX/TX side of DMA Module</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_gen_en"><td><p>TX_GEN_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_gen_en"><td><p>TX_GEN_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-dma_calypte-mi_width"><td><p>MI_WIDTH</p></td>
@@ -471,6 +470,16 @@ at entity-area constants.</p></td>
 <tr class="row-odd" id="vhdl-portsignal-dma_calypte-usr_tx_mfb_dst_rdy"><td><p>USR_TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dma_calypte-st_sp_dbg_chan"><td><p>ST_SP_DBG_CHAN</p></td>
+<td><p>std_logic_vector(log2(TX_CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dma_calypte-st_sp_dbg_meta"><td><p>ST_SP_DBG_META</p></td>
+<td><p>std_logic_vector(ST_SP_DBG_SIGNAL_W -1 downto 0)</p></td>
+<td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
