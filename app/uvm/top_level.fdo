@@ -12,53 +12,28 @@ set TB_FILE          "./testbench.sv"
 set PACKAGES   ""
 set MOD        ""
 set COMPONENTS ""
-# SET COMPONENTS
-
-###################################
-# GENERATE PKG FILE
-###################################
-# Source common core const scripts
-source $OFM_PATH/build/targets.tcl
-source $OFM_PATH/build/VhdlPkgGen.tcl
-source $OFM_PATH/build/Shared.tcl
-
-set BOARD        "NONE"
-set CARD_NAME    "NONE"
-set DMA_ENABLE           true
-set ETH_ENABLE           true
-#VhdlPkgBegin
-#set PROJECT_NAME "APPLICATION_CORE-VER"
-#set DMA_RX_BLOCKING_MODE false
-#set DMA_CROX_CLK_SEL     0
-#set DMA_400G_DEMO        false
-#source ./config/user_const.tcl
-#source ./config/ndk_const.tcl
-#VhdlPkgBool DMA_400G_DEMO $DMA_400G_DEMO
-#
-#VhdlPkgFinish "./config/ndk_const.vhd" "combo_user_const"
-###################################
-# FINISH GENERATING PKG FILE
-###################################
 
 # add element to ARCHGRP array
 set ARCHGRP_UVM(APPLICATION_CORE_ENTITY_ONLY) true
+set ARCHGRP_UVM(APP_CORE_ENABLE) true
 
 # convert array to list
 set ARCHGRP_L [array get ARCHGRP_UVM]
 
 lappend PACKAGES   "./config/ndk_const.vhd"
-lappend COMPONENTS [list "DUT_ENTITY" "$FIRMWARE_BASE/ndk/core/intel"  $ARCHGRP_L]
-lappend COMPONENTS [list "DUT_INTEL"  "../top"  "FULL"]
-lappend COMPONENTS [list "VER"        "."         "FULL"]
+lappend COMPONENTS [list "DUT_ENTITY" "$FIRMWARE_BASE/ndk/core/intel" $ARCHGRP_L]
+lappend COMPONENTS [list "DUT_INTEL"  "../top"                        $ARCHGRP_L]
+lappend COMPONENTS [list "VER"        "."                             "FULL"]
 
-#SET TEST NAME
 set SIG_FILE  "signals.fdo"
-#set TEST_NAME "test::full_speed"
-set TEST_NAME "test::base"
-
-# Enable Code Coverage
 set SIM_FLAGS(CODE_COVERAGE) false
-set SIM_FLAGS(EXTRA_VFLAGS) "+UVM_VERBOSITY=UVM_NONE +UVM_TESTNAME=$TEST_NAME -uvmcontrol=all +UVM_MAX_QUIT_COUNT=1"
+set SIM_FLAGS(UVM_ENABLE) true
+set SIM_FLAGS(UVM_TEST) "test::base"
+#set SIM_FLAGS(UVM_TEST) "test::full_speed"
+#set SIM_FLAGS(UVM_VERBOSITY) "UVM_MEDIUM"
+#set SIM_FLAGS(DEBUG) true
+#set SIM_FLAGS(RAND_SEED) 1305311032
+#set SIM_FLAGS(EXTRA_VFLAGS) "-voptargs=+acc"
 
 # Global include file for compilation
 source "$OFM_PATH/build/Modelsim.inc.fdo"
@@ -67,6 +42,7 @@ source "$OFM_PATH/build/Modelsim.inc.fdo"
 puts "Std Numeric Warnings - Disabled"
 set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
+config wave -signalnamewidth 1
 
 #run verification
 nb_sim_run
@@ -77,5 +53,3 @@ if {$SIM_FLAGS(CODE_COVERAGE)} {
     coverage save -instance /testbench/DUT -code bcefst -verbose -testname {*}$TEST_NAME actual.ucdb
     coverage report -html -output cov_html -instance=/testbench/DUT -source -details -assert -directive -cvg -code bcefst -verbose -threshL 50 -threshH 90
 }
-
-quit
