@@ -13,6 +13,7 @@ Before you get started, there are a few requirements that you need to have. Amon
 ### Requirements and supported FPGA cards
 
 - To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 22.4** or **Xilinx Vivado 2022.2** (depending on the target card), including a valid license.
+- We recommend using the **Questa Sim-64 2023.1_2** tool to run HDL verifications (UVM).
 - Basic additional repositories which are needed to build the NDK-based Minimal application:
     - [Open FPGA Modules](https://github.com/CESNET/ofm/)
     - [NDK Core](https://github.com/CESNET/ndk-core/)
