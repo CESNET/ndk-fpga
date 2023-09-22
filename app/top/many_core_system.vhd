@@ -485,6 +485,7 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                                     core_index_1 <= (others => '0');
                                                     wr_en <= '0';
                                                     results_count <= (others => '0');
+                                                    o_all_cores_done <= '0';
                                                 else
                                                     core_dispatch_en <= (others => '0');
                                                     core_result_en <= (others => '0');
@@ -709,6 +710,7 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                                 fifo_read_local_final <= '0';
                                                 fifo_read_local_final_1 <= '0';
                                                 results_count <= (others =>'0');
+                                                o_all_cores_done <= '0';
                                            else 
                                                 if (fifo_empty(NUM_CORES + NUM_COLLECT_FIFOS - 1) = '0') then
                                                     fifo_read_local_final <= '1';
