@@ -1,5 +1,5 @@
 -- barrel core variant 2
--- regFile 1 is in distributed memory and regFile 2 are in BRAM 
+-- regFile 1 is in LUTRAM and regFile 2 are in BRAM 
 -- data mem is also implemented in the lower half of regFile 2 BRAM (no external data mem)
 -- multiplier is available
 
@@ -162,7 +162,7 @@ signal data_wb: DATA_TYPE;
 -- signals for load from memory mapped addresses
 signal loaded_mem_mapped_data, loaded_mem_mapped_data_pipe_5, loaded_mem_mapped_data_pipe_6: DATA_TYPE;
 
--- registers for receiving jobs and sending results
+-- registers for requesting and receiving jobs, sending results
 type thread_ID_queue_type is array ((NUM_THREADS - 1) downto 0) of unsigned(2 downto 0); 
 type data_reg_type is array ((NUM_THREADS - 1) downto 0) of DATA_TYPE; 
 signal job_request_queue, job_done_queue: thread_ID_queue_type;
@@ -177,51 +177,6 @@ signal threads_per_core_done_reg: std_logic_vector(NUM_THREADS - 1 downto 0) := 
 ---- to ensure that the register fle is implemented with LUTRAM
 attribute ram_style : string;
 attribute ram_style of barrel_regFile_array : signal is "distributed";
-
---attribute keep : string;
---attribute keep of i_instr, cycle_counter, thread_ptr_new_request, thread_ptr_to_allocate, thread_ptr_new_result, thread_ptr_result_sent: signal is "true";
---attribute keep of next_instr_addr: signal is "true";
---attribute keep of imm_val, imm_val_12, imm_val_pipe_1, imm_val_pipe_2, imm_val_pipe_3,imm_val_pipe_4, imm_val_pipe_5, imm_val_pipe_6 : signal is "true";
---attribute keep of current_thread_id, thread_id_pipe_0: signal is "true";
---attribute keep of thread_id_pipe_1, thread_id_pipe_2, thread_id_pipe_3, thread_id_pipe_4, thread_id_pipe_5, thread_id_pipe_6: signal is "true";
---attribute keep of next_thread_id : signal is "true";
---attribute keep of next_pc : signal is "true";
---attribute keep of pc_pipe_0 : signal is "true";
---attribute keep of src1_addr : signal is "true";
---attribute keep of src2_addr : signal is "true";
---attribute keep of dest_addr, dest_addr_pipe_1,  dest_addr_pipe_2, dest_addr_pipe_3, dest_addr_pipe_4, dest_addr_pipe_5, dest_addr_pipe_6: signal is "true";
---attribute keep of reg_wr_back_data : signal is "true";
---attribute keep of next_pc_before_jump_pipe_0 : signal is "true";
---attribute keep of reg1 : signal is "true";
---attribute keep of reg2 : signal is "true";
---attribute keep of alu_operand_1, alu_operand_1_pipe_3, alu_operand_2_pipe_3  : signal is "true";
---attribute keep of alu_operand_2 : signal is "true";
---attribute keep of alu_opcode : signal is "true";
---attribute keep of alu_result, alu_result_final, alu_result_1, alu_result_2, alu_result_pipe_4, alu_result_pipe_5,
---    result, alu_result_add, alu_result_add_pipe_4 : signal is "true";
---attribute keep of alu_operand_1_sel : signal is "true";
---attribute keep of alu_operand_2_sel : signal is "true";
---attribute keep of reg_wb_sel, reg_wb_sel_pipe_3, reg_wb_sel_pipe_4, reg_wb_sel_pipe_5, reg_wb_sel_tmp : signal is "true";
---attribute keep of reg_wr_en, reg_wr_en_BRAM, reg_wr_en_pipe_6: signal is "true";
---attribute keep of pc_sel_jmp : signal is "true";
---attribute keep of pc_sel_br, pc_sel_br_pipe_3, pc_sel_br_pipe_4 : signal is "true";
---attribute keep of func_opcode : signal is "true";
---attribute keep of br_unsigned : signal is "true";
---attribute keep of br_eq : signal is "true";
---attribute keep of br_lt : signal is "true";
---attribute keep of is_load_instr, is_store_instr : signal is "true";
---attribute keep of is_add_op, is_add_op_pipe_3, is_add_op_pipe_4, alu_group,  alu_group_pipe_3: signal is "true";
---attribute keep of alu_result_1_tmp_1, alu_result_1_tmp_2, alu_result_1_tmp_3, alu_result_1_tmp_4,  alu_result_1_tmp_5: signal is "true";
---attribute keep of reg_value_to_store_pipe_3, reg_value_to_store_pipe_4, reg_value_to_store_pipe_5, reg_value_to_store_pipe_6: signal is "true";
---attribute keep of rd_addr_BRAM, wr_addr_BRAM: signal is "true";
---attribute keep of is_load_1_instr, is_load_1_instr_pipe_1, is_load_1_instr_pipe_2: signal is "true";
---attribute keep of is_store_1_instr, is_store_1_instr_pipe_1, is_store_1_instr_pipe_2, is_store_1_instr_pipe_3: signal is "true";
---attribute keep of is_store_1_instr_pipe_4, is_store_1_instr_pipe_5, is_store_1_instr_pipe_6: signal is "true";
---attribute keep of is_mem_mapped_store_instr, is_mem_mapped_store_instr_pipe_5, is_mem_mapped_store_instr_pipe_6: signal is "true";
---attribute keep of data_from_mem_BRAM_pipe_3, data_from_mem_BRAM_pipe_4, data_from_mem_BRAM_pipe_5, data_from_mem_BRAM_pipe_6: signal is "true";
---attribute keep of data_wb: signal is "true";
---attribute keep of mult_result_pipe_6: signal is "true";
---attribute keep of threads_per_core_done_reg, data_to_fifo, data_to_fifo_pipe_5, data_to_fifo_pipe_6, fifo_write, fifo_write_pipe_5, fifo_write_pipe_6: signal is "true";
 
 begin  
     -- cycle count to allow for first instr fetch latency and possibly for measurement purposes
@@ -464,7 +419,7 @@ begin
                 end process; 
                 
 
-    -- Register File 1 is implemented using distributed memory.
+    -- Register File 1 is implemented using LUTRAM.
     -- Register File 2 is implemented using 1 BRAM shared with data memory.
     regFile_1:  process(clk)
                 begin
@@ -524,7 +479,7 @@ begin
                                 "00" & std_logic_vector(thread_id_pipe_0) & src2_addr;  
     
     -- addr for write port
-    -- dest addr forregFile implemented in distributed memory - dest_addr provided by decoder 
+    -- dest addr forregFile implemented in LUTRAM - dest_addr provided by decoder 
     -- if it is a move into mem, use the addr for data mem in BRAM built from the immediate value
     wr_addr_BRAM <= "10" & std_logic_vector(thread_id_pipe_6) & imm_val_pipe_6(6 downto 2) 
                             when (is_store_1_instr_pipe_6 = '1') else
@@ -586,7 +541,7 @@ begin
                 end if;              
             end process; 
               
-        -- Into EX Stage - Stage 3                                                               
+    -- Into EX Stage - Stage 3                                                               
     pipe_2:     process(clk)
                     begin 
                         if (clk'event and clk = '1') then
@@ -691,7 +646,7 @@ begin
                             end if; 
                         end process;                                                                                                     
                                                          
-     -- select alu operands             
+    -- select alu operands             
     -- select the first operand for ALU either from register source 1 or PC for branch or JAL/JALR
     alu_operand_1 <= reg1_pipe_2 when alu_operand_1_sel_pipe_2 = '0' else func_zero_ext(pc_pipe_2, DATA_WIDTH);                                                                                                                                                        
     -- select for operand 2 of ALU: either 0 for data from reg or 1 for immediate value
@@ -706,7 +661,7 @@ begin
                         P => mult_result);   
      
     
-   -- Into Data Mem First Stage - Stage 4 
+    -- Into Data Mem First Stage - Stage 4 
     pipe_3:     process(clk)
                 begin 
                     if (clk'event and clk = '1') then
@@ -918,7 +873,7 @@ begin
     fifo_write <= '1' when ((alu_result_add_pipe_4 = FIFO_addr) and (is_store_instr_pipe_4 = '1')) else '0'; 
     data_to_fifo <= reg_value_to_store_pipe_4; -- byte to be sent to FIFO but written in the last stage                                                                              
   
-   -- allocate jobs to threads and read results, handle requests, acknowledgements, parameters using memory-mapped addresses
+    -- allocate jobs to threads and read results, handle requests, acknowledgements, parameters using memory-mapped addresses
     -- memory address is calculated in the EX-stage   
     -- case of collecting results using fifos     
 if_gen_collect:     
@@ -1040,14 +995,16 @@ if_gen_collect:
                                     o_job_result <= job_result_reg(to_integer(var_thread_id_2)); -- result to be sent out to the port                                      
                                     thread_ptr_result_sent <= thread_ptr_result_sent + 1; -- move pointer forward for the next result to be sent
                                     num_results_sent <= num_results_sent + 1; -- increment num of results sent   
-                                    job_done_reg(to_integer(var_thread_id_2)) <= '0';
-                                    o_job_done <= '1'; 
-                                else
-                                    o_job_done <= '0';              
+                                    job_done_reg(to_integer(var_thread_id_2)) <= '0';          
                                 end if;                                
                                 
                                 -- are there any results to be sent?
                                 num_pending_results <= num_incoming_results - num_results_sent;
+                                if (num_pending_results > 0) then
+                                    o_job_done <= '1';
+                                else
+                                    o_job_done <= '0';
+                                end if; 
                                 
                                 -- a thread is done with its job
                                 if ((alu_result_add_pipe_4 = thread_per_core_done_addr) and (is_store_instr_pipe_4 = '1'))  then
