@@ -123,17 +123,17 @@ architecture FULL of APP_SUBCORE is
     --signals for 8 BRAMs generated for frame buffer
     type rd_data_type is array(0 to 7) of DATA_TYPE;
 
-    signal rd_data_arr          : rd_data_type;
-    signal wr_addr              : std_logic_vector(13 downto 0);
-    signal ena_arr              : std_logic_vector(7 downto 0);
-    signal enb_arr              : std_logic_vector(7 downto 0);
-    signal wr_data_in           : DATA_TYPE;
-    signal valid                : std_logic;
-    signal all_cores_done       : std_logic;
-    signal wr_en                : std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM
-    signal BRAM_last_index      : std_logic_vector(2 downto 0);
-    signal rd_data              : DATA_TYPE;
-    
+    signal rd_data_arr     : rd_data_type;
+    signal wr_addr         : std_logic_vector(13 downto 0);
+    signal ena_arr         : std_logic_vector(7 downto 0);
+    signal enb_arr         : std_logic_vector(7 downto 0);
+    signal wr_data_in      : DATA_TYPE;
+    signal valid           : std_logic;
+    signal all_cores_done  : std_logic;
+    signal wr_en           : std_logic_vector(3 downto 0);  -- write 4 individual bytes in BRAM
+    signal BRAM_last_index : std_logic_vector(2 downto 0);
+    signal rd_data         : DATA_TYPE;
+
     -- counters
     signal packed_data              : std_logic_vector(511 downto 0);
     signal packed_data_next         : std_logic_vector(511 downto 0);
@@ -142,8 +142,8 @@ architecture FULL of APP_SUBCORE is
     signal rd_addr                  : std_logic_vector(14 downto 0);
     signal rd_addr_next             : std_logic_vector(14 downto 0);
 
---    signal bram_mux_cntr      : unsigned(rd_addr'range);
---    signal bram_mux_cntr_next : unsigned(rd_addr'range);
+    signal bram_mux_cntr      : unsigned(rd_addr'range);
+    signal bram_mux_cntr_next : unsigned(rd_addr'range);
 
     type transfer_fsm_state_type is (IDLE, PACKING, SENDING_1_HALF, SENDING_2_HALF);
     signal transfer_state, transfer_next_state : transfer_fsm_state_type := IDLE;
@@ -240,217 +240,125 @@ begin
             end if;
         end loop;
     end process;
-    
-    -- select the correct BRAM for reading                  
-    BRAM_rd_proc:   process(CLK)
-                    begin  
-                        for i in 0 to 7 loop
-                            if (rd_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then                       
-                                enb_arr(i) <='1';
-                            else 
-                                enb_arr(i) <= '0';
-                            end if;
-                        end loop; 
-                        
-                        if rising_edge(CLK) then
-                            BRAM_last_index <= rd_addr(13 downto 11);
-                        end if;
-                        
-                    end process;           
-    
-    packing_fsm_output_logic_p : process (CLK) is
+
+    -- select the correct BRAM for reading
+    BRAM_rd_proc : process(all)
+    begin
+        for i in 0 to 7 loop
+            if (rd_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
+                enb_arr(i) <= '1';
+            else
+                enb_arr(i) <= '0';
+            end if;
+        end loop;
+    end process;
+
+    -- read from frame buffer and send to PCI interface logic
+    -- FSM for transferring data to PCI interface
+    packing_fsm_state_reg_p : process (CLK) is
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1' or manycore_rst = '1') then
-                DMA_RX_MFB_DATA    <= (others => '0');
-                DMA_RX_MFB_SOF     <= (others => '0');
-                DMA_RX_MFB_EOF     <= (others => '0');
-                DMA_RX_MFB_SOF_POS <= (others => '0');
-                DMA_RX_MFB_EOF_POS <= (others => '1');
-                DMA_RX_MFB_SRC_RDY <= '0';
-                
-                rd_addr <= (others => '0');
-                transfer_state <= IDLE;
+
+                transfer_state      <= IDLE;
+                rd_addr             <= (others => '0');
                 packed_data_counter <= (others => '0');
-            else
-                DMA_RX_MFB_DATA    <= (others => '0');
-                DMA_RX_MFB_SOF     <= (others => '0');
-                DMA_RX_MFB_EOF     <= (others => '0');
-                DMA_RX_MFB_SOF_POS <= (others => '0');
-                DMA_RX_MFB_EOF_POS <= (others => '1');
-                DMA_RX_MFB_SRC_RDY <= '0';
-                
-                case transfer_state is
-                    when IDLE =>
-        
-                        if (all_cores_done = '1'and unsigned(rd_addr) < NUM_JOBS) then
-                            rd_addr         <= std_logic_vector(unsigned(rd_addr) + 1);
-                            transfer_state  <= PACKING;
-                        end if;
-        
-                    when PACKING =>
-                        packed_data((to_integer(packed_data_counter)*32) + 32 - 1 downto (to_integer(packed_data_counter)*32)) <= rd_data_arr(to_integer(unsigned(BRAM_last_index)));                        
-                        packed_data_counter <= packed_data_counter + 1;
-                        
-                        -- 16 data elements are to be packed.
-                        if (packed_data_counter = 15) then
-                            transfer_state  <= SENDING_1_HALF;
-                        else
-                            rd_addr         <= std_logic_vector(unsigned(rd_addr) + 1);
-                        end if;
-                
-                    when SENDING_1_HALF =>
-                        DMA_RX_MFB_DATA    <= packed_data(255 downto 0);
-                        DMA_RX_MFB_SOF     <= "1";
-                        DMA_RX_MFB_EOF     <= "0";
-                        DMA_RX_MFB_SRC_RDY <= '1';
-                        
-                        if (DMA_RX_MFB_DST_RDY = '1') then																		
-                            transfer_state <= SENDING_2_HALF;          
-					    end if;
+                packed_data         <= (others => '0');
+                bram_mux_cntr       <= (others => '0');
 
-                    when SENDING_2_HALF =>
-                        DMA_RX_MFB_DATA    <= packed_data(511 downto 256);
-                        DMA_RX_MFB_SOF     <= "0";
-                        DMA_RX_MFB_EOF     <= "1";
-                        DMA_RX_MFB_SRC_RDY <= '1';                        
-                                              
-                        if (DMA_RX_MFB_DST_RDY = '1') then
-                            if (unsigned(rd_addr) = NUM_JOBS) then
-                                transfer_state <= IDLE;
-                            else
-                                rd_addr            <= std_logic_vector(unsigned(rd_addr) + 1);
-                                transfer_state <= PACKING;
-                            end if;
-                        end if;
+            elsif (DMA_RX_MFB_DST_RDY = '1') then
 
-                    when others => null;
-                end case;
+                transfer_state      <= transfer_next_state;
+                rd_addr             <= rd_addr_next;
+                packed_data_counter <= packed_data_counter_next;
+                packed_data         <= packed_data_next;
+                bram_mux_cntr       <= bram_mux_cntr_next;
+
             end if;
         end if;
-    end process;    
-    
---    -- select the correct BRAM for reading
---    BRAM_rd_proc : process(all)
---    begin
---        for i in 0 to 7 loop
---            if (rd_addr(13 downto 11) = std_logic_vector(to_unsigned(i, 3))) then
---                enb_arr(i) <= '1';
---            else
---                enb_arr(i) <= '0';
---            end if;
---        end loop;
---    end process;
+    end process;
 
---    -- read from frame buffer and send to PCI interface logic
---    -- FSM for transferring data to PCI interface
---    packing_fsm_state_reg_p : process (CLK) is
---    begin
---        if (rising_edge(CLK)) then
---            if (RESET = '1' or manycore_rst = '1') then
+    -- FSM Transition diagram converted to process
+    packing_fsm_nst_logic_p : process (all) is
+    begin
+        transfer_next_state <= transfer_state;
 
---                transfer_state      <= IDLE;
---                rd_addr             <= (others => '0');
---                packed_data_counter <= (others => '0');
---                packed_data         <= (others => '0');
---                bram_mux_cntr       <= (others => '0');
+        case transfer_state is
+            when IDLE =>
+                if (all_cores_done = '1' and unsigned(rd_addr) <= NUM_JOBS) then
+                    transfer_next_state <= PACKING;
+                end if;
+            when PACKING =>
+                if (packed_data_counter = 15) then
+                    transfer_next_state <= SENDING_1_HALF;
+                end if;
+            when SENDING_1_HALF =>
+                transfer_next_state <= SENDING_2_HALF;
+            when SENDING_2_HALF =>
+                if (unsigned(rd_addr) = NUM_JOBS) then
+                    transfer_next_state <= IDLE;
+                else
+                    transfer_next_state <= PACKING;
+                end if;
+            when others => null;
+        end case;
 
---            elsif (DMA_RX_MFB_DST_RDY = '1') then
+    end process;
 
---                transfer_state      <= transfer_next_state;
---                rd_addr             <= rd_addr_next;
---                packed_data_counter <= packed_data_counter_next;
---                packed_data         <= packed_data_next;
---                bram_mux_cntr       <= bram_mux_cntr_next;
+    -- There is a huge problem when rd_addr counter is used both for multiplexing between BRAMs and
+    -- also to steer the FSM. The bram_mux_cntr has therefor been created to create a separate
+    -- mechanism to multiplex between BRAMs. With rd_addr, there is also a problem, that BRAM output
+    -- react to the change of this signal with the delay of one clock cycle.
+    -- FSM Transition diagram converted to process
+    packing_fsm_output_logic_p : process (all) is
+    begin
+        rd_addr_next             <= rd_addr;
+        packed_data_next         <= packed_data;
+        packed_data_counter_next <= packed_data_counter;
+        bram_mux_cntr_next       <= bram_mux_cntr;
 
---            end if;
---        end if;
---    end process;
+        DMA_RX_MFB_DATA    <= (others => '0');
+        DMA_RX_MFB_SOF     <= (others => '0');
+        DMA_RX_MFB_EOF     <= (others => '0');
+        DMA_RX_MFB_SOF_POS <= (others => '0');
+        DMA_RX_MFB_EOF_POS <= (others => '1');
+        DMA_RX_MFB_SRC_RDY <= '0';
 
----- FSM Transition diagram converted to process
---    packing_fsm_nst_logic_p : process (all) is
---    begin
---        transfer_next_state <= transfer_state;
+        case transfer_state is
+            when IDLE =>
 
---        case transfer_state is
---            when IDLE =>
---                if (all_cores_done = '1' and unsigned(rd_addr) <= NUM_JOBS) then
---                    transfer_next_state <= PACKING;
---                end if;
---            when PACKING =>
---                if (packed_data_counter = 15) then
---                    transfer_next_state <= SENDING_1_HALF;
---                end if;
---            when SENDING_1_HALF =>
---                transfer_next_state <= SENDING_2_HALF;
---            when SENDING_2_HALF =>
---                if (unsigned(rd_addr) = NUM_JOBS) then
---                    transfer_next_state <= IDLE;
---                else
---                    transfer_next_state <= PACKING;
---                end if;
---            when others => null;
---        end case;
+                if (all_cores_done = '1' and unsigned(rd_addr) <= NUM_JOBS) then
+                    rd_addr_next       <= std_logic_vector(unsigned(rd_addr) + 1);
+                    bram_mux_cntr_next <= (others => '0');
+                end if;
 
---    end process;
+            when PACKING =>
+                packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32))
+                    <= rd_data_arr(to_integer(bram_mux_cntr(13 downto 11)));
+                packed_data_counter_next <= packed_data_counter + 1;
 
---    -- There is a huge problem when rd_addr counter is used both for multiplexing between BRAMs and
---    -- also to steer the FSM. The bram_mux_cntr has therefor been created to create a separate
---    -- mechanism to multiplex between BRAMs. With rd_addr, there is also a problem, that BRAM output
---    -- react to the change of this signal with the delay of one clock cycle.
---    -- FSM Transition diagram converted to process
---packing_fsm_output_logic_p : process (all) is
---variable row: line;
---    begin
---        rd_addr_next             <= rd_addr;
---        packed_data_next         <= packed_data;
---        packed_data_counter_next <= packed_data_counter;
---        bram_mux_cntr_next       <= bram_mux_cntr;
+                -- Because of the one-clock-period delay of the output data, the counters are stopped.
+                if (packed_data_counter < 15) then
+                    rd_addr_next       <= std_logic_vector(unsigned(rd_addr) + 1);
+                    bram_mux_cntr_next <= bram_mux_cntr + 1;
+                end if;
 
---        DMA_RX_MFB_DATA    <= (others => '0');
---        DMA_RX_MFB_SOF     <= (others => '0');
---        DMA_RX_MFB_EOF     <= (others => '0');
---        DMA_RX_MFB_SOF_POS <= (others => '0');
---        DMA_RX_MFB_EOF_POS <= (others => '1');
---        DMA_RX_MFB_SRC_RDY <= '0';
+            when SENDING_1_HALF =>
+                DMA_RX_MFB_DATA    <= packed_data(255 downto 0);
+                DMA_RX_MFB_SOF     <= "1";
+                DMA_RX_MFB_EOF     <= "0";
+                DMA_RX_MFB_SRC_RDY <= '1';
 
---        case transfer_state is
---            when IDLE =>
+            when SENDING_2_HALF =>
+                rd_addr_next       <= std_logic_vector(unsigned(rd_addr) + 1);
+                bram_mux_cntr_next <= bram_mux_cntr + 1;
+                DMA_RX_MFB_DATA    <= packed_data(511 downto 256);
+                DMA_RX_MFB_SOF     <= "0";
+                DMA_RX_MFB_EOF     <= "1";
+                DMA_RX_MFB_SRC_RDY <= '1';
 
---                if (all_cores_done = '1' and unsigned(rd_addr) <= NUM_JOBS) then
---                    rd_addr_next       <= std_logic_vector(unsigned(rd_addr) + 1);
---                    bram_mux_cntr_next <= (others => '0');
---                end if;
+            when others => null;
+        end case;
+    end process;
 
---            when PACKING =>
---                packed_data_next(((to_integer(packed_data_counter)*32) + 32) - 1 downto (to_integer(packed_data_counter)*32))
---                    <= rd_data_arr(to_integer(bram_mux_cntr(13 downto 11)));
---                    hwrite(row, rd_data_arr(to_integer(bram_mux_cntr(13 downto 11))));
---                    writeline(BRAM_data_file, row);
---                packed_data_counter_next <= packed_data_counter + 1;
-
---                -- Because of the one-clock-period delay of the output data, the counters are stopped.
---                if (packed_data_counter < 15) then
---                    rd_addr_next             <= std_logic_vector(unsigned(rd_addr) + 1);
---                    bram_mux_cntr_next       <= bram_mux_cntr + 1;
---                end if;
-
---            when SENDING_1_HALF =>
---                DMA_RX_MFB_DATA    <= packed_data(255 downto 0);
---                DMA_RX_MFB_SOF     <= "1";
---                DMA_RX_MFB_EOF     <= "0";
---                DMA_RX_MFB_SRC_RDY <= '1';
-
---            when SENDING_2_HALF =>
---                rd_addr_next       <= std_logic_vector(unsigned(rd_addr) + 1);
---                bram_mux_cntr_next <= bram_mux_cntr + 1;
---                DMA_RX_MFB_DATA    <= packed_data(511 downto 256);
---                DMA_RX_MFB_SOF     <= "0";
---                DMA_RX_MFB_EOF     <= "1";
---                DMA_RX_MFB_SRC_RDY <= '1';
-
---            when others => null;
---        end case;
---    end process;
-    
 end architecture;
