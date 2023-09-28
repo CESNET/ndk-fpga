@@ -200,13 +200,20 @@ signal job_count: unsigned(log2(NUM_JOBS)  downto 0);
 signal core_index, core_index_1, core_index_2: unsigned(log2(NUM_CORES) - 1 downto 0);
 signal wr_en, wr_en_1,wr_en_2: std_logic;
 
---attribute keep : string;
---attribute keep of data_to_mem, data_mem_wr_en, data_mem_addr, core_dispatch_en, core_index, core_index_1, core_index_2, wr_en, wr_en_1, wr_en_2, job_count, job_value, result_value, job_request, job_done: signal is "true";
---attribute keep of core_id: signal is "true";
---attribute keep of fifo_read, fifo_write, fifo_empty, fifo_full, data_to_fifo, data_out_of_fifo: signal is "true";
---attribute keep of results_count, o_all_cores_done, all_cores_done_reg, fifo_read_local_final, fifo_read_local_final_1: signal is "true";
-             
+signal cycle_counter: DATA_TYPE;
+   
 begin
+
+    cycle_count: process (clk)
+    begin 
+        if rising_edge(clk) then -- rising edge
+            if (reset = '0') then     
+                cycle_counter <= (others => '0');             
+            else
+                cycle_counter <= std_logic_vector(unsigned(cycle_counter) + 1);
+            end if;
+        end if;
+    end process; 
 
 -- initialize core IDs in 2 dimensional array
 init_proc:  process(clk)
@@ -483,9 +490,13 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                                     job_count <= (others => '0');
                                                     core_index <= (others => '0');
                                                     core_index_1 <= (others => '0');
+                                                    core_index_2 <= (others => '0');
                                                     wr_en <= '0';
-                                                    results_count <= (others => '0');
+                                                    wr_en_1 <= '0';
                                                     o_all_cores_done <= '0';
+                                                    results_count <= (others => '0');
+                                                    o_data_valid <= '0';
+                                                    o_data_out <= (others => '0');     
                                                 else
                                                     core_dispatch_en <= (others => '0');
                                                     core_result_en <= (others => '0');
@@ -497,33 +508,30 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                                         job_value(to_integer(core_index)) <= func_zero_ext(std_logic_vector(job_count), DATA_WIDTH);                                                          
                                                     end if;
                                                     
-                                                    -- enable collect result for this core
-                                                    if (results_count < NUM_JOBS) then
+                                                     -- enable collect result for this core
+                                                    if ((results_count < NUM_JOBS) and (job_done(to_integer(core_index)) = '1')) then
                                                         core_result_en(to_integer(core_index)) <= '1';
-                                                        if (job_done(to_integer(core_index_2)) = '1') then
-                                                            results_count <= results_count + 1;                                                                                                                                                          
-                                                            wr_en <= '1';  
-                                                        else
-                                                            wr_en <= '0';   
-                                                        end if;
+                                                        results_count <= results_count + 1;                                                                                                                                                          
+                                                        wr_en <= '1';  
                                                     else
                                                         wr_en <= '0';   
                                                     end if;
                                                     
-                                                     -- go through each core sequentially  
-                                                    core_index <= core_index + 1;      
-                                                    core_index_1 <= core_index;
-                                                    core_index_2 <= core_index_1;
- 
-                                                    wr_en_1 <= wr_en;
-                                                    wr_en_2 <= wr_en_1;
+                                                    -- enable collect result for this core
+                                                    if ((results_count < NUM_JOBS) and (job_done(to_integer(core_index)) = '1')) then
+                                                        core_result_en(to_integer(core_index)) <= '1';
+                                                        results_count <= results_count + 1;                                                                                                                                                          
+                                                        wr_en <= '1';  
+                                                    else
+                                                        wr_en <= '0';   
+                                                    end if;
                                                     
-                                                    if (wr_en_2 = '1') then 
+                                                    if (wr_en_1 = '1') then 
                                                         o_data_valid <= '1'; -- indicate data is valid
-                                                        o_data_out <= result_value(to_integer(core_index_1));               
+                                                        o_data_out <= result_value(to_integer(core_index_2));               
                                                     else
                                                         o_data_valid <= '0'; 
-                                                    end if;                                                                                                     
+                                                    end if;                                                                                                       
                                                                                                
                                                     -- to signal when all cores are done
                                                     if (results_count = NUM_JOBS - 1) then
@@ -725,9 +733,11 @@ if_job_dispatch:    if (COLLECT_MODE = '0') generate
                                         
                                                 if (fifo_read_local_final_1 = '1') and (fifo_read_local_final /= '0') then
                                                     o_data_valid <= '1'; -- indicate data is valid
-                                                    o_data_out <= data_out_of_fifo(NUM_CORES + NUM_COLLECT_FIFOS - 1);  
+                                                    o_data_out <= data_out_of_fifo(NUM_CORES + NUM_COLLECT_FIFOS - 1); 
                                                      -- for dynamic distribution, we need a way of finding out when the output is ready to be transmitted e.g. by UART 
                                                     results_count <= results_count + 1; -- increment the number of elements being written so that we know when we are done
+                                                    -- if each core does not say explicitly that is done, 
+                                                    -- we can find when all cores are done by checking the number of results obtained
                                                     if (results_count = NUM_JOBS - 2) then
                                                         o_all_cores_done <= '1';
                                                     end if;
