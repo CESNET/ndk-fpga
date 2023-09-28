@@ -134,26 +134,29 @@ begin
             wait until rising_edge(clk_tb);
         end loop;
         rx_mfb_dst_rdy <= not rx_mfb_dst_rdy;
-
     end process;
     -- rx_mfb_dst_rdy <= '1';
 
     cntr_p : process(clk_tb)
-        variable row : line;
     begin
         if (rising_edge(clk_tb)) then
             if (reset_tb = '1') then
                 pkt_counter <= (others => '0');
-            elsif (rx_mfb_sof = "1" and rx_mfb_eof = "0" and rx_mfb_src_rdy = '1' and rx_mfb_dst_rdy = '1') then
-                hwrite(row, rx_mfb_data);
-                writeline(packed_data_file, row);
-            elsif (rx_mfb_sof = "0" and rx_mfb_eof = "1" and rx_mfb_src_rdy = '1' and rx_mfb_dst_rdy = '1') then
-                hwrite(row, rx_mfb_data);
-                writeline(packed_data_file, row);
+            elsif (rx_mfb_sof = "1" and rx_mfb_src_rdy = '1' and rx_mfb_dst_rdy = '1') then
                 pkt_counter <= pkt_counter + 1;
             end if;
 
         end if;
     end process;
 
+    write_file_p: process (all) is
+        variable row : line;
+    begin
+        if (rising_edge(clk_tb)) then
+            if (rx_mfb_src_rdy = '1' and rx_mfb_dst_rdy = '1') then
+                hwrite(row, rx_mfb_data);
+                writeline(packed_data_file, row);
+            end if;
+        end if;
+    end process;
 end architecture;
