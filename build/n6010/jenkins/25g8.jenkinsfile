@@ -11,3 +11,11 @@ stagesFirmware(
     artifacts: 'n6010-minimal-25g8',
     lastBuilds: 2,
 )
+
+stagesNdkTest(
+    card: 'n6010',
+    mode: '25g8',
+    project: 'minimal',
+    fw_name: 'n6010-minimal-25g8.nfw',
+    testbranch: 'friedl-feat-ndk_app_minimal'
+)
