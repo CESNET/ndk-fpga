@@ -168,7 +168,6 @@ architecture FULL of APP_SUBCORE is
     -- attribute mark_debug of enb_arr: signal is "true";
     -- attribute mark_debug of all_cores_done: signal is "true";
     -- attribute mark_debug of transfer_state: signal is "true";
-
 begin
 
 
@@ -302,7 +301,6 @@ begin
                 end if;
             when others => null;
         end case;
-
     end process;
 
     -- There is a huge problem when rd_addr counter is used both for multiplexing between BRAMs and
@@ -360,5 +358,4 @@ begin
             when others => null;
         end case;
     end process;
-
 end architecture;
