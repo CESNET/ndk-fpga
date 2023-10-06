@@ -21,13 +21,29 @@ lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/eth_hdr_pack.vhd"
 
 if {$ARCHGRP_ARR(APP_CORE_ENABLE)} {
+
+    set regex {v(\d+\.\d+)}
+
+    set command_output [exec {*}[list vivado -version]]
+    set tool_version ""
+
+    if {![regexp $regex "$command_output" match tool_version]} {
+        error "Cannot determine Vivado version"
+    }
+
     # Components
     lappend COMPONENTS [ list "MI_ASYNC"                $MI_ASYNC_BASE       "FULL" ]
     lappend COMPONENTS [ list "MFB_METADATA_INSERTOR"   $MFB_META_INS_BASE   "FULL" ]
     lappend COMPONENTS [ list "MFB_METADATA_EXTRACTOR"  $MFB_META_EXT_BASE   "FULL" ]
 
     # Files
-    lappend MOD "$ENTITY_BASE/mult.xci"
+
+    if {$tool_version == "2022.2"} {
+        lappend MOD "$ENTITY_BASE/mult.xci"
+    } elseif {$tool_version == "2021.2"} {
+        lappend MOD "$ENTITY_BASE/old_vivado_ip/mult.xci"
+    }
+
     lappend MOD "$ENTITY_BASE/barrel_core_variant_1.vhd"
     lappend MOD "$ENTITY_BASE/barrel_core_variant_1_mult.vhd"
     lappend MOD "$ENTITY_BASE/barrel_core_variant_2.vhd"
