@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdint.h>
+#include <err.h>
 
 #include <nfb/nfb.h>
 #include <nfb/ndp.h>
@@ -20,10 +21,13 @@
 
 int main(int argc, char *argv[])
 {
-    int ret, attempts, j, k, n;
+    int ret, attempts, pkt_counter, j, k, n;
     struct nfb_device *dev;
     struct ndp_queue *rxq;
-    struct ndp_packet pkts[NDP_PACKET_COUNT];
+    struct ndp_packet pkts[NDP_PACKET_COUNT];			
+	// Prepare to reset many-core system
+	struct nfb_comp *comp;
+	int comp_offs; 
 	
 	// Output file name
 	const char *filename_1 = "vcu118_pci.dat";
@@ -32,7 +36,9 @@ int main(int argc, char *argv[])
 	
 	// File pointers
 	FILE *fileptr_1, *fileptr_2;
-
+	// Open the file to write the elements
+	fileptr_1 = fopen(filename_1, "wb");
+	
 	char *buffer = (char*)calloc(4, sizeof(char));	
 	uint16_t index, value;
 	
@@ -48,29 +54,42 @@ int main(int argc, char *argv[])
 
 	// Image size
 	const int xres = 128;
-	const int yres = 128;//(xres * (ymax - ymin)) /(xmax - xmin); 	
-		
+	const int yres = 128;//(xres * (ymax - ymin)) /(xmax - xmin); 
+
 	// Get packets from PCI	
-    /* Get handle to NFB device for futher operation */
-	fileptr_1 = fopen(filename_1, "rb");
+    /* Get handle to NFB device for futher operation */	
     if ((dev = nfb_open("0")) == NULL)
         errx(1, "Can't open device file");
+
+	// Find component in the Device Tree of the dev
+	comp_offs = nfb_comp_find(dev, "ziti,minimal,multicore_debug_core",0);
+	if (comp_offs < 0)
+		errx(1, "Unable to find component."); 
+
+	// Open found component to be accessible
+	comp = nfb_comp_open(dev, comp_offs);
+	if (comp == NULL)
+		errx(1,"Unable to open component.");
 
     /* Open one RX NDP queue for data transmit */
     rxq = ndp_open_rx_queue(dev, 0);
 
     if (rxq == NULL)
         errx(1, "Can't open queue");
-
+	
     /* Start queue */
     // They have to be started before any transmission takes place because the
     // packets are dropped otherwise
     ndp_queue_start(rxq);
 
+	// After starting the queue, write 1 to the component.
+	// This puts APP_SUBCORE to reset
+	nfb_comp_write32(comp, 0, 1);
+
     // For this case study, we need to fetch 16384 packets.
 	// One time though the loop we try to fetch 64.
-	
-	for (j = 0; j < 256; j++) {
+	pkt_counter = 0;
+	while (pkt_counter < 1024) {
 		/* Let try to receive some packets */
 		for (attempts = 0; attempts < 2000; attempts++) {
 			/* Let the library fill at most NDP_PACKET_COUNT, but it may be less */
@@ -79,16 +98,23 @@ int main(int argc, char *argv[])
 				usleep(100);
 				continue;
 			}
-		}
+			else if (ret > 0) {
+				break;
+			}
+		}	
 		
-		for (k = 0; k < 64; k++) {
-			fwrite(pkts[k].data, 1, 64, fileptr_1); //64 elements
-		}
+		// Write pkts to file
+		for (k = 0; k < ret; k++) { 
+			fwrite(pkts[k].data, 1, pkts[k].data_length, fileptr_1); 
+		} 
+	
+		// Increment the number of packets
+		pkt_counter += ret;
 		
 		// Release packets that were already read
-		ndp_rx_burst_put(rxq);
+		ndp_rx_burst_put(rxq);		
 	}
-	
+
 	/* Stop queue and cleanup */
     ndp_queue_stop(rxq);
     ndp_close_rx_queue(rxq);
@@ -101,15 +127,15 @@ int main(int argc, char *argv[])
 	fileptr_2 = fopen(filename_2, "wb");
 	
 	while (!feof(fileptr_1)) {
-		fread(buffer, 8, 4, fileptr_1);
+		fread(buffer, 1, 4, fileptr_1);
 		value = (*buffer) & 0x000003ff;
-		index = (*buffer) >> 10;
-		//fwrite(&index, 2, 1, fileptr_1);
+		//index = (*buffer) >> 10;
+		//fwrite(&index, 2, 1, fileptr_2);
 		fwrite(&value, 2, 1, fileptr_2);
 	}
 	
 	fclose(fileptr_1);
-	fclose(fileptr_2);
+	fclose(fileptr_2); 
 
 	// Convert Mandelbrot data to image PPM
 	fileptr_1 = fopen(filename_2, "rb");
@@ -119,14 +145,13 @@ int main(int argc, char *argv[])
 	fprintf(fileptr_2,
 		   "P6\n# Mandelbrot, xmin=%lf, xmax=%lf, ymin=%lf, ymax=%lf, max_iterations=%d\n%d\n%d\n%d\n",
 		   xmin, xmax, ymin, ymax, max_iterations, xres, yres, (max_iterations < 128 ? 128 : max_iterations));
-
+	
+	fread(&n, 2, 1, fileptr_1);
 	for (k = 0; k < yres; k++) 
 	{
 		for(j = 0; j < xres; j++) 
 		{ 
-		  //fread(&n, sizeof(int), 1, in_fileptr);
 		  fread(&n, 2, 1, fileptr_1);
-		  //printf("n %d \n", n);
 		  // Compute pixel color depending on num of iterations and write it to file
 		  if (n == max_iterations) // Bounded
 		  {       
@@ -146,7 +171,10 @@ int main(int argc, char *argv[])
 			fwrite(color, 6, 1, fileptr_2);
 		  }
 		}
-	}
+	} 
+	
+	fclose(fileptr_1);
+	fclose(fileptr_2); 
 	
     return 0;
 }
