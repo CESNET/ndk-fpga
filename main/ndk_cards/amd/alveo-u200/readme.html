@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMD Alveo U200 &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: af67b2da
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">AMD Alveo U200</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/ndk_cards/amd/alveo-u200/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="amd-alveo-u200">
+<span id="card-alveo-u200"></span><h1>AMD Alveo U200<a class="headerlink" href="#amd-alveo-u200" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Card information:</dt><dd><ul>
+<li><p>Vendor: AMD/Xilinx</p></li>
+<li><p>Name: Alveo U200</p></li>
+<li><p>Ethernet ports: 2x QSFP28</p></li>
+<li><p>PCIe conectors: Edge connector</p></li>
+<li><p><a class="reference external" href="https://www.xilinx.com/products/boards-and-kits/alveo/u200.html">FPGA Card Website</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>FPGA specification:</dt><dd><ul>
+<li><p>FPGA part number: <code class="docutils literal notranslate"><span class="pre">xcu200-fsgd2104-2-e</span></code> (basically same as VU9P)</p></li>
+<li><p>Ethernet Hard IP: CMAC (100G Ethernet)</p></li>
+<li><p>PCIe Hard IP: USP (up to PCIe Gen3 x16)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="ndk-firmware-support">
+<h2>NDK firmware support<a class="headerlink" href="#ndk-firmware-support" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Ethernet cores that are supported in the NDK firmware:</dt><dd><ul>
+<li><p><a class="reference internal" href="../../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">CMAC in the Network Module</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>PCIe cores that are supported in the NDK firmware:</dt><dd><ul>
+<li><p><a class="reference internal" href="../../../ndk_core/intel/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">USP in the PCIe Module</span></a></p></li>
+<li><p>See the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory&gt;/ndk/card/alveo-u200/config/card_conf.tcl</span></code> file for supported PCIe configurations.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):</dt><dd><ul>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g2</span></code> command for firmware with 2x100GbE (default).</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g0</span></code> command for firmware with CMAC disabled but DMAs and Application core remaining (experimental feature).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Support for booting the NDK firmware using the nfb-boot tool:</dt><dd><ul>
+<li><p>NO, use JTAG.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="programming-the-device">
+<h2>Programming the device<a class="headerlink" href="#programming-the-device" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Buld the firmware using <code class="docutils literal notranslate"><span class="pre">make</span></code> as described above (“Generate bitstream” using Vivado GUI flow)</p></li>
+<li><p>Connect USB cable to the JTAG interface of the card</p></li>
+<li><p>Open Hardware manager in Vivado (build on 2022.2)</p></li>
+<li><p>Program the device</p></li>
+</ol>
+<p>For more information, refer to the <a class="reference external" href="https://docs.xilinx.com/r/2022.2-English/ug908-vivado-programming-debugging/Opening-the-Hardware-Manager?tocId=x0two8P7pmYkinePAp~Scg">Programming and debugging manual</a>
+of the Vivado</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To build the NDK firmware for this card, you must have the Xilinx Vivado installed, including a valid license.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Ethernet interface has not been properly tested on this device, although CMACs can be included.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
