@@ -1,0 +1,38 @@
+node("preklad") {
+	cleanWs()
+	def swbase = "ndk-sw"
+	checkout scm
+
+	stage("Checkout development branches") { 
+		sh "git clone https://github.com/CESNET/ndk-sw.git"
+
+		sh "(cd ndk/ofm; git checkout devel)"
+		sh "(cd ndk/core; git checkout main)"
+	}
+
+	sh "python3.9 -m venv venv-cocotb"
+
+	stage("Prepare environment") { 
+		sh """
+			source venv-cocotb/bin/activate
+		    python3.9 -m pip install cython wheel
+		    python3.9 -m pip install pylibfdt fdt
+		    python3.9 -m pip install ${swbase}/pynfb/
+		    python3.9 -m pip install ${swbase}/ext/libnfb_ext_python/
+		    python3.9 -m pip install ndk/ofm/python/cocotbext/
+		"""
+	}
+
+	stage("Run test") {
+		sh """
+			source venv-cocotb/bin/activate
+
+			. /usr/local/bin/fpga_version.sh;
+			fpga_sim 2020.4;
+			make -C tests/cocotb SIM_FLAGS=\"-c -do quit\"
+			"""
+		junit testResults: "build/fb2cghh/results.xml"
+	}
+
+	sh "rm -rf venv-cocotb"
+}

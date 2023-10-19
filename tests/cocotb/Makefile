@@ -9,5 +9,7 @@ CARD = fb2cghh
 
 CARD_DIR=../../build/$(CARD)/
 
+ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
 all:
-	make TARGET=cocotb -C $(CARD_DIR) PYTHONPATH=$$PYTHONPATH:$(PWD)
+	make TARGET=cocotb -C $(CARD_DIR) PYTHONPATH=$$PYTHONPATH:$(ROOT_DIR)
