@@ -26,61 +26,62 @@ properties([
 
 // Jenkins configuration for multiple modules
 node('preklad') {
+    lock(label:"resources-${env.NODE_NAME}", quantity: 1) {
+        // Clean old builds
+        cleanBuilds()
 
-    // Clean old builds
-    cleanBuilds()
+        // fetch sources from GIT
+        checkout scm
+        // clean artifacts possibly left by previous builds
+        sh "git clean -df"
 
-    // fetch sources from GIT
-    checkout scm
-    // clean artifacts possibly left by previous builds
-    sh "git clean -df"
-
-    def failed = []
-    // run verification of every component
-    withEnv(["PATH+VSIM=/usr/local/fpga/Modeltech/linux_x86_64", 'LM_LICENSE_FILE=1717@license.liberouter.org']) {
-        for(c in COMPONENTS) {
-            // parse
-            def name      = c[0]
-            def path      = c[1]
-            def fdo       = c[2]
-            def pkg       = c[3]
-            def settings  = c[4]
-            def repo_root = pwd()
-            def multi_ver = "$repo_root/ndk/ofm/build/scripts/multi_ver/multi_ver.py"
-            // exec vsim
-            try { // try-catch is a hack to continue even after the first failed verification
-                timeout(time: 12, unit: 'HOURS') {
-                    stage("$name") {
-                        dir("$path") {
-                            sh "python3 $multi_ver $fdo $pkg $settings"
+        def failed = []
+        // run verification of every component
+        withEnv(["PATH+VSIM=/usr/local/fpga/Modeltech/linux_x86_64", 'LM_LICENSE_FILE=1717@license.liberouter.org']) {
+            for(c in COMPONENTS) {
+                // parse
+                def name      = c[0]
+                def path      = c[1]
+                def fdo       = c[2]
+                def pkg       = c[3]
+                def settings  = c[4]
+                def repo_root = pwd()
+                def multi_ver = "$repo_root/ndk/ofm/build/scripts/multi_ver/multi_ver.py"
+                // exec vsim
+                try { // try-catch is a hack to continue even after the first failed verification
+                    timeout(time: 12, unit: 'HOURS') {
+                        stage("$name") {
+                            dir("$path") {
+                                sh "python3 $multi_ver $fdo $pkg $settings"
+                            }
                         }
                     }
+                } catch(err) {
+                    currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
+                    failed.add("$name")
+                } finally { // collect interesting files
+                    archiveArtifacts "$path/transcript*" // verification log
                 }
-            } catch(err) {
-                currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
-                failed.add("$name")
-            } finally { // collect interesting files
-                archiveArtifacts "$path/transcript*" // verification log
             }
         }
-    }
 
-    // send out emails if failure is detected
-    if(currentBuild.result == "FAILURE") {
-        println "FAILED on components: ${failed}."
-        emailext \
-            recipientProviders: [culprits(), developers()],
-            to: 'cabal@cesnet.cz',
-            subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
-            body: """\
-                The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
+        // send out emails if failure is detected
+        if(currentBuild.result == "FAILURE") {
+            println "FAILED on components: ${failed}."
+            emailext \
+                recipientProviders: [culprits(), developers()],
+                to: 'cabal@cesnet.cz',
+                subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
+                body: """\
+                    The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
 
-                For more details see ${env.BUILD_URL}.
+                    For more details see ${env.BUILD_URL}.
 
-                Yours sincerely
-                Jenkins\
-            """.stripIndent(),
-            attachLog: true,
-            compressLog: true
+                    Yours sincerely
+                    Jenkins\
+                """.stripIndent(),
+                attachLog: true,
+                compressLog: true
+        }
     }
 }

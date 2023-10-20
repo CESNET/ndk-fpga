@@ -36,11 +36,13 @@ def COMPONENTS_MULTIVER = [\
 
 // Run component verifications using common script
 node('preklad') {
-    // fetch sources from GIT
-    checkout scm
-    def common_run = load "ndk/ofm/tests/jenkins/common.jenkins"
-    common_run.commonPrekladVerRun(COMPONENTS_VER)
-    def root_path  = pwd()
-    common_run.commonPrekladMultiVerRun(COMPONENTS_MULTIVER, "$root_path/ndk/ofm")
+    lock(label:"resources-${env.NODE_NAME}", quantity: 1) {
+        // fetch sources from GIT
+        checkout scm
+        def common_run = load "ndk/ofm/tests/jenkins/common.jenkins"
+        common_run.commonPrekladVerRun(COMPONENTS_VER)
+        def root_path  = pwd()
+        common_run.commonPrekladMultiVerRun(COMPONENTS_MULTIVER, "$root_path/ndk/ofm")
+    }
 }
 
