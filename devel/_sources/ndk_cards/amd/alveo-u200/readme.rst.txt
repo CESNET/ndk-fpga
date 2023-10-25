@@ -26,7 +26,7 @@ NDK firmware support
     - Use ``make 100g2`` command for firmware with 2x100GbE (default).
     - Use ``make 100g0`` command for firmware with CMAC disabled but DMAs and Application core remaining (experimental feature).
 - Support for booting the NDK firmware using the nfb-boot tool:
-    - NO, use JTAG.
+    - NO, use JTAG (see below).
 
 Programming the device
 ^^^^^^^^^^^^^^^^^^^^^^
