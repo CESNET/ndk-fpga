@@ -6,7 +6,7 @@ node("preklad") {
 	stage("Checkout development branches") { 
 		sh "git clone https://github.com/CESNET/ndk-sw.git"
 
-		sh "(cd ndk/ofm; git checkout devel)"
+		sh "(cd ndk/ofm; git checkout main)"
 		sh "(cd ndk/core; git checkout main)"
 	}
 
