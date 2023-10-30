@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 8f58c561
+                Git branch: devel, <br> Git hash: 961e507f
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -260,12 +260,18 @@ False (default) - internal “Time Counter” with increment given by CLK_FREQUE
 <td><p>2048</p></td>
 <td><p>Number of Items in the Packet Delayer’s RX FIFO (the main buffer).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-queues"><td><p>QUEUES</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-buffer_af_offset"><td><p>BUFFER_AF_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>10</p></td>
+<td><p>Almost Full Offset of the main buffer in Packet Delayers.
+States the number of data words it can accept after Almost Full is asserted.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-queues"><td><p>QUEUES</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>The number of Queues (DMA Channels).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_timestamp_limiter-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_timestamp_limiter-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
@@ -301,147 +307,152 @@ False (default) - internal “Time Counter” with increment given by CLK_FREQUE
 <td><p>in</p></td>
 <td><p>Connect your own Time source to this port (used when the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">EXTERNAL_TIME_SRC</span></code> generic is <code class="docutils literal notranslate"><span class="pre">True</span></code>).</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-pause_queue"><td><p>PAUSE_QUEUE</p></td>
+<td><p>std_logic_vector(QUEUES-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Issues a request to pause corresponding DMA channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>RX MFB STREAM</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_queue"><td><p>RX_MFB_QUEUE</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_queue"><td><p>RX_MFB_QUEUE</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(QUEUES))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>ID of the packet’s DMA channel or queue.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_timestamp"><td><p>RX_MFB_TIMESTAMP</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_timestamp"><td><p>RX_MFB_TIMESTAMP</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*TIMESTAMP_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Timestamps are valid with each SOF.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>TX MFB STREAM</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>MI INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Not supported!</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_timestamp_limiter-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_timestamp_limiter-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>

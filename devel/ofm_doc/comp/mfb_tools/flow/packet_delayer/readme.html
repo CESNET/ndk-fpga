@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 8f58c561
+                Git branch: devel, <br> Git hash: 961e507f
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -206,9 +206,15 @@ The packets read from the RX FIFO are stored in the TX FIFO.</p>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_packet_delayer-fifo_depth"><td><p>FIFO_DEPTH</p></td>
 <td><p>natural</p></td>
 <td><p>2048</p></td>
-<td><p>Number of Items in the Input packet FIFOX_MULTI (main buffer).</p></td>
+<td><p>Number of Items in the Input MFB_FIFOX (main buffer).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_packet_delayer-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_packet_delayer-fifo_af_offset"><td><p>FIFO_AF_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>10</p></td>
+<td><p>Almost Full Offset of the input MFB_FIFOX.
+States the number of Items it can accept after Almost Full is asserted.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_packet_delayer-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
@@ -252,97 +258,102 @@ Time counter is reset with the next first SOF.</p></td>
 It can be a precise time from the TSU, a value from a simple incrementing counter, or anything in between.
 The quality of the time source affects the precision of the packet’s transmission but not the component’s functionality.</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-pause_request"><td><p>PAUSE_REQUEST</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Used to pause incomming traffic when the buffer is Almost Full.</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>RX inf</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_ts"><td><p>RX_MFB_TS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_ts"><td><p>RX_MFB_TS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*TS_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Timestamp valid with each SOF.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>TX inf</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
