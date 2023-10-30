@@ -18,6 +18,8 @@ set DMA_TX_CHANNELS      16
 # In blocking mode, packets are dropped only when the RX DMA channel is off.
 # In non-blocking mode, packets are dropped whenever they cannot be sent.
 set DMA_RX_BLOCKING_MODE true
+# External DDR4 memory settings (allowed values 4 or 0).
+set MEM_PORTS            4
 
 # ------------------------------------------------------------------------------
 # Other parameters:
