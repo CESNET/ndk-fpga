@@ -37,6 +37,18 @@ architecture FULL of APPLICATION_CORE is
         return v_addr_base;
     end function;
 
+    constant MT_RND_GEN_DATA_WIDTH : natural := 64;
+    constant MT_RND_GEN_ADDR_WIDTH : natural := 32;
+
+    function mt_random_data_seed_f return slv_array_t is
+        variable v_rnd_seed : slv_array_t(0 to (MEM_DATA_WIDTH/MT_RND_GEN_DATA_WIDTH)-1)(MT_RND_GEN_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
+    begin
+        for ii in 0 to (MEM_DATA_WIDTH/MT_RND_GEN_DATA_WIDTH)-1 loop
+            v_rnd_seed(ii) := std_logic_vector(to_unsigned((672 + ii*MEM_DATA_WIDTH), MT_RND_GEN_DATA_WIDTH));
+        end loop;
+        return v_rnd_seed;
+    end function;
+
     -- ============================================== MVB ==============================================
     signal eth_rx_mvb_data_deser         : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
     signal eth_rx_mvb_vld_deser          : slv_array_t(ETH_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
@@ -499,20 +511,10 @@ begin
             MI_DATA_WIDTH               => MI_DATA_WIDTH,
             MI_ADDR_WIDTH               => MI_ADDR_WIDTH,
      
-            RAND_GEN_DATA_WIDTH         => 64,
-            RAND_GEN_ADDR_WIDTH         => 32,
-            RANDOM_DATA_SEED            => 
-                (
-                    X"04a90474c868e517",
-                    X"8b9d55e316e57bfc",
-                    X"0554f750a3702377",
-                    X"abcd76981c982117",
-                    X"fc21f22c3ad6d735",
-                    X"5d06b6ae01cf86f8",
-                    X"38fc9671a56bb8e8",
-                    X"457a2fb6bd25f1fa"
-                ),
-            RANDOM_ADDR_SEED            => X"FEFE01FF",
+            RAND_GEN_DATA_WIDTH         => MT_RND_GEN_DATA_WIDTH,
+            RAND_GEN_ADDR_WIDTH         => MT_RND_GEN_ADDR_WIDTH,
+            RANDOM_DATA_SEED            => mt_random_data_seed_f,
+            RANDOM_ADDR_SEED            => std_logic_vector(to_unsigned(66844679, MT_RND_GEN_ADDR_WIDTH)),
             -- REFR_REQ_BEFORE_TEST - Requires support for manual memory refresh
             -- control, experimental function only!
             REFR_REQ_BEFORE_TEST        => false,
