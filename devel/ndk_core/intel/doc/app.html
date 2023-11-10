@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 961e507f
+                Git branch: devel, <br> Git hash: 2629fddc
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -861,6 +861,17 @@ Each data packet (MFB) must have an appropriate header (MVB)!</p></td>
 <td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>DMA TX MFB streams: destination ready of each MFB bus</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Application specific signals</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_usr_choke_chans"><td><p>DMA_TX_USR_CHOKE_CHANS</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_TX_CHANNELS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Selectively pause (choke) a DMA channel(s) from Application.
+Can be used to avoid stopping the whole DMA Module when just a single channel is slacking behind.</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
 <td><p>EXTERNAL MEMORY INTERFACES (clocked at MEM_CLK)</p></td>
