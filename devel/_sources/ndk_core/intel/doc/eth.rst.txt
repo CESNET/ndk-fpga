@@ -180,7 +180,7 @@ Network Module Core
 
 The so-called Network Module Core is a subcomponent of the Network Module.
 It contains the required hard IP(s), appropriate adapters, and an MI component for reconfiguring the hard IP(s).
-Right now, the Network Module can use three different Ethernet hard IPs, for Intel FPGA, it is the E-tile or the F-Tile, and for the Xilinx FPGA, it is the CMAC. 
+Right now, the Network Module can use three different Ethernet hard IPs, for Intel FPGA, it is the E-tile or the F-Tile, and for the Xilinx FPGA, it is the CMAC.
 For the F-Tile, there are two variants of IP core: it is F-Tile and F-Tile_Multirate, which support different speeds for implemented IP.
 For the F-Tile_Multirate reconfiguration, use Dynamic Reconfiguration Controller.
 According to the selected NIC (and therefore the type of hard IP), one of the four architectures of the Network Module Core (with the proper hard IP) is used.
@@ -189,7 +189,7 @@ On the right side, it is connected to the Network Module Logic.
 All four architectures of the Network Module Core are displayed below.
 
 
-.. list-table:: 
+.. list-table::
 
     * - .. image:: img/etile_network_module_core.svg
             :align: center
@@ -225,6 +225,8 @@ F-tile hard IP cores always use the MAC segmented interface in our designs.
 CMAC’s client interface is the `LBUS interface <https://docs.xilinx.com/r/en-US/pg165-cmac/User-Side-LBUS-Interface>`_.
 The Network Module Core always uses the appropriate adapters (according to the hard IP).
 
+Each channel on both E-tile and F-tile architectures also includes a diagnostic post-MAC loopback module, which (when enabled via the MGMT) re-transmits received frames back to the link partner. We call this mode the "PCS reverse loopback". When the loopback is active, received frames are also passed to the Application as in normal mode. However, the frames transmitted from the Application are discarded.
+See the `nfb-eth tool <https://cesnet.github.io/ndk-sw/tools/nfb-eth.html>`_ documentation for instructions on how to turn the loopback on/off.
 
 .. _sw_access_reconfig_infs:
 

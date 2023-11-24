@@ -36,7 +36,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 2629fddc
+                Git branch: devel, <br> Git hash: cb6dbb97
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -168,8 +168,8 @@ Two (MI and MI PHY) are connected to MI Splitters, and one (MI PMD) is directly 
 The MI PHY Splitter forwards requests to one or more instances of the Network Module Core.
 The MI Splitter forwards requests to one or more instances of Network Module Logic.
 The main blocks and their connection between address spaces are in the table below:</p>
-<table class="docutils align-center" id="id5">
-<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id5" title="Permalink to this table"></a></caption>
+<table class="docutils align-center" id="id6">
+<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id6" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 13%" />
 <col style="width: 25%" />
@@ -345,8 +345,8 @@ The only difference is the address offset, which is 0x2000.</p>
 <p>To get a complete register address in one of the components of the Network Module, you must add the appropriate base address of the Network Module (as defined in the <a class="reference internal" href="mi.html#ndk-mi"><span class="std std-ref">MI address space package</span></a>) to it.</p>
 </div>
 <p>The addressing of both main blocks is described in the tables below:</p>
-<table class="docutils align-center" id="id6">
-<caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id6" title="Permalink to this table"></a></caption>
+<table class="docutils align-center" id="id7">
+<caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id7" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 15%" />
 <col style="width: 31%" />
@@ -380,8 +380,8 @@ The only difference is the address offset, which is 0x2000.</p>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<table class="docutils align-center" id="id7">
-<caption><span class="caption-text">Tab. 3</span><a class="headerlink" href="#id7" title="Permalink to this table"></a></caption>
+<table class="docutils align-center" id="id8">
+<caption><span class="caption-text">Tab. 3</span><a class="headerlink" href="#id8" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 15%" />
 <col style="width: 31%" />
@@ -458,6 +458,8 @@ F-tile can also utilize the AVST interface (for speeds up to 100 GE) or the MAC 
 F-tile hard IP cores always use the MAC segmented interface in our designs.
 CMAC’s client interface is the <a class="reference external" href="https://docs.xilinx.com/r/en-US/pg165-cmac/User-Side-LBUS-Interface">LBUS interface</a>.
 The Network Module Core always uses the appropriate adapters (according to the hard IP).</p>
+<p>Each channel on both E-tile and F-tile architectures also includes a diagnostic post-MAC loopback module, which (when enabled via the MGMT) re-transmits received frames back to the link partner. We call this mode the “PCS reverse loopback”. When the loopback is active, received frames are also passed to the Application as in normal mode. However, the frames transmitted from the Application are discarded.
+See the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-eth.html">nfb-eth tool</a> documentation for instructions on how to turn the loopback on/off.</p>
 <section id="sw-access-to-the-reconfiguration-interfaces">
 <span id="sw-access-reconfig-infs"></span><h3>SW access to the reconfiguration interfaces<a class="headerlink" href="#sw-access-to-the-reconfiguration-interfaces" title="Permalink to this heading"></a></h3>
 <p>Software access is provided via the management unit (MGMT), which is instantiated per channel.
@@ -511,8 +513,8 @@ However, that is not the concern of the MI Splitter here but in the top-level of
 To create a complete address of a MAC Lite register, add the address of the register, the channel offset, the port offset, and the offset of the Network Module Logic (MI_ADC_PORT_NETMOD in the <a class="reference external" href="https://github.com/CESNET/ndk-core/blob/main/intel/src/mi_addr_space_pkg.vhd">MI address space package</a>).
 To show the connections of the MAC Lites, an example of the MAC Lite address spaces for a configuration with two 4x25 GE ports follows.</p>
 <p>Notation: TX_MAC_LITE(port_id)(channel_id), RX_MAC_LITE(port_id)(channel_id).</p>
-<table class="docutils align-center" id="id8">
-<caption><span class="caption-text">Tab. 4</span><a class="headerlink" href="#id8" title="Permalink to this table"></a></caption>
+<table class="docutils align-center" id="id9">
+<caption><span class="caption-text">Tab. 4</span><a class="headerlink" href="#id9" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 29%" />
 <col style="width: 43%" />
