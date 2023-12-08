@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: bd378ba7
+                Git branch: devel, <br> Git hash: 8a6651c7
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -163,12 +163,17 @@ value of the <code class="xref vhdl vhdl-genconstant docutils literal notranslat
 Another option is to use an external time source, for example, the TSU (for better precision).
 In this case, set the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">EXTERNAL_TIME_SRC</span></code> generic to <code class="docutils literal notranslate"><span class="pre">True</span></code> and connect your time source to the
 <a class="reference internal" href="#vhdl-portsignal-mfb_timestamp_limiter-external_time"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">EXTERNAL_TIME</span></code></a> port.</p>
-<p>The MI interface enables the user to reset Time in the Packet Delayers.
+<p>The MI interface enables the user to do two things.</p>
+<p>#. Reset the accumulated “time” in the Packet Delayers.
 This is useful when using the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">Timestamp</span> <span class="pre">format</span> <span class="pre">1</span></code>,
 where the time is being incremented in each clock cycle since the very first packet after boot/reset passes through.
 You can simply reset all Packet Delayers (all Queues) by setting the MI_RESET_REG register, or you can
 select specific Queues by setting the MI_SEL_QUEUE_REG register before setting the MI_RESET_REG register.
-After writing a <strong>1</strong> to the MI_RESET_REG register to issue the reset, its value automatically returns back to <strong>0</strong>.</p>
+After writing a <strong>1</strong> to the MI_RESET_REG register to issue the reset, its value automatically returns back to <strong>0</strong>.
+#. Bypass timestamp limiting and transmit data at top speed.
+When enabled, all timestamp values are automatically set to 0 and all packets are redirected to Queue 0 to avoid merging at the end.
+NOTE that the top speed is ON in the default state!
+To enable timestamp limiting, write 0 to the MI_TOP_SPEED_REG register.</p>
 <p><strong>MI address space</strong></p>
 <table class="docutils align-default">
 <thead>
@@ -182,6 +187,9 @@ After writing a <strong>1</strong> to the MI_RESET_REG register to issue the res
 </tr>
 <tr class="row-odd"><td><p>0x04</p></td>
 <td><p>Select Queues for reset register</p></td>
+</tr>
+<tr class="row-even"><td><p>0x08</p></td>
+<td><p>Top speed register</p></td>
 </tr>
 </tbody>
 </table>
