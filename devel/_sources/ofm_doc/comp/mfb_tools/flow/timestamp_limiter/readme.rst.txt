@@ -11,7 +11,7 @@ Timestamp Limiter
 
 .. vhdl:autoentity:: MFB_TIMESTAMP_LIMITER
 
-.. vhdl:constants:: MFB_TIMESTAMP_LIMITER
+.. .. vhdl:constants:: MFB_TIMESTAMP_LIMITER
 
 .. Arcitecture
 .. ~~~~~~~~~~~

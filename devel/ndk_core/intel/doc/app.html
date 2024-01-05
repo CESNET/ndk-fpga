@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: de32dba2
+                Git branch: devel, <br> Git hash: e289da76
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -81,6 +81,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/faq.html">Frequently Asked Questions</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
 <ul>
@@ -274,13 +275,9 @@
 <td><p>HDR_LEN</p></td>
 <td><p>The size of the user header in bytes. HDR_LEN=0 means that the user header is not present in the packet.</p></td>
 </tr>
-<tr class="row-odd"><td><p>8  to 10</p></td>
+<tr class="row-odd"><td><p>8  to 11</p></td>
 <td><p>HDR_ID</p></td>
-<td><p>DRAFT ONLY: A 3-bit identification of the type/format of the user header, the definition of each HDR_ID value is application-specific.</p></td>
-</tr>
-<tr class="row-even"><td><p>11 to 11</p></td>
-<td><p>nETH</p></td>
-<td><p>DRAFT ONLY: Value 0: the packet contains an Ethernet frame without the CRC; Value 1: it is an application-specific packet.</p></td>
+<td><p>A 4-bit identification of the type/format of the user header, the definition of each HDR_ID value is application-specific. HDR_ID is referred to as “Packet specific flags” in the <a class="reference external" href="https://cesnet.github.io/ndk-sw/libnfb-api-ndp.html">NDP API</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -387,6 +384,46 @@ The minimum allowed length of the packet data is 60B, if necessary, the applicat
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>MFB parameters: width of one item in bits</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_ports"><td><p>HBM_PORTS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>HBM parameters: number of HBM ports</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_addr_width"><td><p>HBM_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>HBM parameters: width of AXI address signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_data_width"><td><p>HBM_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>256</p></td>
+<td><p>HBM parameters: width of AXI data signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_burst_width"><td><p>HBM_BURST_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>HBM parameters: width of AXI burst signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_id_width"><td><p>HBM_ID_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>6</p></td>
+<td><p>HBM parameters: width of AXI ID signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_len_width"><td><p>HBM_LEN_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>HBM parameters: width of AXI LEN signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_size_width"><td><p>HBM_SIZE_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>3</p></td>
+<td><p>HBM parameters: width of AXI size signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_resp_width"><td><p>HBM_RESP_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>HBM parameters: width of AXI resp signal</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-application_core-mem_ports"><td><p>MEM_PORTS</p></td>
 <td><p>natural</p></td>
@@ -876,146 +913,321 @@ Each data packet (MFB) must have an appropriate header (MVB)!</p></td>
 Can be used to avoid stopping the whole DMA Module when just a single channel is slacking behind.</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
+<td><p>HBM AXI INTERFACES (clocked at HBM_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_clk"><td><p>HBM_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_reset"><td><p>HBM_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_init_done"><td><p>HBM_INIT_DONE</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_araddr"><td><p>HBM_AXI_ARADDR</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_arburst"><td><p>HBM_AXI_ARBURST</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_arid"><td><p>HBM_AXI_ARID</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_arlen"><td><p>HBM_AXI_ARLEN</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_arsize"><td><p>HBM_AXI_ARSIZE</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_arvalid"><td><p>HBM_AXI_ARVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_arready"><td><p>HBM_AXI_ARREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rdata"><td><p>HBM_AXI_RDATA</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rdata_parity"><td><p>HBM_AXI_RDATA_PARITY</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rid"><td><p>HBM_AXI_RID</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rlast"><td><p>HBM_AXI_RLAST</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rresp"><td><p>HBM_AXI_RRESP</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rvalid"><td><p>HBM_AXI_RVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rready"><td><p>HBM_AXI_RREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awaddr"><td><p>HBM_AXI_AWADDR</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awburst"><td><p>HBM_AXI_AWBURST</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awid"><td><p>HBM_AXI_AWID</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awlen"><td><p>HBM_AXI_AWLEN</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awsize"><td><p>HBM_AXI_AWSIZE</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awvalid"><td><p>HBM_AXI_AWVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awready"><td><p>HBM_AXI_AWREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_wdata"><td><p>HBM_AXI_WDATA</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_wdata_parity"><td><p>HBM_AXI_WDATA_PARITY</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_wlast"><td><p>HBM_AXI_WLAST</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_wstrb"><td><p>HBM_AXI_WSTRB</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_wvalid"><td><p>HBM_AXI_WVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_wready"><td><p>HBM_AXI_WREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_bid"><td><p>HBM_AXI_BID</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_bresp"><td><p>HBM_AXI_BRESP</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_bvalid"><td><p>HBM_AXI_BVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_bready"><td><p>HBM_AXI_BREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>EXTERNAL MEMORY INTERFACES (clocked at MEM_CLK)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_clk"><td><p>MEM_CLK</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_clk"><td><p>MEM_CLK</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Clock for each memory port</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_rst"><td><p>MEM_RST</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_rst"><td><p>MEM_RST</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Reset synchronized with MEM_CLK for each memory port</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_ready"><td><p>MEM_AVMM_READY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_ready"><td><p>MEM_AVMM_READY</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MEM Avalon-MM: ready for request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_read"><td><p>MEM_AVMM_READ</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_read"><td><p>MEM_AVMM_READ</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM Avalon-MM: read request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_write"><td><p>MEM_AVMM_WRITE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_write"><td><p>MEM_AVMM_WRITE</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM Avalon-MM: write request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_address"><td><p>MEM_AVMM_ADDRESS</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_address"><td><p>MEM_AVMM_ADDRESS</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM Avalon-MM: address of r/w request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_burstcount"><td><p>MEM_AVMM_BURSTCOUNT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_burstcount"><td><p>MEM_AVMM_BURSTCOUNT</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_BURST_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM Avalon-MM: burst count of read/write request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_writedata"><td><p>MEM_AVMM_WRITEDATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_writedata"><td><p>MEM_AVMM_WRITEDATA</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM Avalon-MM: write data, valid only with write request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_readdata"><td><p>MEM_AVMM_READDATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_readdata"><td><p>MEM_AVMM_READDATA</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MEM Avalon-MM: read data</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_readdatavalid"><td><p>MEM_AVMM_READDATAVALID</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_readdatavalid"><td><p>MEM_AVMM_READDATAVALID</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MEM Avalon-MM: read data valid flag</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_refr_period"><td><p>MEM_REFR_PERIOD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_refr_period"><td><p>MEM_REFR_PERIOD</p></td>
 <td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_REFR_PERIOD_WIDTH - 1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM parameter: user refresh period</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mem_refr_req"><td><p>MEM_REFR_REQ</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_refr_req"><td><p>MEM_REFR_REQ</p></td>
 <td><p>std_logic_vector(MEM_PORTS - 1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MEM parameter: user refresh request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mem_refr_ack"><td><p>MEM_REFR_ACK</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_refr_ack"><td><p>MEM_REFR_ACK</p></td>
 <td><p>std_logic_vector(MEM_PORTS - 1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MEM parameter: user refresh ack</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-emif_rst_req"><td><p>EMIF_RST_REQ</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_rst_req"><td><p>EMIF_RST_REQ</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>EMIF local reset request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-emif_rst_done"><td><p>EMIF_RST_DONE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_rst_done"><td><p>EMIF_RST_DONE</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF local reset done flag</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-emif_ecc_usr_int"><td><p>EMIF_ECC_USR_INT</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_ecc_usr_int"><td><p>EMIF_ECC_USR_INT</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF ECC user interupt flag</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-emif_cal_success"><td><p>EMIF_CAL_SUCCESS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_cal_success"><td><p>EMIF_CAL_SUCCESS</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF calibration success flag</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-emif_cal_fail"><td><p>EMIF_CAL_FAIL</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_cal_fail"><td><p>EMIF_CAL_FAIL</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>EMIF calibration fail flag</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-emif_auto_precharge"><td><p>EMIF_AUTO_PRECHARGE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_auto_precharge"><td><p>EMIF_AUTO_PRECHARGE</p></td>
 <td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>EMIF auto precharge request</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>MI INTERFACE (clocked at MI_CLK)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: data from master to slave (write data)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: slave address</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: byte enable</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: read request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: write request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: ready of slave module</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: data from slave to master (read data)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: valid of MI_DRD data signal</p></td>
@@ -1038,7 +1250,7 @@ Can be used to avoid stopping the whole DMA Module when just a single channel is
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, CESNET z.s.p.o..</p>
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
