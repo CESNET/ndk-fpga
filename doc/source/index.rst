@@ -34,6 +34,7 @@ The NDK-based Minimal application is a simple example of how to build an FPGA ap
     ndk_core/doc/testing
     ofm_doc/build/readme
     ndk_core/doc/devtree
+    ndk_core/doc/faq
 
 .. toctree::
     :maxdepth: 2
