@@ -29,7 +29,7 @@ addr     yes      Requested address. Variable is the logic vector width ``ADDR_W
 meta     yes      Metadata. Variable is the logic vector width ``META_WIDTH``.
 be       yes      Byte enable for reading or writing data. Variable is the logic vector width ``DATA_WIDTH/8``.
 wr       yes      Write request. It cannot be asserted when signal rd is asserted.
-dwr      yes      Written data. Variable is the logic vector width ``DATA_WIDTH ``.
+dwr      yes      Written data. Variable is the logic vector width ``DATA_WIDTH``.
 rd       yes      Read request. It cannot be asserted when signal wr is asserted.
 ardy     no       Driver sends a response in this signal if the request has been accepted DUT.
 ======== ======== ================================================

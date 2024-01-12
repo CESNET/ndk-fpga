@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: e289da76
+                Git branch: devel, <br> Git hash: 83cc58d9
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
@@ -411,6 +411,8 @@ in the following figure:</p>
 </table>
 </dd></dl>
 
+<section id="subcomponents">
+<h2>Subcomponents<a class="headerlink" href="#subcomponents" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Subcomponents</span></p>
 <ul>
@@ -421,6 +423,136 @@ in the following figure:</p>
 <li class="toctree-l1"><a class="reference internal" href="comp/software_manager/readme.html">Software Manager</a></li>
 </ul>
 </div>
+<section id="uvm-verification">
+<h3>UVM Verification<a class="headerlink" href="#uvm-verification" title="Permalink to this heading"></a></h3>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../../../../_images/uvm_ver.jpg"><img alt="../../../../../../_images/uvm_ver.jpg" src="../../../../../../_images/uvm_ver.jpg" style="width: 390.59999999999997px; height: 294.59999999999997px;" /></a>
+</figure>
+</section>
+</section>
+<section id="verification-plan">
+<h2>Verification Plan<a class="headerlink" href="#verification-plan" title="Permalink to this heading"></a></h2>
+<p>TODO:</p>
+</section>
+<section id="coverage-mesure">
+<h2>Coverage Mesure<a class="headerlink" href="#coverage-mesure" title="Permalink to this heading"></a></h2>
+<p>There is three test in Multiver script. High percentage of uncovered lines is due to unreacheable states and due to mi comunication with software manager. Mi comunication is tested by hw tests.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">test configuration</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+<col style="width: 16.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>conf name</p></th>
+<th class="head"><p>Regions</p></th>
+<th class="head"><p>Max packet size</p></th>
+<th class="head"><p>buffer addres width</p></th>
+<th class="head"><p>input fifo (RX)</p></th>
+<th class="head"><p>channels num</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>1(~40Gb/s)</p></td>
+<td><p>2^16-1</p></td>
+<td><p>16-bit</p></td>
+<td><p>NONE</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>32_channel</p></td>
+<td><p>1(~40Gb/s)</p></td>
+<td><p>2^16-1</p></td>
+<td><p>16-bit</p></td>
+<td><p>NONE</p></td>
+<td><p>32</p></td>
+</tr>
+<tr class="row-even"><td><p>32_channel</p></td>
+<td><p>1(~40Gb/s)</p></td>
+<td><p>2^16-1</p></td>
+<td><p>16-bit</p></td>
+<td><p>On input</p></td>
+<td><p>2</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">coverage</span><a class="headerlink" href="#id3" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>conf name</p></th>
+<th class="head"><p>base</p></th>
+<th class="head"><p>full speed</p></th>
+<th class="head"><p>merge</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>63.1942%</p></td>
+<td><p>63.4521%</p></td>
+<td><p>64.0038%</p></td>
+</tr>
+<tr class="row-odd"><td><p>32_channels</p></td>
+<td><p>62.6153%</p></td>
+<td><p>61.4392%</p></td>
+<td><p>62.7494%</p></td>
+</tr>
+<tr class="row-even"><td><p>opt_fifo_en</p></td>
+<td><p>65.3934%</p></td>
+<td><p>64.9822%</p></td>
+<td><p>65.9905%</p></td>
+</tr>
+</tbody>
+</table>
+<p>Delay is mesure only for full spead test. Which allweys accept output from DUT. Delay represents how many nanoseconds take to go through DMA Calypte.</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">delay</span><a class="headerlink" href="#id4" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>conf name</p></th>
+<th class="head"><p>min</p></th>
+<th class="head"><p>max</p></th>
+<th class="head"><p>average</p></th>
+<th class="head"><p>standard deviation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>53ns</p></td>
+<td><p>68ns</p></td>
+<td><p>57ns</p></td>
+<td><p>5ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>32_channels</p></td>
+<td><p>40ns</p></td>
+<td><p>1752ns</p></td>
+<td><p>56ns</p></td>
+<td><p>63ns</p></td>
+</tr>
+<tr class="row-even"><td><p>opt_fifo_en</p></td>
+<td><p>44ns</p></td>
+<td><p>428ns</p></td>
+<td><p>294ns</p></td>
+<td><p>158ns</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 
 
