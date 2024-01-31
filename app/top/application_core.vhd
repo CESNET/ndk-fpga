@@ -20,10 +20,9 @@ architecture FULL of APPLICATION_CORE is
     constant CORE_DMA_TX_CHAN  : natural := DMA_TX_CHANNELS/APP_ST_PER_DMA_ST;
 
     -- MI bus signals distribution --
-    -- (ETH_STREAMS - 1 downto 0          ) ... eth-signals
-    -- (MEM_PORTS   - 1 downto ETH_STREAMS) ... mem-signals
-    -- (MEM_PORTS*2 - 1 downto MEM_PORTS + ETH_STREAMS) ... mem-logger-signals
-    constant MI_PORTS_RAW      : natural := ETH_STREAMS + MEM_PORTS * 2;
+    -- (ETH_STREAMS - 1 downto 0) ==> eth-signals
+    -- (ETH_STREAMS)              ==> mem-tester-wrap
+    constant MI_PORTS_RAW      : natural := ETH_STREAMS + 1;
     constant MI_PORTS          : natural := 2 ** log2(MI_PORTS_RAW);
 
     function mi_addr_base_f return slv_array_t is
@@ -35,18 +34,6 @@ architecture FULL of APPLICATION_CORE is
             v_addr_base(i) := std_logic_vector(to_unsigned(i*2**SUBADDR_W,MI_ADDR_WIDTH));
         end loop;
         return v_addr_base;
-    end function;
-
-    constant MT_RND_GEN_DATA_WIDTH : natural := 64;
-    constant MT_RND_GEN_ADDR_WIDTH : natural := 32;
-
-    function mt_random_data_seed_f return slv_array_t is
-        variable v_rnd_seed : slv_array_t(0 to (MEM_DATA_WIDTH/MT_RND_GEN_DATA_WIDTH)-1)(MT_RND_GEN_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
-    begin
-        for ii in 0 to (MEM_DATA_WIDTH/MT_RND_GEN_DATA_WIDTH)-1 loop
-            v_rnd_seed(ii) := std_logic_vector(to_unsigned((672 + ii*MEM_DATA_WIDTH), MT_RND_GEN_DATA_WIDTH));
-        end loop;
-        return v_rnd_seed;
     end function;
 
     -- ============================================== MVB ==============================================
@@ -148,16 +135,7 @@ architecture FULL of APPLICATION_CORE is
     signal split_mi_wr                   : std_logic_vector(MI_PORTS-1 downto 0);
     signal split_mi_ardy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');
     signal split_mi_drd                  : slv_array_t     (MI_PORTS-1 downto 0)(MI_DATA_WIDTH-1 downto 0);
-    signal split_mi_drdy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');
-
-    signal mem_mi_dwr                    : slv_array_t     (MEM_PORTS-1 downto 0)(MI_DATA_WIDTH-1 downto 0);
-    signal mem_mi_addr                   : slv_array_t     (MEM_PORTS-1 downto 0)(MI_ADDR_WIDTH-1 downto 0);
-    signal mem_mi_be                     : slv_array_t     (MEM_PORTS-1 downto 0)(MI_DATA_WIDTH/8-1 downto 0);
-    signal mem_mi_rd                     : std_logic_vector(MEM_PORTS-1 downto 0);                          
-    signal mem_mi_wr                     : std_logic_vector(MEM_PORTS-1 downto 0);                          
-    signal mem_mi_drd                    : slv_array_t     (MEM_PORTS-1 downto 0)(MI_DATA_WIDTH-1 downto 0);
-    signal mem_mi_ardy                   : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');       
-    signal mem_mi_drdy                   : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');       
+    signal split_mi_drdy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');   
 
 begin
 
@@ -497,132 +475,98 @@ begin
     DMA_TX_MFB_DST_RDY       <= dma_tx_mfb_dst_rdy_deser;
 
     -- =========================================================================
-    --  MEMORY TESTERS
+    -- MEMORY TESTER WARPPER
     -- =========================================================================
 
-    mem_testers_g : for i in MEM_PORTS-1 downto 0 generate
-        mem_tester_i : entity work.MEM_TESTER
-        generic map (
-            AMM_DATA_WIDTH              => MEM_DATA_WIDTH,
-            AMM_ADDR_WIDTH              => MEM_ADDR_WIDTH,
-            AMM_BURST_COUNT_WIDTH       => MEM_BURST_WIDTH,
-            AMM_FREQ_KHZ                => AMM_FREQ_KHZ,
+    mem_tester_wrap_i : entity work.MEM_TESTER_WRAP
+    generic map (
+        HBM_PORTS             => HBM_PORTS,
+        HBM_ADDR_WIDTH        => HBM_ADDR_WIDTH,
+        HBM_DATA_WIDTH        => HBM_DATA_WIDTH,
+        HBM_BURST_WIDTH       => HBM_BURST_WIDTH,
+        HBM_ID_WIDTH          => HBM_ID_WIDTH,
+        HBM_LEN_WIDTH         => HBM_LEN_WIDTH,
+        HBM_SIZE_WIDTH        => HBM_SIZE_WIDTH,
+        HBM_RESP_WIDTH        => HBM_RESP_WIDTH,
+        HBM_FREQ_KHZ          => 450000, -- TODO
+        DDR_PORTS             => MEM_PORTS,
+        DDR_ADDR_WIDTH        => MEM_ADDR_WIDTH,
+        DDR_BURST_WIDTH       => MEM_BURST_WIDTH,
+        DDR_DATA_WIDTH        => MEM_DATA_WIDTH,
+        DDR_REFR_PERIOD_WIDTH => MEM_REFR_PERIOD_WIDTH,
+        DDR_DEF_REFR_PERIOD   => MEM_DEF_REFR_PERIOD,
+        DDR_FREQ_KHZ          => AMM_FREQ_KHZ,
+        MI_DATA_WIDTH         => MI_DATA_WIDTH,
+        MI_ADDR_WIDTH         => MI_ADDR_WIDTH,
+        DEVICE                => DEVICE
+    )
+    port map(
+        CLK                    => APP_CLK,
+        RESET                  => APP_RESET(3),
 
-            MI_DATA_WIDTH               => MI_DATA_WIDTH,
-            MI_ADDR_WIDTH               => MI_ADDR_WIDTH,
-     
-            RAND_GEN_DATA_WIDTH         => MT_RND_GEN_DATA_WIDTH,
-            RAND_GEN_ADDR_WIDTH         => MT_RND_GEN_ADDR_WIDTH,
-            RANDOM_DATA_SEED            => mt_random_data_seed_f,
-            RANDOM_ADDR_SEED            => std_logic_vector(to_unsigned(66844679, MT_RND_GEN_ADDR_WIDTH)),
-            -- REFR_REQ_BEFORE_TEST - Requires support for manual memory refresh
-            -- control, experimental function only!
-            REFR_REQ_BEFORE_TEST        => false,
-            REFR_PERIOD_WIDTH           => MEM_REFR_PERIOD_WIDTH,
-            DEF_REFR_PERIOD             => std_logic_vector(to_unsigned(MEM_DEF_REFR_PERIOD, MEM_REFR_PERIOD_WIDTH)),
-
-            DEVICE                      => DEVICE
-        )
-        port map(
-            AMM_CLK                     => MEM_CLK                  (i),
-            AMM_RST                     => MEM_RST                  (i),
-     
-            AMM_READY                   => MEM_AVMM_READY           (i),
-            AMM_READ                    => MEM_AVMM_READ            (i),
-            AMM_WRITE                   => MEM_AVMM_WRITE           (i),
-            AMM_ADDRESS                 => MEM_AVMM_ADDRESS         (i),
-            AMM_READ_DATA               => MEM_AVMM_READDATA        (i),
-            AMM_WRITE_DATA              => MEM_AVMM_WRITEDATA       (i),
-            AMM_BURST_COUNT             => MEM_AVMM_BURSTCOUNT      (i),
-            AMM_READ_DATA_VALID         => MEM_AVMM_READDATAVALID   (i),
-
-            REFR_PERIOD                 => MEM_REFR_PERIOD          (i),
-            REFR_REQ                    => MEM_REFR_REQ             (i),
-            REFR_ACK                    => MEM_REFR_ACK             (i),
-
-            EMIF_RST_REQ                => EMIF_RST_REQ             (i),
-            EMIF_RST_DONE               => EMIF_RST_DONE            (i),
-            EMIF_ECC_ISR                => EMIF_ECC_USR_INT         (i),
-            EMIF_CAL_SUCCESS            => EMIF_CAL_SUCCESS         (i),
-            EMIF_CAL_FAIL               => EMIF_CAL_FAIL            (i),
-            EMIF_AUTO_PRECHARGE         => EMIF_AUTO_PRECHARGE      (i),
-     
-            MI_CLK                      => APP_CLK, 
-            MI_RST                      => APP_RESET                (0), -- TODO
-            MI_DWR                      => split_mi_dwr             (i + ETH_STREAMS),
-            MI_ADDR                     => split_mi_addr            (i + ETH_STREAMS),
-            MI_BE                       => split_mi_be              (i + ETH_STREAMS),
-            MI_RD                       => split_mi_rd              (i + ETH_STREAMS),
-            MI_WR                       => split_mi_wr              (i + ETH_STREAMS),
-            MI_ARDY                     => split_mi_ardy            (i + ETH_STREAMS),
-            MI_DRD                      => split_mi_drd             (i + ETH_STREAMS),
-            MI_DRDY                     => split_mi_drdy            (i + ETH_STREAMS)
-        );
-
-        mem_logger_i : entity work.MEM_LOGGER
-        generic map (    
-            MEM_DATA_WIDTH          => MEM_DATA_WIDTH       ,
-            MEM_ADDR_WIDTH          => MEM_ADDR_WIDTH       ,
-            MEM_BURST_COUNT_WIDTH   => MEM_BURST_WIDTH      ,
-            MEM_FREQ_KHZ            => AMM_FREQ_KHZ         ,
-            MI_DATA_WIDTH           => MI_DATA_WIDTH        ,
-            MI_ADDR_WIDTH           => MI_ADDR_WIDTH
-        )
-        port map (    
-            CLK                     => MEM_CLK                  (i),
-            RST                     => MEM_RST                  (i),
-            --RST_DONE                => rst_done           ,
-        
-            MEM_READY               => MEM_AVMM_READY           (i),
-            MEM_READ                => MEM_AVMM_READ            (i),
-            MEM_WRITE               => MEM_AVMM_WRITE           (i),
-            MEM_ADDRESS             => MEM_AVMM_ADDRESS         (i),
-            MEM_READ_DATA           => MEM_AVMM_READDATA        (i),
-            MEM_WRITE_DATA          => MEM_AVMM_WRITEDATA       (i),
-            MEM_BURST_COUNT         => MEM_AVMM_BURSTCOUNT      (i),
-            MEM_READ_DATA_VALID     => MEM_AVMM_READDATAVALID   (i),
-        
-            MI_DWR                  => mem_mi_dwr               (i),
-            MI_ADDR                 => mem_mi_addr              (i),
-            MI_BE                   => mem_mi_be                (i),
-            MI_RD                   => mem_mi_rd                (i),
-            MI_WR                   => mem_mi_wr                (i),
-            MI_ARDY                 => mem_mi_ardy              (i),
-            MI_DRD                  => mem_mi_drd               (i),
-            MI_DRDY                 => mem_mi_drdy              (i)
-        );
-
-        mi_async_i : entity work.MI_ASYNC
-        generic map(
-            ADDR_WIDTH => MI_ADDR_WIDTH,
-            DATA_WIDTH => MI_DATA_WIDTH,
-            DEVICE     => DEVICE
-        )
-        port map(
-            -- Master interface
-            CLK_M     => APP_CLK,
-            RESET_M   => APP_RESET                (0),
-            MI_M_DWR  => split_mi_dwr             (i + ETH_STREAMS + MEM_PORTS),
-            MI_M_ADDR => split_mi_addr            (i + ETH_STREAMS + MEM_PORTS),
-            MI_M_RD   => split_mi_rd              (i + ETH_STREAMS + MEM_PORTS),
-            MI_M_WR   => split_mi_wr              (i + ETH_STREAMS + MEM_PORTS),
-            MI_M_BE   => split_mi_be              (i + ETH_STREAMS + MEM_PORTS),
-            MI_M_DRD  => split_mi_drd             (i + ETH_STREAMS + MEM_PORTS),
-            MI_M_ARDY => split_mi_ardy            (i + ETH_STREAMS + MEM_PORTS),
-            MI_M_DRDY => split_mi_drdy            (i + ETH_STREAMS + MEM_PORTS),
-
-            -- Slave interface
-            CLK_S     => MEM_CLK                    (i),
-            RESET_S   => MEM_RST                    (i),
-            MI_S_DWR  => mem_mi_dwr                 (i),
-            MI_S_ADDR => mem_mi_addr                (i),
-            MI_S_RD   => mem_mi_rd                  (i),
-            MI_S_WR   => mem_mi_wr                  (i),
-            MI_S_BE   => mem_mi_be                  (i),
-            MI_S_DRD  => mem_mi_drd                 (i),
-            MI_S_ARDY => mem_mi_ardy                (i),
-            MI_S_DRDY => mem_mi_drdy                (i)
-        );
-    end generate;
+        HBM_CLK                => HBM_CLK,
+        HBM_RESET              => HBM_RESET,
+        HBM_INIT_DONE          => HBM_INIT_DONE,
+        HBM_AXI_ARADDR         => HBM_AXI_ARADDR,
+        HBM_AXI_ARBURST        => HBM_AXI_ARBURST,
+        HBM_AXI_ARID           => HBM_AXI_ARID,
+        HBM_AXI_ARLEN          => HBM_AXI_ARLEN,
+        HBM_AXI_ARSIZE         => HBM_AXI_ARSIZE,
+        HBM_AXI_ARVALID        => HBM_AXI_ARVALID,
+        HBM_AXI_ARREADY        => HBM_AXI_ARREADY,
+        HBM_AXI_RDATA          => HBM_AXI_RDATA,
+        HBM_AXI_RDATA_PARITY   => HBM_AXI_RDATA_PARITY,
+        HBM_AXI_RID            => HBM_AXI_RID,
+        HBM_AXI_RLAST          => HBM_AXI_RLAST,
+        HBM_AXI_RRESP          => HBM_AXI_RRESP,
+        HBM_AXI_RVALID         => HBM_AXI_RVALID,
+        HBM_AXI_RREADY         => HBM_AXI_RREADY,
+        HBM_AXI_AWADDR         => HBM_AXI_AWADDR,
+        HBM_AXI_AWBURST        => HBM_AXI_AWBURST,
+        HBM_AXI_AWID           => HBM_AXI_AWID,
+        HBM_AXI_AWLEN          => HBM_AXI_AWLEN,
+        HBM_AXI_AWSIZE         => HBM_AXI_AWSIZE,
+        HBM_AXI_AWVALID        => HBM_AXI_AWVALID,
+        HBM_AXI_AWREADY        => HBM_AXI_AWREADY,
+        HBM_AXI_WDATA          => HBM_AXI_WDATA,
+        HBM_AXI_WDATA_PARITY   => HBM_AXI_WDATA_PARITY,
+        HBM_AXI_WLAST          => HBM_AXI_WLAST,
+        HBM_AXI_WSTRB          => HBM_AXI_WSTRB,
+        HBM_AXI_WVALID         => HBM_AXI_WVALID,
+        HBM_AXI_WREADY         => HBM_AXI_WREADY,
+        HBM_AXI_BID            => HBM_AXI_BID,
+        HBM_AXI_BRESP          => HBM_AXI_BRESP,
+        HBM_AXI_BVALID         => HBM_AXI_BVALID,
+        HBM_AXI_BREADY         => HBM_AXI_BREADY,
+    
+        DDR_CLK                => MEM_CLK,
+        DDR_RESET              => MEM_RST,
+        DDR_AVMM_READY         => MEM_AVMM_READY,
+        DDR_AVMM_READ          => MEM_AVMM_READ,
+        DDR_AVMM_WRITE         => MEM_AVMM_WRITE,
+        DDR_AVMM_ADDRESS       => MEM_AVMM_ADDRESS,
+        DDR_AVMM_BURSTCOUNT    => MEM_AVMM_BURSTCOUNT,
+        DDR_AVMM_WRITEDATA     => MEM_AVMM_WRITEDATA,
+        DDR_AVMM_READDATA      => MEM_AVMM_READDATA,
+        DDR_AVMM_READDATAVALID => MEM_AVMM_READDATAVALID,
+        DDR_REFR_PERIOD        => MEM_REFR_PERIOD,
+        DDR_REFR_REQ           => MEM_REFR_REQ,
+        DDR_REFR_ACK           => MEM_REFR_ACK,
+        EMIF_RST_REQ           => EMIF_RST_REQ,
+        EMIF_RST_DONE          => EMIF_RST_DONE,
+        EMIF_ECC_USR_INT       => EMIF_ECC_USR_INT,
+        EMIF_CAL_SUCCESS       => EMIF_CAL_SUCCESS,
+        EMIF_CAL_FAIL          => EMIF_CAL_FAIL,
+        EMIF_AUTO_PRECHARGE    => EMIF_AUTO_PRECHARGE,
+    
+        MI_DWR                 => split_mi_dwr(ETH_STREAMS),
+        MI_ADDR                => split_mi_addr(ETH_STREAMS),
+        MI_BE                  => split_mi_be(ETH_STREAMS),
+        MI_RD                  => split_mi_rd(ETH_STREAMS),
+        MI_WR                  => split_mi_wr(ETH_STREAMS),
+        MI_ARDY                => split_mi_ardy(ETH_STREAMS),
+        MI_DRD                 => split_mi_drd(ETH_STREAMS),
+        MI_DRDY                => split_mi_drdy(ETH_STREAMS)
+    );
 
 end architecture;
