@@ -27,7 +27,7 @@ An address range of 26 bits is available for the whole NDK firmware. It is divid
     0x00005000-0x00007FFF -- Debug GLS modules
     0x00008000-0x0000BFFF -- Ethernet MACs
     0x0000C000-0x0000FFFF -- Reserved space
-    0x00010000-0x0001FFFF -- DRAFT: Memory controller
+    0x00010000-0x0001FFFF -- JTAG IP (Intel JTAG-over-protocol IP)
     0x00020000-0x007FFFFF -- Reserved space
     0x00800000-0x00FFFFFF -- Ethernet PCS/PMA
     0x01000000-0x013FFFFF -- DMA controller
