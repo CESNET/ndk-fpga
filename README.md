@@ -26,6 +26,9 @@ Before you get started, there are a few requirements that you need to have. Amon
     - Silicom fb2CGhh@KU15P card
     - Silicom N6010 card
     - Bittware IA-420F card
+    - AMD/Xilinx Alveo U200
+    - AMD/Xilinx Alveo U55C
+    - AMD/Xilinx Virtex UltraScale+ FPGA VCU118 Evaluation Kit
 - Other supported FPGA cards in the NDK framework but not available as open-source:
     - Netcope NFB-200G2QL card
 - To control an FPGA card with an application based on the NDK framework, you also need:
