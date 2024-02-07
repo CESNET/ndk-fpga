@@ -48,6 +48,9 @@ The NDK-based Minimal application is a simple example of how to build an FPGA ap
     ndk_cards/silicom/fb2cghh/readme
     ndk_cards/silicom/n6010/readme
     ndk_cards/bittware/ia-420f/readme
+    ndk_cards/amd/alveo-u200/readme
+    ndk_cards/amd/alveo-u55c/readme
+    ndk_cards/amd/vcu118/readme
     ndk_cards_private/nfb-200g2ql/readme
 
 .. toctree::
