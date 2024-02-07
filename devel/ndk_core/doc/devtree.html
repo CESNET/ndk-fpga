@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: f7fc49e0
+                Git branch: devel, <br> Git hash: 530b1d2c
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -64,7 +64,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#dt-integration-in-build-system">DT integration in build system</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#location-of-dtb-in-the-firmware">Location of DTB in the firmware</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example-of-dts-of-one-component">Example of DTS of one component</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-of-generated-dts-for-fpga-card-dk-dev-1sdx-p">Example of generated DTS for FPGA card (DK-DEV-1SDX-P)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-of-generated-dts-for-fpga-card">Example of generated DTS for FPGA card</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#requirements-for-developers">Requirements for developers</a></li>
 </ul>
 </li>
@@ -160,26 +160,28 @@
 
 ref_name: my_comp {
     reg = &lt;$BASE_ADDRESS 0x40&gt;;
-    compatible = &quot;netcope,my_comp&quot;;
+    compatible = &quot;cesnet,my_comp&quot;;
     version = &lt;0x00010004&gt;;
     type = &quot;reduced&quot;;
 };
 </pre></div>
 </div>
 </section>
-<section id="example-of-generated-dts-for-fpga-card-dk-dev-1sdx-p">
-<h2>Example of generated DTS for FPGA card (DK-DEV-1SDX-P)<a class="headerlink" href="#example-of-generated-dts-for-fpga-card-dk-dev-1sdx-p" title="Permalink to this heading"></a></h2>
+<section id="example-of-generated-dts-for-fpga-card">
+<h2>Example of generated DTS for FPGA card<a class="headerlink" href="#example-of-generated-dts-for-fpga-card" title="Permalink to this heading"></a></h2>
 <div class="highlight-dts notranslate"><div class="highlight"><pre><span></span><span class="cp">/dts-v1/</span><span class="p">;</span>
 
 <span class="nf">/</span><span class="cm"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="nf">firmware</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">build-tool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Quartus $quartus(version)&quot;</span><span class="p">;</span>
-<span class="w">        </span><span class="n">build-author</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cabal@cesnet.cz&quot;</span><span class="p">;</span>
-<span class="w">        </span><span class="n">build-revision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ff3f73b&quot;</span><span class="p">;</span>
-<span class="w">        </span><span class="n">build-time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x6143474c</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">        </span><span class="n">card-name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DK-DEV-1SDX-P&quot;</span><span class="p">;</span>
-<span class="w">        </span><span class="n">project-name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DK-DEV-1SDX-P&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">build-tool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Quartus Version 22.4.0 Build 94 12/07/2022 SC Pro Edition&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">build-author</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;no-reply@liberouter.org&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">build-revision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;95415f0&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">build-time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x65c33529</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">card-name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;N6010&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">project-name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;NDK_MINIMAL&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">project-variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;100G2&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="n">project-version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;0.5.8&quot;</span><span class="p">;</span>
 
 <span class="w">        </span><span class="nl">mi0</span><span class="p">:</span><span class="w"> </span><span class="nf">mi_bus0</span><span class="cm"> </span><span class="p">{</span>
 <span class="w">            </span><span class="kr">#address-cells</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
@@ -187,6 +189,17 @@ ref_name: my_comp {
 <span class="w">            </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,bus,mi&quot;</span><span class="p">;</span>
 <span class="w">            </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;PCI0,BAR0&quot;</span><span class="p">;</span>
 <span class="w">            </span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="w">            </span><span class="nl">boot</span><span class="p">:</span><span class="w"> </span><span class="nf">ofs_pmci</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,pmci&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x2000</span><span class="w"> </span><span class="mh">0x1000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">};</span>
+
+<span class="w">            </span><span class="nf">mi_test_space</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,mi_test_space&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="w"> </span><span class="mh">0x100</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">};</span>
 
 <span class="w">            </span><span class="nl">tsu</span><span class="p">:</span><span class="w"> </span><span class="nf">tsu</span><span class="cm"> </span><span class="p">{</span>
 <span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,tsu&quot;</span><span class="p">;</span>
@@ -199,11 +212,24 @@ ref_name: my_comp {
 <span class="w">                </span><span class="kr">#address-cells</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="kr">#size-cells</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 
+<span class="w">                </span><span class="nl">dma_params_rx0</span><span class="p">:</span><span class="w"> </span><span class="nf">dma_params_rx0</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">frame_size_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3fff</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">frame_size_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3c</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nl">dma_params_tx0</span><span class="p">:</span><span class="w"> </span><span class="nf">dma_params_tx0</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">frame_size_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3fff</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">frame_size_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3c</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_rx0</span><span class="cm"> </span><span class="p">{</span>
 <span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000000</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_rx1</span><span class="cm"> </span><span class="p">{</span>
@@ -211,6 +237,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000080</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_rx2</span><span class="cm"> </span><span class="p">{</span>
@@ -218,6 +245,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000100</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_rx3</span><span class="cm"> </span><span class="p">{</span>
@@ -225,6 +253,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000180</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_rx4</span><span class="cm"> </span><span class="p">{</span>
@@ -232,6 +261,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000200</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_rx5</span><span class="cm"> </span><span class="p">{</span>
@@ -239,6 +269,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000280</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_rx6</span><span class="cm"> </span><span class="p">{</span>
@@ -246,6 +277,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000300</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_rx7</span><span class="cm"> </span><span class="p">{</span>
@@ -253,6 +285,71 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000380</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx8</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000400</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx9</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000480</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx10</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000500</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx11</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000580</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx12</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000600</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx13</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000680</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx14</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000700</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx15</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000780</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_tx0</span><span class="cm"> </span><span class="p">{</span>
@@ -260,6 +357,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200000</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_tx1</span><span class="cm"> </span><span class="p">{</span>
@@ -267,6 +365,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200080</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_tx2</span><span class="cm"> </span><span class="p">{</span>
@@ -274,6 +373,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200100</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_tx3</span><span class="cm"> </span><span class="p">{</span>
@@ -281,6 +381,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200180</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_tx4</span><span class="cm"> </span><span class="p">{</span>
@@ -288,6 +389,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200200</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_tx5</span><span class="cm"> </span><span class="p">{</span>
@@ -295,6 +397,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200280</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_tx6</span><span class="cm"> </span><span class="p">{</span>
@@ -302,6 +405,7 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200300</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
 <span class="w">                </span><span class="nf">dma_ctrl_ndp_tx7</span><span class="cm"> </span><span class="p">{</span>
@@ -309,23 +413,135 @@ ref_name: my_comp {
 <span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200380</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx8</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200400</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx9</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200480</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx10</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200500</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx11</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200580</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx12</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200600</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx13</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200680</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx14</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200700</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+
+<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx15</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200780</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 <span class="w">            </span><span class="p">};</span>
 
 <span class="w">            </span><span class="nl">i2c0</span><span class="p">:</span><span class="w"> </span><span class="nf">i2c0</span><span class="cm"> </span><span class="p">{</span>
 <span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,i2c&quot;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x800010</span><span class="w"> </span><span class="mh">0x08</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3010</span><span class="w"> </span><span class="mh">0x08</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x04</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">};</span>
+
+<span class="w">            </span><span class="nl">pmdctrl0</span><span class="p">:</span><span class="w"> </span><span class="nf">pmdctrl0</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x301c</span><span class="w"> </span><span class="mh">0x04</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x10000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x03</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">            </span><span class="p">};</span>
 
 <span class="w">            </span><span class="nl">pmd0</span><span class="p">:</span><span class="w"> </span><span class="nf">pmd0</span><span class="cm"> </span><span class="p">{</span>
 <span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,transceiver&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;QSFP&quot;</span><span class="p">;</span>
-<span class="w">                </span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">status</span><span class="o">-</span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x03</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x04</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x08</span><span class="o">&gt;</span><span class="p">;</span>
 
 <span class="w">                </span><span class="nf">control-param</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="n">i2c-addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xf0</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">i2c-addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xa0</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+<span class="w">            </span><span class="p">};</span>
+
+<span class="w">            </span><span class="nl">i2c1</span><span class="p">:</span><span class="w"> </span><span class="nf">i2c1</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,i2c&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3110</span><span class="w"> </span><span class="mh">0x08</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x06</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">};</span>
+
+<span class="w">            </span><span class="nl">pmdctrl1</span><span class="p">:</span><span class="w"> </span><span class="nf">pmdctrl1</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x311c</span><span class="w"> </span><span class="mh">0x04</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x10000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x05</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">};</span>
+
+<span class="w">            </span><span class="nl">pmd1</span><span class="p">:</span><span class="w"> </span><span class="nf">pmd1</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,transceiver&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;QSFP&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">status</span><span class="o">-</span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x05</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x06</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0d</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="w">                </span><span class="nf">control-param</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">i2c-addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xa0</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+<span class="w">            </span><span class="p">};</span>
+
+<span class="w">            </span><span class="nl">regarr0</span><span class="p">:</span><span class="w"> </span><span class="nf">regarr0</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,pcsregs&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x800000</span><span class="w"> </span><span class="mh">0x40000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x07</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">};</span>
+
+<span class="w">            </span><span class="nl">pcspma0</span><span class="p">:</span><span class="w"> </span><span class="nf">pcspma0</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;100G&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x07</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x09</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="w">                </span><span class="nf">control-param</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">ip-name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;E_TILE&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 <span class="w">            </span><span class="p">};</span>
 
@@ -336,7 +552,7 @@ ref_name: my_comp {
 <span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x8000</span><span class="w"> </span><span class="mh">0x200</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="n">mtu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3fff</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x04</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0b</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">            </span><span class="p">};</span>
 
 <span class="w">            </span><span class="nl">rxmac0</span><span class="p">:</span><span class="w"> </span><span class="nf">rxmac0</span><span class="cm"> </span><span class="p">{</span>
@@ -346,30 +562,34 @@ ref_name: my_comp {
 <span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x8200</span><span class="w"> </span><span class="mh">0x200</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="n">mtu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3fff</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x03</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0a</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">            </span><span class="p">};</span>
 
 <span class="w">            </span><span class="nf">eth0</span><span class="cm"> </span><span class="p">{</span>
 <span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,eth&quot;</span><span class="p">;</span>
-<span class="w">                </span><span class="n">pmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="n">rxmac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x03</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="n">txmac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x04</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">pmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x08</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">pcspma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x09</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">rxmac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0a</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">txmac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0b</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="w">                </span><span class="nf">pmd-params</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="w"> </span><span class="mh">0x01</span><span class="w"> </span><span class="mh">0x02</span><span class="w"> </span><span class="mh">0x03</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
 <span class="w">            </span><span class="p">};</span>
 
-<span class="w">            </span><span class="nl">i2c1</span><span class="p">:</span><span class="w"> </span><span class="nf">i2c1</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,i2c&quot;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x800110</span><span class="w"> </span><span class="mh">0x08</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x05</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="nl">regarr1</span><span class="p">:</span><span class="w"> </span><span class="nf">regarr1</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,pcsregs&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xa00000</span><span class="w"> </span><span class="mh">0x40000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0c</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">            </span><span class="p">};</span>
 
-<span class="w">            </span><span class="nl">pmd1</span><span class="p">:</span><span class="w"> </span><span class="nf">pmd1</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,transceiver&quot;</span><span class="p">;</span>
-<span class="w">                </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;QSFP&quot;</span><span class="p">;</span>
-<span class="w">                </span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x05</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x06</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="nl">pcspma1</span><span class="p">:</span><span class="w"> </span><span class="nf">pcspma1</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;100G&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0c</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0e</span><span class="o">&gt;</span><span class="p">;</span>
 
 <span class="w">                </span><span class="nf">control-param</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="n">i2c-addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xf8</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">ip-name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;E_TILE&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 <span class="w">            </span><span class="p">};</span>
 
@@ -380,7 +600,7 @@ ref_name: my_comp {
 <span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xa000</span><span class="w"> </span><span class="mh">0x200</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="n">mtu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3fff</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x08</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x10</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">            </span><span class="p">};</span>
 
 <span class="w">            </span><span class="nl">rxmac1</span><span class="p">:</span><span class="w"> </span><span class="nf">rxmac1</span><span class="cm"> </span><span class="p">{</span>
@@ -390,147 +610,132 @@ ref_name: my_comp {
 <span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x02</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xa200</span><span class="w"> </span><span class="mh">0x200</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="n">mtu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3fff</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x07</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">phandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0f</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">            </span><span class="p">};</span>
 
 <span class="w">            </span><span class="nf">eth1</span><span class="cm"> </span><span class="p">{</span>
 <span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,eth&quot;</span><span class="p">;</span>
-<span class="w">                </span><span class="n">pmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x06</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="n">rxmac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x07</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="n">txmac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x08</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">pmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0d</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">pcspma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0e</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">rxmac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x0f</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">txmac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x10</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="w">                </span><span class="nf">pmd-params</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="w"> </span><span class="mh">0x01</span><span class="w"> </span><span class="mh">0x02</span><span class="w"> </span><span class="mh">0x03</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
 <span class="w">            </span><span class="p">};</span>
 
-<span class="w">            </span><span class="nf">adc_sensors</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000</span><span class="w"> </span><span class="mh">0x7c</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,stratix_adc_sensors&quot;</span><span class="p">;</span>
+<span class="w">            </span><span class="nf">intel_sdm_controller</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,intel_sdm_controller&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000</span><span class="w"> </span><span class="mh">0x2c</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">boot_en</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">            </span><span class="p">};</span>
 
-<span class="w">            </span><span class="nl">app</span><span class="p">:</span><span class="w"> </span><span class="nf">nic_application</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x2000000</span><span class="w"> </span><span class="mh">0x10</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="nf">intel_jtag_op_controller</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,intel_jtag_op_ctrl&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x10000</span><span class="w"> </span><span class="mh">0xc000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">            </span><span class="p">};</span>
-<span class="w">        </span><span class="p">};</span>
 
-<span class="w">        </span><span class="nl">mi1</span><span class="p">:</span><span class="w"> </span><span class="nf">mi_bus1</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">            </span><span class="kr">#address-cells</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">            </span><span class="kr">#size-cells</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">            </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,bus,mi&quot;</span><span class="p">;</span>
-<span class="w">            </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;PCI1,BAR0&quot;</span><span class="p">;</span>
-<span class="w">            </span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">            </span><span class="nl">app</span><span class="p">:</span><span class="w"> </span><span class="nf">application</span><span class="cm"> </span><span class="p">{</span>
 
-<span class="w">            </span><span class="nf">dma_module</span><span class="o">@</span><span class="mi">0x01000000</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                </span><span class="kr">#address-cells</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="kr">#size-cells</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nf">app_core_minimal_0</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x2000000</span><span class="w"> </span><span class="mh">0x800000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,minimal,app_core&quot;</span><span class="p">;</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx0</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000000</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="nf">rx_chan_router</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,mvb_channel_router&quot;</span><span class="p">;</span>
+<span class="w">                        </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x2000000</span><span class="w"> </span><span class="mh">0x04</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">};</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx1</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000080</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nf">app_core_minimal_1</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x2800000</span><span class="w"> </span><span class="mh">0x800000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,minimal,app_core&quot;</span><span class="p">;</span>
+
+<span class="w">                    </span><span class="nf">rx_chan_router</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,mvb_channel_router&quot;</span><span class="p">;</span>
+<span class="w">                        </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x2800000</span><span class="w"> </span><span class="mh">0x04</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">};</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx2</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000100</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nl">ddr_tester_0</span><span class="p">:</span><span class="w"> </span><span class="nf">mem_tester_0</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3000000</span><span class="w"> </span><span class="mh">0x100</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,mem_tester&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx3</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000180</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nl">ddr_tester_1</span><span class="p">:</span><span class="w"> </span><span class="nf">mem_tester_1</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3020000</span><span class="w"> </span><span class="mh">0x100</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,mem_tester&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx4</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000200</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nl">ddr_tester_2</span><span class="p">:</span><span class="w"> </span><span class="nf">mem_tester_2</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3040000</span><span class="w"> </span><span class="mh">0x100</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,mem_tester&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx5</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000280</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nl">ddr_tester_3</span><span class="p">:</span><span class="w"> </span><span class="nf">mem_tester_3</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3060000</span><span class="w"> </span><span class="mh">0x100</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,mem_tester&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx6</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000300</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nl">ddr_logger_0</span><span class="p">:</span><span class="w"> </span><span class="nf">mem_logger_0</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x3080000</span><span class="w"> </span><span class="mh">0x30</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,mem_logger&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_rx7</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_rx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1000380</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nl">ddr_logger_1</span><span class="p">:</span><span class="w"> </span><span class="nf">mem_logger_1</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x30a0000</span><span class="w"> </span><span class="mh">0x30</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,mem_logger&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx0</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200000</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nl">ddr_logger_2</span><span class="p">:</span><span class="w"> </span><span class="nf">mem_logger_2</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x30c0000</span><span class="w"> </span><span class="mh">0x30</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,mem_logger&quot;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx1</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200080</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nl">ddr_logger_3</span><span class="p">:</span><span class="w"> </span><span class="nf">mem_logger_3</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x30e0000</span><span class="w"> </span><span class="mh">0x30</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,mem_logger&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+<span class="w">            </span><span class="p">};</span>
+
+<span class="w">            </span><span class="nf">dbg_gls0</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,gen_loop_switch&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x5000</span><span class="w"> </span><span class="mh">0x200</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="w">                </span><span class="nf">mfb_gen2dma</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,mfb_generator&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x5080</span><span class="w"> </span><span class="mh">0x40</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx2</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200100</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nf">mfb_gen2eth</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,mfb_generator&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x50c0</span><span class="w"> </span><span class="mh">0x40</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">};</span>
+<span class="w">            </span><span class="p">};</span>
+
+<span class="w">            </span><span class="nf">dbg_gls1</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,gen_loop_switch&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x5200</span><span class="w"> </span><span class="mh">0x200</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="w">                </span><span class="nf">mfb_gen2dma</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,mfb_generator&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x5280</span><span class="w"> </span><span class="mh">0x40</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx3</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200180</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="p">};</span>
-
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx4</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200200</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="p">};</span>
-
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx5</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200280</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="p">};</span>
-
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx6</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200300</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                </span><span class="p">};</span>
-
-<span class="w">                </span><span class="nf">dma_ctrl_ndp_tx7</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;netcope,dma_ctrl_ndp_tx&quot;</span><span class="p">;</span>
-<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x1200380</span><span class="w"> </span><span class="mh">0x80</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x20000</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="w">                    </span><span class="n">pcie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                </span><span class="nf">mfb_gen2eth</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,ofm,mfb_generator&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x52c0</span><span class="w"> </span><span class="mh">0x40</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x01</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="w">                </span><span class="p">};</span>
 <span class="w">            </span><span class="p">};</span>
 <span class="w">        </span><span class="p">};</span>
