@@ -22,7 +22,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Terminology" href="terminology.html" />
+    <link rel="next" title="NDK Terminology" href="terminology.html" />
     <link rel="prev" title="Minimal NDK application" href="../../app-minimal.html" /> 
 </head>
 
@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: af67b2da
+                Git branch: main, <br> Git hash: 07fdd6e3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -66,12 +66,26 @@
 <li class="toctree-l2"><a class="reference internal" href="#further-work-with-the-ndk">Further work with the NDK</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intel/readme.html">NDK architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
@@ -175,26 +189,26 @@
 <p>The NDK platform uses the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-info.html">nfb-info tool</a> to read the basic information about the NDK firmware from the FPGA card. Using this tool, we can check that our NDK firmware has booted correctly. An example of the output of the nfb-info tool can be seen below:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>nfb-info
 ---------------------------------------<span class="w"> </span>Board<span class="w"> </span>info<span class="w"> </span>----
+Board<span class="w"> </span>name<span class="w">                 </span>:<span class="w"> </span>COMBO-GENERIC
+Serial<span class="w"> </span>number<span class="w">              </span>:<span class="w"> </span><span class="m">0</span>
 Network<span class="w"> </span>interfaces<span class="w">         </span>:<span class="w"> </span><span class="m">2</span>
 ------------------------------------<span class="w"> </span>Firmware<span class="w"> </span>info<span class="w"> </span>----
+Card<span class="w"> </span>name<span class="w">                  </span>:<span class="w"> </span>N6010
 Project<span class="w"> </span>name<span class="w">               </span>:<span class="w"> </span>NDK_MINIMAL
-Built<span class="w"> </span>at<span class="w">                   </span>:<span class="w"> </span><span class="m">2022</span>-09-24<span class="w"> </span><span class="m">00</span>:44:19
-Build<span class="w"> </span>tool<span class="w">                 </span>:<span class="w"> </span>Quartus<span class="w"> </span>Version<span class="w"> </span><span class="m">22</span>.2.0<span class="w"> </span>Build<span class="w"> </span><span class="m">94</span><span class="w"> </span><span class="m">06</span>/08/2022<span class="w"> </span>SC<span class="w"> </span>Pro<span class="w"> </span>Edition
+Project<span class="w"> </span>variant<span class="w">            </span>:<span class="w"> </span>100G2
+Project<span class="w"> </span>version<span class="w">            </span>:<span class="w"> </span><span class="m">0</span>.5.8
+Built<span class="w"> </span>at<span class="w">                   </span>:<span class="w"> </span><span class="m">2024</span>-02-07<span class="w"> </span><span class="m">08</span>:45:45
+Build<span class="w"> </span>tool<span class="w">                 </span>:<span class="w"> </span>Quartus<span class="w"> </span>Version<span class="w"> </span><span class="m">22</span>.4.0<span class="w"> </span>Build<span class="w"> </span><span class="m">94</span><span class="w"> </span><span class="m">12</span>/07/2022<span class="w"> </span>SC<span class="w"> </span>Pro<span class="w"> </span>Edition
 Build<span class="w"> </span>author<span class="w">               </span>:<span class="w"> </span>no-reply@liberouter.org
 RX<span class="w"> </span>queues<span class="w">                  </span>:<span class="w"> </span><span class="m">16</span>
 TX<span class="w"> </span>queues<span class="w">                  </span>:<span class="w"> </span><span class="m">16</span>
 ETH<span class="w"> </span>channels<span class="w">               </span>:<span class="w"> </span><span class="m">2</span>
 --------------------------------------<span class="w"> </span>System<span class="w"> </span>info<span class="w"> </span>----
 PCIe<span class="w"> </span>Endpoint<span class="w"> </span><span class="m">0</span>:
-*<span class="w"> </span>PCI<span class="w"> </span>slot<span class="w">                </span>:<span class="w"> </span><span class="m">0000</span>:82:00.0
+*<span class="w"> </span>PCI<span class="w"> </span>slot<span class="w">                </span>:<span class="w"> </span><span class="m">0000</span>:17:00.0
 *<span class="w"> </span>PCI<span class="w"> </span>speed<span class="w">               </span>:<span class="w"> </span><span class="m">16</span><span class="w"> </span>GT/s
-*<span class="w"> </span>PCI<span class="w"> </span>link<span class="w"> </span>width<span class="w">          </span>:<span class="w"> </span>x8
-*<span class="w"> </span>NUMA<span class="w"> </span>node<span class="w">               </span>:<span class="w"> </span><span class="m">1</span>
-PCIe<span class="w"> </span>Endpoint<span class="w"> </span><span class="m">1</span>:
-*<span class="w"> </span>PCI<span class="w"> </span>slot<span class="w">                </span>:<span class="w"> </span><span class="m">0000</span>:81:00.0
-*<span class="w"> </span>PCI<span class="w"> </span>speed<span class="w">               </span>:<span class="w"> </span><span class="m">16</span><span class="w"> </span>GT/s
-*<span class="w"> </span>PCI<span class="w"> </span>link<span class="w"> </span>width<span class="w">          </span>:<span class="w"> </span>x8
-*<span class="w"> </span>NUMA<span class="w"> </span>node<span class="w">               </span>:<span class="w"> </span><span class="m">1</span>
+*<span class="w"> </span>PCI<span class="w"> </span>link<span class="w"> </span>width<span class="w">          </span>:<span class="w"> </span>x16
+*<span class="w"> </span>NUMA<span class="w"> </span>node<span class="w">               </span>:<span class="w"> </span><span class="m">0</span>
 </pre></div>
 </div>
 </section>
@@ -216,7 +230,7 @@ The following references provide the information to do just that.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../../app-minimal.html" class="btn btn-neutral float-left" title="Minimal NDK application" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="terminology.html" class="btn btn-neutral float-right" title="Terminology" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="terminology.html" class="btn btn-neutral float-right" title="NDK Terminology" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

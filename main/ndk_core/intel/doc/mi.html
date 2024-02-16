@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: af67b2da
+                Git branch: main, <br> Git hash: 07fdd6e3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -55,7 +55,7 @@
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../doc/how_to_start.html">How to start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../readme.html">NDK architecture</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="app.html">The Application</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">The MI bus interconnect</a><ul>
@@ -73,6 +73,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../../doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
@@ -133,7 +147,7 @@
 <span class="mh">0x00005000</span><span class="o">-</span><span class="mh">0x00007FFF</span> <span class="o">--</span> <span class="n">Debug</span> <span class="n">GLS</span> <span class="n">modules</span>
 <span class="mh">0x00008000</span><span class="o">-</span><span class="mh">0x0000BFFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">MACs</span>
 <span class="mh">0x0000C000</span><span class="o">-</span><span class="mh">0x0000FFFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
-<span class="mh">0x00010000</span><span class="o">-</span><span class="mh">0x0001FFFF</span> <span class="o">--</span> <span class="n">DRAFT</span><span class="p">:</span> <span class="n">Memory</span> <span class="n">controller</span>
+<span class="mh">0x00010000</span><span class="o">-</span><span class="mh">0x0001FFFF</span> <span class="o">--</span> <span class="n">JTAG</span> <span class="n">IP</span> <span class="p">(</span><span class="n">Intel</span> <span class="n">JTAG</span><span class="o">-</span><span class="n">over</span><span class="o">-</span><span class="n">protocol</span> <span class="n">IP</span><span class="p">)</span>
 <span class="mh">0x00020000</span><span class="o">-</span><span class="mh">0x007FFFFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
 <span class="mh">0x00800000</span><span class="o">-</span><span class="mh">0x00FFFFFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">PCS</span><span class="o">/</span><span class="n">PMA</span>
 <span class="mh">0x01000000</span><span class="o">-</span><span class="mh">0x013FFFFF</span> <span class="o">--</span> <span class="n">DMA</span> <span class="n">controller</span>

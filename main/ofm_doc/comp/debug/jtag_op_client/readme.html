@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JTAG-over-protocol Client &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="UVM Verification" href="../../../ver.html" />
+    <link rel="prev" title="Mem logger" href="../data_logger/mem_logger/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: 07fdd6e3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../debug.html">Debug Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../mem_tester/readme.html">DDR4 Memory Tester</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../histogramer/readme.html">Histogramer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../latency_meter/readme.html">Latency meter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data_logger/readme.html">Data logger</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">JTAG-over-protocol Client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#address-space-size">Address space size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#debugging-hw-part">Debugging - HW part</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#debugging-sw-part">Debugging - SW part</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#debugging-debug-part">Debugging - DEBUG part</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../debug.html">Debug Tools</a></li>
+      <li class="breadcrumb-item active">JTAG-over-protocol Client</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/ofm_doc/comp/debug/jtag_op_client/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="jtag-over-protocol-client">
+<span id="jtag-op-client"></span><h1>JTAG-over-protocol Client<a class="headerlink" href="#jtag-over-protocol-client" title="Permalink to this heading"></a></h1>
+<p>This component is used for software communication with internal debug hardware present on Intel FPGAs.
+It acts as MI wrapper of the <em>JTAG-over-protocol IP</em> core and provides the capability of debugging card designs via e. g. SignalTap over PCIe without the need of connecting a JTAG cable.
+The debugging is done via a running instance of <code class="docutils literal notranslate"><span class="pre">etherlink</span></code> application which translates the traffic between JTAG server (communicating with SignalTap) and nfb driver.</p>
+<section id="address-space-size">
+<h2>Address space size<a class="headerlink" href="#address-space-size" title="Permalink to this heading"></a></h2>
+<p>Size of the <em>JTAG-over-protocol IP</em> address space depends on the configuration given while generating the IP core.
+The total memory occupied by the component consists of three distinct memory blocks for each subpart (as mentioned in the <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/728673/21-3/jtag-over-protocol-parameters.html">documentation of the IP core</a>).</p>
+<ul class="simple">
+<li><p>Minimum size is <code class="docutils literal notranslate"><span class="pre">0x1800</span></code> (<code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">*</span> <span class="pre">0x0800</span></code>) items for memory depth of 2048 items or less -&gt; address width = 13 bits.</p></li>
+<li><p>Default size is <code class="docutils literal notranslate"><span class="pre">0x4000</span></code> (<code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">*</span> <span class="pre">0x1000</span></code> + padding) items for memory depth of 4096 items -&gt; address width = 14 bits.</p></li>
+<li><p>Maximum size is <code class="docutils literal notranslate"><span class="pre">0xc000</span></code> (<code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">*</span> <span class="pre">0x4000</span></code>) items for memory depth of 16384 items -&gt; address width = 16 bits.</p></li>
+</ul>
+</section>
+<section id="debugging-hw-part">
+<h2>Debugging - HW part<a class="headerlink" href="#debugging-hw-part" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>instantiate JTAG_OP_CLIENT component</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>while building design on top of NDK</dt><dd><ul>
+<li><p>the component is already present in the design on address <code class="docutils literal notranslate"><span class="pre">0x00010000</span></code></p></li>
+<li><p>the address space provided is sufficiently large (<code class="docutils literal notranslate"><span class="pre">0x00010000</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>while building without the use of NDK</dt><dd><ul>
+<li><p>component folder is located under the OFM repository at <code class="docutils literal notranslate"><span class="pre">&lt;ofm</span> <span class="pre">path&gt;/comp/debug/jtag_op_client</span></code></p></li>
+<li><p>also add the component to the top-level <code class="docutils literal notranslate"><span class="pre">DevTree.tcl</span></code> file for gaining sw access to the component</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>create <em>.stp</em> file</dt><dd><ul class="simple">
+<li><p>use Quartus Prime SignalTap Logic Analyzer software to add debug logic to your design</p></li>
+<li><p>debug logic can alternatively be added to the design via corresponding IP core instantiations directly in source code</p></li>
+<li><p>without debug logic present in the design, JTAG chain ends up being broken (no debug logic to communicate with)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>build design</dt><dd><ul class="simple">
+<li><p>with JTAG_OP_CLIENT component and debug logic added to it</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>configure device</dt><dd><ul class="simple">
+<li><p>upload the design to the target device (NFB card)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</section>
+<section id="debugging-sw-part">
+<h2>Debugging - SW part<a class="headerlink" href="#debugging-sw-part" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>install the etherlink rpm package</dt><dd><ul class="simple">
+<li><p>download the package from the CESNET package management site (TBD) or</p></li>
+<li><p>clone <em>hak-rpm-pkg</em> branch from <a class="reference external" href="https://github.com/CESNET/remote-debug-for-intel-fpga">the app github repository</a> and execute the commands below</p></li>
+<li><p>alternatively, build the app directly from source code via the commands in README.md file</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>remote-debug-for-intel-fpga
+cmake<span class="w"> </span>.<span class="w"> </span>-Bbuild<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+cpack
+
+<span class="c1"># install the package (with superuser privileges)</span>
+sudo<span class="w"> </span>su
+rpm<span class="w"> </span>-i<span class="w"> </span>&lt;rpm<span class="w"> </span>package<span class="w"> </span>name&gt;
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>run <code class="docutils literal notranslate"><span class="pre">jtag_op_mgmt.py</span></code> script with sudo privileges on the machine hosting the target device</dt><dd><ul class="simple">
+<li><p>the script is located under <code class="docutils literal notranslate"><span class="pre">&lt;ofm_path&gt;/comp/debug/jtag_op_client/sw/jtag_op_mgmt.py</span></code></p></li>
+<li><p>the script runs an instance of the <code class="docutils literal notranslate"><span class="pre">etherlink</span></code> application (its location is expected under <code class="docutils literal notranslate"><span class="pre">/usr/local/bin/etherlink</span></code>)</p></li>
+<li><p>after that, it registers the application for communication with the jtag server (running on the same host)</p></li>
+<li><p>check the script options when sw paths different from the default ones are needed (for <code class="docutils literal notranslate"><span class="pre">etherlink</span></code> or <code class="docutils literal notranslate"><span class="pre">jtagconfig</span></code>)</p></li>
+<li><p>the script gets all the information from the Device Tree of the currently loaded design (using <code class="docutils literal notranslate"><span class="pre">nfb</span></code> module) and via <code class="docutils literal notranslate"><span class="pre">ss</span></code> command (for etherlink port info)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only one running instance of the application is supported in the current implementation.
+Be sure to unregister the JTAG connection after you are done with debugging (more detailed info is given by the script after it is run).</p>
+</div>
+</section>
+<section id="debugging-debug-part">
+<h2>Debugging - DEBUG part<a class="headerlink" href="#debugging-debug-part" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>open the .stp file used for build</dt><dd><ul class="simple">
+<li><p>use Quartus Prime SignalTap Logic Analyzer on the host machine to start debugging the design with .stp file</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>configure the SignalTap logic Analyzer</dt><dd><ul class="simple">
+<li><p>in the JTAG Chain Configuration pane set JTAG-over-protocol as the hardware option and wait until the chain is scanned</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>analyze the results</dt><dd><ul class="simple">
+<li><p>use SignalTap as you were used to and enjoy life without JTAG cables</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../data_logger/mem_logger/readme.html" class="btn btn-neutral float-left" title="Mem logger" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../ver.html" class="btn btn-neutral float-right" title="UVM Verification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

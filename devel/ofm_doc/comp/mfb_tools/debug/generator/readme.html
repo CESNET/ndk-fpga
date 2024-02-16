@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 07fdd6e3
+                Git branch: devel, <br> Git hash: 49008d2d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -197,7 +197,16 @@ options (like frame length) accessible over the MI.</p>
 <p>Distribution of Ethernet frames to channels</p>
 <ul class="simple">
 <li><p>incr       : RR increment. 0 = round-robin disable (stay on zero channel). Default 0x01</p></li>
-<li><p>CONFIG     : CONFIG[0] = channel reverse enable, others bit are reserved. Default 0x00</p></li>
+<li><dl class="simple">
+<dt>CONFIG<span class="classifier">CONFIG[0] = channel reverse enable, others bit are reserved. Default 0x00</span></dt><dd><dl class="simple">
+<dt>: CONFIG[1] = Experimental: Enables burst mode in which the amount of burst_size</dt><dd><p>packets are sent and the transmission is stopped until next cycle of enable of the
+generator occurs (that is burst is sent -&gt; disable -&gt; enable).
+NOTE: Does not work with USE_PACP_ARCH set to true</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
 <li><p>burst_size : number of packets to begenerated before channel is changed</p></li>
 <li><p>ch_min     : the lowest channel number for round-robin distribution. Default 0x0000</p></li>
 <li><p>ch_max     : the highest channel number for round-robin distribution. Default 0xFFFF</p></li>

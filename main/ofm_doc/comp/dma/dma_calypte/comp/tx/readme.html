@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: af67b2da
+                Git branch: main, <br> Git hash: 07fdd6e3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
@@ -55,12 +55,26 @@
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -252,12 +266,12 @@ The header pointer points to the header of a current packet.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-dma_hdr_pointer_width"><td><p>DMA_HDR_POINTER_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>9</p></td>
+<td><p>11</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-channels"><td><p>CHANNELS</p></td>
 <td><p>natural</p></td>
-<td><p>8</p></td>
+<td><p>32</p></td>
 <td><p>Set the number of DMA channels, each channel has its separate buffer</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
@@ -276,9 +290,14 @@ entry level statistics.</p></td>
 <td><p>24</p></td>
 <td><p>Width of the metadata in bits which are stored in the DMA header.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
 <td><p>natural</p></td>
-<td><p>2**14</p></td>
+<td><p>4</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
+<td><p>natural</p></td>
+<td><p>2**11</p></td>
 <td><p>Size of the largest packets that can be transmitted on the USR_TX_MFB interface.</p></td>
 </tr>
 </tbody>
@@ -448,46 +467,61 @@ entry level statistics.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
+<td><p>Debugging signals</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-st_sp_dbg_chan"><td><p>ST_SP_DBG_CHAN</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-st_sp_dbg_meta"><td><p>ST_SP_DBG_META</p></td>
+<td><p>std_logic_vector(ST_SP_DBG_SIGNAL_W -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>Control MI bus</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(MI_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(MI_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(MI_WIDTH/8 -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(MI_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
@@ -511,6 +545,114 @@ entry level statistics.</p></td>
 <ul class="simple">
 <li><p><a class="reference internal" href="../../../../mvb_tools/storage/fifox/readme.html#mvb-fifox"><span class="std std-ref">MVB FIFOX</span></a></p></li>
 </ul>
+<section id="uvm-verification">
+<h3>UVM Verification<a class="headerlink" href="#uvm-verification" title="Permalink to this heading"></a></h3>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../../../../_images/uvm_ver1.jpg"><img alt="../../../../../../_images/uvm_ver1.jpg" src="../../../../../../_images/uvm_ver1.jpg" style="width: 390.59999999999997px; height: 294.59999999999997px;" /></a>
+</figure>
+</section>
+</section>
+<section id="verification-plan">
+<h2>Verification Plan<a class="headerlink" href="#verification-plan" title="Permalink to this heading"></a></h2>
+<p>TODO:</p>
+</section>
+<section id="coverage-mesure">
+<h2>Coverage Mesure<a class="headerlink" href="#coverage-mesure" title="Permalink to this heading"></a></h2>
+<p>There is five test in Multiver script.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">coverage</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>conf name</p></th>
+<th class="head"><p>base</p></th>
+<th class="head"><p>full speed</p></th>
+<th class="head"><p>merge</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>75.3494%</p></td>
+<td><p>74.9002%</p></td>
+<td><p>75.5762%</p></td>
+</tr>
+<tr class="row-odd"><td><p>4_channels</p></td>
+<td><p>76.4729%</p></td>
+<td><p>76.4729%</p></td>
+<td><p>76.4729%</p></td>
+</tr>
+<tr class="row-even"><td><p>8_channels, min_pcie_frames</p></td>
+<td><p>77.6599%</p></td>
+<td><p>77.3954%</p></td>
+<td><p>77.6599%</p></td>
+</tr>
+<tr class="row-odd"><td><p>buff_size_small</p></td>
+<td><p>76.2113%</p></td>
+<td><p>75.7632%</p></td>
+<td><p>76.4380%</p></td>
+</tr>
+<tr class="row-even"><td><p>buff_size_large</p></td>
+<td><p>75.3069%</p></td>
+<td><p>74.8577%</p></td>
+<td><p>755337%</p></td>
+</tr>
+</tbody>
+</table>
+<p>Delay is mesure only for full spead test. Which allweys accept output from DUT. Delay represents how many nanoseconds take to go through DMA Calypte.</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">delay</span><a class="headerlink" href="#id3" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>conf name</p></th>
+<th class="head"><p>min</p></th>
+<th class="head"><p>max</p></th>
+<th class="head"><p>average</p></th>
+<th class="head"><p>standard deviation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>defaulit</p></td>
+<td><p>28ns</p></td>
+<td><p>500ns</p></td>
+<td><p>175ns</p></td>
+<td><p>83ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>4_channels</p></td>
+<td><p>28ns</p></td>
+<td><p>816ns</p></td>
+<td><p>183ns</p></td>
+<td><p>97ns</p></td>
+</tr>
+<tr class="row-even"><td><p>8_channels, min_pcie_frames</p></td>
+<td><p>24ns</p></td>
+<td><p>944ns</p></td>
+<td><p>192ns</p></td>
+<td><p>111ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>buff_size_small</p></td>
+<td><p>28ns</p></td>
+<td><p>500ns</p></td>
+<td><p>175ns</p></td>
+<td><p>83ns</p></td>
+</tr>
+<tr class="row-even"><td><p>buff_size_big</p></td>
+<td><p>28ns</p></td>
+<td><p>500ns</p></td>
+<td><p>175ns</p></td>
+<td><p>83ns</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
 

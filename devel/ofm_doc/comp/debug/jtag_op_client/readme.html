@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 07fdd6e3
+                Git branch: devel, <br> Git hash: 49008d2d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -177,8 +177,16 @@ The total memory occupied by the component consists of three distinct memory blo
 </dl>
 </li>
 <li><dl class="simple">
+<dt>enable JTAG_OP_CLIENT</dt><dd><ul class="simple">
+<li><p>the component is disabled by default</p></li>
+<li><p>to enable it, add <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">VIRTUAL_DEBUG_ENABLE</span> <span class="pre">true</span></code> to the app_conf.tcl file</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
 <dt>build design</dt><dd><ul class="simple">
-<li><p>with JTAG_OP_CLIENT component and debug logic added to it</p></li>
+<li><p>with JTAG_OP_CLIENT component (enabled) and debug logic added</p></li>
 </ul>
 </dd>
 </dl>
@@ -197,21 +205,37 @@ The total memory occupied by the component consists of three distinct memory blo
 <ol class="arabic simple">
 <li><dl class="simple">
 <dt>install the etherlink rpm package</dt><dd><ul class="simple">
-<li><p>download the package from the CESNET package management site (TBD) or</p></li>
-<li><p>clone <em>hak-rpm-pkg</em> branch from <a class="reference external" href="https://github.com/CESNET/remote-debug-for-intel-fpga">the app github repository</a> and execute the commands below</p></li>
+<li><p>download the prebuilt rpm package (via the CESNET Copr or from <a class="reference external" href="https://github.com/CESNET/remote-debug-for-intel-fpga">the app github repository</a> releases) or</p></li>
 <li><p>alternatively, build the app directly from source code via the commands in README.md file</p></li>
+<li><p>(to build the package manually, clone <em>hak-rpm-pkg</em> branch from <a class="reference external" href="https://github.com/CESNET/remote-debug-for-intel-fpga">the app github repository</a> and execute the commands below)</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>remote-debug-for-intel-fpga
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># install the prebuilt rpm via Copr</span>
+sudo<span class="w"> </span>dnf<span class="w"> </span>copr<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>@CESNET/nfb-framework
+sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>remote-debug-for-intel-fpga
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># build the rpm manually</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/CESNET/remote-debug-for-intel-fpga
+<span class="nb">cd</span><span class="w"> </span>remote-debug-for-intel-fpga
+git<span class="w"> </span>switch<span class="w"> </span>hak-rpm-pkg
 cmake<span class="w"> </span>.<span class="w"> </span>-Bbuild<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
 cpack
 
-<span class="c1"># install the package (with superuser privileges)</span>
+<span class="c1"># install the package (built or downloaded)</span>
 sudo<span class="w"> </span>su
 rpm<span class="w"> </span>-i<span class="w"> </span>&lt;rpm<span class="w"> </span>package<span class="w"> </span>name&gt;
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># build the app from source code (app will be installed to &#39;usr/local/bin&#39;)</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/CESNET/remote-debug-for-intel-fpga
+<span class="nb">cd</span><span class="w"> </span>remote-debug-for-intel-fpga
+cmake<span class="w"> </span>.<span class="w"> </span>-Bbuild<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+make
+sudo<span class="w"> </span>make<span class="w"> </span>install
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
@@ -230,7 +254,8 @@ rpm<span class="w"> </span>-i<span class="w"> </span>&lt;rpm<span class="w"> </s
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Only one running instance of the application is supported in the current implementation.
-Be sure to unregister the JTAG connection after you are done with debugging (more detailed info is given by the script after it is run).</p>
+You can list open JTAG connections by issuing <code class="docutils literal notranslate"><span class="pre">jtagconfig</span></code>.
+Be sure to unregister the JTAG connection after you are done with debugging (run <code class="docutils literal notranslate"><span class="pre">jtagconfig</span> <span class="pre">--remove</span> <span class="pre">&lt;#&gt;</span></code> where &lt;#&gt; is the JTAG-over-protocol option number).</p>
 </div>
 </section>
 <section id="debugging-debug-part">

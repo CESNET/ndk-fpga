@@ -50,13 +50,13 @@ Example of DTS of one component
 
     ref_name: my_comp {
         reg = <$BASE_ADDRESS 0x40>;
-        compatible = "netcope,my_comp";
+        compatible = "cesnet,my_comp";
         version = <0x00010004>;
         type = "reduced";
     };
 
-Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Example of generated DTS for FPGA card
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: dts
 
@@ -65,12 +65,14 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
     / {
 
         firmware {
-            build-tool = "Quartus $quartus(version)";
-            build-author = "cabal@cesnet.cz";
-            build-revision = "ff3f73b";
-            build-time = <0x6143474c>;
-            card-name = "DK-DEV-1SDX-P";
-            project-name = "DK-DEV-1SDX-P";
+            build-tool = "Quartus Version 22.4.0 Build 94 12/07/2022 SC Pro Edition";
+            build-author = "no-reply@liberouter.org";
+            build-revision = "95415f0";
+            build-time = <0x65c33529>;
+            card-name = "N6010";
+            project-name = "NDK_MINIMAL";
+            project-variant = "100G2";
+            project-version = "0.5.8";
 
             mi0: mi_bus0 {
                 #address-cells = <0x01>;
@@ -78,6 +80,17 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                 compatible = "netcope,bus,mi";
                 resource = "PCI0,BAR0";
                 width = <0x20>;
+
+                boot: ofs_pmci {
+                    compatible = "cesnet,pmci";
+                    version = <0x01>;
+                    reg = <0x2000 0x1000>;
+                };
+
+                mi_test_space {
+                    compatible = "cesnet,ofm,mi_test_space";
+                    reg = <0x00 0x100>;
+                };
 
                 tsu: tsu {
                     compatible = "netcope,tsu";
@@ -90,11 +103,24 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                     #address-cells = <0x01>;
                     #size-cells = <0x01>;
 
+                    dma_params_rx0: dma_params_rx0 {
+                        frame_size_max = <0x3fff>;
+                        frame_size_min = <0x3c>;
+                        phandle = <0x01>;
+                    };
+
+                    dma_params_tx0: dma_params_tx0 {
+                        frame_size_max = <0x3fff>;
+                        frame_size_min = <0x3c>;
+                        phandle = <0x02>;
+                    };
+
                     dma_ctrl_ndp_rx0 {
                         compatible = "netcope,dma_ctrl_ndp_rx";
                         reg = <0x1000000 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x01>;
                     };
 
                     dma_ctrl_ndp_rx1 {
@@ -102,6 +128,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1000080 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x01>;
                     };
 
                     dma_ctrl_ndp_rx2 {
@@ -109,6 +136,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1000100 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x01>;
                     };
 
                     dma_ctrl_ndp_rx3 {
@@ -116,6 +144,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1000180 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x01>;
                     };
 
                     dma_ctrl_ndp_rx4 {
@@ -123,6 +152,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1000200 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x01>;
                     };
 
                     dma_ctrl_ndp_rx5 {
@@ -130,6 +160,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1000280 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x01>;
                     };
 
                     dma_ctrl_ndp_rx6 {
@@ -137,6 +168,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1000300 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x01>;
                     };
 
                     dma_ctrl_ndp_rx7 {
@@ -144,6 +176,71 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1000380 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x01>;
+                    };
+
+                    dma_ctrl_ndp_rx8 {
+                        compatible = "netcope,dma_ctrl_ndp_rx";
+                        reg = <0x1000400 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x01>;
+                    };
+
+                    dma_ctrl_ndp_rx9 {
+                        compatible = "netcope,dma_ctrl_ndp_rx";
+                        reg = <0x1000480 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x01>;
+                    };
+
+                    dma_ctrl_ndp_rx10 {
+                        compatible = "netcope,dma_ctrl_ndp_rx";
+                        reg = <0x1000500 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x01>;
+                    };
+
+                    dma_ctrl_ndp_rx11 {
+                        compatible = "netcope,dma_ctrl_ndp_rx";
+                        reg = <0x1000580 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x01>;
+                    };
+
+                    dma_ctrl_ndp_rx12 {
+                        compatible = "netcope,dma_ctrl_ndp_rx";
+                        reg = <0x1000600 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x01>;
+                    };
+
+                    dma_ctrl_ndp_rx13 {
+                        compatible = "netcope,dma_ctrl_ndp_rx";
+                        reg = <0x1000680 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x01>;
+                    };
+
+                    dma_ctrl_ndp_rx14 {
+                        compatible = "netcope,dma_ctrl_ndp_rx";
+                        reg = <0x1000700 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x01>;
+                    };
+
+                    dma_ctrl_ndp_rx15 {
+                        compatible = "netcope,dma_ctrl_ndp_rx";
+                        reg = <0x1000780 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x01>;
                     };
 
                     dma_ctrl_ndp_tx0 {
@@ -151,6 +248,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1200000 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x02>;
                     };
 
                     dma_ctrl_ndp_tx1 {
@@ -158,6 +256,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1200080 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x02>;
                     };
 
                     dma_ctrl_ndp_tx2 {
@@ -165,6 +264,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1200100 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x02>;
                     };
 
                     dma_ctrl_ndp_tx3 {
@@ -172,6 +272,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1200180 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x02>;
                     };
 
                     dma_ctrl_ndp_tx4 {
@@ -179,6 +280,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1200200 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x02>;
                     };
 
                     dma_ctrl_ndp_tx5 {
@@ -186,6 +288,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1200280 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x02>;
                     };
 
                     dma_ctrl_ndp_tx6 {
@@ -193,6 +296,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1200300 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x02>;
                     };
 
                     dma_ctrl_ndp_tx7 {
@@ -200,23 +304,135 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                         reg = <0x1200380 0x80>;
                         version = <0x20000>;
                         pcie = <0x00>;
+                        params = <0x02>;
+                    };
+
+                    dma_ctrl_ndp_tx8 {
+                        compatible = "netcope,dma_ctrl_ndp_tx";
+                        reg = <0x1200400 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x02>;
+                    };
+
+                    dma_ctrl_ndp_tx9 {
+                        compatible = "netcope,dma_ctrl_ndp_tx";
+                        reg = <0x1200480 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x02>;
+                    };
+
+                    dma_ctrl_ndp_tx10 {
+                        compatible = "netcope,dma_ctrl_ndp_tx";
+                        reg = <0x1200500 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x02>;
+                    };
+
+                    dma_ctrl_ndp_tx11 {
+                        compatible = "netcope,dma_ctrl_ndp_tx";
+                        reg = <0x1200580 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x02>;
+                    };
+
+                    dma_ctrl_ndp_tx12 {
+                        compatible = "netcope,dma_ctrl_ndp_tx";
+                        reg = <0x1200600 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x02>;
+                    };
+
+                    dma_ctrl_ndp_tx13 {
+                        compatible = "netcope,dma_ctrl_ndp_tx";
+                        reg = <0x1200680 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x02>;
+                    };
+
+                    dma_ctrl_ndp_tx14 {
+                        compatible = "netcope,dma_ctrl_ndp_tx";
+                        reg = <0x1200700 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x02>;
+                    };
+
+                    dma_ctrl_ndp_tx15 {
+                        compatible = "netcope,dma_ctrl_ndp_tx";
+                        reg = <0x1200780 0x80>;
+                        version = <0x20000>;
+                        pcie = <0x00>;
+                        params = <0x02>;
                     };
                 };
 
                 i2c0: i2c0 {
                     compatible = "netcope,i2c";
-                    reg = <0x800010 0x08>;
-                    phandle = <0x01>;
+                    reg = <0x3010 0x08>;
+                    phandle = <0x04>;
+                };
+
+                pmdctrl0: pmdctrl0 {
+                    reg = <0x301c 0x04>;
+                    version = <0x10000>;
+                    phandle = <0x03>;
                 };
 
                 pmd0: pmd0 {
                     compatible = "netcope,transceiver";
                     type = "QSFP";
-                    control = <0x01>;
-                    phandle = <0x02>;
+                    status-reg = <0x03>;
+                    control = <0x04>;
+                    phandle = <0x08>;
 
                     control-param {
-                        i2c-addr = <0xf0>;
+                        i2c-addr = <0xa0>;
+                    };
+                };
+
+                i2c1: i2c1 {
+                    compatible = "netcope,i2c";
+                    reg = <0x3110 0x08>;
+                    phandle = <0x06>;
+                };
+
+                pmdctrl1: pmdctrl1 {
+                    reg = <0x311c 0x04>;
+                    version = <0x10000>;
+                    phandle = <0x05>;
+                };
+
+                pmd1: pmd1 {
+                    compatible = "netcope,transceiver";
+                    type = "QSFP";
+                    status-reg = <0x05>;
+                    control = <0x06>;
+                    phandle = <0x0d>;
+
+                    control-param {
+                        i2c-addr = <0xa0>;
+                    };
+                };
+
+                regarr0: regarr0 {
+                    compatible = "netcope,pcsregs";
+                    reg = <0x800000 0x40000>;
+                    phandle = <0x07>;
+                };
+
+                pcspma0: pcspma0 {
+                    type = "100G";
+                    control = <0x07>;
+                    phandle = <0x09>;
+
+                    control-param {
+                        ip-name = "E_TILE";
                     };
                 };
 
@@ -227,7 +443,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                     version = <0x02>;
                     reg = <0x8000 0x200>;
                     mtu = <0x3fff>;
-                    phandle = <0x04>;
+                    phandle = <0x0b>;
                 };
 
                 rxmac0: rxmac0 {
@@ -237,30 +453,34 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                     version = <0x02>;
                     reg = <0x8200 0x200>;
                     mtu = <0x3fff>;
-                    phandle = <0x03>;
+                    phandle = <0x0a>;
                 };
 
                 eth0 {
                     compatible = "netcope,eth";
-                    pmd = <0x02>;
-                    rxmac = <0x03>;
-                    txmac = <0x04>;
+                    pmd = <0x08>;
+                    pcspma = <0x09>;
+                    rxmac = <0x0a>;
+                    txmac = <0x0b>;
+
+                    pmd-params {
+                        lines = <0x00 0x01 0x02 0x03>;
+                    };
                 };
 
-                i2c1: i2c1 {
-                    compatible = "netcope,i2c";
-                    reg = <0x800110 0x08>;
-                    phandle = <0x05>;
+                regarr1: regarr1 {
+                    compatible = "netcope,pcsregs";
+                    reg = <0xa00000 0x40000>;
+                    phandle = <0x0c>;
                 };
 
-                pmd1: pmd1 {
-                    compatible = "netcope,transceiver";
-                    type = "QSFP";
-                    control = <0x05>;
-                    phandle = <0x06>;
+                pcspma1: pcspma1 {
+                    type = "100G";
+                    control = <0x0c>;
+                    phandle = <0x0e>;
 
                     control-param {
-                        i2c-addr = <0xf8>;
+                        ip-name = "E_TILE";
                     };
                 };
 
@@ -271,7 +491,7 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                     version = <0x02>;
                     reg = <0xa000 0x200>;
                     mtu = <0x3fff>;
-                    phandle = <0x08>;
+                    phandle = <0x10>;
                 };
 
                 rxmac1: rxmac1 {
@@ -281,147 +501,132 @@ Example of generated DTS for FPGA card (DK-DEV-1SDX-P)
                     version = <0x02>;
                     reg = <0xa200 0x200>;
                     mtu = <0x3fff>;
-                    phandle = <0x07>;
+                    phandle = <0x0f>;
                 };
 
                 eth1 {
                     compatible = "netcope,eth";
-                    pmd = <0x06>;
-                    rxmac = <0x07>;
-                    txmac = <0x08>;
+                    pmd = <0x0d>;
+                    pcspma = <0x0e>;
+                    rxmac = <0x0f>;
+                    txmac = <0x10>;
+
+                    pmd-params {
+                        lines = <0x00 0x01 0x02 0x03>;
+                    };
                 };
 
-                adc_sensors {
-                    reg = <0x1000 0x7c>;
-                    compatible = "netcope,stratix_adc_sensors";
+                intel_sdm_controller {
+                    compatible = "netcope,intel_sdm_controller";
+                    reg = <0x1000 0x2c>;
+                    type = <0x00>;
+                    version = <0x01>;
+                    boot_en = <0x00>;
                 };
 
-                app: nic_application {
-                    reg = <0x2000000 0x10>;
+                intel_jtag_op_controller {
+                    compatible = "cesnet,ofm,intel_jtag_op_ctrl";
+                    reg = <0x10000 0xc000>;
+                    type = <0x00>;
+                    version = <0x01>;
                 };
-            };
 
-            mi1: mi_bus1 {
-                #address-cells = <0x01>;
-                #size-cells = <0x01>;
-                compatible = "netcope,bus,mi";
-                resource = "PCI1,BAR0";
-                width = <0x20>;
+                app: application {
 
-                dma_module@0x01000000 {
-                    #address-cells = <0x01>;
-                    #size-cells = <0x01>;
+                    app_core_minimal_0 {
+                        reg = <0x2000000 0x800000>;
+                        compatible = "cesnet,minimal,app_core";
 
-                    dma_ctrl_ndp_rx0 {
-                        compatible = "netcope,dma_ctrl_ndp_rx";
-                        reg = <0x1000000 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                        rx_chan_router {
+                            compatible = "cesnet,ofm,mvb_channel_router";
+                            reg = <0x2000000 0x04>;
+                        };
                     };
 
-                    dma_ctrl_ndp_rx1 {
-                        compatible = "netcope,dma_ctrl_ndp_rx";
-                        reg = <0x1000080 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    app_core_minimal_1 {
+                        reg = <0x2800000 0x800000>;
+                        compatible = "cesnet,minimal,app_core";
+
+                        rx_chan_router {
+                            compatible = "cesnet,ofm,mvb_channel_router";
+                            reg = <0x2800000 0x04>;
+                        };
                     };
 
-                    dma_ctrl_ndp_rx2 {
-                        compatible = "netcope,dma_ctrl_ndp_rx";
-                        reg = <0x1000100 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    ddr_tester_0: mem_tester_0 {
+                        reg = <0x3000000 0x100>;
+                        compatible = "netcope,mem_tester";
                     };
 
-                    dma_ctrl_ndp_rx3 {
-                        compatible = "netcope,dma_ctrl_ndp_rx";
-                        reg = <0x1000180 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    ddr_tester_1: mem_tester_1 {
+                        reg = <0x3020000 0x100>;
+                        compatible = "netcope,mem_tester";
                     };
 
-                    dma_ctrl_ndp_rx4 {
-                        compatible = "netcope,dma_ctrl_ndp_rx";
-                        reg = <0x1000200 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    ddr_tester_2: mem_tester_2 {
+                        reg = <0x3040000 0x100>;
+                        compatible = "netcope,mem_tester";
                     };
 
-                    dma_ctrl_ndp_rx5 {
-                        compatible = "netcope,dma_ctrl_ndp_rx";
-                        reg = <0x1000280 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    ddr_tester_3: mem_tester_3 {
+                        reg = <0x3060000 0x100>;
+                        compatible = "netcope,mem_tester";
                     };
 
-                    dma_ctrl_ndp_rx6 {
-                        compatible = "netcope,dma_ctrl_ndp_rx";
-                        reg = <0x1000300 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    ddr_logger_0: mem_logger_0 {
+                        reg = <0x3080000 0x30>;
+                        compatible = "netcope,mem_logger";
                     };
 
-                    dma_ctrl_ndp_rx7 {
-                        compatible = "netcope,dma_ctrl_ndp_rx";
-                        reg = <0x1000380 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    ddr_logger_1: mem_logger_1 {
+                        reg = <0x30a0000 0x30>;
+                        compatible = "netcope,mem_logger";
                     };
 
-                    dma_ctrl_ndp_tx0 {
-                        compatible = "netcope,dma_ctrl_ndp_tx";
-                        reg = <0x1200000 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    ddr_logger_2: mem_logger_2 {
+                        reg = <0x30c0000 0x30>;
+                        compatible = "netcope,mem_logger";
                     };
 
-                    dma_ctrl_ndp_tx1 {
-                        compatible = "netcope,dma_ctrl_ndp_tx";
-                        reg = <0x1200080 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    ddr_logger_3: mem_logger_3 {
+                        reg = <0x30e0000 0x30>;
+                        compatible = "netcope,mem_logger";
+                    };
+                };
+
+                dbg_gls0 {
+                    compatible = "cesnet,ofm,gen_loop_switch";
+                    reg = <0x5000 0x200>;
+                    version = <0x01>;
+
+                    mfb_gen2dma {
+                        compatible = "cesnet,ofm,mfb_generator";
+                        reg = <0x5080 0x40>;
+                        version = <0x01>;
                     };
 
-                    dma_ctrl_ndp_tx2 {
-                        compatible = "netcope,dma_ctrl_ndp_tx";
-                        reg = <0x1200100 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    mfb_gen2eth {
+                        compatible = "cesnet,ofm,mfb_generator";
+                        reg = <0x50c0 0x40>;
+                        version = <0x01>;
+                    };
+                };
+
+                dbg_gls1 {
+                    compatible = "cesnet,ofm,gen_loop_switch";
+                    reg = <0x5200 0x200>;
+                    version = <0x01>;
+
+                    mfb_gen2dma {
+                        compatible = "cesnet,ofm,mfb_generator";
+                        reg = <0x5280 0x40>;
+                        version = <0x01>;
                     };
 
-                    dma_ctrl_ndp_tx3 {
-                        compatible = "netcope,dma_ctrl_ndp_tx";
-                        reg = <0x1200180 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
-                    };
-
-                    dma_ctrl_ndp_tx4 {
-                        compatible = "netcope,dma_ctrl_ndp_tx";
-                        reg = <0x1200200 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
-                    };
-
-                    dma_ctrl_ndp_tx5 {
-                        compatible = "netcope,dma_ctrl_ndp_tx";
-                        reg = <0x1200280 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
-                    };
-
-                    dma_ctrl_ndp_tx6 {
-                        compatible = "netcope,dma_ctrl_ndp_tx";
-                        reg = <0x1200300 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
-                    };
-
-                    dma_ctrl_ndp_tx7 {
-                        compatible = "netcope,dma_ctrl_ndp_tx";
-                        reg = <0x1200380 0x80>;
-                        version = <0x20000>;
-                        pcie = <0x01>;
+                    mfb_gen2eth {
+                        compatible = "cesnet,ofm,mfb_generator";
+                        reg = <0x52c0 0x40>;
+                        version = <0x01>;
                     };
                 };
             };

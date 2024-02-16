@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frequently Asked Questions &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ReflexCES XpressSX AGI-FH400G" href="../../ndk_cards/reflexces/agi-fh400g/readme.html" />
+    <link rel="prev" title="Device Tree" href="devtree.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: main, <br> Git hash: 07fdd6e3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-a-network-development-kit-ndk">What is a Network Development Kit (NDK)?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-sw-do-i-need-to-build-the-ndk-firmware">What SW do I need to build the NDK firmware?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-fpga-chips-and-cards-does-ndk-support">What FPGA chips and cards does NDK support?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-communication-interfaces-can-a-ndk-applications-have-available">What communication interfaces can a NDK applications have available?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-ethernet-standards-does-ndk-support">What Ethernet standards does NDK support?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#does-ndk-implement-iso-osi-protocol-support">Does NDK implement ISO/OSI protocol support?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#does-ndk-support-jumbo-packets">Does NDK support Jumbo packets?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#is-there-also-an-open-source-dma-controller-available">Is there also an open-source DMA controller available?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-clock-frequencies-are-available-for-the-user-application">What clock frequencies are available for the user application?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#is-there-a-sw-stack-also-available-for-the-ndk">Is there a SW stack also available for the NDK?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-the-difference-between-ndk-and-netfpga">What is the difference between NDK and NetFPGA?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-the-difference-between-ndk-and-corundum">What is the difference between NDK and Corundum?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-the-difference-between-ndk-and-opennic">What is the difference between NDK and OpenNIC?</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Frequently Asked Questions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/ndk_core/doc/faq.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="frequently-asked-questions">
+<span id="ndk-faq"></span><h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this heading"></a></h1>
+<section id="what-is-a-network-development-kit-ndk">
+<h2>What is a Network Development Kit (NDK)?<a class="headerlink" href="#what-is-a-network-development-kit-ndk" title="Permalink to this heading"></a></h2>
+<p>The NDK is a generic FPGA framework for easy development of your own high-speed network FPGA application. <a class="reference external" href="https://www.cesnet.cz/cesnet/?lang=en">CESNET (an association of universities of the Czech Republic and the Czech Academy of Sciences)</a> develops and uses NDK primarily to implement own FPGA probes for monitoring CESNET high-speed backbone networks.</p>
+</section>
+<section id="what-sw-do-i-need-to-build-the-ndk-firmware">
+<h2>What SW do I need to build the NDK firmware?<a class="headerlink" href="#what-sw-do-i-need-to-build-the-ndk-firmware" title="Permalink to this heading"></a></h2>
+<p>Intel Quartus Prime Pro tool is required to build FW with target FPGA from Intel. Xilinx Vivado tool is needed to build FW with target FPGA from Xilinx (AMD). You also need to have the corresponding licenses for these tools. The specific required versions of these tools are listed for each NDK application in the main README.md file.</p>
+</section>
+<section id="what-fpga-chips-and-cards-does-ndk-support">
+<h2>What FPGA chips and cards does NDK support?<a class="headerlink" href="#what-fpga-chips-and-cards-does-ndk-support" title="Permalink to this heading"></a></h2>
+<p>The NDK supports FPGA chips from both major manufacturers Intel and Xilinx (AMD). Specifically, these are Intel Agilex, Stratix 10 and Xilinx UltraScale+ FPGA chips. A list of specific supported FPGA cards is available for each NDK application in the main README.md file.</p>
+</section>
+<section id="what-communication-interfaces-can-a-ndk-applications-have-available">
+<h2>What communication interfaces can a NDK applications have available?<a class="headerlink" href="#what-communication-interfaces-can-a-ndk-applications-have-available" title="Permalink to this heading"></a></h2>
+<p>A NDK application can use the interface for communication with external memories, for network communication (Ethernet), for software configuration (write and read 32b words) and for high-speed data transfers between the FPGA and the host memory (DMA).</p>
+</section>
+<section id="what-ethernet-standards-does-ndk-support">
+<h2>What Ethernet standards does NDK support?<a class="headerlink" href="#what-ethernet-standards-does-ndk-support" title="Permalink to this heading"></a></h2>
+<p>The specific support of Ethernet standards is always dependent on the target FPGA card or on the Ethernet IP used. NDK currently supports Intel E-Tile, F-Tile or Xilinx CMAC Ethernet IP. All listed IPs support the 100GBASE standard; E-Tile, F-Tile also handle 10GBASE and 25GBASE; and F-Tile then supports even more Ethernet standards.</p>
+</section>
+<section id="does-ndk-implement-iso-osi-protocol-support">
+<h2>Does NDK implement ISO/OSI protocol support?<a class="headerlink" href="#does-ndk-implement-iso-osi-protocol-support" title="Permalink to this heading"></a></h2>
+<p>No, the user application in the NDK must work on the line layer (L2), i.e. with Ethernet frames without CRC (it is removed/added in the Ethernet IP). If necessary, support for ISO/OSI protocols must be implemented within the user application.</p>
+</section>
+<section id="does-ndk-support-jumbo-packets">
+<h2>Does NDK support Jumbo packets?<a class="headerlink" href="#does-ndk-support-jumbo-packets" title="Permalink to this heading"></a></h2>
+<p>Yes, the NDK firmware supports packets up to 16383 B by default, which is the maximum possible value. However, the RX MAC by default discards received Ethernet frames larger than 1522 B (including CRC), but this limit can be changed dynamically through the SW tool (nfb-eth).</p>
+</section>
+<section id="is-there-also-an-open-source-dma-controller-available">
+<h2>Is there also an open-source DMA controller available?<a class="headerlink" href="#is-there-also-an-open-source-dma-controller-available" title="Permalink to this heading"></a></h2>
+<p>Not currently, but a low-latency DMA controller (DMA Calypte) is currently under development, which will be available as an open-source component of the NDK.</p>
+</section>
+<section id="what-clock-frequencies-are-available-for-the-user-application">
+<h2>What clock frequencies are available for the user application?<a class="headerlink" href="#what-clock-frequencies-are-available-for-the-user-application" title="Permalink to this heading"></a></h2>
+<p>The user application in the NDK has available four clock signals from the same source with frequencies: 100, 200, 300 and 400 MHz. A 100MHz clock is typically used for the configuration interface and the default is 200MHz for the data path. Using a slower clock may degrade the overall throughput of the NDK.</p>
+</section>
+<section id="is-there-a-sw-stack-also-available-for-the-ndk">
+<h2>Is there a SW stack also available for the NDK?<a class="headerlink" href="#is-there-a-sw-stack-also-available-for-the-ndk" title="Permalink to this heading"></a></h2>
+<p>Yes, a Linux driver, a library with a simple API for developing your own SW application and a set of useful tools are available in a <a class="reference external" href="https://github.com/CESNET/ndk-sw">separate repository</a>.</p>
+</section>
+<section id="what-is-the-difference-between-ndk-and-netfpga">
+<h2>What is the difference between NDK and NetFPGA?<a class="headerlink" href="#what-is-the-difference-between-ndk-and-netfpga" title="Permalink to this heading"></a></h2>
+<p>NetFPGA is a general framework for developing your own FPGA application same as the NDK. Unfortunately NetFPGA only supports Xilinx UltraScale+ FPGA chips and does not support Ethernet and data rates higher than 100 Gbps.</p>
+</section>
+<section id="what-is-the-difference-between-ndk-and-corundum">
+<h2>What is the difference between NDK and Corundum?<a class="headerlink" href="#what-is-the-difference-between-ndk-and-corundum" title="Permalink to this heading"></a></h2>
+<p>Rather, Corundum is also trying to create a general FPGA network, but it also enables the expansion of its own RTL application. Corundum also supports various FPGA cards with chips from both Xilinx and Intel. Unfortunately it does not support Ethernet and data transfer rates higher than 100 Gbps.</p>
+</section>
+<section id="what-is-the-difference-between-ndk-and-opennic">
+<h2>What is the difference between NDK and OpenNIC?<a class="headerlink" href="#what-is-the-difference-between-ndk-and-opennic" title="Permalink to this heading"></a></h2>
+<p>OpenNIC is a general framework for developing your own FPGA application same as the NDK. Unfortunately OpenNIC only supports Xilinx UltraScale+ FPGA chips and does not support Ethernet and data transfer speeds higher than 100 Gbps.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="devtree.html" class="btn btn-neutral float-left" title="Device Tree" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../ndk_cards/reflexces/agi-fh400g/readme.html" class="btn btn-neutral float-right" title="ReflexCES XpressSX AGI-FH400G" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: af67b2da
+                Git branch: main, <br> Git hash: 07fdd6e3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -55,7 +55,7 @@
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../doc/how_to_start.html">How to start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../readme.html">NDK architecture</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="app.html">The Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mi.html">The MI bus interconnect</a></li>
@@ -86,6 +86,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../../doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
@@ -160,8 +174,8 @@ Two (MI and MI PHY) are connected to MI Splitters, and one (MI PMD) is directly 
 The MI PHY Splitter forwards requests to one or more instances of the Network Module Core.
 The MI Splitter forwards requests to one or more instances of Network Module Logic.
 The main blocks and their connection between address spaces are in the table below:</p>
-<table class="docutils align-center" id="id5">
-<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id5" title="Permalink to this table"></a></caption>
+<table class="docutils align-center" id="id6">
+<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id6" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 12.5%" />
 <col style="width: 25.0%" />
@@ -337,8 +351,8 @@ The only difference is the address offset, which is 0x2000.</p>
 <p>To get a complete register address in one of the components of the Network Module, you must add the appropriate base address of the Network Module (as defined in the <a class="reference internal" href="mi.html#ndk-mi"><span class="std std-ref">MI address space package</span></a>) to it.</p>
 </div>
 <p>The addressing of both main blocks is described in the tables below:</p>
-<table class="docutils align-center" id="id6">
-<caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id6" title="Permalink to this table"></a></caption>
+<table class="docutils align-center" id="id7">
+<caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id7" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 15.4%" />
 <col style="width: 30.8%" />
@@ -372,8 +386,8 @@ The only difference is the address offset, which is 0x2000.</p>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<table class="docutils align-center" id="id7">
-<caption><span class="caption-text">Tab. 3</span><a class="headerlink" href="#id7" title="Permalink to this table"></a></caption>
+<table class="docutils align-center" id="id8">
+<caption><span class="caption-text">Tab. 3</span><a class="headerlink" href="#id8" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 15.4%" />
 <col style="width: 30.8%" />
@@ -413,27 +427,34 @@ The only difference is the address offset, which is 0x2000.</p>
 <p>The so-called Network Module Core is a subcomponent of the Network Module.
 It contains the required hard IP(s), appropriate adapters, and an MI component for reconfiguring the hard IP(s).
 Right now, the Network Module can use three different Ethernet hard IPs, for Intel FPGA, it is the E-tile or the F-Tile, and for the Xilinx FPGA, it is the CMAC.
-According to the selected NIC (and therefore the type of hard IP), one of the three architectures of the Network Module Core (with the proper hard IP) is used.
+For the F-Tile, there are two variants of IP core: it is F-Tile and F-Tile_Multirate, which support different speeds for implemented IP.
+For the F-Tile_Multirate reconfiguration, use Dynamic Reconfiguration Controller.
+According to the selected NIC (and therefore the type of hard IP), one of the four architectures of the Network Module Core (with the proper hard IP) is used.
 The hard IP is connected directly to the FPGA’s serial QSFP pins (left side of the diagram).
 On the right side, it is connected to the Network Module Logic.
-All three architectures of the Network Module Core are displayed below.</p>
+All four architectures of the Network Module Core are displayed below.</p>
 <table class="docutils align-default">
 <tbody>
-<tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/etile_network_module_core.svg"><img alt="../../../_images/etile_network_module_core.svg" class="align-center" src="../../../_images/etile_network_module_core.svg" width="80%" /></a>
+<tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/etile_network_module_core.svg"><img alt="../../../_images/etile_network_module_core.svg" class="align-center" src="../../../_images/etile_network_module_core.svg" width="100%" /></a>
 </td>
 <td><a class="reference internal image-reference" href="../../../_images/ftile_network_module_core.svg"><img alt="../../../_images/ftile_network_module_core.svg" class="align-center" src="../../../_images/ftile_network_module_core.svg" width="100%" /></a>
 </td>
 </tr>
+<tr class="row-even"><td><a class="reference internal image-reference" href="ndk_core/intel/doc/img/ftile_multirate_network_module_core.svg"><img alt="ndk_core/intel/doc/img/ftile_multirate_network_module_core.svg" class="align-center" src="ndk_core/intel/doc/img/ftile_multirate_network_module_core.svg" width="100%" /></a>
+</td>
+<td><a class="reference internal image-reference" href="../../../_images/cmac_network_module_core.svg"><img alt="../../../_images/cmac_network_module_core.svg" class="align-center" src="../../../_images/cmac_network_module_core.svg" width="100%" /></a>
+</td>
+</tr>
 </tbody>
 </table>
-<a class="reference internal image-reference" href="../../../_images/cmac_network_module_core.svg"><img alt="../../../_images/cmac_network_module_core.svg" class="align-center" src="../../../_images/cmac_network_module_core.svg" width="40%" /></a>
-<p>All three architectures contain the same parts in slightly different forms.
-The first two architectures are for Intel FPGAs (due to the instantiated hard IPs).
+<p>All four architectures contain the same parts in slightly different forms.
+The first three architectures are for Intel FPGAs (due to the instantiated hard IPs).
 The E-Tile hard IP core is always just one instance, no matter the number of Ethernet channels or their speed.
 That means that the instantiated hard IP always has four QSFP interfaces and four XCVR reconfiguration interfaces.</p>
-<p>The F-Tile hard IP core is instantiated once per each Ethernet channel.
+<p>The F-Tile hard IP core is instantiated once per each Ethernet channel. The same goes for the F-Tile_Multirate, but it also contains a single Dynamic Reconfiguration Controller, which is used to reconfigurate the IP’s parameters such as speed, type of FEC, etc.
 The QSFP interfaces (as well as the XCVR reconfiguration interfaces) are distributed evenly among the hard IPs.
-There are eight interfaces altogether, so each hard IP has 8/number_of_channels interfaces.</p>
+There are eight interfaces altogether, so each hard IP has 8/number_of_channels interfaces.
+For more information about the F-Tile Multirate, use <a class="reference internal" href="../src/comp/network_mod/comp/network_mod_core/doc/f-tile_multirate_ip.html#ndk-f-tile-multirate"><span class="std std-ref">F-Tile_Multirate</span></a>.</p>
 <p>The CMAC architecture contains the Xilinx CMAC hard IP.
 Same as E-Tile, it has just one instance of the hard IP with four QSFP interfaces and four DRP reconfiguration interfaces.
 However, the CMAC is instantiated only in one variant: with one 100 GE channel.</p>
@@ -443,6 +464,8 @@ F-tile can also utilize the AVST interface (for speeds up to 100 GE) or the MAC 
 F-tile hard IP cores always use the MAC segmented interface in our designs.
 CMAC’s client interface is the <a class="reference external" href="https://docs.xilinx.com/r/en-US/pg165-cmac/User-Side-LBUS-Interface">LBUS interface</a>.
 The Network Module Core always uses the appropriate adapters (according to the hard IP).</p>
+<p>Each channel on both E-tile and F-tile architectures also includes a diagnostic post-MAC loopback module, which (when enabled via the MGMT) re-transmits received frames back to the link partner. We call this mode the “PCS reverse loopback”. When the loopback is active, received frames are also passed to the Application as in normal mode. However, the frames transmitted from the Application are discarded.
+See the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-eth.html">nfb-eth tool</a> documentation for instructions on how to turn the loopback on/off.</p>
 <section id="sw-access-to-the-reconfiguration-interfaces">
 <span id="sw-access-reconfig-infs"></span><h3>SW access to the reconfiguration interfaces<a class="headerlink" href="#sw-access-to-the-reconfiguration-interfaces" title="Permalink to this heading"></a></h3>
 <p>Software access is provided via the management unit (MGMT), which is instantiated per channel.
@@ -457,6 +480,8 @@ The addresses of the available CSR registers in reconfiguration interfaces are r
 <li><p><a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug_etile_xcvr_phy.pdf">Intel E-Tile Transceiver PHY User Guide</a></p></li>
 <li><p><a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug20313.pdf">Intel F-tile Ethernet Hard IP User Guide</a></p></li>
 <li><p><a class="reference external" href="https://cdrdv2.intel.com/v1/dl/getContent/637401">Intel F-Tile Ethernet Intel FPGA Hard IP Register Map</a></p></li>
+<li><p><a class="reference external" href="https://cdrdv2-public.intel.com/773503/ug-714307-773503.pdf">Intel F-Tile Ethernet Multirate Intel FPGA IP User Guide</a></p></li>
+<li><p><a class="reference external" href="https://www.intel.com/programmable/technical-pdfs/711009.pdf">Intel F-Tile Dynamic Reconfiguration Suite Intel FPGA IP User Guide</a></p></li>
 <li><p><a class="reference external" href="https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/cmac_usplus/v3_1/pg203-cmac-usplus.pdf">Xilinx Ultrascale+ CMAC Ethernet Intel FPGA Hard IP User Guide</a></p></li>
 </ol>
 </section>
@@ -494,8 +519,8 @@ However, that is not the concern of the MI Splitter here but in the top-level of
 To create a complete address of a MAC Lite register, add the address of the register, the channel offset, the port offset, and the offset of the Network Module Logic (MI_ADC_PORT_NETMOD in the <a class="reference external" href="https://github.com/CESNET/ndk-core/blob/main/intel/src/mi_addr_space_pkg.vhd">MI address space package</a>).
 To show the connections of the MAC Lites, an example of the MAC Lite address spaces for a configuration with two 4x25 GE ports follows.</p>
 <p>Notation: TX_MAC_LITE(port_id)(channel_id), RX_MAC_LITE(port_id)(channel_id).</p>
-<table class="docutils align-center" id="id8">
-<caption><span class="caption-text">Tab. 4</span><a class="headerlink" href="#id8" title="Permalink to this table"></a></caption>
+<table class="docutils align-center" id="id9">
+<caption><span class="caption-text">Tab. 4</span><a class="headerlink" href="#id9" title="Permalink to this table"></a></caption>
 <colgroup>
 <col style="width: 28.6%" />
 <col style="width: 42.9%" />

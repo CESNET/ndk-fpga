@@ -78,9 +78,9 @@ Tries to use as simple adders as the set latency allows. It has a valid bit for 
 
 **SHIFTER** - Behavioral implementation of left or right block-by-block shifter.
 
-**SQUARER** - The unit is used for calculation square (n^2** of input vector.
+**SQUARER** - The unit is used for calculation square (n^2** of input vector).
 
-**SR_SYNC_LATCH** - Synchronous SR latch whose forbidden state has been removed. Latches data of variable length. Detailed documentation can be found :ref:`here<sr_sync_latch>`
+**SR_SYNC_LATCH** - Synchronous SR latch whose forbidden state has been removed. Latches data of variable length. Detailed documentation can be found :ref:`here<sr_sync_latch>`.
 
 **SUM_ONE** - Behavioral implementation of generic counter of ones in input vector.
 

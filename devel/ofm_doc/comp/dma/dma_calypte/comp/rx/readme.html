@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 07fdd6e3
+                Git branch: devel, <br> Git hash: 49008d2d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
@@ -170,7 +170,7 @@ in the following figure:</p>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-rx_dma_calypte-user_rx_mfb_region_size"><td><p>USER_RX_MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
-<td><p>4</p></td>
+<td><p>8</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-rx_dma_calypte-user_rx_mfb_block_size"><td><p>USER_RX_MFB_BLOCK_SIZE</p></td>
@@ -185,7 +185,7 @@ in the following figure:</p>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-rx_dma_calypte-pcie_up_mfb_regions"><td><p>PCIE_UP_MFB_REGIONS</p></td>
 <td><p>natural</p></td>
-<td><p>1</p></td>
+<td><p>2</p></td>
 <td><p>PCIe MFB configuration</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-rx_dma_calypte-pcie_up_mfb_region_size"><td><p>PCIE_UP_MFB_REGION_SIZE</p></td>
@@ -380,32 +380,37 @@ in the following figure:</p>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_sof"><td><p>PCIE_UP_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_meta"><td><p>PCIE_UP_MFB_META</p></td>
+<td><p>std_logic_vector(PCIE_UP_MFB_REGIONS*PCIE_RQ_META_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_sof"><td><p>PCIE_UP_MFB_SOF</p></td>
 <td><p>std_logic_vector(PCIE_UP_MFB_REGIONS - 1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_eof"><td><p>PCIE_UP_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_eof"><td><p>PCIE_UP_MFB_EOF</p></td>
 <td><p>std_logic_vector(PCIE_UP_MFB_REGIONS - 1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_sof_pos"><td><p>PCIE_UP_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_sof_pos"><td><p>PCIE_UP_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(PCIE_UP_MFB_REGIONS*max(1, log2(PCIE_UP_MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_eof_pos"><td><p>PCIE_UP_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_eof_pos"><td><p>PCIE_UP_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(PCIE_UP_MFB_REGIONS*max(1, log2(PCIE_UP_MFB_REGION_SIZE*PCIE_UP_MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_src_rdy"><td><p>PCIE_UP_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_src_rdy"><td><p>PCIE_UP_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_dst_rdy"><td><p>PCIE_UP_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte-pcie_up_mfb_dst_rdy"><td><p>PCIE_UP_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>

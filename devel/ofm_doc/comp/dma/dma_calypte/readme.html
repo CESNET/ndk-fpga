@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 07fdd6e3
+                Git branch: devel, <br> Git hash: 49008d2d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -499,7 +499,7 @@ at entity-area constants.</p></td>
 <td><p>Upstream MFB interface (for sending data to PCIe Endpoints)</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_meta"><td><p>PCIE_RQ_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_RQ_META_WIDTH -1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_RQ_MFB_REGIONS*PCIE_RQ_META_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
@@ -539,7 +539,7 @@ at entity-area constants.</p></td>
 <td><p>Downstream MFB interface (for sending data from PCIe Endpoints)</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_cq_mfb_meta"><td><p>PCIE_CQ_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_CQ_META_WIDTH -1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -579,7 +579,7 @@ at entity-area constants.</p></td>
 <td><p>Response interface for PCIe CQ requests</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_cc_mfb_meta"><td><p>PCIE_CC_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_CC_META_WIDTH -1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS*PCIE_CC_META_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>

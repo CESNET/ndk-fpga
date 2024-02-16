@@ -64,26 +64,26 @@ The NDK platform uses the `nfb-info tool <https://cesnet.github.io/ndk-sw/tools/
 
     $ nfb-info 
     --------------------------------------- Board info ----
+    Board name                 : COMBO-GENERIC
+    Serial number              : 0
     Network interfaces         : 2
     ------------------------------------ Firmware info ----
+    Card name                  : N6010
     Project name               : NDK_MINIMAL
-    Built at                   : 2022-09-24 00:44:19
-    Build tool                 : Quartus Version 22.2.0 Build 94 06/08/2022 SC Pro Edition
+    Project variant            : 100G2
+    Project version            : 0.5.8
+    Built at                   : 2024-02-07 08:45:45
+    Build tool                 : Quartus Version 22.4.0 Build 94 12/07/2022 SC Pro Edition
     Build author               : no-reply@liberouter.org
     RX queues                  : 16
     TX queues                  : 16
     ETH channels               : 2
     -------------------------------------- System info ----
     PCIe Endpoint 0:
-    * PCI slot                : 0000:82:00.0
+    * PCI slot                : 0000:17:00.0
     * PCI speed               : 16 GT/s
-    * PCI link width          : x8
-    * NUMA node               : 1
-    PCIe Endpoint 1:
-    * PCI slot                : 0000:81:00.0
-    * PCI speed               : 16 GT/s
-    * PCI link width          : x8
-    * NUMA node               : 1
+    * PCI link width          : x16
+    * NUMA node               : 0
 
 Further work with the NDK
 =========================

@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: af67b2da
+                Git branch: main, <br> Git hash: 07fdd6e3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -55,12 +55,26 @@
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/how_to_start.html">How to start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_core/intel/readme.html">NDK architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -70,6 +84,7 @@
 <li class="toctree-l3"><a class="reference internal" href="comp/base/mem/np_lutram/readme.html">NP LUT RAM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comp/base/mem/sdp_bram/readme.html">Simple dual-port BRAM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comp/base/mem/sdp_bram/readme.html#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/mp_bram/readme.html">Multi-port BRAM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
@@ -136,6 +151,8 @@ Ports are registered and the read latency is 2 clock cycles. Expert knowledge is
 Located in the same folder as DP_BMEM_V7. <code class="docutils literal notranslate"><span class="pre">OBSOLETE,</span> <span class="pre">use</span> <span class="pre">SDP_BRAM</span> <span class="pre">or</span> <span class="pre">SDP_BRAM_XILINX!</span></code></p>
 <p><strong>SDP_BRAM</strong> - Structural implementation of dual clock BRAM memory based on Xilinx and Intel specific primitives (xpm_memory_sdpram, altera_syncram) with one read port and one write port.
 It supports the byte enable feature!</p>
+<p><strong>MP_BRAM</strong> - Generic multiported single clock BRAM memory based on <strong>SDP_BRAM</strong>. Currently supports only 1 write port. Amount of read ports is not restricted. Also supports byte enable
+feature.</p>
 <p><strong>SDP_BRAM_BEHAV</strong> - Another behavioral implementation of dual clock BRAM memory with one read port and one write port.
 Located in the same folder as SDP_BRAM. <code class="docutils literal notranslate"><span class="pre">OBSOLETE,</span> <span class="pre">use</span> <span class="pre">DP_BRAM</span> <span class="pre">or</span> <span class="pre">DP_BRAM_XILINX!</span></code></p>
 <p><strong>SDP_BRAM_XILINX</strong> - Structural implementation of dual clock BRAM memory based on Xilinx specific primitives with one read port and one write port. Only for Xilinx FPGAs.</p>

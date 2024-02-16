@@ -56,8 +56,7 @@ The MFB bus transfers the packet data, which may contain a user header before th
 Bit range Item name  Item description
 ========= ========== ===========================================
 0  to 7   HDR_LEN    The size of the user header in bytes. HDR_LEN=0 means that the user header is not present in the packet.
-8  to 10  HDR_ID     DRAFT ONLY: A 3-bit identification of the type/format of the user header, the definition of each HDR_ID value is application-specific.
-11 to 11  nETH       DRAFT ONLY: Value 0: the packet contains an Ethernet frame without the CRC; Value 1: it is an application-specific packet.
+8  to 11  HDR_ID     A 4-bit identification of the type/format of the user header, the definition of each HDR_ID value is application-specific. HDR_ID is referred to as "Packet specific flags" in the `NDP API <https://cesnet.github.io/ndk-sw/libnfb-api-ndp.html>`_.
 ========= ========== ===========================================
 
 Transmitting packets to the DMA module

@@ -84,18 +84,77 @@ The NDK-based Minimal application also contains :ref:`Memory Tester <mem_tester>
 
     See the :ref:`Memory Tester <mem_tester>` module documentation for a more detailed description.
 
-The example of MI offsets
-*************************
+The application MI offsets
+**************************
 
-This example assumes that the Minimal application consists of two subcores and also contains two Memory tester modules.
+In this case, the MI address space for the entire application core is divided between the individual application subcores and the wrapper of the memory testers.
+The whole MI address space is described using DevTree. And its overview can be obtained by reading it from the card using the ``nfb-bus -l`` command.
+For MI offsets of application core see ``/firmware/mi_bus0/application/*`` paths in example output of the command:
 
 .. code-block::
 
-    0x0000000-0x07FFFFF -- APP subcore 0 (registers of DMA channel distribution + reserved space)
-    0x0800000-0x0FFFFFF -- APP subcore 1 (registers of DMA channel distribution + reserved space)
-    0x1000000-0x17FFFFF -- Memory Tester 0
-    0x1800000-0x1FFFFFF -- Memory Tester 1
-
-.. note::
-
-    The final MI address is obtained by summing the base address and the offset. If the base address of the application core is ``0x02000000``, then the final address of APP subcore 1 will be ``0x02000000 + 0x0800000 = 0x02800000``.
+    0x00002000: cesnet,pmci                         /firmware/mi_bus0/ofs_pmci
+    0x00000000: cesnet,ofm,mi_test_space            /firmware/mi_bus0/mi_test_space
+    0x00004000: netcope,tsu                         /firmware/mi_bus0/tsu
+    0x01000000: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx0
+    0x01000080: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx1
+    0x01000100: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx2
+    0x01000180: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx3
+    0x01000200: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx4
+    0x01000280: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx5
+    0x01000300: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx6
+    0x01000380: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx7
+    0x01000400: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx8
+    0x01000480: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx9
+    0x01000500: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx10
+    0x01000580: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx11
+    0x01000600: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx12
+    0x01000680: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx13
+    0x01000700: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx14
+    0x01000780: netcope,dma_ctrl_ndp_rx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_rx15
+    0x01200000: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx0
+    0x01200080: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx1
+    0x01200100: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx2
+    0x01200180: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx3
+    0x01200200: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx4
+    0x01200280: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx5
+    0x01200300: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx6
+    0x01200380: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx7
+    0x01200400: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx8
+    0x01200480: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx9
+    0x01200500: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx10
+    0x01200580: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx11
+    0x01200600: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx12
+    0x01200680: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx13
+    0x01200700: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx14
+    0x01200780: netcope,dma_ctrl_ndp_tx             /firmware/mi_bus0/dma_module@0x01000000/dma_ctrl_ndp_tx15
+    0x00003010: netcope,i2c                         /firmware/mi_bus0/i2c0
+    0x0000301c:                                     /firmware/mi_bus0/pmdctrl0
+    0x00003110: netcope,i2c                         /firmware/mi_bus0/i2c1
+    0x0000311c:                                     /firmware/mi_bus0/pmdctrl1
+    0x00800000: netcope,pcsregs                     /firmware/mi_bus0/regarr0
+    0x00008000: netcope,txmac                       /firmware/mi_bus0/txmac0
+    0x00008200: netcope,rxmac                       /firmware/mi_bus0/rxmac0
+    0x00a00000: netcope,pcsregs                     /firmware/mi_bus0/regarr1
+    0x0000a000: netcope,txmac                       /firmware/mi_bus0/txmac1
+    0x0000a200: netcope,rxmac                       /firmware/mi_bus0/rxmac1
+    0x00001000: netcope,intel_sdm_controller        /firmware/mi_bus0/intel_sdm_controller
+    0x00010000: cesnet,ofm,intel_jtag_op_ctrl       /firmware/mi_bus0/intel_jtag_op_controller
+    0x02000000: cesnet,minimal,app_core             /firmware/mi_bus0/application/app_core_minimal_0
+    0x02000000: cesnet,ofm,mvb_channel_router       /firmware/mi_bus0/application/app_core_minimal_0/rx_chan_router
+    0x02800000: cesnet,minimal,app_core             /firmware/mi_bus0/application/app_core_minimal_1
+    0x02800000: cesnet,ofm,mvb_channel_router       /firmware/mi_bus0/application/app_core_minimal_1/rx_chan_router
+    0x03000000: netcope,mem_tester                  /firmware/mi_bus0/application/mem_tester_0
+    0x03020000: netcope,mem_tester                  /firmware/mi_bus0/application/mem_tester_1
+    0x03040000: netcope,mem_tester                  /firmware/mi_bus0/application/mem_tester_2
+    0x03060000: netcope,mem_tester                  /firmware/mi_bus0/application/mem_tester_3
+    0x03080000: netcope,mem_logger                  /firmware/mi_bus0/application/mem_logger_0
+    0x030a0000: netcope,mem_logger                  /firmware/mi_bus0/application/mem_logger_1
+    0x030c0000: netcope,mem_logger                  /firmware/mi_bus0/application/mem_logger_2
+    0x030e0000: netcope,mem_logger                  /firmware/mi_bus0/application/mem_logger_3
+    0x00005000: cesnet,ofm,gen_loop_switch          /firmware/mi_bus0/dbg_gls0
+    0x00005080: cesnet,ofm,mfb_generator            /firmware/mi_bus0/dbg_gls0/mfb_gen2dma
+    0x000050c0: cesnet,ofm,mfb_generator            /firmware/mi_bus0/dbg_gls0/mfb_gen2eth
+    0x00005200: cesnet,ofm,gen_loop_switch          /firmware/mi_bus0/dbg_gls1
+    0x00005280: cesnet,ofm,mfb_generator            /firmware/mi_bus0/dbg_gls1/mfb_gen2dma
+    0x000052c0: cesnet,ofm,mfb_generator            /firmware/mi_bus0/dbg_gls1/mfb_gen2eth

@@ -34,20 +34,24 @@ The NDK-based Minimal application is a simple example of how to build an FPGA ap
     ndk_core/doc/testing
     ofm_doc/build/readme
     ndk_core/doc/devtree
+    ndk_core/doc/faq
 
 .. toctree::
     :maxdepth: 2
     :caption: Supported cards:
     :hidden:
 
-    ndk_cards/agi-fh400g/readme
-    ndk_cards/dk-dev-1sdx-p/readme
-    ndk_cards/dk-dev-agi027res/readme
-    ndk_cards/fb4cgg3/readme
-    ndk_cards/fb2cghh/readme
-    ndk_cards/ia-420f/readme
-    ndk_cards/nfb-200g2ql/readme
-    ndk_cards/n6010/readme
+    ndk_cards/reflexces/agi-fh400g/readme
+    ndk_cards/intel/dk-dev-1sdx-p/readme
+    ndk_cards/intel/dk-dev-agi027res/readme
+    ndk_cards/silicom/fb4cgg3/readme
+    ndk_cards/silicom/fb2cghh/readme
+    ndk_cards/silicom/n6010/readme
+    ndk_cards/bittware/ia-420f/readme
+    ndk_cards/amd/alveo-u200/readme
+    ndk_cards/amd/alveo-u55c/readme
+    ndk_cards/amd/vcu118/readme
+    ndk_cards_private/nfb-200g2ql/readme
 
 .. toctree::
     :maxdepth: 2

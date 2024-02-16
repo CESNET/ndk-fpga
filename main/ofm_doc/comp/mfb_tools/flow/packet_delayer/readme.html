@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: af67b2da
+                Git branch: main, <br> Git hash: 07fdd6e3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -55,12 +55,26 @@
 <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul class="current">
@@ -93,10 +107,13 @@
 <li class="toctree-l2"><a class="reference internal" href="../loopback/readme.html">MFB Loopback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_masker/readme.html">MFB Frame Masker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../edit/frame_trimmer/readme.html">MFB FRAME TRIMMER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../edit/frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo_simple/readme.html">MFB PD ASFIFO SIMPLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MFB ASFIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MFB FIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
@@ -141,10 +158,10 @@
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-mfb_packet_delayer">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_PACKET_DELAYER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_packet_delayer" title="Permalink to this definition"></a></dt>
-<dd><p>Incoming packets with Timestamps [ns] are stored in the RX FIFO, from which they are read when the Time Counter value reaches the Timestamp value.
+<dd><p>Incoming packets with Timestamps [ns] are stored in the RX FIFO.
+From there each packet is read when the Stored time value reaches the packet’s Timestamp value.
 There are 2 Timestamp formats that are currently supported (see the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">TS_FORMAT</span></code> generic).
-The packets read from the RX FIFO are stored in the TX FIFO.
-The read logic of the RX FIFO is very simplified and not made for high efficiency and it’s been tested for MFB_REGIONS=1 only.</p>
+The packets read from the RX FIFO are stored in the TX FIFO.</p>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -179,17 +196,12 @@ The read logic of the RX FIFO is very simplified and not made for high efficienc
 <td><p>0</p></td>
 <td><p>Metadata width (in bits).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_packet_delayer-clk_frequency"><td><p>CLK_FREQUENCY</p></td>
-<td><p>natural</p></td>
-<td><p>322265625</p></td>
-<td><p>Freq of the CLK signal (in Hz).</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_packet_delayer-ts_width"><td><p>TS_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_packet_delayer-ts_width"><td><p>TS_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>48</p></td>
 <td><p>Width of Timestamps (in bits).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_packet_delayer-ts_format"><td><p>TS_FORMAT</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_packet_delayer-ts_format"><td><p>TS_FORMAT</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Format of Timestamps. Options:</p>
@@ -199,18 +211,18 @@ The read logic of the RX FIFO is very simplified and not made for high efficienc
 </ul>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_packet_delayer-autoreset_timeout"><td><p>AUTORESET_TIMEOUT</p></td>
-<td><p>natural</p></td>
-<td><p>1000000</p></td>
-<td><p>Number of NS(?) in IDLE state until scheduling an autoreset.
-Autoreset (Only for TS_FORMAT=1?) will reset accumulated time from the prev RESET with the next SOF.</p></td>
-</tr>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_packet_delayer-fifo_depth"><td><p>FIFO_DEPTH</p></td>
 <td><p>natural</p></td>
 <td><p>2048</p></td>
-<td><p>Number of Items in the Input packet FIFOX_MULTI (main buffer).</p></td>
+<td><p>Number of Items in the Input MFB_FIFOX (main buffer).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_packet_delayer-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_packet_delayer-fifo_af_offset"><td><p>FIFO_AF_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>10</p></td>
+<td><p>Almost Full Offset of the input MFB_FIFOX.
+States the number of Items it can accept after Almost Full is asserted.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_packet_delayer-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
@@ -241,97 +253,115 @@ Autoreset (Only for TS_FORMAT=1?) will reset accumulated time from the prev RESE
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-time_reset"><td><p>TIME_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Reset time accumulation (applies only when TS_FORMAT=1).
+Time counter is reset with the next first SOF.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-current_time"><td><p>CURRENT_TIME</p></td>
+<td><p>std_logic_vector(64-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>A 64-bit value representing Time, which is used to decide whether a packet’s Timestamp is OK and can be transmitted or not.
+It can be a precise time from the TSU, a value from a simple incrementing counter, or anything in between.
+The quality of the time source affects the precision of the packet’s transmission but not the component’s functionality.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-pause_request"><td><p>PAUSE_REQUEST</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Used to pause incomming traffic when the buffer is Almost Full.</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>RX inf</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_ts"><td><p>RX_MFB_TS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_ts"><td><p>RX_MFB_TS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*TS_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Timestamp valid with each SOF.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>TX inf</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_packet_delayer-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
