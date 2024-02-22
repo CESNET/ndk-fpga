@@ -6,10 +6,11 @@
 
 
 CARD = fb2cghh
+SIM = cocotb
 
 CARD_DIR=../../build/$(CARD)/
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 all:
-	make TARGET=cocotb -C $(CARD_DIR) PYTHONPATH=$$PYTHONPATH:$(ROOT_DIR)
+	make TARGET=$(SIM) -C $(CARD_DIR) PYTHONPATH=$$PYTHONPATH:$(ROOT_DIR) TOP_LEVEL_ENT=fpga
