@@ -31,6 +31,7 @@ def COMPONENTS_MULTIVER = [\
     ['DMA_TRANS_ACCU'    ,'ndk/modules/ndk-mod-dma-medusa/rx/comp/dma_endpoint/comp/trans_accu/ver'   ,'top_level.fdo'             ,'tbench/test_pkg.sv'   ,'ver_settings.py'],\
     ['PCIE_ADAPTERS'     ,'ndk/core/intel/src/comp/pcie/comp/pcie_adapter/uvm'                        ,'top_level.fdo'             ,'tbench/tests/pkg.sv'  ,'ver_settings.py'],\
     ['PCIE_TOP'          ,'ndk/core/intel/src/comp/pcie/uvm'                                          ,'top_level.fdo'             ,'tbench/tests/pkg.sv'  ,'ver_settings.py'],\
+    ['NETWORK_MOD'       ,'ndk/core/intel/src/comp/network_mod/uvm'                                   ,'top_level.fdo'             ,'tbench/pkg.sv'        ,'ver_settings.py'],\
 ]
  /////////////////////////////////////////////////////////////////////////////
 
