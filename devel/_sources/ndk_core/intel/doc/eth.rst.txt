@@ -180,14 +180,13 @@ Network Module Core
 
 The so-called Network Module Core is a subcomponent of the Network Module.
 It contains the required hard IP(s), appropriate adapters, and an MI component for reconfiguring the hard IP(s).
-Right now, the Network Module can use three different Ethernet hard IPs, for Intel FPGA, it is the E-tile or the F-Tile, and for the Xilinx FPGA, it is the CMAC.
-For the F-Tile, there are two variants of IP core: it is F-Tile and F-Tile_Multirate, which support different speeds for implemented IP.
-For the F-Tile_Multirate reconfiguration, use Dynamic Reconfiguration Controller.
+Right now, the Network Module can use three different Ethernet hard IPs: for Intel FPGA, it is the E-Tile or the F-Tile, and for the Xilinx FPGA, it is the CMAC.
+For the F-Tile, there are two IP core variants: F-Tile and F-Tile_Multirate.
+The F-Tile and F-Tile_Multirate contain an additional subcomponent system, which makes it more readable.
 According to the selected NIC (and therefore the type of hard IP), one of the four architectures of the Network Module Core (with the proper hard IP) is used.
-The hard IP is connected directly to the FPGA's serial QSFP pins (left side of the diagram).
+The hard IP is connected directly to the FPGA’s serial QSFP pins (left side of the diagram).
 On the right side, it is connected to the Network Module Logic.
-All four architectures of the Network Module Core are displayed below.
-
+The three basic architectures of the Network Module Core are displayed below.
 
 .. list-table::
 
@@ -197,26 +196,32 @@ All four architectures of the Network Module Core are displayed below.
       - .. image:: img/ftile_network_module_core.svg
             :align: center
             :width: 100 %
-    * - .. image:: img/ftile_multirate_network_module_core.svg
-            :align: center
-            :width: 100 %
-      - .. image:: img/cmac_network_module_core.svg
-            :align: center
-            :width: 100 %
+.. image:: img/cmac_network_module_core.svg
+    :align: center
+    :width: 40 %
 
-All four architectures contain the same parts in slightly different forms.
-The first three architectures are for Intel FPGAs (due to the instantiated hard IPs).
-The E-Tile hard IP core is always just one instance, no matter the number of Ethernet channels or their speed.
-That means that the instantiated hard IP always has four QSFP interfaces and four XCVR reconfiguration interfaces.
-
-The F-Tile hard IP core is instantiated once per each Ethernet channel. The same goes for the F-Tile_Multirate, but it also contains a single Dynamic Reconfiguration Controller, which is used to reconfigurate the IP's parameters such as speed, type of FEC, etc.
-The QSFP interfaces (as well as the XCVR reconfiguration interfaces) are distributed evenly among the hard IPs.
+The F-Tile hard IP core is instantiated once per each subcomponent.
+Each Ethernet channel has just one generated subcomponent, and it contains parts such as "MGMT, drp_bridge, MAC_Loopback".
+The same goes for the F-Tile_Multirate, but it also contains just one Dynamic Reconfiguration Controller (DRC), which is instantiated in the first subcomponents.
+Subcomponents that do not contain the DRC are connected to the DRC located in the first subcomponent through intel AVMM Interface (this connection is made by constraints in "multirate.qsf").
+Use DRC to reconfigure the IP's parameters such as speed, type of FEC, etc.
+The QSFP interfaces (as well as the XCVR reconfiguration interfaces) are split among the subcomponents evenly.
 There are eight interfaces altogether, so each hard IP has 8/number_of_channels interfaces.
 For more information about the F-Tile Multirate, use :ref:`F-Tile_Multirate <ndk_f-tile_multirate>`.
 
-The CMAC architecture contains the Xilinx CMAC hard IP.
-Same as E-Tile, it has just one instance of the hard IP with four QSFP interfaces and four DRP reconfiguration interfaces.
-However, the CMAC is instantiated only in one variant: with one 100 GE channel.
+.. list-table::
+
+    * - .. image:: img/ftile_submodule_nmc.svg
+            :align: center
+            :width: 90 %
+      - .. image:: img/ftile_multirate_submodule_nmc.svg
+            :align: center
+            :width: 100 %
+
+The E-Tile hard IP core is always just one instance, no matter the number of Ethernet channels or their speed, it is the same with CMAC.
+That means that the instantiated hard IP always has four QSFP interfaces and four XCVR reconfiguration interfaces.
+
+CMAC have same architecture as E-Tile, however, the CMAC is instantiated only in one variant: with one 100 GE channel.
 
 On the left side of the hard IP(s) is a pair of adapters for each channel.
 The adapters convert the hard IP’s client interface to the MFB interface. E-tile’s client interface is the Avalon Streaming (AVST) interface.

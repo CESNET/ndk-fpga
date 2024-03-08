@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 67a010f2
+                Git branch: devel, <br> Git hash: b8c2e117
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -740,7 +740,8 @@ and requires that the first transaction in a word starts at byte 0.</p></td>
 <tr class="row-even"><td><p>=====</p></td>
 <td><p>MI32 interfaces (MI_CLK)</p></td>
 <td><p>=====</p></td>
-<td><p>Root of the MI32 bus tree for each PCIe endpoint</p></td>
+<td><p>MI - Root of the MI32 bus tree for each PCIe endpoint (connection to the MTC)
+MI_DBG - MI interface to PCIe registers (currently only debug registers)</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie-mi_clk"><td><p>MI_CLK</p></td>
 <td><p>std_logic</p></td>
@@ -753,17 +754,17 @@ and requires that the first transaction in a word starts at byte 0.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie-mi_dwr"><td><p>MI_DWR</p></td>
-<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(32-1 downto 0)</p></td>
+<td><p>slv_array_t     (PCIE_ENDPOINTS-1 downto 0)(32-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie-mi_addr"><td><p>MI_ADDR</p></td>
-<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(32-1 downto 0)</p></td>
+<td><p>slv_array_t     (PCIE_ENDPOINTS-1 downto 0)(32-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie-mi_be"><td><p>MI_BE</p></td>
-<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(32/8-1 downto 0)</p></td>
+<td><p>slv_array_t     (PCIE_ENDPOINTS-1 downto 0)(32/8-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
@@ -778,7 +779,7 @@ and requires that the first transaction in a word starts at byte 0.</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie-mi_drd"><td><p>MI_DRD</p></td>
-<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(32-1 downto 0)</p></td>
+<td><p>slv_array_t     (PCIE_ENDPOINTS-1 downto 0)(32-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -790,6 +791,46 @@ and requires that the first transaction in a word starts at byte 0.</p></td>
 <tr class="row-even" id="vhdl-portsignal-pcie-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
 <td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_dbg_dwr"><td><p>MI_DBG_DWR</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_dbg_addr"><td><p>MI_DBG_ADDR</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_dbg_be"><td><p>MI_DBG_BE</p></td>
+<td><p>std_logic_vector(32/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_dbg_rd"><td><p>MI_DBG_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_dbg_wr"><td><p>MI_DBG_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_dbg_drd"><td><p>MI_DBG_DRD</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_dbg_ardy"><td><p>MI_DBG_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_dbg_drdy"><td><p>MI_DBG_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
 <td></td>
 </tr>
 </tbody>
