@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: b8c2e117
+                Git branch: devel, <br> Git hash: c2c52064
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -169,24 +169,34 @@ without waiting for response.</p>
 <td><p>64</p></td>
 <td><p>One MVB item width</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_operation-rsp_item_width"><td><p>RSP_ITEM_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_operation-consume_item_width"><td><p>CONSUME_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>0</p></td>
+<td><p>Width of consumable item. When one needs to transmit some data to TX_OP interface
+and they are not needed later, some resources in latency FIFO will be saved by sending</p>
+<blockquote>
+<div><p>it as consumable item.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_operation-rsp_item_width"><td><p>RSP_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>24</p></td>
 <td><p>Operation response MVB item width</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_operation-latency_fifo_en"><td><p>LATENCY_FIFO_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_operation-latency_fifo_en"><td><p>LATENCY_FIFO_EN</p></td>
 <td><p>boolean</p></td>
-<td><p>False</p></td>
+<td><p>false</p></td>
 <td><p>When set to true, FIFOX will be instantiated to cover
 latency of operation</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_operation-latency_fifo_depth"><td><p>LATENCY_FIFO_DEPTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_operation-latency_fifo_depth"><td><p>LATENCY_FIFO_DEPTH</p></td>
 <td><p>natural</p></td>
 <td><p>16</p></td>
 <td><p>Latency FIFO depth, set to, or greater than latency of operation
 (eg. when operation is reading from BRAM with output register, set it to &gt; 1)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_operation-latency_fifo_ram_type"><td><p>LATENCY_FIFO_RAM_TYPE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_operation-latency_fifo_ram_type"><td><p>LATENCY_FIFO_RAM_TYPE</p></td>
 <td><p>string</p></td>
 <td><p>“AUTO”</p></td>
 <td><p>Latency FIFO ram type. Options:</p>
@@ -199,6 +209,11 @@ and FIFO_WIDTH &gt;= 72 (URAM is only for Xilinx Ultrascale(+))</p></li>
 <li><p>“AUTO”  - effective implementation dependent on ITEMS and DEVICE</p></li>
 </ul>
 </td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_operation-rx_op_pipe_en"><td><p>RX_OP_PIPE_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Enables pipe on RX_OP_RESPONSE interface</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mvb_operation-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
@@ -243,33 +258,43 @@ and FIFO_WIDTH &gt;= 72 (URAM is only for Xilinx Ultrascale(+))</p></li>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_operation-rx_op_en"><td><p>RX_OP_EN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_operation-rx_data_consume"><td><p>RX_DATA_CONSUME</p></td>
+<td><p>std_logic_vector(MVB_ITEMS * CONSUME_ITEM_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Data which will be consumed by operation. They are not transmitted to TX interface</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_operation-rx_op_en"><td><p>RX_OP_EN</p></td>
 <td><p>std_logic_vector(MVB_ITEMS - 1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Operation enable for each MVB item</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_operation-rx_vld"><td><p>RX_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_operation-rx_vld"><td><p>RX_VLD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS - 1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_operation-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_operation-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_operation-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_operation-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>TX Operation Interface</p></td>
 <td><p>=====</p></td>
 <td><p>Interface to unit executing the operation.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_operation-tx_op_data"><td><p>TX_OP_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_operation-tx_op_data"><td><p>TX_OP_DATA</p></td>
 <td><p>std_logic_vector(MVB_ITEMS * ITEM_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_operation-tx_op_data_consume"><td><p>TX_OP_DATA_CONSUME</p></td>
+<td><p>std_logic_vector(MVB_ITEMS * CONSUME_ITEM_WIDTH - 1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>

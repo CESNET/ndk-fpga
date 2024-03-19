@@ -45,6 +45,8 @@ There is also a variant with an enable signal and a variant with a reverse codin
 
 **GEN_NOR** - Behavioral implementation of generic NOR. With some optimalizations for Xilinx FPGAs (use of fast carry chain wires).
 
+**H3_HASH** - Implementation of universal H3 class hash function. Documentation can be found here :ref:`here <h3_hash>`.
+
 **LAST_ONE** - Behavioral implementation of generic detector of last one in input vector. Output vector one-hot encoded.
 
 **LFSR_SIMPLE_RANDOM_GEN** - Simple LFSR pseudo-random generator uses Fibonacci implementation of LFSR with XNOR gate.
@@ -94,6 +96,7 @@ Tries to use as simple adders as the set latency allows. It has a valid bit for 
    comp/base/logic/sr_sync_latch/readme
    comp/base/logic/barrel_shifter/readme
    comp/base/logic/cnt_multi_memx/readme
+   comp/base/logic/h3hash/readme
 ..  comp/base/logic/<something>
 ..  Add more references here...
 

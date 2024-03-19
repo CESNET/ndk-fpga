@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Barrel Shifter &mdash; Minimal NDK Application Docs  documentation</title>
+  <title>H3 Class Hash &mdash; Minimal NDK Application Docs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
 
@@ -22,8 +22,8 @@
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
-    <link rel="next" title="Multi MEMx Counter" href="../cnt_multi_memx/readme.html" />
-    <link rel="prev" title="Synchronous SR latch" href="../sr_sync_latch/readme.html" /> 
+    <link rel="next" title="Miscellaneous" href="../../../../misc.html" />
+    <link rel="prev" title="Multi MEMx Counter" href="../cnt_multi_memx/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -87,9 +87,9 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../logic.html">Basic logic elements</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../n_loop_op/readme.html">N_LOOP_OP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../sr_sync_latch/readme.html">Synchronous SR latch</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Barrel Shifter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../barrel_shifter/readme.html">Barrel Shifter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cnt_multi_memx/readme.html">Multi MEMx Counter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../h3hash/readme.html">H3 Class Hash</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">H3 Class Hash</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../misc.html">Miscellaneous</a></li>
@@ -121,9 +121,9 @@
       <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../../base.html">Basic Tools</a></li>
           <li class="breadcrumb-item"><a href="../../../../logic.html">Basic logic elements</a></li>
-      <li class="breadcrumb-item active">Barrel Shifter</li>
+      <li class="breadcrumb-item active">H3 Class Hash</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../../../_sources/ofm_doc/comp/base/logic/barrel_shifter/readme.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../../_sources/ofm_doc/comp/base/logic/h3hash/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -131,13 +131,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="barrel-shifter">
-<span id="id1"></span><h1>Barrel Shifter<a class="headerlink" href="#barrel-shifter" title="Permalink to this heading"></a></h1>
+  <section id="h3-class-hash">
+<span id="h3-hash"></span><h1>H3 Class Hash<a class="headerlink" href="#h3-class-hash" title="Permalink to this heading"></a></h1>
 <dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-barrel_shifter_gen">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">BARREL_SHIFTER_GEN</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-barrel_shifter_gen" title="Permalink to this definition"></a></dt>
-<dd><p>Generically adjustable barrel shifter where single bits as well as whole blocks can be shifted.
-The direction can also be set.</p>
+<dt class="sig sig-object vhdl" id="vhdl-entity-h3_hash">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">H3_HASH</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-h3_hash" title="Permalink to this definition"></a></dt>
+<dd><p>Component for computing any hash function from universal H3 class. Universal hash functions
+have some interesting properties, for reference, check out this paper:
+<a class="reference external" href="https://www.cs.princeton.edu/courses/archive/fall09/cos521/Handouts/universalclasses.pdf">https://www.cs.princeton.edu/courses/archive/fall09/cos521/Handouts/universalclasses.pdf</a>.
+This component has default latency of 0 clock cycles, for larger inputs and outputs
+one can enable one pipeline stage and output register.</p>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -147,20 +150,42 @@ The direction can also be set.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-gengeneric-barrel_shifter_gen-blocks"><td><p>BLOCKS</p></td>
-<td><p>integer</p></td>
+<tr class="row-even" id="vhdl-gengeneric-h3_hash-data_width"><td><p>DATA_WIDTH</p></td>
+<td><p>natural</p></td>
 <td><p>256</p></td>
-<td><p>input/output data width in BLOCKs</p></td>
+<td><p>Width of data, which will be hashed, currently supporting
+<cite>DATA_WIDTH</cite> &lt;= 256</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-barrel_shifter_gen-block_size"><td><p>BLOCK_SIZE</p></td>
-<td><p>integer</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-h3_hash-hash_width"><td><p>HASH_WIDTH</p></td>
+<td><p>natural</p></td>
 <td><p>64</p></td>
-<td><p>size of one block in bits</p></td>
+<td><p>Resulting hash width, currently supporting <cite>HASH_WIDTH</cite> &lt;= 64</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-barrel_shifter_gen-shift_left"><td><p>SHIFT_LEFT</p></td>
+<tr class="row-even" id="vhdl-gengeneric-h3_hash-h3_type"><td><p>H3_TYPE</p></td>
+<td><p>string</p></td>
+<td><p>“AUTO”</p></td>
+<td><p>Type of hash core, which will be used. Those are precomputed and stored in h3_pack.vhd.
+Names are defined like this: H3C_(input_width)x(output_width).
+Available values are:</p>
+<ul class="simple">
+<li><p>“H3C_64x16”</p></li>
+<li><p>“H3C_64x22”</p></li>
+<li><p>“H3C_22x11”</p></li>
+<li><p>“H3C_256x64”</p></li>
+<li><p>“AUTO” - hash core will be selected automatically</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-h3_hash-pipeline"><td><p>PIPELINE</p></td>
 <td><p>boolean</p></td>
-<td><p>false</p></td>
-<td><p>set true to shift left, false to shift right</p></td>
+<td><p>true</p></td>
+<td><p>One pipeline stage will be inserted into H3 hash function,
+adding latency of 1 clock cycle.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-h3_hash-out_reg"><td><p>OUT_REG</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Add output register.</p></td>
 </tr>
 </tbody>
 </table>
@@ -173,135 +198,42 @@ The direction can also be set.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-barrel_shifter_gen-data_in"><td><p>DATA_IN</p></td>
-<td><p>std_logic_vector(BLOCKS*BLOCK_SIZE-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-barrel_shifter_gen-data_out"><td><p>DATA_OUT</p></td>
-<td><p>std_logic_vector(BLOCKS*BLOCK_SIZE-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-barrel_shifter_gen-sel"><td><p>SEL</p></td>
-<td><p>std_logic_vector(log2(BLOCKS)-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-barrel_shifter_gen_piped">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">BARREL_SHIFTER_GEN_PIPED</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-barrel_shifter_gen_piped" title="Permalink to this definition"></a></dt>
-<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Generic</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Default</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even" id="vhdl-gengeneric-barrel_shifter_gen_piped-blocks"><td><p>BLOCKS</p></td>
-<td><p>integer</p></td>
-<td><p>256</p></td>
-<td><p>input/output data width in BLOCKs</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-barrel_shifter_gen_piped-block_width"><td><p>BLOCK_WIDTH</p></td>
-<td><p>integer</p></td>
-<td><p>64</p></td>
-<td><p>width of one block in bits</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-barrel_shifter_gen_piped-bar_shift_latency"><td><p>BAR_SHIFT_LATENCY</p></td>
-<td><p>integer</p></td>
-<td><p>0</p></td>
-<td><p>barrel shifting latency</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-barrel_shifter_gen_piped-input_reg"><td><p>INPUT_REG</p></td>
-<td><p>boolean</p></td>
-<td><p>false</p></td>
-<td><p>input register enable (adds additional 1 CLK latency)</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-barrel_shifter_gen_piped-output_reg"><td><p>OUTPUT_REG</p></td>
-<td><p>boolean</p></td>
-<td><p>false</p></td>
-<td><p>output register enable (adds additional 1 CLK latency)</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-barrel_shifter_gen_piped-shift_left"><td><p>SHIFT_LEFT</p></td>
-<td><p>boolean</p></td>
-<td><p>false</p></td>
-<td><p>set true to shift left, false to shift right</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-barrel_shifter_gen_piped-metadata_width"><td><p>METADATA_WIDTH</p></td>
-<td><p>integer</p></td>
-<td><p>0</p></td>
-<td><p>Metadata can be useful when you want to send additional info to the TX side
-along with the rotated value. (for example the value of the RX_SEL signal)</p></td>
-</tr>
-</tbody>
-</table>
-<span class="sig-name descname">Ports</span><table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Port</p></th>
-<th class="head"><p>Type</p></th>
-<th class="head"><p>Mode</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even" id="vhdl-portsignal-barrel_shifter_gen_piped-clk"><td><p>CLK</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td><p>unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-barrel_shifter_gen_piped-reset"><td><p>RESET</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td><p>unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-barrel_shifter_gen_piped-rx_data"><td><p>RX_DATA</p></td>
-<td><p>std_logic_vector(BLOCK_WIDTH*BLOCKS-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-barrel_shifter_gen_piped-rx_sel"><td><p>RX_SEL</p></td>
-<td><p>std_logic_vector(log2(BLOCKS)-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-barrel_shifter_gen_piped-rx_metadata"><td><p>RX_METADATA</p></td>
-<td><p>std_logic_vector(METADATA_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-barrel_shifter_gen_piped-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-h3_hash-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-barrel_shifter_gen_piped-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-h3_hash-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-h3_hash-data_in"><td><p>DATA_IN</p></td>
+<td><p>std_logic_vector(DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Input data</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-h3_hash-data_in_vld"><td><p>DATA_IN_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-h3_hash-data_in_rdy"><td><p>DATA_IN_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-barrel_shifter_gen_piped-tx_data"><td><p>TX_DATA</p></td>
-<td><p>std_logic_vector(BLOCK_WIDTH*BLOCKS-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-h3_hash-data_out"><td><p>DATA_OUT</p></td>
+<td><p>std_logic_vector(HASH_WIDTH - 1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Output hash</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-barrel_shifter_gen_piped-tx_metadata"><td><p>TX_METADATA</p></td>
-<td><p>std_logic_vector(METADATA_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-barrel_shifter_gen_piped-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-h3_hash-data_out_vld"><td><p>DATA_OUT_VLD</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-barrel_shifter_gen_piped-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-h3_hash-data_out_rdy"><td><p>DATA_OUT_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
@@ -316,8 +248,8 @@ along with the rotated value. (for example the value of the RX_SEL signal)</p></
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../sr_sync_latch/readme.html" class="btn btn-neutral float-left" title="Synchronous SR latch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../cnt_multi_memx/readme.html" class="btn btn-neutral float-right" title="Multi MEMx Counter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../cnt_multi_memx/readme.html" class="btn btn-neutral float-left" title="Multi MEMx Counter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../../misc.html" class="btn btn-neutral float-right" title="Miscellaneous" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
