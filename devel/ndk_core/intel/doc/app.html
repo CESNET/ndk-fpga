@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c2c52064
+                Git branch: devel, <br> Git hash: a1d820af
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -568,6 +568,16 @@ The minimum allowed length of the packet data is 60B, if necessary, the applicat
 <td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>reset input synchronized with CLK_USER_X4</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-clk_eth"><td><p>CLK_ETH</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>clock input with ethernet core frequency for each ETH stream</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-reset_eth"><td><p>RESET_ETH</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>reset input synchronized with CLK_ETH for each ETH stream</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
 <td><p>CLOCK AND RESET OUTPUTS (DEFINED BY APPLICATION)</p></td>
