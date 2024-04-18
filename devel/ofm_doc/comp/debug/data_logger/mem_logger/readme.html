@@ -38,7 +38,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: a1d820af
+                Git branch: devel, <br> Git hash: 55cf8ddf
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -190,7 +190,7 @@ Example usage can be found in <a class="reference internal" href="../../mem_test
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mem_logger-mem_freq_khz"><td><p>MEM_FREQ_KHZ</p></td>
 <td><p>integer</p></td>
-<td><p>266660</p></td>
+<td><p>300000</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mem_logger-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
@@ -210,17 +210,22 @@ Example usage can be found in <a class="reference internal" href="../../mem_test
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mem_logger-max_paralel_reads"><td><p>MAX_PARALEL_READS</p></td>
 <td><p>integer</p></td>
-<td><p>64</p></td>
+<td><p>128</p></td>
 <td><p>Specify maximum paraller read requests</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mem_logger-latency_ticks_width"><td><p>LATENCY_TICKS_WIDTH</p></td>
 <td><p>integer</p></td>
-<td><p>11</p></td>
+<td><p>12</p></td>
 <td><p>Specify read latency ticks count width</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mem_logger-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mem_logger-mem_async"><td><p>MEM_ASYNC</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mem_logger-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
-<td><p>“ULTRASCALE”</p></td>
+<td><p>“AGILEX”</p></td>
 <td></td>
 </tr>
 </tbody>
@@ -242,17 +247,27 @@ Example usage can be found in <a class="reference internal" href="../../mem_test
 <tr class="row-odd" id="vhdl-portsignal-mem_logger-rst"><td><p>RST</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Synchronous to CLK</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mem_logger-rst_done"><td><p>RST_DONE</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Synchronous to CLK</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
 <td><p>Memory interface</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mem_logger-mem_clk"><td><p>MEM_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mem_logger-mem_rst"><td><p>MEM_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mem_logger-mem_ready"><td><p>MEM_READY</p></td>
 <td><p>std_logic</p></td>
