@@ -35,13 +35,13 @@ Verification Plan
 TODO:
 
 
-Coverage Mesure
----------------
+Coverage Measure
+----------------
 
-There is five test in Multiver script.
+There are five tests in the Multiver script.
 
 .. list-table:: test configuration
-   :widths: 50 50 50 50 50 50 50
+   :widths: 50 50 50 50 50 50
    :header-rows: 1
 
    * - conf name
@@ -51,35 +51,35 @@ There is five test in Multiver script.
      - PCIE LEN (MIN, MAX)
      - channels num
 
-  * - default
+   * - default
      - 1(~40Gb/s)
      - 2^11-1
      - 14-bit, 11-bit
      - 1.256
      - 2
 
-  *  - 4_channels
+   * - 4_channels
      - 1(~40Gb/s)
      - 2^11-1
      - 14-bit, 11-bit
      - 1.256
      - 4
 
-  *  - 8_channels, min_pcie_frames 
+   * - 8_channels, min_pcie_frames 
      - 1(~40Gb/s)
      - 2^11-1
      - 14-bit, 11-bit
      - 1.32
      - 8
 
-  *  - buff_size_small
+   * - buff_size_small
      - 1(~40Gb/s)
      - 2^11-1
      - 13-bit, 10-bit
      - 1.256
      - 2
 
-  *  - buff_size_large 
+   * - buff_size_large 
      - 1(~40Gb/s)
      - 2^11-1
      - 16-bit, 13-bit
@@ -122,7 +122,7 @@ There is five test in Multiver script.
      - 755337%
 
 
-Delay is mesure only for full spead test. Which allweys accept output from DUT. Delay represents how many nanoseconds take to go through DMA Calypte.
+Delay is mesured only for the full spead test. This test allways accepts output from DUT (never drops DST RDY). The delay represents how many nanoseconds it takes for a packet to pass through the DMA Calypte.
 
 .. list-table:: delay
    :widths: 50 50 50 50 50

@@ -58,10 +58,11 @@ Switching profiles
 ------------------
 
 Python script named ``profile_swap.py`` was made for swapping profiles.
+It is located in the ``ndk-core/intel/src/comp/network_mod/sw/`` directory.
 There are five parameters, which have to be set to change the speed or type of FEC. These parameters are:
 
 - ``-s_ch`` Start_channel - represents which first IP from the range of IPs that you want to change the position of. The first IP is ``0``.
-- ``-ch``   Channels - indicates the range from the _start channel_ that you want to change. There is a treatment in case of a non-valid range choice.
+- ``-ch``   Channels - indicates the number of channels from the `start_channel` that you want to change. There is a treatment in case of a non-valid range choice.
 - ``-s_p``  Start_profile - this parameter needs to be set to the profile, which was applied as the last default profile after the build is ``1``.
 - ``-e_p``  End_profile - indicates a profile to which you want to change the IP core. :ref:`Tab. 1 <Tab. 1 F-Tile_Multirate IPs variants>` lists possible variants.
 - ``-sp``   Speed - represents the speed of the implemented IP core, the values of speeds that you can use are shown in the _help_ also in the script.
