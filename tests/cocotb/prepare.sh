@@ -13,7 +13,7 @@ PKG_COCOTBEXT_OFM=$OFM_PATH/python/cocotbext/
 python -m venv venv-cocotb
 source venv-cocotb/bin/activate
 
-python -m pip install cython wheel
+python -m pip install cython wheel setuptools
 python -m pip install pylibfdt fdt
 python -m pip install $PKG_PYNFB 
 python -m pip install $PKG_LIBNFBEXT_PYTHON 
