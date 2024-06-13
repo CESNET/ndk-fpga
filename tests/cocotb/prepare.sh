@@ -15,6 +15,7 @@ source venv-cocotb/bin/activate
 
 python -m pip install cython wheel setuptools
 python -m pip install pylibfdt fdt
+python -m pip install scapy
 python -m pip install $PKG_PYNFB 
 python -m pip install $PKG_LIBNFBEXT_PYTHON 
 python -m pip install $PKG_COCOTBEXT_OFM 
