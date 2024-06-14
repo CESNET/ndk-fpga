@@ -32,8 +32,6 @@ set SIM_FLAGS(UVM_TEST) "test::base"
 #set SIM_FLAGS(UVM_TEST) "test::full_speed"
 #set SIM_FLAGS(UVM_VERBOSITY) "UVM_MEDIUM"
 #set SIM_FLAGS(DEBUG) true
-#set SIM_FLAGS(RAND_SEED) 1305311032
-#set SIM_FLAGS(EXTRA_VFLAGS) "-voptargs=+acc"
 
 # Global include file for compilation
 source "$OFM_PATH/build/Modelsim.inc.fdo"
@@ -47,9 +45,3 @@ config wave -signalnamewidth 1
 #run verification
 nb_sim_run
 
-# Reports
-# Uncomment lines below to generate html coce coverage report
-if {$SIM_FLAGS(CODE_COVERAGE)} {
-    coverage save -instance /testbench/DUT -code bcefst -verbose -testname {*}$TEST_NAME actual.ucdb
-    coverage report -html -output cov_html -instance=/testbench/DUT -source -details -assert -directive -cvg -code bcefst -verbose -threshL 50 -threshH 90
-}
