@@ -46,7 +46,7 @@ module testbench;
     reset_if     reset_user_x2(CLK_USER_X2);
     reset_if     reset_user_x3(CLK_USER_X3);
     reset_if     reset_user_x4(CLK_USER_X4);
-       // OUTPUT INTERFACE
+    // OUTPUT INTERFACE
     reset_if     reset_mi(MI_CLK);
     reset_if     reset_dma_x1(DMA_CLK_X1);
     reset_if     reset_dma_x2(DMA_CLK_X2);
@@ -54,7 +54,7 @@ module testbench;
     reset_if     reset_mem[test_pkg::MEM_PORTS](MEM_CLK);
 
     // ETHERNET I/O INTERFACE
-    mvb_if #(test_pkg::REGIONS,  test_pkg::ETH_RX_HDR_WIDTH)                                                                           eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
+    mvb_if #(test_pkg::REGIONS,  test_pkg::ETH_RX_HDR_WIDTH)                                                                            eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
     mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0)                          eth_rx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
     mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::ETH_TX_HDR_WIDTH) eth_tx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
     // DMA I/O INTERFACE
@@ -108,6 +108,7 @@ module testbench;
     // ETH
     /////////////////////////
     // ETH RX
+    // std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS*test_pkg::ETH_RX_HDR_WIDTH-1:0] eth_rx_mvb_data;
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS-1:0]                            eth_rx_mvb_vld;
     logic [test_pkg::ETH_STREAMS-1:0]                                                eth_rx_mvb_dst_rdy;
@@ -228,17 +229,19 @@ module testbench;
 
 
     APPLICATION_CORE  #(
+        .ETH_MFB_REGIONS   (test_pkg::REGIONS),
+        .ETH_MFB_REG_SIZE  (test_pkg::MFB_REG_SIZE),
         .ETH_CHANNELS      (test_pkg::ETH_CHANNELS),
         .ETH_STREAMS       (test_pkg::ETH_STREAMS),
         .PCIE_ENDPOINTS    (test_pkg::PCIE_ENDPOINTS),
+        .DMA_MFB_REGIONS   (test_pkg::REGIONS),
+        .DMA_MFB_REG_SIZE  (test_pkg::MFB_REG_SIZE),
         .DMA_STREAMS       (test_pkg::DMA_STREAMS),
         .DMA_RX_CHANNELS   (test_pkg::DMA_RX_CHANNELS),
         .DMA_TX_CHANNELS   (test_pkg::DMA_TX_CHANNELS),
         .DMA_HDR_META_WIDTH(test_pkg::DMA_HDR_META_WIDTH),
         .DMA_RX_FRAME_SIZE_MAX (test_pkg::DMA_PKT_MTU),
         .DMA_TX_FRAME_SIZE_MAX (test_pkg::DMA_PKT_MTU),
-        .MFB_REGIONS       (test_pkg::REGIONS),
-        .MFB_REG_SIZE      (test_pkg::MFB_REG_SIZE),
         .MFB_BLOCK_SIZE    (test_pkg::MFB_BLOCK_SIZE),
         .MFB_ITEM_WIDTH    (test_pkg::MFB_ITEM_WIDTH),
         .MEM_PORTS         (test_pkg::MEM_PORTS),
