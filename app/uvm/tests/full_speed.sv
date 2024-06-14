@@ -8,59 +8,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
-class mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-  `uvm_object_param_utils(    test::mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-  `uvm_sequence_library_utils(test::mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-
-    function new(string name = "mfb_rx_speed");
-        super.new(name);
-        init_sequence_library();
-    endfunction
-
-    virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
-        if (param_cfg == null) begin
-            this.cfg = new();
-        end else begin
-            this.cfg = param_cfg;
-        end
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_stop_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-    endfunction
-endclass
-
-class mfb_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uvm_sequence_library#(uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-  `uvm_object_param_utils(    test::mfb_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-  `uvm_sequence_library_utils(test::mfb_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-
-  function new(string name = "");
-    super.new(name);
-    init_sequence_library();
-  endfunction
-
-    // subclass can redefine and change run sequences
-    // can be useful in specific tests
-    virtual function void init_sequence();
-        this.add_sequence(uvm_mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_mfb::sequence_stop_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-    endfunction
-endclass
-
-class mvb_lib_tx#(ITEMS, ITEM_WIDTH) extends uvm_sequence_library#(uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH));
-  `uvm_object_param_utils(    test::mvb_lib_tx#(ITEMS, ITEM_WIDTH))
-  `uvm_sequence_library_utils(test::mvb_lib_tx#(ITEMS, ITEM_WIDTH))
-
-    function new(string name = "");
-        super.new(name);
-        init_sequence_library();
-    endfunction
-
-    // subclass can redefine and change run sequences
-    // can be useful in specific tests
-    virtual function void init_sequence();
-        this.add_sequence(uvm_mvb::sequence_full_speed_tx#(ITEMS, ITEM_WIDTH)::get_type());
-        this.add_sequence(uvm_mvb::sequence_stop_tx#(ITEMS, ITEM_WIDTH)::get_type());
-    endfunction
-endclass
 
 class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
             REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends
@@ -77,16 +24,23 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
             string it_num;
             it_num.itoa(it);
 
-            uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(mfb_rx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
+            uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
              {this.get_full_name(), ".m_env.m_eth_mfb_rx_", it_num ,".*"});
+
+             uvm_logic_vector_mvb::sequence_lib_rx#(REGIONS, ETH_RX_HDR_WIDTH)::type_id::set_inst_override(uvm_logic_vector_mvb::sequence_lib_speed_rx#(REGIONS, ETH_RX_HDR_WIDTH)::get_type(),
+             {this.get_full_name(), ".m_env.m_eth_mvb_rx_", it_num,".*"});
         end
 
         for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
             string it_num;
             it_num.itoa(it);
 
-            uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(mfb_rx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
+            uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
              {this.get_full_name(), ".m_env.m_dma_mfb_rx_", it_num,".*"});
+
+            uvm_logic_vector_mvb::sequence_lib_rx#(REGIONS, DMA_RX_MVB_WIDTH)::type_id::set_inst_override(uvm_logic_vector_mvb::sequence_lib_speed_rx#(REGIONS, DMA_RX_MVB_WIDTH)::get_type(),
+             {this.get_full_name(), ".m_env.m_dma_mvb_rx_", it_num,".*"});
+
             //.mfb_seq
         end
 
@@ -95,7 +49,7 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
-        m_env.delay_max_set(200ns);
+        m_env.delay_max_set(1ms);
     endfunction
 
     static function type_id get_type();
@@ -111,9 +65,9 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
     endfunction
 
     virtual task eth_tx_sequence(uvm_phase phase, int unsigned index);
-        mfb_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq;
+        uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq;
 
-        mfb_seq = mfb_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("mfb_eth_tx_seq", this);
+        mfb_seq = uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("mfb_eth_tx_seq", this);
         mfb_seq.init_sequence();
         mfb_seq.min_random_count = 10;
         mfb_seq.max_random_count = 20;
@@ -136,21 +90,23 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
 
         //SEND PACKETS
         //mfb_seq.set_starting_phase(phase);
-        assert(mfb_seq.randomize());
-        mfb_seq.start(m_eth_agent[index].m_sequencer);
-        event_eth_rx_end[index] = 1'b1;
+        for (int unsigned it = 0; it < 4; it++) begin
+            assert(mfb_seq.randomize());
+            mfb_seq.start(m_eth_agent[index].m_sequencer);
+        end
+        event_eth_rx_end[index] = 1'b0;
     endtask
 
     virtual task dma_tx_sequence(uvm_phase phase, int unsigned index);
-        mfb_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_seq;
-        mvb_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)                                mvb_seq;
+        uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_seq;
+        uvm_mvb::sequence_lib_tx_speed#(REGIONS, DMA_TX_MVB_WIDTH)                                mvb_seq;
 
-        mfb_seq = mfb_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_dma_tx_seq", this);
+        mfb_seq = uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_dma_tx_seq", this);
         mfb_seq.init_sequence();
         mfb_seq.min_random_count = 10;
         mfb_seq.max_random_count = 20;
 
-        mvb_seq = mvb_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("mvb_dma_tx_seq", this);
+        mvb_seq = uvm_mvb::sequence_lib_tx_speed#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("mvb_dma_tx_seq", this);
         mvb_seq.init_sequence();
         mvb_seq.min_random_count = 10;
         mvb_seq.max_random_count = 20;
@@ -180,8 +136,10 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
 
         //SEND PACKETS
         //mfb_seq.set_starting_phase(phase);
-        assert(mfb_seq.randomize());
-        mfb_seq.start(m_dma_agent[index].m_sequencer);
-        event_dma_rx_end[index] = 1'b1;
+        for (int unsigned it = 0; it < 4; it++) begin
+            assert(mfb_seq.randomize());
+            mfb_seq.start(m_dma_agent[index].m_sequencer);
+        end
+        event_dma_rx_end[index] = 1'b0;
     endtask
 endclass
