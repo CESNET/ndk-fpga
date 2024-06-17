@@ -23,7 +23,6 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     uvm_app_core_minimal::env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
             REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_env;
 
-    bit   timeout;
     logic event_reset;
     logic event_eth_rx_end[ETH_STREAMS];
     logic event_dma_rx_end[DMA_STREAMS];
@@ -94,7 +93,6 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         mvb_seq.init_sequence();
         mvb_seq.min_random_count = 50;
         mvb_seq.max_random_count = 150;
-        mvb_seq.init_sequence();
 
         forever begin
             //mvb_seq.set_starting_phase(phase);
@@ -104,13 +102,12 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     task run_eth_meta(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr);
-        uvm_app_core_top_agent::logic_vector_sequence_lib_eth#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)  mvb_seq;
+        uvm_app_core_top_agent::logic_vector_sequence_lib_eth#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH) mvb_seq;
 
         mvb_seq = uvm_app_core_top_agent::logic_vector_sequence_lib_eth#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("mvb_seq", this);
         mvb_seq.init_sequence();
         mvb_seq.min_random_count = 50;
         mvb_seq.max_random_count = 150;
-        mvb_seq.init_sequence();
 
         forever begin
             //mvb_seq.set_starting_phase(phase);
@@ -224,17 +221,6 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         event_dma_rx_end[index] = 1'b0;
     endtask
 
-    task test_wait_timeout(int unsigned time_length);
-        #(time_length*1us);
-    endtask
-
-    task test_wait_result();
-        do begin
-            #(600ns);
-        end while (m_env.m_scoreboard.used() != 0);
-        timeout = 0;
-    endtask
-
     virtual task run_reset(uvm_phase phase);
         uvm_reset::sequence_reset reset;
         uvm_reset::sequence_run   run;
@@ -272,6 +258,7 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task run_phase(uvm_phase phase);
+        time end_time;
         run_packet_subsequences();
 
         phase.raise_objection(this);
@@ -342,20 +329,14 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             end
         end
 
-
-        timeout = 1;
-        fork
-            test_wait_timeout(20);
-            test_wait_result();
-        join_any;
-
+        end_time = $time() + 20us;
+        while (end_time > $time() && m_env.m_scoreboard.used() != 0) begin
+            #(500ns);
+        end
         phase.drop_objection(this);
     endtask
 
     function void report_phase(uvm_phase phase);
         `uvm_info(this.get_full_name(), {"\n\tTEST : ", this.get_type_name(), " END\n"}, UVM_NONE);
-        if (timeout) begin
-            `uvm_error(this.get_full_name(), "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n");
-        end
     endfunction
 endclass

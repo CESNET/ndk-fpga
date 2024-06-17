@@ -30,6 +30,7 @@ SETTINGS = {
         "RESET_WIDTH"          : 4,
         "BOARD"                : "\\\"400G1\\\"",
         "DEVICE"               : "\\\"ULTRASCALE\\\"",
+        "__core_params__" : {"UVM_TEST" : "test::base"},
     },
     "eth_1" : {
         "ETH_PORTS"            : 1,
@@ -60,11 +61,18 @@ SETTINGS = {
         "ETH_CHANNELS"         : 1,
     },
 
+    "test_speed" : {
+         "__core_params__" : {"UVM_TEST" : "test::full_speed"},
+    }
+   
+
 
     "_combinations_" : (
     ("default",), # Works the same as '("default",),' as the "default" is applied in every combination
+    ("default", "test_speed", ), 
     ("eth_1", "dma_1", "mfb",),
     ("dma_1", "eth_ch1", "mfb_1",),
     ("dma_1", "eth_ch1",),
+    ("eth_1", "dma_1", "mfb", "test_speed", ),
     ),
 }
