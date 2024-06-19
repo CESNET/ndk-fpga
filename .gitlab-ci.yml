@@ -2,7 +2,7 @@ variables:
   GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: recursive
 
-image: python:3.7-alpine
+image: python:3.9-alpine
 
 pages:
   stage: deploy
