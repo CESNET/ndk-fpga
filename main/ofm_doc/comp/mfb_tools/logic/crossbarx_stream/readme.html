@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CrossbarX Stream &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -155,10 +154,10 @@
            <div itemprop="articleBody">
              
   <section id="crossbarx-stream">
-<span id="id1"></span><h1>CrossbarX Stream<a class="headerlink" href="#crossbarx-stream" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>CrossbarX Stream<a class="headerlink" href="#crossbarx-stream" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-crossbarx_stream">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">CROSSBARX_STREAM</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-crossbarx_stream" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">CROSSBARX_STREAM</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-crossbarx_stream" title="Link to this definition"></a></dt>
 <dd><p>This unit can:</p>
 <ul class="simple">
 <li><p>discard packets,</p></li>
@@ -439,11 +438,11 @@ Only used when CX_USE_CLK2==True and CX_USE_CLK_ARB==False</p></td>
 </dd></dl>
 
 <section id="block-diagram">
-<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading"></a></h2>
+<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/cx_stream.svg" id="cx-stream-diag"><img alt="" class="align-center" id="cx-stream-diag" src="../../../../../_images/cx_stream.svg" width="100%" /></a>
 </section>
 <section id="operations">
-<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this heading"></a></h2>
+<h2>Operations<a class="headerlink" href="#operations" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p>Discarding : discards come with EOFs. Therefore, they are first transferred from the RX Buffer through the CX Stream to the TX Buffer, where they are overwritten by the next transaction.</p></li>
 <li><p>Gap insertion : the Packet Planner component (PP) takes care of this.</p></li>

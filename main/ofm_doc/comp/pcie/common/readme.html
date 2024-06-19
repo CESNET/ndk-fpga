@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PCI_EXT_CAP &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -132,12 +131,12 @@
            <div itemprop="articleBody">
              
   <section id="pci-ext-cap">
-<span id="id1"></span><h1>PCI_EXT_CAP<a class="headerlink" href="#pci-ext-cap" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>PCI_EXT_CAP<a class="headerlink" href="#pci-ext-cap" title="Link to this heading"></a></h1>
 <p>PCI Extended Capability unit stores OFM-specific identification mechanisms.
 It is typically connected to the PCIe core and mapped to the PCI configuration space
 as a Vendor-Specific Extension Capability (VSEC) with ID 0x0D7B.</p>
 <table class="docutils align-default" id="id2">
-<caption><span class="caption-text">Address space</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">Address space</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 7.7%" />
 <col style="width: 23.1%" />
@@ -195,7 +194,7 @@ as a Vendor-Specific Extension Capability (VSEC) with ID 0x0D7B.</p>
 </tbody>
 </table>
 <table class="docutils align-default" id="id3">
-<caption><span class="caption-text">Extra space</span><a class="headerlink" href="#id3" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">Extra space</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 7.7%" />
 <col style="width: 23.1%" />
@@ -218,7 +217,7 @@ as a Vendor-Specific Extension Capability (VSEC) with ID 0x0D7B.</p>
 </tbody>
 </table>
 <section id="device-tree">
-<h2>Device Tree<a class="headerlink" href="#device-tree" title="Permalink to this heading"></a></h2>
+<h2>Device Tree<a class="headerlink" href="#device-tree" title="Link to this heading"></a></h2>
 <p>The Device Tree with the firmware description is obtained through the <cite>dtb_pkg</cite> VHDL package.</p>
 <p>Software gets the length of stored DT in bytes by reading the <cite>DTB length</cite> register
 and then performs the appropriate number of reads from the dword-sized <cite>DTB data</cite> register.
@@ -226,18 +225,18 @@ Each read is preceded with a write of the requested dword index to the <cite>DTB
 <p>Device Tree is typically stored in the form of Device Tree Blob (<cite>dtb</cite>) compressed by the <cite>xz</cite>.</p>
 </section>
 <section id="endpoint-id">
-<h2>Endpoint ID<a class="headerlink" href="#endpoint-id" title="Permalink to this heading"></a></h2>
+<h2>Endpoint ID<a class="headerlink" href="#endpoint-id" title="Link to this heading"></a></h2>
 <p>For multi-PCIe endpoint firmware, the software must identify a particular PCIe endpoint.
 For that purpose, it reads the <cite>Endpoint ID</cite> value (4b) in the <cite>Flags</cite> register.
 The <cite>Endpoint ID</cite> is valid only if the <cite>Endpoint ID flag</cite> bit is set.</p>
 </section>
 <section id="extra-space">
-<h2>Extra space<a class="headerlink" href="#extra-space" title="Permalink to this heading"></a></h2>
+<h2>Extra space<a class="headerlink" href="#extra-space" title="Link to this heading"></a></h2>
 <p>The <cite>Extra data</cite> register uses indirect addressing like the <cite>DTB data</cite> register.
 Access must be preceded with a write of an index to the <cite>Extra address</cite> register.</p>
 </section>
 <section id="card-id">
-<h2>Card ID<a class="headerlink" href="#card-id" title="Permalink to this heading"></a></h2>
+<h2>Card ID<a class="headerlink" href="#card-id" title="Link to this heading"></a></h2>
 <p>When more cards are present in the system, the software needs to pair
 all PCIe endpoints of multi-PCIe cards to the correct parent device
 (typically based on the primary PCIe endpoint with the <cite>Endpoint ID</cite> value 0).</p>

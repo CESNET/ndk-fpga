@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>logic_vector_array_axi environment &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="FlowTest Sequence" href="../packet_generators/ft_gen_sequence/readme.html" />
     <link rel="prev" title="AXI Agent" href="../axi/readme.html" /> 
 </head>
 
@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -122,6 +122,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#rx-inner-sequences">RX Inner sequences</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../packet_generators/ft_gen_sequence/readme.html">FlowTest Sequence</a></li>
 </ul>
 </li>
 </ul>
@@ -155,7 +156,7 @@
            <div itemprop="articleBody">
              
   <section id="logic-vector-array-axi-environment">
-<span id="logic-vector-array-axi"></span><h1>logic_vector_array_axi environment<a class="headerlink" href="#logic-vector-array-axi-environment" title="Permalink to this heading"></a></h1>
+<span id="logic-vector-array-axi"></span><h1>logic_vector_array_axi environment<a class="headerlink" href="#logic-vector-array-axi-environment" title="Link to this heading"></a></h1>
 <p>This environment has one high-level logic vector array agent and it works only with data.
 This package contains two environments. The RX environment generates and sends data to the DUT. The TX environment generates TREADY and
 observes the TX interface.</p>
@@ -168,13 +169,13 @@ observes the TX interface.</p>
 <li><p>REGIONS</p></li>
 </ul>
 <section id="top-sequencers-and-sequences">
-<h2>Top sequencers and sequences<a class="headerlink" href="#top-sequencers-and-sequences" title="Permalink to this heading"></a></h2>
+<h2>Top sequencers and sequences<a class="headerlink" href="#top-sequencers-and-sequences" title="Link to this heading"></a></h2>
 <p>In the RX direction, there is the Logic vector array sequencer that handles the AXI TDATA and the TUSER.</p>
 <p>In the TX direction, there is one sequencer of type axi::sequencer #(DATA_WIDTH, TUSER_WIDTH, REGIONS) which generates the TREADY signal.</p>
 <p>Both directions have an analysis_export for logic vector array transactions.</p>
 </section>
 <section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
 <p>The config class has three variables.</p>
 <table class="docutils align-default">
 <thead>
@@ -226,7 +227,7 @@ observes the TX interface.</p>
 </div>
 </section>
 <section id="low-level-sequence-configuration">
-<h2>Low-level sequence configuration<a class="headerlink" href="#low-level-sequence-configuration" title="Permalink to this heading"></a></h2>
+<h2>Low-level sequence configuration<a class="headerlink" href="#low-level-sequence-configuration" title="Link to this heading"></a></h2>
 <p>The configuration object <cite>config_sequence</cite> contains two functions.</p>
 <table class="docutils align-default">
 <thead>
@@ -248,7 +249,7 @@ observes the TX interface.</p>
 </table>
 </section>
 <section id="rx-inner-sequences">
-<h2>RX Inner sequences<a class="headerlink" href="#rx-inner-sequences" title="Permalink to this heading"></a></h2>
+<h2>RX Inner sequences<a class="headerlink" href="#rx-inner-sequences" title="Link to this heading"></a></h2>
 <p>For the RX direction, there is one base sequence class “sequence_simple_rx_base” which simplifies the creation of other sequences. It processes the reset signal and exports the create_sequence_item virtual
 function. In this function, a child can create an axi::sequence_item as they like. Another important function in the “sequence_simple_rx_base” class is try_get() which
 gets the required data from the base array agent. It is also important to note that the base class is state-oriented. The following table describes the internal states.</p>
@@ -339,6 +340,7 @@ gets the required data from the base array agent. It is also important to note t
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../axi/readme.html" class="btn btn-neutral float-left" title="AXI Agent" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../packet_generators/ft_gen_sequence/readme.html" class="btn btn-neutral float-right" title="FlowTest Sequence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

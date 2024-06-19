@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Common package &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -154,10 +153,10 @@
            <div itemprop="articleBody">
              
   <section id="common-package">
-<span id="uvm-common"></span><h1>Common package<a class="headerlink" href="#common-package" title="Permalink to this heading"></a></h1>
+<span id="uvm-common"></span><h1>Common package<a class="headerlink" href="#common-package" title="Link to this heading"></a></h1>
 <p>common package contain commonly used small components.</p>
 <section id="random">
-<h2>Random<a class="headerlink" href="#random" title="Permalink to this heading"></a></h2>
+<h2>Random<a class="headerlink" href="#random" title="Link to this heading"></a></h2>
 <p>Common randomization is required for generating space between frame and space between
 packets. For this purpose two classes have been created (rand_rdy, rand_length). Fist class
 generates rdy signal. Second class generate number reprezenting length.</p>
@@ -200,12 +199,12 @@ to generate better randomization. Class rand_rdy and rand_length is common inter
 </div>
 </section>
 <section id="comparer">
-<h2>Comparer<a class="headerlink" href="#comparer" title="Permalink to this heading"></a></h2>
+<h2>Comparer<a class="headerlink" href="#comparer" title="Link to this heading"></a></h2>
 <p>These components compare transactions from the DUT with transactions from the model.
 There are three major classes. All classes have one required parameter and one optional parameter.
 The first parameter is the type of model’s transactions. The second parameter is the type of DUT transactions.</p>
 <table class="docutils align-default" id="id1">
-<caption><span class="caption-text">comparer classes</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">comparer classes</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 50.0%" />
 <col style="width: 50.0%" />
@@ -230,7 +229,7 @@ The first parameter is the type of model’s transactions. The second parameter 
 <p>If the type of the model and DUT transactions are the same, then a predefined comparer component can be used.
 This component has only one parameter - the transaction type.</p>
 <table class="docutils align-default" id="id2">
-<caption><span class="caption-text">comparer classes</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">comparer classes</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 100.0%" />
 </colgroup>
@@ -250,7 +249,7 @@ This component has only one parameter - the transaction type.</p>
 <p>All comparers contain a watchdog. You can set up the maximum waiting time for the model and DUT transactions.
 Maximum waiting time for the model transactions may be necessary if the DUT can create results from partial input.</p>
 <table class="docutils align-default" id="id3">
-<caption><span class="caption-text">comparer classes</span><a class="headerlink" href="#id3" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">comparer classes</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 33.3%" />
 <col style="width: 66.7%" />
@@ -335,7 +334,7 @@ You can do this by reimplementing pure virtual functions:
 </div>
 </section>
 <section id="fifo">
-<h2>fifo<a class="headerlink" href="#fifo" title="Permalink to this heading"></a></h2>
+<h2>fifo<a class="headerlink" href="#fifo" title="Link to this heading"></a></h2>
 <p>This component has been created for connecting models. The problem is when there is an output value of one model changes before entering another model.
 A common example is when the same model is used in the verification multiple times, and each time, its input(s) are modified differently. Such a scenario is displayed in the example below.</p>
 <div class="highlight-VHDL notranslate"><div class="highlight"><pre><span></span><span class="n">ENTITY_i</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">entity</span><span class="w"> </span><span class="nc">work</span><span class="p">.</span><span class="n">ENTITY_A</span>

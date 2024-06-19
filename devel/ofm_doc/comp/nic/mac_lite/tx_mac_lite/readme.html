@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TX MAC LITE &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -128,12 +127,12 @@
            <div itemprop="articleBody">
              
   <section id="tx-mac-lite">
-<span id="id1"></span><h1>TX MAC LITE<a class="headerlink" href="#tx-mac-lite" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>TX MAC LITE<a class="headerlink" href="#tx-mac-lite" title="Link to this heading"></a></h1>
 <p>This component is used to implement the Ethernet MAC layer on the transmitting side.
 Thanks to the modular architecture (TX MAC LITE + Adapter), it can be connected to a supported ETH Hard IP block or implement the MAC layer separately.
 The implementation may include differences from the Ethernet standard.</p>
 <section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading"></a></h2>
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
 <p>The TX MAC LITE checks the length of the input frames, if it is less than 60B, these frames are discarded.
 TX MAC LITE may optionally contain subcomponents that are used to calculate and insert a CRC into the frame being sent.
 In cases where the module must insert a CRC or generate inter-packet gaps, the Spacer (CrossbarX Stream) component is used as the main buffer.
@@ -152,7 +151,7 @@ The whole module can be controlled by SW using MI registers (see chapter Registe
 </ul>
 </section>
 <section id="adapter">
-<h2>Adapter<a class="headerlink" href="#adapter" title="Permalink to this heading"></a></h2>
+<h2>Adapter<a class="headerlink" href="#adapter" title="Link to this heading"></a></h2>
 <p>The adapter allows you to connect the TX MAC LITE to various variants of the PCS/PMA layer of the Ethernet or various Ethernet Hard IPs.
 The main task of the adapter is to convert the selected input bus to the MFB bus.
 Currently, several variants of the adapter are implemented:</p>
@@ -164,7 +163,7 @@ Currently, several variants of the adapter are implemented:</p>
 </ul>
 </section>
 <section id="register-map">
-<h2>Register Map<a class="headerlink" href="#register-map" title="Permalink to this heading"></a></h2>
+<h2>Register Map<a class="headerlink" href="#register-map" title="Link to this heading"></a></h2>
 <p>TX MAC LITE is off by default, it must be turned on (Enable register) to allow Ethernet frames to be sent.
 There are four statistical counters in the address space. You have to sample the counters first and then you can read their content.</p>
 <div class="admonition note">
@@ -482,10 +481,10 @@ Software tool is then able to read those registers.</p>
 </table>
 </section>
 <section id="ports-and-generics">
-<h2>Ports and Generics<a class="headerlink" href="#ports-and-generics" title="Permalink to this heading"></a></h2>
+<h2>Ports and Generics<a class="headerlink" href="#ports-and-generics" title="Link to this heading"></a></h2>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-tx_mac_lite">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">TX_MAC_LITE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-tx_mac_lite" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">TX_MAC_LITE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-tx_mac_lite" title="Link to this definition"></a></dt>
 <dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>

@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Byte array to pma convert enviroment &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -121,6 +120,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packet_generators/ft_gen_sequence/readme.html">FlowTest Sequence</a></li>
 </ul>
 </li>
 </ul>
@@ -154,14 +154,14 @@
            <div itemprop="articleBody">
              
   <section id="byte-array-to-pma-convert-enviroment">
-<span id="uvm-byte-array-pma"></span><h1>Byte array to pma convert enviroment<a class="headerlink" href="#byte-array-to-pma-convert-enviroment" title="Permalink to this heading"></a></h1>
+<span id="uvm-byte-array-pma"></span><h1>Byte array to pma convert enviroment<a class="headerlink" href="#byte-array-to-pma-convert-enviroment" title="Link to this heading"></a></h1>
 <p>This enviroment serves for preparation of agents (configuration set and creation), their connection to right analysis export and starting sequence on the right sequencer. This environment connect Byte Array agent with PMA agent in fact.</p>
 <section id="byte-array-to-pma-monitor">
-<h2>Byte Array to PMA monitor<a class="headerlink" href="#byte-array-to-pma-monitor" title="Permalink to this heading"></a></h2>
+<h2>Byte Array to PMA monitor<a class="headerlink" href="#byte-array-to-pma-monitor" title="Link to this heading"></a></h2>
 <p>Function of this monitor is take PMA transaction descramble it, then choose if it is start, middle or end of high level transaction that depends on type of frame (<code class="docutils literal notranslate"><span class="pre">IDLE</span></code>, <code class="docutils literal notranslate"><span class="pre">START</span></code>, …). When the end of transaction occured, high level transaction is writed to analysis port. To accumulation of data is used easy fifo.</p>
 </section>
 <section id="byte-array-to-pma-sequence">
-<h2>Byte Array to PMA Sequence<a class="headerlink" href="#byte-array-to-pma-sequence" title="Permalink to this heading"></a></h2>
+<h2>Byte Array to PMA Sequence<a class="headerlink" href="#byte-array-to-pma-sequence" title="Link to this heading"></a></h2>
 <p>This sequence is used for generation of encoded data in right way and then send it to driver. Ther is state machine, which generate data in the right way. First random amount of idles is generated, after this state is changed to start and start sequence is generated, after second chunk of start sequence is generated, then state is changed to data and after that data from high level sequence are cutted to chunks which has same width as PMA transaction and there are sended to driver. After all data are sended, then terminate sequence is generate, this sequence depends on amount of valid bytes of last two words in high level sequence. To every sequence is generated header which has only valid values and tehre is also generated header valid once per two clocks cycles. There is one constraint in randomization which set percentage of occurrence of the block lock in verification. Every PMA sequence which is generated is scramble by scrambler with polynom <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">x^39</span> <span class="pre">+</span> <span class="pre">x^58</span></code>.</p>
 </section>
 </section>

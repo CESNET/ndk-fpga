@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Application &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -136,16 +135,16 @@
            <div itemprop="articleBody">
              
   <section id="the-application">
-<span id="ndk-app"></span><h1>The Application<a class="headerlink" href="#the-application" title="Permalink to this heading"></a></h1>
+<span id="ndk-app"></span><h1>The Application<a class="headerlink" href="#the-application" title="Link to this heading"></a></h1>
 <p>The NDK is designed for creating new network applications for packet processing in a deep pipeline. The NDK provides space for your application and defines several interfaces for communication with devices on the network, with software (control and data), or with external memory. We refer to this space in the NDK as <strong>the Application</strong>.</p>
 <p>Depending on the selected FPGA card, there are several ETH streams for communication over an Ethernet network and several DMA streams for communication with the host CPU through the DMA module. There are also several <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/683091/22-3/introduction-to-memory-mapped-interfaces.html">Avalon-MM interfaces</a> for access to external memory (typically DDR4) and an MI interface for access to the CSR implemented in the application. ETH and DMA streams use a combination of MFB (for packet data) and MVB (for packet headers and metadata) buses to transfer Ethernet packets. The Application allows you to assign the selected user clock to individual parts of the design. A typical connection of the Application is shown in the block diagram below:</p>
 <a class="reference internal image-reference" href="../../../_images/ndk_app.drawio.svg"><img alt="../../../_images/ndk_app.drawio.svg" class="align-center" src="../../../_images/ndk_app.drawio.svg" width="100%" /></a>
 <p>We recommend splitting the Application into several parts that we call Application cores. Typically, an Application core is instantiated for each Ethernet stream. Depending on the selected FPGA card, the number of ETH streams is equal to the number of DMA streams, or there are multiple ETH streams and only one DMA stream. For such cases, the NDK has prepared modules (see the <a class="reference external" href="https://github.com/CESNET/ndk-app-minimal/blob/main/app/intel/application_core.vhd">Application implementation in NDK-APP-Minimal</a>) to ensure that each Application Core is correctly connected to the available DMA interfaces. They also ensure proper distribution of the available DMA channels among the Application cores.</p>
 <section id="how-to-use-the-application-interfaces">
-<h2>How to use the Application interfaces<a class="headerlink" href="#how-to-use-the-application-interfaces" title="Permalink to this heading"></a></h2>
+<h2>How to use the Application interfaces<a class="headerlink" href="#how-to-use-the-application-interfaces" title="Link to this heading"></a></h2>
 <p>The following sections describe how to work with each of the Application interfaces. You will also learn in which formats you can receive data and in which you must send it. We also strongly recommend that you read the <a class="reference internal" href="../../../ofm_doc/comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB bus specification</span></a>, <a class="reference internal" href="../../../ofm_doc/comp/mvb_tools/readme.html#mvb-bus"><span class="std std-ref">MVB bus specification</span></a> and <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus specification</span></a>. The MTU of packets transferred via DMA or Ethernet can be set using configuration parameters, see <a class="reference internal" href="../../doc/configuration.html#ndk-configuration"><span class="std std-ref">chapter “Configuration files and parameters”</span></a>. The set MTU values are then available in the <a class="reference internal" href="../../doc/devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a> description of the NDK firmware.</p>
 <section id="receiving-packets-from-ethernet">
-<h3>Receiving packets from Ethernet<a class="headerlink" href="#receiving-packets-from-ethernet" title="Permalink to this heading"></a></h3>
+<h3>Receiving packets from Ethernet<a class="headerlink" href="#receiving-packets-from-ethernet" title="Link to this heading"></a></h3>
 <p>Ethernet packets enter the application over two buses (<code class="docutils literal notranslate"><span class="pre">ETH_RX_*</span></code>). The MVB bus carries the packet metadata, and the MFB bus carries the actual packet data. Both buses have independent flow control.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -249,11 +248,11 @@
 
 </section>
 <section id="transmitting-packets-to-the-ethernet">
-<h3>Transmitting packets to the Ethernet<a class="headerlink" href="#transmitting-packets-to-the-ethernet" title="Permalink to this heading"></a></h3>
+<h3>Transmitting packets to the Ethernet<a class="headerlink" href="#transmitting-packets-to-the-ethernet" title="Link to this heading"></a></h3>
 <p>The packets are sent to the Ethernet only through the MFB bus (<code class="docutils literal notranslate"><span class="pre">ETH_TX_MFB_*</span></code>). In this case, the metadata is transferred in a special signal: <code class="docutils literal notranslate"><span class="pre">ETH_TX_MFB_HDR</span></code>. This signal is valid for each MFB Region where an Ethernet packet starts. The packet data must contain an Ethernet frame without the CRC, which is calculated and inserted further in the design. The minimum allowed length of the packet data is 60B, if necessary, the application must add padding to the packet. The metadata format is also defined in the <code class="docutils literal notranslate"><span class="pre">eth_hdr_pack</span></code> package (see the previous section).</p>
 </section>
 <section id="receiving-packets-from-the-dma-module">
-<h3>Receiving packets from the DMA module<a class="headerlink" href="#receiving-packets-from-the-dma-module" title="Permalink to this heading"></a></h3>
+<h3>Receiving packets from the DMA module<a class="headerlink" href="#receiving-packets-from-the-dma-module" title="Link to this heading"></a></h3>
 <p>The application receives packets from the DMA module over two buses, MVB and MFB (<code class="docutils literal notranslate"><span class="pre">DMA_TX_*</span></code>). As before, MVB carries the metadata, and MFB carries the actual packet data. Both buses have independent flow control.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -287,7 +286,7 @@
 </table>
 </section>
 <section id="transmitting-packets-to-the-dma-module">
-<h3>Transmitting packets to the DMA module<a class="headerlink" href="#transmitting-packets-to-the-dma-module" title="Permalink to this heading"></a></h3>
+<h3>Transmitting packets to the DMA module<a class="headerlink" href="#transmitting-packets-to-the-dma-module" title="Link to this heading"></a></h3>
 <p>The application sends packets to the DMA module over two buses, MVB and MFB (<code class="docutils literal notranslate"><span class="pre">DMA_RX_*</span></code>), which have the same roles as stated in previous sections. As before, MVB carries the metadata, and MFB carries the actual packet data. Again, the MVB bus does not use a single <code class="docutils literal notranslate"><span class="pre">MVB_DATA</span></code> signal but multiple data signals instead:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">MVB_LEN</span></code> - the length of the packet in bytes</p></li>
@@ -304,17 +303,17 @@ The minimum allowed length of the packet data is 60B, if necessary, the applicat
 </div>
 </section>
 <section id="read-write-access-to-the-application-registers-from-sw">
-<h3>Read/write access to the Application registers from SW<a class="headerlink" href="#read-write-access-to-the-application-registers-from-sw" title="Permalink to this heading"></a></h3>
+<h3>Read/write access to the Application registers from SW<a class="headerlink" href="#read-write-access-to-the-application-registers-from-sw" title="Link to this heading"></a></h3>
 <p>The application is typically controlled by a software tool. The NDK provides the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-bus.html#nfb-bus">nfb-bus tool</a> and an <a class="reference external" href="https://cesnet.github.io/ndk-sw/libnfb-quick-start-registers.html">API for generating read/write memory requests</a>. These are transferred via the <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> in the NDK firmware. This memory-oriented bus is wired throughout the NDK firmware, and each part, including the application, has its own allocated address space. You can find more about the MI and the available address space in the <a class="reference internal" href="mi.html#ndk-mi"><span class="std std-ref">MI bus interconnect</span></a> chapter.</p>
 <p>The description of the components with a specific address space is implemented in the NDK using a <a class="reference internal" href="../../doc/devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a>. Also, the Application must have its own DeviceTree description, which can further refer to the internal components and their address spaces. It is a good idea to take inspiration from the <a class="reference external" href="https://github.com/CESNET/ndk-app-minimal/blob/main/app/intel/DevTree.tcl">NDK-APP-Minimal application DeviceTree file</a> when creating a DeviceTree file for your application.</p>
 </section>
 </section>
 <section id="ports-and-generics-of-the-application">
-<h2>Ports and generics of the Application<a class="headerlink" href="#ports-and-generics-of-the-application" title="Permalink to this heading"></a></h2>
+<h2>Ports and generics of the Application<a class="headerlink" href="#ports-and-generics-of-the-application" title="Link to this heading"></a></h2>
 <p>In the tables below, you can see a detailed description of the Application interface, i.e., a description of all its generics and ports.</p>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-application_core">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">APPLICATION_CORE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-application_core" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">APPLICATION_CORE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-application_core" title="Link to this definition"></a></dt>
 <dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>

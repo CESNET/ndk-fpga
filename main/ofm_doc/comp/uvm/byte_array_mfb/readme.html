@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Byte_array_mfb environment &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -155,7 +154,7 @@
            <div itemprop="articleBody">
              
   <section id="byte-array-mfb-environment">
-<span id="uvm-byte-array-mfb"></span><h1>Byte_array_mfb environment<a class="headerlink" href="#byte-array-mfb-environment" title="Permalink to this heading"></a></h1>
+<span id="uvm-byte-array-mfb"></span><h1>Byte_array_mfb environment<a class="headerlink" href="#byte-array-mfb-environment" title="Link to this heading"></a></h1>
 <p>This environment has two high-level agents. The first one is a byte array agent and it works with data. The second one is a logic vector agent which works with metadata.
 This package contains two environments. Environment RX generates data and metadata and sends them to the DUT. Environment TX generates the DST_RDY signal and
 observes the TX interface.</p>
@@ -167,14 +166,14 @@ observes the TX interface.</p>
 <li><p>META_WIDTH</p></li>
 </ul>
 <section id="top-sequencers-and-sequences">
-<h2>Top sequencers and sequences<a class="headerlink" href="#top-sequencers-and-sequences" title="Permalink to this heading"></a></h2>
+<h2>Top sequencers and sequences<a class="headerlink" href="#top-sequencers-and-sequences" title="Link to this heading"></a></h2>
 <p>In the RX direction, there are two sequencers: the first is a Byte Array sequencer that handles MFB_DATA.
 The second is a Logic Vector sequencer that handles MFB_METADATA. Both sequencers pull the data from sequences together.</p>
 <p>In the TX direction, there is one sequencer of type mfb::sequencer #(), which generates the DST_RDY signal.</p>
 <p>Both directions have two analysis_exports. One export is for the Byte Array transactions, and the second is for the Logic Vector (metadata) transactions.</p>
 </section>
 <section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
 <p>The config class has three variables.</p>
 <table class="docutils align-default">
 <thead>
@@ -230,7 +229,7 @@ The second is a Logic Vector sequencer that handles MFB_METADATA. Both sequencer
 </div>
 </section>
 <section id="low-sequence-configuration">
-<h2>Low sequence configuration<a class="headerlink" href="#low-sequence-configuration" title="Permalink to this heading"></a></h2>
+<h2>Low sequence configuration<a class="headerlink" href="#low-sequence-configuration" title="Link to this heading"></a></h2>
 <p>configuration object <cite>config_sequence</cite> contain two function.</p>
 <table class="docutils align-default">
 <thead>
@@ -252,7 +251,7 @@ The second is a Logic Vector sequencer that handles MFB_METADATA. Both sequencer
 </table>
 </section>
 <section id="rx-inner-sequences">
-<h2>RX Inner sequences<a class="headerlink" href="#rx-inner-sequences" title="Permalink to this heading"></a></h2>
+<h2>RX Inner sequences<a class="headerlink" href="#rx-inner-sequences" title="Link to this heading"></a></h2>
 <p>For the RX direction exists one base sequence class “sequence_simple_rx_base” which simplifies creating others sequences. It processes the reset signal and exports virtual
 function create_sequence_item. In this function can child create mfb::sequence_item what they like. Other important function in “sequence_simple_rx_base” class is try_get() which
 downloads required data from base array agent. It is also important to note that the base class is state oriented. Following table describes internal states.</p>

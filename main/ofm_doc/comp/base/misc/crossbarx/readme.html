@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CrossbarX &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -139,7 +138,7 @@
            <div itemprop="articleBody">
              
   <section id="crossbarx">
-<span id="id1"></span><h1>CrossbarX<a class="headerlink" href="#crossbarx" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>CrossbarX<a class="headerlink" href="#crossbarx" title="Link to this heading"></a></h1>
 <p>This unit performs data transfer between two buffers connected on SRC_BUF and DST_BUF interfaces based on Transactions passed on the TRANS interface.
 Transactions can be passed on multiple independent Streams.
 Different Streams must have different Buffer A but common Buffer B.
@@ -149,11 +148,11 @@ To enable tracking of the data transfer actual progress.
 The unit propagates Completed signal for each done Transaction together with its Metadata.
 These Completed signals have the same order as the input Transactions (within each Stream).</p>
 <section id="block-diagram">
-<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading"></a></h2>
+<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/CrossbarX.svg" id="crossbarx-block-diagram"><img alt="" id="crossbarx-block-diagram" src="../../../../../_images/CrossbarX.svg" width="100%" /></a>
 </section>
 <section id="generics">
-<span id="crossbarx-generics"></span><h2>Generics<a class="headerlink" href="#generics" title="Permalink to this heading"></a></h2>
+<span id="crossbarx-generics"></span><h2>Generics<a class="headerlink" href="#generics" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -256,7 +255,7 @@ This could break the entire Color confirmation mechanism!</p>
 </div>
 </section>
 <section id="ports">
-<span id="crossbarx-ports"></span><h2>Ports<a class="headerlink" href="#ports" title="Permalink to this heading"></a></h2>
+<span id="crossbarx-ports"></span><h2>Ports<a class="headerlink" href="#ports" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -392,7 +391,7 @@ See FIFOX Multi documentation <a class="reference internal" href="../../fifo/fif
 </div>
 </section>
 <section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading"></a></h2>
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
 <p>The internal architecture of CrossbarX can be seen in the above <a class="reference internal" href="#crossbarx-block-diagram"><span class="std std-ref">diagram</span></a>.
 The main advantage of the CrossbarX is its scalability when performing parallel data transfers on a very wide data bus.
 For this reason, the component allows to setup multiple <em>independent</em> Streams od Transactions.
@@ -424,7 +423,7 @@ This way the user is safely informed about the Transaction’s completion in a i
 The user can use the Metadata field to propagate any info regarding the Transactions which he intends to use after their completion.</p>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <p>For more detailed description refer to Jan Kubalek’s <a class="reference external" href="https://www.fit.vut.cz/study/thesis-file/22958/22958.pdf">thesis</a> 2019/20.</p>
 </section>
 </section>

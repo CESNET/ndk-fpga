@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UVM simulation &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -129,11 +128,11 @@
            <div itemprop="articleBody">
              
   <section id="uvm-simulation">
-<span id="id1"></span><h1>UVM simulation<a class="headerlink" href="#uvm-simulation" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>UVM simulation<a class="headerlink" href="#uvm-simulation" title="Link to this heading"></a></h1>
 <p>UVM simulation is a tool that can be used by FW developers to create baseline tests for their components.
 This section will explain how to create a UVM simulation.</p>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <p>This section contains examples of the UVM simulation.
 Every example is located in the uvm_sim folder.
 All examples contain only the most necessary files (UVM components).
@@ -144,7 +143,7 @@ The developer defines a set of transactions in each sequence he wants to generat
 The following three examples are for the most commonly used combinations of interfaces: MFB + MI, MVB + MI, and MFB + META/MVB.
 The following subsections will describe what the sequences look like and how to modify them to use them for another component.</p>
 <section id="mfb-mi">
-<h3>MFB + MI<a class="headerlink" href="#mfb-mi" title="Permalink to this heading"></a></h3>
+<h3>MFB + MI<a class="headerlink" href="#mfb-mi" title="Link to this heading"></a></h3>
 <p>The first example is a simulation of the <a class="reference external" href="https://gitlab.liberouter.org/ndk/ofm/-/tree/devel/comp/mfb_tools/logic/speed_meter">Speed Meter</a> component that uses MFB and MI interfaces.
 There are two sequences in the <code class="docutils literal notranslate"><span class="pre">sequence_tb.sv</span></code> file, <code class="docutils literal notranslate"><span class="pre">sequence_mi.sv</span></code> for the MI interface and <code class="docutils literal notranslate"><span class="pre">sequence_mfb_data.sv</span></code> for the MFB interface.
 The first one inherits from the <code class="docutils literal notranslate"><span class="pre">sequence_mi_sim</span></code>, which is located in the uvm_mi pkg (for more information see, the <a class="reference internal" href="mi/readme.html#uvm-mi"><span class="std std-ref">UVM MI documentation</span></a>).
@@ -236,7 +235,7 @@ For example, if you want to construct a packet with random values, where you wan
 </div>
 </section>
 <section id="mfb-meta-mvb">
-<h3>MFB + META/MVB<a class="headerlink" href="#mfb-meta-mvb" title="Permalink to this heading"></a></h3>
+<h3>MFB + META/MVB<a class="headerlink" href="#mfb-meta-mvb" title="Link to this heading"></a></h3>
 <p>The second example is a simulation of the <a class="reference external" href="https://gitlab.liberouter.org/ndk/ofm/-/tree/devel/comp/mfb_tools/flow/dropper">Dropper</a> component that uses the MFB interface with metadata.
 There are two sequences in the <code class="docutils literal notranslate"><span class="pre">sequence_tb.sv</span></code> file, <code class="docutils literal notranslate"><span class="pre">sequence_mfb_data.sv</span></code> for the MFB interface and <code class="docutils literal notranslate"><span class="pre">sequence_meta.sv</span></code> for metadata.
 The first one is the same as in the previous example, and the second one generates random metadata and drop signal.
@@ -277,7 +276,7 @@ In other case, the simluation will stuck.</p>
 </div>
 </section>
 <section id="mvb-mi">
-<h3>MVB + MI<a class="headerlink" href="#mvb-mi" title="Permalink to this heading"></a></h3>
+<h3>MVB + MI<a class="headerlink" href="#mvb-mi" title="Link to this heading"></a></h3>
 <p>The last example is a simulation of the <a class="reference external" href="https://gitlab.liberouter.org/ndk/ofm/-/tree/devel/comp/mvb_tools/storage/lookup_table">Lookup Table</a> component that uses MVB interface with MI.
 There are two sequences in the <code class="docutils literal notranslate"><span class="pre">sequence_tb.sv</span></code> file, <code class="docutils literal notranslate"><span class="pre">sequence_mvb_data.sv</span></code> for the MVB interface and <code class="docutils literal notranslate"><span class="pre">sequence_mi.sv</span></code> for the MI interface.
 The first one generates data for MVB transactions.
@@ -327,7 +326,7 @@ For this purpose, the <code class="docutils literal notranslate"><span class="pr
 </div>
 </section>
 <section id="how-to-use-the-uvm-simulation">
-<h3>How to use the UVM simulation<a class="headerlink" href="#how-to-use-the-uvm-simulation" title="Permalink to this heading"></a></h3>
+<h3>How to use the UVM simulation<a class="headerlink" href="#how-to-use-the-uvm-simulation" title="Link to this heading"></a></h3>
 <p>So that was a brief description with a few examples.
 Now, if you want to use these examples for a component of your choice, here is a list of steps you have to do:</p>
 <ol class="arabic simple">

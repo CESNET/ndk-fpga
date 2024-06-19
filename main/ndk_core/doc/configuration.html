@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Configuration files and parameters &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -164,13 +163,13 @@
            <div itemprop="articleBody">
              
   <section id="configuration-files-and-parameters">
-<span id="ndk-configuration"></span><h1>Configuration files and parameters<a class="headerlink" href="#configuration-files-and-parameters" title="Permalink to this heading"></a></h1>
+<span id="ndk-configuration"></span><h1>Configuration files and parameters<a class="headerlink" href="#configuration-files-and-parameters" title="Link to this heading"></a></h1>
 <p>This chapter describes the NDK configuration files and parameters. The
 configuration has three levels: the CORE, the card, and the user application. A
 detailed description of each level is below (the abreviated version is provided
 via the <a class="reference internal" href="#ndk-conf-tldr"><span class="std std-ref">following link</span></a>).</p>
 <section id="parametrizing-ndk-core-design">
-<span id="ndk-core-configuration"></span><h2>Parametrizing NDK-CORE design<a class="headerlink" href="#parametrizing-ndk-core-design" title="Permalink to this heading"></a></h2>
+<span id="ndk-core-configuration"></span><h2>Parametrizing NDK-CORE design<a class="headerlink" href="#parametrizing-ndk-core-design" title="Link to this heading"></a></h2>
 <p>The files in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/config</span></code> directory and the
 <code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/core.mk</span></code> file contain CORE parameters. Some
 of these parameters are configurable (more info below). The sourcing of
@@ -181,7 +180,7 @@ the application and card-specific configuration, see following sections on this 
 <figure class="align-center" id="id5">
 <span id="fig-const-hierarchy"></span><a class="reference internal image-reference" href="../../_images/const_hierarchy.svg"><img alt="../../_images/const_hierarchy.svg" height="458" src="../../_images/const_hierarchy.svg" width="463" /></a>
 <figcaption>
-<p><span class="caption-text">Hierarchy diagram</span><a class="headerlink" href="#id5" title="Permalink to this image"></a></p>
+<p><span class="caption-text">Hierarchy diagram</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
 <div class="legend">
 <p>Numbers show the order in which these parameter files are sourced. Sourcing
 takes place in the <cite>core_boostrap.tcl</cite> file.</p>
@@ -189,9 +188,9 @@ takes place in the <cite>core_boostrap.tcl</cite> file.</p>
 </figcaption>
 </figure>
 <section id="file-description">
-<h3>File description<a class="headerlink" href="#file-description" title="Permalink to this heading"></a></h3>
+<h3>File description<a class="headerlink" href="#file-description" title="Link to this heading"></a></h3>
 <section id="core-conf-tcl">
-<span id="ndk-core-conf-core-conf-tcl"></span><h4>core_conf.tcl<a class="headerlink" href="#core-conf-tcl" title="Permalink to this heading"></a></h4>
+<span id="ndk-core-conf-core-conf-tcl"></span><h4>core_conf.tcl<a class="headerlink" href="#core-conf-tcl" title="Link to this heading"></a></h4>
 <p>This file provides a listing of all parameters that can be changed by the user.
 Each parameter contains a comment with allowed values and the meaning of
 these values. Because the NDK-CORE design is independent of the underlying
@@ -201,7 +200,7 @@ and may cause errors during the synthesis/implementation process. The user can a
 other configuration parameters to this file according to their need.</p>
 </section>
 <section id="core-const-tcl">
-<span id="ndk-core-conf-core-const-tcl"></span><h4>core_const.tcl<a class="headerlink" href="#core-const-tcl" title="Permalink to this heading"></a></h4>
+<span id="ndk-core-conf-core-const-tcl"></span><h4>core_const.tcl<a class="headerlink" href="#core-const-tcl" title="Link to this heading"></a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This file contains parameters that should not be changed deliberately by the
@@ -232,13 +231,13 @@ TCL shell will raise an error and stop the compilation process. You should
 implement these checks only for the parameters used in the NDK-CORE.</p>
 </section>
 <section id="core-mk">
-<span id="core-mk-include"></span><h4>core.mk<a class="headerlink" href="#core-mk" title="Permalink to this heading"></a></h4>
+<span id="core-mk-include"></span><h4>core.mk<a class="headerlink" href="#core-mk" title="Link to this heading"></a></h4>
 <p>This file contains default values for the parameters specified in the Makefile.
 The allowed values of each parameter are provided in the comments. The user of the
 design can change these values freely.</p>
 </section>
 <section id="core-bootstrap-tcl">
-<h4>core_bootstrap.tcl<a class="headerlink" href="#core-bootstrap-tcl" title="Permalink to this heading"></a></h4>
+<h4>core_bootstrap.tcl<a class="headerlink" href="#core-bootstrap-tcl" title="Link to this heading"></a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The features in this file are for development and should not be changed.</p>
@@ -250,7 +249,7 @@ priority last. The <code class="docutils literal notranslate"><span class="pre">
 </section>
 </section>
 <section id="further-work-with-parameters">
-<h3>Further work with parameters<a class="headerlink" href="#further-work-with-parameters" title="Permalink to this heading"></a></h3>
+<h3>Further work with parameters<a class="headerlink" href="#further-work-with-parameters" title="Link to this heading"></a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>These features are for development and should not be used in regular
@@ -261,7 +260,7 @@ parameters during compilation/synthesis of the VHDL source files. For this purpo
 there are two mechanisms provided for passing the parameters specified in the
 TCL shell to affect the final VHDL design.</p>
 <section id="passing-through-modules-tcl">
-<h4>Passing through Modules.tcl<a class="headerlink" href="#passing-through-modules-tcl" title="Permalink to this heading"></a></h4>
+<h4>Passing through Modules.tcl<a class="headerlink" href="#passing-through-modules-tcl" title="Link to this heading"></a></h4>
 <p>As described in the <a class="reference internal" href="../../ofm_doc/build/readme.html#ofm-build-system"><span class="std std-ref">Build System</span></a> section, the Modules.tcl files allow
 for modular and hierarchical organization of VHDL source files. The Modules.tcl files
 provide an <em>ARCHGRP</em> list to pass specific constants across the source file hierarchy. Each
@@ -280,7 +279,7 @@ to the associative array when a specific array value is needed. An example is sh
 <code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/Modules.tcl</span></code> file.</p>
 </section>
 <section id="adding-constants-to-the-vhdl-package">
-<span id="core-config-vhdl-pkg-const"></span><h4>Adding constants to the VHDL package<a class="headerlink" href="#adding-constants-to-the-vhdl-package" title="Permalink to this heading"></a></h4>
+<span id="core-config-vhdl-pkg-const"></span><h4>Adding constants to the VHDL package<a class="headerlink" href="#adding-constants-to-the-vhdl-package" title="Link to this heading"></a></h4>
 <p>A dynamic VHDL package is generated each time a user starts
 building a new design. The package is called <code class="docutils literal notranslate"><span class="pre">combo_user_const</span></code> and
 contains all parameters which were added in the <code class="docutils literal notranslate"><span class="pre">core_const.tcl</span></code> file described
@@ -310,16 +309,16 @@ name.</p>
 </section>
 </section>
 <section id="parametrizing-a-specific-card-type">
-<span id="ndk-card-configuration"></span><h2>Parametrizing a specific card type<a class="headerlink" href="#parametrizing-a-specific-card-type" title="Permalink to this heading"></a></h2>
+<span id="ndk-card-configuration"></span><h2>Parametrizing a specific card type<a class="headerlink" href="#parametrizing-a-specific-card-type" title="Link to this heading"></a></h2>
 <p>The final design of the NDK application depends on the underlying
 platform, e.g., the card type on which the design should run.
 The system provides mechanism to configure card specific parameters.</p>
 <section id="id1">
-<h3>File description<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<h3>File description<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>The file structure is similar to the one described in the configuration of the
 <cite>NDK-CORE</cite> design.</p>
 <section id="card-conf-tcl">
-<h4>card_conf.tcl<a class="headerlink" href="#card-conf-tcl" title="Permalink to this heading"></a></h4>
+<h4>card_conf.tcl<a class="headerlink" href="#card-conf-tcl" title="Link to this heading"></a></h4>
 <p>This file lists user-configurable parameters and their possible values in the
 comments. The file contains parameters relevant to a specific card. Those
 parameters are mostly tied to the underlying hardware, like the number of Ethernet
@@ -328,7 +327,7 @@ same as that of the <code class="docutils literal notranslate"><span class="pre"
 difference is that it has a higher priority.</p>
 </section>
 <section id="card-const-tcl">
-<span id="card-conf-card-const-tcl"></span><h4>card_const.tcl<a class="headerlink" href="#card-const-tcl" title="Permalink to this heading"></a></h4>
+<span id="card-conf-card-const-tcl"></span><h4>card_const.tcl<a class="headerlink" href="#card-const-tcl" title="Link to this heading"></a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This file contains features for development. It is not recommended for the user to change
@@ -347,7 +346,7 @@ component is card-specific too).</p>
 they are used in the <cite>core_const.tcl</cite> file.</p>
 </section>
 <section id="card-mk">
-<h4>card.mk<a class="headerlink" href="#card-mk" title="Permalink to this heading"></a></h4>
+<h4>card.mk<a class="headerlink" href="#card-mk" title="Link to this heading"></a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This file contains features for development. It is not recommended for the user to change
@@ -361,7 +360,7 @@ these is described in the <a class="reference internal" href="#app-config-makefi
 </section>
 </section>
 <section id="id2">
-<h3>Further work with parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<h3>Further work with parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>These features are for development and should not be used in regular
@@ -370,7 +369,7 @@ application use.</p>
 <p>Passing the parameter values to other parts of the design or build system is
 very similar to the case of <cite>NDK-CORE</cite>.</p>
 <section id="id3">
-<h4>Passing through Modules.tcl<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h4>
+<h4>Passing through Modules.tcl<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
 <p>The card-specific parameters are passed to the Modules.tcl file of the top-level
 entity using the <code class="docutils literal notranslate"><span class="pre">CARD_ARCHGRP</span></code> associative array. This array is initialized in
 the <code class="docutils literal notranslate"><span class="pre">&lt;card_root_directory&gt;/src/Vivado.inc.tcl</span></code> file for Xilinx-based cards and
@@ -382,7 +381,7 @@ in the <a class="reference internal" href="#ndk-core-conf-core-conf-tcl"><span c
 are visible in the <cite>*.inc.tcl</cite> files and can be added to the array.</p>
 </section>
 <section id="id4">
-<h4>Adding constants to the VHDL package<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h4>
+<h4>Adding constants to the VHDL package<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
 <p>It is recommended to add card-specific constants to the <code class="docutils literal notranslate"><span class="pre">combo_user_const</span></code> VHDL
 package in <cite>card_const.tcl</cite> file. The way of adding these constants was described in
 the <a class="reference internal" href="#core-config-vhdl-pkg-const"><span class="std std-ref">Adding constants to the VHDL package</span></a> section in the documentation of NDK-CORE
@@ -391,19 +390,19 @@ configuration.</p>
 </section>
 </section>
 <section id="parametrizing-the-user-application">
-<span id="ndk-app-configuration"></span><h2>Parametrizing the user application<a class="headerlink" href="#parametrizing-the-user-application" title="Permalink to this heading"></a></h2>
+<span id="ndk-app-configuration"></span><h2>Parametrizing the user application<a class="headerlink" href="#parametrizing-the-user-application" title="Link to this heading"></a></h2>
 <p>The user application can also be parametrized using specific configuration
 files. Configuration parameters can be handed to the subcomponents of the
 <code class="docutils literal notranslate"><span class="pre">APPLICATION_CORE</span></code> design entity. It also allows the user to choose one of,
 sometimes, multiple configurations for a specific card before launching the
 build process.</p>
 <section id="configuration-files">
-<h3>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading"></a></h3>
+<h3>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h3>
 <p>The configuration of the application is less constrained than <cite>NDK-CORE</cite> and
 card configuration. The application repository provides three files in which the user
 application is or can be configured.</p>
 <section id="build-card-name-makefile">
-<span id="app-config-makefile"></span><h4>build/&lt;card_name&gt;/Makefile<a class="headerlink" href="#build-card-name-makefile" title="Permalink to this heading"></a></h4>
+<span id="app-config-makefile"></span><h4>build/&lt;card_name&gt;/Makefile<a class="headerlink" href="#build-card-name-makefile" title="Link to this heading"></a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This file contains features for development. It is not recommended for the user to change
@@ -430,7 +429,7 @@ make<span class="w"> </span>100g4<span class="w"> </span><span class="nv">DMA_TY
 </div>
 </section>
 <section id="build-card-name-vivado-quartus-tcl">
-<h4>build/&lt;card_name&gt;/{Vivado,Quartus}.tcl<a class="headerlink" href="#build-card-name-vivado-quartus-tcl" title="Permalink to this heading"></a></h4>
+<h4>build/&lt;card_name&gt;/{Vivado,Quartus}.tcl<a class="headerlink" href="#build-card-name-vivado-quartus-tcl" title="Link to this heading"></a></h4>
 <p>This file adds the <code class="docutils literal notranslate"><span class="pre">APPLICATION_CORE</span></code> architecture where a logic of a
 user application is. The <cite>APP_ARCHGRP</cite> associative array is
 initialized in this file and allows the user to pass one or more user-specified
@@ -439,7 +438,7 @@ components. All configuration parameters in the <a class="reference internal" hr
 are visible here and can be added to the array as well.</p>
 </section>
 <section id="build-card-name-app-conf-tcl">
-<span id="ndk-app-conf-app-conf-tcl"></span><h4>build/&lt;card_name&gt;/app_conf.tcl<a class="headerlink" href="#build-card-name-app-conf-tcl" title="Permalink to this heading"></a></h4>
+<span id="ndk-app-conf-app-conf-tcl"></span><h4>build/&lt;card_name&gt;/app_conf.tcl<a class="headerlink" href="#build-card-name-app-conf-tcl" title="Link to this heading"></a></h4>
 <p>This file has the highest priority of all user-configurable
 constants (for more details, refer to the <a class="reference internal" href="#fig-const-hierarchy"><span class="std std-ref">Hierarchy diagram</span></a>). The user
 can change the parameters specified in this file or add others according to
@@ -449,10 +448,10 @@ their needs. Adding a parameter to the VHDL package is also possible because the
 </section>
 </section>
 <section id="tl-dr">
-<span id="ndk-conf-tldr"></span><h2>TL;DR<a class="headerlink" href="#tl-dr" title="Permalink to this heading"></a></h2>
+<span id="ndk-conf-tldr"></span><h2>TL;DR<a class="headerlink" href="#tl-dr" title="Link to this heading"></a></h2>
 <p>This section contains specific recipes for achieving specific goals.</p>
 <section id="i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value">
-<h3>I need to include specific component in CORE depending on a given parameter value<a class="headerlink" href="#i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value" title="Permalink to this heading"></a></h3>
+<h3>I need to include specific component in CORE depending on a given parameter value<a class="headerlink" href="#i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value" title="Link to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>First, you should write your parameter to the
 <code class="docutils literal notranslate"><span class="pre">core/intel/config/core_conf.tcl</span></code> with a specific value (if the parameter
@@ -512,7 +511,7 @@ which they were added to the array.</p></li>
 </div>
 </section>
 <section id="what-can-i-do-with-the-core-conf-tcl-file">
-<h3>What can I do with the <cite>core_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-conf-tcl-file" title="Permalink to this heading"></a></h3>
+<h3>What can I do with the <cite>core_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-conf-tcl-file" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>You can declare new configuration parameters (and assign their default
 values) so they would be visible across all supported cards. These default
@@ -522,7 +521,7 @@ Especially when new configuration parameter or parameter value is added.</p></li
 </ul>
 </section>
 <section id="what-can-i-do-with-the-core-const-tcl-file">
-<h3>What can I do with the <cite>core_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-const-tcl-file" title="Permalink to this heading"></a></h3>
+<h3>What can I do with the <cite>core_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-const-tcl-file" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>You can add a dependent parameter (the value of such a parameter depends on
 the value of another parameter). The developer should add CORE-specific
@@ -558,13 +557,13 @@ the <cite>fpga.vhd</cite> and <cite>fpga_common.vhd</cite> components:</p></li>
 </div>
 </section>
 <section id="what-can-i-do-with-the-card-conf-tcl-file">
-<h3>What can I do with the <cite>card_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-conf-tcl-file" title="Permalink to this heading"></a></h3>
+<h3>What can I do with the <cite>card_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-conf-tcl-file" title="Link to this heading"></a></h3>
 <p>You can change parameters specified in the <cite>core_conf.tcl</cite> file for a specific
 card type (because some parameters are directly dependent on an underlying
 hardware), e.g., the number of Ethernet ports or Ethernet channels.</p>
 </section>
 <section id="what-can-i-do-with-the-card-const-tcl-file">
-<h3>What can I do with the <cite>card_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-const-tcl-file" title="Permalink to this heading"></a></h3>
+<h3>What can I do with the <cite>card_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-const-tcl-file" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>You can add a dependent parameter when a card requiers it. CORE specific
 parameters belong to the <cite>core_const.tcl</cite>.</p></li>
@@ -574,7 +573,7 @@ parameters belong to the <cite>core_const.tcl</cite>.</p></li>
 </ul>
 </section>
 <section id="what-can-i-do-with-the-app-conf-tcl-file">
-<h3>What can I do with the <cite>app_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-app-conf-tcl-file" title="Permalink to this heading"></a></h3>
+<h3>What can I do with the <cite>app_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-app-conf-tcl-file" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>You can add parameters for the given application (component
 <cite>application_core.vhd</cite>).</p></li>
@@ -587,7 +586,7 @@ and <cite>core_const.tcl</cite>).</p></li>
 </section>
 </section>
 <section id="contact-for-author">
-<h2>Contact for author<a class="headerlink" href="#contact-for-author" title="Permalink to this heading"></a></h2>
+<h2>Contact for author<a class="headerlink" href="#contact-for-author" title="Link to this heading"></a></h2>
 <p>Send suggestions regarding missing information or unanswered questions to
 <cite>valekv&#64;cesnet.cz</cite>.</p>
 </section>

@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Packet Planner &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -138,7 +137,7 @@
            <div itemprop="articleBody">
              
   <section id="packet-planner">
-<span id="id1"></span><h1>Packet Planner<a class="headerlink" href="#packet-planner" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Packet Planner<a class="headerlink" href="#packet-planner" title="Link to this heading"></a></h1>
 <p>The Packet Planner processes input MVB packet headers by assigning addresses to an outside buffer space to each packet, so that they are placed one after another with the needed inter-packet gaps and alignment.
 With the help from the input read pointer from the outside buffer it also checks space availability and stops the header input before the buffer overflows.</p>
 <p>The user specifies:</p>
@@ -158,7 +157,7 @@ The Packet Planner itself propagates its internal write pointer to the user.
 This is meant mainly for debug purposes.
 You can also use it to simulate an infinite target buffer space by connecting it directly back as the read pointer.</p>
 <section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading"></a></h2>
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/packet_planner.svg" id="packet-planner-diagram"><img alt="" class="align-center" id="packet-planner-diagram" src="../../../../../_images/packet_planner.svg" width="100%" /></a>
 <p>The Packet Planner receives multiple input packet headers from multiple independent interfaces (<em>Streams</em>).
 Since all the pakcets are planned to a single linear buffer space, they are all serialized in a single input FIFOX Multi and processed as one stream of headers.
@@ -199,7 +198,7 @@ This fix should not lead to any throughput reduction considering the data in the
 </div>
 </section>
 <section id="additional-features">
-<h2>Additional features<a class="headerlink" href="#additional-features" title="Permalink to this heading"></a></h2>
+<h2>Additional features<a class="headerlink" href="#additional-features" title="Link to this heading"></a></h2>
 <p>Because the component has FIFOX Multis on its input and outputs, the number of parallel headers processed in the internal pipeline can be set independently with generic <code class="docutils literal notranslate"><span class="pre">PLANNED_PKTS</span></code>.
 This may allow the user to reduce internal logic complexity at the cost of throughput for small packets.</p>
 <p>The internal pipeline is enabled by Almost Full signals from the output FIFOs.
@@ -207,7 +206,7 @@ Using generics <code class="docutils literal notranslate"><span class="pre">STRE
 This will save you resources in cas you already have a FIFO placed somewhere after this component.</p>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <p>For more detailed description refer to Jan Kubalek’s <a class="reference external" href="https://www.fit.vut.cz/study/thesis-file/22958/22958.pdf">thesis</a> 2019/20.</p>
 </section>
 </section>

@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MVB agent &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -126,6 +125,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packet_generators/ft_gen_sequence/readme.html">FlowTest Sequence</a></li>
 </ul>
 </li>
 </ul>
@@ -159,9 +159,9 @@
            <div itemprop="articleBody">
              
   <section id="mvb-agent">
-<span id="uvm-mvb"></span><h1>MVB agent<a class="headerlink" href="#mvb-agent" title="Permalink to this heading"></a></h1>
+<span id="uvm-mvb"></span><h1>MVB agent<a class="headerlink" href="#mvb-agent" title="Link to this heading"></a></h1>
 <section id="interface">
-<h2>Interface<a class="headerlink" href="#interface" title="Permalink to this heading"></a></h2>
+<h2>Interface<a class="headerlink" href="#interface" title="Link to this heading"></a></h2>
 <p>MVB interface is simple interface which is composed of signals below.</p>
 <table class="docutils align-default">
 <thead>
@@ -196,13 +196,13 @@ Also there is one modport for monitor. This modport is used for both RX and TX.<
 <p>There are asserts to check correct settings and functionality of interface.</p>
 </section>
 <section id="sequence-item">
-<h2>Sequence item<a class="headerlink" href="#sequence-item" title="Permalink to this heading"></a></h2>
+<h2>Sequence item<a class="headerlink" href="#sequence-item" title="Link to this heading"></a></h2>
 <p>Sequence item have same signals as interface accept for <code class="docutils literal notranslate"><span class="pre">DATA</span></code>. In the <code class="docutils literal notranslate"><span class="pre">DATA</span></code> is saved all items in the array.
 There is <code class="docutils literal notranslate"><span class="pre">ITEMS</span></code>’s logic vector items with width of <code class="docutils literal notranslate"><span class="pre">ITEM_WIDTH</span></code>.</p>
 <p>All of those signals are randomized. There also are overridden UVM functions(“do_compare”, “do_copy” and “convert2string”).</p>
 </section>
 <section id="sequence">
-<h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this heading"></a></h2>
+<h2>Sequence<a class="headerlink" href="#sequence" title="Link to this heading"></a></h2>
 <p>There is <code class="docutils literal notranslate"><span class="pre">req</span></code> which is instance of sequence_item. There are 2 unsigned integers <code class="docutils literal notranslate"><span class="pre">max_transaction_count</span></code> and <code class="docutils literal notranslate"><span class="pre">min_transaction_count</span></code>.
 Last variable is randomized <code class="docutils literal notranslate"><span class="pre">transaction_count</span></code>. This variable is randomized in range of &lt;<code class="docutils literal notranslate"><span class="pre">max_transaction_count</span></code>, <code class="docutils literal notranslate"><span class="pre">min_transaction_count</span></code>&gt;.</p>
 <p>There are 2 sequences. One for RX and one for TX. This is because TX, and RX behave differently.
@@ -210,20 +210,20 @@ Signal <code class="docutils literal notranslate"><span class="pre">SRC_RDY</spa
 <p>Because of this there is one bit variable <code class="docutils literal notranslate"><span class="pre">next_action</span></code>. This bit decide on contents of actual <code class="docutils literal notranslate"><span class="pre">req</span></code> based on previous sequence item.</p>
 </section>
 <section id="driver">
-<h2>Driver<a class="headerlink" href="#driver" title="Permalink to this heading"></a></h2>
+<h2>Driver<a class="headerlink" href="#driver" title="Link to this heading"></a></h2>
 <p>The driver gets sequence_item from sequence and assign corresponding signals to interface.</p>
 <p>Because of behaviour described above there are also 2 drivers. One for RX and one for TX. The RX driver have to also create response and sand it back to sequence.</p>
 </section>
 <section id="monitor">
-<h2>Monitor<a class="headerlink" href="#monitor" title="Permalink to this heading"></a></h2>
+<h2>Monitor<a class="headerlink" href="#monitor" title="Link to this heading"></a></h2>
 <p>Monitor just waiting for monitor clocking block and than sample values at interface. And at the end he write this sample to the analysis port.</p>
 </section>
 <section id="config">
-<h2>Config<a class="headerlink" href="#config" title="Permalink to this heading"></a></h2>
+<h2>Config<a class="headerlink" href="#config" title="Link to this heading"></a></h2>
 <p>In the config 2 variables. First is <code class="docutils literal notranslate"><span class="pre">active</span></code> that decides if the driver and sequencer will be created. And the second one is <code class="docutils literal notranslate"><span class="pre">interface_name</span></code>.</p>
 </section>
 <section id="agent">
-<h2>Agent<a class="headerlink" href="#agent" title="Permalink to this heading"></a></h2>
+<h2>Agent<a class="headerlink" href="#agent" title="Link to this heading"></a></h2>
 <p>There are also 2 agents. Agent only connect everything together.</p>
 </section>
 </section>

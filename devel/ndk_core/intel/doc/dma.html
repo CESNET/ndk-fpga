@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The DMA module &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -129,7 +128,7 @@
            <div itemprop="articleBody">
              
   <section id="the-dma-module">
-<span id="ndk-intel-dma"></span><span id="ndk-dma"></span><h1>The DMA module<a class="headerlink" href="#the-dma-module" title="Permalink to this heading"></a></h1>
+<span id="ndk-intel-dma"></span><span id="ndk-dma"></span><h1>The DMA module<a class="headerlink" href="#the-dma-module" title="Link to this heading"></a></h1>
 <p>The DMA module is a wrapper containing the DMA controller (DMA IP), auxiliary, and debug logic. The connection of the DMA module is shown in the block diagram below. The DMA module is parametric and handles different numbers of DMA streams. The number of DMA streams corresponds to the number of instantiated DMA controllers. The currently supported DMA controllers in NDK are:</p>
 <ul class="simple">
 <li><p><strong>DMA Medusa IP</strong> – Closed-source DMA controller optimized for high throughput (up to 400 Gbps) and support for multiple PCIe endpoints. See the <span class="xref std std-ref">DMA Medusa IP documentation</span> for a detailed description.</p></li>
@@ -143,7 +142,7 @@
 <p>The DMA module optionally includes a <a class="reference internal" href="../../../ofm_doc/comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">Gen Loop Switch (GLS) module</span></a> for each DMA stream. The GLS module is used for debugging, contains packet generators and allows to enable loopback modes. The GLS module can be controlled through MI requests.</p>
 <a class="reference internal image-reference" href="../../../_images/dma_module.drawio.svg"><img alt="../../../_images/dma_module.drawio.svg" class="align-center" src="../../../_images/dma_module.drawio.svg" width="100%" /></a>
 <section id="selecting-a-dma-controller">
-<h2>Selecting a DMA controller<a class="headerlink" href="#selecting-a-dma-controller" title="Permalink to this heading"></a></h2>
+<h2>Selecting a DMA controller<a class="headerlink" href="#selecting-a-dma-controller" title="Link to this heading"></a></h2>
 <p>Before running the FPGA firmware compilation, the desired DMA controller can be selected using the makefile parameter <code class="docutils literal notranslate"><span class="pre">DMA_TYPE</span></code>. Without this parameter, the default DMA controller is automatically selected. These are the allowed values:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=0</span></code> – No DMA IP is instantiated. DMA IP is replaced by a loopback.</p></li>
@@ -156,7 +155,7 @@
 </div>
 </section>
 <section id="dma-medusa-ip-notes">
-<h2>DMA Medusa IP notes<a class="headerlink" href="#dma-medusa-ip-notes" title="Permalink to this heading"></a></h2>
+<h2>DMA Medusa IP notes<a class="headerlink" href="#dma-medusa-ip-notes" title="Link to this heading"></a></h2>
 <p>The DMA Medusa IP has an internal architecture divided into several DMA endpoints, each rated for 100 Gbps throughput. See the <span class="xref std std-ref">DMA Medusa documentation</span> for a detailed description. Individual DMA endpoints are statically mapped to a physical PCIe endpoint (mapping is implemented in the <a class="reference internal" href="pcie.html#ndk-pcie-mod"><span class="std std-ref">PCIe module</span></a>). The current implementation allows one or two DMA endpoints to be mapped to one PCIe endpoint. Individual DMA channels of the DMA Medusa IP are controlled through MI requests, therefore, the <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> is also mapped to the DMA Medusa from individual PCIe endpoints.</p>
 </section>
 </section>

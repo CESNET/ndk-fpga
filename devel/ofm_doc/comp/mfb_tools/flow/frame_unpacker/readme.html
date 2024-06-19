@@ -1,29 +1,28 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Frame Unpacker &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
     <link rel="next" title="MFB Splitter Simple" href="../splitter_simple/readme.html" />
-    <link rel="prev" title="MFB Reconfigurator" href="../reconfigurator/readme.html" /> 
+    <link rel="prev" title="Frame Packer" href="../frame_packer/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -85,6 +84,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_packer/readme.html">Frame Packer</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Frame Unpacker</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#arcitecture">Arcitecture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -157,10 +157,10 @@
            <div itemprop="articleBody">
              
   <section id="frame-unpacker">
-<span id="id1"></span><h1>Frame Unpacker<a class="headerlink" href="#frame-unpacker" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Frame Unpacker<a class="headerlink" href="#frame-unpacker" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-frame_unpacker">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">FRAME_UNPACKER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-frame_unpacker" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">FRAME_UNPACKER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-frame_unpacker" title="Link to this definition"></a></dt>
 <dd><p>This unit accepts and processes SuperPackets.
 SuperPackets consist of one or more MFB frames.
 Each of these <code class="docutils literal notranslate"><span class="pre">individual</span></code> frames has a special header:</p>
@@ -425,7 +425,7 @@ Contains concatenated MVB header and extracted SuperPacket header (RX_MVB_DATA &
 </dd></dl>
 
 <section id="arcitecture">
-<h2>Arcitecture<a class="headerlink" href="#arcitecture" title="Permalink to this heading"></a></h2>
+<h2>Arcitecture<a class="headerlink" href="#arcitecture" title="Link to this heading"></a></h2>
 <p>The Frame Unpacker operates in the following way.
 First, it extracts the length of the first individual frame of the SuperPacket from the first header (located immediately behind SOF).
 To get the offset of the SOF of the following individual frame, it makes a sum of the length (from the header), length of the header (a constant), and the SOF POS (which is offset by the region it is located in).
@@ -453,17 +453,17 @@ These are then forwarded to the output on MVB or are inserted as metadata to the
 At the end of the pipeline, the headers of the individual packets are cut off (which does not happen during their extraction).</p>
 </section>
 <section id="block-diagram">
-<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading"></a></h2>
+<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/frame_unpacker_diagram.drawio.svg" id="frame-unpacker-schematic"><img alt="" class="align-center" id="frame-unpacker-schematic" src="../../../../../_images/frame_unpacker_diagram.drawio.svg" width="100%" /></a>
 </section>
 <section id="subcomponents">
-<h2>Subcomponents<a class="headerlink" href="#subcomponents" title="Permalink to this heading"></a></h2>
+<h2>Subcomponents<a class="headerlink" href="#subcomponents" title="Link to this heading"></a></h2>
 <p>The Frame Unpacker has two dedicated subcomponents: the Offset Processor and the SOF Creator.
 They are illustrated at the bottom of the diagram above and documented below.</p>
 <p><strong>Offset Processor</strong></p>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-offset_processor">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">OFFSET_PROCESSOR</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-offset_processor" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">OFFSET_PROCESSOR</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-offset_processor" title="Link to this definition"></a></dt>
 <dd><p>The Offset Processor (OP) receives the offset from the OP in the previous stage along with its SOF (the Old SOF).
 From the SOF Creator (also in the previous stage), it receives the extracted Length and its own SOF (the New SOF).
 Based on the Old SOF, it propagates either the received offset (when Old SOF = 1) or “creates” a new offset by rounding up the received offset to the next Block and adding the received length to it.
@@ -666,7 +666,7 @@ Options: “serial”, “parallel”, “prefixsum”</p></td>
 <p><strong>SOF Creator</strong></p>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-sof_creator">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">SOF_CREATOR</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-sof_creator" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">SOF_CREATOR</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-sof_creator" title="Link to this definition"></a></dt>
 <dd><p>The SOF Creator accepts the “new” offset from the Offset Processor and rounds it up to the nearest Block.
 Then it evaluates it to determine whether it points to this Word and this Region, and if it does, it asserts (creates) SOF.
 Lastly, with the help of the rounded offset, it extracts the Length field of the header of the following individual frame in the SuperPacket.</p>
@@ -846,7 +846,7 @@ Lastly, with the help of the rounded offset, it extracts the Length field of the
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../reconfigurator/readme.html" class="btn btn-neutral float-left" title="MFB Reconfigurator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../frame_packer/readme.html" class="btn btn-neutral float-left" title="Frame Packer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../splitter_simple/readme.html" class="btn btn-neutral float-right" title="MFB Splitter Simple" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

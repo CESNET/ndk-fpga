@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rate Limiter &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -85,6 +84,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_packer/readme.html">Frame Packer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
@@ -158,11 +158,11 @@
            <div itemprop="articleBody">
              
   <section id="rate-limiter">
-<span id="id1"></span><h1>Rate Limiter<a class="headerlink" href="#rate-limiter" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Rate Limiter<a class="headerlink" href="#rate-limiter" title="Link to this heading"></a></h1>
 <p>The Rate limiter modifies the output speed according to the given configuration.
 The user can set the speed to anything, from a constant rate to complex patterns, as needed for the specific application.</p>
 <section id="operation">
-<h2>Operation<a class="headerlink" href="#operation" title="Permalink to this heading"></a></h2>
+<h2>Operation<a class="headerlink" href="#operation" title="Link to this heading"></a></h2>
 <p>The component forwards the incoming data unchanged.
 Based on the values loaded to the configuration registers, it either lets the traffic flow through at full speed or slows the traffic down when the limit of the configured rate is reached.
 The user configures the output speed per each Interval (see the picture below).
@@ -194,7 +194,7 @@ See the Speed conversions and Adjusting Section Length sections below.
 This way, any conversions in the firmware can be omitted, which simplifies the logic.</p>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-rate_limiter">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">RATE_LIMITER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-rate_limiter" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">RATE_LIMITER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-rate_limiter" title="Link to this definition"></a></dt>
 <dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -418,7 +418,7 @@ Maximum: 2**MI_DATA_WIDTH</p></td>
 
 </section>
 <section id="address-space-and-configuration">
-<h2>Address space and configuration<a class="headerlink" href="#address-space-and-configuration" title="Permalink to this heading"></a></h2>
+<h2>Address space and configuration<a class="headerlink" href="#address-space-and-configuration" title="Link to this heading"></a></h2>
 <p>The component has several registers accessible through the MI interface that are used for its configuration.</p>
 <table class="docutils align-default">
 <thead>
@@ -486,7 +486,7 @@ Maximum: 2**MI_DATA_WIDTH</p></td>
 </table>
 </section>
 <section id="usage">
-<span id="id2"></span><h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
+<span id="id2"></span><h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
 <p><strong>Intro</strong></p>
 <p>The status register is also used as a control register.
 By setting its bits (flags), the user can change the working modes of the Rate Limiter and its settings.
@@ -577,7 +577,7 @@ Both Auxiliary bits are always set simultaneously, so for data consistency, eith
 For example, if you’re using packet limiting - the LIMITING TYPE flag is set to 1 - and then you wish to reset the pointer in the IDLE state, make sure you also set the LIMITING TYPE flag to 1 because this single write request will overwrite both bits.</p>
 </section>
 <section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this heading"></a></h2>
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>To simulate intervals of different lengths, set the same output speed to more Intervals in a row.</p></li>
 <li><p>Remember to set consecutive speed registers. Upon encountering a gap in the form of an invalid (not set) speed register, the component loops from the first speed again.</p></li>

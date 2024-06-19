@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Device Tree &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -122,54 +121,54 @@
            <div itemprop="articleBody">
              
   <section id="device-tree">
-<span id="ndk-devtree"></span><h1>Device Tree<a class="headerlink" href="#device-tree" title="Permalink to this heading"></a></h1>
+<span id="ndk-devtree"></span><h1>Device Tree<a class="headerlink" href="#device-tree" title="Link to this heading"></a></h1>
 <p>Using <a class="reference external" href="https://www.kernel.org/doc/html/latest/devicetree/index.html">the Device Tree</a> (DT), we describe the contents of the firmware for the utility software: base addresses, versions and features of the individual components. To a certain extent, the Device Tree communicates to the user basic information about the HW platform, firmware version, etc. The Device Tree structure will be closely linked to a specific firmware - integrated inside.</p>
 <section id="dt-integration-in-build-system">
-<h2>DT integration in build system<a class="headerlink" href="#dt-integration-in-build-system" title="Permalink to this heading"></a></h2>
+<h2>DT integration in build system<a class="headerlink" href="#dt-integration-in-build-system" title="Link to this heading"></a></h2>
 <p>There are scripts in the translation system that go through components using <code class="docutils literal notranslate"><span class="pre">Modules.tcl</span></code>. The top-level <code class="docutils literal notranslate"><span class="pre">DevTree.tcl</span></code> script (in ofm/build) first inserts general information in the form of DT-properties into the DTS framework (build time, current repository revision, author of the firmware build, etc.). Then, if it exists, it calls a function called <code class="docutils literal notranslate"><span class="pre">dts_build_project</span></code>, and it calls the <code class="docutils literal notranslate"><span class="pre">dts_build_netcope</span></code> function, which should be included in each base of the card project (typically a top-level directory with <code class="docutils literal notranslate"><span class="pre">fpga_common.vhd</span></code>). Here, the card project already ensures the insertion of specific information (eg card type) itself, including the instancing of its subcomponents (typically <code class="docutils literal notranslate"><span class="pre">dts_boot_controller</span></code>, <code class="docutils literal notranslate"><span class="pre">dts_dma_module</span></code>, <code class="docutils literal notranslate"><span class="pre">dts_application</span></code>…) and passing generics to these functions.</p>
 <p>After running make (for compiling the firmware of the selected card) a file <code class="docutils literal notranslate"><span class="pre">DevTree.dts</span></code> (generated by passing TCL scripts <code class="docutils literal notranslate"><span class="pre">DevTree.tcl</span></code>) and VHDL package <code class="docutils literal notranslate"><span class="pre">DevTree.vhd</span></code> are created, which contains std_logic_vector <code class="docutils literal notranslate"><span class="pre">DTB_DATA</span></code> (which is a binary representation of compiled (<a class="reference external" href="https://github.com/dgibson/dtc/tree/main/libfdt">dtc</a>) and compressed (<a class="reference external" href="https://www.kernel.org/doc/html/latest/staging/xz.html">xz</a>) input <code class="docutils literal notranslate"><span class="pre">DevTree.dts</span></code> file). This package is used by the <code class="docutils literal notranslate"><span class="pre">PCI_EXT_CAP</span></code> component, see the next chapter.</p>
 <p>Because constants in packages cannot be accessed directly in TCL, the <code class="docutils literal notranslate"><span class="pre">user_const.vhd</span></code> package files are generated by the TCL script <code class="docutils literal notranslate"><span class="pre">user_const.tcl</span></code>. This is the only way to ensure consistency in top-level generations and Device Tree descriptions. Translation scripts need <a class="reference external" href="https://github.com/dgibson/dtc/tree/main/libfdt">the dtc compiler</a> for their operation.</p>
 </section>
 <section id="location-of-dtb-in-the-firmware">
-<h2>Location of DTB in the firmware<a class="headerlink" href="#location-of-dtb-in-the-firmware" title="Permalink to this heading"></a></h2>
+<h2>Location of DTB in the firmware<a class="headerlink" href="#location-of-dtb-in-the-firmware" title="Link to this heading"></a></h2>
 <p>The DT blob is located in the PCI configuration space. A custom extension (PCIe VSEC - Vendor-Specific Extended Capability) has been created. Because the configuration space is relatively small, there are only a few control registers that make the entire DTB stored in BRAM accessible. In this way, the DTB does not load the MI bus and cannot be easily or accidentally removed from the design. You can use the dtc tool to read the complete Device Tree from the FPGA card:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># dtc -I dtb /dev/nfb0</span>
 </pre></div>
 </div>
 </section>
 <section id="example-of-dts-of-one-component">
-<h2>Example of DTS of one component<a class="headerlink" href="#example-of-dts-of-one-component" title="Permalink to this heading"></a></h2>
-<div class="highlight-dts notranslate"><div class="highlight"><pre><span></span>/*
- * ref_name:   instance name, typically populated by the parent module when needed
- *             get reference to the installed component (can be empty)
- * my_comp:    component name, populates the dts_my_comp function
- * reg:        component address space
- *             - the first value indicates the base address on the MI,
- *             - the second value indicates the internal space size used
- * compatible: a driver submodule or software tool is bound to this string
- *             There must be a node specification for a specific compatible string:
- *             - properties and subnode names
- *             - their types and connection to HW functionality
- *             - mandatory or optional items
- *             no SW tool works directly with node without compatible property
- * version:    version of the component in terms of SW interface (register functions)
- * type:       additional / optional property
- *             - can specify large changes in the component
- *             - possibly extends the property compatible
- * others:     other properties / subnodes that the software can use
-*/
+<h2>Example of DTS of one component<a class="headerlink" href="#example-of-dts-of-one-component" title="Link to this heading"></a></h2>
+<div class="highlight-dts notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * ref_name:   instance name, typically populated by the parent module when needed</span>
+<span class="cm"> *             get reference to the installed component (can be empty)</span>
+<span class="cm"> * my_comp:    component name, populates the dts_my_comp function</span>
+<span class="cm"> * reg:        component address space</span>
+<span class="cm"> *             - the first value indicates the base address on the MI,</span>
+<span class="cm"> *             - the second value indicates the internal space size used</span>
+<span class="cm"> * compatible: a driver submodule or software tool is bound to this string</span>
+<span class="cm"> *             There must be a node specification for a specific compatible string:</span>
+<span class="cm"> *             - properties and subnode names</span>
+<span class="cm"> *             - their types and connection to HW functionality</span>
+<span class="cm"> *             - mandatory or optional items</span>
+<span class="cm"> *             no SW tool works directly with node without compatible property</span>
+<span class="cm"> * version:    version of the component in terms of SW interface (register functions)</span>
+<span class="cm"> * type:       additional / optional property</span>
+<span class="cm"> *             - can specify large changes in the component</span>
+<span class="cm"> *             - possibly extends the property compatible</span>
+<span class="cm"> * others:     other properties / subnodes that the software can use</span>
+<span class="cm">*/</span>
 
-ref_name: my_comp {
-    reg = &lt;$BASE_ADDRESS 0x40&gt;;
-    compatible = &quot;cesnet,my_comp&quot;;
-    version = &lt;0x00010004&gt;;
-    type = &quot;reduced&quot;;
-};
+<span class="nl">ref_name</span><span class="p">:</span><span class="w"> </span><span class="nf">my_comp</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kr">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="err">$</span><span class="na">BASE_ADDRESS</span><span class="w"> </span><span class="mh">0x40</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cesnet,my_comp&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0x00010004</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;reduced&quot;</span><span class="p">;</span>
+<span class="p">};</span>
 </pre></div>
 </div>
 </section>
 <section id="example-of-generated-dts-for-fpga-card">
-<h2>Example of generated DTS for FPGA card<a class="headerlink" href="#example-of-generated-dts-for-fpga-card" title="Permalink to this heading"></a></h2>
+<h2>Example of generated DTS for FPGA card<a class="headerlink" href="#example-of-generated-dts-for-fpga-card" title="Link to this heading"></a></h2>
 <div class="highlight-dts notranslate"><div class="highlight"><pre><span></span><span class="cp">/dts-v1/</span><span class="p">;</span>
 
 <span class="nf">/</span><span class="cm"> </span><span class="p">{</span>
@@ -750,7 +749,7 @@ ref_name: my_comp {
 </div>
 </section>
 <section id="requirements-for-developers">
-<h2>Requirements for developers<a class="headerlink" href="#requirements-for-developers" title="Permalink to this heading"></a></h2>
+<h2>Requirements for developers<a class="headerlink" href="#requirements-for-developers" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><dl class="simple">
 <dt>Requirements for SW developers:</dt><dd><ul>

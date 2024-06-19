@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Network Module &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -140,7 +139,7 @@
            <div itemprop="articleBody">
              
   <section id="the-network-module">
-<span id="ndk-intel-net-mod"></span><span id="ndk-net-mod"></span><h1>The Network Module<a class="headerlink" href="#the-network-module" title="Permalink to this heading"></a></h1>
+<span id="ndk-intel-net-mod"></span><span id="ndk-net-mod"></span><h1>The Network Module<a class="headerlink" href="#the-network-module" title="Link to this heading"></a></h1>
 <p>Network Module enables connection of the NDK platform to an Ethernet interface(s).
 The basic architecture is displayed below.</p>
 <a class="reference internal image-reference" href="../../../_images/network_module_arch.svg"><img alt="../../../_images/network_module_arch.svg" class="align-center" src="../../../_images/network_module_arch.svg" width="65%" /></a>
@@ -175,7 +174,7 @@ The MI PHY Splitter forwards requests to one or more instances of the Network Mo
 The MI Splitter forwards requests to one or more instances of Network Module Logic.
 The main blocks and their connection between address spaces are in the table below:</p>
 <table class="docutils align-center" id="id6">
-<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id6" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id6" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 12.5%" />
 <col style="width: 25.0%" />
@@ -211,13 +210,13 @@ The main blocks and their connection between address spaces are in the table bel
 <div class="line"><br /></div>
 </div>
 <section id="how-to-use-the-network-module-interfaces">
-<h2>How to use the Network Module interfaces<a class="headerlink" href="#how-to-use-the-network-module-interfaces" title="Permalink to this heading"></a></h2>
+<h2>How to use the Network Module interfaces<a class="headerlink" href="#how-to-use-the-network-module-interfaces" title="Link to this heading"></a></h2>
 <p>In the following two subsections, you will learn how to work with the interfaces of the Network Module that connect to the Application (left side of the diagram above).
 That includes the format in which data should be sent to and received from the Application.
 The Ethernet packets are sent over the <a class="reference internal" href="../../../ofm_doc/comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB bus</span></a>, some additional info is sent over the <a class="reference internal" href="../../../ofm_doc/comp/mvb_tools/readme.html#mvb-bus"><span class="std std-ref">MVB bus</span></a>, and access to the CSR registers is provided over the <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a>.
 We strongly recommend reading their specifications before trying to use them.</p>
 <section id="receiving-packets-from-the-application">
-<h3>Receiving packets from the Application<a class="headerlink" href="#receiving-packets-from-the-application" title="Permalink to this heading"></a></h3>
+<h3>Receiving packets from the Application<a class="headerlink" href="#receiving-packets-from-the-application" title="Link to this heading"></a></h3>
 <p>Ethernet packets enter the Network Module through the MFB bus (<code class="docutils literal notranslate"><span class="pre">RX_MFB_*</span></code>) along with its metadata (<code class="docutils literal notranslate"><span class="pre">RX_MFB_HDR</span></code>).
 MFB bus carries the actual packet data, and metadata data contain the Ethernet header.
 The packet data is an Ethernet frame without CRC.
@@ -319,7 +318,7 @@ The format of the header received from the Application (<code class="docutils li
 
 </section>
 <section id="transmitting-packets-to-the-application">
-<h3>Transmitting packets to the Application<a class="headerlink" href="#transmitting-packets-to-the-application" title="Permalink to this heading"></a></h3>
+<h3>Transmitting packets to the Application<a class="headerlink" href="#transmitting-packets-to-the-application" title="Link to this heading"></a></h3>
 <p>Ethernet packets are sent to the Application over two buses: the MFB (<code class="docutils literal notranslate"><span class="pre">TX_MFB_*</span></code>) and the MVB (<code class="docutils literal notranslate"><span class="pre">TX_MVB_*</span></code>).
 The MFB bus carries the actual packet data, and the MVB bus carries the packet’s metadata.
 Both buses have independent flow control.</p>
@@ -336,7 +335,7 @@ All header items are also listed in the <code class="docutils literal notranslat
 </section>
 </section>
 <section id="sw-access-to-the-network-module-cores-and-network-module-logics">
-<h2>SW access to the Network Module Cores and Network Module Logics<a class="headerlink" href="#sw-access-to-the-network-module-cores-and-network-module-logics" title="Permalink to this heading"></a></h2>
+<h2>SW access to the Network Module Cores and Network Module Logics<a class="headerlink" href="#sw-access-to-the-network-module-cores-and-network-module-logics" title="Link to this heading"></a></h2>
 <p>The Network Module Core(s) is/are accessed over the MI PHY bus.
 Each Core has its own address space offset from each other by 0x00200000.
 According to this offset, the MI PHY Splitter forwards the MI transactions to the target Core(s).
@@ -352,7 +351,7 @@ The only difference is the address offset, which is 0x2000.</p>
 </div>
 <p>The addressing of both main blocks is described in the tables below:</p>
 <table class="docutils align-center" id="id7">
-<caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id7" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id7" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 15.4%" />
 <col style="width: 30.8%" />
@@ -387,7 +386,7 @@ The only difference is the address offset, which is 0x2000.</p>
 <div class="line"><br /></div>
 </div>
 <table class="docutils align-center" id="id8">
-<caption><span class="caption-text">Tab. 3</span><a class="headerlink" href="#id8" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">Tab. 3</span><a class="headerlink" href="#id8" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 15.4%" />
 <col style="width: 30.8%" />
@@ -423,7 +422,7 @@ The only difference is the address offset, which is 0x2000.</p>
 </div>
 </section>
 <section id="network-module-core">
-<span id="newtwork-module-core"></span><h2>Network Module Core<a class="headerlink" href="#network-module-core" title="Permalink to this heading"></a></h2>
+<span id="newtwork-module-core"></span><h2>Network Module Core<a class="headerlink" href="#network-module-core" title="Link to this heading"></a></h2>
 <p>The so-called Network Module Core is a subcomponent of the Network Module.
 It contains the required hard IP(s), appropriate adapters, and an MI component for reconfiguring the hard IP(s).
 Right now, the Network Module can use three different Ethernet hard IPs, for Intel FPGA, it is the E-tile or the F-Tile, and for the Xilinx FPGA, it is the CMAC.
@@ -467,7 +466,7 @@ The Network Module Core always uses the appropriate adapters (according to the h
 <p>Each channel on both E-tile and F-tile architectures also includes a diagnostic post-MAC loopback module, which (when enabled via the MGMT) re-transmits received frames back to the link partner. We call this mode the “PCS reverse loopback”. When the loopback is active, received frames are also passed to the Application as in normal mode. However, the frames transmitted from the Application are discarded.
 See the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-eth.html">nfb-eth tool</a> documentation for instructions on how to turn the loopback on/off.</p>
 <section id="sw-access-to-the-reconfiguration-interfaces">
-<span id="sw-access-reconfig-infs"></span><h3>SW access to the reconfiguration interfaces<a class="headerlink" href="#sw-access-to-the-reconfiguration-interfaces" title="Permalink to this heading"></a></h3>
+<span id="sw-access-reconfig-infs"></span><h3>SW access to the reconfiguration interfaces<a class="headerlink" href="#sw-access-to-the-reconfiguration-interfaces" title="Link to this heading"></a></h3>
 <p>Software access is provided via the management unit (MGMT), which is instantiated per channel.
 This component employs an MDIO (Management Data Input/Output) interface.
 Its main task is to provide access to the reconfiguration interfaces of the hard IP(s).
@@ -487,7 +486,7 @@ The addresses of the available CSR registers in reconfiguration interfaces are r
 </section>
 </section>
 <section id="network-module-logic">
-<span id="newtwork-module-logic"></span><h2>Network Module Logic<a class="headerlink" href="#network-module-logic" title="Permalink to this heading"></a></h2>
+<span id="newtwork-module-logic"></span><h2>Network Module Logic<a class="headerlink" href="#network-module-logic" title="Link to this heading"></a></h2>
 <p>The Network Module Core is connected to Network Module Logic which contains <a class="reference external" href="https://ndk.gitlab.liberouter.org:5051/ofm/comp/nic/mac_lite/tx_mac_lite/readme.html">TX</a>  and <a class="reference external" href="https://ndk.gitlab.liberouter.org:5051/ofm/comp/nic/mac_lite/rx_mac_lite/readme.html">RX</a> MAC Lites.
 There is one MAC Lite pair (TX + RX) for each Ethernet channel, and they are connected one-on-one to appropriate adapters located in the Network Module Core.
 On the other side, TX MAC Lites receive data from the MFB Splitter, which splits the incoming stream of MFB data into channels (according to the PORT item of the header, see the <code class="docutils literal notranslate"><span class="pre">eth_hdr_pack</span></code> above).
@@ -502,7 +501,7 @@ To achieve the same throughput in both clock domains, the width of the MFB bus i
 The Network Module Logic is connected to the TimeStamp Unit (<a class="reference internal" href="tsu.html#ndk-tsu"><span class="std std-ref">TSU</span></a>), which generates timestamps.
 The timestamps are inserted per frame into their header (the <code class="docutils literal notranslate"><span class="pre">TIMESTAMP</span></code> and <code class="docutils literal notranslate"><span class="pre">TIMESTAMPVLD</span></code> items of the header).</p>
 <section id="sw-access-to-the-mac-lites">
-<span id="sw-access-mac-lites"></span><h3>SW access to the MAC Lites<a class="headerlink" href="#sw-access-to-the-mac-lites" title="Permalink to this heading"></a></h3>
+<span id="sw-access-mac-lites"></span><h3>SW access to the MAC Lites<a class="headerlink" href="#sw-access-to-the-mac-lites" title="Link to this heading"></a></h3>
 <p>The MI splitting logic block shown in the diagram below is a virtual block that exists only to explain the Network Module (it is not an actual component).
 The purpose of this subsection is to describe the access to the MAC Lites for multi-channel configurations.
 The diagram below shows how the MAC Lites are connected to the MI bus.</p>
@@ -520,7 +519,7 @@ To create a complete address of a MAC Lite register, add the address of the regi
 To show the connections of the MAC Lites, an example of the MAC Lite address spaces for a configuration with two 4x25 GE ports follows.</p>
 <p>Notation: TX_MAC_LITE(port_id)(channel_id), RX_MAC_LITE(port_id)(channel_id).</p>
 <table class="docutils align-center" id="id9">
-<caption><span class="caption-text">Tab. 4</span><a class="headerlink" href="#id9" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">Tab. 4</span><a class="headerlink" href="#id9" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 28.6%" />
 <col style="width: 42.9%" />

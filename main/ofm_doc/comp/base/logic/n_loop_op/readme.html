@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>N_LOOP_OP &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -136,7 +135,7 @@
            <div itemprop="articleBody">
              
   <section id="n-loop-op">
-<span id="id1"></span><h1>N_LOOP_OP<a class="headerlink" href="#n-loop-op" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>N_LOOP_OP<a class="headerlink" href="#n-loop-op" title="Link to this heading"></a></h1>
 <p>The N_LOOP_OP (N-loop operator) is a unit for performing multiple parallel read-modify-write operations over an multi-port memory.
 The user defines the number of read-modify-write interfaces (operators) and the number of read-only interfaces (these have simpler architecture) and the unit provides user-friendly interfaces for this to be done.
 There are 2 main reasons why this is easier compared to solving the problem yourself:</p>
@@ -155,15 +154,15 @@ This unit provides information about the occurence of a collision and enables th
 Try to keep this number as low as possible to avoid problems with timing and resource consumption.</p>
 </div>
 <section id="block-diagram">
-<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading"></a></h2>
+<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/n_loop_op.svg" id="n-loop-op-diagram"><img alt="" class="align-center" id="n-loop-op-diagram" src="../../../../../_images/n_loop_op.svg" width="100%" /></a>
 </section>
 <section id="operator-flow">
-<h2>Operator flow<a class="headerlink" href="#operator-flow" title="Permalink to this heading"></a></h2>
+<h2>Operator flow<a class="headerlink" href="#operator-flow" title="Link to this heading"></a></h2>
 <p>Here is an example of how the N_LOOP_OP can be used when working with items stored in a memory.
 This example demonstrates how to use the unit’s interfaces and the overall flow of operators.</p>
 <section id="situation">
-<h3>Situation<a class="headerlink" href="#situation" title="Permalink to this heading"></a></h3>
+<h3>Situation<a class="headerlink" href="#situation" title="Link to this heading"></a></h3>
 <p>Lets say you have a memory with statistic 64 counters.
 Your design is connected to 3 independent interfaces (<em>I0</em>, <em>I1</em> and <em>I2</em>).
 Each of the interfaces can send you a request to <em>increment</em> or <em>decrement</em> the a counter on a specific address (0 - 63) by 1.
@@ -173,7 +172,7 @@ There is also an interface <em>Iset</em>, which can send you a request to <em>se
 A <em>set</em> request has a priority over any <em>increment</em> or <em>decrement</em> requests over the same counter.</p>
 </section>
 <section id="solution">
-<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this heading"></a></h3>
+<h3>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h3>
 <p>To implement this example using the N_LOOP_OP you need to define the following:</p>
 <ol class="arabic">
 <li><p>Number of operators.</p>
@@ -257,9 +256,9 @@ Now, only operator process 0 needs to support the <em>set</em> operation, becaus
 </section>
 </section>
 <section id="additional-features">
-<h2>Additional Features<a class="headerlink" href="#additional-features" title="Permalink to this heading"></a></h2>
+<h2>Additional Features<a class="headerlink" href="#additional-features" title="Link to this heading"></a></h2>
 <section id="quick-reset">
-<h3>Quick reset<a class="headerlink" href="#quick-reset" title="Permalink to this heading"></a></h3>
+<h3>Quick reset<a class="headerlink" href="#quick-reset" title="Link to this heading"></a></h3>
 <p>Generics: <code class="docutils literal notranslate"><span class="pre">QUICK_RESET_EN</span></code> and <code class="docutils literal notranslate"><span class="pre">RESET_VAL</span></code></p>
 <p>The quick reset feature allows you to reset all values in the internal memory to a specific value by activating the <code class="docutils literal notranslate"><span class="pre">RESET</span></code>.
 This feature adds additional logic.</p>

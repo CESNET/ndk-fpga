@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NDK testing &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -118,7 +117,7 @@
            <div itemprop="articleBody">
              
   <section id="ndk-testing">
-<span id="id1"></span><h1>NDK testing<a class="headerlink" href="#ndk-testing" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>NDK testing<a class="headerlink" href="#ndk-testing" title="Link to this heading"></a></h1>
 <p>This chapter describes how the NDK firmware and its HDL components can be tested:</p>
 <ul class="simple">
 <li><p>Test R/W access to scratch registers in the NDK firmware (<a class="reference internal" href="#ndk-testing-mi"><span class="std std-ref">see below</span></a>).</p></li>
@@ -127,7 +126,7 @@
 <li><p>There is also a <a class="reference internal" href="../intel/cocotb/README.html#cocotb-sim"><span class="std std-ref">simulation of almost the entire firmware using cocotb</span></a> (however, it is not yet publicly available).</p></li>
 </ul>
 <section id="testing-r-w-access-to-the-scratch-registers">
-<span id="ndk-testing-mi"></span><h2>Testing R/W access to the scratch registers<a class="headerlink" href="#testing-r-w-access-to-the-scratch-registers" title="Permalink to this heading"></a></h2>
+<span id="ndk-testing-mi"></span><h2>Testing R/W access to the scratch registers<a class="headerlink" href="#testing-r-w-access-to-the-scratch-registers" title="Link to this heading"></a></h2>
 <p>The NDK firmware implements 64 32-bit scratch registers for testing purposes. Like other parts of the firmware, they are accessible via the <a class="reference internal" href="../intel/doc/mi.html#ndk-mi"><span class="std std-ref">MI bus</span></a>. This address space is (among other things) stored in the <a class="reference internal" href="devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a>. The <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-bus.html">nfb-bus tool</a> can be used for easy R/W access to any register in the firmware that is mapped to the MI bus. The following example shows how to:</p>
 <ul class="simple">
 <li><p>read the first scratch register (the offset is 0x0 in the byte format) in the MI TEST SPACE component (selected using the DeviceTree path),</p></li>
@@ -144,7 +143,7 @@ $<span class="w"> </span>nfb-bus<span class="w"> </span>-p<span class="w"> </spa
 <p>You can test R/W requests to the NDK firmware address space of these scratch registers however you want. Similarly, in the future, you can access the registers in your own application that you build on the NDK platform.</p>
 </section>
 <section id="gls-module-tutorial">
-<span id="ndk-testing-gls"></span><h2>GLS module tutorial<a class="headerlink" href="#gls-module-tutorial" title="Permalink to this heading"></a></h2>
+<span id="ndk-testing-gls"></span><h2>GLS module tutorial<a class="headerlink" href="#gls-module-tutorial" title="Link to this heading"></a></h2>
 <p>The NDK firmware may include a GLS module that is instantiated in each DMA stream between the application core and the DMA controller. The GLS module is used for testing purposes and contains HW packet generators, speed meters, and datapath switches. Please refer to the <a class="reference internal" href="../../ofm_doc/comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">GLS module documentation</span></a> for a more information.</p>
 <p>The GLS module also comes with a Python script (<code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/ofm/comp/mfb_tools/debug/gen_loop_switch/sw/gls_mod.py</span></code>) that can be used to quickly perform several basic tests (modes). For example, you can measure the throughput of the NDK firmware. A list of tests can be obtained by running this script without parameters:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 gls_mod.py

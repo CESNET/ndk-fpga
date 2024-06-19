@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>logic_vector_array_mfb environment &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -123,6 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packet_generators/ft_gen_sequence/readme.html">FlowTest Sequence</a></li>
 </ul>
 </li>
 </ul>
@@ -156,7 +156,7 @@
            <div itemprop="articleBody">
              
   <section id="logic-vector-array-mfb-environment">
-<span id="logic-vector-array-mfb-mfb"></span><h1>logic_vector_array_mfb environment<a class="headerlink" href="#logic-vector-array-mfb-environment" title="Permalink to this heading"></a></h1>
+<span id="logic-vector-array-mfb-mfb"></span><h1>logic_vector_array_mfb environment<a class="headerlink" href="#logic-vector-array-mfb-environment" title="Link to this heading"></a></h1>
 <p>This environment has two high-level agents. The first one is a logic vector array agent and it works with data. The second one is a logic vector agent which works with metadata.
 This package contains two environments. Environment RX generates data and metadata and sends them to the DUT. Environment TX generates the DST_RDY signal and
 observes the TX interface.</p>
@@ -169,14 +169,14 @@ observes the TX interface.</p>
 <li><p>META_WIDTH</p></li>
 </ul>
 <section id="op-sequencers-and-sequences">
-<h2>op sequencers and sequences<a class="headerlink" href="#op-sequencers-and-sequences" title="Permalink to this heading"></a></h2>
+<h2>op sequencers and sequences<a class="headerlink" href="#op-sequencers-and-sequences" title="Link to this heading"></a></h2>
 <p>In the RX direction, there are two sequencers: the first is a Logic vector array sequencer that handles MFB_DATA.
 The second is a logic vector sequencer that handles MFB_METADATA. Both sequencers pull the data from sequences together.</p>
 <p>In the TX direction, there is one sequencer of type mfb::sequencer #(), which generates the DST_RDY signal.</p>
 <p>Both directions have two analysis_exports. One export is for the logic vector array transactions, and the second is for the logic vector (metadata) transactions.</p>
 </section>
 <section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
 <p>The config class has three variables.</p>
 <table class="docutils align-default">
 <thead>
@@ -232,7 +232,7 @@ The second is a logic vector sequencer that handles MFB_METADATA. Both sequencer
 </div>
 </section>
 <section id="low-sequence-configuration">
-<h2>Low sequence configuration<a class="headerlink" href="#low-sequence-configuration" title="Permalink to this heading"></a></h2>
+<h2>Low sequence configuration<a class="headerlink" href="#low-sequence-configuration" title="Link to this heading"></a></h2>
 <p>The configuration object <cite>config_sequence</cite> contains two functions.</p>
 <table class="docutils align-default">
 <thead>
@@ -254,7 +254,7 @@ The second is a logic vector sequencer that handles MFB_METADATA. Both sequencer
 </table>
 </section>
 <section id="rx-inner-sequences">
-<h2>RX Inner sequences<a class="headerlink" href="#rx-inner-sequences" title="Permalink to this heading"></a></h2>
+<h2>RX Inner sequences<a class="headerlink" href="#rx-inner-sequences" title="Link to this heading"></a></h2>
 <p>For the RX direction, there is one basic sequence class called the “sequence_simple_rx_base” which simplifies creating other sequences. It processes the reset signal and exports the virtual
 function create_sequence_item. In this function, a child can create mfb::sequence_items as they like. Another important function in the “sequence_simple_rx_base” class is try_get() which
 gets the required data from the base array agent. It is also important to note that the base class is state-oriented. The following table describes internal states.</p>

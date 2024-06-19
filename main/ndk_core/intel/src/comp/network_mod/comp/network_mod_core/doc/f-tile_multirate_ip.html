@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>F-Tile Multirate IP &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../../../../" id="documentation_options" src="../../../../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../../../../_static/jquery.js"></script>
-        <script src="../../../../../../../../_static/underscore.js"></script>
-        <script src="../../../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../../../../_static/doctools.js"></script>
-        <script src="../../../../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../../../search.html" /> 
@@ -112,21 +111,21 @@
            <div itemprop="articleBody">
              
   <section id="f-tile-multirate-ip">
-<span id="ndk-f-tile-multirate"></span><h1>F-Tile Multirate IP<a class="headerlink" href="#f-tile-multirate-ip" title="Permalink to this heading"></a></h1>
+<span id="ndk-f-tile-multirate"></span><h1>F-Tile Multirate IP<a class="headerlink" href="#f-tile-multirate-ip" title="Link to this heading"></a></h1>
 <section id="implemented-ip-cores">
-<h2>Implemented IP cores<a class="headerlink" href="#implemented-ip-cores" title="Permalink to this heading"></a></h2>
+<h2>Implemented IP cores<a class="headerlink" href="#implemented-ip-cores" title="Link to this heading"></a></h2>
 <p>Right now, you can use two designs with Multirate IP. These designs have optimized parameters, so you do not need to change anything.
 These designs are 100GE and 25GE, the individual profiles that can be set are listed in <span class="xref std std-ref">Tab. 1</span>.
 If you want to make a build with Multirate IP, check the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> file for agi-fh400g, there are pseudo names for each Multirate IP core.</p>
 </section>
 <section id="build-tips">
-<h2>Build tips<a class="headerlink" href="#build-tips" title="Permalink to this heading"></a></h2>
+<h2>Build tips<a class="headerlink" href="#build-tips" title="Link to this heading"></a></h2>
 <p>The first step is to make a build. If an error during the build occurs, here are a few tips to help you to fix them.
 If you have a problem during the build with Timing analysis and it seems that it could be because of asynchronous clk signals, look into the <code class="docutils literal notranslate"><span class="pre">timing.sdc</span></code> file. There is the declaration of asynchronous clocks for both Multirate IP cores.
 If you have a problem with the Profile ID setup for Dynamic Reconfiguration, look into <code class="docutils literal notranslate"><span class="pre">multirate.qsf</span></code>. There is the declaration of profiles for both types of IP cores (100G and 25G) and it is set by its setup (the order of profiles when the IP was generated). These assignments allow you to set the order of all profiles (from 0 to …) for all IP cores.
 If you have other problems, look into Intel’s documentation: <span class="xref std std-ref">Intel F-Tile Ethernet Multirate Intel FPGA IP User Guide</span> and <span class="xref std std-ref">Intel F-Tile Dynamic Reconfiguration Suite Intel FPGA IP User Guide</span>.</p>
 <table class="docutils align-center" id="id1">
-<caption><span class="caption-text">Tab. 1 F-Tile_Multirate IPs variants</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">Tab. 1 F-Tile_Multirate IPs variants</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 11.1%" />
 <col style="width: 27.8%" />
@@ -178,7 +177,7 @@ If you have other problems, look into Intel’s documentation: <span class="xref
 </div>
 </section>
 <section id="switching-profiles">
-<h2>Switching profiles<a class="headerlink" href="#switching-profiles" title="Permalink to this heading"></a></h2>
+<h2>Switching profiles<a class="headerlink" href="#switching-profiles" title="Link to this heading"></a></h2>
 <p>Python script named <code class="docutils literal notranslate"><span class="pre">profile_swap.py</span></code> was made for swapping profiles.
 There are five parameters, which have to be set to change the speed or type of FEC. These parameters are:</p>
 <ul class="simple">

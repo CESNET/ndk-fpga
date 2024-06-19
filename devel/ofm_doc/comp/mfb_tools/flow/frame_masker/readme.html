@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MFB Frame Masker &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -85,6 +84,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_packer/readme.html">Frame Packer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
@@ -157,10 +157,10 @@
            <div itemprop="articleBody">
              
   <section id="mfb-frame-masker">
-<span id="id1"></span><h1>MFB Frame Masker<a class="headerlink" href="#mfb-frame-masker" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>MFB Frame Masker<a class="headerlink" href="#mfb-frame-masker" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-mfb_frame_masker">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_FRAME_MASKER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_frame_masker" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_FRAME_MASKER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_frame_masker" title="Link to this definition"></a></dt>
 <dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -394,7 +394,7 @@ The Mask is valid with TX_DST_RDY and applied with SOF (TX_SOF_UNMASKED).</p></t
 </dd></dl>
 
 <section id="component-specification">
-<h2>Component specification<a class="headerlink" href="#component-specification" title="Permalink to this heading"></a></h2>
+<h2>Component specification<a class="headerlink" href="#component-specification" title="Link to this heading"></a></h2>
 <p>The Frame Masker 2 outputs one or more frames according to the user’s specification through the TX_MASK port.
 This Mask (set by the user/verification) is valid with TX_DST_RDY and also with SOFs in the output word.
 The TX SOF and EOF ports with the suffix “MASKED” are part of the standard output MFB interface that contains the masked frames.
@@ -417,7 +417,7 @@ It does not change values during masking, only when a new data word is loaded in
 The ports of this interface are directly connected to the signals in this register.</p>
 </section>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <p><strong>Example 1</strong> demonstates a common reading of 2 packets in one clock cycle.
 Note that the values of Mask can be arbitrary in Regions without SOF (SOF_UNMASKED).
 So instead of Mask <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">0</span> <span class="pre">1</span> <span class="pre">0</span></code>, it could be also written as <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">x</span> <span class="pre">1</span> <span class="pre">x</span></code>.
@@ -605,9 +605,9 @@ If it is set to <code class="docutils literal notranslate"><span class="pre">Tru
 </div>
 </section>
 <section id="verification-plan">
-<h2>Verification plan<a class="headerlink" href="#verification-plan" title="Permalink to this heading"></a></h2>
+<h2>Verification plan<a class="headerlink" href="#verification-plan" title="Link to this heading"></a></h2>
 <table class="docutils align-center" id="id2">
-<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 11.1%" />
 <col style="width: 33.3%" />

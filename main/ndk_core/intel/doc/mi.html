@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The MI bus interconnect &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -127,7 +126,7 @@
            <div itemprop="articleBody">
              
   <section id="the-mi-bus-interconnect">
-<span id="ndk-mi"></span><h1>The MI bus interconnect<a class="headerlink" href="#the-mi-bus-interconnect" title="Permalink to this heading"></a></h1>
+<span id="ndk-mi"></span><h1>The MI bus interconnect<a class="headerlink" href="#the-mi-bus-interconnect" title="Link to this heading"></a></h1>
 <p>The NDK provides the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-bus.html#nfb-bus">nfb-bus tool</a> and an <a class="reference external" href="https://cesnet.github.io/ndk-sw/libnfb-quick-start-registers.html">API for generating read/write memory requests</a>. These requests are transferred via the <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> in the NDK firmware. This memory-oriented bus is wired throughout the NDK firmware and each part has an allocated address space. The components accessible over the MI bus and their specific address spaces are described in the NDK using a <a class="reference internal" href="../../doc/devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a>.</p>
 <p>The MI bus interconnection allows easy access to implemented Control/Status Registers (CSR). Communication via the <a class="reference internal" href="../../../ofm_doc/comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> is always initiated by the software via direct memory access to the PCIe device (FPGA card) memory space. The software sends a read or write PCIe transaction, which is then processed by the <a class="reference internal" href="../../../ofm_doc/comp/pcie/mtc/readme.html#mtc"><span class="std std-ref">MTC module</span></a> implemented in the FPGA. The MTC module acts as a Master point on the MI bus. It translates requests from the PCIe bus to the MI bus and handles their execution.</p>
 <div class="admonition warning">
@@ -135,7 +134,7 @@
 <p>A read request to a non-existent/non-implemented memory space in the FPGA can deadlock the NDK firmware or the entire PCIe communication.</p>
 </div>
 <section id="the-main-allocation-of-the-mi-address-space">
-<h2>The main allocation of the MI address space<a class="headerlink" href="#the-main-allocation-of-the-mi-address-space" title="Permalink to this heading"></a></h2>
+<h2>The main allocation of the MI address space<a class="headerlink" href="#the-main-allocation-of-the-mi-address-space" title="Link to this heading"></a></h2>
 <p>An address range of 26 bits is available for the whole NDK firmware. It is divided between the individual parts of the design. The main allocation of the MI address space must be identically described in the VHDL package <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/core/intel/src/mi_addr_space_pkg.vhd</span></code> and in the DeviceTree file of the NDK-CORE <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/core/intel/src/DevTree.tcl</span></code>. This allocation can also be found below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x00000000</span><span class="o">-</span><span class="mh">0x000000FF</span> <span class="o">--</span> <span class="n">Test</span> <span class="n">space</span> <span class="p">(</span><span class="n">debug</span> <span class="n">R</span><span class="o">/</span><span class="n">W</span> <span class="n">registers</span><span class="p">)</span>
 <span class="mh">0x00000100</span><span class="o">-</span><span class="mh">0x00000FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>

@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Histogramer &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -127,10 +126,10 @@
            <div itemprop="articleBody">
              
   <section id="histogramer">
-<span id="id1"></span><h1>Histogramer<a class="headerlink" href="#histogramer" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Histogramer<a class="headerlink" href="#histogramer" title="Link to this heading"></a></h1>
 <p>Histogramer is used to manage a histogram.</p>
 <section id="key-features">
-<h2>Key features<a class="headerlink" href="#key-features" title="Permalink to this heading"></a></h2>
+<h2>Key features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Histogram boxes are stored inside Block RAM</p></li>
 <li><p>Each box will be sequentially cleared after the reset</p></li>
@@ -143,10 +142,10 @@
 </ul>
 </section>
 <section id="component-port-and-generics-description">
-<h2>Component port and generics description<a class="headerlink" href="#component-port-and-generics-description" title="Permalink to this heading"></a></h2>
+<h2>Component port and generics description<a class="headerlink" href="#component-port-and-generics-description" title="Link to this heading"></a></h2>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-histogramer">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">HISTOGRAMER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-histogramer" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">HISTOGRAMER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-histogramer" title="Link to this definition"></a></dt>
 <dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -259,7 +258,7 @@ Box probably overflowed when its value equals 2**BOX_WIDTH-1</p></td>
 
 </section>
 <section id="instance-template">
-<h2>Instance template<a class="headerlink" href="#instance-template" title="Permalink to this heading"></a></h2>
+<h2>Instance template<a class="headerlink" href="#instance-template" title="Link to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">histogrammer_i</span> <span class="p">:</span> <span class="n">entity</span> <span class="n">work</span><span class="o">.</span><span class="n">HISTOGRAMER</span>
 <span class="n">generic</span> <span class="nb">map</span><span class="p">(</span>
     <span class="n">INPUT_WIDTH</span>             <span class="o">=&gt;</span> <span class="n">INPUT_WIDTH</span><span class="p">,</span>

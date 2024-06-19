@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DDR4 Memory Tester &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -138,10 +137,10 @@
            <div itemprop="articleBody">
              
   <section id="ddr4-memory-tester">
-<span id="mem-tester"></span><h1>DDR4 Memory Tester<a class="headerlink" href="#ddr4-memory-tester" title="Permalink to this heading"></a></h1>
+<span id="mem-tester"></span><h1>DDR4 Memory Tester<a class="headerlink" href="#ddr4-memory-tester" title="Link to this heading"></a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">MEM_TESTER</span></code> is used to test external DDR memory to detect failures and overal performance of the memory.</p>
 <section id="key-features">
-<h2>Key features<a class="headerlink" href="#key-features" title="Permalink to this heading"></a></h2>
+<h2>Key features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
 <ul>
 <li><p>Memory interface is compatible with AMM (Avalon-Memory-Mapped) interface and Intel EMIF Hard IP</p></li>
 <li><p>Basic test workflow:</p>
@@ -190,10 +189,10 @@
 </ul>
 </section>
 <section id="component-port-and-generics-description">
-<h2>Component port and generics description<a class="headerlink" href="#component-port-and-generics-description" title="Permalink to this heading"></a></h2>
+<h2>Component port and generics description<a class="headerlink" href="#component-port-and-generics-description" title="Link to this heading"></a></h2>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-mem_tester">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MEM_TESTER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mem_tester" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MEM_TESTER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mem_tester" title="Link to this definition"></a></dt>
 <dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -483,7 +482,7 @@ Shoud be power of 2</p></td>
 
 </section>
 <section id="control-sw">
-<h2>Control SW<a class="headerlink" href="#control-sw" title="Permalink to this heading"></a></h2>
+<h2>Control SW<a class="headerlink" href="#control-sw" title="Link to this heading"></a></h2>
 <p>Because the measurement is handled by <cite>MEM_LOGGER</cite> (<cite>DATA_LOGGER</cite> wrap) you need to install its package:</p>
 <ul class="simple">
 <li><p>You also need to install <cite>python nfb</cite> package</p></li>
@@ -623,7 +622,7 @@ simultaneous r+w   0
 </div>
 </section>
 <section id="pytest-sw">
-<h2>Pytest SW<a class="headerlink" href="#pytest-sw" title="Permalink to this heading"></a></h2>
+<h2>Pytest SW<a class="headerlink" href="#pytest-sw" title="Link to this heading"></a></h2>
 <p>You can also use automated testing using pytest framework:</p>
 <ul class="simple">
 <li><p>This script will try to find <cite>MEM_TESTER</cite> and <cite>MEM_LOGGER</cite> components</p></li>
@@ -639,7 +638,7 @@ simultaneous r+w   0
 <p>If you need to use different device, edit <cite>device</cite> variable in test_mem_tester.py</p>
 </section>
 <section id="pdf-report-generator-sw">
-<h2>PDF report generator SW<a class="headerlink" href="#pdf-report-generator-sw" title="Permalink to this heading"></a></h2>
+<h2>PDF report generator SW<a class="headerlink" href="#pdf-report-generator-sw" title="Link to this heading"></a></h2>
 <p>Additionally you can run <cite>report_gen.py</cite> script that will run <cite>MEM_TESTER</cite> with different configurations
 and will generate PDF or Markdown report with measured graphs.</p>
 <ul class="simple">
@@ -669,7 +668,7 @@ and will generate PDF or Markdown report with measured graphs.</p>
 </ul>
 </section>
 <section id="internal-architecture">
-<h2>Internal Architecture<a class="headerlink" href="#internal-architecture" title="Permalink to this heading"></a></h2>
+<h2>Internal Architecture<a class="headerlink" href="#internal-architecture" title="Link to this heading"></a></h2>
 <p>Architecture description:</p>
 <ul>
 <li><p><a class="reference internal" href="../../mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> logic is separated into another file (<code class="docutils literal notranslate"><span class="pre">mem_tester_mi.vhd</span></code>)</p>
@@ -695,7 +694,7 @@ and will generate PDF or Markdown report with measured graphs.</p>
 <a class="reference internal image-reference" href="../../../../_images/mem_tester.svg"><img alt="../../../../_images/mem_tester.svg" class="align-center" src="../../../../_images/mem_tester.svg" width="40%" /></a>
 </section>
 <section id="mi-bus-control">
-<h2>MI Bus Control<a class="headerlink" href="#mi-bus-control" title="Permalink to this heading"></a></h2>
+<h2>MI Bus Control<a class="headerlink" href="#mi-bus-control" title="Link to this heading"></a></h2>
 <p><strong>MI Address Space Definition</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x0000</span> <span class="o">--</span> <span class="n">ctrl</span> <span class="ow">in</span>
           <span class="mf">1.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">reset</span>
@@ -741,7 +740,7 @@ wait for either <code class="docutils literal notranslate"><span class="pre">cal
 </ul>
 </section>
 <section id="sub-components">
-<h2>Sub-components<a class="headerlink" href="#sub-components" title="Permalink to this heading"></a></h2>
+<h2>Sub-components<a class="headerlink" href="#sub-components" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="amm_gen/readme.html">AMM_GEN</a></li>
@@ -751,7 +750,7 @@ wait for either <code class="docutils literal notranslate"><span class="pre">cal
 </div>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/stratix-10/ug-s10-emi.pdf">External Memory Interfaces Intel Stratix 10 FPGA IP User Guide (external)</a></p></li>
 <li><p><a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/agilex/ug-ag-emi.pdf">External Memory Interfaces Intel Agilex FPGA IP User Guide (external)</a></p></li>

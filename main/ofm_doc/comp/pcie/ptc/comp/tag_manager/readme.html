@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PTC Tag Manager &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../../_static/jquery.js"></script>
-        <script src="../../../../../../_static/underscore.js"></script>
-        <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../../_static/doctools.js"></script>
-        <script src="../../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../search.html" />
@@ -129,7 +128,7 @@
            <div itemprop="articleBody">
              
   <section id="ptc-tag-manager">
-<span id="id1"></span><h1>PTC Tag Manager<a class="headerlink" href="#ptc-tag-manager" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>PTC Tag Manager<a class="headerlink" href="#ptc-tag-manager" title="Link to this heading"></a></h1>
 <p>The purpose of the Tag Manager is to convert between the ID tagging space of the DMA transactions and the ID tagging space of the PCIe transactions.
 The DMA tagging consists of a Unit ID (one for each unit which generates requests) and a Tag.
 This way, each unit can have its own independent space of transaction Tags.
@@ -139,7 +138,7 @@ For downstream read responses, the mapping is done the other way around based on
 The Tag Manager is also responsible for freeing of the PCIe Tags, checking of their availability and of the availability of storage space in the downstream MVB+MFB Storage FIFO.
 (The MVB+MFB Storage FIFO must be kept from overflowing to prevent fall of DST_RDY on the downstream IP core interface.)</p>
 <section id="block-diagram">
-<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading"></a></h2>
+<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h2>
 <p>The core part of the unit is the Tag mapping N_LOOP_OP.
 It is a memory, which stores the corresponding DMA Tag and Unit ID for each possible PCIe Tag.
 Since, this memory can be updated multiple times in each cycle, the N_LOOP_OP is used, which allows parallel memory update.</p>

@@ -42,5 +42,6 @@ Library of commonly used agents and enviroments in UVM verification
     intel_mac_seg/readme
     axi/readme
     logic_vector_array_axi/readme
+    packet_generators/ft_gen_sequence/readme
 
 

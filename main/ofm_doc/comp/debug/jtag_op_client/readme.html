@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JTAG-over-protocol Client &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -128,12 +127,12 @@
            <div itemprop="articleBody">
              
   <section id="jtag-over-protocol-client">
-<span id="jtag-op-client"></span><h1>JTAG-over-protocol Client<a class="headerlink" href="#jtag-over-protocol-client" title="Permalink to this heading"></a></h1>
+<span id="jtag-op-client"></span><h1>JTAG-over-protocol Client<a class="headerlink" href="#jtag-over-protocol-client" title="Link to this heading"></a></h1>
 <p>This component is used for software communication with internal debug hardware present on Intel FPGAs.
 It acts as MI wrapper of the <em>JTAG-over-protocol IP</em> core and provides the capability of debugging card designs via e. g. SignalTap over PCIe without the need of connecting a JTAG cable.
 The debugging is done via a running instance of <code class="docutils literal notranslate"><span class="pre">etherlink</span></code> application which translates the traffic between JTAG server (communicating with SignalTap) and nfb driver.</p>
 <section id="address-space-size">
-<h2>Address space size<a class="headerlink" href="#address-space-size" title="Permalink to this heading"></a></h2>
+<h2>Address space size<a class="headerlink" href="#address-space-size" title="Link to this heading"></a></h2>
 <p>Size of the <em>JTAG-over-protocol IP</em> address space depends on the configuration given while generating the IP core.
 The total memory occupied by the component consists of three distinct memory blocks for each subpart (as mentioned in the <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/728673/21-3/jtag-over-protocol-parameters.html">documentation of the IP core</a>).</p>
 <ul class="simple">
@@ -143,7 +142,7 @@ The total memory occupied by the component consists of three distinct memory blo
 </ul>
 </section>
 <section id="debugging-hw-part">
-<h2>Debugging - HW part<a class="headerlink" href="#debugging-hw-part" title="Permalink to this heading"></a></h2>
+<h2>Debugging - HW part<a class="headerlink" href="#debugging-hw-part" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
 <li><dl class="simple">
 <dt>instantiate JTAG_OP_CLIENT component</dt><dd><ul class="simple">
@@ -193,7 +192,7 @@ The total memory occupied by the component consists of three distinct memory blo
 </ol>
 </section>
 <section id="debugging-sw-part">
-<h2>Debugging - SW part<a class="headerlink" href="#debugging-sw-part" title="Permalink to this heading"></a></h2>
+<h2>Debugging - SW part<a class="headerlink" href="#debugging-sw-part" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
 <li><dl class="simple">
 <dt>install the etherlink rpm package</dt><dd><ul class="simple">
@@ -234,7 +233,7 @@ Be sure to unregister the JTAG connection after you are done with debugging (mor
 </div>
 </section>
 <section id="debugging-debug-part">
-<h2>Debugging - DEBUG part<a class="headerlink" href="#debugging-debug-part" title="Permalink to this heading"></a></h2>
+<h2>Debugging - DEBUG part<a class="headerlink" href="#debugging-debug-part" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
 <li><dl class="simple">
 <dt>open the .stp file used for build</dt><dd><ul class="simple">

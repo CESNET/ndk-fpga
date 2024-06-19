@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LII agent &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/underscore.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -154,19 +153,19 @@
            <div itemprop="articleBody">
              
   <section id="lii-agent">
-<span id="uvm-lii-rx"></span><h1>LII agent<a class="headerlink" href="#lii-agent" title="Permalink to this heading"></a></h1>
+<span id="uvm-lii-rx"></span><h1>LII agent<a class="headerlink" href="#lii-agent" title="Link to this heading"></a></h1>
 <p>Agent is used for connecting of all components (driver, monitor,…). Agent has his own configuration object which contains two parameters: active (when is up then agent is active in other way is passive) and interface which say name of the interface that is used.
 When agent is active then sequencer and driver are created amd connected to interface. When is passive then only monitor is created.</p>
 </section>
 <section id="lii-interface">
-<h1>LII interface<a class="headerlink" href="#lii-interface" title="Permalink to this heading"></a></h1>
+<h1>LII interface<a class="headerlink" href="#lii-interface" title="Link to this heading"></a></h1>
 <p>LII (Media-independent interface) bus is interface which allows communication throught 10g low latency ethernet. There are asserts which check if EEOF is asserted right and if SOF and EOF are coming in right ordder. Link for detailed description of LII bus is here: <a class="reference external" href="https://gitlab.liberouter.org/ndk/hft/-/tree/friedl-feat-ethphy/comp/eth_phy/10ge/top">https://gitlab.liberouter.org/ndk/hft/-/tree/friedl-feat-ethphy/comp/eth_phy/10ge/top</a></p>
 <section id="lii-bus-description">
-<h2>LII bus description<a class="headerlink" href="#lii-bus-description" title="Permalink to this heading"></a></h2>
+<h2>LII bus description<a class="headerlink" href="#lii-bus-description" title="Link to this heading"></a></h2>
 <p>LII bus has these 5 ports + 2 ports optional (EEOF and EDB) which depends on parameter FAST_SOF. In verification interface are asserts which check these events.</p>
 </section>
 <section id="generics">
-<h2>Generics<a class="headerlink" href="#generics" title="Permalink to this heading"></a></h2>
+<h2>Generics<a class="headerlink" href="#generics" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -190,7 +189,7 @@ When agent is active then sequencer and driver are created amd connected to inte
 </table>
 </section>
 <section id="ports">
-<h2>Ports<a class="headerlink" href="#ports" title="Permalink to this heading"></a></h2>
+<h2>Ports<a class="headerlink" href="#ports" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -240,7 +239,7 @@ When agent is active then sequencer and driver are created amd connected to inte
 </section>
 </section>
 <section id="lii-sequence-item">
-<h1>LII sequence item<a class="headerlink" href="#lii-sequence-item" title="Permalink to this heading"></a></h1>
+<h1>LII sequence item<a class="headerlink" href="#lii-sequence-item" title="Link to this heading"></a></h1>
 <p>Sequence item contains basic ports from interface, except EEOF and EDB which are only drived to interface by driver. All signals which are in sequence item are randomized.
 There are three methods:</p>
 <ul class="simple">
@@ -250,11 +249,11 @@ There are three methods:</p>
 </ul>
 </section>
 <section id="lii-monitor">
-<h1>LII monitor<a class="headerlink" href="#lii-monitor" title="Permalink to this heading"></a></h1>
+<h1>LII monitor<a class="headerlink" href="#lii-monitor" title="Link to this heading"></a></h1>
 <p>LII monitor is used for monitoring of traffic. There is only easy monitor which write whole transaction to analysis port when reset is not asserted.</p>
 </section>
 <section id="lii-driver">
-<h1>LII driver<a class="headerlink" href="#lii-driver" title="Permalink to this heading"></a></h1>
+<h1>LII driver<a class="headerlink" href="#lii-driver" title="Link to this heading"></a></h1>
 <p>LII driver is used for driving LII transactions to interface. There is used one parameter <code class="docutils literal notranslate"><span class="pre">FAST</span> <span class="pre">SOF</span></code>, when this parameter is asserted then driver driving <code class="docutils literal notranslate"><span class="pre">EEOF</span></code> and <code class="docutils literal notranslate"><span class="pre">EDB</span></code> to interface. <code class="docutils literal notranslate"><span class="pre">EEOF</span></code> and <code class="docutils literal notranslate"><span class="pre">EDB</span></code> is drived only when in the next transaction is asserted <code class="docutils literal notranslate"><span class="pre">EOF</span></code>, <code class="docutils literal notranslate"><span class="pre">EDB</span></code> must be same as <code class="docutils literal notranslate"><span class="pre">BYTES_VLD</span></code> in next transaction.</p>
 </section>
 

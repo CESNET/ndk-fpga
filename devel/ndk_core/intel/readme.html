@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NDK architecture &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -124,7 +123,7 @@
            <div itemprop="articleBody">
              
   <section id="ndk-architecture">
-<span id="ndk-intel"></span><span id="ndk-arch"></span><h1>NDK architecture<a class="headerlink" href="#ndk-architecture" title="Permalink to this heading"></a></h1>
+<span id="ndk-intel"></span><span id="ndk-arch"></span><h1>NDK architecture<a class="headerlink" href="#ndk-architecture" title="Link to this heading"></a></h1>
 <p>The Network Development Kit (NDK) is available for the selected card based on FPGA. The NDK allows users to quickly and easily develop new network appliances based on FPGA acceleration cards. The NDK is optimized for high throughput and scalable to support 10, 100 and 400 Gigabit Ethernet.</p>
 <a class="reference internal image-reference" href="../../_images/card_with_ndk.drawio.svg"><img alt="../../_images/card_with_ndk.drawio.svg" class="align-center" src="../../_images/card_with_ndk.drawio.svg" width="100%" /></a>
 <p>The diagram above shows a simplified NDK architecture on a generic FPGA board.
@@ -145,7 +144,7 @@ The NDK top level architecture consists of several building blocks:</p>
 </div>
 </section>
 <section id="build-system">
-<h1>Build system<a class="headerlink" href="#build-system" title="Permalink to this heading"></a></h1>
+<h1>Build system<a class="headerlink" href="#build-system" title="Link to this heading"></a></h1>
 <p>The following table provides an overview of files used for building a project/design.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -153,7 +152,7 @@ The NDK top level architecture consists of several building blocks:</p>
 The placeholder {TOOL} refers to the tool-specific filename, for example: Vivado, Quartus.</p>
 </div>
 <table class="docutils align-default" id="id1">
-<caption><span class="caption-text">Configuration files</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<caption><span class="caption-text">Configuration files</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 25.0%" />
 <col style="width: 25.0%" />

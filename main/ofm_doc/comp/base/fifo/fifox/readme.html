@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FIFOX &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -134,10 +133,10 @@
            <div itemprop="articleBody">
              
   <section id="fifox">
-<span id="id1"></span><h1>FIFOX<a class="headerlink" href="#fifox" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>FIFOX<a class="headerlink" href="#fifox" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-fifox">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">FIFOX</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-fifox" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">FIFOX</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-fifox" title="Link to this definition"></a></dt>
 <dd><p>A universal <code class="docutils literal notranslate"><span class="pre">FIFO</span></code>, capable of implementation in multiple types of memories.
 Both <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> and <code class="docutils literal notranslate"><span class="pre">ITEMS</span></code> may be set to any value; however <code class="docutils literal notranslate"><span class="pre">ITEMS</span></code>
 has an implicit lower limit of <code class="docutils literal notranslate"><span class="pre">2</span></code> that will be automatically used if required.</p>
@@ -209,7 +208,7 @@ two clock cycles before it can be read.</p>
 </table>
 <dl class="vhdl enum">
 <dt class="sig sig-object vhdl" id="vhdl-enum-fifox_ram_type">
-<span class="k"><span class="pre">TYPE</span> </span><span class="sig-name descname"><span class="pre">FIFOX_RAM_TYPE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-enum-fifox_ram_type" title="Permalink to this definition"></a></dt>
+<span class="k"><span class="pre">TYPE</span> </span><span class="sig-name descname"><span class="pre">FIFOX_RAM_TYPE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-enum-fifox_ram_type" title="Link to this definition"></a></dt>
 <dd><p>Represents the type of memory implementation used by <code class="docutils literal notranslate"><span class="pre">FIFOX</span></code>. Should be
 chosen based on the target FPGA and required size of the <code class="docutils literal notranslate"><span class="pre">FIFOX</span></code></p>
 <p>Note: this type is for documentation only; string representations of the
@@ -335,15 +334,15 @@ and <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span 
 </dd></dl>
 
 <section id="block-diagram">
-<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Permalink to this heading"></a></h2>
+<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h2>
 <p>TODO- Přidat blokový diagram komponenty FIFOX</p>
 </section>
 <section id="verification">
-<h2>Verification<a class="headerlink" href="#verification" title="Permalink to this heading"></a></h2>
+<h2>Verification<a class="headerlink" href="#verification" title="Link to this heading"></a></h2>
 <p>Verification is coverage oriented. There is code coverage turned on. The code coverage report can be generated by uncommenting one line in top_level.fdo. Both input and output interfaces of component are connected by MVB interfaces to the verification environment. The scoreboard checks that the data that are written into component are readed in  correct order at output interface.</p>
 </section>
 <section id="verification-block-diagram">
-<h2>Verification block diagram<a class="headerlink" href="#verification-block-diagram" title="Permalink to this heading"></a></h2>
+<h2>Verification block diagram<a class="headerlink" href="#verification-block-diagram" title="Link to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../../_images/fifox_ver.svg"><img alt="../../../../../_images/fifox_ver.svg" src="../../../../../_images/fifox_ver.svg" width="100%" /></a>
 <p>There are 3 tests. The first 2 are most random and are designed to verify correct functionality in classic use. The 3th one is designed to check functionality when data are more often written and less often readed.</p>
 </section>

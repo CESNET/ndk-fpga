@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AMM_GEN &mdash; Minimal NDK Application Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
   <!--[if lt IE 9]>
     <script src="../../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-        <script src="../../../../../_static/jquery.js"></script>
-        <script src="../../../../../_static/underscore.js"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -38,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 62cc6fb1
+                Git branch: devel, <br> Git hash: c9a528ec
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -140,11 +139,11 @@
            <div itemprop="articleBody">
              
   <section id="amm-gen">
-<span id="id1"></span><h1>AMM_GEN<a class="headerlink" href="#amm-gen" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>AMM_GEN<a class="headerlink" href="#amm-gen" title="Link to this heading"></a></h1>
 <p>This component is used to manually read or write to the external memory from the MI bus via the AMM bus.
 It has to be connected to EMIF Hard IP.</p>
 <section id="internal-architecture">
-<h2>Internal Architecture<a class="headerlink" href="#internal-architecture" title="Permalink to this heading"></a></h2>
+<h2>Internal Architecture<a class="headerlink" href="#internal-architecture" title="Link to this heading"></a></h2>
 <p>AMM data bus width is significantly larger than MI data bus width and
 all data words in the burst have to be sent/received in one continuous request.
 Therefore there is a buffer that can be first filled with MI bus transactions and then sent to EMIF.
@@ -174,7 +173,7 @@ by MI bus registers.</p>
 </div>
 </section>
 <section id="mi-bus-control">
-<h2>MI Bus Control<a class="headerlink" href="#mi-bus-control" title="Permalink to this heading"></a></h2>
+<h2>MI Bus Control<a class="headerlink" href="#mi-bus-control" title="Link to this heading"></a></h2>
 <p><strong>MI Address Space Definition</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BASE</span> <span class="o">+</span> <span class="mh">0x00</span> <span class="o">--</span> <span class="n">ctrl</span>
               <span class="mf">1.</span> <span class="n">bit</span> <span class="o">--</span> <span class="n">memory</span> <span class="n">write</span>
