@@ -63,9 +63,7 @@ SETTINGS = {
 
     "test_speed" : {
          "__core_params__" : {"UVM_TEST" : "test::full_speed"},
-    }
-   
-
+    },
 
     "_combinations_" : (
     ("default",), # Works the same as '("default",),' as the "default" is applied in every combination
