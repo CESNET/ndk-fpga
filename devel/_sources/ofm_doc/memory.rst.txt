@@ -36,6 +36,8 @@ It supports the byte enable feature!
 **MP_BRAM** - Generic multiported single clock BRAM memory based on **SDP_BRAM**. Currently supports only 1 write port. Amount of read ports is not restricted. Also supports byte enable
 feature.
 
+**LVT_MEM** - Multiported memory implemented suitable for shallow memories, supports generic amount of write/read ports and has customizable read during write behaviour.
+
 **SDP_BRAM_BEHAV** - Another behavioral implementation of dual clock BRAM memory with one read port and one write port.
 Located in the same folder as SDP_BRAM. ``OBSOLETE, use DP_BRAM or DP_BRAM_XILINX!``
 
@@ -61,6 +63,7 @@ Allows setting type of memory (LUT, BRAM, URAM) or automatic mode. Optimized for
    comp/base/mem/np_lutram/readme
    comp/base/mem/sdp_bram/readme
    comp/base/mem/mp_bram/readme
+   comp/base/mem/lvt_mem/readme
 ..   comp/base/mem/<something>
              
 References

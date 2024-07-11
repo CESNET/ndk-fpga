@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: c9a528ec
+                Git branch: devel, <br> Git hash: 81fe0b7d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -175,6 +175,14 @@ have DST_RDY asserted. Ports, which will not receive any item, do not have to ha
 <td><p>boolean</p></td>
 <td><p>False</p></td>
 <td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-gen_mvb_demux-input_reg"><td><p>INPUT_REG</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Input register. This component will
+break, when connected to output of MVB_MERGE,
+since it can RX_VLD signal before transmission.
+In that case, enable this input register.</p></td>
 </tr>
 </tbody>
 </table>
