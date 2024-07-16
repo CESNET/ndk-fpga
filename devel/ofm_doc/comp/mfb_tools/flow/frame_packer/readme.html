@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 81fe0b7d
+                Git branch: devel, <br> Git hash: a97bde2d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -157,7 +157,7 @@
              
   <section id="frame-packer">
 <span id="id1"></span><h1>Frame Packer<a class="headerlink" href="#frame-packer" title="Link to this heading"></a></h1>
-<a class="reference internal image-reference" href="../../../../../_images/frame_packer.svg" id="frame-packer-schematic"><img alt="" class="align-center" id="frame-packer-schematic" src="../../../../../_images/frame_packer.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="../../../../../_images/frame_packer.svg" id="frame-packer-schematic"><img alt="" class="align-center" id="frame-packer-schematic" src="../../../../../_images/frame_packer.svg" style="width: 100%;" /></a>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-frame_packer">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">FRAME_PACKER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-frame_packer" title="Link to this definition"></a></dt>
@@ -435,7 +435,7 @@ Along with the packets, the previously generated auxiliary signals are shifted a
 Each channel unit begins with MUX array that selects data based on the valid blocks array that arrives along with shifted data.
 Each MUX passes the block according to its index.
 The input of the MUXs comes from the Barrel Shifters (the number of MUX inputs depends on the number of Barrel Shifters).</p>
-<a class="reference internal image-reference" href="../../../../../_images/packet_accumulator.svg" id="packet-accumulator-schematic"><img alt="" class="align-center" id="packet-accumulator-schematic" src="../../../../../_images/packet_accumulator.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="../../../../../_images/packet_accumulator.svg" id="packet-accumulator-schematic"><img alt="" class="align-center" id="packet-accumulator-schematic" src="../../../../../_images/packet_accumulator.svg" style="width: 100%;" /></a>
 <p>After the data is selected, it is either stored in a temporary register or sent for further processing.
 This temporary register (assembly register) is used to store data until the whole word is full of valid data.
 Its status is monitored by the status <code class="docutils literal notranslate"><span class="pre">pointer</span></code>, which is also used for the calculation of shift select signal.</p>

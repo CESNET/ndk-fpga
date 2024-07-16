@@ -209,7 +209,7 @@
 <section id="timing-diagram-example">
 <h2>Timing diagram example<a class="headerlink" href="#timing-diagram-example" title="Link to this heading"></a></h2>
 <p>Example uses <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH=512</span></code> and <code class="docutils literal notranslate"><span class="pre">SOP_POS_WIDTH=3</span></code>:</p>
-<a class="reference internal image-reference" href="../../../_images/wave_flu.svg"><img alt="../../../_images/wave_flu.svg" class="align-center" src="../../../_images/wave_flu.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="../../../_images/wave_flu.svg"><img alt="../../../_images/wave_flu.svg" class="align-center" src="../../../_images/wave_flu.svg" style="width: 100%;" /></a>
 <ul class="simple">
 <li><p>Packet A starts in cycle 4. <code class="docutils literal notranslate"><span class="pre">SOP_POS=2</span></code>, therefore the first byte is at <code class="docutils literal notranslate"><span class="pre">SOP_POS*DATA_WIDTH/(2^SOP_POS_WIDTH)</span> <span class="pre">=</span> <span class="pre">2*512/(2^3)</span> <span class="pre">=</span> <span class="pre">128</span></code>. More precisely <code class="docutils literal notranslate"><span class="pre">(135</span> <span class="pre">downto</span> <span class="pre">128)</span></code>. <code class="docutils literal notranslate"><span class="pre">(127</span> <span class="pre">downto</span> <span class="pre">0)</span></code> is unused. 48 bytes are transferred (512-128)/8.</p></li>
 <li><p>Packet A continues in cycle 7. 64 bytes are transferred.</p></li>

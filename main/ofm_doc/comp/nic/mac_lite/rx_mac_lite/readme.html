@@ -133,7 +133,7 @@ The implementation may include differences from the Ethernet standard.</p>
 <section id="architecture">
 <h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
 <p>RX MAC LITE contains several components that analyze the received frame (CRC, MAC address, length) and check for errors. The Ethernet frame is stored in the buffer (store and forward), if it does not contain errors, it is sent to the output interface along with the metadata, otherwise the frame is discarded. Some of these components are optional. The whole module can be controlled by SW using MI registers (see chapter Register Map).</p>
-<a class="reference internal image-reference" href="../../../../../_images/rx_mac_lite_arch.svg"><img alt="../../../../../_images/rx_mac_lite_arch.svg" class="align-center" src="../../../../../_images/rx_mac_lite_arch.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="../../../../../_images/rx_mac_lite_arch.svg"><img alt="../../../../../_images/rx_mac_lite_arch.svg" class="align-center" src="../../../../../_images/rx_mac_lite_arch.svg" style="width: 100%;" /></a>
 <p><strong>Description of RX MAC LITE submodules:</strong></p>
 <ul class="simple">
 <li><p><strong>CTRL Unit</strong> - controls the whole module through MI registers</p></li>

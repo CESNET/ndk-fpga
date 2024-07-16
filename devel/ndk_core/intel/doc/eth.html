@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 81fe0b7d
+                Git branch: devel, <br> Git hash: a97bde2d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -143,7 +143,7 @@
 <span id="ndk-intel-net-mod"></span><span id="ndk-net-mod"></span><h1>The Network Module<a class="headerlink" href="#the-network-module" title="Link to this heading"></a></h1>
 <p>Network Module enables connection of the NDK platform to an Ethernet interface(s).
 The basic architecture is displayed below.</p>
-<a class="reference internal image-reference" href="../../../_images/network_module_arch.svg"><img alt="../../../_images/network_module_arch.svg" class="align-center" src="../../../_images/network_module_arch.svg" width="65%" /></a>
+<a class="reference internal image-reference" href="../../../_images/network_module_arch.svg"><img alt="../../../_images/network_module_arch.svg" class="align-center" src="../../../_images/network_module_arch.svg" style="width: 65%;" /></a>
 <p>The Network Module enables connection of the NDK platform to an Ethernet interface(s).
 The basic architecture is displayed below.</p>
 <p>The Network Module utilizes Ethernet hard IP blocks of the FPGA (Stratix 10, Agilex, or UltraScale+) to implement functions of the Ethernet sublayers.
@@ -163,7 +163,7 @@ SW access is described in the following sections:</p>
 <p>This was a simple description of the key building blocks of the Network Module.
 In reality, the Network Module is much more generic.
 A more implementation-based look at the top level of the Network Module follows.</p>
-<a class="reference internal image-reference" href="../../../_images/network_module_new.svg" id="newtwork-module-big-picture"><img alt="../../../_images/network_module_new.svg" class="align-center" id="newtwork-module-big-picture" src="../../../_images/network_module_new.svg" width="80%" /></a>
+<a class="reference internal image-reference" href="../../../_images/network_module_new.svg" id="newtwork-module-big-picture"><img alt="../../../_images/network_module_new.svg" class="align-center" id="newtwork-module-big-picture" src="../../../_images/network_module_new.svg" style="width: 80%;" /></a>
 <p>There are two main blocks, the Network Module Core and the Network Module Logic.
 The number of their instances depends on the number of physical ports of the target card.
 The following sections describe each of the main blocks in more detail: <a class="reference internal" href="#newtwork-module-core"><span class="std std-ref">Network Module Core</span></a> and <a class="reference internal" href="#newtwork-module-logic"><span class="std std-ref">Network Module Logic</span></a>.
@@ -435,14 +435,14 @@ On the right side, it is connected to the Network Module Logic.
 The three basic architectures of the Network Module Core are displayed below.</p>
 <table class="docutils align-default">
 <tbody>
-<tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/etile_network_module_core.svg"><img alt="../../../_images/etile_network_module_core.svg" class="align-center" src="../../../_images/etile_network_module_core.svg" width="100%" /></a>
+<tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/etile_network_module_core.svg"><img alt="../../../_images/etile_network_module_core.svg" class="align-center" src="../../../_images/etile_network_module_core.svg" style="width: 100%;" /></a>
 </td>
-<td><a class="reference internal image-reference" href="../../../_images/ftile_network_module_core.svg"><img alt="../../../_images/ftile_network_module_core.svg" class="align-center" src="../../../_images/ftile_network_module_core.svg" width="100%" /></a>
+<td><a class="reference internal image-reference" href="../../../_images/ftile_network_module_core.svg"><img alt="../../../_images/ftile_network_module_core.svg" class="align-center" src="../../../_images/ftile_network_module_core.svg" style="width: 100%;" /></a>
 </td>
 </tr>
 </tbody>
 </table>
-<a class="reference internal image-reference" href="../../../_images/cmac_network_module_core.svg"><img alt="../../../_images/cmac_network_module_core.svg" class="align-center" src="../../../_images/cmac_network_module_core.svg" width="40%" /></a>
+<a class="reference internal image-reference" href="../../../_images/cmac_network_module_core.svg"><img alt="../../../_images/cmac_network_module_core.svg" class="align-center" src="../../../_images/cmac_network_module_core.svg" style="width: 40%;" /></a>
 <p>The F-Tile hard IP core is instantiated once per each subcomponent.
 Each Ethernet channel has just one generated subcomponent, and it contains parts such as “MGMT, drp_bridge, MAC_Loopback”.
 The same goes for the F-Tile_Multirate, but it also contains just one Dynamic Reconfiguration Controller (DRC), which is instantiated in the first subcomponents.
@@ -453,9 +453,9 @@ There are eight interfaces altogether, so each hard IP has 8/number_of_channels 
 For more information about the F-Tile Multirate, use <a class="reference internal" href="../src/comp/network_mod/comp/network_mod_core/doc/f-tile_multirate_ip.html#ndk-f-tile-multirate"><span class="std std-ref">F-Tile_Multirate</span></a>.</p>
 <table class="docutils align-default">
 <tbody>
-<tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/ftile_submodule_nmc.svg"><img alt="../../../_images/ftile_submodule_nmc.svg" class="align-center" src="../../../_images/ftile_submodule_nmc.svg" width="90%" /></a>
+<tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/ftile_submodule_nmc.svg"><img alt="../../../_images/ftile_submodule_nmc.svg" class="align-center" src="../../../_images/ftile_submodule_nmc.svg" style="width: 90%;" /></a>
 </td>
-<td><a class="reference internal image-reference" href="../../../_images/ftile_multirate_submodule_nmc.svg"><img alt="../../../_images/ftile_multirate_submodule_nmc.svg" class="align-center" src="../../../_images/ftile_multirate_submodule_nmc.svg" width="100%" /></a>
+<td><a class="reference internal image-reference" href="../../../_images/ftile_multirate_submodule_nmc.svg"><img alt="../../../_images/ftile_multirate_submodule_nmc.svg" class="align-center" src="../../../_images/ftile_multirate_submodule_nmc.svg" style="width: 100%;" /></a>
 </td>
 </tr>
 </tbody>
@@ -499,7 +499,7 @@ On the other side, TX MAC Lites receive data from the MFB Splitter, which splits
 RX MAC Lites then feed the inputs of the MFB merger, which merges the MFB data from the individual channels into one output stream.
 The last component in the picture is the MI splitting logic block, representing that all of the MAC Lites are somehow connected to the MI bus.
 More information about this block is mentioned in the following subsection.</p>
-<a class="reference internal image-reference" href="../../../_images/network_mod_logic.svg"><img alt="../../../_images/network_mod_logic.svg" class="align-center" src="../../../_images/network_mod_logic.svg" width="70%" /></a>
+<a class="reference internal image-reference" href="../../../_images/network_mod_logic.svg"><img alt="../../../_images/network_mod_logic.svg" class="align-center" src="../../../_images/network_mod_logic.svg" style="width: 70%;" /></a>
 <p>The MAC Lites split the whole Network Module into two clock domains (not considering the MI clock domain, which is for the MI bus only).
 In the current setting, the clock signal in the left clock domain has twice the frequency of the clock signal in the right clock domain.
 That is because we want to avoid timing problems further in our designs.
@@ -511,7 +511,7 @@ The timestamps are inserted per frame into their header (the <code class="docuti
 <p>The MI splitting logic block shown in the diagram below is a virtual block that exists only to explain the Network Module (it is not an actual component).
 The purpose of this subsection is to describe the access to the MAC Lites for multi-channel configurations.
 The diagram below shows how the MAC Lites are connected to the MI bus.</p>
-<a class="reference internal image-reference" href="../../../_images/mi_splitting_logic.svg"><img alt="../../../_images/mi_splitting_logic.svg" class="align-center" src="../../../_images/mi_splitting_logic.svg" width="40%" /></a>
+<a class="reference internal image-reference" href="../../../_images/mi_splitting_logic.svg"><img alt="../../../_images/mi_splitting_logic.svg" class="align-center" src="../../../_images/mi_splitting_logic.svg" style="width: 40%;" /></a>
 <p>The diagram above tries to illustrate which output port of the MI Splitter is connected to which MAC Lite.
 In a MAC Lite pair (TX + RX), TX MAC Lite always comes first, meaning it is connected to the output with a lower ID.
 The corresponding RX MAC Lite (of the same channel) comes right after the TX MAC Lite (connects to output with ID incremented by 1).

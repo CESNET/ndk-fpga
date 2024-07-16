@@ -157,7 +157,7 @@ This is meant mainly for debug purposes.
 You can also use it to simulate an infinite target buffer space by connecting it directly back as the read pointer.</p>
 <section id="architecture">
 <h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
-<a class="reference internal image-reference" href="../../../../../_images/packet_planner.svg" id="packet-planner-diagram"><img alt="" class="align-center" id="packet-planner-diagram" src="../../../../../_images/packet_planner.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="../../../../../_images/packet_planner.svg" id="packet-planner-diagram"><img alt="" class="align-center" id="packet-planner-diagram" src="../../../../../_images/packet_planner.svg" style="width: 100%;" /></a>
 <p>The Packet Planner receives multiple input packet headers from multiple independent interfaces (<em>Streams</em>).
 Since all the pakcets are planned to a single linear buffer space, they are all serialized in a single input FIFOX Multi and processed as one stream of headers.
 On the output the packets are distributed back to to the original <em>Stream</em>.

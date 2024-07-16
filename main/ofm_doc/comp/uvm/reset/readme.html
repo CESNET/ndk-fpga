@@ -163,7 +163,7 @@ sequence_rand   - Reset randomly generated with some distribution. Reset is gene
 <p>For this purpose is in package three classes sync_cbs, sync_register and sync_terminate. Class sync_cbs and sync_register is for connect more class snyc_terminated together. For example in some smaller enviroment is two sequences which bot is required on reset. Then two class sync_terminated can be connected to class sync_register. Connect casses sync_* to reset agent is with function sync_connect.</p>
 <p>Class sync_terminated contain taks is_reset(outpu logic ret). Which return value in variable ret if last clock cycle was reset set.</p>
 <p>Example of connection</p>
-<a class="reference internal image-reference" href="../../../../_images/reset.svg"><img alt="../../../../_images/reset.svg" class="align-center" src="../../../../_images/reset.svg" width="50%" /></a>
+<a class="reference internal image-reference" href="../../../../_images/reset.svg"><img alt="../../../../_images/reset.svg" class="align-center" src="../../../../_images/reset.svg" style="width: 50%;" /></a>
 <div class="highlight-SystemVerilog notranslate"><div class="highlight"><pre><span></span><span class="c1">//connect reset syncrhonization object</span>
 <span class="n">reset_agent</span><span class="p">.</span><span class="n">sync_connect</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">reset_sync</span><span class="p">);</span>
 </pre></div>

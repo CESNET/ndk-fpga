@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 81fe0b7d
+                Git branch: devel, <br> Git hash: a97bde2d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -150,7 +150,7 @@ In other words, when using 4-byte data words, the lowest log2(4) bits of the add
 If we increase the data width, the address alignment will change as well.
 So to access 8-byte registers on the TX interface, the addresses must be aligned to multiples of 8 (= the lowest log2(8) bits of the addres have to be 0).
 Hopefully, this description with the following diagram explains the situation well enough.</p>
-<a class="reference internal image-reference" href="../../../../_images/mi_reconfigurator_dwr_up2.svg"><img alt="" class="align-center" src="../../../../_images/mi_reconfigurator_dwr_up2.svg" width="60%" /></a>
+<a class="reference internal image-reference" href="../../../../_images/mi_reconfigurator_dwr_up2.svg"><img alt="" class="align-center" src="../../../../_images/mi_reconfigurator_dwr_up2.svg" style="width: 60%;" /></a>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -160,7 +160,7 @@ When converting to a wider bus, the valid data have to be shifted to the correct
 The data validity is then signaled by the TX BE (Byte Enable).</p>
 <p>The same has to be done for read requests as well, only the shifting is done the other way around for the TX DRD.
 (The unit has to remember the lowest bits of the original request to shift the DRD correctly.)</p>
-<a class="reference internal image-reference" href="../../../../_images/mi_reconfigurator_dwr_up.svg"><img alt="" class="align-center" src="../../../../_images/mi_reconfigurator_dwr_up.svg" width="60%" /></a>
+<a class="reference internal image-reference" href="../../../../_images/mi_reconfigurator_dwr_up.svg"><img alt="" class="align-center" src="../../../../_images/mi_reconfigurator_dwr_up.svg" style="width: 60%;" /></a>
 </div></blockquote>
 </li>
 <li><p>RX width &gt; TX width</p>
@@ -173,7 +173,7 @@ The most complicated part here is the processing of read request DRD signals.</p
 </div></blockquote>
 </li>
 </ol>
-<a class="reference internal image-reference" href="../../../../_images/mi_reconfigurator_dwr_down.svg"><img alt="" class="align-center" src="../../../../_images/mi_reconfigurator_dwr_down.svg" width="60%" /></a>
+<a class="reference internal image-reference" href="../../../../_images/mi_reconfigurator_dwr_down.svg"><img alt="" class="align-center" src="../../../../_images/mi_reconfigurator_dwr_down.svg" style="width: 60%;" /></a>
 </section>
 </section>
 

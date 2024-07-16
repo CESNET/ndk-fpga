@@ -366,7 +366,7 @@ This means that the address ranges follow up on each other - there aren’t any 
 In theory, if we wanted some addresses or address ranges not to be used, we could all map them to one port and then not connect it to anything.</p>
 <p>The most common use case is that ABs are mapped one-on-one to ports (default PORT_MAPPING), which is also the case shown in the figure below.
 Then address range associated with port 0 is from AB(0) up to AB(1)-1, range associated with port 1 is from AB(1) up to AB(2)-1 and so on.</p>
-<a class="reference internal image-reference" href="../../../../_images/mi_splitter_exm1.svg"><img alt="../../../../_images/mi_splitter_exm1.svg" class="align-center" src="../../../../_images/mi_splitter_exm1.svg" width="50%" /></a>
+<a class="reference internal image-reference" href="../../../../_images/mi_splitter_exm1.svg"><img alt="../../../../_images/mi_splitter_exm1.svg" class="align-center" src="../../../../_images/mi_splitter_exm1.svg" style="width: 50%;" /></a>
 </section>
 <section id="examples-of-use">
 <h2>Examples of use<a class="headerlink" href="#examples-of-use" title="Link to this heading"></a></h2>
@@ -516,7 +516,7 @@ For that we’re gonna need to use PORT_MAPPING.
 Let’s take the first example we had.
 Now the ABs are going to stay the same, but instead of 7 ports we are going to have just 5.
 The routing is illustrated in the next figure.</p>
-<a class="reference internal image-reference" href="../../../../_images/mi_splitter_exm3.svg"><img alt="../../../../_images/mi_splitter_exm3.svg" class="align-center" src="../../../../_images/mi_splitter_exm3.svg" width="50%" /></a>
+<a class="reference internal image-reference" href="../../../../_images/mi_splitter_exm3.svg"><img alt="../../../../_images/mi_splitter_exm3.svg" class="align-center" src="../../../../_images/mi_splitter_exm3.svg" style="width: 50%;" /></a>
 <p>We want to route transactions addressed to the first and last address ranges out of port 0,
 transactions addressed to the second and second last address ranges out of port 1,
 transactions addressed to the third address range out of port 2,
@@ -524,7 +524,7 @@ transactions addressed to the fourth address range out of port 4 and
 transactions addressed to the fifth address range out of port 3.
 This is illustrated in the table below.
 As the table is somewhat messy, description follows below.</p>
-<a class="reference internal image-reference" href="../../../../_images/port_mapping_exm3.svg"><img alt="../../../../_images/port_mapping_exm3.svg" class="align-center" src="../../../../_images/port_mapping_exm3.svg" width="90%" /></a>
+<a class="reference internal image-reference" href="../../../../_images/port_mapping_exm3.svg"><img alt="../../../../_images/port_mapping_exm3.svg" class="align-center" src="../../../../_images/port_mapping_exm3.svg" style="width: 90%;" /></a>
 <p>Items in the table that have the same color belong together.
 The first 2 columns show how ABs are mapped to ports according to requirements stated above.
 In the third column are ABs that are associated with indices in the second column.

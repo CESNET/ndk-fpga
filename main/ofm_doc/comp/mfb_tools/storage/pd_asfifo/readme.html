@@ -164,7 +164,7 @@ If so, the packet will not appear on the ASFIFO output.
 Because the information about discarding is only available with the EOF, the unit works in store-and-forward mode (each packet has to be stored completely before we can decide whether to propagate it further).</p>
 <section id="architecture">
 <h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
-<a class="reference internal image-reference" href="../../../../../_images/pd_asfifo.svg" id="mfb-pd-asfifo-basic"><img alt="" class="align-center" id="mfb-pd-asfifo-basic" src="../../../../../_images/pd_asfifo.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="../../../../../_images/pd_asfifo.svg" id="mfb-pd-asfifo-basic"><img alt="" class="align-center" id="mfb-pd-asfifo-basic" src="../../../../../_images/pd_asfifo.svg" style="width: 100%;" /></a>
 <p>The internal architecture of the unit consists of multipe stages.</p>
 <p>If a packet has both SOF and EOF in the same data word (single-word packet), it can be discarded immidiately by masking of the SOF and EOF to 0.</p>
 <p>If the packet continues to the next word (there can only by 1 such packet in each data word), the unit starts storing its data into the Mark ASFIFO.

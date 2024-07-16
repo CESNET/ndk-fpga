@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 81fe0b7d
+                Git branch: devel, <br> Git hash: a97bde2d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -556,7 +556,8 @@ sequencer and generates low-level transactions</p></li>
 sequence_library because it simplifies the run of some sequences for specific
 tests.</p></li>
 </ol>
-<img alt="layered agents" class="align-center" src="../../../_images/layered_agents.svg" /><div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">env</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_env</span><span class="p">;</span>
+<img alt="layered agents" class="align-center" src="../../../_images/layered_agents.svg" />
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">env</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_env</span><span class="p">;</span>
 
 <span class="w">    </span><span class="p">...</span>
 
@@ -731,7 +732,8 @@ environment.</p>
 <span class="kd">endclass</span>
 </pre></div>
 </div>
-<img alt="configuration object" class="align-center" src="../../../_images/cofiguration_object.svg" /></section>
+<img alt="configuration object" class="align-center" src="../../../_images/cofiguration_object.svg" />
+</section>
 <section id="id2">
 <h3>Sequence library<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <p>It is recommended to use a sequence library as the lower sequence. This is going
@@ -820,14 +822,16 @@ logical unit. A common use of the environment is to connect the high-level agent
 with the low-level one. The picture below shows an Environment with two agents,
 one subenvironment containing a high-level agent connected to a low-level agent,
 and one virtual sequencer.</p>
-<img alt="environment" class="align-center" src="../../../_images/enviroment.svg" /><section id="virtual-sequencer">
+<img alt="environment" class="align-center" src="../../../_images/enviroment.svg" />
+<section id="virtual-sequencer">
 <h3>Virtual sequencer<a class="headerlink" href="#virtual-sequencer" title="Link to this heading"></a></h3>
 <p>A virtual sequencer connects all highest-level sequencers into one which runs a
 virtual sequence. It serves to synchronize all highest-level sequencers (so the
 agents start sending data at the same time). If the environment contains
 subenvironments like in the previous picture, the virtual sequencer connects
 only to the highest-level sequencer in each subenvironment.</p>
-<img alt="virtual sequencer" class="align-center" src="../../../_images/virtual_sequencer.svg" /><div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">sequencer</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_sequencer</span><span class="p">;</span>
+<img alt="virtual sequencer" class="align-center" src="../../../_images/virtual_sequencer.svg" />
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">sequencer</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_sequencer</span><span class="p">;</span>
 <span class="w">    </span><span class="no">`uvm_component_utils</span><span class="p">(</span><span class="n">env</span><span class="o">::</span><span class="n">sequencer</span><span class="p">)</span>
 
 <span class="w">    </span><span class="n">mfb</span><span class="o">::</span><span class="n">sequencer</span><span class="w">          </span><span class="n">m_mfb_sequencer</span><span class="p">;</span>
@@ -895,7 +899,8 @@ prints an error message through the UVM_error macro.</p>
 <p>The UVM_error macro does not stop the verification. At the end of the
 verification, the Scoreboard has to check if some errors occurred.</p>
 </div>
-<img alt="scoreboard" class="align-center" src="../../../_images/scoreboard.svg" /><div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">scoreboard</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_scoreboard</span><span class="p">;</span>
+<img alt="scoreboard" class="align-center" src="../../../_images/scoreboard.svg" />
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">scoreboard</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_scoreboard</span><span class="p">;</span>
 <span class="w">    </span><span class="no">`uvm_component_utils</span><span class="p">(</span><span class="n">env</span><span class="o">::</span><span class="n">scoreboard</span><span class="p">)</span>
 
 <span class="w">    </span><span class="c1">//CONNECT DUT</span>
@@ -954,7 +959,8 @@ has the Request-Response mechanism.</p>
 <p>For example, the read request on MI has two transactions. The first transaction
 is from a master to a slave (the request) and the second transaction is a
 response from that slave back to the master.</p>
-<img alt="question response" class="align-center" src="../../../_images/MI_agent.svg" /></section>
+<img alt="question response" class="align-center" src="../../../_images/MI_agent.svg" />
+</section>
 <section id="reset">
 <h2>Reset<a class="headerlink" href="#reset" title="Link to this heading"></a></h2>
 <p>One possible solution to the problem when a reset is generated in the middle of
@@ -1093,7 +1099,8 @@ on the MVB interface. For the sake of simplicity, the MVB interface is not
 aligned to the MFB. The FIFO method is used so the solution only depends on the
 ordering of the MFB and MVB streams.</p>
 <p>The following image shows the connections between the blocks of such verification:</p>
-<img alt="Verification connection" class="align-center" src="../../../_images/mfb_splitter.svg" /><section id="byte-array-port-environment">
+<img alt="Verification connection" class="align-center" src="../../../_images/mfb_splitter.svg" />
+<section id="byte-array-port-environment">
 <h3>Byte_array_port environment<a class="headerlink" href="#byte-array-port-environment" title="Link to this heading"></a></h3>
 <p>The environment is used for grouping the byte_array and the port. The advantage of this
 approach lies in generating data for the MVB and the MFB in one roll.</p>
@@ -1880,7 +1887,8 @@ with the <em>uvm_component</em> should contain two classes: <em>agent_rx</em> an
 See the MI interface as an example for the bidirectional and the pipelined
 interface. Also, the slave side has to be able to respond in the same clock
 cycle as a request occurs (this is not implemented).</p>
-<img alt="interface direction" class="align-center" src="../../../_images/interface_direction.svg" /><section id="modules-tcl">
+<img alt="interface direction" class="align-center" src="../../../_images/interface_direction.svg" />
+<section id="modules-tcl">
 <h3>Modules.tcl<a class="headerlink" href="#modules-tcl" title="Link to this heading"></a></h3>
 <p>Written in TCL language, this file contains the required components and
 dependencies for the package. The following command adds a package that will be

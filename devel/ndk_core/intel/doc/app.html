@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 81fe0b7d
+                Git branch: devel, <br> Git hash: a97bde2d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -138,7 +138,7 @@
 <span id="ndk-app"></span><h1>The Application<a class="headerlink" href="#the-application" title="Link to this heading"></a></h1>
 <p>The NDK is designed for creating new network applications for packet processing in a deep pipeline. The NDK provides space for your application and defines several interfaces for communication with devices on the network, with software (control and data), or with external memory. We refer to this space in the NDK as <strong>the Application</strong>.</p>
 <p>Depending on the selected FPGA card, there are several ETH streams for communication over an Ethernet network and several DMA streams for communication with the host CPU through the DMA module. There are also several <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/683091/22-3/introduction-to-memory-mapped-interfaces.html">Avalon-MM interfaces</a> for access to external memory (typically DDR4) and an MI interface for access to the CSR implemented in the application. ETH and DMA streams use a combination of MFB (for packet data) and MVB (for packet headers and metadata) buses to transfer Ethernet packets. The Application allows you to assign the selected user clock to individual parts of the design. A typical connection of the Application is shown in the block diagram below:</p>
-<a class="reference internal image-reference" href="../../../_images/ndk_app.drawio.svg"><img alt="../../../_images/ndk_app.drawio.svg" class="align-center" src="../../../_images/ndk_app.drawio.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="../../../_images/ndk_app.drawio.svg"><img alt="../../../_images/ndk_app.drawio.svg" class="align-center" src="../../../_images/ndk_app.drawio.svg" style="width: 100%;" /></a>
 <p>We recommend splitting the Application into several parts that we call Application cores. Typically, an Application core is instantiated for each Ethernet stream. Depending on the selected FPGA card, the number of ETH streams is equal to the number of DMA streams, or there are multiple ETH streams and only one DMA stream. For such cases, the NDK has prepared modules (see the <a class="reference external" href="https://github.com/CESNET/ndk-app-minimal/blob/main/app/intel/application_core.vhd">Application implementation in NDK-APP-Minimal</a>) to ensure that each Application Core is correctly connected to the available DMA interfaces. They also ensure proper distribution of the available DMA channels among the Application cores.</p>
 <section id="how-to-use-the-application-interfaces">
 <h2>How to use the Application interfaces<a class="headerlink" href="#how-to-use-the-application-interfaces" title="Link to this heading"></a></h2>
