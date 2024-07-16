@@ -17,8 +17,10 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     localparam DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS) + 1;
 
     //top env for sychnronization
-    uvm_app_core_top_agent::agent#(MFB_ITEM_WIDTH) m_eth_agent[ETH_STREAMS];
-    uvm_app_core_top_agent::agent#(MFB_ITEM_WIDTH) m_dma_agent[DMA_STREAMS];
+    //uvm_app_core_top_agent::agent#(TR_TYPE, ITEM_WIDTH, META_WIDTH)
+
+    typedef uvm_app_core_top_agent::sequence_eth_item#(2**8, 16, MFB_ITEM_WIDTH)                                                   sequence_item_eth_rx;
+    typedef uvm_app_core_top_agent::sequence_dma_item#(DMA_TX_CHANNELS, $clog2(DMA_PKT_MTU+1), DMA_HDR_META_WIDTH, MFB_ITEM_WIDTH) sequence_item_dma_rx;
 
     uvm_app_core_minimal::env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
             REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_env;
@@ -40,110 +42,16 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endfunction
 
     function void build_phase(uvm_phase phase);
-
-        for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
-            string it_num;
-            it_num.itoa(it);
-
-            m_eth_agent[it] = uvm_app_core_top_agent::agent#(MFB_ITEM_WIDTH)::type_id::create({"m_eth_agent_", it_num}, this);
-        end
-
-        for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
-            string it_num;
-            it_num.itoa(it);
-
-            m_dma_agent[it] = uvm_app_core_top_agent::agent#(MFB_ITEM_WIDTH)::type_id::create({"m_dma_agent_", it_num}, this);
-        end
-
         m_env = uvm_app_core_minimal::env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
             REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_env", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
-        for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
-            string it_num;
-            uvm_app_core_top_agent::mvb_config m_config;
-
-            it_num.itoa(it);
-
-            m_config = new();
-            m_config.port_min = it     * ETH_CHANNELS;
-            m_config.port_max = (it+1) * ETH_CHANNELS-1;
-
-            uvm_config_db#(uvm_app_core_top_agent::mvb_config)::set(this, {"m_env.m_eth_mvb_rx_", it_num,".m_logic_vector_agent.m_sequencer"}, "m_config",    m_config);
-            uvm_config_db#(mailbox#(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH)))::set(this, {"m_env.m_eth_mvb_rx_", it_num,".m_logic_vector_agent.m_sequencer"}, "hdr_export",    m_eth_agent[it].m_driver.header_export);
-            uvm_config_db#(mailbox#(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH)))::set(this, {"m_env.m_eth_mfb_rx_", it_num,".m_logic_vector_array_agent.m_sequencer"}, "packet_export", m_eth_agent[it].m_driver.logic_vector_array_export);
-            m_env.m_resets_app.sync_connect(m_eth_agent[it].reset_sync);
-        end
-
-        for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
-            string it_num;
-            it_num.itoa(it);
-            uvm_config_db#(mailbox#(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH)))::set(this, {"m_env.m_dma_mvb_rx_", it_num,".m_logic_vector_agent.m_sequencer"}, "hdr_export",    m_dma_agent[it].m_driver.header_export);
-            uvm_config_db#(mailbox#(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH)))::set(this, {"m_env.m_dma_mfb_rx_", it_num,".m_logic_vector_array_agent.m_sequencer"}, "packet_export", m_dma_agent[it].m_driver.logic_vector_array_export);
-            m_env.m_resets_app.sync_connect(m_dma_agent[it].reset_sync);
-        end
         m_env.delay_max_set(1ms);
     endfunction
 
-    task run_dma_meta(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr);
-        uvm_app_core_top_agent::logic_vector_sequence_lib#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH, DMA_PKT_MTU)  mvb_seq;
-
-        mvb_seq = uvm_app_core_top_agent::logic_vector_sequence_lib#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH, DMA_PKT_MTU)::type_id::create("mvb_seq", this);
-        mvb_seq.init_sequence();
-        mvb_seq.min_random_count = 50;
-        mvb_seq.max_random_count = 150;
-
-        forever begin
-            //mvb_seq.set_starting_phase(phase);
-            void'(mvb_seq.randomize());
-            mvb_seq.start(sqr);
-        end
-    endtask
-
-    task run_eth_meta(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr);
-        uvm_app_core_top_agent::logic_vector_sequence_lib_eth#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH) mvb_seq;
-
-        mvb_seq = uvm_app_core_top_agent::logic_vector_sequence_lib_eth#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("mvb_seq", this);
-        mvb_seq.init_sequence();
-        mvb_seq.min_random_count = 50;
-        mvb_seq.max_random_count = 150;
-
-        forever begin
-            //mvb_seq.set_starting_phase(phase);
-            void'(mvb_seq.randomize());
-            mvb_seq.start(sqr);
-        end
-    endtask
-
-    task run_packet(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr);
-        uvm_app_core_top_agent::logic_vector_array_sequence_simple#(MFB_ITEM_WIDTH) seq;
-        seq = uvm_app_core_top_agent::logic_vector_array_sequence_simple#(MFB_ITEM_WIDTH)::type_id::create("seq", this);
-        seq.randomize();
-        seq.start(sqr);
-    endtask
-
-    task run_packet_subsequences();
-        for(int unsigned it = 0; it < ETH_STREAMS; it++) begin
-            fork
-                automatic int index = it;
-                run_eth_meta(m_env.m_eth_mvb_rx[index].m_sequencer);
-                run_packet  (m_env.m_eth_mfb_rx[index].m_sequencer.m_data);
-            join_none;
-        end
-
-        // RUN DMA
-        for(int unsigned it = 0; it < DMA_STREAMS; it++) begin
-            fork
-                automatic int index = it;
-                run_dma_meta(m_env.m_dma_mvb_rx[index].m_sequencer);
-                run_packet  (m_env.m_dma_mfb_rx[index].m_sequencer.m_data);
-            join_none;
-        end
-    endtask
-
     virtual task eth_tx_sequence(uvm_phase phase, int unsigned index);
-        uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq;
+        uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq; 
 
         mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("mfb_eth_tx_seq", this);
         mfb_seq.init_sequence();
@@ -152,26 +60,22 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         //RUN ETH
         forever begin
-            //mfb_seq.set_starting_phase(phase);
             mfb_seq.randomize();
             mfb_seq.start(m_env.m_eth_mfb_tx[index].m_sequencer);
         end
     endtask
 
     virtual task eth_rx_sequence(uvm_phase phase, int unsigned index);
-        uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH) mfb_seq;
+        uvm_app_core::sequence_eth#(2**8, 16, MFB_ITEM_WIDTH) packet_seq;
 
-        mfb_seq = uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)::type_id::create("mfb_rx_seq", this);
-        mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 40;
-        mfb_seq.max_random_count = 60;
+        packet_seq = uvm_app_core::sequence_eth#(2**8, 16, MFB_ITEM_WIDTH)::type_id::create("mfb_rx_seq", this);
 
-        //SEND PACKETS
-        //mfb_seq.set_starting_phase(phase);
-        assert(mfb_seq.randomize());
-        mfb_seq.start(m_eth_agent[index].m_sequencer);
+        for (int unsigned it = 0; it < 10; it++) begin
+            assert(packet_seq.randomize());
+            packet_seq.start(m_env.m_eth_rx[index].m_sequencer);
+        end
 
-        //END sequence
+
         event_eth_rx_end[index] = 1'b0;
     endtask
 
@@ -205,17 +109,14 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task dma_rx_sequence(uvm_phase phase, int unsigned index);
-        uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)  mfb_seq;
+        uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx) packet_seq;
 
-        mfb_seq = uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)::type_id::create("mfb_dma_rx_seq", this);
-        mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 40;
-        mfb_seq.max_random_count = 60;
+        packet_seq = uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx)::type_id::create("mfb_rx_seq", this);
 
-        //SEND PACKETS
-        //mfb_seq.set_starting_phase(phase);
-        assert(mfb_seq.randomize());
-        mfb_seq.start(m_dma_agent[index].m_sequencer);
+        for (int unsigned it = 0; it < 10; it++) begin
+            assert(packet_seq.randomize());
+            packet_seq.start(m_env.m_dma_rx[index].m_sequencer);
+        end
 
         //END sequence
         event_dma_rx_end[index] = 1'b0;
@@ -259,7 +160,6 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
     virtual task run_phase(uvm_phase phase);
         time end_time;
-        run_packet_subsequences();
 
         phase.raise_objection(this);
         //// RUN TX
@@ -318,14 +218,6 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             end
             for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
                  wait(event_eth_rx_end[it] == 1'b0);
-            end
-
-            //wait for top agetn
-            for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
-                 wait(m_dma_agent[it].m_driver.logic_vector_array_export.num() == 0 && m_dma_agent[it].m_driver.header_export.num() == 0);
-            end
-            for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
-                 wait(m_eth_agent[it].m_driver.logic_vector_array_export.num() == 0 && m_eth_agent[it].m_driver.header_export.num() == 0);
             end
         end
 

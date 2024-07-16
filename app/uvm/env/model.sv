@@ -44,7 +44,13 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
     endfunction
 
     function bit used();
-        return super.used();
+        bit ret = 0;
+
+        ret |= super.used();
+
+        for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
+            ret |= (dma_hdr_fifo[it].size() > 0);
+        end
     endfunction
 
     virtual function void reset();
@@ -155,7 +161,8 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
 
             if (length != packet.item.size()) begin
                 string msg;
-                $sformat(msg, "\n\tDMA TO ETH[%0d] Header is desynchronize from packet\nHeader input time %0dns\n\t%s\nPacket input time %0dns\n\t%s", index, hdr.time_last()/1ns, hdr.item.convert2string(), packet.time_last()/1ns, packet.item.convert2string());
+
+                $sformat(msg, "\n\tDMA TO ETH[%0d] Header is desynchronize from packet\nHeader input time %0dns\n\t%s\nPacket input time %0dns\n\thdr length %0d\n\t%s", index, hdr.time_last()/1ns, hdr.item.convert2string(), packet.time_last()/1ns, length, packet.item.convert2string());
                 `uvm_fatal(this.get_full_name(), msg);
             end
 

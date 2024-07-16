@@ -92,7 +92,7 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
         //mfb_seq.set_starting_phase(phase);
         for (int unsigned it = 0; it < 4; it++) begin
             assert(mfb_seq.randomize());
-            mfb_seq.start(m_eth_agent[index].m_sequencer);
+            mfb_seq.start(m_env.m_eth_rx[index].m_sequencer);
         end
         event_eth_rx_end[index] = 1'b0;
     endtask
@@ -138,7 +138,7 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
         //mfb_seq.set_starting_phase(phase);
         for (int unsigned it = 0; it < 4; it++) begin
             assert(mfb_seq.randomize());
-            mfb_seq.start(m_dma_agent[index].m_sequencer);
+            mfb_seq.start(m_env.m_dma_rx[index].m_sequencer);
         end
         event_dma_rx_end[index] = 1'b0;
     endtask
