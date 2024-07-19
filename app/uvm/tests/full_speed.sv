@@ -81,20 +81,7 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
     endtask
 
     virtual task eth_rx_sequence(uvm_phase phase, int unsigned index);
-        uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH) mfb_seq;
-
-        mfb_seq = uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)::type_id::create("mfb_rx_seq", this);
-        mfb_seq.min_random_count = 10;
-        mfb_seq.max_random_count = 20;
-        mfb_seq.init_sequence();
-
-        //SEND PACKETS
-        //mfb_seq.set_starting_phase(phase);
-        for (int unsigned it = 0; it < 4; it++) begin
-            assert(mfb_seq.randomize());
-            mfb_seq.start(m_env.m_eth_rx[index].m_sequencer);
-        end
-        event_eth_rx_end[index] = 1'b0;
+        super.eth_rx_sequence(phase, index);
     endtask
 
     virtual task dma_tx_sequence(uvm_phase phase, int unsigned index);
@@ -127,19 +114,6 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
     endtask
 
     virtual task dma_rx_sequence(uvm_phase phase, int unsigned index);
-        uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH) mfb_seq;
-
-        mfb_seq = uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)::type_id::create("mfb_dma_rx_seq", this);
-        mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 10;
-        mfb_seq.max_random_count = 20;
-
-        //SEND PACKETS
-        //mfb_seq.set_starting_phase(phase);
-        for (int unsigned it = 0; it < 4; it++) begin
-            assert(mfb_seq.randomize());
-            mfb_seq.start(m_env.m_dma_rx[index].m_sequencer);
-        end
-        event_dma_rx_end[index] = 1'b0;
+        super.dma_rx_sequence(phase, index);
     endtask
 endclass
