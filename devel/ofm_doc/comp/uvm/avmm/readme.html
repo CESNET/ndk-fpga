@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RESET agent &mdash; Minimal NDK Application Docs  documentation</title>
+  <title>AVMM Agent &mdash; Minimal NDK Application Docs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -21,8 +21,7 @@
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="Logic vector agent" href="../logic_vector/readme.html" />
-    <link rel="prev" title="Components" href="../componets.html" /> 
+    <link rel="prev" title="FlowTest Sequence" href="../packet_generators/flowtest/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -90,10 +89,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../manual.html">SystemVerilog and UVM tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sim_manual.html">UVM simulation</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">RESET agent</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#simple-sychronous-reset-agents">simple sychronous RESET agents</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_mvb/readme.html">logic_vector_mvb environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array/readme.html">Logic Vector Array agent</a></li>
@@ -120,7 +116,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../packet_generators/flowtest/readme.html">FlowTest Sequence</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../avmm/readme.html">AVMM Agent</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AVMM Agent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sequence-items">Sequence Items</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#response-logic">Response logic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequences">Sequences</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -143,9 +144,9 @@
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../ver.html">UVM Verification</a></li>
           <li class="breadcrumb-item"><a href="../componets.html">Components</a></li>
-      <li class="breadcrumb-item active">RESET agent</li>
+      <li class="breadcrumb-item active">AVMM Agent</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../../_sources/ofm_doc/comp/uvm/reset/readme.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../_sources/ofm_doc/comp/uvm/avmm/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -153,62 +154,86 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="reset-agent">
-<span id="uvm-reset"></span><h1>RESET agent<a class="headerlink" href="#reset-agent" title="Link to this heading"></a></h1>
-<p>This agent generate one bit signal which is never have undefined value. Primary use of this agent is generating reset signal in verification.</p>
-<dl class="simple">
-<dt>Package containt two major sequences.</dt><dd><p>sequence_simple - fist n random cicles generate reset and next m random cicles generates no reset. This pattern is repeating until end of simulation.
-sequence_rand   - Reset randomly generated with some distribution. Reset is generate minimum for two cicle.</p>
-</dd>
-<dt>Connect reset signal with other components</dt><dd><p>In lot of protocols is required some oredered sequences of command to handle protocol. When reset is ocurre and sequences continues in middle of comunication protocol then DUT can end in inconsistend state. This is reason why reset have to be synchronized with some sequences.</p>
-</dd>
-</dl>
-<p>For this purpose is in package three classes sync_cbs, sync_register and sync_terminate. Class sync_cbs and sync_register is for connect more class snyc_terminated together. For example in some smaller enviroment is two sequences which bot is required on reset. Then two class sync_terminated can be connected to class sync_register. Connect casses sync_* to reset agent is with function sync_connect.</p>
-<p>Class sync_terminated contain taks is_reset(outpu logic ret). Which return value in variable ret if last clock cycle was reset set.</p>
-<p>Example of connection</p>
-<a class="reference internal image-reference" href="../../../../_images/reset.svg"><img alt="../../../../_images/reset.svg" class="align-center" src="../../../../_images/reset.svg" style="width: 50%;" /></a>
-<div class="highlight-SystemVerilog notranslate"><div class="highlight"><pre><span></span><span class="c1">//connect reset syncrhonization object</span>
-<span class="n">reset_agent</span><span class="p">.</span><span class="n">sync_connect</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">reset_sync</span><span class="p">);</span>
+  <section id="avmm-agent">
+<h1>AVMM Agent<a class="headerlink" href="#avmm-agent" title="Link to this heading"></a></h1>
+<p>This agent is a low-level agent that is responsible for communication through the Intel Avalon Memory Mapped interface.
+This package <strong>uvm_avmm</strong> contains two agents. The slave agent sends requests to the DUT. The master agent samples requests from DUT and sends responses from the memory model.</p>
+<p>The agents are configured with three parameters:</p>
+<ul class="simple">
+<li><p>ADDRESS_WIDTH</p></li>
+<li><p>DATA_WIDTH</p></li>
+<li><p>BURST_WIDTH</p></li>
+</ul>
+<section id="sequence-items">
+<h2>Sequence Items<a class="headerlink" href="#sequence-items" title="Link to this heading"></a></h2>
+<p>The following table shows properties in the <em>sequence_items</em> classes.
+This is a low-level protocol, so if you generate data in sequence, please be careful not to break the AVMM protocol rules.</p>
+<section id="sequence-item-request">
+<h3>sequence_item_request<a class="headerlink" href="#sequence-item-request" title="Link to this heading"></a></h3>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">ready</span><span class="p">;</span>
+<span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">read</span><span class="p">;</span>
+<span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">write</span><span class="p">;</span>
+<span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">ADDRESS_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">address</span><span class="p">;</span>
+<span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">DATA_WIDTH</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">writedata</span><span class="p">;</span>
+<span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">BURST_WIDTH</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">burstcount</span><span class="p">;</span>
 </pre></div>
 </div>
-<div class="highlight-SystemVerilog notranslate"><div class="highlight"><pre><span></span><span class="c1">//example of processing in low lewer sequence</span>
-<span class="k">task</span><span class="w"> </span><span class="n">send_transaction</span><span class="p">(</span><span class="n">byte_array</span><span class="w"> </span><span class="n">hl_tr</span><span class="p">);</span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">    </span><span class="kt">bit</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span>
-<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">reset</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">&lt;</span><span class="w">  </span><span class="n">hl_tr</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">())</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">        </span><span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span>
-<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">sof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span>
-<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">eof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span>
-<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hl_tr</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="n">it</span><span class="p">];</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">it</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">beign</span>
-<span class="w">            </span><span class="n">req</span><span class="p">.</span><span class="n">sof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b1</span><span class="p">;</span>
-<span class="w">        </span><span class="k">end</span>
-<span class="w">        </span><span class="n">it</span><span class="o">++</span><span class="p">;</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">it</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">hl_tr</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">())</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">            </span><span class="n">req</span><span class="p">.</span><span class="n">eof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b1</span><span class="p">;</span>
-<span class="w">        </span><span class="k">end</span>
-<span class="w">        </span><span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="w">        </span><span class="n">sync_reset</span><span class="p">.</span><span class="n">is_reset</span><span class="p">(</span><span class="n">reset</span><span class="p">);</span>
-<span class="w">    </span><span class="k">end</span>
-<span class="w">    </span><span class="c1">//send empty frame until reset is done</span>
-<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">reset</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">        </span><span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">randomize</span><span class="p">();</span>
-<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">sof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span>
-<span class="w">        </span><span class="n">req</span><span class="p">.</span><span class="n">eof</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">;</span>
-<span class="w">        </span><span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-<span class="w">        </span><span class="n">sync_reset</span><span class="p">.</span><span class="n">is_reset</span><span class="p">(</span><span class="n">reset</span><span class="p">);</span>
-<span class="w">    </span><span class="k">end</span>
-<span class="k">endtask</span>
+</section>
+<section id="sequence-item-response">
+<h3>sequence_item_response<a class="headerlink" href="#sequence-item-response" title="Link to this heading"></a></h3>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">ready</span><span class="p">;</span>
+<span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">readdata</span><span class="p">;</span>
+<span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">readdatavalid</span><span class="p">;</span>
 </pre></div>
 </div>
-<section id="simple-sychronous-reset-agents">
-<h2>simple sychronous RESET agents<a class="headerlink" href="#simple-sychronous-reset-agents" title="Link to this heading"></a></h2>
-<p>enviroment env#(RESETS) contain RESETS number of reset agents which generate synchronous reset for asynchronous clock domain. Synchronization mechanism is realy simple and cannot be used everyvhere.
-All resets agent read one value which is change ones per specified time. Time is specified in class env_config_item#(RESETS) in variable driver_delay. User have to setup up time to two times maximum of slowest reset time multiple of slowest clock.
-2*max(CLK[it]*RESET_TIME[it]). Enviroment work as agent. You can run any sequence on enviroment seqeuencer which can be ran on agent sequencer</p>
-<p>Configuration is made by class env_config_item#(RESETS) where can be configuret three thing. Active/Pasive for all agents default is all active. Name of interface for all interface. High level driver delay.</p>
+</section>
+</section>
+<section id="response-logic">
+<h2>Response logic<a class="headerlink" href="#response-logic" title="Link to this heading"></a></h2>
+<p>The master agent is capable of generating responses to input requests. For that reason, the agent contains two other components: <em>request_subscriber</em> and <em>memory_model</em>.
+These two components use internal items, <em>request_item</em> and <em>response_item</em>.</p>
+<section id="request-item">
+<h3>request_item<a class="headerlink" href="#request-item" title="Link to this heading"></a></h3>
+<div class="admonition-note-class-note admonition">
+<p class="admonition-title">Note
+  :class: note</p>
+<p><em>request_item_type_e</em> is an enum of { <strong>READ</strong>, <strong>WRITE</strong> }</p>
+</div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="n">request_item_type_e</span><span class="w"> </span><span class="n">request_type</span><span class="p">;</span>
+<span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">ADDRESS_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">address</span><span class="p">;</span>
+<span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">DATA_WIDTH</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">writedata</span><span class="p">;</span>
+<span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">BURST_WIDTH</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">burstcount</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="response-item">
+<h3>response_item<a class="headerlink" href="#response-item" title="Link to this heading"></a></h3>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">readdata</span><span class="p">;</span>
+<span class="kt">time</span><span class="w"> </span><span class="n">timestamp</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="request-subscriber">
+<h3>request_subscriber<a class="headerlink" href="#request-subscriber" title="Link to this heading"></a></h3>
+<p>The <em>request_subscriber</em> converts <em>sequence_item_request</em> into <em>request_item</em>.</p>
+</section>
+<section id="memory-model">
+<h3>memory_model<a class="headerlink" href="#memory-model" title="Link to this heading"></a></h3>
+<p>The <em>memory_model</em>’s main purpose is to process the input <em>request_item</em>.
+For <strong>READ</strong> <em>request_item</em>, the <em>memory_model</em> outputs timestamped <em>request_item</em> with read data, which are used by sequences to send <em>sequence_item_response</em> items.
+The model uses a file as its memory.</p>
+<p>The model can be configured using the <em>config_item</em>:</p>
+<ul class="simple">
+<li><p><strong>generated_memory_file</strong> Is a switch that tells the model to generate the memory file on the path <em>memory_filepath</em>. Set this property off if you want to use your memory file. The default is on.</p></li>
+<li><p><strong>generated_memory_file_type</strong> Determines the type of generated file. It can be <strong>NULL</strong> (all bits are 0) or <strong>RANDOM</strong> (random content). The default is <strong>NULL</strong>.</p></li>
+<li><p><strong>memory_filepath</strong> The path of the memory file. It can be useful if you can’t use the autogenerated name based on the UVM component hierarchy.</p></li>
+</ul>
+</section>
+</section>
+<section id="sequences">
+<h2>Sequences<a class="headerlink" href="#sequences" title="Link to this heading"></a></h2>
+<p>The sequences use the <em>response_item</em> fifo located in their sequencer to generate <em>sequence_item_response</em> items.
+There are several sequences that work with <em>response_item</em>’s timestamp and response latency and can be useful for more complex DUT verification.</p>
 </section>
 </section>
 
@@ -216,8 +241,7 @@ All resets agent read one value which is change ones per specified time. Time is
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../componets.html" class="btn btn-neutral float-left" title="Components" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../logic_vector/readme.html" class="btn btn-neutral float-right" title="Logic vector agent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../packet_generators/flowtest/readme.html" class="btn btn-neutral float-left" title="FlowTest Sequence" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

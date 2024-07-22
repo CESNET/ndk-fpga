@@ -10,18 +10,18 @@ Sequence parameters
 Configuration generation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-* **generated_config** is an on/off switch that determines whether the sequence will generate a new configuration file located at **config_filepath** or use a user-provided file at **config_filepath**.
+* **generated_config** is an on/off switch determining whether the sequence will generate a new configuration file located at **config_filepath** or use a user-provided file at **config_filepath**.
 
 .. admonition:: Warning
     :class: warning
 
-    If **generated_config** is *on*, the file at **config_filepath** will be overwritten! Be carefull not to overwrite something you didn't want!
+    If **generated_config** is *on*, the file at **config_filepath** will be overwritten! Be careful not to overwrite something you didn't want!
 
 * **Default is on**.
 
-* You can also optionally provide a configuration that will override the default values of the configuration generator constants. This configuration must be a JSON file located at **config_generator_config_filepath**. \
-You can find these constants at the begining of **config_generator.py**. The constants reflect options that are provided via an YAML configuration file described in the generator repository.
-    
+* You can also optionally provide a configuration that will override the default values of the configuration generator constants. This configuration must be a JSON file located at **config_generator_config_filepath**.
+  You can find these constants at the beginning of **config_generator.py**. The constants reflect options provided via a YAML configuration file described in the generator repository.
+
     * **LAYER_MAX_NUMBER** is the maximum number of layers in the layer list.
 
     * **LAYER_TYPES** is the list of possible layer types. **Don't change it!**
@@ -36,20 +36,20 @@ You can find these constants at the begining of **config_generator.py**. The con
 
     .. admonition:: Note
       :class: note
-    
-      **GENERATED_-_RANGE_MAX_NUMBER** parameters are disabled by default *(0)*. The generator uses sequence-generated addresses that are passed in arguments (e.g. *--ipv4*).
 
-    * **IPv4_PREFIX_MIN** is the minimum possible prefix of generated IPv4 addresses.
+      **GENERATED_-_RANGE_MAX_NUMBER** parameters are disabled by default *(0)*. The generator uses sequence-generated addresses passed as arguments (e.g. *--ipv4*).
 
-    * **IPv4_PREFIX_MAX** is the maximum possible prefix of generated IPv4 addresses.
+    * **IPv4_PREFIX_MIN** is the minimum possible prefix for generated IPv4 addresses.
+
+    * **IPv4_PREFIX_MAX** is the maximum possible prefix for generated IPv4 addresses.
 
     * **IPv4_MIN_PACKET_SIZE_TO_FRAGMENT_MIN** is the minimum value of **min_packet_size_to_fragment** for IPv4 parameter (see generator repository)
 
     * **IPv4_MIN_PACKET_SIZE_TO_FRAGMENT_MAX** is the maximum value of **min_packet_size_to_fragment** for IPv4 parameter (see generator repository)
 
-    * **IPv6_PREFIX_MIN** is the minimum possible prefix of generated IPv6 addresses.
+    * **IPv6_PREFIX_MIN** is the minimum possible prefix for generated IPv6 addresses.
 
-    * **IPv6_PREFIX_MAX** is the maximum possible prefix of generated IPv6 addresses. 
+    * **IPv6_PREFIX_MAX** is the maximum possible prefix for generated IPv6 addresses.
 
     * **IPv6_MIN_PACKET_SIZE_TO_FRAGMENT_MIN** is the minimum value of **min_packet_size_to_fragment** for IPv6 parameter (see generator repository)
 
@@ -69,26 +69,26 @@ You can find these constants at the begining of **config_generator.py**. The con
 
     * **MAX_FLOW_INTER_PACKET_GAP** is the **max_flow_inter_packet_gap** parameter (see generator repository)
 
-    * **MANDATORY_IPv4_ADDRESS_RANGES** is the list of user-defined IPv4 addresses. Use this if you want to generate specific IPv4 addressed.
+    * **MANDATORY_IPv4_ADDRESS_RANGES** is the list of user-defined IPv4 addresses. Use this if you want to generate specific IPv4 addresses.
 
-    * **MANDATORY_IPv6_ADDRESS_RANGES** is the list of user-defined IPv6 addresses. Use this if you want to generate specific IPv6 addressed.
+    * **MANDATORY_IPv6_ADDRESS_RANGES** is the list of user-defined IPv6 addresses. Use this if you want to generate specific IPv6 addresses.
 
-    * **MANDATORY_MAC_ADDRESS_RANGES** is the list of user-defined MAC addresses. Use this if you want to generate specific MAC addressed.
+    * **MANDATORY_MAC_ADDRESS_RANGES** is the list of user-defined MAC addresses. Use this if you want to generate specific MAC addresses.
 
 Profile generation
 ^^^^^^^^^^^^^^^^^^
 
-* **generated_profile** is an on/off switch that determines whether the sequence will generate a new profile file located at **profile_filepath** or use a user-provided file at **profile_filepath**.
+* **generated_profile** is an on/off switch determining whether the sequence will generate a new profile file located at **profile_filepath** or use a user-provided file at **profile_filepath**.
 
 .. admonition:: Warning
     :class: warning
 
-    If **generated_profile** is *on*, the file at **profile_filepath** will be overwritten! Be carefull not to overwrite something you didn't want!
+    If **generated_profile** is *on*, the file at **profile_filepath** will be overwritten! Be careful not to overwrite something you didn't want!
 
 * **Default is on**.
 
-* You can also optionally provide a configuration that will override the default values of the profile generator constants. This configuration must be a JSON file located at **profile_generator_config_filepath**. \
-You can find these constants at the begining of **profile_generator.py**. The constants reflect options that are provided via a CSV profile file described in the generator repository.
+* You can also optionally provide a configuration that will override the default values of the profile generator constants. This configuration must be a JSON file located at **profile_generator_config_filepath**.
+  You can find these constants at the beginning of **profile_generator.py**. The constants reflect options provided via a CSV profile file described in the generator repository.
 
     * **START_TIME_MIN** is the minimum possible start time of a flow.
 
@@ -98,29 +98,29 @@ You can find these constants at the begining of **profile_generator.py**. The co
 
     * **END_TIME_MAX** is the maximum possible end time of a flow.
 
-    * **PACKETS_MIN_NUMBER** is the minimum possible number of packets in forward direction.
+    * **PACKETS_MIN_NUMBER** is the minimum possible number of packets in the forward direction.
 
-    * **PACKETS_MAX_NUMBER** is the maximum possible number of packets in forward direction.
+    * **PACKETS_MAX_NUMBER** is the maximum possible number of packets in the forward direction.
 
-    * **BYTES_PER_PACKET_MIN_NUMBER** is the minimum possible number of bytes per packet in forward direction.
+    * **BYTES_PER_PACKET_MIN_NUMBER** is the minimum possible number of bytes per packet in the forward direction.
 
-    * **BYTES_PER_PACKET_MAX_NUMBER** is the maximum possible number of bytes per packet in forward direction.
+    * **BYTES_PER_PACKET_MAX_NUMBER** is the maximum possible number of bytes per packet in the forward direction.
 
-    * **BYTES_MIN_NUMBER** is the minimum possible number of bytes in forward direction.
+    * **BYTES_MIN_NUMBER** is the minimum possible number of bytes in the forward direction.
 
-    * **BYTES_MAX_NUMBER** is the maximum possible number of bytes in forward direction.
+    * **BYTES_MAX_NUMBER** is the maximum possible number of bytes in the forward direction.
 
-    * **PACKETS_REV_MIN_NUMBER** is the minimum possible number of packets in reverse direction.
+    * **PACKETS_REV_MIN_NUMBER** is the minimum possible number of packets in the reverse direction.
 
-    * **PACKETS_REV_MAX_NUMBER** is the maximum possible number of packets in reverse direction.
+    * **PACKETS_REV_MAX_NUMBER** is the maximum possible number of packets in the reverse direction.
 
-    * **BYTES_PER_PACKET_REV_MIN_NUMBER** is the minimum possible number of bytes per packet in reverse direction.
+    * **BYTES_PER_PACKET_REV_MIN_NUMBER** is the minimum possible number of bytes per packet in the reverse direction.
 
-    * **BYTES_PER_PACKET_REV_MAX_NUMBER** is the maximum possible number of bytes per packet in reverse direction.
+    * **BYTES_PER_PACKET_REV_MAX_NUMBER** is the maximum possible number of bytes per packet in the reverse direction.
 
-    * **BYTES_REV_MIN_NUMBER** is the minimum possible number of bytes in reverse direction.
+    * **BYTES_REV_MIN_NUMBER** is the minimum possible number of bytes in the reverse direction.
 
-    * **BYTES_REV_MAX_NUMBER** is the maximum possible number of bytes in reverse direction.
+    * **BYTES_REV_MAX_NUMBER** is the maximum possible number of bytes in the reverse direction.
 
     * **RECORD_MIN_NUMBER** is the minimum possible number of flows.
 
@@ -132,7 +132,7 @@ Example configurations
 .. admonition:: Note
     :class: note
 
-    Parameters in a JSON configuration are case insensitive and can be provided in any order.
+    Parameters in a JSON configuration are case-insensitive and can be provided in any order.
 
 Configuration generator configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
