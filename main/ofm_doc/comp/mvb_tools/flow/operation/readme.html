@@ -135,10 +135,10 @@
 <dt class="sig sig-object vhdl" id="vhdl-entity-mvb_operation">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_OPERATION</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_operation" title="Link to this definition"></a></dt>
 <dd><p>This component enables optional transaction forking and response
-receiving based on <a class="reference internal" href="#vhdl-portsignal-mvb_operation-rx_op_en"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RX_OP_EN</span></code></a>. Optionally forked data are sent
+receiving based on <code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RX_OP_EN</span></code>. Optionally forked data are sent
 to <strong>TX Operation Interface</strong> and responses are received from <strong>RX Operation Interface</strong>.
-<a class="reference internal" href="#vhdl-portsignal-mvb_operation-rx_op_vld"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RX_OP_VLD</span></code></a> vector must be same as operation received from
-<a class="reference internal" href="#vhdl-portsignal-mvb_operation-tx_op_vld"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">TX_OP_VLD</span></code></a> (no shakedown behaviour must be present in operation unit)
+<code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RX_OP_VLD</span></code> vector must be same as operation received from
+<code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">TX_OP_VLD</span></code> (no shakedown behaviour must be present in operation unit)
 and responses must not be reordered.
 When shakedown behaviour of OP unit is required, one can put SHAKEDOWN before <strong>RX Interface</strong>.</p>
 <p>Both received data and responses are then transmitted on <strong>TX Interface</strong>.</p>
@@ -332,7 +332,7 @@ and FIFO_WIDTH &gt;= 72 (URAM is only for Xilinx Ultrascale(+))</p></li>
 <td><p>std_logic_vector(MVB_ITEMS - 1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Response valid, eg. operation was executed on i-th item. This vector is same as
-received <a class="reference internal" href="#vhdl-portsignal-mvb_operation-rx_op_en"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RX_OP_EN</span></code></a>.</p></td>
+received <code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RX_OP_EN</span></code>.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mvb_operation-tx_vld"><td><p>TX_VLD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS - 1 downto 0)</p></td>

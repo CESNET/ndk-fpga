@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 9e115050
+                Git branch: devel, <br> Git hash: 2947ded2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -157,14 +157,14 @@
 <dt class="sig sig-object vhdl" id="vhdl-entity-mfb_enabler">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_ENABLER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_enabler" title="Link to this definition"></a></dt>
 <dd><p>This component enables sending of MFB frames to the output.
-For this purpose, it uses the <a class="reference internal" href="#vhdl-portsignal-mfb_enabler-tx_enable"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">TX_ENABLE</span></code></a> port.
+For this purpose, it uses the <code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">TX_ENABLE</span></code> port.
 Enabling starts from the first SOF.
 Disabling starts from the last EOF in the current word.
 If this happens in the middle of a frame then all following words are sent until the EOF is found.
 If in this word is/are other complete frame/s then it/they are sent as well.
 If this happens when outside of a frame then at least the next frame (can be more) in the first following valid word is still sent to the output.
 The following packets are discarded.
-For indication of the region in which discarded frame ends, there is a flag <a class="reference internal" href="#vhdl-portsignal-mfb_enabler-stat_discarded"><code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">STAT_DISCARDED</span></code></a>.</p>
+For indication of the region in which discarded frame ends, there is a flag <code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">STAT_DISCARDED</span></code>.</p>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
