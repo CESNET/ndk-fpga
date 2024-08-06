@@ -504,9 +504,9 @@ begin
         CLK                    => APP_CLK,
         RESET                  => APP_RESET(3),
 
-        HBM_CLK                => HBM_CLK,
-        HBM_RESET              => HBM_RESET,
-        HBM_INIT_DONE          => HBM_INIT_DONE,
+        HBM_CLK                => HBM_CLK(0),
+        HBM_RESET              => HBM_RESET(0),
+        HBM_INIT_DONE          => HBM_INIT_DONE(0),
         HBM_AXI_ARADDR         => HBM_AXI_ARADDR,
         HBM_AXI_ARBURST        => HBM_AXI_ARBURST,
         HBM_AXI_ARID           => HBM_AXI_ARID,
