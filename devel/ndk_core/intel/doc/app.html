@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 2947ded2
+                Git branch: devel, <br> Git hash: 27e618da
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -448,67 +448,82 @@ The minimum allowed length of the packet data is 60B, if necessary, the applicat
 <td><p>2</p></td>
 <td><p>HBM parameters: width of AXI resp signal</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_ports"><td><p>MEM_PORTS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_prot_width"><td><p>HBM_PROT_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>3</p></td>
+<td><p>HBM parameters: width of AXI prot signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_qos_width"><td><p>HBM_QOS_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>HBM parameters: width of AXI qos signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_user_width"><td><p>HBM_USER_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>HBM parameters: width of AXI user signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mem_ports"><td><p>MEM_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>MEM parameters: number of external memory ports (EMIFs)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-mem_addr_width"><td><p>MEM_ADDR_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_addr_width"><td><p>MEM_ADDR_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>27</p></td>
 <td><p>MEM parameters: width of AVMM address signal</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_burst_width"><td><p>MEM_BURST_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mem_burst_width"><td><p>MEM_BURST_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>7</p></td>
 <td><p>MEM parameters: width of AVMM burst count signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-mem_data_width"><td><p>MEM_DATA_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_data_width"><td><p>MEM_DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
 <td><p>MEM parameters: width of AVMM data signals</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_refr_period_width"><td><p>MEM_REFR_PERIOD_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mem_refr_period_width"><td><p>MEM_REFR_PERIOD_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>MEM parameters: width of user refresh period</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-mem_def_refr_period"><td><p>MEM_DEF_REFR_PERIOD</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_def_refr_period"><td><p>MEM_DEF_REFR_PERIOD</p></td>
 <td><p>integer</p></td>
 <td><p>0</p></td>
 <td><p>MEM parameters: default refresh periods for each interface</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-amm_freq_khz"><td><p>AMM_FREQ_KHZ</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-amm_freq_khz"><td><p>AMM_FREQ_KHZ</p></td>
 <td><p>integer</p></td>
 <td><p>266660</p></td>
 <td><p>Freq of the AMM bus with EMIF</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>32</p></td>
 <td><p>MI parameters: width of data signals</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>32</p></td>
 <td><p>MI parameters: width of address signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-fpga_id_width"><td><p>FPGA_ID_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-fpga_id_width"><td><p>FPGA_ID_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>64</p></td>
 <td><p>Width of FPGA ID</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-reset_width"><td><p>RESET_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-reset_width"><td><p>RESET_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>2</p></td>
 <td><p>Width of reset signals</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-board"><td><p>BOARD</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-board"><td><p>BOARD</p></td>
 <td><p>string</p></td>
 <td><p>UNDEFINED</p></td>
 <td><p>Name of FPGA board</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>UNDEFINED</p></td>
 <td><p>Name of FPGA device</p></td>
@@ -967,17 +982,17 @@ Can be used to avoid stopping the whole DMA Module when just a single channel is
 <td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-application_core-hbm_clk"><td><p>HBM_CLK</p></td>
-<td><p>std_logic</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-application_core-hbm_reset"><td><p>HBM_RESET</p></td>
-<td><p>std_logic</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-application_core-hbm_init_done"><td><p>HBM_INIT_DONE</p></td>
-<td><p>std_logic</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -1016,74 +1031,104 @@ Can be used to avoid stopping the whole DMA Module when just a single channel is
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rdata"><td><p>HBM_AXI_RDATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_arprot"><td><p>HBM_AXI_ARPROT</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_arqos"><td><p>HBM_AXI_ARQOS</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_aruser"><td><p>HBM_AXI_ARUSER</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rdata"><td><p>HBM_AXI_RDATA</p></td>
 <td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rdata_parity"><td><p>HBM_AXI_RDATA_PARITY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rdata_parity"><td><p>HBM_AXI_RDATA_PARITY</p></td>
 <td><p>slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rid"><td><p>HBM_AXI_RID</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rid"><td><p>HBM_AXI_RID</p></td>
 <td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rlast"><td><p>HBM_AXI_RLAST</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rlast"><td><p>HBM_AXI_RLAST</p></td>
 <td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rresp"><td><p>HBM_AXI_RRESP</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rresp"><td><p>HBM_AXI_RRESP</p></td>
 <td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rvalid"><td><p>HBM_AXI_RVALID</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rvalid"><td><p>HBM_AXI_RVALID</p></td>
 <td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rready"><td><p>HBM_AXI_RREADY</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rready"><td><p>HBM_AXI_RREADY</p></td>
 <td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awaddr"><td><p>HBM_AXI_AWADDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awaddr"><td><p>HBM_AXI_AWADDR</p></td>
 <td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awburst"><td><p>HBM_AXI_AWBURST</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awburst"><td><p>HBM_AXI_AWBURST</p></td>
 <td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awid"><td><p>HBM_AXI_AWID</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awid"><td><p>HBM_AXI_AWID</p></td>
 <td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awlen"><td><p>HBM_AXI_AWLEN</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awlen"><td><p>HBM_AXI_AWLEN</p></td>
 <td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awsize"><td><p>HBM_AXI_AWSIZE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awsize"><td><p>HBM_AXI_AWSIZE</p></td>
 <td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awvalid"><td><p>HBM_AXI_AWVALID</p></td>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awvalid"><td><p>HBM_AXI_AWVALID</p></td>
 <td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awready"><td><p>HBM_AXI_AWREADY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awready"><td><p>HBM_AXI_AWREADY</p></td>
 <td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
 <td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awprot"><td><p>HBM_AXI_AWPROT</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awqos"><td><p>HBM_AXI_AWQOS</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awuser"><td><p>HBM_AXI_AWUSER</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_wdata"><td><p>HBM_AXI_WDATA</p></td>
