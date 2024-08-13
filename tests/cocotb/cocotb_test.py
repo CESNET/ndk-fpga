@@ -32,7 +32,7 @@ async def cocotb_test_enable_rxmac_and_check_status(dut):
     mac = nfb.eth[0].rxmac
     await e(mac.enable)()
     await e(mac.is_enabled)()
-    await e(nfb.ndp.rx[0].stats_read)()
+    await e(nfb.ndp.rx[0].read_stats)()
 
 
 @cocotb.test(skip=True)
@@ -93,8 +93,8 @@ async def _cocotb_test_ndp_sendmsg(dev, nfb):
     await e(nfb.ndp.tx[0].sendmsg)([(pkt, bytes(), 0)])
 
     await Timer(5, units='us')
-    stats = await e(nfb.eth[0].txmac.stats_read)()
-    assert stats['sent'] == 1
+    stats = await e(nfb.eth[0].txmac.read_stats)()
+    assert stats['passed'] == 1
 
 async def _cocotb_test_ndp_recvmsg(dev, nfb):
     for eth in nfb.eth:
