@@ -3,7 +3,7 @@ node("preklad") {
 	def swbase = "ndk-sw"
 	checkout scm
 
-	stage("Checkout development branches") { 
+	stage("Checkout development branches") {
 		sh "git clone https://github.com/CESNET/ndk-sw.git"
 
 		sh "(cd ndk/ofm; git checkout main)"
@@ -12,13 +12,14 @@ node("preklad") {
 
 	sh "python3.9 -m venv venv-cocotb"
 
-	stage("Prepare environment") { 
+	stage("Prepare environment") {
 		sh """
 			source venv-cocotb/bin/activate
 		    python3.9 -m pip install cython wheel
 		    python3.9 -m pip install pylibfdt fdt
-		    python3.9 -m pip install ${swbase}/pynfb/
-		    python3.9 -m pip install ${swbase}/ext/libnfb_ext_python/
+		    python3.9 -m pip wheel -w ./cocotbwheels ${swbase}/pynfb/
+		    python3.9 -m pip install --find-links ./cocotbwheels nfb
+		    python3.9 -m pip install --find-links ./cocotbwheels ${swbase}/ext/libnfb_ext_python/
 		    python3.9 -m pip install ndk/ofm/python/cocotbext/
 		"""
 	}
