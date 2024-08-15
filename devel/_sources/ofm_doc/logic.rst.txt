@@ -15,7 +15,7 @@ Basic logic elements
 
 **BIN2HOT** - Behavioral implementation of binary to one-hot converter with enable.
 
-**CARRY_CHAIN** - Generic structural implementation of carry chain. 
+**CARRY_CHAIN** - Generic structural implementation of carry chain.
 
 **CMP** - Generic implementation of comparator. It contains behavioral variant and also DSP variant based on Xilinx 7-Series DSP slices.
 
@@ -66,7 +66,7 @@ There is also a variant with an enable signal and a variant with a reverse codin
 **N_LOOP_OP_PRO** - This unit serves the same purpose as the N_LOOP_OP unit, but is based on NP_LUTRAM_PRO. This means, that it requires additional double speed CLK2 and has lesser chip resource usage.
 Expert knowledge is required to use this component!
 
-**N_ONE** - Detector of a variable number (N) of ones in the input vector. The value of N is set by the input binary signal. 
+**N_ONE** - Detector of a variable number (N) of ones in the input vector. The value of N is set by the input binary signal.
 
 **N_TO_M_HANDSHAKE** - Connects N sources and M destination using shared (SRC_RDY, DST_RDY) handshake.
 Data is only transfered when all sources and all destinations are ready.
@@ -74,7 +74,7 @@ Data is only transfered when all sources and all destinations are ready.
 **OR** - Behavioral implementation of generic OR.
 
 **PIPE_DSP** - Implementation of N one detector
- 
+
 **PIPE_TREE_ADDER** - Creates a tree of adders with registers in between to add multiple values together.
 Tries to use as simple adders as the set latency allows. It has a valid bit for each input.
 
@@ -91,7 +91,7 @@ Tries to use as simple adders as the set latency allows. It has a valid bit for 
 .. toctree::
    :maxdepth: 1
    :hidden:
-          
+
    comp/base/logic/n_loop_op/readme
    comp/base/logic/sr_sync_latch/readme
    comp/base/logic/barrel_shifter/readme

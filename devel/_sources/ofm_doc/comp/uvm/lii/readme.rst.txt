@@ -38,11 +38,11 @@ Ports
 =============  ===  ==================     ======================================================
 Name           Dir  Dimension              Description
 =============  ===  ==================     ======================================================
-DATA           IN   DATA_WIDTH             TX data. On the first data within an frame, only bit 31:8 are 
-BYTES_VLD      IN   DATA_WIDTH             valid bytes in the the last word in range 0x1 to 0x4. Valid on EOF cycle 
-SOF            IN   1                      Start of data frame, single clock cycle 
-EOF            IN   1                      End of data frame, single clock cycle 
-RDY            IN   1                      TX data. On the first data within an frame, only bit 31:8 are 
+DATA           IN   DATA_WIDTH             TX data. On the first data within an frame, only bit 31:8 are
+BYTES_VLD      IN   DATA_WIDTH             valid bytes in the the last word in range 0x1 to 0x4. Valid on EOF cycle
+SOF            IN   1                      Start of data frame, single clock cycle
+EOF            IN   1                      End of data frame, single clock cycle
+RDY            IN   1                      TX data. On the first data within an frame, only bit 31:8 are
 EEOF           IN   1                      Early end of data frame, single clock cycle pulse
 EDB            IN   DATA_WIDTH             Early valid bytes
 =============  ===  ==================     ======================================================
@@ -52,7 +52,7 @@ LII sequence item
 Sequence item contains basic ports from interface, except EEOF and EDB which are only drived to interface by driver. All signals which are in sequence item are randomized.
 There are three methods:
 
-- ``do_copy`` is used for copying of the transaction. 
+- ``do_copy`` is used for copying of the transaction.
 - ``do_compare`` is used for comparing data of two transactions.
 - ``convert2string`` is used for printing whole transaction.
 

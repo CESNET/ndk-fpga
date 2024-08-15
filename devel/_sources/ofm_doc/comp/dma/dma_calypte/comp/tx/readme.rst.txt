@@ -65,7 +65,7 @@ There are five tests in the Multiver script.
      - 1.256
      - 4
 
-   * - 8_channels, min_pcie_frames 
+   * - 8_channels, min_pcie_frames
      - 1(~40Gb/s)
      - 2^11-1
      - 14-bit, 11-bit
@@ -79,7 +79,7 @@ There are five tests in the Multiver script.
      - 1.256
      - 2
 
-   * - buff_size_large 
+   * - buff_size_large
      - 1(~40Gb/s)
      - 2^11-1
      - 16-bit, 13-bit
@@ -106,7 +106,7 @@ There are five tests in the Multiver script.
      - 76.4729%
      - 76.4729%
 
-   * - 8_channels, min_pcie_frames 
+   * - 8_channels, min_pcie_frames
      - 77.6599%
      - 77.3954%
      - 77.6599%
@@ -146,19 +146,19 @@ Delay is mesured only for the full spead test. This test allways accepts output 
      - 183ns
      - 97ns
 
-   * - 8_channels, min_pcie_frames 
+   * - 8_channels, min_pcie_frames
      - 24ns
      - 944ns
      - 192ns
      - 111ns
 
-   * - buff_size_small 
+   * - buff_size_small
      - 28ns
      - 500ns
      - 175ns
      - 83ns
 
-   * - buff_size_big 
+   * - buff_size_big
      - 28ns
      - 500ns
      - 175ns

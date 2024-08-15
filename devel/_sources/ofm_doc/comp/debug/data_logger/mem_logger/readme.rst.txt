@@ -15,7 +15,7 @@ Key features
     * Number of ticks between first and last read, write and both (SW can calculate data flow)
     * Read requests latencies (minimum, maximum, average and histogram)
 
-        * :ref:`LATENCY_METER<latency_meter>` and :ref:`HISTOGRAMER<histogramer>` components are used 
+        * :ref:`LATENCY_METER<latency_meter>` and :ref:`HISTOGRAMER<histogramer>` components are used
 
 * You can specify if read latency should be measured to the first or last received word (default: to last word)
 
@@ -33,7 +33,7 @@ Instance template (simple usage)
 .. code-block::
 
     mem_logger_i : entity work.MEM_LOGGER
-    generic map (    
+    generic map (
         MEM_DATA_WIDTH          => MEM_DATA_WIDTH       ,
         MEM_ADDR_WIDTH          => MEM_ADDR_WIDTH       ,
         MEM_BURST_COUNT_WIDTH   => MEM_BURST_WIDTH      ,
@@ -42,10 +42,10 @@ Instance template (simple usage)
         MI_DATA_WIDTH           => MI_DATA_WIDTH        ,
         MI_ADDR_WIDTH           => MI_ADDR_WIDTH
     )
-    port map (    
+    port map (
         CLK                     => MEM_CLK                  (i),
         RST                     => MEM_RST                  (i),
-    
+
         MEM_READY               => MEM_AVMM_READY           (i),
         MEM_READ                => MEM_AVMM_READ            (i),
         MEM_WRITE               => MEM_AVMM_WRITE           (i),
@@ -54,7 +54,7 @@ Instance template (simple usage)
         MEM_WRITE_DATA          => MEM_AVMM_WRITEDATA       (i),
         MEM_BURST_COUNT         => MEM_AVMM_BURSTCOUNT      (i),
         MEM_READ_DATA_VALID     => MEM_AVMM_READDATAVALID   (i),
-    
+
         MI_DWR                  => mem_mi_dwr               (i),
         MI_ADDR                 => mem_mi_addr              (i),
         MI_BE                   => mem_mi_be                (i),

@@ -18,7 +18,7 @@ The core part of this unit is the multi-port memory unit :ref:`NP_LUTRAM<np_lutr
 
 .. warning::
    Some parts of the N_LOOP_OP have a quadratic logic complexity depending on the number of operators.
-   Try to keep this number as low as possible to avoid problems with timing and resource consumption. 
+   Try to keep this number as low as possible to avoid problems with timing and resource consumption.
 
 Block diagram
 ^^^^^^^^^^^^^
@@ -54,7 +54,7 @@ Solution
 To implement this example using the N_LOOP_OP you need to define the following:
 
 #. Number of operators.
-   
+
    The number of operators must be set as the **maximum** number of **different** counters, that can be updated at the same time.
    Since we have 4 interfaces sending completely independent requests, the number will be **4**.
    (i.e. the worst case is every interface requesting an operation on a different address.)

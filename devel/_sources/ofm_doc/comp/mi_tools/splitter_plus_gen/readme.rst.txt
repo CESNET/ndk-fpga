@@ -168,8 +168,8 @@ The routing is illustrated in the next figure.
     :align: center
     :width: 50 %
 
-We want to route transactions addressed to the first and last address ranges out of port 0, 
-transactions addressed to the second and second last address ranges out of port 1, 
+We want to route transactions addressed to the first and last address ranges out of port 0,
+transactions addressed to the second and second last address ranges out of port 1,
 transactions addressed to the third address range out of port 2,
 transactions addressed to the fourth address range out of port 4 and
 transactions addressed to the fifth address range out of port 3.

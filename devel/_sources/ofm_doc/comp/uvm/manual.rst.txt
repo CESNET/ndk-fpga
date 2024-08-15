@@ -1450,28 +1450,28 @@ Scoreboard
         endfunction
 
         function void build_phase(uvm_phase phase);
-    
+
             m_model          = model #(CHANNELS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH)::type_id::create("m_model", this);
             m_model.tx_input = model_input_fifo#(ITEM_WIDTH, META_WIDTH)::type_id::create("tx_input" , m_model);
             for (int it = 0; it < CHANNELS; it++) begin
                 string it_string;
                 it_string.itoa(it);
-    
+
                 tx_compare[it] = uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create({"tx_compare_", it_string}, this);
-    
+
                 m_model.rx_input[it]   = uvm_common::fifo_model_input#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create({"rx_input_data_", it_string} , m_model);
                 m_model.rx_discard[it] = uvm_common::fifo_model_input#(uvm_logic_vector::sequence_item #(1))::type_id::create({"rx_discard_", it_string} , m_model);
             end
-    
+
             rx_compare_data = comparer_data #(ITEM_WIDTH, HDR_WIDTH)::type_id::create("rx_compare_data", this);
             rx_compare_meta = comparer_meta #(ITEM_WIDTH, HDR_WIDTH)::type_id::create("rx_compare_meta", this);
         endfunction
-    
+
         function void connect_phase(uvm_phase phase);
             model_input_fifo#(ITEM_WIDTH, META_WIDTH) tx_input;
             uvm_common::fifo_model_input#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) rx_input;
             uvm_common::fifo_model_input#(uvm_logic_vector::sequence_item #(1))               rx_discard;
-    
+
             //TX INPUT
             $cast(tx_input, m_model.tx_input);
             tx_input_data.connect(tx_input.analysis_export_data);
@@ -1480,19 +1480,19 @@ Scoreboard
             for (int unsigned it = 0; it < CHANNELS; it++) begin
                 m_model.tx_output[it].connect(tx_compare[it].analysis_imp_model);
                 tx_out[it].connect(tx_compare[it].analysis_imp_dut);
-    
+
                 $cast(rx_input, m_model.rx_input[it]);
                 rx_input_data[it].connect(rx_input.analysis_export);
                 $cast(rx_discard, m_model.rx_discard[it]);
                 mvb_discard[it].connect(rx_discard.analysis_export);
             end
-    
+
             m_model.rx_output.connect(rx_compare_data.analysis_imp_model);
             m_model.rx_output.connect(rx_compare_meta.analysis_imp_model);
             rx_out_data.connect(rx_compare_data.analysis_imp_dut);
             rx_out_hdr.connect(rx_compare_meta.analysis_imp_dut);
         endfunction
-    
+
         function int unsigned used();
             int unsigned ret = 0;
             ret |= m_model.used();
@@ -1503,7 +1503,7 @@ Scoreboard
             ret |= rx_compare_meta.used();
             return ret;
         endfunction
-    
+
         function int unsigned success();
             int unsigned ret = 1;
             for (int unsigned it = 0; it < CHANNELS; it++) begin
@@ -1513,11 +1513,11 @@ Scoreboard
             ret &= rx_compare_meta.success();
             return ret;
         endfunction
-    
+
         function void report_phase(uvm_phase phase);
             int unsigned total_errors = 0;
             string msg = "";
-    
+
             // TX path
             for (int unsigned it = 0; it < CHANNELS; it++) begin
                 $swrite(msg, "%s\n\tTX path OUTPUT [%0d]: %s", msg, it, tx_compare[it].info());
@@ -1525,14 +1525,14 @@ Scoreboard
             $swrite(msg, "%s\n\t---------------------------------------", msg);
             $swrite(msg, "%s\n\tRX path OUTPUT DATA : %s", msg,  rx_compare_data.info());
             $swrite(msg, "%s\n\tRX path OUTPUT META : %s", msg,  rx_compare_meta.info());
-    
+
             if (this.success() == 1 && this.used() == 0) begin
                 `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
             end else begin
                 `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
             end
         endfunction
-    
+
     endclass
 
 

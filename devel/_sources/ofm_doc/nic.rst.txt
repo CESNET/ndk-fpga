@@ -7,7 +7,7 @@ The network components are typically located in the ``comp/nic/`` directory in t
 .. toctree::
    :maxdepth: 1
    :caption: Content:
-   
+
    comp/nic/mac_lite/rx_mac_lite/readme
    comp/nic/mac_lite/tx_mac_lite/readme
    comp/nic/mac_lite/tx_mac_lite/comp/adapters/lbus/reconf/readme

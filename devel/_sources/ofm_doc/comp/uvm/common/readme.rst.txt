@@ -88,7 +88,7 @@ If the type of the model and DUT transactions are the same, then a predefined co
 This component has only one parameter - the transaction type.
 
 .. list-table:: comparer classes
-   :widths: 200 
+   :widths: 200
    :header-rows: 1
 
    * - class
@@ -126,11 +126,11 @@ You can do this by reimplementing pure virtual functions:
     // The class extends a specified model and dut type of transactions.
     class scoreboard_channel_header #(HDR_WIDTH, META_WIDTH, CHANNELS, PKT_MTU) extends uvm_common::comparer_base_tagged #(packet_header #(META_WIDTH, CHANNELS, PKT_MTU), uvm_logic_vector::sequence_item#(HDR_WIDTH));
         `uvm_component_param_utils(uvm_app_core::scoreboard_channel_header #(HDR_WIDTH, META_WIDTH, CHANNELS, PKT_MTU))
-    
+
         function new(string name, uvm_component parent = null);
             super.new(name, parent);
         endfunction
-    
+
         // This method implements a comparison of these two types.
         virtual function int unsigned compare(packet_header #(META_WIDTH, CHANNELS, PKT_MTU) tr_model, uvm_logic_vector::sequence_item#(HDR_WIDTH) tr_dut);
             int unsigned eq = 1;
@@ -138,23 +138,23 @@ You can do this by reimplementing pure virtual functions:
             logic [$clog2(CHANNELS)-1:0] channel;
             logic [$clog2(PKT_MTU+1)] packet_size;
             logic discard;
-    
+
             if (META_WIDTH == 0) begin
                 {discard, channel, packet_size} = tr_dut.data;
             end else begin
-                {discard, channel, meta, packet_size} = tr_dut.data; 
+                {discard, channel, meta, packet_size} = tr_dut.data;
             end
-    
+
             eq &= (discard === tr_model.discard);
             eq &= (channel === tr_model.channel);
             if (META_WIDTH != 0) begin
                 eq &= (meta    === tr_model.meta);
             end
             eq &= (packet_size === tr_model.packet_size);
-    
+
             return eq;
         endfunction
-    
+
         // This method implements error message printing when an error occurs.
         virtual function string message(packet_header #(META_WIDTH, CHANNELS, PKT_MTU) tr_model, uvm_logic_vector::sequence_item#(HDR_WIDTH) tr_dut);
             string error_msg; //ETH [%0d] header
@@ -162,18 +162,18 @@ You can do this by reimplementing pure virtual functions:
             logic [$clog2(CHANNELS)-1:0] channel;
             logic [$clog2(PKT_MTU+1)] packet_size;
             logic discard;
-    
+
             if (META_WIDTH == 0) begin
                 {discard, channel, packet_size} = tr_dut.data;
             end else begin
-                {discard, channel, meta, packet_size} = tr_dut.data; 
+                {discard, channel, meta, packet_size} = tr_dut.data;
             end
             $swrite(error_msg, "\n\t\t          [DUT model]");
             $swrite(error_msg, "%s\n\t\tdiscard [%b %b]", error_msg, discard, tr_model.discard);
             $swrite(error_msg, "%s\n\t\tchannel [%0d %0d]", error_msg, channel, tr_model.channel);
             $swrite(error_msg, "%s\n\t\tmeta    [%h %h]", error_msg, meta, tr_model.meta);
             $swrite(error_msg, "%s\n\t\tpacket_size [%0d %0d]", error_msg, packet_size, tr_model.packet_size);
-    
+
             return error_msg;
         endfunction
     endclass

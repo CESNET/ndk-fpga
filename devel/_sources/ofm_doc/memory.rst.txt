@@ -59,13 +59,13 @@ Allows setting type of memory (LUT, BRAM, URAM) or automatic mode. Optimized for
 .. toctree::
    :maxdepth: 1
    :hidden:
-          
+
    comp/base/mem/np_lutram/readme
    comp/base/mem/sdp_bram/readme
    comp/base/mem/mp_bram/readme
    comp/base/mem/lvt_mem/readme
 ..   comp/base/mem/<something>
-             
+
 References
 ----------
 

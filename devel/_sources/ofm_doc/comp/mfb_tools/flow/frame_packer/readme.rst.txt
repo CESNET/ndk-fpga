@@ -44,7 +44,7 @@ The parameters of the calculation are the status ``pointer``, the number of ``va
 When the shift select is being calculated, the packets are routed to the Barrel Shifters (one per packet).
 Its purpose is to rotate the MFB word so that the data can be easily assembled in each channel unit.
 The first Barrel Shifter is used for packets that originates in the previous words.
-Other Barrel Shifters are used for packets that begins in the current word. 
+Other Barrel Shifters are used for packets that begins in the current word.
 The packet starting in the first region is processed by the barrel shifter with index ``1``, the packet starting in the second region is processed by the barrel shifter with index ``2``, and so on.
 Along with the packets, the previously generated auxiliary signals are shifted as well.
 
@@ -78,4 +78,3 @@ The length and the channel ID are sent to the ``MVB_FIFO`` which is directly con
 References
 ~~~~~~~~~~
 For more detailed description refer to `David Beneš's master thesis <https://www.vut.cz/www_base/zav_prace_soubor_verejne.php?file_id=267988>`_  (2023/2024)
- 

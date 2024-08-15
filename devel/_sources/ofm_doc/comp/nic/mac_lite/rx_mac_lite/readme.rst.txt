@@ -40,7 +40,7 @@ Currently, several variants of the adapter are implemented:
 - **CMAC Adapter** - connects CMAC Hard IP, which is used in Xilinx UltraScale+ FPGA for 100 Gbps Ethernet (Uses MFB not LBUS!)
 - **AVST Adapter** - connects E-Tile Hard IP, which is used in Intel Stratix 10 and Agilex FPGA for up to 100 Gbps Ethernet
 - **MAC Segmented Adapter (WIP)** - connects F-Tile Hard IP, which is used in Intel Agilex FPGA for up to 400 Gbps Ethernet
- 
+
 Register Map
 ^^^^^^^^^^^^
 

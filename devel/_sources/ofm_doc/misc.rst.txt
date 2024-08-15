@@ -44,7 +44,7 @@ Detailed :ref:`documentation can be found here<trans_sorter>`.
 .. toctree::
    :maxdepth: 1
    :hidden:
-          
+
    comp/base/misc/crossbarx/readme
    comp/base/misc/trans_sorter/readme
    comp/base/misc/packet_planner/readme

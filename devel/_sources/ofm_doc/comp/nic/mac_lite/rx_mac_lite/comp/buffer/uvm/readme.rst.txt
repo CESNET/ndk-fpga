@@ -4,7 +4,7 @@
 ..
 .. SPDX-License-Identifier: BSD-3-Clause
 
-.. Buffer verification 
+.. Buffer verification
 .. _uvm_buffer:
 
 ************

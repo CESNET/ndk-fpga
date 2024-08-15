@@ -7,7 +7,7 @@ The basic components are typically located in the ``comp/base/`` directory in th
 .. toctree::
    :maxdepth: 1
    :caption: Content:
-   
+
    async
    memory
    fifo

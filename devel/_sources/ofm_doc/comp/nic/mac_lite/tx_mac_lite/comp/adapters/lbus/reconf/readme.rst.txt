@@ -16,7 +16,7 @@ requirements.
 
 Operation
 ---------
-The input frame transactions meet the MFB specification while the outgoing 
+The input frame transactions meet the MFB specification while the outgoing
 meet the LBUS specification. The second one is similar to the
 first with following differences:
 

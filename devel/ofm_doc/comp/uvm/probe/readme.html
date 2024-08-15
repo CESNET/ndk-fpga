@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>probe agent &mdash; Minimal NDK Application Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="prev" title="AVST CRDT Agent" href="../avst_crdt/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Minimal NDK Application Docs
+          </a>
+              <div class="version">
+                Git branch: devel, <br> Git hash: 67fd5966
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/intel/readme.html#build-system">Build system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">SystemVerilog and UVM tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sim_manual.html">UVM simulation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../componets.html">Components</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../reset/readme.html">RESET agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector/readme.html">Logic vector agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_mvb/readme.html">logic_vector_mvb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array/readme.html">Logic Vector Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_mfb/readme.html">logic_vector_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array/readme.html">Byte Array agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_mii/readme.html">Byte array to MII transitional environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../common/readme.html">Common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html">LII agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-interface">LII interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-monitor">LII monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lii_rx/readme.html#lii-driver">LII driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mvb/readme.html">MVB agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mfb/readme.html">MFB Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packet_generators/flowtest/readme.html">FlowTest Sequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../avmm/readme.html">AVMM Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../avst_crdt/readme.html">AVST CRDT Agent</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">probe agent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#interface">Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bind">Bind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#callback">Callback</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Minimal NDK Application Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../ver.html">UVM Verification</a></li>
+          <li class="breadcrumb-item"><a href="../componets.html">Components</a></li>
+      <li class="breadcrumb-item active">probe agent</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/ofm_doc/comp/uvm/probe/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="probe-agent">
+<span id="uvm-probe"></span><h1>probe agent<a class="headerlink" href="#probe-agent" title="Link to this heading"></a></h1>
+<p>The purpose of this agent is to get information from the tested design. That information is commonly used in models to correct generated output. For example, to check the correct time when some pipelines in DUT are disabled or to change some rules for dropping packets.</p>
+<section id="interface">
+<h2>Interface<a class="headerlink" href="#interface" title="Link to this heading"></a></h2>
+<p>The interface has one parameter and three signals. The parameter defines the width of the data signal. Signal <strong>event_signal</strong> is connected to a trigger. Signal <strong>event_data</strong> is connected to collected data. The last signal <strong>CLK</strong> is a clock. The trigger is evaluated when there is a rising edge of the clock.</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">interface</span><span class="w"> </span><span class="n">probe_inf</span><span class="w"> </span><span class="p">#(</span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">input</span><span class="w"> </span><span class="kt">wire</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">event_signal</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w"> </span><span class="kt">wire</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">event_data</span><span class="p">,</span>
+<span class="w">    </span><span class="k">input</span><span class="w"> </span><span class="kt">wire</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">CLK</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">...</span>
+<span class="k">endinterface</span>
+</pre></div>
+</div>
+</section>
+<section id="bind">
+<h2>Bind<a class="headerlink" href="#bind" title="Link to this heading"></a></h2>
+<p>The bind command creates an instance of an interface directly in a component. The bind command is divided into several parts. The first is a component name. The second is a path to the component. <strong>probe_inf</strong> is an interface name. <strong>probe_status</strong> is a bind name. The interface has three parameters. The first is a trigger. The second is sampled data. When the trigger is fired, data is sampled. The last parameter is a clock. All parameters are connected to the internal signals in a bound component.</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// entity name : path to entity  probe_if #(DATA_WIDTH) ( trigger , data , CLOCK)</span>
+<span class="k">bind</span><span class="w"> </span><span class="n">FIFOX</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">VHDL_DUT_U</span><span class="w"> </span><span class="n">probe_inf</span><span class="w"> </span><span class="p">#(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">probe_status</span><span class="p">((</span><span class="n">RESET</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="p">),</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">wr_en</span><span class="p">,</span><span class="w"> </span><span class="n">rd_en</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">CLK</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="callback">
+<h2>Callback<a class="headerlink" href="#callback" title="Link to this heading"></a></h2>
+<p>The callback is called when there is a rising edge of the clock and the trigger is activated. The data is sampled at this point.</p>
+<p>Callback class definition</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">cbs_simple</span><span class="w"> </span><span class="p">#(</span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_event_callback</span><span class="p">;</span>
+<span class="w">    </span><span class="no">`uvm_object_param_utils</span><span class="p">(</span><span class="n">uvm_probe</span><span class="o">::</span><span class="n">cbs_simple</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">))</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">queue</span><span class="p">[$];</span>
+
+<span class="w">    </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="c1">// this callback is called just befor trigger. if this callback return 1</span>
+<span class="w">    </span><span class="c1">// then function post_trigger is not goingt to be called.</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="kt">bit</span><span class="w"> </span><span class="n">pre_trigger</span><span class="p">(</span><span class="n">uvm_event</span><span class="w"> </span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_object</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="c1">// this function is called just after trigger.</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">post_trigger</span><span class="p">(</span><span class="n">uvm_event</span><span class="w"> </span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_object</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
+<span class="w">        </span><span class="n">uvm_probe</span><span class="o">::</span><span class="n">data</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">c_data</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="n">wr_en</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="n">rd_en</span><span class="p">;</span>
+
+<span class="w">        </span><span class="p">$</span><span class="n">cast</span><span class="p">(</span><span class="n">c_data</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//store data from probe</span>
+<span class="w">        </span><span class="n">queue</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">c_data</span><span class="p">.</span><span class="n">data</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">//{wr_en, rd_en} = c_data.data;</span>
+<span class="w">        </span><span class="c1">//$write(&quot;GET WR EN(%b) and RD EN(%b)\n&quot;, wr_en, rd_en);</span>
+<span class="w">    </span><span class="k">endfunction</span>
+
+<span class="w">    </span><span class="c1">// Model can get information stored in fifo</span>
+<span class="w">    </span><span class="k">task</span><span class="w"> </span><span class="n">get</span><span class="p">(</span><span class="k">output</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">wr_en</span><span class="p">,</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">rd_en</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">logic</span><span class="w"> </span><span class="p">[</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="o">:</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">data</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">wait</span><span class="p">(</span><span class="n">queue</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">queue</span><span class="p">.</span><span class="n">pop_front</span><span class="p">();</span>
+<span class="w">        </span><span class="p">{</span><span class="n">wr_en</span><span class="p">,</span><span class="w"> </span><span class="n">rd_en</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">;</span>
+<span class="w">    </span><span class="k">endtask</span>
+<span class="kd">endclass</span>
+</pre></div>
+</div>
+<p>Create and connect the callback to a model</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// Model inputs</span>
+<span class="c1">// class #(DATA_WIDTH) variable_name</span>
+<span class="n">uvm_probe</span><span class="o">::</span><span class="n">cbs_simple</span><span class="w"> </span><span class="p">#(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">wr_and_rd_en_in</span><span class="p">;</span>
+
+<span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">//create callback object</span>
+<span class="w">    </span><span class="n">wr_and_rd_en_in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_probe</span><span class="o">::</span><span class="n">cbs_simple</span><span class="w"> </span><span class="p">#(</span><span class="mi">2</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;wr_and_rd_en_in&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">//connect callback to the interface</span>
+<span class="w">    </span><span class="n">uvm_probe</span><span class="o">::</span><span class="n">pool</span><span class="o">::</span><span class="n">get_global_pool</span><span class="p">().</span><span class="n">get</span><span class="p">({</span><span class="w"> </span><span class="s">&quot;probe_event_component_&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;testbench.DUT_U.VHDL_DUT_U&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;.probe_status&quot;</span><span class="w"> </span><span class="p">}).</span><span class="n">add_callback</span><span class="p">(</span><span class="n">wr_and_rd_en_in</span><span class="p">);</span>
+<span class="k">endfunction</span>
+
+<span class="k">task</span><span class="w"> </span><span class="n">run_phase</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="n">wr_en</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">logic</span><span class="w"> </span><span class="n">rd_en</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">forever</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="p">...</span>
+<span class="w">        </span><span class="c1">//get data from the probe</span>
+<span class="w">        </span><span class="n">wr_and_rd_en_in</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">wr_en</span><span class="p">,</span><span class="w"> </span><span class="n">rd_en</span><span class="p">);</span>
+<span class="w">        </span><span class="p">...</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">endtask</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../avst_crdt/readme.html" class="btn btn-neutral float-left" title="AVST CRDT Agent" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

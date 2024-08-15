@@ -55,7 +55,7 @@ request_item
 
 .. admonition:: Note
       :class: note
-      
+
     *request_item_type_e* is an enum of { **READ**, **WRITE** }
 
 .. code-block:: systemverilog

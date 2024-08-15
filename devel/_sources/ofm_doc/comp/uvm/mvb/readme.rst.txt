@@ -22,15 +22,15 @@ MVB interface is simple interface which is composed of signals below.
 Name          Width                  Description
 ========      ===========            ================================================
 DATA          WORD_WIDTH             This signal containts data to be transferred.
-VLD           ITEMS                  For each item in ``DATA`` there is one valid bit. If the bit is HIGH then that item is valid. 
+VLD           ITEMS                  For each item in ``DATA`` there is one valid bit. If the bit is HIGH then that item is valid.
 SRC_RDY       1                      Source if ready when this signal is HIGH.
 DST_RDY       1                      Destination if ready when this signal is HIGH.
 ========      ===========            ================================================
 
-The  ``ITEMS`` and ``ITEM_WIDTH`` are parameters and they must be greater then 0. 
+The  ``ITEMS`` and ``ITEM_WIDTH`` are parameters and they must be greater then 0.
 The ``WORD_WIDTH`` is local parameter and its value is calculated my multiplying parameters ``ITEMS`` and ``ITEM_WIDTH``.
 
-The interface is used for both RX nad TX. For each direction there is dut and driver modport. 
+The interface is used for both RX nad TX. For each direction there is dut and driver modport.
 Also there is one modport for monitor. This modport is used for both RX and TX.
 
 There are asserts to check correct settings and functionality of interface.
@@ -44,7 +44,7 @@ All of those signals are randomized. There also are overridden UVM functions("do
 
 Sequence
 ^^^^^^^^
-There is ``req`` which is instance of sequence_item. There are 2 unsigned integers ``max_transaction_count`` and ``min_transaction_count``. 
+There is ``req`` which is instance of sequence_item. There are 2 unsigned integers ``max_transaction_count`` and ``min_transaction_count``.
 Last variable is randomized ``transaction_count``. This variable is randomized in range of <``max_transaction_count``, ``min_transaction_count``>.
 
 There are 2 sequences. One for RX and one for TX. This is because TX, and RX behave differently.
@@ -68,4 +68,4 @@ In the config 2 variables. First is ``active`` that decides if the driver and se
 
 Agent
 ^^^^^
-There are also 2 agents. Agent only connect everything together. 
+There are also 2 agents. Agent only connect everything together.

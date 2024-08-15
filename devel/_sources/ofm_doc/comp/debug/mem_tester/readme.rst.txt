@@ -12,31 +12,31 @@ Key features
 * Memory interface is compatible with AMM (Avalon-Memory-Mapped) interface and Intel EMIF Hard IP
 * Basic test workflow:
 
-    * Sequential write of the pseudo random data to every memory address 
+    * Sequential write of the pseudo random data to every memory address
     * Resting pseudo random generator (to generate the exactly same sequence)
     * Sequentially sending read requests to all memory address space and comparing received data with pseudo random generator output
 
 * Additionally random address generation can be enabled to measure more realistic memory performance
 
-    * However in this mode error counter will detect errors due to the overlap of some addresses 
+    * However in this mode error counter will detect errors due to the overlap of some addresses
     * Therefore random addressing mode should be used only for measuring and not for testing
 
 * Some other test parameters can be set:
 
     * Incremental read (next read request will be send only after the result of previous read is received)
-    
-        * This mode is better for measuring latencies, because memory is not loaded with other requests 
-  
+
+        * This mode is better for measuring latencies, because memory is not loaded with other requests
+
     * Auto precharge for random addressing
     * Manual control over refresh period
 
-* Test configuration can be set via MI interface 
+* Test configuration can be set via MI interface
 * There is also python script for generating PDF report with different modes
 * Measuring is handled by :ref:`MEM_LOGGER<mem_logger>`
-* ``MEM_TESTER`` must be placed to the external memory drivers clock domain 
+* ``MEM_TESTER`` must be placed to the external memory drivers clock domain
 
-    * For MI bus there is internal MI_ASYNC component for bridging different clock domains 
- 
+    * For MI bus there is internal MI_ASYNC component for bridging different clock domains
+
     * You can even manually read adn write to the external memory using :ref:`AMM_GEN<amm_gen>` component
 
 
@@ -74,7 +74,7 @@ Then you can control `MEM_TESTER` using `mem_tester.py` script:
 * You can even manualy write and read to the external memory using `--gen-*` arguments
 
 .. warning::
-    Test with random indexing active will generate a few errors, 
+    Test with random indexing active will generate a few errors,
     due to multiple writes to the same address.
     Its used just for measurement purpose.
 
@@ -137,18 +137,18 @@ Example output:
 
 .. code-block::
 
-    $ python3 sw/mem_tester.py 
+    $ python3 sw/mem_tester.py
     || ------------------- ||
     || TEST WAS SUCCESSFUL ||
     || ------------------- ||
 
     Mem_logger statistics:
     ----------------------
-    write requests       16777215        
-    write words        67108860        
-    read requests        16777215        
-    requested words    67108860        
-    received words     67108860        
+    write requests       16777215
+    write words        67108860
+    read requests        16777215
+    requested words    67108860
+    received words     67108860
     Flow:
     write               137.03 [Gb/s]
     read                24.66 [Gb/s]
@@ -163,32 +163,32 @@ Example output:
     avg                 80.04 [ns]
     histogram [ns]:
                     ...
-        69.0 -  75.0 ... 16165552        
+        69.0 -  75.0 ... 16165552
                     ...
-        87.0 -  93.0 ... 62962           
-        93.0 -  99.0 ... 241581          
+        87.0 -  93.0 ... 62962
+        93.0 -  99.0 ... 241581
                     ...
-        111.0 - 117.0 ... 128501          
+        111.0 - 117.0 ... 128501
                     ...
-        147.0 - 153.0 ... 1               
+        147.0 - 153.0 ... 1
                     ...
-        435.0 - 441.0 ... 50118           
+        435.0 - 441.0 ... 50118
                     ...
-        453.0 - 459.0 ... 2               
-        459.0 - 465.0 ... 1               
+        453.0 - 459.0 ... 2
+        459.0 - 465.0 ... 1
                     ...
-        471.0 - 477.0 ... 2570            
+        471.0 - 477.0 ... 2570
                     ...
-        483.0 - 489.0 ... 1               
-        489.0 - 495.0 ... 62961           
-        495.0 - 501.0 ... 62962           
+        483.0 - 489.0 ... 1
+        489.0 - 495.0 ... 62961
+        495.0 - 501.0 ... 62962
                     ...
-        573.0 - 579.0 ... 1               
+        573.0 - 579.0 ... 1
                     ...
-        627.0 - 633.0 ... 2               
+        627.0 - 633.0 ... 2
     Errors:
-    zero burst count   0               
-    simultaneous r+w   0       
+    zero burst count   0
+    simultaneous r+w   0
 
 
 Pytest SW
@@ -197,12 +197,12 @@ Pytest SW
 You can also use automated testing using pytest framework:
 
 * This script will try to find `MEM_TESTER` and `MEM_LOGGER` components
-* Will try to open then and read their configuration and status 
+* Will try to open then and read their configuration and status
 * Will run sequential tests on each detected memory interface (with minimal and maximal burst counts)
 
 .. code-block::
 
-    python3 -m pytest -xs --tb=short test_mem_tester.py 
+    python3 -m pytest -xs --tb=short test_mem_tester.py
     # -s ... to show measured data
     # -x ... end after first failure
     # -tb ... show only assertion message
@@ -232,7 +232,7 @@ In order to generate PDF report you need to install `pandoc` and `texlive` or ot
 Then you can generate PDF or (only Markdown) report using:
 
 .. code-block::
-    
+
     python3 report_gen.py
     python3 report_gen.py md
 
@@ -258,9 +258,9 @@ Architecture description:
 * ``LFSR_SIMPLE_RANDOM_GEN`` components generate random data and addresses for testing external memory
 * ``AMM_MUX`` is used to select between these AMM interfaces:
 
-    * Internal logic during memory test 
+    * Internal logic during memory test
     * :ref:`AMM_GEN <amm_gen>` during the manual access
-  
+
 * The whole component is then controlled by FSM
 
 
@@ -283,7 +283,7 @@ MI Bus Control
               3. bit -- run test
               4. bit -- AMM_GEN enable (connects AMM_GEN to AMM bus)
               5. bit -- random addressing enable
-              6. bit -- max. one simultaneous read transaction (for measuring latency) 
+              6. bit -- max. one simultaneous read transaction (for measuring latency)
               7. bit -- auto precharge request to EMIF (if connected)
     0x0004 -- ctrl out
               1. bit -- test done
@@ -293,10 +293,10 @@ MI Bus Control
               5. bit -- calibration fail
               6. bit -- AMM_READY
     0x0008 -- err cnt
-    0x000C -- burst cnt during test 
+    0x000C -- burst cnt during test
     0x0010 -- limit address during test
-    0x0014 -- refresh period 
-    0x0018 -- default refresh period 
+    0x0014 -- refresh period
+    0x0018 -- default refresh period
     0x0040 -- AMM_GEN   base address
 
 
@@ -311,7 +311,7 @@ Following bits inside ``ctrl in`` register reacts only for rising edge:
 Reset sequence:
 
 * Set ``reset`` bit to ``1`` and then to ``0``
-* To reset EMIF IP set ``reset EMIF IP`` bit to ``1`` and then to ``0`` and 
+* To reset EMIF IP set ``reset EMIF IP`` bit to ``1`` and then to ``0`` and
   wait for either ``calibration successful`` bit or ``calibration fail`` bit
 
 Run test:

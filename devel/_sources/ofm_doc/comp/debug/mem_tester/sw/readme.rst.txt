@@ -27,7 +27,7 @@ C Program
 
 .. code-block::
 
-  make 
+  make
   ./mem_tester -t all
 
 **AMM_GEN Usage**
@@ -35,7 +35,7 @@ C Program
 Manual write to the external memory:
 
 - First, fill the manual r/w buffer using ``-m burst_id data`` command:
-  
+
   - ``burst_id`` parameter (in range: ``0 to BURST_CNT - 1``) selects which AMM word will be set
   - ``data`` parameter is a new AMM word (512b number in hexa)
 

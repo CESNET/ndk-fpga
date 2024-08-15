@@ -38,16 +38,16 @@ is required to generate DST_RDY and driver after clock cycle set ITEMS, META, SO
 Following table shows variables in sequence_items class. The meaning of signals is the same as in :ref:`mfb documentation<mfb_bus>`.
 
 ===================================================================   =
-Name                                                                  
+Name
 ===================================================================   =
-logic [REGION_SIZE * BLOCK_SIZE * ITEM_WIDTH] data[REGIONS]          
-logic [META_WIDTH]                            meta[REGIONS]           
-logic [$clog2(REGION_SIZE)]                   sof_pos[REGIONS]        
-logic [$clog2(REGION_SIZE * BLOCK_SIZE)]      eof_pos[REGIONS]        
-logic [REGIONS]                               sof                     
-logic [REGIONS]                               eof                     
-logic                                         src_rdy                 
-logic                                         dst_rdy                 
+logic [REGION_SIZE * BLOCK_SIZE * ITEM_WIDTH] data[REGIONS]
+logic [META_WIDTH]                            meta[REGIONS]
+logic [$clog2(REGION_SIZE)]                   sof_pos[REGIONS]
+logic [$clog2(REGION_SIZE * BLOCK_SIZE)]      eof_pos[REGIONS]
+logic [REGIONS]                               sof
+logic [REGIONS]                               eof
+logic                                         src_rdy
+logic                                         dst_rdy
 ===================================================================   =
 
 This is low level protocol if you generate data in sequence please be carefull if you dont breaking mfb protocols rules.

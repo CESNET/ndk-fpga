@@ -33,7 +33,7 @@ The architecture has 3 different shapes depending on the configuration:
         :alt:
 
     |
-    
+
     When the data width is being increased, the following has to be done:
 
     The target address on the MI bus always has to be aligned to a whole MI data word.
@@ -54,7 +54,7 @@ The architecture has 3 different shapes depending on the configuration:
     This means that each request might take multiple cycles to process.
     To reduce the required time, the unit only propagates valid parts of the requests based on the RX BE value and *does not generate any TX requests with TX BE == 0*.
     The most complicated part here is the processing of read request DRD signals.
-    
+
     In this mode, the component doesn't support execution of multiple parallel requests.
 
 .. image:: doc/mi_reconfigurator_dwr_down.svg
