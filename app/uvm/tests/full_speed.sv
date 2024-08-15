@@ -8,6 +8,75 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
+class sequence_speed#(
+    int unsigned DMA_TX_CHANNELS,
+    int unsigned DMA_RX_CHANNELS,
+    int unsigned DMA_PKT_MTU,
+    int unsigned DMA_HDR_META_WIDTH,
+    int unsigned DMA_STREAMS,
+    int unsigned ETH_TX_HDR_WIDTH,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned ETH_STREAMS,
+    int unsigned REGIONS,
+    int unsigned MFB_REG_SIZE,
+    int unsigned MFB_BLOCK_SIZE
+) extends uvm_app_core::sequence_main#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH, ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE);
+    `uvm_object_param_utils(test::sequence_speed#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH, ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE))
+
+    // Constructor - creates new instance of this class
+    function new(string name = "sequence");
+        super.new(name);
+    endfunction
+
+
+    virtual task eth_tx_sequence(int unsigned index);
+        uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq;
+
+        mfb_seq = uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("mfb_eth_tx_seq", p_sequencer.m_eth_tx[index]);
+        mfb_seq.init_sequence();
+        mfb_seq.min_random_count = 10;
+        mfb_seq.max_random_count = 20;
+
+        //RUN ETH
+        uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_eth_tx[index], "", "state", tx_status);
+        while (!tx_status.stopped()) begin
+            mfb_seq.randomize();
+            mfb_seq.start(p_sequencer.m_eth_tx[index]);
+        end
+    endtask
+
+    virtual task dma_tx_sequence(int unsigned index);
+        uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_seq;
+        uvm_mvb::sequence_lib_tx_speed#(REGIONS, DMA_TX_MVB_WIDTH)                                mvb_seq;
+
+        mfb_seq = uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_dma_tx_seq", p_sequencer.m_dma_mfb_tx[index]);
+        mfb_seq.init_sequence();
+        mfb_seq.min_random_count = 10;
+        mfb_seq.max_random_count = 20;
+
+        mvb_seq = uvm_mvb::sequence_lib_tx_speed#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("mvb_dma_tx_seq", p_sequencer.m_dma_mvb_tx[index]);
+        mvb_seq.init_sequence();
+        mvb_seq.min_random_count = 10;
+        mvb_seq.max_random_count = 20;
+
+        //RUN ETH
+        uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_mvb_tx[index], "", "state", tx_status);
+        uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_mfb_tx[index], "", "state", tx_status);
+        fork
+            while (!tx_status.stopped()) begin
+                //mfb_seq.set_starting_phase(phase);
+                void'(mfb_seq.randomize());
+                mfb_seq.start(p_sequencer.m_dma_mfb_tx[index]);
+            end
+            while (!tx_status.stopped()) begin
+                //mvb_seq.set_starting_phase(phase);
+                void'(mvb_seq.randomize());
+                mvb_seq.start(p_sequencer.m_dma_mvb_tx[index]);
+            end
+        join_none;
+    endtask
+endclass
+
 
 class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
             REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends
@@ -18,6 +87,17 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
                                                 REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH),
                                                "test::full_speed") type_id;
 
+    function new (string name, uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
+    static function type_id get_type();
+        return type_id::get();
+    endfunction
+
+    function string get_type_name();
+        return get_type().get_type_name();
+    endfunction
 
     function void build_phase(uvm_phase phase);
         for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
@@ -52,68 +132,48 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
         m_env.delay_max_set(1ms);
     endfunction
 
-    static function type_id get_type();
-        return type_id::get();
-    endfunction
+    virtual task run_phase(uvm_phase phase);
+        test::sequence_speed#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH, ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE) main_seq;
+        uvm_app_core::sequence_stop#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH, ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE) stop_seq;
+        time end_time;
 
-    function string get_type_name();
-        return get_type().get_type_name();
-    endfunction
+        main_seq = test::sequence_speed#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH, ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE)::type_id::create("main_seq", m_env.m_sequencer);
+        stop_seq = uvm_app_core::sequence_stop#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH, ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE)::type_id::create("stop_seq", m_env.m_sequencer);
+        phase.raise_objection(this);
 
-    function new (string name, uvm_component parent = null);
-        super.new(name, parent);
-    endfunction
-
-    virtual task eth_tx_sequence(uvm_phase phase, int unsigned index);
-        uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq;
-
-        mfb_seq = uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("mfb_eth_tx_seq", this);
-        mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 10;
-        mfb_seq.max_random_count = 20;
-
-        //RUN ETH
-        forever begin
-            //mfb_seq.set_starting_phase(phase);
-            mfb_seq.randomize();
-            mfb_seq.start(m_env.m_eth_mfb_tx[index].m_sequencer);
-        end
-    endtask
-
-    virtual task eth_rx_sequence(uvm_phase phase, int unsigned index);
-        super.eth_rx_sequence(phase, index);
-    endtask
-
-    virtual task dma_tx_sequence(uvm_phase phase, int unsigned index);
-        uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_seq;
-        uvm_mvb::sequence_lib_tx_speed#(REGIONS, DMA_TX_MVB_WIDTH)                                mvb_seq;
-
-        mfb_seq = uvm_mfb::sequence_lib_tx_speed#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_dma_tx_seq", this);
-        mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 10;
-        mfb_seq.max_random_count = 20;
-
-        mvb_seq = uvm_mvb::sequence_lib_tx_speed#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("mvb_dma_tx_seq", this);
-        mvb_seq.init_sequence();
-        mvb_seq.min_random_count = 10;
-        mvb_seq.max_random_count = 20;
-
-        //RUN ETH
+        // RUN RESET
         fork
-            forever begin
-                //mvb_seq.set_starting_phase(phase);
-                void'(mvb_seq.randomize());
-                mvb_seq.start(m_env.m_dma_mvb_tx[index].m_sequencer);
-            end
-            forever begin
-                //mfb_seq.set_starting_phase(phase);
-                void'(mfb_seq.randomize());
-                mfb_seq.start(m_env.m_dma_mfb_tx[index].m_sequencer);
-            end
+            run_reset(phase);
         join_none;
-    endtask
 
-    virtual task dma_rx_sequence(uvm_phase phase, int unsigned index);
-        super.dma_rx_sequence(phase, index);
+        ////configure egent
+        wait(event_reset == 1'b0);
+        for (int unsigned it = 0; it < 3; it++) begin
+
+            //RUN RIVER SEQUENCE ONLY IF RESET IS NOT SET
+            dirver_sequence();
+            #(200ns);
+
+            end_time = $time() + 400us;
+            while (end_time > $time()) begin
+            //for (int unsigned it = 0; it < 10; it++) begin
+                assert(main_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+                main_seq.start(m_env.m_sequencer);
+            end
+
+            assert(stop_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            end_time = $time() + 20us;
+
+            fork
+                stop_seq.start(m_env.m_sequencer);
+            join_none;
+
+            while (end_time > $time() && m_env.m_scoreboard.used() != 0) begin
+                #(500ns);
+            end
+            stop_seq.done_set();
+        end
+
+        phase.drop_objection(this);
     endtask
 endclass
