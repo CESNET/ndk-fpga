@@ -1,0 +1,100 @@
+def common_card_test_run(CARD_NAME) {
+    try {
+        sh """
+        source venv-cocotb/bin/activate
+
+        . /usr/local/bin/fpga_version.sh;
+        fpga_sim 2020.4;
+        make -C tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\"
+        """
+    } catch (err) {
+        echo "Error detected, firmware build failed!"
+        currentBuild.result = 'FAILURE'
+        currentStage.result = 'FAILURE'
+        failed.add("$card_name")
+    }
+
+    junit allowEmptyResults: true, testResults: "build/$CARD_NAME/results.xml"
+
+    try {
+        sh "test -f build/$CARD_NAME/results.xml"
+    } catch (err) {
+        echo "Error detected, no tests performed (results missing)!"
+        currentBuild.result = 'FAILURE'
+        currentStage.result = 'FAILURE'
+        failed.add("$card_name")
+    }
+}
+
+def CARDS = ["alveo-u200", "alveo-u55c", "vcu118", "ia-420f", "n6010", "fb2cghh", "fb4cgg3", "nfb-200g2ql", "dk-dev-1sdx-p"]
+
+node("preklad") {
+    cleanWs()
+    def swbase = "ndk-sw"
+    checkout scm
+
+    stage("Clone required repository") {
+        sh "git clone https://github.com/CESNET/ndk-sw.git"
+    }
+
+    if (params.nightly != null && params.nightly == true) {
+        stage("Prepare for nightly build") {
+            sh "(cd ndk/ofm; git checkout main)"
+		    sh "(cd ndk/core; git checkout main)"
+            sh "(cd ndk/cards; git checkout main)"
+            sh "(cd ndk/cards_private/nfb-200g2ql; git checkout main)"
+            sh "(cd ndk/modules/ndk-mod-dma-medusa; git checkout main)"
+        }
+    }
+
+    sh "python3.9 -m venv venv-cocotb"
+
+    stage("Prepare environment") {
+        sh """
+            source venv-cocotb/bin/activate
+            python3.9 -m pip install cython wheel
+            python3.9 -m pip install pylibfdt fdt
+            python3.9 -m pip wheel -w ./cocotbwheels ${swbase}/pynfb/
+            python3.9 -m pip install --find-links ./cocotbwheels nfb
+            python3.9 -m pip install --find-links ./cocotbwheels ${swbase}/ext/libnfb_ext_python/
+            python3.9 -m pip install ndk/ofm/python/cocotbext/
+        """
+    }
+
+    def failed = []
+
+    for(card_name in CARDS) {
+        try {
+            timeout(time: 1, unit: 'HOURS') {
+                stage("Run test: $card_name") {
+                    common_card_test_run(card_name)
+                }
+            }
+        } catch(err) {
+            echo "Error detected, test stage failed!"
+            currentBuild.result = 'FAILURE'
+            failed.add("$card_name")
+        }
+    }
+
+    sh "rm -rf venv-cocotb"
+
+    // send out emails if failure is detected
+    if(currentBuild.result == "FAILURE") {
+        println "FAILED on cards: ${failed}."
+        emailext \
+            recipientProviders: [culprits(), developers()],
+            to: 'cabal@cesnet.cz, spinler@cesnet.cz, isa@cesnet.cz, kondys@cesnet.cz, friedl@cesnet.cz',
+            subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
+            body: """\
+                The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on cards: ${failed}. You can find build log in the attachments.
+
+                For more details see ${env.BUILD_URL}.
+
+                Yours sincerely
+                Jenkins\
+            """.stripIndent(),
+            attachLog: true,
+            compressLog: true
+    }
+}
