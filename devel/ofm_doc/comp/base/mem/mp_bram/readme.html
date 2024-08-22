@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 74064e64
+                Git branch: devel, <br> Git hash: 216303d3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -154,42 +154,57 @@ Amount of read ports is not restricted.</p>
 <td><p>Data word width in bits. If BLOCK_ENABLE is True then DATA_WIDTH must
 be N*BLOCK_WIDTH.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mp_bram-items"><td><p>ITEMS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mp_bram-block_width"><td><p>BLOCK_WIDTH</p></td>
 <td><p>integer</p></td>
-<td><p>4096</p></td>
-<td><p>Depth of BRAM in number of the data words.</p></td>
+<td><p>8</p></td>
+<td><p>[1, inf] -&gt; block width</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mp_bram-block_enable"><td><p>BLOCK_ENABLE</p></td>
 <td><p>boolean</p></td>
 <td><p>False</p></td>
-<td><p>Enable masking of WR_DATA signal per BLOCK_WIDTH.</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mp_bram-block_width"><td><p>BLOCK_WIDTH</p></td>
-<td><p>natural</p></td>
-<td><p>8</p></td>
-<td><p>Width of one data block. Allowed values are 8 or 9. The parameter is
-ignored when BLOCK_ENABLE=False.</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mp_bram-items"><td><p>ITEMS</p></td>
+<td><p>integer</p></td>
+<td><p>4096</p></td>
+<td><p>Depth of BRAM in number of the data words.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mp_bram-output_reg"><td><p>OUTPUT_REG</p></td>
 <td><p>boolean</p></td>
 <td><p>True</p></td>
 <td><p>Output directly from BRAM or throw register (better timing).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mp_bram-metadata_width"><td><p>METADATA_WIDTH</p></td>
-<td><p>integer</p></td>
-<td><p>0</p></td>
-<td><p>Width of read metadata signal</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-mp_bram-write_ports"><td><p>WRITE_PORTS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mp_bram-write_ports"><td><p>WRITE_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Amount of write ports, currently supports just 1 write port.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mp_bram-read_ports"><td><p>READ_PORTS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mp_bram-read_ports"><td><p>READ_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td><p>Amount of read ports. For each read port, BRAM is replicated to provide one
 read port.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mp_bram-metadata_width"><td><p>METADATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>0</p></td>
+<td><p>metadata is data which is send with read request</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mp_bram-undef_behaw_when_wr_to_same_address"><td><p>UNDEF_BEHAW_WHEN_WR_TO_SAME_ADDRESS</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>when this generic is disabled then two port can write to same address in one clock cycle.
+Result are going to be undefined. This mean user have to secure there is no write to same
+address in same clock.
+Port wit lower id is prioritised and write data.
+If this generic is true then this architecture desnt support write to same address
+in same clock cycle from two ports</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mp_bram-one_clk_write"><td><p>ONE_CLK_WRITE</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>If This generic is set to true then Write delay is shorter by bypassing
+Normal write delay is two clock cycles. If this generic is set  to true tehn write delay is one clock.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mp_bram-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
@@ -236,20 +251,21 @@ implementation according to the FPGA used. Supported values are:</p>
 <td><p>in</p></td>
 <td><p>Enable of write port.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mp_bram-wr_be"><td><p>WR_BE</p></td>
-<td><p>slv_array_t(WRITE_PORTS - 1 downto 0)(max((DATA_WIDTH/BLOCK_WIDTH),1)-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>Block enable of written data, used only when BLOCK_ENABLE = True.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mp_bram-wr_addr"><td><p>WR_ADDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-mp_bram-wr_addr"><td><p>WR_ADDR</p></td>
 <td><p>slv_array_t(WRITE_PORTS - 1 downto 0)(log2(ITEMS)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Write address.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mp_bram-wr_data"><td><p>WR_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mp_bram-wr_data"><td><p>WR_DATA</p></td>
 <td><p>slv_array_t(WRITE_PORTS - 1 downto 0)(DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Write data input.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mp_bram-wr_be"><td><p>WR_BE</p></td>
+<td><p>slv_array_t(WRITE_PORTS - 1 downto 0)(DATA_WIDTH/tsel(BLOCK_ENABLE, BLOCK_WIDTH, DATA_WIDTH+1)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ENABLE block. you can write only part of data into memory (“0011”) =&gt; write only down 16 bits
+Use work around when  BOCK_WIDTH is zero then width of signal is NULL. (DATA_WIDTH/(DATA_WIDTH +1) == 0)</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
 <td><p>READ PORTS</p></td>
@@ -261,35 +277,30 @@ implementation according to the FPGA used. Supported values are:</p>
 <td><p>in</p></td>
 <td><p>Read enable signal, it is only used to generate RD_DATA_VLD.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mp_bram-rd_pipe_en"><td><p>RD_PIPE_EN</p></td>
-<td><p>std_logic_vector(READ_PORTS - 1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mp_bram-rd_addr"><td><p>RD_ADDR</p></td>
+<td><p>slv_array_t(READ_PORTS - 1 downto 0)(log2(ITEMS)-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Clock enable of read port.</p></td>
+<td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mp_bram-rd_meta_in"><td><p>RD_META_IN</p></td>
 <td><p>slv_array_t(READ_PORTS - 1 downto 0)(METADATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Metadata propagated when RD_PIPE_EN==’1’ (valid on RD_EN)</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mp_bram-rd_addr"><td><p>RD_ADDR</p></td>
-<td><p>slv_array_t(READ_PORTS - 1 downto 0)(log2(ITEMS)-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>Read address.</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mp_bram-rd_data_vld"><td><p>RD_DATA_VLD</p></td>
+<td><p>std_logic_vector(READ_PORTS - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Read data output.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mp_bram-rd_data"><td><p>RD_DATA</p></td>
 <td><p>slv_array_t(READ_PORTS - 1 downto 0)(DATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>Read data output.</p></td>
+<td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mp_bram-rd_meta_out"><td><p>RD_META_OUT</p></td>
 <td><p>slv_array_t(READ_PORTS - 1 downto 0)(METADATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>Metadata propagated when RD_PIPE_EN==’1’ (valid on RD_DATA_VLD)</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mp_bram-rd_data_vld"><td><p>RD_DATA_VLD</p></td>
-<td><p>std_logic_vector(READ_PORTS - 1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Valid bit of output read data.</p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
