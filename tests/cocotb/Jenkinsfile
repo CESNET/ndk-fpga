@@ -27,9 +27,6 @@ node("preklad") {
 	stage("Run test") {
 		sh """
 			source venv-cocotb/bin/activate
-
-			. /usr/local/bin/fpga_version.sh;
-			fpga_sim 2020.4;
 			make -C tests/cocotb SIM_FLAGS=\"-c -do quit\"
 			"""
 		junit testResults: "build/fb2cghh/results.xml"

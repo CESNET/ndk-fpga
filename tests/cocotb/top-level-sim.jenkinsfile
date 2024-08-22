@@ -2,9 +2,6 @@ def common_card_test_run(CARD_NAME) {
     try {
         sh """
         source venv-cocotb/bin/activate
-
-        . /usr/local/bin/fpga_version.sh;
-        fpga_sim 2020.4;
         make -C tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\"
         """
     } catch (err) {
