@@ -41,6 +41,7 @@ async def _rx_pkts(dev, nfb):
     for i in range(10):
         await dev._eth_rx_driver[0].write_packet(list(pkt))
 
+
 @cocotb.test()
 async def reset_pci_inside_pkt_rx(dut):
     dev, nfb = await get_dev_init(dut)
@@ -51,6 +52,53 @@ async def reset_pci_inside_pkt_rx(dut):
     await _rx_pkts(dev, nfb)
     await dev._reset()
     await _rx_pkts(dev, nfb)
+
+
+@cocotb.test(skip=True)
+async def cocotb_test_reset_pcie_and_check_cc_idle(dut):
+    dev, nfb = await get_dev_init(dut)
+
+    # Do a transaction first
+    mac = nfb.eth[0].rxmac
+    await e(mac.enable)()
+    await e(mac.is_enabled)()
+
+    await Timer(1, units='us')
+
+    tvalid = dev.mi[0]._cc.bus.TVALID
+
+    # Check for value before reset
+    assert tvalid.value == 0
+
+    reset = cocotb.start_soon(dev._reset())
+    cc_tvalid_rise = RisingEdge(tvalid)
+    timer = Timer(5, units='us')
+
+    # Check that reset completes without signal rising
+    assert await First(cc_tvalid_rise, reset) != cc_tvalid_rise
+    # Check that after reset the signal doesn't rise for some time
+    assert await First(cc_tvalid_rise, timer) != cc_tvalid_rise
+
+
+@cocotb.test(skip=True)
+async def cocotb_test_reset_pcie_and_check_rq_idle(dut):
+    dev, nfb = await get_dev_init(dut)
+
+    # Generate some transactions
+    await dev.dma.rx[0]._push_desc()
+    await Timer(1, units='us')
+
+    # Signal to check
+    tvalid = dev.pcie_req[0]._rq.bus.TVALID
+
+    assert tvalid.value == 0, "tvalid was active before reset"
+
+    reset = cocotb.start_soon(dev._reset())
+    cc_tvalid_rise = RisingEdge(tvalid)
+    timer = Timer(5, units='us')
+
+    assert await First(cc_tvalid_rise, reset) != cc_tvalid_rise, "tvalid rises before reset done"
+    assert await First(cc_tvalid_rise, timer) != cc_tvalid_rise, "tvalid rises too eraly after reset"
 
 
 pci_core = core.pcie_i.pcie_core_i

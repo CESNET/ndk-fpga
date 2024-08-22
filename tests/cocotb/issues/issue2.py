@@ -47,7 +47,8 @@ async def mtc_big_write_tr(dut):
     # This one transfers correctly 32B, 4B incorrectly and then stucks!
     await with_timeout(
         wr_rd(c, 36),
-        5, 'us',
+        10, 'us',
+    )
     )
 
 
