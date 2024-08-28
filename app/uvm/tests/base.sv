@@ -112,18 +112,21 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             end
 
             assert(stop_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
-            end_time = $time() + 200us;
 
             fork
                 stop_seq.start(m_env.m_sequencer);
             join_none;
 
-            while (end_time > $time() && m_env.m_scoreboard.used() != 0) begin
+            end_time = $time() + 400us;
+            while (end_time > $time() && m_env.used() != 0) begin
                 #(500ns);
             end
+            if (m_env.used() != 0) begin
+                `uvm_warning(this.get_full_name(), $sformatf("\n\tUSED(%0d) sould be zero.\n\tDuring reconfiguration, There is some data in design", m_env.used()));
+            end
+
             stop_seq.done_set();
         end
-
 
         phase.drop_objection(this);
     endtask
