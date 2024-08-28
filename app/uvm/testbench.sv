@@ -24,6 +24,11 @@ module testbench;
                         test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::MEM_PORTS, test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_BURST_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH)
                         test_full_speed;
 
+    typedef test::fifo#(test_pkg::ETH_STREAMS, test_pkg::ETH_CHANNELS, test_pkg::ETH_PKT_MTU, test_pkg::ETH_RX_HDR_WIDTH, test_pkg::ETH_TX_HDR_WIDTH, test_pkg::DMA_STREAMS, test_pkg::DMA_RX_CHANNELS, test_pkg::DMA_TX_CHANNELS, test_pkg::DMA_HDR_META_WIDTH, test_pkg::DMA_PKT_MTU,
+                        test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::MEM_PORTS, test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_BURST_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH)
+                        test_fifo;
+
+
     /////////////////////////
     // DEFINE CLOCK
     logic CLK_USER_X1 = 0;
