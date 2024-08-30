@@ -40,9 +40,8 @@ module testbench;
     logic DMA_CLK_X1;
     logic DMA_CLK_X2;
     logic APP_CLK;
-    logic MEM_CLK = '0;
-    logic [test_pkg::MEM_PORTS-1:0] clk_logic_mem;
-    //logic [test_pkg::MEM_PORTS-1:0] MEM_CLK = '0;
+    //logic MEM_CLK = '0;
+    logic [test_pkg::MEM_PORTS-1:0] MEM_CLK = '0;
 
     /////////////////////////
     // INTERFACESS
@@ -56,7 +55,6 @@ module testbench;
     reset_if     reset_dma_x1(DMA_CLK_X1);
     reset_if     reset_dma_x2(DMA_CLK_X2);
     reset_if     reset_app(APP_CLK);
-    reset_if     reset_mem[test_pkg::MEM_PORTS](MEM_CLK);
 
     // ETHERNET I/O INTERFACE
     mvb_if #(test_pkg::REGIONS,  test_pkg::ETH_RX_HDR_WIDTH)                                                                            eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
@@ -79,7 +77,6 @@ module testbench;
     always #(test_pkg::CLK_PERIOD/4)  CLK_USER_X2 = ~CLK_USER_X2;
     always #(test_pkg::CLK_PERIOD/6)  CLK_USER_X3 = ~CLK_USER_X3;
     always #(test_pkg::CLK_PERIOD/8)  CLK_USER_X4 = ~CLK_USER_X4;
-    //always #(test_pkg::CLK_MEM_PERIOD[mem_it]/2)  MEM_CLK[mem_it] = ~MEM_CLK[mem_it];
 
     /////////////////////////
     // RESETS
@@ -98,15 +95,45 @@ module testbench;
     logic [test_pkg::RESET_WIDTH-1:0] reset_logic_dma_x2;
     logic [test_pkg::RESET_WIDTH-1:0] reset_logic_app;
     logic [test_pkg::MEM_PORTS-1:0]   reset_logic_mem;
+
+    logic [test_pkg::MEM_PORTS] mem_ready;
+    logic [test_pkg::MEM_PORTS] mem_read;
+    logic [test_pkg::MEM_PORTS] mem_write;
+    logic [test_pkg::MEM_PORTS*test_pkg::MEM_ADDR_WIDTH]  mem_address;
+    logic [test_pkg::MEM_PORTS*test_pkg::MEM_BURST_WIDTH] mem_burstcount;
+    logic [test_pkg::MEM_PORTS*test_pkg::MEM_DATA_WIDTH ] mem_writedata;
+    logic [test_pkg::MEM_PORTS*test_pkg::MEM_DATA_WIDTH ] mem_readdata;
+    logic [test_pkg::MEM_PORTS] mem_readdatavalid;
+
+
+
+
     assign reset_mi.RESET      = reset_logic_mi[0];
     assign reset_dma_x1.RESET  = reset_logic_dma_x1[0];
     assign reset_dma_x2.RESET  = reset_logic_dma_x2[0];
     assign reset_app.RESET     = reset_logic_app[0];
 
     for (genvar mem_it = 0; mem_it < test_pkg::MEM_PORTS; mem_it++) begin
-        assign reset_logic_mem[mem_it] = reset_mem[mem_it].RESET;
-        assign clk_logic_mem[mem_it]   = MEM_CLK;
-        //always #(test_pkg::CLK_MEM_PERIOD[mem_it]/2)  MEM_CLK[mem_it] = ~MEM_CLK[mem_it];
+        reset_if                                                                                 mem_reset(MEM_CLK[mem_it]);
+        avmm_if#(test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MEM_BURST_WIDTH)  mem      (MEM_CLK[mem_it]);
+
+        assign reset_logic_mem[mem_it] = mem_reset.RESET;
+        assign mem_ready        [mem_it] = mem.READY; // : in  std_logic_vector(MEM_PORTS-1 downto 0);
+        assign mem.READ       = mem_read [mem_it]; // : out std_logic_vector(MEM_PORTS-1 downto 0);
+        assign mem.WRITE      = mem_write[mem_it]; // : out std_logic_vector(MEM_PORTS-1 downto 0);
+        assign mem.ADDRESS    = mem_address      [(mem_it+1)*test_pkg::MEM_ADDR_WIDTH-1  -: test_pkg::MEM_ADDR_WIDTH ]; // : out std_logic_vector(MEM_PORTS*MEM_ADDR_WIDTH-1 downto 0);
+        assign mem.BURSTCOUNT = mem_burstcount   [(mem_it+1)*test_pkg::MEM_BURST_WIDTH-1 -: test_pkg::MEM_BURST_WIDTH]; // : out std_logic_vector(MEM_PORTS*MEM_BURST_WIDTH-1 downto 0);
+        assign mem.WRITEDATA  = mem_writedata    [(mem_it+1)*test_pkg::MEM_DATA_WIDTH -1 -: test_pkg::MEM_DATA_WIDTH ]; // : out std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
+        assign mem.READDATA   = mem_readdata     [(mem_it+1)*test_pkg::MEM_DATA_WIDTH -1 -: test_pkg::MEM_DATA_WIDTH ]; // : in  std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
+        assign mem_readdatavalid[mem_it] = mem.READDATAVALID; // : in  std_logic_vector(MEM_PORTS-1 downto 0);
+
+        always #(test_pkg::MEM_CLK_PERIOD[mem_it]/2)  MEM_CLK[mem_it] = ~MEM_CLK[mem_it];
+
+        initial begin
+            //RESET
+            uvm_config_db#(virtual reset_if)::set(null, "", $sformatf("RESET_MEM_%0d", mem_it), mem_reset);
+            uvm_config_db#(virtual avmm_if#(test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MEM_BURST_WIDTH))::set(null, "", $sformatf("MEM_%0d", mem_it), mem);
+        end
     end
 
     /////////////////////////
@@ -338,17 +365,17 @@ module testbench;
         .DMA_TX_MFB_SRC_RDY    (dma_rx_mfb_src_rdy), //  : in  std_logic_vector(DMA_STREAMS-1 downto 0);
         .DMA_TX_MFB_DST_RDY    (dma_rx_mfb_dst_rdy), //  : out std_logic_vector(DMA_STREAMS-1 downto 0);
 
-        .MEM_CLK               (clk_logic_mem),   // : in  std_logic_vector(MEM_PORTS-1 downto 0);
+        .MEM_CLK               (MEM_CLK),   // : in  std_logic_vector(MEM_PORTS-1 downto 0);
         .MEM_RST               (reset_logic_mem), // : in  std_logic_vector(MEM_PORTS-1 downto 0);
 
-        .MEM_AVMM_READY        (), // : in  std_logic_vector(MEM_PORTS-1 downto 0);
-        .MEM_AVMM_READ         (), // : out std_logic_vector(MEM_PORTS-1 downto 0);
-        .MEM_AVMM_WRITE        (), // : out std_logic_vector(MEM_PORTS-1 downto 0);
-        .MEM_AVMM_ADDRESS      (), // : out std_logic_vector(MEM_PORTS*MEM_ADDR_WIDTH-1 downto 0);
-        .MEM_AVMM_BURSTCOUNT   (), // : out std_logic_vector(MEM_PORTS*MEM_BURST_WIDTH-1 downto 0);
-        .MEM_AVMM_WRITEDATA    (), // : out std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
-        .MEM_AVMM_READDATA     (), // : in  std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
-        .MEM_AVMM_READDATAVALID(), // : in  std_logic_vector(MEM_PORTS-1 downto 0);
+        .MEM_AVMM_READY        (mem_ready        ), // : in  std_logic_vector(MEM_PORTS-1 downto 0);
+        .MEM_AVMM_READ         (mem_read         ), // : out std_logic_vector(MEM_PORTS-1 downto 0);
+        .MEM_AVMM_WRITE        (mem_write        ), // : out std_logic_vector(MEM_PORTS-1 downto 0);
+        .MEM_AVMM_ADDRESS      (mem_address      ), // : out std_logic_vector(MEM_PORTS*MEM_ADDR_WIDTH-1 downto 0);
+        .MEM_AVMM_BURSTCOUNT   (mem_burstcount   ), // : out std_logic_vector(MEM_PORTS*MEM_BURST_WIDTH-1 downto 0);
+        .MEM_AVMM_WRITEDATA    (mem_writedata    ), // : out std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
+        .MEM_AVMM_READDATA     (mem_readdata     ), // : in  std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
+        .MEM_AVMM_READDATAVALID(mem_readdatavalid), // : in  std_logic_vector(MEM_PORTS-1 downto 0);
 
         .EMIF_RST_REQ          (), // : out std_logic_vector(MEM_PORTS-1 downto 0);
         .EMIF_RST_DONE         (), // : in  std_logic_vector(MEM_PORTS-1 downto 0);
@@ -402,8 +429,6 @@ module testbench;
         automatic virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) vir_dma_tx_mfb[test_pkg::DMA_STREAMS] = dma_tx_mfb;
         automatic virtual mvb_if #(test_pkg::REGIONS, DMA_RX_MVB_WIDTH)                                                              vir_dma_rx_mvb[test_pkg::DMA_STREAMS] = dma_rx_mvb;
         automatic virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) vir_dma_rx_mfb[test_pkg::DMA_STREAMS] = dma_rx_mfb;
-        //RESET
-        automatic virtual reset_if vir_reset_mem[test_pkg::MEM_PORTS] = reset_mem;
 
 
         /////////////////////////////////////////////
@@ -436,12 +461,6 @@ module testbench;
         uvm_config_db#(virtual reset_if)::set(null, "", "RESET_DMA_X1",  reset_dma_x1);
         uvm_config_db#(virtual reset_if)::set(null, "", "RESET_DMA_X2",  reset_dma_x2);
         uvm_config_db#(virtual reset_if)::set(null, "", "RESET_APP",     reset_app);
-        for (int unsigned it = 0; it < test_pkg::MEM_PORTS; it++) begin
-            string it_num;
-            it_num.itoa(it);
-
-            uvm_config_db#(virtual reset_if)::set(null, "", {"RESET_MEM_", it_num}, vir_reset_mem[it]);
-        end
 
         //CONFIGURE INF
         uvm_config_db#(virtual mi_if#(test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH))::set(null, "", "MI_INTERFACE", config_if);

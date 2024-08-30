@@ -29,6 +29,7 @@ package test_pkg;
     parameter int unsigned MFB_BLOCK_SIZE       = 8;
     parameter int unsigned MFB_ITEM_WIDTH       = 8;
     parameter int unsigned MEM_PORTS            = 1;
+    parameter time         MEM_CLK_PERIOD [MEM_PORTS-1:0]  =  '{MEM_PORTS{10ns}};
     parameter int unsigned MEM_ADDR_WIDTH       = 26;
     parameter int unsigned MEM_BURST_WIDTH      = 7;
     parameter int unsigned MEM_DATA_WIDTH       = 512;
