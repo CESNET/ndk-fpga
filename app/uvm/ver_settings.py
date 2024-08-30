@@ -65,12 +65,18 @@ SETTINGS = {
          "__core_params__" : {"UVM_TEST" : "test::full_speed"},
     },
 
+    "test_fifo" : {
+         "__core_params__" : {"UVM_TEST" : "test::fifo"},
+    },
+
     "_combinations_" : (
     ("default",), # Works the same as '("default",),' as the "default" is applied in every combination
-    ("default", "test_speed", ), 
+    ("default", "test_speed", ),
+    ("default", "test_fifo", ),
     ("eth_1", "dma_1", "mfb",),
     ("dma_1", "eth_ch1", "mfb_1",),
     ("dma_1", "eth_ch1",),
     ("eth_1", "dma_1", "mfb", "test_speed", ),
+    ("eth_1", "dma_1", "mfb", "test_fifo", ),
     ),
 }
