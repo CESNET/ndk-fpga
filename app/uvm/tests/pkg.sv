@@ -15,4 +15,5 @@ package test;
 
     `include "base.sv"
     `include "full_speed.sv"
+    `include "fifo.sv"
 endpackage

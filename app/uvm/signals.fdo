@@ -11,6 +11,7 @@ delete wave *
 add_wave "-noupdate -color yellow -label CLK"     "/testbench/APP_CLK"
 add_wave "-noupdate -color yellow -label RESET"   "/testbench/reset_app/RESET"
 
+add_wave -noupdate -group "CONFIG" "/testbench/config_if/*"
 
 for {set it 0} {$it < 4} {incr it} {
 
