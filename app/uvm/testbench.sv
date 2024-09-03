@@ -71,6 +71,10 @@ module testbench;
     //CONFIGURE INTERFACE
     mi_if#(test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH) config_if(MI_CLK);
 
+    //TSU INTERFACE
+    mvb_if #(1, 64) m_tsu (APP_CLK);
+
+
     /////////////////////////
     // CLOCK GENERATION
     always #(test_pkg::CLK_PERIOD/2)  CLK_USER_X1 = ~CLK_USER_X1;
@@ -377,6 +381,11 @@ module testbench;
         .MEM_AVMM_READDATA     (mem_readdata     ), // : in  std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
         .MEM_AVMM_READDATAVALID(mem_readdatavalid), // : in  std_logic_vector(MEM_PORTS-1 downto 0);
 
+        .TSU_CLK    (APP_CLK), //: in std_logic
+        .TSU_RESET  (1'b0), //: in std_logic;
+        .TSU_TS_NS  (m_tsu.DATA[64-1 : 0]), //: in std_logic_vector(64-1 downto 0);  -- Timestamp from TSU in nanoseconds format
+        .TSU_TS_VLD (m_tsu.SRC_RDY & m_tsu.VLD[0]), //: in std_logic;
+
         .EMIF_RST_REQ          (), // : out std_logic_vector(MEM_PORTS-1 downto 0);
         .EMIF_RST_DONE         (), // : in  std_logic_vector(MEM_PORTS-1 downto 0);
         .EMIF_ECC_USR_INT      (), // : in  std_logic_vector(MEM_PORTS-1 downto 0);
@@ -392,7 +401,7 @@ module testbench;
         .MI_DRD                (config_if.DRD),  //  : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
         .MI_DRDY               (config_if.DRDY)  //  : out std_logic
     );
-
+    assign m_tsu.SRC_RDY = 1'b1;
 
     app_core_property #(
         .ETH_STREAMS (test_pkg::ETH_STREAMS),
@@ -464,6 +473,9 @@ module testbench;
 
         //CONFIGURE INF
         uvm_config_db#(virtual mi_if#(test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH))::set(null, "", "MI_INTERFACE", config_if);
+
+        //TSU
+        uvm_config_db#(virtual mvb_if #(1, 64))::set(null, "", "TSU_INTERFACE", m_tsu);
 
         /////////////////////////////////////////////
         // RUN TEST

@@ -145,10 +145,14 @@ class sequence_fifo#(
     endfunction
 
     virtual task eth_rx_sequence(int unsigned index);
-        uvm_app_core::sequence_eth#(2**8, 16, MFB_ITEM_WIDTH) packet_seq;
+        uvm_app_core::sequence_library_eth#(2**8, 16, MFB_ITEM_WIDTH) packet_seq;
+        uvm_app_core::config_sequence_eth seq_cfg;
         int unsigned it;
 
-        packet_seq = uvm_app_core::sequence_eth#(2**8, 16, MFB_ITEM_WIDTH)::type_id::create("mfb_rx_seq", p_sequencer.m_eth_rx[index]);
+        seq_cfg = new();
+        seq_cfg.time_start = time_start;
+        packet_seq = uvm_app_core::sequence_library_eth#(2**8, 16, MFB_ITEM_WIDTH)::type_id::create("mfb_rx_seq", p_sequencer.m_eth_rx[index]);
+        packet_seq.init_sequence(seq_cfg);
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_eth_rx[index], "", "state", rx_status);
         it = 0;
@@ -358,6 +362,7 @@ class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endfunction
 
     virtual task run_phase(uvm_phase phase);
+        uvm_app_core::sequence_tsu  tsu_seq;
         test::sequence_fifo#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
                             ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH) main_seq;
         test::sequence_fifo_stop#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
@@ -375,6 +380,13 @@ class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             run_reset(phase);
         join_none;
 
+        // RUN TSU
+        tsu_seq = uvm_app_core::sequence_tsu::type_id::create("tsu_seq", m_env.m_tsu.m_sequencer);
+        tsu_seq.randomize();
+        fork
+            tsu_seq.start(m_env.m_tsu.m_sequencer);
+        join_none;
+
         ////configure egent
         wait(event_reset == 1'b0);
         for (int unsigned it = 0; it < 2; it++) begin
@@ -385,6 +397,7 @@ class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
             assert(main_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
             main_seq.start(m_env.m_sequencer);
+            main_seq.time_start = tsu_seq.time_start;
 
             assert(stop_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
             fork
