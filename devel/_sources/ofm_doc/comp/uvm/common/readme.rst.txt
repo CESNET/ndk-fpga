@@ -78,7 +78,7 @@ The first parameter is the type of model's transactions. The second parameter is
      - description
    * - uvm_common::comparer_base_ordered#(type MODEL_ITEM, DUT_ITEM = MODEL_ITEM)
      - The DUT output has to produce transactions in the same order as the model
-   * - uvm_common::comparer_base_disordered#(type MODEL_ITEM, DUT_ITEM = MODEL_ITEM)
+   * - uvm_common::comparer_base_unordered#(type MODEL_ITEM, DUT_ITEM = MODEL_ITEM)
      - The DUT output doesn't have to produce transactions in the same order as the model
    * - uvm_common::comparer_base_tagged#(type MODEL_ITEM, DUT_ITEM = MODEL_ITEM)
      - The Dut output has to produce transactions in the same order as the model only for each tag. In other words, if the transactions were split per tag into separate streams (one stream for each tag), they must be in order within each stream.
@@ -93,7 +93,7 @@ This component has only one parameter - the transaction type.
 
    * - class
    * - comparer_ordered #(type CLASS_TYPE)
-   * - comparer_disordered #(type CLASS_TYPE)
+   * - comparer_unordered #(type CLASS_TYPE)
    * - comparer_taged #(type CLASS_TYPE)
 
 All comparers contain a watchdog. You can set up the maximum waiting time for the model and DUT transactions.

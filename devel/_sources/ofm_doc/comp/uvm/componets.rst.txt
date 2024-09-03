@@ -46,3 +46,5 @@ Library of commonly used agents and enviroments in UVM verification
     avmm/readme
     avst_crdt/readme
     probe/readme
+    lbus/readme
+    logic_vector_array_lbus/readme

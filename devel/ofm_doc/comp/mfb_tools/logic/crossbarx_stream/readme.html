@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: ad0151ba
+                Git branch: devel, <br> Git hash: 04cd4747
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -236,21 +236,28 @@ RX_CLK has the same period as TX_CLK.</p></td>
 <td><p>1024</p></td>
 <td><p>Maximum packet size in MFB ITEMS.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-trans_fifo_size"><td><p>TRANS_FIFO_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-num_of_pkts"><td><p>NUM_OF_PKTS</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Number of maximum sized packets in Input and Output buffer
+MUST be a power of 2
+(4 -&gt; ~150 Gb/s, 8 -&gt; ~400 Gb/s)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-crossbarx_stream-trans_fifo_size"><td><p>TRANS_FIFO_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>64</p></td>
 <td><p>Maximum number of Transaction waiting for data transfer.
 Setting this value too low will lead to lower throughput,
 which should trigger a simulation assert warning in component CrossbarX.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-crossbarx_stream-f_gap_adjust_en"><td><p>F_GAP_ADJUST_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-f_gap_adjust_en"><td><p>F_GAP_ADJUST_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>CrossbarX Stream functions setup ————————————
 Insert gaps of defined size between packets.
 When set to False, the smallest possible gap is used.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-f_gap_adjust_size_avg"><td><p>F_GAP_ADJUST_SIZE_AVG</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-crossbarx_stream-f_gap_adjust_size_avg"><td><p>F_GAP_ADJUST_SIZE_AVG</p></td>
 <td><p>natural</p></td>
 <td><p>24</p></td>
 <td><p>Required average gap after every packet in MFB ITEMS.
@@ -258,32 +265,32 @@ Differences in gaps are calculated according to the Deficit Idle Count algorithm
 If AVG size is equal to MIN size, all gap sizes will be greater or equal to MIN size.
 MUST be greater or equal to F_GAP_ADJUST_SIZE_MIN!</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-crossbarx_stream-f_gap_adjust_size_min"><td><p>F_GAP_ADJUST_SIZE_MIN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-f_gap_adjust_size_min"><td><p>F_GAP_ADJUST_SIZE_MIN</p></td>
 <td><p>natural</p></td>
 <td><p>24</p></td>
 <td><p>MUST be greater or equal to MFB_BLOCK_SIZE!</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-f_extend_start_en"><td><p>F_EXTEND_START_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-crossbarx_stream-f_extend_start_en"><td><p>F_EXTEND_START_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enable to extend (or shrink) packets at the front.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-crossbarx_stream-f_extend_start_size"><td><p>F_EXTEND_START_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-f_extend_start_size"><td><p>F_EXTEND_START_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>-4</p></td>
 <td><p>In MFB ITEMS, negative number for packet shrinking.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-f_extend_end_en"><td><p>F_EXTEND_END_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-crossbarx_stream-f_extend_end_en"><td><p>F_EXTEND_END_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enable to extend (or shrink) packets at the back.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-crossbarx_stream-f_extend_end_size"><td><p>F_EXTEND_END_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-f_extend_end_size"><td><p>F_EXTEND_END_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>-5</p></td>
 <td><p>In MFB ITEMS, negative number for packet shrinking.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-crossbarx_stream-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-crossbarx_stream-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, ..</p></td>
