@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PCIE Byte Count &mdash; Minimal NDK Application Docs  documentation</title>
+  <title>Register FIFO &mdash; Minimal NDK Application Docs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -20,9 +20,7 @@
         <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../../search.html" />
-    <link rel="next" title="PCIe Byte Enable Decoder" href="../byte_en_decoder/readme.html" />
-    <link rel="prev" title="PCI_EXT_CAP" href="../../common/readme.html" /> 
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -77,25 +75,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../../mtc/readme.html">MTC (MI Transaction Controller)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../ptc/readme.html">PTC (PCIe Transaction Controller)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../common/readme.html">PCI_EXT_CAP</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">PCIE Byte Count</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../byte_en_decoder/readme.html">PCIe Byte Enable Decoder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../convertors/readme.html">PCIE CONVERSION UNITS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../dma/dma_calypte/readme.html">DMA Calypte</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
 </ul>
@@ -114,10 +101,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../../../pcie.html">PCIe Tools</a></li>
-      <li class="breadcrumb-item active">PCIE Byte Count</li>
+      <li class="breadcrumb-item active">Register FIFO</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../../../_sources/ofm_doc/comp/pcie/logic/byte_count/readme.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../../_sources/ofm_doc/comp/base/fifo/reg_fifo/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -125,14 +111,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pcie-byte-count">
-<span id="id1"></span><h1>PCIE Byte Count<a class="headerlink" href="#pcie-byte-count" title="Link to this heading"></a></h1>
+  <section id="register-fifo">
+<span id="reg-fifo"></span><h1>Register FIFO<a class="headerlink" href="#register-fifo" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-pcie_byte_count">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">PCIE_BYTE_COUNT</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-pcie_byte_count" title="Link to this definition"></a></dt>
-<dd><p>This component calculates the correct number of bytes contained in the payload of the incoming
-PCIe transaction. The size is calculated using <cite>DW_COUNT</cite>, <cite>FIRST_BE</cite> and <cite>LAST_BE</cite> signals
-provided by each transaction.</p>
+<dt class="sig sig-object vhdl" id="vhdl-entity-reg_fifo">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">REG_FIFO</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-reg_fifo" title="Link to this definition"></a></dt>
+<dd><p>This component is the most primitive FIFO here which is made of registers that buffers data also when the
+output TX_DST_RDY is deasserted. In that case, the buffer keeps an output RX_DST_RDY asserted
+unless the FIFO is full. If the TX_DST_RDY is asserted, the buffer behaves as a set of register
+stages of the size ITEMS.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is advised to use this component only on a very limited amounts of DATA_WIDTH*ITEMS.
+Otherwise the consumption of the registers can be huge. For more items, refer to other types
+of FIFO.</p>
+</div>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -142,10 +135,21 @@ provided by each transaction.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-gengeneric-pcie_byte_count-output_reg"><td><p>OUTPUT_REG</p></td>
+<tr class="row-even" id="vhdl-gengeneric-reg_fifo-data_width"><td><p>DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>256</p></td>
+<td><p>Bit width of data</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-reg_fifo-items"><td><p>ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-reg_fifo-fake_fifo"><td><p>FAKE_FIFO</p></td>
 <td><p>boolean</p></td>
-<td><p>False</p></td>
-<td><p>Optional output register</p></td>
+<td><p>FALSE)</p></td>
+<td><p>If this is true, the input data are directly connected to the output as well as the
+handshaking signals.</p></td>
 </tr>
 </tbody>
 </table>
@@ -158,45 +162,45 @@ provided by each transaction.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-pcie_byte_count-clk"><td><p>CLK</p></td>
+<tr class="row-even" id="vhdl-portsignal-reg_fifo-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_byte_count-reset"><td><p>RESET</p></td>
+<tr class="row-odd" id="vhdl-portsignal-reg_fifo-rst"><td><p>RST</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_byte_count-in_dw_count"><td><p>IN_DW_COUNT</p></td>
-<td><p>std_logic_vector(11-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-reg_fifo-rx_data"><td><p>RX_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>DWord count from TLP header</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_byte_count-in_first_be"><td><p>IN_FIRST_BE</p></td>
-<td><p>std_logic_vector(4-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-reg_fifo-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td><p>First Byte Enable from TLP header</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_byte_count-in_last_be"><td><p>IN_LAST_BE</p></td>
-<td><p>std_logic_vector(4-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-reg_fifo-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-reg_fifo-tx_data"><td><p>TX_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-reg_fifo-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-reg_fifo-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<td><p>std_logic)</p></td>
 <td><p>in</p></td>
-<td><p>Last Byte Enable from TLP header</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_byte_count-out_first_ib"><td><p>OUT_FIRST_IB</p></td>
-<td><p>std_logic_vector(2-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>First Invalid Bytes of TLP</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_byte_count-out_last_ib"><td><p>OUT_LAST_IB</p></td>
-<td><p>std_logic_vector(2-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Last Invalid Bytes of TLP</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_byte_count-out_byte_count"><td><p>OUT_BYTE_COUNT</p></td>
-<td><p>std_logic_vector(13-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Byte Count of TLP</p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -207,10 +211,7 @@ provided by each transaction.</p>
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../../common/readme.html" class="btn btn-neutral float-left" title="PCI_EXT_CAP" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../byte_en_decoder/readme.html" class="btn btn-neutral float-right" title="PCIe Byte Enable Decoder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

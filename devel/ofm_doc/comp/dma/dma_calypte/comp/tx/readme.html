@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 23eba90d
+                Git branch: devel, <br> Git hash: e74fc045
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
@@ -94,8 +94,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../readme.html">DMA Calypte</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../../readme.html#provided-dma-configurations">Provided DMA configurations</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../../readme.html#subcomponents">Subcomponents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../rx/readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">TX DMA Calypte</a></li>
 </ul>
@@ -136,14 +136,6 @@
              
   <section id="tx-dma-calypte">
 <span id="id1"></span><h1>TX DMA Calypte<a class="headerlink" href="#tx-dma-calypte" title="Link to this heading"></a></h1>
-<dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-tx_dma_calypte">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">TX_DMA_CALYPTE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-tx_dma_calypte" title="Link to this definition"></a></dt>
-<dd><div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The Completer Completion interface is not supported yet. Calypte Controller
-supports only Memory Write PCIe transactions.</p>
-</div>
 <p>This is the transmitting part of the DMA Calypte core. TX direction behaves
 similarly to the RX DMA Calypte. Data buffers are provided in the hardware to
 which the data can be stored. The frames are output on the <em>USR_TX_</em> side and
@@ -157,9 +149,12 @@ the frame on the output is read continuously from the address of the first
 byte. The block scheme of the TX DMA Calypte controller is provided in the
 following figure:</p>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../../../../../../_images/tx_calypte_block-tx_dma_calypte_top.svg"><img alt="../../../../../../_images/tx_calypte_block-tx_dma_calypte_top.svg" src="../../../../../../_images/tx_calypte_block-tx_dma_calypte_top.svg" style="width: 8497.0px; height: 2223.0px;" /></a>
+<a class="reference internal image-reference" href="../../../../../../_images/tx_calypte_block-tx_dma_calypte_top.svg"><img alt="../../../../../../_images/tx_calypte_block-tx_dma_calypte_top.svg" src="../../../../../../_images/tx_calypte_block-tx_dma_calypte_top.svg" style="width: 1000px;" /></a>
 </figure>
-<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-tx_dma_calypte">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">TX_DMA_CALYPTE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-tx_dma_calypte" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
 <th class="head"><p>Type</p></th>
@@ -190,7 +185,7 @@ following figure:</p>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-usr_tx_mfb_region_size"><td><p>USR_TX_MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
-<td><p>4</p></td>
+<td><p>8</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-usr_tx_mfb_block_size"><td><p>USR_TX_MFB_BLOCK_SIZE</p></td>
@@ -210,7 +205,7 @@ following figure:</p>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-pcie_cq_mfb_regions"><td><p>PCIE_CQ_MFB_REGIONS</p></td>
 <td><p>natural</p></td>
-<td><p>1</p></td>
+<td><p>2</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-pcie_cq_mfb_region_size"><td><p>PCIE_CQ_MFB_REGION_SIZE</p></td>
@@ -229,75 +224,50 @@ following figure:</p>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>Output PCIe interface (Completer Completion) MFB setting</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-pcie_cc_mfb_regions"><td><p>PCIE_CC_MFB_REGIONS</p></td>
-<td><p>natural</p></td>
-<td><p>1</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-pcie_cc_mfb_region_size"><td><p>PCIE_CC_MFB_REGION_SIZE</p></td>
-<td><p>natural</p></td>
-<td><p>1</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-pcie_cc_mfb_block_size"><td><p>PCIE_CC_MFB_BLOCK_SIZE</p></td>
-<td><p>natural</p></td>
-<td><p>8</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-pcie_cc_mfb_item_width"><td><p>PCIE_CC_MFB_ITEM_WIDTH</p></td>
-<td><p>natural</p></td>
-<td><p>32</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>=====</p></td>
 <td><p>Setting of internal components</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-data_pointer_width"><td><p>DATA_POINTER_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-data_pointer_width"><td><p>DATA_POINTER_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>14</p></td>
+<td><p>13</p></td>
 <td><p>Pointer width for data and hdr buffers. The data pointer points to bytes of the packet.
 The header pointer points to the header of a current packet.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-dma_hdr_pointer_width"><td><p>DMA_HDR_POINTER_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-dma_hdr_pointer_width"><td><p>DMA_HDR_POINTER_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>11</p></td>
-<td></td>
+<td><p>10</p></td>
+<td><p>NOTE: Depracated, the width of the header pointer is calculated from DATA_POINTER_WIDTH</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-channels"><td><p>CHANNELS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-channels"><td><p>CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>Set the number of DMA channels, each channel has its separate buffer</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>Others</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-cntrs_width"><td><p>CNTRS_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-cntrs_width"><td><p>CNTRS_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>64</p></td>
 <td><p>Set the width of counters of packets for each channel which are there to provide some
 entry level statistics.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-hdr_meta_width"><td><p>HDR_META_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-hdr_meta_width"><td><p>HDR_META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>24</p></td>
 <td><p>Width of the metadata in bits which are stored in the DMA header.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_calypte-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_calypte-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
 <td><p>natural</p></td>
-<td><p>2**11</p></td>
+<td><p>2**12</p></td>
 <td><p>Size of the largest packets that can be transmitted on the USR_TX_MFB interface.</p></td>
 </tr>
 </tbody>
@@ -387,7 +357,7 @@ entry level statistics.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-pcie_cq_mfb_meta"><td><p>PCIE_CQ_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_CQ_META_WIDTH -1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -422,106 +392,61 @@ entry level statistics.</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>PCIe Completer Completion MFB interface</p></td>
-<td><p>=====</p></td>
-<td><p>Transmits responses to read requests received on the CQ interface</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-pcie_cc_mfb_data"><td><p>PCIE_CC_MFB_DATA</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS*PCIE_CC_MFB_REGION_SIZE*PCIE_CC_MFB_BLOCK_SIZE*PCIE_CC_MFB_ITEM_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-pcie_cc_mfb_meta"><td><p>PCIE_CC_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_CC_META_WIDTH -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-pcie_cc_mfb_sof"><td><p>PCIE_CC_MFB_SOF</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-pcie_cc_mfb_eof"><td><p>PCIE_CC_MFB_EOF</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-pcie_cc_mfb_sof_pos"><td><p>PCIE_CC_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS*max(1, log2(PCIE_CC_MFB_REGION_SIZE)) -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-pcie_cc_mfb_eof_pos"><td><p>PCIE_CC_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS*max(1, log2(PCIE_CC_MFB_REGION_SIZE*PCIE_CC_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-pcie_cc_mfb_src_rdy"><td><p>PCIE_CC_MFB_SRC_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-pcie_cc_mfb_dst_rdy"><td><p>PCIE_CC_MFB_DST_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>=====</p></td>
 <td><p>Debugging signals</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-st_sp_dbg_chan"><td><p>ST_SP_DBG_CHAN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-st_sp_dbg_chan"><td><p>ST_SP_DBG_CHAN</p></td>
 <td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-st_sp_dbg_meta"><td><p>ST_SP_DBG_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-st_sp_dbg_meta"><td><p>ST_SP_DBG_META</p></td>
 <td><p>std_logic_vector(ST_SP_DBG_SIGNAL_W -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>Control MI bus</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(MI_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(MI_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(MI_WIDTH/8 -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(MI_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_calypte-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_calypte-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
@@ -530,21 +455,208 @@ entry level statistics.</p></td>
 </table>
 </dd></dl>
 
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Specific subcomponents</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="comp/metadata_extractor/readme.html">Metadata Extractor</a></li>
-<li class="toctree-l1"><a class="reference internal" href="comp/chan_start_stop_ctrl/readme.html">Channel Start/stop control</a></li>
-<li class="toctree-l1"><a class="reference internal" href="comp/packet_dispatcher/readme.html">Packet Dispatcher</a></li>
-<li class="toctree-l1"><a class="reference internal" href="comp/pcie_trans_buffer/readme.html">Transaction buffer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="comp/software_manager/readme.html">Software Manager</a></li>
-</ul>
+<section id="control-status-registers">
+<h2>Control/Status Registers<a class="headerlink" href="#control-status-registers" title="Link to this heading"></a></h2>
+<p>In order for the controller to be controlled by the software, an address space
+with configuration/status (C/S) registers is initialized. Currently, each
+channel contains its own set of registers with the overall size of 128 B. The
+1st channel’s registers are located on the address <em>0x00</em>, the second on <em>0x80</em>, the
+third on <em>0x100</em>, etc. The address offset of the whole TX controller within the DMA
+engine is <em>0x200000</em>. The registers are connected through <a class="reference internal" href="../../../../mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> to
+the global configuration tree. The set of C/S for one channel is listed in
+the following table.</p>
+<table class="docutils align-center" id="id2">
+<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Access permission (FPGA/Host)</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0x00</p></td>
+<td><p>Control</p></td>
+<td><p>R/W</p></td>
+<td><p>Bit 0: Set to 1 to request the enable of a channel. Set to 0 to request stop of a channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x04</p></td>
+<td><p>Status</p></td>
+<td><p>W/R</p></td>
+<td><p>Bit 0: Set to 1 if a channel is enabled. Set to 0 if the channel is disabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x08</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x0C</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>0x10</p></td>
+<td><p>Software data pointer (SDP)</p></td>
+<td><p>R/W</p></td>
+<td><p>Writing pointer for data (up to 16 bits)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x14</p></td>
+<td><p>Software header pointer (SDP)</p></td>
+<td><p>R/W</p></td>
+<td><p>Writing pointer for headers (up to 16 bits)</p></td>
+</tr>
+<tr class="row-even"><td><p>0x18</p></td>
+<td><p>Hardware data pointer (HDP)</p></td>
+<td><p>R/W</p></td>
+<td><p>Reading pointer for data (up to 16 bits)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x1C</p></td>
+<td><p>Hardware header pointer (HHP)</p></td>
+<td><p>R/W</p></td>
+<td><p>Reading pointer for headers (up to 16 bits)</p></td>
+</tr>
+<tr class="row-even"><td><p>0x20</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x24</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>0x28</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x2C</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>0x30</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x34</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>0x38</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x3C</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>0x40</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x44</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>0x48</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x4C</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>0x50</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x54</p></td>
+<td><p>-Reserved-</p></td>
+<td><p>N/A</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>0x58</p></td>
+<td><p>Data pointer mask (DPM)</p></td>
+<td><p>W/R</p></td>
+<td><p>Mask for the data pointers (determines data buffer size)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x5C</p></td>
+<td><p>Header pointer mask (HPM)</p></td>
+<td><p>W/R</p></td>
+<td><p>Mask for the header pointers (determines header buffer size)</p></td>
+</tr>
+<tr class="row-even"><td><p>0x60</p></td>
+<td><p>Received packetsL</p></td>
+<td><p>W/RW (Strobe)</p></td>
+<td><p>Counter of received packets (lower part)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x64</p></td>
+<td><p>Received packetsH</p></td>
+<td><p>W/RW (Strobe)</p></td>
+<td><p>Counter of received packets (upper part)</p></td>
+</tr>
+<tr class="row-even"><td><p>0x68</p></td>
+<td><p>Received bytesL</p></td>
+<td><p>W/RW (Strobe)</p></td>
+<td><p>Counter of received bytes (lower part)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x6C</p></td>
+<td><p>Received bytesH</p></td>
+<td><p>W/RW (Strobe)</p></td>
+<td><p>Counter of received bytes (upper part)</p></td>
+</tr>
+<tr class="row-even"><td><p>0x70</p></td>
+<td><p>Discarded packetsL</p></td>
+<td><p>W/RW (Strobe)</p></td>
+<td><p>Counter of discarded packets (lower part)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x74</p></td>
+<td><p>Discarded packetsH</p></td>
+<td><p>W/RW (Strobe)</p></td>
+<td><p>Counter of discarded packets (upper part)</p></td>
+</tr>
+<tr class="row-even"><td><p>0x78</p></td>
+<td><p>Discarded bytesL</p></td>
+<td><p>W/RW (Strobe)</p></td>
+<td><p>Counter of discarded bytes (lower part)</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x7C</p></td>
+<td><p>Discarded bytesH</p></td>
+<td><p>W/RW (Strobe)</p></td>
+<td><p>Counter of discarded bytes (upper part)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some registers have a <em>strobe</em> functionality in which case specific
+writes on a counter’s address need to be issued from the host in order to
+manipulate a counter’s register:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">0x0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Resets a counter and its register</p>
+</dd>
+<dt class="field-even">0x1<span class="colon">:</span></dt>
+<dd class="field-even"><p>Samples a value of a counter to its register</p>
+</dd>
+<dt class="field-odd">0x2<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Combination of the two previous, e.g. a value of a counter is sampled
+to its register and the counter is put to reset.</p>
+</dd>
+</dl>
+</div></blockquote>
 </div>
-<section id="general-subcomponents">
-<h2>General subcomponents<a class="headerlink" href="#general-subcomponents" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="../../../../mvb_tools/storage/fifox/readme.html#mvb-fifox"><span class="std std-ref">MVB FIFOX</span></a></p></li>
-</ul>
 <section id="uvm-verification">
 <h3>UVM Verification<a class="headerlink" href="#uvm-verification" title="Link to this heading"></a></h3>
 <figure class="align-center">
@@ -554,162 +666,89 @@ entry level statistics.</p></td>
 </section>
 <section id="verification-plan">
 <h2>Verification Plan<a class="headerlink" href="#verification-plan" title="Link to this heading"></a></h2>
-<p>TODO:</p>
+<p>All of these tests were checked in a verification with a random seed. The verification
+files are located in the <code class="docutils literal notranslate"><span class="pre">uvm/</span></code> directory</p>
+<table class="docutils align-center" id="id3">
+<caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 11.1%" />
+<col style="width: 33.3%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 22.2%" />
+<col style="width: 11.1%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Requirement level</p></th>
+<th class="head"><p>Checked by</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Test name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>base</p></td>
+<td><p>Simple packet transfer and check if no packets are droped/damaged on an enabled channel. Randomly
+enable/disable the channels (check the packet counters on the end).</p></td>
+<td><p>Required</p></td>
+<td><p>Counter check on the end of test</p></td>
+<td><p>Verified</p></td>
+<td><p>test::base</p></td>
+</tr>
+<tr class="row-odd"><td><p>mult_region</p></td>
+<td><p>For a multiple-regions configuration vary the packet begins/ends in all regions. This puts the
+transaction buffer under stress test.</p></td>
+<td><p>Required</p></td>
+<td><p>Func. cover</p></td>
+<td><p>Verified</p></td>
+<td><p>test::base/test::speed</p></td>
+</tr>
+<tr class="row-even"><td><p>pkt_drop</p></td>
+<td><p>Check if packets are droped on a disabled channel. Check if the counters of dropped packets have
+correct values.</p></td>
+<td><p>Required</p></td>
+<td><p>Packet counter check on the end of a test</p></td>
+<td><p>Unverified</p></td>
+<td><p>test::base</p></td>
+</tr>
+<tr class="row-odd"><td><p>thrp_meas</p></td>
+<td><p>Measure throughput in Gbps.</p></td>
+<td><p>Optional</p></td>
+<td><p>Reported periodically by the <em>statistics</em> class from the <code class="docutils literal notranslate"><span class="pre">uvm_mfb</span></code> environment. (The verbosity needs
+to be set to <code class="docutils literal notranslate"><span class="pre">UVM_LOW</span></code> in order to display these statistics)</p></td>
+<td><p>Verified</p></td>
+<td><p>test::speed</p></td>
+</tr>
+<tr class="row-even"><td><p>lat_meas</p></td>
+<td><p>Measure latency from input to output. Report average value, maximum,
+minimum and standard deviation. Repeat 10000 times and report values in
+the documentation.</p></td>
+<td><p>Optional</p></td>
+<td><p>None</p></td>
+<td><p>Unverified</p></td>
+<td><p>Special sequence that does measurement for a single packet.</p></td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="coverage-measure">
-<h2>Coverage Measure<a class="headerlink" href="#coverage-measure" title="Link to this heading"></a></h2>
-<p>There are five tests in the Multiver script.</p>
-<table class="docutils align-default" id="id2">
-<caption><span class="caption-text">test configuration</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
-<colgroup>
-<col style="width: 16.7%" />
-<col style="width: 16.7%" />
-<col style="width: 16.7%" />
-<col style="width: 16.7%" />
-<col style="width: 16.7%" />
-<col style="width: 16.7%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>conf name</p></th>
-<th class="head"><p>Regions</p></th>
-<th class="head"><p>Max packet size</p></th>
-<th class="head"><p>buffer addres width (DATA, HDR)</p></th>
-<th class="head"><p>PCIE LEN (MIN, MAX)</p></th>
-<th class="head"><p>channels num</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>1(~40Gb/s)</p></td>
-<td><p>2^11-1</p></td>
-<td><p>14-bit, 11-bit</p></td>
-<td><p>1.256</p></td>
-<td><p>2</p></td>
-</tr>
-<tr class="row-odd"><td><p>4_channels</p></td>
-<td><p>1(~40Gb/s)</p></td>
-<td><p>2^11-1</p></td>
-<td><p>14-bit, 11-bit</p></td>
-<td><p>1.256</p></td>
-<td><p>4</p></td>
-</tr>
-<tr class="row-even"><td><p>8_channels, min_pcie_frames</p></td>
-<td><p>1(~40Gb/s)</p></td>
-<td><p>2^11-1</p></td>
-<td><p>14-bit, 11-bit</p></td>
-<td><p>1.32</p></td>
-<td><p>8</p></td>
-</tr>
-<tr class="row-odd"><td><p>buff_size_small</p></td>
-<td><p>1(~40Gb/s)</p></td>
-<td><p>2^11-1</p></td>
-<td><p>13-bit, 10-bit</p></td>
-<td><p>1.256</p></td>
-<td><p>2</p></td>
-</tr>
-<tr class="row-even"><td><p>buff_size_large</p></td>
-<td><p>1(~40Gb/s)</p></td>
-<td><p>2^11-1</p></td>
-<td><p>16-bit, 13-bit</p></td>
-<td><p>1.256</p></td>
-<td><p>2</p></td>
-</tr>
-</tbody>
-</table>
-<table class="docutils align-default" id="id3">
-<caption><span class="caption-text">coverage</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
-<colgroup>
-<col style="width: 25.0%" />
-<col style="width: 25.0%" />
-<col style="width: 25.0%" />
-<col style="width: 25.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>conf name</p></th>
-<th class="head"><p>base</p></th>
-<th class="head"><p>full speed</p></th>
-<th class="head"><p>merge</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>75.3494%</p></td>
-<td><p>74.9002%</p></td>
-<td><p>75.5762%</p></td>
-</tr>
-<tr class="row-odd"><td><p>4_channels</p></td>
-<td><p>76.4729%</p></td>
-<td><p>76.4729%</p></td>
-<td><p>76.4729%</p></td>
-</tr>
-<tr class="row-even"><td><p>8_channels, min_pcie_frames</p></td>
-<td><p>77.6599%</p></td>
-<td><p>77.3954%</p></td>
-<td><p>77.6599%</p></td>
-</tr>
-<tr class="row-odd"><td><p>buff_size_small</p></td>
-<td><p>76.2113%</p></td>
-<td><p>75.7632%</p></td>
-<td><p>76.4380%</p></td>
-</tr>
-<tr class="row-even"><td><p>buff_size_large</p></td>
-<td><p>75.3069%</p></td>
-<td><p>74.8577%</p></td>
-<td><p>755337%</p></td>
-</tr>
-</tbody>
-</table>
-<p>Delay is mesured only for the full spead test. This test allways accepts output from DUT (never drops DST RDY). The delay represents how many nanoseconds it takes for a packet to pass through the DMA Calypte.</p>
-<table class="docutils align-default" id="id4">
-<caption><span class="caption-text">delay</span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 20.0%" />
-<col style="width: 20.0%" />
-<col style="width: 20.0%" />
-<col style="width: 20.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>conf name</p></th>
-<th class="head"><p>min</p></th>
-<th class="head"><p>max</p></th>
-<th class="head"><p>average</p></th>
-<th class="head"><p>standard deviation</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>defaulit</p></td>
-<td><p>28ns</p></td>
-<td><p>500ns</p></td>
-<td><p>175ns</p></td>
-<td><p>83ns</p></td>
-</tr>
-<tr class="row-odd"><td><p>4_channels</p></td>
-<td><p>28ns</p></td>
-<td><p>816ns</p></td>
-<td><p>183ns</p></td>
-<td><p>97ns</p></td>
-</tr>
-<tr class="row-even"><td><p>8_channels, min_pcie_frames</p></td>
-<td><p>24ns</p></td>
-<td><p>944ns</p></td>
-<td><p>192ns</p></td>
-<td><p>111ns</p></td>
-</tr>
-<tr class="row-odd"><td><p>buff_size_small</p></td>
-<td><p>28ns</p></td>
-<td><p>500ns</p></td>
-<td><p>175ns</p></td>
-<td><p>83ns</p></td>
-</tr>
-<tr class="row-even"><td><p>buff_size_big</p></td>
-<td><p>28ns</p></td>
-<td><p>500ns</p></td>
-<td><p>175ns</p></td>
-<td><p>83ns</p></td>
-</tr>
-</tbody>
-</table>
+<section id="local-subcomponents">
+<h2>Local Subcomponents<a class="headerlink" href="#local-subcomponents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="comp/metadata_extractor/readme.html">Metadata Extractor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/chan_start_stop_ctrl/readme.html">Channel Start/stop control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/packet_dispatcher/readme.html">Packet Dispatcher</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/pcie_trans_buffer/readme.html">Transaction buffer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/software_manager/readme.html">Software Manager</a></li>
+</ul>
+</div>
+</section>
+<section id="general-subcomponents">
+<h2>General Subcomponents<a class="headerlink" href="#general-subcomponents" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../../../base/fifo/fifox_multi/readme.html#fifox-multi"><span class="std std-ref">FIFOX Multi</span></a></p></li>
+</ul>
 </section>
 </section>
 

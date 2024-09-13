@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: devel, <br> Git hash: 23eba90d
+                Git branch: devel, <br> Git hash: e74fc045
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -94,11 +94,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">DMA Calypte</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#provided-dma-configurations">Provided DMA configurations</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#future-expected">Future expected</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#subcomponents">Subcomponents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#local-subcomponents">Local Subcomponents</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="comp/rx/readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4"><a class="reference internal" href="comp/tx/readme.html">TX DMA Calypte</a></li>
 </ul>
@@ -138,17 +135,17 @@
              
   <section id="dma-calypte">
 <span id="id1"></span><h1>DMA Calypte<a class="headerlink" href="#dma-calypte" title="Link to this heading"></a></h1>
-<dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-dma_calypte">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">DMA_CALYPTE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-dma_calypte" title="Link to this definition"></a></dt>
-<dd><p>This core provides simple DMA functionality for both RX and TX directions.
+<p>This core provides simple DMA functionality for both RX and TX directions.
 The design was primary focused on the lowest latency possible for the
 transaction from the input of the DMA core to reach its output. The block scheme
 as well as its connection to the NDK design is provided in the following figure:</p>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../../../../_images/tx_calypte_block-dma_whole_block.svg"><img alt="../../../../_images/tx_calypte_block-dma_whole_block.svg" src="../../../../_images/tx_calypte_block-dma_whole_block.svg" style="width: 5617.0px; height: 2592.0px;" /></a>
+<a class="reference internal image-reference" href="../../../../_images/tx_calypte_block-dma_whole_block.svg"><img alt="../../../../_images/tx_calypte_block-dma_whole_block.svg" src="../../../../_images/tx_calypte_block-dma_whole_block.svg" style="width: 1000px;" /></a>
 </figure>
-<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-dma_calypte">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">DMA_CALYPTE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-dma_calypte" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
 <th class="head"><p>Type</p></th>
@@ -236,27 +233,6 @@ Defines the total width of User data stream.</p></td>
 <td><p>32</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-pcie_cc_mfb_regions"><td><p>PCIE_CC_MFB_REGIONS</p></td>
-<td><p>natural</p></td>
-<td><p>2</p></td>
-<td><p>Completer Completion MFB interface configration, allowed configurations are:
-(1,1,8,32)</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-pcie_cc_mfb_region_size"><td><p>PCIE_CC_MFB_REGION_SIZE</p></td>
-<td><p>natural</p></td>
-<td><p>1</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-pcie_cc_mfb_block_size"><td><p>PCIE_CC_MFB_BLOCK_SIZE</p></td>
-<td><p>natural</p></td>
-<td><p>8</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-pcie_cc_mfb_item_width"><td><p>PCIE_CC_MFB_ITEM_WIDTH</p></td>
-<td><p>natural</p></td>
-<td><p>32</p></td>
-<td></td>
-</tr>
 <tr class="row-odd" id="vhdl-gengeneric-dma_calypte-hdr_meta_width"><td><p>HDR_META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>24</p></td>
@@ -290,18 +266,24 @@ Maximum value: 32 (restricted by size of SDP and HDP MI register)</p></td>
 Defines width of Packet length signals.
 the maximum is 2**16 - 1</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-trbuf_reg_en"><td><p>TRBUF_REG_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enables an additional register of the transaction buffer that improves
+throughput</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>TX DMA settings</p></td>
 <td><p>=====</p></td>
 <td><p>Settings for TX direction of DMA Module</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_channels"><td><p>TX_CHANNELS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_channels"><td><p>TX_CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Total number of TX DMA Channels
 Minimum value: TX_SEL_CHANNELS*DMA_ENDPOINTS</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_ptr_width"><td><p>TX_PTR_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_ptr_width"><td><p>TX_PTR_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>14</p></td>
 <td><p>Width of Software and Hardware Descriptor Pointer
@@ -309,40 +291,40 @@ Defines width of signals used for these values in DMA Module
 Affects logic complexity
 Maximum value: 32 (restricted by size of SDP and HDP MI register)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-usr_tx_pkt_size_max"><td><p>USR_TX_PKT_SIZE_MAX</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-usr_tx_pkt_size_max"><td><p>USR_TX_PKT_SIZE_MAX</p></td>
 <td><p>natural</p></td>
 <td><p>2**12</p></td>
 <td><p>Maximum size of a User packet (in bytes)
 Defines width of Packet length signals.
 the maximum is 2**16 - 1</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>Optional settings</p></td>
 <td><p>=====</p></td>
 <td><p>Settings for testing and debugging, settings usually left unchanged
 at entity-area constants.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-dsp_cnt_width"><td><p>DSP_CNT_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-dsp_cnt_width"><td><p>DSP_CNT_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>64</p></td>
 <td><p>Width of DSP packet and byte statistics counters</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-rx_gen_en"><td><p>RX_GEN_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-rx_gen_en"><td><p>RX_GEN_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
 <td><p>Enable generation of RX/TX side of DMA Module</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_gen_en"><td><p>TX_GEN_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_gen_en"><td><p>TX_GEN_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-mi_width"><td><p>MI_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-mi_width"><td><p>MI_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>Width of MI bus</p></td>
@@ -573,46 +555,6 @@ at entity-area constants.</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_cc_mfb_data"><td><p>PCIE_CC_MFB_DATA</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS*PCIE_CC_MFB_REGION_SIZE*PCIE_CC_MFB_BLOCK_SIZE*PCIE_CC_MFB_ITEM_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Response interface for PCIe CQ requests</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_cc_mfb_meta"><td><p>PCIE_CC_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS*PCIE_CC_META_WIDTH -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_cc_mfb_sof"><td><p>PCIE_CC_MFB_SOF</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_cc_mfb_eof"><td><p>PCIE_CC_MFB_EOF</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_cc_mfb_sof_pos"><td><p>PCIE_CC_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS*max(1, log2(PCIE_CC_MFB_REGION_SIZE)) -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_cc_mfb_eof_pos"><td><p>PCIE_CC_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_CC_MFB_REGIONS*max(1, log2(PCIE_CC_MFB_REGION_SIZE*PCIE_CC_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_cc_mfb_src_rdy"><td><p>PCIE_CC_MFB_SRC_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_cc_mfb_dst_rdy"><td><p>PCIE_CC_MFB_DST_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
 <tr class="row-odd"><td><p>=====</p></td>
 <td><p>MI interface for SW access</p></td>
 <td><p>=====</p></td>
@@ -662,38 +604,29 @@ at entity-area constants.</p></td>
 </table>
 </dd></dl>
 
-<section id="provided-dma-configurations">
-<h2>Provided DMA configurations<a class="headerlink" href="#provided-dma-configurations" title="Link to this heading"></a></h2>
+<section id="supported-pcie-configurations">
+<h2>Supported PCIe Configurations<a class="headerlink" href="#supported-pcie-configurations" title="Link to this heading"></a></h2>
 <p>The design can be configured for various bus widths and PCIe IP core
 configurations.</p>
 <ol class="arabic">
-<li><p>Device: AMD/Xilinx Kintex UltraScale+</p>
-<p>PCI Express configuration: Gen3 x8</p>
+<li><p>Device: AMD Kintex UltraScale+</p>
+<p>PCI Express configuration: <strong>Gen3 x8</strong></p>
 <p>Internal bus width: 256 bits</p>
 <p>Frequency: 250 MHz</p>
 <p>Input MFB configuration: 1,4,8,8</p>
 <p>Output MFB configuration: 1,1,8,32</p>
 </li>
-</ol>
-<section id="future-expected">
-<h3>Future expected<a class="headerlink" href="#future-expected" title="Link to this heading"></a></h3>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Those configurations are not supported yet.</p>
-</div>
-<ol class="arabic">
-<li><p>Device: AMD/Xilinx Kintex UltraScale+</p>
-<p>PCI Express configuration: Gen3 x16</p>
+<li><p>Device: AMD Kintex UltraScale+, Intel Agilex F</p>
+<p>PCI Express configuration: <strong>Gen3 x16 (AMD), Gen4 x16 (Intel)</strong></p>
 <p>Internal bus width: 512 bits</p>
-<p>Frequency: 250 MHz</p>
-<p>Input MFB configuration: 2,4,8,8</p>
+<p>Frequency: 250 MHz (AMD), 400 MHz (Intel)</p>
+<p>Input MFB configuration: 1,8,8,8</p>
 <p>Output MFB configuration: 2,1,8,32</p>
 </li>
 </ol>
 </section>
-</section>
-<section id="subcomponents">
-<h2>Subcomponents<a class="headerlink" href="#subcomponents" title="Link to this heading"></a></h2>
+<section id="local-subcomponents">
+<h2>Local Subcomponents<a class="headerlink" href="#local-subcomponents" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="comp/rx/readme.html">RX DMA Calypte</a></li>
