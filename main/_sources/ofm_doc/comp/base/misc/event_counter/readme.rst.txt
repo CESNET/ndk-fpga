@@ -69,3 +69,4 @@ Here is an example of how this feature can be used to monitor traffic load on a 
 
     This setup will allow us to capture and plot the changes in the traffic on the data bus over 1 second, milisecond after milisecond.
 
+.. vhdl:autoentity:: EVENT_COUNTER_MI_WRAPPER

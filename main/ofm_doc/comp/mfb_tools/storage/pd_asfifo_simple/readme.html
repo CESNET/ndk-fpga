@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -83,6 +83,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/frame_packer/readme.html">Frame Packer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/splitter_simple/readme.html">MFB Splitter Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
@@ -290,57 +291,62 @@ that triggers the RX_AFULL signal.</p></td>
 <td><p>out</p></td>
 <td><p>Almost full flag</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-rx_status"><td><p>RX_STATUS</p></td>
+<td><p>std_logic_vector(log2(FIFO_ITEMS) downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>FIFO status</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>TX MFB interface</p></td>
 <td><p>=====</p></td>
 <td><p>Runs on TX_CLK</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_clk"><td><p>TX_CLK</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_clk"><td><p>TX_CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_reset"><td><p>TX_RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_reset"><td><p>TX_RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_data"><td><p>TX_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_data"><td><p>TX_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_meta"><td><p>TX_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_meta"><td><p>TX_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_sof"><td><p>TX_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_sof"><td><p>TX_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_eof"><td><p>TX_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_eof"><td><p>TX_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_sof_pos"><td><p>TX_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_sof_pos"><td><p>TX_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_eof_pos"><td><p>TX_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_eof_pos"><td><p>TX_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_pd_asfifo_simple-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>

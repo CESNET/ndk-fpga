@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
@@ -93,8 +93,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#provided-dma-configurations">Provided DMA configurations</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#subcomponents">Subcomponents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../../../rx/readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">TX DMA Calypte</a></li>
 </ul>
@@ -168,7 +168,7 @@ output are chosen according their usefullness later in the design.</p>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_metadata_extractor-pcie_mfb_regions"><td><p>PCIE_MFB_REGIONS</p></td>
 <td><p>natural</p></td>
-<td><p>1</p></td>
+<td><p>2</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_metadata_extractor-pcie_mfb_region_size"><td><p>PCIE_MFB_REGION_SIZE</p></td>
@@ -218,7 +218,7 @@ output are chosen according their usefullness later in the design.</p>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-pcie_mfb_meta"><td><p>PCIE_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_CQ_META_WIDTH -1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>More information about the content of this port can be found in <em>pcie_meta_pack</em></p></td>
 </tr>
@@ -257,34 +257,13 @@ output are chosen according their usefullness later in the design.</p>
 <td><p>=====</p></td>
 <td><p>Metadata are all valid with SOF except for USR_MFB_META_BYTE_EN.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_meta_is_dma_hdr"><td><p>USR_MFB_META_IS_DMA_HDR</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td><p>One bit indication if a current transaction contains DMA header.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_meta_pcie_addr"><td><p>USR_MFB_META_PCIE_ADDR</p></td>
-<td><p>std_logic_vector(62 -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Processed adress from the PCIe header of a current transaction.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_meta_chan_num"><td><p>USR_MFB_META_CHAN_NUM</p></td>
-<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Index of a channel.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_meta_byte_en"><td><p>USR_MFB_META_BYTE_EN</p></td>
-<td><p>std_logic_vector((PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8 -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Byte enable for every MFB word where frame is transmitted. Calculated from Byte Enable
-signals of the PCIe transaction.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_meta_byte_cnt"><td><p>USR_MFB_META_BYTE_CNT</p></td>
-<td><p>std_logic_vector(13 -1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Size of current transaction in bytes</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
 <td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_meta"><td><p>USR_MFB_META</p></td>
+<td><p>std_logic_vector(PCIE_MFB_REGIONS*(13 + (PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8 + log2(CHANNELS) + 62 +1) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>

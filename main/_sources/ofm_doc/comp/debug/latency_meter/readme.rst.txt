@@ -9,7 +9,7 @@ Key features
 ^^^^^^^^^^^^
 
 * Measures the number of ticks between the start and the end of a given event
-* Multiple parallel events can be measured 
+* Multiple parallel events can be measured
 * Zero latency events can be measured (start and end occurs at the same time)
 
 Component port and generics description

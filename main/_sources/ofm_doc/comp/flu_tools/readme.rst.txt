@@ -77,7 +77,7 @@ Copy-paste code blocks
     RX_SOP     : in  std_logic;
     RX_EOP     : in  std_logic;
     RX_SRC_RDY : in  std_logic;
-    RX_DST_RDY : out std_logic; 
+    RX_DST_RDY : out std_logic;
     -- Frame Link Unaligned output interface
     TX_DATA    : out std_logic_vector(DATA_WIDTH-1 downto 0);
     TX_SOP_POS : out std_logic_vector(SOP_POS_WIDTH-1 downto 0);

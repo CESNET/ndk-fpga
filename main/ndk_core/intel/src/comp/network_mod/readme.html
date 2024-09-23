@@ -35,7 +35,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -227,7 +227,12 @@
 <td><p>2</p></td>
 <td><p>max 2 (MI address space limit)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_port_speed"><td><p>ETH_PORT_SPEED</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_streams"><td><p>ETH_STREAMS</p></td>
+<td><p>natural</p></td>
+<td><p>ETH_PORTS</p></td>
+<td><p>Number ETH streams, must be equal to ETH_PORTS or ETH_PORTS*ETH_PORT_CHAN!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_port_speed"><td><p>ETH_PORT_SPEED</p></td>
 <td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
 <td><p>(others =&gt; 25)</p></td>
 <td><p>Speed per Ethernet port.
@@ -238,25 +243,30 @@ CMAC   core: 100.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_port_chan"><td><p>ETH_PORT_CHAN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_port_chan"><td><p>ETH_PORT_CHAN</p></td>
 <td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
 <td><p>(others =&gt; 4)</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-ehip_port_type"><td><p>EHIP_PORT_TYPE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-ehip_port_type"><td><p>EHIP_PORT_TYPE</p></td>
 <td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
 <td><p>(others =&gt; 0)</p></td>
-<td><p>Maximum allowed size of RX frame in bytes per Ethernet port.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_port_rx_mtu"><td><p>ETH_PORT_RX_MTU</p></td>
-<td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
-<td><p>(others =&gt; 16383)</p></td>
 <td><p>Type of used IP core default is F_Tile.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_port_tx_mtu"><td><p>ETH_PORT_TX_MTU</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_port_rx_mtu"><td><p>ETH_PORT_RX_MTU</p></td>
+<td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>(others =&gt; 16383)</p></td>
+<td><p>Maximum allowed size of RX frame in bytes per Ethernet port.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_port_tx_mtu"><td><p>ETH_PORT_TX_MTU</p></td>
 <td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
 <td><p>(others =&gt; 16383)</p></td>
 <td><p>Maximum allowed size of TX frame in bytes per Ethernet port.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_mac_bypass"><td><p>ETH_MAC_BYPASS</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>Optional option to disable MAC Lite modules. Dangerously!</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-network_mod-lanes"><td><p>LANES</p></td>
 <td><p>natural</p></td>
@@ -342,6 +352,21 @@ E_TILE core: 1,8,8,8.</p>
 <td><p>Other configuration:</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-ts_demo_en"><td><p>TS_DEMO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable timestamp-limiting demo/testing.
+Timestamps and channel IDs are sent from the APP Core to the Network module
+via a special MVB-like interface. There, before entering the IP core,
+time between packets from the same DMA channel is measured.
+The measured data is presented to the user via a couple of dedicated registers.
+WARNING: works only for a single-channel (and single-Region) designs with E-Tile (Intel)!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-tx_dma_channels"><td><p>TX_DMA_CHANNELS</p></td>
+<td><p>natural</p></td>
+<td><p>16</p></td>
+<td></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-network_mod-lane_rx_polarity"><td><p>LANE_RX_POLARITY</p></td>
 <td><p>std_logic_vector(ETH_PORTS*LANES-1 downto 0)</p></td>
@@ -546,291 +571,307 @@ PORT_ENABLED    : out std_logic_vector(ETH_PORTS-1 downto 0);</p></td>
 <td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-network_mod-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-network_mod-rx_mfb_hdr"><td><p>RX_MFB_HDR</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*ETH_TX_HDR_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*ETH_TX_HDR_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>valid with SOF</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-network_mod-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-network_mod-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-network_mod-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-network_mod-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-network_mod-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
-<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-network_mod-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
-<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-eth_tx_mvb_channel"><td><p>ETH_TX_MVB_CHANNEL</p></td>
+<td><p>std_logic_vector(ETH_PORTS*REGIONS*max(1,log2(TX_DMA_CHANNELS))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>This interface is to transmit Channel IDs and Timestamps of packets
+from the APP Core to the demo/testing logic in the Network Mod Core (E-Tile).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-eth_tx_mvb_timestamp"><td><p>ETH_TX_MVB_TIMESTAMP</p></td>
+<td><p>std_logic_vector(ETH_PORTS*REGIONS*48-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-eth_tx_mvb_vld"><td><p>ETH_TX_MVB_VLD</p></td>
+<td><p>std_logic_vector(ETH_PORTS*REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>TX interface (Packets received from Ethernet)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
-<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
-<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*ETH_RX_HDR_WIDTH-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*ETH_RX_HDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
-<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
-<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>MI interface - ETH MAC</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_clk"><td><p>MI_CLK</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_clk"><td><p>MI_CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_reset"><td><p>MI_RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_reset"><td><p>MI_RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_drdy"><td><p>MI_DRDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>MI interface - ETH PCS/PMA</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_clk_phy"><td><p>MI_CLK_PHY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_reset_phy"><td><p>MI_RESET_PHY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_dwr_phy"><td><p>MI_DWR_PHY</p></td>
-<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_addr_phy"><td><p>MI_ADDR_PHY</p></td>
-<td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_rd_phy"><td><p>MI_RD_PHY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_wr_phy"><td><p>MI_WR_PHY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_be_phy"><td><p>MI_BE_PHY</p></td>
-<td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drd_phy"><td><p>MI_DRD_PHY</p></td>
-<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_ardy_phy"><td><p>MI_ARDY_PHY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drdy_phy"><td><p>MI_DRDY_PHY</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>MI interface - ETH PMD (QSFP)</p></td>
+<td><p>MI interface - ETH PCS/PMA</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_clk_pmd"><td><p>MI_CLK_PMD</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_clk_phy"><td><p>MI_CLK_PHY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_reset_pmd"><td><p>MI_RESET_PMD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_reset_phy"><td><p>MI_RESET_PHY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_dwr_pmd"><td><p>MI_DWR_PMD</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_dwr_phy"><td><p>MI_DWR_PHY</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_addr_pmd"><td><p>MI_ADDR_PMD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_addr_phy"><td><p>MI_ADDR_PHY</p></td>
 <td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_rd_pmd"><td><p>MI_RD_PMD</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_rd_phy"><td><p>MI_RD_PHY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_wr_pmd"><td><p>MI_WR_PMD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_wr_phy"><td><p>MI_WR_PHY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_be_pmd"><td><p>MI_BE_PMD</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_be_phy"><td><p>MI_BE_PHY</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_drd_pmd"><td><p>MI_DRD_PMD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_drd_phy"><td><p>MI_DRD_PHY</p></td>
 <td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-mi_ardy_pmd"><td><p>MI_ARDY_PMD</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_ardy_phy"><td><p>MI_ARDY_PHY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_drdy_pmd"><td><p>MI_DRDY_PMD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_drdy_phy"><td><p>MI_DRDY_PHY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
+<td><p>MI interface - ETH PMD (QSFP)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_clk_pmd"><td><p>MI_CLK_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_reset_pmd"><td><p>MI_RESET_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_dwr_pmd"><td><p>MI_DWR_PMD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_addr_pmd"><td><p>MI_ADDR_PMD</p></td>
+<td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_rd_pmd"><td><p>MI_RD_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_wr_pmd"><td><p>MI_WR_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_be_pmd"><td><p>MI_BE_PMD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drd_pmd"><td><p>MI_DRD_PMD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_ardy_pmd"><td><p>MI_ARDY_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drdy_pmd"><td><p>MI_DRDY_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>TSU interface</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-tsu_clk"><td><p>TSU_CLK</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tsu_clk"><td><p>TSU_CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-tsu_rst"><td><p>TSU_RST</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tsu_rst"><td><p>TSU_RST</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-network_mod-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
 <td><p>std_logic_vector(64-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-network_mod-tsu_ts_dv"><td><p>TSU_TS_DV</p></td>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tsu_ts_dv"><td><p>TSU_TS_DV</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>

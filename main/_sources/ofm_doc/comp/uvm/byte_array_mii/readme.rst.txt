@@ -48,7 +48,7 @@ This class appends a random number (between idle_count_min and idle_count_max) o
 
 channel_align.sv
 ^^^^^^^^^^^^^^^^
-This class appends as many idle octets to the array as needed to make sure, that the next frame starts on lane 0 of any channel. In other words, it fills the remaining free bytes of the current channel with idle octets. 
+This class appends as many idle octets to the array as needed to make sure, that the next frame starts on lane 0 of any channel. In other words, it fills the remaining free bytes of the current channel with idle octets.
 
 data_buffer.sv
 ^^^^^^^^^^^^^^

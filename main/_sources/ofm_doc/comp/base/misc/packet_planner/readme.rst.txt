@@ -67,7 +67,7 @@ Here is the description of each stage:
    Otherwise the pipeline is stopped until the buffer read pointer shifts enough for the packets to fit.
 
 .. warning::
-    
+
     Because multiple packets are processed at the same time and can only be passed through Step 4 all at once, a deadlock can occur if only some of the packets fit into an empty buffer, but not all.
     To avoid this, the component has additional logic in Step 0.
     The process reading packet headers from the input FIFOX Multi checks if their one-by-one accumulated length reaches the size of one buffer word.

@@ -11,7 +11,7 @@ MI bus description
 MI bus has these 8 ports + 1 port optional divided into two channels (*the port directions in example are valid for slave MI components*):
 
 .. code-block:: vhdl
-    
+
     -- ===========================================================================
     -- Ports of MI bus request channel (master to slave):
     -- ===========================================================================

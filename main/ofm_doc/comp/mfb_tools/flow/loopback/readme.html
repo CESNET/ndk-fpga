@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -83,6 +83,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_packer/readme.html">Frame Packer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
@@ -206,7 +207,12 @@ address space is set as follows:</p>
 <td><p>When true, simple interconnect from input to output is inserted, the loopback logic is
 not applied</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_loopback-same_clk"><td><p>SAME_CLK</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_loopback-piped_ports"><td><p>PIPED_PORTS</p></td>
+<td><p>boolean</p></td>
+<td><p>FALSE</p></td>
+<td><p>Puts MFB pipes to all of the ports</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_loopback-same_clk"><td><p>SAME_CLK</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
 <td><p>When true, the MI bus and the internal logic use the same clock, otherwise the
@@ -293,42 +299,42 @@ asynchronous crossing is inserted</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_mfb_data_in"><td><p>RX_MFB_DATA_IN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_data_in"><td><p>RX_DATA_IN</p></td>
 <td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_mfb_meta_in"><td><p>RX_MFB_META_IN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_meta_in"><td><p>RX_META_IN</p></td>
 <td><p>std_logic_vector(META_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_mfb_sof_in"><td><p>RX_MFB_SOF_IN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_sof_in"><td><p>RX_SOF_IN</p></td>
 <td><p>std_logic_vector(REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_mfb_eof_in"><td><p>RX_MFB_EOF_IN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_eof_in"><td><p>RX_EOF_IN</p></td>
 <td><p>std_logic_vector(REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_mfb_sof_pos_in"><td><p>RX_MFB_SOF_POS_IN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_sof_pos_in"><td><p>RX_SOF_POS_IN</p></td>
 <td><p>std_logic_vector(REGIONS*max(1, log2(REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_mfb_eof_pos_in"><td><p>RX_MFB_EOF_POS_IN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_eof_pos_in"><td><p>RX_EOF_POS_IN</p></td>
 <td><p>std_logic_vector(REGIONS*max(1, log2(REGION_SIZE*BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_mfb_src_rdy_in"><td><p>RX_MFB_SRC_RDY_IN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_src_rdy_in"><td><p>RX_SRC_RDY_IN</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_mfb_dst_rdy_in"><td><p>RX_MFB_DST_RDY_IN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_dst_rdy_in"><td><p>RX_DST_RDY_IN</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
@@ -338,42 +344,42 @@ asynchronous crossing is inserted</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_mfb_data_out"><td><p>RX_MFB_DATA_OUT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_data_out"><td><p>RX_DATA_OUT</p></td>
 <td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_mfb_meta_out"><td><p>RX_MFB_META_OUT</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_meta_out"><td><p>RX_META_OUT</p></td>
 <td><p>std_logic_vector(META_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_mfb_sof_out"><td><p>RX_MFB_SOF_OUT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_sof_out"><td><p>RX_SOF_OUT</p></td>
 <td><p>std_logic_vector(REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_mfb_eof_out"><td><p>RX_MFB_EOF_OUT</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_eof_out"><td><p>RX_EOF_OUT</p></td>
 <td><p>std_logic_vector(REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_mfb_sof_pos_out"><td><p>RX_MFB_SOF_POS_OUT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_sof_pos_out"><td><p>RX_SOF_POS_OUT</p></td>
 <td><p>std_logic_vector(REGIONS*max(1, log2(REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_mfb_eof_pos_out"><td><p>RX_MFB_EOF_POS_OUT</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_eof_pos_out"><td><p>RX_EOF_POS_OUT</p></td>
 <td><p>std_logic_vector(REGIONS*max(1, log2(REGION_SIZE*BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_mfb_src_rdy_out"><td><p>RX_MFB_SRC_RDY_OUT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-rx_src_rdy_out"><td><p>RX_SRC_RDY_OUT</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_mfb_dst_rdy_out"><td><p>RX_MFB_DST_RDY_OUT</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-rx_dst_rdy_out"><td><p>RX_DST_RDY_OUT</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
@@ -383,42 +389,42 @@ asynchronous crossing is inserted</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_mfb_data_out"><td><p>TX_MFB_DATA_OUT</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_data_out"><td><p>TX_DATA_OUT</p></td>
 <td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_mfb_meta_out"><td><p>TX_MFB_META_OUT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_meta_out"><td><p>TX_META_OUT</p></td>
 <td><p>std_logic_vector(META_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_mfb_sof_out"><td><p>TX_MFB_SOF_OUT</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_sof_out"><td><p>TX_SOF_OUT</p></td>
 <td><p>std_logic_vector(REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_mfb_eof_out"><td><p>TX_MFB_EOF_OUT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_eof_out"><td><p>TX_EOF_OUT</p></td>
 <td><p>std_logic_vector(REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_mfb_sof_pos_out"><td><p>TX_MFB_SOF_POS_OUT</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_sof_pos_out"><td><p>TX_SOF_POS_OUT</p></td>
 <td><p>std_logic_vector(REGIONS*max(1, log2(REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_mfb_eof_pos_out"><td><p>TX_MFB_EOF_POS_OUT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_eof_pos_out"><td><p>TX_EOF_POS_OUT</p></td>
 <td><p>std_logic_vector(REGIONS*max(1, log2(REGION_SIZE*BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_mfb_src_rdy_out"><td><p>TX_MFB_SRC_RDY_OUT</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_src_rdy_out"><td><p>TX_SRC_RDY_OUT</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_mfb_dst_rdy_out"><td><p>TX_MFB_DST_RDY_OUT</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_dst_rdy_out"><td><p>TX_DST_RDY_OUT</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
@@ -428,42 +434,42 @@ asynchronous crossing is inserted</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_mfb_data_in"><td><p>TX_MFB_DATA_IN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_data_in"><td><p>TX_DATA_IN</p></td>
 <td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_mfb_meta_in"><td><p>TX_MFB_META_IN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_meta_in"><td><p>TX_META_IN</p></td>
 <td><p>std_logic_vector(META_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_mfb_sof_in"><td><p>TX_MFB_SOF_IN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_sof_in"><td><p>TX_SOF_IN</p></td>
 <td><p>std_logic_vector(REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_mfb_eof_in"><td><p>TX_MFB_EOF_IN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_eof_in"><td><p>TX_EOF_IN</p></td>
 <td><p>std_logic_vector(REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_mfb_sof_pos_in"><td><p>TX_MFB_SOF_POS_IN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_sof_pos_in"><td><p>TX_SOF_POS_IN</p></td>
 <td><p>std_logic_vector(REGIONS*max(1, log2(REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_mfb_eof_pos_in"><td><p>TX_MFB_EOF_POS_IN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_eof_pos_in"><td><p>TX_EOF_POS_IN</p></td>
 <td><p>std_logic_vector(REGIONS*max(1, log2(REGION_SIZE*BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_mfb_src_rdy_in"><td><p>TX_MFB_SRC_RDY_IN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_loopback-tx_src_rdy_in"><td><p>TX_SRC_RDY_IN</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_mfb_dst_rdy_in"><td><p>TX_MFB_DST_RDY_IN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_loopback-tx_dst_rdy_in"><td><p>TX_DST_RDY_IN</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>

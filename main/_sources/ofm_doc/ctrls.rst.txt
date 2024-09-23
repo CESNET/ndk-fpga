@@ -8,7 +8,7 @@ The TSU modules are typically located in the ``comp/tsu/`` directory in the OFM 
 .. toctree::
    :maxdepth: 1
    :caption: Content:
-   
+
    comp/ctrls/sdm_client/readme
    comp/tsu/tsu_gen/readme
 

@@ -34,10 +34,14 @@ Debugging - HW part
     - debug logic can alternatively be added to the design via corresponding IP core instantiations directly in source code
     - without debug logic present in the design, JTAG chain ends up being broken (no debug logic to communicate with)
 
-3. build design
-    - with JTAG_OP_CLIENT component and debug logic added to it
+3. enable JTAG_OP_CLIENT
+    - the component is disabled by default
+    - to enable it, add ``set VIRTUAL_DEBUG_ENABLE true`` to the app_conf.tcl file
 
-4. configure device
+4. build design
+    - with JTAG_OP_CLIENT component (enabled) and debug logic added
+
+5. configure device
     - upload the design to the target device (NFB card)
 
 
@@ -45,19 +49,37 @@ Debugging - SW part
 ^^^^^^^^^^^^^^^^^^^
 
 1. install the etherlink rpm package
-    - download the package from the CESNET package management site (TBD) or
-    - clone *hak-rpm-pkg* branch from `the app github repository`_ and execute the commands below
+    - download the prebuilt rpm package (via the CESNET Copr or from `the app github repository`_ releases) or
     - alternatively, build the app directly from source code via the commands in README.md file
+    - (to build the package manually, clone *hak-rpm-pkg* branch from `the app github repository`_ and execute the commands below)
 
 .. code-block:: bash
 
+    # install the prebuilt rpm via Copr
+    sudo dnf copr enable @CESNET/nfb-framework
+    sudo dnf install remote-debug-for-intel-fpga
+
+.. code-block:: bash
+
+    # build the rpm manually
+    git clone https://github.com/CESNET/remote-debug-for-intel-fpga
     cd remote-debug-for-intel-fpga
+    git switch hak-rpm-pkg
     cmake . -Bbuild && cd build
     cpack
 
-    # install the package (with superuser privileges)
+    # install the package (built or downloaded)
     sudo su
     rpm -i <rpm package name>
+
+.. code-block:: bash
+
+    # build the app from source code (app will be installed to 'usr/local/bin')
+    git clone https://github.com/CESNET/remote-debug-for-intel-fpga
+    cd remote-debug-for-intel-fpga
+    cmake . -Bbuild && cd build
+    make
+    sudo make install
 
 2. run ``jtag_op_mgmt.py`` script with sudo privileges on the machine hosting the target device
     - the script is located under ``<ofm_path>/comp/debug/jtag_op_client/sw/jtag_op_mgmt.py``
@@ -68,7 +90,8 @@ Debugging - SW part
 
 .. note::
     Only one running instance of the application is supported in the current implementation.
-    Be sure to unregister the JTAG connection after you are done with debugging (more detailed info is given by the script after it is run).
+    You can list open JTAG connections by issuing ``jtagconfig``.
+    Be sure to unregister the JTAG connection after you are done with debugging (run ``jtagconfig --remove <#>`` where <#> is the JTAG-over-protocol option number).
 
 
 Debugging - DEBUG part

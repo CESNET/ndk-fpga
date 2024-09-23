@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -83,6 +83,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/frame_packer/readme.html">Frame Packer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/splitter_simple/readme.html">MFB Splitter Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
@@ -196,7 +197,16 @@ options (like frame length) accessible over the MI.</p>
 <p>Distribution of Ethernet frames to channels</p>
 <ul class="simple">
 <li><p>incr       : RR increment. 0 = round-robin disable (stay on zero channel). Default 0x01</p></li>
-<li><p>CONFIG     : CONFIG[0] = channel reverse enable, others bit are reserved. Default 0x00</p></li>
+<li><dl class="simple">
+<dt>CONFIG<span class="classifier">CONFIG[0] = channel reverse enable, others bit are reserved. Default 0x00</span></dt><dd><dl class="simple">
+<dt>: CONFIG[1] = Experimental: Enables burst mode in which the amount of burst_size</dt><dd><p>packets are sent and the transmission is stopped until next cycle of enable of the
+generator occurs (that is burst is sent -&gt; disable -&gt; enable).
+NOTE: Does not work with USE_PACP_ARCH set to true</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
 <li><p>burst_size : number of packets to begenerated before channel is changed</p></li>
 <li><p>ch_min     : the lowest channel number for round-robin distribution. Default 0x0000</p></li>
 <li><p>ch_max     : the highest channel number for round-robin distribution. Default 0xFFFF</p></li>

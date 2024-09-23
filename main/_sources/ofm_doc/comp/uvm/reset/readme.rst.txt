@@ -1,4 +1,4 @@
-.. readme.rst: Documentation of reset agent 
+.. readme.rst: Documentation of reset agent
 .. Copyright (C) 2021 CESNET z. s. p. o.
 .. Author(s): Radek Iša   <isa@cesnet.cz>
 .. Author(s): Tomáš Beneš <xbenes55@stud.fit.vutbr.cz>

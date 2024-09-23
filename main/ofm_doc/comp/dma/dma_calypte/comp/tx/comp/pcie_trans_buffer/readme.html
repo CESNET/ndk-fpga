@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
@@ -93,8 +93,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#provided-dma-configurations">Provided DMA configurations</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#subcomponents">Subcomponents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../../../rx/readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">TX DMA Calypte</a></li>
 </ul>
@@ -170,7 +170,7 @@ for each port.</p>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_pcie_trans_buffer-mfb_regions"><td><p>MFB_REGIONS</p></td>
 <td><p>natural</p></td>
-<td><p>1</p></td>
+<td><p>2</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_pcie_trans_buffer-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
@@ -225,7 +225,7 @@ for each port.</p>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-pcie_mfb_meta"><td><p>PCIE_MFB_META</p></td>
-<td><p>std_logic_vector((MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -234,29 +234,9 @@ for each port.</p>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-pcie_mfb_eof"><td><p>PCIE_MFB_EOF</p></td>
-<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-pcie_mfb_sof_pos"><td><p>PCIE_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-pcie_mfb_eof_pos"><td><p>PCIE_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-pcie_mfb_src_rdy"><td><p>PCIE_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-pcie_mfb_src_rdy"><td><p>PCIE_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-pcie_mfb_dst_rdy"><td><p>PCIE_MFB_DST_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
@@ -267,7 +247,7 @@ for each port.</p>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_chan"><td><p>RD_CHAN</p></td>
 <td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Note: This will be shared for both regions</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_data"><td><p>RD_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
@@ -282,6 +262,11 @@ for each port.</p>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_en"><td><p>RD_EN</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_data_vld"><td><p>RD_DATA_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
 <td></td>
 </tr>
 </tbody>

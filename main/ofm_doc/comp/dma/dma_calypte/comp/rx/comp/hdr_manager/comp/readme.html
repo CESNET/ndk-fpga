@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../../search.html" method="get">
@@ -93,8 +93,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../../readme.html">DMA Calypte</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../../../../../readme.html#provided-dma-configurations">Provided DMA configurations</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../../../../../readme.html#subcomponents">Subcomponents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="../../../readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../tx/readme.html">TX DMA Calypte</a></li>
 </ul>
@@ -249,81 +249,86 @@ is round up INPUT_SIZE/BLOCK_SIZE</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>RESET ADDRESS MANAGER</p></td>
+<td><p>Incoming start request (for the reset of the ADDR_MANAGER)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-channel_reset"><td><p>CHANNEL_RESET</p></td>
-<td><p>std_logic_vector(CHANNELS-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-start_req_vld"><td><p>START_REQ_VLD</p></td>
+<td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td><p>if one bit of this signal is set, the coresponding channel’s HW address is reset</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-start_req_channel"><td><p>START_REQ_CHANNEL</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>REQUEST ADDRES FOR CHANNEL (Metadata instructions)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-input_disc"><td><p>INPUT_DISC</p></td>
+<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-input_disc"><td><p>INPUT_DISC</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Requested channel</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-input_channel"><td><p>INPUT_CHANNEL</p></td>
+<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-input_channel"><td><p>INPUT_CHANNEL</p></td>
 <td><p>std_logic_vector(log2(CHANNELS)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-input_size"><td><p>INPUT_SIZE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-input_size"><td><p>INPUT_SIZE</p></td>
 <td><p>std_logic_vector(log2(PKT_MTU+1) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-input_src_rdy"><td><p>INPUT_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-input_src_rdy"><td><p>INPUT_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-input_dst_rdy"><td><p>INPUT_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-input_dst_rdy"><td><p>INPUT_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>RESPONSE ADDRES (To be inserted to the PCIex header)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-out_addr"><td><p>OUT_ADDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-out_addr"><td><p>OUT_ADDR</p></td>
 <td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Address to RAM</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-out_offset"><td><p>OUT_OFFSET</p></td>
+<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-out_offset"><td><p>OUT_OFFSET</p></td>
 <td><p>std_logic_vector(POINTER_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-out_addr_vld"><td><p>OUT_ADDR_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-out_addr_vld"><td><p>OUT_ADDR_VLD</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-out_disc"><td><p>OUT_DISC</p></td>
+<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-out_disc"><td><p>OUT_DISC</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-out_last"><td><p>OUT_LAST</p></td>
+<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-out_last"><td><p>OUT_LAST</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-out_first"><td><p>OUT_FIRST</p></td>
+<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-out_first"><td><p>OUT_FIRST</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-pcie_addr_gen-out_dst_rdy"><td><p>OUT_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-pcie_addr_gen-out_dst_rdy"><td><p>OUT_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>this signal have two clock delay. If you want to stop receiving new</p></td>

@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -57,6 +57,7 @@
 <li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intel/readme.html">NDK architecture</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration files and parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#build-system-files">Build system files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parametrizing-ndk-core-design">Parametrizing NDK-CORE design</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#file-description">File description</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#core-conf-tcl">core_conf.tcl</a></li>
@@ -168,6 +169,95 @@
 configuration has three levels: the CORE, the card, and the user application. A
 detailed description of each level is below (the abreviated version is provided
 via the <a class="reference internal" href="#ndk-conf-tldr"><span class="std std-ref">following link</span></a>).</p>
+<section id="build-system-files">
+<span id="ndk-build-files"></span><h2>Build system files<a class="headerlink" href="#build-system-files" title="Link to this heading"></a></h2>
+<p>The following table provides an overview of files used for building a project/design.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Path <code class="docutils literal notranslate"><span class="pre">build/card</span></code> reduced to build, <code class="docutils literal notranslate"><span class="pre">ndk/core/intel</span></code> reduced to <code class="docutils literal notranslate"><span class="pre">core</span></code>, <code class="docutils literal notranslate"><span class="pre">ndk/cards/vendor/dev</span></code> reduced to card.
+The placeholder {TOOL} refers to the tool-specific filename, for example: Vivado, Quartus.</p>
+</div>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text">Configuration files</span><a class="headerlink" href="#id5" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Group</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>build/app_conf.tcl</p></td>
+<td><p>Configuration</p></td>
+<td><p>user configuration of a project for a specific card</p></td>
+</tr>
+<tr class="row-odd"><td><p>build/{TOOL}.tcl</p></td>
+<td><p>Build</p></td>
+<td><p>TCL entry point</p></td>
+</tr>
+<tr class="row-even"><td><p>build/Makefile</p></td>
+<td><p>Makefile</p></td>
+<td><p>entry point for <cite>make</cite> to build a project for a specific card; some parameters can be specified here</p></td>
+</tr>
+<tr class="row-odd"><td><p>card/config/card_conf.tcl</p></td>
+<td><p>Configuration</p></td>
+<td><p>user-configurable parameters for the card</p></td>
+</tr>
+<tr class="row-even"><td><p>card/config/card_const.tcl</p></td>
+<td><p>Configuration</p></td>
+<td><p>parameters for the core, constant for the card</p></td>
+</tr>
+<tr class="row-odd"><td><p>card/src/Modules.tcl</p></td>
+<td><p>Build</p></td>
+<td><p>IP cores and card-specific modules</p></td>
+</tr>
+<tr class="row-even"><td><p>card/src/{TOOL}.inc.tcl</p></td>
+<td><p>Build</p></td>
+<td><p>configuration of the synthesis tool and constraints</p></td>
+</tr>
+<tr class="row-odd"><td><p>card/src/card.mk</p></td>
+<td><p>Makefile</p></td>
+<td><p>environment variables passed to TCL</p></td>
+</tr>
+<tr class="row-even"><td><p>core/config/core_conf.tcl</p></td>
+<td><p>Configuration</p></td>
+<td><p>user-configurable parameters for the core</p></td>
+</tr>
+<tr class="row-odd"><td><p>core/config/core_const.tcl</p></td>
+<td><p>Configuration</p></td>
+<td><p>constant parameters for the core (checks, etc.)</p></td>
+</tr>
+<tr class="row-even"><td><p>core/config/core_bootstrap.tcl</p></td>
+<td><p>Configuration</p></td>
+<td><p>the main configuration script, loads of all config files</p></td>
+</tr>
+<tr class="row-odd"><td><p>core/config/core_func.tcl</p></td>
+<td><p>Configuration</p></td>
+<td><p>helper procedures used in _conf.tcl (e.g. ParsePcieConf)</p></td>
+</tr>
+<tr class="row-even"><td><p>core/Modules.tcl</p></td>
+<td><p>Build</p></td>
+<td><p>Top-level components and modules common for all designs (TSU, DMA, etc.)</p></td>
+</tr>
+<tr class="row-odd"><td><p>core/{TOOL}.inc.tcl</p></td>
+<td><p>Build</p></td>
+<td><p>minimalistic, sources common.inc.tcl</p></td>
+</tr>
+<tr class="row-even"><td><p>core/common.inc.tcl</p></td>
+<td><p>Build</p></td>
+<td><p>generates DT + vhdl pkg, sets ARCHGRP for Modules.tcl</p></td>
+</tr>
+<tr class="row-odd"><td><p>core/core.mk</p></td>
+<td><p>Makefile</p></td>
+<td><p>minimalistic</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="parametrizing-ndk-core-design">
 <span id="ndk-core-configuration"></span><h2>Parametrizing NDK-CORE design<a class="headerlink" href="#parametrizing-ndk-core-design" title="Link to this heading"></a></h2>
 <p>The files in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/config</span></code> directory and the
@@ -177,10 +267,10 @@ configuration parameter files has its own hierarchy, which is shown in the
 <a class="reference internal" href="#fig-const-hierarchy"><span class="std std-ref">Hierarchy diagram</span></a>. This section describes the
 configuration files used in the case of NDK-CORE design. For the description of
 the application and card-specific configuration, see following sections on this page.</p>
-<figure class="align-center" id="id5">
+<figure class="align-center" id="id6">
 <span id="fig-const-hierarchy"></span><a class="reference internal image-reference" href="../../_images/const_hierarchy.svg"><img alt="../../_images/const_hierarchy.svg" src="../../_images/const_hierarchy.svg" style="width: 463.04999999999995px; height: 458.4px;" /></a>
 <figcaption>
-<p><span class="caption-text">Hierarchy diagram</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+<p><span class="caption-text">Hierarchy diagram</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
 <div class="legend">
 <p>Numbers show the order in which these parameter files are sourced. Sourcing
 takes place in the <cite>core_boostrap.tcl</cite> file.</p>

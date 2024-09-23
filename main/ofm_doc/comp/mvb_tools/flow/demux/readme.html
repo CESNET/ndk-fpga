@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -93,6 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../shakedown/readme.html">MVB Shakedown</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../operation/readme.html">MVB Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mvb2mfb/readme.html">MVB2MFB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/lookup_table/readme.html">MVB Lookup Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MVB FIFOX</a></li>
@@ -164,22 +165,23 @@ have DST_RDY asserted. Ports, which will not receive any item, do not have to ha
 <td><p>2</p></td>
 <td><p>TX interfaces count</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-gen_mvb_demux-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-gen_mvb_demux-version"><td><p>VERSION</p></td>
 <td><p>string</p></td>
-<td><p>“7SERIES”</p></td>
+<td><p>“register”</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-gen_mvb_demux-data_demux"><td><p>DATA_DEMUX</p></td>
+<tr class="row-even" id="vhdl-gengeneric-gen_mvb_demux-output_reg"><td><p>OUTPUT_REG</p></td>
 <td><p>boolean</p></td>
 <td><p>False</p></td>
-<td><p>When False, all RX_DATA are copied to TX_DATA signal,
-when True, RX_DATA are demultiplexed and other items
-are zeroed.</p></td>
+<td></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-gen_mvb_demux-input_reg"><td><p>INPUT_REG</p></td>
 <td><p>boolean</p></td>
-<td><p>True</p></td>
-<td></td>
+<td><p>false</p></td>
+<td><p>Input register. This component will
+break, when connected to output of MVB_MERGE,
+since it can RX_VLD signal before transmission.
+In that case, enable this input register.</p></td>
 </tr>
 </tbody>
 </table>

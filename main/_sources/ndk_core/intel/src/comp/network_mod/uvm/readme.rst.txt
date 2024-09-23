@@ -14,15 +14,6 @@ BUFFER
 Verification Plan
 ^^^^^^^^^^^^^^^^^
 
-..  csv-table:: Verification Plan
-    :header: "ID", "Description", "Requirenment level", "Test", "Checked by(assert, F cov, C cov)", "Tested(status)"
-    :delim: ;
-    :widths: 5 150 20 20 20 20
-
-    1; "Description 1"; ""; ""; ""; "NO";
-    2; "Description 2"; ""; ""; ""; "NO";
-
-
 .. list-table:: Verification Plan
    :header-rows: 1
 
@@ -37,11 +28,9 @@ Verification Plan
      -
      -
      -
-     -
      - no
    * - 2
      - Description 1
-     -
      -
      -
      -

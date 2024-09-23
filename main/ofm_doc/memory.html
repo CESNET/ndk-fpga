@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -84,6 +84,7 @@
 <li class="toctree-l3"><a class="reference internal" href="comp/base/mem/sdp_bram/readme.html">Simple dual-port BRAM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comp/base/mem/sdp_bram/readme.html#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comp/base/mem/mp_bram/readme.html">Multi-port BRAM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/lvt_mem/readme.html">Live value table memory</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
@@ -152,6 +153,7 @@ Located in the same folder as DP_BMEM_V7. <code class="docutils literal notransl
 It supports the byte enable feature!</p>
 <p><strong>MP_BRAM</strong> - Generic multiported single clock BRAM memory based on <strong>SDP_BRAM</strong>. Currently supports only 1 write port. Amount of read ports is not restricted. Also supports byte enable
 feature.</p>
+<p><strong>LVT_MEM</strong> - Multiported memory implemented suitable for shallow memories, supports generic amount of write/read ports and has customizable read during write behaviour.</p>
 <p><strong>SDP_BRAM_BEHAV</strong> - Another behavioral implementation of dual clock BRAM memory with one read port and one write port.
 Located in the same folder as SDP_BRAM. <code class="docutils literal notranslate"><span class="pre">OBSOLETE,</span> <span class="pre">use</span> <span class="pre">DP_BRAM</span> <span class="pre">or</span> <span class="pre">DP_BRAM_XILINX!</span></code></p>
 <p><strong>SDP_BRAM_XILINX</strong> - Structural implementation of dual clock BRAM memory based on Xilinx specific primitives with one read port and one write port. Only for Xilinx FPGAs.</p>

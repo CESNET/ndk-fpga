@@ -17,8 +17,8 @@ Asynchronous modules
 .. toctree::
    :maxdepth: 1
    :caption: Detailed documentation:
-          
-.. comp/base/async/open_loop/index           
+
+.. comp/base/async/open_loop/index
 .. Add more references here...
 
 References

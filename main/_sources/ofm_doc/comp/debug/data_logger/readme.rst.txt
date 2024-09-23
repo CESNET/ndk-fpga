@@ -9,25 +9,25 @@ Simple usage can be seen in :ref:`MEM_LOGGER<mem_logger>` component.
 Key features
 ^^^^^^^^^^^^
 
-* Counter interface 
+* Counter interface
 
-    * Each counter interface contains a counter that can count 
+    * Each counter interface contains a counter that can count
       the number of occurrences of a specific event, the number of clock cycles of a event, ...
     * The number of used counter interfaces is set via generic parameters
     * Width is common for every counter and can be set to any value (even larger than MI bus width)
     * If the counter should overflow, it will stay at the maximum possible value
     * Custom increment value can be used (default: 1)
-    * Counter submit signal can be used to submit (save) counter value at a specific time 
+    * Counter submit signal can be used to submit (save) counter value at a specific time
       (for example if you can't determine when the event ends)
-    
+
 * Value interface
-  
-    * Each value interface can calculate: 
-  
+
+    * Each value interface can calculate:
+
         * Minimal and maximal occurred value
         * Sum and count of all occurred values (SW can then calculate average value)
         * Histogram with custom box count and box with (see :ref:`HISTOGRAMER<histogramer>`)
-  
+
     * The number of used value interfaces is set via generic parameters
     * Each value interface can have different width
     * Each statistic can be enabled or disabled separately for each interface (to reduce resources)
@@ -36,7 +36,7 @@ Key features
 
     * Can be used for custom configuration or status flags and values
     * There is a control output interface and a control input interface
-  
+
         * CTRLO = output from `DATA_LOGGER`
         * CTRLI = input to `DATA_LOGGER`
 
@@ -66,14 +66,14 @@ Instance template (simple usage)
 .. code-block::
 
     data_logger_i : entity work.DATA_LOGGER
-    generic map (    
+    generic map (
         MI_DATA_WIDTH       => MI_DATA_WIDTH  ,
         MI_ADDR_WIDTH       => MI_ADDR_WIDTH  ,
 
         CNTER_CNT           => CNTER_CNT      ,
         CNTER_WIDTH         => CNTER_WIDTH
     )
-    port map (    
+    port map (
         CLK                 => CLK     ,
         RST                 => RST     ,
 
@@ -99,7 +99,7 @@ Instance template (full usage)
 .. code-block::
 
     data_logger_i : entity work.DATA_LOGGER
-    generic map (    
+    generic map (
         MI_DATA_WIDTH       => MI_DATA_WIDTH  ,
         MI_ADDR_WIDTH       => MI_ADDR_WIDTH  ,
 
@@ -111,17 +111,17 @@ Instance template (full usage)
         CNTER_WIDTH         => CNTER_WIDTH    ,
         VALUE_WIDTH         => VALUE_WIDTH    ,
 
-        MIN_EN              => MIN_EN         ,  
-        MAX_EN              => MAX_EN         ,  
-        SUM_EN              => SUM_EN         ,  
-        HIST_EN             => HIST_EN        ,  
+        MIN_EN              => MIN_EN         ,
+        MAX_EN              => MAX_EN         ,
+        SUM_EN              => SUM_EN         ,
+        HIST_EN             => HIST_EN        ,
 
         SUM_EXTRA_WIDTH     => SUM_EXTRA_WIDTH,
-        HIST_BOX_CNT        => HIST_BOX_CNT   ,  
+        HIST_BOX_CNT        => HIST_BOX_CNT   ,
         HIST_BOX_WIDTH      => HIST_BOX_WIDTH ,
         CTRLO_DEFAULT       => CTRLO_DEFAULT
     )
-    port map (    
+    port map (
         CLK                 => CLK     ,
         RST                 => RST     ,
         RST_DONE            => rst_done,
@@ -177,8 +177,8 @@ Folder ``data_logger/sw/`` contains ``Python3`` package that provides:
 * Modules for ``DATA_LOGGER`` wraps like ``MEM_LOGGER``
 * Simple graph generator based on `matplotlib` library
 * Simple PDF / Markdown report generator
-* Common tools 
-  
+* Common tools
+
 Package can be installed using this command:
 
 * You also need to install ``python nfb`` package
@@ -196,7 +196,7 @@ MI address space
 
     0x0000: CTRL REG
             0: sw rst
-            1: rst done  
+            1: rst done
     0x0004: STATS REG
     0x0008: INDEX REG
     0x000C: SLICE REG
@@ -215,12 +215,12 @@ MI address space
     * ``5`` ... ``CNTER_WIDTH``
     * ``6`` ... ``VALUE_WIDTH (i)``
     * ``7`` ... ``VALUE_ENs (i)``
-  
+
         * ``0``.... ``MIN_EN``
         * ``1``.... ``MAX_EN``
         * ``2``.... ``SUM_EN``
         * ``3``.... ``HIST_EN``
-  
+
     * ``8`` ... ``SUM_EXTRA_WIDTH (i)``
     * ``9`` ... ``HIST_BOX_CNT (i)``
     * ``10``... ``HIST_BOX_WIDTH (i)``
@@ -234,8 +234,8 @@ MI address space
     * ``15``... ``value max  (i)``
     * ``16``... ``value sum  (i)``
     * ``17``... ``value hist (i)``
-  
+
 * ``INDEX REG``... selects value for multi-value statistics `(i)`
 * ``SLICE REG``... selects MI width slice for statistics with larger data width
-* ``HIST REG``... selects histogram box (write to this register will initiate read request to `HISTOGRAMMER`) 
+* ``HIST REG``... selects histogram box (write to this register will initiate read request to `HISTOGRAMMER`)
 * ``VALUE REG``... register with the requested value

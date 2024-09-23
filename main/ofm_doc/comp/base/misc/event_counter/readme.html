@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -193,6 +193,106 @@ Since the time quantum is now 1 ms, we only need 1 000 items to be stored in the
 The size of the FIFO can therefore be set to <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">024</span></code> items.</p>
 <p>This setup will allow us to capture and plot the changes in the traffic on the data bus over 1 second, milisecond after milisecond.</p>
 </div></blockquote>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-event_counter_mi_wrapper">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">EVENT_COUNTER_MI_WRAPPER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-event_counter_mi_wrapper" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-event_counter_mi_wrapper-max_interval_cycles"><td><p>MAX_INTERVAL_CYCLES</p></td>
+<td><p>natural</p></td>
+<td><p>2**12-1</p></td>
+<td><p>Maximum number of CLK cycles in one counting interval
+Automatically rounded to the closes higher (2**N-1).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-event_counter_mi_wrapper-max_concurrent_events"><td><p>MAX_CONCURRENT_EVENTS</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Maximum number of event occurences in one CLK cycle
+Automatically rounded to the closes higher (2**N-1).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-event_counter_mi_wrapper-capture_en"><td><p>CAPTURE_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable FIFO for capturing sequence of event intervals</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-event_counter_mi_wrapper-capture_fifo_items"><td><p>CAPTURE_FIFO_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>1024</p></td>
+<td><p>Size of capturing FIFO</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-event_counter_mi_wrapper-mi_width"><td><p>MI_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>MI interface width</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-event_counter_mi_wrapper-mi_interval_addr"><td><p>MI_INTERVAL_ADDR</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(to_unsigned(0,MI_WIDTH))</p></td>
+<td><p>MI address for Interval settings</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-event_counter_mi_wrapper-mi_events_addr"><td><p>MI_EVENTS_ADDR</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(to_unsigned(1,MI_WIDTH))</p></td>
+<td><p>MI address for Events Counter register</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-event_counter_mi_wrapper-mi_cpt_en_addr"><td><p>MI_CPT_EN_ADDR</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(to_unsigned(2,MI_WIDTH))</p></td>
+<td><p>MI address for Events Capture enable register</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-event_counter_mi_wrapper-mi_cpt_rd_addr"><td><p>MI_CPT_RD_ADDR</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(to_unsigned(3,MI_WIDTH))</p></td>
+<td><p>MI address for Events Capture FIFO output read</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-event_counter_mi_wrapper-mi_addr_mask"><td><p>MI_ADDR_MASK</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
+<td><p>(others =&gt; ‘1’)</p></td>
+<td><p>MI address mask
+(has ‘1’ on bits, which are relevant in MI addresses)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-event_counter_mi_wrapper-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>Target device</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-event_counter_mi_wrapper-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-event_counter_mi_wrapper-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </section>
 </section>
 

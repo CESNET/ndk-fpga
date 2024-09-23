@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
@@ -93,8 +93,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#provided-dma-configurations">Provided DMA configurations</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#subcomponents">Subcomponents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tx/readme.html">TX DMA Calypte</a></li>
 </ul>
@@ -366,71 +366,86 @@ implementation according to the FPGA used. Supported values are:</p>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>PCIE HEADER (MVB OUTPUT)</p></td>
+<td><p>PCIE HEADERs (MVB OUTPUT)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-pcie_hdr_size"><td><p>PCIE_HDR_SIZE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-dma_pcie_hdr_size"><td><p>DMA_PCIE_HDR_SIZE</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td><p>PCIE header size, the values can be:</p>
+<td><p>PCIE header size, the values can be (also applies for DATA_PCIE_HDR_SIZE):</p>
 <ul class="simple">
-<li><p>0 =&gt; PCIE_HDR(3*32-1 downto 0) bits are valid,</p></li>
-<li><p>1 =&gt; PCIE_HDR(4*32-1 downto 0) bits are valid</p></li>
+<li><p>0 =&gt; DMA_PCIE_HDR(3*32-1 downto 0) bits are valid,</p></li>
+<li><p>1 =&gt; DMA_PCIE_HDR(4*32-1 downto 0) bits are valid</p></li>
 </ul>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-pcie_hdr"><td><p>PCIE_HDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-dma_pcie_hdr"><td><p>DMA_PCIE_HDR</p></td>
 <td><p>std_logic_vector(4*32-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>PCIE header content, can be vendor specific</p></td>
+<td><p>PCIE header content (vendor specific)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-pcie_hdr_vld"><td><p>PCIE_HDR_VLD</p></td>
-<td><p>std_logic_vector(0 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-pcie_hdr_src_rdy_data_tran"><td><p>PCIE_HDR_SRC_RDY_DATA_TRAN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-dma_pcie_hdr_src_rdy"><td><p>DMA_PCIE_HDR_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-pcie_hdr_src_rdy_dma_hdr"><td><p>PCIE_HDR_SRC_RDY_DMA_HDR</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-pcie_hdr_dst_rdy"><td><p>PCIE_HDR_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-dma_pcie_hdr_dst_rdy"><td><p>DMA_PCIE_HDR_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-dma_channel"><td><p>DMA_CHANNEL</p></td>
-<td><p>std_logic_vector(log2(CHANNELS)-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Channel to which a packet is sent</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-dma_discard"><td><p>DMA_DISCARD</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td><p>Signals if the current packet should be discarded</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-dma_hdr"><td><p>DMA_HDR</p></td>
-<td><p>std_logic_vector(64-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>DMA header content</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-dma_hdr_vld"><td><p>DMA_HDR_VLD</p></td>
-<td><p>std_logic_vector(0 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>This is allways ‘1’</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-dma_hdr_src_rdy"><td><p>DMA_HDR_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-data_pcie_hdr_size"><td><p>DATA_PCIE_HDR_SIZE</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-dma_hdr_dst_rdy"><td><p>DMA_HDR_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-data_pcie_hdr"><td><p>DATA_PCIE_HDR</p></td>
+<td><p>std_logic_vector(4*32-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-data_pcie_hdr_src_rdy"><td><p>DATA_PCIE_HDR_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-data_pcie_hdr_dst_rdy"><td><p>DATA_PCIE_HDR_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>PCIE HEADER (MVB OUTPUT)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-dma_channel"><td><p>DMA_CHANNEL</p></td>
+<td><p>std_logic_vector(log2(CHANNELS)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Channel to which a packet is sent</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-dma_discard"><td><p>DMA_DISCARD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Signals if the current packet should be discarded</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-dma_hdr"><td><p>DMA_HDR</p></td>
+<td><p>std_logic_vector(64-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA header content</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-dma_hdr_vld"><td><p>DMA_HDR_VLD</p></td>
+<td><p>std_logic_vector(0 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>This is allways ‘1’</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_hdr_manager-dma_hdr_src_rdy"><td><p>DMA_HDR_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_hdr_manager-dma_hdr_dst_rdy"><td><p>DMA_HDR_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>

@@ -50,7 +50,7 @@ monitoring, security and network infrastructure configuration.
 
 .. Indices and tables
 .. ******************
-.. 
+..
 .. * :ref:`genindex`
 .. * :ref:`modindex`
 .. * :ref:`search`

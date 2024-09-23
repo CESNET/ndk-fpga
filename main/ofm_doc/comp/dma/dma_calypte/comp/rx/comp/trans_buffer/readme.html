@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../../../../search.html" method="get">
@@ -93,8 +93,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#provided-dma-configurations">Provided DMA configurations</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#subcomponents">Subcomponents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tx/readme.html">TX DMA Calypte</a></li>
 </ul>
@@ -155,24 +155,29 @@
 <td><p>128</p></td>
 <td><p>The amount of data which needs to be buffered in bytes</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_dma_trans_buffer-reg_out_en"><td><p>REG_OUT_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>TRUE</p></td>
+<td><p>Adds a skid buffer on the output</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>MFB bus parameters</p></td>
 <td><p>=====</p></td>
 <td><p>The amount of regions is always set to 1</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-rx_dma_trans_buffer-rx_region_size"><td><p>RX_REGION_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_dma_trans_buffer-rx_region_size"><td><p>RX_REGION_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>1</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-rx_dma_trans_buffer-rx_block_size"><td><p>RX_BLOCK_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_dma_trans_buffer-rx_block_size"><td><p>RX_BLOCK_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>4*8</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-rx_dma_trans_buffer-rx_item_width"><td><p>RX_ITEM_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_dma_trans_buffer-rx_item_width"><td><p>RX_ITEM_WIDTH</p></td>
 <td><p>integer</p></td>
-<td><p>8</p></td>
+<td><p>8)</p></td>
 <td></td>
 </tr>
 </tbody>

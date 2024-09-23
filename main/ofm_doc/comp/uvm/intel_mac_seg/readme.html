@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -113,17 +113,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Intel MAC SEG</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#interface">Interface</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#sequence-item">Sequence item</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#sequence">Sequence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#driver">Driver</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#monitor">Monitor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#config">Config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#agent">Agent</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packet_generators/flowtest/readme.html">FlowTest Sequence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../avmm/readme.html">AVMM Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../avst_crdt/readme.html">AVST CRDT Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../probe/readme.html">probe agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lbus/readme.html">LBUS Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_lbus/readme.html">LOGIC VECTOR ARRAY LBUS Environment</a></li>
 </ul>
 </li>
 </ul>
@@ -158,26 +160,39 @@
              
   <section id="intel-mac-seg">
 <span id="uvm-intel-mac-seg"></span><h1>Intel MAC SEG<a class="headerlink" href="#intel-mac-seg" title="Link to this heading"></a></h1>
-<section id="interface">
-<h2>Interface<a class="headerlink" href="#interface" title="Link to this heading"></a></h2>
-</section>
+<p>This agent is a low-level agent that is responsible for communication through Intel MAC SEG. It is commonly used for ethernet communication.
+The <strong>intel_mac_seg_if</strong> interface has one parameter, <strong>SEGMENTS</strong>, which represents a number of segments. There are two agents for Rx and Tx communication.
+The component is commonly used with the uvm_logic_vector_array when the <strong>uvm_logic_vector_array::sequence_item</strong> has to be converted to the <strong>uvm_intel_mac_seg::sequence_item</strong>.</p>
 <section id="sequence-item">
 <h2>Sequence item<a class="headerlink" href="#sequence-item" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>rand logic [64-1:0] data[SEGMENTS];</p></li>
+<li><p>rand logic          inframe[SEGMENTS];</p></li>
+<li><p>rand logic [3-1:0]  eop_empty[SEGMENTS];</p></li>
+<li><p>rand logic          fcs_error[SEGMENTS];</p></li>
+<li><p>rand logic [2-1:0]  error[SEGMENTS];</p></li>
+<li><p>rand logic [3-1:0]  status_data[SEGMENTS];</p></li>
+<li><p>rand logic          valid;</p></li>
+<li><p>rand logic          ready;</p></li>
+</ul>
+</div></blockquote>
 </section>
 <section id="sequence">
 <h2>Sequence<a class="headerlink" href="#sequence" title="Link to this heading"></a></h2>
-</section>
-<section id="driver">
-<h2>Driver<a class="headerlink" href="#driver" title="Link to this heading"></a></h2>
-</section>
-<section id="monitor">
-<h2>Monitor<a class="headerlink" href="#monitor" title="Link to this heading"></a></h2>
+<p>There are two sequences. The one for RX is not commonly used. It doesn’t generate truly valid frames. Better is to use the <strong>uvm_logic_vector_array_intel_mac_seg::env</strong>
+environment. The Tx one generates a ready signal for the Tx agent.</p>
 </section>
 <section id="config">
 <h2>Config<a class="headerlink" href="#config" title="Link to this heading"></a></h2>
-</section>
-<section id="agent">
-<h2>Agent<a class="headerlink" href="#agent" title="Link to this heading"></a></h2>
+<p>The config contains two variables. The <strong>active</strong> decides whether the agent drives the interface or only observes the interface.
+The <strong>interface_name</strong> variable represents the name under which is interface stored in a database.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>uvm_active_passive_enum active;</p></li>
+<li><p>string interface_name;</p></li>
+</ul>
+</div></blockquote>
 </section>
 </section>
 

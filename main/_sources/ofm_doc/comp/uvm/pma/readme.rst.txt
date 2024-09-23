@@ -54,7 +54,7 @@ PMA sequence item
 Sequence item contains basic ports from interface. All signals which are in sequence item are randomized.
 There are three methods:
 
-- ``do_copy`` is used for copying of the transaction. 
+- ``do_copy`` is used for copying of the transaction.
 - ``do_compare`` is used for comparing data of two transactions.
 - ``convert2string`` is used for printing whole transaction.
 

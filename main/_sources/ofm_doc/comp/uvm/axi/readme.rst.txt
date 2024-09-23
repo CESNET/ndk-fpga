@@ -22,7 +22,7 @@ The environment is configured by three parameters:
 sequence_item
 ---------------------------
 
-This package contains two agents. The RX agent sends data to the DUT and the TX agent samples the received data. Sequence run in the RX agent generates TDATA, TUSER, TKEEP, TLAST, and TVALID 
+This package contains two agents. The RX agent sends data to the DUT and the TX agent samples the received data. Sequence run in the RX agent generates TDATA, TUSER, TKEEP, TLAST, and TVALID
 variables in a sequence_item. One clock cycle later, the driver sets the TREADY variable in the sequence_item as a response. The TX agent receives data from the DUT. It
 is required to generate TREADY and drive TDATA, TUSER, TKEEP, TLAST, and TVALID as a response one clock cycle later.
 

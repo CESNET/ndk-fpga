@@ -9,7 +9,7 @@ Key features
 ^^^^^^^^^^^^
 
 * Histogram boxes are stored inside Block RAM
-* Each box will be sequentially cleared after the reset 
+* Each box will be sequentially cleared after the reset
 * A new input request will increment the histogram box based on an input value
 * Read request will read the content of a given box
 * Read requests can be set to clear box content after execution

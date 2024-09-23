@@ -37,7 +37,7 @@
             Minimal NDK Application Docs
           </a>
               <div class="version">
-                Git branch: main, <br> Git hash: 07fdd6e3
+                Git branch: main, <br> Git hash: b4addaa5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
@@ -83,6 +83,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_packer/readme.html">Frame Packer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
@@ -217,11 +218,17 @@ The packets read from the RX FIFO are stored in the TX FIFO.</p>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mfb_packet_delayer-fifo_af_offset"><td><p>FIFO_AF_OFFSET</p></td>
 <td><p>natural</p></td>
-<td><p>10</p></td>
-<td><p>Almost Full Offset of the input MFB_FIFOX.
-States the number of Items it can accept after Almost Full is asserted.</p></td>
+<td><p>1000</p></td>
+<td><p>Almost Full Offset of the Input MFB_FIFOX.
+Pauses the appropriate DMA channel when the amount of stored Items reaches this value.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_packet_delayer-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_packet_delayer-fifo_ae_offset"><td><p>FIFO_AE_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>1000</p></td>
+<td><p>Almost Empty Offset of the input MFB_FIFOX.
+Unpauses (resumes) the appropriate DMA channel when the amount of stored Items drops under this value.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_packet_delayer-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>

@@ -4,4 +4,3 @@ MI ASYNC
 --------
 
 .. vhdl:autoentity:: MI_ASYNC
-    

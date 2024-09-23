@@ -27,11 +27,11 @@ The main building blocks are the TX PCS :vhdl:entity:`tx_path_40ge`, RX PCS :vhd
 TX PCS
 ^^^^^^
 The transmit side of the PCS layer performs functions defined in 802.3 clause 82.2: data coming from the XLGMII are encoded into 66-bit blocks, scrambled, distributed on 4 lanes, and then on each lane, the alignment marker block is periodically inserted.
- 
+
 The main building components are as follows:
 
-* Encoder :vhdl:entity:`gbaser_encode` performs XLGMII to GBASE-R block encoding according to 802.3 clause 82.2.3. 
-* FIFO :vhdl:entity:`pcs_tx_fifo_deprecated` serves as a buffer for speed rate compensation between MAC and PMA and for dropping of IDLE blocks as a result of alignment marker inserting 
+* Encoder :vhdl:entity:`gbaser_encode` performs XLGMII to GBASE-R block encoding according to 802.3 clause 82.2.3.
+* FIFO :vhdl:entity:`pcs_tx_fifo_deprecated` serves as a buffer for speed rate compensation between MAC and PMA and for dropping of IDLE blocks as a result of alignment marker inserting
 * Scrambler :vhdl:entity:`scrambler_gen` implements self-synchronizing scrambler defined in 802.3 section 49.2.6
 * AM insertor :vhdl:entity:`am_ins` inserts alignment marker blocks into the data stream to allow the receiver to deskew and reorder the lanes
 
