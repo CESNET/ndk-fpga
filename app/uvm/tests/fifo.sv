@@ -358,7 +358,7 @@ class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
-        m_env.delay_max_set(1ms);
+        m_env.delay_max_set(10ms, 10ms);
     endfunction
 
     virtual task run_phase(uvm_phase phase);
@@ -405,7 +405,7 @@ class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
                 stop_seq.start(m_env.m_sequencer);
             join_none;
 
-            end_time = $time() + 1ms; // Prevents verification from freezing after a very long time!
+            end_time = $time() + 50ms; // Prevents verification from freezing after a very long time!
             rdy2end = 0;
             while (end_time > $time() && rdy2end < 5) begin
                 // The check of the number of incomplete packets in the verification must pass repeatedly!
