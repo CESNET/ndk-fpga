@@ -1,0 +1,5 @@
+proc fc_log_all_signals {fc} {
+    log -r $fc/*
+}
+
+fc_log_all_signals /fpga/usp_i

@@ -1,0 +1,23 @@
+# signal_sig.fdo : Include file with signals 
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author:   Daniel Kříž <xkrizd01@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+view wave
+delete wave *
+
+add wave -divider "PCIE_CQ_AXI2MFB"
+
+add_wave "-noupdate -color yellow -label RST"   /testbench/RST
+add_wave "-noupdate -color yellow -label CLK"   /testbench/CLK
+
+all ALL /testbench/DUT_U/VHDL_DUT_U
+#all Connection_block /testbench/DUT_U/VHDL_DUT_U/intel_g/conn_block_i
+#all CRDT_UP_MTC /testbench/DUT_U/VHDL_DUT_U/intel_g/conn_block_i/crdt_up_mtc_i
+#all CRDT_UP_PTC /testbench/DUT_U/VHDL_DUT_U/intel_g/conn_block_i/crdt_up_ptc_i
+#all CRDT_DOWN_MTC /testbench/DUT_U/VHDL_DUT_U/intel_g/conn_block_i/crdt_down_mtc_i
+#all CRDT_DOWN_PTC /testbench/DUT_U/VHDL_DUT_U/intel_g/conn_block_i/crdt_down_ptc_i
+
+config wave -signalnamewidth 1

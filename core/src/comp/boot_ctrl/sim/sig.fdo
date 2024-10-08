@@ -1,0 +1,15 @@
+# sig.fdo : Include file with signals
+# Copyright (C) 2024 CESNET z.s.p.o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+
+exec make
+view wave
+delete wave *
+
+add_wave -noupdate -group "TOP" "/testbench/*"
+add_wave -noupdate -group "UUT" "/testbench/uut_i/*"
+#add_wave -noupdate -group "ASYNC" "/testbench/uut_i/mi_async_i/*"
+
+restart -f
+run 5500 us

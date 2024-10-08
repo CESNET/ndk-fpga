@@ -1,0 +1,15 @@
+# signal_sig.fdo : Include file with signals 
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <xkondy00@vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+view wave
+delete wave *
+
+all ALL /testbench/DUT_U/VHDL_DUT_U
+#rx  RX  /testbench/DUT_U/VHDL_DUT_U
+#tx  TX_MAC  /testbench/DUT_U/VHDL_DUT_U/mac_lites_g(0)/tx_mac_lite_i
+
+config wave -signalnamewidth 1

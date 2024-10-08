@@ -1,0 +1,30 @@
+# sim.fdo: Simulation script
+# Copyright (C) 2024 CESNET z.s.p.o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Directories and files overview
+set FIRMWARE_BASE    "../../../../../../ofm"
+set ENTITY_BASE      ".."
+
+set TB_FILE          "testbench.vhd"
+set SIG_FILE         "sig.fdo"
+
+set COMPONENTS [list [list "DUT" $ENTITY_BASE "FULL"]]
+
+set SIM_FLAGS(DEBUG) true
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from libraries
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+set  NumericStdNoWarnings 1
+
+#Config
+config wave -signalnamewidth 1
+#lappend SIM_FLAGS(EXTRA_VFLAGS) -voptargs=+acc
+
+# File with signals
+source $SIG_FILE

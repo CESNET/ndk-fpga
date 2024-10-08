@@ -1,0 +1,21 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author:   Daniel Kříž <xkrizd01@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add_wave "-noupdate -color yellow -label PCIE_USER_CLK"   /testbench/PCIE_USER_CLK
+add_wave "-noupdate -color yellow -label PCIE_USER_RESET" /testbench/PCIE_USER_RESET
+add_wave "-noupdate -color yellow -label DMA_CLK"   /testbench/DMA_CLK
+add_wave "-noupdate -color yellow -label DMA_RESET" /testbench/DMA_RESET
+
+all PCIE /testbench/DUT_U/VHDL_DUT_U
+all PCIE_CORE testbench/DUT_U/VHDL_DUT_U/pcie_core_i
+
+for {set it 0} {$it < 4} {incr it} {
+    all PCIE_ADAPTER\[$it\] testbench/DUT_U/VHDL_DUT_U/pcie_core_i/pcie_adapter_g($it)/pcie_adapter_i
+    all PTC\[$it\] testbench/DUT_U//VHDL_DUT_U/pcie_ctrl_g($it)/pcie_ctrl_i/ptc_g/ptc_i
+    all MTC\[$it\] testbench/DUT_U//VHDL_DUT_U/pcie_ctrl_g($it)/pcie_ctrl_i/mtc_i
+}
