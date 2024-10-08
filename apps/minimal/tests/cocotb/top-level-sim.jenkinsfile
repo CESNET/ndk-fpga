@@ -2,7 +2,7 @@ def common_card_test_run(CARD_NAME) {
     try {
         sh """
         source venv-cocotb/bin/activate
-        make -C tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\"
+        make -C apps/minimal/tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\"
         """
     } catch (err) {
         echo "Error detected, firmware build failed!"
@@ -11,10 +11,10 @@ def common_card_test_run(CARD_NAME) {
         failed.add("$card_name")
     }
 
-    junit allowEmptyResults: true, testResults: "build/$CARD_NAME/results.xml"
+    junit allowEmptyResults: true, testResults: "apps/minimal/build/$CARD_NAME/results.xml"
 
     try {
-        sh "test -f build/$CARD_NAME/results.xml"
+        sh "test -f apps/minimal/build/$CARD_NAME/results.xml"
     } catch (err) {
         echo "Error detected, no tests performed (results missing)!"
         currentBuild.result = 'FAILURE'
@@ -36,11 +36,8 @@ node("preklad") {
 
     if (params.nightly != null && params.nightly == true) {
         stage("Prepare for nightly build") {
-            sh "(cd ndk/ofm; git checkout main)"
-		    sh "(cd ndk/core; git checkout main)"
-            sh "(cd ndk/cards; git checkout main)"
-            sh "(cd ndk/cards_private/nfb-200g2ql; git checkout main)"
-            sh "(cd ndk/modules/ndk-mod-dma-medusa; git checkout main)"
+            sh "(cd extra/nfb-200g2ql; git checkout main)"
+            sh "(cd extra/dma-medusa; git checkout main)"
         }
     }
 
@@ -54,7 +51,7 @@ node("preklad") {
             python3.9 -m pip wheel -w ./cocotbwheels ${swbase}/pynfb/
             python3.9 -m pip install --find-links ./cocotbwheels nfb
             python3.9 -m pip install --find-links ./cocotbwheels ${swbase}/ext/libnfb_ext_python/
-            python3.9 -m pip install ndk/ofm/python/cocotbext/
+            python3.9 -m pip install python/cocotbext/
         """
     }
 
