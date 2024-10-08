@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OFM_PATH=../../ndk/ofm
+OFM_PATH=../../../../
 
 #swbase=../../../swbase/
 swbase=git+https://github.com/CESNET/ndk-sw.git#subdirectory=
