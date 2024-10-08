@@ -1,12 +1,3 @@
-[submodule "ndk/ofm"]
-	path = ndk/ofm
-	url = ../ofm.git
-[submodule "ndk/core"]
-	path = ndk/core
-	url = ../ndk-core.git
-[submodule "ndk/cards"]
-	path = ndk/cards
-	url = ../ndk-cards-open.git
 [submodule "ndk/modules/ndk-mod-dma-medusa"]
 	path = ndk/modules/ndk-mod-dma-medusa
 	url = ../ndk-mod-dma-medusa.git
