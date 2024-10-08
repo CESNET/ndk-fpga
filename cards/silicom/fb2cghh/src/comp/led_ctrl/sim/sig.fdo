@@ -1,0 +1,15 @@
+# sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z.s.p.o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+
+set DUT_PATH "/testbench/uut_i"
+
+exec make
+view wave
+delete wave *
+
+add_wave "-noupdate" $DUT_PATH/*
+
+restart -f
+run 10 us

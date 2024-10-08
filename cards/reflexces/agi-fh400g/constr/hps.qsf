@@ -1,0 +1,223 @@
+# hps.qsf
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+#  Pinout and IO Standards
+# ==============================================================================
+
+set_location_assignment PIN_U17 -to HPS_CLK_100MHZ
+
+set_location_assignment PIN_CD26 -to HPS_LED_R
+set_location_assignment PIN_BV26 -to HPS_LED_G
+
+set_location_assignment PIN_BM34 -to HPS_USB_CLK
+set_location_assignment PIN_AB18 -to HPS_USB_STP
+set_location_assignment PIN_BJ33 -to HPS_USB_DIR
+set_location_assignment PIN_AB14 -to HPS_USB_NXT
+set_location_assignment PIN_AE16 -to HPS_USB_DATA[0]
+set_location_assignment PIN_BM26 -to HPS_USB_DATA[1]
+set_location_assignment PIN_CD28 -to HPS_USB_DATA[2]
+set_location_assignment PIN_AB6 -to HPS_USB_DATA[3]
+set_location_assignment PIN_CA27 -to HPS_USB_DATA[4]
+set_location_assignment PIN_AE3 -to HPS_USB_DATA[5]
+set_location_assignment PIN_BV28 -to HPS_USB_DATA[6]
+set_location_assignment PIN_AB1 -to HPS_USB_DATA[7]
+
+set_location_assignment PIN_BJ27 -to HPS_UART_CTS
+set_location_assignment PIN_N13 -to HPS_UART_RTS
+set_location_assignment PIN_BF26 -to HPS_UART_TXD
+set_location_assignment PIN_L15 -to HPS_UART_RXD
+
+set_location_assignment PIN_AD26 -to HPS_I2C1_SDA
+set_location_assignment PIN_N17 -to HPS_I2C1_SCL
+
+set_location_assignment PIN_U13 -to SD_CARD_INS_N
+set_location_assignment PIN_N21 -to HPS_MMC_CMD
+set_location_assignment PIN_N27 -to HPS_MMC_CLK
+set_location_assignment PIN_L28 -to HPS_MMC_DATA[0]
+set_location_assignment PIN_L23 -to HPS_MMC_DATA[1]
+set_location_assignment PIN_U27 -to HPS_MMC_DATA[2]
+set_location_assignment PIN_W26 -to HPS_MMC_DATA[3]
+
+set_location_assignment PIN_N25 -to HPS_M10_SPI_MOSI
+set_location_assignment PIN_W28 -to HPS_M10_SPI_MISO
+set_location_assignment PIN_U25 -to HPS_M10_SPI_SS_N
+set_location_assignment PIN_BM32 -to HPS_M10_SPI_SCK
+
+set_location_assignment PIN_BM30 -to HPS_M10_RST_N
+set_location_assignment PIN_L19 -to HPS_M10_INT_N
+set_location_assignment PIN_BJ29 -to HPS_M10_ACK
+
+set_location_assignment PIN_AA27 -to HPS_DDR4_ALERT_N
+set_location_assignment PIN_AD28 -to HPS_DDR4_BA[0]
+set_location_assignment PIN_AN27 -to HPS_DDR4_BA[1]
+set_location_assignment PIN_AK28 -to HPS_DDR4_BG[0]
+#set_location_assignment PIN_AV37 -to HPS_DDR4_BG[1]
+set_location_assignment PIN_AT38 -to HPS_DDR4_RST_N
+set_location_assignment PIN_BC37 -to HPS_DDR4_CS_N
+set_location_assignment PIN_BF38 -to HPS_DDR4_ACT_N
+set_location_assignment PIN_AV35 -to HPS_DDR4_ODT_N
+set_location_assignment PIN_BC35 -to HPS_DDR4_CKE
+set_location_assignment PIN_AV33 -to HPS_DDR4_CK
+set_location_assignment PIN_AT34 -to HPS_DDR4_CK_N
+set_location_assignment PIN_BF34 -to HPS_DDR4_PAR
+
+set_location_assignment PIN_AA31 -to HPS_DDR4_REFCLK_P
+set_location_assignment PIN_AD32 -to HPS_DDR4_REFCLK_N
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to HPS_DDR4_REFCLK_P 
+set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to HPS_DDR4_REFCLK_P
+
+set_location_assignment PIN_N33 -to HPS_DDR4_ADDR[0]
+set_location_assignment PIN_L34 -to HPS_DDR4_ADDR[1]
+set_location_assignment PIN_U33 -to HPS_DDR4_ADDR[2]
+set_location_assignment PIN_W34 -to HPS_DDR4_ADDR[3]
+set_location_assignment PIN_N31 -to HPS_DDR4_ADDR[4]
+set_location_assignment PIN_L32 -to HPS_DDR4_ADDR[5]
+set_location_assignment PIN_U31 -to HPS_DDR4_ADDR[6]
+set_location_assignment PIN_W32 -to HPS_DDR4_ADDR[7]
+set_location_assignment PIN_N29 -to HPS_DDR4_ADDR[8]
+set_location_assignment PIN_L30 -to HPS_DDR4_ADDR[9]
+set_location_assignment PIN_U29 -to HPS_DDR4_ADDR[10]
+set_location_assignment PIN_W30 -to HPS_DDR4_ADDR[11]
+set_location_assignment PIN_AK32 -to HPS_DDR4_ADDR[12]
+set_location_assignment PIN_AA29 -to HPS_DDR4_ADDR[13]
+set_location_assignment PIN_AD30 -to HPS_DDR4_ADDR[14]
+set_location_assignment PIN_AN29 -to HPS_DDR4_ADDR[15]
+set_location_assignment PIN_AK30 -to HPS_DDR4_ADDR[16]
+
+set_location_assignment PIN_AA43 -to HPS_DDR4_DQ[57]
+set_location_assignment PIN_AD44 -to HPS_DDR4_DQ[63]
+set_location_assignment PIN_AN43 -to HPS_DDR4_DQ[58]
+set_location_assignment PIN_AK44 -to HPS_DDR4_DQ[56]
+set_location_assignment PIN_AA41 -to HPS_DDR4_DQS[7]
+set_location_assignment PIN_AD42 -to HPS_DDR4_DQS_N[7]
+set_location_assignment PIN_AN41 -to HPS_DDR4_DBI_N[7]
+set_location_assignment PIN_AA39 -to HPS_DDR4_DQ[60]
+set_location_assignment PIN_AD40 -to HPS_DDR4_DQ[59]
+set_location_assignment PIN_AN39 -to HPS_DDR4_DQ[62]
+set_location_assignment PIN_AK40 -to HPS_DDR4_DQ[61]
+set_location_assignment PIN_AV43 -to HPS_DDR4_DQ[49]
+set_location_assignment PIN_AT44 -to HPS_DDR4_DQ[50]
+set_location_assignment PIN_BC43 -to HPS_DDR4_DQ[53]
+set_location_assignment PIN_BF44 -to HPS_DDR4_DQ[51]
+set_location_assignment PIN_AV41 -to HPS_DDR4_DQS[6]
+set_location_assignment PIN_AT42 -to HPS_DDR4_DQS_N[6]
+set_location_assignment PIN_BC41 -to HPS_DDR4_DBI_N[6]
+set_location_assignment PIN_AV39 -to HPS_DDR4_DQ[48]
+set_location_assignment PIN_AT40 -to HPS_DDR4_DQ[52]
+set_location_assignment PIN_BC39 -to HPS_DDR4_DQ[54]
+set_location_assignment PIN_BF40 -to HPS_DDR4_DQ[55]
+set_location_assignment PIN_N39 -to HPS_DDR4_DQ[41]
+set_location_assignment PIN_L40 -to HPS_DDR4_DQ[47]
+set_location_assignment PIN_U39 -to HPS_DDR4_DQ[43]
+set_location_assignment PIN_W40 -to HPS_DDR4_DQ[45]
+set_location_assignment PIN_N37 -to HPS_DDR4_DQS[5]
+set_location_assignment PIN_L38 -to HPS_DDR4_DQS_N[5]
+set_location_assignment PIN_U37 -to HPS_DDR4_DBI_N[5]
+set_location_assignment PIN_N35 -to HPS_DDR4_DQ[46]
+set_location_assignment PIN_L36 -to HPS_DDR4_DQ[42]
+set_location_assignment PIN_U35 -to HPS_DDR4_DQ[44]
+set_location_assignment PIN_W36 -to HPS_DDR4_DQ[40]
+set_location_assignment PIN_AA37 -to HPS_DDR4_DQ[36]
+set_location_assignment PIN_AD38 -to HPS_DDR4_DQ[33]
+set_location_assignment PIN_AN37 -to HPS_DDR4_DQ[35]
+set_location_assignment PIN_AK38 -to HPS_DDR4_DQ[37]
+set_location_assignment PIN_AA35 -to HPS_DDR4_DQS[4]
+set_location_assignment PIN_AD36 -to HPS_DDR4_DQS_N[4]
+set_location_assignment PIN_AN35 -to HPS_DDR4_DBI_N[4]
+set_location_assignment PIN_AA33 -to HPS_DDR4_DQ[32]
+set_location_assignment PIN_AD34 -to HPS_DDR4_DQ[34]
+set_location_assignment PIN_AN33 -to HPS_DDR4_DQ[39]
+set_location_assignment PIN_AK34 -to HPS_DDR4_DQ[38]
+set_location_assignment PIN_B33 -to HPS_DDR4_DQ[25]
+set_location_assignment PIN_D34 -to HPS_DDR4_DQ[31]
+set_location_assignment PIN_J33 -to HPS_DDR4_DQ[27]
+set_location_assignment PIN_H34 -to HPS_DDR4_DQ[29]
+set_location_assignment PIN_B31 -to HPS_DDR4_DQS[3]
+set_location_assignment PIN_D32 -to HPS_DDR4_DQS_N[3]
+set_location_assignment PIN_J31 -to HPS_DDR4_DBI_N[3]
+set_location_assignment PIN_B29 -to HPS_DDR4_DQ[24]
+set_location_assignment PIN_D30 -to HPS_DDR4_DQ[30]
+set_location_assignment PIN_J29 -to HPS_DDR4_DQ[28]
+set_location_assignment PIN_H30 -to HPS_DDR4_DQ[26]
+set_location_assignment PIN_B27 -to HPS_DDR4_DQ[23]
+set_location_assignment PIN_D28 -to HPS_DDR4_DQ[17]
+set_location_assignment PIN_J27 -to HPS_DDR4_DQ[21]
+set_location_assignment PIN_H28 -to HPS_DDR4_DQ[19]
+set_location_assignment PIN_B25 -to HPS_DDR4_DQS[2]
+set_location_assignment PIN_D26 -to HPS_DDR4_DQS_N[2]
+set_location_assignment PIN_J25 -to HPS_DDR4_DBI_N[2]
+set_location_assignment PIN_B21 -to HPS_DDR4_DQ[22]
+set_location_assignment PIN_D23 -to HPS_DDR4_DQ[20]
+set_location_assignment PIN_J21 -to HPS_DDR4_DQ[18]
+set_location_assignment PIN_H23 -to HPS_DDR4_DQ[16]
+set_location_assignment PIN_B17 -to HPS_DDR4_DQ[9]
+set_location_assignment PIN_D19 -to HPS_DDR4_DQ[15]
+set_location_assignment PIN_J17 -to HPS_DDR4_DQ[11]
+set_location_assignment PIN_H19 -to HPS_DDR4_DQ[13]
+set_location_assignment PIN_B13 -to HPS_DDR4_DQS[1]
+set_location_assignment PIN_D15 -to HPS_DDR4_DQS_N[1]
+set_location_assignment PIN_J13 -to HPS_DDR4_DBI_N[1]
+set_location_assignment PIN_D11 -to HPS_DDR4_DQ[14]
+set_location_assignment PIN_H11 -to HPS_DDR4_DQ[10]
+set_location_assignment PIN_H7 -to HPS_DDR4_DQ[12]
+set_location_assignment PIN_J9 -to HPS_DDR4_DQ[8]
+set_location_assignment PIN_N9 -to HPS_DDR4_DQ[2]
+set_location_assignment PIN_L11 -to HPS_DDR4_DQ[5]
+set_location_assignment PIN_U9 -to HPS_DDR4_DQ[1]
+set_location_assignment PIN_W11 -to HPS_DDR4_DQ[7]
+set_location_assignment PIN_N5 -to HPS_DDR4_DQS[0]
+set_location_assignment PIN_L7 -to HPS_DDR4_DQS_N[0]
+set_location_assignment PIN_U5 -to HPS_DDR4_DBI_N[0]
+set_location_assignment PIN_N2 -to HPS_DDR4_DQ[4]
+set_location_assignment PIN_L4 -to HPS_DDR4_DQ[0]
+set_location_assignment PIN_U2 -to HPS_DDR4_DQ[6]
+set_location_assignment PIN_W4 -to HPS_DDR4_DQ[3]
+
+set_location_assignment PIN_AN31 -to HPS_DDR4_OCT_RZQ
+
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_CLK_100MHZ 
+
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_LED_R
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_LED_G
+
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_CLK 
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_STP 
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DIR 
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_NXT 
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[0]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[1]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[2]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[3]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[4]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[5]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[6]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[7]
+
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_UART_CTS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_UART_RTS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_UART_TXD
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_UART_RXD
+
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_I2C1_SDA
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_I2C1_SCL
+
+set_instance_assignment -name IO_STANDARD "1.8 V" -to SD_CARD_INS_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_MMC_CMD
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_MMC_CLK
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_MMC_DATA[0]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_MMC_DATA[1]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_MMC_DATA[2]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_MMC_DATA[3]
+
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_M10_SPI_MOSI
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_M10_SPI_MISO
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_M10_SPI_SS_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_M10_SPI_SCK
+
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_M10_RST_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_M10_INT_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_M10_ACK

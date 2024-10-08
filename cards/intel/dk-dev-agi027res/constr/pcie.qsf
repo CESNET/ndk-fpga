@@ -1,0 +1,99 @@
+# pcie.qsf
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Pin Locations - PCIe 0
+# ==============================================================================
+
+set_location_assignment PIN_CD58 -to fpga_pcie_perstn
+set_location_assignment PIN_BM62 -to pcie_1v2_clkreqn
+set_location_assignment PIN_BV60 -to pcie_ep_waken
+
+set_location_assignment PIN_DM70 -to refclk_pcie_14c_ch0_n
+set_location_assignment PIN_DR68 -to refclk_pcie_14c_ch0_p
+set_location_assignment PIN_CR70 -to refclk_pcie_14c_ch1_n
+set_location_assignment PIN_CU68 -to refclk_pcie_14c_ch1_p
+
+set_location_assignment PIN_DE82 -to pcie_ep_rx_p[0]
+set_location_assignment PIN_CW80 -to pcie_ep_rx_p[1]
+set_location_assignment PIN_CM82 -to pcie_ep_rx_p[2]
+set_location_assignment PIN_CF80 -to pcie_ep_rx_p[3]
+set_location_assignment PIN_BY82 -to pcie_ep_rx_p[4]
+set_location_assignment PIN_BP80 -to pcie_ep_rx_p[5]
+set_location_assignment PIN_BH82 -to pcie_ep_rx_p[6]
+set_location_assignment PIN_BB80 -to pcie_ep_rx_p[7]
+set_location_assignment PIN_AR82 -to pcie_ep_rx_p[8]
+set_location_assignment PIN_AJ80 -to pcie_ep_rx_p[9]
+set_location_assignment PIN_AC82 -to pcie_ep_rx_p[10]
+set_location_assignment PIN_V80  -to pcie_ep_rx_p[11]
+set_location_assignment PIN_P82  -to pcie_ep_rx_p[12]
+set_location_assignment PIN_K80  -to pcie_ep_rx_p[13]
+set_location_assignment PIN_M77  -to pcie_ep_rx_p[14]
+set_location_assignment PIN_C77  -to pcie_ep_rx_p[15]
+set_location_assignment PIN_DB83 -to pcie_ep_rx_n[0]
+set_location_assignment PIN_CT79 -to pcie_ep_rx_n[1]
+set_location_assignment PIN_CJ83 -to pcie_ep_rx_n[2]
+set_location_assignment PIN_CC79 -to pcie_ep_rx_n[3]
+set_location_assignment PIN_BU83 -to pcie_ep_rx_n[4]
+set_location_assignment PIN_BL79 -to pcie_ep_rx_n[5]
+set_location_assignment PIN_BE83 -to pcie_ep_rx_n[6]
+set_location_assignment PIN_AW79 -to pcie_ep_rx_n[7]
+set_location_assignment PIN_AM83 -to pcie_ep_rx_n[8]
+set_location_assignment PIN_AF79 -to pcie_ep_rx_n[9]
+set_location_assignment PIN_Y83  -to pcie_ep_rx_n[10]
+set_location_assignment PIN_T79  -to pcie_ep_rx_n[11]
+set_location_assignment PIN_M83  -to pcie_ep_rx_n[12]
+set_location_assignment PIN_G79  -to pcie_ep_rx_n[13]
+set_location_assignment PIN_P76  -to pcie_ep_rx_n[14]
+set_location_assignment PIN_E76  -to pcie_ep_rx_n[15]
+
+set_location_assignment PIN_DL74 -to pcie_ep_tx_p[0]
+set_location_assignment PIN_DB77 -to pcie_ep_tx_p[1]
+set_location_assignment PIN_CW74 -to pcie_ep_tx_p[2]
+set_location_assignment PIN_CJ77 -to pcie_ep_tx_p[3]
+set_location_assignment PIN_CF74 -to pcie_ep_tx_p[4]
+set_location_assignment PIN_BU77 -to pcie_ep_tx_p[5]
+set_location_assignment PIN_BP74 -to pcie_ep_tx_p[6]
+set_location_assignment PIN_BE77 -to pcie_ep_tx_p[7]
+set_location_assignment PIN_BB74 -to pcie_ep_tx_p[8]
+set_location_assignment PIN_AM77 -to pcie_ep_tx_p[9]
+set_location_assignment PIN_AJ74 -to pcie_ep_tx_p[10]
+set_location_assignment PIN_Y77  -to pcie_ep_tx_p[11]
+set_location_assignment PIN_V74  -to pcie_ep_tx_p[12]
+set_location_assignment PIN_K74  -to pcie_ep_tx_p[13]
+set_location_assignment PIN_C71  -to pcie_ep_tx_p[14]
+set_location_assignment PIN_M71  -to pcie_ep_tx_p[15]
+set_location_assignment PIN_DH73 -to pcie_ep_tx_n[0]
+set_location_assignment PIN_DE76 -to pcie_ep_tx_n[1]
+set_location_assignment PIN_CT73 -to pcie_ep_tx_n[2]
+set_location_assignment PIN_CM76 -to pcie_ep_tx_n[3]
+set_location_assignment PIN_CC73 -to pcie_ep_tx_n[4]
+set_location_assignment PIN_BY76 -to pcie_ep_tx_n[5]
+set_location_assignment PIN_BL73 -to pcie_ep_tx_n[6]
+set_location_assignment PIN_BH76 -to pcie_ep_tx_n[7]
+set_location_assignment PIN_AW73 -to pcie_ep_tx_n[8]
+set_location_assignment PIN_AR76 -to pcie_ep_tx_n[9]
+set_location_assignment PIN_AF73 -to pcie_ep_tx_n[10]
+set_location_assignment PIN_AC76 -to pcie_ep_tx_n[11]
+set_location_assignment PIN_T73  -to pcie_ep_tx_n[12]
+set_location_assignment PIN_G73  -to pcie_ep_tx_n[13]
+set_location_assignment PIN_E69  -to pcie_ep_tx_n[14]
+set_location_assignment PIN_P69  -to pcie_ep_tx_n[15]
+
+# ==============================================================================
+# Pin IO Standards & Input Termination 
+# ==============================================================================
+
+set_instance_assignment -name IO_STANDARD "1.0 V" -to fpga_pcie_perstn
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to pcie_1v2_clkreqn
+set_instance_assignment -name IO_STANDARD "1.2 V" -to pcie_ep_waken
+
+set_instance_assignment -name IO_STANDARD "HCSL" -to refclk_pcie_14c_ch0_p
+set_instance_assignment -name IO_STANDARD "HCSL" -to refclk_pcie_14c_ch1_p
+
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to pcie_ep_tx_p
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to pcie_ep_rx_p

@@ -1,0 +1,683 @@
+<?xml version="1.0" ?>
+<!--Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel FPGA IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Intel and sold by Intel or its authorized distributors.  Please
+refer to the applicable agreement for further details, at
+https://fpgasoftware.intel.com/eula.-->
+<ipxact:component xmlns:altera="http://www.altera.com/XMLSchema/IPXact2014/extensions" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2014">
+  <ipxact:vendor>Intel Corporation</ipxact:vendor>
+  <ipxact:library>ftile_pll_8x25g</ipxact:library>
+  <ipxact:name>systemclk_f_0</ipxact:name>
+  <ipxact:version>2.3.0</ipxact:version>
+  <ipxact:busInterfaces>
+    <ipxact:busInterface>
+      <ipxact:name>out_systempll_synthlock_0</ipxact:name>
+      <ipxact:busType vendor="intel" library="intel" name="conduit" version="22.4"></ipxact:busType>
+      <ipxact:abstractionTypes>
+        <ipxact:abstractionType>
+          <ipxact:abstractionRef vendor="intel" library="intel" name="conduit" version="22.4"></ipxact:abstractionRef>
+          <ipxact:portMaps>
+            <ipxact:portMap>
+              <ipxact:logicalPort>
+                <ipxact:name>out_systempll_synthlock</ipxact:name>
+              </ipxact:logicalPort>
+              <ipxact:physicalPort>
+                <ipxact:name>out_systempll_synthlock_0</ipxact:name>
+              </ipxact:physicalPort>
+            </ipxact:portMap>
+          </ipxact:portMaps>
+        </ipxact:abstractionType>
+      </ipxact:abstractionTypes>
+      <ipxact:slave></ipxact:slave>
+      <ipxact:parameters>
+        <ipxact:parameter parameterId="associatedClock" type="string">
+          <ipxact:name>associatedClock</ipxact:name>
+          <ipxact:displayName>associatedClock</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="associatedReset" type="string">
+          <ipxact:name>associatedReset</ipxact:name>
+          <ipxact:displayName>associatedReset</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="prSafe" type="bit">
+          <ipxact:name>prSafe</ipxact:name>
+          <ipxact:displayName>Partial Reconfiguration Safe</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+      </ipxact:parameters>
+      <ipxact:vendorExtensions>
+        <altera:altera_assignments>
+          <ipxact:parameters>
+            <ipxact:parameter parameterId="ui.blockdiagram.direction" type="string">
+              <ipxact:name>ui.blockdiagram.direction</ipxact:name>
+              <ipxact:value>output</ipxact:value>
+            </ipxact:parameter>
+          </ipxact:parameters>
+        </altera:altera_assignments>
+      </ipxact:vendorExtensions>
+    </ipxact:busInterface>
+    <ipxact:busInterface>
+      <ipxact:name>out_systempll_clk_0</ipxact:name>
+      <ipxact:busType vendor="intel" library="intel" name="ftile_hssi_system_clock" version="22.4"></ipxact:busType>
+      <ipxact:abstractionTypes>
+        <ipxact:abstractionType>
+          <ipxact:abstractionRef vendor="intel" library="intel" name="ftile_hssi_system_clock" version="22.4"></ipxact:abstractionRef>
+          <ipxact:portMaps>
+            <ipxact:portMap>
+              <ipxact:logicalPort>
+                <ipxact:name>clk</ipxact:name>
+              </ipxact:logicalPort>
+              <ipxact:physicalPort>
+                <ipxact:name>out_systempll_clk_0</ipxact:name>
+              </ipxact:physicalPort>
+            </ipxact:portMap>
+          </ipxact:portMaps>
+        </ipxact:abstractionType>
+      </ipxact:abstractionTypes>
+      <ipxact:master></ipxact:master>
+      <ipxact:parameters>
+        <ipxact:parameter parameterId="clockRate" type="longint">
+          <ipxact:name>clockRate</ipxact:name>
+          <ipxact:displayName>Clock rate</ipxact:displayName>
+          <ipxact:value>0</ipxact:value>
+        </ipxact:parameter>
+      </ipxact:parameters>
+      <ipxact:vendorExtensions>
+        <altera:altera_assignments>
+          <ipxact:parameters>
+            <ipxact:parameter parameterId="ui.blockdiagram.direction" type="string">
+              <ipxact:name>ui.blockdiagram.direction</ipxact:name>
+              <ipxact:value>output</ipxact:value>
+            </ipxact:parameter>
+          </ipxact:parameters>
+        </altera:altera_assignments>
+      </ipxact:vendorExtensions>
+    </ipxact:busInterface>
+    <ipxact:busInterface>
+      <ipxact:name>out_refclk_fgt_0</ipxact:name>
+      <ipxact:busType vendor="intel" library="intel" name="ftile_hssi_reference_clock" version="22.4"></ipxact:busType>
+      <ipxact:abstractionTypes>
+        <ipxact:abstractionType>
+          <ipxact:abstractionRef vendor="intel" library="intel" name="ftile_hssi_reference_clock" version="22.4"></ipxact:abstractionRef>
+          <ipxact:portMaps>
+            <ipxact:portMap>
+              <ipxact:logicalPort>
+                <ipxact:name>clk</ipxact:name>
+              </ipxact:logicalPort>
+              <ipxact:physicalPort>
+                <ipxact:name>out_refclk_fgt_0</ipxact:name>
+              </ipxact:physicalPort>
+            </ipxact:portMap>
+          </ipxact:portMaps>
+        </ipxact:abstractionType>
+      </ipxact:abstractionTypes>
+      <ipxact:master></ipxact:master>
+      <ipxact:parameters>
+        <ipxact:parameter parameterId="clockRate" type="longint">
+          <ipxact:name>clockRate</ipxact:name>
+          <ipxact:displayName>Clock rate</ipxact:displayName>
+          <ipxact:value>0</ipxact:value>
+        </ipxact:parameter>
+      </ipxact:parameters>
+      <ipxact:vendorExtensions>
+        <altera:altera_assignments>
+          <ipxact:parameters>
+            <ipxact:parameter parameterId="ui.blockdiagram.direction" type="string">
+              <ipxact:name>ui.blockdiagram.direction</ipxact:name>
+              <ipxact:value>output</ipxact:value>
+            </ipxact:parameter>
+          </ipxact:parameters>
+        </altera:altera_assignments>
+      </ipxact:vendorExtensions>
+    </ipxact:busInterface>
+    <ipxact:busInterface>
+      <ipxact:name>refclk_fgt</ipxact:name>
+      <ipxact:busType vendor="intel" library="intel" name="conduit" version="22.4"></ipxact:busType>
+      <ipxact:abstractionTypes>
+        <ipxact:abstractionType>
+          <ipxact:abstractionRef vendor="intel" library="intel" name="conduit" version="22.4"></ipxact:abstractionRef>
+          <ipxact:portMaps>
+            <ipxact:portMap>
+              <ipxact:logicalPort>
+                <ipxact:name>in_refclk_fgt_0</ipxact:name>
+              </ipxact:logicalPort>
+              <ipxact:physicalPort>
+                <ipxact:name>in_refclk_fgt_0</ipxact:name>
+              </ipxact:physicalPort>
+            </ipxact:portMap>
+          </ipxact:portMaps>
+        </ipxact:abstractionType>
+      </ipxact:abstractionTypes>
+      <ipxact:slave></ipxact:slave>
+      <ipxact:parameters>
+        <ipxact:parameter parameterId="associatedClock" type="string">
+          <ipxact:name>associatedClock</ipxact:name>
+          <ipxact:displayName>associatedClock</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="associatedReset" type="string">
+          <ipxact:name>associatedReset</ipxact:name>
+          <ipxact:displayName>associatedReset</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="prSafe" type="bit">
+          <ipxact:name>prSafe</ipxact:name>
+          <ipxact:displayName>Partial Reconfiguration Safe</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+      </ipxact:parameters>
+      <ipxact:vendorExtensions>
+        <altera:altera_assignments>
+          <ipxact:parameters>
+            <ipxact:parameter parameterId="ui.blockdiagram.direction" type="string">
+              <ipxact:name>ui.blockdiagram.direction</ipxact:name>
+              <ipxact:value>input</ipxact:value>
+            </ipxact:parameter>
+          </ipxact:parameters>
+        </altera:altera_assignments>
+      </ipxact:vendorExtensions>
+    </ipxact:busInterface>
+  </ipxact:busInterfaces>
+  <ipxact:model>
+    <ipxact:views>
+      <ipxact:view>
+        <ipxact:name>QUARTUS_SYNTH</ipxact:name>
+        <ipxact:envIdentifier>:quartus.altera.com:</ipxact:envIdentifier>
+        <ipxact:componentInstantiationRef>QUARTUS_SYNTH</ipxact:componentInstantiationRef>
+      </ipxact:view>
+    </ipxact:views>
+    <ipxact:instantiations>
+      <ipxact:componentInstantiation>
+        <ipxact:name>QUARTUS_SYNTH</ipxact:name>
+        <ipxact:moduleName>systemclk_f</ipxact:moduleName>
+        <ipxact:fileSetRef>
+          <ipxact:localName>QUARTUS_SYNTH</ipxact:localName>
+        </ipxact:fileSetRef>
+      </ipxact:componentInstantiation>
+    </ipxact:instantiations>
+    <ipxact:ports>
+      <ipxact:port>
+        <ipxact:name>out_systempll_synthlock_0</ipxact:name>
+        <ipxact:wire>
+          <ipxact:direction>out</ipxact:direction>
+          <ipxact:wireTypeDefs>
+            <ipxact:wireTypeDef>
+              <ipxact:typeName>STD_LOGIC</ipxact:typeName>
+              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
+            </ipxact:wireTypeDef>
+          </ipxact:wireTypeDefs>
+        </ipxact:wire>
+      </ipxact:port>
+      <ipxact:port>
+        <ipxact:name>out_systempll_clk_0</ipxact:name>
+        <ipxact:wire>
+          <ipxact:direction>out</ipxact:direction>
+          <ipxact:wireTypeDefs>
+            <ipxact:wireTypeDef>
+              <ipxact:typeName>STD_LOGIC</ipxact:typeName>
+              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
+            </ipxact:wireTypeDef>
+          </ipxact:wireTypeDefs>
+        </ipxact:wire>
+      </ipxact:port>
+      <ipxact:port>
+        <ipxact:name>out_refclk_fgt_0</ipxact:name>
+        <ipxact:wire>
+          <ipxact:direction>out</ipxact:direction>
+          <ipxact:wireTypeDefs>
+            <ipxact:wireTypeDef>
+              <ipxact:typeName>STD_LOGIC</ipxact:typeName>
+              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
+            </ipxact:wireTypeDef>
+          </ipxact:wireTypeDefs>
+        </ipxact:wire>
+      </ipxact:port>
+      <ipxact:port>
+        <ipxact:name>in_refclk_fgt_0</ipxact:name>
+        <ipxact:wire>
+          <ipxact:direction>in</ipxact:direction>
+          <ipxact:wireTypeDefs>
+            <ipxact:wireTypeDef>
+              <ipxact:typeName>STD_LOGIC</ipxact:typeName>
+              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
+            </ipxact:wireTypeDef>
+          </ipxact:wireTypeDefs>
+        </ipxact:wire>
+      </ipxact:port>
+    </ipxact:ports>
+  </ipxact:model>
+  <ipxact:vendorExtensions>
+    <altera:entity_info>
+      <ipxact:vendor>Intel Corporation</ipxact:vendor>
+      <ipxact:library>ftile_pll</ipxact:library>
+      <ipxact:name>systemclk_f</ipxact:name>
+      <ipxact:version>2.3.0</ipxact:version>
+    </altera:entity_info>
+    <altera:altera_module_parameters>
+      <ipxact:parameters>
+        <ipxact:parameter parameterId="syspll_mod_0" type="string">
+          <ipxact:name>syspll_mod_0</ipxact:name>
+          <ipxact:displayName>Mode of System PLL</ipxact:displayName>
+          <ipxact:value>ETHERNET_FREQ_830_156</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_mod_1" type="string">
+          <ipxact:name>syspll_mod_1</ipxact:name>
+          <ipxact:displayName>Mode of System PLL</ipxact:displayName>
+          <ipxact:value>Disabled</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_mod_2" type="string">
+          <ipxact:name>syspll_mod_2</ipxact:name>
+          <ipxact:displayName>Mode of System PLL</ipxact:displayName>
+          <ipxact:value>Disabled</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_refclk_src_0" type="string">
+          <ipxact:name>syspll_refclk_src_0</ipxact:name>
+          <ipxact:displayName>Refclk source</ipxact:displayName>
+          <ipxact:value>RefClk #0</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_refclk_src_1" type="string">
+          <ipxact:name>syspll_refclk_src_1</ipxact:name>
+          <ipxact:displayName>Refclk source</ipxact:displayName>
+          <ipxact:value>RefClk #0</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_refclk_src_2" type="string">
+          <ipxact:name>syspll_refclk_src_2</ipxact:name>
+          <ipxact:displayName>Refclk source</ipxact:displayName>
+          <ipxact:value>RefClk #0</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_freq_mhz_0" type="string">
+          <ipxact:name>syspll_freq_mhz_0</ipxact:name>
+          <ipxact:displayName>Output frequency</ipxact:displayName>
+          <ipxact:value>805.6640625</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_freq_mhz_1" type="string">
+          <ipxact:name>syspll_freq_mhz_1</ipxact:name>
+          <ipxact:displayName>Output frequency</ipxact:displayName>
+          <ipxact:value>805.6640625</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_freq_mhz_2" type="string">
+          <ipxact:name>syspll_freq_mhz_2</ipxact:name>
+          <ipxact:displayName>Output frequency</ipxact:displayName>
+          <ipxact:value>805.6640625</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_availpor_0" type="bit">
+          <ipxact:name>syspll_availpor_0</ipxact:name>
+          <ipxact:displayName>Refclk is available at power-on</ipxact:displayName>
+          <ipxact:value>true</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_availpor_1" type="bit">
+          <ipxact:name>syspll_availpor_1</ipxact:name>
+          <ipxact:displayName>Refclk is available at power-on</ipxact:displayName>
+          <ipxact:value>true</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_availpor_2" type="bit">
+          <ipxact:name>syspll_availpor_2</ipxact:name>
+          <ipxact:displayName>Refclk is available at power-on</ipxact:displayName>
+          <ipxact:value>true</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="syspll_flux_src" type="string">
+          <ipxact:name>syspll_flux_src</ipxact:name>
+          <ipxact:displayName>FLUX source</ipxact:displayName>
+          <ipxact:value>Auto</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="cmnpll_enable_0" type="bit">
+          <ipxact:name>cmnpll_enable_0</ipxact:name>
+          <ipxact:displayName>Enable FHT Common PLL A</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="cmnpll_enable_1" type="bit">
+          <ipxact:name>cmnpll_enable_1</ipxact:name>
+          <ipxact:displayName>Enable FHT Common PLL B</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="cmnpll_refclk_src_0" type="string">
+          <ipxact:name>cmnpll_refclk_src_0</ipxact:name>
+          <ipxact:displayName>FHT refclk source</ipxact:displayName>
+          <ipxact:value>FHT RefClk #0</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="cmnpll_refclk_src_1" type="string">
+          <ipxact:name>cmnpll_refclk_src_1</ipxact:name>
+          <ipxact:displayName>FHT refclk source</ipxact:displayName>
+          <ipxact:value>FHT RefClk #0</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="cmnpll_xtensa_src" type="string">
+          <ipxact:name>cmnpll_xtensa_src</ipxact:name>
+          <ipxact:displayName>Controller source</ipxact:displayName>
+          <ipxact:value>Auto</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="cmnpll_dummy" type="bit">
+          <ipxact:name>cmnpll_dummy</ipxact:name>
+          <ipxact:displayName></ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_0" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_0</ipxact:name>
+          <ipxact:displayName>Enable Refclk #0 for FGT PMA</ipxact:displayName>
+          <ipxact:value>true</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_0" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_0</ipxact:name>
+          <ipxact:displayName>Refclk frequency #0</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_0" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_0</ipxact:name>
+          <ipxact:displayName>Refclk frequency #0</ipxact:displayName>
+          <ipxact:value>156.250000</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_1" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_1</ipxact:name>
+          <ipxact:displayName>Enable Refclk #1 for FGT PMA</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_1" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_1</ipxact:name>
+          <ipxact:displayName>Refclk frequency #1</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_1" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_1</ipxact:name>
+          <ipxact:displayName>Refclk frequency #1</ipxact:displayName>
+          <ipxact:value>NotSpecified</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_2" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_2</ipxact:name>
+          <ipxact:displayName>Enable Refclk #2 for FGT PMA</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_2" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_2</ipxact:name>
+          <ipxact:displayName>Refclk frequency #2</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_2" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_2</ipxact:name>
+          <ipxact:displayName>Refclk frequency #2</ipxact:displayName>
+          <ipxact:value>NotSpecified</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_3" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_3</ipxact:name>
+          <ipxact:displayName>Enable Refclk #3 for FGT PMA</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_3" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_3</ipxact:name>
+          <ipxact:displayName>Refclk frequency #3</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_3" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_3</ipxact:name>
+          <ipxact:displayName>Refclk frequency #3</ipxact:displayName>
+          <ipxact:value>NotSpecified</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_4" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_4</ipxact:name>
+          <ipxact:displayName>Enable Refclk #4 for FGT PMA</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_4" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_4</ipxact:name>
+          <ipxact:displayName>Refclk frequency #4</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_4" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_4</ipxact:name>
+          <ipxact:displayName>Refclk frequency #4</ipxact:displayName>
+          <ipxact:value>NotSpecified</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_5" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_5</ipxact:name>
+          <ipxact:displayName>Enable Refclk #5 for FGT PMA</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_5" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_5</ipxact:name>
+          <ipxact:displayName>Refclk frequency #5</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_5" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_5</ipxact:name>
+          <ipxact:displayName>Refclk frequency #5</ipxact:displayName>
+          <ipxact:value>NotSpecified</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_6" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_6</ipxact:name>
+          <ipxact:displayName>Enable Refclk #6 for FGT PMA</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_6" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_6</ipxact:name>
+          <ipxact:displayName>Refclk frequency #6</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_6" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_6</ipxact:name>
+          <ipxact:displayName>Refclk frequency #6</ipxact:displayName>
+          <ipxact:value>NotSpecified</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_7" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_7</ipxact:name>
+          <ipxact:displayName>Enable Refclk #7 for FGT PMA</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_7" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_7</ipxact:name>
+          <ipxact:displayName>Refclk frequency #7</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_7" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_7</ipxact:name>
+          <ipxact:displayName>Refclk frequency #7</ipxact:displayName>
+          <ipxact:value>NotSpecified</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_8" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_8</ipxact:name>
+          <ipxact:displayName>Enable Refclk #8 for FGT PMA</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_8" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_8</ipxact:name>
+          <ipxact:displayName>Refclk frequency #8</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_8" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_8</ipxact:name>
+          <ipxact:displayName>Refclk frequency #8</ipxact:displayName>
+          <ipxact:value>NotSpecified</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_output_enable_9" type="bit">
+          <ipxact:name>refclk_fgt_output_enable_9</ipxact:name>
+          <ipxact:displayName>Enable Refclk #9 for FGT PMA</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_txt_9" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_txt_9</ipxact:name>
+          <ipxact:displayName>Refclk frequency #9</ipxact:displayName>
+          <ipxact:value>100</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_freq_mhz_9" type="string">
+          <ipxact:name>refclk_fgt_freq_mhz_9</ipxact:name>
+          <ipxact:displayName>Refclk frequency #9</ipxact:displayName>
+          <ipxact:value>NotSpecified</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_cdrclk_output_enable_0" type="bit">
+          <ipxact:name>refclk_cdrclk_output_enable_0</ipxact:name>
+          <ipxact:displayName>Enable FGT CDR Output #0</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_cdrclk_output_enable_1" type="bit">
+          <ipxact:name>refclk_cdrclk_output_enable_1</ipxact:name>
+          <ipxact:displayName>Enable FGT CDR Output #1</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fht_freq_mhz_txt_0" type="string">
+          <ipxact:name>refclk_fht_freq_mhz_txt_0</ipxact:name>
+          <ipxact:displayName>FHT refclk frequency #0</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fht_freq_mhz_txt_1" type="string">
+          <ipxact:name>refclk_fht_freq_mhz_txt_1</ipxact:name>
+          <ipxact:displayName>FHT refclk frequency #1</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_0" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_0</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#0 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_1" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_1</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#1 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_2" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_2</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#2 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_3" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_3</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#3 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_4" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_4</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#4 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_5" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_5</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#5 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_6" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_6</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#6 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_7" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_7</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#7 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_8" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_8</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#8 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="refclk_fgt_coreclk_enable_9" type="bit">
+          <ipxact:name>refclk_fgt_coreclk_enable_9</ipxact:name>
+          <ipxact:displayName>Enable FGT refclk#9 to core</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="device" type="string">
+          <ipxact:name>device</ipxact:name>
+          <ipxact:displayName>device</ipxact:displayName>
+          <ipxact:value>AGIB027R29A1E2VR0</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="device_die_types" type="string">
+          <ipxact:name>device_die_types</ipxact:name>
+          <ipxact:displayName>device_die_types</ipxact:displayName>
+          <ipxact:value>HSSI_GDR,HSSI_RNR,MAIN_FM8</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="device_die_revisions" type="string">
+          <ipxact:name>device_die_revisions</ipxact:name>
+          <ipxact:displayName>device_die_revisions</ipxact:displayName>
+          <ipxact:value>HSSI_GDR_REVA,HSSI_RNR_REVA,MAIN_FM8_REVA</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="device_highspeed_tile" type="string">
+          <ipxact:name>device_highspeed_tile</ipxact:name>
+          <ipxact:displayName>device_highspeed_tile</ipxact:displayName>
+          <ipxact:value>F-Tile</ipxact:value>
+        </ipxact:parameter>
+      </ipxact:parameters>
+    </altera:altera_module_parameters>
+    <altera:altera_system_parameters>
+      <ipxact:parameters>
+        <ipxact:parameter parameterId="board" type="string">
+          <ipxact:name>board</ipxact:name>
+          <ipxact:displayName>Board</ipxact:displayName>
+          <ipxact:value>Intel Agilex I-Series FPGA Development Kit DK-DEV-AGI027RES</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="device" type="string">
+          <ipxact:name>device</ipxact:name>
+          <ipxact:displayName>Device</ipxact:displayName>
+          <ipxact:value>AGIB027R29A1E2VR0</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="deviceFamily" type="string">
+          <ipxact:name>deviceFamily</ipxact:name>
+          <ipxact:displayName>Device family</ipxact:displayName>
+          <ipxact:value>Agilex</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="deviceSpeedGrade" type="string">
+          <ipxact:name>deviceSpeedGrade</ipxact:name>
+          <ipxact:displayName>Device Speed Grade</ipxact:displayName>
+          <ipxact:value>2</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="generationId" type="int">
+          <ipxact:name>generationId</ipxact:name>
+          <ipxact:displayName>Generation Id</ipxact:displayName>
+          <ipxact:value>0</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="bonusData" type="string">
+          <ipxact:name>bonusData</ipxact:name>
+          <ipxact:displayName>bonusData</ipxact:displayName>
+          <ipxact:value>bonusData 
+{
+   element systemclk_f_0
+   {
+      datum _sortIndex
+      {
+         value = "0";
+         type = "int";
+      }
+   }
+}
+</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="hideFromIPCatalog" type="bit">
+          <ipxact:name>hideFromIPCatalog</ipxact:name>
+          <ipxact:displayName>Hide from IP Catalog</ipxact:displayName>
+          <ipxact:value>true</ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="lockedInterfaceDefinition" type="string">
+          <ipxact:name>lockedInterfaceDefinition</ipxact:name>
+          <ipxact:displayName>lockedInterfaceDefinition</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="systemInfos" type="string">
+          <ipxact:name>systemInfos</ipxact:name>
+          <ipxact:displayName>systemInfos</ipxact:displayName>
+          <ipxact:value>&lt;systemInfosDefinition&gt;
+    &lt;connPtSystemInfos/&gt;
+&lt;/systemInfosDefinition&gt;</ipxact:value>
+        </ipxact:parameter>
+      </ipxact:parameters>
+    </altera:altera_system_parameters>
+    <altera:altera_interface_boundary>
+      <altera:interface_mapping altera:name="out_refclk_fgt_0" altera:internal="systemclk_f_0.out_refclk_fgt_0" altera:type="ftile_hssi_reference_clock" altera:dir="start">
+        <altera:port_mapping altera:name="out_refclk_fgt_0" altera:internal="out_refclk_fgt_0"></altera:port_mapping>
+      </altera:interface_mapping>
+      <altera:interface_mapping altera:name="out_systempll_clk_0" altera:internal="systemclk_f_0.out_systempll_clk_0" altera:type="ftile_hssi_system_clock" altera:dir="start">
+        <altera:port_mapping altera:name="out_systempll_clk_0" altera:internal="out_systempll_clk_0"></altera:port_mapping>
+      </altera:interface_mapping>
+      <altera:interface_mapping altera:name="out_systempll_synthlock_0" altera:internal="systemclk_f_0.out_systempll_synthlock_0" altera:type="conduit" altera:dir="end">
+        <altera:port_mapping altera:name="out_systempll_synthlock_0" altera:internal="out_systempll_synthlock_0"></altera:port_mapping>
+      </altera:interface_mapping>
+      <altera:interface_mapping altera:name="refclk_fgt" altera:internal="systemclk_f_0.refclk_fgt" altera:type="conduit" altera:dir="end">
+        <altera:port_mapping altera:name="in_refclk_fgt_0" altera:internal="in_refclk_fgt_0"></altera:port_mapping>
+      </altera:interface_mapping>
+    </altera:altera_interface_boundary>
+    <altera:altera_has_warnings>false</altera:altera_has_warnings>
+    <altera:altera_has_errors>false</altera:altera_has_errors>
+  </ipxact:vendorExtensions>
+</ipxact:component>

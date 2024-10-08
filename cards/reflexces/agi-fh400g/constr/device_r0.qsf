@@ -1,0 +1,12 @@
+# device_r0.qsf
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+#  Global assignments
+# ==============================================================================
+
+set_global_assignment -name DEVICE AGIB027R29A1E2VR0
+set_global_assignment -name FAMILY Agilex

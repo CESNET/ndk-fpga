@@ -1,0 +1,118 @@
+# pcie0.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+#  Pinout and IO Standards
+# ==============================================================================
+
+set_location_assignment PIN_DR68 -to PCIE0_CLK0_P
+set_location_assignment PIN_CU68 -to PCIE0_CLK1_P
+set_location_assignment PIN_CD58 -to PCIE0_PERST_N
+
+set_location_assignment PIN_DL74 -to PCIE0_TX_P[0]
+set_location_assignment PIN_DB77 -to PCIE0_TX_P[1]
+set_location_assignment PIN_CW74 -to PCIE0_TX_P[2]
+set_location_assignment PIN_CJ77 -to PCIE0_TX_P[3]
+set_location_assignment PIN_CF74 -to PCIE0_TX_P[4]
+set_location_assignment PIN_BU77 -to PCIE0_TX_P[5]
+set_location_assignment PIN_BP74 -to PCIE0_TX_P[6]
+set_location_assignment PIN_BE77 -to PCIE0_TX_P[7]
+set_location_assignment PIN_BB74 -to PCIE0_TX_P[8]
+set_location_assignment PIN_AM77 -to PCIE0_TX_P[9]
+set_location_assignment PIN_AJ74 -to PCIE0_TX_P[10]
+set_location_assignment PIN_Y77 -to PCIE0_TX_P[11]
+set_location_assignment PIN_V74 -to PCIE0_TX_P[12]
+set_location_assignment PIN_K74 -to PCIE0_TX_P[13]
+set_location_assignment PIN_C71 -to PCIE0_TX_P[14]
+set_location_assignment PIN_M71 -to PCIE0_TX_P[15]
+
+set_location_assignment PIN_DH73 -to PCIE0_TX_N[0]
+set_location_assignment PIN_DE76 -to PCIE0_TX_N[1]
+set_location_assignment PIN_CT73 -to PCIE0_TX_N[2]
+set_location_assignment PIN_CM76 -to PCIE0_TX_N[3]
+set_location_assignment PIN_CC73 -to PCIE0_TX_N[4]
+set_location_assignment PIN_BY76 -to PCIE0_TX_N[5]
+set_location_assignment PIN_BL73 -to PCIE0_TX_N[6]
+set_location_assignment PIN_BH76 -to PCIE0_TX_N[7]
+set_location_assignment PIN_AW73 -to PCIE0_TX_N[8]
+set_location_assignment PIN_AR76 -to PCIE0_TX_N[9]
+set_location_assignment PIN_AF73 -to PCIE0_TX_N[10]
+set_location_assignment PIN_AC76 -to PCIE0_TX_N[11]
+set_location_assignment PIN_T73 -to PCIE0_TX_N[12]
+set_location_assignment PIN_G73 -to PCIE0_TX_N[13]
+set_location_assignment PIN_E69 -to PCIE0_TX_N[14]
+set_location_assignment PIN_P69 -to PCIE0_TX_N[15]
+
+set_location_assignment PIN_DE82 -to PCIE0_RX_P[0]
+set_location_assignment PIN_CW80 -to PCIE0_RX_P[1]
+set_location_assignment PIN_CM82 -to PCIE0_RX_P[2]
+set_location_assignment PIN_CF80 -to PCIE0_RX_P[3]
+set_location_assignment PIN_BY82 -to PCIE0_RX_P[4]
+set_location_assignment PIN_BP80 -to PCIE0_RX_P[5]
+set_location_assignment PIN_BH82 -to PCIE0_RX_P[6]
+set_location_assignment PIN_BB80 -to PCIE0_RX_P[7]
+set_location_assignment PIN_AR82 -to PCIE0_RX_P[8]
+set_location_assignment PIN_AJ80 -to PCIE0_RX_P[9]
+set_location_assignment PIN_AC82 -to PCIE0_RX_P[10]
+set_location_assignment PIN_V80 -to PCIE0_RX_P[11]
+set_location_assignment PIN_P82 -to PCIE0_RX_P[12]
+set_location_assignment PIN_K80 -to PCIE0_RX_P[13]
+set_location_assignment PIN_M77 -to PCIE0_RX_P[14]
+set_location_assignment PIN_C77 -to PCIE0_RX_P[15]
+
+set_location_assignment PIN_DB83 -to PCIE0_RX_N[0]
+set_location_assignment PIN_CT79 -to PCIE0_RX_N[1]
+set_location_assignment PIN_CJ83 -to PCIE0_RX_N[2]
+set_location_assignment PIN_CC79 -to PCIE0_RX_N[3]
+set_location_assignment PIN_BU83 -to PCIE0_RX_N[4]
+set_location_assignment PIN_BL79 -to PCIE0_RX_N[5]
+set_location_assignment PIN_BE83 -to PCIE0_RX_N[6]
+set_location_assignment PIN_AW79 -to PCIE0_RX_N[7]
+set_location_assignment PIN_AM83 -to PCIE0_RX_N[8]
+set_location_assignment PIN_AF79 -to PCIE0_RX_N[9]
+set_location_assignment PIN_Y83 -to PCIE0_RX_N[10]
+set_location_assignment PIN_T79 -to PCIE0_RX_N[11]
+set_location_assignment PIN_M83 -to PCIE0_RX_N[12]
+set_location_assignment PIN_G79 -to PCIE0_RX_N[13]
+set_location_assignment PIN_P76 -to PCIE0_RX_N[14]
+set_location_assignment PIN_E76 -to PCIE0_RX_N[15]
+
+set_instance_assignment -name IO_STANDARD HCSL -to PCIE0_CLK0_P
+set_instance_assignment -name IO_STANDARD HCSL -to PCIE0_CLK1_P
+set_instance_assignment -name IO_STANDARD "1.0 V" -to PCIE0_PERST_N
+
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[4]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[5]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[6]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[7]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[8]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[9]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[10]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[11]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[12]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[13]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[14]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_TX_P[15]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[4]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[5]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[6]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[7]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[8]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[9]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[10]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[11]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[12]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[13]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[14]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE0_RX_P[15]

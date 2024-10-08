@@ -1,0 +1,32 @@
+# sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z.s.p.o.
+# Author: David Beneš <benes.david2000@seznam.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+
+set DUT_PATH "/testbench/"
+
+exec make
+view wave
+delete wave *
+
+#add_wave "-noupdate" $DUT_PATH/*
+
+#add wave -position end  /testbench/*
+#add wave -position end  /testbench/uut_i/*
+
+add wave -position end  /testbench/uut_i/SPI_CLK
+add wave -position end  /testbench/uut_i/SPI_NSS
+add wave -position end  /testbench/uut_i/SPI_MOSI
+add wave -position end  /testbench/uut_i/SPI_MISO
+add wave -position end  /testbench/uut_i/SPI_INT
+add wave -position end  /testbench/uut_i/BMC_MI_ADDR
+add wave -position end  /testbench/uut_i/BMC_MI_DWR
+add wave -position end  /testbench/uut_i/BMC_MI_WR
+add wave -position end  /testbench/uut_i/BMC_MI_RD
+add wave -position end  /testbench/uut_i/BMC_MI_BE
+add wave -position end  /testbench/uut_i/BMC_MI_ARDY
+add wave -position end  /testbench/uut_i/BMC_MI_DRD
+add wave -position end  /testbench/uut_i/BMC_MI_DRDY
+
+restart -f
+run 5500 us

@@ -1,0 +1,28 @@
+# qsfp_virtual.qsf
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach0_p
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach0_n
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach3_p
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach3_n
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach4_p
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach4_n
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach5_p
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach5_n
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach6_p
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_fgt12ach6_n
+
+set_instance_assignment -name VIRTUAL_PIN ON -to qsfpdd0_rx_n
+set_instance_assignment -name VIRTUAL_PIN ON -to qsfpdd0_rx_p
+set_instance_assignment -name VIRTUAL_PIN ON -to qsfpdd0_tx_n
+set_instance_assignment -name VIRTUAL_PIN ON -to qsfpdd0_tx_p
+
+set_instance_assignment -name VIRTUAL_PIN ON -to qsfpdd1_rx_n
+set_instance_assignment -name VIRTUAL_PIN ON -to qsfpdd1_rx_p
+set_instance_assignment -name VIRTUAL_PIN ON -to qsfpdd1_tx_n
+set_instance_assignment -name VIRTUAL_PIN ON -to qsfpdd1_tx_p
+
+set_instance_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON -to MB77

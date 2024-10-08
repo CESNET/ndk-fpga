@@ -1,0 +1,97 @@
+# cxl.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Pin Locations - PCIe 1 (CXL)
+# ==============================================================================
+
+set_location_assignment PIN_CY30 -to fpga_cxl_perstn
+set_location_assignment PIN_ED26 -to refclk_cxl_15c_ch0_n
+set_location_assignment PIN_EG27 -to refclk_cxl_15c_ch0_p
+set_location_assignment PIN_EY26 -to refclk_cxl_15c_ch1_n
+set_location_assignment PIN_FC27 -to refclk_cxl_15c_ch1_p
+set_location_assignment PIN_KW31 -to fpga_cxl_prsntx1_n
+set_location_assignment PIN_LB30 -to fpga_cxl_prsntx4_n
+set_location_assignment PIN_LH30 -to fpga_cxl_prsntx8_n
+set_location_assignment PIN_LL31 -to fpga_cxl_prsntx16_n
+
+set_location_assignment PIN_AL8  -to cxl_rx_p[0]
+set_location_assignment PIN_AP1  -to cxl_rx_p[1]
+set_location_assignment PIN_BD8  -to cxl_rx_p[2]
+set_location_assignment PIN_BG1  -to cxl_rx_p[3]
+set_location_assignment PIN_BT8  -to cxl_rx_p[4]
+set_location_assignment PIN_BW1  -to cxl_rx_p[5]
+set_location_assignment PIN_CH8  -to cxl_rx_p[6]
+set_location_assignment PIN_CL1  -to cxl_rx_p[7]
+set_location_assignment PIN_DA8  -to cxl_rx_p[8]
+set_location_assignment PIN_DD1  -to cxl_rx_p[9]
+set_location_assignment PIN_DN8  -to cxl_rx_p[10]
+set_location_assignment PIN_DT1  -to cxl_rx_p[11]
+set_location_assignment PIN_EE8  -to cxl_rx_p[12]
+set_location_assignment PIN_EH1  -to cxl_rx_p[13]
+set_location_assignment PIN_EV8  -to cxl_rx_p[14]
+set_location_assignment PIN_FA1  -to cxl_rx_p[15]
+set_location_assignment PIN_AH10 -to cxl_rx_n[0]
+set_location_assignment PIN_AU3  -to cxl_rx_n[1]
+set_location_assignment PIN_BA10 -to cxl_rx_n[2]
+set_location_assignment PIN_BK3  -to cxl_rx_n[3]
+set_location_assignment PIN_BN10 -to cxl_rx_n[4]
+set_location_assignment PIN_CB3  -to cxl_rx_n[5]
+set_location_assignment PIN_CE10 -to cxl_rx_n[6]
+set_location_assignment PIN_CP3  -to cxl_rx_n[7]
+set_location_assignment PIN_CV10 -to cxl_rx_n[8]
+set_location_assignment PIN_DG3  -to cxl_rx_n[9]
+set_location_assignment PIN_DK10 -to cxl_rx_n[10]
+set_location_assignment PIN_DW3  -to cxl_rx_n[11]
+set_location_assignment PIN_EB10 -to cxl_rx_n[12]
+set_location_assignment PIN_EM3  -to cxl_rx_n[13]
+set_location_assignment PIN_ER10 -to cxl_rx_n[14]
+set_location_assignment PIN_FD3  -to cxl_rx_n[15]
+
+set_location_assignment PIN_AL20 -to cxl_tx_p[0]
+set_location_assignment PIN_AP14 -to cxl_tx_p[1]
+set_location_assignment PIN_BD20 -to cxl_tx_p[2]
+set_location_assignment PIN_BG14 -to cxl_tx_p[3]
+set_location_assignment PIN_BT20 -to cxl_tx_p[4]
+set_location_assignment PIN_BW14 -to cxl_tx_p[5]
+set_location_assignment PIN_CH20 -to cxl_tx_p[6]
+set_location_assignment PIN_CL14 -to cxl_tx_p[7]
+set_location_assignment PIN_DA20 -to cxl_tx_p[8]
+set_location_assignment PIN_DD14 -to cxl_tx_p[9]
+set_location_assignment PIN_DN20 -to cxl_tx_p[10]
+set_location_assignment PIN_DT14 -to cxl_tx_p[11]
+set_location_assignment PIN_EE20 -to cxl_tx_p[12]
+set_location_assignment PIN_EH14 -to cxl_tx_p[13]
+set_location_assignment PIN_EV20 -to cxl_tx_p[14]
+set_location_assignment PIN_FA14 -to cxl_tx_p[15]
+set_location_assignment PIN_AH22 -to cxl_tx_n[0]
+set_location_assignment PIN_AU16 -to cxl_tx_n[1]
+set_location_assignment PIN_BA22 -to cxl_tx_n[2]
+set_location_assignment PIN_BK16 -to cxl_tx_n[3]
+set_location_assignment PIN_BN22 -to cxl_tx_n[4]
+set_location_assignment PIN_CB16 -to cxl_tx_n[5]
+set_location_assignment PIN_CE22 -to cxl_tx_n[6]
+set_location_assignment PIN_CP16 -to cxl_tx_n[7]
+set_location_assignment PIN_CV22 -to cxl_tx_n[8]
+set_location_assignment PIN_DG16 -to cxl_tx_n[9]
+set_location_assignment PIN_DK22 -to cxl_tx_n[10]
+set_location_assignment PIN_DW16 -to cxl_tx_n[11]
+set_location_assignment PIN_EB22 -to cxl_tx_n[12]
+set_location_assignment PIN_EM16 -to cxl_tx_n[13]
+set_location_assignment PIN_ER22 -to cxl_tx_n[14]
+set_location_assignment PIN_FD16 -to cxl_tx_n[15]
+
+# ==============================================================================
+# Pin IO Standards & Input Termination 
+# ==============================================================================
+
+set_instance_assignment -name IO_STANDARD "1.0 V" -to fpga_cxl_perstn
+
+set_instance_assignment -name IO_STANDARD "HCSL" -to refclk_cxl_15c_ch0_p
+set_instance_assignment -name IO_STANDARD "HCSL" -to refclk_cxl_15c_ch1_p
+
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to cxl_tx_p
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to cxl_rx_p

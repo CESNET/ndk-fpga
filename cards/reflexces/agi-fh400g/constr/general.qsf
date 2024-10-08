@@ -1,0 +1,186 @@
+# general.qsf
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+#  Global assignments
+# ==============================================================================
+
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
+set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
+set_global_assignment -name DEVICE_IO_STANDARD_ALL "1.2 V"
+
+set_global_assignment -name USE_INIT_DONE SDM_IO0
+set_global_assignment -name USE_HPS_COLD_RESET SDM_IO10
+set_global_assignment -name USE_PWRMGT_SDA SDM_IO11
+set_global_assignment -name USE_NCATTRIP SDM_IO12
+set_global_assignment -name USE_SEU_ERROR SDM_IO13
+set_global_assignment -name USE_PWRMGT_SCL SDM_IO14
+#set_global_assignment -name USE_CVP_CONFDONE SDM_IO15
+set_global_assignment -name USE_CONF_DONE SDM_IO16
+
+set_global_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON
+
+set_global_assignment -name PWRMGT_SLAVE_DEVICE_TYPE ED8401
+set_global_assignment -name PWRMGT_SLAVE_DEVICE0_ADDRESS 40
+set_global_assignment -name CONFIGURATION_VCCIO_LEVEL AUTO
+set_global_assignment -name CVP_MODE OFF
+set_global_assignment -name CVP_CONFDONE_OPEN_DRAIN OFF
+set_global_assignment -name HPS_DAP_SPLIT_MODE DISABLED
+set_global_assignment -name PWRMGT_DIRECT_FORMAT_COEFFICIENT_M 1
+set_global_assignment -name PWRMGT_DIRECT_FORMAT_COEFFICIENT_R 64
+set_global_assignment -name ACTIVE_SERIAL_CLOCK AS_FREQ_100MHZ
+set_global_assignment -name GENERATE_COMPRESSED_SOF ON
+set_global_assignment -name PWRMGT_VOLTAGE_OUTPUT_FORMAT "LINEAR FORMAT"
+set_global_assignment -name PWRMGT_LINEAR_FORMAT_N "-13"
+set_global_assignment -name STRATIXV_CONFIGURATION_SCHEME "ACTIVE SERIAL X4"
+#set_global_assignment -name STRATIXV_CONFIGURATION_SCHEME "AVST X32"
+
+set_global_assignment -name VERILOG_MACRO "ALTERA_EMIF_ENABLE_ISSP=1"
+
+set_global_assignment -name DEVICE_INITIALIZATION_CLOCK OSC_CLK_1_100MHZ
+
+# ==============================================================================
+#  Pinout and IO Standards
+# ==============================================================================
+
+set_location_assignment PIN_AK56 -to HW_ID[0]
+set_location_assignment PIN_AN55 -to HW_ID[1]
+set_location_assignment PIN_AD56 -to HW_ID[2]
+set_location_assignment PIN_AA55 -to HW_ID[3]
+
+set_location_assignment PIN_AN47 -to AG_LED_G[0]
+set_location_assignment PIN_AA49 -to AG_LED_G[1]
+set_location_assignment PIN_AD48 -to AG_LED_R[0]
+set_location_assignment PIN_AK48 -to AG_LED_R[1]
+
+set_location_assignment PIN_AV45 -to AG_I2C_SCLK
+set_location_assignment PIN_AT46 -to AG_I2C_SDA
+
+set_location_assignment PIN_U63 -to AG_SYSCLK0_P
+#set_location_assignment PIN_W64 -to AG_SYSCLK0_N
+set_location_assignment PIN_U51 -to AG_SYSCLK1_P
+#set_location_assignment PIN_W52 -to AG_SYSCLK1_N
+set_location_assignment PIN_B47 -to AG_EXT_SYNC_1HZ
+
+set_location_assignment PIN_BV62 -to AG_CLK_INT_N
+set_location_assignment PIN_CA61 -to AG_CLK_GEN_LOL_N
+
+set_location_assignment PIN_AA51 -to AG_DEV_POR_N
+set_location_assignment PIN_AD52 -to AG_RST_N
+set_location_assignment PIN_AK52 -to AG_SOFT_RST
+set_location_assignment PIN_AN51 -to AG_M10_RST_N
+
+set_location_assignment PIN_BF52 -to AG_M10_IMG_SEL_N
+set_location_assignment PIN_AV53 -to AG_M10_REBOOT_N
+set_location_assignment PIN_AD50 -to M10_AG_DONE
+set_location_assignment PIN_AN49 -to M10_AG_STATUS_N
+
+set_location_assignment PIN_AV51 -to AG_REQ_CONF_N
+set_location_assignment PIN_AT52 -to AG_CFG_IMG_SEL
+
+set_location_assignment PIN_BM62 -to FLASH_A[0]
+set_location_assignment PIN_BJ61 -to FLASH_A[1]
+set_location_assignment PIN_BM60 -to FLASH_A[2]
+set_location_assignment PIN_BF62 -to FLASH_A[3]
+set_location_assignment PIN_BC61 -to FLASH_A[4]
+set_location_assignment PIN_AT62 -to FLASH_A[5]
+set_location_assignment PIN_AV61 -to FLASH_A[6]
+set_location_assignment PIN_BF60 -to FLASH_A[7]
+set_location_assignment PIN_BC59 -to FLASH_A[8]
+set_location_assignment PIN_AD60 -to FLASH_A[9]
+set_location_assignment PIN_AA59 -to FLASH_A[10]
+set_location_assignment PIN_AK58 -to FLASH_A[11]
+set_location_assignment PIN_AN57 -to FLASH_A[12]
+set_location_assignment PIN_AD58 -to FLASH_A[13]
+set_location_assignment PIN_AA57 -to FLASH_A[14]
+set_location_assignment PIN_W58 -to FLASH_A[15]
+set_location_assignment PIN_U57 -to FLASH_A[16]
+set_location_assignment PIN_L58 -to FLASH_A[17]
+set_location_assignment PIN_N57 -to FLASH_A[18]
+set_location_assignment PIN_W56 -to FLASH_A[19]
+set_location_assignment PIN_U55 -to FLASH_A[20]
+set_location_assignment PIN_L56 -to FLASH_A[21]
+set_location_assignment PIN_N55 -to FLASH_A[22]
+set_location_assignment PIN_W54 -to FLASH_A[23]
+set_location_assignment PIN_U53 -to FLASH_A[24]
+set_location_assignment PIN_L54 -to FLASH_A[25]
+set_location_assignment PIN_N53 -to FLASH_A[26]
+set_location_assignment PIN_B59 -to FLASH_D[0]
+set_location_assignment PIN_D60 -to FLASH_D[1]
+set_location_assignment PIN_J59 -to FLASH_D[2]
+set_location_assignment PIN_H60 -to FLASH_D[3]
+set_location_assignment PIN_B61 -to FLASH_D[4]
+set_location_assignment PIN_D62 -to FLASH_D[5]
+set_location_assignment PIN_J61 -to FLASH_D[6]
+set_location_assignment PIN_H62 -to FLASH_D[7]
+set_location_assignment PIN_D64 -to FLASH_D[8]
+set_location_assignment PIN_J63 -to FLASH_D[9]
+set_location_assignment PIN_H64 -to FLASH_D[10]
+set_location_assignment PIN_N59 -to FLASH_D[11]
+set_location_assignment PIN_L60 -to FLASH_D[12]
+set_location_assignment PIN_U59 -to FLASH_D[13]
+set_location_assignment PIN_W60 -to FLASH_D[14]
+set_location_assignment PIN_N61 -to FLASH_D[15]
+set_location_assignment PIN_AV68 -to FLASH_OE_N
+set_location_assignment PIN_AT70 -to FLASH_WE_N
+set_location_assignment PIN_BC63 -to FLASH_CE0_N
+set_location_assignment PIN_AY64 -to FLASH_CE1_N
+set_location_assignment PIN_BJ63 -to FLASH_RY_BY_N
+set_location_assignment PIN_BM64 -to FLASH_BYTE_N
+set_location_assignment PIN_BC65 -to FLASH_WP_N
+set_location_assignment PIN_AY66 -to FLASH_RST_N
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[0] 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[1] 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[2] 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[3]
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_G[0] 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_G[1] 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_R[0] 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_R[1] 
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_I2C_SCLK 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_I2C_SDA 
+
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to AG_SYSCLK0_P 
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to AG_SYSCLK1_P 
+set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to AG_SYSCLK0_P
+set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to AG_SYSCLK1_P
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_EXT_SYNC_1HZ 
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_CLK_INT_N 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_CLK_GEN_LOL_N 
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_DEV_POR_N 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_RST_N 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_SOFT_RST 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_M10_RST_N 
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_M10_IMG_SEL_N 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_M10_REBOOT_N 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_AG_DONE 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_AG_STATUS_N 
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_REQ_CONF_N 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_CFG_IMG_SEL 
+
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_A[*] 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_D[*] 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_CE0_N 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_CE1_N 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_OE_N 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_WE_N 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_RY_BY_N 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_BYTE_N 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_WP_N 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_RST_N 
+
+set_global_assignment -name OCP_HW_EVAL DISABLE
+# this parameter was set as disable beacouse it makes problem with build for ftile IP cores

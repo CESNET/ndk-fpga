@@ -1,0 +1,17 @@
+# qsfp_virtual.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP_REFCLK0_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP_REFCLK0_N
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP_REFCLK1_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP_REFCLK1_N
+
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP_RX_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP_RX_N
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP_TX_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP_TX_N
+
+set_instance_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON -to GK83

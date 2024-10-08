@@ -1,0 +1,84 @@
+# qsfp.qsf
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Pin Locations
+# ==============================================================================
+
+set_location_assignment PIN_D33 -to ZQSFP_1V8_PORT_EN
+set_location_assignment PIN_H32 -to ZQSFP_1V8_PORT_INT_N
+
+set_location_assignment PIN_AT10 -to CLK_312P5M_QSFP0_P
+set_location_assignment PIN_AT11 -to CLK_156P25M_QSFP0_P
+set_location_assignment PIN_AU10 -to CLK_312P5M_QSFP0_N
+set_location_assignment PIN_AU11 -to CLK_156P25M_QSFP0_N
+set_location_assignment PIN_AV10 -to CLK_312P5M_QSFP1_P
+set_location_assignment PIN_AW10 -to CLK_312P5M_QSFP1_N
+set_location_assignment PIN_AW11 -to CLK_156P25M_QSFP1_P
+set_location_assignment PIN_AY11 -to CLK_156P25M_QSFP1_N
+set_location_assignment PIN_BC11 -to CLK_312P5M_QSFP2_P
+set_location_assignment PIN_BC10 -to CLK_312P5M_QSFP2_N
+
+set_location_assignment PIN_BG7 -to QSFP1_RX_P[3]
+set_location_assignment PIN_BG8 -to QSFP1_RX_N[3]
+set_location_assignment PIN_BJ7 -to QSFP1_RX_P[2]
+set_location_assignment PIN_BJ8 -to QSFP1_RX_N[2]
+set_location_assignment PIN_BL7 -to QSFP1_RX_P[1]
+set_location_assignment PIN_BL8 -to QSFP1_RX_N[1]
+set_location_assignment PIN_BN7 -to QSFP1_RX_P[0]
+set_location_assignment PIN_BN8 -to QSFP1_RX_N[0]
+
+set_location_assignment PIN_BK4 -to QSFP1_TX_P[3]
+set_location_assignment PIN_BK5 -to QSFP1_TX_N[3]
+set_location_assignment PIN_BL1 -to QSFP1_TX_P[2]
+set_location_assignment PIN_BL2 -to QSFP1_TX_N[2]
+set_location_assignment PIN_BM4 -to QSFP1_TX_P[1]
+set_location_assignment PIN_BM5 -to QSFP1_TX_N[1]
+set_location_assignment PIN_BP4 -to QSFP1_TX_P[0]
+set_location_assignment PIN_BP5 -to QSFP1_TX_N[0]
+
+set_location_assignment PIN_BC7 -to QSFP2_RX_P[3]
+set_location_assignment PIN_BC8 -to QSFP2_RX_N[3]
+set_location_assignment PIN_BD4 -to QSFP2_RX_P[2]
+set_location_assignment PIN_BD5 -to QSFP2_RX_N[2]
+set_location_assignment PIN_BE7 -to QSFP2_RX_P[1]
+set_location_assignment PIN_BE8 -to QSFP2_RX_N[1]
+set_location_assignment PIN_BF4 -to QSFP2_RX_P[0]
+set_location_assignment PIN_BF5 -to QSFP2_RX_N[0]
+
+set_location_assignment PIN_BE1 -to QSFP2_TX_P[3]
+set_location_assignment PIN_BE2 -to QSFP2_TX_N[3]
+set_location_assignment PIN_BG1 -to QSFP2_TX_P[2]
+set_location_assignment PIN_BG2 -to QSFP2_TX_N[2]
+set_location_assignment PIN_BH4 -to QSFP2_TX_P[1]
+set_location_assignment PIN_BH5 -to QSFP2_TX_N[1]
+set_location_assignment PIN_BJ1 -to QSFP2_TX_P[0]
+set_location_assignment PIN_BJ2 -to QSFP2_TX_N[0]
+
+# ==============================================================================
+# Pin IO Standards & Input Termination 
+# ==============================================================================
+
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ZQSFP_1V8_PORT_EN
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ZQSFP_1V8_PORT_INT_N
+
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to CLK_156P25M_QSFP0_P
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to CLK_312P5M_QSFP0_P
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to CLK_312P5M_QSFP1_P
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to CLK_156P25M_QSFP1_P
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to CLK_312P5M_QSFP2_P
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=disable_term" -to CLK_156P25M_QSFP1_P
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=enable_3p3v_tol" -to CLK_156P25M_QSFP1_P
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to CLK_156P25M_QSFP1_P
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to CLK_156P25M_QSFP1_P
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_use_as_bti_clock=TRUE" -to CLK_156P25M_QSFP1_P
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to CLK_156P25M_QSFP1_P
+
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_TX_P
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_RX_P                                                             
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP2_TX_P
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP2_RX_P

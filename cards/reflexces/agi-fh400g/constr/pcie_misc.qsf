@@ -1,0 +1,22 @@
+# pcie_misc.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+#  Pinout and IO Standards
+# ==============================================================================
+
+# These ports are only available on the first prototype,
+# on other prototypes they were used as QSFP I2C interface.
+#set_location_assignment PIN_AT56 -to PCIE_WAKE
+#set_location_assignment PIN_BC55 -to PCIE_CLKREQ
+
+set_location_assignment PIN_BF54 -to PCIE1_CLK_SEL_N
+set_location_assignment PIN_BC53 -to PCIE2_CLK_SEL_N
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to PCIE_WAKE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to PCIE_CLKREQ
+set_instance_assignment -name IO_STANDARD "1.2 V" -to PCIE1_CLK_SEL_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to PCIE2_CLK_SEL_N

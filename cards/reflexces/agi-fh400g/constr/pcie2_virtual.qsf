@@ -1,0 +1,19 @@
+# pcie2_virtual.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set_instance_assignment -name VIRTUAL_PIN ON -to PCIE2_PERST_N
+set_instance_assignment -name VIRTUAL_PIN ON -to PCIE2_CLK0_P
+set_instance_assignment -name VIRTUAL_PIN ON -to PCIE2_CLK0_N
+set_instance_assignment -name VIRTUAL_PIN ON -to PCIE2_CLK1_P
+set_instance_assignment -name VIRTUAL_PIN ON -to PCIE2_CLK1_N
+
+set_instance_assignment -name VIRTUAL_PIN ON -to PCIE2_RX_P
+set_instance_assignment -name VIRTUAL_PIN ON -to PCIE2_RX_N
+set_instance_assignment -name VIRTUAL_PIN ON -to PCIE2_TX_P
+set_instance_assignment -name VIRTUAL_PIN ON -to PCIE2_TX_N
+
+# PRESERVE R-Tile
+set_instance_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON -to AL8

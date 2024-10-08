@@ -1,0 +1,23 @@
+# cxl_virtual.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set_instance_assignment -name VIRTUAL_PIN ON -to fpga_cxl_perstn
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_cxl_15c_ch0_n
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_cxl_15c_ch0_p
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_cxl_15c_ch1_n
+set_instance_assignment -name VIRTUAL_PIN ON -to refclk_cxl_15c_ch1_p
+set_instance_assignment -name VIRTUAL_PIN ON -to fpga_cxl_prsntx1_n
+set_instance_assignment -name VIRTUAL_PIN ON -to fpga_cxl_prsntx4_n
+set_instance_assignment -name VIRTUAL_PIN ON -to fpga_cxl_prsntx8_n
+set_instance_assignment -name VIRTUAL_PIN ON -to fpga_cxl_prsntx16_n
+
+set_instance_assignment -name VIRTUAL_PIN ON -to cxl_rx_p
+set_instance_assignment -name VIRTUAL_PIN ON -to cxl_rx_n
+set_instance_assignment -name VIRTUAL_PIN ON -to cxl_tx_p
+set_instance_assignment -name VIRTUAL_PIN ON -to cxl_tx_n
+
+# PRESERVE R-Tile 15C (CXL)
+set_instance_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON -to AL8

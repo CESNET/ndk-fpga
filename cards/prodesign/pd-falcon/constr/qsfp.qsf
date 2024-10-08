@@ -1,0 +1,227 @@
+# qsfp.qsf
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Denis Kurka <xkurka05@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Pin Locations
+# ==============================================================================
+
+# Clock settings
+set_location_assignment PIN_AV15 -to REFCLK_R9A1
+set_location_assignment PIN_AV14 -to "REFCLK_R9A1(n)"
+
+set_location_assignment PIN_AU17 -to REFCLK_R9A2
+set_location_assignment PIN_AT17 -to "REFCLK_R9A2(n)"
+
+
+set_location_assignment PIN_AG14 -to REFCLK_R9C1
+set_location_assignment PIN_AH15 -to "REFCLK_R9C1(n)"
+
+set_location_assignment PIN_AG18 -to REFCLK_R9C2
+set_location_assignment PIN_AF18 -to "REFCLK_R9C2(n)"
+
+
+
+set_location_assignment PIN_AH42 -to REFCLK_L8C1
+set_location_assignment PIN_AG41 -to "REFCLK_L8C1(n)"
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_R9A1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_R9A2
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_L8C1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_R9C1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_R9C2
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_R9A1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_L8C1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_R9C1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_R9A2
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_R9C2
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_R9A1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_L8C1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_R9C1
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol" -to REFCLK_R9A1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol" -to REFCLK_L8C1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol" -to REFCLK_R9C1
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to REFCLK_R9A1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to REFCLK_L8C1
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to REFCLK_R9C1
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_R9A2
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_R9C2
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol" -to REFCLK_R9A2
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol" -to REFCLK_R9C2
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to REFCLK_R9A2
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to REFCLK_R9C2
+
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_R9A1
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_R9A2
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_L8C1
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_R9C1
+set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_R9C2
+
+## TX PINs
+# QSPFDD TX on QSFP_DD1 connector
+set_location_assignment PIN_BK1 -to QSFP1_TX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP1_TX_P[0]
+set_location_assignment PIN_BK2 -to QSFP1_TX_N[0]
+
+set_location_assignment PIN_BJ4 -to QSFP1_TX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP1_TX_P[1]
+set_location_assignment PIN_BJ5 -to QSFP1_TX_N[1]
+
+set_location_assignment PIN_BH1 -to QSFP1_TX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP1_TX_P[2]
+set_location_assignment PIN_BH2 -to QSFP1_TX_N[2]
+
+set_location_assignment PIN_BG4 -to QSFP1_TX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP1_TX_P[3]
+set_location_assignment PIN_BG5 -to QSFP1_TX_N[3]
+
+# QSPFDD TX on QSFP_DD2 connector
+set_location_assignment PIN_AV1 -to QSFP2_TX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP2_TX_P[0]
+set_location_assignment PIN_AV2 -to QSFP2_TX_N[0]
+
+set_location_assignment PIN_AU4 -to QSFP2_TX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP2_TX_P[1]
+set_location_assignment PIN_AU5 -to QSFP2_TX_N[1]
+
+set_location_assignment PIN_AT1 -to QSFP2_TX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP2_TX_P[2]
+set_location_assignment PIN_AT2 -to QSFP2_TX_N[2]
+
+set_location_assignment PIN_AR4 -to QSFP2_TX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP2_TX_P[3]
+set_location_assignment PIN_AR5 -to QSFP2_TX_N[3]
+
+
+# QSPFDD TX on QSFP_DD3 connector
+set_location_assignment PIN_AF1 -to QSFP3_TX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_TX_P[0]
+set_location_assignment PIN_AF2 -to QSFP3_TX_N[0]
+
+set_location_assignment PIN_AE4 -to QSFP3_TX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_TX_P[1]
+set_location_assignment PIN_AE5 -to QSFP3_TX_N[1]
+
+set_location_assignment PIN_AD1 -to QSFP3_TX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_TX_P[2]
+set_location_assignment PIN_AD2 -to QSFP3_TX_N[2]
+
+set_location_assignment PIN_AC4 -to QSFP3_TX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_TX_P[3]
+set_location_assignment PIN_AC5 -to QSFP3_TX_N[3]
+
+#set_location_assignment PIN_V1 -to QSFP3_TX_P[4]
+#set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_TX_P[4]
+#set_location_assignment PIN_V2 -to QSFP3_TX_N[4]
+#
+#set_location_assignment PIN_U4 -to QSFP3_TX_P[5]
+#set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_TX_P[5]
+#set_location_assignment PIN_U5 -to QSFP3_TX_N[5]
+#
+#set_location_assignment PIN_T1 -to QSFP3_TX_P[6]
+#set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_TX_P[6]
+#set_location_assignment PIN_T2 -to QSFP3_TX_N[6]
+#
+#set_location_assignment PIN_R4 -to QSFP3_TX_P[7]
+#set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_TX_P[7]
+#set_location_assignment PIN_R5 -to QSFP3_TX_N[7]
+
+
+# QSPFDD TX on QSFP_DD4 connector
+set_location_assignment PIN_P1 -to QSFP4_TX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP4_TX_P[0]
+set_location_assignment PIN_P2 -to QSFP4_TX_N[0]
+
+set_location_assignment PIN_N4 -to QSFP4_TX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP4_TX_P[1]
+set_location_assignment PIN_N5 -to QSFP4_TX_N[1]
+
+set_location_assignment PIN_M1 -to QSFP4_TX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP4_TX_P[2]
+set_location_assignment PIN_M2 -to QSFP4_TX_N[2]
+
+set_location_assignment PIN_L4 -to QSFP4_TX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP4_TX_P[3]
+set_location_assignment PIN_L5 -to QSFP4_TX_N[3]
+
+
+## RX PINs
+# QSPFDD RX on QSFP_DD1 connector
+set_location_assignment PIN_AY13 -to QSFP1_RX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP1_RX_P[0]
+set_location_assignment PIN_AY14 -to QSFP1_RX_N[0]
+
+set_location_assignment PIN_BG10 -to QSFP1_RX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP1_RX_P[1]
+set_location_assignment PIN_BG11 -to QSFP1_RX_N[1]
+
+set_location_assignment PIN_BK7 -to QSFP1_RX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP1_RX_P[2]
+set_location_assignment PIN_BK8 -to QSFP1_RX_N[2]
+
+set_location_assignment PIN_BE10 -to QSFP1_RX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP1_RX_P[3]
+set_location_assignment PIN_BE11 -to QSFP1_RX_N[3]
+
+
+# QSPFDD RX on QSFP_DD2 connector
+set_location_assignment PIN_AR10 -to QSFP2_RX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP2_RX_P[0]
+set_location_assignment PIN_AR11 -to QSFP2_RX_N[0]
+
+set_location_assignment PIN_AY7 -to QSFP2_RX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP2_RX_P[1]
+set_location_assignment PIN_AY8 -to QSFP2_RX_N[1]
+
+set_location_assignment PIN_AV7 -to QSFP2_RX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP2_RX_P[2]
+set_location_assignment PIN_AV8 -to QSFP2_RX_N[2]
+
+set_location_assignment PIN_AN10 -to QSFP2_RX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP2_RX_P[3]
+set_location_assignment PIN_AN11 -to QSFP2_RX_N[3]
+
+
+# QSPFDD RX on QSFP_DD3 connector
+set_location_assignment PIN_AF7 -to QSFP3_RX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_RX_P[0]
+set_location_assignment PIN_AF8 -to QSFP3_RX_N[0]
+
+set_location_assignment PIN_AD7 -to QSFP3_RX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_RX_P[1]
+set_location_assignment PIN_AD8 -to QSFP3_RX_N[1]
+
+set_location_assignment PIN_AE10 -to QSFP3_RX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_RX_P[2]
+set_location_assignment PIN_AE11 -to QSFP3_RX_N[2]
+
+set_location_assignment PIN_AB7 -to QSFP3_RX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP3_RX_P[3]
+set_location_assignment PIN_AB8 -to QSFP3_RX_N[3]
+
+
+# QSPFDD RX on QSFP_DD4 connector
+set_location_assignment PIN_R10 -to QSFP4_RX_P[0]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP4_RX_P[0]
+set_location_assignment PIN_R11 -to QSFP4_RX_N[0]
+
+set_location_assignment PIN_U10 -to QSFP4_RX_P[1]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP4_RX_P[1]
+set_location_assignment PIN_U11 -to QSFP4_RX_N[1]
+
+set_location_assignment PIN_W10 -to QSFP4_RX_P[2]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP4_RX_P[2]
+set_location_assignment PIN_W11 -to QSFP4_RX_N[2]
+
+set_location_assignment PIN_N10 -to QSFP4_RX_P[3]
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to QSFP4_RX_P[3]
+set_location_assignment PIN_N11 -to QSFP4_RX_N[3]

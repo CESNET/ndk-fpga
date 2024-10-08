@@ -1,0 +1,54 @@
+<pfg version="1">
+    <settings custom_db_dir="./" mode="AVSTX8"/>
+    <output_files>
+        <output_file name="fpga" directory="./" type="POF">
+            <file_options/>
+            <secondary_file type="MAP" name="fpga_pof">
+                <file_options/>
+            </secondary_file>
+            <flash_device_id>Flash_Device_1</flash_device_id>
+        </output_file>
+    </output_files>
+    <bitstreams>
+        <bitstream id="Bitstream_1">
+            <path>./fpga.sof</path>
+        </bitstream>
+    </bitstreams>
+    <raw_files>
+        <raw_file type="HEX" id="Info_Factory_1">./factory_image_info.hex</raw_file>
+        <raw_file type="HEX" id="Info_User_1">./user1_image_info.hex</raw_file>
+        <raw_file type="HEX" id="Info_User_2">./user2_image_info.hex</raw_file>
+    </raw_files>
+    <flash_devices>
+        <flash_device type="CFI_2Gb" id="Flash_Device_1">
+            <partition reserved="1" fixed_s_addr="0" s_addr="0x00010000" e_addr="auto" fixed_e_addr="0" id="OPTIONS" size="0"/>
+            <partition reserved="0" fixed_s_addr="0" s_addr="0x00020000" e_addr="0x381F000" fixed_e_addr="0" id="Factory_Image" size="0"/>
+            <partition reserved="0" fixed_s_addr="0" s_addr="0x04000000" e_addr="0x77FF000" fixed_e_addr="0" id="User_Image_1" size="0"/>
+            <partition reserved="0" fixed_s_addr="0" s_addr="0x07FF6000" e_addr="auto" fixed_e_addr="0" id="factory_image_info" size="0"/>
+            <partition reserved="0" fixed_s_addr="0" s_addr="0x07FF7000" e_addr="auto" fixed_e_addr="0" id="user1_image_info" size="0"/>
+            <partition reserved="0" fixed_s_addr="0" s_addr="0x07FF8000" e_addr="auto" fixed_e_addr="0" id="user2_image_info" size="0"/>
+            <partition reserved="0" fixed_s_addr="0" s_addr="0x08000000" e_addr="0xB7FF000" fixed_e_addr="0" id="User_Image_2" size="0"/>
+        </flash_device>
+    </flash_devices>
+    <assignments>
+        <assignment page="1" partition_id="User_Image_1">
+            <bitstream_id>Bitstream_1</bitstream_id>
+        </assignment>
+        <assignment page="2" partition_id="User_Image_2">
+            <bitstream_id>Bitstream_1</bitstream_id>
+        </assignment>
+        <assignment page="0" partition_id="Factory_Image">
+            <bitstream_id>Bitstream_1</bitstream_id>
+        </assignment>
+        <assignment partition_id="factory_image_info">
+            <raw_file_id>Info_Factory_1</raw_file_id>
+        </assignment>
+        <assignment partition_id="user1_image_info">
+            <raw_file_id>Info_User_1</raw_file_id>
+        </assignment>
+        <assignment partition_id="user2_image_info">
+            <raw_file_id>Info_User_2</raw_file_id>
+        </assignment>
+    </assignments>
+</pfg>
+

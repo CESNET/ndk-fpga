@@ -1,0 +1,64 @@
+# qsfp.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Daniel Kříž <xkrizd01@vutbr.cz.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Pin Locations - QSFP-DD
+# ==============================================================================
+
+set_location_assignment PIN_AT13 -to QSFP_REFCLK_156M
+set_location_assignment PIN_AP13 -to "QSFP_REFCLK_156M(n)"
+
+set_location_assignment PIN_BM11 -to QSFP_RX_N[7]
+set_location_assignment PIN_BL10 -to QSFP_RX_P[7]
+set_location_assignment PIN_BJ8  -to QSFP_RX_N[6]
+set_location_assignment PIN_BK7  -to QSFP_RX_P[6]
+set_location_assignment PIN_BH11 -to QSFP_RX_N[5]
+set_location_assignment PIN_BG10 -to QSFP_RX_P[5]
+set_location_assignment PIN_BE8  -to QSFP_RX_N[4]
+set_location_assignment PIN_BF7  -to QSFP_RX_P[4]
+set_location_assignment PIN_BD11 -to QSFP_RX_N[3]
+set_location_assignment PIN_BC10 -to QSFP_RX_P[3]
+set_location_assignment PIN_BA8  -to QSFP_RX_N[2]
+set_location_assignment PIN_BB7  -to QSFP_RX_P[2]
+set_location_assignment PIN_AY11 -to QSFP_RX_N[1]
+set_location_assignment PIN_AW10 -to QSFP_RX_P[1]
+set_location_assignment PIN_AU8  -to QSFP_RX_N[0]
+set_location_assignment PIN_AV7  -to QSFP_RX_P[0]
+
+set_location_assignment PIN_BM5 -to QSFP_TX_N[7]
+set_location_assignment PIN_BL4 -to QSFP_TX_P[7]
+set_location_assignment PIN_BJ2 -to QSFP_TX_N[6]
+set_location_assignment PIN_BK1 -to QSFP_TX_P[6]
+set_location_assignment PIN_BH5 -to QSFP_TX_N[5]
+set_location_assignment PIN_BG4 -to QSFP_TX_P[5]
+set_location_assignment PIN_BE2 -to QSFP_TX_N[4]
+set_location_assignment PIN_BF1 -to QSFP_TX_P[4]
+set_location_assignment PIN_BD5 -to QSFP_TX_N[3]
+set_location_assignment PIN_BC4 -to QSFP_TX_P[3]
+set_location_assignment PIN_BA2 -to QSFP_TX_N[2]
+set_location_assignment PIN_BB1 -to QSFP_TX_P[2]
+set_location_assignment PIN_AY5 -to QSFP_TX_N[1]
+set_location_assignment PIN_AW4 -to QSFP_TX_P[1]
+set_location_assignment PIN_AU2 -to QSFP_TX_N[0]
+set_location_assignment PIN_AV1 -to QSFP_TX_P[0]
+
+# ==============================================================================
+# Pin IO Standards & Input Termination 
+# ==============================================================================
+
+set_instance_assignment  -name IO_STANDARD "DIFFERENTIAL LVPECL" -to QSFP_REFCLK_156M
+
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to QSFP_REFCLK_156M
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol"   -to QSFP_REFCLK_156M
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to QSFP_REFCLK_156M
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000"           -to QSFP_REFCLK_156M
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false"           -to QSFP_REFCLK_156M
+
+set_global_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON
+set_instance_assignment -name HSSI_PARAMETER "refclk_divider_use_as_bti_clock=true" -to QSFP_REFCLK_156M
+
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP_TX_P
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP_RX_P                                                             

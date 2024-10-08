@@ -1,0 +1,179 @@
+# pcie.qsf
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Pin Locations - PCIe 0
+# ==============================================================================
+
+set_location_assignment PIN_AP44 -to PCIE0_SYSCLK1_N
+set_location_assignment PIN_AP45 -to PCIE0_SYSCLK1_P
+set_location_assignment PIN_AT44 -to PCIE0_SYSCLK0_N
+set_location_assignment PIN_AT45 -to PCIE0_SYSCLK0_P
+
+set_location_assignment PIN_BB39 -to PCIE0_SYSRST_N
+set_location_assignment PIN_E37  -to PCIE0_WAKE
+
+set_location_assignment PIN_AP53 -to PCIE0_RX_N[15]
+set_location_assignment PIN_AP54 -to PCIE0_RX_P[15]
+set_location_assignment PIN_AR51 -to PCIE0_RX_N[14]
+set_location_assignment PIN_AR52 -to PCIE0_RX_P[14]
+set_location_assignment PIN_AT53 -to PCIE0_RX_N[13]
+set_location_assignment PIN_AT54 -to PCIE0_RX_P[13]
+set_location_assignment PIN_AU51 -to PCIE0_RX_N[12]
+set_location_assignment PIN_AU52 -to PCIE0_RX_P[12]
+set_location_assignment PIN_AV53 -to PCIE0_RX_N[11]
+set_location_assignment PIN_AV54 -to PCIE0_RX_P[11]
+set_location_assignment PIN_AW51 -to PCIE0_RX_N[10]
+set_location_assignment PIN_AW52 -to PCIE0_RX_P[10]
+set_location_assignment PIN_AY53 -to PCIE0_RX_N[9]
+set_location_assignment PIN_AY54 -to PCIE0_RX_P[9]
+set_location_assignment PIN_BA51 -to PCIE0_RX_N[8]
+set_location_assignment PIN_BA52 -to PCIE0_RX_P[8]
+set_location_assignment PIN_BB53 -to PCIE0_RX_N[7]
+set_location_assignment PIN_BB54 -to PCIE0_RX_P[7]
+set_location_assignment PIN_BC51 -to PCIE0_RX_N[6]
+set_location_assignment PIN_BC52 -to PCIE0_RX_P[6]
+set_location_assignment PIN_BD53 -to PCIE0_RX_N[5]
+set_location_assignment PIN_BD54 -to PCIE0_RX_P[5]
+set_location_assignment PIN_BE51 -to PCIE0_RX_N[4]
+set_location_assignment PIN_BE52 -to PCIE0_RX_P[4]
+set_location_assignment PIN_BF53 -to PCIE0_RX_N[3]
+set_location_assignment PIN_BF54 -to PCIE0_RX_P[3]
+set_location_assignment PIN_BG51 -to PCIE0_RX_N[2]
+set_location_assignment PIN_BG52 -to PCIE0_RX_P[2]
+set_location_assignment PIN_BH53 -to PCIE0_RX_N[1]
+set_location_assignment PIN_BH54 -to PCIE0_RX_P[1]
+set_location_assignment PIN_BJ51 -to PCIE0_RX_N[0]
+set_location_assignment PIN_BJ52 -to PCIE0_RX_P[0]
+
+set_location_assignment PIN_AP49 -to PCIE0_TX_N[15]
+set_location_assignment PIN_AP50 -to PCIE0_TX_P[15]
+set_location_assignment PIN_AR47 -to PCIE0_TX_N[14]
+set_location_assignment PIN_AR48 -to PCIE0_TX_P[14]
+set_location_assignment PIN_AT49 -to PCIE0_TX_N[13]
+set_location_assignment PIN_AT50 -to PCIE0_TX_P[13]
+set_location_assignment PIN_AU47 -to PCIE0_TX_N[12]
+set_location_assignment PIN_AU48 -to PCIE0_TX_P[12]
+set_location_assignment PIN_AV49 -to PCIE0_TX_N[11]
+set_location_assignment PIN_AV50 -to PCIE0_TX_P[11]
+set_location_assignment PIN_AW47 -to PCIE0_TX_N[10]
+set_location_assignment PIN_AW48 -to PCIE0_TX_P[10]
+set_location_assignment PIN_AY49 -to PCIE0_TX_N[9]
+set_location_assignment PIN_AY50 -to PCIE0_TX_P[9]
+set_location_assignment PIN_BA47 -to PCIE0_TX_N[8]
+set_location_assignment PIN_BA48 -to PCIE0_TX_P[8]
+set_location_assignment PIN_BB49 -to PCIE0_TX_N[7]
+set_location_assignment PIN_BB50 -to PCIE0_TX_P[7]
+set_location_assignment PIN_BC47 -to PCIE0_TX_N[6]
+set_location_assignment PIN_BC48 -to PCIE0_TX_P[6]
+set_location_assignment PIN_BD49 -to PCIE0_TX_N[5]
+set_location_assignment PIN_BD50 -to PCIE0_TX_P[5]
+set_location_assignment PIN_BE47 -to PCIE0_TX_N[4]
+set_location_assignment PIN_BE48 -to PCIE0_TX_P[4]
+set_location_assignment PIN_BF49 -to PCIE0_TX_N[3]
+set_location_assignment PIN_BF50 -to PCIE0_TX_P[3]
+set_location_assignment PIN_BG47 -to PCIE0_TX_N[2]
+set_location_assignment PIN_BG48 -to PCIE0_TX_P[2]
+set_location_assignment PIN_BH49 -to PCIE0_TX_N[1]
+set_location_assignment PIN_BH50 -to PCIE0_TX_P[1]
+set_location_assignment PIN_BJ47 -to PCIE0_TX_N[0]
+set_location_assignment PIN_BJ48 -to PCIE0_TX_P[0]
+
+# ==============================================================================
+# Pin Locations - PCIe 1 (UPI0)
+# ==============================================================================
+
+set_location_assignment PIN_AG44 -to PCIE1_SYSCLK1_N
+set_location_assignment PIN_AG45 -to PCIE1_SYSCLK1_P
+set_location_assignment PIN_AJ44 -to PCIE1_SYSCLK0_N
+set_location_assignment PIN_AJ45 -to PCIE1_SYSCLK0_P
+
+set_location_assignment PIN_AD45 -to PCIE1_SYSRST_N
+
+set_location_assignment PIN_V53  -to PCIE1_RX_N[15]
+set_location_assignment PIN_V54  -to PCIE1_RX_P[15]
+set_location_assignment PIN_W51  -to PCIE1_RX_N[14]
+set_location_assignment PIN_W52  -to PCIE1_RX_P[14]
+set_location_assignment PIN_Y53  -to PCIE1_RX_N[13]
+set_location_assignment PIN_Y54  -to PCIE1_RX_P[13]
+set_location_assignment PIN_AA51 -to PCIE1_RX_N[12]
+set_location_assignment PIN_AA52 -to PCIE1_RX_P[12]
+set_location_assignment PIN_AB53 -to PCIE1_RX_N[11]
+set_location_assignment PIN_AB54 -to PCIE1_RX_P[11]
+set_location_assignment PIN_AC51 -to PCIE1_RX_N[10]
+set_location_assignment PIN_AC52 -to PCIE1_RX_P[10]
+set_location_assignment PIN_AD53 -to PCIE1_RX_N[9]
+set_location_assignment PIN_AD54 -to PCIE1_RX_P[9]
+set_location_assignment PIN_AE51 -to PCIE1_RX_N[8]
+set_location_assignment PIN_AE52 -to PCIE1_RX_P[8]
+set_location_assignment PIN_AF53 -to PCIE1_RX_N[7]
+set_location_assignment PIN_AF54 -to PCIE1_RX_P[7]
+set_location_assignment PIN_AG51 -to PCIE1_RX_N[6]
+set_location_assignment PIN_AG52 -to PCIE1_RX_P[6]
+set_location_assignment PIN_AH53 -to PCIE1_RX_N[5]
+set_location_assignment PIN_AH54 -to PCIE1_RX_P[5]
+set_location_assignment PIN_AJ51 -to PCIE1_RX_N[4]
+set_location_assignment PIN_AJ52 -to PCIE1_RX_P[4]
+set_location_assignment PIN_AK53 -to PCIE1_RX_N[3]
+set_location_assignment PIN_AK54 -to PCIE1_RX_P[3]
+set_location_assignment PIN_AL51 -to PCIE1_RX_N[2]
+set_location_assignment PIN_AL52 -to PCIE1_RX_P[2]
+set_location_assignment PIN_AM53 -to PCIE1_RX_N[1]
+set_location_assignment PIN_AM54 -to PCIE1_RX_P[1]
+set_location_assignment PIN_AN51 -to PCIE1_RX_N[0]
+set_location_assignment PIN_AN52 -to PCIE1_RX_P[0]
+
+set_location_assignment PIN_V49  -to PCIE1_TX_N[15]
+set_location_assignment PIN_V50  -to PCIE1_TX_P[15]
+set_location_assignment PIN_W47  -to PCIE1_TX_N[14]
+set_location_assignment PIN_W48  -to PCIE1_TX_P[14]
+set_location_assignment PIN_Y49  -to PCIE1_TX_N[13]
+set_location_assignment PIN_Y50  -to PCIE1_TX_P[13]
+set_location_assignment PIN_AA47 -to PCIE1_TX_N[12]
+set_location_assignment PIN_AA48 -to PCIE1_TX_P[12]
+set_location_assignment PIN_AB49 -to PCIE1_TX_N[11]
+set_location_assignment PIN_AB50 -to PCIE1_TX_P[11]
+set_location_assignment PIN_AC47 -to PCIE1_TX_N[10]
+set_location_assignment PIN_AC48 -to PCIE1_TX_P[10]
+set_location_assignment PIN_AD49 -to PCIE1_TX_N[9]
+set_location_assignment PIN_AD50 -to PCIE1_TX_P[9]
+set_location_assignment PIN_AE47 -to PCIE1_TX_N[8]
+set_location_assignment PIN_AE48 -to PCIE1_TX_P[8]
+set_location_assignment PIN_AF49 -to PCIE1_TX_N[7]
+set_location_assignment PIN_AF50 -to PCIE1_TX_P[7]
+set_location_assignment PIN_AG47 -to PCIE1_TX_N[6]
+set_location_assignment PIN_AG48 -to PCIE1_TX_P[6]
+set_location_assignment PIN_AH49 -to PCIE1_TX_N[5]
+set_location_assignment PIN_AH50 -to PCIE1_TX_P[5]
+set_location_assignment PIN_AJ47 -to PCIE1_TX_N[4]
+set_location_assignment PIN_AJ48 -to PCIE1_TX_P[4]
+set_location_assignment PIN_AK49 -to PCIE1_TX_N[3]
+set_location_assignment PIN_AK50 -to PCIE1_TX_P[3]
+set_location_assignment PIN_AL47 -to PCIE1_TX_N[2]
+set_location_assignment PIN_AL48 -to PCIE1_TX_P[2]
+set_location_assignment PIN_AM49 -to PCIE1_TX_N[1]
+set_location_assignment PIN_AM50 -to PCIE1_TX_P[1]
+set_location_assignment PIN_AN47 -to PCIE1_TX_N[0]
+set_location_assignment PIN_AN48 -to PCIE1_TX_P[0]
+
+# ==============================================================================
+# Pin IO Standards & Input Termination 
+# ==============================================================================
+
+set_instance_assignment -name IO_STANDARD HCSL -to PCIE0_SYSCLK1_P
+set_instance_assignment -name IO_STANDARD HCSL -to PCIE0_SYSCLK0_P
+set_instance_assignment -name IO_STANDARD HCSL -to PCIE1_SYSCLK1_P
+set_instance_assignment -name IO_STANDARD HCSL -to PCIE1_SYSCLK0_P
+
+set_instance_assignment -name IO_STANDARD 1.8V -to PCIE0_SYSRST_N
+set_instance_assignment -name IO_STANDARD 1.8V -to PCIE0_WAKE
+set_instance_assignment -name IO_STANDARD 1.8V -to PCIE1_SYSRST_N
+set_instance_assignment -name IO_STANDARD 1.8V -to PCIE1_WAKE
+
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to PCIE0_TX_P
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to PCIE0_RX_P
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to PCIE1_TX_P
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to PCIE1_RX_P

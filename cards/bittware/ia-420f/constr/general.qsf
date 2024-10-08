@@ -1,0 +1,97 @@
+# general.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Daniel Kříž <xkrizd01@vutbr.cz.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Main device/configuration
+# ==============================================================================
+
+set_global_assignment -name FAMILY Agilex
+set_global_assignment -name DEVICE AGFB014R24B2E2V
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
+
+set_global_assignment -name STRATIXV_CONFIGURATION_SCHEME "ACTIVE SERIAL X4"
+set_global_assignment -name ENABLE_ED_CRC_CHECK ON
+set_global_assignment -name MINIMUM_SEU_INTERVAL 0
+set_global_assignment -name ACTIVE_SERIAL_CLOCK AS_FREQ_100MHZ
+set_global_assignment -name USE_PWRMGT_SCL SDM_IO14
+set_global_assignment -name USE_PWRMGT_SDA SDM_IO11
+set_global_assignment -name USE_CONF_DONE SDM_IO16
+set_global_assignment -name USE_PWRMGT_ALERT SDM_IO12
+set_global_assignment -name USE_INIT_DONE SDM_IO0
+set_global_assignment -name USE_HPS_COLD_RESET SDM_IO13
+set_global_assignment -name SDM_DIRECT_TO_FACTORY_IMAGE SDM_IO10
+set_global_assignment -name VID_OPERATION_MODE "PMBUS SLAVE"
+set_global_assignment -name PWRMGT_DEVICE_ADDRESS_IN_PMBUS_SLAVE_MODE 01
+set_global_assignment -name DEVICE_INITIALIZATION_CLOCK OSC_CLK_1_125MHZ
+set_global_assignment -name PWRMGT_VOLTAGE_OUTPUT_FORMAT "LINEAR FORMAT"
+set_global_assignment -name PWRMGT_LINEAR_FORMAT_N "-12"
+
+set_global_assignment -name GENERATE_COMPRESSED_SOF ON
+
+# ==============================================================================
+# Clocks
+# ==============================================================================
+
+set_location_assignment PIN_CU50 -to USR_CLK_33M
+set_location_assignment PIN_CR50 -to "USR_CLK_33M(n)"
+
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to USR_CLK_33M
+
+set_location_assignment PIN_DC52 -to SYS_CLK_50M
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SYS_CLK_50M
+
+# ==============================================================================
+# LEDs
+# ==============================================================================
+
+set_location_assignment PIN_CU48 -to USER_LED_G
+set_location_assignment PIN_CT49 -to USER_LED_R
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to USER_LED_G
+set_instance_assignment -name IO_STANDARD "1.2 V" -to USER_LED_R
+
+# ==============================================================================
+# Shared I2C bus
+# ==============================================================================
+
+set_location_assignment PIN_CE52 -to FPGA_I2C_SCL
+set_location_assignment PIN_CM57 -to FPGA_I2C_SDA
+set_location_assignment PIN_CK57 -to FPGA_I2C_MUX_GNT
+set_location_assignment PIN_CN56 -to FPGA_I2C_REQ_L
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_I2C_SDA
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_I2C_SCL
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_I2C_MUX_GNT
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_I2C_REQ_L
+
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to FPGA_I2C_SDA
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to FPGA_I2C_SCL
+set_instance_assignment -name AUTO_OPEN_DRAIN_PINS ON  -to FPGA_I2C_SDA
+set_instance_assignment -name AUTO_OPEN_DRAIN_PINS ON  -to FPGA_I2C_SCL
+set_instance_assignment -name FAST_OUTPUT_REGISTER off -to FPGA_I2C_SDA
+set_instance_assignment -name FAST_OUTPUT_REGISTER off -to FPGA_I2C_SCL
+
+# ==============================================================================
+# BMC SPI bus
+# ==============================================================================
+
+set_location_assignment PIN_CH53 -to FPGA2BMC_IRQ
+set_location_assignment PIN_CF53 -to FPGA2BMC_MST_EN_N
+set_location_assignment PIN_CG52 -to BMC2FPGA_RST_N
+set_location_assignment PIN_DC56 -to BMC2FPGA_SPI_SCK
+set_location_assignment PIN_DA56 -to BMC2FPGA_SPI_MISO
+set_location_assignment PIN_DB55 -to BMC2FPGA_SPI_MOSI
+set_location_assignment PIN_CY55 -to BMC2FPGA_SPI_CS
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA2BMC_IRQ
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA2BMC_MST_EN_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to BMC2FPGA_RST_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to BMC2FPGA_SPI_SCK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to BMC2FPGA_SPI_MISO
+set_instance_assignment -name IO_STANDARD "1.2 V" -to BMC2FPGA_SPI_MOSI
+set_instance_assignment -name IO_STANDARD "1.2 V" -to BMC2FPGA_SPI_CS

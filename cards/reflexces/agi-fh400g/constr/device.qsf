@@ -1,0 +1,12 @@
+# device.qsf
+# Copyright (C) 2024 BrnoLogic
+# Author(s): Vlastimil Kosar <kosar@brnologic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+#  Global assignments
+# ==============================================================================
+
+set_global_assignment -name DEVICE AGIB027R29A1E2V
+set_global_assignment -name FAMILY Agilex

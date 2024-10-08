@@ -1,0 +1,137 @@
+# general.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Martin Matějka <xmatej55@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Main device/configuration
+# ==============================================================================
+
+set_global_assignment -name FAMILY Agilex
+set_global_assignment -name DEVICE AGFB014R24A2E2V
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "1.2 V"
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
+set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "USE AS REGULAR IO"
+#set_global_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON
+
+set_global_assignment -name PWRMGT_DEVICE_ADDRESS_IN_PMBUS_SLAVE_MODE 3C
+set_global_assignment -name VID_OPERATION_MODE "PMBUS SLAVE"
+set_global_assignment -name PWRMGT_BUS_SPEED_MODE "100 KHZ"
+
+set_global_assignment -name AUTO_RESTART_CONFIGURATION OFF
+set_global_assignment -name ENABLE_CONFIGURATION_PINS OFF
+set_global_assignment -name ENABLE_BOOT_SEL_PIN OFF
+set_global_assignment -name STRATIXV_CONFIGURATION_SCHEME "AVST X8"
+set_global_assignment -name USE_CONFIGURATION_DEVICE OFF
+set_global_assignment -name STRATIXII_CONFIGURATION_DEVICE AUTO
+set_global_assignment -name GENERATE_PR_RBF_FILE ON
+set_global_assignment -name ENABLE_ED_CRC_CHECK ON
+set_global_assignment -name MINIMUM_SEU_INTERVAL 479
+set_global_assignment -name ACTIVE_SERIAL_CLOCK AS_FREQ_115MHZ_IOSC
+set_global_assignment -name DEVICE_INITIALIZATION_CLOCK OSC_CLK_1_125MHZ
+set_global_assignment -name USE_PWRMGT_SCL SDM_IO0
+set_global_assignment -name USE_PWRMGT_SDA SDM_IO16
+set_global_assignment -name USE_PWRMGT_ALERT SDM_IO12
+set_global_assignment -name USE_INIT_DONE SDM_IO5
+set_global_assignment -name USE_NCATTRIP SDM_IO9
+set_global_assignment -name USE_CONF_DONE Off
+
+#set_global_assignment -name PWRMGT_VOLTAGE_OUTPUT_FORMAT "Auto discovery"
+#set_global_assignment -name PWRMGT_LINEAR_FORMAT_N 0
+
+set_global_assignment -name GENERATE_COMPRESSED_SOF ON
+
+# ==============================================================================
+# Clocks
+# ==============================================================================
+
+set_location_assignment PIN_A24 -to SYS_CLK_100M
+set_location_assignment PIN_C24 -to "SYS_CLK_100M(n)"
+
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to SYS_CLK_100M
+set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to SYS_CLK_100M
+
+# ==============================================================================
+# LEDs
+# ==============================================================================
+
+# ==============================================================================
+# BMC interface
+# ==============================================================================
+
+set_location_assignment PIN_DC20 -to QSPI_DCLK
+set_location_assignment PIN_CT17 -to QSPI_NCS
+set_location_assignment PIN_CY21 -to QSPI_DATA[0]
+set_location_assignment PIN_CT19 -to QSPI_DATA[1]
+set_location_assignment PIN_CU22 -to QSPI_DATA[2]
+set_location_assignment PIN_CR22 -to QSPI_DATA[3]
+set_location_assignment PIN_DA20 -to SPI_INGRESS_SCLK
+set_location_assignment PIN_CY17 -to SPI_INGRESS_CSN
+set_location_assignment PIN_CY19 -to SPI_INGRESS_MISO
+set_location_assignment PIN_DB19 -to SPI_INGRESS_MOSI
+set_location_assignment PIN_DA18 -to SPI_EGRESS_MOSI
+set_location_assignment PIN_DC18 -to SPI_EGRESS_CSN
+set_location_assignment PIN_CR24 -to SPI_EGRESS_SCLK
+set_location_assignment PIN_DB17 -to SPI_EGRESS_MISO
+set_location_assignment PIN_CU24 -to M10_GPIO_FPGA_USR_100M
+set_location_assignment PIN_CT21 -to M10_GPIO_FPGA_M10_HB
+set_location_assignment PIN_C30  -to M10_GPIO_M10_SEU_ERROR
+set_location_assignment PIN_J24  -to M10_GPIO_FPGA_THERM_SHDN
+set_location_assignment PIN_B19  -to M10_GPIO_FPGA_SEU_ERROR
+set_location_assignment PIN_G28  -to NCSI_RBT_NCSI_CLK
+set_location_assignment PIN_G30  -to NCSI_RBT_NCSI_TXD[0]
+set_location_assignment PIN_P31  -to NCSI_RBT_NCSI_TXD[1]
+set_location_assignment PIN_M31  -to NCSI_RBT_NCSI_TX_EN
+set_location_assignment PIN_H29  -to NCSI_RBT_NCSI_RXD[0]
+set_location_assignment PIN_J30  -to NCSI_RBT_NCSI_RXD[1]
+set_location_assignment PIN_L30  -to NCSI_RBT_NCSI_CRS_DV 
+set_location_assignment PIN_N30  -to NCSI_RBT_NCSI_ARB_IN 
+set_location_assignment PIN_F29  -to NCSI_RBT_NCSI_ARB_OUT
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSPI_NCS
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSPI_DATA
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSPI_DCLK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SPI_INGRESS_SCLK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SPI_INGRESS_CSN
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SPI_INGRESS_MISO
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SPI_INGRESS_MOSI
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SPI_EGRESS_MOSI
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SPI_EGRESS_CSN
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SPI_EGRESS_SCLK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SPI_EGRESS_MISO
+set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_GPIO_FPGA_USR_100M
+set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_GPIO_FPGA_M10_HB
+set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_GPIO_M10_SEU_ERROR
+set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_GPIO_FPGA_SEU_ERROR
+set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_GPIO_FPGA_THERM_SHDN
+set_instance_assignment -name IO_STANDARD "1.2 V" -to NCSI_RBT_NCSI_CLK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to NCSI_RBT_NCSI_TXD
+set_instance_assignment -name IO_STANDARD "1.2 V" -to NCSI_RBT_NCSI_TX_EN
+set_instance_assignment -name IO_STANDARD "1.2 V" -to NCSI_RBT_NCSI_RXD
+set_instance_assignment -name IO_STANDARD "1.2 V" -to NCSI_RBT_NCSI_CRS_DV
+set_instance_assignment -name IO_STANDARD "1.2 V" -to NCSI_RBT_NCSI_ARB_IN
+set_instance_assignment -name IO_STANDARD "1.2 V" -to NCSI_RBT_NCSI_ARB_OUT
+
+set_instance_assignment -name SLEW_RATE 0 -to QSPI_NCS
+set_instance_assignment -name SLEW_RATE 0 -to QSPI_DATA
+set_instance_assignment -name SLEW_RATE 0 -to QSPI_DCLK
+set_instance_assignment -name SLEW_RATE 0 -to SPI_INGRESS_SCLK
+set_instance_assignment -name SLEW_RATE 0 -to SPI_INGRESS_CSN
+set_instance_assignment -name SLEW_RATE 0 -to SPI_INGRESS_MISO
+set_instance_assignment -name SLEW_RATE 0 -to SPI_INGRESS_MOSI
+set_instance_assignment -name SLEW_RATE 0 -to SPI_EGRESS_MOSI
+set_instance_assignment -name SLEW_RATE 0 -to SPI_EGRESS_CSN
+set_instance_assignment -name SLEW_RATE 0 -to SPI_EGRESS_SCLK
+set_instance_assignment -name SLEW_RATE 0 -to SPI_EGRESS_MISO
+set_instance_assignment -name SLEW_RATE 0 -to M10_GPIO_FPGA_SEU_ERROR
+set_instance_assignment -name SLEW_RATE 0 -to M10_GPIO_FPGA_THERM_SHDN
+set_instance_assignment -name SLEW_RATE 0 -to NCSI_RBT_NCSI_CLK
+set_instance_assignment -name SLEW_RATE 0 -to NCSI_RBT_NCSI_TXD
+set_instance_assignment -name SLEW_RATE 0 -to NCSI_RBT_NCSI_TX_EN
+set_instance_assignment -name SLEW_RATE 0 -to NCSI_RBT_NCSI_RXD
+set_instance_assignment -name SLEW_RATE 0 -to NCSI_RBT_NCSI_CRS_DV
+set_instance_assignment -name SLEW_RATE 0 -to NCSI_RBT_NCSI_ARB_IN
+set_instance_assignment -name SLEW_RATE 0 -to NCSI_RBT_NCSI_ARB_OUT

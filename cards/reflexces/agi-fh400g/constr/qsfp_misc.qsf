@@ -1,0 +1,61 @@
+# qsfp_misc.qsf
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+#  Pinout and IO Standards
+# ==============================================================================
+
+set_location_assignment PIN_AT56 -to QSFP_I2C_SCL
+set_location_assignment PIN_BC55 -to QSFP_I2C_SDA
+set_location_assignment PIN_H56 -to QSFP_MODPRS_N
+set_location_assignment PIN_B57 -to QSFP_INITMODE
+set_location_assignment PIN_D58 -to QSFP_MODSEL_N
+set_location_assignment PIN_J57 -to QSFP_INT_N
+set_location_assignment PIN_H58 -to QSFP_RST_N
+
+set_location_assignment PIN_B49 -to QSFP_LED_R[7]
+set_location_assignment PIN_H52 -to QSFP_LED_R[6]
+set_location_assignment PIN_J51 -to QSFP_LED_R[5]
+set_location_assignment PIN_H48 -to QSFP_LED_R[4]
+set_location_assignment PIN_B55 -to QSFP_LED_R[3]
+set_location_assignment PIN_J53 -to QSFP_LED_R[2]
+set_location_assignment PIN_D48 -to QSFP_LED_R[1]
+set_location_assignment PIN_H50 -to QSFP_LED_R[0]
+
+set_location_assignment PIN_J49 -to QSFP_LED_G[7]
+set_location_assignment PIN_B53 -to QSFP_LED_G[6]
+set_location_assignment PIN_D52 -to QSFP_LED_G[5]
+set_location_assignment PIN_D50 -to QSFP_LED_G[4]
+set_location_assignment PIN_D54 -to QSFP_LED_G[3]
+set_location_assignment PIN_H54 -to QSFP_LED_G[2]
+set_location_assignment PIN_J47 -to QSFP_LED_G[1]
+set_location_assignment PIN_B51 -to QSFP_LED_G[0]
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_I2C_SCL
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_I2C_SDA
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_INITMODE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_MODPRS_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_MODSEL_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_RST_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_INT_N
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_R[0]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_R[1]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_R[2]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_R[3]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_R[4]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_R[5]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_R[6]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_R[7]
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_G[0]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_G[1]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_G[2]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_G[3]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_G[4]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_G[5]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_G[6]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to QSFP_LED_G[7]

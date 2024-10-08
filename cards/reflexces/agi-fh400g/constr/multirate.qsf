@@ -1,0 +1,41 @@
+# multirat.qsf: setup for profile of multirate ip cores (F-tile Multirate IP)
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Záhora <zahora@cesnet.cz>
+
+## ============================================================
+## SET instances for 100G Multirate IP core
+## ============================================================
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_2x100G4_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_2x100G4_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_2x100G4_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_2x100G4_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 1 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_2x100G4_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_2x100G4_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_2x100G4_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_2x100G4_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_2x100G4_g.eth_ip_g[1].FTILE_MULTIRATE_ETH_2x100G4_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 3 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_2x100G4_g.eth_ip_g[1].FTILE_MULTIRATE_ETH_2x100G4_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+
+## ============================================================
+## SET instances for 25G Multirate IP core
+## ============================================================
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 1 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[1].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 5 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[1].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[2].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 9 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[2].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[3].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 13 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[3].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[4].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 17 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[4].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[5].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 21 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[5].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[6].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 25 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[6].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+
+set_instance_assignment -name IP_COLOCATE F_TILE -from ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[0].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|dr_ctrl_g.dr_ctrl_i|dr_f_0 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[7].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA
+set_instance_assignment -name IP_RECONFIG_ID 29 -to ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g.eth_ip_g[7].FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i|ftile_eth_ip_i|eth_f_dr_0 -entity FPGA

@@ -1,0 +1,203 @@
+# qsfp.qsf
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Pin Locations
+# ==============================================================================
+
+#set_location_assignment PIN_JH70 -to refclk_fgt12ach0_p
+##set_location_assignment PIN_JP70 -to refclk_fgt12ach0_n
+#set_location_assignment PIN_HJ68 -to refclk_fgt12ach3_p
+##set_location_assignment PIN_HM70 -to refclk_fgt12ach3_n
+set_location_assignment PIN_JD74 -to refclk_fgt12ach4_p
+#set_location_assignment PIN_JA73 -to refclk_fgt12ach4_n
+#set_location_assignment PIN_HL74 -to refclk_fgt12ach5_p
+##set_location_assignment PIN_HH73 -to refclk_fgt12ach5_n
+#set_location_assignment PIN_FP74 -to refclk_fgt12ach6_p
+##set_location_assignment PIN_FU73 -to refclk_fgt12ach6_n
+
+#set_location_assignment PIN_ME76 -to qsfpdd0_rx_n[0]
+#set_location_assignment PIN_LT76 -to qsfpdd0_rx_n[1]
+#set_location_assignment PIN_LV79 -to qsfpdd0_rx_n[2]
+#set_location_assignment PIN_LT82 -to qsfpdd0_rx_n[3]
+#set_location_assignment PIN_LK79 -to qsfpdd0_rx_n[4]
+#set_location_assignment PIN_LG82 -to qsfpdd0_rx_n[5]
+#set_location_assignment PIN_KV79 -to qsfpdd0_rx_n[6]
+#set_location_assignment PIN_KP82 -to qsfpdd0_rx_n[7]
+#set_location_assignment PIN_MB77 -to qsfpdd0_rx_p[0]
+#set_location_assignment PIN_LP77 -to qsfpdd0_rx_p[1]
+#set_location_assignment PIN_LY80 -to qsfpdd0_rx_p[2]
+#set_location_assignment PIN_LP83 -to qsfpdd0_rx_p[3]
+#set_location_assignment PIN_LM80 -to qsfpdd0_rx_p[4]
+#set_location_assignment PIN_LD83 -to qsfpdd0_rx_p[5]
+#set_location_assignment PIN_LA80 -to qsfpdd0_rx_p[6]
+#set_location_assignment PIN_KL83 -to qsfpdd0_rx_p[7]
+#set_location_assignment PIN_ME69 -to qsfpdd0_tx_n[0]
+#set_location_assignment PIN_MG73 -to qsfpdd0_tx_n[1]
+#set_location_assignment PIN_LV73 -to qsfpdd0_tx_n[2]
+#set_location_assignment PIN_LK73 -to qsfpdd0_tx_n[3]
+#set_location_assignment PIN_LG76 -to qsfpdd0_tx_n[4]
+#set_location_assignment PIN_KV73 -to qsfpdd0_tx_n[5]
+#set_location_assignment PIN_KP76 -to qsfpdd0_tx_n[6]
+#set_location_assignment PIN_KE73 -to qsfpdd0_tx_n[7]
+#set_location_assignment PIN_MB71 -to qsfpdd0_tx_p[0]
+#set_location_assignment PIN_MJ74 -to qsfpdd0_tx_p[1]
+#set_location_assignment PIN_LY74 -to qsfpdd0_tx_p[2]
+#set_location_assignment PIN_LM74 -to qsfpdd0_tx_p[3]
+#set_location_assignment PIN_LD77 -to qsfpdd0_tx_p[4]
+#set_location_assignment PIN_LA74 -to qsfpdd0_tx_p[5]
+#set_location_assignment PIN_KL77 -to qsfpdd0_tx_p[6]
+#set_location_assignment PIN_KH74 -to qsfpdd0_tx_p[7]
+
+set_location_assignment PIN_KE79 -to qsfpdd1_rx_n[7]
+set_location_assignment PIN_KB82 -to qsfpdd1_rx_n[6]
+set_location_assignment PIN_JN79 -to qsfpdd1_rx_n[5]
+set_location_assignment PIN_JK82 -to qsfpdd1_rx_n[4]
+set_location_assignment PIN_JA79 -to qsfpdd1_rx_n[3]
+set_location_assignment PIN_HU82 -to qsfpdd1_rx_n[2]
+set_location_assignment PIN_HE82 -to qsfpdd1_rx_n[1]
+set_location_assignment PIN_GN82 -to qsfpdd1_rx_n[0]
+set_location_assignment PIN_KH80 -to qsfpdd1_rx_p[7]
+set_location_assignment PIN_JW83 -to qsfpdd1_rx_p[6]
+set_location_assignment PIN_JT80 -to qsfpdd1_rx_p[5]
+set_location_assignment PIN_JG83 -to qsfpdd1_rx_p[4]
+set_location_assignment PIN_JD80 -to qsfpdd1_rx_p[3]
+set_location_assignment PIN_HP83 -to qsfpdd1_rx_p[2]
+set_location_assignment PIN_HB83 -to qsfpdd1_rx_p[1]
+set_location_assignment PIN_GK83 -to qsfpdd1_rx_p[0]
+set_location_assignment PIN_KB76 -to qsfpdd1_tx_n[7]
+set_location_assignment PIN_JN73 -to qsfpdd1_tx_n[6]
+set_location_assignment PIN_JK76 -to qsfpdd1_tx_n[5]
+set_location_assignment PIN_HU76 -to qsfpdd1_tx_n[4]
+set_location_assignment PIN_HH79 -to qsfpdd1_tx_n[3]
+set_location_assignment PIN_HE76 -to qsfpdd1_tx_n[2]
+set_location_assignment PIN_GT79 -to qsfpdd1_tx_n[1]
+set_location_assignment PIN_GK77 -to qsfpdd1_tx_n[0]
+set_location_assignment PIN_JW77 -to qsfpdd1_tx_p[7]
+set_location_assignment PIN_JT74 -to qsfpdd1_tx_p[6]
+set_location_assignment PIN_JG77 -to qsfpdd1_tx_p[5]
+set_location_assignment PIN_HP77 -to qsfpdd1_tx_p[4]
+set_location_assignment PIN_HL80 -to qsfpdd1_tx_p[3]
+set_location_assignment PIN_HB77 -to qsfpdd1_tx_p[2]
+set_location_assignment PIN_GW80 -to qsfpdd1_tx_p[1]
+set_location_assignment PIN_GG78 -to qsfpdd1_tx_p[0]
+
+# ==============================================================================
+# Pin IO Standards & Input Termination 
+# ==============================================================================
+
+# Quartus sets automatically
+#set_instance_assignment -name IO_STANDARD "CURRENT MODE LOGIC (CML)" -to refclk_fgt12ach0_p
+#set_instance_assignment -name IO_STANDARD "CURRENT MODE LOGIC (CML)" -to refclk_fgt12ach3_p
+#set_instance_assignment -name IO_STANDARD "CURRENT MODE LOGIC (CML)" -to refclk_fgt12ach4_p
+#set_instance_assignment -name IO_STANDARD "CURRENT MODE LOGIC (CML)" -to refclk_fgt12ach5_p
+#set_instance_assignment -name IO_STANDARD "CURRENT MODE LOGIC (CML)" -to refclk_fgt12ach6_p
+
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to qsfpdd0_tx_p
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to qsfpdd0_rx_p
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to qsfpdd1_tx_p
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to qsfpdd1_rx_p
+
+set_instance_assignment -name HSSI_PARAMETER "rx_onchip_termination=RX_ONCHIP_TERMINATION_R_2" -to qsfpdd1_rx_p[0]
+set_instance_assignment -name HSSI_PARAMETER "rx_onchip_termination=RX_ONCHIP_TERMINATION_R_2" -to qsfpdd1_rx_p[1]
+set_instance_assignment -name HSSI_PARAMETER "rx_onchip_termination=RX_ONCHIP_TERMINATION_R_2" -to qsfpdd1_rx_p[2]
+set_instance_assignment -name HSSI_PARAMETER "rx_onchip_termination=RX_ONCHIP_TERMINATION_R_2" -to qsfpdd1_rx_p[3]
+set_instance_assignment -name HSSI_PARAMETER "rx_onchip_termination=RX_ONCHIP_TERMINATION_R_2" -to qsfpdd1_rx_p[4]
+set_instance_assignment -name HSSI_PARAMETER "rx_onchip_termination=RX_ONCHIP_TERMINATION_R_2" -to qsfpdd1_rx_p[5]
+set_instance_assignment -name HSSI_PARAMETER "rx_onchip_termination=RX_ONCHIP_TERMINATION_R_2" -to qsfpdd1_rx_p[6]
+set_instance_assignment -name HSSI_PARAMETER "rx_onchip_termination=RX_ONCHIP_TERMINATION_R_2" -to qsfpdd1_rx_p[7]
+
+set_instance_assignment -name HSSI_PARAMETER "rx_ac_couple_enable=ENABLE" -to qsfpdd1_rx_p[0]
+set_instance_assignment -name HSSI_PARAMETER "rx_ac_couple_enable=ENABLE" -to qsfpdd1_rx_p[1]
+set_instance_assignment -name HSSI_PARAMETER "rx_ac_couple_enable=ENABLE" -to qsfpdd1_rx_p[2]
+set_instance_assignment -name HSSI_PARAMETER "rx_ac_couple_enable=ENABLE" -to qsfpdd1_rx_p[3]
+set_instance_assignment -name HSSI_PARAMETER "rx_ac_couple_enable=ENABLE" -to qsfpdd1_rx_p[4]
+set_instance_assignment -name HSSI_PARAMETER "rx_ac_couple_enable=ENABLE" -to qsfpdd1_rx_p[5]
+set_instance_assignment -name HSSI_PARAMETER "rx_ac_couple_enable=ENABLE" -to qsfpdd1_rx_p[6]
+set_instance_assignment -name HSSI_PARAMETER "rx_ac_couple_enable=ENABLE" -to qsfpdd1_rx_p[7]
+
+# ==============================================================================
+# HSSI Parameters for Quartus 21.4
+# ==============================================================================
+
+#set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=35" -to qsfpdd1_tx_p[0]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=0" -to qsfpdd1_tx_p[0]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0" -to qsfpdd1_tx_p[0]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=5" -to qsfpdd1_tx_p[0]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=35" -to qsfpdd1_tx_p[1]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=0" -to qsfpdd1_tx_p[1]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0" -to qsfpdd1_tx_p[1]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=5" -to qsfpdd1_tx_p[1]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=35" -to qsfpdd1_tx_p[2]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=0" -to qsfpdd1_tx_p[2]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0" -to qsfpdd1_tx_p[2]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=5" -to qsfpdd1_tx_p[2]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=35" -to qsfpdd1_tx_p[3]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=0" -to qsfpdd1_tx_p[3]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0" -to qsfpdd1_tx_p[3]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=5" -to qsfpdd1_tx_p[3]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=35" -to qsfpdd1_tx_p[4]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=0" -to qsfpdd1_tx_p[4]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0" -to qsfpdd1_tx_p[4]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=5" -to qsfpdd1_tx_p[4]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=35" -to qsfpdd1_tx_p[5]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=0" -to qsfpdd1_tx_p[5]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0" -to qsfpdd1_tx_p[5]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=5" -to qsfpdd1_tx_p[5]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=35" -to qsfpdd1_tx_p[6]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=0" -to qsfpdd1_tx_p[6]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0" -to qsfpdd1_tx_p[6]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=5" -to qsfpdd1_tx_p[6]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=35" -to qsfpdd1_tx_p[7]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=0" -to qsfpdd1_tx_p[7]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0" -to qsfpdd1_tx_p[7]
+#set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=5" -to qsfpdd1_tx_p[7]
+
+#set_instance_assignment -name HSSI_PARAMETER "rx_term_mode_select=RX_TERM_MODE_SELECT_GROUNDED" -to qsfpdd1_rx_p[0]
+#set_instance_assignment -name HSSI_PARAMETER "rx_term_mode_select=RX_TERM_MODE_SELECT_GROUNDED" -to qsfpdd1_rx_p[1]
+#set_instance_assignment -name HSSI_PARAMETER "rx_term_mode_select=RX_TERM_MODE_SELECT_GROUNDED" -to qsfpdd1_rx_p[2]
+#set_instance_assignment -name HSSI_PARAMETER "rx_term_mode_select=RX_TERM_MODE_SELECT_GROUNDED" -to qsfpdd1_rx_p[3]
+#set_instance_assignment -name HSSI_PARAMETER "rx_term_mode_select=RX_TERM_MODE_SELECT_GROUNDED" -to qsfpdd1_rx_p[4]
+#set_instance_assignment -name HSSI_PARAMETER "rx_term_mode_select=RX_TERM_MODE_SELECT_GROUNDED" -to qsfpdd1_rx_p[5]
+#set_instance_assignment -name HSSI_PARAMETER "rx_term_mode_select=RX_TERM_MODE_SELECT_GROUNDED" -to qsfpdd1_rx_p[6]
+#set_instance_assignment -name HSSI_PARAMETER "rx_term_mode_select=RX_TERM_MODE_SELECT_GROUNDED" -to qsfpdd1_rx_p[7]
+
+# ==============================================================================
+# HSSI Parameters for Quartus 22.1+
+# ==============================================================================
+
+set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=25"  -to qsfpdd1_tx_p[0]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=5"  -to qsfpdd1_tx_p[0]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0"  -to qsfpdd1_tx_p[0]
+set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=0" -to qsfpdd1_tx_p[0]
+set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=25"  -to qsfpdd1_tx_p[1]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=5"  -to qsfpdd1_tx_p[1]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0"  -to qsfpdd1_tx_p[1]
+set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=0" -to qsfpdd1_tx_p[1]
+set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=25"  -to qsfpdd1_tx_p[2]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=5"  -to qsfpdd1_tx_p[2]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0"  -to qsfpdd1_tx_p[2]
+set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=0" -to qsfpdd1_tx_p[2]
+set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=25"  -to qsfpdd1_tx_p[3]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=5"  -to qsfpdd1_tx_p[3]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0"  -to qsfpdd1_tx_p[3]
+set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=0" -to qsfpdd1_tx_p[3]
+set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=25"  -to qsfpdd1_tx_p[4]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=5"  -to qsfpdd1_tx_p[4]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0"  -to qsfpdd1_tx_p[4]
+set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=0" -to qsfpdd1_tx_p[4]
+set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=25"  -to qsfpdd1_tx_p[5]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=5"  -to qsfpdd1_tx_p[5]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0"  -to qsfpdd1_tx_p[5]
+set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=0" -to qsfpdd1_tx_p[5]
+set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=25"  -to qsfpdd1_tx_p[6]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=5"  -to qsfpdd1_tx_p[6]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0"  -to qsfpdd1_tx_p[6]
+set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=0" -to qsfpdd1_tx_p[6]
+set_instance_assignment -name HSSI_PARAMETER "txeq_main_tap=25"  -to qsfpdd1_tx_p[7]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_1=5"  -to qsfpdd1_tx_p[7]
+set_instance_assignment -name HSSI_PARAMETER "txeq_pre_tap_2=0"  -to qsfpdd1_tx_p[7]
+set_instance_assignment -name HSSI_PARAMETER "txeq_post_tap_1=0" -to qsfpdd1_tx_p[7]
