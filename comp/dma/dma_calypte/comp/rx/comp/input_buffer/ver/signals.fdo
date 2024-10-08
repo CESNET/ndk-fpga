@@ -1,0 +1,28 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author: Vladislav Valek <xvalek14@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-CLause
+
+proc rx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex"       $PATH/RX_*
+}
+
+proc tx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex"       $PATH/TX_*
+}
+
+proc int {NAME PATH} {
+    add_wave "-noupdate"       $PATH/CLK
+    add wave -divider "$NAME"
+    add wave -divider "Pkt divider"
+     add_wave "-noupdate"       $PATH/pkt_divide_state
+     add_wave "-noupdate  -hex"       $PATH/div_*
+    add wave -divider "Skid buffer"
+     add_wave "-noupdate  -hex"       $PATH/sb_*
+    add wave -divider "Shift FSM"
+     add_wave "-noupdate  -hex"       $PATH/sh_fsm_*
+     add_wave "-noupdate -unsigned"       $PATH/shift_sel
+}

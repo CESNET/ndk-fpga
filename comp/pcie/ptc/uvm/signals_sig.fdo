@@ -1,0 +1,32 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author:   Daniel Kříž <xkrizd01@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+# Uncomment if you want to use python script, which separate headers.
+#eval [exec python uvm_test_sig.py --fetch_info]
+#eval [exec python uvm_test_sig.py]
+
+add_wave "-noupdate -color yellow -label RST"   /testbench/RST
+add_wave "-noupdate -color yellow -label CLK"   /testbench/CLK
+
+all PTC /testbench/DUT_U/VHDL_DUT_U/ptc_i
+#all DOWN_SPLITTER /testbench/DUT_U/VHDL_DUT_U/ptc_i/dma_down_ports_split_g/dma_down_splitter_i
+#all DMA2PCIE /testbench/DUT_U/VHDL_DUT_U/ptc_i/dma2pcie_hdr_trans_i
+#all CODAPA_CHECKER /testbench/DUT_U/VHDL_DUT_U/ptc_i/codapa_checker
+#all MFB_HDR_DATA_MERGE /testbench/DUT_U/VHDL_DUT_U/ptc_i/mfb_hdr_data_merge
+#all PLAN_AND_INSERT /testbench/DUT_U/VHDL_DUT_U/ptc_i/mfb_hdr_data_merge/hdr_plan_and_insert_i
+#all DATA_INSERT /testbench/DUT_U/VHDL_DUT_U/ptc_i/mfb_hdr_data_merge/data_insert_i
+#all HDRPLAN /testbench/DUT_U/VHDL_DUT_U/ptc_i/mfb_hdr_data_merge/hdr_plan_and_insert_i
+# all PCIE2DMA /testbench/DUT_U/VHDL_DUT_U/ptc_i/pcie2dma_hdr_transform_i
+#all RC_HDR_DEPARSER_0 /testbench/DUT_U/VHDL_DUT_U/ptc_i/pcie2dma_hdr_transform_i/rx_deparse_gen(0)/pcie_rc_hdr_deparser_i
+#all RC_HDR_DEPARSER_1 /testbench/DUT_U/VHDL_DUT_U/ptc_i/pcie2dma_hdr_transform_i/rx_deparse_gen(1)/pcie_rc_hdr_deparser_i
+#all MFB_ASFIFOX /testbench/DUT_U/VHDL_DUT_U/ptc_i/dma_up_ports_g(0)/up_mfb_asynch_fifo_i
+#all MVB_ASFIFOX /testbench/DUT_U/VHDL_DUT_U/ptc_i/dma_up_ports_g(0)/up_mvb_asynch_fifo_i
+#add_wave "-group { ST FIFO     } -noupdate -hex" "testbench/DUT_U/VHDL_DUT_U/ptc_i/down_storage_fifo_gen/down_storage_fifo_i/*"
+#add_wave "-group { ST FIFOCORE } -noupdate -hex" "testbench/DUT_U/VHDL_DUT_U/ptc_i/down_storage_fifo_gen/down_storage_fifo_i/mfb_main_fifo_i/*"
+
+config wave -signalnamewidth 1

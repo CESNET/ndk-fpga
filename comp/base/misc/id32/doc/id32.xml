@@ -1,0 +1,298 @@
+<source>
+
+<component>Design Identification 32 bit</component>
+
+<authors>
+    <author login="beck">Patrik Beck</author>
+</authors>
+
+<description>
+    Identification component is small component which is used to detect
+    design inside FPGA. It contain project identification, design version,
+    version of SW interface and string identification. Informations are
+    stored inside registers which are accessible through dedicated 32 bit
+    interface.
+</description>
+
+<interface>
+	<!-- doplnit dividery -->
+	<generic_map>
+      <generic name="PROJECT_ID" type="std_logic_vector(15:0)" default="1">
+          Project identification number. This number has to be unique for
+          every project. There is no special policy how to assigne number
+          for a new project.
+      </generic>
+
+      <generic name="SW_MAJOR" type="std_logic_vector(7:0)" default="1">
+          Software interface version - major number. This number is
+          incremented whenever new firmware design is released and the
+          concept of software interface is changed (only big changes).
+      </generic>
+
+      <generic name="SW_MINOR" type="std_logic_vector(7:0)" default="1">
+          Software interface version - minor number. This number is
+          incremented whenever the software interface is changed (all
+          changes). If SW major number is changed, the SW minor number is
+          set to zero.
+      </generic>
+
+      <generic name="HW_MAJOR" type="std_logic_vector(15:0)" default="1">
+          Firmware version - major number. This number is incremented only
+          if new firmware version is released and the whole architecture is
+          changed.
+      </generic>
+
+      <generic name="HW_MINOR" type="std_logic_vector(15:0)" default="1">
+          Firmware version - minor number. This number is incremented
+          whenever new firmware version is released. If HW major number is
+          changed, the HW minor number is set to zero.
+      </generic>
+
+      <generic name="PROJECT_TEXT" type="std_logic_vector(255:0)" default="1">
+          Project text - the project text is null terminated string which
+          must not contain white spaces. Please use "_" character instead
+          of spaces.
+      </generic>
+  </generic_map>
+
+<port_map>
+      <!-- Port map description -->
+      <port name="CLK" dir="in" width="1">
+          Component base clock. It has to be connected to the local bus
+          clock.
+      </port>
+
+      <port name="RESET" dir="in" width="1">
+          Global reset used for the first register.
+      </port>
+
+      <divider>Data Interface</divider>
+      <port name="ADDRESS" dir="in" width="7">
+          Internal register and ROM memory addressing.
+      </port>
+
+      <port name="DATA_IN" dir="in" width="32">
+          Input data.
+      </port>
+
+      <port name="DATA_OUT" dir="in" width="32">
+          Output data.
+      </port>
+
+      <port name="WRITE_ENABLE" dir="in" width="1">
+          Signal enables writing data onto the addressed register.
+      </port>
+
+  </port_map>
+
+</interface>
+
+<constant> <!-- ### doplnit ### --> </constant>
+
+<operations>
+	<init>
+
+		<it ref="### doplnit ###">Initialization is not necessary</it>
+
+<!-- ### operace mohou byt poprehazovane ### -->
+
+	</init>
+<op name="Identification component detection" id="ID_COMP_DETECT">
+        <p>
+            Sometimes it is useful to have a way how to know if the
+            identification component is presented in the design or not. So,
+            the NEG register has been add at address 0 to ID component. If
+            you write a value to the NEG register, the logic negation of
+            the number is stored and can be also read. ID component should
+            be placed to address 0 of FPGA address space. So, the NEG
+            register should be also at address 0 of the whole FPGA address
+            space.
+        </p>
+    </op>
+
+<op name="Project detection" id="ID_PROJECT_DETECTION">
+        <p>
+
+            There are three identification types of identification in the
+            ID component - project ID, SW version and HW version. You can
+            have a look in address space description for detail
+            informations.
+        </p>
+
+    </op>
+
+<op name="Project string read" id="ID_PROJECT_STRING">
+        <p>
+            ID component contain also array of 16 bytes where text
+            information about project is stored. The array is read
+            only and contain ASCI values of given string. For more
+            details see address space description.
+        </p>
+    </op>
+
+</operations>
+
+<addr_space id="ID" name="Design Identification" main="yes">
+   <reg name="Negation register" id="ID_NEG" offset="0x0000" access="RW" words="1">
+		<bit_vect bits="32">
+			<description_above>
+			<p>
+         Sometimes it is usefull to have a way how to know if the
+         identification component is presented in the design or not.
+         So, the NEG register has been add at address 0 to ID
+         component. If you write a value to the NEG register, the logic
+         negation of the number is stored and can be also read. ID
+         component should be placed to address 0 of FPGA address space.
+         So, the NEG register should be also at address 0 of the whole
+         FPGA address space.
+		</p>
+		<p>
+		 Example: If you write 0x00000000 value to the ID_NEG register, then
+		 0xFFFFFFFF value is stored and returned if read operation is performed.
+		</p>
+
+			</description_above>
+		</bit_vect>
+</reg>
+
+	<reg name="Software version register" id="ID_SW_REG" offset="0x0004" access="R" words="1">
+		<bit_vect bits="32">
+			<description_above>
+			This register is dedicated for SW. It consists of two parts.
+           The first part contains project ID and the second design
+           version.
+
+			</description_above>
+			<format>
+      <bit from="0" to="7" name="SW minor version">
+		  See documentation of interface - part generics for detailed
+		  description and policy how to assign this number.
+      </bit>
+      <bit from="8" to="15" name="SW major version">
+		  See documentation of interface - part generics for detailed
+		  description and policy how to assign this number.
+      </bit>
+      <bit from="16" to="31" name="Project ID number">
+		  See documentation of interface - part generics for detailed
+		  description and policy how to assign this number.
+      </bit>
+   </format>
+		</bit_vect>
+</reg>
+
+	<reg name="Hardware version register" id="ID_HW_REG" offset="0x0008" access="R" words="4">
+		<bit_vect bits="32">
+			<description_above>
+			This register contain design version number which is exactly the same
+		   as tag in CVS. Value in this registers should be used when any HW bug
+		   is reported.
+
+			</description_above>
+			<format>
+      <bit from="0" to="15" name="HW minor version">
+		  See documentation of interface - part generics for detailed
+		  description and policy how to assign this number.
+      </bit>
+      <bit from="16" to="31" name="HW major version">
+		  See documentation of interface - part generics for detailed
+		  description and policy how to assign this number.
+      </bit>
+   </format>
+		</bit_vect>
+</reg>
+
+	<reg name="Identification" id="ID_TEXT" offset="0x0020" access="R" words="4">
+		<bit_vect bits="32">
+			<description_above>
+			In this memory can be stored 16 bytes of text where any text can be
+		   stored. For example SCAMPI or Liberouter. See documentation of
+		   interface - part generics for detailed description and policy how to
+		   assign this number.
+
+			</description_above>
+		</bit_vect>
+</reg>
+
+</addr_space>
+
+<sw_body>
+   <p>
+   If the ID component is not present in the desing, driver support for
+   the combo card is disabled(for example csbus won't work).
+   </p>
+
+   <p>
+   To enable sw support without use of ID component the boot protection
+   has to be disabled, when loading combo6core module. See
+   documentation for combo6core for details.
+</p>
+</sw_body>
+
+<body>
+
+    <!-- Here is description in standard Satrapa format-->
+
+    <h1>Identification component</h1>
+
+    <p>
+        ID component consists  of several register which are maped onto the
+        FPGA address space and can be simple read.  The address space
+        structure is shown on following picture.
+    </p>
+
+    <p>
+       <obr src="fig/address_space.fig">Address space structure</obr>
+    </p>
+
+    <p>
+        The first 32bit word is writable and is dedicated to detect if
+        ID component is presented. If you write there any value, the
+        negative value is stored.  Following 32bit register contain
+        unique project number. Next two registers contain major and minor
+        version number and the last 16 words is string for better project
+        identification.
+    </p>
+
+    <p>
+        Only the first ID detection register is writable. Other registers
+        are read only.
+    </p>
+
+    <h2>Interface</h2>
+
+    <p>
+
+        ID interface behavior is similar to the memory interface. There is
+        used independent data bus for in and out direction. One is used in
+        read and the another one in write operation. Address bus is shared
+        and additional DATA_WE signal enables write to registers.
+    </p>
+    <p>
+        If entity ID_MI32 is used, memory interface is universal type t_mi32.
+        In that case, four lowest bits are used for addressing and the rest
+        is ignored.
+    </p>
+
+    <p>
+        Read and write operations are shown on following picture. You can
+        see that write operation is performed in only one clock cycles but
+        the data latency in read operation is two clock cycles.
+    </p>
+
+    <h2>Block structure</h2>
+
+    <p>
+        The ID component structure is shown on following picture. ID
+        consists of several register and address decoder. Registers are on
+        the right side and on the left side, there is address decoder
+        composed of several multiplexers.
+    </p>
+
+    <p>
+       <obr src="fig/id.fig">Block structure</obr>
+    </p>
+
+
+</body>
+
+</source>

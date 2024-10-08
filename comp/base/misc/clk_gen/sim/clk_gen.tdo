@@ -1,0 +1,13 @@
+# Modelsim script - time simulation
+# $Id$
+
+vlib work
+vcom -93 ../clk_gen.sim.vhd clk_gen_tb.vhd
+vsim -t 1ps -sdfmax /UUT=../clk_gen.sim.sdf -lib work testbench
+
+view wave
+view signals
+
+add wave *
+
+run 8000 ns

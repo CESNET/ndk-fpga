@@ -1,0 +1,23 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2003 CESNET
+# Author: Petr Kobiersky <xkobie00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Global file with signals
+
+
+source "./signals.fdo"
+
+add wave -divider "SWITCH"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+rx  RX  /testbench/DUT_U/VHDL_DUT_U
+tx  TX  //testbench/DUT_U/VHDL_DUT_U
+#internal  INTERNAL  //testbench/DUT_U/VHDL_DUT_U/gen_when_inum_in_word_non0/inst_word_non0
+#internal  INTERNAL  //testbench/DUT_U/VHDL_DUT_U/gen_when_inum_in_word0/inst_word0
+

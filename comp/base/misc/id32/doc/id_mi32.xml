@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- Page name -->
+<component>Design Identification 32 bit with MI32 interface</component>
+
+<!-- Authors worked on -->
+<authors>
+    <author login="beck">Patrik Beck</author>
+    <author login="pus">Viktor Pus</author>
+</authors>
+
+<features>
+   <item>Negation register.</item>
+   <item>Storage for project ID and Text, SW and HW Versions and number of RX
+         and TX channels.</item>
+   <item>Command output.</item>
+   <item>Status output.</item>
+</features>
+
+<!-- Short Block description -->
+<description>
+    Identification component is a small component which is used to detect
+    design inside FPGA. It contains project identification, design version,
+    version of SW interface, string identification and number of RX and TX
+    channels. Also there is Command register which controls COMMAND output
+    of the component, bit 0 is usually used for SW resetting. 128-bit Status
+    register may be written from hardware and read by software. Informations
+    are stored inside registers which are accessible through universal 32 bit
+    interface.
+</description>
+
+
+<!-- Component interface description -->
+<interface>
+
+  <generic_map>
+      <generic name="PROJECT_ID" type="std_logic_vector(15:0)" default="0">
+          Project identification number. This number has to be unique for
+          every project. There is no special policy how to assign number
+          for a new project.
+      </generic>
+
+      <generic name="SW_MAJOR" type="std_logic_vector(7:0)" default="0">
+          Software interface version - major number. This number is
+          incremented whenever new firmware design is released and the
+          concept of software interface is changed (only big changes).
+      </generic>
+
+      <generic name="SW_MINOR" type="std_logic_vector(7:0)" default="0">
+          Software interface version - minor number. This number is
+          incremented whenever the software interface is changed (all
+          changes). If SW major number is changed, the SW minor number is
+          set to zero.
+      </generic>
+
+      <generic name="HW_MAJOR" type="std_logic_vector(15:0)" default="0">
+          Firmware version - major number. This number is incremented only
+          if new firmware version is released and the whole architecture is
+          changed.
+      </generic>
+
+      <generic name="HW_MINOR" type="std_logic_vector(15:0)" default="0">
+          Firmware version - minor number. This number is incremented
+          whenever new firmware version is released. If HW major number is
+          changed, the HW minor number is set to zero.
+      </generic>
+
+      <generic name="PROJECT_TEXT" type="std_logic_vector(255:0)" default="0">
+          Project text - the project text is null terminated string which
+          must not contain white spaces. Please use "_" character instead
+          of spaces.
+      </generic>
+
+      <generic name="RX_CHANNELS" type="std_logic_vector(7:0)" default="FF">
+          Number of RX (receive) channels.
+      </generic>
+
+      <generic name="TX_CHANNELS" type="std_logic_vector(7:0)" default="FF">
+          Number of TX (transmit) channels.
+      </generic>
+  </generic_map>
+
+
+  <port_map>
+      <!-- Port map description -->
+      <port  name="CLK" dir="in" width="1">
+          Component base clock. It has to be connected to the local bus
+          clock.
+      </port>
+
+      <port  name="RESET" dir="in" width="1">
+          Global reset.
+      </port>
+
+      <port  name="COMMAND" dir="out" width="32">
+          Output of Command register.
+      </port>
+
+      <port  name="STATUS" dir="in" width="128">
+          Input of Status register
+      </port>
+
+      <port  name="WE" dir="in" width="4">
+          Write enable for Status register. 1 means write for each 32-bit word.
+      </port>
+
+      <port  name="MI" dir="inout" width="">
+          Universal 32bit memory interface
+      </port>
+
+  </port_map>
+
+</interface>
+
+
+<operations>
+
+    <!-- *********************************************************** -->
+    <op name="Identification component detection" id="ID_COMP_DETECT">
+        <p>
+            Sometimes it is useful to have a way how to know if the
+            identification component is presented in the design or not. So,
+            the NEG register has been add at address 0 to ID component. If
+            you write a value to the NEG register, the logic negation of
+            the number is stored and can be also read. ID component should
+            be placed to address 0 of FPGA address space. So, the NEG
+            register should be also at address 0 of the whole FPGA address
+            space.
+        </p>
+    </op>
+
+    <!-- *********************************************************** -->
+    <op name="Project detection" id="ID_PROJECT_DETECTION">
+        <p>
+
+            There are three identification types of identification in the
+            ID component - project ID, SW version and HW version. You can
+            have a look in address space description for detail
+            informations.
+        </p>
+    </op>
+
+    <!-- *********************************************************** -->
+    <op name="Command register handling" id="ID_COMMAND">
+        <p>
+            Writing to Command register affects COMMAND output signal
+            of the component, so it can be used co control whole design
+			behaviour. This register may also be read. Bit 0 is used
+			for SW resetting.
+        </p>
+    </op>
+
+    <!-- *********************************************************** -->
+    <op name="Status register read" id="ID_STATUS">
+        <p>
+            128-bit Status register can be read by software to determine
+            state of the design.
+        </p>
+    </op>
+
+    <!-- *********************************************************** -->
+    <op name="Project string read" id="ID_PROJECT_STRING">
+        <p>
+            ID component contains also array of 16 bytes where text
+            information about project is stored. The array is read
+            only and contain ASCI values of given string. For more
+            details see address space description.
+        </p>
+    </op>
+
+    <!-- *********************************************************** -->
+    <op name="Number of RX/TX channels read" id="ID_CHANNELS_NUMBER">
+        <p>
+            There are two 8-bit registers with number of RX and TX channels.
+        </p>
+    </op>
+
+
+</operations>
+
+
+<!-- *************************************************************** -->
+<!--                    Address Space Description                    -->
+<!-- *************************************************************** -->
+
+<addr_space id ="ID" name="Design Identification" main="yes" size="0x0044">
+
+   <reg name="Negation register"
+      id="ID_NEG"  offset="0x0000"   access="RW" words="4">
+      Negation register
+      <bit_vect bits="32">
+      <description_above>
+         Write to this register and then you can read negative value from it.
+      </description_above>
+      <format>
+         <bit from="0" to="31" name="Negation register" access="RW">
+            Negation register
+         </bit>
+      </format>
+      </bit_vect>
+   </reg>
+
+   <reg name="SW number"
+      id="ID_SW_REG"  offset="0x0004"   access="R" words="4">
+      Project ID and SW numbers
+      <bit_vect bits="32">
+      <description_above>
+         Register contains info about project and SW version.
+      </description_above>
+      <format>
+         <bit from="0" to="7" name="SW_MINOR" access="R">
+            SW_MINOR number
+         </bit>
+         <bit from="8" to="15" name="SW_MAJOR" access="R">
+            SW_MAJOR number
+         </bit>
+         <bit from="16" to="31" name="PROJECT_ID" access="R">
+            PROJECT_ID number
+         </bit>
+      </format>
+      </bit_vect>
+   </reg>
+
+   <reg name="HW number"
+      id="ID_HW_REG"  offset="0x0008"   access="R" words="4">
+      HW numbers
+      <bit_vect bits="32">
+      <description_above>
+         Register contains info about HW version.
+      </description_above>
+      <format>
+         <bit from="0" to="15" name="HW_MINOR" access="R">
+            HW_MINOR number
+         </bit>
+         <bit from="16" to="31" name="HW_MAJOR" access="R">
+            HW_MAJOR number
+         </bit>
+      </format>
+      </bit_vect>
+   </reg>
+
+   <reg name="Command"
+      id="ID_CMD"  offset="0x000C"   access="RW" words="4">
+      Command
+      <bit_vect bits="32">
+      <description_above>
+         Register contains flipflop connected to COMMAND output.
+      </description_above>
+      <format>
+         <bit from="0" to="0" name="SW_RESET" access="RW">
+            Bit is used for SW_RESET.
+         </bit>
+         <bit from="1" to="31" name="RESERVED" access="R">
+            These bits are reserved for future use.
+         </bit>
+      </format>
+      </bit_vect>
+   </reg>
+
+   <reg name="Status"
+      id="ID_STAT"  offset="0x0010"   access="R" words="16">
+      Command
+      <bit_vect bits="128">
+      <description_above>
+         Register contains flipflop connected to STATUS input.
+      </description_above>
+      <format>
+         <bit from="0" to="127" name="DESIGN_SPECIFIC" access="R">
+            Meaning of all bits is design-specific. Value after reset is 0.
+         </bit>
+      </format>
+      </bit_vect>
+   </reg>
+
+   <reg name="Text"
+      id="ID_TEXT"  offset="0x0020"   access="R" words="32">
+      Text
+      <bit_vect bits="256">
+      <description_above>
+         Project text in 8-bit ASCII, first character is at the lowest word.
+      </description_above>
+      <format>
+         <bit from="0" to="255" name="ID_TEXT" access="R">
+            Project text.
+         </bit>
+      </format>
+      </bit_vect>
+   </reg>
+
+   <reg name="NUmber of RX/TX channels"
+      id="ID_CHANNELS"  offset="0x0040"   access="R" words="4">
+      Text
+      <bit_vect bits="16">
+      <description_above>
+         Register contains number of RX and TX channels.
+      </description_above>
+      <format>
+         <bit from="0" to="7" name="RX_CHANNELS" access="R">
+            Number of RX channels.
+         </bit>
+         <bit from="8" to="15" name="TX_CHANNELS" access="R">
+            Number of TX channels.
+         </bit>
+      </format>
+      </bit_vect>
+   </reg>
+
+</addr_space>
+
+<body>
+
+    <!-- Here is description in standard Satrapa format-->
+
+    <h1>Identification component</h1>
+
+    <p>
+        ID component consists of several registers which are maped to the
+        FPGA address space and can be simple read.
+    </p>
+
+    <p>
+        The first 32bit word is writable and is dedicated to detect if
+        ID component is presented. If you write there any value, the
+        negative value is stored.  Following 32bit register contain
+        unique project number and software major and minor version number.
+        Next two registers contain hardware major and minor
+        version number.
+        Next register is Command register and may be used to controll
+        dedicated COMMAND output of the component.
+        Status register is writable from hardware in four 32-bit words.
+        This way, hardware can pass information about its state to software.
+        The next 32 words is string for better project
+        identification.
+        Last readable register contains number of RX channels in lowest byte
+        and number of TX channels in next byte.
+    </p>
+
+    <p>
+        Only the first ID detection and Command register are writable.
+        Other registers are read only.
+    </p>
+
+    <h2>Interface</h2>
+
+    <p>
+        Memory interface is universal type t_mi32.
+        In that case, two lowest bits are ignored and five following bits
+        are used for addressing.
+    </p>
+
+    <h2>Resources</h2>
+    <p>
+      After synthesis with XST, 197 Slices are used.
+      Maximum frequency is much higher than 125MHz.
+    </p>
+
+</body>
+
+</source>

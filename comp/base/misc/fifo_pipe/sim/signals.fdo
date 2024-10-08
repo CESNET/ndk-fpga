@@ -1,0 +1,41 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2018 CESNET
+# Author: Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc tb_internals { PATH GROUP } {
+   eval "add wave $GROUP -divider {TB internals}"
+   add_wave "$GROUP -noupdate -hex -label TEST_STATUS"   $PATH/TEST_STATUS
+   add_wave "$GROUP -noupdate -hex -label false_fifo"   $PATH/false_fifo
+   add_wave "$GROUP -noupdate -hex -label false_wr_ptr"   $PATH/false_wr_ptr
+   add_wave "$GROUP -noupdate -hex -label false_rd_ptr"   $PATH/false_rd_ptr
+}
+
+proc fifo_pipe_ports { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Synchronization}"
+   add_wave "$GROUP -noupdate -hex -label CLK -color yellow"   $PATH/CLK
+   add_wave "$GROUP -noupdate -hex -label RESET -color yellow"   $PATH/RESET
+
+   eval "add wave $GROUP -divider {Ports}"
+   add_wave "$GROUP -noupdate -hex -label RX_SRC_RDY" $PATH/RX_SRC_RDY
+   add_wave "$GROUP -noupdate -hex -label RX_DST_RDY" $PATH/RX_DST_RDY
+   add_wave "$GROUP -noupdate -hex -label RX_DATA" $PATH/RX_DATA
+   add_wave "$GROUP -noupdate -hex -label TX_SRC_RDY" $PATH/TX_SRC_RDY
+   add_wave "$GROUP -noupdate -hex -label TX_DST_RDY" $PATH/TX_DST_RDY
+   add_wave "$GROUP -noupdate -hex -label TX_DATA" $PATH/TX_DATA
+}
+
+proc fifo_pipe_internals { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Internals}"
+   add_wave "$GROUP -noupdate -hex -label data_pipeline" $PATH/data_pipeline
+   add_wave "$GROUP -noupdate -hex -label afull_pipeline" $PATH/afull_pipeline
+   add_wave "$GROUP -noupdate -hex -label fifo_fill" $PATH/fifo_fill
+   add_wave "$GROUP -noupdate -hex -label fifo_almost_full" $PATH/fifo_almost_full
+   add_wave "$GROUP -noupdate -hex -label fifo_empty" $PATH/fifo_empty
+   add_wave "$GROUP -noupdate -hex -label reset_cnt" $PATH/reset_cnt
+}

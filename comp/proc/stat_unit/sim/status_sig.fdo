@@ -1,0 +1,20 @@
+# comp_sig.fdo : Include file with signal procedures
+# Copyright (C) 2011 CESNET
+# Author(s): Pavel Benacek <benacek@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+#
+
+# Paths
+set STATUS_UNIT_PATH  "/testbench/uut"
+set TB_ROOT	"/testbench"
+
+
+# Files with signals
+source "signals.fdo"
+
+
+blk_STATUS_UNIT_OTHER
+blk_STATUS_UNIT
+

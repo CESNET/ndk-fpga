@@ -1,0 +1,20 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2021 CESNET
+# Author(s): Jan Kubalek <kubalek@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc mi32 {NAME DIR PATH} {
+     add_wave "-group { $NAME } -noupdate -hex" $PATH/${DIR}_DWR
+     add_wave "-group { $NAME } -noupdate -hex" $PATH/${DIR}_MWR
+     add_wave "-group { $NAME } -noupdate -hex" $PATH/${DIR}_ADDR
+     add_wave "-group { $NAME } -noupdate -hex" $PATH/${DIR}_RD
+     add_wave "-group { $NAME } -noupdate -hex" $PATH/${DIR}_WR
+     add_wave "-group { $NAME } -noupdate -hex" $PATH/${DIR}_BE
+     add_wave "-group { $NAME } -noupdate -hex" $PATH/${DIR}_DRD
+     add_wave "-group { $NAME } -noupdate -hex" $PATH/${DIR}_ARDY
+     add_wave "-group { $NAME } -noupdate -hex" $PATH/${DIR}_DRDY
+}

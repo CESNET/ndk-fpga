@@ -1,0 +1,22 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2012 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Global file with signals
+
+
+source "./signals.fdo"
+
+# TODO: ZMENA NAZVU TESTOVANEJ KOMPONENTY
+add wave -divider "FLU2FL"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+rx  RX  /testbench/DUT_U/VHDL_DUT_U
+tx  TX  /testbench/DUT_U/VHDL_DUT_U
+all XX /testbench/DUT_U/VHDL_DUT_U

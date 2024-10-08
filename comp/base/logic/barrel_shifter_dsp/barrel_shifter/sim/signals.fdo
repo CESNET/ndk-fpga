@@ -1,0 +1,17 @@
+# Include file with signals
+# Copyright (C) 2015 CESNET
+#
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_DSP_SHIFTER { } {
+
+    global DSP_SHIFTER_PATH
+    add_wave "-noupdate -hex -label DATA_IN" /$DSP_SHIFTER_PATH/DATA_IN
+    add_wave "-noupdate -hex -label DATA_OUT" /$DSP_SHIFTER_PATH/DATA_OUT
+    add_wave "-noupdate -hex -label SHIFT_EXP" /$DSP_SHIFTER_PATH/SHIFT_EXP
+    add_wave "-noupdate -hex -label SHIFT_BINARY" /$DSP_SHIFTER_PATH/SHIFT_BINARY
+}

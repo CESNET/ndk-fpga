@@ -1,0 +1,22 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author:   Daniel Kříž <xkrizd01@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "MVB_PIPE"
+
+add_wave "-noupdate -color yellow -label RST"   /testbench/RST
+add_wave "-noupdate -color yellow -label CLK"   /testbench/CLK
+
+all LUT /testbench/DUT_U/VHDL_DUT_U/dut_i
+#all LRAM /testbench/DUT_U/VHDL_DUT_U/dut_i/lutram_g/lutram_i
+#all BRAM /testbench/DUT_U/VHDL_DUT_U/dut_i/bram_g/bram_i
+# For verification debug purposes
+#all MI /testbench/mi_config
+# DUT WRAPPER
+all DUT /testbench/DUT_U/VHDL_DUT_U
+
+config wave -signalnamewidth 1

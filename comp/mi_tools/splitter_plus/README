@@ -1,0 +1,23 @@
+                              ====================
+                                MI_SPLITTER_PLUS
+                              ====================
+
+Abstract:
+~~~~~~~~~
+It converts one MI (Memory Interface) to generic number of MIs. Address spaces
+of ports needn't to have the same size.
+
+Author:
+~~~~~~~
+Vaclav Bartos <washek@liberouter.org>
+
+
+Documentation:
+~~~~~~~~~~~~~~
+https://www.liberouter.org/trac/netcope/wiki/mi_splitter_plus
+
+
+Verification:
+~~~~~~~~~~~~~
+Not verified
+

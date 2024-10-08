@@ -1,0 +1,46 @@
+#Configuration file for MVB_HASH_TABLE_SIMPLE component:
+mvb_hash_table_simple:
+
+    #MVB_HASH_TABLE_SIMPLE parametres and settings:
+    hash_key: 10884469298454947624
+    mvb_key_width: 16
+    data_out_width: 64
+    hash_width: 10
+    hash_key_width: 64
+    table_capacity: 1024
+    num_of_tables: 2
+
+    #Configuration of table using toeplitz hash function:
+    TOEPLITZ:
+        - record:
+            mvb_key: 65
+            data: 6551
+        - record:
+            mvb_key: 61
+            data: 896
+        - record:
+            mvb_key: 684
+            data: 6158
+        - record:
+            mvb_key: 6847
+            data: 3056
+        - record:
+            mvb_key: 9841
+            data: 987456
+
+    #Configuration of table using simple xor hash function:
+    SIMPLE_XOR:
+        - record:
+            mvb_key: 3996
+            data: 7841
+        - record:
+            mvb_key: 9845
+            data: 32886
+        - record:
+            mvb_key: 6846
+            data: 135
+        - record:
+            mvb_key: 369
+            data: 265
+
+

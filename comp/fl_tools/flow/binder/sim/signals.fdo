@@ -1,0 +1,356 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2008 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc blk_FL_BINDER { PARAM {UNIT_ID 0} } {
+   global FL_BINDER_PATH
+   set BASE "$FL_BINDER_PATH"
+
+   # Binder interface
+   if { $PARAM == "IFC" } {
+      add wave -divider "FL Binder"
+      add_wave "-label clk" $BASE/clk
+      add_wave "-label reset" $BASE/reset
+
+      add wave -divider "FLB: Input interface"
+      add_wave "-label rx_sof_n" $BASE/rx_sof_n
+      add_wave "-label rx_sop_n" $BASE/rx_sop_n
+      add_wave "-label rx_eop_n" $BASE/rx_eop_n
+      add_wave "-label rx_eof_n" $BASE/rx_eof_n
+      add_wave "-label rx_src_rdy_n" $BASE/rx_src_rdy_n
+      add_wave "-label rx_dst_rdy_n" $BASE/rx_dst_rdy_n
+      add_wave "-label rx_data -hex" $BASE/rx_data
+      add_wave "-label rx_rem -hex" $BASE/rx_rem
+
+      add wave -divider "FLB: Output interface"
+      add_wave "-label tx_sof_n" $BASE/tx_sof_n
+      add_wave "-label tx_sop_n" $BASE/tx_sop_n
+      add_wave "-label tx_eop_n" $BASE/tx_eop_n
+      add_wave "-label tx_eof_n" $BASE/tx_eof_n
+      add_wave "-label tx_src_rdy_n" $BASE/tx_src_rdy_n
+      add_wave "-label tx_dst_rdy_n" $BASE/tx_dst_rdy_n
+      add_wave "-label tx_data -hex" $BASE/tx_data
+      add_wave "-label tx_rem -hex" $BASE/tx_rem
+   }
+
+   # Output block - most occupied queue choosing policy
+   if { $PARAM == "OUTPUT_BLOCK" } {
+      add wave -divider "FLB - Output block"
+      add_wave "-label clk" $BASE/gen_full_binder/fl_binder/gen_output/output_block/clk
+      add_wave "-label reset" $BASE/gen_full_binder/fl_binder/gen_output/output_block/reset
+      add_wave "-label rx_sof_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/rx_sof_n
+      add_wave "-label rx_sop_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/rx_sop_n
+      add_wave "-label rx_eop_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/rx_eop_n
+      add_wave "-label rx_eof_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/rx_eof_n
+      add_wave "-label rx_src_rdy_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/rx_src_rdy_n
+      add_wave "-label rx_dst_rdy_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/rx_dst_rdy_n
+      add_wave "-label rx_data -hex" $BASE/gen_full_binder/fl_binder/gen_output/output_block/rx_data
+      add_wave "-label rx_rem -hex" $BASE/gen_full_binder/fl_binder/gen_output/output_block/rx_rem
+      add_wave "-label status" $BASE/gen_full_binder/fl_binder/gen_output/output_block/status
+      add_wave "-label empty" $BASE/gen_full_binder/fl_binder/gen_output/output_block/empty
+      add_wave "-label ifc -hex" $BASE/gen_full_binder/fl_binder/gen_output/output_block/ifc
+      add_wave "-label tx_sof_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/tx_sof_n
+      add_wave "-label tx_sop_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/tx_sop_n
+      add_wave "-label tx_eop_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/tx_eop_n
+      add_wave "-label tx_eof_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/tx_eof_n
+      add_wave "-label tx_src_rdy_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/tx_src_rdy_n
+      add_wave "-label tx_dst_rdy_n" $BASE/gen_full_binder/fl_binder/gen_output/output_block/tx_dst_rdy_n
+      add_wave "-label tx_data -hex" $BASE/gen_full_binder/fl_binder/gen_output/output_block/tx_data
+      add_wave "-label tx_rem -hex" $BASE/gen_full_binder/fl_binder/gen_output/output_block/tx_rem
+
+      add wave -divider "Internal"
+      add_wave "-label cnt_next" $BASE/gen_full_binder/fl_binder/gen_output/output_block/cnt_next
+      add_wave "-label reg_valid" $BASE/gen_full_binder/fl_binder/gen_output/output_block/reg_valid
+      add_wave "-label queue_chosen" $BASE/gen_full_binder/fl_binder/gen_output/output_block/queue_chosen
+      add_wave "-label reg_next" $BASE/gen_full_binder/fl_binder/gen_output/output_block/reg_next
+      add_wave "-label reg_ready" $BASE/gen_full_binder/fl_binder/gen_output/output_block/reg_ready
+      add_wave "-label reg_addr" $BASE/gen_full_binder/fl_binder/gen_output/output_block/reg_addr
+      add_wave "-label min_bus" $BASE/gen_full_binder/fl_binder/gen_output/output_block/min_bus
+      add_wave "-label mx_min" $BASE/gen_full_binder/fl_binder/gen_output/output_block/mx_min
+
+      add wave -divider "FSM"
+      add_wave "-label clk" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/clk
+      add_wave "-label eof" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/eof
+      add_wave "-label queue_rdy" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/queue_rdy
+      add_wave "-label empty" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/empty
+      add_wave "-label clr_ready" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/clr_ready
+      add_wave "-label clr_valid" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/clr_valid
+      add_wave "-label next_queue" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/next_queue
+      add_wave "-label present_state" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/present_state
+      add_wave "-label reset" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/reset
+      add_wave "-label set_valid" $BASE/gen_full_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/set_valid
+   }
+
+   # Output block - most occupied queue choosing policy
+   if { $PARAM == "OUTPUT_BLOCK_SIMPLE" } {
+      add wave -divider "FLB - Output block"
+      add_wave "-label clk" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/clk
+      add_wave "-label reset" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/reset
+      add_wave "-label rx_sof_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/rx_sof_n
+      add_wave "-label rx_sop_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/rx_sop_n
+      add_wave "-label rx_eop_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/rx_eop_n
+      add_wave "-label rx_eof_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/rx_eof_n
+      add_wave "-label rx_src_rdy_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/rx_src_rdy_n
+      add_wave "-label rx_dst_rdy_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/rx_dst_rdy_n
+      add_wave "-label rx_data -hex" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/rx_data
+      add_wave "-label rx_rem -hex" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/rx_rem
+      add_wave "-label status" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/status
+      add_wave "-label empty" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/empty
+      add_wave "-label ifc -hex" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/ifc
+      add_wave "-label tx_sof_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/tx_sof_n
+      add_wave "-label tx_sop_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/tx_sop_n
+      add_wave "-label tx_eop_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/tx_eop_n
+      add_wave "-label tx_eof_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/tx_eof_n
+      add_wave "-label tx_src_rdy_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/tx_src_rdy_n
+      add_wave "-label tx_dst_rdy_n" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/tx_dst_rdy_n
+      add_wave "-label tx_data -hex" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/tx_data
+      add_wave "-label tx_rem -hex" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/tx_rem
+
+      add wave -divider "Internal"
+      add_wave "-label cnt_next" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/cnt_next
+      add_wave "-label reg_valid" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/reg_valid
+      add_wave "-label queue_chosen" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/queue_chosen
+      add_wave "-label reg_next" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/reg_next
+      add_wave "-label reg_ready" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/reg_ready
+      add_wave "-label reg_addr" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/reg_addr
+      add_wave "-label min_bus" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/min_bus
+      add_wave "-label mx_min" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/mx_min
+
+      add wave -divider "FSM"
+      add_wave "-label clk" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/clk
+      add_wave "-label eof" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/eof
+      add_wave "-label queue_rdy" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/queue_rdy
+      add_wave "-label empty" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/empty
+      add_wave "-label clr_ready" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/clr_ready
+      add_wave "-label clr_valid" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/clr_valid
+      add_wave "-label next_queue" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/next_queue
+      add_wave "-label present_state" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/present_state
+      add_wave "-label reset" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/reset
+      add_wave "-label set_valid" $BASE/gen_simple_binder/fl_binder/gen_output/output_block/flb_output_fsm_i/set_valid
+   }
+
+   # Output block - round robin queue choosing policy
+   if { $PARAM == "OUTPUT_BLOCK_ROBIN" } {
+      add wave -divider "FLB - Output block (Robin)"
+      add_wave "-label clk" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/clk
+      add_wave "-label reset" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/reset
+      add_wave "-label rx_sof_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/rx_sof_n
+      add_wave "-label rx_sop_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/rx_sop_n
+      add_wave "-label rx_eop_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/rx_eop_n
+      add_wave "-label rx_eof_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/rx_eof_n
+      add_wave "-label rx_src_rdy_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/rx_src_rdy_n
+      add_wave "-label rx_dst_rdy_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/rx_dst_rdy_n
+      add_wave "-label rx_data -hex" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/rx_data
+      add_wave "-label rx_rem -hex" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/rx_rem
+      add_wave "-label status" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/status
+      add_wave "-label empty" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/empty
+      add_wave "-label ifc -hex" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/ifc
+      add_wave "-label frame_rdy" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/frame_rdy
+      add_wave "-label no_frame" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/no_frame
+      add_wave "-label tx_sof_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/tx_sof_n
+      add_wave "-label tx_sop_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/tx_sop_n
+      add_wave "-label tx_eop_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/tx_eop_n
+      add_wave "-label tx_eof_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/tx_eof_n
+      add_wave "-label tx_src_rdy_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/tx_src_rdy_n
+      add_wave "-label tx_dst_rdy_n" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/tx_dst_rdy_n
+      add_wave "-label tx_data -hex" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/tx_data
+      add_wave "-label tx_rem -hex" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/tx_rem
+
+      add wave -divider "Internal"
+      add_wave "-label cnt_next" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/cnt_next
+      add_wave "-label cnt_next_ce" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/cnt_next_ce
+      add_wave "-label reg_valid" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/reg_valid
+      add_wave "-label queue_chosen" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/queue_chosen
+      add_wave "-label reg_next" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/reg_next
+      add_wave "-label reg_next_we" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/reg_next_we
+      add_wave "-label reg_ready" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/reg_ready
+      add_wave "-label reg_ready_we" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/reg_ready_we
+      add_wave "-label reg_addr" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/reg_addr
+      add_wave "-label min_bus" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/min_bus
+      add_wave "-label mx_min" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/mx_min
+
+      add wave -divider "FSM"
+      add_wave "-label clk" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/clk
+      add_wave "-label eof" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/eof
+      add_wave "-label queue_rdy" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/queue_rdy
+      add_wave "-label empty" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/empty
+      add_wave "-label clr_ready" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/clr_ready
+      add_wave "-label clr_valid" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/clr_valid
+      add_wave "-label next_queue" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/next_queue
+      add_wave "-label present_state" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/present_state
+      add_wave "-label reset" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/reset
+      add_wave "-label set_valid" $BASE/gen_full_binder/fl_binder/gen_output_robin/output_block/flb_output_fsm_i/set_valid
+   }
+
+   # Frame Counters
+   if { $PARAM == "FRAME_COUNTERS" } {
+      add wave -divider "FLB - Frame Counters"
+      add_wave "-label clk" $BASE/gen_full_binder/fl_binder/gen_output_robin/frame_counters/clk
+      add_wave "-label reset" $BASE/gen_full_binder/fl_binder/gen_output_robin/frame_counters/reset
+      add_wave "-label inc" $BASE/gen_full_binder/fl_binder/gen_output_robin/frame_counters/inc
+      add_wave "-label dec" $BASE/gen_full_binder/fl_binder/gen_output_robin/frame_counters/dec
+      add_wave "-label frame_rdy" $BASE/gen_full_binder/fl_binder/gen_output_robin/frame_counters/frame_rdy
+      add_wave "-label no_frame" $BASE/gen_full_binder/fl_binder/gen_output_robin/frame_counters/no_frame
+   }
+
+   # Simple Binder
+   if { $PARAM == "SIMPLE_BINDER" } {
+      add wave -divider "FLB - SIMPLE arch"
+      add_wave "-label trans_sof_n" $BASE/gen_simple_binder/fl_binder/trans_sof_n
+      add_wave "-label trans_sop_n" $BASE/gen_simple_binder/fl_binder/trans_sop_n
+      add_wave "-label trans_eop_n" $BASE/gen_simple_binder/fl_binder/trans_eop_n
+      add_wave "-label trans_eof_n" $BASE/gen_simple_binder/fl_binder/trans_eof_n
+      add_wave "-label trans_src_rdy_n" $BASE/gen_simple_binder/fl_binder/trans_src_rdy_n
+      add_wave "-label trans_dst_rdy_n" $BASE/gen_simple_binder/fl_binder/trans_dst_rdy_n
+      add_wave "-label trans_data -hex" $BASE/gen_simple_binder/fl_binder/trans_data
+      add_wave "-label trans_rem -hex" $BASE/gen_simple_binder/fl_binder/trans_rem
+
+      add wave -divider "FLB: FIFO OUT"
+      add_wave "-label fifo_sof_n" $BASE/gen_simple_binder/fl_binder/fifo_sof_n
+      add_wave "-label fifo_sop_n" $BASE/gen_simple_binder/fl_binder/fifo_sop_n
+      add_wave "-label fifo_eop_n" $BASE/gen_simple_binder/fl_binder/fifo_eop_n
+      add_wave "-label fifo_eof_n" $BASE/gen_simple_binder/fl_binder/fifo_eof_n
+      add_wave "-label fifo_src_rdy_n" $BASE/gen_simple_binder/fl_binder/fifo_src_rdy_n
+      add_wave "-label fifo_dst_rdy_n" $BASE/gen_simple_binder/fl_binder/fifo_dst_rdy_n
+      add_wave "-label fifo_data -hex" $BASE/gen_simple_binder/fl_binder/fifo_data
+      add_wave "-label fifo_rem -hex" $BASE/gen_simple_binder/fl_binder/fifo_rem
+
+      add wave -divider "FLB: Output Block"
+      add_wave "-label out_rx_sof_n" $BASE/gen_simple_binder/fl_binder/out_rx_sof_n
+      add_wave "-label out_rx_sop_n" $BASE/gen_simple_binder/fl_binder/out_rx_sop_n
+      add_wave "-label out_rx_eop_n" $BASE/gen_simple_binder/fl_binder/out_rx_eop_n
+      add_wave "-label out_rx_eof_n" $BASE/gen_simple_binder/fl_binder/out_rx_eof_n
+      add_wave "-label out_rx_src_rdy_n" $BASE/gen_simple_binder/fl_binder/out_rx_src_rdy_n
+      add_wave "-label out_rx_dst_rdy_n" $BASE/gen_simple_binder/fl_binder/out_rx_dst_rdy_n
+      add_wave "-label out_rx_data -hex" $BASE/gen_simple_binder/fl_binder/out_rx_data
+      add_wave "-label out_rx_rem -hex" $BASE/gen_simple_binder/fl_binder/out_rx_rem
+      add_wave "-label out_status" $BASE/gen_simple_binder/fl_binder/out_status
+      add_wave "-label out_empty" $BASE/gen_simple_binder/fl_binder/out_empty
+      add_wave "-label out_ifc -hex" $BASE/gen_simple_binder/fl_binder/out_ifc
+      add_wave "-label frame_rdy" $BASE/gen_simple_binder/fl_binder/fc_frame_rdy
+      add_wave "-label no_frame" $BASE/gen_simple_binder/fl_binder/fc_no_frame
+   }
+
+   # Align unit
+   if { $PARAM == "ALIGN_FRAME" } {
+      add wave -divider "FLB - ALIGN FRAME"
+      add_wave "-label clk" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/clk
+      add_wave "-label reset" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/reset
+      add_wave "-label rx_sof_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/rx_sof_n
+      add_wave "-label rx_sop_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/rx_sop_n
+      add_wave "-label rx_eop_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/rx_eop_n
+      add_wave "-label rx_eof_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/rx_eof_n
+      add_wave "-label rx_src_rdy_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/rx_src_rdy_n
+      add_wave "-label rx_dst_rdy_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/rx_dst_rdy_n
+      add_wave "-label rx_data -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/rx_data
+      add_wave "-label rx_rem -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/rx_rem
+      add_wave "-label data_out -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/data_out
+      add_wave "-label write" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/write
+      add_wave "-label full" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/full
+      add_wave "-label new_frame" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/new_frame
+      add_wave "-label frame_part" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/frame_part
+
+      add wave -divider "Input FIFO"
+      add_wave "-label fifo_data -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fifo_data
+      add_wave "-label fifo_rem -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fifo_rem
+      add_wave "-label fifo_src_rdy_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fifo_src_rdy_n
+      add_wave "-label fifo_dst_rdy_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fifo_dst_rdy_n
+      add_wave "-label fifo_sop_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fifo_sop_n
+      add_wave "-label fifo_eop_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fifo_eop_n
+      add_wave "-label fifo_sof_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fifo_sof_n
+      add_wave "-label fifo_eof_n" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fifo_eof_n
+
+      add wave -divider "Internal"
+      add_wave "-label cnt_row" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/cnt_row
+      add_wave "-label cnt_row_ce" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/cnt_row_ce
+      add_wave "-label fl_juice" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fl_juice
+
+      add wave -divider "FSM"
+      add_wave "-label fsm_dv" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fsm_dv
+      add_wave "-label fsm_cnt_row_max" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fsm_cnt_row_max
+      add_wave "-label fsm_eop" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fsm_eop
+      add_wave "-label fsm_fifo_full" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fsm_fifo_full
+      add_wave "-label fsm_insert_idle" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/fsm_insert_idle
+      add_wave "-label present_state" $BASE/gen_nfifo2fifo_binder/fl_binder/gen_align_frame__$UNIT_ID/align_frame_i/flb_align_frame_fsm_i/present_state
+   }
+
+   # NFIFO2FIFO
+   if { $PARAM == "NFIFO2FIFO" } {
+      add wave -divider "FLB - NFIFO2FIFO"
+      add_wave "-label clk" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/clk
+      add_wave "-label reset" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/reset
+      add_wave "-label data_in -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/data_in
+      add_wave "-label write" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/write
+      add_wave "-label full" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/full
+      add_wave "-label data_out -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/data_out
+      add_wave "-label data_vld" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/data_vld
+      add_wave "-label block_addr -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/block_addr
+      add_wave "-label read" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/read
+      add_wave "-label empty" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/empty
+      add_wave "-label status -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/nfifo2fifo_i/status
+   }
+
+   # Data transformer
+   if { $PARAM == "DATA_TRANSFORMER" } {
+      add wave -divider "FLB - DATA TRANSFORMER"
+      add_wave "-label clk" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/clk
+      add_wave "-label reset" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/reset
+      add_wave "-label data_out -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/data_out
+      add_wave "-label data_vld" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/data_vld
+      add_wave "-label block_addr -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/block_addr
+      add_wave "-label read" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/read
+      add_wave "-label empty" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/empty
+      add_wave "-label status -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/status
+      add_wave "-label tx_sof_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_sof_n
+      add_wave "-label tx_sop_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_sop_n
+      add_wave "-label tx_eop_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_eop_n
+      add_wave "-label tx_eof_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_eof_n
+      add_wave "-label tx_src_rdy_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_src_rdy_n
+      add_wave "-label tx_dst_rdy_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_dst_rdy_n
+      add_wave "-label tx_data -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_data
+      add_wave "-label tx_rem -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_rem
+      add_wave "-label tx_status -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_status
+      add_wave "-label tx_empty" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_empty
+      add_wave "-label tx_ifc -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/tx_ifc
+
+      add wave -divider "Internal"
+      add_wave "-label reg_data_invalid" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/reg_data_invalid
+      add_wave "-label reg_data_invalid_set" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/reg_data_invalid_set
+      add_wave "-label reg_data_invalid_clr" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/reg_data_invalid_clr
+      add_wave "-label reg_first_word" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/reg_first_word
+      add_wave "-label reg_first_word_clr" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/reg_first_word_clr
+      add_wave "-label frame_done" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/frame_done
+      add_wave "-label decomp_sof_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/decomp_sof_n
+      add_wave "-label decomp_sop_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/decomp_sop_n
+      add_wave "-label decomp_eop_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/decomp_eop_n
+      add_wave "-label decomp_eof_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/decomp_eof_n
+      add_wave "-label decomp_data -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/decomp_data
+      add_wave "-label decomp_rem -hex" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/decomp_rem
+      add_wave "-label decomp_dst_rdy_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/decomp_dst_rdy_n
+      add_wave "-label decomp_src_rdy_n" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/decomp_src_rdy_n
+      add_wave "-label fl_juice_in" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/fl_juice_in
+      add_wave "-label fl_juice" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/fl_juice
+      add_wave "-label rem_sel" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/rem_sel
+      add_wave "-label rem_in" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/rem_in
+      add_wave "-label sig_frame_done" $BASE/gen_nfifo2fifo_binder/fl_binder/data_transformer_i/sig_frame_done
+
+   }
+   # Only tests for Stupid Binder
+   if { $PARAM == "ONLY_TESTS" } {
+      add wave -divider "Stupid binder tests"
+      add_wave "-label status" $BASE/gen_stupid_binder/fl_binder/status
+      add_wave "-label fc_frame_rdy" $BASE/gen_stupid_binder/fl_binder/fc_frame_rdy
+      add_wave "-label mx_ifc_sel -uns" $BASE/gen_stupid_binder/fl_binder/mx_ifc_sel
+      add_wave "-label hold_fl" $BASE/gen_stupid_binder/fl_binder/hold_fl
+      add_wave "-label num_fl" $BASE/gen_stupid_binder/fl_binder/num_fl
+      add_wave "-label start_num -unsigned" $BASE/gen_stupid_binder/fl_binder/start_num
+      add_wave "-label my_shift" $BASE/gen_stupid_binder/fl_binder/my_shift
+
+   }
+
+
+}

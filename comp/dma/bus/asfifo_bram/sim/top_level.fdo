@@ -1,0 +1,26 @@
+# top_level.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Authors: Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+set FIRMWARE_BASE "../../../../.."
+set COMP_BASE     "$FIRMWARE_BASE/comp"
+
+set TB_FILE "top_level_tb.vhd"
+set SIG_FILE "signals_sig.fdo"
+
+set COMPONENTS [list [list "DMA_ASFIFO_BRAM" ".." "FULL"] ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 500ns

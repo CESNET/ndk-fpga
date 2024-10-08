@@ -1,0 +1,58 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2018 CESNET
+# Author: Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc tb_internals { PATH GROUP } {
+    eval "add wave $GROUP -divider {TB internals}"
+    add_wave "$GROUP -noupdate -hex -label TEST_STATUS"   $PATH/TEST_STATUS
+    add_wave "$GROUP -noupdate -hex -label fake_mem"   $PATH/fake_mem
+    add_wave "$GROUP -noupdate -hex -label op_ops_s"   $PATH/op_ops_s
+}
+
+proc n_loop_op_ports { PATH GROUP } {
+
+    eval "add wave $GROUP -divider {Synchronization}"
+    add_wave "$GROUP -noupdate -hex -label CLK -color yellow"   $PATH/CLK
+    add_wave "$GROUP -noupdate -hex -label RESET -color yellow"   $PATH/RESET
+
+    eval "add wave $GROUP -divider {Ports}"
+    add_wave "$GROUP -noupdate -hex -label OP_ITEM_SEL"   $PATH/OP_ITEM_SEL
+    add_wave "$GROUP -noupdate -hex -label OP_OPERATIONS"   $PATH/OP_OPERATIONS
+    add_wave "$GROUP -noupdate -hex -label OP_IN_SEL"   $PATH/OP_IN_SEL
+    add_wave "$GROUP -noupdate -hex -label OP_IN_OPS"   $PATH/OP_IN_OPS
+    add_wave "$GROUP -noupdate -hex -label OP_IN_DATA"   $PATH/OP_IN_DATA
+    add_wave "$GROUP -noupdate -hex -label OP_OUT_DATA"   $PATH/OP_OUT_DATA
+    add_wave "$GROUP -noupdate -hex -label READ_ADDR"   $PATH/READ_ADDR
+    add_wave "$GROUP -noupdate -hex -label READ_DATA"   $PATH/READ_DATA
+
+
+}
+
+proc n_loop_op_internals { PATH GROUP } {
+
+    eval "add wave $GROUP -divider {Internals}"
+    add_wave "$GROUP -noupdate -hex -label mem_in_we"     $PATH/mem_in_we
+    add_wave "$GROUP -noupdate -hex -label mem_in_addr"     $PATH/mem_in_addr
+    add_wave "$GROUP -noupdate -hex -label mem_in_data"     $PATH/mem_in_data
+    add_wave "$GROUP -noupdate -hex -label mem_out_addr"     $PATH/mem_out_addr
+    add_wave "$GROUP -noupdate -hex -label mem_out_data"     $PATH/mem_out_data
+    add_wave "$GROUP -noupdate -hex -label read_data_reg"     $PATH/read_data_reg
+    add_wave "$GROUP -noupdate -hex -label reg0_data"     $PATH/reg0_data
+    add_wave "$GROUP -noupdate -hex -label reg0_vld"     $PATH/reg0_vld
+    add_wave "$GROUP -noupdate -hex -label reg0_d_sel"     $PATH/reg0_d_sel
+    add_wave "$GROUP -noupdate -hex -label reg0_d_sel_a"     $PATH/reg0_d_sel_a
+    add_wave "$GROUP -noupdate -hex -label reg0_addr"     $PATH/reg0_addr
+    add_wave "$GROUP -noupdate -hex -label reg0_op"     $PATH/reg0_op
+    add_wave "$GROUP -noupdate -hex -label reg1_data"     $PATH/reg1_data
+    add_wave "$GROUP -noupdate -hex -label reg1_addr"     $PATH/reg1_addr
+    add_wave "$GROUP -noupdate -hex -label reg1_vld"     $PATH/reg1_vld
+    add_wave "$GROUP -noupdate -hex -label reg2_data"     $PATH/reg2_data
+    add_wave "$GROUP -noupdate -hex -label reg2_addr"     $PATH/reg2_addr
+    add_wave "$GROUP -noupdate -hex -label reg2_vld"     $PATH/reg2_vld
+    add_wave "$GROUP -noupdate -hex -label init_val"     $PATH/init_val
+
+}

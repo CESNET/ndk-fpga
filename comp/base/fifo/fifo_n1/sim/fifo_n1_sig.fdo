@@ -1,0 +1,30 @@
+# fifo_n1_sig.fdo : Include file with signals
+# Copyright (C) 2017 CESNET
+# Author: Vaclav Hummel <xhumme00@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+# Paths
+set FIFO_N1_PATH   "/testbench/uut"
+set TB_PATH   "/testbench"
+
+source  "signals.fdo"
+
+add wave -divider ""
+add wave -divider "TB internals"
+add wave -divider ""
+tb_internals "$TB_PATH" ""
+
+add wave -divider ""
+add wave -divider "FIFO_N1 ports"
+add wave -divider ""
+fifo_n1_ports "$FIFO_N1_PATH" ""
+
+add wave -divider ""
+add wave -divider "FIFO_N1 internals"
+add wave -divider ""
+fifo_n1_internals "$FIFO_N1_PATH" ""
+
+

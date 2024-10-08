@@ -1,0 +1,18 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2018 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+source "./signals.fdo"
+
+add wave -divider "MFB_GET_ITEMS"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+rx    RX    /testbench/DUT_U/VHDL_DUT_U
+tx    TX    /testbench/DUT_U/VHDL_DUT_U
+inter INTER /testbench/DUT_U/VHDL_DUT_U
+
+

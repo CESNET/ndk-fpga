@@ -1,0 +1,54 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Ivan Bryndza <xbrynd00@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_FLU2AXI_RX { } {
+
+    global TB_PATH
+    global FLU2AXI_PATH
+
+    add wave -divider "FLU INPUT INTERFACE"
+    add_wave "-noupdate -hex -label RX_DATA"    /$TB_PATH/RX_DATA
+    add_wave "-noupdate -hex -label RX_SOP_POS" /$TB_PATH/RX_SOP_POS
+    add_wave "-noupdate -hex -label RX_EOP_POS" /$TB_PATH/RX_EOP_POS
+    add_wave "-noupdate -hex -label RX_SOP"     /$TB_PATH/RX_SOP
+    add_wave "-noupdate -hex -label RX_EOP"     /$TB_PATH/RX_EOP
+    add_wave "-noupdate -hex -label RX_SRC_RDY" /$TB_PATH/RX_SRC_RDY
+    add_wave "-noupdate -hex -label RX_DST_RDY" /$TB_PATH/RX_DST_RDY
+    add wave -divider  "Internal signal"
+    add_wave "-noupdate -hex -label ext_sop_pos" /$FLU2AXI_PATH/ext_sop_pos
+
+    add wave -divider "In pipe signals"
+    add_wave "-noupdate -hex -label in_pipe_data" /$FLU2AXI_PATH/in_pipe_data
+    add_wave "-noupdate -hex -label in_pipe_sop_pos" /$FLU2AXI_PATH/in_pipe_sop_pos
+    add_wave "-noupdate -hex -label in_pipe_eop_pos" /$FLU2AXI_PATH/in_pipe_eop_pos
+    add_wave "-noupdate -hex -label in_pipe_sop" /$FLU2AXI_PATH/in_pipe_sop
+    add_wave "-noupdate -hex -label in_pipe_eop" /$FLU2AXI_PATH/in_pipe_eop
+    add_wave "-noupdate -hex -label in_pipe_src_rdy" /$FLU2AXI_PATH/in_pipe_src_rdy
+    add_wave "-noupdate -hex -label in_pipe_dst_rdy" /$FLU2AXI_PATH/in_pipe_dst_rdy
+}
+
+proc blk_FLU2AXI_TX { } {
+
+    global TB_PATH
+    global FLU2AXI_PATH
+
+    add wave -divider "Out pipe signals"
+    add_wave "-noupdate -hex -label out_pipe_tdata" /$FLU2AXI_PATH/out_pipe_tdata
+    add_wave "-noupdate -hex -label out_pipe_tkeep" /$FLU2AXI_PATH/out_pipe_tkeep
+    add_wave "-noupdate -hex -label out_pipe_tlast" /$FLU2AXI_PATH/out_pipe_tlast
+    add_wave "-noupdate -hex -label out_pipe_tvalid" /$FLU2AXI_PATH/out_pipe_tvalid
+    add_wave "-noupdate -hex -label out_pipe_tready" /$FLU2AXI_PATH/out_pipe_tready
+
+    add wave -divider "AXI OUTPUT INTERFACE"
+    add_wave "-noupdate -hex -label TX_TDATA"    /$TB_PATH/TX_TDATA
+    add_wave "-noupdate -hex -label TX_TKEEP" /$TB_PATH/TX_TKEEP
+    add_wave "-noupdate -hex -label TX_TLAST"     /$TB_PATH/TX_TLAST
+    add_wave "-noupdate -hex -label TX_TVALID" /$TB_PATH/TX_TVALID
+    add_wave "-noupdate -hex -label TX_TREADY"     /$TB_PATH/TX_TREADY
+}

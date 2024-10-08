@@ -1,0 +1,33 @@
+# watchdog.fdo : Include file with signals
+# Copyright (C) 2015 CESNET
+# Authors: Adam Piecek <xpiece00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set WATCHDOG_BASE    "$OFM_PATH/comp/base/misc/watchdog"
+set TB_FILE          "watchdog_tb.vhd"
+set SIG_FILE         "watchdog_sig.fdo"
+
+set MOD $TB_FILE
+
+set PACKAGES ""
+
+# Modules definition
+set COMPONENTS [list                                                       \
+    [list "Watchdog"    $WATCHDOG_BASE  FULL]                \
+]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 2us

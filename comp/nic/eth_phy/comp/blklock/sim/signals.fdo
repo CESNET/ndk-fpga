@@ -1,0 +1,19 @@
+# signals.fdo: Block lock simulation file
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Oliver Gurka <xgurka00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+add wave -noupdate -label CLK /testbench/clk
+add wave -noupdate -label RST /testbench/rst
+add wave -divider RX_IN\ UP
+add wave -noupdate /testbench/rx_header_in
+add wave -noupdate /testbench/rx_header_valid
+add wave -divider SLIP
+add wave -noupdate /testbench/slip_command
+add wave -noupdate -label SLIP_WAIT_REG /testbench/dut/slip_wait_reg
+add wave -divider OUTPUT
+add wave -noupdate /testbench/rx_lock_aquired
+add wave -divider FSM
+add wave -noupdate -label CURR_STATE /testbench/dut/curr_state
+add wave -noupdate -label NEXT_STATE /testbench/dut/next_state

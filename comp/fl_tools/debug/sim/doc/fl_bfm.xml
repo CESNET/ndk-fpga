@@ -1,0 +1,171 @@
+<source>
+
+    <component>
+        FrameLink BFM (Bus functional model)
+    </component>
+
+    <authors>
+        <author login="xkosar02">
+            Vlastimil Kosar
+        </author>
+    </authors>
+
+    <features>
+        <item>
+            Supports FrameLink data bus width of 16, 32, 64 and 128 bits.
+        </item>
+        <item>
+            Creates FrameLink dataflow from a file.
+        </item>
+	<item>
+	    Supports 3 modes of FrameLink SRC_RDY_N signals generation.
+	</item>
+	<item>
+	    Replaces FL_SIM and is full compatibile with dataflow files of FL_SIM.
+	</item>
+	<item>
+	    Supports up to 16 FL_BFMs in testbench.
+	</item>
+    </features>
+
+
+    <description>
+        This FrameLink simulation component creates FrameLink dataflow
+        from hexa values in formated file. Component suports FrameLink data bus width of 16, 32, 64 and 128 bits.
+	Component replaces FL_SIM. New functionality is generating of SRC_RDY_N signal in 3 modes. For logging use
+	component <ref_comp ref="fl_monitor" tag_id="HEAD">FrameLink Monitor</ref_comp>. In testbench up to 16 FL_BFMs
+	can be used.
+    </description>
+
+    <interface>
+
+        <generic_map>
+            <generic name="DATA_WIDTH" type="integer" default="">
+		    RX/TX interface data bus width (16, 32, 64 and 128 bits supported).
+            </generic>
+	    <generic name="FL_BFM_ID" type="integer" default="">
+		    Unique identity of FL_BFM as one of 16 posible FL_BFMs in design
+            </generic>
+        </generic_map>
+
+        <port_map>
+            <port name="RESET" dir="in" width="1">
+                Global reset.
+            </port>
+            <port name="CLK" dir="in" width="1">
+                Clock input.
+            </port>
+
+            <divider>
+                TX FrameLink interface
+            </divider>
+            <port name="TX_DATA" dir="out" width="DATA_WIDTH">
+                TX data bus.
+            </port>
+            <port name="TX_REM" dir="out" width="log2(DATA_WIDTH/8)">
+                TX data remainder.
+            </port>
+            <port name="TX_SOF_N" dir="out" width="1">
+                TX start of frame.
+            </port>
+            <port name="TX_EOF_N" dir="out" width="1">
+                TX end of frame.
+            </port>
+            <port name="TX_SOP_N" dir="out" width="1">
+                TX start of packet (segment).
+            </port>
+            <port name="TX_EOP_N" dir="out" width="1">
+                TX end of packet (segment).
+            </port>
+            <port name="TX_SRC_RDY_N" dir="out" width="1">
+                TX source ready.
+            </port>
+            <port name="TX_DST_RDY_N" dir="in" width="1">
+                TX destination ready.
+            </port>
+        </port_map>
+
+    </interface>
+
+    <body>
+
+        <h1>Data alignment</h1>
+        <p>
+            Little-endian byte order is used in this component.
+        </p>
+
+        <h1>FrameLink Simulation Component</h1>
+        <p>
+          Up to 16 FL_BFMs can be used in design.
+        </p>
+        <p>
+         When you want to use FL_BFM component fl_bfm_rdy_pkg and FL_BFM_pkg packages must be included:
+         </p>
+         <p>
+         <i>use work.fl_bfm_rdy_pkg.all;</i><br/>
+	 <i>use work.FL_BFM_pkg.all;</i>
+        </p>
+
+     <h1>SendWriteFile procedure</h1>
+      <p>
+       This function is used for sending data to FL_BFM component.<br/>
+       Ex. <i>SendWriteFile("./tests/fl_sim.txt", RND, flCmd_0, 0);</i>
+       <br/>
+       This code will start simulation. (Sending data from file to output FrameLink interface). The file contains neccesary amount of data for crating both data signal and control signals. The file format is described below.
+      </p>
+      <p>
+       <b><i>Procedure reads data from file, converts them to FL_BFM internal format and the data are then send.</i></b>
+       <pre>
+        PROCEDURE SendWriteFile (CONSTANT FileName : IN string; CONSTANT RDYDriver: IN RDYSignalDriver; SIGNAL flCmd : INOUT flCmdTypeItem; CONSTANT FLBFMID  : IN integer);
+       </pre>
+       <ul>
+       <li> FileName - name of file from where data are read</li>
+       <li> RDYDriver - mode of SRC_RDY_N signal driving</li>
+       <li> flCmd - name of shared variable. The name pattern is flCmd_?, where ? means single hexa digit, which identifies FL_BFM component in design. Must be same as parameter FLBFMID and generic FL_BFM_ID.</li>
+       <li> FLBFMID - identifies FL_BFM component in design. Range is from 0 to 15 (decimal). Must corespond with name of ahared variable and generic FL_BFM_ID  </li>
+       </ul>
+      </p>
+
+      <h1>Modes of generating SRC_RDY_N signal</h1>
+      <p>
+        Three modes of generating signal SRC_RDY_N:
+	<ul>
+       <li> EVER - signal is active (in 0) when data are send</li>
+       <li> ONOFF - signal oscilates between active (0) and inactive (1) regulary</li>
+       <li> RND - signal states (0,1) are random generated.</li>
+       </ul>
+       Random generator seed can be set by procedure <i>SetSeed(Seed : in integer);</i>.
+      </p>
+
+
+     <h1>File format</h1>
+       <p>
+       <ul>
+       <li> Hexadecimal values are stored in 32-bit format. </li>
+       <li> Multi-line packets are supported.</li>
+       <li> End of part of packet marker is '$' on start of line. </li>
+       <li> End of packet marker is '#' on start of line. </li>
+       <li> Maximum length of line is 2048 characters. </li>
+       <li> When Multi-line packet is used, only last line can have number of haxa digits in multiples of 2. Other lines can have number of hexa digit in multiples of 8.</li>
+       <li> Corect number notation of hexa number A is 0A, ABC is 0ABC, etc.</li>
+       <li> File can content comments. - on start of line means comment and is ignored. (This feature is unsuported in FL_SIM a when use with FL_SIM can create errors) </li>
+       </ul>
+       </p>
+       <p>
+         Example:
+        </p>
+        <p>
+        <pre>
+	   -- Example:
+           1122AABB
+           00CC
+           $
+           125487
+           $
+           10
+           #
+        </pre>
+        Description of the example: It is one packet which consists from 3 parts. The last # cann't be ommited.
+        </p>
+    </body>
+</source>

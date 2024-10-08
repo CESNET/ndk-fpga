@@ -1,0 +1,56 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+proc blk_bus_handshake_ifc { } {
+    global TB_PATH
+
+    add wave -divider "Interface"
+
+    add_wave "-noupdate      -label ACLK"     /$TB_PATH/aclk
+    add_wave "-noupdate      -label ARST"     /$TB_PATH/arst
+    add_wave "-noupdate -hex -label ADATAIN"  /$TB_PATH/adatain
+    add_wave "-noupdate      -label ASEND"    /$TB_PATH/asend
+    add_wave "-noupdate      -label AREADY"   /$TB_PATH/aready
+
+    add wave -divider ""
+    add_wave "-noupdate      -label BCLK"     /$TB_PATH/bclk
+    add_wave "-noupdate      -label BRST"     /$TB_PATH/brst
+    add_wave "-noupdate -hex -label BDATAOUT" /$TB_PATH/bdataout
+    add_wave "-noupdate      -label BLOAD"    /$TB_PATH/bload
+    add_wave "-noupdate      -label BVALID"   /$TB_PATH/bvalid
+}
+
+
+proc blk_bus_handshake_internals { } {
+    global bus_handshake_PATH
+
+    add wave -divider "Internal signals"
+    add_wave "-noupdate      -label signal_aready" /$bus_handshake_PATH/signal_aready
+    add_wave "-noupdate      -label a_en_next"     /$bus_handshake_PATH/a_en_next
+    add_wave "-noupdate      -label a_en"          /$bus_handshake_PATH/a_en
+    add_wave "-noupdate      -label b_en"          /$bus_handshake_PATH/b_en
+
+    add wave -divider ""
+    add_wave "-noupdate      -label signal_bvalid" /$bus_handshake_PATH/signal_bvalid
+    add_wave "-noupdate      -label b_ack_next"    /$bus_handshake_PATH/b_ack_next
+    add_wave "-noupdate      -label b_ack"         /$bus_handshake_PATH/b_ack
+    add_wave "-noupdate      -label a_ack"         /$bus_handshake_PATH/a_ack
+
+    add wave -divider ""
+    add_wave "-noupdate      -label anxt_data"     /$bus_handshake_PATH/anxt_data
+    add_wave "-noupdate -hex -label adata"         /$bus_handshake_PATH/adata
+    add_wave "-noupdate      -label bload_data"    /$bus_handshake_PATH/bload_data
+
+    add wave -divider ""
+    add_wave "-noupdate      -label TX_present_st" /$bus_handshake_PATH/TRANSMIT_FSM/present_st
+    add_wave "-noupdate      -label TX_next_st"    /$bus_handshake_PATH/TRANSMIT_FSM/next_st
+    add_wave "-noupdate      -label RX_present_st" /$bus_handshake_PATH/RECEIVE_FSM/present_st
+    add_wave "-noupdate      -label RX_next_st"    /$bus_handshake_PATH/RECEIVE_FSM/next_st
+}

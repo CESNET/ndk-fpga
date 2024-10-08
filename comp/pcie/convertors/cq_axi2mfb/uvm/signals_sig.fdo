@@ -1,0 +1,32 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author:   Daniel Kříž <xkrizd01@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "PCIE_CQ_AXI2MFB"
+
+add_wave "-noupdate -color yellow -label RST"   /testbench/RST
+add_wave "-noupdate -color yellow -label CLK"   /testbench/CLK
+
+all ALL /testbench/DUT_U/VHDL_DUT_U
+#add wave -divider "SOF_0"
+#add wave /testbench/DUT_U/VHDL_DUT_U/CQ_AXI_USER(80)
+#add wave -divider "SOF_PTR_0"
+#add wave /testbench/DUT_U/VHDL_DUT_U/CQ_AXI_USER(83:82)
+#add wave -divider "SOF_1"
+#add wave /testbench/DUT_U/VHDL_DUT_U/CQ_AXI_USER(81)
+#add wave -divider "SOF_PTR_1"
+#add wave /testbench/DUT_U/VHDL_DUT_U/CQ_AXI_USER(85:84)
+#add wave -divider "EOF_0"
+#add wave /testbench/DUT_U/VHDL_DUT_U/CQ_AXI_USER(86)
+#add wave -divider "EOF_PTR_0"
+#add wave /testbench/DUT_U/VHDL_DUT_U/CQ_AXI_USER(91:88)
+#add wave -divider "EOF_1"
+#add wave /testbench/DUT_U/VHDL_DUT_U/CQ_AXI_USER(87)
+#add wave -divider "EOF_PTR_1"
+#add wave /testbench/DUT_U/VHDL_DUT_U/CQ_AXI_USER(95:92)
+
+config wave -signalnamewidth 1

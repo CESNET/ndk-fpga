@@ -1,0 +1,21 @@
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Mario Kuka <kuka@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Specify top level entity & architecture
+set TOP_LEVEL_ENT       "DMA_HDR_EXTRACTOR"
+set TOP_LEVEL_ARCHGRP   "FULL"
+# Specify component base directory
+set TOP_BASE ".."
+set FIRMWARE_BASE "../../../../.."
+set SIG_FILE "signals.fdo"
+set TB_FILE  "testbench.vhd"
+
+# Include components
+set COMPONENTS [list \
+   [ list $TOP_LEVEL_ENT $TOP_BASE $TOP_LEVEL_ARCHGRP ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+nb_sim_run 100ns

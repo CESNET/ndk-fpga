@@ -1,0 +1,16 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_STREAM { } {
+
+    global STREAM_PATH
+    add_wave "-noupdate -hex -label IN_TS" /$STREAM_PATH/IN_TS
+    add_wave "-noupdate -hex -label IN_TS_DV" /$STREAM_PATH/IN_TS_DV
+    add_wave "-noupdate -hex -label OUT_TS" /$STREAM_PATH/OUT_TS
+    add_wave "-noupdate -hex -label OUT_TS_DV" /$STREAM_PATH/OUT_TS_DV
+    }

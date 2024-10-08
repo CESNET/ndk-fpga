@@ -1,0 +1,110 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jakub Cabal <xcabal05@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+source "./signals.fdo"
+
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+set DUT "/testbench/DUT_U/VHDL_DUT_U"
+
+add_wave "-group {RX_MFB0} -noupdate -hex" $DUT/RX_MFB0_DATA
+add_wave "-group {RX_MFB0} -noupdate -hex" $DUT/RX_MFB0_SOF
+add_wave "-group {RX_MFB0} -noupdate -hex" $DUT/RX_MFB0_EOF
+add_wave "-group {RX_MFB0} -noupdate -hex" $DUT/RX_MFB0_SOF_POS
+add_wave "-group {RX_MFB0} -noupdate -hex" $DUT/RX_MFB0_EOF_POS
+add_wave "-group {RX_MFB0} -noupdate -hex" $DUT/RX_MFB0_SRC_RDY
+add_wave "-group {RX_MFB0} -noupdate -hex" $DUT/RX_MFB0_DST_RDY
+
+add_wave "-group {RX_MFB1} -noupdate -hex" $DUT/RX_MFB1_DATA
+add_wave "-group {RX_MFB1} -noupdate -hex" $DUT/RX_MFB1_SOF
+add_wave "-group {RX_MFB1} -noupdate -hex" $DUT/RX_MFB1_EOF
+add_wave "-group {RX_MFB1} -noupdate -hex" $DUT/RX_MFB1_SOF_POS
+add_wave "-group {RX_MFB1} -noupdate -hex" $DUT/RX_MFB1_EOF_POS
+add_wave "-group {RX_MFB1} -noupdate -hex" $DUT/RX_MFB1_SRC_RDY
+add_wave "-group {RX_MFB1} -noupdate -hex" $DUT/RX_MFB1_DST_RDY
+
+add_wave "-group {rx0_dly} -noupdate -hex" $DUT/data0_rx_dly
+add_wave "-group {rx0_dly} -noupdate -hex" $DUT/sof0_rx_dly
+add_wave "-group {rx0_dly} -noupdate -hex" $DUT/eof0_rx_dly
+add_wave "-group {rx0_dly} -noupdate -hex" $DUT/sof_pos0_rx_dly
+add_wave "-group {rx0_dly} -noupdate -hex" $DUT/eof_pos0_rx_dly
+add_wave "-group {rx0_dly} -noupdate -hex" $DUT/src_rdy0_rx_dly
+add_wave "-group {rx0_dly} -noupdate -hex" $DUT/RX_MFB0_DST_RDY
+
+add_wave "-group {rx1_dly} -noupdate -hex" $DUT/data1_rx_dly
+add_wave "-group {rx1_dly} -noupdate -hex" $DUT/sof1_rx_dly
+add_wave "-group {rx1_dly} -noupdate -hex" $DUT/eof1_rx_dly
+add_wave "-group {rx1_dly} -noupdate -hex" $DUT/sof_pos1_rx_dly
+add_wave "-group {rx1_dly} -noupdate -hex" $DUT/eof_pos1_rx_dly
+add_wave "-group {rx1_dly} -noupdate -hex" $DUT/src_rdy1_rx_dly
+add_wave "-group {rx1_dly} -noupdate -hex" $DUT/RX_MFB1_DST_RDY
+
+add_wave "-group {set_in_FSM} -noupdate -hex" $DUT/mux_addr
+add_wave "-group {set_in_FSM} -noupdate -hex" $DUT/src_rdy_tx
+add_wave "-group {set_in_FSM} -noupdate -hex" $DUT/dst_rdy0_rx
+add_wave "-group {set_in_FSM} -noupdate -hex" $DUT/dst_rdy1_rx
+add_wave "-group {set_in_FSM} -noupdate -hex" $DUT/sof0_masked
+add_wave "-group {set_in_FSM} -noupdate -hex" $DUT/sof1_masked
+add_wave "-group {set_in_FSM} -noupdate -hex" $DUT/cnt_rst
+
+add_wave "-group {FSM_st} -noupdate -hex" $DUT/present_st
+add_wave "-group {FSM_st} -noupdate -hex" $DUT/next_st
+
+add_wave "-group {cnt_sig} -noupdate -hex" $DUT/cnt_rst
+add_wave "-group {cnt_sig} -noupdate -hex" $DUT/is_some_sof
+add_wave "-group {cnt_sig} -noupdate -hex" $DUT/pkt_cnt
+add_wave "-group {cnt_sig} -noupdate -hex" $DUT/PKT_CNT_MAX
+add_wave "-group {cnt_sig} -noupdate -hex" $DUT/pkt_cnt_reached
+
+add_wave "-group {sw_log} -noupdate -hex" $DUT/dst_rdy_tx
+add_wave "-group {sw_log} -noupdate -hex" $DUT/mux_addr_change_to_0
+add_wave "-group {sw_log} -noupdate -hex" $DUT/mux_addr_change_to_1
+add_wave "-group {sw_log} -noupdate -hex" $DUT/sof1_masked
+add_wave "-group {sw_log} -noupdate -hex" $DUT/sof0_masked
+add_wave "-group {sw_log} -noupdate -hex" $DUT/sof1_masked_reg
+add_wave "-group {sw_log} -noupdate -hex" $DUT/sof0_masked_reg
+add_wave "-group {sw_log} -noupdate -hex" $DUT/sw_right_now0
+add_wave "-group {sw_log} -noupdate -hex" $DUT/sw_right_now1
+add_wave "-group {sw_log} -noupdate -hex" $DUT/sof0_to_be_masked
+add_wave "-group {sw_log} -noupdate -hex" $DUT/sof1_to_be_masked
+
+add_wave "-group {mask_log} -noupdate -hex" $DUT/inc_pkt0
+add_wave "-group {mask_log} -noupdate -hex" $DUT/sof0_rx
+add_wave "-group {mask_log} -noupdate -hex" $DUT/eof0_rx
+add_wave "-group {mask_log} -noupdate -hex" $DUT/sof0_to_be_masked
+add_wave "-group {mask_log} -noupdate -hex" $DUT/sw_right_now0
+add_wave "-group {mask_log} -noupdate -hex" $DUT/inc_pkt1
+add_wave "-group {mask_log} -noupdate -hex" $DUT/sof1_rx
+add_wave "-group {mask_log} -noupdate -hex" $DUT/eof1_rx
+add_wave "-group {mask_log} -noupdate -hex" $DUT/sof1_to_be_masked
+add_wave "-group {mask_log} -noupdate -hex" $DUT/sw_right_now1
+
+add_wave "-group {tx_dly} -noupdate -hex" $DUT/data_tx
+add_wave "-group {tx_dly} -noupdate -hex" $DUT/sof_tx
+add_wave "-group {tx_dly} -noupdate -hex" $DUT/eof_tx
+add_wave "-group {tx_dly} -noupdate -hex" $DUT/sof_pos_tx
+add_wave "-group {tx_dly} -noupdate -hex" $DUT/eof_pos_tx
+add_wave "-group {tx_dly} -noupdate -hex" $DUT/src_rdy_tx
+
+add_wave "-group {TX_MFB} -noupdate -hex" $DUT/TX_MFB_DATA
+add_wave "-group {TX_MFB} -noupdate -hex" $DUT/TX_MFB_SOF
+add_wave "-group {TX_MFB} -noupdate -hex" $DUT/TX_MFB_EOF
+add_wave "-group {TX_MFB} -noupdate -hex" $DUT/TX_MFB_SOF_POS
+add_wave "-group {TX_MFB} -noupdate -hex" $DUT/TX_MFB_EOF_POS
+add_wave "-group {TX_MFB} -noupdate -hex" $DUT/TX_MFB_SRC_RDY
+add_wave "-group {TX_MFB} -noupdate -hex" $DUT/TX_MFB_DST_RDY
+
+add_wave "-group {GENERICS} -noupdate -hex" $DUT/REGIONS
+add_wave "-group {GENERICS} -noupdate -hex" $DUT/REGION_SIZE
+add_wave "-group {GENERICS} -noupdate -hex" $DUT/BLOCK_SIZE
+add_wave "-group {GENERICS} -noupdate -hex" $DUT/ITEM_WIDTH
+add_wave "-group {GENERICS} -noupdate -hex" $DUT/META_WIDTH
+add_wave "-group {GENERICS} -noupdate -hex" $DUT/PKT_CNT_MAX
+
+#all ALL /testbench/DUT_U/VHDL_DUT_U
+

@@ -1,0 +1,46 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2012 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc rx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label RX_DATA"       $PATH/RX_DATA
+     add_wave "-noupdate  -hex -label RX_SOP_POS"    $PATH/RX_SOP_POS
+     add_wave "-noupdate  -hex -label RX_EOP_POS"    $PATH/RX_EOP_POS
+     add_wave "-noupdate  -label RX_SOP"        $PATH/RX_SOP
+     add_wave "-noupdate  -label RX_EOP"        $PATH/RX_EOP
+     add_wave "-noupdate  -label RX_SRC_RDY"    $PATH/RX_SRC_RDY
+     add_wave "-noupdate  -label RX_DST_RDY"    $PATH/RX_DST_RDY
+}
+
+proc tx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label TX_DATA"       $PATH/TX_DATA
+     add_wave "-noupdate  -hex -label TX_SOP_POS"    $PATH/TX_SOP_POS
+     add_wave "-noupdate  -hex -label TX_EOP_POS"    $PATH/TX_EOP_POS
+     add_wave "-noupdate  -label TX_SOP"        $PATH/TX_SOP
+     add_wave "-noupdate  -label TX_EOP"        $PATH/TX_EOP
+     add_wave "-noupdate  -label TX_SRC_RDY"    $PATH/TX_SRC_RDY
+     add_wave "-noupdate  -label TX_DST_RDY"    $PATH/TX_DST_RDY
+}
+
+proc all {NAME PATH} {
+     add_wave "-noupdate  -hex -label inum"       $PATH/inum
+     add_wave "-noupdate  -hex -label inum_ready"       $PATH/inum_ready
+     add_wave "-noupdate  -hex -label inum_next"       $PATH/inum_next
+     add_wave "-noupdate  -hex -label inum_field"       $PATH/inum_field
+     add_wave "-noupdate  -hex -label rr_cnt"       $PATH/rr_cnt
+     add_wave "-noupdate  -hex -label eop_sent"       $PATH/rx_mx_i/eop_sent
+     add_wave "-noupdate  -hex -label sel_reg"       $PATH/rx_mx_i/sel_reg
+     add_wave "-noupdate  -hex -label sop_after_eop"       $PATH/rx_mx_i/sop_after_eop
+     add_wave "-noupdate  -hex -label sel_nochange"       $PATH/rx_mx_i/sel_nochange
+}

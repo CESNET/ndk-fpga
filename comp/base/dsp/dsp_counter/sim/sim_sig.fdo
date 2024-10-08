@@ -1,0 +1,34 @@
+# sim_sig.fdo : Include file with signals
+# Copyright (C) 2019 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <xkondy00@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+# Paths
+set TB_PATH  "/testbench"
+set CNT_PATH "/testbench/uut/device_g/dsp_counter_i"
+
+# include signals
+source "signals.fdo"
+
+add wave -divider "GENERICS"
+add_wave "-label device" $TB_PATH/DEVICE
+add_wave "-label input_regs" $TB_PATH/INPUT_REGS
+add_wave "-label dsp_enable" $TB_PATH/DSP_ENABLE
+add_wave "-label count_by_width" $TB_PATH/INPUT_WIDTH
+add_wave "-label result_width" $TB_PATH/OUTPUT_WIDTH
+
+add wave -divider "RESULTS"
+add_wave "-label sim_result" $TB_PATH/sim_result
+add_wave "-label cnt_result" $TB_PATH/cnt_result
+add_wave "-label result_ok"  $TB_PATH/result_ok
+
+add wave -divider
+all TB_ALL  $TB_PATH
+all CNT_ALL $TB_PATH/uut
+
+add wave -divider
+all CNT_DSP_ALL       $CNT_PATH
+all INTEL_CNT_DSP_ALL $CNT_PATH/auto_reset_g/auto_rst_cnt_variant_g/device_g/dsp_counter_stratix_10_atom_i/dsp_i
+

@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>RX Buffer for FrameLink</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="polcak_l">Libor Polcak</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+	<item>Generic FrameLink receiving interface</item>
+	<item>This component receives FrameLink protocol and sends it through MI32 bus</item>
+	<item>Data width: 8, 16, 32, 64 or 128 bits</item>
+	<!--	<item>Tested in hardware (frequency 100 MHz)</item>
+	<item>Throughput 3.2 Gbps</item>-->
+</features>
+
+
+<!-- Bugs -->
+<!--<bugs>
+</bugs>-->
+
+
+<!-- Things to do -->
+<todo>
+	<item>Tests in the hardware</item>
+</todo>
+
+
+<!-- Short Block description -->
+<description>
+	RX buffer component is FrameLink interface that receives data. It can be
+	used to debug other FrameLink components. Incoming FrameLink protocol is
+	stored inside and can be loaded into the registers that are readable through
+	the MI32 bus with the software interface.
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<generic_map>
+
+		<generic name="DATA_WIDTH" type="integer" default="16">
+			FrameLink data width
+		</generic>
+		<generic name="USE_BRAMS" type="boolean" default="True">
+			True => use BlockBAMs in the FIFO;
+      False => use SelectRAMs in the FIFO
+		</generic>
+		<generic name="ITEMS" type="integer" default="1024">
+			Number of items in the FIFO
+		</generic>
+
+	</generic_map>
+
+	<port_map>
+
+		<divider>Common signals</divider>
+		<port  name="CLK" dir="in" width="1">
+			Clock input
+		</port>
+		<port  name="RESET" dir="in" width="1">
+			Global reset
+		</port>
+
+		<divider>FrameLink input interface</divider>
+		<port name="RX_DATA" dir="in" width="DATA_WIDTH">
+			FrameLink data
+		</port>
+		<port name="RX_REM" dir="in" width="log2(DATA_WIDTH/8)">
+			FrameLink REM signal
+		</port>
+		<port name="RX_SOF_N" dir="in" width="1">
+			FrameLink start of frame
+		</port>
+		<port name="RX_SOP_N" dir="in" width="1">
+			FrameLink start of packet
+		</port>
+		<port name="RX_EOP_N" dir="in" width="1">
+			FrameLink end of packet
+		</port>
+		<port name="RX_EOF_N" dir="in" width="1">
+			FrameLink end of frame
+		</port>
+		<port name="RX_SRC_RDY_N" dir="in" width="1">
+			RX source ready
+		</port>
+		<port name="RX_DST_READY_N" dir="out" width="1">
+			RX destination ready
+		</port>
+
+		<divider>MI32 interface</divider>
+		<port name="MI32" dir="in/out" width="1">
+			MI32 Local Bus
+		</port>
+
+	</port_map>
+</interface>
+
+
+<!-- CONSTANTS SECTION *************************************************** -->
+<constant>
+    <const name="ACCEPT command" id="RXB_CMD_ACCEPT" value="0x01">
+		After this constant is loaded to the
+		<ref id="RXB_REG_CMD">command register</ref> RX Buffer accepts incoming
+		FrameLink protocol.
+    </const>
+
+    <const name="STOP command" id="RXB_CMD_STOP" value="0x00">
+		Loading this constant to the
+		<ref id="RXB_REG_CMD">command register</ref> stops input
+		processing.
+		</const>
+
+		<const name="GET ITEM command" id="RXB_CMD_GET_ITEM" value="0x02">
+		Loading this constant to the
+		<ref id="RXB_REG_CMD">command register</ref> gets one FrameLink item
+		from the FIFO, if it is not empty. Input processing is also stopped.
+	  </const>
+
+		<const name="GET ITEM + ACCEPT command" id="RXB_CMD_GET_ITEM_ACCEPT"
+		value="0x03">
+		After this constant is loaded to the
+		<ref id="RXB_REG_CMD">command register</ref> one FrameLink item is taken
+		from the FIFO, if it is not empty. RX Buffer also accepts incoming
+		FrameLink protocol.
+		</const>
+
+</constant>
+
+<!-- OPERATIONS SECTION ************************************************* -->
+<operations>
+	<init>
+		<it ref="RXB_OP_ACCEPT"> Start accepting incoming transmission  </it>
+	</init>
+
+
+	<op name="START input processing" id="RXB_OP_ACCEPT">
+		RX Buffer is not accepting incoming FrameLink protocol after reset. The
+		input processing is started by loading
+		<ref id="RXB_CMD_ACCEPT">ACCEPT command</ref> into the
+		<ref id="RXB_REG_CMD">command register</ref>.
+	</op>
+
+	<op name="STOP input processing" id="RXB_OP_STOP">
+		The input processing can be stopped any time by
+		loading <ref id="RXB_CMD_STOP">STOP command</ref> into the
+		<ref id="RXB_REG_CMD">command register</ref>.
+	</op>
+
+	<op name="GET ITEM operation" id="RXB_OP_GET_ITEM">
+		RX Buffer gets one FrameLink item from the FIFO after
+		<ref id="RXB_CMD_GET_ITEM">GET ITEM command</ref> or
+		<ref id="RXB_CMD_GET_ITEM_ACCEPT">GET ITEM + ACCEPT command</ref> is loaded
+		into the <ref id="RXB_REG_CMD">command register</ref>. Loading these
+		constant has also effect on the input processing.
+	</op>
+
+	<op name="GET STATUS operation" id="RXB_OP_GET_STATUS">
+		RX Buffer sends information if the FIFO is empty or not. The information
+		is stored in the <ref id="RXB_REG_STATUS">status register</ref>.
+	</op>
+
+</operations>
+
+
+<!-- ADDRESS SPACE SECTION ********************************************** -->
+<addr_space id="RXB_CONTROL" name="Main address space" main="yes" size="0x20">
+
+	<reg name="Command register" id="RXB_REG_CMD" offset="0x00"
+		access="RW" words="1">
+		<bit_vect bits="32">
+		<description_above>
+			The register is divided into two bits, each of them has
+			different meaning as follow:
+		</description_above>
+		<format>
+			<bit from="0" to="0" name="RXB Start/Stop">
+				Start/stop bit. If this bit is set to logical '1' RX Buffer is ready to
+				receive incoming FrameLink protocol.</bit>
+			<bit from="1" to="1" name="RXB GetItem">
+				When this bit is set to the logical '1' RX Buffer gets one item from
+				the FIFO. If the FIFO is empty no action is done.</bit>
+			<bit from="2" to="31" name="Reserved">
+				Not used</bit>
+		</format>
+		</bit_vect>
+	</reg>
+
+	<reg name="Status Register" offset="0x04" id="RXB_REG_STATUS"
+	access="R" words="1">
+		<bit_vect bits="32">
+		<description_above>
+			The status register provides information if the FIFO is empty or
+			not.
+		</description_above>
+		<format>
+			<bit from="0" to="0" name="RXB FIFO Status" >
+				'0' means the FIFO is empty, '1' means there is at least one item in
+				the FIFO.</bit>
+			<bit from="1" to="31" name="Reserved" >
+				Not used.</bit>
+		</format>
+		</bit_vect>
+	</reg>
+
+	<reg name="FL Signals Register" offset="0x08" id="RXB_REG_FL_SIG"
+	access="R" words="1">
+		<bit_vect bits="32">
+		<description_above>
+			The status register provides information about FrameLink signals described
+			below.
+		</description_above>
+		<format>
+			<bit from="0" to="0" name="RXB FL SOF_N" >
+				Start of frame, active in '0'.</bit>
+			<bit from="1" to="1" name="RXB FL EOF_N" >
+				End of frame, active in '0'.</bit>
+			<bit from="2" to="2" name="RXB FL SOP_N" >
+				Start of packet, active in '0'.</bit>
+			<bit from="3" to="3" name="RXB FL EOP_N" >
+				End of packet, active in '0'.</bit>
+			<bit from="4" to="31" name="Reserved" >
+				Not used.</bit>
+		</format>
+		</bit_vect>
+	</reg>
+
+	<reg name="FL REM Register" offset="0x0C" id="RXB_REG_FL_REM"
+	access="R" words="1">
+		<bit_vect bits="32">
+		<description_above>
+			The register provides FrameLink REM signal.
+		</description_above>
+		<format>
+			<bit from="0" to="log2(DATA_WIDTH/8) - 1" name="RXB FL REM" >
+				Number of valid bytes in the
+				<ref id="RXB_REG_FL_DATA">data register</ref> encoded into FrameLink
+				REM signal.</bit>
+			<bit from="log2(DATA_WIDTH/8)" to="31" name="Reserved" >
+				Not used.</bit>
+		</format>
+		</bit_vect>
+	</reg>
+
+	<reg name="FL Data Register" offset="0x10" id="RXB_REG_FL_DATA"
+		access="R" words="DATA_WIDTH/32">
+		<bit_vect bits="DATA_WIDTH">
+		<description_above>
+			FrameLink data are stored in this register.
+		</description_above>
+		<format>
+			<bit from="0" to="DATA_WIDTH - 1" name="RXB FL DATA" >
+				FrameLink data.</bit>
+		</format>
+		<description_below>
+			If DATA_WIDTH is greater than 32 you can read higher bytes from addresses
+			0x14, 0x18 and 0x1C. When DATA_WIDTH is equal to 16 bits from 16 to 31 are not
+			used.
+		</description_below>
+		</bit_vect>
+	</reg>
+</addr_space>
+
+
+<!-- SW BODY SECTION **************************************************** -->
+<sw_body>
+
+	<p>
+		Current behaviour of the FL RX Buffer si stored in the
+		<ref id="RXB_REG_CMD">command register</ref>. The bit 0 controls whether
+		the component is receiving FrameLink items or not.
+	</p>
+	<p>
+		After the item is received it is stored in the FIFO. The
+		<ref id="RXB_REG_STATUS">status register</ref> indicates the current state
+		of the FIFO inside.
+	</p>
+	<p>
+		<ref id="RXB_OP_GET_ITEM">Get Item</ref> operation moves the
+		first item from the FIFO to the registers. Before using this operation
+		the content of the <ref id="RXB_REG_STATUS">status register</ref>
+		should be loaded because information whether there is an item
+		waiting in the FIFO is stored there.
+		<ref id="RXB_REG_CMD">Command register</ref> should be also read in order
+		to chose the correct constant to store to get the item.
+	</p>
+	<p>
+		Correct constant can be solved out with logical OR operation with the old
+		value of the <ref id="RXB_REG_CMD">command register</ref> and the
+		<ref id="RXB_CMD_GET_ITEM">get item constant</ref>.
+	</p>
+	<p>
+		Once the FrameLink item is stored in the registers it can be read through
+		the MI32 bus.
+	</p>
+	<p>
+		This commponent does not support unaligned access to the registers.
+	</p>
+</sw_body>
+
+<!-- HW BODY SECTION **************************************************** -->
+<body>
+<h1>FL RX Buffer info</h1>
+
+	<h2>Input</h2>
+	<p>
+		FL RX Buffers's input is standard FrameLink protocol. It is stored in the
+		<ref_comp ref="fl_fifo" tag_id="HEAD">FrameLink FIFO</ref_comp>.
+	</p>
+
+	<h2>Command register</h2>
+	<p>
+		Software operations <ref id="RXB_OP_ACCEPT">START</ref>,
+		<ref id="RXB_OP_STOP">STOP</ref> and
+		<ref id="RXB_OP_GET_ITEM">GET ITEM</ref> can change current behaviour
+		of the component that is stored in the
+		<ref id="RXB_REG_CMD">Command register</ref>.
+	</p>
+
+	<h2>Status register</h2>
+	<p>
+		<ref id="RXB_REG_STATUS">Status register</ref> should be used before using
+		<ref id="RXB_OP_GET_ITEM">GET ITEM</ref> operation, because it shows
+		whether this operation can be done or not.
+	</p>
+
+	<h2>FrameLink registers</h2>
+	<p>
+		Current FrameLink item is loaded into <ref id="RXB_REG_FL_DATA">data</ref>,
+		<ref id="RXB_REG_FL_REM">REM</ref> and
+		<ref id="RXB_REG_FL_SIG">signal</ref> registers that are readable through
+		MI32 bus.
+	</p>
+
+<h1>Frequency and Resources usage by Precision</h1>
+
+	<p>
+        <!--Resources usage and max. frequency by Precision-->
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Slices (% of C6X slices)</th>
+				<th>BlockRams (+ % of C6X BRAMs)</th>
+			</tr>
+			<tr>
+				<th>DATA_WIDTH = 16, ITEMS = 1024</th>
+				<td>49(0.21%)</td>
+				<td>1(0.43%)</td>
+			</tr>
+			<!--			<tr>
+				<th>ITEMS = 1024</th>
+				<td>1249(5.7%)</td>
+				<td>10(4%)</td>
+			</tr>-->
+		<nazev>Chip utilization (Precision)</nazev>
+		</tab>
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Max.frequency by Precision</th>
+				<th>Frequency tested in HW</th>
+			</tr>
+			<tr>
+				<th>DATA_WIDTH = 16, ITEMS = 1024</th>
+				<td>203.625 MHz</td>
+				<td>None</td>
+			</tr>
+			<!--			<tr>
+				<th>ITEMS = 1024</th>
+				<td>122 MHz</td>
+				<td>100 MHz</td>
+			</tr>-->
+		<nazev>Maximal frequency (Precision)</nazev>
+		</tab>
+        <!--Resources usage and max. frequency by XST-->
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Slices (% of C6X slices)</th>
+				<th>BlockRams (+ % of C6X BRAMs)</th>
+			</tr>
+			<tr>
+				<th>DATA_WIDTH = 16, ITEMS = 1024</th>
+				<td>15(0%)</td>
+				<td>1(0%)</td>
+			</tr>
+		<nazev>Chip utilization (XST)</nazev>
+		</tab>
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Max.frequency by XST</th>
+				<th>Frequency tested in HW</th>
+			</tr>
+			<tr>
+				<th>DATA_WIDTH = 16, ITEMS = 1024</th>
+				<td>359.512 MHz</td>
+				<td>None</td>
+			</tr>
+		<nazev>Maximal frequency (XST)</nazev>
+		</tab>
+  </p>
+
+<h1>Schemes</h1>
+
+	<p>
+		The block structure of the component is in the following figure.
+		It's composed of FrameLink FIFO, address decoder and registers.
+		<obr src="./fig/rx_buffer.fig">RX Buffer  architecture</obr>
+	</p>
+
+	<p>
+		More detailed figures of the address decoder.
+		<obr src="./fig/write_enable.fig">Write enable control</obr>
+		<obr src="./fig/output.fig">Output multiplexor</obr>
+	</p>
+
+</body>
+
+</source>

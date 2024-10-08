@@ -1,0 +1,114 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): David Beneš <xbenes52@vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+set FIRMWARE_BASE         "../../../../../"
+
+set DUT_BASE              ".."
+set DUT_UVM_BASE          ".";
+
+set TB_FILE               "./tbench/testbench.sv"
+set SIG_FILE              "./signals_sig.fdo"
+
+set COMPONENTS [list \
+    [list "DUT"      $DUT_BASE       "FULL"]\
+    [list "DUT_UVM"  $DUT_UVM_BASE   "FULL"]\
+]
+
+# Disable Code Coverage
+set SIM_FLAGS(CODE_COVERAGE) false
+set SIM_FLAGS(UVM_ENABLE) true
+# Options: ex_test speed
+set SIM_FLAGS(UVM_TEST) "test::ex_test"
+set SIM_FLAGS(UVM_VERBOSITY) "UVM_NONE"
+set SIM_FLAGS(DEBUG) false
+#set SIM_FLAGS(RAND_SEED) 1795040703
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from std_arith library
+puts "Std_arith Warnings - Disabled"
+set StdArithNoWarnings 1
+
+# Suppress warnings from numeric_std library
+puts "Numeric_std Warnings - Disabled"
+set NumericStdNoWarnings 1
+nb_sim_run
+
+# Reports
+if {$SIM_FLAGS(CODE_COVERAGE)} {
+    #file delete actual.ucdb
+    #file delete -force -- cov_html/
+    coverage configure -2stepexclusion off
+
+    coverage exclude -du fp_fifo_ctrl -fstate state st_LOAD_LNG
+    coverage exclude -du fp_fifo_ctrl -fstate state st_FIRST_PAC
+    coverage exclude -du fp_fifo_ctrl -fstate state st_PASS
+
+    # Exclude files that are not part of the Frame Packer
+    coverage exclude -src $FIRMWARE_BASE/comp/base/pkg/math_pack.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/pkg/type_pack.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/mux/mux.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/demux/demux.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/bin2hot/bin2hot.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/before_one/before_one.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/after_one/after_one.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/barrel_shifter/barrel_shifter_gen.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/n_one/n_one_logic.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/n_one/n_one_core.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/n_one/n_one.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/logic/n_one/n_one_ent.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/fifo/fifox/fifox.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/fifo/fifo/fifo.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/mem/sdp_bram/sdp_bram_behav.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/misc/pipe/pipe_arch.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/base/shreg/sh_reg_base/sh_reg_base_dynamic_arch.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mfb_tools/flow/frame_packer/fp_block_vld.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mfb_tools/flow/frame_packer/fp_dropper.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mfb_tools/flow/frame_packer/fp_ver_module.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mfb_tools/flow/metadata_insertor/metadata_insertor.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mfb_tools/flow/pipe/mfb_pipe.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mfb_tools/storage/fifox/mfb_fifox.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mvb_tools/flow/merge_n_to_m/merge_n_to_m_ent.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mvb_tools/flow/merge_n_to_m/merge_n_to_m.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mvb_tools/flow/merge_n_to_m/shakedown.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mvb_tools/flow/shakedown/mvb_shakedown.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mvb_tools/storage/fifox/mvb_fifox.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mvb_tools/storage/fifo/fifo_ent.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mvb_tools/storage/fifo/fifo_arch.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/mvb_tools/aggregate/last_vld/last_vld.vhd
+    coverage exclude -src $FIRMWARE_BASE/comp/debug/streaming_debug/streaming_debug_probe.vhd
+
+    #Toggle Disable
+    coverage exclude -du fp_aux_gen      -togglenode TX_MFB_DST_RDY
+    coverage exclude -du fp_aux_gen      -togglenode RX_MFB_DST_RDY
+    coverage exclude -du frame_packer    -togglenode aux_rx_dst_rdy
+    coverage exclude -du frame_packer    -togglenode aux_tx_mfb_dst_rdy
+    coverage exclude -du frame_packer    -togglenode TX_MVB_DISCARD
+    coverage exclude -du fp_bs_calc      -togglenode RX_SOF_POS_UNS
+    coverage exclude -du fp_channel      -togglenode spkt_tx_eof_num
+    coverage exclude -du fp_fifo_ctrl    -togglenode block_counter
+    coverage exclude -du fp_fifo_ctrl    -togglenode pkts_read
+    coverage exclude -du fp_fifo_ctrl    -togglenode SPKT_RX_EOF_NUM
+    coverage exclude -du fp_fifo_ctrl    -togglenode pkts_to_read
+    coverage exclude -du fp_data_sel     -togglenode TX_META
+    coverage exclude -du fp_data_sel     -togglenode sel_out(7)
+    coverage exclude -du fp_data_sel     -togglenode sel_out_n(7)
+    coverage exclude -du fp_data_sel     -togglenode sel_one_hot(7)
+    coverage exclude -du fp_spkt_lng     -togglenode eof_cnt
+    coverage exclude -du fp_spkt_lng     -togglenode rx_fifox_pkt_num
+    coverage exclude -du fp_spkt_lng     -togglenode spkt_eof_num
+    coverage exclude -du fp_spkt_lng     -togglenode TX_SPKT_EOF_NUM
+    coverage exclude -du fp_timeout_ext  -togglenode tmp_enable
+
+    coverage exclude -src $FIRMWARE_BASE/comp/mfb_tools/flow/frame_packer/frame_packer.vhd -line 307 -code e
+    coverage exclude -src $FIRMWARE_BASE/comp/mfb_tools/flow/frame_packer/fp_channel.vhd   -line 150 -code e
+
+    coverage save -instance /testbench/DUT_U -assert -directive -cvg -code bcefst -verbose actual.ucdb
+    vcover merge final.ucdb final.ucdb actual.ucdb
+    vcover report -html -output cov_html -details -threshL 50 -threshH 90 final.ucdb
+}
+

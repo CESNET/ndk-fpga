@@ -1,0 +1,36 @@
+# binder_sig.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+
+set TB_PATH                "/testbench"
+set FL_BINDER_PATH         "$TB_PATH/uut"
+
+source      "signals.fdo"
+
+add_wave "-label binder_frame_err -color magenta" /testbench/frame_err
+add wave -noupdate -label reset $TB_PATH/reset
+add wave -noupdate -label base_clk $TB_PATH/clk
+
+blk_FL_BINDER "IFC"
+#blk_FL_BINDER "IBLOCK0"
+#blk_FL_BINDER "MFIFO"
+#blk_FL_BINDER "DT_FULL"
+#blk_FL_BINDER "DT_LIGHT"
+blk_FL_BINDER "OUTPUT_BLOCK"
+blk_FL_BINDER "OUTPUT_BLOCK_ROBIN"
+#blk_FL_BINDER "FRAME_COUNTERS"
+blk_FL_BINDER "SIMPLE_BINDER"
+
+# NFIFO2FIFO Binder
+# blk_FL_BINDER "ALIGN_FRAME" 0
+# blk_FL_BINDER "NFIFO2FIFO"
+# blk_FL_BINDER "DATA_TRANSFORMER"
+blk_FL_BINDER "ONLY_TESTS"
+

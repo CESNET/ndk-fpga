@@ -1,0 +1,30 @@
+# xor96.fdo: Simulation script
+# Copyright (C) 2018 CESNET
+# Author: Petr Panak <xpanak04@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../../.."
+set xor96_BASE       ".."
+
+set TB_FILE          "./testbench.vhd"
+set SIG_FILE         "./xor96_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "xor96" $xor96_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 1500ns

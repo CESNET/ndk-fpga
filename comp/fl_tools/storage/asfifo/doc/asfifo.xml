@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+        <component>Asynchronous FIFO for FrameLink</component>
+
+<authors>
+   <author login="pus">Viktor Pus</author>
+</authors>
+
+<features>
+   <item>Uses Virtex5 built-in FIFO block</item>
+   <item>So far FIXED data width 64 bits</item>
+   <item>512 items in FIFO</item>
+</features>
+
+<description>
+
+   This component is Asynchronous FIFO with two FrameLink interfaces.
+   One interface is recieving (RX) and second is transmitting (TX) data.
+   It is wrapper for one 36Kb Xilinx FIFO using BlockRAM.
+
+</description>
+
+<interface>
+<port_map>
+   <divider>Common Interface</divider>
+   <port name="RX_CLK"        dir="in"  width="1">
+      Clock signal for RX interface
+   </port>
+   <port name="RX_RESET"      dir="in"  width="1">
+      Reset signal for RX interface
+   </port>
+   <port name="TX_CLK"        dir="in"  width="1">
+      Clock signal for TX interface
+   </port>
+   <port name="TX_RESET"      dir="in"  width="1">
+      Reset signal for TX interface
+   </port>
+
+   <divider>FrameLink interfaces</divider>
+   <port name="RX"       dir="inout" width="">
+      Recieve interface (write to FIFO)
+   </port>
+
+   <port name="TX"       dir="inout" width="">
+      Transmit interface (read from FIFO)
+   </port>
+
+</port_map>
+</interface>
+
+<body>
+
+    <h1>Specification</h1>
+    <p>
+    Entity name is FL_ASFIFO_CV2_64B.
+    In the future, generic version should exist for various data widths
+    and implementations (distributed memories, BRAMS+custom logic).
+    </p>
+
+
+<h1>Frequency and Resources usage</h1>
+
+  <p>
+   Only one 36Kb BlockRAM and two invertors are needed...
+  </p>
+
+
+</body>
+
+</source>

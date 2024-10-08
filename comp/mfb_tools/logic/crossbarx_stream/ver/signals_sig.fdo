@@ -1,0 +1,31 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author: Daniel Kriz <xkrizd01@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+source "./signals.fdo"
+
+add wave -divider "CROSSBARX_STREAM"
+add_wave "-noupdate -color yellow -label RX_RESET"     testbench/DUT_U/VHDL_DUT_U/RX_RESET
+add_wave "-noupdate -color yellow -label RX_CLK"       testbench/DUT_U/VHDL_DUT_U/RX_CLK
+add_wave "-noupdate -color yellow -label RX_CLK2"      testbench/DUT_U/VHDL_DUT_U/RX_CLK2
+add_wave "-noupdate -color yellow -label TX_RESET"     testbench/DUT_U/VHDL_DUT_U/TX_RESET
+add_wave "-noupdate -color yellow -label TX_CLK"       testbench/DUT_U/VHDL_DUT_U/TX_CLK
+add_wave "-noupdate -color yellow -label CX_CLK_ARB"   testbench/DUT_U/VHDL_DUT_U/CX_CLK_ARB
+add_wave "-noupdate -color yellow -label CX_RESET_ARB" testbench/DUT_U/VHDL_DUT_U/CX_RESET_ARB
+
+add wave -divider "GENERICS"
+add_wave "-label ext_start_en"   testbench/DUT_U/VHDL_DUT_U/F_EXTEND_START_EN
+add_wave "-label ext_start_size" testbench/DUT_U/VHDL_DUT_U/F_EXTEND_START_SIZE
+add_wave "-label ext_end_en"     testbench/DUT_U/VHDL_DUT_U/F_EXTEND_END_EN
+add_wave "-label ext_end_size"   testbench/DUT_U/VHDL_DUT_U/F_EXTEND_END_SIZE
+
+config wave -signalnamewidth 1
+
+all ALL             /testbench/DUT_U/VHDL_DUT_U/dut_i
+#all CROSSBARX      /testbench/DUT_U/VHDL_DUT_U/dut_i/crossbarx_i
+#all PACKET_PLANNER /testbench/DUT_U/VHDL_DUT_U/dut_i/pkt_planner_i
+#all OUTPUT_BUFFER  /testbench/DUT_U/VHDL_DUT_U/dut_i/tx_buffer_i
+#all SDP_BRAM_28    /testbench/DUT_U/VHDL_DUT_U/dut_i/tx_buffer_i/main_buffer_gen(28)/main_buffer_i/internal_sdp_bram_i

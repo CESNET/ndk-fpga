@@ -1,0 +1,20 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Tomáš Beneš <xbenes55@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "SPLITTER_SIMPLE_GEN"
+add_wave "-noupdate -color yellow -label RST"   /testbench/reset/RESET
+add_wave "-noupdate -color yellow -label CLK"   /testbench/CLK
+
+all "RX" "/testbench/mfb_rx"
+
+for {set it 0} {$it < 16} {incr it} {
+    all "TX\[$it\]" "/testbench/mfb_tx\[$it\]"
+}
+
+config wave -signalnamewidth 1

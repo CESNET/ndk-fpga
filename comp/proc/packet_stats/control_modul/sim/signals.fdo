@@ -1,0 +1,81 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2015 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_STATS { } {
+
+    global STATS_PATH
+
+      set GROUP "{MI32}"
+      add_wave "-group $GROUP -noupdate -hex -label MI32_ADDR"  $STATS_PATH/MI32_ADDR
+      add_wave "-group $GROUP -noupdate -hex -label MI32_WR  "  $STATS_PATH/MI32_WR
+      add_wave "-group $GROUP -noupdate -hex -label MI32_DWR "  $STATS_PATH/MI32_DWR
+      add_wave "-group $GROUP -noupdate -hex -label MI32_RD  "  $STATS_PATH/MI32_RD
+      add_wave "-group $GROUP -noupdate -hex -label MI32_DRD "  $STATS_PATH/MI32_DRD
+      add_wave "-group $GROUP -noupdate -hex -label MI32_DRDY"  $STATS_PATH/MI32_DRDY
+      add_wave "-group $GROUP -noupdate -hex -label MI32_ARDY"  $STATS_PATH/MI32_ARDY
+      add_wave "-group $GROUP -noupdate -hex -label MI32_BE  "  $STATS_PATH/MI32_BE
+
+      set GROUP "{TANS NUM}"
+      add_wave "-group $GROUP -noupdate -hex -label ADD_TR "  $STATS_PATH/ADD_TR
+      add_wave "-group $GROUP -noupdate -hex -label ADD_RDY"  $STATS_PATH/ADD_RDY
+      add_wave "-group $GROUP -noupdate -hex -label RM_TR  "  $STATS_PATH/RM_TR
+      add_wave "-group $GROUP -noupdate -hex -label RM_RDY "  $STATS_PATH/RM_RDY
+      add_wave "-group $GROUP -noupdate -hex -label cnt_trans_num "  /testbench/uut/cnt_tran_num
+
+      set GROUP "{FILTER}"
+      add_wave "-group $GROUP -noupdate -hex -label FILTER_ADDR  "  $STATS_PATH/FILTER_ADDR
+      add_wave "-group $GROUP -noupdate -hex -label FILTER_RM    "  $STATS_PATH/FILTER_RM
+      add_wave "-group $GROUP -noupdate -hex -label FILTER_RM_ALL"  $STATS_PATH/FILTER_RM_ALL
+      add_wave "-group $GROUP -noupdate -hex -label FILTER_NEXT  "  $STATS_PATH/FILTER_NEXT
+
+      set GROUP "{STATS RM}"
+      add_wave "-group $GROUP -noupdate -hex -label RM_ADDRESS  "  $STATS_PATH/RM_ADDRESS
+      add_wave "-group $GROUP -noupdate -hex -label RM_RD_ENABLE"  $STATS_PATH/RM_RD_ENABLE
+      add_wave "-group $GROUP -noupdate -hex -label RM_REQ      "  $STATS_PATH/RM_REQ
+
+      set GROUP "{STATS RD}"
+      add_wave "-group $GROUP -noupdate -hex -label RD_NUM_BYTES  "  $STATS_PATH/RD_NUM_BYTES
+      add_wave "-group $GROUP -noupdate -hex -label RD_NUM_PACKETS"  $STATS_PATH/RD_NUM_PACKETS
+      add_wave "-group $GROUP -noupdate -hex -label RD_VLD        "  $STATS_PATH/RD_VLD
+      add_wave "-group $GROUP -noupdate -hex -label RD_NEXT       "  $STATS_PATH/RD_NEXT
+
+      set GROUP "{WAIT BLOCK}"
+      add_wave "-group $GROUP -noupdate -hex -label FILTER_ADDR  "  $STATS_PATH/FILTER_ADDR
+      add_wave "-group $GROUP -noupdate -hex -label FILTER_RM    "  $STATS_PATH/FILTER_RM
+      add_wave "-group $GROUP -noupdate -hex -label FILTER_RM_ALL"  $STATS_PATH/FILTER_RM_ALL
+      add_wave "-group $GROUP -noupdate -hex -label FILTER_NEXT  "  $STATS_PATH/FILTER_NEXT
+      add_wave "-group $GROUP -noupdate -hex -label wait_addr    "  /testbench/uut/wait_addr
+      add_wave "-group $GROUP -noupdate -hex -label wait_rm      "  /testbench/uut/wait_rm
+      add_wave "-group $GROUP -noupdate -hex -label wait_rm_all  "  /testbench/uut/wait_rm_all
+      add_wave "-group $GROUP -noupdate -hex -label wait_next    "  /testbench/uut/wait_next
+      add_wave "-group $GROUP -noupdate -hex -label cnt_value    "  /testbench/uut/WAIT_TR_i/cnt_wait_i/cnt_value
+
+      set GROUP "{TR GEN BLOCK}"
+      add_wave "-group $GROUP -noupdate -hex -label wait_addr    "  /testbench/uut/wait_addr
+      add_wave "-group $GROUP -noupdate -hex -label wait_rm      "  /testbench/uut/wait_rm
+      add_wave "-group $GROUP -noupdate -hex -label wait_rm_all  "  /testbench/uut/wait_rm_all
+      add_wave "-group $GROUP -noupdate -hex -label wait_next    "  /testbench/uut/wait_next
+      add_wave "-group $GROUP -noupdate -hex -label flt_addr     "  /testbench/uut/flt_addr
+      add_wave "-group $GROUP -noupdate -hex -label flt_rd_enable"  /testbench/uut/flt_rd_enable
+      add_wave "-group $GROUP -noupdate -hex -label flt_rm_req   "  /testbench/uut/flt_rm_req
+
+      set GROUP "{PAC STATS BLOK}"
+      add_wave "-group $GROUP -noupdate -hex -label RM_ADDRESS    "  /testbench/uut/PACKET_STAT_i/RM_ADDRESS
+      add_wave "-group $GROUP -noupdate -hex -label RM_RD_ENABLE  "  /testbench/uut/PACKET_STAT_i/RM_RD_ENABLE
+      add_wave "-group $GROUP -noupdate -hex -label RM_REQ        "  /testbench/uut/PACKET_STAT_i/RM_REQ
+      add_wave "-group $GROUP -noupdate -hex -label CNT_ADDRESS   "  /testbench/uut/PACKET_STAT_i/CNT_ADDRESS
+      add_wave "-group $GROUP -noupdate -hex -label PACKET_LENGTH "  /testbench/uut/PACKET_STAT_i/PACKET_LENGTH
+      add_wave "-group $GROUP -noupdate -hex -label ADD_PACKET    "  /testbench/uut/PACKET_STAT_i/ADD_PACKET
+      add_wave "-group $GROUP -noupdate -hex -label SRC_RDY       "  /testbench/uut/PACKET_STAT_i/SRC_RDY
+      add_wave "-group $GROUP -noupdate -hex -label DST_RDY       "  /testbench/uut/PACKET_STAT_i/DST_RDY
+      add_wave "-group $GROUP -noupdate -hex -label RD_NUM_BYTES  "  /testbench/uut/PACKET_STAT_i/RD_NUM_BYTES
+      add_wave "-group $GROUP -noupdate -hex -label RD_NUM_PACKETS"  /testbench/uut/PACKET_STAT_i/RD_NUM_PACKETS
+      add_wave "-group $GROUP -noupdate -hex -label RD_VLD        "  /testbench/uut/PACKET_STAT_i/RD_VLD
+      add_wave "-group $GROUP -noupdate -hex -label RD_NEXT       "  /testbench/uut/PACKET_STAT_i/RD_NEXT
+}

@@ -1,0 +1,9 @@
+{signal: [
+  {name: 'CLK', wave: 'p.........'},
+  {name: 'DATA [31:0]', wave: 'x==.=xx==x', data : ["C/B/-/A", "E/-/D/-", "I/H/G/F", "-/J/-/-", "-/L/K/-"]},
+  {name: 'VLD [3:0]', wave: 'x==.=xx==x', data:["1101", "1010", "1111", "0100", "0110"]},
+  {name: 'SRC_RDY', wave: '01...0.1.0'},
+  {name: 'DST_RDY', wave: '0101.....0'}
+],
+config: { hscale: 2 }
+}

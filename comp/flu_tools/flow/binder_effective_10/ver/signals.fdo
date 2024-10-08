@@ -1,0 +1,213 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2012 CESNET
+# Author: Pavel Benacek <benacek@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc rx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-group {$NAME} -noupdate  -hex -label RX_DATA"       $PATH/RX_DATA
+     add_wave "-group {$NAME} -noupdate  -hex -label RX_SOP_POS"    $PATH/RX_SOP_POS
+     add_wave "-group {$NAME} -noupdate  -hex -label RX_EOP_POS"    $PATH/RX_EOP_POS
+     add_wave "-group {$NAME} -noupdate  -label RX_SOP"        $PATH/RX_SOP
+     add_wave "-group {$NAME} -noupdate  -label RX_EOP"        $PATH/RX_EOP
+     add_wave "-group {$NAME} -noupdate  -label RX_SRC_RDY"    $PATH/RX_SRC_RDY
+     add_wave "-group {$NAME} -noupdate  -label RX_DST_RDY"    $PATH/RX_DST_RDY
+     add_wave "-group {$NAME} -noupdate  -hex -label RX_HDR_DATA"  $PATH/RX_HDR_DATA
+     add_wave "-group {$NAME} -noupdate  -label RX_HDR_SRC_RDY"    $PATH/RX_HDR_SRC_RDY
+     add_wave "-group {$NAME} -noupdate  -label RX_HDR_DST_RDY"    $PATH/RX_HDR_DST_RDY
+}
+
+proc tx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-group {$NAME} -noupdate  -hex -label TX_DATA"        $PATH/TX_DATA
+     add_wave "-group {$NAME} -noupdate  -hex -label TX_SOP_POS"     $PATH/TX_SOP_POS
+     add_wave "-group {$NAME} -noupdate  -hex -label TX_EOP_POS"     $PATH/TX_EOP_POS
+     add_wave "-group {$NAME} -noupdate  -label TX_SOP"              $PATH/TX_SOP
+     add_wave "-group {$NAME} -noupdate  -label TX_EOP"              $PATH/TX_EOP
+     add_wave "-group {$NAME} -noupdate  -label TX_SRC_RDY"          $PATH/TX_SRC_RDY
+     add_wave "-group {$NAME} -noupdate  -label TX_DST_RDY"          $PATH/TX_DST_RDY
+     add_wave "-group {$NAME} -noupdate  -hex -label TX_HDR_DATA"    $PATH/TX_HDR_DATA
+     add_wave "-group {$NAME} -noupdate  -label TX_HDR_SRC_RDY"      $PATH/TX_HDR_SRC_RDY
+     add_wave "-group {$NAME} -noupdate  -label TX_HDR_DST_RDY"      $PATH/TX_HDR_DST_RDY
+     add_wave "-group {$NAME} -noupdate  -hex -label SELECTED_FROM"  $PATH/SELECTED_FROM
+}
+
+proc binder_internal {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-group {$NAME} -noupdate -label rr_data -hex"    $PATH/rr_data
+   add_wave "-group {$NAME} -noupdate -label rr_sop"          $PATH/rr_sop
+   add_wave "-group {$NAME} -noupdate -label rr_eop"          $PATH/rr_eop
+   add_wave "-group {$NAME} -noupdate -label rr_sop_pos -hex" $PATH/rr_sop_pos
+   add_wave "-group {$NAME} -noupdate -label rr_eop_pos -hex" $PATH/rr_eop_pos
+   add_wave "-group {$NAME} -noupdate -label rr_src_rdy"      $PATH/rr_src_rdy
+   add_wave "-group {$NAME} -noupdate -label rr_dst_rdy"      $PATH/rr_dst_rdy
+}
+
+proc flua_binder_rx {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-group {$NAME} -noupdate -label RX_DATA0 -hex"      $PATH/RX_DATA0
+   add_wave "-group {$NAME} -noupdate -label RX_SOP_POS0 -hex"   $PATH/RX_SOP_POS0
+   add_wave "-group {$NAME} -noupdate -label RX_EOP_POS0 -hex"   $PATH/RX_EOP_POS0
+   add_wave "-group {$NAME} -noupdate -label RX_SOP0"            $PATH/RX_SOP0
+   add_wave "-group {$NAME} -noupdate -label RX_EOP0"            $PATH/RX_EOP0
+   add_wave "-group {$NAME} -noupdate -label RX_SRC_RDY0"        $PATH/RX_SRC_RDY0
+   add_wave "-group {$NAME} -noupdate -label RX_DST_RDY0"        $PATH/RX_DST_RDY0
+
+   add_wave "-group {$NAME} -noupdate -label RX_DATA1 -hex"      $PATH/RX_DATA1
+   add_wave "-group {$NAME} -noupdate -label RX_SOP_POS1 -hex"   $PATH/RX_SOP_POS1
+   add_wave "-group {$NAME} -noupdate -label RX_EOP_POS1 -hex"   $PATH/RX_EOP_POS1
+   add_wave "-group {$NAME} -noupdate -label RX_SOP1"            $PATH/RX_SOP1
+   add_wave "-group {$NAME} -noupdate -label RX_EOP1"            $PATH/RX_EOP1
+   add_wave "-group {$NAME} -noupdate -label RX_SRC_RDY1"        $PATH/RX_SRC_RDY1
+   add_wave "-group {$NAME} -noupdate -label RX_DST_RDY1"        $PATH/RX_DST_RDY1
+}
+
+proc flua_binder_tx {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-group {$NAME} -noupdate -label TX_DATA -hex"        $PATH/TX_DATA
+   add_wave "-group {$NAME} -noupdate -label TX_SOP_POS -hex"     $PATH/TX_SOP_POS
+   add_wave "-group {$NAME} -noupdate -label TX_EOP_POS -hex"     $PATH/TX_EOP_POS
+   add_wave "-group {$NAME} -noupdate -label TX_SOP"              $PATH/TX_SOP
+   add_wave "-group {$NAME} -noupdate -label TX_EOP"              $PATH/TX_EOP
+   add_wave "-group {$NAME} -noupdate -label TX_SRC_RDY"          $PATH/TX_SRC_RDY
+   add_wave "-group {$NAME} -noupdate -label TX_DST_RDY"          $PATH/TX_DST_RDY
+}
+
+proc flua_binder_internal {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-group {$NAME} -noupdate -label in_rx_data0 -hex"          $PATH/in_rx_data0
+   add_wave "-group {$NAME} -noupdate -label in_rx_sop_pos0 -hex"       $PATH/in_rx_sop_pos0
+   add_wave "-group {$NAME} -noupdate -label in_rx_eop_pos0 -hex"       $PATH/in_rx_eop_pos0
+   add_wave "-group {$NAME} -noupdate -label in_rx_sop0"                $PATH/in_rx_sop0
+   add_wave "-group {$NAME} -noupdate -label in_rx_eop0"                $PATH/in_rx_eop0
+   add_wave "-group {$NAME} -noupdate -label in_rx_src_rdy0"            $PATH/in_rx_src_rdy0
+   add_wave "-group {$NAME} -noupdate -label in_rx_dst_rdy0"            $PATH/in_rx_dst_rdy0
+   add_wave "-group {$NAME} -noupdate -label in_rx_data1 -hex"          $PATH/in_rx_data1
+   add_wave "-group {$NAME} -noupdate -label in_rx_sop_pos1 -hex"       $PATH/in_rx_sop_pos1
+   add_wave "-group {$NAME} -noupdate -label in_rx_eop_pos1 -hex"       $PATH/in_rx_eop_pos1
+   add_wave "-group {$NAME} -noupdate -label in_rx_sop1"                $PATH/in_rx_sop1
+   add_wave "-group {$NAME} -noupdate -label in_rx_eop1"                $PATH/in_rx_eop1
+   add_wave "-group {$NAME} -noupdate -label in_rx_src_rdy1"            $PATH/in_rx_src_rdy1
+   add_wave "-group {$NAME} -noupdate -label in_rx_dst_rdy1"            $PATH/in_rx_dst_rdy1
+
+   add_wave "-group {$NAME} -noupdate -label flua_data0 -hex"           $PATH/flua_data0
+   add_wave "-group {$NAME} -noupdate -label flua_sop_pos0 -hex"        $PATH/flua_sop_pos0
+   add_wave "-group {$NAME} -noupdate -label flua_eop_pos0 -hex"        $PATH/flua_eop_pos0
+   add_wave "-group {$NAME} -noupdate -label flua_sop0"                 $PATH/flua_sop0
+   add_wave "-group {$NAME} -noupdate -label flua_eop0"                 $PATH/flua_eop0
+   add_wave "-group {$NAME} -noupdate -label flua_src_rdy0"             $PATH/flua_src_rdy0
+   add_wave "-group {$NAME} -noupdate -label flua_dst_rdy0"             $PATH/flua_dst_rdy0
+   add_wave "-group {$NAME} -noupdate -label flua_data1 -hex"           $PATH/flua_data1
+   add_wave "-group {$NAME} -noupdate -label flua_sop_pos1 -hex"        $PATH/flua_sop_pos1
+   add_wave "-group {$NAME} -noupdate -label flua_eop_pos1 -hex"        $PATH/flua_eop_pos1
+   add_wave "-group {$NAME} -noupdate -label flua_sop1"                 $PATH/flua_sop1
+   add_wave "-group {$NAME} -noupdate -label flua_eop1"                 $PATH/flua_eop1
+   add_wave "-group {$NAME} -noupdate -label flua_src_rdy1"             $PATH/flua_src_rdy1
+   add_wave "-group {$NAME} -noupdate -label flua_dst_rdy1"             $PATH/flua_dst_rdy1
+   add_wave "-group {$NAME} -noupdate -label flua_shift0 -hex"          $PATH/flua_shift0
+   add_wave "-group {$NAME} -noupdate -label flua_shift1 -hex"          $PATH/flua_shift1
+   add_wave "-group {$NAME} -noupdate -label act_lane0"                 $PATH/act_lane0
+   add_wave "-group {$NAME} -noupdate -label act_lane1"                 $PATH/act_lane1
+   add_wave "-group {$NAME} -noupdate -label out_tx_data -hex"          $PATH/out_tx_data
+   add_wave "-group {$NAME} -noupdate -label out_tx_sop_pos -hex"       $PATH/out_tx_sop_pos
+   add_wave "-group {$NAME} -noupdate -label out_tx_eop_pos -hex"       $PATH/out_tx_eop_pos
+   add_wave "-group {$NAME} -noupdate -label out_tx_sop"                $PATH/out_tx_sop
+   add_wave "-group {$NAME} -noupdate -label out_tx_eop"                $PATH/out_tx_eop
+   add_wave "-group {$NAME} -noupdate -label out_tx_src_rdy"            $PATH/out_tx_src_rdy
+   add_wave "-group {$NAME} -noupdate -label out_tx_dst_rdy"            $PATH/out_tx_dst_rdy
+}
+
+proc flua_binder_fsm {NAME PATH} {
+      add wave -divider "$NAME"
+
+      add_wave "-group {$NAME} -noupdate -label RESET"                 $PATH/RESET
+      add_wave "-group {$NAME} -noupdate -label CLK"                   $PATH/CLK
+      add_wave "-group {$NAME} -noupdate -label SOP0"                 $PATH/SOP0
+      add_wave "-group {$NAME} -noupdate -label SRC_RDY0"             $PATH/SRC_RDY0
+      add_wave "-group {$NAME} -noupdate -label SOP1"                 $PATH/SOP1
+      add_wave "-group {$NAME} -noupdate -label SRC_RDY1"             $PATH/SRC_RDY1
+      add_wave "-group {$NAME} -noupdate -label DST_RDY"              $PATH/DST_RDY
+      add_wave "-group {$NAME} -noupdate -label EOP0"                 $PATH/EOP0
+      add_wave "-group {$NAME} -noupdate -label EOP_POS_BLK0 -hex"    $PATH/EOP_POS_BLK0
+      add_wave "-group {$NAME} -noupdate -label EOP1"                 $PATH/EOP1
+      add_wave "-group {$NAME} -noupdate -label EOP_POS_BLK1 -hex"    $PATH/EOP_POS_BLK1
+      add_wave "-group {$NAME} -noupdate -label SHIFT0 -hex"          $PATH/SHIFT0
+      add_wave "-group {$NAME} -noupdate -label SHIFT1 -hex"          $PATH/SHIFT1
+      add_wave "-group {$NAME} -noupdate -label ACT_LANE0"            $PATH/ACT_LANE0
+      add_wave "-group {$NAME} -noupdate -label ACT_LANE1"            $PATH/ACT_LANE1
+      add_wave "-group {$NAME} -noupdate -label DST_RDY0"             $PATH/DST_RDY0
+      add_wave "-group {$NAME} -noupdate -label DST_RDY1"             $PATH/DST_RDY1
+
+
+      add_wave "-group {$NAME} -noupdate -label act_state"          $PATH/act_state
+      add_wave "-group {$NAME} -noupdate -label next_state"         $PATH/next_state
+      add_wave "-group {$NAME} -noupdate -label reg_active_lane"    $PATH/reg_active_lane
+      add_wave "-group {$NAME} -noupdate -label active_lane"        $PATH/active_lane
+      add_wave "-group {$NAME} -noupdate -label active_lane_en"     $PATH/active_lane_en
+      add_wave "-group {$NAME} -noupdate -label lookup_mem"         $PATH/lookup_mem
+      add_wave "-group {$NAME} -noupdate -label lane0_data_ready"   $PATH/lane0_data_ready
+      add_wave "-group {$NAME} -noupdate -label lane1_data_ready"   $PATH/lane1_data_ready
+      add_wave "-group {$NAME} -noupdate -label lane0_short_packet" $PATH/lane0_short_packet
+      add_wave "-group {$NAME} -noupdate -label lane1_short_packet" $PATH/lane1_short_packet
+      add_wave "-group {$NAME} -noupdate -label lane0_eop"          $PATH/lane0_eop
+      add_wave "-group {$NAME} -noupdate -label lane1_eop"          $PATH/lane1_eop
+}
+
+
+
+proc flua_shifter_rx {NAME PATH} {
+      add wave -divider "$NAME"
+      add_wave "-group {$NAME} -noupdate -label RESET"        $PATH/RESET
+      add_wave "-group {$NAME} -noupdate -label CLK"          $PATH/CLK
+      add_wave "-group {$NAME} -noupdate -label SHIFT_VAL -hex"      $PATH/SHIFT_VAL
+      add_wave "-group {$NAME} -noupdate -label RX_DATA -hex"        $PATH/RX_DATA
+      add_wave "-group {$NAME} -noupdate -label RX_SOP_POS -hex"     $PATH/RX_SOP_POS
+      add_wave "-group {$NAME} -noupdate -label RX_EOP_POS -hex"     $PATH/RX_EOP_POS
+      add_wave "-group {$NAME} -noupdate -label RX_SOP"              $PATH/RX_SOP
+      add_wave "-group {$NAME} -noupdate -label RX_EOP"              $PATH/RX_EOP
+      add_wave "-group {$NAME} -noupdate -label RX_SRC_RDY"          $PATH/RX_SRC_RDY
+      add_wave "-group {$NAME} -noupdate -label RX_DST_RDY"          $PATH/RX_DST_RDY
+      add_wave "-group {$NAME} -noupdate -label SHIFT_VAL -hex"      $PATH/SHIFT_VAL
+}
+
+proc flua_shifter_tx {NAME PATH} {
+      add wave -divider "$NAME"
+      add_wave "-group {$NAME} -noupdate -label TX_DATA -hex"        $PATH/TX_DATA
+      add_wave "-group {$NAME} -noupdate -label TX_SOP_POS -hex"     $PATH/TX_SOP_POS
+      add_wave "-group {$NAME} -noupdate -label TX_EOP_POS -hex"     $PATH/TX_EOP_POS
+      add_wave "-group {$NAME} -noupdate -label TX_SOP"              $PATH/TX_SOP
+      add_wave "-group {$NAME} -noupdate -label TX_EOP"              $PATH/TX_EOP
+      add_wave "-group {$NAME} -noupdate -label TX_SRC_RDY"          $PATH/TX_SRC_RDY
+      add_wave "-group {$NAME} -noupdate -label TX_DST_RDY"          $PATH/TX_DST_RDY
+}
+
+proc flua_shifter_internal {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-group {$NAME} -noupdate -label reg_flua_data -hex"       $PATH/reg_flua_data
+   add_wave "-group {$NAME} -noupdate -label reg_shift_val -hex"       $PATH/reg_shift_val
+   add_wave "-group {$NAME} -noupdate -label data_shift_bus -hex"      $PATH/data_shift_bus
+   add_wave "-group {$NAME} -noupdate -label eop_moved_en"             $PATH/eop_moved_en
+   add_wave "-group {$NAME} -noupdate -label reg_eop_moved_en"         $PATH/reg_eop_moved_en
+   add_wave "-group {$NAME} -noupdate -label eop_pos_blk"              $PATH/eop_pos_blk
+   add_wave "-group {$NAME} -noupdate -label ext_eop_pos_blk"          $PATH/ext_eop_pos_blk
+   add_wave "-group {$NAME} -noupdate -label ext_reg_shift_val -hex"   $PATH/ext_reg_shift_val
+   add_wave "-group {$NAME} -noupdate -label sum_new_eop_pos -hex"     $PATH/sum_new_eop_pos
+
+   add_wave "-group {$NAME} -noupdate -label new_eop_pos_blk -hex"     $PATH/new_eop_pos_blk
+   add_wave "-group {$NAME} -noupdate -label new_eop_pos -hex"         $PATH/new_eop_pos
+   add_wave "-group {$NAME} -noupdate -label reg_new_eop_pos -hex"     $PATH/reg_new_eop_pos
+
+   add_wave "-group {$NAME} -noupdate -label flua_word_valid"          $PATH/flua_word_valid
+
+   add_wave "-group {$NAME} -noupdate -label reg_data_shift_val -hex"  $PATH/reg_data_shift_val
+   add_wave "-group {$NAME} -noupdate -label act_data_shift_val -hex"  $PATH/act_data_shift_val
+}
+

@@ -1,0 +1,28 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Lukas Nevrkla <xnevrk03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+set OFM_PATH         "../../../../.."
+set UUT_BASE         ".."
+
+set MATH_PKG_BASE    "$OFM_PATH/comp/base/pkg"
+set TYPE_PKG_BASE    "$OFM_PATH/comp/base/pkg"
+
+set SIG_FILE            "./sig.fdo"
+set TB_FILE             "./testbench.vhd"
+
+set COMPONENTS [list \
+    [ list      "UUT"              ".."            "FULL"       ] \
+    [ list      "MATH_PKG"         $MATH_PKG_BASE  "MATH"       ] \
+    [ list      "TYPE_PKG"         $TYPE_PKG_BASE  "TYPE"       ] \
+]
+
+source "$OFM_PATH/build/Modelsim.inc.fdo"
+
+set StdArithNoWarnings 1
+set NumericStdNoWarnings 1
+
+nb_sim_run

@@ -1,0 +1,21 @@
+# sim.fdo: Top level simulation file for elastic_fifo.vhd
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Oliver Gurka <xgurka00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set ENTITY_BASE      ".."
+
+set TB_FILE "testbench.vhd"
+set SIG_FILE "signals.fdo"
+
+set COMPONENTS [list \
+   [ list "ELASTIC_FIFO"      $ENTITY_BASE        "FULL" ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run
+

@@ -1,0 +1,81 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <kondys@cesnet.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc all {NAME PATH} {
+    add_wave -noupdate -group "all_signals_mix" -hex      $PATH/*
+}
+
+proc INTERFACE {PATH} {
+
+    add_wave -noupdate -group "RX" -hex       $PATH/RX_DATA
+    add_wave -noupdate -group "RX" -hex       $PATH/RX_META
+    add_wave -noupdate -group "RX" -hex       $PATH/RX_SOF_POS
+    add_wave -noupdate -group "RX" -hex       $PATH/RX_EOF_POS
+    add_wave -noupdate -group "RX" -bin       $PATH/RX_SOF
+    add_wave -noupdate -group "RX" -bin       $PATH/RX_EOF
+    add_wave -noupdate -group "RX" -bin       $PATH/RX_SRC_RDY
+    add_wave -noupdate -group "RX" -bin       $PATH/RX_DST_RDY
+
+    add_wave -noupdate -group "TX" -hex       $PATH/TX_DATA
+    add_wave -noupdate -group "TX" -hex       $PATH/TX_META
+    add_wave -noupdate -group "TX" -hex       $PATH/TX_SOF_POS
+    add_wave -noupdate -group "TX" -hex       $PATH/TX_EOF_POS
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_SOF_MASKED
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_EOF_MASKED
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_SRC_RDY
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_DST_RDY
+
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_SOF_UNMASKED
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_EOF_UNMASKED
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_SRC_RDY_UNMASKED
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_SOF_ORIGINAL
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_EOF_ORIGINAL
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_SRC_RDY_ORIGINAL
+
+    add_wave -noupdate -group "TX" -bin       $PATH/TX_MASK
+
+}
+
+proc DEBUG {PATH} {
+
+    add_wave -noupdate -group "MFB_PIPE output" -hex     $PATH/pipe_tx_data
+    add_wave -noupdate -group "MFB_PIPE output" -hex     $PATH/pipe_tx_meta
+    add_wave -noupdate -group "MFB_PIPE output" -hex     $PATH/pipe_tx_sof_pos
+    add_wave -noupdate -group "MFB_PIPE output" -hex     $PATH/pipe_tx_eof_pos
+    add_wave -noupdate -group "MFB_PIPE output" -bin     $PATH/pipe_tx_sof
+    add_wave -noupdate -group "MFB_PIPE output" -bin     $PATH/pipe_tx_eof
+    add_wave -noupdate -group "MFB_PIPE output" -bin     $PATH/pipe_tx_src_rdy
+    add_wave -noupdate -group "MFB_PIPE output" -bin     $PATH/pipe_tx_dst_rdy
+
+    add_wave -noupdate -group "MFB data reg"    -hex     $PATH/data_reg
+    add_wave -noupdate -group "MFB data reg"    -hex     $PATH/meta_reg
+    add_wave -noupdate -group "MFB data reg"    -hex     $PATH/sof_pos_reg
+    add_wave -noupdate -group "MFB data reg"    -hex     $PATH/eof_pos_reg
+    add_wave -noupdate -group "MFB data reg"    -bin     $PATH/sof_reg
+    add_wave -noupdate -group "MFB data reg"    -bin     $PATH/eof_reg
+    add_wave -noupdate -group "MFB data reg"    -bin     $PATH/src_rdy_reg
+
+    add_wave -noupdate -group "Mask signals"    -integer $PATH/highest_sof_reg_index
+    add_wave -noupdate -group "Mask signals"    -bin     $PATH/current_accum_mask_sof
+    add_wave -noupdate -group "Mask signals"    -bin     $PATH/current_sof_reg
+    add_wave -noupdate -group "Mask signals"    -hex     $PATH/u_array_sof_pos
+    add_wave -noupdate -group "Mask signals"    -hex     $PATH/u_array_eof_pos
+    add_wave -noupdate -group "Mask signals"    -bin     $PATH/whole_frame
+    add_wave -noupdate -group "Mask signals"    -bin     $PATH/masked_sof
+    add_wave -noupdate -group "Mask signals"    -bin     $PATH/pkt_cont
+
+    add_wave -noupdate -group "EOF masking"     -bin     $PATH/current_eof_reg
+    add_wave -noupdate -group "EOF masking"     -bin     $PATH/current_accum_mask_eof
+    add_wave -noupdate -group "EOF masking"     -bin     $PATH/lv_rx_data
+    add_wave -noupdate -group "EOF masking"     -bin     $PATH/lv_rx_vld
+    add_wave -noupdate -group "EOF masking"     -bin     $PATH/lv_rx_src_rdy
+    add_wave -noupdate -group "EOF masking"     -bin     $PATH/lv_tx_data
+    add_wave -noupdate -group "EOF masking"     -bin     $PATH/lv_tx_data_presc
+    add_wave -noupdate -group "EOF masking"     -bin     $PATH/lv_tx_dst_rdy
+    add_wave -noupdate -group "EOF masking"     -bin     $PATH/eof_mask
+    add_wave -noupdate -group "Output signals"  -bin     $PATH/masked_eof
+
+}

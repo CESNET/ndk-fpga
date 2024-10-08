@@ -1,0 +1,12 @@
+# coctb_test_sig.fdo : Include file with signals
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /mi_pipe/*
+
+config wave -signalnamewidth 1

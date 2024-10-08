@@ -1,0 +1,60 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2007 CESNET
+# Author: Vlastimil Kosar <xkosar02@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc fl_fork {NAME PATH} {
+    add wave -divider "FL_SIM"
+      add_wave "-noupdate -color yellow -label RESET" $PATH/RESET
+      add_wave "-noupdate -color yellow -label CLK"   $PATH/FL_CLK
+      add_wave "-noupdate -hex -label FRAME_LINK_BUS"   $PATH/FL_BUS
+      add_wave "-noupdate -hex -label FL_BUS_OUT"   $PATH/OUT_BUS
+      add_wave "-noupdate -label CTRL"   $PATH/fl_sim_ctrl
+      add_wave "-noupdate -label STROBE"   $PATH/fl_sim_strobe
+      add_wave "-noupdate -label BUSY"   $PATH/fl_sim_busy
+      add wave -divider "$NAME - IN BUS"
+      add_wave "-noupdate -hex -label FRAME_LINK_BUS"   /testbench/FL_SIM_U/AUX_FL_BUS2
+     add wave -divider "$NAME"
+      add_wave "-noupdate -hex -label OUT_BUS0" $PATH/OUT_BUS0
+      add_wave "-noupdate -hex -label OUT_BUS1" $PATH/OUT_BUS1
+}
+
+proc fl_fork_norec {NAME PATH} {
+   add wave -divider "$NAME - input"
+   add_wave "-hex -label rx_data        " $PATH/rx_data
+   add_wave "-hex -label rx_rem         " $PATH/rx_rem
+   add_wave "-bin -label rx_sof_n       " $PATH/rx_sof_n
+   add_wave "-bin -label rx_eof_n       " $PATH/rx_eof_n
+   add_wave "-bin -label rx_sop_n       " $PATH/rx_sop_n
+   add_wave "-bin -label rx_eop_n       " $PATH/rx_eop_n
+   add_wave "-bin -label rx_src_rdy_n   " $PATH/rx_src_rdy_n
+   add_wave "-bin -label rx_dst_rdy_n   " $PATH/rx_dst_rdy_n
+
+   add wave -divider "$NAME - output 0"
+   add_wave "-hex -label tx0_data        " $PATH/tx0_data
+   add_wave "-hex -label tx0_rem         " $PATH/tx0_rem
+   add_wave "-bin -label tx0_sof_n       " $PATH/tx0_sof_n
+   add_wave "-bin -label tx0_eof_n       " $PATH/tx0_eof_n
+   add_wave "-bin -label tx0_sop_n       " $PATH/tx0_sop_n
+   add_wave "-bin -label tx0_eop_n       " $PATH/tx0_eop_n
+   add_wave "-bin -label tx0_src_rdy_n   " $PATH/tx0_src_rdy_n
+   add_wave "-bin -label tx0_dst_rdy_n   " $PATH/tx0_dst_rdy_n
+
+   add wave -divider "$NAME - output 1"
+   add_wave "-hex -label tx1_data        " $PATH/tx1_data
+   add_wave "-hex -label tx1_rem         " $PATH/tx1_rem
+   add_wave "-bin -label tx1_sof_n       " $PATH/tx1_sof_n
+   add_wave "-bin -label tx1_eof_n       " $PATH/tx1_eof_n
+   add_wave "-bin -label tx1_sop_n       " $PATH/tx1_sop_n
+   add_wave "-bin -label tx1_eop_n       " $PATH/tx1_eop_n
+   add_wave "-bin -label tx1_src_rdy_n   " $PATH/tx1_src_rdy_n
+   add_wave "-bin -label tx1_dst_rdy_n   " $PATH/tx1_dst_rdy_n
+}

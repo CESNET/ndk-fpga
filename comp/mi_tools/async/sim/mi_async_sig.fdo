@@ -1,0 +1,27 @@
+# mi_async_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z.s.p.o.
+# Author: Tomas Hak <xhakto01@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+
+set MI32_ASYNC_PATH "/testbench/uut_i"
+
+source "../ver/signals.fdo"
+
+add wave -divider "MI32 ASYNC"
+add_wave "-noupdate -color yellow -label CLK_M"        $MI32_ASYNC_PATH/CLK_M
+add_wave "-noupdate -color yellow -label RESET_M"      $MI32_ASYNC_PATH/RESET_M
+add_wave "-noupdate               -label reset_s_sync" $MI32_ASYNC_PATH/reset_s_sync
+add_wave "-noupdate -color yellow -label CLK_S"        $MI32_ASYNC_PATH/CLK_S
+add_wave "-noupdate -color yellow -label RESET_S"      $MI32_ASYNC_PATH/RESET_S
+
+mi32   MASTER   M    "$MI32_ASYNC_PATH"
+mi32   SLAVE    S    "$MI32_ASYNC_PATH"
+
+add_wave "-group {FIFO IN/OUT} -noupdate" $MI32_ASYNC_PATH/fifo_*
+add_wave "-group {DRDY}        -noupdate" $MI32_ASYNC_PATH/drdy_*
+
+add wave -divider "RESET FSM"
+add_wave "-noupdate -label p_state"       $MI32_ASYNC_PATH/p_state
+add_wave "-noupdate -label n_state"       $MI32_ASYNC_PATH/n_state
+add_wave "-noupdate -label no_reset_sig"  $MI32_ASYNC_PATH/no_reset_sig
+

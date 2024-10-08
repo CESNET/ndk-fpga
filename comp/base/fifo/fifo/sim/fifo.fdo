@@ -1,0 +1,47 @@
+# FIFO behavioral simulation
+# Author(s): Tomas Pecenka <pecenka@liberouter.org>
+#            Viktor Pus    <pus@liberouter.org>
+# $Id$
+
+vlib work
+vcom -93 -explicit -work work ../../pkg/math_pack.vhd
+vcom -93 -explicit -work work ../../dp_distmem/distmem_func.vhd
+vcom -93 -explicit -work work ../../dp_distmem/dp_distmem_distram.vhd
+vcom -93 -explicit -work work ../../dp_distmem/dp_distmem.vhd
+vcom -93 -explicit -work work ../fifo.vhd
+vcom -93 -explicit -work work ../../../clk_gen/clk2x.vhd
+vcom -93 -explicit -work work ../../../clk_gen/clk4x.vhd
+vcom -93 -explicit -work work ../../../clk_gen/clk_gen.vhd
+vcom -93 -explicit -work work fifo100_aux.vhd
+vcom -93 -explicit -work work fifo_tb.vhd
+
+vsim -t 1ps -L xilinxcorelib -lib work testbench
+
+view wave
+# view structure
+# view signals
+
+add wave /testbench/clk_100
+add wave /testbench/reset
+add wave -hex /testbench/data_in
+add wave /testbench/write_req
+add wave -hex /testbench/data_out
+add wave /testbench/read_req
+add wave /testbench/empty
+add wave /testbench/full
+add wave /testbench/lstblk
+add wave -divider {clk_gen signals}
+add wave /testbench/clk_50
+add wave /testbench/clk_lock
+add wave -divider {FIFO ports}
+add wave -hex /testbench/uut/u_fifo/data_in
+add wave /testbench/uut/u_fifo/write_req
+add wave -hex /testbench/uut/u_fifo/data_out
+add wave /testbench/uut/u_fifo/read_req
+add wave /testbench/uut/u_fifo/empty
+add wave /testbench/uut/u_fifo/full
+add wave /testbench/uut/u_fifo/clk
+add wave /testbench/uut/u_fifo/reset
+add wave /testbench/uut/u_fifo/lstblk
+
+run 3 us

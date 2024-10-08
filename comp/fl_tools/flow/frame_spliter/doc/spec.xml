@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="iso-8859-2"?>
+<source>
+   <component>Frame spliter</component>
+
+   <authors>
+      <author login="kastil">Jan Kastil</author>
+   </authors>
+
+   <features>
+      <item>Split frame into two frames</item>
+   </features>
+
+   <!-- Bugs -->
+   <bugs>
+     <item>Not known bugs</item>
+   </bugs>
+
+   <!-- What have to be done -->
+   <todo>
+    test in HW
+    write documentation
+   </todo>
+
+
+   <description>
+   Frame spliter splits frame into two others. First output frame contains packets from 0 to Fl_Width_N-1. Second frame contains others packets. If split_pos is equal to 0, only first packet of frame is send to fist output and all others packets go into second output.
+   </description>
+
+   <interface>
+      <generic_map>
+         <generic name="FL_WIDTH_IN" type="integer" default="32">
+		Width of input framelink.
+         </generic>
+
+		   <generic name="FL_WIDTH_OUT1" type="integer" default="32">
+			   Width of first output framelink.
+         </generic>
+
+		   <generic name="FL_WIDTH_OUT2" type="integer" default="32">
+			   Width of second output framelink.
+         </generic>
+
+         <generic name="SPLIT_POS" type="integer" default="1">
+		This number plus one packet will enter first output. The others packets enters second output.
+         </generic>
+      </generic_map>
+
+      <port_map>
+
+         <port name="FL_RESET" dir="in" width="1">
+            Reset signal. Active in 1.
+         </port>
+
+         <port name="FL_CLK" dir="in" width="1">
+            Clock
+         </port>
+
+    <divider>
+	  	    RX FrameLink interface
+	    </divider>
+	    <port name="RX_DATA" dir="out" width="DATA_WIDTH">
+		    RX data bus.
+	    </port>
+	    <port name="RX_REM" dir="out" width="log2(DATA_WIDTH/8)">
+		    RX data remainder.
+	    </port>
+	    <port name="RX_SOF_N" dir="out" width="1">
+		    RX start of frame.
+	    </port>
+	    <port name="RX_EOF_N" dir="out" width="1">
+		    RX end of frame.
+	    </port>
+	    <port name="RX_SOP_N" dir="out" width="1">
+		    RX start of packet (segment).
+	    </port>
+	    <port name="RX_EOP_N" dir="out" width="1">
+		    RX end of packet (segment).
+	    </port>
+	    <port name="RX_SRC_RDY_N" dir="out" width="1">
+		    RX source ready.
+	    </port>
+	    <port name="RX_DST_RDY_N" dir="in" width="1">
+		    RX destination ready.
+            </port>
+
+ <divider>
+                TX FrameLink interface - First output
+            </divider>
+            <port name="TX_DATA_OUT1" dir="out" width="DATA_WIDTH">
+                TX data bus.
+            </port>
+            <port name="TX_REM_OUT1" dir="out" width="log2(DATA_WIDTH/8)">
+                TX data remainder.
+            </port>
+            <port name="TX_SOF_N_OUT1" dir="out" width="1">
+                TX start of frame.
+            </port>
+            <port name="TX_EOF_N_OUT1" dir="out" width="1">
+                TX end of frame.
+            </port>
+            <port name="TX_SOP_N_OUT1" dir="out" width="1">
+                TX start of packet (segment).
+            </port>
+            <port name="TX_EOP_N_OUT1" dir="out" width="1">
+                TX end of packet (segment).
+            </port>
+            <port name="TX_SRC_RDY_N_OUT1" dir="out" width="1">
+                TX source ready.
+            </port>
+            <port name="TX_DST_RDY_N_OUT1" dir="in" width="1">
+                TX destination ready.
+            </port>
+
+  <divider>
+                TX FrameLink interface - second output
+            </divider>
+            <port name="TX_DATA_OUT2" dir="out" width="DATA_WIDTH">
+                TX data bus.
+            </port>
+            <port name="TX_REM_OUT2" dir="out" width="log2(DATA_WIDTH/8)">
+                TX data remainder.
+            </port>
+            <port name="TX_SOF_N_OUT2" dir="out" width="1">
+                TX start of frame.
+            </port>
+            <port name="TX_EOF_N_OUT2" dir="out" width="1">
+                TX end of frame.
+            </port>
+            <port name="TX_SOP_N_OUT2" dir="out" width="1">
+                TX start of packet (segment).
+            </port>
+            <port name="TX_EOP_N_OUT2" dir="out" width="1">
+                TX end of packet (segment).
+            </port>
+            <port name="TX_SRC_RDY_N_OUT2" dir="out" width="1">
+                TX source ready.
+            </port>
+            <port name="TX_DST_RDY_N_OUT2" dir="in" width="1">
+                TX destination ready.
+            </port>
+
+       </port_map>
+       </interface>
+
+
+   <body>
+
+
+    <!-- Here is description in standard Satrapa format-->
+    <h1> component</h1>
+    <p>
+ Frame spliter splits frame into two others. First output frame contains packets from 0 to Fl_Width_N-1. Second frame contains others packets. If split_pos is equal to 0, only first packet of frame is send to fist output and all others packets go into second output.
+    </p>
+    </body>
+</source>

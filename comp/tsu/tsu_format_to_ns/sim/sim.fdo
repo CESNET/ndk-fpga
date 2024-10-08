@@ -1,0 +1,30 @@
+# sim.fdo: Simulation script
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <xkondy00@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../.."
+set DUT_BASE	     ".."
+
+set TB_FILE          "./testbench.vhd"
+set SIG_FILE         "./sim_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list [list "DUT" $DUT_BASE "SIM"]]
+
+
+set SIM_FLAGS(VOPT_ARGS) "+acc=v+-floatparameters+/testbench"
+set SIM_FLAGS(DEBUG) true
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+set NumericStdNoWarnings 1
+
+# File with signals
+nb_sim_run

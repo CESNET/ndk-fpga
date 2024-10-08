@@ -1,0 +1,27 @@
+# sim_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <xkondy00@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+# Paths
+set TB_PATH "/testbench"
+
+# include signals
+source "signals.fdo"
+
+
+add wave -divider "Generics and constants"
+add wave $TB_PATH/MODE
+add wave $TB_PATH/DATA_WIDTH
+add wave $TB_PATH/INPUT_REGS_EN
+add wave $TB_PATH/NUM_OF_FULL_COMPARATORS
+add wave $TB_PATH/TOTAL_NUM_OF_COMPARATORS
+add wave $TB_PATH/LEFTOVER_BITS
+add wave -divider "Signals"
+
+all TB_ALL  $TB_PATH
+all CMP_ALL $TB_PATH/uut
+all DSP_CMP_ALL $TB_PATH/uut/dsp_enable_g/device_g/dsp_i
+

@@ -1,0 +1,57 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2008 CESNET
+# Author: Jan Viktorin <xvikto03@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+
+
+proc write_part {NAME PATH} {
+   add wave -divider "$NAME"
+	add_wave "-noupdate -color blue -label CLK_WR"  $PATH/clk_wr
+	add_wave "-noupdate -color yellow -label WR"  $PATH/wr
+	add_wave "-noupdate -hex -color orange -label DI"  $PATH/di
+	add_wave "-noupdate -color purple -label FULL"  $PATH/full
+	add_wave "-noupdate -color white -label STATUS"  $PATH/status
+}
+
+proc read_part {NAME PATH} {
+   add wave -divider "$NAME"
+	add_wave "-noupdate -color blue -label CLK_RD"  $PATH/clk_rd
+	add_wave "-noupdate -color yellow -label RD"  $PATH/rd
+	add_wave "-noupdate -hex -color orange -label DO"  $PATH/do
+	add_wave "-noupdate -color purple -label DO_DV"  $PATH/do_dv
+	add_wave "-noupdate -color white -label EMPTY"  $PATH/empty
+}
+
+proc internal {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-noupdate -label rd_addr" $PATH/rd_addr
+   add_wave "-noupdate -label rd_bin" $PATH/rd_bin
+   add_wave "-noupdate -label rd_bin_next" $PATH/rd_bin_next
+   add_wave "-noupdate -label rd_ptr" $PATH/rd_ptr
+   add_wave "-noupdate -label sync_rd_ptr" $PATH/sync_rd_ptr
+   add_wave "-noupdate -label last_sync_rd_ptr" $PATH/last_sync_rd_ptr
+   add_wave "-noupdate -label rd_gray_next" $PATH/rd_gray_next
+
+   add_wave "-noupdate -label wr_addr" $PATH/wr_addr
+   add_wave "-noupdate -label wr_bin" $PATH/wr_bin
+   add_wave "-noupdate -label wr_bin_next" $PATH/wr_bin_next
+   add_wave "-noupdate -label wr_ptr" $PATH/wr_ptr
+   add_wave "-noupdate -label sync_wr_ptr" $PATH/sync_wr_ptr
+   add_wave "-noupdate -label wr_gray_next" $PATH/wr_gray_next
+
+   add_wave "-noupdate -label write_allow" $PATH/write_allow
+   add_wave "-noupdate -label read_allow" $PATH/read_allow
+
+   add_wave "-noupdate -hex -color blue -label reg_mark_cnt_write_addr"  $PATH/wr_bin_mark
+   add_wave "-noupdate -hex -color blue -label reg_mark_write_nextgray"  $PATH/wr_ptr_mark
+}
+
+proc mark {NAME PATH} {
+   add wave -divider "$NAME"
+	add_wave "-noupdate -hex -color blue -label mark"     $PATH/mark
+	add_wave "-noupdate -hex -color blue -label release"  $PATH/release
+}

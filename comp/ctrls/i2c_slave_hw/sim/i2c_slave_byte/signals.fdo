@@ -1,0 +1,70 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2010 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+add_wave "-noupdate -label CLK" /testbench/CLK
+add_wave "-noupdate -label RESET" /testbench/RESET
+add wave -divider "Input command"
+add_wave "-noupdate -label CMD" /testbench/cmd
+add_wave "-noupdate -label ACK_IN" /testbench/ack_in
+add_wave "-noupdate -label DIN" /testbench/DIN
+add_wave "-noupdate -label CMD_VLD" /testbench/cmd_vld
+add_wave "-noupdate -label CMD_RDY" /testbench/cmd_rdy
+add wave -divider "Output data"
+add_wave "-noupdate -label CMD_ACK" /testbench/cmd_ack
+add_wave "-noupdate -label ACK_OUT" /testbench/ack_out
+add_wave "-noupdate -label DOUT" /testbench/dout
+add_wave "-noupdate -label START" /testbench/start
+add_wave "-noupdate -label STOP" /testbench/stop
+add wave -divider "Slave I2C"
+add_wave "-noupdate -label SDA_I" /testbench/sda_i
+add_wave "-noupdate -label SCL_I" /testbench/scl_i
+add_wave "-noupdate -label SDA_O" /testbench/sda_o
+add_wave "-noupdate -label SCL_O" /testbench/scl_o
+add_wave "-noupdate -label SDA_OEN" /testbench/sda_oen
+add_wave "-noupdate -label SCL_OEN" /testbench/scl_oen
+
+add wave -divider "Tristate I2C"
+add_wave "-noupdate -label tristate_sda" /testbench/tristate_sda
+add_wave "-noupdate -label tristate_scl" /testbench/tristate_scl
+
+add wave -divider "Bit ctrl internal signals"
+add_wave "-noupdate -label cmd" /testbench/uut/bit_ctrl/cmd
+add_wave "-noupdate -label din" /testbench/uut/bit_ctrl/din
+add_wave "-noupdate -label cmd_vld" /testbench/uut/bit_ctrl/cmd_vld
+add_wave "-noupdate -label cmd_rdy" /testbench/uut/bit_ctrl/cmd_rdy
+add_wave "-noupdate -label cmd_ack" /testbench/uut/bit_ctrl/cmd_ack
+add_wave "-noupdate -label dout" /testbench/uut/bit_ctrl/dout
+add_wave "-noupdate -label state" /testbench/uut/bit_ctrl/state
+#add_wave "-noupdate -label " /testbench/uut/bit_ctrl/
+
+add wave -divider "Byte ctrl internal signals"
+add_wave "-noupdate -label shreg_din" /testbench/uut/shreg_din
+add_wave "-noupdate -label shreg_din_sh" /testbench/uut/shreg_din_sh
+add_wave "-noupdate -label shreg_dout" /testbench/uut/shreg_dout
+add_wave "-noupdate -label shreg_dout_we" /testbench/uut/shreg_dout_we
+add_wave "-noupdate -label dcnt" /testbench/uut/dcnt
+add_wave "-noupdate -label dcnt_ld" /testbench/uut/dcnt_ld
+add_wave "-noupdate -label dcnt_en" /testbench/uut/dcnt_en
+add_wave "-noupdate -label state" /testbench/uut/state
+#add_wave "-noupdate -label " /testbench/uut/
+
+add wave -divider "Master I2C"
+add_wave "-noupdate -label master_SDA_I" /testbench/master_sda_i
+add_wave "-noupdate -label master_SCL_I" /testbench/master_scl_i
+add_wave "-noupdate -label master_SDA_O" /testbench/master_sda_o
+add_wave "-noupdate -label master_SCL_O" /testbench/master_scl_o
+add_wave "-noupdate -label master_SDA_OEN" /testbench/master_sda_oen_o
+add_wave "-noupdate -label master_SCL_OEN" /testbench/master_scl_oen_o
+add wave -divider "Master"
+add_wave "-noupdate -label master_be" /testbench/master_be
+add_wave "-noupdate -hex -label master_dwr" /testbench/master_dwr
+add_wave "-noupdate -hex -label master_drd" /testbench/master_drd
+add_wave "-noupdate -label master_wen" /testbench/master_wen
+add_wave "-noupdate -label master_int" /testbench/master_int
+

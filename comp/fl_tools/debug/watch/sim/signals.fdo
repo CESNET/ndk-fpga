@@ -1,0 +1,66 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+   add_wave "-noupdate -hex -label RESET"       /testbench/RESET
+   add_wave "-noupdate -hex -label CLK"       /testbench/CLK
+
+   add wave -divider "Frame Link interfaces"
+   add_wave "-noupdate -hex -label SOF_N"       /testbench/SOF_N
+   add_wave "-noupdate -hex -label EOF_N"       /testbench/EOF_N
+   add_wave "-noupdate -hex -label SOP_N"       /testbench/SOP_N
+   add_wave "-noupdate -hex -label EOP_N"       /testbench/EOP_N
+   add_wave "-noupdate -hex -label DST_RDY_N"   /testbench/DST_RDY_N
+   add_wave "-noupdate -hex -label SRC_RDY_N"   /testbench/SRC_RDY_N
+
+   add wave -divider "Debug interface"
+   add_wave "-noupdate -label FRAME_ERR"       /testbench/uut/frame_err
+
+   add wave -divider "MI_32 interface"
+   add_wave "-noupdate -hex -label MI_DWR"     /testbench/MI_DWR
+   add_wave "-noupdate -hex -label MI_ADDR"    /testbench/MI_ADDR
+   add_wave "-noupdate -hex -label MI_RD"      /testbench/MI_RD
+   add_wave "-noupdate -hex -label MI_WR"      /testbench/MI_WR
+   add_wave "-noupdate -hex -label MI_BE"      /testbench/MI_BE
+   add_wave "-noupdate -hex -label MI_DRD"     /testbench/MI_DRD
+   add_wave "-noupdate -hex -label MI_ARDY"    /testbench/MI_ARDY
+   add_wave "-noupdate -hex -label MI_DRDY"    /testbench/MI_DRDY
+
+   add wave -divider "internal signals"
+   add_wave "-noupdate -hex -label counters" /testbench/uut/counters
+   add_wave "-noupdate -hex -label g_counters" /testbench/uut/g_counters
+   add_wave "-noupdate -hex -label invalid" /testbench/uut/invalid
+   add_wave "-noupdate -hex -label reg_en" /testbench/uut/reg_en
+   add_wave "-noupdate -hex -label reg_sel" /testbench/uut/reg_sel
+   add_wave "-noupdate -hex -label out_mux" /testbench/uut/out_mux
+   add_wave "-noupdate -hex -label mux_counters_in_a" /testbench/uut/mux_counters_in_a
+   add_wave "-noupdate -hex -label mux_counters_in_s" /testbench/uut/mux_counters_in_s
+   add_wave "-noupdate -hex -label mux_control" /testbench/uut/mux_control
+   add_wave "-noupdate -hex -label mux_counters" /testbench/uut/mux_counters
+   add_wave "-noupdate -hex -label mux_rdy" /testbench/uut/mux_rdy
+   add_wave "-noupdate -hex -label mux_in_nice" /testbench/uut/mux_in_nice
+   add_wave "-noupdate -hex -label mux_in_sample" /testbench/uut/mux_in_sample
+   add_wave "-noupdate -hex -label reg_drd" /testbench/uut/reg_drd
+   add_wave "-noupdate -hex -label sig_eof_n" /testbench/uut/sig_eof_n
+   add_wave "-noupdate -hex -label sig_dst_rdy_n" /testbench/uut/sig_dst_rdy_n
+   add_wave "-noupdate -hex -label sig_src_rdy_n" /testbench/uut/sig_src_rdy_n
+   add_wave "-color yellow -noupdate -hex -label guard/SOF_N" /testbench/uut/cntr_gen__0/guard_inst/SOF_N
+   add_wave "-noupdate -hex -label guard/SOP_N" /testbench/uut/cntr_gen__0/guard_inst/SOP_N
+   add_wave "-noupdate -hex -label guard/EOP_N" /testbench/uut/cntr_gen__0/guard_inst/EOP_N
+   add_wave "-color yellow -noupdate -hex -label guard/EOF_N" /testbench/uut/cntr_gen__0/guard_inst/EOF_N
+   add_wave "-noupdate -hex -label guard/SRC_RDY_N" /testbench/uut/cntr_gen__0/guard_inst/SRC_RDY_N
+   add_wave "-noupdate -hex -label guard/DST_RDY_N" /testbench/uut/cntr_gen__0/guard_inst/DST_RDY_N
+   add_wave "-noupdate -hex -label guard/part1" /testbench/uut/cntr_gen__0/guard_inst/part1
+   add_wave "-noupdate -hex -label guard/part3" /testbench/uut/cntr_gen__0/guard_inst/part2
+   add_wave "-noupdate -hex -label guard/part3" /testbench/uut/cntr_gen__0/guard_inst/part3
+   add_wave "-noupdate -hex -label guard/invld" /testbench/uut/cntr_gen__0/guard_inst/invld
+   add_wave "-noupdate -hex -label guard/reg_invld" /testbench/uut/cntr_gen__0/guard_inst/reg_invld
+   add_wave "-noupdate -hex -label guard/reg_fend" /testbench/uut/cntr_gen__0/guard_inst/reg_fend
+   add_wave "-noupdate -hex -label guard/reg_was_sof" /testbench/uut/cntr_gen__0/guard_inst/reg_was_sof
+   add_wave "-noupdate -hex -label mux_in" /testbench/uut/mux_in
+   add_wave "-noupdate -hex -label test" /testbench/uut/test
+

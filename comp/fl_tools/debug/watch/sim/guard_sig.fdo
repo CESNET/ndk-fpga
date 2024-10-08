@@ -1,0 +1,24 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2007 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+   add_wave "-noupdate -hex -label RESET"       /testbench/RESET
+   add_wave "-noupdate -hex -label CLK"       /testbench/CLK
+
+   add wave -divider "Frame Link interface"
+   add_wave "-noupdate -hex -label SOF_N"       /testbench/SOF_N
+   add_wave "-noupdate -hex -label EOF_N"       /testbench/EOF_N
+   add_wave "-noupdate -hex -label SOP_N"       /testbench/SOP_N
+   add_wave "-noupdate -hex -label EOP_N"       /testbench/EOP_N
+   add_wave "-noupdate -hex -label DST_RDY_N"   /testbench/DST_RDY_N
+   add_wave "-noupdate -hex -label SRC_RDY_N"   /testbench/SRC_RDY_N
+
+   add wave -divider "MI_32 interface"
+   add_wave "-noupdate -hex -label invalid"       /testbench/invalid
+
+   add wave -divider "internal signals"
+

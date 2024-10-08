@@ -1,0 +1,71 @@
+<source>
+
+<component>Encoder</component>
+
+<authors>
+   <author login="kosek">Martin Kosek</author>
+</authors>
+
+<features>
+   <item>Simple encoder with generic input width</item>
+</features>
+
+<description>
+   <p>
+      This generic encoder should help us to improve readability and
+      reusability of our designs.
+   </p>
+</description>
+
+<interface>
+	<generic_map>
+      <generic name="ITEMS" type="integer" default="">
+         Number of input wires (input width).
+      </generic>
+	</generic_map>
+
+   <port_map>
+      <port name="DI" dir="in" width="ITEMS">
+         One-hot type bus, that needs to be encoded
+      </port>
+      <port name="ADDR" dir="out" width="log2(ITEMS)">
+         Resulting encoded vector
+      </port>
+   </port_map>
+</interface>
+
+<body>
+   <h1>Resources usage</h1>
+   <p>
+      <tab sloupce="cccc">
+         <tr>
+            <th>Generic settings</th>
+            <th>Slices (% of C6X slices)</th>
+            <th>BlockRams (% of C6X BRAMs)</th>
+         </tr>
+         <tr>
+            <th>4b input</th>
+            <td>1 (0.0%)</td>
+            <td>0 (0.0%)</td>
+         </tr>
+         <tr>
+            <th>8b input</th>
+            <td>3 (0.21%)</td>
+            <td>0 (0.0%)</td>
+         </tr>
+         <tr>
+            <th>16b input</th>
+            <td>10 (0.71%)</td>
+            <td>0 (0.0%)</td>
+         </tr>
+         <tr>
+            <th>32b input</th>
+            <td>25 (1.78%)</td>
+            <td>0 (0.0%)</td>
+         </tr>
+      <nazev>Chip utilization</nazev>
+      </tab>
+   </p>
+</body>
+
+</source>

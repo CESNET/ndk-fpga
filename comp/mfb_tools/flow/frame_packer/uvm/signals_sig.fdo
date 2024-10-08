@@ -1,0 +1,19 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author:   David Beneš <xbenes52@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+view wave
+delete wave *
+
+all FRAME_PACKER        /testbench/DUT_U/VHDL_DUT_U
+all AUXILIARY_SIGNALS   /testbench/DUT_U/VHDL_DUT_U/aux_gen_i
+all DMA_CHANNEL_13      /testbench/DUT_U/VHDL_DUT_U/dma_channel_g(13)/dma_channel_i
+all EXT_TIMEOUT_13      /testbench/DUT_U/VHDL_DUT_U/dma_channel_g(13)/dma_channel_i/ext_timeout_i
+# all OUT_CTRL_13         /testbench/DUT_U/VHDL_DUT_U/dma_channel_g(13)/dma_channel_i/out_ctrl_i
+# all SP_LEN_13           /testbench/DUT_U/VHDL_DUT_U/dma_channel_g(13)/dma_channel_i/spkt_len_i
+# all FIFO_CTRL_13        /testbench/DUT_U/VHDL_DUT_U/dma_channel_g(13)/dma_channel_i/fifo_ctrl_i
+# all MERGER              /testbench/DUT_U/VHDL_DUT_U/merger_i
+# all VER_MOD_13          /testbench/DUT_U/VHDL_DUT_U/ver_mod_g(13)/ver_mod_i

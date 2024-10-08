@@ -1,0 +1,34 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2016 CESNET z. s. p. o.
+# Author: Vaclav Hummel <xhumme00@stud.fit.vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+proc tb_internals { PATH GROUP } {
+   eval "add wave $GROUP -divider {TB internals}"
+   add_wave "$GROUP -noupdate -hex -label MERGE_INPUT_DATA"           $PATH/merge_input_data
+   add_wave "$GROUP -noupdate -hex -label MERGE_OUTPUT_DATA"           $PATH/merge_output_data
+}
+
+proc merge_ports { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Synchronization}"
+   add_wave "$GROUP -noupdate -hex -label CLK -color yellow"   $PATH/CLK
+   add_wave "$GROUP -noupdate -hex -label RST -color yellow"   $PATH/RST
+
+   eval "add wave $GROUP -divider {Input}"
+   add_wave "$GROUP -noupdate -hex -label INPUT_DATA"             $PATH/input_data
+
+   eval "add wave $GROUP -divider {Output}"
+   add_wave "$GROUP -noupdate -hex -label OUTPUT_DATA"           $PATH/output_data
+
+}
+
+proc merge_internals { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Internals}"
+   add_wave "$GROUP -noupdate -hex -label SELS"     $PATH/sels
+   add_wave "$GROUP -noupdate -hex -label INPUT_REG"     $PATH/input_reg
+   add_wave "$GROUP -noupdate -hex -label OUTPUT_REG_IN"     $PATH/output_reg_in
+   add_wave "$GROUP -noupdate -hex -label OUTPUT_REG"     $PATH/output_reg
+
+}

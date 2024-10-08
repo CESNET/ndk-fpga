@@ -1,0 +1,85 @@
+# signals.fdo : Include file with signals.
+# Copyright (C) 2003 CESNET
+# Author: Lukas Solanka <solanka@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+proc FL_DISTRIBUTOR_RX { } {
+    global FL_DISTRIBUTOR_PATH
+
+    add wave -divider "RX interface"
+    add_wave "-noupdate -hex -label rx_data      " $FL_DISTRIBUTOR_PATH/rx_data
+    add_wave "-noupdate -hex -label rx_rem       " $FL_DISTRIBUTOR_PATH/rx_rem
+    add_wave "-noupdate -hex -label rx_src_rdy_n " $FL_DISTRIBUTOR_PATH/rx_src_rdy_n
+    add_wave "-noupdate -hex -label rx_dst_rdy_n " $FL_DISTRIBUTOR_PATH/rx_dst_rdy_n
+    add_wave "-noupdate -hex -label rx_sop_n     " $FL_DISTRIBUTOR_PATH/rx_sop_n
+    add_wave "-noupdate -hex -label rx_eop_n     " $FL_DISTRIBUTOR_PATH/rx_eop_n
+    add_wave "-noupdate -hex -label rx_sof_n     " $FL_DISTRIBUTOR_PATH/rx_sof_n
+    add_wave "-noupdate -hex -label rx_eof_n     " $FL_DISTRIBUTOR_PATH/rx_eof_n
+}
+
+proc FL_DISTRIBUTOR_TX { } {
+    global FL_DISTRIBUTOR_PATH
+    global UUT_PATH
+
+    add wave -divider "TX interface"
+    add_wave "-noupdate -hex -label tx_data      " $FL_DISTRIBUTOR_PATH/tx_data
+    add_wave "-noupdate -hex -label tx_rem       " $FL_DISTRIBUTOR_PATH/tx_rem
+    add_wave "-noupdate -hex -label tx_src_rdy_n " $FL_DISTRIBUTOR_PATH/tx_src_rdy_n
+    add_wave "-noupdate -hex -label tx_dst_rdy_n " $FL_DISTRIBUTOR_PATH/tx_dst_rdy_n
+    add_wave "-noupdate -hex -label tx_sop_n     " $FL_DISTRIBUTOR_PATH/tx_sop_n
+    add_wave "-noupdate -hex -label tx_eop_n     " $FL_DISTRIBUTOR_PATH/tx_eop_n
+    add_wave "-noupdate -hex -label tx_sof_n     " $FL_DISTRIBUTOR_PATH/tx_sof_n
+    add_wave "-noupdate -hex -label tx_eof_n     " $FL_DISTRIBUTOR_PATH/tx_eof_n
+
+#    add wave -divider "TX interface OUTPUT"
+#    add_wave "-noupdate -hex -label tx_data      " $UUT_PATH/tx_data
+#    add_wave "-noupdate -hex -label tx_rem       " $UUT_PATH/tx_rem
+#    add_wave "-noupdate -hex -label tx_src_rdy_n " $UUT_PATH/tx_src_rdy_n
+#    add_wave "-noupdate -hex -label tx_dst_rdy_n " $UUT_PATH/tx_dst_rdy_n
+#    add_wave "-noupdate -hex -label tx_sop_n     " $UUT_PATH/tx_sop_n
+#    add_wave "-noupdate -hex -label tx_eop_n     " $UUT_PATH/tx_eop_n
+#    add_wave "-noupdate -hex -label tx_sof_n     " $UUT_PATH/tx_sof_n
+#    add_wave "-noupdate -hex -label tx_eof_n     " $UUT_PATH/tx_eof_n
+}
+
+proc FL_DISTRIBUTOR_INT { } {
+    global FL_DISTRIBUTOR_PATH
+
+    add wave -divider "Internal signals"
+    add_wave "-noupdate -hex -label TX_INTERFACE"      $FL_DISTRIBUTOR_PATH/TX_INTERFACE
+    add_wave "-noupdate -hex -label reg_inum"      $FL_DISTRIBUTOR_PATH/reg_inum
+    add_wave "-noupdate -hex -label reg_inum_set"  $FL_DISTRIBUTOR_PATH/reg_inum_set
+    add_wave "-noupdate -hex -label reg_inum_ce"   $FL_DISTRIBUTOR_PATH/reg_inum_ce
+    add_wave "-noupdate -hex -label cnt_scan"      $FL_DISTRIBUTOR_PATH/cnt_scan
+    add_wave "-noupdate -hex -label cnt_scan_ce"   $FL_DISTRIBUTOR_PATH/cnt_scan_ce
+    add_wave "-noupdate -hex -label cnt_scan_clr"  $FL_DISTRIBUTOR_PATH/cnt_scan_clr
+    add_wave "-noupdate -hex -label cnt_total"     $FL_DISTRIBUTOR_PATH/cnt_total
+    add_wave "-noupdate -hex -label cnt_total_inc" $FL_DISTRIBUTOR_PATH/cnt_total_inc
+    add_wave "-noupdate -hex -label cnt_total_dec" $FL_DISTRIBUTOR_PATH/cnt_total_dec
+}
+
+
+proc FL_DISTRIBUTOR_INPUT { } {
+    global FL_DISTRIBUTOR_PATH
+
+    add wave -divider "Input part"
+    add_wave "-noupdate -label clk"               $FL_DISTRIBUTOR_PATH/clk
+    add_wave "-noupdate -hex -label is_reading"     $FL_DISTRIBUTOR_PATH/is_reading
+    add_wave "-noupdate -hex -label fifo_rx_src_rdy_n"   $FL_DISTRIBUTOR_PATH/fifo_rx_src_rdy_n
+    add_wave "-noupdate -hex -label fifo_rx_dst_rdy_n"   $FL_DISTRIBUTOR_PATH/fifo_rx_dst_rdy_n
+}
+
+proc FL_DISTRIBUTOR_OUT { } {
+    global FL_DISTRIBUTOR_PATH
+
+    add wave -divider "Output part"
+    add_wave "-noupdate -label fifo_tx_src_rdy_n" $FL_DISTRIBUTOR_PATH/fifo_tx_src_rdy_n
+    add_wave "-noupdate -label fifo_tx_dst_rdy_n" $FL_DISTRIBUTOR_PATH/fifo_tx_dst_rdy_n
+    add_wave "-noupdate -label fifo_write_en" $FL_DISTRIBUTOR_PATH/fifo_write_en
+}
+

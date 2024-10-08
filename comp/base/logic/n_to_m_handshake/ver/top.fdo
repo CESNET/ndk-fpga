@@ -1,0 +1,25 @@
+# top.fdo:
+# Copyright (C) 2019 CESNET z. s. p. o.
+# Author(s): Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+set FIRMWARE_BASE "../../../../.."
+# For whole design testing
+set MATH_PKG_BASE  "$OFM_PATH/comp/base/pkg"
+
+set SIG_FILE "top_sig.fdo"
+set TB_FILE  "testbench.vhd"
+
+set COMPONENTS [list \
+   [ list      "TOP"       ".."           "FULL"         ] \
+   [ list      "MATH_PKG"  $MATH_PKG_BASE "MATH"         ] \
+   [ list      "MATH_PKG"  $MATH_PKG_BASE "TYPE"         ] \
+   [ list      "MATH_PKG"  $MATH_PKG_BASE "DMA_BUS"      ] \
+   [ list      "PKG"       "."            "FULL"         ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+set StdArithNoWarnings 1
+set NumericStdNoWarnings 1
+
+nb_sim_run

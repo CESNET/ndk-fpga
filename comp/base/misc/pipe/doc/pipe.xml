@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>Pipe</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="tomalek">Tomas Malek</author>
+       <author login="washek">Vaclav Bartos</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+   <item>Pipelining including feedback</item>
+   <item>Generic data width</item>
+   <item>Optional output registers</item>
+</features>
+
+
+<!-- Bugs
+<bugs>
+</bugs>
+-->
+
+<!-- Things to do
+<todo>
+</todo>
+-->
+
+<!-- Short Block description -->
+<description>
+
+	<!-- THE MOST IMPORTANT PART!!! There should be about 8 rows which
+	     fully describe the component and its main functions -->
+
+   Component for pipelining data paths with source and destination ready
+   signals.
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+
+		<generic name="DATA_WIDTH" type="integer" default="64">
+			Number of data bits.
+		</generic>
+
+		<generic name="USE_OUTREG" type="boolean" default="false">
+			Set true if you want to use registers at output.
+		</generic>
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Common signals</divider>
+		<port  name="CLK" dir="in" width="1">
+			Global FPGA clock
+		</port>
+		<port  name="RESET" dir="in" width="1">
+			Global reset
+		</port>
+
+		<divider>Input interface</divider>
+		<port name="IN_DATA" dir="in" width="DATA_WIDTH">
+		   Input data.
+		</port>
+		<port name="IN_SRC_RDY" dir="in" width="1">
+		   Input source ready signal.
+		</port>
+		<port name="IN_DST_RDY" dir="out" width="1">
+		   Destination ready signal on input side.
+		</port>
+
+		<divider>Output interface</divider>
+		<port name="OUT_DATA" dir="out" width="DATA_WIDTH">
+		   Output data.
+		</port>
+		<port name="OUT_SRC_RDY" dir="out" width="1">
+		   Output source ready signal.
+		</port>
+		<port name="OUT_DST_RDY" dir="in" width="1">
+		   Destination ready signal on output side.
+		</port>
+
+	</port_map>
+
+</interface>
+
+
+<!-- ADDRESS SPACE SECTION ********************************************** -->
+<!-- use if the component has a SW interface, otherwise delete this sections -->
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+<h2>PIPE architecture</h2>
+
+<p>
+   <obr src="./fig/pipe.fig">Pipe scheme</obr>
+</p>
+
+</body>
+
+</source>
+
+
+

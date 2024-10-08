@@ -1,0 +1,31 @@
+I2C controller core from Opencores.org (http://www.opencores.org/?do=project&who=i2c)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Documentation
+~~~~~~~~~~~~~
+https://www.liberouter.org/trac/netcope/wiki/i2c_ctrl
+http://www.opencores.com/?do=svnget&project=i2c&file=%2Ftrunk%2Fdoc%2Fi2c_specs.pdf
+
+Changes (by Stepan Friedl, friedl@liberouter.org, 2009/03/15)
+~~~~~~~
+
+ - Wishbone interface in the i2c_master_top entity replaced by the "MI64 like"
+   interface (DWR(63:0), DRD(63:0), WEN, BE)
+ - PRER_INIT generics added (reset value of the PRER register)
+ - interrupt output (INT)
+
+Controller registers to the DWR/DRD port mapping:
+
+bit 63                           bit32                                 bit0
++-------------------------------------------------------------------------+
+|RESERVED|RESERVED| TXR/RXR | CR/SR  |RESERVED|   CTR   | PRERhi  | PRERlo|
++-------------------------------------------------------------------------+
+
+Design hierarchy:
+~~~~~~~~~~~~~~~~
+
+i2c_master_top
+ |
+ +-->i2c_master_bit_ctrl
+      |
+      +---> i2c_master_bit_ctrl

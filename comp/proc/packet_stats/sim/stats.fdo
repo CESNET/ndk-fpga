@@ -1,0 +1,30 @@
+# editor.fdo: Simulation script
+# Copyright (C) 2015 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../.."
+set STATS_BASE       "$OFM_PATH/comp/proc/packet_stats"
+
+set TB_FILE          "$STATS_BASE/sim/testbench.vhd"
+set SIG_FILE         "$STATS_BASE/sim/stats_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "PAC_STATS" $STATS_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 10010000ns

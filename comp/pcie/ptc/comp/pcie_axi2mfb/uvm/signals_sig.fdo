@@ -1,0 +1,17 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Daniel Kříž <xkrizd01@vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "PTC_PCIE_AXI2MFB"
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/RST
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/CLK
+
+mfb_tx /testbench/DUT_U/VHDL_DUT_U
+axi_rx /testbench/DUT_U/VHDL_DUT_U
+all PTC_MFB2PCIE_AXI /testbench/DUT_U/VHDL_DUT_U
+
+config wave -signalnamewidth 1

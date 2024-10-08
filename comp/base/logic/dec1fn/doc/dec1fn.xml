@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>Decoder 1 from N</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="martinek">Tomas Martinek</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+	<item>Generic size of output vector</item>
+</features>
+
+
+<!-- Bugs -->
+<bugs>
+</bugs>
+
+
+<!-- Things to do -->
+<todo>
+</todo>
+
+
+<!-- Short Block description -->
+<description>
+
+   Decoder 1 from N is a component that converts input vector in binary code
+   into the code 1 from N. The code 1 from N means that the output vector
+   contains only one '1' item (others items are '0') such that this '1' item
+   is placed at possition corresponding to binary number at the component
+   input. For example: if input binary value is 6(d) e.i. 0110(b) then the
+   output vector is 0000:0000:0100 0000(b), '1' item is placed at possition
+   6. This decoder is written in generic way, so the user can specify the
+   width of output vector.
+   Other component is coder from binary code to 1 from N code. It have the same
+   port. Only DO is change with DI. Port to this component is in the bar.
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+
+		<generic name="ITEMS" type="integer" default="-">
+			Size of output vector in code 1 from N
+		</generic>
+
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Input/Output signals</divider>
+		<port  name="ADDR" dir="in (out)" width="log2(ITEMS)">
+         Input (Output) vector in binary form
+		</port>
+		<port  name="DO (DI)" dir="out (in)" width="ITEMS">
+         Output (Input) vector in code 1 from N
+		</port>
+		<port  name="ENABLE" dir="IN" width="1">
+         Input enable bit
+		</port>
+
+	</port_map>
+
+</interface>
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+<h1>Frequency and Resources usage</h1>
+	<p>
+      <!--Resources usage and max. frequency by Precision-->
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>VIRTEX 5 Slices</th>
+				<th>VIRTEX 5 Slices- dec1fn2b</th>
+			</tr>
+			<tr>
+				<th>ITEMS = 8</th>
+				<td>2(0%)</td>
+				<td>2(0%)</td>
+			</tr>
+			<tr>
+				<th>ITEMS = 16</th>
+				<td>4(0%)</td>
+				<td>4(0%)</td>
+			</tr>
+			<tr>
+				<th>ITEMS = 32</th>
+				<td>8(0%)</td>
+				<td>9(0%)</td>
+			</tr>
+		<nazev>Chip utilization (Precision)</nazev>
+		</tab>
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Max.frequency by Precision</th>
+				<th>Frequency tested in HW</th>
+			</tr>
+			<tr>
+				<th>ITEMS = 4</th>
+				<td>178 MHz (--- MHz)</td>
+				<td>n/a</td>
+			</tr>
+			<tr>
+				<th>ITEMS = 1024</th>
+				<td>174 MHz (--- MHz)</td>
+				<td>n/a</td>
+			</tr>
+		<nazev>Maximal frequency (Precision)</nazev>
+		</tab>
+	</p>
+
+
+	<p>
+      <!--Resources usage and max. frequency by XST-->
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>VIRTEX 5 Slices</th>
+				<th>VIRTEX 5 Slices- dec1fn2b</th>
+			</tr>
+			<tr>
+				<th>ITEMS = 8</th>
+				<td>2(0%)</td>
+				<td>1(0%)</td>
+			</tr>
+			<tr>
+				<th>ITEMS = 16</th>
+				<td>4(0%)</td>
+				<td>3(0%)</td>
+			</tr>
+			<tr>
+				<th>ITEMS = 32</th>
+				<td>8(0%)</td>
+				<td>8(0%)</td>
+			</tr>
+		<nazev>Chip utilization (XST)</nazev>
+		</tab>
+	</p>
+
+</body>
+
+</source>

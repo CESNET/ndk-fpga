@@ -1,0 +1,73 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2008 CESNET
+# Author: Michal Kajan <kajan@liberouter.org>
+#         Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+
+proc blk_ASFIFO { TB ASFIFO } {
+
+   add wave -divider "$ASFIFO"
+   add wave -divider "Write interface"
+   add_wave "-noupdate      -label RST_WR" $TB/RST_WR
+   add_wave "-noupdate      -label CLK_WR" $TB/CLK_WR
+   add_wave "-noupdate -hex -label DI"     $TB/DI
+   add_wave "-noupdate      -label WR"     $TB/WR
+   add_wave "-noupdate      -label FULL"   $TB/FULL
+   add_wave "-noupdate -uns -label STATUS" $TB/STATUS
+
+   add wave -divider "Read interface"
+   add_wave "-noupdate      -label RST_RD" $TB/RST_RD
+   add_wave "-noupdate      -label CLK_RD" $TB/CLK_RD
+   add_wave "-noupdate -hex -label DO"     $TB/DO
+   add_wave "-noupdate      -label RD"     $TB/RD
+   add_wave "-noupdate      -label EMPTY"  $TB/EMPTY
+}
+
+
+proc blk_ASFIFO_MISC { TB ASFIFO } {
+   add wave -divider "$ASFIFO - Internal signals"
+
+   add_wave "-noupdate -hex -label rd_data"            $TB/rd_data
+
+   add wave -divider ""
+   add_wave "-noupdate -hex -label rd_addr"            $TB/rd_addr
+   add_wave "-noupdate -hex -label rd_bin"             $TB/rd_bin
+   add_wave "-noupdate -bin -label rd_ptr"             $TB/rd_ptr
+   add_wave "-noupdate -bin -label sync_rd_ptr"        $TB/sync_rd_ptr
+   add_wave "-noupdate -hex -label sync_rd_ptr_bin"    $TB/sync_rd_ptr_bin
+
+   add wave -divider ""
+   add_wave "-noupdate -hex -label rd_bin_next"        $TB/rd_bin_next
+   add_wave "-noupdate -bin -label rd_gray_next"       $TB/rd_gray_next
+
+   add wave -divider ""
+   add_wave "-noupdate -hex -label wr_addr"            $TB/wr_addr
+   add_wave "-noupdate -hex -label wr_bin"             $TB/wr_bin
+   add_wave "-noupdate -bin -label wr_ptr"             $TB/wr_ptr
+   add_wave "-noupdate -bin -label sync_wr_ptr"        $TB/sync_wr_ptr
+
+   add wave -divider ""
+   add_wave "-noupdate -hex -label wr_bin_next"        $TB/wr_bin_next
+   add_wave "-noupdate -bin -label wr_gray_next"       $TB/wr_gray_next
+
+   add wave -divider ""
+   add_wave "-noupdate      -label empty_signal"       $TB/empty_signal
+   add_wave "-noupdate      -label full_signal"        $TB/full_signal
+
+   add wave -divider ""
+   add_wave "-noupdate      -label write_allow"        $TB/write_allow
+   add_wave "-noupdate      -label read_allow"         $TB/read_allow
+
+   add wave -divider ""
+   add_wave "-noupdate      -label out_reg_we"         $TB/out_reg_we
+   add_wave "-noupdate -hex -label reg_rd_data"        $TB/reg_rd_data
+   add_wave "-noupdate      -label reg_empty"          $TB/reg_empty
+
+   add wave -divider ""
+   add_wave "-noupdate -uns -label status_signal"      $TB/status_signal
+   add_wave "-noupdate -uns -label status_signal_next" $TB/status_signal_next
+}

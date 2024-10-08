@@ -1,0 +1,29 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2019 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "RX_MAC_LITE"
+add_wave "-noupdate -color yellow -label RESET" /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"   /testbench/CLK
+
+all  miidec /testbench/DUT_U/VHDL_DUT_U/umii_dec_i
+all  rxmac  /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i
+
+#all  cut     /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/crc_cutter_g/crc_cutter_i
+#all  crc     /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/crc_check_en_g/crc_check_i
+#all  mac     /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/mac_check_en_g/mac_check_i
+#all  buf     /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/buffer_i
+#all  PDAF    /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/buffer_i/dbuf_i
+#all  alig    /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/buffer_i/mvb_aligner_g/mvb_aligner_i
+#all  stat    /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/stat_unit_i
+#all  ctrl    /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/ctrl_unit_i
+#all  spme    /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/speed_meter_i
+#all  reco    /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/mfb_reconf_i
+#all  recoreg /testbench/DUT_U/VHDL_DUT_U/rx_mac_lite_i/mfb_reconf_i/min_to_tx_reg_rec_i
+
+config wave -signalnamewidth 1
+

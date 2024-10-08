@@ -1,0 +1,30 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Daniel Kříž <xkrizd01@vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "CLK & RESET"
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/RST
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/CLK
+
+#add wave -divider "RX and TX interfaces"
+#mfb_rx MFB_RX /testbench/DUT_U/VHDL_DUT_U
+#mfb_tx MVB_TX /testbench/DUT_U/VHDL_DUT_U
+
+all CHECKSUM_CALCULATOR /testbench/DUT_U/VHDL_DUT_U
+
+all MFB_ITEMS_VLD      /testbench/DUT_U/VHDL_DUT_U/mfb_items_vld_i
+
+add wave -divider "Chsum dedicated components"
+all CHSUM_REGIONAL0  /testbench/DUT_U/VHDL_DUT_U/chsum_regional_g(0)/chsum_regional_i
+all CHSUM_REGIONAL1  /testbench/DUT_U/VHDL_DUT_U/chsum_regional_g(1)/chsum_regional_i
+all CHSUM_REGIONAL2  /testbench/DUT_U/VHDL_DUT_U/chsum_regional_g(2)/chsum_regional_i
+all CHSUM_REGIONAL3  /testbench/DUT_U/VHDL_DUT_U/chsum_regional_g(3)/chsum_regional_i
+all CHSUM_FINALIZER  /testbench/DUT_U/VHDL_DUT_U/chsum_finalizer_i
+all FIFOX_MULTI      /testbench/DUT_U/VHDL_DUT_U/fifoxm_i
+
+
+config wave -signalnamewidth 1

@@ -1,0 +1,56 @@
+# rtlproject.toml: File verification and synthesis combinations
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Oliver Gurka <oliver.gurka@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+[generics]
+asserts = [
+    """(MVB_ITEM_WIDTH_RAW >= MFB_REGION_SIZE * MFB_BLOCK_SIZE * MFB_ITEM_WIDTH) \
+    or (MFB_ALIGNMENT == MFB_REGION_SIZE * MFB_BLOCK_SIZE)""",
+    "(MVB_ITEM_WIDTH_RAW % MFB_ITEM_WIDTH) == 0",
+    """(MFB_ALIGNMENT <= MFB_REGION_SIZE*MFB_BLOCK_SIZE) and \
+    (MFB_ALIGNMENT >= MFB_BLOCK_SIZE)""",
+]
+
+[settings.default]
+MFB_REGIONS         = 4
+MFB_REGION_SIZE     = 8
+MFB_BLOCK_SIZE      = 8
+MFB_ITEM_WIDTH      = 8
+MFB_ALIGNMENT       = 64
+MFB_META_WIDTH      = 12
+DEVICE              = "ULTRASCALE"
+MVB_ITEMS           = 4
+MVB_ITEM_WIDTH_RAW  = 536
+
+[settings.regions]
+type = "list"
+MVB_ITEMS   = [1, 2]
+MFB_REGIONS = [1, 2]
+
+[settings.align_low]
+MFB_ALIGNMENT = 8
+
+[settings.mvb_item_small]
+MVB_ITEM_WIDTH_RAW = 48
+
+[[ver.combinations]]
+name = "regions"
+settings = ["regions"]
+
+[[ver.combinations]]
+name = "small"
+settings = ["", ["align_low", "mvb_item_small"]]
+
+[[ver.combinations]]
+name = "region_big_small"
+settings = ["regions[0]", ["mvb_item_small", "align_low"]]
+
+[ver.settings]
+tests = ["test_basic", "test_perf"]
+
+[[synth.combinations]]
+name        = "Some basic"
+description = "Space search of resource usage and timing for Agilex and Ultrascale devices"
+settings    = ["regions"]

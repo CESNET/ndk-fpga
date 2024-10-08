@@ -1,0 +1,71 @@
+<source>
+
+<component>Multiplexer</component>
+
+<authors>
+   <author login="kosek">Martin Kosek</author>
+</authors>
+
+<features>
+   <item>Simple multiplexer with generic count of input interfaces
+   and their width</item>
+</features>
+
+<description>
+   <p>
+      This generic multiplexer should help us to improve readability and
+      reusability of our designs.
+   </p>
+</description>
+
+<interface>
+	<generic_map>
+      <generic name="DATA_WIDTH" type="integer" default="">
+         Data width of one multiplexer input.
+      </generic>
+      <generic name="MUX_WIDTH" type="integer" default="">
+         Multiplexer width (number of inputs).
+      </generic>
+	</generic_map>
+
+   <port_map>
+      <port name="DATA_IN" dir="in" width="DATA_WIDTH*MUX_WIDTH">
+         Data inputs. Inputs are composed in a parallel way in one signal.
+      </port>
+      <port name="SEL" dir="in" width="log2(MUX_WIDTH)">
+         Chosen input selection.
+      </port>
+      <port name="DATA_OUT" dir="in" width="DATA_WIDTH">
+         Chosen input
+      </port>
+   </port_map>
+
+</interface>
+
+<body>
+   <h1>Frequency and Resources usage</h1>
+   <p>
+      <tab sloupce="cccc">
+         <tr>
+            <th>Generic settings</th>
+            <th>Slices (% of C6X slices)</th>
+            <th>BlockRams (% of C6X BRAMs)</th>
+            <th>Max. HW frequency</th>
+         </tr>
+         <tr>
+            <th>16 inputs, 1b width</th>
+            <td>4 (0.02%)</td>
+            <td>0 (0.0%)</td>
+            <td>100 MHz</td>
+         </tr>
+         <tr>
+            <th>4 inputs, 32b width</th>
+            <td>32 (0.1%)</td>
+            <td>0 (0.0%)</td>
+            <td>100 MHz</td>
+         </tr>
+      <nazev>Chip utilization &amp; max design frequency</nazev>
+      </tab>
+   </p></body>
+
+</source>

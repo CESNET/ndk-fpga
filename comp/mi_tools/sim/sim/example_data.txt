@@ -1,0 +1,10 @@
+# File supports commnets which are defined by char '#' on start of line
+# There mustn't be space on the beginning of line
+# Data are separeted from address by EXACTLY one space
+#address data
+00000000 00000004
+00000004 00000008
+00000008 0000000C
+
+
+

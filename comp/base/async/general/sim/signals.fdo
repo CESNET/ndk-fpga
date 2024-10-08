@@ -1,0 +1,34 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_GENERAL { } {
+
+    global TB_PATH
+    global GENERAL_PATH
+
+    add_wave "-noupdate -hex -label ACLK"          /$TB_PATH/aclk
+    add_wave "-noupdate -hex -label DATAIN"        /$TB_PATH/data_in
+    add_wave "-noupdate -hex -label READY"         /$TB_PATH/aready
+    add_wave "-noupdate -hex -label DATAOUT"       /$TB_PATH/data_out
+    add_wave "-noupdate -hex -label BCLK"          /$TB_PATH/bclk
+    add_wave "-noupdate -hex -label ARST"          /$TB_PATH/arst
+    add_wave "-noupdate -hex -label BRST"          /$TB_PATH/brst
+
+    add wave -divider "INTERNAL SIGNALS"
+    add_wave "-noupdate -hex -label adata"         /$GENERAL_PATH/adata
+    add_wave "-noupdate -hex -label adata_next"    /$GENERAL_PATH/adata_next
+    add_wave "-noupdate -hex -label bdata"         /$GENERAL_PATH/bdata
+    add_wave "-noupdate -hex -label bdata_q"       /$GENERAL_PATH/bdata_q
+    add_wave "-noupdate -hex -label aack"          /$GENERAL_PATH/aack
+    add_wave "-noupdate -hex -label signal_aready" /$GENERAL_PATH/signal_aready
+    add_wave "-noupdate -hex -label nxst"          /$GENERAL_PATH/detect_edge_on/FSM/next_st
+    add_wave "-noupdate -hex -label prst"          /$GENERAL_PATH/detect_edge_on/FSM/present_st
+    add_wave "-noupdate -hex -label last_adatain"  /$GENERAL_PATH/detect_edge_on/FSM/last_adatain
+    add_wave "-noupdate -hex -label sig_adata"     /$GENERAL_PATH/detect_edge_on/FSM/sig_adata
+}

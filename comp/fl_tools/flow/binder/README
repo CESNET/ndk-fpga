@@ -1,0 +1,33 @@
+                              ==================
+                               FrameLink Binder
+                              ==================
+
+Abstract:
+~~~~~~~~~
+Binder simply binds variable count of input FrameLink interface to one output
+FrameLink interface. Input and output width/count can be specified by user.
+User can also optionaly choose from several input queue choosing algorithms.
+
+This component could prove very useful, when there are components with high
+throughput and lesser throughput in our design. We can use FrameLink Splitter
+to split data flow from one high-thtoughput component to several instances
+of low-throughput components and then use FrameLink Binder to bind the data
+flows into one. This approach should improve the maximal throughput of our
+design.
+
+
+Author:
+~~~~~~~
+Martin Kosek <kosek@liberouter.org>
+
+
+Documentation:
+~~~~~~~~~~~~~~
+https://www.liberouter.org/trac/firmware/wiki/fl_binder_doc
+
+
+Verification:
+~~~~~~~~~~~~~
+ * status: verification environment ready, common configurations verified
+ * report: https://www.liberouter.org/trac/firmware/wiki/fl_binder_ver
+

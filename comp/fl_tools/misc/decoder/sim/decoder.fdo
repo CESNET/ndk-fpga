@@ -1,0 +1,21 @@
+# decoder.fdo: Functional simulation file
+# Copyright (C) 2006 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../../.."
+set FL_DEC_BASE      ".."
+
+set SIG_FILE         "decoder_sig.fdo"
+set TB_FILE          "decoder_tb.vhd"
+
+set COMPONENTS [list \
+                  [ list "FL_DEC"     $FL_DEC_BASE            "FULL"] \
+               ]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 1us

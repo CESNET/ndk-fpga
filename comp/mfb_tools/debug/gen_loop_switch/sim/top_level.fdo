@@ -1,0 +1,32 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author: Jan Kubalek <kubalek@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set MAKEFILE_GEN "true"
+
+set FIRMWARE_BASE         "../../../../.."
+
+set TB_FILE               "./tbench/testbench.sv"
+set SIG_FILE              "./signals_sig.fdo"
+
+set COMPONENTS [list \
+    [list "DUT"      ".."   "FULL"]\
+    [list "DUT_VER"  "."    "FULL"]\
+]
+
+# Disable Code Coverage
+set CODE_COVERAGE "false"
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+set StdArithNoWarnings 1
+set NumericStdNoWarnings 1
+
+config wave -signalnamewidth 1
+
+nb_sim_run
+

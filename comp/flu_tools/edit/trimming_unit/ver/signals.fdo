@@ -1,0 +1,52 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2012 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc rx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label RX_DATA"       $PATH/RX_DATA
+     add_wave "-noupdate  -hex -label RX_SOP_POS"    $PATH/RX_SOP_POS
+     add_wave "-noupdate  -hex -label RX_EOP_POS"    $PATH/RX_EOP_POS
+     add_wave "-noupdate  -label RX_SOP"        $PATH/RX_SOP
+     add_wave "-noupdate  -label RX_EOP"        $PATH/RX_EOP
+     add_wave "-noupdate  -label RX_SRC_RDY"    $PATH/RX_SRC_RDY
+     add_wave "-noupdate  -label RX_DST_RDY"    $PATH/RX_DST_RDY
+}
+
+proc tx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label TX_DATA"       $PATH/TX_DATA
+     add_wave "-noupdate  -hex -label TX_SOP_POS"    $PATH/TX_SOP_POS
+     add_wave "-noupdate  -hex -label TX_EOP_POS"    $PATH/TX_EOP_POS
+     add_wave "-noupdate  -label TX_SOP"        $PATH/TX_SOP
+     add_wave "-noupdate  -label TX_EOP"        $PATH/TX_EOP
+     add_wave "-noupdate  -label TX_SRC_RDY"    $PATH/TX_SRC_RDY
+     add_wave "-noupdate  -label TX_DST_RDY"    $PATH/TX_DST_RDY
+
+     add_wave "-noupdate  -label LENGTH"    $PATH/LENGTH
+     add_wave "-noupdate  -label LENGTH_READY"   $PATH/LENGTH_READY
+     add_wave "-noupdate  -label LENGTH_NEXT"    $PATH/LENGTH_NEXT
+}
+
+proc all {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -label sop_after_eop"    $PATH/sop_after_eop
+     add_wave "-noupdate  -label discard_eop"    $PATH/discard_eop
+     add_wave "-noupdate  -label shift"    $PATH/shift
+     add_wave "-noupdate  -label shift_reg"    $PATH/shift_reg
+     add_wave "-noupdate -hex -label eop_shift_data"    $PATH/eop_shift_data
+     add_wave "-noupdate -hex -label sop_shift_data"    $PATH/sop_shift_data
+     add_wave "-noupdate -hex -label expect_eop_pos"    $PATH/expect_eop_pos
+     add_wave "-noupdate -hex -label expect_eop_pos_reg"    $PATH/expect_eop_pos_reg
+     add_wave "-noupdate -hex -label expect_eop"    $PATH/expect_eop
+     add_wave "-noupdate -hex -label discard_word"    $PATH/discard_word
+}

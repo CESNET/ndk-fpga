@@ -1,0 +1,24 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2013 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Global file with signals
+
+
+source "./signals.fdo"
+
+add wave -divider "HINS"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+rx   RX      /testbench/DUT_U/VHDL_DUT_U
+dst_mac DST_MAC /testbench/DUT_U/VHDL_DUT_U
+src_mac SRC_MAC /testbench/DUT_U/VHDL_DUT_U
+tx   TX      /testbench/DUT_U/VHDL_DUT_U
+internal Internal /testbench/DUT_U/VHDL_DUT_U
+

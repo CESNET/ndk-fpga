@@ -1,0 +1,69 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2009 CESNET
+# Author(s): Jan Stourac <xstour03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# -------------------------------------------------------------------------
+#                       Waveform Definition
+# -------------------------------------------------------------------------
+
+proc blk_TSU_CV2_CORE { PARAM } {
+   global TSU_CV2_CORE_PATH
+
+add wave -divider "TSU_CV2_CORE_UNIT"
+# User signals
+add wave -divider "MI32 Bus interface"
+add wave -noupdate -label dwr -hex               $TSU_CV2_CORE_PATH/DWR
+add wave -noupdate -label addr -hex              $TSU_CV2_CORE_PATH/ADDR
+add wave -noupdate -label rd                     $TSU_CV2_CORE_PATH/RD
+add wave -noupdate -label wr                     $TSU_CV2_CORE_PATH/WR
+add wave -noupdate -label be                     $TSU_CV2_CORE_PATH/BE
+add wave -noupdate -label drd -hex               $TSU_CV2_CORE_PATH/DRD
+add wave -noupdate -label ardy                   $TSU_CV2_CORE_PATH/ARDY
+add wave -noupdate -label drdy                   $TSU_CV2_CORE_PATH/DRDY
+
+add wave -divider "Output interface"
+add wave -noupdate -label ts -hex                $TSU_CV2_CORE_PATH/TS
+add wave -noupdate -label ts_dv                  $TSU_CV2_CORE_PATH/TS_DV
+
+add_wave "-noupdate -label last_ts -hex 		    " /testbench/last_ts
+add_wave "-noupdate -label TS_ERR 		    " /testbench/TS_ERR
+
+add wave -divider "Registers"
+add wave -noupdate -label reg_realtime -hex      $TSU_CV2_CORE_PATH/reg_realtime
+add wave -noupdate -label incr_value -hex        $TSU_CV2_CORE_PATH/incr_value
+add wave -noupdate -label reg_pulsepsec -hex     $TSU_CV2_CORE_PATH/reg_pulsepsec
+add wave -noupdate -label reg_write              $TSU_CV2_CORE_PATH/reg_write
+
+add wave -noupdate -label core_reg_mi_data_input -hex	 $TSU_CV2_CORE_PATH/core_reg_mi_data_input
+
+add wave -divider "Common MI32 register"
+add wave -noupdate -label core_reg_mi_data_low -hex	 $TSU_CV2_CORE_PATH/core_reg_mi_data_low
+add wave -noupdate -label core_reg_mi_data_middle -hex	 $TSU_CV2_CORE_PATH/core_reg_mi_data_middle
+add wave -noupdate -label core_reg_mi_data_high -hex	 $TSU_CV2_CORE_PATH/core_reg_mi_data_high
+add wave -noupdate -label mi_reg_mi_data_low -hex	 $TSU_CV2_CORE_PATH/mi_reg_mi_data_low
+add wave -noupdate -label mi_reg_mi_data_middle -hex	 $TSU_CV2_CORE_PATH/mi_reg_mi_data_middle
+add wave -noupdate -label mi_reg_mi_data_high -hex	 $TSU_CV2_CORE_PATH/mi_reg_mi_data_high
+add wave -noupdate -label mi_reg_cntrl -hex     	 $TSU_CV2_CORE_PATH/mi_reg_cntrl
+
+add wave -divider "DSP"
+
+add wave -divider "MI write enable signals"
+add wave -noupdate -label reg_rtr_we_0        -hex	 $TSU_CV2_CORE_PATH/reg_rtr_we_0
+
+add wave -noupdate -label reg_incr_val_we   -hex	 $TSU_CV2_CORE_PATH/reg_incr_val_we
+add wave -noupdate -label core_reg_cntrl_write -hex	 $TSU_CV2_CORE_PATH/core_reg_cntrl_write
+add wave -noupdate -label core_reg_mi_data_low_we -hex	 $TSU_CV2_CORE_PATH/core_reg_mi_data_low_we
+add wave -noupdate -label core_reg_mi_data_middle_we -hex $TSU_CV2_CORE_PATH/core_reg_mi_data_middle_we
+add wave -noupdate -label core_reg_mi_data_high_we -hex	 $TSU_CV2_CORE_PATH/core_reg_mi_data_high_we
+add wave -noupdate -label mi_reg_ts_dv_we   -hex	 $TSU_CV2_CORE_PATH/mi_reg_ts_dv_we
+add wave -noupdate -label mi_reg_cntrl_we   -hex	 $TSU_CV2_CORE_PATH/mi_reg_cntrl_we
+add wave -noupdate -label mi_reg_mi_data_low_we -hex	 $TSU_CV2_CORE_PATH/mi_reg_mi_data_low_we
+add wave -noupdate -label mi_reg_mi_data_middle_we -hex	 $TSU_CV2_CORE_PATH/mi_reg_mi_data_middle_we
+add wave -noupdate -label mi_reg_mi_data_high_we -hex	 $TSU_CV2_CORE_PATH/mi_reg_mi_data_high_we
+
+add wave -divider "MI32 ardy signals"
+
+}

@@ -1,0 +1,55 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2003 CESNET
+# Author: Petr Kobiersky <xkobie00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc rx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label RX_DATA"    $PATH/RX_DATA
+     add_wave "-noupdate  -hex -label RX_REM"     $PATH/RX_DREM
+     add_wave "-noupdate  -label RX_SOF_N"        $PATH/RX_SOF_N
+     add_wave "-noupdate  -label RX_EOF_N"        $PATH/RX_EOF_N
+     add_wave "-noupdate  -label RX_SOP_N"        $PATH/RX_SOP_N
+     add_wave "-noupdate  -label RX_EOP_N"        $PATH/RX_EOP_N
+     add_wave "-noupdate  -label RX_SRC_RDY_N"    $PATH/RX_SRC_RDY_N
+     add_wave "-noupdate  -label RX_DST_RDY_N"    $PATH/RX_DST_RDY_N
+     add_wave "-noupdate  -hex -label RX_CHAN"    $PATH/RX_CHAN
+}
+
+proc tx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label TX_DATA"    $PATH/TX_DATA
+     add_wave "-noupdate  -hex -label TX_REM"     $PATH/TX_DREM
+     add_wave "-noupdate  -label TX_SOF_N"        $PATH/TX_SOF_N
+     add_wave "-noupdate  -label TX_EOF_N"        $PATH/TX_EOF_N
+     add_wave "-noupdate  -label TX_SOP_N"        $PATH/TX_SOP_N
+     add_wave "-noupdate  -label TX_EOP_N"        $PATH/TX_EOP_N
+     add_wave "-noupdate  -label TX_SRC_RDY_N"    $PATH/TX_SRC_RDY_N
+     add_wave "-noupdate  -label TX_DST_RDY_N"    $PATH/TX_DST_RDY_N
+     add_wave "-noupdate  -hex -label TX_CHAN"    $PATH/TX_CHAN
+}
+
+proc stat {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label STATUS"     $PATH/STATUS
+}
+
+proc mi32 {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label MI_DWR"     $PATH/MI_DWR
+     add_wave "-noupdate  -hex -label MI_ADDR"    $PATH/MI_ADDR
+     add_wave "-noupdate  -label MI_BE"           $PATH/MI_BE
+     add_wave "-noupdate  -label MI_RD"           $PATH/MI_RD
+     add_wave "-noupdate  -label MI_WR"           $PATH/MI_WR
+     add_wave "-noupdate  -label MI_DRDY"         $PATH/MI_DRDY
+     add_wave "-noupdate  -label MI_ARDY"         $PATH/MI_ARDY
+     add_wave "-noupdate  -hex -label MI_DRD"     $PATH/MI_DRD
+}

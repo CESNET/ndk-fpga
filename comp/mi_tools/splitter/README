@@ -1,0 +1,23 @@
+                                ===============
+                                  MI_SPLITTER
+                                ===============
+
+Abstract:
+~~~~~~~~~
+It converts one MI (Memory Interface) to generic number of MIs.
+
+
+Author:
+~~~~~~~
+Vaclav Bartos <washek@liberouter.org>
+
+
+Documentation:
+~~~~~~~~~~~~~~
+https://www.liberouter.org/trac/netcope/wiki/mi_splitter
+
+
+Verification:
+~~~~~~~~~~~~~
+Not verified
+

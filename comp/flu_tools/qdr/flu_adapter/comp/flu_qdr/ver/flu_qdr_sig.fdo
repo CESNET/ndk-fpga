@@ -1,0 +1,22 @@
+# flu_qdr_sig.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Vaclav Hummel <xhumme00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Global file with signals
+
+set FLU_ADAPTER_PATH   "/testbench/uut"
+set TB_BASE          "/testbench"
+
+source                "signals.fdo"
+
+#flu_qdr_ports        "$TB_BASE/DUT_U/VHDL_DUT_U"
+
+#flu2qdr_ports        "$TB_BASE/DUT_U/VHDL_DUT_U/flu_adapteri/flu2qdri"
+
+#qdr_ports        "$TB_BASE/DUT_U/VHDL_DUT_U/flu_adapteri/qdri"
+

@@ -1,0 +1,15 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2016 CESNET z. s. p. o.
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+source "./signals.fdo"
+
+add wave -divider "FIFO"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+
+rx  RX  /testbench/DUT_U/VHDL_DUT_U
+tx  TX  /testbench/DUT_U/VHDL_DUT_U
+

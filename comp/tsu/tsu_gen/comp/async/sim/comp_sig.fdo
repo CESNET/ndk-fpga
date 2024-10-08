@@ -1,0 +1,20 @@
+# comp_sig.fdo : Include file with signal procedures
+# Copyright (C) 2009 CESNET
+# Author(s): Jan Stourac <xstour03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+#
+
+#Source paths
+set ASYNC_BASE  "$FIRMWARE_BASE/comp/tsu/tsu_cv2/comp/async"
+
+# Paths
+set ASYNC_PATH       "/testbench/uut/"
+
+
+# Files with signals
+source "$ASYNC_BASE/sim/signals.fdo"
+
+blk_ASYNC "IFC"
+

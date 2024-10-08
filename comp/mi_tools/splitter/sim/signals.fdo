@@ -1,0 +1,69 @@
+#
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2008 CESNET
+# Author(s): Vaclav Bartos <xbarto11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+set PATH /testbench/UUT
+
+add wave -divider "MI Splitter"
+
+add_wave "-noupdate -color yellow -label RESET" $PATH/RESET
+add_wave "-noupdate -color yellow -label CLK"   $PATH/CLK
+
+add wave -divider "Input MI"
+
+add_wave "-noupdate -hex -label IN_DWR"          $PATH/IN_DWR
+add_wave "-noupdate -hex -label IN_ADDR"         $PATH/IN_ADDR
+add_wave "-noupdate -hex -label IN_RD"           $PATH/IN_RD
+add_wave "-noupdate -hex -label IN_WR"           $PATH/IN_WR
+add_wave "-noupdate -hex -label IN_ARDY"         $PATH/IN_ARDY
+add_wave "-noupdate -hex -label IN_BE"           $PATH/IN_BE
+add_wave "-noupdate -hex -label IN_DRD"          $PATH/IN_DRD
+add_wave "-noupdate -hex -label IN_DRDY"         $PATH/IN_DRDY
+
+add wave -divider "Input MI - pipeline"
+
+add_wave "-noupdate -hex -label pipe_dwr"        $PATH/pipe_dwr
+add_wave "-noupdate -hex -label pipe_addr"       $PATH/pipe_addr
+add_wave "-noupdate -hex -label pipe_rd"         $PATH/pipe_rd
+add_wave "-noupdate -hex -label pipe_wr"         $PATH/pipe_wr
+add_wave "-noupdate -hex -label pipe_ardy"       $PATH/pipe_ardy
+add_wave "-noupdate -hex -label pipe_be"         $PATH/pipe_be
+add_wave "-noupdate -hex -label pipe_drd"        $PATH/pipe_drd
+add_wave "-noupdate -hex -label pipe_drdy"       $PATH/pipe_drdy
+
+add wave -divider "Output MIs"
+
+add_wave "-noupdate -hex -label OUT_DWR"         $PATH/OUT_DWR
+add_wave "-noupdate -hex -label OUT_ADDR"        $PATH/OUT_ADDR
+add_wave "-noupdate -bin -label OUT_RD"          $PATH/OUT_RD
+add_wave "-noupdate -bin -label OUT_WR"          $PATH/OUT_WR
+add_wave "-noupdate -bin -label OUT_ARDY"        $PATH/OUT_ARDY
+add_wave "-noupdate -hex -label OUT_BE"          $PATH/OUT_BE
+add_wave "-noupdate -hex -label OUT_DRD"         $PATH/OUT_DRD
+add_wave "-noupdate -bin -label OUT_DRDY"        $PATH/OUT_DRDY
+
+add wave -divider "Fifo"
+
+add_wave "-noupdate -hex -label DIN"            $PATH/FIFO/DIN
+add_wave "-noupdate -hex -label WE"             $PATH/FIFO/WE
+add_wave "-noupdate -hex -label FULL"           $PATH/FIFO/FULL
+add_wave "-noupdate -hex -label DOUT"           $PATH/FIFO/DOUT
+add_wave "-noupdate -hex -label RE"             $PATH/FIFO/RE
+add_wave "-noupdate -hex -label EMPTY"          $PATH/FIFO/EMPTY
+
+add wave -divider "Fifo in testbench"
+
+add_wave "-noupdate -hex -label drd_delay_in"     /testbench/drd_delay_in
+add_wave "-noupdate -hex -label drd_delay"        /testbench/drd_delay
+add_wave "-noupdate -hex -label drd_delay_out"    /testbench/drd_delay_out
+add_wave "-noupdate -bin -label drdy_delay_in"    /testbench/drdy_delay_in
+add_wave "-noupdate -hex -label drdy_delay"       /testbench/drdy_delay
+add_wave "-noupdate -bin -label drdy_delay_out"   /testbench/drdy_delay_out
+

@@ -1,0 +1,118 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Vladislav Valek <valekv@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc ctrl {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate -hex"       $PATH/MI_*
+}
+
+proc wr {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate -hex"       $PATH/USER_*
+}
+
+proc rd {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate -hex"       $PATH/PCIE_*
+}
+
+proc ints {PATH} {
+    add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/start_*
+    add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/stop_*
+    add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/hdrm_*
+    add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/mfb_*
+    add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/trbuf_fifo_*
+    add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/data_path_dst_rdy
+    add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/hdr_log_dst_rdy
+}
+
+proc high_level_view {PATH} {
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_sw_manager_i/start_fsm_pst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_sw_manager_i/start_fsm_nst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_sw_manager_i/stop_fsm_pst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_sw_manager_i/stop_fsm_nst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_hdr_manager_i/chan_state_change_pst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_hdr_manager_i/chan_state_change_nst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_hdr_insertor_i/tprocess_pst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_hdr_insertor_i/tprocess_nst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_hdr_manager_i/pkt_process_pst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_hdr_manager_i/pkt_process_nst
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "pcie_hdr_data_tran_fifo_status"] $PATH/rx_dma_hdr_manager_i/pcie_hdr_data_tran_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "pcie_hdr_dma_hdr_tran_fifo_status"] $PATH/rx_dma_hdr_manager_i/pcie_hdr_dma_hdr_tran_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_hdr_manager_i/dma_hdr_fifo_status
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "input_fifo_status"] $PATH/rx_dma_hdr_manager_i/input_mvb_fifo_i/STATUS
+}
+
+proc hdr_ins {PATH} {
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(1023 downto 768)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(767 downto 512)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(511 downto 256)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(255 downto 0)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR" -group "DATA_SHIFTED_4"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(1023 downto 896)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR" -group "DATA_SHIFTED_4"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(895 downto 640)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR" -group "DATA_SHIFTED_4"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(639 downto 384)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR" -group "DATA_SHIFTED_4"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(383 downto 128)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR" -group "DATA_SHIFTED_4"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(127 downto 0)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_SOF
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_EOF
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_SRC_RDY
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_DST_RDY
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/TX_*
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/HDRM_*
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/bshifter_data_out(255 downto 0)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/bshifter_data_out(255 downto 128)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/bshifter_data_out(127 downto 0)"
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/low_shift_val
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_pst
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_nst
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/shift_sel_pst
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/shift_sel_nst
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/tprocess_pst
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/tprocess_nst
+}
+
+proc inp_buff {PATH} {
+    add_wave [list -noupdate -hex -group "INPUT_BUFFER"] $PATH/input_buffer_i/*
+}
+
+proc trans_buff {PATH} {
+    add_wave [list -noupdate -hex -group "TRANSACTION_BUFFER"] $PATH/tr_buff_g/transaction_buffer_i/*
+}
+
+proc hdr_mgr {PATH} {
+    add_wave [list -noupdate -hex -group "HDR_MANAGER"] $PATH/rx_dma_hdr_manager_i/*
+    add_wave [list -noupdate -hex -group "HDR_MANAGER"] $PATH/rx_dma_hdr_manager_i/pcie_hdr_data_tran_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HDR_MANAGER"] $PATH/rx_dma_hdr_manager_i/pcie_hdr_dma_hdr_tran_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HDR_MANAGER" -group "DATA ADDR MGR"] $PATH/rx_dma_hdr_manager_i/data_pcie_addr_mgr_i/*
+    add_wave [list -noupdate -hex -group "HDR_MANAGER" -group "DMA ADDR MGR"]  $PATH/rx_dma_hdr_manager_i/dma_hdr_pcie_addr_mgr_i/*
+}
+
+proc sw_mgr {PATH} {
+    add_wave [list -noupdate -hex -group "SW_MANAGER"] $PATH/rx_dma_sw_manager_i/*
+}
+
+proc conf_regs {PATH} {
+
+    set regs [list "R_CONTROL" "R_STATUS" "R_SDP" "R_SHP" "R_HDP" "R_HHP" "R_DADDR_LOW" "R_DADDR_HIGH" "R_HADDR_LOW" "R_HADDR_HIGH" "R_DPM" "R_HPM" "R_SENT_PKTS_LOW" "R_SENT_PKTS_HIGH" "R_SENT_BYTES_LOW" "R_SENT_BYTES_HIGH" "R_DISC_PKTS_LOW" "R_DISC_PKTS_HIGH" "R_DISC_BYTES_LOW" "R_DISC_BYTES_HIGH"]
+    set reg_idxs [list 0 1 4 5 6 7 16 17 18 19 22 23 24 25 26 27 28 29 30 31]
+
+    foreach {n} $regs {i} $reg_idxs {
+        add_wave [list -noupdate -hex -group "CONFIGURATION REGISTERS" -label "${n}_0"] $PATH/rx_dma_sw_manager_i/reg_gen(${i})/reg_i/memg(0)/lutram_i/distmem
+
+        if { $i == 6 || $i == 7 } {
+            add_wave [list -noupdate -hex -group "CONFIGURATION REGISTERS" -label "${n}_1"] $PATH/rx_dma_sw_manager_i/reg_gen(${i})/reg_i/memg(1)/lutram_i/distmem
+        }
+    }
+}
+
+proc pkt_cntrs {PATH} {
+    set regs [list "PACKETS SENT" "BYTES SENT" "PACKETS DISCARDED" "BYTES DISCARDED" ]
+    set reg_names [list "pkt_sent_cnt_i" "bts_sent_cnt_i" "pkt_disc_cnt_i" "bts_disc_cnt_i"]
+
+    foreach {n} $regs {i} $reg_names {
+        add_wave [list -noupdate -hex -group "PACKET COUNTERS" -unsigned -label "${n}"] $PATH/rx_dma_sw_manager_i/${i}/cnt_memx_i/logic_g/sdp_lutram_i/distmem
+    }
+}

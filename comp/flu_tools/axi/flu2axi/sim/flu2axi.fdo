@@ -1,0 +1,30 @@
+# flu2axi.fdo: Simulation script
+# Copyright (C) 2014 CESNET
+# Author: Ivan Bryndza <xbrynd00@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../../.."
+set FLU2AXI_BASE     ".."
+
+set TB_FILE          "$FLU2AXI_BASE/sim/testbench.vhd"
+set SIG_FILE         "$FLU2AXI_BASE/sim/flu2axi_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "FLU2AXI" $FLU2AXI_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 2us

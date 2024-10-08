@@ -1,0 +1,25 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2010 CESNET
+# Author: Koranda Karel <xkoran01@stud.fit.vutbr.cz>
+#
+# $Id$
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+add wave -divider "TESTBENCH"
+add_wave "-noupdate -label MASK"	/testbench/mask
+add_wave "-noupdate -label FIRST_ONE_ONEHOT" /testbench/first_one_onehot
+add_wave "-noupdate -label FIRST_ONE_BINARY" /testbench/first_one_binary
+add_wave "-noupdate -label FIRST_ONE_PRESENT" /testbench/first_one_present
+add wave -divider "F_O_DETECTORs Internals"
+add_wave "-noupdate -label MASK"	/testbench/uut/mask
+add_wave "-noupdate -label FIRST_ONE_ONEHOT" /testbench/uut/first_one_onehot
+add_wave "-noupdate -label FIRST_ONE_BINARY" /testbench/uut/first_one_binary
+add_wave "-noupdate -label FIRST_ONE_PRESENT" /testbench/uut/first_one_present
+add_wave "-noupdate -label qtr_first_one" /testbench/uut/qtr_first_one
+add_wave "-noupdate -label first_one_i" /testbench/uut/first_one_i
+add_wave "-noupdate -label first_one_b" /testbench/uut/first_one_b
+add_wave "-noupdate -label first_one_or_input" /testbench/uut/first_one_or_input
+add_wave "-noupdate -label first_one_or_output" /testbench/uut/first_one_or_output
+

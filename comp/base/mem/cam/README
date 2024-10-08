@@ -1,0 +1,6 @@
+Ternary Content Associative Memory (TCAM)
+=========================================
+
+For most scenarios, use the CAM entity in VHDL, and "CAM" entity name and "CAM" archgrp in Modules.tcl
+
+Documentation: https://homeproj.cesnet.cz/projects/fwbase/wiki/CAM

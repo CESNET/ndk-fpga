@@ -1,0 +1,39 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2020 CESNET
+# Author: Tomas Hak <xhakto01@stud.fit.vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+proc blk_MFB_TRANSFORMER_CR {} {
+
+	global MFB_TRANSFORMER_PATH
+
+	add wave -position end -label CLK		$MFB_TRANSFORMER_PATH/CLK
+	add wave -position end -label RESET		$MFB_TRANSFORMER_PATH/RESET
+}
+
+
+proc blk_MFB_TRANSFORMER_RX {} {
+
+	global MFB_TRANSFORMER_PATH
+
+	add wave -position end	-hex	-label RX_DATA		$MFB_TRANSFORMER_PATH/RX_DATA
+	add wave -position end	-bin	-label RX_SOP		$MFB_TRANSFORMER_PATH/RX_SOP
+	add wave -position end	-bin	-label RX_EOP		$MFB_TRANSFORMER_PATH/RX_EOP
+	add wave -position end	-bin	-label RX_SOP_POS	$MFB_TRANSFORMER_PATH/RX_SOP_POS
+	add wave -position end	-bin	-label RX_EOP_POS	$MFB_TRANSFORMER_PATH/RX_EOP_POS
+	add wave -position end 		-label RX_SRC_RDY	$MFB_TRANSFORMER_PATH/RX_SRC_RDY
+	add wave -position end 		-label RX_DST_RDY	$MFB_TRANSFORMER_PATH/RX_DST_RDY
+}
+
+proc blk_MFB_TRANSFORMER_TX {} {
+
+	global MFB_TRANSFORMER_PATH
+
+	add wave -position end	-hex	-label TX_DATA		$MFB_TRANSFORMER_PATH/TX_DATA
+	add wave -position end	-bin	-label TX_SOP		$MFB_TRANSFORMER_PATH/TX_SOP
+	add wave -position end	-bin	-label TX_EOP		$MFB_TRANSFORMER_PATH/TX_EOP
+	add wave -position end	-bin	-label TX_SOP_POS	$MFB_TRANSFORMER_PATH/TX_SOP_POS
+	add wave -position end	-bin	-label TX_EOP_POS	$MFB_TRANSFORMER_PATH/TX_EOP_POS
+	add wave -position end		-label TX_SRC_RDY	$MFB_TRANSFORMER_PATH/TX_SRC_RDY
+	add wave -position end		-label TX_DST_RDY       $MFB_TRANSFORMER_PATH/TX_DST_RDY
+}

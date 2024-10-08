@@ -1,0 +1,20 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+source "./signals.fdo"
+
+add_wave "-noupdate -color yellow -label CLK"    /testbench/CLK
+add_wave "-noupdate -color yellow -label RESET"  /testbench/RESET
+
+all TOP         /testbench/DUT_U/VHDL_DUT_U
+all BASE        /testbench/DUT_U/VHDL_DUT_U/mfb_generator_i
+all CORE        /testbench/DUT_U/VHDL_DUT_U/mfb_generator_i/core_arch_gen/core_i
+all CORE        /testbench/DUT_U/VHDL_DUT_U/mfb_generator_i/core_arch_gen/core_pacp_i
+all PAC_PLANNER /testbench/DUT_U/VHDL_DUT_U/mfb_generator_i/core_arch_gen/core_pacp_i/packet_planner_i
+
+config wave -signalnamewidth 1
+

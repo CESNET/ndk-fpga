@@ -1,0 +1,36 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc write_part {NAME PATH} {
+   add wave -divider "$NAME"
+	add_wave "-noupdate      -label WR_CLK"             $PATH/wr_clk
+	add_wave "-noupdate      -label WR_RESET"           $PATH/wr_rst
+	add_wave "-noupdate -dec -label WR_DMA_DATA"        $PATH/wr_dma_data
+	add_wave "-noupdate -dec -label WR_DMA_HDR"         $PATH/wr_dma_hdr
+	add_wave "-noupdate      -label WR_DMA_SOP"         $PATH/wr_dma_sop
+	add_wave "-noupdate      -label WR_DMA_EOP"         $PATH/wr_dma_eop
+  add_wave "-noupdate      -label WR_DMA_SRC_RDY"     $PATH/wr_dma_src_rdy
+	add_wave "-noupdate      -label WR_DMA_DST_RDY"     $PATH/wr_dma_dst_rdy
+}
+
+proc read_part {NAME PATH} {
+   add wave -divider "$NAME"
+	add_wave "-noupdate      -label RD_CLK"             $PATH/rd_clk
+	add_wave "-noupdate      -label RD_RESET"           $PATH/rd_rst
+	add_wave "-noupdate -dec -label RD_DMA_DATA"        $PATH/rd_dma_data
+	add_wave "-noupdate -dec -label RD_DMA_HDR"         $PATH/rd_dma_hdr
+	add_wave "-noupdate      -label RD_DMA_SOP"         $PATH/rd_dma_sop
+	add_wave "-noupdate      -label RD_DMA_EOP"         $PATH/rd_dma_eop
+  add_wave "-noupdate      -label RD_DMA_SRC_RDY"     $PATH/rd_dma_src_rdy
+	add_wave "-noupdate      -label RD_DMA_DST_RDY"     $PATH/rd_dma_dst_rdy
+}
+
+proc internal {NAME PATH} {
+   add wave -divider "$NAME"
+
+}

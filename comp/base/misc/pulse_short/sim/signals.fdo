@@ -1,0 +1,26 @@
+
+# signals.fdo: Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Vladislav Valek <xvalek14@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc all {PATH} {
+    add_wave "-bin -noupdate" $PATH/aclk
+    add_wave "-bin -noupdate" $PATH/bclk
+    add_wave "-bin -noupdate" $PATH/rst
+    add_wave "-bin -noupdate" $PATH/trigger
+    add_wave "-bin -noupdate" $PATH/pulse_out
+
+    add wave -divider "SYNC SIGNALS"
+    add wave -bin -noupdate $PATH/uut_i/rst_sync
+    add wave -bin -noupdate $PATH/uut_i/en_sync
+    add wave -bin -noupdate $PATH/uut_i/trigger_sync
+
+    add wave -divider "INTERNAL SIGNALS"
+    add wave -bin -noupdate $PATH/uut_i/idle
+    add wave -unsigned -noupdate $PATH/uut_i/del_cntr
+    add wave -bin -noupdate $PATH/uut_i/counter_trigg
+    add wave -noupdate $PATH/uut_i/del_cntr_state
+}

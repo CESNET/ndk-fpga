@@ -1,0 +1,24 @@
+# ptc.fdo: Functional simulation file for ptc tag manager
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Vaclav Hummel <xhumme00@cesnet.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+set MAKEFILE_GEN "true"
+
+set FIRMWARE_BASE    "../../../.."
+set DUT_BASE         ".."
+
+set SIG_FILE         "./ptc_sig.fdo"
+set TB_FILE          "./testbench.vhd"
+
+set COMPONENTS [list \
+   [ list "DUT"      $DUT_BASE "FULL"] \
+   [ list "TEST_PKG" "."       "FULL"] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+puts "Numeric Std Warnings - Disabled"
+set NumericStdNoWarnings 1
+
+nb_sim_run

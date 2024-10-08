@@ -1,0 +1,29 @@
+# top_level_sig.fdo : Include file with signals
+# signals.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+set DUT_PATH "/testbench/DUT_U/VHDL_DUT_U/dut_i"
+
+add_wave "-noupdate -color yellow -label CLK"    /testbench/DUT_U/CLK
+add_wave "-noupdate -color yellow -label RESET"  /testbench/DUT_U/RESET
+
+add wave -divider "TOP"
+add_wave "-group {top} -group {RX MVB}   -noupdate -hex" $DUT_PATH/RX_MVB_*
+add_wave "-group {top} -group {RX MFB}   -noupdate -hex" $DUT_PATH/RX_MFB_*
+add_wave "-group {top} -group {TX MVB}   -noupdate -hex" $DUT_PATH/TX_MVB_*
+add_wave "-group {top} -group {TX MFB}   -noupdate -hex" $DUT_PATH/TX_MFB_*
+add_wave "-group {top} -group {internal} -noupdate -hex" $DUT_PATH/s_*
+
+for {set i 0} {$i < 8} {incr i} {
+    set STAGE_PATH "$DUT_PATH/stage_g($i)"
+    for {set e 0} {$e < 16} {incr e} {
+        set MRG_PATH "$STAGE_PATH/merger_g($e)/merger_i"
+
+        add_wave "-group {submodules} -group {stage_$i} -group {merger_$e} -noupdate -hex" $MRG_PATH/*
+    }
+}
+
+config wave -signalnamewidth 1

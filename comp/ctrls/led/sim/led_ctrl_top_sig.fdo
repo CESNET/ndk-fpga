@@ -1,0 +1,17 @@
+# led_ctrl_top_sig.fdo : Include file with signals
+# Copyright (C) 2016 CESNET
+# Author: Juraj Kubiš
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set LED_CTRL_TOP_PATH   "/testbench"
+
+# include signals
+source      "signals.fdo"
+
+blk_LED_CTRL_TOP\{ \}
+

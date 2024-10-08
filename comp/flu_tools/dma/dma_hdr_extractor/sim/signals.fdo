@@ -1,0 +1,52 @@
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Mario Kuka <kuka@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Paths
+set COMP_PATH        "/testbench/uut"
+set TESTBENCH_PATH   "/testbench"
+
+# signlas
+proc Synchronization {PATH} {
+    add_wave "-noupdate -hex -label CLK -color yellow"   $PATH/CLK
+    add_wave "-noupdate -hex -label RESET -color yellow" $PATH/RESET
+}
+
+proc RX {PATH} {
+    add_wave "-noupdate -hex -label RX_CHANNEL"  $PATH/RX_CHANNEL
+    add_wave "-noupdate -hex -label RX_DATA"     $PATH/RX_DATA
+    add_wave "-noupdate -hex -label RX_SOP_POS"  $PATH/RX_SOP_POS
+    add_wave "-noupdate -hex -label RX_EOP_POS"  $PATH/RX_EOP_POS
+    add_wave "-noupdate -hex -label RX_SOP"      $PATH/RX_SOP
+    add_wave "-noupdate -hex -label RX_EOP"      $PATH/RX_EOP
+    add_wave "-noupdate -hex -label RX_SRC_RDY"  $PATH/RX_SRC_RDY
+    add_wave "-noupdate -hex -label RX_DST_RDY"  $PATH/RX_DST_RDY
+}
+
+proc TX {PATH} {
+    add_wave "-noupdate -hex -label TX_HDR"      $PATH/TX_HDR
+    add_wave "-noupdate -hex -label TX_DATA"     $PATH/TX_DATA
+    add_wave "-noupdate -hex -label TX_SOP_POS"  $PATH/TX_SOP_POS
+    add_wave "-noupdate -hex -label TX_EOP_POS"  $PATH/TX_EOP_POS
+    add_wave "-noupdate -hex -label TX_SOP"      $PATH/TX_SOP
+    add_wave "-noupdate -hex -label TX_EOP"      $PATH/TX_EOP
+    add_wave "-noupdate -hex -label TX_SRC_RDY"  $PATH/TX_SRC_RDY
+    add_wave "-noupdate -hex -label TX_DST_RDY"  $PATH/TX_DST_RDY
+}
+
+
+# Layout
+add wave -divider ""
+add wave -divider "SYNC"
+add wave -divider ""
+Synchronization "$COMP_PATH"
+
+add wave -divider ""
+add wave -divider "UUT"
+add wave -divider "RX"
+RX "$COMP_PATH"
+add wave -divider "TX"
+TX "$COMP_PATH"
+
+# window

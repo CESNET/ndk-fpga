@@ -1,0 +1,21 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# Paths
+set UUT_PATH   "/testbench/uut"
+
+source			"signals.fdo"
+
+#add_wave "-noupdate -color yellow -label RST" /testbench/RESET
+#add_wave "-noupdate -color yellow -label CLK" /testbench/CLK
+
+add_wave /testbench/uut/*
+
+#mi32 "$UUT_PATH"
+#rx   "$UUT_PATH"
+#sig  "$UUT_PATH"
+

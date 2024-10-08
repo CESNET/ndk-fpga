@@ -1,0 +1,183 @@
+<source>
+
+    <component>
+        FrameLink Packet Binder component
+    </component>
+
+    <authors>
+        <author login="spacekm">
+            Michal Spacek
+        </author>
+    </authors>
+
+    <features>
+        <item>
+            Binds packets from two input FrameLink frames into one frame.
+        </item>
+    </features>
+
+    <description>
+        This Packet Binder component joins two frames (one from each interface) to one frame. Component reads packets in one FrameLink frame from primary interface. When EOF signal comes, components starts reading packets from the secondary interface , until EOF signal comes. Then it starts reading data from Primary interface again. Packet Binder uses FL_FIFO as input buffer on both interfaces.
+    </description>
+
+    <interface>
+
+        <generic_map>
+		<generic name="FL_WIDTH" type="integer" default="32">
+		    FrameLink interface data bus width
+            </generic>
+	    <generic name="PRIMARY" type="integer" default="0">
+		    specifies the primary interface (only 0 or 1 values supported)
+            </generic>
+	    <generic name="IF0_BUFFER_SIZE" type="integer" default="512">
+		    size of buffer for interface 0
+            </generic>
+	    <generic name="IF1_BUFFER_SIZE" type="integer" default="512">
+		    size of buffer for interface 1
+            </generic>
+	    <generic name="IF0_PARTS" type="integer" default="1">
+		    number of parts in frame for interface 0
+            </generic>
+	    <generic name="IF1_PARTS" type="integer" default="3">
+		    number of parts in frame for interface 1
+            </generic>
+	    <generic name="OUTPUT_REG" type="boolean" default="true">
+		    if true, register will be placed before output
+            </generic>
+        </generic_map>
+
+        <port_map>
+	    <port name="CLK" dir="in" width="1">
+		Clock input.
+            </port>
+            <port name="RESET" dir="in" width="1">
+                Global reset.
+            </port>
+
+
+	    <divider>
+	  	    RX FrameLink interface 0
+	    </divider>
+	    <port name="RX_DATA_0" dir="in" width="FL_WIDTH">
+		    RX data bus.
+	    </port>
+	    <port name="RX_REM_0" dir="in" width="log2(FL_WIDTH/8)">
+		    RX data remainder.
+	    </port>
+	    <port name="RX_SRC_RDY_N_0" dir="in" width="1">
+		    RX source ready.
+	    </port>
+	    <port name="RX_DST_RDY_N_0" dir="out" width="1">
+		    RX destination ready.
+            </port>
+	    <port name="RX_SOP_N_0" dir="in" width="1">
+		    RX start of packet (segment).
+	    </port>
+	    <port name="RX_EOP_N_0" dir="in" width="1">
+		    RX end of packet (segment).
+	    </port>
+	    <port name="RX_SOF_N_0" dir="in" width="1">
+		    RX start of frame.
+	    </port>
+	    <port name="RX_EOF_N_0" dir="in" width="1">
+		    RX end of frame.
+	    </port>
+
+	    <divider>
+		    RX FrameLink interface 1
+	    </divider>
+	    <port name="RX_DATA_1" dir="in" width="FL_WIDTH">
+		    RX data bus.
+	    </port>
+	    <port name="RX_REM_1" dir="in" width="log2(FL_WIDTH/8)">
+		    RX data remainder.
+	    </port>
+	    <port name="RX_SRC_RDY_N_1" dir="in" width="1">
+		    RX source ready.
+	    </port>
+	    <port name="RX_DST_RDY_N_1" dir="out" width="1">
+		    RX destination ready.
+	    </port>
+	    <port name="RX_SOP_N_1" dir="in" width="1">
+		    RX start of packet (segment).
+	    </port>
+	    <port name="RX_EOP_N_1" dir="in" width="1">
+		    RX end of packet (segment).
+	    </port>
+	    <port name="RX_SOF_N_1" dir="in" width="1">
+		    RX start of frame.
+	    </port>
+	    <port name="RX_EOF_N_1" dir="in" width="1">
+		    RX end of frame.
+	    </port>
+
+
+            <divider>
+                TX FrameLink interface
+            </divider>
+	    <port name="TX_DATA" dir="out" width="FL_WIDTH">
+                TX data bus.
+            </port>
+	    <port name="TX_REM" dir="out" width="log2(FL_WIDTH/8)">
+                TX data remainder.
+            </port>
+            <port name="TX_SRC_RDY" dir="out" width="1">
+		    TX source ready.
+	    </port>
+            <port name="TX_DST_RDY" dir="in" width="1">
+		    TX destination ready.
+            </port>
+            <port name="TX_SOP" dir="out" width="1">
+		    TX start of packet (segment).
+	    </port>
+            <port name="TX_EOP" dir="out" width="1">
+		    TX end of packet (segment).
+            </port>
+            <port name="TX_SOF" dir="out" width="1">
+                TX start of frame.
+            </port>
+            <port name="TX_EOF" dir="out" width="1">
+                TX end of frame.
+            </port>
+        </port_map>
+
+    </interface>
+
+    <body>
+
+        <h1>FrameLink Packet Binder Component</h1>
+        <p>
+		This Packet Binder component joins two frames (one from each interface) to one frame. Component reads packets in one FrameLink frame from primary interface. When EOF signal comes, components starts reading packets from the secondary interface , until EOF signal comes. Then it starts reading data from Primary interface again. Packet Binder uses FL_FIFO as input buffer on both interfaces.
+        </p>
+	<h2>Frequency and Resources usage</h2>
+	<p>
+		<tab sloupce="cccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Slices XST (% of C6X slices)</th>
+			</tr>
+			<tr>
+				<th>BUFFER_SIZE = 512 for each interface, OUTPUT_REG=true, FL_WIDTH=32</th>
+				<td>149 (0.618%)</td>
+			</tr>
+
+		<nazev>Chip utilization</nazev>
+		</tab>
+
+		<tab sloupce="cccc">
+			<tr>
+				<th>Generic settings</th>
+                                <th>Max.frequency by XST</th>
+			</tr>
+			<tr>
+				<th>buffer_size = 512 for each interface, OUTPUT_REG=true, FL_WIDTH=32</th>
+				<td>235.716 MHz</td>
+			</tr>
+
+		<nazev>Maximal frequency</nazev>
+		</tab>
+
+         All values was measured after synthesis before PaR.
+       </p>
+    </body>
+</source>

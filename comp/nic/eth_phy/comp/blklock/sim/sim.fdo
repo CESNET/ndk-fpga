@@ -1,0 +1,35 @@
+# sim.fdo: Block lock simulation file
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Oliver Gurka <xgurka00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set FIRMWARE_BASE    "../../../../../.."
+set OFM_PATH         "$FIRMWARE_BASE/ofm"
+set ENTITY_BASE      ".."
+set TB_FILE          "testbench.vhd"
+
+set COMPONENTS [list \
+                  [list "BLOCK_LOCK" $ENTITY_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+set SIM_FLAGS(EXTRA_VFLAGS) "-msgmode both"
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Files with signals
+
+exec make
+view wave
+delete wave *
+
+source "signals.fdo"
+
+set StdArithNoWarnings 1; # dismiss startup warnings
+
+restart -f
+log -r *
+wave zoomrange 0 100ns
+
+run 10us
+wave zoomrange 0 100ns

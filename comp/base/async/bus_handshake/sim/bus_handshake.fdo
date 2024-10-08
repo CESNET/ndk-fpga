@@ -1,0 +1,30 @@
+# bus_handshake.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Authors: Jakub Cabal
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set GENERAL_BASE	   "$FIRMWARE_BASE/comp/base/async/bus_handshake"
+
+set TB_FILE          "$GENERAL_BASE/sim/testbench.vhd"
+set SIG_FILE         "$GENERAL_BASE/sim/bus_handshake_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list [list "ASYNC_BUS_HANDSHAKE" $GENERAL_BASE   "FULL"]]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 2000ns
+wave zoomrange 0 1000ns

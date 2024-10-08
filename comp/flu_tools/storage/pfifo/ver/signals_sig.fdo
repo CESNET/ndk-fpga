@@ -1,0 +1,26 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2012 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Global file with signals
+
+
+source "./signals.fdo"
+
+add wave -divider "FLU_ASFIFO"
+add_wave "-noupdate -color yellow -label RX_RESET"   /testbench/RX_RESET
+add_wave "-noupdate -color yellow -label RX_CLK"     /testbench/RX_CLK
+add_wave "-noupdate -color yellow -label TX_RESET"   /testbench/TX_RESET
+add_wave "-noupdate -color yellow -label TX_CLK"     /testbench/TX_CLK
+
+
+rx  RX  /testbench/DUT_U/VHDL_DUT_U
+tx  TX  /testbench/DUT_U/VHDL_DUT_U
+all_core ALL_CORE /testbench/DUT_U/VHDL_DUT_U/PFIFO_CORE
+all ALL /testbench/DUT_U/VHDL_DUT_U
+

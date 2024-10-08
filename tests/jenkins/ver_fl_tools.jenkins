@@ -1,0 +1,56 @@
+/*
+ * ver_flu_tools.jenkins: Jenkins configuration script
+ * Copyright (C) 2024 CESNET z. s. p. o.
+ * Author(s): Jakub Cabal <cabal@cesnet.cz>
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+// Clean previous builds
+library 'liberouter'
+cleanBuilds()
+
+// /////////////////////////////////////////////////////////////////////////////
+// BASIC-VERIFICATION
+// /////////////////////////////////////////////////////////////////////////////
+// Add engines for automatic Jenkins verifications into the following list
+// FORMAT:
+//  ['name',             'path_to_ver',                                'script.fdo'],
+def COMPONENTS_VER = [\
+    ['Binder',           'comp/fl_tools/flow/binder/ver',              'binder.fdo'],\
+    ['Distributor',      'comp/fl_tools/flow/distributor/ver',         'distributor.fdo'],\
+    ['Multiplexer',      'comp/fl_tools/flow/multiplexer/ver',         'multiplexer.fdo'],\
+    ['Pipe',             'comp/fl_tools/flow/pipe/ver',                'top_level.fdo'],\
+    ['SLR Crossing',     'comp/fl_tools/flow/slr_crossing/ver',        'top_level.fdo'],\
+    ['Transformer',      'comp/fl_tools/flow/transformer/ver',         'top_level.fdo'],\
+    ['ASFIFO',           'comp/fl_tools/storage/asfifo/ver',           'top_level.fdo'],\
+    ['ASFIFO BRAM',      'comp/fl_tools/storage/asfifo_bram/ver',      'top_level.fdo'],\
+    ['ASFIFO LUT',       'comp/fl_tools/storage/asfifo_lut/ver',       'top_level.fdo'],\
+    ['FIFO',             'comp/fl_tools/storage/fifo/ver',             'top_level.fdo'],\
+    ['FIFO BRAM Xilinx', 'comp/fl_tools/storage/fifo_bram_xilinx/ver', 'top_level.fdo'],\
+]
+// /////////////////////////////////////////////////////////////////////////////
+
+// /////////////////////////////////////////////////////////////////////////////
+// MULTI-VERIFICATION
+// /////////////////////////////////////////////////////////////////////////////
+// Add engines for automatic Jenkins verifications into the following list
+// FORMAT:
+//  [ 'name'               , 'path_to_ver'                             , 'fdo_file.fdo'       , 'test_pkg.sv/.vhd'   , 'settings.py'           ]
+//def COMPONENTS_MULTIVER = [\
+//    ['ASYNC'             , 'comp/mi_tools/async/ver'                 , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'       ],\
+//    ['SPLITTER_PLUS_GEN' , 'comp/mi_tools/splitter_plus_gen/ver'     , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'       ],\
+//    ['RECONFIGURATOR'    , 'comp/mi_tools/reconf/ver'                , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'       ],\
+//]
+// /////////////////////////////////////////////////////////////////////////////
+
+// Run component verifications using common script
+node('preklad') {
+    lock(label:"resources-${env.NODE_NAME}", quantity: 1) {
+        // fetch sources from GIT
+        checkout scm
+        def common_run = load "tests/jenkins/common.jenkins"
+        common_run.commonPrekladVerRun(COMPONENTS_VER)
+        //common_run.commonPrekladMultiVerRun(COMPONENTS_MULTIVER)
+    }
+}

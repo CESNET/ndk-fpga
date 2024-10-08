@@ -1,0 +1,59 @@
+# dcpro_adapter_sig.fdo : Include file with signals
+# Copyright (C) 2017 CESNET
+# Author: Mario Kuka <kuka@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Paths
+set COMP_PATH        "/testbench/uut"
+set TESTBENCH_PATH   "/testbench"
+
+# signlas
+proc Synchronization {PATH} {
+   add_wave "-noupdate -hex -label CLK -color yellow"       $PATH/CLK
+   add_wave "-noupdate -hex -label RESET -color yellow"     $PATH/RESET
+}
+
+proc FLU_IN {PATH} {
+   add_wave "-noupdate -hex -label RX_DATA   "  $PATH/RX_DATA
+   add_wave "-noupdate -hex -label RX_SOP_POS"  $PATH/RX_SOP_POS
+   add_wave "-noupdate -hex -label RX_EOP_POS"  $PATH/RX_EOP_POS
+   add_wave "-noupdate -hex -label RX_SOP    "  $PATH/RX_SOP
+   add_wave "-noupdate -hex -label RX_EOP    "  $PATH/RX_EOP
+   add_wave "-noupdate -hex -label RX_SRC_RDY"  $PATH/RX_SRC_RDY
+   add_wave "-noupdate -hex -label RX_DST_RDY"  $PATH/RX_DST_RDY
+}
+
+proc FLU_OUT {PATH} {
+   add_wave "-noupdate -hex -label TX_DATA   "  $PATH/TX_DATA
+   add_wave "-noupdate -hex -label TX_SOP_POS"  $PATH/TX_SOP_POS
+   add_wave "-noupdate -hex -label TX_EOP_POS"  $PATH/TX_EOP_POS
+   add_wave "-noupdate -hex -label TX_SOP    "  $PATH/TX_SOP
+   add_wave "-noupdate -hex -label TX_EOP    "  $PATH/TX_EOP
+   add_wave "-noupdate -hex -label TX_SRC_RDY"  $PATH/TX_SRC_RDY
+   add_wave "-noupdate -hex -label TX_DST_RDY"  $PATH/TX_DST_RDY
+}
+
+proc IFC_OUT {PATH} {
+   add_wave "-noupdate -hex -label IFC        "  $PATH/IFC
+   add_wave "-noupdate -hex -label IFC_SRC_RDY"  $PATH/IFC_SRC_RDY
+   add_wave "-noupdate -hex -label IFC_DST_RDY"  $PATH/IFC_DST_RDY
+}
+
+
+# Layout
+add wave -divider ""
+add wave -divider "SYNC"
+add wave -divider ""
+Synchronization "$COMP_PATH"
+
+add wave -divider ""
+add wave -divider "UUT"
+add wave -divider "FLU_IN"
+FLU_IN "$COMP_PATH"
+add wave -divider "FLU_OUT"
+FLU_OUT "$COMP_PATH"
+add wave -divider "IFC_OUT"
+IFC_OUT "$COMP_PATH"
+
+# window

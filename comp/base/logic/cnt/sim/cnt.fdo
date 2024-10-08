@@ -1,0 +1,23 @@
+# cnt.fdo : Include file with signals
+# Copyright (C) 2005 CESNET
+# Authors: Martin Mikusek <martin.mikusek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+vlib work
+vdel -all work
+vlib work
+
+vcom -93 -explicit -work work ../cnt_types.vhd
+vcom -93 -explicit -work work ../cnt.vhd
+vcom -93 -explicit -work work cnt_tb.vhd
+vsim -t 1ps  -L xilinxcorelib  -lib work testbench
+
+view wave
+add wave *
+
+restart -f
+run 1000 ns

@@ -1,0 +1,38 @@
+# switch_1to4.fdo : Include file with signals
+# Copyright (C) 2003 CESNET
+# Authors: Lukas Solanka <solanka@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set VHDL_BASE        "../../../.."
+
+set TB_FILE          "switch_1to4_tb.vhd"
+set SIG_FILE         "switch_1to4_sig.fdo"
+
+# Components architectures
+set UUT              "FULL"
+
+# Components paths
+set SWITCH_BASE      ".."
+
+# List of packages
+
+# List of components
+set COMPONENTS [list                                                       \
+    [list "FL_SWITCH_1TO4"    $SWITCH_BASE      $UUT]                      \
+]
+
+# Global include file for compilation
+source "$VHDL_BASE/base/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 10us
+

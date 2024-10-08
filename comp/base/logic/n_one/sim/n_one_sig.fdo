@@ -1,0 +1,29 @@
+# planner_sig.fdo : Include file with signals
+# Copyright (C) 2016 CESNET
+# Author: Vaclav Hummel <xhumme00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+# Paths
+set N_ONE_PATH   "/testbench/uut"
+set TB_PATH   "/testbench"
+
+source  "signals.fdo"
+
+add wave -divider ""
+add wave -divider "TB internals"
+add wave -divider ""
+tb_internals "$TB_PATH" ""
+
+add wave -divider ""
+add wave -divider "N_ONE ports"
+add wave -divider ""
+n_one_ports "$N_ONE_PATH" ""
+
+add wave -divider ""
+add wave -divider "N_ONE internals"
+add wave -divider ""
+n_one_internals "$N_ONE_PATH" ""
+

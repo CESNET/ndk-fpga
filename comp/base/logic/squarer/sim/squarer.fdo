@@ -1,0 +1,24 @@
+# squarer.fdo: Squarer simulation file
+# Copyright (C) 2009 CESNET
+# Author: Ondrej Lengal <lengal@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set SQUARER_BASE     "$OFM_PATH/comp/base/logic/squarer"
+
+set SIG_FILE         "$SQUARER_BASE/sim/squarer_sig.fdo"
+set SIGNALS_FILE     "$SQUARER_BASE/sim/signals.fdo"
+set TB_FILE          "$SQUARER_BASE/sim/squarer_tb.vhd"
+
+
+set COMPONENTS [list \
+                  [ list "SQUARER"            $SQUARER_BASE   "FULL"] \
+               ]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 1000ms

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>Shift register with reset to zeroes</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="spacekm">Michal Spacek</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+	<item>uses sh_reg component</item>
+	<item>reseting is done by shifting zeroes to the input</item>
+	<item>generic data width</item>
+</features>
+
+
+
+<!-- Short Block description -->
+<description>
+
+	<!-- THE MOST IMPORTANT PART!!! There should be about 8 rows which
+	     fully describe the component and its main functions -->
+
+	sh_reg_res is a simple component, that added a simple reset to zeroes feature to the sh_reg shift register.
+	Interface is the same as the interface of the sh_reg, only the RESET signal is added.
+	The RESET signal must be high at least the same number of clock cycles as is the bit width of the shift register
+	to set the register to zeroes.
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+
+		<generic name="NUM_BITS" type="integer" default="16">
+			Number of bits in the register
+		</generic>
+		<generic name="INIT" type="std_logic_vector(15 downto 0)" default="0">
+			init value
+		</generic>
+		<generic name="INIT_EXT00" type="std_logic_vector(63 downto 0)" default="0">
+			extended init value
+		</generic>
+
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Common signals</divider>
+		<port  name="CLK" dir="in" width="1">
+			Clock
+		</port>
+		<port  name="RESET" dir="in" width="1">
+			Reset
+		</port>
+		<port name="CE" dir="in" width="1">
+			Clock enable
+		</port>
+
+		<divider>Input/output interface</divider>
+		<port name="DIN" dir="in" width="1">
+			Data in
+		</port>
+		<port name="DOUT" dir="out" width="1">
+			Data out
+		</port>
+
+	</port_map>
+
+</interface>
+
+
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+		<h1>The reset feature</h1>
+	<p>
+	The reseting process is done by shifting zeroes into the sh_reg shift register, so the reset signal must be high at least the same number of clock cycles as is the bit width of the shift register.
+
+
+	</p>
+
+
+<h1>Frequency and Resources usage</h1>
+
+	<p>
+
+        <!--Resources usage and max. frequency by Precision-->
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Slices (% of C6X slices)</th>
+				<th>BlockRams (+ % of C6X BRAMs)</th>
+			</tr>
+			<tr>
+				<th>16bit width</th>
+				<td>2 (0.78%)</td>
+				<td>0 (0 %)</td>
+			</tr>
+			<tr>
+				<th>64bit width</th>
+				<td>3 (0.21%)</td>
+				<td>0 (0 %)</td>
+			</tr>
+		<nazev>Chip utilization</nazev>
+		</tab>
+
+
+
+  </p>
+
+
+<h1>Schemes</h1>
+
+	<p>
+		The block structure of the component is in the following figure.
+		It's composed of shift register sh_reg
+		<obr src="./fig/sh_reg_res.fig">sh_reg_res architecture</obr>
+	</p>
+
+</body>
+
+</source>

@@ -1,0 +1,28 @@
+# binder.fdo: FrameLink Binder functional simulation file
+# Copyright (C) 2006 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set BINDER_BASE      "../../../flow/binder"
+set FL_WATCH_BASE    "../../../debug/watch"
+set FL_SIM_BASE      "../../../debug/sim"
+
+set SIG_FILE         "binder_sig.fdo"
+set TB_FILE          "binder_tb.vhd"
+
+set COMPONENTS [list \
+                  [ list "FL_WATCH"      $FL_WATCH_BASE     "FULL" ] \
+                  [ list "FL_SIM"        $FL_SIM_BASE       "FULL" ] \
+                  [ list "FL_BINDER"     $BINDER_BASE       "FULL" ] \
+               ]
+
+set PACKAGES "$OFM_PATH/comp/mi_tools/pkg/mi32_pkg.vhd"
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 3us

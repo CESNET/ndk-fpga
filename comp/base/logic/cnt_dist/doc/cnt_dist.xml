@@ -1,0 +1,104 @@
+<source>
+
+<component>Array of counters in distributed memory</component>
+
+<authors>
+  <author login="xmikus03">Martin Mikusek</author>
+</authors>
+
+<features>
+	<item>Save resources when you need a large number of wide counters</item>
+</features>
+
+<description>
+   Usefull for save resources when many and big counters are needed. Counters are stored in distributed memory and increased (or cleared) sequentialy. Cannot be used where increasing of counters is needed in one period.
+</description>
+
+<interface>
+	<generic_map>
+      <generic name="WIDTH" type="integer" default="32">
+	 Counter width
+      </generic>
+
+      <generic name="DISTMEM_TYPE" type="integer" default="32">
+	 Type of used distmem (16, 32, 64)
+      </generic>
+
+      <generic name="COUNT" type="integer" default="">
+	 Count of counters
+      </generic>
+
+   </generic_map>
+
+<port_map>
+      <port name="RESET" dir="in" width="1">
+	 Global reset port.
+      </port>
+
+      <port name="CLK" dir="in" width="1">
+	 Global clock port.
+      </port>
+
+      <port name="FLAG" dir="in" width="COUNT">
+	 Flag vector, each bit represents counter enable for one counter
+      </port>
+
+      <port name="FLAG_DV" dir="in" width="1">
+	 Flag data valid
+      </port>
+
+      <port name="CLR" dir="in" width="1">
+	 Synchronous reset
+      </port>
+
+      <port name="ADDR" dir="in" width="LOG2(COUNT)">
+	 Addres of counter for output
+      </port>
+
+      <port name="DO" dir="out" width="WIDTH">
+	 Selected counter actual value
+      </port>
+
+      <port name="RDY" dir="in" width="1">
+	 Asserted when unit is ready
+      </port>
+
+   </port_map>
+
+</interface>
+
+<body>
+   <h1>Component Information</h1>
+   <p>
+      When you need clear some registers, assert FLAG vector, FLAG_DV
+      and CLR for one period. CLR must be asserted until unit is READY.
+   </p>
+
+   <h1>Frequency and Resources usage</h1>
+   <p>
+      <tab sloupce="cccc">
+         <tr>
+            <th>Generic settings</th>
+            <th>Slices (% of C6X slices)</th>
+            <th>BlockRams (% of C6X BRAMs)</th>
+            <th>Max. HW frequency</th>
+         </tr>
+         <tr>
+            <th>32b wide counter, 16 counters</th>
+            <td>98 (0.4%)</td>
+            <td>0 (0.0%)</td>
+            <td>150 MHz</td>
+         </tr>
+         <tr>
+            <th>32b wide counter, 32 counters</th>
+            <td>113 (0.5%)</td>
+            <td>0 (0.0%)</td>
+            <td>150 MHz</td>
+         </tr>
+      <nazev>Chip utilization &amp; max design frequency</nazev>
+      </tab>
+   </p>
+
+</body>
+
+</source>

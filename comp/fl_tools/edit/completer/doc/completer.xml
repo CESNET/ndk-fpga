@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>Completer</component>
+
+
+<!-- Authors -->
+<authors>
+    <author login="sandin">Martin Louda</author>
+</authors>
+
+
+<!-- Short Block description -->
+<description>
+
+    The Completer unit takes frame consisting of input words, that are
+    divided into address and data bits. Data bits are saved to internal
+    memory to given address. As a result, at the end of input frame the
+    data are completed in internal block RAM memory. Then the data are sent
+    to output interface (lower word first).
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+    <!-- Generic description -->
+    <generic_map>
+
+        <generic name="DATA_SIZE" type="integer" default="128">
+            Data size in bytes (1, 2, 4, ... 1024)
+        </generic>
+        <generic name="DATA_WIDTH" type="integer" default="32">
+            Data part width of the input word
+        </generic>
+        <generic name="ADDR_WIDTH" type="integer" default="16">
+            Address part width of the input word
+        </generic>
+        <generic name="FL_IN_WIDTH" type="integer" default="32">
+            Input data width
+        </generic>
+        <generic name="ALIGN_OLD" type="boolean" default="false">
+            Use old HFE first word alignment (address/data)
+        </generic>
+        <generic name="ERASE" type="boolean" default="true">
+            Fill internal memory with zeroes after reading it
+        </generic>
+
+    </generic_map>
+
+    <!-- Port description -->
+    <port_map>
+
+        <divider>Common signals</divider>
+        <port  name="CLK" dir="in" width="1">
+            Global FPGA clock
+        </port>
+        <port  name="RESET" dir="in" width="1">
+            Global reset
+        </port>
+
+        <divider>Input FrameLink interface</divider>
+        <port name="IN_DATA" dir="in" width="FL_IN_WIDTH">
+            Input data bus
+        </port>
+        <port name="IN_REM" dir="in" width="log2(FL_IN_WIDTH/8)">
+            Input data remainder
+        </port>
+        <port name="IN_SOF_N" dir="in" width="1">
+            Input start of frame
+        </port>
+        <port name="IN_EOF_N" dir="in" width="1">
+            Input end of frame
+        </port>
+        <port name="IN_SOP_N" dir="in" width="1">
+            Input start of packet (segment)
+        </port>
+        <port name="IN_EOP_N" dir="in" width="1">
+            Input end of packet (segment)
+        </port>
+        <port name="IN_SRC_RDY_N" dir="in" width="1">
+            Input source ready
+        </port>
+        <port name="IN_DST_RDY_N" dir="out" width="1">
+            Input destination ready
+        </port>
+
+        <divider>Output FrameLink interface</divider>
+        <port name="OUT_DATA" dir="out" width="DATA_WIDTH">
+            Output data bus
+        </port>
+        <port name="OUT_REM" dir="out" width="log2(DATA_WIDTH/8)">
+            Output data remainder
+        </port>
+        <port name="OUT_SOF_N" dir="out" width="1">
+            Output start of frame
+        </port>
+        <port name="OUT_EOF_N" dir="out" width="1">
+            Output end of frame
+        </port>
+        <port name="OUT_SOP_N" dir="out" width="1">
+            Output start of packet (segment)
+        </port>
+        <port name="OUT_EOP_N" dir="out" width="1">
+            Output end of packet (segment)
+        </port>
+        <port name="OUT_SRC_RDY_N" dir="out" width="1">
+            Output source ready
+        </port>
+        <port name="OUT_DST_RDY_N" dir="in" width="1">
+            Output destination ready
+        </port>
+
+        <divider>MI32 interface</divider>
+        <port name="MI" dir="inout" width="32">
+            Interface to software; VHDL type t_mi32
+        </port>
+
+    </port_map>
+
+</interface>
+
+
+<!-- ADDRESS SPACE SECTION ********************************************** -->
+<!-- use if the component has a SW interface, otherwise delete this sections -->
+
+<!-- main address space -->
+<addr_space id ="COMPLETER" name="Completer unit" main="yes" size="0x0">
+
+    <reg name="Control register" id="COMP_CTRL" offset="0x00" access="W"
+        words="1">
+        <bit_vect bits="1">
+        <description_above>
+            Completer control register. Write into this register to get or
+            release sw control over the unit.
+        </description_above>
+        <format>
+            <bit from="0" to="0" name="GET_CTRL">
+                Get (1) / release (0) sw control
+            </bit>
+        </format>
+        </bit_vect>
+    </reg>
+
+    <reg name="Internal memory" id="COMP_MEM" offset="0x0"
+        access="R" words="1">
+        <bit_vect bits="32">
+        <description_above>
+            Mapped internal memory of Completer unit (only when sw got
+            control over the unit). The internal memory contains completed
+            last written data word from input. Beware that generic
+            parameter ERASE must be set to "false" to disable completed
+            data word to be erased from internal memory.
+        </description_above>
+        <format>
+            <bit from="0" to="32" name="ADDR_SPACE">
+                Internal memory address space
+            </bit>
+        </format>
+        </bit_vect>
+    </reg>
+
+</addr_space>
+
+
+<!-- SW BODY SECTION **************************************************** -->
+<!-- use if the component has a SW interface, otherwise delete this section -->
+
+<sw_body>
+
+    <h2>Get/release control</h2>
+    <p>
+        By writing into bit 0 of control register value '1' the sw gets
+        control over the unit. In fact it disables writing into internal
+        memory of the unit so that it can be read. To release sw control
+        and enable regular unit operation, write value '0' into control
+        register.
+    </p>
+
+    <h2>Read internal memory</h2>
+    <p>
+        Internal memory contains completed data that were last written via
+        input interface. To read it, sw must get control over the unit
+        first. Beware that data are normally erased from internal memory
+        after are sent via output interface. To disable this behavior,
+        generic parameter ERASE must be set to "false". Only then you can
+        be sure you'll read correct data from internal memory. The size of
+        address space of the memory is determined by generic parameters
+        DATA_SIZE and DATA_WIDTH. If DATA_WIDTH > 32, only lower 32 bits of
+        each word can be read via sw interface.
+    </p>
+
+</sw_body>
+
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+    <h2>Input word</h2>
+    <p>
+        Each input word is divided into address and data part
+        or it can contain only data. Address part width is set by generic
+        parameter ADDR_WIDTH, data part width is set by generic parameter
+        DATA_WIDTH. ADDR_WIDTH must be less or equal to word width
+        (FL_IN_WIDTH).
+    </p>
+
+    <h2>Input/output protocol</h2>
+    <p>
+        Size of data to complete is set by generic parameter DATA_SIZE (in
+        bytes). Data to complete must be sent in one FrameLink frame with
+        no header or footer while lenght of the frame is not limited.
+    </p>
+    <p>
+        Output data are sent in one FrameLink frame with no header or
+        footer. First are sent lower words of completed data. Data width of
+        output FrameLink bus is determined by input word data path width.
+        If you need different FrameLink bus width use FrameLink Transformer
+        component.
+    </p>
+
+    <h2>Address/data alignment</h2>
+    <p>
+        Word alignment is defined by generic parameter ALIGN_OLD. If it's
+        set to true, it means that old HFE alignment is used. Following
+        figures show the alignment style according to ALIGN_OLD generic.
+    </p>
+
+    <p>
+       <obr src="./fig/align.fig">ALIGN_OLD = false</obr>
+
+       <obr src="./fig/align-old.fig">ALIGN_OLD = true</obr>
+    </p>
+
+    <h2>Frequency and Resources usage</h2>
+    <p>
+        <!--Resources usage and max. frequency by XST-->
+        <tab sloupce="cccccc">
+            <tr>
+                <th>DATA_SIZE</th>
+                <th>DATA_WIDTH</th>
+                <th>FL_IN_WIDTH</th>
+                <th>ALIGN_OLD</th>
+                <th>Slices (% of C6X slices)</th>
+                <th>BRAMs (% of C6X BRAMs)</th>
+            </tr>
+            <tr>
+                <th>128 (bytes)</th>
+                <th>32 (bits)</th>
+                <th>32 (bits)</th>
+                <th>false</th>
+                <td>61 (0 %)</td>
+                <td>2 (0 %)</td>
+            </tr>
+            <tr>
+                <th>64 (bytes)</th>
+                <th>16 (bits)</th>
+                <th>32 (bits)</th>
+                <th>true</th>
+                <td>26 (0 %)</td>
+                <td>1 (0 %)</td>
+            </tr>
+        <nazev>Chip utilization</nazev>
+        </tab>
+
+        <tab sloupce="ccccc">
+            <tr>
+                <th>DATA_SIZE</th>
+                <th>DATA_WIDTH</th>
+                <th>FL_IN_WIDTH</th>
+                <th>ALIGN_OLD</th>
+                <th>Max.frequency by XST</th>
+            </tr>
+            <tr>
+                <th>128 (bytes)</th>
+                <th>32 (bits)</th>
+                <th>32 (bits)</th>
+                <th>false</th>
+                <td>203 MHz</td>
+            </tr>
+            <tr>
+                <th>64 (bytes)</th>
+                <th>16 (bits)</th>
+                <th>32 (bits)</th>
+                <th>true</th>
+                <td>264 MHz</td>
+            </tr>
+        <nazev>Maximal frequency</nazev>
+        </tab>
+    </p>
+
+</body>
+
+</source>

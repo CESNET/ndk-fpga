@@ -1,0 +1,35 @@
+# dfifo.fdo: Top Level Function simulation file for dfifo
+# Copyright (C) 2009 CESNET
+# Author: Jiri Novotnak <xnovot87@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+# For whole design testing
+set FIRMWARE_BASE       "../../../../../.."
+set COMP_BASE           "$FIRMWARE_BASE/comp"
+set FL_FIFO_BASE        ".."
+set TB_FILE             "$FL_FIFO_BASE/sim/dfifo_tb.vhd"
+set SIG_FILE            "$FL_FIFO_BASE/sim/dfifo_sig.fdo"
+set FL_SIM_BASE         "../../../debug/sim"
+
+set FL_SIM              "FULL"
+
+# Modules definition
+set COMPONENTS [list [list "FL_FIFO"  $FL_FIFO_BASE   "FULL"] \
+               [list "FL_SIM"         $FL_SIM_BASE           $FL_SIM] ]
+
+set MOD ""
+
+
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 60us
+

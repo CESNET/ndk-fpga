@@ -1,0 +1,20 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2015 CESNET
+# Author: Kamil Vojanec <xvojan00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_URAM { } {
+
+    global URAM_PATH
+    add_wave "-noupdate -hex -label PIPE_EN" /$URAM_PATH/PIPE_EN
+    add_wave "-noupdate -hex -label REB" /$URAM_PATH/REB
+    add_wave "-noupdate -hex -label WEA" /$URAM_PATH/WEA
+    add_wave "-noupdate -hex -label ADDR" /$URAM_PATH/ADDRA
+    add_wave "-noupdate -hex -label DI" /$URAM_PATH/DIA
+    add_wave "-noupdate -hex -label DOB_DV" /$URAM_PATH/DOB_DV
+    add_wave "-noupdate -hex -label DOB" /$URAM_PATH/DOB
+}

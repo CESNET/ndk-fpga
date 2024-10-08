@@ -1,0 +1,21 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2021 CESNET
+# Author: Marek Santa <santa@liberouter.org>
+#         Tomáš Beneš <xbenes55@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc mi {NAME INT PATH} {
+     add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label MI_${NAME}_DWR"     $PATH/${INT}_DWR
+     add_wave "-noupdate  -hex -label MI_${NAME}_ADDR"    $PATH/${INT}_ADDR
+     add_wave "-noupdate  -label MI_${NAME}_RD"           $PATH/${INT}_RD
+     add_wave "-noupdate  -label MI_${NAME}_WR"           $PATH/${INT}_WR
+     add_wave "-noupdate  -hex -label MI_${NAME}_BE"      $PATH/${INT}_BE
+     add_wave "-noupdate  -hex -label MI_${NAME}_DRD"     $PATH/${INT}_DRD
+     add_wave "-noupdate  -label MI_${NAME}_ARDY"         $PATH/${INT}_ARDY
+     add_wave "-noupdate  -label MI_${NAME}_DRDY"         $PATH/${INT}_DRDY
+}

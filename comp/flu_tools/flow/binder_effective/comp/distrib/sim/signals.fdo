@@ -1,0 +1,87 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author(s): Pavel Benacek <benacek@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# -------------------------------------------------------------------------
+#                       Waveform Definition
+# -------------------------------------------------------------------------
+
+proc blk_DISTRIB { } {
+    #global TESTBENCH_PATH
+    global DISTRIB_PATH
+
+    # CLK & Reset
+    add wave -divider "Clocks & Reset"
+    add wave -label "CLK" -noupdate      $DISTRIB_PATH/CLK
+    add wave -label "RESET" -noupdate    $DISTRIB_PATH/RESET
+
+    # Input
+    add wave -divider "RX Interface"
+    add wave -noupdate -hex -label "RX_DATA"        $DISTRIB_PATH/RX_DATA
+    add wave -noupdate -hex -label "RX_SOP_POS"     $DISTRIB_PATH/RX_SOP_POS
+    add wave -noupdate -hex -label "RX_EOP_POS"     $DISTRIB_PATH/RX_EOP_POS
+    add wave -noupdate -label "RX_SOP"              $DISTRIB_PATH/RX_SOP
+    add wave -noupdate -label "RX_EOP"              $DISTRIB_PATH/RX_EOP
+    add wave -noupdate -label "RX_SRC_RDY"          $DISTRIB_PATH/RX_SRC_RDY
+    add wave -noupdate -label "RX_DST_RDY"          $DISTRIB_PATH/RX_DST_RDY
+    add wave -noupdate -label "DISTRIBUTED_TO"      $DISTRIB_PATH/DISTRIBUTED_TO
+
+    # Output (lane 0)
+    add wave -divider "TX Interface (lane 1)"
+    add wave -noupdate -hex -label "TX_DATA0"       $DISTRIB_PATH/TX_DATA0
+    add wave -noupdate -hex -label "TX_SOP_POS0"    $DISTRIB_PATH/TX_SOP_POS0
+    add wave -noupdate -hex -label "TX_EOP_POS0"    $DISTRIB_PATH/TX_EOP_POS0
+    add wave -noupdate -label "TX_SOP0"             $DISTRIB_PATH/TX_SOP0
+    add wave -noupdate -label "TX_EOP0"             $DISTRIB_PATH/TX_EOP0
+    add wave -noupdate -label "TX_SRC_RDY0"         $DISTRIB_PATH/TX_SRC_RDY0
+    add wave -noupdate -label "TX_DST_RDY0"         $DISTRIB_PATH/TX_DST_RDY0
+
+    # Output (lane 1)
+    add wave -divider "TX Interface (lane 2)"
+    add wave -noupdate -hex -label "TX_DATA1"       $DISTRIB_PATH/TX_DATA1
+    add wave -noupdate -hex -label "TX_SOP_POS1"    $DISTRIB_PATH/TX_SOP_POS1
+    add wave -noupdate -hex -label "TX_EOP_POS1"    $DISTRIB_PATH/TX_EOP_POS1
+    add wave -noupdate -label "TX_SOP1"             $DISTRIB_PATH/TX_SOP1
+    add wave -noupdate -label "TX_EOP1"             $DISTRIB_PATH/TX_EOP1
+    add wave -noupdate -label "TX_SRC_RDY1"         $DISTRIB_PATH/TX_SRC_RDY1
+    add wave -noupdate -label "TX_DST_RDY1"         $DISTRIB_PATH/TX_DST_RDY1
+
+}
+
+proc blk_OTHER { } {
+    #global TESTBENCH_PATH
+    global DISTRIB_PATH
+
+   add wave -divider "Internal signals"
+   add wave -noupdate -label "in_rx_data" -hex        $DISTRIB_PATH/in_rx_data
+   add wave -noupdate -label "in_rx_sop_pos" -hex     $DISTRIB_PATH/in_rx_sop_pos
+   add wave -noupdate -label "in_rx_eop_pos" -hex     $DISTRIB_PATH/in_rx_eop_pos
+   add wave -noupdate -label "in_rx_sop"           $DISTRIB_PATH/in_rx_sop
+   add wave -noupdate -label "in_rx_eop"           $DISTRIB_PATH/in_rx_eop
+   add wave -noupdate -label "in_rx_src_rdy"       $DISTRIB_PATH/in_rx_src_rdy
+   add wave -noupdate -label "in_rx_dst_rdy"       $DISTRIB_PATH/in_rx_dst_rdy
+
+   add wave -noupdate -label "distributed_to_out"  $DISTRIB_PATH/distributed_to_out
+
+   add wave -noupdate -label "out_tx_data0" -hex      $DISTRIB_PATH/out_tx_data0
+   add wave -noupdate -label "out_tx_sop_pos0" -hex   $DISTRIB_PATH/out_tx_sop_pos0
+   add wave -noupdate -label "out_tx_eop_pos0" -hex   $DISTRIB_PATH/out_tx_eop_pos0
+   add wave -noupdate -label "out_tx_sop0"            $DISTRIB_PATH/out_tx_sop0
+   add wave -noupdate -label "out_tx_eop0"            $DISTRIB_PATH/out_tx_eop0
+   add wave -noupdate -label "out_tx_src_rdy0"        $DISTRIB_PATH/out_tx_src_rdy0
+   add wave -noupdate -label "out_tx_dst_rdy0"        $DISTRIB_PATH/out_tx_dst_rdy0
+   add wave -noupdate -label "out_tx_data1" -hex      $DISTRIB_PATH/out_tx_data1
+   add wave -noupdate -label "out_tx_sop_pos1" -hex   $DISTRIB_PATH/out_tx_sop_pos1
+   add wave -noupdate -label "out_tx_eop_pos1" -hex   $DISTRIB_PATH/out_tx_eop_pos1
+   add wave -noupdate -label "out_tx_sop1"            $DISTRIB_PATH/out_tx_sop1
+   add wave -noupdate -label "out_tx_eop1"            $DISTRIB_PATH/out_tx_eop1
+   add wave -noupdate -label "out_tx_src_rdy1"        $DISTRIB_PATH/out_tx_src_rdy1
+   add wave -noupdate -label "out_tx_dst_rdy1"        $DISTRIB_PATH/out_tx_dst_rdy1
+
+   add wave -noupdate -label "flu_distrib_mask"       $DISTRIB_PATH/flu_distrib_mask
+   add wave -noupdate -label "flu_distrib_rdy"        $DISTRIB_PATH/flu_distrib_rdy
+   add wave -noupdate -label "flu_distrib_next"       $DISTRIB_PATH/flu_distrib_next
+}

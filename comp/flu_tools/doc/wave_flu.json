@@ -1,0 +1,10 @@
+{signal: [
+  {name: 'CLK',     wave: 'p...........'},
+  {name: 'DATA',    wave: 'x3..x4.5x.6x', data: ['A', 'A', 'AB', 'B']},
+  {name: 'SOP_POS', wave: 'x3..x..5x...', data: ['02', '02']},
+  {name: 'EOP_POS', wave: 'x......5x.6x', data: ['0C', '1F']},
+  {name: 'SOP',     wave: '01..0..10...'},
+  {name: 'EOP',     wave: '0......10.10'},
+  {name: 'SRC_RDY', wave: '01..01..0.10'},
+  {name: 'DST_RDY', wave: '0..10.1.01..'},
+]}

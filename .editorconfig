@@ -1,0 +1,23 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+
+[Makefile]
+indent_style = tab
+
+# Ignore section
+[*.{pcap,ip}]
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
+charset = unset
+
+[*.drawio]
+end_of_line = false
+insert_final_newline = false
+trim_trailing_whitespace = false
+charset = unset

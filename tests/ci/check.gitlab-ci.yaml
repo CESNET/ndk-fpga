@@ -1,0 +1,14 @@
+editorconfig:
+  stage: check
+  needs: []
+  image: mstruebing/editorconfig-checker
+  script: [ec]
+
+pycodestyle:
+  stage: check
+  needs: []
+  image:
+    name: plone/code-quality
+    entrypoint: [""]
+  script:
+    - sh tests/ci/pycodestyle.sh

@@ -1,0 +1,29 @@
+# n_loop_op_pro.fdo: Functional simulation file for merger from n inputs to m outputs
+# Copyright (C) 2018 CESNET
+# Author: Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../.."
+set DUT_BASE         ".."
+
+set MAKEFILE_GEN "true"
+
+# adding DMA Module top signals
+
+set SIG_FILE            "./n_loop_op_pro_sig.fdo"
+set TB_FILE             "./testbench.vhd"
+
+set COMPONENTS [list \
+   [list "DUT"      $DUT_BASE       "FULL"]\
+]
+
+set SIM_FLAGS(VOPT_ARGS) "+acc"
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+set  StdArithNoWarnings 1
+set NumericStdNoWarnings 1
+
+nb_sim_run 250us

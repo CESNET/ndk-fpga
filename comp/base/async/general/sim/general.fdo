@@ -1,0 +1,24 @@
+# synchronizer.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Authors: Jakub Cabal
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set GENERAL_BASE	   "$FIRMWARE_BASE/comp/base/async/general"
+
+set TB_FILE          "$GENERAL_BASE/sim/testbench.vhd"
+set SIG_FILE         "$GENERAL_BASE/sim/general_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list [list "ASYNC_GENERAL"  "$GENERAL_BASE" "FULL"]]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# File with signals
+nb_sim_run 1000ns

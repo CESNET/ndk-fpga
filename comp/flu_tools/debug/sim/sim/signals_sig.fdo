@@ -1,0 +1,16 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2014CESNET
+# Author: Ivan Bryndza <xbrynd00@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Global file with signals
+
+
+source "./signals.fdo"
+
+flu_bfm FLU_BFM /testbench
+

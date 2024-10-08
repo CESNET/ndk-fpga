@@ -1,0 +1,16 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author:   Oliver Gurka <xgurka00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "MVB_GEN_MUX"
+
+add_wave "-noupdate -color yellow -label RST"   /testbench/RST
+add_wave "-noupdate -color yellow -label CLK"   /testbench/CLK
+
+all ALL /testbench/DUT_U/VHDL_DUT_U
+
+config wave -signalnamewidth 1

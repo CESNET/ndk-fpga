@@ -1,0 +1,15 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Daniel Kriz <danielkriz@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add_wave "-noupdate -color yellow -label CLK"   /testbench/DUT_U/VHDL_DUT_U/CLK
+add_wave "-noupdate -color yellow -label RESET"   /testbench/DUT_U/VHDL_DUT_U/RESET
+
+all MTC /testbench/DUT_U/VHDL_DUT_U
+all ADDR_TRANS /testbench/DUT_U/VHDL_DUT_U/addr_trans_i
+
+config wave -signalnamewidth 1

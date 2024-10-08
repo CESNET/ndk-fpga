@@ -1,0 +1,33 @@
+# signals_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET
+# Author: Tomas Hak <xhakto01@stud.fit.vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+source "./signals.fdo"
+
+add wave -divider "DUT"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+add_wave "-group { all } -noupdate" /testbench/*
+add_wave "-group { all } -group { DUT } -group { top                   } -noupdate" /testbench/DUT_U/VHDL_DUT_U/*
+add_wave "-group { all } -group { DUT } -group { rx_to_min_item_rec_i  } -noupdate" /testbench/DUT_U/VHDL_DUT_U/rx_to_min_item_rec_i/*
+add_wave "-group { all } -group { DUT } -group { rx_to_min_block_rec_i } -noupdate" /testbench/DUT_U/VHDL_DUT_U/rx_to_min_block_rec_i/*
+add_wave "-group { all } -group { DUT } -group { rx_to_min_reg_rec_i   } -noupdate" /testbench/DUT_U/VHDL_DUT_U/rx_to_min_reg_rec_i/*
+add_wave "-group { all } -group { DUT } -group { rx_to_min_trans_i     } -noupdate" /testbench/DUT_U/VHDL_DUT_U/rx_to_min_trans_i/*
+add_wave "-group { all } -group { DUT } -group { min_to_tx_item_rec_i  } -noupdate" /testbench/DUT_U/VHDL_DUT_U/min_to_tx_item_rec_i/*
+add_wave "-group { all } -group { DUT } -group { min_to_tx_block_rec_i } -noupdate" /testbench/DUT_U/VHDL_DUT_U/min_to_tx_block_rec_i/*
+add_wave "-group { all } -group { DUT } -group { min_to_tx_reg_rec_i   } -noupdate" /testbench/DUT_U/VHDL_DUT_U/min_to_tx_reg_rec_i/*
+add_wave "-group { all } -group { DUT } -group { min_to_tx_trans_i     } -noupdate" /testbench/DUT_U/VHDL_DUT_U/min_to_tx_trans_i/*
+
+#add wave -divider "DEBUG"
+#add wave -divider "DOWN_ARCH"
+#add_wave "-noupdate -label sel"                   /testbench/DUT_U/VHDL_DUT_U/gen_arch_down_g/mfb_transformer_down_i/sel
+#add_wave "-noupdate -label inside_packet_reg"     /testbench/DUT_U/VHDL_DUT_U/gen_arch_down_g/mfb_transformer_down_i/inside_packet_reg
+
+#add wave -divider "UP_ARCH"
+#add_wave "-noupdate -label cnt"                   /testbench/DUT_U/VHDL_DUT_U/gen_arch_up_g/mfb_transformer_up_i/cnt
+#add_wave "-noupdate -label last_eop"              /testbench/DUT_U/VHDL_DUT_U/gen_arch_up_g/mfb_transformer_up_i/last_eop
+#add_wave "-noupdate -label export"                /testbench/DUT_U/VHDL_DUT_U/gen_arch_up_g/mfb_transformer_up_i/export
+#add_wave "-noupdate -label export_sel"            /testbench/DUT_U/VHDL_DUT_U/gen_arch_up_g/mfb_transformer_up_i/export_sel
+

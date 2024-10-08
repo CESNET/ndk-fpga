@@ -1,0 +1,27 @@
+# sim_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Daniel Kříž <xkrizd01@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Paths
+set TB_PATH          "/testbench"
+
+# include signals
+source "signals.fdo"
+
+puts "Numeric Std Warnings - Disabled"
+set NumericStdNoWarnings 1
+
+all TOP $TB_PATH/uut
+all MEMX $TB_PATH/uut/memx_i
+all  testbench $TB_PATH
+add_wave "-group {testbench} -noupdate -hex" $TB_PATH/fifo
+#all  testbench $TB_PATH/fifo_read_p
+#all AVST2AXICQ $TB_PATH/pcie_avst2axicq_i
+#all AXI2MI $TB_PATH/axi2mi_i
+#all mi_int_i $TB_PATH/axi2mi_i/mi_int_i
+#all cc_int_i $TB_PATH/axi2mi_i/cc_int_i
+#all AXICC2AVST $TB_PATH/pcie_axicc2avst_i
+
+wave zoomrange 0 1000ns

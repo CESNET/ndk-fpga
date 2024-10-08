@@ -1,0 +1,37 @@
+# mi32_async.fdo: Top Level Function simulation file
+# Copyright (C) 2021 CESNET
+# Author: Jiri Matousek <xmatou06@stud.fit.vutbr.cz>
+#         Tomáš Beneš <xbenes55@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# For whole design testing
+set FIRMWARE_BASE                 "../../../.."
+set COMP_BASE                     "$FIRMWARE_BASE/comp"
+set MI_PIPE_DUT_BASE ".."
+set MI_PIPE_VER_BASE "."
+
+set TB_FILE                       "./tbench/testbench.sv"
+set SIG_FILE                      "./top_level_sig.fdo"
+
+# components list
+set COMPONENTS [list \
+   [list "MI_PIPE_DUT_BASE" $MI_PIPE_DUT_BASE "FULL"] \
+   [list "MI_PIPE_VER_BASE" $MI_PIPE_VER_BASE "FULL"] \
+]
+
+# Enable Code Coverage
+set CODE_COVERAGE "true"
+
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run
+#reports
+#coverage report -html -htmldir cov_html -instance /testbench/DUT_U -source -details -assert -directive -cvg -code bcefst -verbose -threshL 50 -threshH 90

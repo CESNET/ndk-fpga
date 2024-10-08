@@ -1,0 +1,104 @@
+<source>
+
+    <component>First one detector component</component>
+
+<authors>
+   <author login="pazdera">Jan Pazdera</author>
+</authors>
+
+<features>
+    <item> First one detection in input std_logic_vector  </item>
+</features>
+
+<bugs>
+</bugs>
+
+<todo>
+</todo>
+
+<description>
+    This component performs detection of first one in input bit
+    vector. The first one position is in one-hot and binary format.
+</description>
+
+<interface>
+	<generic_map>
+        <generic name="DATA_WIDTH" type="integer" default="-">
+            Data width
+        </generic>
+    </generic_map>
+
+<port_map>
+    <port name="MASK" dir="in" width="DATA_WIDTH">
+         Reset signal
+     </port>
+     <port name="FIRST_ONE_ONEHOT" dir="out" width="DATA_WIDTH">
+         Position of the first 'one' in ONEHOT coding
+     </port>
+     <port name="FIRST_ONE_BINARY" dir="out" width="log2(DATA_WIDTH)">
+         Position of the first 'one' in BINARY coding
+     </port>
+     <port name="FIRST_ONE_PRESENT" dir="out" width="1">
+         Deasserted if no 'one' is present in input MASK
+     </port>
+ </port_map>
+
+</interface>
+
+
+<body>
+<p>
+    This component (FOD) performs detection of first one in input bit
+    vector. The first one position is in one-hot and binary format.
+    FOD is combinational component with no flip-flops so the output is
+    available in the next clock.
+</p>
+
+<h1>Frequency and Resources usage (XST)</h1>
+
+	<p>
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Slices (% of C6X slices)</th>
+				<th>BlockRams (+ % of C6X BRAMs)</th>
+			</tr>
+			<tr>
+				<th>DATA_WIDTH = 8</th>
+				<td>7(0%)</td>
+				<td>0(0%)</td>
+			</tr>
+			<tr>
+				<th>DATA_WIDTH = 16</th>
+				<td>17(0%)</td>
+				<td>0(0%)</td>
+			</tr>
+		<nazev>Chip utilization</nazev>
+		</tab>
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Maximum combinational path delay by XST</th>
+				<th>Frequency tested in HW</th>
+			</tr>
+			<tr>
+				<th>DATA_WIDTH = 8</th>
+				<td>8.650 ns</td>
+				<td>50 MHz, 100 MHz</td>
+			</tr>
+			<tr>
+				<th>DATA_WIDTH = 16</th>
+				<td>11.429 ns</td>
+                <td>N/A</td>
+			</tr>
+		<nazev>Maximal frequency</nazev>
+		</tab>
+
+  </p>
+
+</body>
+
+</source>
+

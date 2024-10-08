@@ -1,0 +1,45 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc blk_CAM { } {
+   global CAM_PATH
+
+   add wave -divider "CAM"
+   add_wave "-label reset -color yellow" $CAM_PATH/reset
+   add_wave "-label clk -color yellow" $CAM_PATH/clk
+   add wave -divider "Control signals"
+   add_wave "-label write_en" $CAM_PATH/write_en
+   add_wave "-label match_en" $CAM_PATH/match_en
+   add_wave "-label match_rdy" $CAM_PATH/match_rdy
+   add_wave "-label match_rst" $CAM_PATH/match_rst
+   add wave -divider "Input data"
+   add_wave "-label addr" $CAM_PATH/addr
+   add_wave "-label data_in" $CAM_PATH/data_in
+   add_wave "-label mask_in" $CAM_PATH/mask_in
+   add wave -divider "Output data"
+   add_wave "-label match_bus" $CAM_PATH/match_bus
+   add_wave "-label match_bus_vld" $CAM_PATH/match_bus_vld
+}
+
+
+proc blk_CAM_INT { } {
+   global CAM_PATH
+
+   add wave -divider "CAM internals"
+   add_wave "-label filling_part/addr_out" $CAM_PATH/data_array/filling_part/addr_out
+   add_wave "-label filling_part/write_enable_out" $CAM_PATH/data_array/filling_part/write_enable_out
+   add_wave "-label filling_part/write_enable_bus" $CAM_PATH/data_array/filling_part/write_enable_bus
+   add_wave "-label filling_part/data_fill_bus" $CAM_PATH/data_array/filling_part/data_fill_bus
+   add_wave "-label data_array/MATCH_ENABLE" $CAM_PATH/data_array/MATCH_ENABLE
+   add_wave "-label data_array/reg_match_enable" $CAM_PATH/data_array/reg_match_enable
+   add_wave "-label data_array/data_in_seq" $CAM_PATH/data_array/data_in_seq
+   add_wave "-label data_array/match_out" $CAM_PATH/data_array/match_out
+   add_wave "-label data_array/reg_match_out" $CAM_PATH/data_array/reg_match_out
+   add_wave "-label data_array/cnt_search" $CAM_PATH/data_array/cnt_search
+   add_wave "-label data_array/cnt_search_dly" $CAM_PATH/data_array/cnt_search_dly
+}

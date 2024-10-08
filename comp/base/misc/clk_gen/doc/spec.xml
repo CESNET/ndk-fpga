@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<source>
+
+<!-- Page name -->
+<component>Clk gen</component>
+
+
+<!-- Authors worked on -->
+<authors>
+</authors>
+
+
+<!-- Versions list -->
+<versions>
+</versions>
+
+
+<!-- Bugs -->
+<bugs>
+</bugs>
+
+<!-- What have to be done -->
+<todo>
+</todo>
+
+
+<!-- Short Block description -->
+<description>
+
+	Documentation under construction..
+
+</description>
+
+<!-- COMPONENT INTERFACE ************************************************* -->
+<interface>
+
+	<generic_map>
+	</generic_map>
+
+	<port_map>
+	</port_map>
+
+</interface>
+
+
+<!-- CONSTANT SECTION ************************************************* -->
+
+<constant>
+</constant>
+
+
+<!-- OPERATIONS SECTION ************************************************* -->
+
+<operations>
+</operations>
+
+
+<!-- STRUCTURE ************************************************* -->
+<structure src="./fig/block_struct.fig">
+</structure>
+
+<schemes>
+</schemes>
+
+
+<!-- ADDRESS SPACE ************************************************* -->
+<addr_space id ="MAIN" name="Main" main="yes">
+</addr_space>
+
+
+<!-- *********************** Registers description  ********************* -->
+
+
+<!-- BODY ************************************************* -->
+<body>
+</body>
+
+</source>

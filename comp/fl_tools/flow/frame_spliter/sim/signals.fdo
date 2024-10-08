@@ -1,0 +1,39 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Jan Kastil <xkasti00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc fl_sim {NAME PATH} {
+    add wave -divider "$NAME"
+      add_wave "-noupdate -color yellow -label RESET" $PATH/RESET
+      add_wave "-noupdate -color yellow -label CLK"   $PATH/FL_CLK
+      add_wave "-noupdate -hex -label FRAME_LINK_BUS"   $PATH/FL_BUS
+      add_wave "-noupdate -label CTRL"   $PATH/fl_sim_ctrl
+      add_wave "-noupdate -label STROBE"   $PATH/fl_sim_strobe
+      add_wave "-noupdate -label BUSY"   $PATH/fl_sim_busy
+      add wave -divider "$NAME - IN BUS"
+      add_wave "-noupdate -hex -label FRAME_LINK_BUS"   /testbench/FL_SIM_U/AUX_FL_BUS2
+      add wave -divider "$NAME - LOGGING"
+      add_wave "-noupdate -hex -label AUX_FL_BUS"   /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/AUX_FL_BUS
+
+add wave -divider "FRAME_SPLITER"
+add_wave "-noupdate -label Status" /testbench/uut/Status
+add_wave "-noupdate -label Statusp" /testbench/uut/Statusp
+add_wave "-noupdate -label Counter" /testbench/uut/counter
+add_wave "-noupdate -label Stat1" /testbench/uut/Stat1
+
+add wave -divider INPUT
+add_wave "-noupdate -label StartFrame" /testbench/uut/RX_SOF_N
+add_wave "-noupdate -label OUT1" /testbench/fl_bus_out1
+add_wave "-noupdate -label OUT2" /testbench/fl_bus_out2
+add_wave "-noupdate -label Rovnost" /testbench/uut/rovnost
+add_wave "-noupdate -label Rovnost2" /testbench/uut/rovnost2
+}

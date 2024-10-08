@@ -1,0 +1,31 @@
+# tb_nfifo2mem.fdo: NFIFO2MEM simulation
+# Copyright (C) 2008 CESNET
+# Author: Vozenilek Jan <xvozen00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# For whole design testing
+set FIRMWARE_BASE "../../../.."
+set BASECOMP_BASE "$FIRMWARE_BASE/comp/base"
+set BUF_TOP_BASE  "$BASECOMP_BASE/buffers/top"
+set TB_FILE       "tb_fifo2nfifo.vhd"
+set SIG_FILE      "signals.fdo"
+
+set MOD $TB_FILE
+set PACKAGES ""
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "FIFO2NFIFO" $BUF_TOP_BASE FULL] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 2us

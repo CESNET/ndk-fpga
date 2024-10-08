@@ -1,0 +1,19 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2013 CESNET
+# Author: Viktor Pus <pus@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_XOR48 { } {
+
+    global XOR48_PATH
+
+    add_wave "-noupdate -hex -label A" /$XOR48_PATH/A
+    add_wave "-noupdate -hex -label B" /$XOR48_PATH/B
+    add_wave "-noupdate -hex -label CEAB" /$XOR48_PATH/CEAB
+    add_wave "-noupdate -hex -label CEP" /$XOR48_PATH/CEP
+    add_wave "-noupdate -hex -label P" /$XOR48_PATH/P
+}

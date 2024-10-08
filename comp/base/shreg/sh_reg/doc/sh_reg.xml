@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>Shift register</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="martinek">Martinek Tomas</author>
+       <author login="tomalek">Tomas Malek</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+	<item>Generic shift register</item>
+</features>
+
+
+<!-- Bugs -->
+<bugs>
+	<item>Not known bugs</item>
+</bugs>
+
+
+<!-- Things to do -->
+<todo>
+
+</todo>
+
+
+<!-- Short Block description -->
+<description>
+
+	<!-- THE MOST IMPORTANT PART!!! There should be about 8 rows which
+	     fully describe the component and its main functions -->
+
+	sh_reg is a generic shift register based on SRL16 component
+
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+
+		<generic name="NUM_BITS" type="integer" default="16">
+			Number of bits in the register
+		</generic>
+		<generic name="INIT" type="std_logic_vector(15 downto 0)" default="0">
+			init value
+		</generic>
+		<generic name="INIT_EXT00" type="std_logic_vector(63 downto 0)" default="0">
+			extended init value
+		</generic>
+
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Common signals</divider>
+		<port  name="CLK" dir="in" width="1">
+			Clock
+		</port>
+		<port name="CE" dir="in" width="1">
+			Clock enable
+		</port>
+
+		<divider>Input/output interface</divider>
+		<port name="DIN" dir="in" width="1">
+			Data in
+		</port>
+		<port name="DOUT" dir="out" width="1">
+			Data out
+		</port>
+
+	</port_map>
+
+</interface>
+
+
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+
+
+</body>
+
+
+
+</source>

@@ -1,0 +1,47 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2013 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc rx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label RX_DATA"       $PATH/RX_DATA
+     add_wave "-noupdate  -hex -label RX_SOP_POS"    $PATH/RX_SOP_POS
+     add_wave "-noupdate  -hex -label RX_EOP_POS"    $PATH/RX_EOP_POS
+     add_wave "-noupdate  -label RX_SOP"        $PATH/RX_SOP
+     add_wave "-noupdate  -label RX_EOP"        $PATH/RX_EOP
+     add_wave "-noupdate  -label RX_SRC_RDY"    $PATH/RX_SRC_RDY
+     add_wave "-noupdate  -label RX_DST_RDY"    $PATH/RX_DST_RDY
+     add_wave "-noupdate  -hex -label HDR_DATA" $PATH/HDR_DATA
+     add_wave "-noupdate  -label HDR_READY"     $PATH/HDR_READY
+     add_wave "-noupdate  -label HDR_NEXT"      $PATH/HDR_NEXT
+}
+
+proc tx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label TX_DATA"       $PATH/TX_DATA
+     add_wave "-noupdate  -hex -label TX_SOP_POS"    $PATH/TX_SOP_POS
+     add_wave "-noupdate  -hex -label TX_EOP_POS"    $PATH/TX_EOP_POS
+     add_wave "-noupdate  -label TX_SOP"        $PATH/TX_SOP
+     add_wave "-noupdate  -label TX_EOP"        $PATH/TX_EOP
+     add_wave "-noupdate  -label TX_SRC_RDY"    $PATH/TX_SRC_RDY
+     add_wave "-noupdate  -label TX_DST_RDY"    $PATH/TX_DST_RDY
+}
+
+proc internal {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -hex -label in_data"     $PATH/in_data
+     add_wave "-noupdate  -hex -label mux_data"    $PATH/mux_data
+     add_wave "-noupdate  -hex -label reg_data"    $PATH/reg_data
+     add_wave "-noupdate  -hex -label out_data"    $PATH/out_data
+     add_wave "-noupdate  -hex -label hdr"         $PATH/hdr
+     add_wave "-noupdate  -hex -label aligned_hdr" $PATH/aligned_hdr
+}

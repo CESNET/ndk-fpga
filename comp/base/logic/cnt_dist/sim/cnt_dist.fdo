@@ -1,0 +1,26 @@
+# cnt_dist.fdo : Include file with signals
+# Copyright (C) 2005 CESNET
+# Authors: Martin Mikusek <martin.mikusek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+vlib work
+vdel -all work
+vlib work
+
+vcom -93 -explicit -work work ../../pkg/math_pack.vhd
+vcom -93 -explicit -work work ../../dp_distmem/distmem_func.vhd
+vcom -93 -explicit -work work ../../dp_distmem/dp_distmem_distram.vhd
+vcom -93 -explicit -work work ../../dp_distmem/dp_distmem.vhd
+vcom -93 -explicit -work work ../cnt_dist.vhd
+vcom -93 -explicit -work work cnt_dist_tb.vhd
+vsim -t 1ps  -L xilinxcorelib  -lib work testbench
+
+view wave
+add wave *
+
+restart -f
+run 1000 ns

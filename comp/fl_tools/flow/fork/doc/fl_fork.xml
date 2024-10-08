@@ -1,0 +1,162 @@
+<source>
+
+    <component>
+        FrameLink Fork component
+    </component>
+
+    <authors>
+        <author login="xkosar02">
+            Vlastimil Kosar
+        </author>
+    </authors>
+
+    <features>
+        <item>
+            Supports rx/tx FrameLink data bus width of 16, 32, 64 and 128 bits.
+        </item>
+        <item>
+            Split input FrameLink dataflow to output ports and waits until all devices are ready to receive data.
+        </item>
+    </features>
+
+    <description>
+        This FrameLink fork component splits input FrameLink dataflow to ouput ports and waits until all devices are ready to receive data. Component suports FrameLink data bus width of 16, 32, 64 and 128 bits. Exists wrappers for 2,3 and 4 port output interfaces.
+    </description>
+
+    <interface>
+
+        <generic_map>
+            <generic name="DATA_WIDTH" type="integer" default="32">
+		    RX/TX interface data bus width (16, 32, 64 and 128 bits supported).
+            </generic>
+	    <generic name="OUTPUT_PORTS" type="integer" default="2">
+		    Number of output interfaces.
+            </generic>
+        </generic_map>
+
+        <port_map>
+	    <port name="CLK" dir="in" width="1">
+		Clock input.
+            </port>
+            <port name="RESET" dir="in" width="1">
+                Global reset.
+            </port>
+
+
+	    <divider>
+	  	    RX FrameLink interface
+	    </divider>
+	    <port name="RX_DATA" dir="in" width="DATA_WIDTH">
+		    RX data bus.
+	    </port>
+	    <port name="RX_REM" dir="in" width="log2(DATA_WIDTH/8)">
+		    RX data remainder.
+	    </port>
+	    <port name="RX_SRC_RDY_N" dir="in" width="1">
+		    RX source ready.
+	    </port>
+	    <port name="RX_DST_RDY_N" dir="out" width="1">
+		    RX destination ready.
+            </port>
+	    <port name="RX_SOP_N" dir="in" width="1">
+		    RX start of packet (segment).
+	    </port>
+	    <port name="RX_EOP_N" dir="in" width="1">
+		    RX end of packet (segment).
+	    </port>
+	    <port name="RX_SOF_N" dir="in" width="1">
+		    RX start of frame.
+	    </port>
+	    <port name="RX_EOF_N" dir="in" width="1">
+		    RX end of frame.
+	    </port>
+
+
+
+            <divider>
+                TX FrameLink interface - concentrated ports (use wrappers for spliting to
+                output interfaces)
+            </divider>
+            <port name="TX_DATA" dir="out" width="OUTPUT_PORTS*DATA_WIDTH">
+                TX data bus.
+            </port>
+            <port name="TX_REM" dir="out" width="OUTPUT_PORTS*log2(DATA_WIDTH/8)">
+                TX data remainder.
+            </port>
+            <port name="TX_SRC_RDY_N" dir="out" width="OUTPUT_PORTS">
+		    TX source ready.
+	    </port>
+            <port name="TX_DST_RDY_N" dir="in" width="OUTPUT_PORTS">
+		    TX destination ready.
+            </port>
+            <port name="TX_SOP_N" dir="out" width="OUTPUT_PORTS">
+		    TX start of packet (segment).
+	    </port>
+            <port name="TX_EOP_N" dir="out" width="OUTPUT_PORTS">
+		    TX end of packet (segment).
+            </port>
+            <port name="TX_SOF_N" dir="out" width="OUTPUT_PORTS">
+                TX start of frame.
+            </port>
+            <port name="TX_EOF_N" dir="out" width="OUTPUT_PORTS">
+                TX end of frame.
+            </port>
+        </port_map>
+
+    </interface>
+
+    <body>
+
+        <h1>Data alignment</h1>
+	<p>
+            Little-endian byte order is used in this component.
+        </p>
+
+        <h1>FrameLink Fork Component</h1>
+        <p>
+          This FrameLink fork component splits input FrameLink dataflow to ouput ports and waits until all devices are ready to receive data. Component suports FrameLink data bus width of 16, 32, 64 and 128 bits. Exists wrappers for 2,3 and 4 port output interfaces.
+        </p>
+        <h2> Scheme </h2>
+        <p>
+          Scheme of <obr src="./fig/fl_fork.fig">FL_FORK.</obr>
+        </p>
+	<h2>Frequency and Resources usage</h2>
+	<p>
+		<tab sloupce="cccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Slices XST (% of C6X slices)</th>
+                                <th>Slices Precision (% of C6X slices)</th>
+			</tr>
+			<tr>
+                <th>4 port interface</th>
+				<td>1 (0.004%)</td>
+                                <td>1 (0.004%)</td>
+			</tr>
+
+		<nazev>Chip utilization</nazev>
+		</tab>
+
+		<tab sloupce="cccc">
+			<tr>
+				<th>Generic settings</th>
+                                <th>Max.frequency by XST</th>
+				<th>Max.frequency by Precision</th>
+			</tr>
+			<tr>
+                          <th>4 port interface</th>
+				<td>no sequential logic</td>
+                                <td>no sequential logic</td>
+			</tr>
+
+		<nazev>Maximal frequency</nazev>
+		</tab>
+
+         All values was measured after synthesis before PaR.
+       </p>
+       <h2>Wrappers</h2>
+       <p>
+         For splitting concentrated output ports to standalone FrameLink bus output interfaces use wrappers. Wrappers currently exists for 2, 3 and 4 output ports interfaces. This wrappers ara in files named fl_fork_1tox.vhd, where x is number of output ports.
+       </p>
+    </body>
+</source>

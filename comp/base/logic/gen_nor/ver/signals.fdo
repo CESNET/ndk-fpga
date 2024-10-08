@@ -1,0 +1,30 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2018 CESNET
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc tb_signals { PATH } {
+    eval "add wave  -divider {}"
+
+    eval "add wave  -divider {}"
+
+}
+
+proc uut_ports { PATH } {
+
+    eval "add wave  -divider {}"
+
+    add_wave " -noupdate -group { all } -hex" $PATH/DI
+    add_wave " -noupdate -group { all } -hex" $PATH/DO
+
+}
+
+proc uut_internals { PATH } {
+
+    eval "add wave  -divider {}"
+
+    add_wave " -noupdate -group {  } -hex" $PATH/
+
+}

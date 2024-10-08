@@ -1,0 +1,104 @@
+<source>
+
+<component>Fast counter</component>
+
+<authors>
+  <author login="xmikus03">Martin Mikusek</author>
+</authors>
+
+<features>
+   <item>Generic counter width</item>
+   <item>Smaller combinational path in Leonardo</item>
+</features>
+
+<description>
+   Fast counter without load. Direction and Clear port are generic. Solves problem in synthesis of standard counter in Leonardo.
+</description>
+
+<interface>
+   <generic_map>
+      <generic name="WIDTH" type="integer" default="32">
+    Counter width
+      </generic>
+
+      <generic name="DIR" type="TCNT" default="up">
+    Counter direction
+      </generic>
+
+      <generic name="CLEAR" type="boolean" default="false">
+    Enables synchronous reset (CLR port)
+      </generic>
+
+   </generic_map>
+
+<port_map>
+      <port name="RESET" dir="in" width="1">
+    Global reset port.
+      </port>
+
+      <port name="CLK" dir="in" width="1">
+    Global clock port.
+      </port>
+
+      <port name="CE" dir="in" width="1">
+    When asserted, new computed counter value is stored into FDDs.
+      </port>
+
+      <port name="CLR" dir="in" width="1">
+    Synchronous reset.
+      </port>
+
+
+      <port name="DO" dir="out" width="1">
+    Counter actual value. Width is generic.
+      </port>
+   </port_map>
+
+</interface>
+
+<body>
+   <h1>Component information</h1>
+   <p>
+      There is CE signal connected to start of carry chain in standard counter
+      in Leonardo. It's not a good solution because delay of CE signal is added
+      to delay of carry chain. To solve this, CE signal is connected to
+      CE of FFDs so new value of counter is computed allways, but CE enables
+      storing it.
+   </p>
+   <p>
+      When signal CLR is asserted, counter is cleared on next rising CLK edge.
+   </p>
+
+   <h1>Frequency and Resources usage</h1>
+   <p>
+      <tab sloupce="cccc">
+         <tr>
+            <th>Generic settings</th>
+            <th>Slices (% of C6X slices)</th>
+            <th>BlockRams (% of C6X BRAMs)</th>
+            <th>Max. HW frequency</th>
+         </tr>
+         <tr>
+            <th>32b width</th>
+            <td>32 (0.1%)</td>
+            <td>0 (0.0%)</td>
+            <td>150 MHz</td>
+         </tr>
+         <tr>
+            <th>64b width</th>
+            <td>64 (0.3%)</td>
+            <td>0 (0.0%)</td>
+            <td>100 MHz</td>
+         </tr>
+      <nazev>Chip utilization &amp; max design frequency</nazev>
+      </tab>
+   </p>
+
+   <h1>Component scheme</h1>
+   <p>
+      <obr src="fig/cnt.fig">Architecture of 4bit fast counter with synchronous reset</obr>
+   </p>
+
+</body>
+
+</source>

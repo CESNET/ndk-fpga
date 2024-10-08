@@ -1,0 +1,533 @@
+-- testbench.vhd: Testbench
+-- Copyright (C) 2018 CESNET
+-- Author(s): Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+--
+
+library IEEE;
+
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all; 
+use ieee.math_real.all;
+use work.math_pack.all;
+use work.type_pack.all;
+use work.dma_bus_pack.all; -- contains definitions for MVB header fields
+use work.test_pkg.all;
+use std.env.stop;
+use STD.textio.all;
+
+-- ----------------------------------------------------------------------------
+--                        Entity declaration
+-- ----------------------------------------------------------------------------
+
+entity testbench is
+end entity testbench;
+
+-- ----------------------------------------------------------------------------
+--                      Architecture declaration
+-- ----------------------------------------------------------------------------
+
+architecture behavioral of testbench is
+
+   -- Synchronization
+   signal clk                                : std_logic;
+   signal clk_dma                            : std_logic;
+   signal reset                              : std_logic;
+
+   signal new_dma_clk : std_logic := '0';
+   signal dma_clk_used : std_logic := '0';
+
+   -- uut I/O
+
+   signal s_up_mvb_data    : std_logic_vector(MVB_UP_ITEMS*DMA_UPHDR_WIDTH-1 downto 0); -- MVB items
+   signal s_up_mvb_vld     : std_logic_vector(MVB_UP_ITEMS                -1 downto 0); -- MVB item valid
+   signal s_up_mvb_src_rdy : std_logic := '0';
+   signal s_up_mvb_dst_rdy : std_logic;
+
+   signal s_up_mfb_data    : std_logic_vector(MFB_UP_REGIONS*MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH-1 downto 0); -- MFB data word
+   signal s_up_mfb_sof     : std_logic_vector(MFB_UP_REGIONS-1 downto 0);                                                     -- MFB region contains start of frame
+   signal s_up_mfb_eof     : std_logic_vector(MFB_UP_REGIONS-1 downto 0);                                                     -- MFB region contains end of frame
+   signal s_up_mfb_sof_pos : std_logic_vector(MFB_UP_REGIONS*max(1,log2(MFB_UP_REG_SIZE))-1 downto 0);                        -- address of block of region's SOF
+   signal s_up_mfb_eof_pos : std_logic_vector(MFB_UP_REGIONS*max(1,log2(MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE))-1 downto 0);      -- address of item of region's EOF
+   signal s_up_mfb_src_rdy : std_logic := '0';
+   signal s_up_mfb_dst_rdy : std_logic;
+
+   signal s_rq_tdata     : std_logic_vector(MFB_UP_REGIONS*MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH-1 downto 0);
+
+   signal s_rq_tuser     : std_logic_vector(RQ_TUSER_WIDTH-1 downto 0);
+   signal s_rq_tlast     : std_logic;
+   signal s_rq_tkeep     : std_logic_vector(MFB_UP_REGIONS*MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH/32-1 downto 0);
+   signal s_rq_tready    : std_logic;
+   signal s_rq_tvalid    : std_logic;
+
+   signal s_rc_tdata     : std_logic_vector(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH-1 downto 0);
+
+   signal s_rc_tuser     : std_logic_vector(
+                                 log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE)*MFB_DOWN_REGIONS  -- EOP_POS
+                                +MFB_DOWN_REGIONS                                                               -- EOP
+                                +log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE)*MFB_DOWN_REGIONS                      -- SOP_POS
+                                +MFB_DOWN_REGIONS                                                               -- SOP
+                                +(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)/8 -- Byte Enable
+                                -1 downto 0);
+   signal s_rc_tlast         : std_logic;
+   signal s_rc_tkeep         : std_logic_vector(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH/32-1 downto 0);
+   signal s_rc_tvalid        : std_logic;
+   signal s_rc_tready        : std_logic;
+
+   signal s_down_mvb_data    : std_logic_vector(MVB_DOWN_ITEMS*DMA_DOWNHDR_WIDTH-1 downto 0); -- MVB items
+   signal s_down_mvb_vld     : std_logic_vector(MVB_DOWN_ITEMS                  -1 downto 0); -- MVB item valid
+   signal s_down_mvb_src_rdy : std_logic;
+   signal s_down_mvb_dst_rdy : std_logic;
+
+   signal s_down_mfb_data    : std_logic_vector(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH-1 downto 0); -- MFB data word
+   signal s_down_mfb_sof     : std_logic_vector(MFB_DOWN_REGIONS-1 downto 0);                                                           -- MFB region contains start of frame
+   signal s_down_mfb_eof     : std_logic_vector(MFB_DOWN_REGIONS-1 downto 0);                                                           -- MFB region contains end of frame
+   signal s_down_mfb_sof_pos : std_logic_vector(MFB_DOWN_REGIONS*max(1,log2(MFB_DOWN_REG_SIZE))-1 downto 0);                            -- address of block of region's SOF
+   signal s_down_mfb_eof_pos : std_logic_vector(MFB_DOWN_REGIONS*max(1,log2(MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE))-1 downto 0);        -- address of item of region's EOF
+   signal s_down_mfb_src_rdy : std_logic;
+   signal s_down_mfb_dst_rdy : std_logic;
+
+   signal s_rcb_size         : std_logic;
+   signal s_tag_assign       : std_logic_vector(MVB_UP_ITEMS*PCIE_TAG_WIDTH-1 downto 0);
+   signal s_tag_assign_vld   : std_logic_vector(MVB_UP_ITEMS               -1 downto 0);
+
+   -- uut I/O converted
+
+   signal s_up_mvb_data_arr      : slv_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0); -- MVB items
+
+   signal s_up_mfb_data_arr      : slv_array_t(MFB_UP_REGIONS-1 downto 0)(MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH-1 downto 0); -- MFB data word
+   signal s_up_mfb_sof_pos_arr   : slv_array_t(MFB_UP_REGIONS-1 downto 0)(max(1,log2(MFB_UP_REG_SIZE))-1 downto 0);                        -- address of block of region's SOF
+   signal s_up_mfb_eof_pos_arr   : slv_array_t(MFB_UP_REGIONS-1 downto 0)(max(1,log2(MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE))-1 downto 0);      -- address of item of region's EOF
+   
+   signal s_rq_tdata_arr         : slv_array_t(MFB_UP_REGIONS-1 downto 0)(MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH-1 downto 0);
+   
+   signal dummy0 : std_logic_vector(RQ_TUSER_WIDTH-1 downto 36);
+   signal s_rq_tuser_eop_pos_arr : slv_array_t(MFB_UP_REGIONS-1 downto 0)(4-1 downto 0);
+   signal s_rq_tuser_eop         : std_logic_vector(2-1 downto 0);
+   signal s_rq_tuser_sop_pos_arr : slv_array_t(MFB_UP_REGIONS-1 downto 0)(2-1 downto 0);
+   signal s_rq_tuser_sop         : std_logic_vector(2-1 downto 0);
+   signal dummy1 : std_logic_vector(4-1 downto 0);
+   signal s_rq_tuser_last_be_arr : slv_array_t(MFB_UP_REGIONS-1 downto 0)(4-1 downto 0);
+   signal s_rq_tuser_first_be_arr: slv_array_t(MFB_UP_REGIONS-1 downto 0)(4-1 downto 0);
+
+   signal s_rc_tdata_arr         : slv_array_t(MFB_DOWN_REGIONS-1 downto 0)(MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH-1 downto 0);
+
+   signal s_rc_tuser_eop_pos_arr : slv_array_t(MFB_DOWN_REGIONS-1 downto 0)(log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE)-1 downto 0);
+   signal s_rc_tuser_eop         : std_logic_vector(MFB_DOWN_REGIONS-1 downto 0);
+   signal s_rc_tuser_sop_pos_arr : slv_array_t(MFB_DOWN_REGIONS-1 downto 0)(log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE)-1 downto 0);
+   signal s_rc_tuser_sop         : std_logic_vector(MFB_DOWN_REGIONS-1 downto 0);
+
+   signal s_down_mvb_data_arr    : slv_array_t(MVB_DOWN_ITEMS-1 downto 0)(DMA_DOWNHDR_WIDTH-1 downto 0); -- MVB items
+
+   signal s_down_mfb_data_arr    : slv_array_t(MFB_DOWN_REGIONS-1 downto 0)(MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH-1 downto 0); -- MFB data word
+   signal s_down_mfb_sof_pos_arr : slv_array_t(MFB_DOWN_REGIONS-1 downto 0)(max(1,log2(MFB_DOWN_REG_SIZE))-1 downto 0);                            -- address of block of region's SOF
+   signal s_down_mfb_eof_pos_arr : slv_array_t(MFB_DOWN_REGIONS-1 downto 0)(max(1,log2(MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE))-1 downto 0);        -- address of item of region's EOF
+
+   signal s_tag_assign_arr       : slv_array_t(MVB_UP_ITEMS-1 downto 0)(PCIE_TAG_WIDTH-1 downto 0);
+
+   -- test signals
+
+   -- print line
+   shared variable l : line;
+
+   -- FIFO for generated UP MVB+MFB transactions
+   shared variable up_mvb_mfb_gen_fifo : slv_fifo_t(fifo (max(MVB_UP_ITEMS,MFB_UP_REGIONS)*2-1 downto 0)(MVB_MFB_TRANS_WIDTH-1 downto 0)) :=
+                             (fifo  => (others => (others => 'U')),
+                              fill  => 0,
+                              full  => '0',
+                              empty => '1');
+
+   -- DMA ID and Tag free mask
+   shared variable dma_idtag_free : std_logic_vector(2**(DMA_ID_WIDTH+DMA_TAG_WIDTH)-1 downto 0) := (others => '1');
+
+   -- generated UP transactions counter
+   shared variable up_trans_cntr : integer := 0;
+
+   -- UP MVB interface
+   shared variable up_mvb_i : mvb_i_t(data (MVB_UP_ITEMS*DMA_UPHDR_WIDTH-1 downto 0), vld (MVB_UP_ITEMS-1 downto 0)) :=
+                             (data    => (others => 'U'),
+                              vld     => (others => 'U'),
+                              src_rdy => '0',
+                              dst_rdy => '0');
+
+   -- UP MFB interface
+   shared variable up_mfb_i : mfb_i_t
+                             (data    (MFB_UP_DATA_WIDTH-1 downto 0),
+                              sof     (MFB_UP_REGIONS-1 downto 0),
+                              eof     (MFB_UP_REGIONS-1 downto 0),
+                              sof_pos (MFB_UP_REGIONS*MFB_UP_SOF_POS_WIDTH-1 downto 0),
+                              eof_pos (MFB_UP_REGIONS*MFB_UP_EOF_POS_WIDTH-1 downto 0)) :=
+                             (data    => (others => 'U'),
+                              sof     => (others => '0'),
+                              eof     => (others => '0'),
+                              sof_pos => (others => 'U'),
+                              eof_pos => (others => 'U'),
+                              src_rdy => '0',
+                              dst_rdy => '0');
+
+   -- FIFO of MVB+MFB transaction send to UP
+   shared variable up_send_trans_fifo : slv_fifo_t(fifo (1024-1 downto 0)(MVB_MFB_TRANS_WIDTH-1 downto 0)) :=
+                             (fifo  => (others => (others => 'U')),
+                              fill  => 0,
+                              full  => '0',
+                              empty => '1');
+
+   -- FIFO of ID+TAG pairs of read transactions send to UP MVB
+   shared variable up_idtag_fifo : slv_fifo_t(fifo (1024-1 downto 0)(DMA_ID_WIDTH+DMA_TAG_WIDTH-1 downto 0)) :=
+                             (fifo  => (others => (others => 'U')),
+                              fill  => 0,
+                              full  => '0',
+                              empty => '1');
+
+-- ----------------------------------------------------------------------------
+--                            Architecture body
+-- ----------------------------------------------------------------------------
+
+begin
+
+   -- -------------------------------------------------------------------------
+   -- UUT
+   -- -------------------------------------------------------------------------
+
+   uut: entity work.axi2mfb
+   generic map(
+      MVB_UP_ITEMS        => MVB_UP_ITEMS,
+      MFB_UP_REGIONS      => MFB_UP_REGIONS,
+      MFB_UP_REG_SIZE     => MFB_UP_REG_SIZE,
+      MFB_UP_BLOCK_SIZE   => MFB_UP_BLOCK_SIZE,
+      MFB_UP_ITEM_WIDTH   => MFB_UP_ITEM_WIDTH,
+      MVB_DOWN_ITEMS      => MVB_DOWN_ITEMS,
+      MFB_DOWN_REGIONS    => MFB_DOWN_REGIONS,
+      MFB_DOWN_REG_SIZE   => MFB_DOWN_REG_SIZE,
+      MFB_DOWN_BLOCK_SIZE => MFB_DOWN_BLOCK_SIZE,
+      MFB_DOWN_ITEM_WIDTH => MFB_DOWN_ITEM_WIDTH,
+      PCIE_UPHDR_WIDTH   => PCIE_UPHDR_WIDTH,
+      PCIE_DOWNHDR_WIDTH => PCIE_DOWNHDR_WIDTH,
+      DMA_TAG_WIDTH     => DMA_TAG_WIDTH,
+      DMA_ID_WIDTH      => DMA_ID_WIDTH,
+      PCIE_TAG_WIDTH    => PCIE_TAG_WIDTH,
+      UP_ASFIFO_ITEMS   => UP_ASFIFO_ITEMS,
+      DOWN_ASFIFO_ITEMS => DOWN_ASFIFO_ITEMS,
+      DOWN_FIFO_ITEMS   => DOWN_FIFO_ITEMS,
+      RQ_TUSER_WIDTH    => RQ_TUSER_WIDTH,
+      CHECK_CPL_CREDITS   => CHECK_CPL_CREDITS
+   )
+   port map(
+      CLK   => clk,
+      CLK_DMA => clk_dma,
+      RESET => reset,
+
+      UP_MVB_DATA    => s_up_mvb_data,
+      UP_MVB_VLD     => s_up_mvb_vld,
+      UP_MVB_SRC_RDY => s_up_mvb_src_rdy,
+      UP_MVB_DST_RDY => s_up_mvb_dst_rdy,
+      UP_MFB_DATA    => s_up_mfb_data,
+      UP_MFB_SOF     => s_up_mfb_sof,
+      UP_MFB_EOF     => s_up_mfb_eof,
+      UP_MFB_SOF_POS => s_up_mfb_sof_pos,
+      UP_MFB_EOF_POS => s_up_mfb_eof_pos,
+      UP_MFB_SRC_RDY => s_up_mfb_src_rdy,
+      UP_MFB_DST_RDY => s_up_mfb_dst_rdy,
+      RQ_TDATA     => s_rq_tdata,
+      RQ_TUSER     => s_rq_tuser,
+      RQ_TLAST     => s_rq_tlast,
+      RQ_TKEEP     => s_rq_tkeep,
+      RQ_TREADY    => s_rq_tready,
+      RQ_TVALID    => s_rq_tvalid,
+      RC_TDATA     => s_rc_tdata,
+      RC_TUSER     => s_rc_tuser,
+      RC_TLAST     => s_rc_tlast,
+      RC_TKEEP     => s_rc_tkeep,
+      RC_TVALID    => s_rc_tvalid,
+      RC_TREADY    => s_rc_tready,
+      DOWN_MVB_DATA    => s_down_mvb_data,
+      DOWN_MVB_VLD     => s_down_mvb_vld,
+      DOWN_MVB_SRC_RDY => s_down_mvb_src_rdy,
+      DOWN_MVB_DST_RDY => s_down_mvb_dst_rdy,
+      DOWN_MFB_DATA    => s_down_mfb_data,
+      DOWN_MFB_SOF     => s_down_mfb_sof,
+      DOWN_MFB_EOF     => s_down_mfb_eof,
+      DOWN_MFB_SOF_POS => s_down_mfb_sof_pos,
+      DOWN_MFB_EOF_POS => s_down_mfb_eof_pos,
+      DOWN_MFB_SRC_RDY => s_down_mfb_src_rdy,
+      DOWN_MFB_DST_RDY => s_down_mfb_dst_rdy,
+      RCB_SIZE       => s_rcb_size,
+      TAG_ASSIGN     => s_tag_assign,
+      TAG_ASSIGN_VLD => s_tag_assign_vld
+   );
+
+   -- -------------------------------------------------------------------------
+   --                        clk and reset generators
+   -- -------------------------------------------------------------------------
+
+   -- generating clk
+   clk_gen: process
+   begin
+      clk <= '1';
+      wait for C_CLK_PER / 2;
+      clk <= '0';
+      wait for C_CLK_PER / 2;
+   end process clk_gen;
+
+   -- generating clk
+   clk_dma_gen: process
+   begin
+      clk_dma <= '1';
+      wait for C_CLK_DMA_PER / 2;
+      clk_dma <= '0';
+      wait for C_CLK_DMA_PER / 2;
+   end process clk_dma_gen;
+
+   -- generating reset
+   rst_gen: process
+   begin
+      reset <= '1';
+      wait for C_RST_TIME;
+      reset <= '0';
+      wait;
+   end process rst_gen;
+
+   -- detect new DMA clk period
+   dma_clk_status: process (clk_dma,dma_clk_used)
+   begin
+      if (dma_clk_used'event) then
+         new_dma_clk <= '0';
+      end if;
+
+      if (clk_dma'event and clk_dma='1') then
+         new_dma_clk <= '1';
+      end if;
+   end process;
+
+   -- -------------------------------------------------------------------------
+   -- I/O conversion
+   -- -------------------------------------------------------------------------
+
+--   up_mvb_conv : for i in 0 to MVB_UP_ITEMS-1 generate
+--      s_up_mvb_data(DMA_UPHDR_WIDTH*(i+1)-1 downto DMA_UPHDR_WIDTH*i) <= s_up_mvb_data_arr(i);
+--   end generate;
+
+--   up_mfb_conv : for i in 0 to MFB_UP_REGIONS-1 generate
+--      s_up_mfb_data((MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH)*(i+1)-1 downto (MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH)*i) <= s_up_mfb_data_arr(i);
+--      s_up_mfb_sof_pos((max(1,log2(MFB_UP_REG_SIZE)))*(i+1)-1 downto (max(1,log2(MFB_UP_REG_SIZE)))*i) <= s_up_mfb_sof_pos_arr(i);
+--      s_up_mfb_eof_pos((max(1,log2(MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE)))*(i+1)-1 downto (max(1,log2(MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE)))*i) <= s_up_mfb_eof_pos_arr(i);
+--   end generate;
+
+   down_mfb_conv : for i in 0 to MFB_DOWN_REGIONS-1 generate
+      s_down_mfb_data_arr   (i)   <= s_down_mfb_data   ((MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)*(i+1)-1 downto (MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)*i);
+      s_down_mfb_sof_pos_arr(i)   <= s_down_mfb_sof_pos(max(1,log2(MFB_DOWN_REG_SIZE))*(i+1)-1 downto max(1,log2(MFB_DOWN_REG_SIZE))*i);
+      s_down_mfb_eof_pos_arr(i)   <= s_down_mfb_eof_pos(max(1,log2(MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE))*(i+1)-1 downto max(1,log2(MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE))*i);
+   end generate;
+
+   rq_conv : for i in 0 to MFB_UP_REGIONS-1 generate
+      s_rq_tdata_arr(i) <= s_rq_tdata((MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH)*(i+1)-1 downto (MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH)*i);
+   end generate;
+
+   (
+   dummy0,
+   s_rq_tuser_eop_pos_arr (0),
+   s_rq_tuser_eop_pos_arr (1),
+   s_rq_tuser_eop         (0),
+   s_rq_tuser_eop         (1),
+   s_rq_tuser_sop_pos_arr (0),
+   s_rq_tuser_sop_pos_arr (1),
+   s_rq_tuser_sop         (0),
+   s_rq_tuser_sop         (1),
+   dummy1,
+   s_rq_tuser_last_be_arr (0),
+   s_rq_tuser_last_be_arr (1),
+   s_rq_tuser_first_be_arr(0),
+   s_rq_tuser_first_be_arr(1)
+   ) <= s_rq_tuser;
+
+   rc_conv : for i in 0 to MFB_DOWN_REGIONS-1 generate
+      s_rc_tdata((MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)*(i+1)-1 downto (MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)*i) <= s_rc_tdata_arr(i);
+
+      s_rc_tuser((MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)/8+MFB_DOWN_REGIONS+log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE)*(i+1)-1
+          downto (MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)/8+MFB_DOWN_REGIONS+log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE)*i) <= s_rc_tuser_sop_pos_arr(i);
+      s_rc_tuser((MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)/8+MFB_DOWN_REGIONS+log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE)*MFB_DOWN_REGIONS+MFB_DOWN_REGIONS+log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE)*(i+1)-1
+          downto (MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)/8+MFB_DOWN_REGIONS+log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE)*MFB_DOWN_REGIONS+MFB_DOWN_REGIONS+log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE)*i) <= s_rc_tuser_eop_pos_arr(i);
+   end generate;
+
+   s_rc_tuser((MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)/8+MFB_DOWN_REGIONS-1 downto (MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)/8) <= s_rc_tuser_sop;
+   s_rc_tuser((MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)/8+MFB_DOWN_REGIONS+log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE)*MFB_DOWN_REGIONS+MFB_DOWN_REGIONS-1
+       downto (MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH)/8+MFB_DOWN_REGIONS+log2(MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE)*MFB_DOWN_REGIONS) <= s_rc_tuser_eop;
+
+   -- -------------------------------------------------------------------------
+   -- test process
+   -- -------------------------------------------------------------------------
+
+   -- UP generator generates new UP transactions in up_mvb_mfb_gen_fifo
+   up_mvb_mfb_trans_generator_pr : process
+      variable seed1 : positive := UP_WRITE_LEN_MAX;
+      variable seed2 : positive := UP_GAP_LEN_MAX+1;
+      variable X     : integer;
+
+      variable trans : mvb_mfb_trans_t;
+      variable trans_ser : std_logic_vector(MVB_MFB_TRANS_WIDTH-1 downto 0);
+   begin
+      if (up_mvb_mfb_gen_fifo.full='1') then
+         wait until up_mvb_mfb_gen_fifo.full='0';
+      end if;
+
+      write(l,string'("up_cntr: "));
+      write_dec(l,up_trans_cntr);
+      writeline(output,l);
+
+      randint(seed1,seed2,0,99,X);
+      if (X<UP_READ_CHANCE) then
+         mvb_mfb_trans_new_rand(trans,seed1,seed2,dma_idtag_free,UP_READ_LEN_MIN,UP_READ_LEN_MAX,100,0,0,0);
+      else
+         if ((or dma_idtag_free)='0') then
+            wait until (or dma_idtag_free)='1';
+         end if;
+
+         mvb_mfb_trans_new_rand(trans,seed1,seed2,dma_idtag_free,UP_WRITE_LEN_MIN,UP_WRITE_LEN_MAX,0,UP_GAP_CHANCE,UP_GAP_LEN_MIN,UP_GAP_LEN_MAX);
+      end if;
+
+--      write(l,string'("New generated transaction:"));writeline(output,l);
+--      mvb_mfb_trans_print(trans);
+
+      trans_ser := mvb_mfb_trans_ser(trans);
+      slv_fifo_put(up_mvb_mfb_gen_fifo,trans_ser);
+
+      up_trans_cntr := up_trans_cntr+1;
+
+      if (up_trans_cntr>=UP_TRANSACTIONS) then
+         write(l,string'("Test completed successfully."));writeline(output,l);
+         stop;
+      end if;
+   end process;
+
+   -- UP MVB+MFB interface transaction insertion
+   up_mvb_mfb_trans_post_pr : process
+      variable seed1 : positive := UP_ASFIFO_ITEMS;
+      variable seed2 : positive := MFB_DOWN_EOF_POS_WIDTH+1;
+      variable X     : integer;
+
+      variable new_trans_send     : mvb_mfb_trans_array_t(MVB_UP_ITEMS-1 downto 0);
+      variable new_trans_send_vld : std_logic_vector(MVB_UP_ITEMS-1 downto 0);
+
+      variable id_vec    : std_logic_vector(DMA_ID_WIDTH-1 downto 0);
+      variable tag_vec   : std_logic_vector(DMA_TAG_WIDTH-1 downto 0);
+      variable idtag_vec : std_logic_vector(DMA_ID_WIDTH+DMA_TAG_WIDTH-1 downto 0);
+   begin
+      if (RESET='1') then
+         wait until RESET='0';
+      end if;
+
+      wait until clk_dma'event and clk_dma='1';
+
+      -- sample MVB interface
+      up_mvb_i.data    := s_up_mvb_data;
+      up_mvb_i.vld     := s_up_mvb_vld;
+      up_mvb_i.src_rdy := s_up_mvb_src_rdy;
+      up_mvb_i.dst_rdy := s_up_mvb_dst_rdy;
+      -- sample MFB interface
+      up_mfb_i.data    := s_up_mfb_data;
+      up_mfb_i.sof     := s_up_mfb_sof;
+      up_mfb_i.eof     := s_up_mfb_eof;
+      up_mfb_i.sof_pos := s_up_mfb_sof_pos;
+      up_mfb_i.eof_pos := s_up_mfb_eof_pos;
+      up_mfb_i.src_rdy := s_up_mfb_src_rdy;
+      up_mfb_i.dst_rdy := s_up_mfb_dst_rdy;
+      
+      new_trans_send_vld := (others => '0');
+
+      post_new_up_mvb_mfb_word(up_mvb_mfb_gen_fifo,up_mvb_i,up_mfb_i,new_trans_send,new_trans_send_vld);
+
+      for i in 0 to MVB_UP_ITEMS-1 loop
+         exit when (new_trans_send_vld(i)='0');
+
+         write(l,string'("Newly put transaction"));writeline(output,l);
+         mvb_mfb_trans_print(new_trans_send(i));
+
+         if (up_send_trans_fifo.full='1') then
+            report "Full UP send transaction FIFO!" severity failure; -- FIFO full situation will be fixed, if it arises in the future
+         else
+            slv_fifo_put(up_send_trans_fifo,mvb_mfb_trans_ser(new_trans_send(i)));
+         end if;
+
+         if (new_trans_send(i).payload='0') then
+            id_vec  := std_logic_vector(to_unsigned(new_trans_send(i).id ,DMA_ID_WIDTH));
+            tag_vec := std_logic_vector(to_unsigned(new_trans_send(i).tag,DMA_TAG_WIDTH));
+
+            idtag_vec := id_vec & tag_vec;
+
+            if (up_idtag_fifo.full='1') then
+               report "Full ID Tag FIFO!" severity failure; -- FIFO full situation will be fixed, if it arises in the future
+            else
+               slv_fifo_put(up_idtag_fifo,idtag_vec);
+            end if;
+         end if;
+      end loop;
+
+      -- set MVB interface
+      s_up_mvb_data    <= up_mvb_i.data;
+      s_up_mvb_vld     <= up_mvb_i.vld;
+      s_up_mvb_src_rdy <= up_mvb_i.src_rdy after 0 ns;
+      -- set MFB interface
+      s_up_mfb_data    <= up_mfb_i.data;
+      s_up_mfb_sof     <= up_mfb_i.sof;
+      s_up_mfb_eof     <= up_mfb_i.eof;
+      s_up_mfb_sof_pos <= up_mfb_i.sof_pos;
+      s_up_mfb_eof_pos <= up_mfb_i.eof_pos;
+      s_up_mfb_src_rdy <= up_mfb_i.src_rdy;
+
+      wait for C_CLK_DMA_PER/2;
+   end process;
+
+   -----------
+   test : process
+      variable seed1 : positive := 1;
+      variable seed2 : positive := 2;
+      variable rand : real;
+      variable X    : integer;
+
+      variable e : integer := 0;
+
+      variable t0,t1,t2,t3 : mvb_mfb_trans_t;
+      variable t_d : mvb_mfb_trans_array_t(2-1 downto 0);
+
+      variable t_ser : std_logic_vector(MVB_MFB_TRANS_WIDTH-1 downto 0);
+
+      variable t_fifo : slv_fifo_t(fifo (1024-1 downto 0)(MVB_MFB_TRANS_WIDTH-1 downto 0));
+
+      variable i_c : i_array_t(1024-1 downto 0);
+      variable t_c : mvb_mfb_trans_array_t(1024-1 downto 0);
+
+      variable free : std_logic_vector(2**(DMA_ID_WIDTH+DMA_TAG_WIDTH)-1 downto 0) := (others => '1');
+   begin
+      wait for C_CLK_PER/2;
+
+      ---------
+      -- wait for RESET fall
+      ---------
+
+      if (reset='1') then
+         wait until reset='0';
+      end if;
+
+      ---------
+
+      ---------
+      -- error failure
+      ---------
+
+      assert (e/=1) severity failure;
+
+      if (e>0) then
+         e := e-1;
+      end if;
+      
+      ---------
+
+      ---------
+      -- 
+      ---------
+
+      ---------
+
+      wait for C_CLK_PER/2;
+   end process;
+
+end architecture behavioral;

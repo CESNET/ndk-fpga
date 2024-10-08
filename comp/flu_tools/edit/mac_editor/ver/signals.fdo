@@ -1,0 +1,52 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2013 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc rx {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate  -hex -label RX_DATA"       $PATH/RX_DATA
+    add_wave "-noupdate  -hex -label RX_SOP_POS"    $PATH/RX_SOP_POS
+    add_wave "-noupdate  -hex -label RX_EOP_POS"    $PATH/RX_EOP_POS
+    add_wave "-noupdate  -label RX_SOP"             $PATH/RX_SOP
+    add_wave "-noupdate  -label RX_EOP"             $PATH/RX_EOP
+    add_wave "-noupdate  -label RX_SRC_RDY"         $PATH/RX_SRC_RDY
+    add_wave "-noupdate  -label RX_DST_RDY"         $PATH/RX_DST_RDY
+}
+
+proc dst_mac {NAME PATH} {
+    add_wave -divider "$NAME"
+    add_wave "-noupdate -hex -label DST_DATA"       $PATH/DST_DATA
+    add_wave "-noupdate -hex -label DST_MASK"       	    $PATH/DST_MASK
+    add_wave "-noupdate -label DST_W"               $PATH/DST_W
+}
+
+proc src_mac {NAME PATH} {
+    add_wave -divider "$NAME"
+    add_wave "-noupdate -hex -label SRC_DATA"       $PATH/SRC_DATA
+    add_wave "-noupdate -hex -label SRC_MASK"       	    $PATH/SRC_MASK
+    add_wave "-noupdate -label SRC_W"               $PATH/SRC_W
+}
+
+proc tx {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate  -hex -label TX_DATA"       $PATH/TX_DATA
+    add_wave "-noupdate  -hex -label TX_SOP_POS"    $PATH/TX_SOP_POS
+    add_wave "-noupdate  -hex -label TX_EOP_POS"    $PATH/TX_EOP_POS
+    add_wave "-noupdate  -label TX_SOP"             $PATH/TX_SOP
+    add_wave "-noupdate  -label TX_EOP"             $PATH/TX_EOP
+    add_wave "-noupdate  -label TX_SRC_RDY"         $PATH/TX_SRC_RDY
+    add_wave "-noupdate  -label TX_DST_RDY"         $PATH/TX_DST_RDY
+}
+
+proc internal {NAME PATH} {
+     add wave -divider "$NAME"
+}

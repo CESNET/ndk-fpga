@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ndk-xbuild"
+version = "1.0.0.dev1"
+dependencies = [
+    "tomli",
+    "pydantic",
+    "pandas",
+    "cowsay",
+    "colorama"
+]
+requires-python = ">= 3.9"
+description = "Smart build system developed by Liberouter supporting QuestaSim, Quartus and Vivado."
+authors = [
+    {name = "Oliver Gurka", email = "oliver.gurka@cesnet.cz"}
+]
+maintainers = [
+    {name = "Oliver Gurka", email = "oliver.gurka@cesnet.cz"}
+]
+
+[tool.setuptools.packages.find]
+include = ["build_adapters*", "comp_settings*", "ndk_xbuild*"]
+namespaces = false
+
+[project.scripts]
+harp = "ndk_xbuild:ndk_xbuild.main"

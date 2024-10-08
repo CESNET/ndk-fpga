@@ -1,0 +1,15 @@
+# signals_sig.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Authors: Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+source "./signals.fdo"
+
+write_part  "Write part"                /testbench/uut
+read_part   "Read part"                 /testbench/uut
+internal    "Internal signals"          /testbench/uut
+

@@ -1,0 +1,24 @@
+# fifo_pipe.fdo: Functional simulation file for merger from n inputs to m outputs
+# Copyright (C) 2018 CESNET
+# Author: Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../.."
+
+set FIFO_PIPE_BASE   "$OFM_PATH/comp/base/misc/fifo_pipe"
+set MATH_PKG_BASE       "$OFM_PATH/comp/base/pkg"
+
+set SIG_FILE            "$FIFO_PIPE_BASE/sim/fifo_pipe_sig.fdo"
+set TB_FILE             "$FIFO_PIPE_BASE/sim/testbench.vhd"
+
+
+set COMPONENTS [list \
+   [ list      "FIFO_PIPE"       $FIFO_PIPE_BASE        "FULL"         ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 250us

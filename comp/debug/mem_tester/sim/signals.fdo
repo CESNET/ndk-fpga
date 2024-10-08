@@ -1,0 +1,130 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Lukas Nevrkla <xnevrk03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+proc core_logic {NAME PATH} {
+     add_wave "-group { $NAME/main } -noupdate  -label MI_CLK"          $PATH/MI_CLK
+     add_wave "-group { $NAME/main } -noupdate  -label AMM_CLK"         $PATH/AMM_CLK
+
+     add_wave "-group { $NAME/main } -noupdate  -label MI_RST"          $PATH/MI_RST
+     add_wave "-group { $NAME/main } -noupdate  -label AMM_RST"         $PATH/AMM_RST
+
+     add_wave "-group { $NAME/main } -noupdate  -label total_rst"       $PATH/total_rst
+
+     add_wave "-group { $NAME/fsm } -noupdate  -label curr_state "      $PATH/curr_state
+     add_wave "-group { $NAME/fsm } -noupdate  -label next_state "      $PATH/next_state
+     add_wave "-group { $NAME } -noupdate  -label mi_calib_fail  "      $PATH/mi_calib_fail
+     add_wave "-group { $NAME } -noupdate  -label mi_err_cnt     "      $PATH/mi_err_cnt
+
+     add_wave "-group { $NAME/random } -noupdate  -label random_en  "   $PATH/random_en
+     add_wave "-group { $NAME/random } -noupdate  -label random_rst "   $PATH/random_rst
+     add_wave "-group { $NAME/random } -noupdate  -label random_data"   $PATH/random_data
+
+     add_wave "-group { $NAME/err } -noupdate  -label err_found  "      $PATH/err_found
+     add_wave "-group { $NAME/err } -noupdate  -label err_cnt "         $PATH/err_cnt
+
+     add_wave "-group { $NAME/burst } -noupdate  -label curr_burst_cnt" $PATH/curr_burst_cnt
+     add_wave "-group { $NAME/burst } -noupdate  -label burst_en" $PATH/burst_en
+     add_wave "-group { $NAME/burst } -noupdate  -label burst_done" $PATH/burst_done
+
+     add_wave "-group { $NAME/read_burst } -noupdate  -label curr_read_burst_cnt" $PATH/curr_read_burst_cnt
+     add_wave "-group { $NAME/read_burst } -noupdate  -label read_burst_en" $PATH/read_burst_en
+     add_wave "-group { $NAME/read_burst } -noupdate  -label read_burst_done" $PATH/read_burst_done
+}
+
+proc amm {NAME PATH} {
+     add_wave "-group { $NAME } -noupdate  -label AMM_CLK"              $PATH/AMM_CLK
+     add_wave "-group { $NAME } -noupdate  -label AMM_RST"              $PATH/AMM_RST
+
+     add_wave "-group { $NAME } -noupdate  -label AMM_READY"            $PATH/AMM_READY
+     add_wave "-group { $NAME } -noupdate  -label AMM_BURST_COUNT"      $PATH/AMM_BURST_COUNT
+
+     add_wave "-group { $NAME } -noupdate  -label AMM_READ"             $PATH/AMM_READ
+     add_wave "-group { $NAME } -noupdate  -label AMM_WRITE"            $PATH/AMM_WRITE
+
+     add_wave "-group { $NAME } -noupdate  -label AMM_ADDRESS"          $PATH/AMM_ADDRESS
+     add_wave "-group { $NAME } -noupdate  -label AMM_WRITE_DATA"       $PATH/AMM_WRITE_DATA
+     add_wave "-group { $NAME } -noupdate  -label AMM_READ_DATA"        $PATH/AMM_READ_DATA
+     add_wave "-group { $NAME } -noupdate  -label AMM_READ_DATA_VALID"  $PATH/AMM_READ_DATA_VALID
+
+
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_BURST_COUNT"      $PATH/AMM_piped_BURST_COUNT
+
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_READ"             $PATH/AMM_piped_READ
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_WRITE"            $PATH/AMM_piped_WRITE
+
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_ADDRESS"          $PATH/AMM_piped_ADDRESS
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_WRITE_DATA"       $PATH/AMM_piped_WRITE_DATA
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_READ_DATA"        $PATH/AMM_piped_READ_DATA
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_READ_DATA_VALID"  $PATH/AMM_piped_READ_DATA_VALID
+
+
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_2_BURST_COUNT"      $PATH/AMM_piped_2_BURST_COUNT
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_2_READ"             $PATH/AMM_piped_2_READ
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_2_WRITE"            $PATH/AMM_piped_2_WRITE
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_2_ADDRESS"          $PATH/AMM_piped_2_ADDRESS
+
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_2_WRITE_DATA"       $PATH/AMM_piped_2_WRITE_DATA
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_2_READ_DATA"        $PATH/AMM_piped_2_READ_DATA
+     add_wave "-group { $NAME/piped } -noupdate  -label AMM_piped_2_READ_DATA_VALID"  $PATH/AMM_piped_2_READ_DATA_VALID
+
+
+}
+
+proc mi {NAME PATH} {
+     add_wave "-group { $NAME } -noupdate  -label mi_rd_sync   "        $PATH/mi_rd_sync
+     add_wave "-group { $NAME } -noupdate  -label mi_wr_sync   "        $PATH/mi_wr_sync
+
+     add_wave "-group { $NAME } -noupdate  -label mi_addr_sync "        $PATH/mi_addr_sync
+     add_wave "-group { $NAME } -noupdate  -label mi_dwr_sync  "        $PATH/mi_dwr_sync
+     add_wave "-group { $NAME } -noupdate  -label mi_drd_sync  "        $PATH/mi_drd_sync
+     add_wave "-group { $NAME } -noupdate  -label mi_drdy_sync "        $PATH/mi_drdy_sync
+
+     add_wave "-group { $NAME } -noupdate  -label mi_ardy_sync "        $PATH/mi_ardy_sync
+     add_wave "-group { $NAME } -noupdate  -label mi_be_sync   "        $PATH/mi_be_sync
+}
+
+proc mi_parsed {NAME PATH} {
+     add_wave "-group { $NAME } -noupdate  -label mi_rst_req       "    $PATH/mi_rst_req
+     add_wave "-group { $NAME } -noupdate  -label mi_run_test      "    $PATH/mi_run_test
+     add_wave "-group { $NAME } -noupdate  -label mi_manual_en      "    $PATH/mi_manual_en
+     add_wave "-group { $NAME } -noupdate  -label mi_write_ticks_ovf"   $PATH/mi_write_ticks_ovf
+     add_wave "-group { $NAME } -noupdate  -label mi_read_ticks_ovf"    $PATH/mi_read_ticks_ovf
+     add_wave "-group { $NAME } -noupdate  -label mi_write_ticks"       $PATH/mi_write_ticks
+     add_wave "-group { $NAME } -noupdate  -label mi_read_ticks"        $PATH/mi_read_ticks
+
+     add_wave "-group { $NAME } -noupdate  -label mi_test_done     "    $PATH/mi_test_done
+     add_wave "-group { $NAME } -noupdate  -label mi_test_success  "    $PATH/mi_test_success
+     add_wave "-group { $NAME } -noupdate  -label mi_ecc_error     "    $PATH/mi_ecc_error
+     add_wave "-group { $NAME } -noupdate  -label mi_calib_success "    $PATH/mi_calib_success
+     add_wave "-group { $NAME } -noupdate  -label mi_calib_fail    "    $PATH/mi_calib_fail
+     add_wave "-group { $NAME } -noupdate  -label mi_err_cnt       "    $PATH/mi_err_cnt
+}
+
+proc manual_r_w {NAME PATH} {
+     add_wave "-group { $NAME } -noupdate  -label manual_en"            $PATH/manual_en
+     add_wave "-group { $NAME } -noupdate  -label manual_amm_data"      $PATH/manual_amm_data
+     add_wave "-group { $NAME } -noupdate  -label manual_amm_addr"      $PATH/manual_amm_addr
+     add_wave "-group { $NAME } -noupdate  -label manual_set_buff_vld"  $PATH/manual_set_buff_vld
+     add_wave "-group { $NAME } -noupdate  -label manual_clr_buff_vld"  $PATH/manual_clr_buff_vld
+}
+
+proc r_w_ticks {NAME PATH} {
+     add_wave "-group { $NAME } -noupdate  -label curr_write_ticks" $PATH/curr_write_ticks
+     add_wave "-group { $NAME } -noupdate  -label write_ticks_en"   $PATH/write_ticks_en
+     add_wave "-group { $NAME } -noupdate  -label write_ticks_rst"  $PATH/write_ticks_rst
+     add_wave "-group { $NAME } -noupdate  -label write_ticks_rst_req" $PATH/write_ticks_rst_req
+     add_wave "-group { $NAME } -noupdate  -label write_ticks_full"    $PATH/write_ticks_full
+     add_wave "-group { $NAME } -noupdate  -label write_ticks_ovf_occ" $PATH/write_ticks_ovf_occ
+
+     add_wave "-group { $NAME } -noupdate  -label curr_read_ticks" $PATH/curr_read_ticks
+     add_wave "-group { $NAME } -noupdate  -label read_ticks_en"   $PATH/read_ticks_en
+     add_wave "-group { $NAME } -noupdate  -label read_ticks_rst"  $PATH/read_ticks_rst
+     add_wave "-group { $NAME } -noupdate  -label read_ticks_rst_req" $PATH/read_ticks_rst_req
+     add_wave "-group { $NAME } -noupdate  -label read_ticks_full"    $PATH/read_ticks_full
+     add_wave "-group { $NAME } -noupdate  -label read_ticks_ovf_occ" $PATH/read_ticks_ovf_occ
+}
+

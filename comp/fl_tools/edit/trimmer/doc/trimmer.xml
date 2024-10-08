@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>FrameLink Trimmer</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="kosek">Martin Košek</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+   <item>Supports RX/TX FrameLink data bus width of 8, 16, 32, 64 and
+      128 bits.</item>
+   <item>Able to trim header, footer or both</item>
+</features>
+
+
+<!-- Short Block description -->
+<description>
+
+   Trimmer component can be used to remove unwanted part(s) of FrameLink
+   frames. User can choose which part should be removed.
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+
+        <generic name="DATA_WIDTH" type="integer" default="">
+           RX/TX interface data bus width
+        </generic>
+
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Common signals</divider>
+        <port name="CLK" dir="in" width="1">
+            Clock input
+        </port>
+        <port name="RESET" dir="in" width="1">
+            Global reset
+        </port>
+
+        <divider>
+            RX FrameLink interface
+        </divider>
+        <port name="RX_DATA" dir="in" width="DATA_WIDTH">
+            RX data bus
+        </port>
+        <port name="RX_REM" dir="in" width="log2(DATA_WIDTH/8)">
+            RX data remainder
+        </port>
+        <port name="RX_SOF_N" dir="in" width="1">
+            RX start of frame
+        </port>
+        <port name="RX_EOF_N" dir="in" width="1">
+            RX end of frame
+        </port>
+        <port name="RX_SOP_N" dir="in" width="1">
+            RX start of part
+        </port>
+        <port name="RX_EOP_N" dir="in" width="1">
+            RX end of part
+        </port>
+        <port name="RX_SRC_RDY_N" dir="in" width="1">
+            RX source ready
+        </port>
+        <port name="RX_DST_RDY_N" dir="out" width="1">
+            RX destination ready
+        </port>
+
+        <divider>
+            TX FrameLink interface
+        </divider>
+        <port name="TX_DATA" dir="out" width="DATA_WIDTH">
+            TX data bus
+        </port>
+        <port name="TX_REM" dir="out" width="log2(DATA_WIDTH/8)">
+            TX data remainder
+        </port>
+        <port name="TX_SOF_N" dir="out" width="1">
+            TX start of frame
+        </port>
+        <port name="TX_EOF_N" dir="out" width="1">
+            TX end of frame
+        </port>
+        <port name="TX_SOP_N" dir="out" width="1">
+            TX start of packet (segment)
+        </port>
+        <port name="TX_EOP_N" dir="out" width="1">
+            TX end of packet (segment)
+        </port>
+        <port name="TX_SRC_RDY_N" dir="out" width="1">
+            TX source ready
+        </port>
+        <port name="TX_DST_RDY_N" dir="in" width="1">
+            TX destination ready
+         </port>
+
+         <divider>
+            Control interface
+         </divider>
+         <port name="ENABLE" dir="in" width="1">
+            Enables Trimmer. When disabled (signal equals '0'), frames are relayed
+            to output without any modification.
+         </port>
+	</port_map>
+
+</interface>
+
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+   <h1>Trimmer info</h1>
+   <p>
+      Trimmer is able to remove header or footer from FrameLink bus on trimmed bus.
+      The actual removing of frame part is done by TX_SRC_RDY signal which is
+      inactive during trimmed parts. Also SOF and EOF signal are accustomized.
+   </p>
+
+   <h1>Frequency and Resources usage</h1>
+   <p>
+      <tab sloupce="cccc">
+         <tr>
+            <th>Generic settings</th>
+            <th>Slices (% of C6X slices)</th>
+            <th>BlockRams (% of C6X BRAMs)</th>
+            <th>Max. HW frequency</th>
+         </tr>
+         <tr>
+            <th>16b input</th>
+            <td>7 (0.03%)</td>
+            <td>0 (0.0%)</td>
+            <td>200 MHz</td>
+         </tr>
+         <tr>
+            <th>64b input</th>
+            <td>7 (0.03%)</td>
+            <td>0 (0.0%)</td>
+            <td>200 MHz</td>
+         </tr>
+      <nazev>Chip utilization &amp; max design frequency</nazev>
+      </tab>
+   </p>
+
+</body>
+
+</source>

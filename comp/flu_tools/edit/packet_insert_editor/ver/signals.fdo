@@ -1,0 +1,47 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2013 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc rx {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate  -hex -label RX_DATA"       $PATH/RX_DATA
+    add_wave "-noupdate  -hex -label RX_SOP_POS"    $PATH/RX_SOP_POS
+    add_wave "-noupdate  -hex -label RX_EOP_POS"    $PATH/RX_EOP_POS
+    add_wave "-noupdate  -label RX_SOP"             $PATH/RX_SOP
+    add_wave "-noupdate  -label RX_EOP"             $PATH/RX_EOP
+    add_wave "-noupdate  -label RX_SRC_RDY"         $PATH/RX_SRC_RDY
+    add_wave "-noupdate  -label RX_DST_RDY"         $PATH/RX_DST_RDY
+}
+
+proc edit {NAME PATH} {
+    add_wave -divider "$NAME"
+    add_wave "-noupdate -hex -label OFFSET"     $PATH/OFFSET
+    add_wave "-noupdate -label EN_INSERT"       $PATH/EN_INSERT
+    add_wave "-noupdate -label EN_REPLACE"      $PATH/EN_REPLACE
+    add_wave "-noupdate -hex -label NEW_DATA"   $PATH/NEW_DATA
+    add_wave "-noupdate -label MASK"            $PATH/MASK
+}
+
+proc tx {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate  -hex -label TX_DATA"       $PATH/TX_DATA
+    add_wave "-noupdate  -hex -label TX_SOP_POS"    $PATH/TX_SOP_POS
+    add_wave "-noupdate  -hex -label TX_EOP_POS"    $PATH/TX_EOP_POS
+    add_wave "-noupdate  -label TX_SOP"             $PATH/TX_SOP
+    add_wave "-noupdate  -label TX_EOP"             $PATH/TX_EOP
+    add_wave "-noupdate  -label TX_SRC_RDY"         $PATH/TX_SRC_RDY
+    add_wave "-noupdate  -label TX_DST_RDY"         $PATH/TX_DST_RDY
+}
+
+proc internal {NAME PATH} {
+     add wave -divider "$NAME"
+}

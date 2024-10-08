@@ -1,0 +1,64 @@
+# rtlproject.toml: File verification and synthesis combinations
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Oliver Gurka <oliver.gurka@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+[settings.default]
+REGIONS     = 4
+REGION_SIZE = 8
+BLOCK_SIZE  = 8
+ITEM_WIDTH  = 8
+FAKE_PIPE   = false
+USE_DST_RDY = true
+PIPE_TYPE   = "SHREG"
+DEVICE      = "ULTRASCALE"
+
+[settings.regions]
+type = "list"
+REGIONS     = [1, 2, 1, 1, 1, 1]
+REGION_SIZE = [8, 8, 1, 2, 2, 4]
+BLOCK_SIZE  = [8, 8, 8, 8, 4, 8]
+ITEM_WIDTH  = [8, 8, 8, 8, 8, 8]
+
+[settings.pcie]
+REGIONS     = 2
+REGION_SIZE = 1
+BLOCK_SIZE  = 8
+ITEM_WIDTH  = 32
+
+[settings.pipe_type_reg]
+PIPE_TYPE = "REG"
+
+[settings.fake_pipe_up]
+FAKE_PIPE = true
+
+[settings.use_dst_rdy_down]
+USE_DST_RDY = false
+
+[[ver.combinations]]
+name = "haha"
+settings = ["regions"]
+
+[[ver.combinations]]
+name = "haha1"
+settings = ["regions", "fake_pipe_up"]
+
+[[ver.combinations]]
+name = "haha2"
+settings = ["regions[4:6]", "use_dst_rdy_down"]
+
+[[ver.combinations]]
+name = "haha3"
+settings = ["pcie", ["fake_pipe_up", "use_dst_rdy_down"]]
+
+[[ver.combinations]]
+name = "haha4"
+settings = ["", ["fake_pipe_up", "use_dst_rdy_down", "pipe_type_reg"]]
+
+[ver.settings]
+tests = ["ex_test"]
+
+[[synth.combinations]]
+name = "dfasd"
+settings = ["regions"]

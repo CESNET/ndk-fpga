@@ -1,0 +1,17 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+set MAC_PATH "/testbench/DUT_U/VHDL_DUT_U/obuf_i"
+
+add wave -divider "DUT"
+
+rx        RX        /testbench/DUT_U/VHDL_DUT_U
+tx        TX        /testbench/DUT_U/VHDL_DUT_U
+mi        MI32      /testbench/DUT_U/VHDL_DUT_U
+all       MAC       "$MAC_PATH"
+

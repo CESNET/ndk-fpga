@@ -1,0 +1,35 @@
+# top_level.fdo: Top level functional simulation file
+# Copyright (C) 2010 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE       "../../../../.."
+set CTRL_BASE           "../.."
+set MASTER_BASE           "../../../i2c_hw"
+
+set TB_FILE             "$CTRL_BASE/sim/i2c_slave_byte/testbench.vhd"
+set SIG_FILE            "$CTRL_BASE/sim/i2c_slave_byte/top_level_sig.fdo"
+
+
+set MOD ""
+
+# Modules definition
+set COMPONENTS [list [list "I2C_SLAVE_CTRL" $CTRL_BASE "FULL"] \
+                     [list "I2C_MASTER_CTRL" $MASTER_BASE "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 20us
+

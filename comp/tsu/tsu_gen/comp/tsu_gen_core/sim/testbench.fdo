@@ -1,0 +1,38 @@
+# testbench.fdo: Simulation file for testbench of timestamp unit component
+# Copyright (C) 2009 CESNET
+# Author(s): Jan Stourac <xstour03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set OFM_PATH         "../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set TSU_CV2_CORE_BASE "$OFM_PATH/comp/tsu/tsu_gen/comp/tsu_gen_core"
+
+set TB_FILE          "$TSU_CV2_CORE_BASE/sim/testbench.vhd"
+set SIG_FILE         "$TSU_CV2_CORE_BASE/sim/comp_sig.fdo"
+
+set MOD ""
+
+# Modules definition
+set COMPONENTS [list \
+	[list "TSU_CV2_CORE"   $TSU_CV2_CORE_BASE      "FULL"] \
+	[list "MI32_SIM"       $OFM_PATH/comp/mi_tools/sim_old	"FULL"] \
+]
+
+set PACKAGES "$OFM_PATH/comp/mi_tools/pkg/mi32_pkg.vhd"
+
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 4us
+

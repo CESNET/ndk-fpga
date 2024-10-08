@@ -1,0 +1,11 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Vladislav Valek <xvalek14@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc all {PATH} {
+    add wave -noupdate -bin $PATH/*
+
+}

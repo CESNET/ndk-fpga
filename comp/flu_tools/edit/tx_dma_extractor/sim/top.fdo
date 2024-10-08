@@ -1,0 +1,30 @@
+# Copyright (C) 2018 CESNET
+# Author: Mario Kuka <kuka@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Specify top level entity & architecture
+set TOP_LEVEL_ENT       "TX_DMA_EXTRACTOR"
+set TOP_LEVEL_ARCHGRP   "FULL"
+
+# Specify firmware base directory
+set FIRMWARE_BASE    "../../../../.."
+# Specify match package base directory
+set MATH_PKG_BASE    "$OFM_PATH/comp/base/pkg"
+# Specify match package base directory
+set MI32_PKG_BASE    "./pkg"
+# Specify component base directory
+set TOP_BASE         ".."
+
+set SIG_FILE         "$TOP_BASE/sim/signals.fdo"
+set TB_FILE          "$TOP_BASE/sim/testbench.vhd"
+
+# Include components
+set COMPONENTS [list \
+   [ list $TOP_LEVEL_ENT   $TOP_BASE         $TOP_LEVEL_ARCHGRP ] \
+   [ list "MATH_PKG"       $MATH_PKG_BASE    "MATH" ] \
+   [ list "MI32_PKG"       $MI32_PKG_BASE    "MI32" ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+nb_sim_run 200ns

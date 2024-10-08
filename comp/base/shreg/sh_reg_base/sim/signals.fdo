@@ -1,0 +1,35 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2015 CESNET
+# Author(s): Radek Isa <xisara00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# -------------------------------------------------------------------------
+#                       Waveform Definition
+# -------------------------------------------------------------------------
+
+proc blk_SH_REG_BASE {SH_REG_BASE_PATH} {
+
+    #controls
+    add wave  -divider "DRIVEN"
+    add wave  -noupdate    -label "CLK"        $SH_REG_BASE_PATH/CLK
+    add wave  -noupdate    -label "ENABLE"     $SH_REG_BASE_PATH/CE
+    add wave  -noupdate    -label "ADDDR"      $SH_REG_BASE_PATH/ADDR
+
+    #I/O data
+    add wave -divider "output"
+    add wave -noupdate -hex -label "DATA IN"   $SH_REG_BASE_PATH/DIN
+    add wave -noupdate -hex -label "DATA OUT"  $SH_REG_BASE_PATH/DOUT
+
+    add wave -divide "inside signals"
+    add wave -noupdate -hex -label "SRL_ADDR"  $SH_REG_BASE_PATH/SH_REG_SRL/sig_addr
+    #add wave -noupdate -hex -label "SRL_ADDR"  $SH_REG_BASE_PATH/SH_REG_VIVADO/sig_addr
+
+}
+
+proc blk_UUT {UUT_PATH} {
+
+    #add wave -divider "test"
+    #add wave -label "test"     -noupdate      $UUT_PATH/sig_test
+}

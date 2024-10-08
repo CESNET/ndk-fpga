@@ -1,0 +1,28 @@
+# Author(s): Tomas Pecenka <pecenka@liberouter.org>
+# $id$
+
+Files in current directory
+--------------------------
+
+README           - This file
+
+# Suplementary files for simulations
+fifo100_aux.vhd  - suplementary files for testing FIFO on 100MHz
+                 - using clk_gen component
+Makefile.fifoaux - makefile for fifo100_aux.vhd
+
+# Testbench files
+fifo_tb.vhd      - FIFO testbench (using fifo100_aux.vhd)
+
+# Modelsim scripts
+fifo.fdo         - behav - behavioral simulation
+fifo.tdo         - time  - simulation after PaR
+
+Run simulation
+--------------
+    Behavioral:
+            vsim -do fifo.fdo
+
+    Time:
+            gmake -f Makefile.fifoaux simt
+            vsim -do fifo.tdo

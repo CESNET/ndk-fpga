@@ -1,0 +1,26 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Daniel Kriz <danielkriz@cesnet.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "CLK & RESET"
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/RST
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/CLK
+
+#add wave -divider "RX and TX interfaces"
+#mfb_rx MFB_RX /testbench/DUT_U/VHDL_DUT_U
+#mfb_tx MVB_TX /testbench/DUT_U/VHDL_DUT_U
+
+all ITEMS_VALID /testbench/DUT_U/VHDL_DUT_U
+
+all VALIDATION_PREPARE   /testbench/DUT_U/VHDL_DUT_U/validation_prepare_i
+all VALIDATION_PREPARE_R /testbench/DUT_U/VHDL_DUT_U/validation_prepare_i/validation_prepare_r_g(0)/validation_prepare_r_i
+#all VALIDATION_PREPARE_R /testbench/DUT_U/VHDL_DUT_U/validation_prepare_i/validation_prepare_r_g(1)/validation_prepare_r_i
+all OFFSET_REACHED1      /testbench/DUT_U/VHDL_DUT_U/offset_reached1_g(0)/offset_reached1_i
+all OFFSET_REACHED2      /testbench/DUT_U/VHDL_DUT_U/offset_reached2_g(0)/offset_reached2_i
+all VALIDATION_DO        /testbench/DUT_U/VHDL_DUT_U/validation_do_i
+
+config wave -signalnamewidth 1

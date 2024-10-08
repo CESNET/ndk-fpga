@@ -1,0 +1,29 @@
+# flu_adapter.fdo: Functional simulation file for FLU_ADAPTER
+# Copyright (C) 2014 CESNET
+# Author: Vaclav Hummel <xhumme00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../.."
+
+set MATH_PKG_BASE    "$OFM_PATH/comp/base/pkg"
+
+set FLU_ADAPTER_BASE   ".."
+
+set FLU_ADAPTER_PKG_BASE "$FLU_ADAPTER_BASE/pkg/"
+
+set SIG_FILE         "$FLU_ADAPTER_BASE/sim/flu_adapter_sig.fdo"
+set TB_FILE          "$FLU_ADAPTER_BASE/sim/testbench.vhd"
+
+
+set COMPONENTS [list \
+   [ list      "FLU_ADAPTER"       $FLU_ADAPTER_BASE        "FULL"    ] \
+   [ list      "MATH_PKG"        $MATH_PKG_BASE         "MATH"        ] \
+   [ list      "FLU_ADAPTER_PKG"        $FLU_ADAPTER_PKG_BASE         ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 70us

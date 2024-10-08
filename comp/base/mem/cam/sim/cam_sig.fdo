@@ -1,0 +1,17 @@
+# cam_sig.fdo : Include file with signals for CAM
+# Copyright (C) 2006 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set CAM_PATH      "/testbench/uut"
+
+source      "signals.fdo"
+
+blk_CAM
+blk_CAM_INT
+

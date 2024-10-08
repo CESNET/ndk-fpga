@@ -1,0 +1,64 @@
+# sig.fdo : Include file with signals
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Lukas Nevrkla <xnevrk03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+
+# Paths
+set UUT_PATH  "/testbench/uut"
+set EMIF_SIM_PATH  "/testbench/emif_sim_i"
+set TB_PATH   "/testbench"
+
+source  "signals.fdo"
+
+core_logic  CORE    $UUT_PATH
+amm         AMM     $UUT_PATH
+mi          MI      $UUT_PATH/mem_tester_mi_i
+mi_parsed   MI_PARSED    $UUT_PATH
+manual_r_w  MANUAL_R_W    $UUT_PATH
+r_w_ticks   R_W_TICKS     $UUT_PATH
+
+add wave -divider ""
+add_wave "-group { testbench } -noupdate -hex"   $TB_PATH/*
+
+add wave -divider ""
+add_wave "-group { uut } -noupdate -hex"   $UUT_PATH/*
+
+add wave -divider ""
+add_wave "-group { uut_mi } -noupdate -hex"   $UUT_PATH/mem_tester_mi_i/*
+
+add wave -divider ""
+add_wave "-group { uut_mux } -noupdate -hex"   $UUT_PATH/amm_mux_i/*
+
+add wave -divider ""
+add_wave "-group { uut_amm_gen } -noupdate -hex"   $UUT_PATH/amm_gen_i/*
+
+add wave -divider ""
+add_wave "-group { amm_gen_buff } -noupdate -hex"   $UUT_PATH/amm_gen_i/buff_i/*
+
+add wave -divider ""
+add_wave "-group { uut_amm_probe } -noupdate -hex"   $UUT_PATH/amm_probe_i/*
+
+add wave -divider ""
+add_wave "-group { uut_latency_meter } -noupdate -hex"   $UUT_PATH/amm_probe_i/latency_meter_i/*
+
+add wave -divider ""
+add_wave "-group { uut_histogramer } -noupdate -hex"   $UUT_PATH/amm_probe_i/latency_meter_i/histogramer_i/*
+
+add wave -divider ""
+add_wave "-group { emif_refresh } -noupdate -hex"   $UUT_PATH/emif_refresh_i/*
+
+add wave -divider ""
+add_wave "-group { mmr_amm_gen } -noupdate -hex"   $UUT_PATH/mmr_amm_gen_i/*
+
+add wave -divider ""
+add_wave "-group { mmr_meter } -noupdate -hex"   $UUT_PATH/mmr_meter_i/*
+
+add wave -divider ""
+add_wave "-group { mmr_mux } -noupdate -hex"   $UUT_PATH/mmr_mux_i/*
+
+add wave -divider ""
+add_wave "-group { emif_sim } -noupdate -hex"   $EMIF_SIM_PATH/*
+

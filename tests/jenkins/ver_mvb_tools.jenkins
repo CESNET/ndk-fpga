@@ -1,0 +1,67 @@
+/*
+ * ver_mvb_tools.jenkins: Jenkins configuration script
+ * Copyright (C) 2021 CESNET z. s. p. o.
+ * Author(s): Jakub Cabal <cabal@cesnet.cz>
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+// Clean previous builds
+library 'liberouter'
+cleanBuilds()
+
+// /////////////////////////////////////////////////////////////////////////////
+// BASIC-VERIFICATION
+// /////////////////////////////////////////////////////////////////////////////
+// Add engines for automatic Jenkins verifications into the following list
+// FORMAT:
+//  [ 'name',           'path_to_ver',                         'script.fdo'   ],
+def COMPONENTS_VER = [\
+    ['MVB_MERGE_ITEMS', 'comp/mvb_tools/flow/merge_items/ver', 'top_level.fdo'],\
+]
+// /////////////////////////////////////////////////////////////////////////////
+
+// /////////////////////////////////////////////////////////////////////////////
+// MULTI-VERIFICATION
+// /////////////////////////////////////////////////////////////////////////////
+// Add engines for automatic Jenkins verifications into the following list
+// FORMAT:
+//  [ 'name'             , 'path_to_ver'                                      , 'fdo_file.fdo'       , 'test_pkg.sv/.vhd'   , 'settings.py'           ]
+def COMPONENTS_MULTIVER = [\
+    ['MVB_FORK'                 , 'comp/mvb_tools/flow/fork/ver'                     , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['SHAKEDOWN'                , 'comp/mvb_tools/flow/merge_n_to_m/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    //['PIPE'                     , 'comp/mvb_tools/flow/pipe/ver'                     , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['UVM_PIPE'                 , 'comp/mvb_tools/flow/pipe/uvm'                     , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
+    ['MERGE'                    , 'comp/mvb_tools/flow/merge/ver'                    , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['SPLIT'                    , 'comp/mvb_tools/flow/split/ver'                    , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['UVM_DISCARD'              , 'comp/mvb_tools/flow/discard/uvm'                  , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
+    ['CHANNEL_ROUTER'           , 'comp/mvb_tools/flow/channel_router/ver'           , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['FIFO'                     , 'comp/mvb_tools/storage/fifo/ver'                  , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['ASFIFO_BRAM_X'            , 'comp/mvb_tools/storage/asfifo_bram_xilinx/ver'    , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['ASFIFOX'                  , 'comp/mvb_tools/storage/asfifox/ver'               , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['FIFOX'                    , 'comp/mvb_tools/storage/fifox/ver'                 , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['LAST_VLD'                 , 'comp/mvb_tools/aggregate/last_vld/ver'            , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['UVM_MVB_LUT'              , 'comp/mvb_tools/storage/lookup_table/uvm'          , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
+    ['TCAM'                     , 'comp/mvb_tools/storage/tcam/ver'                  , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
+    ['GEN_DEMUX',               , 'comp/mvb_tools/flow/demux/uvm'                    , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
+    ['GEN_MUX',                 , 'comp/mvb_tools/flow/mux/uvm'                      , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
+    ['MERGE_ITEMS'              , 'comp/mvb_tools/flow/merge_items/uvm'              , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
+    ['MERGE_STREAMS_ORDERED'    , 'comp/mvb_tools/flow/merge_streams_ordered/uvm'    , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
+]
+// /////////////////////////////////////////////////////////////////////////////
+
+def COMPONENTS_HARP = [\
+    ['MVB2MFB',         'comp/mvb_tools/flow/mvb2mfb'],\
+]
+
+// Run component verifications using common script
+node('preklad') {
+    lock(label:"resources-${env.NODE_NAME}", quantity: 1) {
+        // fetch sources from GIT
+        checkout scm
+        def common_run = load "tests/jenkins/common.jenkins"
+        common_run.commonPrekladHarpRun(COMPONENTS_HARP)
+        common_run.commonPrekladVerRun(COMPONENTS_VER)
+        common_run.commonPrekladMultiVerRun(COMPONENTS_MULTIVER)
+    }
+}

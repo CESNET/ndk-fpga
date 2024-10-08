@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>nfifo2fifo</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="xvozen00">Jan Vozenilek</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+	<item>Generic number of input interfaces (of generic width).</item>
+	<item>One common output interface (of same width as all inputs together).</item>
+	<item>Behaves as FIFO on both interfaces.</item>
+	<item>Receives data from multiple flows and stores them into memory (BRAM or LUT).</item>
+	<item>Allows 2 modes of status logic.</item>
+</features>
+
+
+<!-- Bugs -->
+<bugs>
+	<item>No known bugs</item>
+</bugs>
+
+
+<!-- Things to do -->
+<todo>
+	<item>Nothing</item>
+</todo>
+
+
+<!-- Short Block description -->
+<description>
+
+	<!-- THE MOST IMPORTANT PART!!! There should be about 8 rows which
+	     fully describe the component and its main functions -->
+
+	The component receives data from multiple interfaces via sh_fifo
+  (FIFO from shift registers - one for each flow)	and stores them into memory
+  (BRAM - dp_bmem or LUT - dp_distmem - wrapped in buf_mem). On read interface
+  data is accessed as	in FIFO - by giving a READ signal with BLOCK_ADDR (number
+  of input interface where data were received). READ signal is also used as
+  pipeline enable - can pause reading). DATA_VLD signal marks valid data.
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+
+		<generic name="DATA_WIDTH" type="integer" default="64">
+			Output data width (at output FIFO interface).
+		</generic>
+		<generic name="FLOWS" type="integer" default="2">
+			Number of input flows (each DATA_WIDTH/FLOWS wide), can also be 1.
+		</generic>
+		<generic name="BLOCK_SIZE" type="integer" default="512">
+			Number of items (DATA_WIDTH wide) that can be stored for each block.
+		</generic>
+		<generic name="LUT_MEMORY" type="boolean" default="false">
+			Type of memory to be used for data storage (true = LUT, false = BRAM).
+		</generic>
+    <generic name="OUTPUT_REG" type="boolean" default="false">
+			Turns usage of output register (for breaking critical path) on/off.
+      Adds 1 CLK cycle to reading latency if set to true.
+		</generic>
+		<generic name="GLOB_STATE" type="boolean" default="false">
+			False: using all available space in component (memory and FIFOs);
+			True: allows only storing BLOCK_SIZE items (DATA_WIDTH wide) for each block.
+		</generic>
+
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Common signals</divider>
+		<port name="CLK" dir="in" width="1">
+			Global FPGA clock.
+		</port>
+		<port name="RESET" dir="in" width="1">
+			Global synchronous reset.
+		</port>
+
+		<divider>Write interface</divider>
+		<port name="DATA_IN" dir="in" width="DATA_WIDTH">
+			Input data (DATA_WIDTH/FLOWS for each flow).
+		</port>
+		<port name="WRITE" dir="in" width="FLOWS">
+			Write signal (one bit for each flow).
+		</port>
+
+		<divider>Read interface</divider>
+		<port name="DATA_OUT" dir="out" width="DATA_WIDTH">
+			Output data.
+		</port>
+		<port name="DATA_VLD" dir="out" width="1">
+			Valid signal for output data.
+		</port>
+		<port name="BLOCK_ADDR" dir="in" width="log2(FLOWS)">
+			Number of input flow on which wanted data was received.
+		</port>
+		<port name="READ" dir="in" width="1">
+			Read signal (indicates BLOCK_ADDR is ready and requests data).
+		</port>
+		<port name="PIPE_EN" dir="in" width="1">
+			Pipeline enable to memory - can pause reading when target becomes busy.
+      Combined with OUTPUT_REG = true can cause reading old data.
+		</port>
+
+		<divider>Control signals</divider>
+		<port name="EMPTY" dir="out" width="FLOWS">
+			Set when no valid data (= one item of DATA_WIDTH) is available in memory
+      (one bit for each flow).
+		</port>
+		<port name="FULL" dir="out" width="FLOWS">
+			Set when no more data can be stored in component (affected by GLOB_STATE)
+      - no writing possible (one bit for each flow).
+		</port>
+		<port name="STATUS" dir="out" width="log2(BLOCK_SIZE+1)*FLOWS">
+			GLOB_STATE = false: Number of items (DATA_WIDTH wide) currently stored
+      in memory - indicates memory usage, not affected by data in input FIFOs;
+			GLOB_STATE = true: Number of items (DATA_WIDTH wide) that are currently
+      in whole component - including data in input FIFOs -> data need NOT to be
+      available yet!
+      Note: Signal width is log2(BLOCK_SIZE+1) for each flow to allow
+      indication of all states from empty (0) to full (BLOCK_SIZE).
+		</port>
+
+	</port_map>
+
+</interface>
+
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+<h1>NFIFO2FIFO info</h1>
+
+	<p>
+    Equation DATA_WIDTH mod FLOWS = 0 is asserted (DATA_WIDTH/FLOWS is input
+    width of single generic interface, all of them are joined into a vector).
+    At each input flow data are received to sh_fifo and then send to memory
+    using a switching logic (rx_switch). Reading is done by giving a number
+    of input flow, where data were received (BLOCK_ADDR), and a READ signal.
+    Empty signal becomes inactive (= reading allowed) after a whole item
+    (of DATA_WIDTH, i.e. FLOWS items were received on input) is available
+    (affected by GLOB_STATE).
+    Read latency is 1 CLK cycle for BRAM and 0 for LUT - if OUTPUT_REG = true
+    than register is put into the path and latency is 1 cycle greater.
+    When FLOWS is set to 1, no switching is done.
+	</p>
+
+<h1>Schemes</h1>
+
+	<p>
+		The block structure of the component is in the following figure.
+		It's composed of memory (dp_distmem or dp_bmem without output register
+    wrapped in buf_mem), input sh_fifos (FIFOs from shift registers),
+    control logic (buf_status) and switching logic (rx_switch).
+		<obr src="./fig/nfifo2fifo.fig">Component architecture</obr>
+	</p>
+
+<h1>Frequency and resources usage</h1>
+<p>
+   <tab sloupce="cccccc">
+   <tr>
+      <th>FPGA</th>
+      <th>Architecture</th>
+      <th>Tool</th>
+      <th>Generic settings</th>
+      <th>Slices</th>
+      <th>Max. Frequency</th>
+   </tr>
+      <tr>
+         <td>xc2vp50</td>
+         <td>FULL</td>
+         <td>precision</td>
+         <td>DATA_WIDTH=64 FLOWS=2 BLOCK_SIZE=512 LUT_MEMORY=false GLOB_STATE=false </td>
+         <td>169</td>
+         <td>174.551</td>
+      </tr>
+      <tr>
+         <td>xc2vp50</td>
+         <td>FULL</td>
+         <td>precision</td>
+         <td>DATA_WIDTH=64 FLOWS=8 BLOCK_SIZE=512 LUT_MEMORY=false GLOB_STATE=false </td>
+         <td>894</td>
+         <td>120.802</td>
+      </tr>
+      <tr>
+         <td>xc2vp50</td>
+         <td>FULL</td>
+         <td>precision</td>
+         <td>DATA_WIDTH=64 FLOWS=2 BLOCK_SIZE=16 LUT_MEMORY=true GLOB_STATE=true </td>
+         <td>288</td>
+         <td>189.970</td>
+      </tr>
+      <tr>
+         <td>xc2vp50</td>
+         <td>FULL</td>
+         <td>precision</td>
+         <td>DATA_WIDTH=64 FLOWS=8 BLOCK_SIZE=16 LUT_MEMORY=true GLOB_STATE=true </td>
+         <td>1270</td>
+         <td>134.463</td>
+      </tr>
+      <tr>
+         <td>xc2vp50</td>
+         <td>FULL</td>
+         <td>xst</td>
+         <td>DATA_WIDTH=64 FLOWS=2 BLOCK_SIZE=512 LUT_MEMORY=false GLOB_STATE=false </td>
+         <td>177</td>
+         <td>172.032</td>
+      </tr>
+      <tr>
+         <td>xc2vp50</td>
+         <td>FULL</td>
+         <td>xst</td>
+         <td>DATA_WIDTH=64 FLOWS=8 BLOCK_SIZE=512 LUT_MEMORY=false GLOB_STATE=false </td>
+         <td>815</td>
+         <td>121.652</td>
+      </tr>
+      <tr>
+         <td>xc2vp50</td>
+         <td>FULL</td>
+         <td>xst</td>
+         <td>DATA_WIDTH=64 FLOWS=2 BLOCK_SIZE=16 LUT_MEMORY=true GLOB_STATE=true </td>
+         <td>278</td>
+         <td>176.375</td>
+      </tr>
+      <tr>
+         <td>xc2vp50</td>
+         <td>FULL</td>
+         <td>xst</td>
+         <td>DATA_WIDTH=64 FLOWS=8 BLOCK_SIZE=16 LUT_MEMORY=true GLOB_STATE=true </td>
+         <td>1206</td>
+         <td>109.532</td>
+      </tr>
+      <tr>
+         <td>xc5vlx110</td>
+         <td>FULL</td>
+         <td>xst</td>
+         <td>DATA_WIDTH=64 FLOWS=2 BLOCK_SIZE=512 LUT_MEMORY=false GLOB_STATE=false </td>
+         <td>168</td>
+         <td>250.396</td>
+      </tr>
+      <tr>
+         <td>xc5vlx110</td>
+         <td>FULL</td>
+         <td>xst</td>
+         <td>DATA_WIDTH=64 FLOWS=8 BLOCK_SIZE=512 LUT_MEMORY=false GLOB_STATE=false </td>
+         <td>413</td>
+         <td>188.507</td>
+      </tr>
+      <tr>
+         <td>xc5vlx110</td>
+         <td>FULL</td>
+         <td>xst</td>
+         <td>DATA_WIDTH=64 FLOWS=2 BLOCK_SIZE=16 LUT_MEMORY=true GLOB_STATE=true </td>
+         <td>166</td>
+         <td>199.362</td>
+      </tr>
+      <tr>
+         <td>xc5vlx110</td>
+         <td>FULL</td>
+         <td>xst</td>
+         <td>DATA_WIDTH=64 FLOWS=8 BLOCK_SIZE=16 LUT_MEMORY=true GLOB_STATE=true </td>
+         <td>396</td>
+         <td>160.599</td>
+      </tr>
+<nazev>Chip utilization and maximal frequency.</nazev>
+</tab>
+</p>
+
+</body>
+
+</source>

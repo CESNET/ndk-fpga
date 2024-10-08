@@ -1,0 +1,35 @@
+# Modelsim script - behavioral simulation
+# $Id$
+
+# Create library
+vlib work
+
+# Compile files
+vcom -93 ../clk2x.vhd
+vcom -93 ../clk_gen.vhd
+vcom -93 clk_gen_tb.vhd
+
+# Run simulator
+vsim -t 1ps  -L xilinxcorelib  -lib work testbench
+
+view wave
+view signals
+add wave *
+
+add wave -divider {DCM}
+add wave /testbench/uut/clk100_u/u_dcm/clkin
+add wave /testbench/uut/clk100_u/u_dcm/rst
+add wave /testbench/uut/clk100_u/u_dcm/clk0_out
+add wave /testbench/uut/clk100_u/u_dcm/clk2x_out
+add wave /testbench/uut/clk100_u/u_dcm/clkdv_out
+add wave /testbench/uut/clk100_u/u_dcm/locked_out
+
+add wave -divider {DCM_V}
+add wave /testbench/uut/clk100_u/u_dcmdv/clkin
+add wave /testbench/uut/clk100_u/u_dcmdv/rst
+add wave /testbench/uut/clk100_u/u_dcmdv/clk0_out
+add wave /testbench/uut/clk100_u/u_dcmdv/clk2x_out
+add wave /testbench/uut/clk100_u/u_dcmdv/clkdv_out
+add wave /testbench/uut/clk100_u/u_dcmdv/locked_out
+
+run 8000 ns

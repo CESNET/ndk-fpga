@@ -1,0 +1,28 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Ivan Bryndza <xbrynd00@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc flu_bfm {NAME PATH} {
+    add wave -divider "$NAME"
+      add_wave "-noupdate -color yellow -label RESET" $PATH/RESET
+      add_wave "-noupdate -color yellow -label CLK"   $PATH/CLK_100
+      add_wave "-noupdate -hex -label TX_SOP"   $PATH/tx_sop
+      add_wave "-noupdate -hex -label TX_EOP"   $PATH/tx_eop
+      add_wave "-noupdate -hex -label TX_SOP_POS"   $PATH/tx_sop_pos
+      add_wave "-noupdate -hex -label TX_EOP_POS"   $PATH/tx_eop_pos
+      add_wave "-noupdate -hex -label TX_SRC_RDY"   $PATH/tx_src_rdy
+      add_wave "-noupdate -hex -label TX_DST_RDY"   $PATH/tx_dst_rdy
+      add_wave "-noupdate -hex -label TX_DATA"   $PATH/tx_data
+      add wave -divider "Internal signals"
+      add_wave "-noupdate -hex -label src_drive"   /testbench/flu_bfm_u/SRC_DRIVE
+      add_wave "-noupdate -hex -label src_rdy"   /testbench/flu_bfm_u/SRC_RDY
+}

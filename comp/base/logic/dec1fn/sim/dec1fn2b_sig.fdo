@@ -1,0 +1,22 @@
+# agregator_sig.fdo : Include file with signals
+# Copyright (C) 2007 CESNET
+# Author: Jan Koritak <jenda@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set TB_PATH             "/testbench"
+
+add wave -divider "BIN -> 1fN"
+add wave -noupdate -label ADDR $TB_PATH/u1_addr
+add wave -noupdate -label DO $TB_PATH/u1_do
+add wave -noupdate -label ENABLE $TB_PATH/u1_enable
+
+add wave -divider "1fN -> BIN"
+add wave -noupdate -label DI $TB_PATH/u2_di
+add wave -noupdate -label ADDR $TB_PATH/u2_addr
+add wave -noupdate -label ENABLE $TB_PATH/u2_enable
+

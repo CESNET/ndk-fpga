@@ -1,0 +1,29 @@
+# FIFO (after PaR) simulation script
+# Author(s): Tomas Pecenka <pecenka@liberouter.org>
+# $Id$
+
+vlib work
+vcom -93 -work work fifo100_aux.sim.vhd fifo_tb.vhd
+vsim -t 1ps -sdfmax /UUT=fifo100_aux.sim.sdf -lib work testbench
+
+view wave
+view structure
+view signals
+
+add wave /testbench/reset
+add wave /testbench/clk_100
+add wave -hex /testbench/data_in
+add wave /testbench/write_req
+add wave -hex /testbench/data_out
+add wave /testbench/read_req
+add wave /testbench/empty
+add wave /testbench/full
+add wave -divider {clk_gen divider}
+add wave /testbench/clk_50
+add wave /testbench/clk_lock
+add wave -divider {Memory adresses}
+add wave -label READ_addr -radix hexadecimal  /testbench/uut/u_fifo_read_address
+add wave -label WRITE_addr -radix hexadecimal /testbench/uut/u_fifo_write_address
+
+run 6 us
+

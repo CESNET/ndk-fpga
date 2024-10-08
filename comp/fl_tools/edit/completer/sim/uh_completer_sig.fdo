@@ -1,0 +1,29 @@
+# uh_completer_sig.fdo : Include file with signals
+# Copyright (C) 2007 CESNET
+# Author: Martin Louda <sandin@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+add_wave "-noupdate -label CLK" /testbench/CLK
+add_wave "-noupdate -label RESET" /testbench/RESET
+
+add wave -divider "COMPLETER ifc"
+add_wave "-noupdate -label MI" /testbench/uut/mi
+add_wave "-noupdate -label DI" /testbench/di
+add_wave "-noupdate -label DO" /testbench/do
+add wave -divider "COMPLETER internals"
+add_wave "-noupdate -label cnt_input" /testbench/uut/cnt_input
+add_wave "-noupdate -label uh_wr" /testbench/uut/uh_wr
+add_wave "-noupdate -label uh_addr" /testbench/uut/uh_addr
+add_wave "-noupdate -label uh_data" /testbench/uut/uh_data
+add_wave "-noupdate -label sig_uh_data" /testbench/uut/sig_uh_data
+add_wave "-noupdate -label reg_data" /testbench/uut/reg_data
+add wave -divider "UH_COMPLETER ifc"
+add_wave "-noupdate -label CLK" /testbench/uut_uh/clk
+add_wave "-noupdate -label RESET" /testbench/uut_uh/reset
+add_wave "-noupdate -label MI" /testbench/uut_uh/mi
+add_wave "-noupdate -label DI" /testbench/uut_uh/di
+add_wave "-noupdate -label DO" /testbench/uut_uh/do

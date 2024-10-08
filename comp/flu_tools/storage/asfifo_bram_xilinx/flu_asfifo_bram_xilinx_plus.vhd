@@ -1,0 +1,110 @@
+-- flu_asfifo_bram_xilinx_plus.vhd: FLU+ wrapper of asynchronous FIFO implemented in Xilinx BRAMs
+-- Copyright (C) 2017 CESNET
+-- Author(s): Lukas Kekely <kekely@cesnet.cz>
+--
+-- SPDX-License-Identifier: BSD-3-Clause
+--
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.std_logic_arith.all;
+use IEEE.std_logic_unsigned.all;
+use IEEE.std_logic_misc.all;
+use work.math_pack.all;
+
+
+
+entity FLU_ASFIFO_BRAM_XILINX_PLUS is
+  generic(
+    DEVICE                  : string := "7SERIES"; --! "VIRTEX6", "7SERIES", ULTRASCALE
+    DATA_WIDTH              : integer := 256;
+    SOP_POS_WIDTH           : integer := 2;
+    ITEMS                   : integer := 512; --! 512, 1024, 2048, 4096, 8192 (less effective)
+    -- Precision of FULL signal (write interface) assertion.
+    --    true = full FIFO's depth can be used, but timing on WR and FULL is worse for high DATA_WIDTH
+    --   false = FIFO is 4 items shallower (take this into accont when setting a value of ALMOST_FULL_OFFSET!), but timing on WR and FULL is better
+    -- NOTE: disabling makes a difference only when FIRST_WORD_FALL_THROUGH is true, DEVICE is VIRTEX6 or 7SERIES and FIFO size (DATA_WIDTH*ITEMS) is more than 36Kb
+    PRECISE_FULL            : boolean := true;
+    -- Timing speed of EMPTY signal (read interface) assertion.
+    --   false = standard ORing of flags (just a few LUTs), but timing on RD anf EMPTY is worse for high DATA_WIDTH
+    --    true = more extra resources (mainly registers), but timing on RD and EMPTY is better
+    -- NOTE: enabling makes a difference only when FIRST_WORD_FALL_THROUGH is true, DEVICE is VIRTEX6 or 7SERIES and FIFO size (DATA_WIDTH*ITEMS) is more than 36Kb
+    FAST_EMPTY              : boolean := false;
+    -- Parameter required to be correctly set when FAST_EMPTY is true.
+    --   TX_CLK_PERIOD <= RX_CLK_PERIOD : value of 1 is sufficient
+    --    TX_CLK_PERIOD > RX_CLK_PERIOD : value must be at least roundup(CLK_RD_PERIOD/CLK_WR_PERIOD)
+    FAST_EMPTY_DEPTH        : integer := 1;
+    CHANNEL_WIDTH           : integer:= 3
+  );
+  port(
+    RX_CLK         : in  std_logic;
+    RX_RESET       : in  std_logic;
+    RX_DATA        : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+    RX_CHANNEL     : in  std_logic_vector(CHANNEL_WIDTH-1 downto 0);
+    RX_SOP_POS     : in  std_logic_vector(SOP_POS_WIDTH-1 downto 0);
+    RX_EOP_POS     : in  std_logic_vector(log2(DATA_WIDTH/8) - 1 downto 0);
+    RX_SOP         : in  std_logic;
+    RX_EOP         : in  std_logic;
+    RX_SRC_RDY     : in  std_logic;
+    RX_DST_RDY     : out std_logic; -- NOTE: assertion delay of few cycles after valid TX cycle (UG473) (same as: read from FULL fifo will deassert FULL only after few cycles)
+
+    TX_CLK         : in  std_logic;
+    TX_RESET       : in  std_logic; -- not used!
+    TX_DATA        : out std_logic_vector(DATA_WIDTH-1 downto 0);
+    TX_CHANNEL     : out std_logic_vector(CHANNEL_WIDTH-1 downto 0);
+    TX_SOP_POS     : out std_logic_vector(SOP_POS_WIDTH-1 downto 0);
+    TX_EOP_POS     : out std_logic_vector(log2(DATA_WIDTH/8) - 1 downto 0);
+    TX_SOP         : out std_logic;
+    TX_EOP         : out std_logic;
+    TX_SRC_RDY     : out std_logic; -- NOTE: assertion delay of few cycles after valid RX cycle (UG473) (same as: write into EMPTY fifo will deassert EMPTY only after few cycles)
+    TX_DST_RDY     : in  std_logic
+  );
+end entity;
+
+
+
+architecture full of FLU_ASFIFO_BRAM_XILINX_PLUS is
+
+  constant EOP_POS_WIDTH : integer := log2(DATA_WIDTH/8);
+  constant DW : integer := DATA_WIDTH + CHANNEL_WIDTH + SOP_POS_WIDTH + EOP_POS_WIDTH + 1 + 1;
+
+  signal di, do : std_logic_vector(DW-1 downto 0);
+  signal full, empty : std_logic;
+
+begin
+
+  fifo_core : entity work.ASFIFO_BRAM_XILINX
+  generic map (
+    DEVICE                  => DEVICE,
+    DATA_WIDTH              => DW,
+    ITEMS                   => ITEMS,
+    DO_REG                  => true,
+    FIRST_WORD_FALL_THROUGH => true,
+    PRECISE_FULL            => PRECISE_FULL,
+    FAST_EMPTY              => FAST_EMPTY,
+    FAST_EMPTY_DEPTH        => FAST_EMPTY_DEPTH
+  ) port map (
+    RST_WR   => RX_RESET,
+    CLK_WR   => RX_CLK,
+    DI       => di,
+    WR       => RX_SRC_RDY,
+    FULL     => full,
+    RST_RD   => TX_RESET,
+    CLK_RD   => TX_CLK,
+    DO       => do,
+    RD       => TX_DST_RDY,
+    EMPTY    => empty
+  );
+
+  di <= RX_DATA & RX_CHANNEL & RX_SOP_POS & RX_EOP_POS & RX_SOP & RX_EOP;
+  RX_DST_RDY <= not full;
+
+  TX_DATA    <= do(DW-1 downto DW-DATA_WIDTH);
+  TX_CHANNEL <= do(DW-DATA_WIDTH-1 downto SOP_POS_WIDTH+EOP_POS_WIDTH+2);
+  TX_SOP_POS <= do(SOP_POS_WIDTH+EOP_POS_WIDTH+1 downto EOP_POS_WIDTH+2);
+  TX_EOP_POS <= do(EOP_POS_WIDTH+1 downto 2);
+  TX_SOP     <= do(1);
+  TX_EOP     <= do(0);
+  TX_SRC_RDY <= not empty;
+
+end architecture;

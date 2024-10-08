@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>MI Splitter</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="washek">Vaclav Bartos</author>
+       <author login="tomalek">Tomas Malek</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+   <item>Allows to connect generic number of components to one MI interface</item>
+   <item>Generic data width</item>
+   <item>Generic adress width</item>
+   <item>Optional pipeline register</item>
+</features>
+
+
+<!-- Bugs
+<bugs>
+</bugs>
+-->
+
+<!-- Things to do
+<todo>
+</todo>
+-->
+
+<!-- Short Block description -->
+<description>
+
+	<!-- THE MOST IMPORTANT PART!!! There should be about 8 rows which
+	     fully describe the component and its main functions -->
+
+   <p>Converts one MI (Memory Interface) to generic number of
+   MIs (needn't to be a power of two).</p>
+
+   <p>Connected components must have the same adress width.</p>
+
+   <p>If components have different delay (latency), you must ensure that
+   any reading transaction from one component is complete done before you start
+   reading from faster component.</p>
+
+   <p>If you want to read from more components at one time, these components
+   must have the same latency.</p>
+
+   <p>In general, read data from connected components must go in the same order
+   as they were requested.</p>
+
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+
+		<generic name="ITEMS" type="integer" default="">
+			Number of output MIs
+		</generic>
+		<generic name="ADDR_WIDTH" type="integer" default="">
+			Number of adress bits of every output MI
+		</generic>
+		<generic name="DATA_WIDTH" type="integer" default="">
+			Number of data bits
+		</generic>
+		<generic name="PIPE" type="boolean" default="false">
+			Enables pipeline register on input interface
+		</generic>
+
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Common signals</divider>
+		<port  name="CLK" dir="in" width="1">
+			Global FPGA clock
+		</port>
+		<port  name="RESET" dir="in" width="1">
+			Global reset
+		</port>
+
+		<divider>Input interface</divider>
+		<port name="IN_DWR" dir="in" width="DATA_WIDTH">
+		   Data write
+		</port>
+		<port name="IN_ADDR" dir="in" width="ADDR_WIDTH + log2(ITEMS)">
+		   Adress. Width is extended (on MSB side) by log2(ITEMS) bits, that are used to
+         address components.
+		</port>
+		<port name="IN_BE" dir="in" width="DATA_WIDTH/8">
+		   Byte enable
+		</port>
+      <port name="IN_RD" dir="in" width="1">
+		   Read request
+		</port>
+		<port name="IN_WR" dir="in" width="1">
+		   Write request
+		</port>
+		<port name="IN_ARDY" dir="out" width="1">
+		   Adress ready (accepted)
+		</port>
+		<port name="IN_DRD" dir="out" width="DATA_WIDTH">
+		   Data read
+		</port>
+		<port name="IN_DRDY" dir="out" width="1">
+		   Data ready
+		</port>
+
+		<divider>Output interfaces vector</divider>
+		<port name="OUT_DWR" dir="out" width="ITEMS*DATA_WIDTH">
+		   Data write. Output ports are implemented as one vector. For
+         example, data for comp1 is on bits 0-31, comp2 32-63, etc.
+         (when DATA_WIDTH = 32).<br />
+         Analogically for other ports.
+		</port>
+		<port name="OUT_ADDR" dir="out" width="ITEMS*ADDR_WIDTH">
+		   Adress
+		</port>
+		<port name="OUT_BE" dir="out" width="ITEMS*DATA_WIDTH/8">
+		   Byte enable
+		</port>
+      <port name="OUT_RD" dir="out" width="ITEMS">
+		   Read request
+		</port>
+		<port name="OUT_WR" dir="out" width="ITEMS">
+		   Write request
+		</port>
+		<port name="OUT_ARDY" dir="in" width="ITEMS">
+		   Adress ready (accepted)
+		</port>
+		<port name="OUT_DRD" dir="in" width="ITEMS*DATA_WIDTH">
+		   Data read
+		</port>
+		<port name="OUT_DRDY" dir="in" width="ITEMS">
+		   Data ready
+		</port>
+
+	</port_map>
+
+</interface>
+
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+
+<h1>Scheme</h1>
+
+<p>
+   <obr src="./fig/mi_splitter.fig">Scheme of MI Splitter</obr>
+</p>
+
+<h1>Frequency and resource usage</h1>
+
+<p>-- TODO --</p>
+
+
+
+</body>
+
+</source>
+
+
+

@@ -1,0 +1,21 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc mi32 { UUT } {
+   add wave -divider "MI32"
+   add_wave "-noupdate -hex" $UUT/MI_*
+}
+
+proc tx { UUT } {
+   add wave -divider "TX"
+   add_wave "-noupdate -hex" $UUT/TX_*
+}
+
+proc sig { UUT } {
+   add wave -divider "internal signals"
+   add_wave "-noupdate -hex" $UUT/s_*
+}

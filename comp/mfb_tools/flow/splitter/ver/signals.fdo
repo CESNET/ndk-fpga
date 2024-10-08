@@ -1,0 +1,67 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2018 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc ed {NAME PATH} {
+   add_wave "-group {$NAME} -noupdate -hex" $PATH/ED_*
+}
+
+proc rx {NAME PATH} {
+   add_wave "-group {RX} -group {MVB} -noupdate -hex" $PATH/RX_MVB_HDR
+   add_wave "-group {RX} -group {MVB} -noupdate -hex" $PATH/RX_MVB_SWITCH
+   add_wave "-group {RX} -group {MVB} -noupdate -hex" $PATH/RX_MVB_PAYLOAD
+   add_wave "-group {RX} -group {MVB} -noupdate -hex" $PATH/RX_MVB_VLD
+   add_wave "-group {RX} -group {MVB} -noupdate -hex" $PATH/RX_MVB_SRC_RDY
+   add_wave "-group {RX} -group {MVB} -noupdate -hex" $PATH/RX_MVB_DST_RDY
+
+   add_wave "-group {RX} -group {MFB} -noupdate -hex" $PATH/RX_MFB_DATA
+   add_wave "-group {RX} -group {MFB} -noupdate -hex" $PATH/RX_MFB_SOF
+   add_wave "-group {RX} -group {MFB} -noupdate -hex" $PATH/RX_MFB_EOF
+   add_wave "-group {RX} -group {MFB} -noupdate -hex" $PATH/RX_MFB_SOF_POS
+   add_wave "-group {RX} -group {MFB} -noupdate -hex" $PATH/RX_MFB_EOF_POS
+   add_wave "-group {RX} -group {MFB} -noupdate -hex" $PATH/RX_MFB_SRC_RDY
+   add_wave "-group {RX} -group {MFB} -noupdate -hex" $PATH/RX_MFB_DST_RDY
+
+   add_wave -divider
+}
+
+proc tx {NAME PATH} {
+   add_wave "-group {TX0} -group {MVB} -noupdate -hex" $PATH/TX0_MVB_HDR
+   add_wave "-group {TX0} -group {MVB} -noupdate -hex" $PATH/TX0_MVB_VLD
+   add_wave "-group {TX0} -group {MVB} -noupdate -hex" $PATH/TX0_MVB_SRC_RDY
+   add_wave "-group {TX0} -group {MVB} -noupdate -hex" $PATH/TX0_MVB_DST_RDY
+
+   add_wave "-group {TX0} -group {MFB} -noupdate -hex" $PATH/TX0_MFB_DATA
+   add_wave "-group {TX0} -group {MFB} -noupdate -hex" $PATH/TX0_MFB_SOF
+   add_wave "-group {TX0} -group {MFB} -noupdate -hex" $PATH/TX0_MFB_EOF
+   add_wave "-group {TX0} -group {MFB} -noupdate -hex" $PATH/TX0_MFB_SOF_POS
+   add_wave "-group {TX0} -group {MFB} -noupdate -hex" $PATH/TX0_MFB_EOF_POS
+   add_wave "-group {TX0} -group {MFB} -noupdate -hex" $PATH/TX0_MFB_SRC_RDY
+   add_wave "-group {TX0} -group {MFB} -noupdate -hex" $PATH/TX0_MFB_DST_RDY
+
+   add_wave "-group {TX1} -group {MVB} -noupdate -hex" $PATH/TX1_MVB_HDR
+   add_wave "-group {TX1} -group {MVB} -noupdate -hex" $PATH/TX1_MVB_VLD
+   add_wave "-group {TX1} -group {MVB} -noupdate -hex" $PATH/TX1_MVB_SRC_RDY
+   add_wave "-group {TX1} -group {MVB} -noupdate -hex" $PATH/TX1_MVB_DST_RDY
+
+   add_wave "-group {TX1} -group {MFB} -noupdate -hex" $PATH/TX1_MFB_DATA
+   add_wave "-group {TX1} -group {MFB} -noupdate -hex" $PATH/TX1_MFB_SOF
+   add_wave "-group {TX1} -group {MFB} -noupdate -hex" $PATH/TX1_MFB_EOF
+   add_wave "-group {TX1} -group {MFB} -noupdate -hex" $PATH/TX1_MFB_SOF_POS
+   add_wave "-group {TX1} -group {MFB} -noupdate -hex" $PATH/TX1_MFB_EOF_POS
+   add_wave "-group {TX1} -group {MFB} -noupdate -hex" $PATH/TX1_MFB_SRC_RDY
+   add_wave "-group {TX1} -group {MFB} -noupdate -hex" $PATH/TX1_MFB_DST_RDY
+
+   add_wave -divider
+}
+
+proc int {NAME PATH} {
+   add_wave "-group {$NAME} -noupdate -hex" $PATH/s_*
+}
+
+proc all {NAME PATH} {
+   add_wave "-group {$NAME} -noupdate -hex" $PATH/*
+}

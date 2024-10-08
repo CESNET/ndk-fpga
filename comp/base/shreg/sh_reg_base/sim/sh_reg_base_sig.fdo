@@ -1,0 +1,21 @@
+# lzss_sig.fdo : Include file with signal procedures
+# Copyright (C) 2015 CESNET
+# Author(s): Radek Isa <xisara00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+#
+
+# Paths
+set SH_REG_BASE_PATH        "/testbench/UUT"
+set UUT_PATH         "/testbench"
+#set FSM_PATH         "$ENC_PATH/FSM_I"
+
+
+# Files with signals
+source "signals.fdo"
+
+blk_SH_REG_BASE $SH_REG_BASE_PATH
+blk_UUT $UUT_PATH
+#blk_FSM $FSM_PATH
+

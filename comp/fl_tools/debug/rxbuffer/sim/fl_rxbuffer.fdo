@@ -1,0 +1,26 @@
+# fl_rxbuffer.fdo: FrameLink RXBuffer functional simulation file
+# Copyright (C) 2006 CESNET
+# Author: Libor POlcak <xpolca03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set RXBUFFER_BASE    "$OFM_PATH/comp/fl_tools/debug/rxbuffer"
+set MI32_SIM_BASE    "$OFM_PATH/comp/mi_tools/sim_old"
+set FL_SIM_BASE      "$OFM_PATH/comp/fl_tools/debug/sim"
+
+set SIG_FILE         "$RXBUFFER_BASE/sim/fl_rxbuffer_sig.fdo"
+set TB_FILE          "$RXBUFFER_BASE/sim/fl_rxbuffer_tb.vhd"
+
+set COMPONENTS [list \
+                  [ list "MI32_SIM"       $MI32_SIM_BASE        "FULL" ] \
+                  [ list "FL_SIM"         $FL_SIM_BASE          "FULL" ] \
+                  [ list "FL_RXBUFFER"    $RXBUFFER_BASE        "FULL" ] \
+               ]
+set PACKAGES "$FL_SIM_BASE/fl_sim_oper.vhd"
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 5us

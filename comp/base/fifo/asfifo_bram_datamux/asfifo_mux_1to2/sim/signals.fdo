@@ -1,0 +1,49 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Viktor Pus <pus@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+
+
+proc write_part {NAME PATH} {
+   add wave -divider "$NAME"
+	add_wave "-noupdate      -label CLK_WR"              $PATH/clk_wr
+	add_wave "-noupdate      -label RST_WR"              $PATH/rst_wr
+
+	add_wave "-noupdate -dec -label DI"                  $PATH/di
+	add_wave "-noupdate      -label WR"                  $PATH/wr
+	add_wave "-noupdate      -label EOP"                 $PATH/EOP
+	add_wave "-noupdate      -label AFULL"               $PATH/afull
+	add_wave "-noupdate      -label FULL"                $PATH/full
+}
+
+proc read_part {NAME PATH} {
+   add wave -divider "$NAME"
+	add_wave "-noupdate      -label CLK_RD"              $PATH/clk_rd
+	add_wave "-noupdate      -label RST_RD"              $PATH/rst_rd
+	add_wave "-noupdate      -label RD"                  $PATH/rd
+	add_wave "-noupdate      -label AEMPTY"              $PATH/aempty
+	add_wave "-noupdate      -label EMPTY"               $PATH/empty
+	add_wave "-noupdate      -label DO_VLD"              $PATH/DO_VLD
+	add_wave "-noupdate      -label DO_VLD_H"            $PATH/DO_VLD_H
+}
+
+proc internal {NAME PATH} {
+
+
+
+
+
+	add_wave "-noupdate		 -label sig_wr_low" 		 $PATH/wr_low
+	add_wave "-noupdate	-dec -label sig_wr_high" 		 $PATH/wr_high
+	add_wave "-noupdate	-dec -label sig_data_high" 		 $PATH/data_high
+	add_wave "-noupdate	-dec -label sig_data_low" 		 $PATH/data_low
+#add_wave "-noupdate	-dec -label sig_fifo_out" 		 $PATH/fifo_out
+	add_wave "-noupdate		 -label sig_empty_l"	     $PATH/empty_l
+	add_wave "-noupdate		 -label sig_empty_h"	     $PATH/empty_h
+	add_wave "-noupdate		 -label sig_present_state" 	 $PATH/present_state
+	add_wave "-noupdate -hex -label DO"                  $PATH/do
+}

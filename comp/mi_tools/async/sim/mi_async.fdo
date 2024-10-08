@@ -1,0 +1,28 @@
+# mi_async.fdo: Simulation script
+# Copyright (C) 2020 CESNET z.s.p.o.
+# Author: Tomas Hak <xhakto01@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Directories and files overview
+set FIRMWARE_BASE    "../../../.."
+set OFM_PATH         "$FIRMWARE_BASE"
+set ENTITY_BASE      ".."
+
+set TB_FILE          "testbench.vhd"
+set SIG_FILE         "mi_async_sig.fdo"
+
+# Modules definition
+set COMPONENTS [ list \
+    [ list "MI_ASYNC" $ENTITY_BASE "FULL" ] \
+]
+
+# Global include file for compilation
+source "$OFM_PATH/build/Modelsim.inc.fdo"
+
+# Suppress warnings from libraries
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+set  NumericStdNoWarnings 1
+
+# File with signals
+nb_sim_run

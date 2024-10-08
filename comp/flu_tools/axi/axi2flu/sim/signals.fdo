@@ -1,0 +1,57 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Ivan Bryndza <xbrynd00@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_AXI2FLU_RX { } {
+
+    global TB_PATH
+    global AXI2FLU_PATH
+
+    add wave -divider "AXI INPUT SIGNALS"
+    add_wave "-noupdate -hex -label RX_TDATA"  /$TB_PATH/RX_TDATA
+    add_wave "-noupdate -hex -label RX_TKEEP"  /$TB_PATH/RX_TKEEP
+    add_wave "-noupdate -hex -label RX_TLAST"  /$TB_PATH/RX_TLAST
+    add_wave "-noupdate -hex -label RX_TVALID" /$TB_PATH/RX_TVALID
+    add_wave "-noupdate -hex -label RX_TREADY" /$TB_PATH/RX_TREADY
+
+    add wave -divider "In pipe signals"
+    add_wave "-noupdate -hex -label in_pipe_tdata" /$AXI2FLU_PATH/in_pipe_tdata
+    add_wave "-noupdate -hex -label in_pipe_tkeep" /$AXI2FLU_PATH/in_pipe_tkeep
+    add_wave "-noupdate -hex -label in_pipe_tlast" /$AXI2FLU_PATH/in_pipe_tlast
+    add_wave "-noupdate -hex -label in_pipe_tvalid" /$AXI2FLU_PATH/in_pipe_tvalid
+    add_wave "-noupdate -hex -label in_pipe_tready" /$AXI2FLU_PATH/in_pipe_tready
+}
+
+proc blk_AXI2FLU_TX { } {
+
+    global TB_PATH
+    global AXI2FLU_PATH
+
+     add wave -divider "Out pipe signals"
+    add_wave "-noupdate -hex -label out_pipe_data" /$AXI2FLU_PATH/out_pipe_data
+    add_wave "-noupdate -hex -label out_pipe_sop_pos" /$AXI2FLU_PATH/out_pipe_sop_pos
+    add_wave "-noupdate -hex -label out_pipe_eop_pos" /$AXI2FLU_PATH/out_pipe_eop_pos
+    add_wave "-noupdate -hex -label out_pipe_sop" /$AXI2FLU_PATH/out_pipe_sop
+    add_wave "-noupdate -hex -label out_pipe_eop" /$AXI2FLU_PATH/out_pipe_eop
+    add_wave "-noupdate -hex -label out_pipe_src_rdy" /$AXI2FLU_PATH/out_pipe_src_rdy
+    add_wave "-noupdate -hex -label out_pipe_dst_rdy" /$AXI2FLU_PATH/out_pipe_dst_rdy
+
+    add wave -divider "FLU OUTPUT SIGNALS"
+    add_wave "-noupdate -hex -label TX_DATA"    /$TB_PATH/TX_DATA
+    add_wave "-noupdate -hex -label TX_SOP_POS" /$TB_PATH/TX_SOP_POS
+    add_wave "-noupdate -hex -label TX_EOP_POS" /$TB_PATH/TX_EOP_POS
+    add_wave "-noupdate -hex -label TX_SOP"     /$TB_PATH/TX_SOP
+    add_wave "-noupdate -hex -label TX_EOP"     /$TB_PATH/TX_EOP
+    add_wave "-noupdate -hex -label TX_SRC_RDY" /$TB_PATH/TX_SRC_RDY
+    add_wave "-noupdate -hex -label TX_DST_RDY" /$TB_PATH/TX_DST_RDY
+
+    add wave -divider "Internal signals"
+    add_wave "-noupdate -hex -label out_sop_pos" /$AXI2FLU_PATH/out_sop_pos
+    add_wave "-noupdate -hex -label eop_int"    /$AXI2FLU_PATH/eop_int
+    add_wave "-noupdate -hex -label reg_eop_int"  /$AXI2FLU_PATH/reg_eop_int
+}

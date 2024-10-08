@@ -1,0 +1,18 @@
+# signals_sig.fdo : Include file with signals
+# Copyright (C) 2015 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+source "./signals.fdo"
+
+add wave -divider "MI memory space"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+mi  "MI32"     /testbench
+others OTHERS /testbench/DUT_U/VHDL_DUT_U
+

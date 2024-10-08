@@ -1,0 +1,35 @@
+# binder.fdo: FL_BINDER verification FDO file
+# Copyright (C) 2008 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set FIRMWARE_BASE         "../../../../.."
+set FL_TOOLS_BASE         "../../.."
+set FL_DUT_BASE           "$FL_TOOLS_BASE/flow/binder"
+set FL_DUT_VER_BASE       "$FL_DUT_BASE/ver"
+
+set TB_FILE               "./tbench/testbench.sv"
+set SIG_FILE              "./binder_sig.fdo"
+
+set COMPONENTS [list \
+                  [list "FL_DUT"      $FL_DUT_BASE       "FULL"] \
+                  [list "FL_DUT_VER"  $FL_DUT_VER_BASE   "FULL"] \
+               ]
+
+# Enable Code Coverage
+#set CODE_COVERAGE "true"
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run

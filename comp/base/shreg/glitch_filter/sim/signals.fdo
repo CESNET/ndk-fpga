@@ -1,0 +1,19 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2010 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+add_wave "-noupdate -label CLK" /testbench/CLK
+add_wave "-noupdate -label RESET" /testbench/RESET
+add wave -divider
+add_wave "-noupdate -label DIN" /testbench/DIN
+add_wave "-noupdate -label DOUT" /testbench/DOUT
+add wave -divider "Internal signals"
+add_wave "-noupdate -label sh_filter" /testbench/uut/sh_filter
+add_wave "-noupdate -label cnt_sample" /testbench/uut/cnt_sample
+add_wave "-noupdate -label sample" /testbench/uut/sample
+add_wave "-noupdate -label sum" /testbench/uut/sum

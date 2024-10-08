@@ -1,0 +1,24 @@
+# planner.fdo: Functional simulation file for merger from n inputs to m outputs
+# Copyright (C) 2016 CESNET
+# Author: Vaclav Hummel <xhumme00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../.."
+
+set N_ONE_BASE    "../"
+set MATH_PKG_BASE "$FIRMWARE_BASE/comp/base/pkg"
+
+set SIG_FILE            "./n_one_sig.fdo"
+set TB_FILE             "./testbench.vhd"
+
+
+set COMPONENTS [list \
+   [ list      "N_ONE"       $N_ONE_BASE        "FULL"         ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 250us

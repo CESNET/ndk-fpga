@@ -1,0 +1,25 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Authors: Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_OPEN_LOOP { } {
+
+    global TB_PATH
+    global OPEN_LOOP_PATH
+
+    add_wave "-noupdate -hex -label ACLK"       /$TB_PATH/aclk
+    add_wave "-noupdate -hex -label ADATAIN"    /$TB_PATH/data_in
+    add_wave "-noupdate -hex -label BCLK"       /$TB_PATH/bclk
+    add_wave "-noupdate -hex -label BDATAOUT"   /$TB_PATH/data_out
+    add_wave "-noupdate -hex -label ARST"       /$TB_PATH/arst
+    add_wave "-noupdate -hex -label BRST"       /$TB_PATH/brst
+
+    add wave -divider "INTERNAL SIGNALS"
+    add_wave "-noupdate -hex"     /$OPEN_LOOP_PATH/*
+
+}

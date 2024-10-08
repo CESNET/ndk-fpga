@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>FrameLink Transformer</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="sandin">Martin Louda</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+        <item>Supports RX/TX FrameLink data bus width of 8, 16, 32, 64 and
+            128 bits.</item>
+</features>
+
+
+<!-- Short Block description -->
+<description>
+
+    Transformer component can be used to convert input FrameLink interface
+    to output interface with different data bus width.
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+
+        <generic name="RX_DATA_WIDTH" type="integer" default="">
+            RX interface data bus width
+        </generic>
+        <generic name="TX_DATA_WIDTH" type="integer" default="">
+            TX interface data bus width
+        </generic>
+
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Common signals</divider>
+        <port name="CLK" dir="in" width="1">
+            Clock input
+        </port>
+        <port name="RESET" dir="in" width="1">
+            Global reset
+        </port>
+
+        <divider>
+            RX FrameLink interface
+        </divider>
+        <port name="RX_DATA" dir="in" width="RX_DATA_WIDTH">
+            RX data bus
+        </port>
+        <port name="RX_REM" dir="in" width="log2(RX_DATA_WIDTH/8)">
+            RX data remainder
+        </port>
+        <port name="RX_SOF_N" dir="in" width="1">
+            RX start of frame
+        </port>
+        <port name="RX_EOF_N" dir="in" width="1">
+            RX end of frame
+        </port>
+        <port name="RX_SOP_N" dir="in" width="1">
+            RX start of packet (segment)
+        </port>
+        <port name="RX_EOP_N" dir="in" width="1">
+            RX end of packet (segment)
+        </port>
+        <port name="RX_SRC_RDY_N" dir="in" width="1">
+            RX source ready
+        </port>
+        <port name="RX_DST_RDY_N" dir="out" width="1">
+            RX destination ready
+        </port>
+
+        <divider>
+            TX FrameLink interface
+        </divider>
+        <port name="TX_DATA" dir="out" width="TX_DATA_WIDTH">
+            TX data bus
+        </port>
+        <port name="TX_REM" dir="out" width="log2(TX_DATA_WIDTH/8)">
+            TX data remainder
+        </port>
+        <port name="TX_SOF_N" dir="out" width="1">
+            TX start of frame
+        </port>
+        <port name="TX_EOF_N" dir="out" width="1">
+            TX end of frame
+        </port>
+        <port name="TX_SOP_N" dir="out" width="1">
+            TX start of packet (segment)
+        </port>
+        <port name="TX_EOP_N" dir="out" width="1">
+            TX end of packet (segment)
+        </port>
+        <port name="TX_SRC_RDY_N" dir="out" width="1">
+            TX source ready
+        </port>
+        <port name="TX_DST_RDY_N" dir="in" width="1">
+            TX destination ready
+        </port>
+
+	</port_map>
+
+</interface>
+
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+<h1>Transformer info</h1>
+
+   <h2>Data alignment</h2>
+   <p>
+       Little-endian byte order is used in this component. When
+       converting to greater bus width, first received data are on the
+       lowest position in final data word. When decreasing bus width,
+       data on the lowest position in input data word are sent first.
+   </p>
+
+
+<h1>Frequency and Resources usage</h1>
+
+	<p>
+
+        <!--Resources usage and max. frequency by Precision-->
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Slices (% of C6X slices)</th>
+			</tr>
+			<tr>
+                <th>64b -> 16b</th>
+				<td>101(1%)</td>
+			</tr>
+			<tr>
+                <th>16b -> 64b</th>
+				<td>82(1%)</td>
+			</tr>
+			<tr>
+                <th>64b -> 32b</th>
+				<td>80(1%)</td>
+			</tr>
+			<tr>
+                <th>32b -> 64b</th>
+				<td>59(1%)</td>
+			</tr>
+		<nazev>Chip utilization</nazev>
+		</tab>
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Max.frequency by Precision</th>
+			</tr>
+			<tr>
+                <th>64b -> 16b</th>
+				<td>200 MHz</td>
+			</tr>
+			<tr>
+                <th>16b -> 64b</th>
+				<td>200 MHz</td>
+			</tr>
+			<tr>
+                <th>64b -> 32b</th>
+				<td>200 MHz</td>
+			</tr>
+			<tr>
+                <th>32b -> 64b</th>
+				<td>200 MHz</td>
+			</tr>
+		<nazev>Maximal frequency</nazev>
+		</tab>
+
+  </p>
+
+
+</body>
+
+</source>

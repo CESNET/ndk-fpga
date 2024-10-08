@@ -1,0 +1,47 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+set FIRMWARE_BASE         "../../../../.."
+
+set DUT_BASE              ".."
+set DUT_UVM_BASE          "."
+
+set TB_FILE               "./tbench/testbench.sv"
+set SIG_FILE              "./signals_sig.fdo"
+
+lappend COMPONENTS \
+    [list "DUT"        $DUT_BASE        "FULL"]\
+    [list "DUT_UVM"    $DUT_UVM_BASE    "FULL"]\
+
+# Enable UVM
+set SIM_FLAGS(UVM_ENABLE) true
+
+# Test settings
+set SIM_FLAGS(UVM_TEST) "test::ex_test"
+set SIM_FLAGS(UVM_VERBOSITY) "UVM_NONE"
+
+# Disable Code Coverage
+set SIM_FLAGS(CODE_COVERAGE) false
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from std_arith library
+puts "Std_arith Warnings - Disabled"
+set StdArithNoWarnings 1
+
+# Suppress warnings from numeric_std library
+puts "Numeric_std Warnings - Disabled"
+set NumericStdNoWarnings 1
+
+nb_sim_run
+
+# Reports
+if {$SIM_FLAGS(CODE_COVERAGE)} {
+   coverage save -directive -cvg -code bcefst -verbose actual.ucdb
+   vcover merge final.ucdb final.ucdb actual.ucdb
+   vcover report -html -output cov_html -annotate -details -assert -directive -cvg -code bcefst -verbose -threshL 50 -threshH 90 final.ucdb
+}

@@ -1,0 +1,22 @@
+# cam.fdo: CAM behavioral simulation FDO script
+# Copyright (C) 2006 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set CAM_BASE         "$OFM_PATH/comp/base/mem/cam"
+
+set SIG_FILE         "$CAM_BASE/sim/cam_sig.fdo"
+set TB_FILE          "$CAM_BASE/sim/cam_tb.vhd"
+
+set COMPONENTS [list \
+                  [ list "CAM"         $CAM_BASE            "CAM"] \
+               ]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 12us

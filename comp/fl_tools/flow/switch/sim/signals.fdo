@@ -1,0 +1,132 @@
+# signals.fdo : Include file with signals.
+# Copyright (C) 2003 CESNET
+# Author: Lukas Solanka <solanka@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+proc FL_SWITCH_RX { } {
+    global FL_SWITCH_PATH
+
+    add wave -divider "RX interface"
+    add_wave "-noupdate -hex -label rx_data      " $FL_SWITCH_PATH/rx_data
+    add_wave "-noupdate -hex -label rx_rem       " $FL_SWITCH_PATH/rx_rem
+    add_wave "-noupdate -hex -label rx_src_rdy_n " $FL_SWITCH_PATH/rx_src_rdy_n
+    add_wave "-noupdate -hex -label rx_dst_rdy_n " $FL_SWITCH_PATH/rx_dst_rdy_n
+    add_wave "-noupdate -hex -label rx_sop_n     " $FL_SWITCH_PATH/rx_sop_n
+    add_wave "-noupdate -hex -label rx_eop_n     " $FL_SWITCH_PATH/rx_eop_n
+    add_wave "-noupdate -hex -label rx_sof_n     " $FL_SWITCH_PATH/rx_sof_n
+    add_wave "-noupdate -hex -label rx_eof_n     " $FL_SWITCH_PATH/rx_eof_n
+}
+
+proc FL_SWITCH_TX0 { } {
+    global FL_SWITCH_PATH
+
+    add wave -divider "TX0 interface"
+    add_wave "-noupdate -hex -label tx0_data      " $FL_SWITCH_PATH/tx0_data
+    add_wave "-noupdate -hex -label tx0_rem       " $FL_SWITCH_PATH/tx0_rem
+    add_wave "-noupdate -hex -label tx0_src_rdy_n " $FL_SWITCH_PATH/tx0_src_rdy_n
+    add_wave "-noupdate -hex -label tx0_dst_rdy_n " $FL_SWITCH_PATH/tx0_dst_rdy_n
+    add_wave "-noupdate -hex -label tx0_sop_n     " $FL_SWITCH_PATH/tx0_sop_n
+    add_wave "-noupdate -hex -label tx0_eop_n     " $FL_SWITCH_PATH/tx0_eop_n
+    add_wave "-noupdate -hex -label tx0_sof_n     " $FL_SWITCH_PATH/tx0_sof_n
+    add_wave "-noupdate -hex -label tx0_eof_n     " $FL_SWITCH_PATH/tx0_eof_n
+}
+
+
+proc FL_SWITCH_TX1 { } {
+    global FL_SWITCH_PATH
+
+    add wave -divider "TX1 interface"
+    add_wave "-noupdate -hex -label tx1_data      " $FL_SWITCH_PATH/tx1_data
+    add_wave "-noupdate -hex -label tx1_rem       " $FL_SWITCH_PATH/tx1_rem
+    add_wave "-noupdate -hex -label tx1_src_rdy_n " $FL_SWITCH_PATH/tx1_src_rdy_n
+    add_wave "-noupdate -hex -label tx1_dst_rdy_n " $FL_SWITCH_PATH/tx1_dst_rdy_n
+    add_wave "-noupdate -hex -label tx1_sop_n     " $FL_SWITCH_PATH/tx1_sop_n
+    add_wave "-noupdate -hex -label tx1_eop_n     " $FL_SWITCH_PATH/tx1_eop_n
+    add_wave "-noupdate -hex -label tx1_sof_n     " $FL_SWITCH_PATH/tx1_sof_n
+    add_wave "-noupdate -hex -label tx1_eof_n     " $FL_SWITCH_PATH/tx1_eof_n
+}
+
+
+proc FL_SWITCH_TX2 { } {
+    global FL_SWITCH_PATH
+
+    add wave -divider "TX2 interface"
+    add_wave "-noupdate -hex -label tx2_data      " $FL_SWITCH_PATH/tx2_data
+    add_wave "-noupdate -hex -label tx2_rem       " $FL_SWITCH_PATH/tx2_rem
+    add_wave "-noupdate -hex -label tx2_src_rdy_n " $FL_SWITCH_PATH/tx2_src_rdy_n
+    add_wave "-noupdate -hex -label tx2_dst_rdy_n " $FL_SWITCH_PATH/tx2_dst_rdy_n
+    add_wave "-noupdate -hex -label tx2_sop_n     " $FL_SWITCH_PATH/tx2_sop_n
+    add_wave "-noupdate -hex -label tx2_eop_n     " $FL_SWITCH_PATH/tx2_eop_n
+    add_wave "-noupdate -hex -label tx2_sof_n     " $FL_SWITCH_PATH/tx2_sof_n
+    add_wave "-noupdate -hex -label tx2_eof_n     " $FL_SWITCH_PATH/tx2_eof_n
+}
+
+
+proc FL_SWITCH_TX3 { } {
+    global FL_SWITCH_PATH
+
+    add wave -divider "TX3 interface"
+    add_wave "-noupdate -hex -label tx3_data      " $FL_SWITCH_PATH/tx3_data
+    add_wave "-noupdate -hex -label tx3_rem       " $FL_SWITCH_PATH/tx3_rem
+    add_wave "-noupdate -hex -label tx3_src_rdy_n " $FL_SWITCH_PATH/tx3_src_rdy_n
+    add_wave "-noupdate -hex -label tx3_dst_rdy_n " $FL_SWITCH_PATH/tx3_dst_rdy_n
+    add_wave "-noupdate -hex -label tx3_sop_n     " $FL_SWITCH_PATH/tx3_sop_n
+    add_wave "-noupdate -hex -label tx3_eop_n     " $FL_SWITCH_PATH/tx3_eop_n
+    add_wave "-noupdate -hex -label tx3_sof_n     " $FL_SWITCH_PATH/tx3_sof_n
+    add_wave "-noupdate -hex -label tx3_eof_n     " $FL_SWITCH_PATH/tx3_eof_n
+}
+
+
+proc FL_SWITCH_INT { } {
+    global FL_SWITCH_PATH
+
+    add wave -divider "Internal signals"
+    add_wave "-noupdate -hex -label rx_src_rdy         " $FL_SWITCH_PATH/rx_src_rdy
+    add_wave "-noupdate -hex -label tx_transm_rdy      " $FL_SWITCH_PATH/tx_transm_rdy
+    add_wave "-noupdate -hex -label rx_sof             " $FL_SWITCH_PATH/rx_sof
+    add_wave "-noupdate -hex -label shift_out_src_rdy_n" $FL_SWITCH_PATH/shift_out_src_rdy_n
+    add_wave "-noupdate -hex -label tx_dst_rdy_n_int   " $FL_SWITCH_PATH/tx_dst_rdy_n_int
+    add_wave "-noupdate -hex -label cnt_init           " $FL_SWITCH_PATH/cnt_init
+    add_wave "-noupdate -hex -label reg_init_done_n    " $FL_SWITCH_PATH/reg_init_done_n
+}
+
+
+proc FL_SWITCH_INPUT { } {
+    global FL_SWITCH_PATH
+
+    add wave -divider "Input part"
+    add_wave "-noupdate -label clk  "               $FL_SWITCH_PATH/clk
+    add_wave "-noupdate -hex -label cnt_words"      $FL_SWITCH_PATH/cnt_words
+    add_wave "-noupdate -hex -label cmp_info_now"   $FL_SWITCH_PATH/cmp_info_now
+    add_wave "-noupdate -hex -label reg_cmp_done"   $FL_SWITCH_PATH/reg_cmp_done
+}
+
+
+proc FL_SWITCH_SHIFT { } {
+    global FL_SWITCH_PATH
+
+    add wave -divider "Shift part"
+    add_wave "-noupdate -label clk  "                    $FL_SWITCH_PATH/clk
+    add_wave "-noupdate -label reg_ifc_allow      "      $FL_SWITCH_PATH/reg_ifc_allow
+    add_wave "-noupdate -hex -label reg_ifc_allow_we   " $FL_SWITCH_PATH/reg_ifc_allow_we
+    add_wave "-noupdate -hex -label sig_switch_info    " $FL_SWITCH_PATH/sig_switch_info
+    add_wave "-noupdate -hex -label sh_reg_ce          " $FL_SWITCH_PATH/sh_reg_ce
+    add_wave "-noupdate -hex -label shift_out_data     " $FL_SWITCH_PATH/shift_out_data
+    add_wave "-noupdate -hex -label shift_out_src_rdy_n" $FL_SWITCH_PATH/shift_out_src_rdy_n
+}
+
+
+proc FL_SWITCH_OUT { } {
+    global FL_SWITCH_PATH
+
+    add wave -divider "Output part"
+    add_wave "-noupdate -label tx_src_rdy_n    " $FL_SWITCH_PATH/tx_src_rdy_n
+    add_wave "-noupdate -label tx_dst_rdy_n    " $FL_SWITCH_PATH/tx_dst_rdy_n
+    add_wave "-noupdate -label tx_dst_rdy_n_int" $FL_SWITCH_PATH/tx_dst_rdy_n_int
+}
+

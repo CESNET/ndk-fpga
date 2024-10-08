@@ -1,0 +1,30 @@
+# uh_completer.fdo: Top level functional simulation file
+# Copyright (C) 2007 CESNET
+# Author: Martin Louda <sandin@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+set FIRMWARE_BASE   "../../../../.."
+set COMPLETER_BASE  "$OFM_PATH/comp/fl_tools/edit/completer"
+
+set TB_FILE         "$COMPLETER_BASE/sim/uh_completer_tb.vhd"
+set SIG_FILE        "$COMPLETER_BASE/sim/uh_completer_sig.fdo"
+
+set MOD ""
+
+# Modules definition
+set COMPONENTS [list [list "UH_COMPLETER"   $COMPLETER_BASE "FULL"] ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run
+

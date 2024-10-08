@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<source>
+
+<!-- Page name -->
+<component>arbitr_rr</component>
+
+
+<!-- Authors worked on -->
+<authors>
+   	<autor login="beck">Patrik Beck</autor>
+</authors>
+
+<features>
+</features>
+
+<!-- Bugs -->
+<bugs>
+</bugs>
+
+<!-- What have to be done -->
+<todo>
+</todo>
+
+<!-- Short Block description -->
+<description>
+   This component is arbitrating n-ports, using method round-robin. The ack
+   signals are ready in the same cycle as the request come.
+</description>
+
+<!-- COMPONENT INTERFACE ************************************************* -->
+<interface>
+
+	<generic_map>
+		<generic name="PORTS" type="integer">
+              Number of ports for arbitration.
+		</generic>
+
+	</generic_map>
+
+	<port_map>
+	      <port  name="CLK" dir="in" width="1">
+	            Synchronization signal
+	      </port>
+
+         <port  name="RESET" dir="in" width="1">
+        	    Reset
+	      </port>
+
+	      <port  name="ENABLE" dir="in" width="1">
+	            Assert this signal, when it is time to change ack signal.
+	      </port>
+
+	      <port  name="RQ" dir="in" width="PORTS">
+	            Requests from all ports
+	      </port>
+
+	      <port  name="ACK" dir="out" width="PORTS">
+	            Acknowledgement for ports, only one bit is high in the same
+               time.
+	      </port>
+
+	</port_map>
+
+</interface>
+
+
+<!-- CONSTANT SECTION ************************************************* -->
+
+<constant>
+</constant>
+
+
+<!-- OPERATIONS SECTION ************************************************* -->
+
+<operations>
+</operations>
+
+
+<schemes>
+</schemes>
+
+
+<!-- ADDRESS SPACE ************************************************* -->
+<addr_space id ="MAIN" name="Main" main="yes">
+</addr_space>
+
+
+<!-- *********************** Registers description  ********************* -->
+
+
+<!-- BODY ************************************************* -->
+<body>
+        <h3>
+                General
+        </h3>
+
+        Unit is arbitrating all ports. The ports have the same priority
+        (round-robin). When ENABLE signal is asserted the ACK signal can be
+        changed due to actual RQ signal.
+
+        <br><br>
+        note: ACK signal has always one bit asserted
+
+
+</body>
+
+</source>

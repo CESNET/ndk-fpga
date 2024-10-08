@@ -1,0 +1,30 @@
+# signal.fdo: Include file with signals
+# Copyright (C) 2018 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+
+
+proc tb_internals { PATH GROUP } {
+	eval "add wave $GROUP -divider {Clocking}"
+	add_wave "$GROUP -noupdate -hex -color yellow"   $PATH/CLK
+	add_wave "$GROUP -noupdate -hex -color yellow"   $PATH/RESET
+}
+
+proc uut_internals { PATH GROUP } {
+	add wave -divider "CQ Interface"
+	add_wave "$GROUP -noupdate -hex"   $PATH/PCIE_CQ/*
+
+	add wave -divider "CC Interface"
+	add_wave "$GROUP -noupdate -hex"   $PATH/PCIE_CC/*
+
+	add wave -divider "MI Interface"
+	add_wave "$GROUP -noupdate -hex"   $PATH/MI/*
+}
+
+proc all { PATH GROUP } {
+    add wave -divider $GROUP
+    add_wave "$GROUP -noupdate -hex"   $PATH/*
+ }

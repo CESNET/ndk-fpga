@@ -1,0 +1,22 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2015 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_BRAM { } {
+
+    global BRAM_PATH
+    add_wave "-noupdate -hex -label PIPE_ENA" /$BRAM_PATH/PIPE_ENA
+    add_wave "-noupdate -hex -label WEA" /$BRAM_PATH/WEA
+    add_wave "-noupdate -hex -label ADDRA" /$BRAM_PATH/ADDRA
+    add_wave "-noupdate -hex -label DIA" /$BRAM_PATH/DIA
+    add_wave "-noupdate -hex -label PIPE_ENB" /$BRAM_PATH/PIPE_ENB
+    add_wave "-noupdate -hex -label REB" /$BRAM_PATH/REB
+    add_wave "-noupdate -hex -label ADDRB" /$BRAM_PATH/ADDRB
+    add_wave "-noupdate -hex -label DOB_DV" /$BRAM_PATH/DOB_DV
+    add_wave "-noupdate -hex -label DOB" /$BRAM_PATH/DOB
+}

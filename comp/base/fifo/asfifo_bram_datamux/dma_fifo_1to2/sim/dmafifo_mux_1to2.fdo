@@ -1,0 +1,31 @@
+# flu_prfifo.fdo: Simulation script
+# Copyright (C) 2012 CESNET
+# Author: Viktor Pus <pus@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set PRFIFO_BASE      "$OFM_PATH/comp/base/fifo/asfifo_bram_datamux/dma_fifo_1to2"
+
+set TB_FILE          "$PRFIFO_BASE/sim/testbench.vhd"
+set SIG_FILE         "$PRFIFO_BASE/sim/dmafifo_mux_1to2_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "DMAFIFO_MUX_1TO2" $PRFIFO_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 5us

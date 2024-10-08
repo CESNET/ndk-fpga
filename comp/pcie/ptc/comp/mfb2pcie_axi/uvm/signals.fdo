@@ -1,0 +1,31 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Daniel Kříž <xkrizd01@vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc mfb_rx {PATH} {
+    add wave -divider "RX_MFB"
+    add_wave [list -noupdate -hex]        $PATH/RX_MFB_DATA
+    add_wave [list -noupdate -hex]        $PATH/RX_MFB_SOF
+    add_wave [list -noupdate -hex]        $PATH/RX_MFB_EOF
+    add_wave [list -noupdate -hex]        $PATH/RX_MFB_SOF_POS
+    add_wave [list -noupdate -hex]        $PATH/RX_MFB_EOF_POS
+    add_wave [list -noupdate -hex]        $PATH/RX_MFB_SRC_RDY
+    add_wave [list -noupdate -hex]        $PATH/RX_MFB_DST_RDY
+}
+
+proc axi_tx {PATH} {
+    add wave -divider "RQ_AXI"
+    add_wave [list -noupdate -hex]        $PATH/RQ_DATA
+    add_wave [list -noupdate -hex]        $PATH/RQ_USER
+    add_wave [list -noupdate -hex]        $PATH/RQ_LAST
+    add_wave [list -noupdate -hex]        $PATH/RQ_KEEP
+    add_wave [list -noupdate -hex]        $PATH/RQ_READY
+    add_wave [list -noupdate -bin]        $PATH/RQ_VALID
+}
+
+proc all {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate  -hex"       $PATH/*
+}

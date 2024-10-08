@@ -1,0 +1,41 @@
+#
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2008 CESNET
+# Author(s): Vaclav Bartos <xbarto11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+add wave -label "CLK" -noupdate /testbench/clk
+#add wave -label "RESET" -noupdate /testbench/reset
+
+add wave -divider "MI32"
+add wave -hexa -label -noupdate "MI32_DWR" /testbench/mi32_dwr
+add wave -hexa -label -noupdate "MI32_ADDR" /testbench/mi32_addr
+#add wave  -label -noupdate "MI32_BE" /testbench/mi32_be
+add wave  -label -noupdate "MI32_WR" /testbench/mi32_wr
+add wave  -label -noupdate "MI32_RD" /testbench/mi32_rd
+add wave -hexa -label -noupdate "MI32_DRD" /testbench/mi32_drd
+add wave  -label -noupdate "MI32_DRDY" /testbench/mi32_drdy
+add wave  -label -noupdate "MI32_ARDY" /testbench/mi32_ardy
+
+add wave -divider "DEBUG"
+add wave -label -noupdate "COMMAND_STATUS" /testbench/mi_sim_i/commandStatus
+
+add wave -divider "testbench delay"
+add wave  -label -noupdate "delay_drdy" /testbench/delay_drdy
+add wave  -label -noupdate "delay_ardy" /testbench/delay_ardy
+add wave  -hexa -label -noupdate "reg_addr" /testbench/reg_addr
+add wave  -hexa -label -noupdate "reg_mux" /testbench/reg_mux
+add wave  -hexa -label -noupdate "sig_addr" /testbench/sig_addr
+
+add wave -divider "testbench ardy/drdy"
+add wave  -hexa -label -noupdate "rm_ardy" /testbench/rm_ardy
+add wave  -hexa -label -noupdate "rm_drdy" /testbench/rm_drdy
+add wave  -label -noupdate "vector_ardy" /testbench/vector_ardy
+add wave  -label -noupdate "vector_drdy" /testbench/vector_drdy
+
+

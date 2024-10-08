@@ -1,0 +1,168 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Martin Louda <sandin@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_DISCARD_ifc { PARAM } {
+   global DISCARD_PATH
+
+if { $PARAM == "IFC" } {
+   add_wave "-noupdate -label CLK" $DISCARD_PATH/CLK
+   add_wave "-noupdate -label RESET" $DISCARD_PATH/RESET
+   add_wave "-noupdate -hex -label STATUS" $DISCARD_PATH/STATUS
+
+   add wave -divider "RX interface"
+   add_wave "-noupdate -hex -label RX_DATA" $DISCARD_PATH/rx_data
+   add_wave "-noupdate -hex -label RX_DREM" $DISCARD_PATH/rx_drem
+   add_wave "-noupdate -label RX_SOF_N" $DISCARD_PATH/rx_sof_n
+   add_wave "-noupdate -label RX_EOF_N" $DISCARD_PATH/rx_eof_n
+   add_wave "-noupdate -label RX_SOP_N" $DISCARD_PATH/rx_sop_n
+   add_wave "-noupdate -label RX_EOP_N" $DISCARD_PATH/rx_eop_n
+   add_wave "-noupdate -label RX_SRC_RDY_N" $DISCARD_PATH/rx_src_rdy_n
+   add_wave "-noupdate -hex -label RX_CHAN" $DISCARD_PATH/rx_chan
+
+   add wave -divider "TX interface"
+   add_wave "-noupdate -hex -label TX_DATA" $DISCARD_PATH/tx_data
+   add_wave "-noupdate -hex -label TX_DREM" $DISCARD_PATH/tx_drem
+   add_wave "-noupdate -label TX_SOF_N" $DISCARD_PATH/tx_sof_n
+   add_wave "-noupdate -label TX_EOF_N" $DISCARD_PATH/tx_eof_n
+   add_wave "-noupdate -label TX_SOP_N" $DISCARD_PATH/tx_sop_n
+   add_wave "-noupdate -label TX_EOP_N" $DISCARD_PATH/tx_eop_n
+   add_wave "-noupdate -label TX_SRC_RDY_N" $DISCARD_PATH/tx_src_rdy_n
+   add_wave "-noupdate -label TX_DST_RDY_N" $DISCARD_PATH/tx_dst_rdy_n
+   add_wave "-noupdate -hex -label TX_CHAN" $DISCARD_PATH/tx_chan
+
+   add wave -divider "Statistic interface"
+   add_wave "-noupdate -label STAT_PASS" $DISCARD_PATH/stat_pass
+   add_wave "-noupdate -label STAT_DROP" $DISCARD_PATH/stat_drop
+   add_wave "-noupdate -hex -label STAT_CHAN" $DISCARD_PATH/stat_chan
+   add_wave "-noupdate -hex -label STAT_LEN " $DISCARD_PATH/stat_len
+   add_wave "-noupdate -hex -label STAT_FREE" $DISCARD_PATH/stat_free
+}
+
+if { $PARAM == "INT" } {
+   add wave -divider "DISCARD internals"
+   add_wave "-noupdate -label cmp_en"     $DISCARD_PATH/cmp_en
+   add_wave "-noupdate -label cmp_ok"     $DISCARD_PATH/cmp_ok
+   add_wave "-noupdate -label reg_cmp_ok" $DISCARD_PATH/reg_cmp_ok
+   add_wave "-noupdate -label pass_frame" $DISCARD_PATH/pass_frame
+
+   add_wave "-noupdate -hex -label reg_chan"   $DISCARD_PATH/reg_chan
+   add_wave "-noupdate -hex -label tx_chan_mux" $DISCARD_PATH/tx_chan_mux
+
+   add_wave "-noupdate -hex -label status_mux" $DISCARD_PATH/status_mux
+   add_wave "-noupdate -hex -label free_mux"   $DISCARD_PATH/free_mux
+   add_wave "-noupdate -hex -label frame_len"  $DISCARD_PATH/frame_len
+   add_wave "-noupdate -hex -label free_len"   $DISCARD_PATH/free_len
+}
+
+}
+
+
+proc blk_DISCARD_STAT_ifc { PARAM } {
+   global DISCARD_STAT_PATH
+
+if { $PARAM == "IFC" } {
+   add_wave "-noupdate -label CLK" $DISCARD_STAT_PATH/CLK
+   add_wave "-noupdate -label RESET" $DISCARD_STAT_PATH/RESET
+   add_wave "-noupdate -hex -label STATUS" $DISCARD_STAT_PATH/STATUS
+
+   add wave -divider "RX interface"
+   add_wave "-noupdate -hex -label RX_DATA" $DISCARD_STAT_PATH/rx_data
+   add_wave "-noupdate -hex -label RX_DREM" $DISCARD_STAT_PATH/rx_drem
+   add_wave "-noupdate -label RX_SOF_N" $DISCARD_STAT_PATH/rx_sof_n
+   add_wave "-noupdate -label RX_EOF_N" $DISCARD_STAT_PATH/rx_eof_n
+   add_wave "-noupdate -label RX_SOP_N" $DISCARD_STAT_PATH/rx_sop_n
+   add_wave "-noupdate -label RX_EOP_N" $DISCARD_STAT_PATH/rx_eop_n
+   add_wave "-noupdate -label RX_SRC_RDY_N" $DISCARD_STAT_PATH/rx_src_rdy_n
+   add_wave "-noupdate -label RX_DST_RDY_N" $DISCARD_STAT_PATH/rx_dst_rdy_n
+   add_wave "-noupdate -hex -label RX_CHAN" $DISCARD_STAT_PATH/rx_chan
+
+   add wave -divider "TX interface"
+   add_wave "-noupdate -hex -label TX_DATA" $DISCARD_STAT_PATH/tx_data
+   add_wave "-noupdate -hex -label TX_DREM" $DISCARD_STAT_PATH/tx_drem
+   add_wave "-noupdate -label TX_SOF_N" $DISCARD_STAT_PATH/tx_sof_n
+   add_wave "-noupdate -label TX_EOF_N" $DISCARD_STAT_PATH/tx_eof_n
+   add_wave "-noupdate -label TX_SOP_N" $DISCARD_STAT_PATH/tx_sop_n
+   add_wave "-noupdate -label TX_EOP_N" $DISCARD_STAT_PATH/tx_eop_n
+   add_wave "-noupdate -label TX_SRC_RDY_N" $DISCARD_STAT_PATH/tx_src_rdy_n
+   add_wave "-noupdate -hex -label TX_CHAN" $DISCARD_STAT_PATH/tx_chan
+
+   add wave -divider "MI32 interface"
+   add_wave "-noupdate -hex -label MI_DWR " $DISCARD_STAT_PATH/mi_dwr
+   add_wave "-noupdate -hex -label MI_ADDR" $DISCARD_STAT_PATH/mi_addr
+   add_wave "-noupdate -label MI_BE  " $DISCARD_STAT_PATH/mi_be
+   add_wave "-noupdate -label MI_RD  " $DISCARD_STAT_PATH/mi_rd
+   add_wave "-noupdate -label MI_WR  " $DISCARD_STAT_PATH/mi_wr
+   add_wave "-noupdate -label MI_DRDY" $DISCARD_STAT_PATH/mi_drdy
+   add_wave "-noupdate -label MI_ARDY" $DISCARD_STAT_PATH/mi_ardy
+   add_wave "-noupdate -hex -label MI_DRD " $DISCARD_STAT_PATH/mi_drd
+}
+
+if { $PARAM == "INT" } {
+   add wave -divider "DISCARD internals"
+   add_wave "-noupdate -label cmp_en"     $DISCARD_STAT_PATH/fl_discard_i/cmp_en
+   add_wave "-noupdate -label cmp_en_vect"     $DISCARD_STAT_PATH/fl_discard_i/cmp_en_vect
+   add_wave "-noupdate -label cmp_ok"     $DISCARD_STAT_PATH/fl_discard_i/cmp_ok
+   #add_wave "-noupdate -label cmp_ok_vect"     $DISCARD_STAT_PATH/fl_discard_i/cmp_ok_vect
+   add_wave "-noupdate -label reg_cmp_ok" $DISCARD_STAT_PATH/fl_discard_i/reg_cmp_ok
+   add_wave "-noupdate -label reg_cmp_ok_vect" $DISCARD_STAT_PATH/fl_discard_i/reg_cmp_ok_vect
+   add_wave "-noupdate -label pass_frame" $DISCARD_STAT_PATH/fl_discard_i/pass_frame
+
+   #add_wave "-noupdate -hex -label reg_chan"   $DISCARD_STAT_PATH/fl_discard_i/reg_chan
+   #add_wave "-noupdate -hex -label tx_chan_mux" $DISCARD_STAT_PATH/fl_discard_i/tx_chan_mux
+
+   add_wave "-noupdate -hex -label status_mux" $DISCARD_STAT_PATH/fl_discard_i/status_mux
+   add wave -divider "Free space computation"
+   add_wave "-noupdate -hex -label max_free"   $DISCARD_STAT_PATH/fl_discard_i/ones_free
+   add_wave "-noupdate -hex -label status_mux"   $DISCARD_STAT_PATH/fl_discard_i/status_mux
+   add_wave "-noupdate -hex -label status_mux_bytes"   $DISCARD_STAT_PATH/fl_discard_i/status_mux_bytes
+   add_wave "-noupdate -hex -label free"   $DISCARD_STAT_PATH/fl_discard_i/free_mux
+   add_wave "-noupdate -hex -label free_sub"   $DISCARD_STAT_PATH/fl_discard_i/free_mux_sub
+   add_wave "-noupdate -hex -color blue -label free_len"   $DISCARD_STAT_PATH/fl_discard_i/free_len
+   add_wave "-noupdate -hex -color blue -label frame_len"  $DISCARD_STAT_PATH/fl_discard_i/frame_len
+
+   add_wave "-noupdate -label stat_pass"  $DISCARD_STAT_PATH/stat_pass
+   add_wave "-noupdate -label stat_drop"  $DISCARD_STAT_PATH/stat_drop
+   add_wave "-noupdate -hex -label stat_chan"  $DISCARD_STAT_PATH/stat_chan
+   add_wave "-noupdate -hex -label stat_len"   $DISCARD_STAT_PATH/stat_len
+   add_wave "-noupdate -hex -label stat_free"  $DISCARD_STAT_PATH/stat_free
+
+   add wave -divider "DISCARD_STAT internals"
+   add_wave "-noupdate -hex -label drop_we"   $DISCARD_STAT_PATH/drop_we
+   add_wave "-noupdate -hex -label pass_we"   $DISCARD_STAT_PATH/pass_we
+
+   add_wave "-noupdate -hex -label addr_wr_mx"   $DISCARD_STAT_PATH/addr_wr_mx
+
+   add_wave "-noupdate -hex -label drop_di_mx"   $DISCARD_STAT_PATH/drop_di_mx
+   add_wave "-noupdate -hex -label pass_di_mx"   $DISCARD_STAT_PATH/pass_di_mx
+   add_wave "-noupdate -hex -label drop_len_di_mx"   $DISCARD_STAT_PATH/drop_len_di_mx
+   add_wave "-noupdate -hex -label pass_len_di_mx"   $DISCARD_STAT_PATH/pass_len_di_mx
+
+
+   add_wave "-noupdate -hex -label drop_add"       $DISCARD_STAT_PATH/drop_add
+   add_wave "-noupdate -hex -label pass_add"       $DISCARD_STAT_PATH/pass_add
+   add_wave "-noupdate -hex -label drop_len_add"   $DISCARD_STAT_PATH/drop_len_add
+   add_wave "-noupdate -hex -label pass_len_add"   $DISCARD_STAT_PATH/pass_len_add
+
+   add_wave "-noupdate -hex -label clr_cnt_chan"   $DISCARD_STAT_PATH/clr_cnt_chan
+   add_wave "-noupdate -hex -label clr_running"    $DISCARD_STAT_PATH/clr_running
+   add_wave "-noupdate -hex -label reg_run"        $DISCARD_STAT_PATH/reg_run
+
+   add_wave "-noupdate -hex -label mi_addr_chan"   $DISCARD_STAT_PATH/mi_addr_chan
+   add_wave "-noupdate -hex -label addr_rd_mx"   $DISCARD_STAT_PATH/addr_rd_mx
+   add_wave "-noupdate -hex -label mi_drop"    $DISCARD_STAT_PATH/mi_drop
+   add_wave "-noupdate -hex -label mi_pass"    $DISCARD_STAT_PATH/mi_pass
+   add_wave "-noupdate -hex -label mi_drop_len" $DISCARD_STAT_PATH/mi_drop_len
+   add_wave "-noupdate -hex -label mi_pass_len" $DISCARD_STAT_PATH/mi_pass_len
+   add_wave "-noupdate -hex -label mi_cnt_mux"     $DISCARD_STAT_PATH/mi_cnt_mux
+   add_wave "-noupdate -hex -label mi_word_mux"    $DISCARD_STAT_PATH/mi_word_mux
+   add_wave "-noupdate -hex -label mi_top_mux"     $DISCARD_STAT_PATH/mi_top_mux
+   add_wave "-noupdate -hex -label mi_reg_top_mux" $DISCARD_STAT_PATH/mi_reg_top_mux
+}
+
+}

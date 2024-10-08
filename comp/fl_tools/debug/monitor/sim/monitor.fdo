@@ -1,0 +1,34 @@
+# monitor.fdo : Include file with signals
+# Copyright (C) 2003 CESNET
+# Authors: Lukas Solanka <solanka@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+
+set TB_FILE          "monitor_tb.vhd"
+set SIG_FILE         "monitor_sig.fdo"
+
+# Components architectures
+set UUT              "FULL"
+
+set MONITOR "FULL_LB"
+
+# List of components
+set COMPONENTS [list                       \
+    [list "FL_MONITOR"    ".."   $MONITOR]]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 10us
+

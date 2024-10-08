@@ -1,0 +1,5 @@
+= FL Discard =
+Discard frames if they don't fit into target buffer.
+
+Documentation:
+https://www.liberouter.org/trac/netcope/wiki/fl_discard_draft

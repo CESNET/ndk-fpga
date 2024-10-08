@@ -1,0 +1,35 @@
+# lzss.fdo: Simulation file sh_reg_base
+# Copyright (C) 2015 CESNET
+# Author(s): Radek Isa <xisara00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+
+#Base directories
+set SH_REG_BASE_BASE		    ".."
+
+set TB_FILE          "testbench.vhd"
+set SIG_FILE         "sh_reg_base_sig.fdo"
+
+set MOD ""
+
+# Modules definition
+set COMPONENTS [list \
+			[list "SH_REG_BASE_DYNAMIC"      $SH_REG_BASE_BASE   ] \
+		 ]
+
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 10us

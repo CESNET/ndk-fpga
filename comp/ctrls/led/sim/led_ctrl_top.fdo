@@ -1,0 +1,24 @@
+# led_ctrl_top.fdo: Simulation script
+# Copyright (C) 2016 CESNET
+# Author: Juraj Kubiš
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../.."
+set TB_FILE          "./testbench.vhd"
+set SIG_FILE         "led_ctrl_top_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "LED_CTRL_TOP" ".."  "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# File with signals
+nb_sim_run 100ms

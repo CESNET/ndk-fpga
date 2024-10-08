@@ -1,0 +1,267 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jan Kubalek <kubalek@cesnet.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+proc uut_internals { PATH1 PATH2 PATH3 } {
+   eval "add wave  -divider {Synchronization}"
+   add_wave " -noupdate -hex -color yellow"   $PATH1/CLK
+   add_wave " -noupdate -hex -color yellow"   $PATH1/CLK_DMA
+   add_wave " -noupdate -hex -color yellow"   $PATH1/RESET
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label UP_MVB -hex"   $PATH2/org_UP_MVB
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label UP_MFB -hex"   $PATH2/org_UP_MFB
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label up_mvb_asfifo_out -hex"   $PATH2/org_up_mvb_asfifo_out
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label up_mfb_trans_out -hex"   $PATH2/org_up_mfb_asfifo_out
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label up_mfb_asfifo_out -hex"   $PATH2/org_up_mfb_trans_out
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label up_mvb_merge_out -hex"   $PATH2/org_up_mvb_merge_out
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label up_mfb_merge_out -hex"   $PATH2/org_up_mfb_merge_out
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label up_mvb_mrgfi_out -hex"   $PATH2/org_up_mvb_mrgfi_out
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label tagm_mvb_in -hex"   $PATH2/org_tagm_mvb_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label tagm_mvb_out -hex"   $PATH2/org_tagm_mvb_out
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label up_mvb_dma2pcie_out -hex"   $PATH2/org_up_mvb_dma2pcie_out
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label up_mvb_c_checker_out -hex"   $PATH2/org_up_mvb_c_checker_out
+
+   # HDR DATA MERGER
+#   eval "add wave  -divider {}"
+#   eval "add wave  -divider {HDR DATA MERGER}"
+#   eval "add wave  -divider {}"
+#   add_wave " -noupdate -hex -color yellow"   $PATH1/CLK
+#   add_wave " -noupdate -hex"   $PATH1/mfb_hdr_data_merge/hdr_plan_and_insert_i/s_*
+#   add_wave " -noupdate -hex -color yellow"   $PATH1/CLK
+#   eval "add wave  -divider {}"
+#   add_wave " -noupdate -hex"   $PATH1/mfb_hdr_data_merge/data_insert_i/s_*
+#   eval "add wave  -divider {}"
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label up_mfb_hdr_merge_out -hex"   $PATH2/org_up_mfb_hdr_merge_out
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label RQ -hex"   $PATH2/org_RQ
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label RQ_MVB -hex"   $PATH2/org_RQ_MVB
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label RQ_MFB -hex"   $PATH2/org_RQ_MFB
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label RCB -hex"   $PATH3/s_rcb_size
+   add_wave " -noupdate -label tag -hex"   $PATH3/tag_ass_i_tag
+   add_wave " -noupdate -label vld -hex"   $PATH3/s_tag_assign_vld
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label RC_MVB -hex"   $PATH2/org_RC_MVB
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label RC_MFB -hex"   $PATH2/org_RC_MFB
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label RC -hex"   $PATH2/org_RC
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label down_mfb_get_items_in -hex"   $PATH2/org_down_mfb_get_items_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label down_mfb_cutter_in -hex"   $PATH2/org_down_mfb_cutter_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label down_mvb_stfifo_in -hex"   $PATH2/org_down_mvb_stfifo_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label down_mfb_stfifo_in -hex"   $PATH2/org_down_mfb_stfifo_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label down_mfb_splfi_in -hex"   $PATH2/org_down_mfb_splfi_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label down_mvb_pcie2dma_in -hex"   $PATH2/org_down_mvb_pcie2dma_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label tagm_release -hex"   $PATH2/org_tagm_release
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label down_mfb_split_in -hex"   $PATH2/org_down_mfb_split_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label down_mvb_split_in -hex"   $PATH2/org_down_mvb_split_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label down_mfb_split_in -hex"   $PATH2/org_down_mfb_split_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label down_mfb_trans_in -hex"   $PATH2/org_down_mfb_trans_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label down_mvb_asfifo_in -hex"   $PATH2/org_down_mvb_asfifo_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label down_mfb_asfifo_in -hex"   $PATH2/org_down_mfb_asfifo_in
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label DOWN_MVB -hex"   $PATH2/org_DOWN_MVB
+
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label DOWN_MFB -hex"   $PATH2/org_DOWN_MFB
+}
+
+proc tag_manager { PATH PATH2 PATH3 PATH4 } {
+   add_wave " -noupdate -label tagm_mvb_in -hex"   $PATH2/org_tagm_mvb_in
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -hex -color yellow"   $PATH/CLK
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/s0_*
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -hex"   $PATH3/s_*
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -hex"   $PATH3/s1_*
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -hex"   $PATH3/s2_*
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/s3_*
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -hex"   $PATH3/freed_words
+   add_wave " -noupdate -hex"   $PATH3/free_cplh_reg
+   add_wave " -noupdate -hex"   $PATH3/enough_free_cplh
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -label tagm_mvb_out -hex"   $PATH2/org_tagm_mvb_out
+   eval "add wave  -divider {TAG ASSIGN}"
+   add_wave " -noupdate -label RCB -hex"   $PATH4/s_rcb_size
+   add_wave " -noupdate -label tag -hex"   $PATH4/tag_ass_i_tag
+   add_wave " -noupdate -label vld -hex"   $PATH4/s_tag_assign_vld
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -hex -color yellow"   $PATH/CLK
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/pcie_fifo_rd_shift
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/assign_ordered_reg
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -hex"   $PATH3/tag_map_read_tag_reg
+   add_wave " -noupdate -hex"   $PATH3/tag_map_read_low_addr_reg
+   add_wave " -noupdate -hex"   $PATH3/tag_map_read_len_reg
+   add_wave " -noupdate -hex"   $PATH3/tag_map_read_rel_reg
+   add_wave " -noupdate -hex"   $PATH3/tag_map_read_reg_vld
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/tag_ass_*
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/tag_rel_tag
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/tag_touch_vld
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/tag_rel_vld
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/first_touch
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -hex"   $PATH3/tag_map_untouched
+   add_wave " -noupdate -hex"   $PATH3/tag_map_vld
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -hex -color yellow"   $PATH/CLK
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/pta_*
+   add_wave " -noupdate -color #eecc66 -hex"   $PATH3/freed_words*
+   eval "add wave  -divider {}"
+   add_wave " -noupdate -label tagm_release -hex"   $PATH2/org_tagm_release
+
+   add_wave " -noupdate -hex -color yellow"   $PATH/CLK
+   add_wave " -noupdate -hex -color yellow"   $PATH/CLK_DMA
+}
+
+proc tb_internals { PATH GROUP } {
+   eval "add wave  -divider {Synchronization}"
+   add_wave " -noupdate -hex -color yellow"   $PATH/CLK
+   add_wave " -noupdate -hex -color yellow"   $PATH/CLK_DMA
+   add_wave " -noupdate -hex -color yellow"   $PATH/RESET
+
+   eval "add wave  -divider {}"
+   eval "add wave  -divider {Unit interface}"
+   eval "add wave  -divider {}"
+
+   eval "add wave  -divider {UP MVB}"
+   add_wave " -noupdate -label type      -color #eecc66 -hex"   $PATH/up_mvb_i_hdr_type
+   add_wave " -noupdate -label address   -color #eecc66 -hex"   $PATH/up_mvb_i_hdr_address
+   add_wave " -noupdate -label length    -color #eecc66 -hex"   $PATH/up_mvb_i_hdr_length
+   add_wave " -noupdate -label tag       -color #eecc66 -hex"   $PATH/up_mvb_i_hdr_tag
+   add_wave " -noupdate -label id        -color #eecc66 -hex"   $PATH/up_mvb_i_hdr_id
+   add_wave " -noupdate -label vld       -color #eecc66 -hex"   $PATH/s_up_mvb_vld
+   add_wave " -noupdate -label src_rdy   -color #eecc66 -hex"   $PATH/s_up_mvb_src_rdy
+   add_wave " -noupdate -label dst_rdy   -color #eecc66 -hex"   $PATH/s_up_mvb_dst_rdy
+
+   eval "add wave  -divider {UP MFB}"
+   add_wave " -noupdate -label data    -hex"   $PATH/up_mfb_i_data
+   add_wave " -noupdate -label sof     -hex"   $PATH/s_up_mfb_sof
+   add_wave " -noupdate -label sof_pos -hex (item)"   $PATH/up_mfb_i_sof_pos
+   add_wave " -noupdate -label eof     -hex"   $PATH/s_up_mfb_eof
+   add_wave " -noupdate -label eof_pos -hex (item)"   $PATH/up_mfb_i_eof_pos
+   add_wave " -noupdate -label src_rdy -hex"   $PATH/s_up_mfb_src_rdy
+   add_wave " -noupdate -label dst_rdy -hex"   $PATH/s_up_mfb_dst_rdy
+
+   eval "add wave  -divider {RQ}"
+   add_wave " -noupdate -label tuser.sop      -color #eecc66 -hex"   $PATH/rq_i_tuser_sop
+   add_wave " -noupdate -label tuser.sop_pos (item)  -color #eecc66 -hex"   $PATH/rq_i_tuser_sop_pos
+   add_wave " -noupdate -label tuser.eop      -color #eecc66 -hex"   $PATH/rq_i_tuser_eop
+   add_wave " -noupdate -label tuser.eop_pos (item)  -color #eecc66 -hex"   $PATH/rq_i_tuser_eop_pos
+   add_wave " -noupdate -label tuser.first_be -color #eecc66 -hex"   $PATH/rq_i_tuser_first_be
+   add_wave " -noupdate -label tuser.last_be  -color #eecc66 -hex"   $PATH/rq_i_tuser_last_be
+   add_wave " -noupdate -label tdata          -color #eecc66 -hex"   $PATH/rq_i_tdata
+   add_wave " -noupdate -label tlast          -color #eecc66 -hex"   $PATH/s_rq_tlast
+   add_wave " -noupdate -label tkeep          -color #eecc66 -hex"   $PATH/s_rq_tkeep
+   add_wave " -noupdate -label tvalid         -color #eecc66 -hex"   $PATH/s_rq_tvalid
+   add_wave " -noupdate -label tready         -color #eecc66 -hex"   $PATH/s_rq_tready
+
+   eval "add wave  -divider {TAG ASSIGN}"
+   add_wave " -noupdate -label RCB -hex"   $PATH/s_rcb_size
+   add_wave " -noupdate -label tag -hex"   $PATH/tag_ass_i_tag
+   add_wave " -noupdate -label vld -hex"   $PATH/s_tag_assign_vld
+
+   eval "add wave  -divider {Synchronization}"
+   add_wave " -noupdate -hex -color yellow"   $PATH/CLK
+   add_wave " -noupdate -hex -color yellow"   $PATH/CLK_DMA
+   add_wave " -noupdate -hex -color yellow"   $PATH/RESET
+
+   eval "add wave  -divider {RC}"
+   add_wave " -noupdate -label tuser.sop     -color #eecc66 -hex"   $PATH/rc_i_tuser_sop
+   add_wave " -noupdate -label tuser.sop_pos (item) -color #eecc66 -hex"   $PATH/rc_i_tuser_sop_pos
+   add_wave " -noupdate -label tuser.eop     -color #eecc66 -hex"   $PATH/rc_i_tuser_eop
+   add_wave " -noupdate -label tuser.eop_pos (item) -color #eecc66 -hex"   $PATH/rc_i_tuser_eop_pos
+   add_wave " -noupdate -label tuser.be      -color #eecc66 -hex"   $PATH/rc_i_tuser_be
+   add_wave " -noupdate -label tdata         -color #eecc66 -hex"   $PATH/rc_i_tdata
+   add_wave " -noupdate -label tlast         -color #eecc66 -hex"   $PATH/s_rc_tlast
+   add_wave " -noupdate -label tkeep         -color #eecc66 -hex"   $PATH/s_rc_tkeep
+   add_wave " -noupdate -label tvalid        -color #eecc66 -hex"   $PATH/s_rc_tvalid
+   add_wave " -noupdate -label tready        -color #eecc66 -hex"   $PATH/s_rc_tready
+
+   eval "add wave  -divider {DOWN MVB}"
+   add_wave " -noupdate -label length    -hex"   $PATH/down_mvb_i_hdr_length
+   add_wave " -noupdate -label tag       -hex"   $PATH/down_mvb_i_hdr_tag
+   add_wave " -noupdate -label id        -hex"   $PATH/down_mvb_i_hdr_id
+   add_wave " -noupdate -label completed -hex"   $PATH/down_mvb_i_hdr_completed
+   add_wave " -noupdate -label vld       -hex"   $PATH/s_down_mvb_vld
+   add_wave " -noupdate -label src_rdy   -hex"   $PATH/s_down_mvb_src_rdy
+   add_wave " -noupdate -label dst_rdy   -hex"   $PATH/s_down_mvb_dst_rdy
+
+   eval "add wave  -divider {DOWN MFB}"
+   add_wave " -noupdate -label data    -color #eecc66 -hex"   $PATH/down_mfb_i_data
+   add_wave " -noupdate -label sof     -color #eecc66 -hex"   $PATH/s_down_mfb_sof
+   add_wave " -noupdate -label sof_pos (item) -color #eecc66 -hex"   $PATH/down_mfb_i_sof_pos
+   add_wave " -noupdate -label eof     -color #eecc66 -hex"   $PATH/s_down_mfb_eof
+   add_wave " -noupdate -label eof_pos (item) -color #eecc66 -hex"   $PATH/down_mfb_i_eof_pos
+   add_wave " -noupdate -label src_rdy -color #eecc66 -hex"   $PATH/s_down_mfb_src_rdy
+   add_wave " -noupdate -label dst_rdy -color #eecc66 -hex"   $PATH/s_down_mfb_dst_rdy
+}

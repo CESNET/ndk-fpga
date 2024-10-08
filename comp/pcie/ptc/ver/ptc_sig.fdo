@@ -1,0 +1,22 @@
+# ptc_sig.fdo : Include file with signals
+# Copyright (C) 2018 CESNET z. s. p. o.
+# Author: Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+# Paths
+#
+set TB_PATH   "/testbench"
+set UUT_PATH  "/testbench/uut"
+
+source  "signals.fdo"
+
+add wave -divider ""
+add wave -divider "PTC"
+add wave -divider ""
+uut_internals "$UUT_PATH" "/testbench/s_org" "$TB_PATH"
+
+add wave -divider ""
+add wave -divider "PTC Tag Manager"
+add wave -divider ""
+tag_manager "$UUT_PATH" "/testbench/s_org" "$UUT_PATH/tag_manager_i" "$TB_PATH"
+

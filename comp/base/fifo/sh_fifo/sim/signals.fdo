@@ -1,0 +1,64 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2007 CESNET
+# Author: Petr Mikusek <petr.mikusek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc blk_SH_FIFO { PARAM } {
+   global SH_FIFO_PATH
+
+   # Relay interface
+   if { $PARAM == "IFC" } {
+      add wave -divider "SH FIFO"
+      add_wave "-label din -hex" $SH_FIFO_PATH/din
+      add_wave "-label we" $SH_FIFO_PATH/we
+      add_wave "-label full" $SH_FIFO_PATH/full
+
+      add_wave "-label dout -hex" $SH_FIFO_PATH/dout
+      add_wave "-label re" $SH_FIFO_PATH/re
+      add_wave "-label empty" $SH_FIFO_PATH/empty
+
+      add_wave "-uns -label status" $SH_FIFO_PATH/status
+   }
+
+   # Internal signals
+   if { $PARAM == "INT" } {
+      add wave -divider "SH FIFO: Internal"
+      add_wave "-label shreg" $SH_FIFO_PATH/shreg
+      add_wave "-unsigned -label cnt_addr" $SH_FIFO_PATH/cnt_addr
+      add_wave "-hex -label reg_din" $SH_FIFO_PATH/reg_din
+      add_wave "-hex -label din_int" $SH_FIFO_PATH/din_int
+      add_wave "-label reg_we" $SH_FIFO_PATH/reg_we
+      add_wave "-label we_int" $SH_FIFO_PATH/we_int
+      add_wave "-hex -label dout_int" $SH_FIFO_PATH/dout_int
+      add_wave "-hex -label reg_dout" $SH_FIFO_PATH/reg_dout
+      add_wave "-label empty_int" $SH_FIFO_PATH/empty_int
+      add_wave "-label reg_empty" $SH_FIFO_PATH/reg_empty
+      add_wave "-label re_int" $SH_FIFO_PATH/re_int
+   }
+
+   # FSM
+   if { $PARAM == "FSM" } {
+      add wave -divider "SH FIFO: FSM"
+      add_wave "-label clk" $SH_FIFO_PATH/fsm_u/clk
+      add_wave "-label reset" $SH_FIFO_PATH/fsm_u/reset
+
+      add_wave "-label we" $SH_FIFO_PATH/fsm_u/we
+      add_wave "-label re" $SH_FIFO_PATH/fsm_u/re
+      add_wave "-label cmp_full" $SH_FIFO_PATH/fsm_u/cmp_full
+      add_wave "-label cmp_empty" $SH_FIFO_PATH/fsm_u/cmp_empty
+
+      add_wave "-label full" $SH_FIFO_PATH/fsm_u/full
+      add_wave "-label empty" $SH_FIFO_PATH/fsm_u/empty
+      add_wave "-label cnt_addr_ce" $SH_FIFO_PATH/fsm_u/cnt_addr_ce
+      add_wave "-label cnt_addr_dir" $SH_FIFO_PATH/fsm_u/cnt_addr_dir
+      add_wave "-label shreg_ce" $SH_FIFO_PATH/fsm_u/shreg_ce
+
+      add_wave "-label present_state" $SH_FIFO_PATH/fsm_u/present_state
+      add_wave "-label next_state" $SH_FIFO_PATH/fsm_u/next_state
+   }
+
+}
+

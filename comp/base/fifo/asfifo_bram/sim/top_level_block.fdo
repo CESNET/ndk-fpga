@@ -1,0 +1,23 @@
+# top_level.fdo : Include file with signals
+# Copyright (C) 2003 CESNET
+# Authors: Tomas Martinek <martinek@liberouter.org>
+#          Viktor Pus <xpusvi00@stud.fit.vutbr.cz>
+#          Jan Viktorin <xvikto03@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+set FIRMWARE_BASE "../../../../.."
+set COMP_BASE     "$FIRMWARE_BASE/comp"
+
+set TB_FILE "top_level_block_tb.vhd"
+set SIG_FILE "asfifo_block_sig.fdo"
+
+set COMPONENTS [list \
+    [list "ASFIFO_BRAM_BLOCK"  ".." "FULL"]    \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+nb_sim_run 5us

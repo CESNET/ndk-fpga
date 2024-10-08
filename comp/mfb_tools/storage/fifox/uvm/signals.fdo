@@ -1,0 +1,41 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Mikuláš Brázda <xbrazd21@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc mfb_rx {PATH} {
+    add wave -divider "RX_MFB"
+    add_wave [list -noupdate -hex]        "$PATH/RX_DATA(255 downto 0)"
+    add_wave [list -noupdate -hex]        "$PATH/RX_DATA(511 downto 256)"
+    add_wave [list -noupdate -bin]        $PATH/RX_SOF
+    add_wave [list -noupdate -bin]        $PATH/RX_EOF
+    add_wave [list -noupdate -bin]        $PATH/RX_SOF_POS
+    add_wave [list -noupdate -bin]        $PATH/RX_EOF_POS
+    add_wave [list -noupdate -bin]        $PATH/RX_SRC_RDY
+    add_wave [list -noupdate -bin]        $PATH/RX_DST_RDY
+    add_wave [list -noupdate -bin]        $PATH/RX_META
+
+}
+
+proc mfb_tx {PATH} {
+    add wave -divider "TX_MFB"
+    add_wave [list -noupdate -hex]        "$PATH/TX_DATA(255 downto 0)"
+    add_wave [list -noupdate -hex]        "$PATH/TX_DATA(511 downto 256)"
+    add_wave [list -noupdate -bin]        $PATH/TX_SOF
+    add_wave [list -noupdate -bin]        $PATH/TX_EOF
+    add_wave [list -noupdate -bin]        $PATH/TX_SOF_POS
+    add_wave [list -noupdate -bin]        $PATH/TX_EOF_POS
+    add_wave [list -noupdate -bin]        $PATH/TX_SRC_RDY
+    add_wave [list -noupdate -bin]        $PATH/TX_DST_RDY
+    add_wave [list -noupdate -bin]        $PATH/TX_META
+}
+
+proc ints {PATH} {
+
+    add wave -divider "INTERNALS"
+    add_wave [list -noupdate]             $PATH/FIFO_STATUS
+    add_wave [list -noupdate]             $PATH/FIFO_AFULL
+    add_wave [list -noupdate]             $PATH/FIFO_AEMPTY
+
+}

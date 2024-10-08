@@ -1,0 +1,57 @@
+/*
+ * ver_flu_tools.jenkins: Jenkins configuration script
+ * Copyright (C) 2021 CESNET z. s. p. o.
+ * Author(s): Jakub Cabal <cabal@cesnet.cz>
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+// Clean previous builds
+library 'liberouter'
+cleanBuilds()
+
+// /////////////////////////////////////////////////////////////////////////////
+// BASIC-VERIFICATION
+// /////////////////////////////////////////////////////////////////////////////
+// Add engines for automatic Jenkins verifications into the following list
+// FORMAT:
+//  [ 'name',              'path_to_ver',                                   'script.fdo'   ],
+def COMPONENTS_VER = [\
+    ['Transformer',        'comp/flu_tools/flow/transformer/ver',           'top_level.fdo'],\
+    ['Distributor',        'comp/flu_tools/flow/distributor/ver',           'top_level.fdo'],\
+    ['Binder',             'comp/flu_tools/flow/binder/ver',                'top_level.fdo'],\
+    ['Binder Effective',   'comp/flu_tools/flow/binder_effective/ver',      'top_level.fdo'],\
+    ['SLR Crossing',       'comp/flu_tools/flow/slr_crossing/ver',          'top_level.fdo'],\
+    ['ASFIFO BRAM Xilinx', 'comp/flu_tools/storage/asfifo_bram_xilinx/ver', 'top_level.fdo'],\
+    ['FIFO BRAM Xilinx',   'comp/flu_tools/storage/fifo_bram_xilinx/ver',   'top_level.fdo'],\
+    ['HINS',               'comp/flu_tools/edit/header_insert/ver',         'top_level.fdo'],\
+    ['HINS Plus',          'comp/flu_tools/edit/header_insert_plus/ver',    'top_level.fdo'],\
+    ['Generator',          'comp/flu_tools/debug/generator/ver',            'top_level.fdo'],\
+    ['Frame Length',       'comp/flu_tools/debug/frame_length/ver',         'top_level.fdo'],\
+    ['FLU2FL',             'comp/flu_tools/fl/flu2fl/ver',                  'top_level.fdo'],\
+]
+// /////////////////////////////////////////////////////////////////////////////
+
+// /////////////////////////////////////////////////////////////////////////////
+// MULTI-VERIFICATION
+// /////////////////////////////////////////////////////////////////////////////
+// Add engines for automatic Jenkins verifications into the following list
+// FORMAT:
+//  [ 'name'               , 'path_to_ver'                             , 'fdo_file.fdo'       , 'test_pkg.sv/.vhd'   , 'settings.py'           ]
+//def COMPONENTS_MULTIVER = [\
+//    ['ASYNC'             , 'comp/mi_tools/async/ver'                 , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'       ],\
+//    ['SPLITTER_PLUS_GEN' , 'comp/mi_tools/splitter_plus_gen/ver'     , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'       ],\
+//    ['RECONFIGURATOR'    , 'comp/mi_tools/reconf/ver'                , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'       ],\
+//]
+// /////////////////////////////////////////////////////////////////////////////
+
+// Run component verifications using common script
+node('preklad') {
+    lock(label:"resources-${env.NODE_NAME}", quantity: 1) {
+        // fetch sources from GIT
+        checkout scm
+        def common_run = load "tests/jenkins/common.jenkins"
+        common_run.commonPrekladVerRun(COMPONENTS_VER)
+        //common_run.commonPrekladMultiVerRun(COMPONENTS_MULTIVER)
+    }
+}

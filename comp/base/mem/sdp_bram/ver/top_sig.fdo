@@ -1,0 +1,33 @@
+# top_sig.fdo : Include file with signals
+# Copyright (C) 2019 CESNET
+# Author: Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+# Paths
+#
+set TB_PATH   "/testbench"
+set UUT_PATH  "/testbench/uut"
+
+source  "signals.fdo"
+
+add wave -divider ""
+add wave -divider "Testbench"
+add wave -divider ""
+tb_signals "$TB_PATH"
+
+add wave -divider ""
+add wave -divider "Top Ports"
+add wave -divider ""
+uut_ports "$UUT_PATH"
+
+add wave -divider ""
+add wave -divider "Top Internals"
+add wave -divider ""
+uut_internals "$UUT_PATH"
+
+add wave -divider ""
+
+

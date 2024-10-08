@@ -1,0 +1,18 @@
+# sim_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Jan Kubalek <kubalek@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Paths
+set TB_PATH "/testbench"
+
+# include signals
+source "signals.fdo"
+
+add wave -divider "Generics and constants"
+#add wave $TB_PATH/*
+add wave -divider "Signals"
+all TB_ALL  $TB_PATH
+all COMP_ALL $TB_PATH/uut
+

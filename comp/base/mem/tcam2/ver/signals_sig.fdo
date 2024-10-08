@@ -1,0 +1,34 @@
+# signals_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author: Tomas Hak <xhakto01@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "TCAM2"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+read_p   READ   /testbench/DUT_U/VHDL_DUT_U
+write_p  WRITE  /testbench/DUT_U/VHDL_DUT_U
+match_p  MATCH  /testbench/DUT_U/VHDL_DUT_U
+
+add wave -divider "INTERNAL"
+
+add wave -divider "INPUT INTERFACE"
+add_wave "-group {TCAM2_INPUT} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/input_*
+
+add wave -divider "MEMORY SIGNALS"
+add_wave "-group {TCAM2_MEMORY} -noupdate -hex"   /testbench/DUT_U/VHDL_DUT_U/mem_*
+
+add wave -divider "READ LOGIC"
+add_wave "-group {TCAM2_READ} -noupdate -hex"     /testbench/DUT_U/VHDL_DUT_U/rd_*
+
+add wave -divider "WRITE LOGIC"
+add_wave "-group {TCAM2_WRITE} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/wr_*
+add_wave "-group {TCAM2_MASK} -noupdate -hex"     /testbench/DUT_U/VHDL_DUT_U/masked_*
+
+add wave -divider "MATCH LOGIC"
+add_wave "-group {TCAM2_MATCH} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/m_*
+add_wave "-group {TCAM2_SF} -noupdate -hex"       /testbench/DUT_U/VHDL_DUT_U/sf_*

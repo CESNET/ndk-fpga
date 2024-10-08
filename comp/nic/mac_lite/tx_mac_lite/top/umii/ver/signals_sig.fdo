@@ -1,0 +1,30 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+source "./signals.fdo"
+
+add wave -divider "TX MAC LITE"
+add_wave "-noupdate -color yellow -label RX_CLK"    /testbench/RX_CLK
+add_wave "-noupdate -color yellow -label RX_CLK_X2" /testbench/RX_CLK_X2
+add_wave "-noupdate -color yellow -label RX_RESET"  /testbench/RX_RESET
+add_wave "-noupdate -color yellow -label TX_CLK"    /testbench/TX_CLK
+add_wave "-noupdate -color yellow -label TX_RESET"  /testbench/TX_RESET
+add_wave "-noupdate -color yellow -label MI_CLK"    /testbench/MI_CLK
+add_wave "-noupdate -color yellow -label MI_RESET"  /testbench/MI_RESET
+
+all TOP        /testbench/DUT_U/VHDL_DUT_U
+all MAC        /testbench/DUT_U/VHDL_DUT_U/tx_mac_lite_i
+#all CRC_GEN    /testbench/DUT_U/VHDL_DUT_U/tx_mac_lite_i/crc_gen_g/mfb_crc32_ethernet_i
+#all CRC_ASFIFO /testbench/DUT_U/VHDL_DUT_U/tx_mac_lite_i/crc_gen_g/crc_asfifo_i
+#all LENGTH     /testbench/DUT_U/VHDL_DUT_U/tx_mac_lite_i/mfb_frame_len_i
+#all SPACER     /testbench/DUT_U/VHDL_DUT_U/tx_mac_lite_i/spacer_g/spacer_i
+#all BUFFER     /testbench/DUT_U/VHDL_DUT_U/tx_mac_lite_i/spacer_g/buffer_i
+#all CRC_INSERT /testbench/DUT_U/VHDL_DUT_U/tx_mac_lite_i/crc_insert_g/crc_insert_i
+#all STAT_UNIT  /testbench/DUT_U/VHDL_DUT_U/tx_mac_lite_i/stat_unit_i
+#all MI32_DEC   /testbench/DUT_U/VHDL_DUT_U/tx_mac_lite_i/adc_i
+#all ENC        /testbench/DUT_U/VHDL_DUT_U/umii_enc_i
+

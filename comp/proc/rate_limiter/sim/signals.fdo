@@ -1,0 +1,43 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2015 CESNET
+# Author: Jakub Lukac <xlukac09@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_rate_limiter { } {
+
+    global RATE_LIMITER_PATH
+
+    add wave -divider   -height 25  "I/O"
+    add_wave "-noupdate -uns -label PACKET_LEN"       /$RATE_LIMITER_PATH/PACKET_LEN
+    add_wave "-noupdate -hex -label PACKET_TS"        /$RATE_LIMITER_PATH/PACKET_TS
+    add_wave "-noupdate -hex -label RECORD_ADDR"      /$RATE_LIMITER_PATH/RECORD_ADDR
+    add_wave "-noupdate -hex -label ADDR_VLD"         /$RATE_LIMITER_PATH/ADDR_VLD
+    add wave -divider   -height 25  "Pass"
+    add_wave "-noupdate -hex -label PASS"             /$RATE_LIMITER_PATH/PASS
+    add wave -divider   -height 25  "SRC/DST RDY"
+    add_wave "-noupdate -hex -label IN_SRC_RDY"       /$RATE_LIMITER_PATH/IN_SRC_RDY
+    add_wave "-noupdate -hex -label IN_DST_RDY"       /$RATE_LIMITER_PATH/IN_DST_RDY
+    add_wave "-noupdate -hex -label OUT_SRC_RDY"      /$RATE_LIMITER_PATH/OUT_SRC_RDY
+    add_wave "-noupdate -hex -label OUT_DST_RDY"      /$RATE_LIMITER_PATH/OUT_DST_RDY
+    add wave -divider   -height 25  "MI32"
+    add_wave "-noupdate -hex -label ADDR"             /$RATE_LIMITER_PATH/MI32_ADDR
+    add_wave "-noupdate -hex -label ARDY"             /$RATE_LIMITER_PATH/MI32_ARDY
+    add wave -divider   -height 25  "Write"
+    add_wave "-noupdate -hex -label WR"               /$RATE_LIMITER_PATH/MI32_WR
+    add_wave "-noupdate -hex -label DWR"              /$RATE_LIMITER_PATH/MI32_DWR
+    add wave -divider   -height 25  "Read"
+    add_wave "-noupdate -hex -label RD"               /$RATE_LIMITER_PATH/MI32_RD
+    add_wave "-noupdate -hex -label DRD"              /$RATE_LIMITER_PATH/MI32_DRD
+    add_wave "-noupdate -hex -label DRDY"             /$RATE_LIMITER_PATH/MI32_DRDY
+    add wave -divider   -height 25  "Data"
+    add_wave "-noupdate -hex -label read_enable"      /$RATE_LIMITER_PATH/read_enable
+    add_wave "-noupdate -hex -label limit_data"       /$RATE_LIMITER_PATH/limit_data
+    add_wave "-noupdate -hex -label stage1_en"        /$RATE_LIMITER_PATH/stage1_en
+    add_wave "-noupdate -hex -label reg_in_src_rdy"   /$RATE_LIMITER_PATH/reg_in_src_rdy
+    add_wave "-noupdate -hex -label in_dst_rdy_mem"   /$RATE_LIMITER_PATH/in_dst_rdy_mem
+
+}

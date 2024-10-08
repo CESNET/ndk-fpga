@@ -1,0 +1,21 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+source "./signals.fdo"
+
+add wave -divider "MFB_ENABLER"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+add wave -divider "VER COUNTER"
+add_wave "-noupdate -bin -color yellow -label DISCARDED_INC" /testbench/DUT_U/stat_discarded
+add_wave "-noupdate -uns -color yellow -label CNT_DISCARDED" /testbench/DUT_U/cnt_discarded
+
+reg   REG   /testbench/DUT_U/VHDL_DUT_U
+rx    RX    /testbench/DUT_U/VHDL_DUT_U
+tx    TX    /testbench/DUT_U/VHDL_DUT_U
+inter INTER /testbench/DUT_U/VHDL_DUT_U

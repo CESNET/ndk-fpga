@@ -1,0 +1,33 @@
+# first_one_detector.fdo: FIRST ONE DETECTOR simulation
+# Copyright (C) 2010 CESNET
+# Author: Koranda Karel <xkoran01@stud.fit.vutbr.cz>
+#
+# $Id$
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# For whole design testing
+set FIRMWARE_BASE "../../../../.."
+set BASECOMP_BASE "$FIRMWARE_BASE/comp/base"
+set FIRSTONE_BASE  "$OFM_PATH/comp/base/misc/first_one_detector"
+set TB_FILE       "tb_first_one_detector.vhd"
+set SIG_FILE      "signals.fdo"
+
+set MOD $TB_FILE
+set PACKAGES ""
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "FIRST_ONE_DETECTOR" $FIRSTONE_BASE FULL] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 5us

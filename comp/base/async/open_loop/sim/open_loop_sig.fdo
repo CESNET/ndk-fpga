@@ -1,0 +1,19 @@
+# open_loop_sig.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Authors: Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set TB_PATH          "/testbench"
+set OPEN_LOOP_PATH   "/testbench/uut"
+
+# include signals
+source      "signals.fdo"
+
+blk_OPEN_LOOP
+
+

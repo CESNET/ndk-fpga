@@ -1,0 +1,17 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Vladislav Valek <xvalek14@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "MFB_TO_LBUS_ADAPTER"
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/RST
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/CLK
+
+mfb_rx /testbench/DUT_U/VHDL_DUT_U
+mfb_tx /testbench/DUT_U/VHDL_DUT_U
+ints /testbench/DUT_U/VHDL_DUT_U
+
+config wave -signalnamewidth 1

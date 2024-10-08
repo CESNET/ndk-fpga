@@ -1,0 +1,30 @@
+# flu_prfifo.fdo: Simulation script
+# Copyright (C) 2014 CESNET
+# Author: Ivan Bryndza <xbrynd00@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../../.."
+set AXI2FLU_BASE     ".."
+
+set TB_FILE          "$AXI2FLU_BASE/sim/testbench.vhd"
+set SIG_FILE         "$AXI2FLU_BASE/sim/axi2flu_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "AXI2FLU" $AXI2FLU_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 2us

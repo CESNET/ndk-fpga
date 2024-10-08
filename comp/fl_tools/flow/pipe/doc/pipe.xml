@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<source>
+
+<component>FrameLink Pipe</component>
+
+<authors>
+   <author login="kosek">Martin Košek</author>
+</authors>
+
+<features>
+   <item>Optional output register</item>
+</features>
+
+<description>
+
+   FrameLink Pipe is a small FIFO memory with FrameLink interface inserted
+   between FrameLink components to break-up possible critical path between
+   components. FIFO consists of shift registers SRL16 (SRL32 for Virtex-5)
+   thus is very resource efficient. Possiblity to register
+   all output signals allows better placement of interconnected FrameLink
+   components on the chip with smaller effort of PaR program.
+
+</description>
+
+<interface>
+   <generic_map>
+      <generic name="DATA_WIDTH" type="integer" default="64">
+         Input and output data width
+      </generic>
+      <generic name="USE_OUTREG" type="boolean" default="false">
+         If true, output register is instantiated
+      </generic>
+   </generic_map>
+   <port_map>
+      <divider>Common Interface</divider>
+      <port name="CLK" dir="in" width="1">
+         Clock input
+      </port>
+      <port name="RESET" dir="in" width="1">
+         Reset input
+      </port>
+
+      <divider>Input FrameLink Interface</divider>
+      <port name="RX" dir="in" width="1">
+         Input interface
+      </port>
+
+      <divider>Output FrameLink Interface</divider>
+      <port name="TX" dir="out" width="1">
+         Output interface
+      </port>
+   </port_map>
+</interface>
+
+<body>
+   <h1>Frequency and Resources usage</h1>
+
+   <p>
+      <tab sloupce="ccc">
+         <tr>
+            <th>Generic settings</th>
+            <th>Slices (% of C6X FPGA)</th>
+            <th>Dffs or latches (% of C6X FPGA)</th>
+         </tr>
+         <tr>
+            <th>DATA_WIDTH = 16</th>
+            <td>14 (0.06%)</td>
+            <td>2 (0.00%)</td>
+         </tr>
+         <tr>
+            <th>DATA_WIDTH = 32</th>
+            <td>22 (0.09%)</td>
+            <td>2 (0.00%)</td>
+         </tr>
+         <tr>
+            <th>DATA_WIDTH = 64</th>
+            <td>39 (0.17%)</td>
+            <td>2 (0.00%)</td>
+         </tr>
+         <nazev>Chip utilization by Precision (USE_OUTREG = false)</nazev>
+      </tab>
+
+      <tab sloupce="ccc">
+         <tr>
+            <th>Generic settings</th>
+            <th>Slices (% of C6X FPGA)</th>
+            <th>Dffs or latches (% of C6X FPGA)</th>
+         </tr>
+         <tr>
+            <th>DATA_WIDTH = 16</th>
+            <td>14 (0.06%)</td>
+            <td>24 (0.05%)</td>
+         </tr>
+         <tr>
+            <th>DATA_WIDTH = 32</th>
+            <td>23 (0.10%)</td>
+            <td>41 (0.08%)</td>
+         </tr>
+         <tr>
+            <th>DATA_WIDTH = 64</th>
+            <td>39 (0.17%)</td>
+            <td>74 (0.15%)</td>
+         </tr>
+         <nazev>Chip utilization by Precision (USE_OUTREG = true)</nazev>
+      </tab>
+   </p>
+
+</body>
+
+</source>

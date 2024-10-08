@@ -1,0 +1,18 @@
+# fl_rxbuffer_sig.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Libor Polcak <xpolca03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# Paths
+set FL_RXBUFFER_PATH       "/testbench/uut"
+set TB_BASE                "/testbench"
+
+source      "signals.fdo"
+
+add wave -noupdate -label reset $TB_BASE/reset
+add wave -noupdate -label base_clk $TB_BASE/clk
+
+blk_FL_RXBUFFER "$TB_BASE" "$FL_RXBUFFER_PATH"
+

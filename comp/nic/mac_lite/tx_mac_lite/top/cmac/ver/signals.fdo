@@ -1,0 +1,38 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc rx {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-group {Interface ($NAME)} -noupdate  -color yellow -label FLU_CLK"   $PATH/FLU_CLK
+   add_wave "-group {Interface ($NAME)} -noupdate  -color yellow -label FLU_RESET" $PATH/FLU_RESET
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex" $PATH/RX_*
+}
+
+proc tx {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-group {Interface ($NAME)} -noupdate  -color yellow -label CMAC_CLK"   $PATH/CMAC_CLK
+   add_wave "-group {Interface ($NAME)} -noupdate  -color yellow -label CMAC_RESET" $PATH/CMAC_RESET
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex" $PATH/TX_*
+}
+
+proc mi {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-group {Interface ($NAME)} -noupdate  -color yellow -label MI_CLK"   $PATH/MI_CLK
+   add_wave "-group {Interface ($NAME)} -noupdate  -color yellow -label MI_RESET" $PATH/MI_RESET
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex -label MI_DWR"  $PATH/MI_DWR
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex -label MI_ADDR" $PATH/MI_ADDR
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex -label MI_RD"   $PATH/MI_RD
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex -label MI_WR"   $PATH/MI_WR
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex -label MI_BE"   $PATH/MI_BE
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex -label MI_DRD"  $PATH/MI_DRD
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex -label MI_ARDY" $PATH/MI_ARDY
+   add_wave "-group {Interface ($NAME)} -noupdate  -hex -label MI_DRDY" $PATH/MI_DRDY
+}
+
+proc all {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-group {$NAME} -noupdate  -hex"   $PATH/*
+}

@@ -1,0 +1,30 @@
+# rate_limiter.fdo: Simulation script
+# Copyright (C) 2015 CESNET
+# Author: Jakub Lukac <xlukac09@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE     "../../../../.."
+set RATE_LIMITER_BASE "$OFM_PATH/comp/proc/rate_limiter/rate_limiter_core"
+
+set TB_FILE           "$RATE_LIMITER_BASE/sim/testbench.vhd"
+set SIG_FILE          "$RATE_LIMITER_BASE/sim/rate_limiter_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "rate_limiter" $RATE_LIMITER_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 2.5us

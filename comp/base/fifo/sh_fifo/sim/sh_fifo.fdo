@@ -1,0 +1,22 @@
+# sh_fifo.fdo: Shift-registers FIFO functional simulation file
+# Copyright (C) 2007 CESNET
+# Author: Petr Mikusek <petr.mikusek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set SH_FIFO_BASE     "$OFM_PATH/comp/base/fifo/sh_fifo"
+
+set SIG_FILE         "sh_fifo_sig.fdo"
+set TB_FILE          "sh_fifo_tb.vhd"
+
+set COMPONENTS [list \
+                  [ list "SH_FIFO" $SH_FIFO_BASE "FULL"] \
+               ]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 2us

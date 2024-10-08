@@ -1,0 +1,18 @@
+# asfifo_sig.fdo : Include file with signals
+# Copyright (C) 2010 CESNET
+# Authors: Jan Viktorin <xvikto03@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+source "./signals.fdo"
+
+add_wave    "-noupdate -label reset"    /testbench/reset
+write_part  "Write part"                /testbench/uut
+read_part   "Read part"                 /testbench/uut
+add_wave    "-noupdate -label BLK_END"  /testbench/blkend
+internal    "Internal signals"          /testbench/uut
+
+

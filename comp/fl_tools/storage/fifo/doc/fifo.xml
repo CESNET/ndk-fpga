@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+        <component>FIFO for FrameLink</component>
+
+<authors>
+   <author login="pus">Viktor Pus</author>
+</authors>
+
+<features>
+   <item>Selectable BRAM or Distmem FIFO</item>
+   <item>Data width 8, 16, 32, 64, or 128 bits</item>
+   <item>Variable depth of FIFO</item>
+   <item>LSTBLK, STATUS and FRAME_RDY signals for more effective flow control</item>
+</features>
+
+<description>
+
+   This component is FIFO with two FrameLink interfaces.
+   One interface is recieving (RX) and second is transmitting (TX) data.
+
+</description>
+
+<interface>
+   <generic_map>
+      <generic name="USE_BRAMS" type="boolean" default="">
+         Switch between BRAM and Distmem FIFO, true selects BRAM.
+         Only in FL_FIFO_FLxx entity.
+      </generic>
+      <generic name="ITEMS" type="integer" default="">
+         Number of items that FIFO can hold.
+      </generic>
+      <generic name="BLOCK_SIZE" type="integer" default="">
+         Defines size of block for LSTBLK signal.
+      </generic>
+      <generic name="STATUS_WIDTH" type="integer" default="">
+         Width of STATUS signal available.
+      </generic>
+      <generic name="PARTS" type="integer" default="">
+         Number of parts in each frame. Greater than zero.
+      </generic>
+   </generic_map>
+
+<port_map>
+   <divider>Common Interface</divider>
+   <port name="CLK"        dir="in"  width="1">
+      Clock signal
+   </port>
+   <port name="RESET"      dir="in"  width="1">
+      Reset signal
+   </port>
+
+   <divider>FrameLink interfaces</divider>
+   <port name="RX"       dir="inout" width="">
+      Recieve interface (write to FIFO)
+   </port>
+
+   <port name="TX"       dir="inout" width="">
+      Transmit interface (read from FIFO)
+   </port>
+
+   <divider>FIFO Control Interface</divider>
+   <port name="LSTBLK"       dir="out" width="1">
+      Last block detection
+   </port>
+   <port name="STATUS"      dir="out" width="STATUS_WIDTH">
+      MSBs of exact number of free items in the FIFO
+   </port>
+   <port name="EMPTY"      dir="out" width="1">
+      FIFO is empty
+   </port>
+   <port name="FULL"      dir="out" width="1">
+      FIFO is full
+   </port>
+   <port name="FRAME_RDY" dir="out" width="1">
+      At least one whole frame is in the FIFO
+   </port>
+</port_map>
+</interface>
+
+<body>
+
+    <h1>Specification</h1>
+    <p>
+    Use entity FL_FIFO_FLxx for normal FIFO, where xx is data width (8, 16,
+    32, 64 or 128 bits).
+    </p>
+
+<p>
+   Both FrameLink interfaces have standard behavior. Output LSTBLK is asserted
+   when N or less than N free items are in FIFO, where N is generic parameter.
+</p>
+<p>
+   Additional signal FRAME_RDY is asserted when at least one whole frame is
+   stored in the FIFO. This may be used for better flow control.
+</p>
+<p>
+   Signal STATUS shows several most significant (or all) bits of the free
+   space counter. This means that user can get exact information about
+   free items in the FIFO.
+</p>
+<p>
+   Because of output pipelining, signals LSTBLK, STATUS, EMPTY and FULL may be
+   inaccurate by one or two items.
+</p>
+
+    <h1>Implementation</h1>
+<p>
+   When using BRAM FIFO with DATA_WIDTH greater than 32 or Distributed FIFO,
+   all four protocol control signals
+   (SOP_N, EOP_N, SOF_N, EOF_N) are stored in the FIFO. Parity bits are used in
+   case of BRAM FIFO. For BRAM_FIFO with DATA_WIDTH = 32, only 2 parity
+   bits are left, so only EOF_N and EOP_N are stored and the other signals are
+   restored at the output of FrameLink FIFO. If DATA_WIDTH is 16 or 8 bits,
+   only EOP_N is stored and all other signals are restored.
+</p>
+<p>
+   To restore all control signals, number of frame parts must be known before
+   translation.
+</p>
+<p>
+   Two helper entities FL_COMPRESS and FL_DECOMPRESS_ANY are used to transform
+   FrameLink signals to bits-saving format.
+</p>
+
+   <h1>FL_COMPRESS</h1>
+<p>
+This module is used to compress FrameLink framing signals (S/E)O(P/F)_N into
+bits-saving format. This is usefull when FrameLink must be stored is some
+kind of memory.
+</p>
+<p>
+FrameLink control signals are input to the FL_COMPRESS entity
+(without DATA and DREM).
+Both SRC_RDY_N and DST_RDY_N are inputs, so that this module is completely
+passive on the FrameLink interface.
+</p>
+<p>
+Output wires FL_JUICE contains compressed framing signals according
+to the WIRES generic. The compression scheme is simple.
+In the most compressed version, only EOP_N signal is stored and
+all other framing signals will be restored in FL_DECOMPRESS.
+</p>
+<p>
+sig_juice = concat(RX_SOF_N, RX_SOP_N, RX_EOF_N, RX_EOP_N) (WIRES-1 downto 0);
+</p>
+<p>
+Output wire FRAME_PART sends one cycle of "1" for every part of the
+first frame. This can be used to detect number of parts on the link.
+</p>
+
+   <h1>FL_DECOMPRESS</h1>
+<p>
+This module has the opposite function. The WIRES generic should
+be the same as for FL_COMPRESS, and the FL_JUICE input should be
+connected to the FL_JUICE output of FL_COMPRESS, possibly after storage.
+</p>
+<p>
+If the PARTS generic is set to proper value,
+(or it is set to 0 - autodetect and FRAME_PART input is connected to
+FRAME_PART output of FL_COMPRESS), then framing signals are perfectly
+restored, with respect to the SRC_RDY_N and DST_RDY_N signals.
+</p>
+<p>
+Use DISCARD input to terminate current frame and start from scratch.
+</p>
+
+<h1>Frequency and Resources usage</h1>
+
+	<p>
+
+        <!--Resources usage and max. frequency by Precision-->
+
+		<tab sloupce="cccC">
+			<tr>
+				<th>Entity and generic settings</th>
+				<th>Slices</th>
+				<th>BlockRams</th>
+            <th>Max. frequency</th>
+			</tr>
+			<tr>
+				<th>FL_FIFO_FL128, USE_BRAMS=false, ITEMS=32</th>
+				<td>656</td>
+				<td>0</td>
+            <td>198 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_FIFO_FL64, USE_BRAMS=false, ITEMS=32</th>
+				<td>358</td>
+				<td>0</td>
+            <td>209 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_FIFO_FL32, USE_BRAMS=false, ITEMS=32</th>
+				<td>207</td>
+				<td>0</td>
+            <td>214 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_FIFO_FL16, USE_BRAMS=false, ITEMS=32</th>
+				<td>129</td>
+				<td>0</td>
+            <td>218 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_FIFO_FL8, USE_BRAMS=false, ITEMS=32</th>
+				<td>85</td>
+				<td>0</td>
+            <td>237 MHz</td>
+			</tr>
+
+			<tr>
+				<th>FL_FIFO_FL128, USE_BRAMS=true, ITEMS=1024</th>
+				<td>104</td>
+				<td>8</td>
+            <td>253 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_FIFO_FL64, USE_BRAMS=true, ITEMS=1024</th>
+				<td>66</td>
+				<td>4</td>
+            <td>253 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_FIFO_FL32, USE_BRAM=true, ITEMS=1024</th>
+				<td>46</td>
+				<td>2</td>
+            <td>253 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_FIFO_FL16, USE_BRAMS=true, ITEMS=1024</th>
+				<td>39</td>
+				<td>1</td>
+            <td>253 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_FIFO_FL8, USE_BRAMS=true, ITEMS=1024</th>
+				<td>34</td>
+				<td>1</td>
+            <td>253 MHz</td>
+			</tr>
+         <nazev>Resources and maximal frequency</nazev>
+		</tab>
+
+  </p>
+
+
+</body>
+
+</source>

@@ -1,0 +1,29 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_STREAM { } {
+
+    global STREAM_PATH
+    add wave -divider "MI_32"
+    add_wave "-noupdate -hex -label MI_DWR" /$STREAM_PATH/MI_DWR
+    add_wave "-noupdate -hex -label MI_ADDR" /$STREAM_PATH/MI_ADDR
+    add_wave "-noupdate -hex -label MI_RD" /$STREAM_PATH/MI_RD
+    add_wave "-noupdate -hex -label MI_WR" /$STREAM_PATH/MI_WR
+    add_wave "-noupdate -hex -label MI_BE" /$STREAM_PATH/MI_BE
+    add_wave "-noupdate -hex -label MI_DRD" /$STREAM_PATH/MI_DRD
+    add_wave "-noupdate -hex -label MI_ARDY" /$STREAM_PATH/MI_ARDY
+    add_wave "-noupdate -hex -label MI_DRDY" /$STREAM_PATH/MI_DRDY
+    add wave -divider "MI_32"
+    add_wave "-noupdate -hex -label REG_DATA_OUT" /$STREAM_PATH/REG_DATA_OUT
+    add_wave "-noupdate -hex -label REG_DATA_IN" /$STREAM_PATH/REG_DATA_IN
+    add_wave "-noupdate -hex -label REG_WE_IN" /$STREAM_PATH/REG_WE_IN
+    add_wave "-noupdate -hex -label REG_WR_OUT" /$STREAM_PATH/REG_WR_OUT
+    add_wave "-noupdate -hex -label REG_RD_OUT" /$STREAM_PATH/REG_RD_OUT
+    add_wave "-noupdate -hex -label REG_ARDY_IN" /$STREAM_PATH/REG_ARDY_IN
+
+}

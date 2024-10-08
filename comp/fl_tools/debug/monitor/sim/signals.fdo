@@ -1,0 +1,49 @@
+# signals.fdo : Include file with signals.
+# Copyright (C) 2003 CESNET
+# Author: Lukas Solanka <solanka@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+proc FL_MONITOR_RX { } {
+    global FL_MONITOR_PATH
+
+    add wave -divider "FL_MONITOR - RX interface"
+    add_wave "-noupdate -hex -label rx_data      " $FL_MONITOR_PATH/data
+    add_wave "-noupdate -hex -label rx_rem       " $FL_MONITOR_PATH/rem
+    add_wave "-noupdate -hex -label rx_src_rdy_n " $FL_MONITOR_PATH/src_rdy_n
+    add_wave "-noupdate -hex -label rx_dst_rdy_n " $FL_MONITOR_PATH/dst_rdy_n
+    add_wave "-noupdate -hex -label rx_sop_n     " $FL_MONITOR_PATH/sop_n
+    add_wave "-noupdate -hex -label rx_eop_n     " $FL_MONITOR_PATH/eop_n
+    add_wave "-noupdate -hex -label rx_sof_n     " $FL_MONITOR_PATH/sof_n
+    add_wave "-noupdate -hex -label rx_eof_n     " $FL_MONITOR_PATH/eof_n
+}
+
+
+proc FL_MONITOR_INT { } {
+    global FL_MONITOR_PATH
+
+    add wave -divider "FL_MONITOR - Internal signals"
+    add_wave "-noupdate -hex -label cmp_pos_match    " $FL_MONITOR_PATH/cmp_pos_match
+    add_wave "-noupdate -hex -label cmp_data_match   " $FL_MONITOR_PATH/cmp_data_match
+    add_wave "-noupdate -hex -label monitored_data   " $FL_MONITOR_PATH/monitored_data
+    add_wave "-noupdate -hex -label reg_data_match   " $FL_MONITOR_PATH/reg_data_match
+    add_wave "-noupdate      -label reg_data_match_we" $FL_MONITOR_PATH/reg_data_match_we
+    add_wave "-noupdate -hex -label cnt_word         " $FL_MONITOR_PATH/cnt_word
+    add_wave "-noupdate -hex -label cnt_match        " $FL_MONITOR_PATH/cnt_match
+    add_wave "-noupdate -hex -label reg_pos_matched  " $FL_MONITOR_PATH/reg_pos_matched
+}
+
+
+proc FL_MONITOR_MI32 { } {
+    global FL_MONITOR_PATH
+
+    add wave -divider "FL_MONITOR - MI32 Interface"
+    add_wave "-noupdate -label clk    "             $FL_MONITOR_PATH/clk
+    add_wave "-noupdate -hex -label mi"             $FL_MONITOR_PATH/mi
+}
+
+

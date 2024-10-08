@@ -1,0 +1,32 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2012 CESNET
+# Author: Pavel Benacek <benacek@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE          "../../../../.."
+
+set FLU_DUT_BASE           ".."
+set FLU_DUT_VER_BASE       "$FLU_DUT_BASE/ver"
+
+set TB_FILE               "./tbench/testbench.sv"
+set SIG_FILE              "./signals_sig.fdo"
+
+set COMPONENTS [list [list "FLU_DUT"      $FLU_DUT_BASE        "FULL"]\
+                     [list "FLU_DUT_VER"  $FLU_DUT_VER_BASE    "FULL"]\
+                     ]
+
+# Enable Code Coverage
+set CODE_COVERAGE "true"
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+nb_sim_run

@@ -1,0 +1,35 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2009 CESNET
+# Author(s): Jan Stourac <xstour03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# -------------------------------------------------------------------------
+#                       Waveform Definition
+# -------------------------------------------------------------------------
+
+proc blk_ASYNC { PARAM } {
+   global ASYNC_PATH
+
+add wave -divider "ASYNC"
+# User signals
+add wave -divider "Input interface"
+add_wave "-noupdate -label IN_CLK"                 $ASYNC_PATH/IN_CLK
+add_wave "-noupdate -label RQST -hex"              $ASYNC_PATH/RQST
+add_wave "-noupdate -label RDY"                    $ASYNC_PATH/RDY
+add wave -divider "Output interface"
+add_wave "-noupdate -label OUT_CLK"                $ASYNC_PATH/OUT_CLK
+add_wave "-noupdate -label OUT_RQST"               $ASYNC_PATH/OUT_RQST
+add wave -divider "Internals - RQST pipeline"
+add_wave "-noupdate -label busy"                   $ASYNC_PATH/busy
+add_wave "-noupdate -label rqst_toogle"            $ASYNC_PATH/rqst_toogle
+add_wave "-noupdate -label rqst_tg_reg0"           $ASYNC_PATH/rqst_tg_reg0
+add_wave "-noupdate -label rqst_tg_reg1"           $ASYNC_PATH/rqst_tg_reg1
+add_wave "-noupdate -label rqst_tg_out"            $ASYNC_PATH/rqst_tg_out
+add wave -divider "Internals - RDY pipeline"
+add_wave "-noupdate -label rdy_toogle"             $ASYNC_PATH/rdy_toogle
+add_wave "-noupdate -label rdy_tg_reg0"            $ASYNC_PATH/rdy_tg_reg0
+add_wave "-noupdate -label rdy_tg_reg1"            $ASYNC_PATH/rdy_tg_reg1
+add_wave "-noupdate -label rdy_tg_out"             $ASYNC_PATH/rdy_tg_out
+}

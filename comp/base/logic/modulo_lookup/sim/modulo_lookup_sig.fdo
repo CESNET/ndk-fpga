@@ -1,0 +1,24 @@
+# modulo_lookup_sig.fdo: Include file with signals
+# Copyright (C) 2013 CESNET
+# Author: Jan Kucera <xkucer73@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# Paths
+set TB_PATH   "/testbench"
+set MOD_PATH  "/testbench/uut"
+
+add wave -divider "Common interface"
+add wave -noupdate -hex -label CLK          $MOD_PATH/CLK
+add wave -noupdate -hex -label RESET        $MOD_PATH/RESET
+
+add wave -divider "Input interface"
+add wave -noupdate -hex -label MODULO       $MOD_PATH/MODULO
+add wave -noupdate -hex -label OPERAND      $MOD_PATH/OPERAND
+add wave -noupdate -hex -label IN_VLD       $MOD_PATH/IN_VLD
+
+add wave -divider "Output interface"
+add wave -noupdate -hex -label RESULT       $MOD_PATH/RESULT
+add wave -noupdate -hex -label OUT_VLD      $MOD_PATH/OUT_VLD
+

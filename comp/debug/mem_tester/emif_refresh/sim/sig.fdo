@@ -1,0 +1,13 @@
+# sig.fdo : Include file with signals
+# Copyright (C) 2021 CESNET z. s. p. o.
+# Author(s): Lukas Nevrkla <xnevrk03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Paths
+set UUT_PATH  "/testbench/uut"
+set TB_PATH   "/testbench"
+
+add wave -divider ""
+add_wave "-group { testbench } -noupdate -hex"   $UUT_PATH/*
+

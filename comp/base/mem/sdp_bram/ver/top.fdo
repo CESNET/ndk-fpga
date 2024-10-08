@@ -1,0 +1,29 @@
+# top.fdo: Main verification file
+# Copyright (C) 2019 CESNET
+# Author: Jan Kubalek <xkubal11@stdu.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set MAKEFILE_GEN "true"
+
+set FIRMWARE_BASE    "../../../../.."
+set PKG_BASE    "$FIRMWARE_BASE/comp/base/pkg"
+
+set SIG_FILE "top_sig.fdo"
+set TB_FILE  "testbench.vhd"
+
+set COMPONENTS [list \
+    [ list      "DUT"                 ".."                       "FULL"] \
+    [ list      "MATH_PKG"            $PKG_BASE                  "MATH"] \
+    [ list      "TYPE_PKG"            $PKG_BASE                  "TYPE"] \
+    [ list      "TEST_PKG"            "."                        "FULL"] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+puts "Numeric Std Warnings - Disabled"
+set NumericStdNoWarnings 1
+
+nb_sim_run

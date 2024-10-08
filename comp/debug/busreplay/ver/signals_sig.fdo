@@ -1,0 +1,16 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2016 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+source "./signals.fdo"
+
+add wave -divider "FLU Dump & Replay"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+show    DUMP  /testbench/DUT_U/DUMP_U
+show  REPLAY  /testbench/DUT_U/REPLAY_U
+

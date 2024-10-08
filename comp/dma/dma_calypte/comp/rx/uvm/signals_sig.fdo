@@ -1,0 +1,30 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Vladislav Valek <valekv@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add_wave "-noupdate -color yellow -label CLK"   /testbench/DUT_U/VHDL_DUT_U/CLK
+add_wave "-noupdate -color yellow -label RESET"   /testbench/DUT_U/VHDL_DUT_U/RESET
+
+ctrl CONTROL /testbench/DUT_U/VHDL_DUT_U
+
+wr USER_INPUT /testbench/DUT_U/VHDL_DUT_U
+
+rd PCIE_OUTPUT /testbench/DUT_U/VHDL_DUT_U
+
+ints /testbench/DUT_U/VHDL_DUT_U
+
+high_level_view /testbench/DUT_U/VHDL_DUT_U
+hdr_ins /testbench/DUT_U/VHDL_DUT_U
+hdr_mgr /testbench/DUT_U/VHDL_DUT_U
+trans_buff /testbench/DUT_U/VHDL_DUT_U
+inp_buff /testbench/DUT_U/VHDL_DUT_U
+
+sw_mgr /testbench/DUT_U/VHDL_DUT_U
+conf_regs /testbench/DUT_U/VHDL_DUT_U
+pkt_cntrs /testbench/DUT_U/VHDL_DUT_U
+
+config wave -signalnamewidth 1

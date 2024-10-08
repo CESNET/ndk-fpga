@@ -1,0 +1,74 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Libor Polcak <xpolca03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc blk_FL_RXBUFFER { TB RXBUFFER } {
+   add wave -divider "FL RX BUFFER"
+   add_wave "-noupdate -hex -label clk" $TB/clk
+   add_wave "-noupdate -hex -label reset" $TB/reset
+
+   add wave -divider "input interface"
+   add_wave "-noupdate -hex -label rx_data -hex" $RXBUFFER/rx_data
+   add_wave "-noupdate -hex -label rx_rem -hex" $RXBUFFER/rx_rem
+   add_wave "-noupdate -hex -label rx_sof_n" $RXBUFFER/rx_sof_n
+   add_wave "-noupdate -hex -label rx_sop_n" $RXBUFFER/rx_sop_n
+   add_wave "-noupdate -hex -label rx_eop_n" $RXBUFFER/rx_eop_n
+   add_wave "-noupdate -hex -label rx_eof_n" $RXBUFFER/rx_eof_n
+   add_wave "-noupdate -hex -label rx_src_rdy_n" $RXBUFFER/rx_src_rdy_n
+   add_wave "-noupdate -hex -label rx_dst_rdy_n" $RXBUFFER/rx_dst_rdy_n
+
+	 add wave -divider "output interface"
+	 add_wave "-noupdate -hex -label MI32" $RXBUFFER/mi32
+
+	 add wave -divider "address decoder"
+	 add_wave "-noupdate -hex -label decoder_input" $RXBUFFER/mx_decoder_data_in
+	 add_wave "-noupdate -hex -label cmd32" $RXBUFFER/reg_cmd32
+	 add_wave "-noupdate -hex -label status32" $RXBUFFER/reg_status32
+	 add_wave "-noupdate -hex -label fl_signals32" $RXBUFFER/reg_fl_sig32
+	 add_wave "-noupdate -hex -label fl_rem32" $RXBUFFER/reg_fl_rem32
+	 add_wave "-noupdate -hex -label fl_data32" $RXBUFFER/reg_fl_data32
+	 add_wave "-noupdate -hex -label decoder_out" $RXBUFFER/mx_decoder_data_out
+
+	 add wave -divider "registers"
+	 add_wave "-noupdate -hex -label cmd" $RXBUFFER/reg_cmd
+	 add_wave "-noupdate -hex -label cmd_we" $RXBUFFER/reg_cmd_we
+	 add_wave "-noupdate -hex -label cmd_cs" $RXBUFFER/reg_cmd_cs
+	 add_wave "-noupdate -hex -label fl_data" $RXBUFFER/reg_fl_data
+	 add_wave "-noupdate -hex -label fl_rem" $RXBUFFER/reg_fl_rem
+	 add_wave "-noupdate -hex -label fl_sig" $RXBUFFER/reg_fl_sig
+	 add_wave "-noupdate -hex -label output_we" $RXBUFFER/output_we
+	 add_wave "-noupdate -hex -label status" $RXBUFFER/reg_status
+
+   add wave -divider "fl fifo input"
+#   add_wave "-noupdate -hex -label rx_data -hex" $RXBUFFER/fl_fifo/rx_data
+#   add_wave "-noupdate -hex -label rx_rem -hex" $RXBUFFER/fl_fifo/rx_rem
+#   add_wave "-noupdate -hex -label rx_sof_n" $RXBUFFER/fl_fifo/rx_sof_n
+#   add_wave "-noupdate -hex -label rx_sop_n" $RXBUFFER/fl_fifo/rx_sop_n
+#   add_wave "-noupdate -hex -label rx_eop_n" $RXBUFFER/fl_fifo/rx_eop_n
+#   add_wave "-noupdate -hex -label rx_eof_n" $RXBUFFER/fl_fifo/rx_eof_n
+   add_wave "-noupdate -hex -label rx_src_rdy_n" $RXBUFFER/flfifo_rx_src_rdy_n
+   add_wave "-noupdate -hex -label rx_dst_rdy_n" $RXBUFFER/flfifo_rx_dst_rdy_n
+
+   add wave -divider "fl fifo output"
+   add_wave "-noupdate -hex -label tx_data -hex" $RXBUFFER/flfifo_tx_data
+#   add_wave "-noupdate -hex -label tx_rem -hex" $RXBUFFER/fl_fifo/tx_rem
+   add_wave "-noupdate -hex -label tx_sof_n" $RXBUFFER/flfifo_tx_sof_n
+   add_wave "-noupdate -hex -label tx_sop_n" $RXBUFFER/flfifo_tx_sop_n
+   add_wave "-noupdate -hex -label tx_eop_n" $RXBUFFER/flfifo_tx_eop_n
+   add_wave "-noupdate -hex -label tx_eof_n" $RXBUFFER/flfifo_tx_eof_n
+   add_wave "-noupdate -hex -label tx_src_rdy_n" $RXBUFFER/flfifo_tx_src_rdy_n
+   add_wave "-noupdate -hex -label tx_dst_rdy_n" $RXBUFFER/flfifo_tx_dst_rdy_n
+
+	 add wave -divider "fl sim output"
+   add_wave "-noupdate -hex -label tx_data -hex" $TB/fl_sim/tx_data
+   add_wave "-noupdate -hex -label tx_rem -hex" $TB/fl_sim/tx_rem
+   add_wave "-noupdate -hex -label tx_sof_n" $TB/fl_sim/tx_sof_n
+   add_wave "-noupdate -hex -label tx_sop_n" $TB/fl_sim/tx_sop_n
+   add_wave "-noupdate -hex -label tx_eop_n" $TB/fl_sim/tx_eop_n
+   add_wave "-noupdate -hex -label tx_eof_n" $TB/fl_sim/tx_eof_n
+   add_wave "-noupdate -hex -label tx_src_rdy_n" $TB/fl_sim/tx_src_rdy_n
+   add_wave "-noupdate -hex -label tx_dst_rdy_n" $TB/fl_sim/tx_dst_rdy_n
+}

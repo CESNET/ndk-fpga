@@ -1,0 +1,24 @@
+# flu2axi_sig.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Ivan Bryndza <xbrynd00@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set TB_PATH          "/testbench"
+set FLU2AXI_PATH   "/testbench/uut"
+
+# include signals
+source      "signals.fdo"
+
+
+add wave -divider "COMMON INTERFACE"
+add wave -noupdate -label RESET -color magenta $TB_PATH/RESET
+add wave -noupdate -label CLK -color magenta $TB_PATH/CLK
+blk_FLU2AXI_RX
+
+blk_FLU2AXI_TX
+

@@ -1,0 +1,479 @@
+# Modelsim.inc.tcl: Modelsim global include tcl script to compille all design
+# Copyright (C) 2003-2020 CESNET
+# Author: Martin Spinler <spinler@cesnet.cz>
+#         Tomas Martinek <martinek@liberouter.org>
+#         Viktor Pus     <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# For verification in OFM repository: OFM_PATH variables are set
+# from FIRMWARE_BASE variable (must refer to the root OFM directory).
+
+if {![info exists OFM_PATH]} {
+    set OFM_PATH $FIRMWARE_BASE
+}
+
+# Source scripts with further procedures utilized during design compilation
+source $OFM_PATH/build/Shared.tcl
+
+# ---------------------------------------------------------------------
+#                     Procedures and Functions
+# ---------------------------------------------------------------------
+
+# Decide which command should be used for particular file
+proc CompileMod {FNAME OPT} {
+    namespace upvar ::NDKBuild SIM_FLAGS SIM_FLAGS
+    array set opt $OPT
+
+    set LIB "work"
+    if {[info exists opt(LIBRARY)]} {
+        set LIB $opt(LIBRARY)
+        eval vlib -type directory $LIB
+    }
+
+    set FEXT [file extension $FNAME]
+
+    # This file uses a simulation library which must be loaded: 'vsim -L mylibrary'
+    if {[info exists opt(SIM_LIB)]} {
+        lappend SIM_FLAGS(SIM_LIB) {*}$opt(SIM_LIB)
+    }
+    # This file uses a simulation module which must be loaded: vsim mymodule testbench'
+    if {[info exists opt(SIM_MODULE)]} {
+        lappend SIM_FLAGS(SIM_MODULE) {*}$opt(SIM_MODULE)
+    }
+
+    # Generate netlists for utilized Vivado IP cores
+    if {$opt(TYPE) == "VIVADO_IP_XACT"} {
+      if {![info exists SIM_FLAGS(FPGA)]} {
+          puts "WARNING: SIM_FLAGS(FPGA) doesn't exists, skipping generating netlist for Vivado IP core $FNAME"
+      } else {
+        set IP_GEN_PATH "$SIM_FLAGS(SIM_MODULE)-${SIM_FLAGS(FPGA)}.vivado_ip_tmp/"
+        file mkdir $IP_GEN_PATH
+
+        # Initialization
+        set IP_NAME [file rootname [file tail $FNAME]]
+        set IP_GEN_SCRIPT ${IP_GEN_PATH}${IP_NAME}_netlist_gen.tcl
+        if {[file exists $IP_GEN_SCRIPT]} {
+            puts "$IP_GEN_SCRIPT exists, assume IP core's netlist has already been generated"
+            return
+        }
+        PrintLabel "IP Netlist Generation ($IP_NAME)"
+
+        # Prepare netlist generation Tcl script for Vivado
+        exec echo "
+            create_project -in_memory -part $SIM_FLAGS(FPGA)
+            set_property target_language VHDL \[current_project\]
+            read_ip $FNAME
+            upgrade_ip \[get_ips $IP_NAME\]
+            set_property GENERATE_SYNTH_CHECKPOINT TRUE \[get_files $FNAME\]
+            synth_ip \[get_ips $IP_NAME\]
+            quit
+        " > $IP_GEN_SCRIPT
+
+        # Generate netlist using Vivado
+        exec vivado -mode tcl -journal ${IP_GEN_PATH}${IP_NAME}_vivado.jou -log ${IP_GEN_PATH}${IP_NAME}_vivado.log -source $IP_GEN_SCRIPT >&@stdout
+      }
+    }
+
+    # Skip unknown file types
+    if {$opt(TYPE) != ""} {
+        return
+    } elseif {$FEXT in [list ".qsys" ".hex"]} {
+        return
+    }
+
+    set COVER_PARAMS [list ]
+    set COVER_PARAMS_SV [list ]
+    if {$SIM_FLAGS(CODE_COVERAGE)} {
+        lappend COVER_PARAMS -cover sbceft -togglewidthlimit 8 -coverdeglitch 5ps -fsmmultitrans
+        if {!$SIM_FLAGS(DEBUG)} {
+            lappend COVER_PARAMS -coveropt 4
+        }
+    }
+    if {$SIM_FLAGS(CODE_COVERAGE_SV)} {
+        lappend COVER_PARAMS_SV -cover sbce
+    }
+    lappend opt(VLOG_SV_FLAGS)
+
+    set VCOM_PARAM ""
+    set VLOG_PARAM ""
+    if {$SIM_FLAGS(DEBUG)} {
+        lappend VCOM_PARAM "-lint"
+    } elseif { !$SIM_FLAGS(CODE_COVERAGE) } {
+        lappend VCOM_PARAM "-nodebug=ports"
+        lappend VLOG_PARAM "-nodebug"
+    }
+
+    # Source compiling
+    if {$FEXT in [list .v .vh]} {
+        set CMD [list vlog -vmake {*}$COVER_PARAMS -timescale "1ps/1ps" {*}$VLOG_PARAM -work $LIB]
+    } elseif {$FEXT in [list .qsys .hex]} {
+        return
+    } elseif {$FEXT in [list .sv .svp]} {
+        regsub "/\[^/\]+\$" $FNAME "/" DIR
+        set CMD [list vlog -vmake {*}$COVER_PARAMS_SV -sv -timescale "1ps/1ps" {*}$VLOG_PARAM -work $LIB +incdir+$DIR {*}$SIM_FLAGS(VLOG_SV_FLAGS) {*}$opt(VLOG_SV_FLAGS)]
+    } else {
+        set CMD [list vcom -vmake -2008 -explicit {*}$COVER_PARAMS {*}$VCOM_PARAM  -work $LIB]
+    }
+
+    if {$SIM_FLAGS(BATCH_COMPILE)} {
+        nb_batch_add $CMD $FNAME
+    } else {
+        eval {*}$CMD $FNAME
+    }
+}
+
+proc nb_sim_restart { {run_params "-all"} } {
+    if {[catch {exec make}]} {
+    }
+
+    # Dont add same signals again
+    restart -f
+    run $run_params
+}
+
+proc nb_sim_run { {run_params "-all"} } {
+    global env SIG_FILE
+
+    # Check if it is a Jenkins run; if so, don't add any waves
+    if {![info exists env(BUILD_TAG)]} {
+        if {[info exists SIG_FILE]} {
+            view wave
+            delete wave *
+            source $SIG_FILE
+        }
+    } else {
+        puts "Running in Jenkins, verbosity decreased"
+
+        puts "Numeric Std Warnings - Disabled"
+        puts "Std Arith Warnings - Disabled"
+        global NumericStdNoWarnings
+        global StdArithNoWarnings
+        set NumericStdNoWarnings 1
+        set StdArithNoWarnings 1
+    }
+    restart -f
+    run $run_params
+}
+
+
+# -------------------------------------------------------------------
+#                       Simulation procedures
+# -------------------------------------------------------------------
+
+# add_wave procedure checks if a signal does exist before it is added
+# into the wave window
+#   add_wave [<param> [...]] <SIGNAL>
+#   add_wave <params> <SIGNAL>               backward compatibility
+proc add_wave { FIRST args } {
+   # get last argument = signal name
+   # other arguments = flags
+   set SIG [lindex [linsert $args 0 $FIRST] end] ;# at least one argument required
+
+   if { [catch {eval "add wave $FIRST $args"}] ne 0 } {
+      puts "WARNING : I can't find signal \"$SIG\""
+      echo "WARNING : I can't find signal \"$SIG\""
+   }
+}
+
+# ---------------------------------------------------------------------
+#                         Compilation
+# ---------------------------------------------------------------------
+
+proc nb_vsim_prepare {} {
+    # Suppress warnings from arithm library
+    puts "Std Arith Warnings - Disabled"
+    set  StdArithNoWarnings 1
+
+    # Quit current simulation
+    quit -sim
+
+    # Clears old work directory and creates new one
+    eval vlib -type directory work
+    vdel -all
+    eval vlib -type directory work
+}
+
+proc nb_vsim_compile_svlibs {SV_LIBS} {
+    # INFO: ModelSim tries to load dynamic library only when encounter unknown symbol.
+    #       Global library is a solution of possible dependencies between libs.
+    #       Other possibility is load library with -gblso parameter (global scope).
+    set USE_GLOBAL_LIB true
+
+    set SV_FLAGS ""
+    set LD_FLAGS ""
+    foreach i $SV_LIBS {
+        array set opt [lassign $i i]
+
+        if {![info exists opt(MAKE_PARAMS)]} {
+            set opt(MAKE_PARAMS) [list]
+        }
+        regsub "/\[^/\]+\$" $i "" DIR
+        regsub ".+/" $i "" FILE
+
+        puts "Compiling SV_LIB $FILE: make -C $DIR"
+        exec make -C $DIR {*}$opt(MAKE_PARAMS)
+
+        if {[file exist "$DIR/lib$FILE.so"] || [file exist "$DIR/lib$FILE.dll"]} {
+            lappend SV_FLAGS -sv_lib $DIR/lib$FILE
+
+            #lappend LD_FLAGS -L$DIR -l$FILE
+            lappend LD_FLAGS -l$FILE
+            eval [list exec cp] [glob $DIR/lib$FILE.so*] ./
+        } else {
+            puts "Warning: SystemVerilog dynamic library $DIR/lib$FILE.so was not found nor compiled."
+        }
+    }
+
+    if {$USE_GLOBAL_LIB && $LD_FLAGS != ""} {
+        exec gcc -fvisibility=hidden -shared -o cdpi.so -L. {*}$LD_FLAGS
+        set SV_FLAGS "-sv_lib cdpi"
+    }
+
+    return $SV_FLAGS
+}
+
+proc nb_vsim_compile_project {sim_flags hierarchy} {
+    global env
+    upvar 1 $sim_flags SIM_FLAGS $hierarchy HIERARCHY
+
+    set FILES [list ]
+    set SV_LIBS [list ]
+
+    if {$SIM_FLAGS(BATCH_COMPILE)} {
+        nb_batch_init
+    }
+
+    if {[info exists env(ARCHGRP)]} {
+        for {set i 0} {$i < [llength $HIERARCHY(COMPONENTS)]} {incr i} {
+            set COMP [lindex $HIERARCHY(COMPONENTS) $i]
+            lassign $COMP COMP_NAME COMP_PATH COMP_ARCHGRP
+
+            foreach ARCH $env(ARCHGRP) {
+                lassign [split $ARCH "="] ARCHGRP_COMP_NAME ARCHGRP_NAME
+                if {$COMP_NAME == $ARCHGRP_COMP_NAME} {
+                    lset COMP 2 $ARCHGRP_NAME
+                    lset HIERARCHY(COMPONENTS) $i $COMP
+                }
+            }
+        }
+    }
+
+    PrintLabel "Packages Compilation"
+    ApplyToMods $HIERARCHY(PACKAGES) "CompileMod" FILES
+
+    PrintLabel "Components compilation"
+    ApplyToComponents $HIERARCHY(COMPONENTS) "CompileMod" FILES SV_LIBS
+
+    PrintLabel "Modules compilation"
+    ApplyToMods $HIERARCHY(MOD) "CompileMod" FILES
+
+    PrintLabel "Testbench Compilation"
+    #ApplyToMods $HIERARCHY(TOP_LEVEL) "CompileMod" FILES
+    ApplyToMods $HIERARCHY(TB_FILE) "CompileMod" FILES
+
+    if {$SIM_FLAGS(BATCH_COMPILE)} {
+        nb_batch_finish
+    }
+
+    # This causes sometimes recompiling of all sources
+    exec vmake > $SIM_FLAGS(MAKEFILE_NAME)
+
+    # Compile SV libs
+    set SIM_FLAGS(SV_LIBS_FLAGS) [nb_vsim_compile_svlibs $SV_LIBS]
+}
+
+proc nb_sim_sanitize_vars {user_sim_flags sim_flags hierarchy VARS} {
+    upvar 1 $user_sim_flags USER_SIM_FLAGS $sim_flags SIM_FLAGS $hierarchy HIERARCHY
+    foreach i $VARS {
+        upvar 1 $i $i
+    }
+
+    lappend PACKAGES
+    lappend COMPONENTS
+    lappend MOD
+    lappend TB_FILE
+
+    set HIERARCHY(PACKAGES) $PACKAGES
+    set HIERARCHY(COMPONENTS) $COMPONENTS
+    set HIERARCHY(MOD) $MOD
+    set HIERARCHY(TB_FILE) $TB_FILE
+
+    set SIM_FLAGS(SIM_LIB) {}
+    set SIM_FLAGS(EXTRA_VFLAGS) {}
+    set SIM_FLAGS(VSIM_MANUAL_START) false
+    set SIM_FLAGS(MAKEFILE_NAME) Makefile
+    set SIM_FLAGS(BATCH_COMPILE) true
+
+    # Copy all variables from user SIM_FLAGS variable
+    foreach i [array names USER_SIM_FLAGS] {
+        set SIM_FLAGS($i) $USER_SIM_FLAGS($i)
+    }
+
+    if {[info exists CODE_COVERAGE] && $CODE_COVERAGE} {
+        set SIM_FLAGS(CODE_COVERAGE) true
+    } elseif {![info exists SIM_FLAGS(CODE_COVERAGE)]} {
+        set SIM_FLAGS(CODE_COVERAGE) false
+    }
+
+    if {![info exists SIM_FLAGS(CODE_COVERAGE_SV)]} {
+        set SIM_FLAGS(CODE_COVERAGE_SV) false
+    }
+
+    if {![info exists SIM_FLAGS(DEBUG)]} {
+        set SIM_FLAGS(DEBUG) false
+    }
+
+    if {[info exists SIM_MODULE]} {
+        set SIM_FLAGS(SIM_MODULE) $SIM_MODULE
+    } else {
+        set SIM_FLAGS(SIM_MODULE) "testbench"
+    }
+
+    if {[info exists VLOG_SV_FLAGS]} {
+        set SIM_FLAGS(VLOG_SV_FLAGS) $VLOG_SV_FLAGS
+    } else {
+        set SIM_FLAGS(VLOG_SV_FLAGS) ""
+    }
+
+    lappend SIM_FLAGS(SVLIB_FLAGS)
+    if {[info exists USER_SIM_FLAGS(SVLIB_FLAGS)]} {
+        lappend SIM_FLAGS(SVLIB_FLAGS) {*}$USER_SIM_FLAGS(SVLIB_FLAGS)
+    }
+}
+
+proc nb_vsim_set_flags {vsim_flags sim_flags} {
+    upvar 1 $vsim_flags VSIM_FLAGS $sim_flags SIM_FLAGS
+
+    set VSIM_FLAGS "-t 1ps -lib work -no_autoacc"
+    if {$SIM_FLAGS(CODE_COVERAGE)} {
+        lappend VSIM_FLAGS -coverage -togglewidthlimit 8
+        if {!$SIM_FLAGS(DEBUG)} {
+            lappend VSIM_FLAGS -cvgopt=+minhitcnt
+        }
+    }
+    foreach i [uniqueList $SIM_FLAGS(SIM_LIB)] {
+        lappend VSIM_FLAGS -L $i
+    }
+
+    lappend VSIM_FLAGS {*}$SIM_FLAGS(EXTRA_VFLAGS)
+
+    # UVM VERIFICATION
+    if {[info exists SIM_FLAGS(UVM_ENABLE)] && $SIM_FLAGS(UVM_ENABLE)} {
+        lappend VSIM_FLAGS -uvmcontrol=all,-trlog +UVM_MAX_QUIT_COUNT=1
+        if { [info exists SIM_FLAGS(UVM_TEST)]} {
+             lappend VSIM_FLAGS "+UVM_TESTNAME=$SIM_FLAGS(UVM_TEST)"
+        }
+        if { [info exists SIM_FLAGS(UVM_VERBOSITY)]} {
+             lappend VSIM_FLAGS "+UVM_VERBOSITY=$SIM_FLAGS(UVM_VERBOSITY)"
+        } else {
+             lappend VSIM_FLAGS "+UVM_VERBOSITY=UVM_NONE"
+        }
+    }
+
+
+    #VOPT ARGS
+    lappend VOPT_ARGS
+    # check if current version of vopt supports the -nomlopt flag
+    if {[catch {vopt -nomlopt -version}] eq 0} {
+        lappend VOPT_ARGS "-nomlopt"
+    }
+
+    if {$SIM_FLAGS(DEBUG)} {
+        lappend VOPT_ARGS -lint=full +acc
+    } elseif { !$SIM_FLAGS(CODE_COVERAGE) } {
+        lappend VOPT_ARGS -nodebug
+    }
+
+    lappend SIM_FLAGS(VOPT_ARGS)
+    lappend VOPT_ARGS {*}$SIM_FLAGS(VOPT_ARGS)
+
+    lappend VSIM_FLAGS "-voptargs=$VOPT_ARGS"
+
+    # Randomization
+    if {[info exists SIM_FLAGS(RAND_SEED)] } {
+        lappend VSIM_FLAGS -sv_seed $SIM_FLAGS(RAND_SEED)
+    } else {
+        lappend VSIM_FLAGS -sv_seed random
+    }
+    lappend VSIM_FLAGS {*}$SIM_FLAGS(SV_LIBS_FLAGS)
+    lappend VSIM_FLAGS {*}[uniqueList $SIM_FLAGS(SIM_MODULE)]
+}
+
+proc nb_sim_parse_parameters {sim_flags} {
+    upvar 1 $sim_flags SIM_FLAGS
+
+    global env
+    array set PARAMS {}
+
+    if {[info exists env(CORE_PARAMS)]} {
+        foreach P $env(CORE_PARAMS) {
+            lassign [split $P "="] PARAM_NAME PARAM_VALUE
+            lappend PARAM_LIST $PARAM_NAME $PARAM_VALUE
+        }
+        array set PARAMS $PARAM_LIST
+    }
+
+    lappend REPLACE_PARAMS \
+        UVM_TEST CODE_COVERAGE RAND_SEED
+
+    echo "============================"
+    foreach param $REPLACE_PARAMS {
+        if {[info exists PARAMS($param)]} {
+            echo "Replacing SIM_FLAGS($param) with $PARAMS($param)"
+            set SIM_FLAGS($param) $PARAMS($param)
+        }
+    }
+    echo "============================"
+}
+
+proc nb_sim_expand_generics {{vsim_flags VSIM_FLAGS} {sim_flags SIM_FLAGS}} {
+    upvar 1 $vsim_flags VSIM_FLAGS
+    upvar 1 $sim_flags SIM_FLAGS
+
+    if {[file exists "./tmp/generics.fdo"]} {
+        source "./tmp/generics.fdo"
+        puts "HARP: Found file with entity parameters settings."
+    } else {
+        return
+    }
+
+    foreach {key value} [array get SIM_GENERICS] {
+        puts "$key=$value"
+        lappend VSIM_FLAGS "-g$SIM_FLAGS(SIM_MODULE)/$key=$value"
+    }
+}
+
+proc nb_sim_main {{user_sim_flags SIM_FLAGS} {sim_generics SIM_GENERICS}} {
+    # Let VSIM_FLAGS variable to be accessible in top level stack frame for running vsim by hand
+    upvar 1 VSIM_FLAGS VSIM_FLAGS
+
+    # Collect variables in user .fdo script and upvar them
+    lappend VARS CODE_COVERAGE SIM_MODULE VLOG_SV_FLAGS
+    lappend VARS PACKAGES COMPONENTS TB_FILE MOD
+    upvar 1 $user_sim_flags USER_SIM_FLAGS
+    foreach i $VARS {
+        upvar 1 $i $i
+    }
+
+    # SIM_FLAGS variable will be visible in NDKBuild namespace
+    namespace eval NDKBuild {variable SIM_FLAGS}
+    namespace upvar NDKBuild SIM_FLAGS SIM_FLAGS
+
+    nb_sim_sanitize_vars USER_SIM_FLAGS SIM_FLAGS HIERARCHY $VARS
+    nb_sim_parse_parameters SIM_FLAGS
+
+    nb_vsim_prepare
+    nb_vsim_compile_project SIM_FLAGS HIERARCHY
+
+    nb_vsim_set_flags VSIM_FLAGS SIM_FLAGS
+    nb_sim_expand_generics VSIM_FLAGS SIM_FLAGS
+
+
+    # Run simulation
+    if {!$SIM_FLAGS(VSIM_MANUAL_START)} {
+        vsim {*}$VSIM_FLAGS
+    }
+}
+
+nb_sim_main

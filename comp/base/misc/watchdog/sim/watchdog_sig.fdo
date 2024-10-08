@@ -1,0 +1,41 @@
+# watchdog_sig.fdo : Include file with signals
+# Copyright (C) 2015 CESNET
+# Authors: Adam Piecek <xpiece00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Components paths
+set TB_PATH             "/testbench"
+set UUT_PATH            "/testbench/uut"
+
+# Common interface
+add_wave "-noupdate -label reset"   /testbench/uut/reset
+add_wave "-noupdate -label clk"     /testbench/uut/clk
+
+add wave -divider "Datasource"
+add_wave "-noupdate -hex -label data_in     " $TB_PATH/data_in
+add_wave "-noupdate -hex -label src_rdy_in  " $TB_PATH/src_rdy_in
+add_wave "-noupdate -hex -label dst_rdy_in  " $TB_PATH/dst_rdy_in
+
+add wave -divider "Data destination"
+add_wave "-noupdate -hex -label data_out    " $TB_PATH/data_out
+add_wave "-noupdate -hex -label src_rdy_out " $TB_PATH/src_rdy_out
+add_wave "-noupdate -hex -label dst_rdy_out " $TB_PATH/dst_rdy_out
+
+add wave -divider "Special signals"
+add_wave "-noupdate -hex -label counter     " $TB_PATH/counter
+add_wave "-noupdate -hex -label locked      " $TB_PATH/locked
+
+add wave -divider "MI32 interface"
+add wave -noupdate -hex -label dwr             $TB_PATH/dwr
+add wave -noupdate -hex -label addr            $TB_PATH/addr
+add wave -noupdate -hex -label rd              $TB_PATH/rd
+add wave -noupdate -hex -label wr              $TB_PATH/wr
+add wave -noupdate -hex -label be              $TB_PATH/be
+add wave -noupdate -hex -label drd             $TB_PATH/drd
+add wave -noupdate -hex -label ardy            $TB_PATH/ardy
+add wave -noupdate -hex -label drdy            $TB_PATH/drdy
+

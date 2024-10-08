@@ -1,0 +1,118 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2009 CESNET
+# Author(s): Jan Stourac <xstour03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# -------------------------------------------------------------------------
+#                       Waveform Definition
+# -------------------------------------------------------------------------
+
+proc blk_TSU_GEN { TSU_GEN_PATH } {
+
+add wave -divider "TSU_GEN_UNIT"
+# User signals
+add wave -divider "MI32 Bus interface"
+add_wave "-noupdate -label dwr -hex"         $TSU_GEN_PATH/MI_DWR
+add_wave "-noupdate -label addr -hex		 " $TSU_GEN_PATH/MI_ADDR
+add_wave "-noupdate -label rd		  	       " $TSU_GEN_PATH/MI_RD
+add_wave "-noupdate -label wr		  	       " $TSU_GEN_PATH/MI_WR
+add_wave "-noupdate -label be 			    " $TSU_GEN_PATH/MI_BE
+add_wave "-noupdate -label drd -hex		    " $TSU_GEN_PATH/MI_DRD
+add_wave "-noupdate -label ardy 		       " $TSU_GEN_PATH/MI_ARDY
+add_wave "-noupdate -label drdy 		       " $TSU_GEN_PATH/MI_DRDY
+add_wave "-noupdate -label reg_wrte -hex   " $TSU_GEN_PATH/tsu_cv2_core_instance/reg_write
+
+add wave -divider "Output interface"
+add_wave "-noupdate -label ts -hex	  	    " $TSU_GEN_PATH/TS
+add_wave "-noupdate -label ts_ns -hex	  	 " $TSU_GEN_PATH/TS_NS
+add_wave "-noupdate -label ts_dv 		    " $TSU_GEN_PATH/TS_DV
+
+add wave -divider "Registers"
+add_wave "-noupdate -label mi_detect_pps_reg1 "    $TSU_GEN_PATH/mi_detect_pps_reg1
+add_wave "-noupdate -label det_clk "               $TSU_GEN_PATH/det_clk
+add_wave "-noupdate -label mi_clk_ref_now "        $TSU_GEN_PATH/mi_clk_ref_now
+add_wave "-noupdate -label detect_pps_reg "        $TSU_GEN_PATH/detect_pps_reg
+add_wave "-noupdate -label detect_pps_reset -hex " $TSU_GEN_PATH/detect_pps_reset
+add_wave "-noupdate -label sync_detect_pps_reset " $TSU_GEN_PATH/sync_detect_pps_reset_zeros
+add_wave "-noupdate -label sig_clk_sel -hex "      $TSU_GEN_PATH/sig_clk_sel
+add_wave "-noupdate -label sig_pps_sel -hex "      $TSU_GEN_PATH/sig_pps_sel
+add_wave "-noupdate -label reg_src -hex "          $TSU_GEN_PATH/reg_src
+add_wave "-noupdate -label CLK_FREQ -hex "         $TSU_GEN_PATH/CLK_FREQ
+add_wave "-noupdate -label state_bits -hex "       $TSU_GEN_PATH/state_bits
+add_wave "-noupdate -label mi_reg_cntrl -hex "     $TSU_GEN_PATH/tsu_cv2_core_instance/mi_reg_cntrl
+add_wave "-noupdate -label core_reg_mi_data_low -hex "    $TSU_GEN_PATH/tsu_cv2_core_instance/core_reg_mi_data_low
+add_wave "-noupdate -label core_reg_mi_data_middle -hex " $TSU_GEN_PATH/tsu_cv2_core_instance/core_reg_mi_data_middle
+add_wave "-noupdate -label core_reg_mi_data_high -hex "   $TSU_GEN_PATH/tsu_cv2_core_instance/core_reg_mi_data_high
+add_wave "-noupdate -label mi_reg_mi_data_low -hex "      $TSU_GEN_PATH/tsu_cv2_core_instance/mi_reg_mi_data_low
+add_wave "-noupdate -label mi_reg_mi_data_middle -hex "   $TSU_GEN_PATH/tsu_cv2_core_instance/mi_reg_mi_data_middle
+add_wave "-noupdate -label mi_reg_mi_data_high -hex "     $TSU_GEN_PATH/tsu_cv2_core_instance/mi_reg_mi_data_high
+add_wave "-noupdate -label incr_value -hex "              $TSU_GEN_PATH/tsu_cv2_core_instance/incr_value
+add_wave "-noupdate -label reg_pulsepsec -hex "           $TSU_GEN_PATH/tsu_cv2_core_instance/reg_pulsepsec
+add_wave "-noupdate -label reg_realtime -hex "            $TSU_GEN_PATH/tsu_cv2_core_instance/reg_realtime
+
+add wave -divider "TSU CORE MI32 Bus interface"
+add_wave "-noupdate -label dwr -hex"         $TSU_GEN_PATH/tsu_cv2_core_instance/tsu_dwr
+add_wave "-noupdate -label addr -hex		 " $TSU_GEN_PATH/tsu_cv2_core_instance/tsu_addr
+add_wave "-noupdate -label rd		  	       " $TSU_GEN_PATH/tsu_cv2_core_instance/tsu_rd
+add_wave "-noupdate -label wr		  	       " $TSU_GEN_PATH/tsu_cv2_core_instance/tsu_wr
+add_wave "-noupdate -label be 			    " $TSU_GEN_PATH/tsu_cv2_core_instance/tsu_be
+add_wave "-noupdate -label drd -hex		    " $TSU_GEN_PATH/tsu_cv2_core_instance/tsu_drd
+add_wave "-noupdate -label ardy 		       " $TSU_GEN_PATH/tsu_cv2_core_instance/tsu_ardy
+add_wave "-noupdate -label drdy 		       " $TSU_GEN_PATH/tsu_cv2_core_instance/tsu_drdy
+
+add wave -divider "PPS counters"
+add_wave "-noupdate -label pps_cnt_reg -hex "      $TSU_GEN_PATH/tsu_pps_processing/pps_cnt_reg
+
+add wave -divider "CLK counters"
+add_wave "-noupdate -label mi_clk_ref_cnt -hex "   $TSU_GEN_PATH/mi_clk_ref_cnt
+add_wave "-noupdate -label clk_ref_cnt -hex "      $TSU_GEN_PATH/clk_ref_cnt
+
+add wave -divider "PPS mux signals"
+add_wave "-noupdate -label pps_mux_cntrl -hex	 " $TSU_GEN_PATH/pps_mux_cntrl
+add_wave "-noupdate -label pps_mux_out -hex	 "    $TSU_GEN_PATH/pps_mux_out
+add_wave "-noupdate -hex -label det_ptm_clk      " $TSU_GEN_PATH/det_ptm_clk
+add_wave "-noupdate -hex -label ptm_prec_xor     " $TSU_GEN_PATH/ptm_prec_xor
+add_wave "-noupdate -hex -label mi_ptm_prec_cnt  " $TSU_GEN_PATH/mi_ptm_prec_cnt
+add_wave "-noupdate -hex -label mi_ptm_prec_now  " $TSU_GEN_PATH/mi_ptm_prec_now
+add_wave "-noupdate -hex -label mi_ptm_prec_old  " $TSU_GEN_PATH/mi_ptm_prec_old
+add_wave "-noupdate -hex -label mi_ptm_prec_cnt  " $TSU_GEN_PATH/mi_ptm_prec_cnt
+
+add wave -divider "MUX select signals"
+add_wave "-noupdate -label sel_state_reg -hex "                $TSU_GEN_PATH/sel_state_reg
+add_wave "-noupdate -label sel_pps_mux_cntrl -hex "            $TSU_GEN_PATH/sel_pps_mux_cntrl
+add_wave "-noupdate -label sel_freq -hex "                     $TSU_GEN_PATH/sel_freq
+add_wave "-noupdate -label sel_tsu_core_clk_mux_cntrl -hex "   $TSU_GEN_PATH/sel_tsu_core_clk_mux_cntrl
+
+add wave -divider "CORE MI32 Bus interface"
+add_wave "-noupdate -label core_dwr -hex"          $TSU_GEN_PATH/tsu_dwr
+add_wave "-noupdate -label core_addr -hex		    " $TSU_GEN_PATH/tsu_addr
+add_wave "-noupdate -label core_rd		  	       " $TSU_GEN_PATH/tsu_rd
+add_wave "-noupdate -label core_wr		  	       " $TSU_GEN_PATH/tsu_wr
+add_wave "-noupdate -label core_be 			       " $TSU_GEN_PATH/tsu_be
+add_wave "-noupdate -label core_drd -hex		    " $TSU_GEN_PATH/tsu_drd
+add_wave "-noupdate -label core_ardy 		       " $TSU_GEN_PATH/tsu_ardy
+add_wave "-noupdate -label core_drdy 		       " $TSU_GEN_PATH/tsu_drdy
+
+add wave -divider "CORE signals"
+add_wave "-noupdate -hex -label core/sel_reg_mi_data_low"      $TSU_GEN_PATH/tsu_cv2_core_instance/sel_reg_mi_data_low
+add_wave "-noupdate -hex -label core/sel_reg_mi_data_middle"   $TSU_GEN_PATH/tsu_cv2_core_instance/sel_reg_mi_data_middle
+add_wave "-noupdate -hex -label core/sel_reg_mi_data_high"     $TSU_GEN_PATH/tsu_cv2_core_instance/sel_reg_mi_data_high
+add_wave "-noupdate -hex -label core/sel_reg_cntrl"            $TSU_GEN_PATH/tsu_cv2_core_instance/sel_reg_cntrl
+add_wave "-noupdate -hex -label core/sel_reg_inta"             $TSU_GEN_PATH/tsu_cv2_core_instance/sel_reg_inta
+
+add wave -divider "MI32 signals"
+add_wave "-noupdate -label reg_pps_mux_cntrl_we -hex"          $TSU_GEN_PATH/reg_pps_mux_cntrl_we
+add_wave "-noupdate -label reg_tsu_core_clk_mux_cntrl_we -hex" $TSU_GEN_PATH/reg_tsu_core_clk_mux_cntrl_we
+add_wave "-noupdate -hex -label freq_drdy"                     $TSU_GEN_PATH/freq_drdy
+add_wave "-noupdate -hex -label detect_drdy"                   $TSU_GEN_PATH/detect_drdy
+add_wave "-noupdate -hex -label tsu_core_ardy"                 $TSU_GEN_PATH/tsu_core_ardy
+add_wave "-noupdate -hex -label tsu_core_drdy"                 $TSU_GEN_PATH/tsu_core_drdy
+
+add wave -divider "Read enable signals"
+add_wave "-noupdate -label core_reg_ts_dv_we -hex"             $TSU_GEN_PATH/reg_freq_re
+add_wave "-noupdate -label reg_state_reg_re -hex"              $TSU_GEN_PATH/reg_state_reg_re
+
+}
+

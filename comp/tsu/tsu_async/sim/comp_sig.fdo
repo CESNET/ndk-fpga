@@ -1,0 +1,32 @@
+# comp_sig.fdo : Include file with signal procedures
+# Copyright (C) 2009 CESNET
+# Author(s): Jan Stourac <xstour03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+#
+
+#Source paths
+set TSU_CV2_BASE  "$FIRMWARE_BASE/comp/tsu/tsu_cv2"
+set TSU_ASYNC_BASE  "$FIRMWARE_BASE/comp/tsu/tsu_async"
+
+# Paths
+set TSU_ASYNC_PATH         "/testbench/uut"
+set TSU_CV2_PATH           "/testbench/tsu_cv2_i"
+
+# Files with signals
+source "$TSU_ASYNC_BASE/sim/signals.fdo"
+
+
+add wave -noupdate -label COMBOV2_REF_RESET /testbench/combov2_ref_reset
+add wave -noupdate -label COMBOV2_REF_CLK /testbench/combov2_ref_clk
+add wave -noupdate -label PTM_PRECISE_RESET /testbench/ptm_precise_reset
+add wave -noupdate -label PTM_PRECISE_CLK /testbench/ptm_precise_clk
+add wave -noupdate -label MI32_RESET /testbench/mi32_reset
+add wave -noupdate -label MI32_CLK /testbench/mi32_clk
+add wave -noupdate -label GPS_PPS_N /testbench/gps_pps_n
+
+blk_TSU_ASYNC "IFC"
+
+blk_TSU_CV2 "IFC"
+

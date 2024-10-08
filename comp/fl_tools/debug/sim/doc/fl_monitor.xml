@@ -1,0 +1,153 @@
+<source>
+
+    <component>
+        FrameLink Monitor component
+    </component>
+
+    <authors>
+        <author login="xkosar02">
+            Vlastimil Kosar
+        </author>
+    </authors>
+
+    <features>
+        <item>
+            Supports FrameLink data bus width of 16, 32, 64 and 128 bits.
+        </item>
+        <item>
+           Logging data from FrameLink bus on input interface.
+        </item>
+	<item>
+	    Supports 3 modes of FrameLink DST_RDY_N signals generation.
+	</item>
+	<item>
+	    Replaces FL_SIM logging and is full compatibile with dataflow files of FL_SIM.
+	</item>
+    </features>
+
+
+    <description>
+         Data are logged on input FrameLink interface. Component suports FrameLink data bus width of 16, 32, 64 and 128 bits.
+    </description>
+
+    <interface>
+
+        <generic_map>
+            <generic name="RX_TX_DATA_WIDTH" type="integer" default="">
+		    RX/TX interface data bus width (16, 32, 64 and 128 bits supported).
+            </generic>
+	    <generic name="FILE_NAME" type="string" default="">
+		    Name of file for logging on input port. Empty string is default and means no logging will be performed.
+            </generic>
+	    <generic name="FRAME_PARTS" type="integer" default="">
+		    Number of FrameLink frame parts.
+            </generic>
+	    <generic name="RDY_DRIVER" type="RDYSignalDriver" default="">
+		    Mode of generating DST_RDY_N signal. (see below)
+            </generic>
+        </generic_map>
+
+        <port_map>
+            <port name="FL_RESET" dir="in" width="1">
+                Global reset.
+            </port>
+            <port name="FL_CLK" dir="in" width="1">
+                Clock input.
+            </port>
+
+	    <divider>
+	  	    RX FrameLink interface
+	    </divider>
+	    <port name="RX_DATA" dir="out" width="DATA_WIDTH">
+		    RX data bus.
+	    </port>
+	    <port name="RX_REM" dir="out" width="log2(DATA_WIDTH/8)">
+		    RX data remainder.
+	    </port>
+	    <port name="RX_SOF_N" dir="out" width="1">
+		    RX start of frame.
+	    </port>
+	    <port name="RX_EOF_N" dir="out" width="1">
+		    RX end of frame.
+	    </port>
+	    <port name="RX_SOP_N" dir="out" width="1">
+		    RX start of packet (segment).
+	    </port>
+	    <port name="RX_EOP_N" dir="out" width="1">
+		    RX end of packet (segment).
+	    </port>
+	    <port name="RX_SRC_RDY_N" dir="out" width="1">
+		    RX source ready.
+	    </port>
+	    <port name="RX_DST_RDY_N" dir="in" width="1">
+		    RX destination ready.
+            </port>
+
+        </port_map>
+
+    </interface>
+
+    <body>
+
+        <h1>Data alignment</h1>
+        <p>
+            Little-endian byte order is used in this component.
+        </p>
+
+        <h1>FrameLink Monitor Component</h1>
+        <p>
+          The size of internal FL FIFO is 32768 items.
+        </p>
+        <p>
+         When you want to use Monitor component fl_bfm_rdy_pkg package must be included:
+         </p>
+         <p>
+         <i>use work.fl_bfm_rdy_pkg;</i>
+        </p>
+
+
+      <h1>Logging</h1>
+      <p>
+        This component can also logging data on both interfaces. The logged data are stored in the same file format as data for simulation, so they can be used for simulation. If you want to log data on input interface you have to set generic parameter FILE_NAME to the name of file to which you want to save logged data. This generic parameter can be ommited, which means that no logging will be performed. The empty string means that no logging will be performed.
+      </p>
+
+      <h1>Modes of generating DST_RDY_N signal</h1>
+      <p>
+        Three modes of generating signal DST_RDY_N:
+	<ul>
+       <li> EVER - signal is active (in 0)</li>
+       <li> ONOFF - signal oscilates between active (0) and inactive (1) regulary</li>
+       <li> RND - signal states (0,1) are random generated.</li>
+       </ul>
+       Random generator seed can be set by procedure <i>SetSeed(Seed : in integer);</i>.
+      </p>
+
+     <h1>File format</h1>
+       <p>
+       <ul>
+       <li> Hexadecimal values are stored in 32-bit format. </li>
+       <li> Multi-line packets are supported.</li>
+       <li> End of part of packet marker is '$' on start of line. </li>
+       <li> End of packet marker is '#' on start of line. </li>
+       <li> Maximum length of line is 2048 characters. </li>
+       <li> When Multi-line packet is used, only last line can have number of haxa digits in multiples of 2. Other lines can have number of hexa digit in multiples of 8.</li>
+       <li> Corect number notation of hexa number A is 0A, ABC is 0ABC, etc.</li>
+       </ul>
+       </p>
+       <p>
+         Example:
+        </p>
+        <p>
+        <pre>
+           1122AABB
+           00CC
+           $
+           125487
+           $
+           10
+           #
+        </pre>
+        Description of the example: It is one packet which consists from 3 parts. The last # cann't be ommited.
+        </p>
+    </body>
+</source>

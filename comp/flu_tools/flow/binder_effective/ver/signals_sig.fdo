@@ -1,0 +1,38 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2012 CESNET
+# Author: Pavel Benacek <benacek@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Global file with signals
+
+
+source "./signals.fdo"
+
+add wave -divider "FLU_SAMPLER"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+rx                      "Binder - RX"                 /testbench/DUT_U/VHDL_DUT_U
+tx                      "Binder - TX"                 /testbench/DUT_U/VHDL_DUT_U
+binder_internal         "Binder - Internal"           /testbench/DUT_U/VHDL_DUT_U
+
+flua_binder_rx          "FLUA Binder - RX"            /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I
+flua_binder_tx          "FLUA Binder - TX"            /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I
+flua_binder_internal    "FLUA Binder - Internal"      /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I
+flua_binder_fsm         "FLUA Binder - FSM"           /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I/FLUA_BINDER_FSM_I
+
+flua_shifter_rx         "FLUA Shifter 0 - RX"         /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I/FLUA_SHIFTER_0_I
+flua_shifter_tx         "FLUA Shifter 0 - TX"         /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I/FLUA_SHIFTER_0_I
+flua_shifter_internal   "FLUA Shifter 0 - Internal"   /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I/FLUA_SHIFTER_0_I/CORE_I
+
+flua_shifter_rx         "FLUA Shifter 1 - RX"         /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I/FLUA_SHIFTER_1_I
+flua_shifter_tx         "FLUA Shifter 1 - TX"         /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I/FLUA_SHIFTER_1_I
+flua_shifter_internal   "FLUA Shifter 1 - Internal"   /testbench/DUT_U/VHDL_DUT_U/FLUA_TO_FLU_BIND_I/FLUA_SHIFTER_1_I/CORE_I
+
+binder_sync_rx          "Binder Sync - RX"            /testbench/DUT_U/VHDL_DUT_U/BINDER_SYNC_I
+binder_sync_tx          "Binder Sync - TX"            /testbench/DUT_U/VHDL_DUT_U/BINDER_SYNC_I
+binder_sync_internal    "Binder Sync - Internal"      /testbench/DUT_U/VHDL_DUT_U/BINDER_SYNC_I

@@ -1,0 +1,47 @@
+# top_level.fdo: Functional simulation file
+# Copyright (C) 2019 CESNET z. s. p. o.
+# Author(s): Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set MAKEFILE_GEN "true"
+
+set FIRMWARE_BASE    "../../../../.."
+
+set COMPONENTS [list \
+    [ list      "uut"                 ".."                       "FULL"] \
+    [ list      "TEST_PKG"            "."                        "FULL"] \
+]
+
+set TB_FILE "testbench.vhd"
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+puts "Numeric Std Warnings - Disabled"
+set NumericStdNoWarnings 1
+set StdArithNoWarnings 1
+
+set TB_PATH   "/testbench"
+set TEST_PATH "/testbench/tester_i"
+set UUT_PATH  "/testbench/uut"
+
+eval "add wave -divider {}"
+add_wave "-noupdate -hex -color yellow" $TB_PATH/CLK
+add_wave "-noupdate -hex -color yellow" $TB_PATH/RESET
+eval "add wave -divider {}"
+add_wave "-noupdate -hex" $TB_PATH/*
+eval "add wave -divider {}"
+add_wave "-noupdate -hex -color yellow" $TB_PATH/CLK
+add_wave "-noupdate -hex -color yellow" $TB_PATH/RESET
+eval "add wave -divider {}"
+add_wave "-noupdate -hex" $TEST_PATH/*
+eval "add wave -divider {}"
+add_wave "-noupdate -hex -color yellow" $TB_PATH/CLK
+add_wave "-noupdate -hex -color yellow" $TB_PATH/RESET
+eval "add wave -divider {}"
+add_wave "-noupdate -hex" $UUT_PATH/*
+eval "add wave -divider {}"
+
+config wave -signalnamewidth 1
+
+nb_sim_run

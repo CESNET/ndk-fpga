@@ -1,0 +1,24 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2015 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# For whole design testing
+set FIRMWARE_BASE         "../../../.."
+set VERIF_BASE            ".."
+set TB_FILE               "test.sv"
+
+set COMPONENTS [list \
+    [list "DPI_VERIF"  $VERIF_BASE       "FULL"]\
+]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+nb_sim_run

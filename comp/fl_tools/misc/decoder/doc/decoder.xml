@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<component>FrameLink decoder</component>
+
+<authors>
+   <author login="kosek">Martin Kosek</author>
+</authors>
+
+<features>
+   <item>Transforms FrameLink negative logic into positive one</item>
+   <item>FRAME signals to distinguish frame parts</item>
+</features>
+
+<description>
+   <p>
+      This component is a generic decoder for FrameLink data flow. It should
+      be used in components, where FrameLink interface is used and where is
+      a need to recognize data parts (header, payload, footer) of frame.
+   </p>
+   <p>
+      It will also transform inter-component negative logic to the
+      positive one, which should help component developers.
+   </p>
+</description>
+
+<interface>
+   <generic_map>
+      <generic name="HEADER" type="boolean" default="">
+         Header is present in a frame.
+      </generic>
+      <generic name="FOOTER" type="boolean" default="">
+         Footer is present in a frame.
+      </generic>
+   </generic_map>
+
+   <port_map>
+      <divider>Common interface</divider>
+      <port name="CLK" dir="in" width="1">Clock</port>
+      <port name="RESET" dir="in" width="1">Reset</port>
+
+      <divider>FrameLink control signals</divider>
+      <port name="SOF_N" dir="in" width="1">Start of frame</port>
+      <port name="SOP_N" dir="in" width="1">Start of part</port>
+      <port name="EOP_N" dir="in" width="1">End of part</port>
+      <port name="EOF_N" dir="in" width="1">End of frame</port>
+      <port name="SRC_RDY_N" dir="in" width="1">Source ready</port>
+      <port name="DST_RDY_N" dir="out" width="1">Destination ready</port>
+
+      <divider>User component interface</divider>
+      <port name="SOF" dir="out" width="1">Start of frame</port>
+      <port name="SOHDR" dir="out" width="1">Start of header</port>
+      <port name="EOHDR" dir="out" width="1">End of header</port>
+      <port name="HDR_FRAME" dir="out" width="1">Header part is transmitted</port>
+      <port name="SOPLD" dir="out" width="1">Start of payload</port>
+      <port name="EOPLD" dir="out" width="1">End of payload</port>
+      <port name="PLD_FRAME" dir="out" width="1">Payload part is transmitted</port>
+      <port name="SOFTR" dir="out" width="1">Start of footer</port>
+      <port name="EOFTR" dir="out" width="1">End of footer</port>
+      <port name="FTR_FRAME" dir="out" width="1">Footer part is transmitted</port>
+      <port name="EOF" dir="out" width="1">End of frame</port>
+      <port name="SOF" dir="out" width="1">Start of frame</port>
+      <port name="SRC_RDY" dir="out" width="1">Source ready</port>
+      <port name="DST_RDY" dir="in" width="1">Destination ready</port>
+   </port_map>
+</interface>
+
+<body>
+   <h1>Decoder Information</h1>
+   <p>
+      <obr src="./fig/fl_dec_usage.fig">FL_DEC usage in components</obr>
+   </p>
+
+   <p>
+      It is important to note, that output signals (like SOHDR, EOF, ...)
+      of this decoder are NOT affected by SRC_RDY or DST_RDY signals.
+      That means, that decoder output signals can be active for more than
+      one clock cycle, if data transfer is interrupted by source or
+      destination side.
+   </p>
+   <p>
+      Therefore if you need to find out the exact clock cycle when output
+      signal is active, you should "AND" it with (SRC_RDY and DST_RDY)
+      signal.
+   </p>
+
+   <h1>Frequency and Resources usage</h1>
+	<p>
+		<tab sloupce="cccc">
+			<tr>
+				<th>Slices (% of C6X slices)</th>
+            <th>BlockRams (+ % of C6X BRAMs)</th>
+            <th>Max. HW frequency</th>
+			</tr>
+			<tr>
+				<td>9 (0.4%)</td>
+            <td>0(0.0%)</td>
+            <td>150 MHz</td>
+			</tr>
+		<nazev>Chip utilization &amp; max design frequency</nazev>
+		</tab>
+   </p>
+</body>
+</source>

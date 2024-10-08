@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+        <component>Frame Link Watch component</component>
+
+<authors>
+   <author login="pus">Viktor Pus</author>
+</authors>
+
+<features>
+   <item>Generic number of watched FrameLink interfaces.</item>
+   <item>Generic input pipeline to avoid frequency problems.</item>
+   <item>Generic width of counters.</item>
+   <item>Optional detection of invalid frames.</item>
+</features>
+
+<description>
+   This component is passive probe of arbitrary number of Frame Link
+   interfaces. It counts number
+   of passed frames and optionally checks
+   interfaces for violations of protocol specification.
+   Gathered informations are accesible via MI32 interface.
+</description>
+
+<interface>
+   <generic_map>
+      <generic name="INTERFACES" type="integer" default="1">
+         Number of watched interfaces. At least one.
+      </generic>
+      <generic name="CNTR_WIDTH" type="integer" default="32">
+         Number of bits in each counter.
+      </generic>
+      <generic name="PIPELINE_LEN" type="integer" default="1">
+         Length of input pipeline. At least one.
+      </generic>
+      <generic name="GUARD" type="boolean" default="true">
+         Enables detection of invalid frames.
+      </generic>
+      <generic name="HEADER" type="boolean" default="true">
+         Defines shape of frames. Necessary only if GUARD = true.
+      </generic>
+      <generic name="FOOTER" type="boolean" default="true">
+         Defines shape of frames. Necessary only if GUARD = true.
+      </generic>
+   </generic_map>
+   <port_map>
+      <divider>Common Interface</divider>
+      <port name="CLK" dir="in" width="1">
+         Clock input
+      </port>
+      <port name="RESET" dir="in" width="1">
+         Reset input
+      </port>
+      <divider>Frame Link Interface</divider>
+      <port name="SOF_N" dir="in" width="INTERFACES">
+         Start of frame from each interface
+      </port>
+      <port name="EOF_N" dir="in" width="INTERFACES">
+         End of frame from each interface
+      </port>
+      <port name="SOP_N" dir="in" width="INTERFACES">
+         Start of part from each interface
+      </port>
+      <port name="EOP_N" dir="in" width="INTERFACES">
+         End of part from each interface
+      </port>
+      <port name="DST_RDY_N" dir="in" width="INTERFACES">
+         Destination ready from each interface
+      </port>
+      <port name="SRC_RDY_N" dir="in" width="INTERFACES">
+         Source ready from each interface
+      </port>
+      <port name="FRAME_ERR" dir="out" width="INTERFACES">
+         Asserted for 1 cycle if current frame violates the protocol.
+      </port>
+      <divider>Memory Interface</divider>
+      <port name="MI" dir="inout" width="">
+         mi32 memory interface
+      </port>
+   </port_map>
+</interface>
+
+<operations>
+   <op name="Stop counting" id="watch_stop">
+      Write 0 to <ref id="fl_watch_control">Control register.</ref>
+   </op>
+   <op name="Start counting" id="watch_start">
+      Write 1 to <ref id="fl_watch_control">Control register</ref>
+      (this is the default state).
+   </op>
+</operations>
+
+<addr_space id="fl_watch_space" name="FL_WATCH address space" main="yes"
+   size="generic">
+   <reg name="Control register" id="fl_watch_control"
+        offset="0x0" access="RW" words="1">
+      <bit_vect bits="32">
+      <description_above>
+         Control register may be used to stop/start frames counting.
+      </description_above>
+      <format>
+         <bit from="0" to="0" name="Enable" access="RW">
+            Default value is 1. When set to 0, all counters are stopped but
+            not cleared.
+         </bit>
+         <bit from="1" to="31" name="Reserved" access="R">
+            These bits are reserved for future use.
+         </bit>
+      </format>
+      </bit_vect>
+   </reg>
+   <reg name="Reserved" id="fl_watch_res" offset="0x4" access="R" words="1">
+      <bit_vect bits="32">
+         <description_above>
+            This register may be used in the future.
+         </description_above>
+         <format>
+            <bit from="0" to="31" name="RESERVED" access="R">Reserved</bit>
+         </format>
+      </bit_vect>
+   </reg>
+   <reg name="Frame counters" id="fl_watch_count"
+        offset="0x8" access="R" words="1">
+      <bit_vect bits="32">
+         <description_above>
+            Counters of frames. Counters are aligned to 32 bit words and padded
+            by zeros.
+            Number of valid bits within one counter depends on
+            CNTR_WIDTH generic.
+            As this register has one instance for each interface, number of
+            Frame counter registers equals INTERFACES generic.
+         </description_above>
+         <format>
+            <bit from="0" to="31" name="COUNTER" access="R">
+               Counter of frames
+            </bit>
+         </format>
+      </bit_vect>
+   </reg>
+   <reg name="Invalid frame counters" id="fl_watch_invld_count"
+        offset="0xC" access="R" words="1">
+      <bit_vect bits="32">
+         <description_above>
+            Counter of invalid frames. Number of words and instances is
+            the same as Frame counter register. Offset of first Invalid
+            frame counter is just after last Frame counter.
+         </description_above>
+         <format>
+            <bit from="0" to="31" name="COUNTER" access="R">
+               Counter of invalid frames
+            </bit>
+         </format>
+      </bit_vect>
+   </reg>
+   <reg name="Interface Ready signals" id="fl_watch_rdy"
+        offset="0x10" access="R" words="1">
+      <bit_vect bits="2">
+         <description_above>
+            Two bits for each monitored interface. Shows current state of
+            SRC_RDY_N and DST_RDY_N signals. Number of words is just to hold
+            all values. Offset o the first word is just after the last
+            Invalid Frame Couter.
+         </description_above>
+         <format>
+            <bit from="0" to="0" name="DST_RDY_N" access="R">
+               Current state of FrameLink DST_RDY_N signal at that interface.
+            </bit>
+            <bit from="1" to="1" name="SRC_RDY_N" access="R">
+               Current state of FrameLink SRC_RDY_N signal at that interface.
+            </bit>
+         </format>
+      </bit_vect>
+   </reg>
+</addr_space>
+
+<sw_body>
+   <h1>Component control</h1>
+    <p>
+      There is one Control register. By writing zero into it, counting
+      is stopped, writing one enables counting again. Counters are not
+      cleared. Overflow of counters is not detected.
+    </p>
+    <h1>Address space</h1>
+    <p>
+      As properties of this component are affected by several generic
+      parameters, also address space is not fixed.
+      <ul>
+         <li>
+            First and second words are always the same, as described in Addr space section.
+         </li>
+         <li>
+            Just after them, there is a set of frame counters.
+            One counter occupies as many 32 bit words, as it needs.
+            The rest of bits in each word (if CNTR_WIDTH mod 32 != 0)
+            is padded with zeros.
+            Number of the counters is defined by generic parameter INTERFACES.
+            <ul>
+            <li>
+            If CNTR_WIDTH is lower or equal 32,
+            then one counter corresponds to one 32 bit word. The first counter
+            is at address 0x08, the second one is at 0x0C, ...
+            </li><li>
+            If CNTR_WIDTH is greater than 32, but not greater than 64,
+            then one counter corresponds to two 32 bit words.
+            The first counter is at addresses 0x08 and 0x0C, the second one
+            is at 0x10 and 0x14.
+            Lower bits of the counter are at lower address.
+            </li><li>
+            ...
+            </li>
+            </ul>
+         </li>
+         <li>
+            Just after the highest word of the last frame counter,
+            a set of invalid frames counters is placed. These counters are similar
+            to frame counters.
+         </li>
+      </ul>
+    </p>
+</sw_body>
+
+<body>
+
+    <h1>Specification</h1>
+    <p>
+      Each Frame Link interface signal is pipelined in PIPELINE_LEN number
+      of registers.
+      After that, counters of EOF_N = 0 cycles are used for each interface
+      to count number of frames.
+    </p>
+    <h2>Guard function</h2>
+    <p>
+      There is also one counter for each interface to detect invalid
+      frames. Detection circuit detects frames with incorrect number of
+      parts as well as some other errors (eg. SOF without SOP). If Frame Link
+      protocol specification is violated, it can be difficult to detect
+      frame start and end, so that number of invalid frames may not be exact.
+    </p>
+    <h3>Detected errors</h3>
+    <p>
+      <ul>
+      <li>
+         SOF must come immediately after EOF. (With respect to RDY signals)
+      </li><li>
+         SOP must come immediately after EOP. (With respect to RDY signals)
+      </li><li>
+         With every SOF, SOP must also come.
+      </li><li>
+         With every EOF, EOP must also come.
+      </li><li>
+         Number of frame parts must be correct.
+      </li>
+      </ul>
+    </p>
+    <h1>Component characteristics</h1>
+    <p>
+		<tab sloupce="ccc">
+			<tr>
+				<th>Generic settings</th>
+				<th>Slices</th>
+				<th>Max. frequency</th>
+			</tr>
+			<tr>
+            <th>3 interfaces, 32 bit counters, Guard function enabled</th>
+            <td>215</td>
+            <td>200 MHz</td>
+			</tr>
+			<tr>
+            <th>8 interfaces, 64 bit counters, Guard function disabled</th>
+            <td>501</td>
+            <td>150 MHz</td>
+         </tr>
+		<nazev>Maximal frequency</nazev>
+		</tab>
+     </p>
+
+</body>
+</source>

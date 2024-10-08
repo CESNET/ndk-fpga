@@ -1,0 +1,59 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2018 CESNET
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc tb_signals { PATH } {
+    eval "add wave  -divider {}"
+    add_wave " -noupdate -group { others } -hex -color yellow" $PATH/WCLK
+    add_wave " -noupdate -group { others } -hex -color yellow" $PATH/WRESET
+    add_wave " -noupdate -group { others } -hex -color yellow" $PATH/RCLK
+    add_wave " -noupdate -group { others } -hex -color yellow" $PATH/RRESET
+
+    eval "add wave  -divider {}"
+    add_wave " -noupdate -group { others } -hex" $PATH/model_mem
+    add_wave " -noupdate -group { others } -hex" $PATH/model_mem_block_vld
+    add_wave " -noupdate -group { others } -hex" $PATH/out_reg0_data
+    add_wave " -noupdate -group { others } -hex" $PATH/out_reg0_block_vld
+    add_wave " -noupdate -group { others } -hex" $PATH/out_reg0_vld
+    add_wave " -noupdate -group { others } -hex" $PATH/out_reg1_data
+    add_wave " -noupdate -group { others } -hex" $PATH/out_reg1_block_vld
+    add_wave " -noupdate -group { others } -hex" $PATH/out_reg1_vld
+
+}
+
+proc uut_ports { PATH } {
+
+    eval "add wave  -divider {}"
+
+    add_wave " -noupdate -group { all } -hex -color yellow" $PATH/WR_CLK
+    add_wave " -noupdate -group { all } -hex -color yellow" $PATH/WR_RST
+    add_wave " -noupdate -group { all } -hex" $PATH/WR_EN
+    add_wave " -noupdate -group { all } -hex" $PATH/WR_BE
+    add_wave " -noupdate -group { all } -hex" $PATH/WR_ADDR
+    add_wave " -noupdate -group { all } -hex" $PATH/WR_DATA
+    add_wave " -noupdate -group { all } -hex -color yellow" $PATH/RD_CLK
+    add_wave " -noupdate -group { all } -hex -color yellow" $PATH/RD_RST
+    add_wave " -noupdate -group { all } -hex" $PATH/RD_EN
+    add_wave " -noupdate -group { all } -hex" $PATH/RD_PIPE_EN
+    add_wave " -noupdate -group { all } -hex" $PATH/RD_ADDR
+    add_wave " -noupdate -group { all } -hex" $PATH/RD_DATA
+    add_wave " -noupdate -group { all } -hex" $PATH/RD_DATA_VLD
+
+}
+
+proc uut_internals { PATH } {
+
+    eval "add wave  -divider {}"
+    add_wave " -noupdate -hex -color yellow" $PATH/CLK
+
+    add_wave " -noupdate -group { int } -hex" $PATH/INTERNAL_BLOCK_WIDTH
+    add_wave " -noupdate -group { int } -hex" $PATH/BLOCKS
+    add_wave " -noupdate -group { int } -hex" $PATH/SUBBLOCKS
+    add_wave " -noupdate -group { int } -hex" $PATH/internal_wr_be
+    add_wave " -noupdate -group { int } -hex" $PATH/internal_wr_data
+    add_wave " -noupdate -group { int } -hex" $PATH/internal_rd_data
+
+}

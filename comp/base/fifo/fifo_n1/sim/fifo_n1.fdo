@@ -1,0 +1,25 @@
+# fifo_n1.fdo: Functional simulation file for fifo_n1
+# Copyright (C) 2017 CESNET
+# Author: Vaclav Hummel <xhumme00@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../.."
+
+set FIFO_N1_BASE        "$OFM_PATH/comp/base/fifo/fifo_n1"
+set MATH_PKG_BASE       "$OFM_PATH/comp/base/pkg"
+
+set SIG_FILE            "$FIFO_N1_BASE/sim/fifo_n1_sig.fdo"
+set TB_FILE             "$FIFO_N1_BASE/sim/testbench.vhd"
+
+
+set COMPONENTS [list \
+   [ list      "fifo_n1"       $FIFO_N1_BASE        "behavioral"         ] \
+   [ list      "MATH_PKG"        $MATH_PKG_BASE         "MATH"         ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 4us

@@ -1,0 +1,24 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Authors: Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_ASYNC_RESET { } {
+
+    global TB_PATH
+    global ASYNC_RESET_PATH
+
+    add_wave "-noupdate -hex -label CLK"        /$TB_PATH/clk
+    add_wave "-noupdate -hex -label ASYNC_RST"  /$TB_PATH/async_rst
+    add_wave "-noupdate -hex -label OUT_RST"    /$TB_PATH/sync_rst
+
+    add wave -divider "INTERNAL SIGNALS"
+    add_wave "-noupdate -hex -label rff1"       /$ASYNC_RESET_PATH/rff1
+    add_wave "-noupdate -hex -label rff2"       /$ASYNC_RESET_PATH/rff2
+    add_wave "-noupdate -hex -label rff3"       /$ASYNC_RESET_PATH/three_reg_sync/rff3
+
+}

@@ -1,0 +1,16 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2009 CESNET
+# Author: Ondrej Lengal <lengal@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc blk_squarer_ifc { BASE } {
+
+   add_wave "-noupdate -label clk    -color yellow     " $BASE/CLK
+
+   add_wave "-noupdate -unsigned -label data           " $BASE/DATA
+   add_wave "-noupdate -unsigned -label result         " $BASE/RESULT
+
+}

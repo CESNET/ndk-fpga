@@ -1,0 +1,43 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2015 CESNET
+# Author: Jakub Lukac <xlukac09@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_rate_limiter { } {
+
+    global RATE_LIMITER_PATH
+
+    add wave -divider   -height 25  "I/O"
+    add_wave "-noupdate -uns -label PACKET_LEN"       /$RATE_LIMITER_PATH/PACKET_LEN
+    add_wave "-noupdate -hex -label PACKET_TS"        /$RATE_LIMITER_PATH/PACKET_TS
+    add_wave "-noupdate -uns -label BUCKET_LIMIT"     /$RATE_LIMITER_PATH/BUCKET_LIMIT
+    add_wave "-noupdate -uns -label SPEED"            /$RATE_LIMITER_PATH/SPEED
+    add_wave "-noupdate -uns -label TIME_CONST"       /$RATE_LIMITER_PATH/TIME_CONST
+    add_wave "-noupdate -hex -label PASS"             /$RATE_LIMITER_PATH/PASS
+    add wave -divider   -height 25  "SRC/DST RDY"
+    add_wave "-noupdate -hex -label IN_SRC_RDY"       /$RATE_LIMITER_PATH/IN_SRC_RDY
+    add_wave "-noupdate -hex -label IN_DST_RDY"       /$RATE_LIMITER_PATH/IN_DST_RDY
+    add_wave "-noupdate -hex -label OUT_SRC_RDY"      /$RATE_LIMITER_PATH/OUT_SRC_RDY
+    add_wave "-noupdate -hex -label OUT_DST_RDY"      /$RATE_LIMITER_PATH/OUT_DST_RDY
+    add wave -divider   -height 25  "Memory INIT"
+    add_wave "-noupdate -hex -label init"             /$RATE_LIMITER_PATH/init
+    add_wave "-noupdate -hex -label cnt"              /$RATE_LIMITER_PATH/cnt
+    add_wave "-noupdate -hex -label write_init"       /$RATE_LIMITER_PATH/write_init
+    add wave -divider   -height 25  "Memory READ"
+    add_wave "-noupdate -hex -label read_enable"      /$RATE_LIMITER_PATH/read_enable
+    add_wave "-noupdate -hex -label RECORD_ADDR"      /$RATE_LIMITER_PATH/RECORD_ADDR
+    add_wave "-noupdate -hex -label data_valid"       /$RATE_LIMITER_PATH/data_valid
+    add_wave "-noupdate -hex -label mem_read_addr"    /$RATE_LIMITER_PATH/reg_record_addr
+    add_wave "-noupdate -hex -label mem_read"         /$RATE_LIMITER_PATH/mem_read
+    add wave -divider   -height 25  "Memory WRITE"
+    add_wave "-noupdate -hex -label bucket_we"        /$RATE_LIMITER_PATH/bucket_we
+    add_wave "-noupdate -hex -label record_addr_out"  /$RATE_LIMITER_PATH/record_addr_out
+    add_wave "-noupdate -hex -label mem_write"        /$RATE_LIMITER_PATH/mem_write
+    add_wave "-noupdate -uns -label bucket_val_out"   /$RATE_LIMITER_PATH/bucket_val_out
+    add_wave "-noupdate -uns -label bucket_ts_out"    /$RATE_LIMITER_PATH/bucket_ts_out
+
+}

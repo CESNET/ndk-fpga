@@ -1,0 +1,16 @@
+# top_level.fdo: Top level functional simulation file
+# Copyright (C) 2006 CESNET
+# Author: Martin Louda <sandin@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+source      "signals.fdo"
+
+set DISCARD_STAT_PATH "testbench/uut"
+
+blk_DISCARD_STAT_ifc "IFC"
+blk_DISCARD_STAT_ifc "INT"
+

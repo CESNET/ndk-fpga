@@ -1,0 +1,33 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2021 CESNET
+# Author: Daniel Kriz <xkrizd01@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set FIRMWARE_BASE         "../../../../.."
+
+set DUT_BASE              ".."
+
+set SIG_FILE              "./signals_sig.fdo"
+
+set COMPONENTS [list \
+    [list "DUT"      $DUT_BASE       "FULL"]\
+]
+
+set COCOTB_PATH [eval cocotb-config --lib-name-path fli modelsim]
+set SIM_FLAGS(EXTRA_VFLAGS) [list -onfinish exit -foreign "cocotb_init $COCOTB_PATH"]
+set SIM_MODULE fifo_bram
+
+set env(MODULE) test_fifo_bram
+set env(TOPLEVEL) work.fifo_bram
+set env(TOPLEVEL_LANG) vhdl
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 2us

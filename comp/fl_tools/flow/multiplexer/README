@@ -1,0 +1,20 @@
+                           =========================
+                             FrameLink Multiplexer
+                           =========================
+
+Abstract:
+~~~~~~~~~
+Merges many FrameLink interfaces into one with the same data width,
+distinguished by the CHANNEL id.
+
+Author:
+~~~~~~~
+Viktor Pus <pus@liberouter.org>
+
+Documentation:
+~~~~~~~~~~~~~~
+https://www.liberouter.org/trac/firmware/wiki/fl_multiplexer_doc
+
+Verification:
+~~~~~~~~~~~~~
+Not yet done

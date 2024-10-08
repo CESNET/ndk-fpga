@@ -1,0 +1,108 @@
+                              ==================
+                               [fifo,mem]2nfifo
+                              ==================
+
+Abstract:
+~~~~~~~~~
+These transmit buffers receive data of full width with number of interface,
+where it should be later sent. Writing is done either as into memory
+(by address and later newlen signal) or as into fifo (just write signal).
+BRAM or LUT memory can be used. Switching is done inside the component
+and output is send to sh_fifos (each of DATA_WIDTH/FLOWS width).
+Two kinds of status logic are available (can stop writing even if there
+is some space in sh_fifos - uses only memory).
+
+The main usage is in TX DMA buffer (mem version).
+
+
+Author:
+~~~~~~~
+Jan Vozenilek <xvozen00@stud.fit.vutbr.cz>
+
+
+Documentation:
+~~~~~~~~~~~~~~
+https://www.liberouter.org/trac/firmware/wiki/fifo2nfifo_doc
+https://www.liberouter.org/trac/firmware/wiki/mem2nfifo_doc
+
+
+Verification:
+~~~~~~~~~~~~~
+ * status: verification environment ready, common configurations verified
+ * https://www.liberouter.org/wiki/index.php/NetCOPE_(SystemVerilog)#FIFO2NFIFO
+ * https://www.liberouter.org/wiki/index.php/NetCOPE_(SystemVerilog)#MEM2NFIFO
+
+
+
+                              ==================
+                               nfifo2[fifo,mem]
+                              ==================
+
+Abstract:
+~~~~~~~~~
+These receive buffers receive data on generic number of interfaces into
+sh_fifos and then switch them into memory (BRAM or LUT). Data can be then
+accessed either as from memory (by address and rellen for releasing data) or
+as from fifo (just read signal). Output register can be used on memory output,
+this increments reading latency by one cycle. Read signal is also used as
+pipeline enable signal to memory.
+Two kinds of status logic are available (can stop writing even if there
+is some space in sh_fifos - uses only memory).
+
+The main usage is in RX DMA buffer (mem version) and fl_binder (fifo version).
+
+
+Author:
+~~~~~~~
+Jan Vozenilek <xvozen00@stud.fit.vutbr.cz>
+
+
+Documentation:
+~~~~~~~~~~~~~~
+https://www.liberouter.org/trac/firmware/wiki/nfifo2fifo_doc
+https://www.liberouter.org/trac/firmware/wiki/nfifo2mem_doc
+
+
+Verification:
+~~~~~~~~~~~~~
+nfifo2fifo
+ * status: verification environment ready, common configurations verified
+ * https://www.liberouter.org/wiki/index.php/NetCOPE_(SystemVerilog)#NFIFO2FIFO
+
+nfifo2mem
+ * status: verification environment for last version NOT ready => NOT verified
+           verification environment for previous version ready, common
+           configurations verified
+ * https://www.liberouter.org/wiki/index.php/NetCOPE_(SystemVerilog)#NFIFO2MEM
+
+
+
+                              =================
+                                    nfifo
+                              =================
+
+Abstract:
+~~~~~~~~~
+Behaves as N fifos with common input/output interface. Write signal is decoded
+by wr_blk_addr and read signal by rd_blk_addr. Buf_mem is used for storing data,
+therefore BRAM or LUT can be used and output register can also be put on output
+(increases read latency by one cycle). Read signal is also used as pipeline enable
+to memory.
+
+Created for packet DMA controllers.
+
+
+Author:
+~~~~~~~
+Jan Vozenilek <xvozen00@stud.fit.vutbr.cz>
+
+
+Documentation:
+~~~~~~~~~~~~~~
+https://www.liberouter.org/trac/firmware/wiki/nfifo_doc
+
+
+Verification:
+~~~~~~~~~~~~~
+ * status: verification environment ready, common configurations verified
+ * https://www.liberouter.org/wiki/index.php/NetCOPE_(SystemVerilog)#NFIFO

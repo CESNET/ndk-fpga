@@ -1,0 +1,11 @@
+{signal: [
+  {name: 'CLK',  wave: 'p...........'},
+  {name: 'ADDR', wave: 'x3x45.678x..', data: ['A0', 'A1', 'A2', 'A3', 'A4', 'A5']},
+  {name: 'DWR',  wave: 'x...........', data: ['D0', 'D1', 'D2', 'D3', 'D4', 'D5']},
+  {name: 'BE',   wave: 'x3x45.678x..', data: ['B0', 'B1', 'B2', 'B3', 'B4', 'B5']},
+  {name: 'WR',   wave: '0...........'},
+  {name: 'RD',   wave: '01011.1110..'},
+  {name: 'ARDY', wave: 'x1x101...x..'},
+  {name: 'DRD',  wave: 'x3x.45x67x8x', data: ['D0', 'D1', 'D2', 'D3', 'D4', 'D5']},
+  {name: 'DRDY', wave: '010.11011010'},
+]}

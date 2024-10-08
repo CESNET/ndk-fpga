@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+        <component>Packet FIFO for FrameLink</component>
+
+<authors>
+   <author login="pus">Viktor Pus</author>
+</authors>
+
+<features>
+      <item>BRAMs are used to store data</item>
+      <item>Frame discarding</item>
+      <item>Data width 8, 16, 32, 64, or 128 bits</item>
+      <item>Variable depth of FIFO</item>
+      <item>LSTBLK, STATUS and FRAME_RDY signals for more effective flow control</item>
+
+</features>
+
+<description>
+
+   This component is FIFO with two FrameLink interfaces and Discard capability.
+   One interface is recieving (RX) and second is transmitting (TX) data.
+   The DISCARD signal allows to skip the frame while reading it.
+
+</description>
+
+<interface>
+   <generic_map>
+      <generic name="ITEMS" type="integer" default="">
+         Number of items that FIFO can hold.
+      </generic>
+      <generic name="BLOCK_SIZE" type="integer" default="">
+         Defines size of block for LSTBLK signal.
+      </generic>
+      <generic name="STATUS_WIDTH" type="integer" default="">
+         Width of STATUS signal available.
+      </generic>
+      <generic name="MAX_DISCARD_BLOCKS" type="integer" default="">
+         Max number of packets.
+      </generic>
+      <generic name="PARTS" type="integer" default="">
+         Number of parts in each frame. Greater than zero.
+      </generic>
+   </generic_map>
+
+<port_map>
+   <divider>Common Interface</divider>
+   <port name="CLK"        dir="in"  width="1">
+      Clock signal
+   </port>
+   <port name="RESET"      dir="in"  width="1">
+      Reset signal
+   </port>
+
+   <divider>FrameLink interfaces</divider>
+   <port name="RX"       dir="inout" width="">
+      Recieve interface (write to FIFO)
+   </port>
+
+   <port name="TX"       dir="inout" width="">
+      Transmit interface (read from FIFO)
+   </port>
+
+   <divider>FIFO Control Interface</divider>
+   <port name="DISCARD"       dir="in" width="1">
+      Discard whole frame.
+   </port>
+   <port name="LSTBLK"       dir="out" width="1">
+      Last block detection
+   </port>
+   <port name="STATUS"      dir="out" width="STATUS_WIDTH">
+      MSBs of exact number of free items in the FIFO
+   </port>
+   <port name="EMPTY"      dir="out" width="1">
+      FIFO is empty
+   </port>
+   <port name="FULL"      dir="out" width="1">
+      FIFO is full
+   </port>
+   <port name="FRAME_RDY" dir="out" width="1">
+      At least one whole frame is in the FIFO
+   </port>
+</port_map>
+</interface>
+
+<body>
+
+    <h1>Specification</h1>
+    <p>
+    Use entity FL_PFIFO_FLxx for FIFO with frame discarding,
+    where xx is data width (8, 16, 32, 64 or 128 bits).
+    </p>
+
+<p>
+   Both FrameLink interfaces have standard behavior. Output LSTBLK is asserted
+   when N or less than N free items are in FIFO, where N is generic parameter.
+</p>
+<p>
+   Additional signal FRAME_RDY is asserted when at least one whole frame is
+   stored in the FIFO. This may be used for better flow control.
+</p>
+<p>
+   Signal STATUS shows several most significant (or all) bits of the free
+   space counter. This means that user can get exact information about
+   free items in the FIFO.
+</p>
+<p>
+   The difference to ordinary FrameLink FIFO is the DISCARD signal.
+   This signal may be used to drop the whole frame while reading.
+   More precise info about this can be found in the documentation of the
+   fifo_bram_discard component.
+</p>
+
+    <h1>Implementation</h1>
+<p>
+   When using BRAM FIFO with DATA_WIDTH greater than 32,
+   all four protocol control signals
+   (SOP_N, EOP_N, SOF_N, EOF_N) are stored in the FIFO.
+   For DATA_WIDTH = 32, only 2 parity
+   bits are left, so only EOF_N and EOP_N are stored and the other signals are
+   restored at the output of FrameLink FIFO. If DATA_WIDTH is 16 or 8 bits,
+   only EOP_N is stored and all other signals are restored.
+</p>
+<p>
+   To restore all control signals, number of frame parts must be known before
+   translation.
+</p>
+<p>
+   Two helper entities FL_COMPRESS and FL_DECOMPRESS_ANY are used to transform
+   FrameLink signals to bits-saving format.
+</p>
+<p>
+   fifo_bram_discard is used to implement discarding of whole
+   frames at once, using DISCARD signal.
+</p>
+
+<h1>Frequency and Resources usage</h1>
+
+	<p>
+
+        <!--Resources usage and max. frequency by Precision-->
+
+		<tab sloupce="cccc">
+			<tr>
+				<th>Entity and generic settings</th>
+				<th>Slices</th>
+				<th>BlockRams</th>
+            <th>Max. frequency</th>
+			</tr>
+			<tr>
+				<th>FL_PFIFO_FL128, ITEMS=1024, MAX_DISCARD_BLOCKS=10</th>
+				<td>113</td>
+				<td>8</td>
+            <td>249 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_PFIFO_FL64, ITEMS=1024, MAX_DISCARD_BLOCKS=10</th>
+				<td>76</td>
+				<td>4</td>
+            <td>249 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_PFIFO_FL32, ITEMS=1024, MAX_DISCARD_BLOCKS=10</th>
+				<td>60</td>
+				<td>2</td>
+            <td>251 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_PFIFO_FL16, ITEMS=1024, MAX_DISCARD_BLOCKS=10</th>
+				<td>62</td>
+				<td>1</td>
+            <td>251 MHz</td>
+			</tr>
+			<tr>
+				<th>FL_PFIFO_FL8, ITEMS=1024, MAX_DISCARD_BLOCKS=10</th>
+				<td>62</td>
+				<td>1</td>
+            <td>251 MHz</td>
+			</tr>
+         <nazev>Resources and maximal frequency</nazev>
+		</tab>
+
+  </p>
+
+
+</body>
+
+</source>

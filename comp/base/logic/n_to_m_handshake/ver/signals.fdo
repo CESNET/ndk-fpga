@@ -1,0 +1,43 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2018 CESNET
+# Author: Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+
+proc tb_internals { PATH GROUP } {
+   eval "add wave $GROUP -divider {TB internals}"
+
+   add_wave "$GROUP -noupdate -hex"   $PATH/test_ok
+   add_wave "$GROUP -noupdate -hex"   $PATH/test_out_data
+   add_wave "$GROUP -noupdate -hex"   $PATH/test_out_data_reg
+
+}
+
+proc top_ports { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Synchronization}"
+   add_wave "$GROUP -noupdate -hex -label CLK -color yellow"   $PATH/CLK
+   add_wave "$GROUP -noupdate -hex -label RESET -color yellow"   $PATH/RESET
+
+   eval "add wave $GROUP -divider {Ports}"
+   add_wave "$GROUP -noupdate -hex"   $PATH/IN_DATA
+   add_wave "$GROUP -noupdate -hex"   $PATH/IN_SRC_RDY
+   add_wave "$GROUP -noupdate -hex"   $PATH/IN_DST_RDY
+   add_wave "$GROUP -noupdate -hex"   $PATH/OUT_DATA
+   add_wave "$GROUP -noupdate -hex"   $PATH/OUT_SRC_RDY
+   add_wave "$GROUP -noupdate -hex"   $PATH/OUT_DST_RDY
+   add_wave "$GROUP -noupdate -hex"   $PATH/ALL_RDY
+
+}
+
+proc top_internals { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Internals}"
+   add_wave "$GROUP -noupdate -hex"     $PATH/s_out_data
+   add_wave "$GROUP -noupdate -hex"     $PATH/s_out_src_rdy
+   add_wave "$GROUP -noupdate -hex"     $PATH/s_out_dst_rdy
+
+}

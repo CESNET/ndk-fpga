@@ -1,0 +1,28 @@
+# free_trans_fifo_sig.fdo : Include file with signals
+# Copyright (C) 2017 CESNET
+# Author: Vaclav Hummel <xhumme00@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+# Paths
+#
+set TB_PATH   "/testbench"
+set UUT_PATH   "/testbench/uut"
+
+source  "signals.fdo"
+
+add wave -divider ""
+add wave -divider "TB internals"
+add wave -divider ""
+tb_internals "$TB_PATH" ""
+
+add wave -divider ""
+add wave -divider "PIPE_TREE_ADDER"
+add wave -divider ""
+uut_internals "$UUT_PATH" ""
+
+config wave -signalnamewidth 1
+
+

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<source>
+
+<!-- Page name -->
+<component>
+         Framelink switch 1 to 4
+</component>
+<!-- based on Payload Checker -->
+
+<!-- Authors worked on -->
+<authors>
+    <author login="solanka">
+            Lukas Solanka
+    </author>
+</authors>
+
+<features>
+    <item>
+        Sends frames from the input interface into one of the four output
+        interfaces (or none).
+    </item>
+
+    <item>
+        The information on which interfaces the frame is to be sent is
+        taken from inside the frame.
+    </item>
+
+    <item>
+        The position of the switching information is determined at compile
+        time.
+    </item>
+</features>
+
+<bugs>
+    <item news="yes">
+        The First N words of each Frame must be received continuously
+        (at the RX interface) without no spaces, otherwise the component
+        will output defective
+        framelink protocol. N is determined by this equation:
+        N = IFC_BYTE_OFFSET / (FL_DATA_WIDTH/8).
+    </item>
+</bugs>
+
+
+<!-- Short Block description -->
+<description>
+    <p>
+        Framelink switch takes frames from the receive interface and sends
+        them to one or more of the four output interfaces (or none).
+        To which interface(s)
+        the frame is to be sent, depends on the switch information that comes
+        with the frame. Its position  within the frame can be set genericly
+        using IFC_BYTE_OFFSET and IFC_NIBBLE_OFFSET.
+    </p>
+</description>
+
+<!-- COMPONENT INTERFACE ************************************************* -->
+<interface>
+
+	<generic_map>
+        <generic name="FL_DATA_WIDTH" type="integer" default="">
+            Frameling data width
+        </generic>
+        <generic name="IFC_BYTE_OFFSET" type="integer" default="">
+            Byte offset of the switching information. Starts with 0.
+        </generic>
+        <generic name="IFC_NIBBLE_OFFSET" type="integer" default="">
+            Switching information position within byte
+            0 - low nibble; 1 - high nibble.
+        </generic>
+	</generic_map>
+
+    <port_map>
+        <!-- Port description -->
+
+        <port  name="CLK" dir="in" width="1">
+        </port>
+        <port  name="RESET" dir="in" width="1">
+        </port>
+
+        <!-- RX interface -->
+        <port  name="RX_DATA" dir="in" width="FL_DATA_WIDTH">
+          Receive interface data.
+        </port>
+        <port  name="RX_REM" dir="in" width="log2(FL_DATA_WIDTH/8)">
+          Receive interface remainder (see framelink doc for more info).
+        </port>
+        <port  name="RX_SRC_RDY_N" dir="in" width="1">
+          Receive interface source ready.
+        </port>
+        <port  name="RX_DST_RDY_N" dir="out" width="1">
+          Receive interface destination ready.
+        </port>
+        <port  name="RX_SOP_N" dir="in" width="1">
+          Receive interface start of part.
+        </port>
+        <port  name="RX_EOP_N" dir="in" width="1">
+          Receive interface end of part.
+        </port>
+        <port  name="RX_SOF_N" dir="in" width="1">
+          Receive interface start of frame.
+        </port>
+        <port  name="RX_EOF_N" dir="in" width="1">
+          Receive interface end of frame.
+        </port>
+
+        <!-- TX0 interface -->
+        <port  name="TX0_DATA" dir="in" width="FL_DATA_WIDTH">
+            Transmit framelink interface 0.
+        </port>
+        <port  name="TX0_REM" dir="in" width="log2(FL_DATA_WIDTH/8)">
+        </port>
+        <port  name="TX0_SRC_RDY_N" dir="in" width="1">
+        </port>
+        <port  name="TX0_DST_RDY_N" dir="out" width="1">
+        </port>
+        <port  name="TX0_SOP_N" dir="in" width="1">
+        </port>
+        <port  name="TX0_EOP_N" dir="in" width="1">
+        </port>
+        <port  name="TX0_SOF_N" dir="in" width="1">
+        </port>
+        <port  name="TX0_EOF_N" dir="in" width="1">
+        </port>
+
+        <!-- TX1 interface -->
+        <port  name="TX1_DATA" dir="in" width="FL_DATA_WIDTH">
+            Transmit framelink interface 1.
+        </port>
+        <port  name="TX1_REM" dir="in" width="log2(FL_DATA_WIDTH/8)">
+        </port>
+        <port  name="TX1_SRC_RDY_N" dir="in" width="1">
+        </port>
+        <port  name="TX1_DST_RDY_N" dir="out" width="1">
+        </port>
+        <port  name="TX1_SOP_N" dir="in" width="1">
+        </port>
+        <port  name="TX1_EOP_N" dir="in" width="1">
+        </port>
+        <port  name="TX1_SOF_N" dir="in" width="1">
+        </port>
+        <port  name="TX1_EOF_N" dir="in" width="1">
+        </port>
+
+        <!-- TX2 interface -->
+        <port  name="TX2_DATA" dir="in" width="FL_DATA_WIDTH">
+            Transmit framelink interface 2.
+        </port>
+        <port  name="TX2_REM" dir="in" width="log2(FL_DATA_WIDTH/8)">
+        </port>
+        <port  name="TX2_SRC_RDY_N" dir="in" width="1">
+        </port>
+        <port  name="TX2_DST_RDY_N" dir="out" width="1">
+        </port>
+        <port  name="TX2_SOP_N" dir="in" width="1">
+        </port>
+        <port  name="TX2_EOP_N" dir="in" width="1">
+        </port>
+        <port  name="TX2_SOF_N" dir="in" width="1">
+        </port>
+        <port  name="TX2_EOF_N" dir="in" width="1">
+        </port>
+
+        <!-- TX3 interface -->
+        <port  name="TX3_DATA" dir="in" width="FL_DATA_WIDTH">
+            Transmit framelink interface 3.
+        </port>
+        <port  name="TX3_REM" dir="in" width="log2(FL_DATA_WIDTH/8)">
+        </port>
+        <port  name="TX3_SRC_RDY_N" dir="in" width="1">
+        </port>
+        <port  name="TX3_DST_RDY_N" dir="out" width="1">
+        </port>
+        <port  name="TX3_SOP_N" dir="in" width="1">
+        </port>
+        <port  name="TX3_EOP_N" dir="in" width="1">
+        </port>
+        <port  name="TX3_SOF_N" dir="in" width="1">
+        </port>
+        <port  name="TX3_EOF_N" dir="in" width="1">
+        </port>
+    </port_map>
+
+</interface>
+
+
+<!-- BODY ************************************************* -->
+<body>
+        <h1>Framelink switch scheme</h1>
+
+    <p>
+       <obr src="./fig/switch_1to4.fig">
+           Framelink switch_1to4 architecture.
+       </obr>
+    </p>
+
+        <h1>Specification</h1>
+
+    <p>
+        Framelink switch uses shift register and counter to save data until
+        the switch information arrives. Then, register is filled with this
+        information that drives the transmit interface - it determines, which
+        of them will be active.
+    </p>
+
+    <p>
+        The switching information is in the form of four bits, where each bit
+        denotes wether the frame should be sent to the particular interface or
+        not. When the bit is set, frame will be send out this interface.
+    </p>
+
+        <h2>Orientation</h2>
+
+    <p>
+     <pre>
+    +---+---+---+---+
+    | 3 | 2 | 1 | 0 |--- bit position corresponds with the interface number
+    +---+---+---+---+
+     </pre>
+    </p>
+
+        <h2>Limitations</h2>
+
+    <p>
+        <ul>
+            <li>Incoming frame must be at least IFC_BYTE_OFFSET long.</li>
+        </ul>
+    </p>
+
+
+        <h1>Device utilization</h1>
+    <p>
+        The main parameter of the component is the Framelink data width.
+        Other parameters influence the device utilization only by +/-
+        a few slices. Frequency is only approximate and
+        real frequency depends on the specific design that uses this
+        component.
+    </p>
+
+    <p>
+		<tab sloupce="ccc">
+			<tr>
+				<th>FL_DATA_WIDTH/IFC_BYTE_OFFSET</th>
+				<th>Slices (% of C6X slices)</th>
+			</tr>
+			<tr>
+				<th>64/127</th>
+				<td>58(0.2%)</td>
+			</tr>
+			<tr>
+				<th>128/127</th>
+				<td>88(0.3%)</td>
+			</tr>
+		<nazev>Chip utilization</nazev>
+		</tab>
+
+		<tab sloupce="ccc">
+			<tr>
+				<th>FL_DATA_WIDTH/IFC_BYTE_OFFSET</th>
+				<th>Max.frequency by Precision</th>
+				<th>Frequency tested in HW</th>
+			</tr>
+			<tr>
+				<th>64/127</th>
+				<td>up to 200 MHz</td>
+				<td>100 MHz</td>
+			</tr>
+			<tr>
+				<th>128/127</th>
+				<td>up to 200 MHz</td>
+				<td>100 MHz</td>
+			</tr>
+		<nazev>Maximal frequency</nazev>
+		</tab>
+    </p>
+
+</body>
+
+</source>

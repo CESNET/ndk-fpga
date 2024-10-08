@@ -1,0 +1,42 @@
+# signals_sig.fdo : Include file with signals
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author: Tomas Fukac <fukac@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "TCAM"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/DUT_U/VHDL_DUT_U/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/DUT_U/VHDL_DUT_U/CLK
+
+read_p   READ   /testbench/DUT_U/VHDL_DUT_U
+write_p  WRITE  /testbench/DUT_U/VHDL_DUT_U
+match_p  MATCH  /testbench/DUT_U/VHDL_DUT_U
+
+#add wave -divider "INTERNAL"
+
+#add wave -divider "INPUT INTERFACE"
+#add_wave "-group {TCAM_0_INPUT} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/tcam_g(0)/tcam_i/input_*
+#add_wave "-group {TCAM_1_INPUT} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/tcam_g(1)/tcam_i/input_*
+#add_wave "-group {TCAM_2_INPUT} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/tcam_g(2)/tcam_i/input_*
+#add_wave "-group {TCAM_3_INPUT} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/tcam_g(3)/tcam_i/input_*
+
+#add wave -divider "MEMORY SIGNALS"
+#add_wave "-group {TCAM_0_MEMORY} -noupdate -hex"   /testbench/DUT_U/VHDL_DUT_U/tcam_g(0)/tcam_i/mem_*
+#add_wave "-group {TCAM_1_MEMORY} -noupdate -hex"   /testbench/DUT_U/VHDL_DUT_U/tcam_g(1)/tcam_i/mem_*
+#add_wave "-group {TCAM_2_MEMORY} -noupdate -hex"   /testbench/DUT_U/VHDL_DUT_U/tcam_g(2)/tcam_i/mem_*
+#add_wave "-group {TCAM_3_MEMORY} -noupdate -hex"   /testbench/DUT_U/VHDL_DUT_U/tcam_g(3)/tcam_i/mem_*
+
+#add wave -divider "READ LOGIC"
+#add_wave "-group {TCAM_0_READ} -noupdate -hex"     /testbench/DUT_U/VHDL_DUT_U/tcam_g(0)/tcam_i/rd_*
+
+#add wave -divider "WRITE LOGIC"
+#add_wave "-group {TCAM_0_WRITE} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/tcam_g(0)/tcam_i/wr_*
+#add_wave "-group {TCAM_0_MASK} -noupdate -hex"     /testbench/DUT_U/VHDL_DUT_U/tcam_g(0)/tcam_i/masked_*
+#add_wave "-group {TCAM_1_WRITE} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/tcam_g(1)/tcam_i/wr_*
+#add_wave "-group {TCAM_1_MASK} -noupdate -hex"     /testbench/DUT_U/VHDL_DUT_U/tcam_g(1)/tcam_i/masked_*
+#add_wave "-group {TCAM_2_WRITE} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/tcam_g(2)/tcam_i/wr_*
+#add_wave "-group {TCAM_2_MASK} -noupdate -hex"     /testbench/DUT_U/VHDL_DUT_U/tcam_g(2)/tcam_i/masked_*
+#add_wave "-group {TCAM_3_WRITE} -noupdate -hex"    /testbench/DUT_U/VHDL_DUT_U/tcam_g(3)/tcam_i/wr_*
+#add_wave "-group {TCAM_3_MASK} -noupdate -hex"     /testbench/DUT_U/VHDL_DUT_U/tcam_g(3)/tcam_i/masked_*

@@ -1,0 +1,22 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/VHDL_DUT_U/RESET
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/VHDL_DUT_U/CLK
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/VHDL_DUT_U/CLK_X2
+
+#all TOP /testbench/DUT_U/VHDL_DUT_U
+#all RXBUF0 /testbench/DUT_U/VHDL_DUT_U/rx_stream_g(0)/rx_buf_i
+#all TRGEN0 /testbench/DUT_U/VHDL_DUT_U/rx_stream_g(0)/tr_gen_i
+#all TRFIFO /testbench/DUT_U/VHDL_DUT_U/tr_fifo_i
+#all CROSS  /testbench/DUT_U/VHDL_DUT_U/crossbarx_i
+#all CROSS-trcg  /testbench/DUT_U/VHDL_DUT_U/crossbarx_i/instr_stream_gen(0)/trcg_i
+#all CROSS-trsr  /testbench/DUT_U/VHDL_DUT_U/crossbarx_i/instr_stream_gen(0)/trsr_i
+#all CROSS-trbr  /testbench/DUT_U/VHDL_DUT_U/crossbarx_i/instr_stream_gen(0)/trbr_i
+#all CROSS-ugen  /testbench/DUT_U/VHDL_DUT_U/crossbarx_i/instr_stream_gen(0)/ugen_i
+

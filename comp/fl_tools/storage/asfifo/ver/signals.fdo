@@ -1,0 +1,34 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2003 CESNET
+# Author: Petr Kobiersky <xkobie00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc rx {NAME PATH} {
+     add_wave "-noupdate  -hex -label RX_DATA"    $PATH/RX_DATA
+     add_wave "-noupdate  -hex -label RX_REM"     $PATH/RX_REM
+     add_wave "-noupdate  -label RX_SOF_N"        $PATH/RX_SOF_N
+     add_wave "-noupdate  -label RX_EOF_N"        $PATH/RX_EOF_N
+     add_wave "-noupdate  -label RX_SOP_N"        $PATH/RX_SOP_N
+     add_wave "-noupdate  -label RX_EOP_N"        $PATH/RX_EOP_N
+     add_wave "-noupdate  -label RX_SRC_RDY_N"    $PATH/RX_SRC_RDY_N
+     add_wave "-noupdate  -label RX_DST_RDY_N"    $PATH/RX_DST_RDY_N
+}
+
+proc tx {NAME PATH} {
+     add_wave "-noupdate  -hex -label TX_DATA"    $PATH/TX_DATA
+     add_wave "-noupdate  -hex -label TX_REM"     $PATH/TX_REM
+     add_wave "-noupdate  -label TX_SOF_N"        $PATH/TX_SOF_N
+     add_wave "-noupdate  -label TX_EOF_N"        $PATH/TX_EOF_N
+     add_wave "-noupdate  -label TX_SOP_N"        $PATH/TX_SOP_N
+     add_wave "-noupdate  -label TX_EOP_N"        $PATH/TX_EOP_N
+     add_wave "-noupdate  -label TX_SRC_RDY_N"    $PATH/TX_SRC_RDY_N
+     add_wave "-noupdate  -label TX_DST_RDY_N"    $PATH/TX_DST_RDY_N
+}

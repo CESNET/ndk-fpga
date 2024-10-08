@@ -1,0 +1,19 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+source "./signals.fdo"
+
+add_wave "-noupdate -color yellow -label CLK"    /testbench/CLK
+add_wave "-noupdate -color yellow -label RESET"  /testbench/RESET
+
+add wave -divider "TOP"
+#rx  RX  /testbench/DUT_U/VHDL_DUT_U/dut_i
+#tx  TX  /testbench/DUT_U/VHDL_DUT_U/dut_i
+#all WRAPPER /testbench/DUT_U/VHDL_DUT_U
+#all ALL /testbench/DUT_U/VHDL_DUT_U/dut_i
+
+#all ITEM_MUX101 /testbench/DUT_U/VHDL_DUT_U/dut_i/item_mux_g(101)/item_mux_i

@@ -1,0 +1,20 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author: Tomas Hak <xhakto01@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc read_p {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate -hex"        $PATH/READ_*
+}
+
+proc write_p {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate  -hex"       $PATH/WRITE_*
+}
+
+proc match_p {NAME PATH} {
+    add wave -divider "$NAME"
+    add_wave "-noupdate  -hex"       $PATH/MATCH_*
+}

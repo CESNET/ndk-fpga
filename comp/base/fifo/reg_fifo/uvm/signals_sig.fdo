@@ -1,0 +1,16 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Vladislav Valek <valekv@cesnet.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "REG_FIFO"
+
+add_wave "-noupdate -color yellow -label RST"   /testbench/RST
+add_wave "-noupdate -color yellow -label CLK"   /testbench/CLK
+
+all ALL /testbench/DUT_U/VHDL_DUT_U
+
+config wave -signalnamewidth 1

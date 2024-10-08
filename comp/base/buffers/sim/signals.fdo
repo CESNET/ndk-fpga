@@ -1,0 +1,85 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2008 CESNET
+# Author: Vozenilek Jan <xvozen00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+
+add wave -divider "TESTBENCH"
+add_wave "-noupdate -label CLK" /testbench/clk
+add_wave "-noupdate -label RESET" /testbench/reset
+#INIT for MFIFO2MEM
+add_wave "-noupdate -uns -label INIT" /testbench/init
+add wave -divider "INPUT"
+add_wave "-noupdate -label WRITE" /testbench/wr
+add_wave "-noupdate -uns -label BLOCK_ADDR" /testbench/blk_addr
+add_wave "-noupdate -uns -label WR_BLK_ADDR" /testbench/wr_blk_addr
+add_wave "-noupdate -label WR_ADDR" /testbench/wr_addr
+add_wave "-noupdate -label NEW_LEN" /testbench/new_len
+add_wave "-noupdate -label NEW_LEN_DV" /testbench/new_len_dv
+add_wave "-noupdate -hex -label DATA_IN" /testbench/di
+# following signals are for mfifo2mem:
+add_wave "-noupdate -label WRITE" /testbench/write
+add_wave "-noupdate -hex -label DATA_IN" /testbench/data_in
+add wave -divider "OUTPUT"
+add_wave "-noupdate -label READ" /testbench/rd
+add_wave "-noupdate -uns -label BLOCK_ADDR" /testbench/blk_addr
+add_wave "-noupdate -uns -label RD_BLK_ADDR" /testbench/rd_blk_addr
+add_wave "-noupdate -label RD_ADDR" /testbench/rd_addr
+add_wave "-noupdate -label REL_LEN" /testbench/rel_length
+add_wave "-noupdate -label REL_LEN_DV" /testbench/rel_dv
+add_wave "-noupdate -hex -label DATA_OUT" /testbench/do
+add_wave "-noupdate -label DATA_VLD" /testbench/dv
+#following signals are for mfifo2mem:
+add_wave "-noupdate -label PIPE_EN" /testbench/pipe_en
+add_wave "-noupdate -label READ" /testbench/read
+add_wave "-noupdate -label REL_LEN" /testbench/rel_len
+add_wave "-noupdate -label REL_LEN_DV" /testbench/rel_len_dv
+add_wave "-noupdate -hex -label DATA_OUT" /testbench/data_out
+add_wave "-noupdate -label DATA_VLD" /testbench/data_vld
+add wave -divider "STATUS"
+add_wave "-noupdate -label blk_empty" /testbench/uut/blk_empty
+add_wave "-noupdate -label blk_full" /testbench/uut/blk_full
+add_wave "-noupdate -label glob_empty" /testbench/uut/glob_empty
+add_wave "-noupdate -label glob_full" /testbench/uut/glob_full
+add_wave "-noupdate -label EMPTY" /testbench/EMPTY
+add_wave "-noupdate -label FULL" /testbench/FULL
+#ALMOST_FULL signal for mfifo2mem_almost_full variant
+add_wave "-noupdate -label ALMOST_FULL" /testbench/ALMOST_FULL
+add_wave "-noupdate -uns -label STATUS" /testbench/uut/status_sig
+add_wave "-noupdate -uns -label STATUS" /testbench/uut/blk_status
+add wave -divider "Internal signals"
+add_wave "-noupdate -label write_allow" /testbench/uut/write_allow
+add_wave "-noupdate -label cnt_write" /testbench/uut/cnt_write_addr
+add_wave "-noupdate -label blk_write" /testbench/uut/blk_write_addr
+add_wave "-noupdate -label reg_write" /testbench/uut/reg_write_addr
+add_wave "-noupdate -label glob_write" /testbench/uut/glob_write_addr
+add_wave "-noupdate -label write_addr" /testbench/uut/write_addr
+add_wave "-noupdate -label read_allow" /testbench/uut/read_allow
+add_wave "-noupdate -label cnt_read" /testbench/uut/cnt_read_addr
+add_wave "-noupdate -label blk_read" /testbench/uut/blk_read_addr
+add_wave "-noupdate -label reg_read" /testbench/uut/reg_read_addr
+add_wave "-noupdate -label glob_read" /testbench/uut/glob_read_addr
+add_wave "-noupdate -label read_addr" /testbench/uut/read_addr
+add_wave "-noupdate -uns -label mem_cnt" /testbench/uut/switch/mem_cnt
+add_wave "-noupdate -uns -label mem_cnt_rd" /testbench/uut/switch/mem_cnt_rd
+add_wave "-noupdate -uns -label mem_cnt_dv" /testbench/uut/switch/mem_cnt_dv
+add_wave "-noupdate -hex -label mem_in" /testbench/uut/mem_in
+add_wave "-noupdate -hex -label mem_out" /testbench/uut/mem_out
+add_wave "-noupdate -label switch_valid" /testbench/uut/switch_valid
+add_wave "-noupdate -label mem_read_allow" /testbench/uut/mem_read_allow
+add_wave "-noupdate -label rellen" /testbench/uut/rellen
+add wave -divider "IN/OUT component signals"
+add_wave "-noupdate -label write_allow" /testbench/uut/write_allow
+add_wave "-noupdate -label read_allow" /testbench/uut/blk_write_allow
+add_wave "-noupdate -hex -label out" /testbench/uut/incomp_dout
+add_wave "-noupdate -label full" /testbench/uut/incomp_full
+add_wave "-noupdate -label empty" /testbench/uut/incomp_empty
+add_wave "-noupdate -label write_allow" /testbench/uut/switch_valid
+add_wave "-noupdate -label read_allow" /testbench/uut/read_allow
+add_wave "-noupdate -hex -label in" /testbench/uut/outcomp_din
+add_wave "-noupdate -label full" /testbench/uut/outcomp_full
+add_wave "-noupdate -label empty" /testbench/uut/outcomp_empty
+add_wave "-noupdate -uns -label status" /testbench/uut/outcomp_stat
+

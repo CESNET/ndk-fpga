@@ -1,0 +1,43 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Vlastimil Kosar <xkobie00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc fl_sim {NAME PATH} {
+    add wave -divider "$NAME"
+      add_wave "-noupdate -color yellow -label RESET" $PATH/RESET
+      add_wave "-noupdate -color yellow -label CLK"   $PATH/FL_CLK
+      add_wave "-noupdate -hex -label FL_BUS_FL_BFM_0"   $PATH/FL_BUS
+      #add_wave "-noupdate -label CTRL"   $PATH/fl_sim_ctrl
+      #add_wave "-noupdate -label STROBE"   $PATH/fl_sim_strobe
+      #add_wave "-noupdate -label BUSY"   $PATH/fl_sim_busy
+      #add_wave "-noupdate -hex -label Command"   /testbench/FL_BFM_U/test
+      #add_wave "-noupdate -hex -label Command1"   /testbench/FL_BFM_U1/test
+      #add wave -divider "$NAME - IN BUS"
+      #add_wave "-noupdate -hex -label FRAME_LINK_BUS"   /testbench/FL_SIM_U/AUX_FL_BUS2
+      #add wave -divider "$NAME - LOGGING"
+      #add_wave "-noupdate -hex -label RX_DATA" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/RX_DATA
+      #add_wave "-noupdate -label RX_SOF_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/RX_SOF_N
+      #add_wave "-noupdate -label RX_SOP_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/RX_SOP_N
+      #add_wave "-noupdate -label RX_EOP_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/RX_EOP_N
+      #add_wave "-noupdate -label RX_EOF_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/RX_EOF_N
+      #add_wave "-noupdate -label RX_SRC_RDY_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/RX_SRC_RDY_N
+      #add_wave "-noupdate -label RX_DST_RDY_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/RX_DST_RDY_N
+      #add_wave "-noupdate -hex -label INBUS_DATA" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/INBUS_DATA
+      #add_wave "-noupdate -label INBUS_SOF_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/INBUS_SOF_N
+      #add_wave "-noupdate -label INBUS_SOP_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/INBUS_SOP_N
+      #add_wave "-noupdate -label INBUS_EOP_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/INBUS_EOP_N
+      #add_wave "-noupdate -label INBUS_EOF_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/INBUS_EOF_N
+      #add_wave "-noupdate -label INBUS_SRC_RDY_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/INBUS_SRC_RDY_N
+      #add_wave "-noupdate -label INBUS_DST_RDY_N" /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/INBUS_DST_RDY_N
+      #add_wave "-noupdate -hex -label AUX_FL_BUS"   /testbench/FL_SIM_U/FL_SIM_LOGGING_TX_U/AUX_FL_BUS
+      add_wave "-noupdate -hex -label FL_BUS_FL_BFM_11"   $PATH/FL_BUS3
+}

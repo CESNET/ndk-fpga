@@ -1,0 +1,20 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET
+# Author(s): Tomáš Beneš <xbenes55@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# restart function
+# (can be used when only VHDL code has been modified)
+
+add wave -divider "PACKER_PLANNER"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+set TB_PATH     "/testbench"
+set PACP_PATH   "$TB_PATH/DUT_U/VHDL_DUT_U"
+set DIC_PATH    "$PACP_PATH/dic_i"
+
+#add_wave "-group { TBENCH  } -noupdate -hex" $TB_PATH/*
+add_wave "-group { PACP    } -group { top    } -noupdate -hex" $PACP_PATH/*
+add_wave "-group { PACP    } -group { DIC    } -noupdate -hex" $DIC_PATH/*

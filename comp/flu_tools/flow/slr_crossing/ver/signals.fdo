@@ -1,0 +1,21 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc rx {NAME PATH} {
+    set GROUP "$NAME"
+     add_wave "-group $GROUP -noupdate  -hex"    $PATH/RX_*
+}
+
+proc tx {NAME PATH} {
+    set GROUP "$NAME"
+     add_wave "-group $GROUP -noupdate  -hex"    $PATH/TX_*
+}
+
+proc others {NAME PATH} {
+    set GROUP "$NAME"
+     add_wave "-group $GROUP -noupdate  -hex"    $PATH/SLR_CROSSING_I/full_architecture_gen/destination_endpoint/*
+}

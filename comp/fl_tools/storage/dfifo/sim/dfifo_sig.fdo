@@ -1,0 +1,21 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2009 CESNET
+# Author: Jiri Novotnak <xnovot87@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+source "signals.fdo"
+
+set TB_PATH                  "/testbench"
+set FL_FIFO_PATH             "/testbench/fl_dfifo"
+set ID                                " "
+
+add_wave "-noupdate -hex -label CLK"         /testbench/CLK
+add_wave "-noupdate -hex -label RESET"       /testbench/RESET
+
+fl_input $FL_FIFO_PATH $ID
+fl_output $FL_FIFO_PATH $ID
+fl_internal $FL_FIFO_PATH $ID
+

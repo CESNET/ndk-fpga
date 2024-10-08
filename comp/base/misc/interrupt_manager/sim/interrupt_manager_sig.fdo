@@ -1,0 +1,30 @@
+# interrupt_manager_sig.fdo : Include file with signals
+# Copyright (C) 2010 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set TB_PATH "/testbench"
+
+add wave -divider "Clock and Reset"
+add_wave "-hex -label CLK"   /testbench/clk
+add_wave "-hex -label RESET" /testbench/reset
+
+add wave -divider "Interface Interrupt signals"
+add_wave "-hex -label INTERRUPT_IN" /testbench/interrupt_in
+add_wave "-hex -label INTR_RDY_IN" /testbench/intr_rdy_in
+
+add_wave "-hex -label INTERRUPT_OUT" /testbench/interrupt_out
+add_wave "-hex -label INTR_DATA_OUT" /testbench/intr_data_out
+add_wave "-hex -label INTR_RDY_OUT" /testbench/intr_rdy_out
+
+add wave -divider "Internal signals"
+add_wave "-hex -label intr_in_pulse" /testbench/uut/intr_in_pulse
+add_wave "-hex -label input_or" /testbench/uut/input_or
+add_wave "-hex -label cnt_delay" /testbench/cnt_delay
+
+

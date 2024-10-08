@@ -1,0 +1,35 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2016 CESNET
+# Author: Juraj Kubiš
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_LED_CTRL_TOP{ } {
+
+   global LED_CTRL_TOP_PATH
+
+   add wave -divider "SYNC"
+   add_wave "-noupdate  -color green   -label RESET"     $LED_CTRL_TOP_PATH/RESET
+   add_wave "-noupdate  -color green   -label CLK"       $LED_CTRL_TOP_PATH/CLK
+
+   add wave -divider "pattern_0"
+   add_wave "-noupdate  -color cyan   -label PATTERN"    $LED_CTRL_TOP_PATH/led/led_ctrl_gen(0)/led_ctrl_i/ptrn
+   add_wave "-noupdate  -color yellow -label STEP"       $LED_CTRL_TOP_PATH/led/led_ctrl_gen(0)/led_ctrl_i/cnt_pattern_step
+   add_wave "-noupdate  -color green  -label LED_GREEN"  $LED_CTRL_TOP_PATH/led_green(0)
+   add_wave "-noupdate  -color firebrick -label LED_RED" $LED_CTRL_TOP_PATH/led_red(0)
+
+   add wave -divider "pattern_1"
+   add_wave "-noupdate  -color cyan   -label PATTERN"    $LED_CTRL_TOP_PATH/led/led_ctrl_gen(1)/led_ctrl_i/ptrn
+   add_wave "-noupdate  -color yellow -label STEP"       $LED_CTRL_TOP_PATH/led/led_ctrl_gen(1)/led_ctrl_i/cnt_pattern_step
+   add_wave "-noupdate  -color green  -label LED_GREEN"  $LED_CTRL_TOP_PATH/led_green(1)
+   add_wave "-noupdate  -color firebrick -label LED_RED" $LED_CTRL_TOP_PATH/led_red(1)
+
+   add wave -divider "pattern_2"
+   add_wave "-noupdate  -color cyan   -label PATTERN"    $LED_CTRL_TOP_PATH/led/led_ctrl_gen(2)/led_ctrl_i/ptrn
+   add_wave "-noupdate  -color yellow -label STEP"       $LED_CTRL_TOP_PATH/led/led_ctrl_gen(2)/led_ctrl_i/cnt_pattern_step
+   add_wave "-noupdate  -color green  -label LED_GREEN"  $LED_CTRL_TOP_PATH/led_green(2)
+   add_wave "-noupdate  -color firebrick -label LED_RED" $LED_CTRL_TOP_PATH/led_red(2)
+}

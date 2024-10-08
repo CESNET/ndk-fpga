@@ -1,0 +1,33 @@
+# testbench.fdo: Simulation file for testbench of timestamp unit component
+# Copyright (C) 2009 CESNET
+# Author(s): Jan Stourac <xstour03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set OFM_PATH         "../../../.."
+set ASYNC_BASE       "$OFM_PATH/comp/tsu/tsu_gen/comp/async"
+
+set TB_FILE          "$ASYNC_BASE/sim/testbench.vhd"
+set SIG_FILE         "$ASYNC_BASE/sim/comp_sig.fdo"
+
+set MOD ""
+
+# Modules definition
+set COMPONENTS [list \
+        [list "ASYNC"   $ASYNC_BASE      "FULL"] \
+]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 1us
+

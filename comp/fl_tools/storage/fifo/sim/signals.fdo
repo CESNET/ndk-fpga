@@ -1,0 +1,13 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2009 CESNET
+# Author: Jiri Novotnak <xnovot87@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+
+proc fl_input{$BASE $ID} {
+   add wave -divider "Input interface"
+   add_wave "-group {INPUT FL $ID} -label RX_DATA" $BASE/RX_DATA
+}

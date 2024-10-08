@@ -1,0 +1,34 @@
+# interrupt_manager.fdo: Synchronous ordinary FIFO simulation
+# Copyright (C) 2010 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+
+set UNIT_BASE "$OFM_PATH/comp/base/misc/interrupt_manager"
+
+set TB_FILE       "$UNIT_BASE/sim/interrupt_manager_tb.vhd"
+set SIG_FILE      "$UNIT_BASE/sim/interrupt_manager_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "UNIT" $UNIT_BASE   "FULL"] \
+               ]
+
+set PACKAGES ""
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 3us

@@ -1,0 +1,29 @@
+# alu_dsp.fdo: Simulation script
+# Copyright (C) 2014 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set ALU_DSP_BASE       "$OFM_PATH/comp/base/logic/alu"
+
+set TB_FILE          "$ALU_DSP_BASE/sim/testbench.vhd"
+set SIG_FILE         "$ALU_DSP_BASE/sim/alu_dsp_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "ALU_DSP" $ALU_DSP_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 300ns

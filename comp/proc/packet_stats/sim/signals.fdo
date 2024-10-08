@@ -1,0 +1,24 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2015 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_STATS { } {
+
+    global STATS_PATH
+    add_wave "-noupdate -hex -label RM_ADDRESS    " /$STATS_PATH/RM_ADDRESS
+    add_wave "-noupdate -hex -label RM_REQ        " /$STATS_PATH/RM_REQ
+    add_wave "-noupdate -hex -label CNT_ADDRESS   " /$STATS_PATH/CNT_ADDRESS
+    add_wave "-noupdate -hex -label PACKET_LENGTH " /$STATS_PATH/PACKET_LENGTH
+    add_wave "-noupdate -hex -label ADD_PACKET    " /$STATS_PATH/ADD_PACKET
+    add_wave "-noupdate -hex -label SRC_RDY       " /$STATS_PATH/SRC_RDY
+    add_wave "-noupdate -hex -label DST_RDY       " /$STATS_PATH/DST_RDY
+    add_wave "-noupdate -hex -label RD_NUM_BYTES  " /$STATS_PATH/RD_NUM_BYTES
+    add_wave "-noupdate -hex -label RD_NUM_PACKETS" /$STATS_PATH/RD_NUM_PACKETS
+    add_wave "-noupdate -hex -label RD_VLD        " /$STATS_PATH/RD_VLD
+    add_wave "-noupdate -hex -label RD_NEXT       " /$STATS_PATH/RD_NEXT
+}

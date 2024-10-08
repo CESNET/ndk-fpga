@@ -1,0 +1,35 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc rx {NAME PATH} {
+    set GROUP "$NAME"
+     add_wave "-group $GROUP -noupdate  -hex -label RX_DATA"    $PATH/RX_DATA
+     add_wave "-group $GROUP -noupdate  -hex -label RX_DREM"    $PATH/RX_DREM
+     add_wave "-group $GROUP -noupdate  -label RX_SOF_N"        $PATH/RX_SOF_N
+     add_wave "-group $GROUP -noupdate  -label RX_EOF_N"        $PATH/RX_EOF_N
+     add_wave "-group $GROUP -noupdate  -label RX_SOP_N"        $PATH/RX_SOP_N
+     add_wave "-group $GROUP -noupdate  -label RX_EOP_N"        $PATH/RX_EOP_N
+     add_wave "-group $GROUP -noupdate  -label RX_SRC_RDY_N"    $PATH/RX_SRC_RDY_N
+     add_wave "-group $GROUP -noupdate  -label RX_DST_RDY_N"    $PATH/RX_DST_RDY_N
+}
+
+proc tx {NAME PATH} {
+    set GROUP "$NAME"
+     add_wave "-group $GROUP -noupdate  -hex -label TX_DATA"    $PATH/TX_DATA
+     add_wave "-group $GROUP -noupdate  -hex -label TX_DREM"    $PATH/TX_DREM
+     add_wave "-group $GROUP -noupdate  -label TX_SOF_N"        $PATH/TX_SOF_N
+     add_wave "-group $GROUP -noupdate  -label TX_EOF_N"        $PATH/TX_EOF_N
+     add_wave "-group $GROUP -noupdate  -label TX_SOP_N"        $PATH/TX_SOP_N
+     add_wave "-group $GROUP -noupdate  -label TX_EOP_N"        $PATH/TX_EOP_N
+     add_wave "-group $GROUP -noupdate  -label TX_SRC_RDY_N"    $PATH/TX_SRC_RDY_N
+     add_wave "-group $GROUP -noupdate  -label TX_DST_RDY_N"    $PATH/TX_DST_RDY_N
+}
+
+proc others {NAME PATH} {
+    set GROUP "$NAME"
+     add_wave "-group $GROUP -noupdate  -hex"    $PATH/SLR_CROSSING_I/full_architecture_gen/destination_endpoint/*
+}

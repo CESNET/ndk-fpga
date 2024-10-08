@@ -1,0 +1,22 @@
+# xor_gen_sig.fdo : Include file with signals
+# Copyright (C) 2018 CESNET
+# Author: Petr Panak <xpanak04@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set TB_PATH      "/testbench"
+set xor_gen_PATH   "/testbench/uut"
+
+# include signals
+source      "signals.fdo"
+
+add wave -noupdate -label RESET -color magenta $TB_PATH/reset
+add wave -noupdate -label CLK -color magenta $TB_PATH/clk
+blk_xor_gen
+add wave -noupdate -label testing_DO -color orange $TB_PATH/D_1
+#add wave -noupdate -color red $TB_PATH/DO(5)
+

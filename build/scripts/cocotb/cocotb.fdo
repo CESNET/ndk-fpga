@@ -1,0 +1,96 @@
+# cocotb.fdo: Cocotb functional simulation file for card
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+
+set NC_FLAGS [list SIMULATION]
+set OFM_PATH $env(OFM_PATH)
+
+# Workaround
+if {[info exists env(FIRMWARE_BASE)]} {
+    set FIRMWARE_BASE $env(FIRMWARE_BASE)
+}
+
+source $OFM_PATH/build/Shared.tcl
+source_with_args $env(SYNTHFILES) "-tnone"
+
+set PACKAGES $HIERARCHY(PACKAGES)
+set COMPONENTS $HIERARCHY(COMPONENTS)
+
+set SYNTH_FLAGS(TOOL) "modelsim"
+set SIM_FLAGS(EXTRA_VFLAGS) [list -quiet -suppress 1130,1339,8664,8683,8684,8822,12110,1549,143 -L unisims_ver -L secureip]
+set SIM_FLAGS(MAKEFILE_GEN) true
+set SIM_FLAGS(MAKEFILE_NAME) simulation.Makefile
+set SIM_FLAGS(VSIM_MANUAL_START) true
+set SIM_FLAGS(DEBUG) true
+
+if {[info exists env(SYNTH_TOOL)]} {
+    set SYNTH_FLAGS(TOOL) $env(SYNTH_TOOL)
+}
+
+set COCOTB_PATH [eval cocotb-config --lib-name-path fli modelsim]
+lappend SIM_FLAGS(EXTRA_VFLAGS) -foreign "cocotb_init $COCOTB_PATH"
+#lappend SIM_FLAGS(EXTRA_VFLAGS) -onfinish exit
+lappend SIM_FLAGS(VOPT_ARGS) +acc
+if {[info exists USER_VFLAGS]} {
+	lappend SIM_FLAGS(EXTRA_VFLAGS) {*}USER_VFLAGS
+}
+
+set SIM_MODULE $SYNTH_FLAGS(MODULE)
+
+# Cocotb environment variables
+set env(MODULE) $env(COCOTB_MODULE)
+set env(TOPLEVEL) work.[string tolower $SYNTH_FLAGS(MODULE)]
+set env(TOPLEVEL_LANG) vhdl
+set env(COCOTB_RESOLVE_X) "ZEROS"
+
+proc sim_pre_run {} {
+    global env
+
+    if {[file exists $env(COCOTB_MODULE)_sig.fdo]} {
+        view wave
+        delete wave *
+        config wave -signalnamewidth 1
+        source $env(COCOTB_MODULE)_sig.fdo
+    }
+}
+
+proc sim_post_run {} {
+    wave zoom full
+#    quit
+}
+
+proc rst {args} {
+    array set data [list -do_run 1 -run -a {*}$args]
+    set do_run $data(-do_run)
+    set run_args $data(-run)
+
+    upvar SIM_FLAGS SIM_FLAGS VSIM_FLAGS VSIM_FLAGS USE_COCOTB USE_COCOTB
+    exec make -f $SIM_FLAGS(MAKEFILE_NAME)
+
+    quit -sim
+    vsim {*}$VSIM_FLAGS
+
+    global NumericStdNoWarnings StdArithNoWarnings
+    set NumericStdNoWarnings 1
+    set StdArithNoWarnings 1
+
+    if {[llength [info commands sim_pre_run]]} {
+        sim_pre_run
+    }
+
+    if {$do_run} {
+        run {*}$run_args
+
+        if {[llength [info commands sim_post_run]]} {
+            sim_post_run
+        }
+    }
+}
+
+if {[file exists $env(COCOTB_MODULE).fdo]} {
+    source $env(COCOTB_MODULE).fdo
+}
+
+source "$OFM_PATH/build/Modelsim.inc.fdo"
+
+rst

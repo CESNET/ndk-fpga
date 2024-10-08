@@ -1,0 +1,162 @@
+# ver_settings.py
+# Copyright (C) 2019 CESNET z. s. p. o.
+# Author(s): Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+
+SETTINGS = {
+    "default" : { # Ultrascale+ default settings
+        "C_CLK_PER"                  : "3.0 ns"            ,
+        "C_CLK_DMA_PER"              : "4.0 ns"            ,
+
+        "DEVICE"                     : "\\\"ULTRASCALE\\\"",
+        "ENDPOINT_TYPE"              : "\\\"DUMMY\\\""     ,
+        "MVB_UP_ITEMS"               : "2"                 ,
+        "MFB_UP_REGIONS"             : "2"                 ,
+        "MFB_UP_REG_SIZE"            : "1"                 ,
+        "MFB_UP_BLOCK_SIZE"          : "8"                 ,
+        "MFB_UP_ITEM_WIDTH"          : "32"                ,
+        "DMA_MFB_UP_REGIONS"         : "MFB_UP_REGIONS"    ,
+        "MVB_DOWN_ITEMS"             : "4"                 ,
+        "MFB_DOWN_REGIONS"           : "4"                 ,
+        "MFB_DOWN_REG_SIZE"          : "1"                 ,
+        "MFB_DOWN_BLOCK_SIZE"        : "4"                 ,
+        "MFB_DOWN_ITEM_WIDTH"        : "32"                ,
+        "DMA_MFB_DOWN_REGIONS"       : "MFB_DOWN_REGIONS"  ,
+        "RQ_TUSER_WIDTH"             : "137"               ,
+        "RC_TUSER_WIDTH"             : "161"               ,
+
+        "DMA_PORTS"                  : "2"                 ,
+        "UP_TRANSACTIONS"            : "1000"              ,
+        "RCB_SIZE"                   : "64"                ,
+        "PCIE_TAG_WIDTH"             : "8"                 ,
+        "AUTO_ASSIGN_TAGS"           : "true"              ,
+        "GEN_PRINT_INTERVAL"         : "200"               ,
+        "UP_NOT_SRC_RDY_CHANCE"      : "50"                ,
+        "UP_READ_CHANCE"             : "70"                ,
+        "UP_GAP_CHANCE"              : "80"                ,
+        "RQ_TREADY_CHANCE"           : "70"                ,
+        "TAG_ASS_SEND_CHANCE"        : "40"                ,
+        "DOWN_RESPONSE_START_CHANCE" : "30"                ,
+        "DOWN_GAP_CHANCE"            : "80"                ,
+        "DOWN_NOT_DST_RDY_CHANCE"    : "60"                ,
+
+        "GEN_PRINT_INTERVAL"         : "200"               ,
+        "FULL_PRINT"                 : "false"             ,
+    },
+    "virtex7" : { # Virtex7
+        "DEVICE"                    : "\\\"7SERIES\\\""   ,
+        "ENDPOINT_TYPE"             : "\\\"DUMMY\\\""     ,
+        "MVB_UP_ITEMS"              : "1"                 ,
+        "MFB_UP_REGIONS"            : "1"                 ,
+        "MFB_UP_REG_SIZE"           : "1"                 ,
+        "MFB_UP_BLOCK_SIZE"         : "8"                 ,
+        "MFB_UP_ITEM_WIDTH"         : "32"                ,
+        "DMA_MFB_UP_REGIONS"        : "MFB_UP_REGIONS*2"  ,
+        "MVB_DOWN_ITEMS"            : "2"                 ,
+        "MFB_DOWN_REGIONS"          : "2"                 ,
+        "MFB_DOWN_REG_SIZE"         : "1"                 ,
+        "MFB_DOWN_BLOCK_SIZE"       : "4"                 ,
+        "MFB_DOWN_ITEM_WIDTH"       : "32"                ,
+        "DMA_MFB_DOWN_REGIONS"      : "MFB_DOWN_REGIONS*2",
+        "RQ_TUSER_WIDTH"            : "60"                ,
+        "RC_TUSER_WIDTH"            : "75"                ,
+    },
+    "stratix10_h_tile" : { # Stratix10 H_TILE
+        "DEVICE"                    : "\\\"STRATIX10\\\"" ,
+        "ENDPOINT_TYPE"             : "\\\"H_TILE\\\""    ,
+        "MVB_DOWN_ITEMS"            : "2"                 ,
+        "MFB_DOWN_REGIONS"          : "2"                 ,
+        "MFB_DOWN_REG_SIZE"         : "1"                 ,
+        "MFB_DOWN_BLOCK_SIZE"       : "8"                 ,
+    },
+    "stratix10_p_tile" : { # Stratix10 P_TILE
+        "DEVICE"                    : "\\\"STRATIX10\\\"" ,
+        "ENDPOINT_TYPE"             : "\\\"P_TILE\\\""    ,
+        "MVB_DOWN_ITEMS"            : "2"                 ,
+        "MFB_DOWN_REGIONS"          : "2"                 ,
+        "MFB_DOWN_REG_SIZE"         : "1"                 ,
+        "MFB_DOWN_BLOCK_SIZE"       : "8"                 ,
+    },
+    "rcb_128" : { # different RCB size
+        "RCB_SIZE"                  : "128"               ,
+    },
+    "no_tag_auto_assign" : { # tags assigned by Endpoint
+        "AUTO_ASSIGN_TAGS"          : "false"             ,
+    },
+    "full_load" : { # maximum throughput
+        "UP_NOT_SRC_RDY_CHANCE"           : "0"           ,
+        "UP_GAP_CHANCE"                   : "0"           ,
+        "RQ_TREADY_CHANCE"                : "100"         ,
+        "TAG_ASS_SEND_CHANCE"             : "100"         ,
+        "DOWN_RESPONSE_START_CHANCE"      : "100"         ,
+        "DOWN_GAP_CHANCE"                 : "0"           ,
+        "DOWN_NOT_DST_RDY_CHANCE"         : "0"           ,
+    },
+    "read_only" : { # Only Read requests
+        "UP_READ_CHANCE"             : "100"              ,
+    },
+    "write_only" : { # Only Write requests
+        "UP_READ_CHANCE"             : "0"                ,
+    },
+    "single_port" : { # Only one DMA Port
+        "DMA_PORTS"                  : "1"                ,
+    },
+    "clk_inv" : { # DMA Clock faster than PCIe Clock
+        "C_CLK_PER"                  : "4.0 ns"            ,
+        "C_CLK_DMA_PER"              : "3.0 ns"            ,
+    },
+    "10_bit_pcie_tag" : { # 10-bit PCIe Tag Width
+        "PCIE_TAG_WIDTH"             : "10"                ,
+    },
+    "verbose" : { #
+        "FULL_PRINT"                 : "true"              ,
+    },
+#    "" : { #
+#    },
+    "_combinations_" : (
+    # Basic tests for Ultrascale
+    ("default"         ,                                                       ),
+    ("default"         ,"rcb_128"                                              ),
+    ("default"         ,          "no_tag_auto_assign"                         ),
+    ("default"         ,                               "full_load"             ),
+    ("default"         ,                               "full_load","write_only"),
+    ("default"         ,                               "full_load","read_only" ),
+    ("default"         ,"rcb_128","no_tag_auto_assign"                         ),
+    ("default"         ,"single_port"                                          ),
+    ("default"         ,"clk_inv"                                              ),
+    # Basic tests for Virtex7
+    ("virtex7"         ,                                                       ),
+    ("virtex7"         ,"rcb_128"                                              ),
+    ("virtex7"         ,          "no_tag_auto_assign"                         ),
+    ("virtex7"         ,                               "full_load"             ),
+    ("virtex7"         ,                               "full_load","write_only"),
+    ("virtex7"         ,                               "full_load","read_only" ),
+    ("virtex7"         ,"rcb_128","no_tag_auto_assign"                         ),
+    ("virtex7"         ,"single_port"                                          ),
+    ("virtex7"         ,"clk_inv"                                              ),
+    # Basic tests for Stratix10 H_TILE
+    ("stratix10_h_tile",                                                       ),
+    ("stratix10_h_tile","rcb_128"                                              ),
+#    ("stratix10_h_tile",          "no_tag_auto_assign"                         ), # Not real
+    ("stratix10_h_tile",                               "full_load"             ),
+    ("stratix10_h_tile",                               "full_load","write_only"),
+    ("stratix10_h_tile",                               "full_load","read_only" ),
+    ("stratix10_h_tile","rcb_128","no_tag_auto_assign"                         ),
+    ("stratix10_h_tile","single_port"                                          ),
+    ("stratix10_h_tile","clk_inv"                                              ),
+    # Basic tests for Stratix10 P_TILE
+    ("stratix10_p_tile",                                                                         ),
+    ("stratix10_p_tile",                                                        "10_bit_pcie_tag"),
+    ("stratix10_p_tile","rcb_128"                                                                ),
+#    ("stratix10_p_tile",          "no_tag_auto_assign"                                           ), # Not real
+#    ("stratix10_p_tile",          "no_tag_auto_assign",                         "10_bit_pcie_tag"), # Not real
+    ("stratix10_p_tile",                               "full_load"                               ),
+    ("stratix10_p_tile",                               "full_load",             "10_bit_pcie_tag"),
+    ("stratix10_p_tile",                               "full_load","write_only"                  ),
+    ("stratix10_p_tile",                               "full_load","read_only"                   ),
+    ("stratix10_p_tile",                               "full_load","read_only", "10_bit_pcie_tag"),
+    ("stratix10_p_tile","rcb_128","no_tag_auto_assign"                                           ),
+    ("stratix10_p_tile","single_port"                                                            ),
+    ("stratix10_p_tile","single_port",                                          "10_bit_pcie_tag"),
+    ("stratix10_p_tile","clk_inv"                                                                ),
+    ),
+}

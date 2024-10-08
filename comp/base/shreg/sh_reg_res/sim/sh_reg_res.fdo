@@ -1,0 +1,24 @@
+# sh_reg_res : Include file with signals
+# Copyright (C) 2006 CESNET
+# Authors: Michal Spacek <xspace14@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+vlib work
+vdel -all work
+vlib work
+
+vcom -93 -explicit -work work ../../sh_reg/sh_reg_elem.vhd
+vcom -93 -explicit -work work ../../sh_reg/sh_reg.vhd
+vcom -93 -explicit -work work ../sh_reg_res.vhd
+vcom -93 -explicit -work work sh_reg_res_tb.vhd
+vsim -t 1ps  -L xilinxcorelib  -lib work testbench
+
+view wave
+add wave *
+
+restart -f
+run 1000 ns

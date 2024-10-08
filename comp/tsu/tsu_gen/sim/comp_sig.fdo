@@ -1,0 +1,22 @@
+# comp_sig.fdo : Include file with signal procedures
+# Copyright (C) 2009 CESNET
+# Author(s): Jan Stourac <xstour03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+#
+
+# Paths
+set TSU_GEN_PATH  "/testbench/uut"
+
+# Files with signals
+source "$TSU_GEN_BASE/sim/signals.fdo"
+
+add wave -noupdate -label RESET /testbench/reset
+add wave -noupdate -label CLK /testbench/clk
+add wave -noupdate -label MI32_RESET /testbench/mi32_reset
+add wave -noupdate -label MI32_CLK /testbench/mi32_clk
+add wave -noupdate -label PPS_N /testbench/pps_n
+
+blk_TSU_GEN $TSU_GEN_PATH
+

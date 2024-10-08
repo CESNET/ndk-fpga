@@ -1,0 +1,31 @@
+# async_reset.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Authors: Jakub Cabal <jakubcabal@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set COMP_BASE        "$FIRMWARE_BASE/comp"
+set ASYNC_RESET_BASE "$FIRMWARE_BASE/comp/base/async/reset/"
+
+set TB_FILE          "$ASYNC_RESET_BASE/sim/testbench.vhd"
+set SIG_FILE         "$ASYNC_RESET_BASE/sim/async_reset_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "ASYNC_RESET" $ASYNC_RESET_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 250ns

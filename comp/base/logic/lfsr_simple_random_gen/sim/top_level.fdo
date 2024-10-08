@@ -1,0 +1,20 @@
+# top_level.fdo: Functional simulation file
+# Copyright (C) 2018 CESNET
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+set FIRMWARE_BASE    "../../../../.."
+set UUT_BASE         ".."
+
+set SIG_FILE         "./signals_sig.fdo"
+set TB_FILE          "./testbench.vhd"
+
+set COMPONENTS [list \
+   [ list "LFSR_SIMPLE_RANDOM_GEN" $UUT_BASE "FULL" ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 5us

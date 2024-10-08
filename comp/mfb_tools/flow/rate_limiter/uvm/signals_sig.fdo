@@ -1,0 +1,28 @@
+# signals_sig.fdo : Include file with signals
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Tomas Hak <xhakto01@vut.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+view wave
+delete wave *
+
+add_wave "-noupdate -color yellow -label CLK"   /testbench/DUT_U/VHDL_DUT_U/CLK
+add_wave "-noupdate -color yellow -label RESET" /testbench/DUT_U/VHDL_DUT_U/RESET
+
+# INTERFACE
+mi
+mfb /testbench/DUT_U/VHDL_DUT_U
+
+# STATE MACHINE
+fsm /testbench/DUT_U/VHDL_DUT_U
+
+# CONFIGURATION REGISTERS
+reg_all    /testbench/DUT_U/VHDL_DUT_U
+reg_status /testbench/DUT_U/VHDL_DUT_U
+reg_length /testbench/DUT_U/VHDL_DUT_U
+reg_speed  /testbench/DUT_U/VHDL_DUT_U
+traffic    /testbench/DUT_U/VHDL_DUT_U
+
+config wave -signalnamewidth 1

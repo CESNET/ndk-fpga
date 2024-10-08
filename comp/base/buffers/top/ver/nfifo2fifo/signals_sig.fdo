@@ -1,0 +1,22 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2008 CESNET
+# Author: Marcela Simkova <xsimko03@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Global file with signals
+
+
+source "./signals.fdo"
+
+# zmena nazvu testovanej komponenty
+add wave -divider "NFIFO2FIFO"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+# zmena nazvu testovanej komponenty
+
+nfifo_write FW  /testbench/DUT_U/VHDL_DUT_U
+fifo_read  FR  /testbench/DUT_U/VHDL_DUT_U

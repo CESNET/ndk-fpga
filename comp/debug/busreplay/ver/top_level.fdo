@@ -1,0 +1,37 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2016 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+set FIRMWARE_BASE         "../../../../.."
+set OFM_PATH              "../../../.."
+set DPI_VERIF_BASE        "$OFM_PATH/comp/mi_tools/ver/sw_access"
+
+set FLU_DUT1_BASE         ".."
+set FLU_DUT2_BASE         "../../busdump"
+set FLU_DUT_VER_BASE      "."
+
+set TB_FILE               "./tbench/testbench.sv"
+set SIG_FILE              "./signals_sig.fdo"
+
+set COMPONENTS [list \
+  [list "DPI_VERIF"    $DPI_VERIF_BASE     "NFB"]\
+  [list "FLU_DUT1"     $FLU_DUT1_BASE      "FULL"]\
+  [list "FLU_DUT2"     $FLU_DUT2_BASE      "FULL"]\
+  [list "FLU_DUT_VER"  $FLU_DUT_VER_BASE   "FULL"]\
+]
+
+# Enable Code Coverage
+set CODE_COVERAGE "false"
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run

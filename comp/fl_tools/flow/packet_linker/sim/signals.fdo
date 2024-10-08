@@ -1,0 +1,51 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2007 CESNET
+# Author: Vlastimil Kosar <xkosar02@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc packet_linker {NAME PATH} {
+    add wave -divider "General signals"
+      add_wave "-noupdate -color yellow -label RESET" $PATH/RESET
+      add_wave "-noupdate -color yellow -label CLK"   $PATH/FL_CLK
+    add wave -divider "FL_SIM"
+      add_wave "-noupdate -hex -label FRAME_LINK_BUS"   $PATH/FL_BUS
+      #add_wave "-noupdate -label CTRL"   $PATH/fl_sim_ctrl
+      #add_wave "-noupdate -label STROBE"   $PATH/fl_sim_strobe
+      #add_wave "-noupdate -label BUSY"   $PATH/fl_sim_busy
+      #add wave -divider "$NAME - IN BUS"
+      #add_wave "-noupdate -hex -label FRAME_LINK_BUS"   /testbench/FL_SIM_U/AUX_FL_BUS2
+     add wave -divider "$NAME"
+      add_wave "-noupdate -hex -label IN_DATA" $PATH/PACKET_LINKER_U/INner_DATA
+      add_wave "-noupdate -hex -label DATA_OUT_MUX" $PATH/PACKET_LINKER_U/data_out_mux
+      add_wave "-noupdate -hex -label IN_REM" $PATH/PACKET_LINKER_U/INner_REM
+      add_wave "-noupdate -label IN_SOF_N" $PATH/PACKET_LINKER_U/INner_SOF_N
+      add_wave "-noupdate -label IN_EOF_N" $PATH/PACKET_LINKER_U/INner_EOF_N
+      add_wave "-noupdate -label IN_SOP_N" $PATH/PACKET_LINKER_U/INner_SOP_N
+      add_wave "-noupdate -label IN_EOP_N" $PATH/PACKET_LINKER_U/INner_EOP_N
+      add_wave "-noupdate -label IN_SRC_RDY_N" $PATH/PACKET_LINKER_U/INner_SRC_RDY_N
+      add_wave "-noupdate -label out_DST_RDY_N" $PATH/PACKET_LINKER_U/out_DST_RDY_N
+      add_wave "-noupdate -hex -label OUT_BUS" $PATH/OUT_BUS
+      add_wave "-noupdate -label CURRENT_STATE" $PATH/PACKET_LINKER_U/current_state
+      add_wave "-noupdate -label statusO -hex" $PATH/PACKET_LINKER_U/status
+      add_wave "-noupdate -label statusT -hex" $PATH/PACKET_LINKER_U/status1
+      add_wave "-noupdate -label NEXT_STATE" $PATH/PACKET_LINKER_U/next_state
+      add_wave "-noupdate -label ALIGN" $PATH/PACKET_LINKER_U/align
+      #add_wave "-noupdate -hex -label OUT_BUS1" $PATH/OUT_BUS1
+      #add_wave "-noupdate -label test" $PATH/PACKET_LINKER_U/test_signal
+      #add_wave "-noupdate -label test1" $PATH/PACKET_LINKER_U/test1
+      #add_wave "-noupdate -label test2" $PATH/PACKET_LINKER_U/test2
+      add_wave "-noupdate -label count -hex" $PATH/PACKET_LINKER_U/count
+      #add_wave "-noupdate -label lrem_sel" $PATH/PACKET_LINKER_U/lrem_sel
+      #add_wave "-noupdate -label lout_rem" $PATH/PACKET_LINKER_U/lout_rem
+      add_wave "-noupdate -label mux_ds_select -hex" $PATH/PACKET_LINKER_U/mux_ds_select
+      add_wave "-noupdate -label mux_link_select -hex" $PATH/PACKET_LINKER_U/mux_link_select
+      add_wave "-noupdate -label reg_rem -hex" $PATH/PACKET_LINKER_U/reg_rem
+}

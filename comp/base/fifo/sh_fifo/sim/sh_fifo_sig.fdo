@@ -1,0 +1,22 @@
+# sh_fifo_sig.fdo : Include file with signals
+# Copyright (C) 2007 CESNET
+# Author: Petr Mikusek <petr.mikusek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set SH_FIFO_PATH "/testbench/uut"
+set TB_PATH      "/testbench"
+
+source "signals.fdo"
+
+add wave -noupdate -label reset $TB_PATH/reset
+add wave -noupdate -label clk $TB_PATH/clk
+
+blk_SH_FIFO "IFC"
+blk_SH_FIFO "INT"
+blk_SH_FIFO "FSM"
+

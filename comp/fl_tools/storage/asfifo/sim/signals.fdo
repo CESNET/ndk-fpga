@@ -1,0 +1,44 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+
+add_wave "-noupdate -hex -label CLK" /testbench/RX_CLK
+add_wave "-noupdate -hex -label RESET"       /testbench/RX_RESET
+add_wave "-noupdate -hex -label CLK" /testbench/TX_CLK
+add_wave "-noupdate -hex -label RESET"       /testbench/TX_RESET
+
+add wave -divider "Write interface"
+add_wave "-noupdate -hex -label RX_DATA"     /testbench/RX_DATA
+add_wave "-noupdate -hex -label RX_REM"      /testbench/RX_REM
+add_wave "-noupdate -hex -label RX_SRC_RDY_N"  /testbench/RX_SRC_RDY_N
+add_wave "-noupdate -hex -label RX_DST_RDY_N"  /testbench/RX_DST_RDY_N
+add_wave "-color magenta -noupdate -hex -label RX_SOF_N"      /testbench/RX_SOF_N
+add_wave "-color magenta -noupdate -hex -label RX_SOP_N"      /testbench/RX_SOP_N
+add_wave "-color magenta -noupdate -hex -label RX_EOP_N"      /testbench/RX_EOP_N
+add_wave "-color magenta -noupdate -hex -label RX_EOF_N"      /testbench/RX_EOF_N
+add_wave "-color magenta -noupdate -hex -label fifo_rx_data"      /testbench/uut/fifo_rx_data
+add_wave "-color magenta -noupdate -hex -label par0_in"      /testbench/uut/par0_in
+add_wave "-color magenta -noupdate -hex -label par1_in"      /testbench/uut/par1_in
+
+add wave -divider "Read interface"
+add_wave "-noupdate -hex -label TX_DATA"     /testbench/TX_DATA
+add_wave "-noupdate -hex -label TX_REM"      /testbench/TX_REM
+add_wave "-noupdate -hex -label TX_SRC_RDY_N"  /testbench/TX_SRC_RDY_N
+add_wave "-noupdate -hex -label TX_DST_RDY_N"  /testbench/TX_DST_RDY_N
+add_wave "-color magenta -noupdate -hex -label TX_SOF_N"      /testbench/TX_SOF_N
+add_wave "-color magenta -noupdate -hex -label TX_SOP_N"      /testbench/TX_SOP_N
+add_wave "-color magenta -noupdate -hex -label TX_EOP_N"      /testbench/TX_EOP_N
+add_wave "-color magenta -noupdate -hex -label TX_EOF_N"      /testbench/TX_EOF_N
+add_wave "-color magenta -noupdate -hex -label fifo_tx_data"      /testbench/uut/fifo_tx_data
+add_wave "-color magenta -noupdate -hex -label par0_out"      /testbench/uut/par0_out
+add_wave "-color magenta -noupdate -hex -label par1_out"      /testbench/uut/par1_out
+
+add wave -divider "Internal signals"
+add_wave "-noupdate -hex -label cnt_parts" /testbench/uut/decompress_i/cnt_parts
+add_wave "-noupdate -hex -label sig_juice_in" /testbench/uut/juice_in
+add_wave "-noupdate -hex -label sig_juice_in" /testbench/uut/juice_out

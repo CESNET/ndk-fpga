@@ -1,0 +1,17 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_CMP48 { } {
+
+    global CMP48_PATH
+    add_wave "-noupdate -hex -label CE_IN" /$CMP48_PATH/CE_IN
+    add_wave "-noupdate -hex -label CE_OUT" /$CMP48_PATH/CE_OUT
+    add_wave "-noupdate -hex -label A" /$CMP48_PATH/A
+    add_wave "-noupdate -hex -label B" /$CMP48_PATH/B
+    add_wave "-noupdate -hex -label P" /$CMP48_PATH/P
+}

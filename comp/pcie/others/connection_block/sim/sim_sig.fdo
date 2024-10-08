@@ -1,0 +1,20 @@
+# sim_sig.fdo : Include file with signals
+# Copyright (C) 2019 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Paths
+set TB_PATH          "/testbench"
+
+# include signals
+source "signals.fdo"
+
+all TOP $TB_PATH
+all CONN $TB_PATH/pcie_connection_block_i
+all MFB2AXICQ $TB_PATH/pcie_connection_block_i/mfb2axicq_i
+all AXI2MI $TB_PATH/axi2mi_i
+all mi_int_i $TB_PATH/axi2mi_i/mi_int_i
+all cc_int_i $TB_PATH/axi2mi_i/cc_int_i
+all AXICC2AVST $TB_PATH/pcie_axicc2avst_i
+

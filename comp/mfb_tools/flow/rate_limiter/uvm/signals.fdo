@@ -1,0 +1,84 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Tomas Hak <xhakto01@vut.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc mi {} {
+    add_wave -group "MI" -noupdate -hex /testbench/mi/*
+}
+
+proc mfb {PATH} {
+    add wave -group "MFB RX" -noupdate -hex /testbench/mfb_rx/*         \
+                                            $PATH/rx_mfb_src_rdy_masked \
+                                            $PATH/mfb_rx_src_rdy_shaped \
+                                            $PATH/rx_mfb_eof_last       \
+                                            $PATH/rx_mfb_eof_rest       \
+                                            $PATH/rx_mfb_eof_rest_reg   \
+                                            $PATH/rx_mfb_eof_masked     \
+                                            $PATH/rx_mfb_sof_last       \
+                                            $PATH/rx_mfb_sof_rest       \
+                                            $PATH/rx_mfb_sof_rest_reg   \
+                                            $PATH/rx_mfb_sof_mask       \
+                                            $PATH/rx_mfb_sof_masked     \
+                                            $PATH/rx_mfb_sof_before_eof \
+                                            $PATH/rx_mfb_sof_mask_auto  \
+                                            $PATH/rx_mfb_sof_pos_deser  \
+                                            $PATH/rx_mfb_eof_pos_deser
+    add wave -group "MFB TX" -noupdate -hex /testbench/mfb_tx/*         \
+                                            $PATH/mfb_tx_dst_rdy_shaped
+}
+
+proc fsm {PATH} {
+    add wave -group "FSM" -noupdate $PATH/p_state         \
+                                    $PATH/n_state         \
+                                    $PATH/write_ctrl_flag \
+                                    $PATH/write_aux_flag  \
+                                    $PATH/start_conf_flag \
+                                    $PATH/start_run_flag  \
+                                    $PATH/stop_conf_flag  \
+                                    $PATH/stop_run_flag   \
+                                    $PATH/reset_ptr_flag  \
+                                    $PATH/limit_byte_flag \
+                                    $PATH/limit_pkts_flag
+}
+
+proc reg_all {PATH} {
+    add wave -group "REGISTER ARRAY" -noupdate $PATH/mi_regs*
+}
+
+proc reg_status {PATH} {
+    add wave -group "STATUS REGISTER" -noupdate $PATH/mi_status_reg*
+}
+
+proc reg_length {PATH} {
+    add wave -group "LENGTH REGISTERS" -noupdate $PATH/mi_sec_len_reg* \
+                                                 $PATH/mi_int_len_reg*
+}
+
+proc reg_speed {PATH} {
+    add wave -group "SPEED REGISTER" -noupdate $PATH/mi_speed_regs*
+}
+
+proc traffic {PATH} {
+    add wave -group "TRAFFIC" -noupdate $PATH/start_shaping     \
+                                        $PATH/next_speed_req    \
+                                        $PATH/next_speed_vld    \
+                                        $PATH/sec_len_cnt       \
+                                        $PATH/int_len_cnt       \
+                                        $PATH/end_of_sec        \
+                                        $PATH/new_section       \
+                                        $PATH/end_of_int        \
+                                        $PATH/active_speed      \
+                                        $PATH/bytes_in_sec      \
+                                        $PATH/bytes_over        \
+                                        $PATH/eofs_in_sec       \
+                                        $PATH/any_eof           \
+                                        $PATH/last_eof          \
+                                        $PATH/packets_over      \
+                                        $PATH/send_last_eof     \
+                                        $PATH/send_last_eof_reg \
+                                        $PATH/send_rest         \
+                                        $PATH/limit_bytes       \
+                                        $PATH/limit_reached
+}

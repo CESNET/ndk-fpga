@@ -1,0 +1,20 @@
+# pipe_sig.fdo : Include file with signals
+# Copyright (C) 2015 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+set TB_PATH      "/testbench"
+set PIPE_PATH   "/testbench/uut"
+
+# include signals
+source      "signals.fdo"
+
+add wave -noupdate -label RESET -color magenta $TB_PATH/reset
+add wave -noupdate -label CLK -color magenta $TB_PATH/clk
+blk_PIPE
+

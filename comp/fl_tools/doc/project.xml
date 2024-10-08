@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<source>
+<!-- Page name -->
+<project>FrameLink tools</project>
+
+<!-- Features -->
+<features>
+   <item>Extensive set of components for various situations</item>
+   <item>Generic components - easily customizable to your project</item>
+   <item>Unified communication protocol <a href="https://www.liberouter.org/wiki/index.php/FrameLink">FrameLink</a></item>
+   <item>All components should work on 100MHz frequency in hardware</item>
+</features>
+
+<!-- Short project description -->
+<description>
+   <p>
+      Overview of FrameLink tools. See <a href="http://www.liberouter.org/vhdl_design/generated/HEAD_FL_TOOLS_hw.php">
+      HW section</a> for list of available tools.
+   </p>
+</description>
+
+<!-- *********************** Body  *********************** -->
+
+<body>
+   <p>
+      All available FrameLink tools - organized in appropriate sections.
+   </p>
+
+   <h2>Data flow related components</h2>
+   <p>
+      <ul>
+         <li><ref_comp ref="fl_binder" tag_id="HEAD">Binder</ref_comp>
+            - binding more data flow into one</li>
+         <li><ref_comp ref="fl_fork" tag_id="HEAD">Fork</ref_comp>
+            - sending one dataflow to several output interfaces</li>
+         <li><ref_comp ref="fl_pipe" tag_id="HEAD">Pipe</ref_comp>
+            - divides FrameLink bus in two combinational paths</li>
+         <li><ref_comp ref="fl_sequencer" tag_id="HEAD">Sequencer</ref_comp>
+            - according to ticket lines up frames from more input into one output</li>
+         <li><ref_comp ref="fl_splitter" tag_id="HEAD">Splitter</ref_comp>
+            - splitting one data flow into several data flows</li>
+         <li><ref_comp ref="fl_switch" tag_id="HEAD">Switch</ref_comp>
+            - switching one incoming data flow to none or more data flows</li>
+         <li><ref_comp ref="fl_transformer" tag_id="HEAD">Transformer</ref_comp>
+            - transforms incoming data flow data width to another</li>
+         <li><ref_comp ref="fl_packet_binder" tag_id="HEAD">Packet Binder</ref_comp>
+            - binds two FrameLink frames into one</li>
+      </ul>
+   </p>
+
+   <h2>Frame edit components</h2>
+   <p>
+      <ul>
+         <li><ref_comp ref="fl_completer" tag_id="HEAD">Completer</ref_comp>
+            - completes inconsequent data words into one large data word.</li>
+         <li><ref_comp ref="fl_cutter" tag_id="HEAD">Cutter</ref_comp>
+            - extracts specified number of bytes from offset in packet, optionally removes them.</li>
+         <li><ref_comp ref="fl_extract" tag_id="HEAD">Extract</ref_comp>
+            - extracts specified number of bytes from offset in packet.</li>
+         <li><ref_comp ref="fl_marker" tag_id="HEAD">Marker</ref_comp>
+            - replaces selected word on bus with another one</li>
+         <li><ref_comp ref="fl_stamper" tag_id="HEAD">Stamper</ref_comp>
+            - inserts one data bus wide stamp at the beginning of frame</li>
+         <li><ref_comp ref="fl_trimmer" tag_id="HEAD">Trimmer</ref_comp>
+            - removes specified FrameLink part(s)</li>
+         <li><ref_comp ref="fl_shortener" tag_id="HEAD">Shortener</ref_comp>
+            - cuts certain bytes from given part of frame received from input FrameLink interface</li>
+         <li><ref_comp ref="fl_first_insert" tag_id="HEAD">First insert</ref_comp>
+            - inserts one word of data at start of first part of each packet</li>
+      </ul>
+   </p>
+
+   <h2>Data storage components</h2>
+   <p>
+      <ul>
+         <li><ref_comp ref="fl_fifo" tag_id="HEAD">FIFO</ref_comp>
+            - ordinary FIFO connectable to FrameLink</li>
+         <li><ref_comp ref="fl_pfifo" tag_id="HEAD">PFIFO</ref_comp>
+            - FIFO with discarding connectable to FrameLink</li>
+         <li><ref_comp ref="fl_prfifo" tag_id="HEAD">PRFIFO</ref_comp>
+            - FIFO with packet releasing ability connectable to FrameLink</li>
+         <li><ref_comp ref="fl_asfifo" tag_id="HEAD">ASFIFO</ref_comp>
+            - Asynchronous FIFO connectable to FrameLink</li>
+      </ul>
+   </p>
+
+   <h2>Debug componets</h2>
+   <p>
+      <ul>
+         <li><ref_comp ref="fl_rxbuffer" tag_id="HEAD">RX Buffer</ref_comp>
+            - receives FrameLink protocol and sends it via MI32 bus.</li>
+         <li><ref_comp ref="fl_sim" tag_id="HEAD">Simulation component</ref_comp>
+            - creates FrameLink dataflow from data stored in a file. </li>
+         <li><ref_comp ref="fl_bfm" tag_id="HEAD">Bus functional model</ref_comp>
+            - creates FrameLink dataflow from data stored in a file. (simulation only)</li>
+         <li><ref_comp ref="fl_monitor" tag_id="HEAD">Monitor</ref_comp>
+            - logs FrameLink dataflow in a file. (simulation only) </li>
+         <li><ref_comp ref="fl_watch" tag_id="HEAD">Watch</ref_comp>
+            - counts number of passed frames and guards the integrity of
+            FrameLink protocol</li>
+         <li><ref_comp ref="fl_icmp_det" tag_id="HEAD">ICMP detacher</ref_comp>
+            - discards every non ICMPv4 packets</li>
+         <li><ref_comp ref="fl_stat" tag_id="HEAD">FL statistics unit</ref_comp>
+            - makes statistics of readiness of devices on FL</li>
+      </ul>
+   </p>
+
+   <h2>Other components</h2>
+   <p>
+      <ul>
+         <li><ref_comp ref="fl_agregator" tag_id="HEAD">Agregator</ref_comp>
+            - agregated incoming frames into one large frame, which length is controlled
+            by time-out and maximal size</li>
+         <li><ref_comp ref="fl_decoder" tag_id="HEAD">Decoder</ref_comp>
+            - transforms FrameLink negatove logic into positive one and adds few useful signal.</li>
+         <li><ref_comp ref="fl_fl2cmd" tag_id="HEAD">FL2CMD</ref_comp>
+            - FrameLink to Command Protocol component</li>
+      </ul>
+   </p>
+</body>
+
+</source>

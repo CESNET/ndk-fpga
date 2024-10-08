@@ -1,0 +1,23 @@
+# squarer.fdo : Include file with signals
+# Copyright (C) 2009 CESNET
+# Author: Ondrej Lengal <lengal@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Paths
+
+source $SIGNALS_FILE
+
+set TB_PATH                   "/testbench"
+set SQUARER_PATH              "$TB_PATH/uut"
+
+add_wave "-noupdate -label clk    -color yellow    " $TB_PATH/clk
+
+add wave -divider "*****************************"
+add wave -divider "          Squarer            "
+add wave -divider "*****************************"
+blk_squarer_ifc "$SQUARER_PATH"
+

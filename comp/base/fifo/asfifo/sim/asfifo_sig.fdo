@@ -1,0 +1,17 @@
+# asfifo_sig.fdo : Include file with signals
+# Copyright (C) 2003 CESNET
+# Authors: Jakub Olbert <xolber00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+#
+
+
+source "./signals.fdo"
+
+# procedures
+blk_ASFIFO /uut ASFIFO
+blk_ASFIFO_MISC /uut ASFIFO
+

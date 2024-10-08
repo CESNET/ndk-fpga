@@ -1,0 +1,41 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc blk_FL_DEC { PARAM } {
+   global FL_DEC_BASE
+
+   # FL_DEC interface
+   if { $PARAM == "IFC" } {
+      add wave -divider "FL_DEC"
+      add_wave "-label clk" $FL_DEC_BASE/clk
+      add_wave "-label reset" $FL_DEC_BASE/reset
+
+      add wave -divider "FrameLink interface"
+      add_wave "-label sof_n" $FL_DEC_BASE/sof_n
+      add_wave "-label sop_n" $FL_DEC_BASE/sop_n
+      add_wave "-label eop_n" $FL_DEC_BASE/eop_n
+      add_wave "-label eof_n" $FL_DEC_BASE/eof_n
+      add_wave "-label src_rdy_n" $FL_DEC_BASE/src_rdy_n
+      add_wave "-label dst_rdy_n" $FL_DEC_BASE/dst_rdy_n
+
+      add wave -divider "Decoder interface"
+      add_wave "-label sof" $FL_DEC_BASE/sof
+      add_wave "-label sohdr" $FL_DEC_BASE/sohdr
+      add_wave "-label eohdr" $FL_DEC_BASE/eohdr
+      add_wave "-label hdr_frame" $FL_DEC_BASE/hdr_frame
+      add_wave "-label sopld" $FL_DEC_BASE/sopld
+      add_wave "-label eopld" $FL_DEC_BASE/eopld
+      add_wave "-label pld_frame" $FL_DEC_BASE/pld_frame
+      add_wave "-label softr" $FL_DEC_BASE/softr
+      add_wave "-label eoftr" $FL_DEC_BASE/eoftr
+      add_wave "-label ftr_frame" $FL_DEC_BASE/ftr_frame
+      add_wave "-label eof" $FL_DEC_BASE/eof
+      add_wave "-label src_rdy" $FL_DEC_BASE/src_rdy
+      add_wave "-label dst_rdy" $FL_DEC_BASE/dst_rdy
+   }
+}

@@ -1,0 +1,7 @@
+digraph ALIGN_FRAME_FSM {
+	rankdir=LR;
+	size="8,5"
+	node [shape = circle, width = 1.8];
+	BUSY        -> ALIGN_EOP   [ label = "EOP = '1' and CNT_ROW_MAX = '0' and FIFO_FULL = '0' and DV = '1'" ];
+	ALIGN_EOP   -> BUSY [ label = "CNT_ROW_MAX = '1' and FIFO_FULL = '0'" ];
+}

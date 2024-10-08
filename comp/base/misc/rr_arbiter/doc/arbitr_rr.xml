@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>Arbitr_rr - Round Robin arbitration</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="beck">Patrik Beck</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+	<item>Generic number of devices</item>
+	<item>Arbitration result in the same cycle</item>
+</features>
+
+
+<!-- Bugs
+<bugs>
+</bugs>
+-->
+
+<!-- Things to do
+<todo>
+</todo>
+-->
+
+<!-- Short Block description -->
+<description>
+
+	<!-- THE MOST IMPORTANT PART!!! There should be about 8 rows which
+	     fully describe the component and its main functions -->
+
+   Generic arbitration controler uses round-robin algorithm. The arbitr_rr
+   is designed for low number of devices (2-5). The arbitration result(ACK
+   signal) is ready in the same cycle as the request arrived. Component is
+   used for example in CB_SWITCH.
+
+   In ACK signal vector only one bit is '1' at the same time. When
+   acknowledged device should be changed, the ENABLE signal have to be set to
+   '1'. In other case the ACK signal vector stay the same.
+
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+
+		<generic name="PORTS" type="integer" default="2">
+			Number of arbitrating devices.
+		</generic>
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Common signals</divider>
+		<port  name="CLK" dir="in" width="1">
+			Global FPGA clock
+		</port>
+		<port  name="RESET" dir="in" width="1">
+			Global reset
+		</port>
+
+		<divider>Input/output interface</divider>
+		<port name="ENABLE" dir="in" width="1">
+		   If '1' the acknowledged unit changes.
+		</port>
+		<port name="RQ" dir="in" width="PORTS">
+			Request vector, if set the device is requesting for
+         acknowledgement.
+		</port>
+
+		<port name="ACK" dir="out" width="PORTS">
+			Acknowledgement vector, if set the device is selected.
+		</port>
+
+	</port_map>
+
+</interface>
+
+
+<!-- CONSTANTS SECTION *************************************************** -->
+<!-- use if the component has a SW interface, otherwise delete this section -->
+
+<constant>
+
+</constant>
+
+
+<!-- OPERATIONS SECTION ************************************************* -->
+<!-- use if the component has a SW interface, otherwise delete this section -->
+
+<operations>
+
+</operations>
+
+
+<!-- ADDRESS SPACE SECTION ********************************************** -->
+<!-- use if the component has a SW interface, otherwise delete this sections -->
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+Maximal frequency is highly dependent on surrounding.
+
+</body>
+
+</source>

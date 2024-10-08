@@ -1,0 +1,69 @@
+# sim.fdo: Signals in simulation for elastic_fifo.vhd
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Oliver Gurka <xgurka00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+add wave -noupdate -label WR_CLK -radix BINARY /testbench/wr_clk
+add wave -noupdate -label WR_CE -radix BINARY /testbench/wr_ce
+add wave -noupdate -label RESET -radix BINARY /testbench/rst
+
+add wave -divider INPUT
+add wave -noupdate -label DATA_STRING -radix HEXADECIMAL /testbench/elastic_fifo_e/wr_data_string
+add wave -noupdate -label DATA_IN -radix HEXADECIMAL /testbench/data_in
+add wave -noupdate -label AUX_IN -radix HEXADECIMAL /testbench/aux_in
+add wave -noupdate -label MASK_IN -radix HEXADECIMAL /testbench/mask_in
+
+add wave -divider FIFO
+add wave -noupdate -label FIFO_DIN -radix HEXADECIMAL /testbench/elastic_fifo_e/fifo_wr_data
+add wave -noupdate -label FIFO_WR_EN -radix BINARY /testbench/elastic_fifo_e/fifo_wr_en
+add wave -noupdate -label FIFO_RD_EN -radix BINARY /testbench/elastic_fifo_e/fifo_rd_en
+add wave -noupdate -label FIFO_WR_STATUS -radix UNSIGNED /testbench/elastic_fifo_e/fifo_wr_status
+add wave -noupdate -label FIFO_RD_STATUS -radix UNSIGNED /testbench/elastic_fifo_e/fifo_rd_status
+add wave -noupdate -label FIFO_AFULL -radix BINARY /testbench/elastic_fifo_e/fifo_wr_afull
+add wave -noupdate -label FIFO_AEMPTY -radix BINARY /testbench/elastic_fifo_e/fifo_rd_aempty
+
+add wave -divider MASK_IN\ PROCESSING
+add wave -noupdate -label MASK_IN_STRING -radix BINARY /testbench/elastic_fifo_e/wr_mask_string
+add wave -noupdate -label RELEVANT_MASK_IN -radix BINARY /testbench/elastic_fifo_e/wr_mux_mask_out
+add wave -noupdate -label SEQ_MASK_IN -radix BINARY /testbench/elastic_fifo_e/wr_mask_idle_seq
+add wave -noupdate -label FIRST_SEQ -radix BINARY /testbench/elastic_fifo_e/wr_mask_first_seq
+
+add wave -divider DATA_MUX
+add wave -noupdate -label MUX_BASE_OFFSET -radix BINARY /testbench/elastic_fifo_e/wr_sh_cnt
+add wave -noupdate -label MUX_OFFSETTED -radix BINARY /testbench/elastic_fifo_e/wr_data_mux_offset_set
+add wave -noupdate -label MUX_OFFSETS -radix BINARY /testbench/elastic_fifo_e/mux_sel_i
+
+add wave -divider IN_DATA_MUX\ DOUT
+add wave -noupdate -label DATA_MUX_OUT -radix HEXADECIMAL /testbench/elastic_fifo_e/mux_dout_i
+add wave -noupdate -label AUX_MUX_OUT -radix HEXADECIMAL /testbench/elastic_fifo_e/mux_auxo_i
+add wave -noupdate -label AUX_MUX_OUT -radix HEXADECIMAL /testbench/elastic_fifo_e/mux_mask_i
+
+add wave -divider READ_INPUTS
+add wave -noupdate -label RD_CLK -radix BINARY /testbench/rd_clk
+add wave -noupdate -label RD_CE -radix BINARY /testbench/rd_ce
+add wave -noupdate -label RESET -radix BINARY /testbench/rst
+
+add wave -divider RD_DATA_STRINGS
+add wave -noupdate -label RD_DOUT_STRING -radix HEXADECIMAL /testbench/elastic_fifo_e/rd_dout_string
+add wave -noupdate -label RD_AUXO_STRING -radix HEXADECIMAL /testbench/elastic_fifo_e/rd_auxo_string
+add wave -noupdate -label RD_MASK_STRING -radix BINARY /testbench/elastic_fifo_e/rd_mask_string
+add wave -noupdate -label IDLE_BLOCK -radix BINARY /testbench/elastic_fifo_e/idle_block
+
+add wave -divider RD_RELEVANT_DATA
+add wave -noupdate -label RD_MUX_SEL -radix BINARY /testbench/elastic_fifo_e/rd_insert_cnt
+add wave -noupdate -label RD_MUX_SEL_CLR -radix BINARY /testbench/elastic_fifo_e/rd_insert_cnt_clr
+add wave -noupdate -label RD_MUX_DOUT -radix HEXADECIMAL /testbench/elastic_fifo_e/rd_data_mux_out_i
+add wave -noupdate -label RD_MUX_AUXO -radix HEXADECIMAL /testbench/elastic_fifo_e/rd_auxo_mux_out_i
+add wave -noupdate -label RD_MUX_MASK -radix BINARY /testbench/elastic_fifo_e/rd_mask_mux_out_i
+
+add wave -divider SHIFT_DEMUXes
+add wave -noupdate -label SHIFT_SEL -radix BINARY /testbench/elastic_fifo_e/rd_blocks_to_shift
+add wave -noupdate -label SHIFT_DMUX_DOUT -radix HEXADECIMAL /testbench/elastic_fifo_e/rd_shift_data_demux_out_i
+add wave -noupdate -label SHIFT_DMUX_AUXO -radix HEXADECIMAL /testbench/elastic_fifo_e/rd_shift_auxo_demux_out_i
+add wave -noupdate -label SHIFT_DATA_ORred -radix HEXADECIMAL /testbench/elastic_fifo_e/rd_mux_idle_din
+add wave -noupdate -label SHIFT_AUXO_ORred -radix HEXADECIMAL /testbench/elastic_fifo_e/rd_mux_idle_auxin
+
+add wave -divider OUTPUT
+add wave -noupdate -label DOUT -radix HEXADECIMAL /testbench/elastic_fifo_e/DOUT
+add wave -noupdate -label AUX_OUT -radix HEXADECIMAL /testbench/elastic_fifo_e/AUX_OUT

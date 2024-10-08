@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<source>
+
+<!-- MAIN INFO ********************************************************** -->
+
+
+<!-- Component name -->
+<component>Shift register</component>
+
+
+<!-- Authors -->
+<authors>
+       <author login="xisara00">Radek Isa</author>
+</authors>
+
+
+<!-- Features -->
+<features>
+	<item>Generic shift register buss</item>
+</features>
+
+
+<!-- Bugs -->
+<bugs>
+	<item>Not known bugs</item>
+</bugs>
+
+
+<!-- Things to do -->
+<todo>
+
+</todo>
+
+
+<!-- Short Block description -->
+<description>
+
+	<!-- THE MOST IMPORTANT PART!!! There should be about 8 rows which
+	     fully describe the component and its main functions -->
+
+        sh_reg_base is a generic component for generate shift register.
+
+
+</description>
+
+
+<!-- COMPONENT INTERFACE ************************************************ -->
+<interface>
+
+	<!-- Generic description -->
+	<generic_map>
+                <generic name="DATA_WIDTH" type="integer" default="1">
+                        size of buss.
+                </generic>
+
+		<generic name="NUM_BITS" type="integer" default="16">
+			Number of bits in each register
+		</generic>
+		<generic name="INIT_TYPE" type="integer" default="0">
+			type of inicialization (0 => all data set to zero), (1 => init vector inicialize each collumn same)
+                                               (2 => init vector inicialize each row), (3 => init vector inicialize each value)
+		</generic>
+		<generic name="INIT" type="std_logic_vector" default="0">
+			extended init value
+		</generic>
+                <generic name="IS_CLK_INVERTED" type="bit" default="0">
+                        chane sensitivity from rising edge to folling edge
+                </generic>
+                <generic name="OPT" type="string" default="VIVADO">
+                        VIVADO - if NUM_BIT is small vivado can change shift register to flip flop register that optimalization can take more resources
+                        SRL    - Allways is used shift register.
+                </generic>
+	</generic_map>
+
+	<!-- Port description -->
+	<port_map>
+
+		<divider>Common signals</divider>
+		<port  name="CLK" dir="in" width="1">
+			Clock
+		</port>
+		<port name="CE" dir="in" width="1">
+			Clock enable
+		</port>
+
+
+		<divider>Input/output interface</divider>
+                <port name="ADDR" dir="in" widht="log2(NUM_BITS)">
+		      addres for choose witch data are put on output.
+                      if is used SH_REG_BASE_STATIC is allways used last value (NUM_BITS-1).
+		<port name="DIN" dir="in" width="DATA_WIDTH">
+			Data in
+		</port>
+		<port name="DOUT" dir="out" width="DATA_WIDTH">
+			Data out
+		</port>
+
+	</port_map>
+
+</interface>
+
+
+
+<!-- HW BODY SECTION **************************************************** -->
+<!-- information for HW designers, structure should be as follow          -->
+<body>
+
+
+
+</body>
+
+
+
+</source>

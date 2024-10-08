@@ -1,0 +1,68 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2003 CESNET
+# Author: Petr Kobiersky <xkobie00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc rx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -color blue -hex -label RX_DATA"    $PATH/RX_DATA
+     add_wave "-noupdate  -hex -label RX_REM"     $PATH/RX_REM
+     add_wave "-noupdate  -label RX_SOF_N"        $PATH/RX_SOF_N
+     add_wave "-noupdate  -label RX_EOF_N"        $PATH/RX_EOF_N
+     add_wave "-noupdate  -label RX_SOP_N"        $PATH/RX_SOP_N
+     add_wave "-noupdate  -label RX_EOP_N"        $PATH/RX_EOP_N
+     add_wave "-noupdate  -color orange -label RX_SRC_RDY_N"    $PATH/RX_SRC_RDY_N
+     add_wave "-noupdate  -color orange -label RX_DST_RDY_N"    $PATH/RX_DST_RDY_N
+}
+
+proc tx {NAME PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -color blue -hex -label TX_DATA"    $PATH/TX_DATA
+     add_wave "-noupdate  -hex -label TX_REM"     $PATH/TX_REM
+     add_wave "-noupdate  -label TX_SOF_N"        $PATH/TX_SOF_N
+     add_wave "-noupdate  -label TX_EOF_N"        $PATH/TX_EOF_N
+     add_wave "-noupdate  -label TX_SOP_N"        $PATH/TX_SOP_N
+     add_wave "-noupdate  -label TX_EOP_N"        $PATH/TX_EOP_N
+     add_wave "-noupdate  -color orange -label TX_SRC_RDY_N"    $PATH/TX_SRC_RDY_N
+     add_wave "-noupdate  -color orange -label TX_DST_RDY_N"    $PATH/TX_DST_RDY_N
+}
+
+proc internal {NAME PATH} {
+    add wave -divider "TX single"
+     add_wave "-noupdate  -color blue -hex -label TX_DATA"    $PATH/TX_DATA
+     add_wave "-noupdate  -hex -label TX_REM"     $PATH/TX_REM
+     add_wave "-noupdate  -label TX_SOF_N"        $PATH/TX_SOF_N
+     add_wave "-noupdate  -label TX_EOF_N"        $PATH/TX_EOF_N
+     add_wave "-noupdate  -label TX_SOP_N"        $PATH/TX_SOP_N
+     add_wave "-noupdate  -label TX_EOP_N"        $PATH/TX_EOP_N
+     add_wave "-noupdate  -color orange -label TX_SRC_RDY_N"    $PATH/TX_SRC_RDY_N
+     add_wave "-noupdate  -color orange -label TX_DST_RDY_N"    $PATH/TX_DST_RDY_N
+
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -label TX_INTERFACE -hex"    $PATH/TX_INTERFACE
+     add_wave "-noupdate  -hex -label reg_inum"    $PATH/reg_inum
+     add_wave "-noupdate  -hex -label reg_inum_set"    $PATH/reg_inum_set
+     add_wave "-noupdate  -hex -label reg_inum_ce"    $PATH/reg_inum_ce
+     add_wave "-noupdate  -color white -hex -label cnt_scan"    $PATH/cnt_scan
+     add_wave "-noupdate  -hex -label cnt_scan_ce"    $PATH/cnt_scan_ce
+     add_wave "-noupdate  -hex -label cnt_scan_clr"    $PATH/cnt_scan_clr
+     add_wave "-noupdate  -color white -hex -label cnt_total"    $PATH/cnt_total
+     add_wave "-noupdate  -hex -label cnt_total_inc"    $PATH/cnt_total_inc
+     add_wave "-noupdate  -hex -label cnt_total_dec"    $PATH/cnt_total_dec
+     add_wave "-noupdate  -hex -label fifo_rx_src_rdy_n"    $PATH/fifo_rx_src_rdy_n
+     add_wave "-noupdate  -hex -label fifo_rx_dst_rdy_n"    $PATH/fifo_rx_dst_rdy_n
+     add_wave "-noupdate  -hex -label fifo_tx_src_rdy_n"    $PATH/fifo_tx_src_rdy_n
+     add_wave "-noupdate  -hex -label fifo_tx_dst_rdy_n"    $PATH/fifo_tx_dst_rdy_n
+     add_wave "-noupdate  -color yellow -hex -label fifo_write_en"    $PATH/fifo_write_en
+     add_wave "-noupdate  -hex -label is_writing"    $PATH/is_writing
+     add_wave "-noupdate  -hex -label is_reading"    $PATH/is_reading
+}
+

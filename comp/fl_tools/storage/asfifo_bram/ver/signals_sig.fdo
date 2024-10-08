@@ -1,0 +1,27 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2003 CESNET
+# Author: Petr Kobiersky <xkobie00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Global file with signals
+
+
+source "./signals.fdo"
+
+# zmena nazvu testovanej komponenty
+add wave -divider "AS FIFO"
+
+add wave -divider "RX"
+add_wave "-noupdate -color yellow -label RX_RESET"   /testbench/RX_RESET
+add_wave "-noupdate -color yellow -label RX_CLK"     /testbench/RX_CLK
+rx  RX  /testbench/DUT_U/VHDL_DUT_U
+
+add wave -divider "TX"
+add_wave "-noupdate -color yellow -label TX_RESET"   /testbench/TX_RESET
+add_wave "-noupdate -color yellow -label TX_CLK"     /testbench/TX_CLK
+tx  TX  /testbench/DUT_U/VHDL_DUT_U
+

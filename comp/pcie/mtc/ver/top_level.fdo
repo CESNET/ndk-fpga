@@ -1,0 +1,26 @@
+# axi2mi.fdo: Functional simulation file
+# Copyright (C) 2018 CESNET
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+set MAKEFILE_GEN "true"
+
+set FIRMWARE_BASE    "../../../.."
+
+set SIG_FILE "./signals_sig.fdo"
+set TB_FILE  "./tbench/testbench.sv"
+
+set COMPONENTS [list \
+	[ list "VER" "." "SZE"] \
+]
+
+set SIM_FLAGS(EXTRA_VFLAGS) "-permit_unmatched_virtual_intf"
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+puts "Numeric Std Warnings - Disabled"
+set NumericStdNoWarnings 1
+set StdArithNoWarnings 1
+
+nb_sim_run

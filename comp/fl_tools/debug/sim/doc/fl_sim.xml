@@ -1,0 +1,231 @@
+<source>
+
+    <component>
+        FrameLink Simulation component
+    </component>
+
+    <authors>
+        <author login="xkosar02">
+            Vlastimil Kosar
+        </author>
+    </authors>
+
+    <features>
+        <item>
+            Supports FrameLink data bus width of 16, 32, 64 and 128 bits.
+        </item>
+        <item>
+            Creates FrameLink dataflow from a file.
+        </item>
+        <item>
+           Logging data from FrameLink bus on both input and output interfaces.
+        </item>
+	<item>
+	   This component is obsolete, use <ref_comp ref="fl_bfm" tag_id="HEAD">FrameLink BFM</ref_comp> and <ref_comp ref="fl_monitor" tag_id="HEAD">FrameLink Monitor</ref_comp> instead.
+	</item>
+    </features>
+
+
+    <description>
+        This FrameLink simulation component creates FrameLink dataflow
+        from hexa values in formated file. This component supports FrameLink
+	dataflow logging to a formated file. Data can be logged on both input and output FrameLink interfaces. Component suports FrameLink data bus width of 16, 32, 64 and 128 bits.
+    </description>
+
+    <interface>
+
+        <generic_map>
+            <generic name="DATA_WIDTH" type="integer" default="">
+		    RX/TX interface data bus width (16, 32, 64 and 128 bits supported).
+            </generic>
+	    <generic name="RX_LOG_FILE" type="string" default="">
+		    Name of file for logging on RX input port. Empty string is default and means no logging will be performed.
+            </generic>
+	    <generic name="TX_LOG_FILE" type="string" default="">
+		    Name of file for logging on TX output port. Empty string is default and means no logging will be performed.
+            </generic>
+        </generic_map>
+
+        <port_map>
+            <port name="FL_RESET" dir="in" width="1">
+                Global reset.
+            </port>
+            <port name="FL_CLK" dir="in" width="1">
+                Clock input.
+            </port>
+
+	    <divider>
+	  	    RX FrameLink interface
+	    </divider>
+	    <port name="RX_DATA" dir="out" width="DATA_WIDTH">
+		    RX data bus.
+	    </port>
+	    <port name="RX_REM" dir="out" width="log2(DATA_WIDTH/8)">
+		    RX data remainder.
+	    </port>
+	    <port name="RX_SOF_N" dir="out" width="1">
+		    RX start of frame.
+	    </port>
+	    <port name="RX_EOF_N" dir="out" width="1">
+		    RX end of frame.
+	    </port>
+	    <port name="RX_SOP_N" dir="out" width="1">
+		    RX start of packet (segment).
+	    </port>
+	    <port name="RX_EOP_N" dir="out" width="1">
+		    RX end of packet (segment).
+	    </port>
+	    <port name="RX_SRC_RDY_N" dir="out" width="1">
+		    RX source ready.
+	    </port>
+	    <port name="RX_DST_RDY_N" dir="in" width="1">
+		    RX destination ready.
+            </port>
+
+            <divider>
+                TX FrameLink interface
+            </divider>
+            <port name="TX_DATA" dir="out" width="DATA_WIDTH">
+                TX data bus.
+            </port>
+            <port name="TX_REM" dir="out" width="log2(DATA_WIDTH/8)">
+                TX data remainder.
+            </port>
+            <port name="TX_SOF_N" dir="out" width="1">
+                TX start of frame.
+            </port>
+            <port name="TX_EOF_N" dir="out" width="1">
+                TX end of frame.
+            </port>
+            <port name="TX_SOP_N" dir="out" width="1">
+                TX start of packet (segment).
+            </port>
+            <port name="TX_EOP_N" dir="out" width="1">
+                TX end of packet (segment).
+            </port>
+            <port name="TX_SRC_RDY_N" dir="out" width="1">
+                TX source ready.
+            </port>
+            <port name="TX_DST_RDY_N" dir="in" width="1">
+                TX destination ready.
+            </port>
+
+            <divider>
+                FL_SIM interface
+            </divider>
+            <port name="CTRL" dir="in" width="t_fl_ctrl">
+		    Send filename to component and indicate send/log.
+            </port>
+            <port name="STROBE" dir="in" width="1">
+                Filename is on CTRL port
+            </port>
+            <port name="BUSY" dir="out" width="1">
+                FL_SIM is busy. FrameLink dataflow generation/logging is in progres.
+            </port>
+        </port_map>
+
+    </interface>
+
+    <body>
+
+        <h1>Data alignment</h1>
+        <p>
+            Little-endian byte order is used in this component.
+        </p>
+
+        <h1>FrameLink Simulation Component</h1>
+        <p>
+          The size of internal FL FIFO is 32768 items.
+        </p>
+        <p>
+         When you want to use FL_SIM component fl_sim_oper package must be included:
+         </p>
+         <p>
+         <i>use work.fl_sim_oper.all; -- FrameLink Simulation Package</i>
+        </p>
+
+       <h2>FL_OP procedure for testbench</h2>
+       <p>
+        This procedure must be placed to your testbench file. Using this procedure is
+        necessery for corect function of FL_SIM.
+
+       <pre>
+        procedure fl_op(ctrl : in t_fl_ctrl) is
+        begin
+          wait until (FL_CLK'event and FL_CLK='1' and fl_sim_busy = '0');
+          fl_sim_ctrl &lt;= ctrl;
+          fl_sim_strobe &lt;= '1';
+          wait until (FL_CLK'event and FL_CLK='1');
+          fl_sim_strobe &lt;= '0';
+        end fl_op;
+       </pre>
+      </p>
+      <p>
+        For corect function of the fl_op procedure is neccesary to place this signals defintions to your testbench file.
+        <pre>
+        signal fl_sim_ctrl        : t_fl_ctrl;
+        signal fl_sim_strobe      : std_logic;
+        signal fl_sim_busy        : std_logic;
+        </pre>
+        And this signals have to be connected to FL_SIM ports CTRL, STROBE and BUSY.
+      </p>
+      <p>
+        <i>
+         <b>Note: </b>If you want to use more FL_SIMs in your tesbench you have to place fl_op procedure and signal definitons for each FL_SIM. Remember that procedures' and signals' names must be different. (eg. for second FL_SIM the procedures name can be fl_op1)
+        </i>
+      </p>
+     <h2>FL_SEND32 procedure</h2>
+      <p>
+       Result of this function can be used as a parametr for
+       fl_op procedure. This function is used for sending data
+       to FL_BUS.<br/>
+       Ex. <i>fl_op(fl_send32("./tests/fl_sim2.txt"));</i>
+       <br/>
+       This code will start simulation. (Sending data from file to output FrameLink interface). The file contains neccesary amount of data for crating both data signal and control signals. The file format is described below.
+      </p>
+      <p>
+       <b><i> Convert file name to t_fl_ctrl and idicate that
+         data will be send</i></b>
+       <pre>
+        function fl_send32(file_name:string) return t_fl_ctrl;
+       </pre>
+      </p>
+      <h2>Logging</h2>
+      <p>
+        This component can also logging data on both interfaces. The logged data are stored in the same file format as data for simulation, so they can be used for simulation. If you want to log data on input interface you have to set generic parameter RX_LOG_FILE to the name of file to which you want to save logged data.If you want to log data on output interface you have to set generic parameter TX_LOG_FILE to the name of file to which you want to save logged data. This generic parameters can be ommited, which means that no logging will be performed. The empty string means that no logging will be performed.
+      </p>
+
+      <h2> Scheme </h2>
+      <p>
+        Block scheme of <obr src="./fig/fl_sim.fig">FL_SIM.</obr> <br/>
+        This component uses <ref_comp ref="fl_fifo" tag_id="HEAD">FrameLink FIFO</ref_comp> and <ref_comp ref="fl_transformer" tag_id="HEAD">FrameLink Transformer</ref_comp>.
+      </p>
+     <h1>File format</h1>
+       <p>
+       <ul>
+       <li> Hexadecimal values are stored in 32-bit format. </li>
+       <li> Multi-line packets are supported.</li>
+       <li> End of part of packet marker is '$' on start of line. </li>
+       <li> End of packet marker is '#' on start of line. </li>
+       <li> Maximum length of line is 2048 characters. </li>
+       <li> When Multi-line packet is used, only last line can have number of haxa digits in multiples of 2. Other lines can have number of hexa digit in multiples of 8.</li>
+       <li> Corect number notation of hexa number A is 0A, ABC is 0ABC, etc.</li>
+       </ul>
+       </p>
+       <p>
+         Example:
+        </p>
+        <p>
+        <pre>
+           1122AABB
+           00CC
+           $
+           125487
+           $
+           10
+           #
+        </pre>
+        Description of the example: It is one packet which consists from 3 parts. The last # cann't be ommited.
+        </p>
+    </body>
+</source>

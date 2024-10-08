@@ -1,0 +1,25 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2008 CESNET
+# Author: Marek Santa <xsanta06@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+# -------------------------------------------------------------------
+#                       Signals of interfaces
+# -------------------------------------------------------------------
+proc mi32 {NAME DIR PATH} {
+    add wave -divider "$NAME"
+     add_wave "-noupdate  -label MI_${DIR}_CLK"          $PATH/CLK_$DIR
+     add_wave "-noupdate  -hex -label MI_${DIR}_DWR"     $PATH/MI_${DIR}_DWR
+     add_wave "-noupdate  -hex -label MI_${DIR}_ADDR"    $PATH/MI_${DIR}_ADDR
+     add_wave "-noupdate  -label MI_${DIR}_RD"           $PATH/MI_${DIR}_RD
+     add_wave "-noupdate  -label MI_${DIR}_WR"           $PATH/MI_${DIR}_WR
+     add_wave "-noupdate  -hex -label MI_${DIR}_BE"      $PATH/MI_${DIR}_BE
+     add_wave "-noupdate  -hex -label MI_${DIR}_DRD"     $PATH/MI_${DIR}_DRD
+     add_wave "-noupdate  -label MI_${DIR}_ARDY"         $PATH/MI_${DIR}_ARDY
+     add_wave "-noupdate  -label MI_${DIR}_DRDY"         $PATH/MI_${DIR}_DRDY
+}

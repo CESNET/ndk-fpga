@@ -1,0 +1,52 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2006 CESNET
+# Author: Martin Louda <sandin@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+add_wave "-noupdate -label CLK" /testbench/CLK
+add_wave "-noupdate -label RESET" /testbench/RESET
+
+add wave -divider "FrameLink 1 RX interface"
+add_wave "-noupdate -hex -label RX_DATA" /testbench/rx_data1
+add_wave "-noupdate -hex -label RX_REM" /testbench/rx_rem1
+add_wave "-noupdate -label RX_SOF_N" /testbench/rx_sof_n1
+add_wave "-noupdate -label RX_EOF_N" /testbench/rx_eof_n1
+add_wave "-noupdate -label RX_SOP_N" /testbench/rx_sop_n1
+add_wave "-noupdate -label RX_EOP_N" /testbench/rx_eop_n1
+add_wave "-noupdate -label RX_SRC_RDY_N" /testbench/rx_src_rdy_n1
+add_wave "-noupdate -label RX_DST_RDY_N" /testbench/rx_dst_rdy_n1
+
+add wave -divider "FrameLink 1 TX interface"
+add_wave "-noupdate -hex -label TX_DATA" /testbench/tx_data1
+add_wave "-noupdate -hex -label TX_REM" /testbench/tx_rem1
+add_wave "-noupdate -label TX_SOF_N" /testbench/tx_sof_n1
+add_wave "-noupdate -label TX_EOF_N" /testbench/tx_eof_n1
+add_wave "-noupdate -label TX_SOP_N" /testbench/tx_sop_n1
+add_wave "-noupdate -label TX_EOP_N" /testbench/tx_eop_n1
+add_wave "-noupdate -label TX_SRC_RDY_N" /testbench/tx_src_rdy_n1
+add_wave "-noupdate -label TX_DST_RDY_N" /testbench/tx_dst_rdy_n1
+
+add wave -divider "FrameLink 2 RX interface"
+add_wave "-noupdate -hex -label RX_DATA" /testbench/rx_data2
+add_wave "-noupdate -hex -label RX_REM" /testbench/rx_rem2
+add_wave "-noupdate -label RX_SOF_N" /testbench/rx_sof_n2
+add_wave "-noupdate -label RX_EOF_N" /testbench/rx_eof_n2
+add_wave "-noupdate -label RX_SOP_N" /testbench/rx_sop_n2
+add_wave "-noupdate -label RX_EOP_N" /testbench/rx_eop_n2
+add_wave "-noupdate -label RX_SRC_RDY_N" /testbench/rx_src_rdy_n2
+add_wave "-noupdate -label RX_DST_RDY_N" /testbench/rx_dst_rdy_n2
+
+add wave -divider "FrameLink 2 TX interface"
+add_wave "-noupdate -hex -label TX_DATA" /testbench/tx_data2
+add_wave "-noupdate -hex -label TX_REM" /testbench/tx_rem2
+add_wave "-noupdate -label TX_SOF_N" /testbench/tx_sof_n2
+add_wave "-noupdate -label TX_EOF_N" /testbench/tx_eof_n2
+add_wave "-noupdate -label TX_SOP_N" /testbench/tx_sop_n2
+add_wave "-noupdate -label TX_EOP_N" /testbench/tx_eop_n2
+add_wave "-noupdate -label TX_SRC_RDY_N" /testbench/tx_src_rdy_n2
+add_wave "-noupdate -label TX_DST_RDY_N" /testbench/tx_dst_rdy_n2
+

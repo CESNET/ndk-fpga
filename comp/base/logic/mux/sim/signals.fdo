@@ -1,0 +1,53 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2018 CESNET
+# Author: Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc tb_internals { PATH GROUP } {
+   eval "add wave $GROUP -divider {TB internals}"
+
+   add_wave "$GROUP -noupdate -hex"   $PATH/test_ok
+}
+
+proc top_ports { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Synchronization}"
+   add_wave "$GROUP -noupdate -hex -label CLK -color yellow"   $PATH/CLK
+   add_wave "$GROUP -noupdate -hex -label RESET -color yellow"   $PATH/RESET
+
+   eval "add wave $GROUP -divider {Ports}"
+   add_wave "$GROUP -noupdate -hex"   $PATH/RX_DATA
+   add_wave "$GROUP -noupdate -hex"   $PATH/RX_SEL
+   add_wave "$GROUP -noupdate -hex"   $PATH/RX_METADATA
+   add_wave "$GROUP -noupdate -hex"   $PATH/RX_SRC_RDY
+   add_wave "$GROUP -noupdate -hex"   $PATH/RX_DST_RDY
+   add_wave "$GROUP -noupdate -hex"   $PATH/TX_DATA
+   add_wave "$GROUP -noupdate -hex"   $PATH/TX_METADATA
+   add_wave "$GROUP -noupdate -hex"   $PATH/TX_SRC_RDY
+   add_wave "$GROUP -noupdate -hex"   $PATH/TX_DST_RDY
+}
+
+proc top_internals { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Internals}"
+   add_wave "$GROUP -noupdate -hex"     $PATH/in_reg_rx_data
+   add_wave "$GROUP -noupdate -hex"     $PATH/in_reg_rx_sel
+   add_wave "$GROUP -noupdate -hex"     $PATH/in_reg_rx_metadata
+   add_wave "$GROUP -noupdate -hex"     $PATH/in_reg_rx_src_rdy
+   add_wave "$GROUP -noupdate -hex"     $PATH/in_reg_rx_dst_rdy
+   add_wave "$GROUP -noupdate -hex"     $PATH/MUX_WIDTHS_LOG
+   add_wave "$GROUP -noupdate -hex"     $PATH/MUX_WIDTHS
+   add_wave "$GROUP -noupdate -hex"     $PATH/MUX_SEL_HIGHS
+   add_wave "$GROUP -noupdate -hex"     $PATH/MUX_CNTS
+   add_wave "$GROUP -noupdate -hex"     $PATH/data_in_arr
+   add_wave "$GROUP -noupdate -hex"     $PATH/data_in_reord_arr
+   add_wave "$GROUP -noupdate -hex"     $PATH/src_rdy_in
+   add_wave "$GROUP -noupdate -hex"     $PATH/dst_rdy_in
+   add_wave "$GROUP -noupdate -hex"     $PATH/sel_in
+   add_wave "$GROUP -noupdate -hex"     $PATH/metadata_in
+   add_wave "$GROUP -noupdate -hex"     $PATH/data_out
+
+}

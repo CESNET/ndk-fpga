@@ -1,0 +1,21 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <kondys@cesnet.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+view wave
+delete wave *
+
+add_wave "-noupdate  -hex"       /testbench/DUT_U/CLK
+add_wave "-noupdate  -hex"       /testbench/DUT_U/RESET
+
+add wave -divider "FRAME_MASKER"
+all FRAME_MASKER  /testbench/DUT_U/VHDL_DUT_U
+add wave -divider "INTERFACE ONLY"
+INTERFACE         /testbench/DUT_U/VHDL_DUT_U
+add wave -divider "DEBUG"
+DEBUG             /testbench/DUT_U/VHDL_DUT_U
+
+config wave -signalnamewidth 1

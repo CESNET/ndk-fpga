@@ -1,0 +1,112 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2017 CESNET
+# Author: Vaclav Hummel <xhumme00@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc tb_internals { PATH GROUP } {
+   eval "add wave $GROUP -divider {Control signals}"
+   add_wave "$GROUP -noupdate -hex -label fifo_src_rdy"           $PATH/fifo_src_rdy
+   add_wave "$GROUP -noupdate -hex -label fifo_we"           $PATH/fifo_we
+}
+
+proc fifo_n1_ports { PATH GROUP } {
+   eval "add wave $GROUP -divider {Synchronization}"
+   add_wave "$GROUP -noupdate -hex -label CLK -color yellow"   $PATH/CLK
+   add_wave "$GROUP -noupdate -hex -label RST -color yellow"   $PATH/RESET
+
+   eval "add wave $GROUP -divider {Write interface}"
+   add_wave "$GROUP -noupdate -hex -label DATA_IN"   $PATH/DATA_IN
+   add_wave "$GROUP -noupdate -hex -label WE"   $PATH/WE
+   add_wave "$GROUP -noupdate -hex -label FULL"   $PATH/FULL
+   add_wave "$GROUP -noupdate -hex -label AFULL"   $PATH/AFULL
+
+   eval "add wave $GROUP -divider {Read interface}"
+   add_wave "$GROUP -noupdate -hex -label DATA_OUT"   $PATH/DATA_OUT
+   add_wave "$GROUP -noupdate -hex -label RE"   $PATH/RE
+   add_wave "$GROUP -noupdate -hex -label EMPTY"   $PATH/EMPTY
+   add_wave "$GROUP -noupdate -hex -label AEMPTY"   $PATH/AEMPTY
+
+}
+
+proc fifo_n1_internals { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Input pipe}"
+   add_wave "$GROUP -noupdate -hex -label pipe0_in_dst_rdy"   $PATH/pipe0_in_dst_rdy
+   add_wave "$GROUP -noupdate -hex -label pipe0_out_deser"   $PATH/pipe0_out_deser
+   add_wave "$GROUP -noupdate -hex -label pipe0_data_out_deser"   $PATH/pipe0_data_out_deser
+   add_wave "$GROUP -noupdate -hex -label pipe0_data_out"   $PATH/pipe0_data_out
+   add_wave "$GROUP -noupdate -hex -label pipe0_data_we"   $PATH/pipe0_data_we
+   add_wave "$GROUP -noupdate -hex -label pipe0_out_src_rdy"   $PATH/pipe0_out_src_rdy
+   add_wave "$GROUP -noupdate -hex -label pipe0_out_dst_rdy"   $PATH/pipe0_out_dst_rdy
+
+   eval "add wave $GROUP -divider {Sum of WE}"
+   add_wave "$GROUP -noupdate -hex -label sum_we"   $PATH/sum_we
+
+   eval "add wave $GROUP -divider {N-one detector}"
+   add_wave "$GROUP -noupdate -hex -label n_one_addrs"   $PATH/n_one_addrs
+   add_wave "$GROUP -noupdate -hex -label n_one_addrs_vld"   $PATH/n_one_addrs_vld
+
+   eval "add wave $GROUP -divider {Data registers}"
+   add_wave "$GROUP -noupdate -hex -label reg1_sum_we"   $PATH/reg1_sum_we
+   add_wave "$GROUP -noupdate -hex -label reg1_n_one_addrs"   $PATH/reg1_n_one_addrs
+   add_wave "$GROUP -noupdate -hex -label reg1_data"   $PATH/reg1_data
+   add_wave "$GROUP -noupdate -hex -label reg1_we"   $PATH/reg1_we
+
+   eval "add wave $GROUP -divider {Control registers}"
+   add_wave "$GROUP -noupdate -hex -label reg1_vld"   $PATH/reg1_vld
+   add_wave "$GROUP -noupdate -hex -label reg1_empty"   $PATH/reg1_empty
+
+   eval "add wave $GROUP -divider {Input multiplexer}"
+   add_wave "$GROUP -noupdate -hex -label in_mux_sel"   $PATH/in_mux_sel
+   add_wave "$GROUP -noupdate -hex -label in_mux_sel_deser"   $PATH/in_mux_sel_deser
+   add_wave "$GROUP -noupdate -hex -label in_mux_out"   $PATH/in_mux_out
+
+   eval "add wave $GROUP -divider {Memory WE}"
+   add_wave "$GROUP -noupdate -hex -label reg2_memory_we_in"   $PATH/reg2_memory_we_in
+   add_wave "$GROUP -noupdate -hex -label reg2_memory_we_shifted"   $PATH/reg2_memory_we_shifted
+
+   eval "add wave $GROUP -divider {Memory selection counter}"
+   add_wave "$GROUP -noupdate -hex -label memory_sel_sum"   $PATH/memory_sel_sum
+   add_wave "$GROUP -noupdate -hex -label memory_sel_sum_ov"   $PATH/memory_sel_sum_ov
+   add_wave "$GROUP -noupdate -hex -label cnt2_memory_sel_ov"   $PATH/cnt2_memory_sel_ov
+
+   eval "add wave $GROUP -divider {Data registers}"
+   add_wave "$GROUP -noupdate -hex -label reg2_sum_we"   $PATH/reg2_sum_we
+   add_wave "$GROUP -noupdate -hex -label reg2_in_mux_out"   $PATH/reg2_in_mux_out
+   add_wave "$GROUP -noupdate -hex -label reg2_memory_we"   $PATH/reg2_memory_we
+   add_wave "$GROUP -noupdate -hex -label cnt2_memory_sel"   $PATH/cnt2_memory_sel
+
+   eval "add wave $GROUP -divider {Control registers}"
+   add_wave "$GROUP -noupdate -hex -label reg2_vld"   $PATH/reg2_vld
+   add_wave "$GROUP -noupdate -hex -label reg2_empty"   $PATH/reg2_empty
+
+   eval "add wave $GROUP -divider {Memory}"
+   add_wave "$GROUP -noupdate -hex -label cnt3_memory_wr_pointer"   $PATH/cnt3_memory_wr_pointer
+   add_wave "$GROUP -noupdate -hex -label memory_full"   $PATH/memory_full
+   add_wave "$GROUP -noupdate -hex -label memory_empty"   $PATH/memory_empty
+
+   eval "add wave $GROUP -divider {Free space counter}"
+   add_wave "$GROUP -noupdate -hex -label cnt3_free_space"   $PATH/cnt3_free_space
+
+   eval "add wave $GROUP -divider {Control registers}"
+   add_wave "$GROUP -noupdate -hex -label reg3_vld"   $PATH/reg3_vld
+   add_wave "$GROUP -noupdate -hex -label reg3_empty"   $PATH/reg3_empty
+
+   eval "add wave $GROUP -divider {Output data path}"
+   add_wave "$GROUP -noupdate -hex -label out_mux_in"   $PATH/out_mux_in
+   add_wave "$GROUP -noupdate -hex -label out_mux_sel"   $PATH/out_mux_sel
+   add_wave "$GROUP -noupdate -hex -label out_mux_out"   $PATH/out_mux_out
+
+   eval "add wave $GROUP -divider {Read pointer}"
+   add_wave "$GROUP -noupdate -hex -label cnt4_memory_rd_pointer_low"   $PATH/cnt4_memory_rd_pointer_low
+   add_wave "$GROUP -noupdate -hex -label cnt4_memory_rd_pointer_high"   $PATH/cnt4_memory_rd_pointer_high
+
+   eval "add wave $GROUP -divider {Output pipe}"
+   add_wave "$GROUP -noupdate -hex -label pipe4_in_dst_rdy"   $PATH/pipe4_in_dst_rdy
+   add_wave "$GROUP -noupdate -hex -label pipe4_out_src_rdy"   $PATH/pipe4_out_src_rdy
+   add_wave "$GROUP -noupdate -hex -label reg4_empty_slv"   $PATH/reg4_empty_slv
+}
+

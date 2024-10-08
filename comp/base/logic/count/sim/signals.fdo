@@ -1,0 +1,16 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+   proc blk_COUNT48 { } {
+
+     global COUNT48_PATH
+     add_wave "-noupdate -hex -label A" /$COUNT48_PATH/A
+     add_wave "-noupdate -hex -label MAX" /$COUNT48_PATH/MAX
+     add_wave "-noupdate -hex -label P" /$COUNT48_PATH/P
+     add_wave "-noupdate -hex -label ENABLE" /$COUNT48_PATH/ENABLE
+   }

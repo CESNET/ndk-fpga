@@ -1,0 +1,14 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2015 CESNET
+# Author: Lukas Kekely <kekely@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc mi {NAME PATH} {
+  add_wave "-noupdate -hex"        $PATH/MI/*
+}
+
+proc others {NAME PATH} {
+  add_wave "-noupdate -hex -label memory"        $PATH/memory
+}

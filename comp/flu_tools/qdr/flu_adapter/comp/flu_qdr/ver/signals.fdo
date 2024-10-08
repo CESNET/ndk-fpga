@@ -1,0 +1,176 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Vaclav Hummel <xhumme00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+
+proc flu_qdr_ports { TB } {
+
+   add wave -divider ""
+   add wave -divider "Synchronization"
+   add_wave "-group { SYNC } -noupdate -hex -label SDM_CLK"                   $TB/app_clk
+   add_wave "-group { SYNC } -noupdate -hex -label SDM_RST"                   $TB/app_rst
+   add_wave "-group { SYNC } -noupdate -hex -label QDR_CLK"                   $TB/qdr_clk
+   add_wave "-group { SYNC } -noupdate -hex -label QDR_RST"                   $TB/qdr_rst
+
+   add wave -divider ""
+   add wave -divider "FLU_ADAPTER"
+
+   add wave -divider "Input FLU"
+   add_wave "-group { IF } -noupdate -hex -label FLU_RX_DATA"               $TB/FLU_RX_DATA
+   add_wave "-group { IF } -noupdate -hex -label FLU_RX_SOP_POS"           $TB/FLU_RX_SOP_POS
+   add_wave "-group { IF } -noupdate -hex -label FLU_RX_EOP_POS"           $TB/FLU_RX_EOP_POS
+   add_wave "-group { IF } -noupdate -hex -label FLU_RX_SOP"               $TB/FLU_RX_SOP
+   add_wave "-group { IF } -noupdate -hex -label FLU_RX_EOP"           $TB/FLU_RX_EOP
+   add_wave "-group { IF } -noupdate -hex -label FLU_RX_SRC_RDY"              $TB/FLU_RX_SRC_RDY
+   add_wave "-group { IF } -noupdate -hex -label FLU_RX_DST_RDY"              $TB/FLU_RX_DST_RDY
+
+   add wave -divider "Output FLU"
+   add_wave "-group { OF } -noupdate -hex -label FLU_TX_DATA"               $TB/FLU_TX_DATA
+   add_wave "-group { OF } -noupdate -hex -label FLU_TX_SOP_POS"           $TB/FLU_TX_SOP_POS
+   add_wave "-group { OF } -noupdate -hex -label FLU_TX_EOP_POS"           $TB/FLU_TX_EOP_POS
+   add_wave "-group { OF } -noupdate -hex -label FLU_TX_SOP"               $TB/FLU_TX_SOP
+   add_wave "-group { OF } -noupdate -hex -label FLU_TX_EOP"           $TB/FLU_TX_EOP
+   add_wave "-group { OF } -noupdate -hex -label FLU_TX_SRC_RDY"              $TB/FLU_TX_SRC_RDY
+   add_wave "-group { OF } -noupdate -hex -label FLU_TX_DST_RDY"              $TB/FLU_TX_DST_RDY
+
+   add wave -divider "User commands"
+   add_wave "-group { UC } -noupdate -hex -label USER_WR_CMD"                 $TB/user_wr_cmd
+   add_wave "-group { UC } -noupdate -hex -label USER_WR_ADDR"                $TB/user_wr_addr
+   add_wave "-group { UC } -noupdate -hex -label USER_WR_DATA"                $TB/user_wr_data
+   add_wave "-group { UC } -noupdate -hex -label USER_WR_BW_N"                $TB/user_wr_bw_n
+   add_wave "-group { UC } -noupdate -hex -label USER_RD_CMD"                 $TB/user_rd_cmd
+   add_wave "-group { UC } -noupdate -hex -label USER_RD_ADDR"                $TB/user_rd_addr
+
+   add wave -divider "User data"
+   add_wave "-group { UD } -noupdate -hex -label USER_RD_VALID"          $TB/user_rd_valid
+   add_wave "-group { UD } -noupdate -hex -label USER_RD_DATA"           $TB/user_rd_data
+}
+
+proc flu2qdr_ports { TB } {
+   add wave -divider ""
+   add wave -divider "FLU2QDR <-> QDR"
+
+   add wave -divider "Read requests"
+   add_wave "-group { RR } -noupdate -hex -label QDR_TX_RD_ADDR"    $TB/qdr_tx_rd_addr
+   add_wave "-group { RR } -noupdate -hex -label QDR_TX_RD_SRC_RDY" $TB/qdr_tx_rd_src_rdy
+   add_wave "-group { RR } -noupdate -hex -label QDR_TX_RD_DST_RDY" $TB/qdr_tx_rd_dst_rdy
+
+   add wave -divider "Write requests"
+   add_wave "-group { WR } -noupdate -hex -label QDR_TX_WR_ADDR"    $TB/qdr_tx_wr_addr
+   add_wave "-group { WR } -noupdate -hex -label QDR_TX_WR_DATA"    $TB/qdr_tx_wr_data
+   add_wave "-group { WR } -noupdate -hex -label QDR_TX_WR_SRC_RDY" $TB/qdr_tx_wr_src_rdy
+   add_wave "-group { WR } -noupdate -hex -label QDR_TX_WR_DST_RDY" $TB/qdr_tx_wr_dst_rdy
+
+   add wave -divider "Read data"
+   add_wave "-group { RD } -noupdate -hex -label QDR_RX_DATA"       $TB/qdr_rx_data
+   add_wave "-group { RD } -noupdate -hex -label QDR_RX_SRC_RDY"    $TB/qdr_rx_src_rdy
+   add_wave "-group { RD } -noupdate -hex -label QDR_RX_DST_RDY"    $TB/qdr_rx_dst_rdy
+
+   add wave -divider ""
+   add wave -divider "FLU2QDR internals"
+
+   add wave -divider "FIFO registers"
+   add_wave "-group { FR } -noupdate -hex -label FIFO_START"    $TB/fifo_start
+   add_wave "-group { FR } -noupdate -hex -label FIFO_START_INC"    $TB/fifo_start_inc
+   add_wave "-group { FR } -noupdate -hex -label FIFO_END"    $TB/fifo_end
+   add_wave "-group { FR } -noupdate -hex -label FIFO_END_INC"    $TB/fifo_end_inc
+   add_wave "-group { FR } -noupdate -hex -label FIFO_END1"    $TB/fifo_end1
+   add_wave "-group { FR } -noupdate -hex -label FIFO_EMPTY"    $TB/fifo_empty
+   add_wave "-group { FR } -noupdate -hex -label FIFO_FULL"    $TB/fifo_full
+
+   add wave -divider "Input FLU registers"
+   add_wave "-group { IFR } -noupdate -hex -label FLU_REG0"    $TB/flu_reg0
+   add_wave "-group { IFR } -noupdate -hex -label FLU_REG1"    $TB/flu_reg1
+   add_wave "-group { IFR } -noupdate -hex -label FLU_REG2"    $TB/flu_reg2
+   add_wave "-group { IFR } -noupdate -hex -label FLU_REG_WE"    $TB/flu_reg_we
+   add_wave "-group { IFR } -noupdate -hex -label FLU_REG_VLD"    $TB/flu_reg_vld
+
+   add wave -divider "Input multiplexor"
+   add_wave "-group { IM } -noupdate -hex -label flu_mux_in"    $TB/flu_mux_in
+   add_wave "-group { IM } -noupdate -hex -label flu_mux_out"    $TB/flu_mux_out
+   add_wave "-group { IM } -noupdate -hex -label flu_mux_sel"    $TB/flu_mux_sel
+
+   add wave -divider "Input FSM"
+   add_wave "-group { IFSM } -noupdate -label CURRENT_STATE"    $TB/current_statein
+   add_wave "-group { IFSM } -noupdate -label NEXT_STATE"    $TB/next_statein
+
+   add wave -divider "QDR read request FSM"
+   add_wave "-group { QRRFSM } -noupdate -label CURRENT_STATE"    $TB/current_staterd
+   add_wave "-group { QRRFSM } -noupdate -label NEXT_STATE"    $TB/next_staterd
+   add_wave "-group { QRRFSM } -noupdate -hex -label RD_ADDR_LSB"    $TB/rd_addr_lsb
+
+   add wave -divider "QDR read request counter"
+   add_wave "-group { QRRC } -noupdate -hex -label RD_CNT"    $TB/rd_cnt
+   add_wave "-group { QRRC } -noupdate -hex -label RD_CNT_INC"    $TB/rd_cnt_inc
+   add_wave "-group { QRRC } -noupdate -hex -label RD_CNT_DEC"    $TB/rd_cnt_dec
+   add_wave "-group { QRRC } -noupdate -hex -label RD_CNT_FULL"    $TB/rd_cnt_full
+
+   add wave -divider "Output QDR registers"
+   add_wave "-group { OQR } -noupdate -hex -label QDR_REG0"    $TB/qdr_reg0
+   add_wave "-group { OQR } -noupdate -hex -label QDR_REG1"    $TB/qdr_reg1
+   add_wave "-group { OQR } -noupdate -hex -label QDR_REG_WE"    $TB/qdr_reg_we
+   add_wave "-group { OQR } -noupdate -hex -label QDR_REG_VLD"    $TB/qdr_reg_vld
+
+   add wave -divider "Output multiplexor"
+   add_wave "-group { OM } -noupdate -hex -label qdr_mux_in"    $TB/qdr_mux_in
+   add_wave "-group { OM } -noupdate -hex -label qdr_mux_out"    $TB/qdr_mux_out
+   add_wave "-group { OM } -noupdate -hex -label qdr_mux_sel"    $TB/qdr_mux_sel
+
+   add wave -divider "Output FSM"
+   add_wave "-group { OFSM } -noupdate -label CURRENT_STATE"    $TB/current_stateout
+   add_wave "-group { OFSM } -noupdate -label NEXT_STATE"    $TB/next_stateout
+
+}
+
+proc qdr_ports { TB } {
+   add wave -divider ""
+   add wave -divider "QDR internals"
+
+   add wave -divider "QDR calibration"
+   add_wave "-group { QC } -noupdate -hex -label CAL_DONE_S"    $TB/cal_done_s
+   add_wave "-group { QC } -noupdate -hex -label CAL_DONE_REG1"    $TB/cal_done_reg1
+   add_wave "-group { QC } -noupdate -hex -label CAL_DONE_REG2"    $TB/cal_done_reg2
+
+   add wave -divider "Read request FIFO"
+   add_wave "-group { RRF } -noupdate -hex -label FIFO_RDIN_WR"    $TB/fifo_rdin_wr
+   add_wave "-group { RRF } -noupdate -hex -label FIFO_RDIN_DI"    $TB/fifo_rdin_di
+   add_wave "-group { RRF } -noupdate -hex -label FIFO_RDIN_FULL"    $TB/fifo_rdin_full
+   add_wave "-group { RRF } -noupdate -hex -label FIFO_RDIN_DO"    $TB/fifo_rdin_do
+   add_wave "-group { RRF } -noupdate -hex -label FIFO_RDIN_RD"    $TB/fifo_rdin_rd
+   add_wave "-group { RRF } -noupdate -hex -label FIFO_RDIN_EMPTY"    $TB/fifo_rdin_empty
+
+   add wave -divider "Read request FSM"
+   add_wave "-group { RRFSM } -noupdate -label CURRENT_STATE"    $TB/current_staterd
+   add_wave "-group { RRFSM } -noupdate -label NEXT_STATE"    $TB/next_staterd
+   add_wave "-group { RRFSM } -noupdate -hex -label RD_ADDR_LSB"    $TB/rd_addr_lsb
+
+   add wave -divider "Write request FIFO"
+   add_wave "-group { WRF } -noupdate -hex -label FIFO_WRIN_WR"    $TB/fifo_wrin_wr
+   add_wave "-group { WRF } -noupdate -hex -label FIFO_WRIN_DI"    $TB/fifo_wrin_di
+   add_wave "-group { WRF } -noupdate -hex -label FIFO_WRIN_FULL"    $TB/fifo_wrin_full
+   add_wave "-group { WRF } -noupdate -hex -label FIFO_WRIN_DO"    $TB/fifo_wrin_do
+   add_wave "-group { WRF } -noupdate -hex -label FIFO_WRIN_RD"    $TB/fifo_wrin_rd
+   add_wave "-group { WRF } -noupdate -hex -label FIFO_WRIN_EMPTY"    $TB/fifo_wrin_empty
+
+   add wave -divider "Write request MUX"
+   add_wave "-group { WRM } -noupdate -hex -label MUX_WRIN_DI"    $TB/mux_wrin_di
+   add_wave "-group { WRM } -noupdate -hex -label MUX_WRIN_SEL"    $TB/mux_wrin_sel
+   add_wave "-group { WRM } -noupdate -hex -label MUX_WRIN_DO"    $TB/mux_wrin_do
+
+   add wave -divider "Data out FIFO"
+   add_wave "-group { DOF } -noupdate -hex -label REG_DATA_OUT"    $TB/reg_data_out
+   add_wave "-group { DOF } -noupdate -hex -label REG_DATA_OUT_WE"    $TB/reg_data_out_we
+   add_wave "-group { DOF } -noupdate -hex -label REG_DATA_OUT_WE_SEL"    $TB/reg_data_out_we_sel
+   add_wave "-group { DOF } -noupdate -hex -label FIFO_OUT_WR"    $TB/fifo_out_wr
+   add_wave "-group { DOF } -noupdate -hex -label FIFO_OUT_DI"    $TB/fifo_out_di
+   add_wave "-group { DOF } -noupdate -hex -label FIFO_OUT_AFULL"    $TB/fifo_out_afull
+   add_wave "-group { DOF } -noupdate -hex -label FIFO_OUT_AFULL_S"    $TB/fifo_out_afull_s
+   add_wave "-group { DOF } -noupdate -hex -label FIFO_OUT_DO"    $TB/fifo_out_do
+   add_wave "-group { DOF } -noupdate -hex -label FIFO_OUT_RD"    $TB/fifo_out_rd
+   add_wave "-group { DOF } -noupdate -hex -label FIFO_OUT_EMPTY"    $TB/fifo_out_empty
+   add_wave "-group { DOF } -noupdate -hex -label FIFO_OUT_EMPTY_S"    $TB/fifo_out_empty_s
+}

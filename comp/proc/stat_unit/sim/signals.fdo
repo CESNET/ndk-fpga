@@ -1,0 +1,79 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2011 CESNET
+# Author(s): Pavel Benacek <benacek@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+# -------------------------------------------------------------------------
+#                       Waveform Definition
+# -------------------------------------------------------------------------
+
+proc blk_STATUS_UNIT { } {
+    global TB_ROOT
+    global STATUS_UNIT_PATH
+
+# User signals -> STAT_UNIT
+
+#counters and registers signals
+add wave -divider "Input stat. signals"
+add wave -label SOP $TB_ROOT/sop_n
+add wave -label SOP_ALIGN_SIZE -hex     $TB_ROOT/sop_align_size
+add wave -label EOP                     $TB_ROOT/eop
+add wave -label EOP_POS -hex            $TB_ROOT/eop_pos
+add wave -label PAYLOAD_LEN -hex        $TB_ROOT/payload_len
+add wave -label FRAME_ERROR             $TB_ROOT/frame_error
+add wave -label CRC_CHECK_FAILED        $TB_ROOT/crc_check_failed
+add wave -label MAC_CHECK_FAILED        $TB_ROOT/mac_check_failed
+add wave -label LEN_BELOW_MTU           $TB_ROOT/len_below_min
+add wave -label LEN_OVER_MTU            $TB_ROOT/len_over_mtu
+add wave -label STAT_DV                 $TB_ROOT/stat_dv
+add wave -label FRAME_REC               $TB_ROOT/frame_rec
+add wave -label FRAME_DIS               $TB_ROOT/frame_dis
+add wave -label BUFF_OVF                $TB_ROOT/buff_ovf
+add wave -label STAT_MAC_BCAST          $TB_ROOT/stat_bcast
+add wave -label STAT_MAC_MCAST          $TB_ROOT/stat_mcast
+
+add wave -divider "Output statistic data"
+add wave -label OUT_MAC_CHECK_FAILED -hex   $STATUS_UNIT_PATH/OUT_MAC_CHECK_FAILED
+add wave -label OUT_FRAMES_RECEIVED -hex    $STATUS_UNIT_PATH/OUT_FRAMES_RECEIVED
+add wave -label OUT_FRAMES_DISCARDED -hex   $STATUS_UNIT_PATH/OUT_FRAMES_DISCARDED
+add wave -label OUT_TOTAL_PACKET_TRAF -hex  $STATUS_UNIT_PATH/OUT_TOTAL_PACKET_TRAF
+add wave -label OUT_BUFFER_OVF -hex         $STATUS_UNIT_PATH/OUT_BUFFER_OVF
+add wave -label OUT_SIZE_SUM_COUNT -hex     $STATUS_UNIT_PATH/OUT_SIZE_SUM_COUNT
+add wave -label OUT_SIZE_SUM -hex           $STATUS_UNIT_PATH/OUT_SIZE_SUM
+add wave -label OUT_CRC_ERR -hex            $STATUS_UNIT_PATH/OUT_CRC_ERR
+add wave -label OUT_OVER_MTU -hex           $STATUS_UNIT_PATH/OUT_OVER_MTU
+add wave -label OUT_BELOW_MIN -hex          $STATUS_UNIT_PATH/OUT_BELOW_MIN
+add wave -label OUT_MAX_SIZE -hex           $STATUS_UNIT_PATH/OUT_MAX_SIZE
+add wave -label OUT_MIN_SIZE -hex           $STATUS_UNIT_PATH/OUT_MIN_SIZE
+add wave -label OUT_MIN_DELAY -hex          $STATUS_UNIT_PATH/OUT_MIN_DELAY
+add wave -label OUT_MAX_DELAY -hex          $STATUS_UNIT_PATH/OUT_MAX_DELAY
+add wave -label OUT_LAST_READ_DELAY -hex    $STATUS_UNIT_PATH/OUT_LAST_READ_DELAY
+add wave -label OUT_UNDERSIZE_FRAMES -hex   $STATUS_UNIT_PATH/OUT_UNDERSIZE_FRAMES
+add wave -label OUT_FRAMES_64 -hex          $STATUS_UNIT_PATH/OUT_FRAMES_64
+add wave -label OUT_FRAMES_65_127 -hex      $STATUS_UNIT_PATH/OUT_FRAMES_65_127
+add wave -label OUT_FRAMES_128_255 -hex     $STATUS_UNIT_PATH/OUT_FRAMES_128_255
+add wave -label OUT_FRAMES_256_511 -hex     $STATUS_UNIT_PATH/OUT_FRAMES_256_511
+add wave -label OUT_FRAMES_512_1023 -hex    $STATUS_UNIT_PATH/OUT_FRAMES_512_1023
+add wave -label OUT_FRAMES_1024_1518 -hex   $STATUS_UNIT_PATH/OUT_FRAMES_1024_1518
+add wave -label OUT_FRAMES_OVER_1518 -hex   $STATUS_UNIT_PATH/OUT_FRAMES_OVER_1518
+
+add wave -divider "Control signals"
+add wave -label START_EN $TB_ROOT/start_en
+add wave -label SW_RESET $TB_ROOT/sw_reset
+add wave -label RAR $TB_ROOT/reset_after_read
+add wave -label READ_EN $TB_ROOT/read_en
+add wave -label LAST_ADDR_EN $TB_ROOT/last_addr_en
+
+}
+
+proc blk_STATUS_UNIT_OTHER { } {
+   global TB_ROOT
+
+#clocks
+add wave -divider "Clocks & Reset"
+add wave -noupdate -label RESET $TB_ROOT/reset
+add wave -label CLK			$TB_ROOT/clk
+
+}

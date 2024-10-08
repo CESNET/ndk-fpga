@@ -1,0 +1,29 @@
+# mux_dsp.fdo: Simulation script
+# Copyright (C) 2014 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../.."
+set MUX48_BASE       "$OFM_PATH/comp/base/logic/mux_dsp"
+
+set TB_FILE          "$MUX48_BASE/sim/testbench.vhd"
+set SIG_FILE         "$MUX48_BASE/sim/mux_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "MUX_DSP_GEN" $MUX48_BASE   "FULL"] \
+               ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+# puts "Std Arith Warnings - Disabled"
+# set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 200ns

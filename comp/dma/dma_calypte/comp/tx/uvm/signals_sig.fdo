@@ -1,0 +1,68 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Daniel Kriz <danielkriz@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add_wave "-noupdate -color yellow -label CLK"   /testbench/DUT_U/VHDL_DUT_U/CLK
+add_wave "-noupdate -color yellow -label RESET"   /testbench/DUT_U/VHDL_DUT_U/RESET
+
+# Set the number of channels for waveform generation
+puts "==============================================="
+puts "Wave parameters:"
+puts "==============================================="
+set CHANNELS 8
+set BUFF_SIZE 8192
+set REGIONS 2
+set DEVICE "ULTRASCALE"
+
+# Constant parameters
+set PCIE_META_W 182
+set META_IS_DMA_HDR_W 1
+set META_PCIE_ADDR_W 62
+
+if {$CHANNELS > 2} {
+    set META_CHAN_NUM_W [expr int(log($CHANNELS)/log(2))]
+} else {
+    set META_CHAN_NUM_W 1
+}
+
+set META_BE_W [expr 256/8]
+set META_BYTE_CNT_W 13
+set META_FBE_W 4
+set META_LBE_W 4
+
+set META_WHOLE_W        [expr $META_IS_DMA_HDR_W + $META_PCIE_ADDR_W + $META_CHAN_NUM_W + $META_BE_W + $META_BYTE_CNT_W + $META_FBE_W + $META_LBE_W]
+set META_REDUCED_W      [expr $META_IS_DMA_HDR_W + $META_PCIE_ADDR_W + $META_CHAN_NUM_W + $META_BE_W + $META_BYTE_CNT_W]
+set META_WO_BYTE_CNT_W  [expr $META_IS_DMA_HDR_W + $META_PCIE_ADDR_W + $META_CHAN_NUM_W + $META_BE_W]
+
+set BUFF_ADDR_W [expr int(log($BUFF_SIZE/4)/log(2))]
+
+puts "CHANNELS:             $CHANNELS"
+puts "BUFF_SIZE:            $BUFF_SIZE"
+puts "REGIONS:              $REGIONS"
+puts "META_IS_DMA_HDR_W:    $META_IS_DMA_HDR_W"
+puts "META_PCIE_ADDR_W:     $META_PCIE_ADDR_W"
+puts "META_CHAN_NUM_W:      $META_CHAN_NUM_W"
+puts "META_BE_W:            $META_BE_W"
+puts "META_BYTE_CNT_W:      $META_BYTE_CNT_W"
+puts "META_FBE_W:           $META_FBE_W"
+puts "META_LBE_W:           $META_LBE_W"
+puts "META_WHOLE_W:         $META_WHOLE_W"
+puts "META_REDUCED_W:       $META_REDUCED_W"
+puts "META_WO_BYTE_CNT_W:   $META_WO_BYTE_CNT_W"
+puts "BUDD_ADDR_W:          $BUFF_ADDR_W"
+
+top_input /testbench/DUT_U/VHDL_DUT_U $META_CHAN_NUM_W $BUFF_ADDR_W $REGIONS $DEVICE $PCIE_META_W
+top_outputs /testbench/DUT_U/VHDL_DUT_U
+internals /testbench/DUT_U/VHDL_DUT_U $META_IS_DMA_HDR_W $META_PCIE_ADDR_W $META_CHAN_NUM_W $META_BE_W $META_BYTE_CNT_W $META_FBE_W $META_LBE_W $META_REDUCED_W $META_WO_BYTE_CNT_W $REGIONS
+meta_extractor /testbench/DUT_U/VHDL_DUT_U/tx_dma_metadata_extractor_i $META_IS_DMA_HDR_W $META_PCIE_ADDR_W $META_CHAN_NUM_W $META_BE_W $META_BYTE_CNT_W $META_FBE_W $META_LBE_W $META_WHOLE_W $META_REDUCED_W $REGIONS $DEVICE
+chan_start_stop_ctrl /testbench/DUT_U/VHDL_DUT_U/tx_dma_chan_start_stop_ctrl_i $META_IS_DMA_HDR_W $META_PCIE_ADDR_W $META_CHAN_NUM_W $META_BE_W $META_BYTE_CNT_W $META_FBE_W $META_LBE_W $META_REDUCED_W $META_WO_BYTE_CNT_W $REGIONS
+trans_buffer /testbench/DUT_U/VHDL_DUT_U/tx_dma_pcie_trans_buffer_i $META_IS_DMA_HDR_W $META_PCIE_ADDR_W $META_CHAN_NUM_W $META_BE_W $META_BYTE_CNT_W $META_FBE_W $META_LBE_W $META_WO_BYTE_CNT_W $REGIONS
+pkt_dispatcher /testbench/DUT_U/VHDL_DUT_U/tx_dma_pkt_dispatcher_i
+sw_mgr /testbench/DUT_U/VHDL_DUT_U/tx_dma_sw_manager_i
+conf_regs /testbench/DUT_U/VHDL_DUT_U/tx_dma_sw_manager_i $DEVICE
+pkt_cntrs /testbench/DUT_U/VHDL_DUT_U/tx_dma_sw_manager_i
+

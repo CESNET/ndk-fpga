@@ -1,0 +1,27 @@
+# axi2mi_sig.fdo: Include file with signals
+# Copyright (C) 2018 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set TB_PATH   "/testbench"
+set UUT_PATH  "/testbench"
+
+source  "signals.fdo"
+
+add wave -divider "TB internals"
+tb_internals "$TB_PATH" ""
+
+add wave -divider ""
+uut_internals "$UUT_PATH" ""
+
+add wave -divider "PCIE"
+add_wave " -group CQ -noupdate -hex" "/testbench/DUT_U/PCIE_C/AXI/CQ/*"
+add_wave " -group CQ -noupdate -hex" "/testbench/DUT_U/PCIE_C/AVALON/CQ/*"
+add_wave " -group CC -noupdate -hex" "/testbench/DUT_U/PCIE_C/AXI/CC/*"
+add_wave " -group CC -noupdate -hex" "/testbench/DUT_U/PCIE_C/AVALON/CC/*"
+
+add wave -divider ""
+all "$TB_PATH/DUT_U/DUT_U/" "MTC_WRAP"
+all "$TB_PATH/DUT_U/DUT_U/cq_mfb_xilinx_g/mfb_cc2axi_i" "CONVERTOR"
+all "$TB_PATH/DUT_U/DUT_U/mtc_i/" "MTC"

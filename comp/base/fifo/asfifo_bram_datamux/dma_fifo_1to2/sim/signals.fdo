@@ -1,0 +1,55 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Viktor Pus <pus@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+
+
+proc write_part {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-noupdate      -label CLK_WR"              $PATH/clk_wr
+   add_wave "-noupdate      -label RST_WR"              $PATH/rst_wr
+
+   add_wave "-noupdate -dec -label TX_DATA"             $PATH/RX_DATA
+   add_wave "-noupdate      -label RX_EOP"              $PATH/RX_EOP
+   add_wave "-noupdate      -label RX_SOP"              $PATH/RX_SOP
+   add_wave "-noupdate -hex -label wr_high"             $PATH/wr_high
+   add_wave "-noupdate -hex -label wr_low"              $PATH/wr_low
+
+}
+
+proc read_part {NAME PATH} {
+   add wave -divider "$NAME"
+   add_wave "-noupdate      -label CLK_RD"              $PATH/clk_rd
+   add_wave "-noupdate      -label RST_RD"              $PATH/rst_rd
+
+   add_wave "-noupdate -hex -label rd"                 $PATH/rd
+
+   add_wave "-noupdate      -label RX_SRC_RDY"          $PATH/RX_SRC_RDY
+   add_wave "-noupdate      -label RX_DST_RDY"          $PATH/RX_DST_RDY
+
+   add wave -divider ""
+
+   add_wave "-noupdate      -label TX_DST_RDY"          $PATH/TX_DST_RDY
+   add_wave "-noupdate      -label TX_SRC_RDY"          $PATH/TX_SRC_RDY
+   add_wave "-noupdate      -label TX_SRC_RDY_H"        $PATH/TX_SRC_RDY_H
+}
+
+proc internal {NAME PATH} {
+
+
+
+   add_wave "-noupdate      -label sig_sop_o"          $PATH/fifo_out_l(14)
+   add wave -divider "Data Output"
+   add_wave "-noupdate -hex -label TX_DATA"            $PATH/TX_DATA
+   add_wave "-noupdate -hex -label TX_DATA_up"         $PATH/TX_DATA(266:256)
+   add_wave "-noupdate -hex -label TX_DATA_down"       $PATH/TX_DATA(10:0)
+   add_wave "-noupdate -hex -label TX_HDR"             $PATH/TX_HDR
+
+   add wave -divider ""
+      add_wave "-noupdate      -label sig_present_state"   $PATH/present_state
+
+}

@@ -1,0 +1,13 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET
+# Author(s): Tomáš Beneš <xbenes55@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "TRANS_SORTER"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+all ALL  /testbench/DUT_U/VHDL_TRANS_SORTER_U

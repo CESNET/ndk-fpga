@@ -1,0 +1,46 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2016 CESNET
+# Author: Vaclav Hummel <xhumme00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+proc tb_internals { PATH GROUP } {
+   eval "add wave $GROUP -divider {TB internals}"
+   add_wave "$GROUP -noupdate -hex -label N_ONE_D"           $PATH/n_one_d
+   add_wave "$GROUP -noupdate -hex -label N_ONE_N"           $PATH/n_one_n
+   add_wave "$GROUP -noupdate -hex -label N_ONE_A"           $PATH/n_one_a
+   add_wave "$GROUP -noupdate -hex -label N_ONE_VLD"           $PATH/n_one_vld
+}
+
+proc n_one_ports { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Synchronization}"
+   add_wave "$GROUP -noupdate -hex -label CLK -color yellow"   $PATH/CLK
+   add_wave "$GROUP -noupdate -hex -label RST -color yellow"   $PATH/RST
+
+   eval "add wave $GROUP -divider {Ports}"
+   add_wave "$GROUP -noupdate -hex -label D"             $PATH/d
+   add_wave "$GROUP -noupdate -hex -label N"             $PATH/n
+   add_wave "$GROUP -noupdate -hex -label A"             $PATH/a
+   add_wave "$GROUP -noupdate -hex -label VLD"           $PATH/vld
+
+
+}
+
+proc n_one_internals { PATH GROUP } {
+
+   eval "add wave $GROUP -divider {Internals}"
+   add_wave "$GROUP -noupdate -hex -label SUM"     $PATH/sum
+   add_wave "$GROUP -noupdate -hex -label SUB_A"     $PATH/sub_a
+   add_wave "$GROUP -noupdate -hex -label SUB_B"     $PATH/sub_b
+   add_wave "$GROUP -noupdate -hex -label SUB"     $PATH/sub
+   add_wave "$GROUP -noupdate -hex -label SUB_CMP"     $PATH/sub_cmp
+   add_wave "$GROUP -noupdate -hex -label SUM_ALL"     $PATH/sum_all
+   add_wave "$GROUP -noupdate -hex -label A0"     $PATH/a0
+   add_wave "$GROUP -noupdate -hex -label A1"     $PATH/a1
+   add_wave "$GROUP -noupdate -hex -label MUX_IN"     $PATH/mux_in
+   add_wave "$GROUP -noupdate -hex -label D_EXT"     $PATH/d_ext
+
+}

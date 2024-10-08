@@ -1,0 +1,34 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2017 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+source "./signals.fdo"
+
+add_wave "-noupdate -color orange -label DMA_CLK"     /testbench/DMA_CLK
+add_wave "-noupdate -color orange -label DMA_RESET"   /testbench/DMA_RESET
+
+add_wave "-noupdate -color yellow -label PCIE_CLK"    /testbench/PCIE_CLK
+add_wave "-noupdate -color yellow -label PCIE_RESET"  /testbench/PCIE_RESET
+
+add wave -divider "TOP"
+rx  RX  /testbench/DUT_U/VHDL_DUT_U/dut_i
+tx  TX  /testbench/DUT_U/VHDL_DUT_U/dut_i
+int INT /testbench/DUT_U/VHDL_DUT_U/dut_i
+
+add wave -divider "HPAI"
+rx  HPAI_RX  /testbench/DUT_U/VHDL_DUT_U/dut_i/hdr_plan_and_insert_i
+tx  HPAI_TX  /testbench/DUT_U/VHDL_DUT_U/dut_i/hdr_plan_and_insert_i
+int HPAI_INT /testbench/DUT_U/VHDL_DUT_U/dut_i/hdr_plan_and_insert_i
+
+add wave -divider "DINS"
+rx  DINS_RX  /testbench/DUT_U/VHDL_DUT_U/dut_i/data_insert_i
+tx  DINS_TX  /testbench/DUT_U/VHDL_DUT_U/dut_i/data_insert_i
+int DINS_INT /testbench/DUT_U/VHDL_DUT_U/dut_i/data_insert_i
+
+add wave -divider "COMPRESSOR"
+all TOP /testbench/DUT_U/VHDL_DUT_U/dut_i/data_insert_i/data_compressor_i
+all SHAKER /testbench/DUT_U/VHDL_DUT_U/dut_i/data_insert_i/data_compressor_i/shaker_i
+

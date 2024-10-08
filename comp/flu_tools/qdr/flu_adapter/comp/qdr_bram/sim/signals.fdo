@@ -1,0 +1,33 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Vaclav Hummel <xhumme00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+
+proc qdr_bram_ports { TB } {
+
+   add wave -divider ""
+   add wave -divider "Synchronization"
+   add_wave "-group { SYNC } -noupdate -hex -label CLK"                   $TB/clk
+   add_wave "-group { SYNC } -noupdate -hex -label RST"                   $TB/rst
+
+   add wave -divider ""
+   add wave -divider "QDR_BRAM"
+
+   add wave -divider "WR request"
+   add_wave "-group { WRR } -noupdate -hex -label USER_WR_CMD"               $TB/user_wr_cmd
+   add_wave "-group { WRR } -noupdate -hex -label USER_WR_ADDR"               $TB/user_wr_addr
+   add_wave "-group { WRR } -noupdate -hex -label USER_WR_DATA"               $TB/user_wr_data
+   add_wave "-group { WRR } -noupdate -hex -label USER_WR_BW_N"               $TB/user_wr_bw_n
+
+   add wave -divider "RD request"
+   add_wave "-group { RDR } -noupdate -hex -label USER_RD_CMD"               $TB/user_rd_cmd
+   add_wave "-group { RDR } -noupdate -hex -label USER_RD_ADDR"               $TB/user_rd_addr
+
+   add wave -divider "Output data"
+   add_wave "-group { OD } -noupdate -hex -label USER_RD_VALID"                 $TB/user_rd_valid
+   add_wave "-group { OD } -noupdate -hex -label USER_RD_DATA"                 $TB/user_rd_data
+}

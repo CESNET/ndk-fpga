@@ -1,0 +1,15 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2024 BrnoLogic, Ltd.
+# Author(s): Radek Hajek <hajek@brnologic.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+add wave -divider "MFB_DUPLICATION"
+add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+add wave -divider "RX"
+add_wave "-noupdate  -hex"       /testbench/DUT_U/VHDL_DUT_U/RX_*
+
+add wave -divider "TX"
+add_wave "-noupdate  -hex"       /testbench/DUT_U/VHDL_DUT_U/TX_*

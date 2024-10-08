@@ -1,0 +1,29 @@
+# free_trans_fifo.fdo: Functional simulation file for free_trans_fifo
+# Copyright (C) 2017 CESNET
+# Author: Vaclav Hummel <xhumme00@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../.."
+
+set PIPE_TREE_ADDER_BASE "$OFM_PATH/comp/base/logic/pipe_tree_adder"
+set MATH_PKG_BASE        "$OFM_PATH/comp/base/pkg"
+
+set SIG_FILE            "$PIPE_TREE_ADDER_BASE/sim/pipe_tree_adder_sig.fdo"
+set TB_FILE             "$PIPE_TREE_ADDER_BASE/sim/testbench.vhd"
+
+
+set COMPONENTS [list \
+   [ list      "pipe_tree_adder" $PIPE_TREE_ADDER_BASE  "full"         ] \
+   [ list      "MATH_PKG"        $MATH_PKG_BASE         "MATH"         ] \
+   [ list      "TYPE_PKG"        $MATH_PKG_BASE         "TYPE"         ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+puts "Numeric Std Warnings - Disabled"
+set NumericStdNoWarnings 1
+
+nb_sim_run 250us

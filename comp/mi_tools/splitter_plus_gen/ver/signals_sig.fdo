@@ -1,0 +1,32 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author: Daniel Kondys <xkondy00@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+#add wave -divider "SPLITTER"
+#add_wave "-noupdate -color yellow -label RESET"   /testbench/RESET
+#add_wave "-noupdate -color yellow -label CLK"     /testbench/CLK
+
+add wave -divider "RX"
+#rx  RX  /testbench/DUT_U/VHDL_DUT_U
+add_wave "-group { RX } -noupdate -hex" /testbench/MI_RX/*
+
+add wave -divider "TX"
+#for each output port (number of output ports is set in test_pkg.sv - parameter PORTS)
+add_wave "-group { TX } -group { tx_0 } -noupdate -hex" {sim:/testbench/MI_TX[0]/*}
+add_wave "-group { TX } -group { tx_1 } -noupdate -hex" {sim:/testbench/MI_TX[1]/*}
+add_wave "-group { TX } -group { tx_2 } -noupdate -hex" {sim:/testbench/MI_TX[2]/*}
+add_wave "-group { TX } -group { tx_3 } -noupdate -hex" {sim:/testbench/MI_TX[3]/*}
+add_wave "-group { TX } -group { tx_4 } -noupdate -hex" {sim:/testbench/MI_TX[4]/*}
+add_wave "-group { TX } -group { tx_5 } -noupdate -hex" {sim:/testbench/MI_TX[5]/*}
+add_wave "-group { TX } -group { tx_6 } -noupdate -hex" {sim:/testbench/MI_TX[6]/*}
+add_wave "-group { TX } -group { tx_7 } -noupdate -hex" {sim:/testbench/MI_TX[7]/*}
+#add_wave "-group { TX } -group { tx_8 } -noupdate -hex" {sim:/testbench/MI_TX[8]/*}
+#add_wave "-group { TX } -group { tx_9 } -noupdate -hex" {sim:/testbench/MI_TX[9]/*}
+
+add wave -divider "ALL"
+add_wave "-group { ALL } -noupdate -hex" {sim:/testbench/VHDL_DUT_U/VHDL_DUT_U/*}
+
+config wave -signalnamewidth 1

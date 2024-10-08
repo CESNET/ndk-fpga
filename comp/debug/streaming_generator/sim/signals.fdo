@@ -1,0 +1,56 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_STREAM { } {
+
+    global STREAM_PATH
+    add wave -divider "MI_32"
+    add_wave "-noupdate -hex -label DWR" /$STREAM_PATH/MI_DWR
+    add_wave "-noupdate -hex -label ADDR" /$STREAM_PATH/MI_ADDR
+    add_wave "-noupdate -hex -label RD" /$STREAM_PATH/MI_RD
+    add_wave "-noupdate -hex -label WR" /$STREAM_PATH/MI_WR
+    add_wave "-noupdate -hex -label BE" /$STREAM_PATH/MI_BE
+    add_wave "-noupdate -hex -label DRD" /$STREAM_PATH/MI_DRD
+    add_wave "-noupdate -hex -label ARDY" /$STREAM_PATH/MI_ARDY
+    add_wave "-noupdate -hex -label DRDY" /$STREAM_PATH/MI_DRDY
+    add wave -divider "SETTINGS"
+    add_wave "-noupdate -hex -label setting1" /$STREAM_PATH/settings1
+    add_wave "-noupdate -hex -label setting2" /$STREAM_PATH/settings2
+    add wave -divider "IN"
+    add_wave "-noupdate -hex -label DST_RDY" /$STREAM_PATH/DST_RDY
+    add wave -divider "OUT"
+    add_wave "-noupdate -hex -label DATA" /$STREAM_PATH/DATA
+    add_wave "-noupdate -hex -label SRC_RDY" /$STREAM_PATH/SRC_RDY
+    add wave -divider "WR_REGS"
+    add_wave "-noupdate -hex -label addr_dec" /$STREAM_PATH/addr_dec
+    add_wave "-noupdate -hex -label addr_div" /$STREAM_PATH/addr_div
+    add_wave "-noupdate -hex -label mux_data_in" /$STREAM_PATH/mux_data_in
+    add_wave "-noupdate -hex -label mux_out" /$STREAM_PATH/mux_out
+    add_wave "-noupdate -hex -label mux_reg_out" /$STREAM_PATH/mux_reg_out
+    add wave -divider "WR_REG_BEFORE_BRAM"
+    add_wave "-noupdate -hex -label bram_wr" /$STREAM_PATH/bram_wr
+    add_wave "-noupdate -hex -label wea" /$STREAM_PATH/wea
+    add_wave "-noupdate -hex -label rea" /$STREAM_PATH/rea
+    add_wave "-noupdate -hex -label dia" /$STREAM_PATH/dia
+    add wave -divider "RD_OUT_MUX"
+    add_wave "-noupdate -hex -label mux_addr_out" /$STREAM_PATH/mux_addr_out
+    add_wave "-noupdate -hex -label mux_reg_out" /$STREAM_PATH/mux_reg_out
+    add_wave "-noupdate -hex -label mux_drd_mem" /$STREAM_PATH/mux_drd_mem
+    add wave -divider "GENERATOR"
+    add_wave "-noupdate -hex -label bram_b_data"  /$STREAM_PATH/bram_b_data
+    add_wave "-noupdate -hex -label bram_b_rd"    /$STREAM_PATH/bram_b_rd
+    add_wave "-noupdate -hex -label bram_b_addr"  /$STREAM_PATH/bram_b_addr
+    add_wave "-noupdate -hex -label config_1" /$STREAM_PATH/config_pom_1
+    add_wave "-noupdate -hex -label config_2" /$STREAM_PATH/config_pom_2
+    add_wave "-noupdate -hex -label config_3" /$STREAM_PATH/config_pom_3
+    add_wave "-noupdate -hex -label config_4" /$STREAM_PATH/config_pom_4
+    add_wave "-noupdate -hex -label RUN"      /$STREAM_PATH/cmd_run
+    add_wave "-noupdate -hex -label cmd_run_off"  /$STREAM_PATH/cmd_run_off
+   add wave -divider "RAND_GENERATOR"
+    add_wave "-noupdate -hex -label rand_value"  /$STREAM_PATH/GENERATOR_inst/RAND_GENERATOR_inst/RAND_OUT
+}

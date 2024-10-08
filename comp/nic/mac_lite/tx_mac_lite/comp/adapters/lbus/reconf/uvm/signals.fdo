@@ -1,0 +1,71 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Vladislav Valek <xvalek14@vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc mfb_rx {PATH} {
+    add wave -divider "RX_MFB"
+    add_wave [list -noupdate -hex]        "$PATH/RX_MFB_DATA(255 downto 0)"
+    add_wave [list -noupdate -hex]        "$PATH/RX_MFB_DATA(511 downto 256)"
+    add_wave [list -noupdate -bin]        $PATH/RX_MFB_SOF
+    add_wave [list -noupdate -bin]        $PATH/RX_MFB_EOF
+    add_wave [list -noupdate -bin]        $PATH/RX_MFB_SOF_POS
+    add_wave [list -noupdate -bin]        $PATH/RX_MFB_EOF_POS
+    add_wave [list -noupdate -bin]        $PATH/RX_MFB_SRC_RDY
+    add_wave [list -noupdate -bin]        $PATH/RX_MFB_DST_RDY
+}
+
+proc mfb_tx {PATH} {
+    add wave -divider "TX_MFB"
+    add_wave [list -noupdate -hex]        "$PATH/TX_MFB_DATA(255 downto 0)"
+    add_wave [list -noupdate -hex]        "$PATH/TX_MFB_DATA(511 downto 256)"
+    add_wave [list -noupdate -bin]        $PATH/TX_MFB_SOF
+    add_wave [list -noupdate -bin]        $PATH/TX_MFB_EOF
+    add_wave [list -noupdate -bin]        $PATH/TX_MFB_SOF_POS
+    add_wave [list -noupdate -bin]        $PATH/TX_MFB_EOF_POS
+    add_wave [list -noupdate -bin]        $PATH/TX_MFB_SRC_RDY
+    add_wave [list -noupdate -bin]        $PATH/TX_MFB_DST_RDY
+}
+
+proc ints {PATH} {
+
+    add wave -divider "INTERNALS"
+
+    add_wave [list -noupdate]             $PATH/sh_fsm_pst
+    add_wave [list -noupdate]             $PATH/sh_fsm_nst
+
+    add wave -divider "INPUT REGISTERS"
+    add_wave [list -noupdate  -hex]       "$PATH/rx_mfb_data_reg(0)(255 downto 0)"
+    add_wave [list -noupdate  -hex]       "$PATH/rx_mfb_data_reg(0)(511 downto 256)"
+    add_wave [list -noupdate  -hex]       "$PATH/rx_mfb_data_reg(1)(255 downto 0)"
+    add_wave [list -noupdate  -hex]       "$PATH/rx_mfb_data_reg(1)(511 downto 256)"
+    add_wave [list -noupdate  -bin]       $PATH/rx_mfb_sof_reg
+    add_wave [list -noupdate  -bin]       $PATH/rx_mfb_eof_reg
+    add_wave [list -noupdate  -bin]       $PATH/rx_mfb_sof_pos_reg
+    add_wave [list -noupdate  -bin]       $PATH/rx_mfb_eof_pos_reg
+    add_wave [list -noupdate  -bin]       $PATH/rx_mfb_src_rdy_reg
+    add_wave [list -noupdate  -bin]       $PATH/rx_mfb_reg_dst_rdy
+    add_wave [list -noupdate  -bin]       $PATH/rx_mfb_reg_en
+
+    add wave -divider "SHIFT CONTROL"
+    add_wave [list -noupdate  -hex]       "$PATH/skdown_shift_data_out(255 downto 0)"
+    add_wave [list -noupdate  -hex]       "$PATH/skdown_shift_data_out(511 downto 256)"
+    add_wave [list -noupdate  -unsigned]  "$PATH/skdown_shift_sel_pst"
+    add_wave [list -noupdate  -unsigned]  "$PATH/skdown_shift_sel_nst"
+
+    add_wave [list -noupdate  -hex]       "$PATH/word_shift_data_out(255 downto 0)"
+    add_wave [list -noupdate  -hex]       "$PATH/word_shift_data_out(511 downto 256)"
+    add_wave [list -noupdate  -unsigned]  $PATH/word_shift_sel_pst
+    add_wave [list -noupdate  -unsigned]  "$PATH/word_shift_sel_nst"
+
+    add_wave [list -noupdate  -bin]       "$PATH/postpone_sof_pst"
+    add_wave [list -noupdate  -bin]       "$PATH/postpone_sof_nst"
+
+    add wave -divider "UNREGISTERED OUTPUT"
+    add_wave [list -noupdate  -bin]       "$PATH/sh_fsm_tx_sof"
+    add_wave [list -noupdate  -bin]       "$PATH/sh_fsm_tx_eof"
+    add_wave [list -noupdate  -bin]       "$PATH/sh_fsm_tx_sof_pos"
+    add_wave [list -noupdate  -bin]       "$PATH/sh_fsm_tx_eof_pos"
+    add_wave [list -noupdate  -bin]       "$PATH/sh_fsm_tx_src_rdy"
+}

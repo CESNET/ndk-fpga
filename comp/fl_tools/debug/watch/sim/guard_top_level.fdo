@@ -1,0 +1,30 @@
+# top_level.fdo: Top Level Function simulation file
+# Copyright (C) 2007 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+# For whole design testing
+set FIRMWARE_BASE        "../../../../.."
+set FL_WATCH_BASE        ".."
+
+set TB_FILE             "$FL_WATCH_BASE/sim/guard_tb.vhd"
+set SIG_FILE            "$FL_WATCH_BASE/sim/guard_sig.fdo"
+
+set MOD ""
+
+# Modules definition
+set COMPONENTS [list [list "FL_WATCH"  $FL_WATCH_BASE   "FULL"] ]
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set  StdArithNoWarnings 1
+
+# File with signals
+nb_sim_run 3us
+

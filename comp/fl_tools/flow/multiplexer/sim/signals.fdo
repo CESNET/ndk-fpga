@@ -1,0 +1,72 @@
+# signals.fdo : Include file with signals
+# Copyright (C) 2010 CESNET
+# Author: Viktor Pus <pus@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+
+add_wave "-noupdate -label CLK" /testbench/CLK
+add_wave "-noupdate -label RESET" /testbench/RESET
+
+add wave -divider "FrameLink 0 RX interface"
+add_wave "-noupdate -hex -label RX_DATA" /testbench/rx_data0
+add_wave "-noupdate -hex -label RX_DREM" /testbench/rx_drem0
+add_wave "-noupdate -label RX_SOF_N" /testbench/rx_sof_n0
+add_wave "-noupdate -label RX_EOF_N" /testbench/rx_eof_n0
+add_wave "-noupdate -label RX_SOP_N" /testbench/rx_sop_n0
+add_wave "-noupdate -label RX_EOP_N" /testbench/rx_eop_n0
+add_wave "-noupdate -label RX_SRC_RDY_N" /testbench/rx_src_rdy_n0
+add_wave "-noupdate -label RX_DST_RDY_N" /testbench/rx_dst_rdy_n0
+
+add wave -divider "FrameLink 1 RX interface"
+add_wave "-noupdate -hex -label RX_DATA" /testbench/rx_data1
+add_wave "-noupdate -hex -label RX_DREM" /testbench/rx_drem1
+add_wave "-noupdate -label RX_SOF_N" /testbench/rx_sof_n1
+add_wave "-noupdate -label RX_EOF_N" /testbench/rx_eof_n1
+add_wave "-noupdate -label RX_SOP_N" /testbench/rx_sop_n1
+add_wave "-noupdate -label RX_EOP_N" /testbench/rx_eop_n1
+add_wave "-noupdate -label RX_SRC_RDY_N" /testbench/rx_src_rdy_n1
+add_wave "-noupdate -label RX_DST_RDY_N" /testbench/rx_dst_rdy_n1
+
+add wave -divider "FrameLink 2 RX interface"
+add_wave "-noupdate -hex -label RX_DATA" /testbench/rx_data2
+add_wave "-noupdate -hex -label RX_DREM" /testbench/rx_drem2
+add_wave "-noupdate -label RX_SOF_N" /testbench/rx_sof_n2
+add_wave "-noupdate -label RX_EOF_N" /testbench/rx_eof_n2
+add_wave "-noupdate -label RX_SOP_N" /testbench/rx_sop_n2
+add_wave "-noupdate -label RX_EOP_N" /testbench/rx_eop_n2
+add_wave "-noupdate -label RX_SRC_RDY_N" /testbench/rx_src_rdy_n2
+add_wave "-noupdate -label RX_DST_RDY_N" /testbench/rx_dst_rdy_n2
+
+add wave -divider "FrameLink 3 RX interface"
+add_wave "-noupdate -hex -label RX_DATA" /testbench/rx_data3
+add_wave "-noupdate -hex -label RX_DREM" /testbench/rx_drem3
+add_wave "-noupdate -label RX_SOF_N" /testbench/rx_sof_n3
+add_wave "-noupdate -label RX_EOF_N" /testbench/rx_eof_n3
+add_wave "-noupdate -label RX_SOP_N" /testbench/rx_sop_n3
+add_wave "-noupdate -label RX_EOP_N" /testbench/rx_eop_n3
+add_wave "-noupdate -label RX_SRC_RDY_N" /testbench/rx_src_rdy_n3
+add_wave "-noupdate -label RX_DST_RDY_N" /testbench/rx_dst_rdy_n3
+
+add wave -divider "FrameLink TX interface"
+add_wave "-noupdate -hex -label TX_CHANNEL" /testbench/tx_channel
+add_wave "-noupdate -hex -label TX_DATA" /testbench/tx_data
+add_wave "-noupdate -hex -label TX_DREM" /testbench/tx_drem
+add_wave "-noupdate -label TX_SOF_N" /testbench/tx_sof_n
+add_wave "-noupdate -label TX_EOF_N" /testbench/tx_eof_n
+add_wave "-noupdate -label TX_SOP_N" /testbench/tx_sop_n
+add_wave "-noupdate -label TX_EOP_N" /testbench/tx_eop_n
+add_wave "-noupdate -label TX_SRC_RDY_N" /testbench/tx_src_rdy_n
+add_wave "-noupdate -label TX_DST_RDY_N" /testbench/tx_dst_rdy_n
+
+add wave -divider "internal signals"
+add_wave "-noupdate -label channel_rdy" /testbench/uut/channel_rdy
+add_wave "-noupdate -label channel_rdy_sh" /testbench/uut/channel_rdy_sh
+add_wave "-noupdate -label reg_last_sel" /testbench/uut/reg_last_sel
+add_wave "-noupdate -label shift" /testbench/uut/shift
+add_wave "-noupdate -label firstone" /testbench/uut/firstone
+add_wave "-noupdate -label sel" /testbench/uut/sel
+add_wave "-noupdate -label output_enable" /testbench/uut/output_enable

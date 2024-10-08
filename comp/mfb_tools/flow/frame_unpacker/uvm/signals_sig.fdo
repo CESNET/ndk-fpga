@@ -1,0 +1,50 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Daniel Kříž <xkrizd01@vutbr.cz>
+
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "FRAME_UNPACKER"
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/RST
+add_wave "-noupdate -color yellow"   /testbench/DUT_U/CLK
+
+#mfb_rx MFB_RX /testbench/DUT_U/VHDL_DUT_U
+#mfb_tx MFB_TX /testbench/DUT_U/VHDL_DUT_U
+
+all FRAME_UNPACKER        /testbench/DUT_U/VHDL_DUT_U
+add_wave -group {FU Header} -group {Input} -noupdate -hex -label "Length"     /testbench/DUT_U/VHDL_DUT_U/RX_MFB_DATA(15:0)
+add_wave -group {FU Header} -group {Input} -noupdate -hex -label "L2_len"     /testbench/DUT_U/VHDL_DUT_U/RX_MFB_DATA(22:16)
+add_wave -group {FU Header} -group {Input} -noupdate -hex -label "L3_len"     /testbench/DUT_U/VHDL_DUT_U/RX_MFB_DATA(31:23)
+add_wave -group {FU Header} -group {Input} -noupdate -hex -label "Flags"      /testbench/DUT_U/VHDL_DUT_U/RX_MFB_DATA(39:32)
+add_wave -group {FU Header} -group {Input} -noupdate -hex -label "Timestamp"  /testbench/DUT_U/VHDL_DUT_U/RX_MFB_DATA(87:40)
+add_wave -group {FU Header} -group {Input} -noupdate -hex -label "Reserve"    /testbench/DUT_U/VHDL_DUT_U/RX_MFB_DATA(127:88)
+add_wave -group {FU Header} -group {Input} -noupdate -hex -label "All"        /testbench/DUT_U/VHDL_DUT_U/RX_MFB_DATA(127:0)
+add_wave -group {FU Header} -group {Input} -noupdate -hex                     /testbench/DUT_U/VHDL_DUT_U/RX_MFB_SOF
+add_wave -group {FU Header} -group {Input} -noupdate -hex                     /testbench/DUT_U/VHDL_DUT_U/RX_MFB_SRC_RDY
+add_wave -group {FU Header} -group {Input} -noupdate -hex                     /testbench/DUT_U/VHDL_DUT_U/RX_MFB_DST_RDY
+add_wave -group {FU Header} -group {Output} -noupdate -hex -label "Length"    /testbench/DUT_U/VHDL_DUT_U/TX_MFB_META(15:0)
+add_wave -group {FU Header} -group {Output} -noupdate -hex -label "L2_len"    /testbench/DUT_U/VHDL_DUT_U/TX_MFB_META(22:16)
+add_wave -group {FU Header} -group {Output} -noupdate -hex -label "L3_len"    /testbench/DUT_U/VHDL_DUT_U/TX_MFB_META(31:23)
+add_wave -group {FU Header} -group {Output} -noupdate -hex -label "Flags"     /testbench/DUT_U/VHDL_DUT_U/TX_MFB_META(39:32)
+add_wave -group {FU Header} -group {Output} -noupdate -hex -label "Timestamp" /testbench/DUT_U/VHDL_DUT_U/TX_MFB_META(87:40)
+add_wave -group {FU Header} -group {Output} -noupdate -hex -label "Reserve"   /testbench/DUT_U/VHDL_DUT_U/TX_MFB_META(127:88)
+add_wave -group {FU Header} -group {Output} -noupdate -hex -label "Channel"   /testbench/DUT_U/VHDL_DUT_U/TX_MFB_META(130:128)
+add_wave -group {FU Header} -group {Output} -noupdate -hex -label "All"       /testbench/DUT_U/VHDL_DUT_U/TX_MFB_META(127:0)
+add_wave -group {FU Header} -group {Output} -noupdate -hex                    /testbench/DUT_U/VHDL_DUT_U/TX_MFB_SOF
+add_wave -group {FU Header} -group {Output} -noupdate -hex                    /testbench/DUT_U/VHDL_DUT_U/TX_MFB_SRC_RDY
+add_wave -group {FU Header} -group {Output} -noupdate -hex                    /testbench/DUT_U/VHDL_DUT_U/TX_MFB_DST_RDY
+all OFFSET_PROCESSOR_0    /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(0)/offset_processor_i
+all OFFSET_PROCESSOR_1    /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(1)/offset_processor_i
+all SOF_CREATOR_0_0       /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(0)/sof_creator_g(0)/sof_creator_i
+all SOF_CREATOR_0_1       /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(0)/sof_creator_g(1)/sof_creator_i
+all SOF_CREATOR_0_2       /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(0)/sof_creator_g(2)/sof_creator_i
+all SOF_CREATOR_0_3       /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(0)/sof_creator_g(3)/sof_creator_i
+all SOF_CREATOR_1_0       /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(1)/sof_creator_g(0)/sof_creator_i
+all SOF_CREATOR_1_1       /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(1)/sof_creator_g(1)/sof_creator_i
+all SOF_CREATOR_1_2       /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(1)/sof_creator_g(2)/sof_creator_i
+all SOF_CREATOR_1_3       /testbench/DUT_U/VHDL_DUT_U/offset_pipeline_g(1)/sof_creator_g(3)/sof_creator_i
+all MFB_CUTTER            /testbench/DUT_U/VHDL_DUT_U/mfb_cutter_i
+
+config wave -signalnamewidth 1

@@ -1,0 +1,35 @@
+# switch_1to4_sig.fdo : Functional simulation file.
+# Copyright (C) 2003 CESNET
+# Author: Lukas Solanka <solanka@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+# Components base directories
+
+# Components paths
+set TB_PATH             "/testbench"
+set UUT_PATH            "/testbench/uut"
+set FL_SWITCH_PATH      "$UUT_PATH"
+
+# Include files with signals
+source signals.fdo
+
+
+add wave -noupdate -label reset /testbench/uut/reset
+add wave -noupdate -label clk /testbench/uut/clk
+
+FL_SWITCH_RX
+
+FL_SWITCH_TX0
+FL_SWITCH_TX1
+FL_SWITCH_TX2
+FL_SWITCH_TX3
+
+FL_SWITCH_INT
+FL_SWITCH_INPUT
+FL_SWITCH_SHIFT
+FL_SWITCH_OUT
+

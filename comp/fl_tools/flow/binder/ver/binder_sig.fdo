@@ -1,0 +1,23 @@
+# binder_sig.fdo : Include file with signals
+# Copyright (C) 2008 CESNET
+# Author: Martin Kosek <kosek@liberouter.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+#set FL_BINDER_PATH         "/testbench/DUT_U/VHDL_DUT_U"
+#source "../sim/signals.fdo"
+
+#blk_FL_BINDER "IFC"
+
+# Simple Binder
+#blk_FL_BINDER "SIMPLE_BINDER"
+#blk_FL_BINDER "OUTPUT_BLOCK_SIMPLE"
+
+# NFIFO2FIFO Binder
+#blk_FL_BINDER "ALIGN_FRAME" 0
+#blk_FL_BINDER "NFIFO2FIFO"
+#blk_FL_BINDER "DATA_TRANSFORMER"
+

@@ -1,0 +1,15 @@
+# dmafifo_mux_1to2_sig.fdo : Include file with signals
+# Copyright (C) 2012 CESNET
+# Author: Viktor Pus <pus@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+source "./signals.fdo"
+
+write_part  "Write part"                /testbench/uut
+read_part   "Read part"                 /testbench/uut
+internal    "Internal signals"          /testbench/uut
+

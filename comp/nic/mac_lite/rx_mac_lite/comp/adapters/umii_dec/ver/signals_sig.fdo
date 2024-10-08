@@ -1,0 +1,19 @@
+# signal_sig.fdo : Include file with signals
+# Copyright (C) 2019 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "UMII_DEC"
+add_wave "-noupdate -color yellow -label RESET" /testbench/RESET
+add_wave "-noupdate -color yellow -label CLK"   /testbench/CLK
+
+mii  MII    /testbench/DUT_U/VHDL_DUT_U
+tx   TX     /testbench/DUT_U/VHDL_DUT_U
+st   STATUS /testbench/DUT_U/VHDL_DUT_U
+#all  ALIG   /testbench/DUT_U/VHDL_DUT_U/xgmii_align_on_g/xgmii_align_i/
+#int  INT    /testbench/DUT_U/VHDL_DUT_U
+#int  FSM_INT /testbench/DUT_U/VHDL_DUT_U/
+

@@ -1,0 +1,13 @@
+# top_level_sig.fdo : Include file with signals
+# Copyright (C) 2018 CESNET z. s. p. o.
+# Author: Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+source "./signals.fdo"
+
+rx  RX  /testbench/DUT_U/VHDL_DUT_U
+tx  TX  /testbench/DUT_U/VHDL_DUT_U
+all ALL /testbench/DUT_U/VHDL_DUT_U
+all FD  /testbench/DUT_U/FORCE_DISCARD_I

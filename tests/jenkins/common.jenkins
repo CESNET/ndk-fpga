@@ -1,0 +1,240 @@
+/*
+ * common.jenkins: Common Jenkins configuration script
+ * Copyright (C) 2021 CESNET z. s. p. o.
+ * Author(s): Jakub Cabal <cabal@cesnet.cz>
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+library 'liberouter'
+
+// Jenkins configuration for multiple modules
+def commonPrekladVerRun(COMPONENTS) {
+
+    // Clean old builds from Jenkins history
+    cleanBuilds()
+
+    // clean artifacts possibly left by previous builds
+    sh "git clean -df"
+
+    // every midnight check for new commits and run pipeline if they exist
+    properties([pipelineTriggers([pollSCM('H H(0-2) * * *')])])
+
+    def failed = []
+    //load new fpga_version and set default simulator
+    def toolsel  = "set +x\n"
+        toolsel += "source fpga_version.sh\n"
+        toolsel += "fpga_sim -d\n"
+        toolsel += "set -x\n"
+
+    // run verification of every component
+    for(c in COMPONENTS) {
+        // parse
+        def name = c[0]
+        def path = c[1]
+        def script = c[2]
+        // exec vsim
+        try { // try-catch is a hack to continue even after the first failed verification
+            timeout(time: 4, unit: 'HOURS') {
+                stage("$name") {
+                    dir("$path") {
+                        def command = "vsim -c -do \"do $script; quit -f\" | grep -E \"(Verification finished successfully)|(VERIFICATION SUCCESS)\"\n"
+                        // "quit -f" added to ensure termination of vsim execution in all cases
+                        // grep used to detect successfull run, each verification should have the following line before the last $stop:
+                        //    $write("Verification finished successfully!\n");
+                        //
+                        sh "${toolsel}${command}"
+                    }
+                }
+            }
+        } catch(err) {
+            currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
+            failed.add("$name")
+        } finally { // collect interesting files
+            archiveArtifacts "$path/transcript" // verification log
+            if(currentBuild.result == "FAILURE") {
+                archiveArtifacts "$path/vsim.wlf" // generated vaweform, use vsim -view vsim.wlf
+            }
+        }
+    }
+
+    // send out emails if failure is detected
+    if(currentBuild.result == "FAILURE") {
+        println "FAILED on components: ${failed}."
+        emailext \
+            recipientProviders: [culprits(), developers()],
+            to: 'cabal@cesnet.cz',
+            subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
+            body: """\
+                The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
+
+                For more details see ${env.BUILD_URL}.
+
+                Yours sincerely
+                Jenkins\
+            """.stripIndent(),
+            attachLog: true,
+            compressLog: true
+    }
+}
+
+// Jenkins configuration for MultiVer
+def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
+
+    // Clean old builds from Jenkins history
+    cleanBuilds()
+
+    // fetch sources from GIT
+    checkout scm
+    // clean artifacts possibly left by previous builds
+    sh "git clean -df"
+
+    // every midnight check for new commits and run pipeline if they exist
+    properties([pipelineTriggers([pollSCM('H H(0-2) * * *')])])
+
+    def failed = []
+    //load new fpga_version and set default simulator
+    def toolsel  = "set +x\n"
+        toolsel += "source fpga_version.sh\n"
+        toolsel += "fpga_sim -d\n"
+        toolsel += "set -x\n"
+
+    // run verification of every component
+    for(c in COMPONENTS) {
+        // parse
+        def name      = c[0]
+        def path      = c[1]
+        def fdo       = c[2]
+        def pkg       = c[3]
+        def settings  = c[4]
+        //def repo_root = pwd()
+        //def multi_ver = "$repo_root/build/scripts/multi_ver/multi_ver.py"
+        def multi_ver = "$ofm_path/build/scripts/multi_ver/multi_ver.py"
+        // exec vsim
+        try { // try-catch is a hack to continue even after the first failed verification
+            timeout(time: 4, unit: 'HOURS') {
+                stage("$name") {
+                    dir("$path") {
+                        def command = "python3 $multi_ver $fdo $pkg $settings -p \"$name\""
+                        sh "${toolsel}${command}"
+                    }
+                }
+            }
+        } catch(err) {
+            currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
+            failed.add("$name")
+        } finally { // collect interesting files
+            archiveArtifacts "$path/transcript*" // verification log
+            if(currentBuild.result == "FAILURE") {
+                archiveArtifacts "$path/vsim.wlf"   // generated vaweform, use vsim -view vsim.wlf
+            }
+        }
+    }
+
+    // send out emails if failure is detected
+    if(currentBuild.result == "FAILURE") {
+        println "FAILED on components: ${failed}."
+        emailext \
+            recipientProviders: [culprits(), developers()],
+            to: 'cabal@cesnet.cz',
+            subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
+            body: """\
+                The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
+
+                For more details see ${env.BUILD_URL}.
+
+                Yours sincerely
+                Jenkins\
+            """.stripIndent(),
+            attachLog: true,
+            compressLog: true
+    }
+}
+
+def commonPrekladHarpRun(COMPONENTS, ofm_path = pwd()) {
+    // Clean old builds from Jenkins history
+    cleanBuilds()
+
+    // fetch sources from GIT
+    checkout scm
+    // clean artifacts possibly left by previous builds
+    sh "git clean -df"
+
+    // every midnight check for new commits and run pipeline if they exist
+    properties([pipelineTriggers([pollSCM('H H(0-2) * * *')])])
+
+    def failed = []
+    //load new fpga_version and set default simulator
+    def toolsel  = "set +x\n"
+    toolsel += "source fpga_version.sh\n"
+    toolsel += "fpga_sim -d\n"
+    toolsel += "set -x\n"
+
+    def venv_dir = "$ofm_path/python/harp/harp_venv"
+
+    // prepare virtual environment with HARP
+    stage("Prepare virtual env") {
+        sh """
+        if ! command -v python3.9; then
+            echo "Python 3.9 is not installed. Please install Python 3.9."
+            exit 1
+        fi
+        python3.9 -m venv $venv_dir
+        source $venv_dir/bin/activate
+        pip install --upgrade pip
+        pip install $ofm_path/python/harp
+        """
+    }
+
+    def env_source = "source $venv_dir/bin/activate\n"
+
+    for(c in COMPONENTS) {
+        // parse
+        def name      = c[0]
+        def path      = c[1]
+
+        // exec vsim
+        try { // try-catch is a hack to continue even after the first failed verification
+            timeout(time: 4, unit: 'HOURS') {
+                stage("$name") {
+                    dir("$path") {
+                        def command = "harp multiver"
+                        sh "${env_source}${toolsel}${command}"
+                    }
+                }
+            }
+        } catch(err) {
+            currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
+            failed.add("$name")
+        } finally { // collect interesting files
+            // there is unknown path to transcripts folder
+            // archiveArtifacts "$path/transcript*"
+            if(currentBuild.result == "FAILURE") {
+                archiveArtifacts "$path/failed_combinations.csv" // failed combinations summary with seed
+            // there is unknown path to wave folder
+                // archiveArtifacts "$path/vsim.wlf"
+            }
+        }
+    }
+
+    // send out emails if failure is detected
+    if(currentBuild.result == "FAILURE") {
+        println "FAILED on components: ${failed}."
+        emailext \
+            recipientProviders: [culprits(), developers()],
+            to: 'cabal@cesnet.cz',
+            subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
+            body: """\
+                The build of the repository (with HARP) ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
+
+                For more details see ${env.BUILD_URL}.
+
+                Yours sincerely
+                Jenkins\
+            """.stripIndent(),
+            attachLog: true,
+            compressLog: true
+    }
+}
+
+return this

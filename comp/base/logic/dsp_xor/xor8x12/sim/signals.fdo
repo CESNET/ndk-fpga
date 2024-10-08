@@ -1,0 +1,16 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2018 CESNET
+# Author: Petr Panak <xpanak04@stud.feec.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_xor8x12 { } {
+
+    global xor8x12_PATH
+
+    add_wave "-noupdate -hex" $xor8x12_PATH/*
+
+}

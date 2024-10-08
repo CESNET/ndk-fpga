@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<source>
+
+<component>FrameLink Binder</component>
+
+<authors>
+   <author login="kosek">Martin Košek</author>
+</authors>
+
+<features>
+   <item>Data width 8, 16, 32, 64, or 128 bits</item>
+   <item>Generic data input and data output width</item>
+   <item>Generic count of input interfaces</item>
+   <item>Choose internal memory - LUT or BlockRAM</item>
+   <item>Multiple input queue choosing algorithms (most_occupied, round_robin, framed)</item>
+</features>
+
+<description>
+   <p>
+      FrameLink Binder binds several FrameLink data flows to one output interface
+      with variable data width. This component could prove very useful, when there
+      are components with high throughput and lesser throughput in our design.
+   </p>
+   <p>
+      We can use FrameLink Splitter to split data flow from one high-thtoughput
+      component to several instances of low-throughput components and then use
+      FrameLink Binder to bind the data flows into one. This approach should
+      improve the throughput of our design.
+   </p>
+</description>
+
+<interface>
+   <generic_map>
+      <generic name="INPUT_WIDTH" type="integer" default="16">
+         Data width of one input interface (8, 16, 64, 128)
+      </generic>
+      <generic name="INPUT_COUNT" type="integer" default="4">
+         Number of input interfaces. Only 2, 4, 8, 16 values supported.
+      </generic>
+      <generic name="OUTPUT_WIDTH" type="integer" default="64">
+         Output width. Has to be a multiple of DATA_WIDTH, where DATA_WIDTH
+         can be multiplied only by the power of 2 (1, 2, 4, ...). OUTPUT_WIDTH
+         cannot be greater than COUNT*DATA_WIDTH.
+      </generic>
+      <generic name="FRAME_PARTS" type="integer" default="2">
+         Number of parts in one FrameLink frame.
+      </generic>
+      <generic name="LUT_MEMORY" type="boolean" default="false">
+         Choose data storage memory type. true = memory composed of LUTs; false =
+         memory composed of BlockRAMs.
+      </generic>
+      <generic name="LUT_BLOCK_SIZE" type="integer" default="16">
+         Number of items (INPUT_WIDTH*INPUT_COUNT wide) in LUT memory that can
+         be stored for each block (RX interface). Total number of memory rows
+         is therefore INPUT_COUNT * LUT_BLOCK_SIZE. Generic has no effect when
+         LUT_MEMORY == false.
+      </generic>
+      <generic name="QUEUE_CHOOSING" type="T_BINDER_QUEUE_POLICY" default="round_robin">
+         Algorithm used in queue choosing unit. There are several possible algorithms - see
+         HW section for more details.
+      </generic>
+      <generic name="SIMPLE_BINDER" type="boolean" default="false">
+         If set to TRUE, a simple architecture of Binder is used instead of
+         the complex one. The simple architecture is only composed of FL_FIFO,
+         FL_TRANSFORMER and output logic and shouldn't contain any bugs. It should be
+         only used when problems with FULL Binder occurs as a fast problem work-around.
+      </generic>
+   </generic_map>
+   <port_map>
+      <divider>Common Interface</divider>
+      <port name="CLK" dir="in" width="1">
+         Clock
+      </port>
+      <port name="RESET" dir="in" width="1">
+         Reset
+      </port>
+
+      <divider>Input FrameLink interfaces</divider>
+      <port name="RX0" dir="inout" width="1">
+         Recieve interface 0
+      </port>
+      <port name="RX1" dir="inout" width="1">
+         Recieve interface 1
+      </port>
+      <port name="RXN" dir="inout" width="1">
+         Recieve interface N (generic)
+      </port>
+
+      <divider>Output FrameLink interface</divider>
+      <port name="TX" dir="inout" width="1">
+         Transmit interface
+      </port>
+   </port_map>
+</interface>
+
+<body>
+   <h1>Binder implementation</h1>
+   <p>
+      Binder core is built on <ref_comp ref="nfifo2fifo">NFIFO2FIFO</ref_comp> component,
+      which stores data from N data interfaces with data width DATA_WIDTH. Data can be
+      then read from output interface wide N*DATA_WIDTH when relevant input data buffer
+      is chosen. Binder itself only secures correct compression of FrameLink protocol
+      to the memory with correct alignment and output transformation back to FrameLink.
+   </p>
+
+   <h2>Queue choosing</h2>
+   <p>
+      There are 3 optional algorithms for input queue choosing:
+      <ul>
+         <li>Most Occupied - the input queue with most occupied space is chosen for
+            output.</li>
+         <li>Round Robin - a fair algorithm that applies round robin on queues
+            with at least one complete packet. If there is no complete packet in
+            any queue, most occupied queue is chosen.
+         </li>
+         <li>Framed - a fair algorithm witch applies round robin on queues
+            which contain at least one entire packet. If there is no complete packet in
+            any queue, Binder waits.
+          </li>
+      </ul>
+   </p>
+
+   <h2>Occupied memory</h2>
+   <p>
+      Every input interface has assigned a queue composed of one memory composed of
+      BlockRAMs. When input data width is less or equal to 32b, each memory will
+      be composed of one BlockRAM (applicable to Virtex2 FPGA). In case of higher
+      data width there may be more BlockRAMs occupied (as maximal width of BlockRAM
+      is 32b).
+   </p>
+
+   <h2>Output width</h2>
+   <p>
+      It is recommmended to use OUTPUT_WIDTH=INPUT_WIDTH*INPUT_COUNT as it is most
+      effective to FPGA resources. In other cases FL_TRANSFORMER have to be
+      instantiated.
+   </p>
+
+   <h1>Frequency and Resources usage</h1>
+
+   <h2>Full Binder (XST)</h2>
+   <p>
+      <tab sloupce="cccc">
+         <tr>
+            <th>Generic settings</th>
+            <th>Slices (% of C6X slices)</th>
+            <th>BlockRams (+ % of C6X BRAMs)</th>
+            <th>Max. HW frequency</th>
+         </tr>
+         <tr>
+            <th>4x 16b input, 64b output, most_occupied</th>
+            <td>534 (2%)</td>
+            <td>4 (1%)</td>
+            <td>120 MHz</td>
+         </tr>
+         <tr>
+            <th>4x 16b input, 64b output, round_robin</th>
+            <td>560 (2%)</td>
+            <td>4 (1%)</td>
+            <td>110 MHz</td>
+         </tr>
+         <tr>
+            <th>4x 16b input, 32b output, round_robin</th>
+            <td>598 (2%)</td>
+            <td>4 (1%)</td>
+            <td>110 MHz</td>
+         </tr>
+         <tr>
+            <th>2x 64b input, 128b output, round_robin</th>
+            <td>514 (2%)</td>
+            <td>4 (1%)</td>
+            <td>120 MHz</td>
+         </tr>
+         <tr>
+            <th>4x 16b input, 64b output, round_robin, LUT MEMORY (4x16 rows)</th>
+            <td>824 (3%)</td>
+            <td>0 (0%)</td>
+            <td>125 MHz</td>
+         </tr>
+      <nazev>Chip utilization &amp; max design frequency</nazev>
+      </tab>
+   </p>
+
+   <h1>Schemes</h1>
+   <p>
+   The block structure of the Full Binder is in the following figures. It is
+   composed of Align Frame units, NFIFO2FIFO for data storage, Data transform
+   for transformation from data vector to FrameLink record and Output block
+   for input queue choosing.
+   </p>
+
+   <p>
+      <obr src="./fig/top_arch.fig">Top level architecture</obr>
+      <obr src="./fig/align_frame.fig">Align Frame</obr>
+      <obr src="./fig/align_frame_fsm.dot">Align Frame FSM</obr>
+      <obr src="./fig/data_transformer.fig">Data Transformer</obr>
+      <obr src="./fig/output_block.fig">Output Block</obr>
+      <obr src="./fig/output_block_fsm.fig">Output Block FSM</obr>
+   </p>
+
+</body>
+</source>

@@ -1,0 +1,36 @@
+- This is comment. Lines starting with '-' will be ignored.
+- Multi line packets are supported.
+- End of packet and start of packet marker is '$'.
+- After '$' must be three-digit decimal number with space between packets in bytes.
+- Number means minimal possible space between packets.
+- Space is adjusted according to FLU rules so it doesn't have to be exaclty your number.
+- Correct number notation of space 3 is 003, 25 is 025, etc.
+-
+- Packet data must be numbers of hexa digits in whole bytes (multiples of 2 digits).
+----------------------------------------------------------------------------------------
+$002
+AABBCCDDEEFF1122
+33445566
+$010
+1122334455AA0B1A
+$855
+CCCCCCCC
+$003
+DDDDDD
+$003
+111111
+$013
+22222222
+$010
+33333333
+$002
+44444444
+$000
+555555
+$000
+6666
+$000
+77
+$000
+123456789ABCDEFF
+$000

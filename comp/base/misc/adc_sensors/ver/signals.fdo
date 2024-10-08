@@ -1,0 +1,40 @@
+# Copyright (C) 2019 CESNET
+# Author(s): Lukas Hejcman <xhejcm01@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+proc mi {NAME PATH} {
+    add_wave "-noupdate -hex" $PATH/MI/*
+}
+
+proc others {NAME PATH} {
+    add_wave "-noupdate -hex" $PATH/conf_reg
+    add_wave "-noupdate -hex" $PATH/conf_reg_cs
+    add_wave "-noupdate -hex" $PATH/conf_reg_we
+    add_wave "-noupdate -hex" $PATH/ctrl_reg
+    add_wave "-noupdate -hex" $PATH/ctrl_reg_cs
+    add_wave "-noupdate -hex" $PATH/ctrl_reg_we
+    add_wave "-noupdate -hex" $PATH/stat_reg
+    add_wave "-noupdate -hex" $PATH/mx_drd
+    add_wave "-noupdate -hex" $PATH/temp*
+    add_wave "-noupdate -hex" $PATH/volt*
+}
+
+proc ip_core_temp {NAME PATH} {
+    add wave -divider $NAME
+    add_wave "-noupdate -hex" $PATH/cmd_rdy_internal_reg
+    add_wave "-noupdate -hex" $PATH/rsp_vld_internal
+    add_wave "-noupdate -hex" $PATH/rsp_chn_internal_cnt
+    add_wave "-noupdate -hex" $PATH/rsp_sop_reg
+    add_wave "-noupdate -hex" $PATH/rsp_eop
+}
+
+proc ip_core_volt {NAME PATH} {
+    add wave -divider $NAME
+    add_wave "-noupdate -hex" $PATH/cmd_rdy_internal_reg
+    add_wave "-noupdate -hex" $PATH/rsp_vld_internal
+    add_wave "-noupdate -hex" $PATH/rsp_chn_internal_cnt
+    add_wave "-noupdate -hex" $PATH/rsp_sop_reg
+    add_wave "-noupdate -hex" $PATH/rsp_eop
+}

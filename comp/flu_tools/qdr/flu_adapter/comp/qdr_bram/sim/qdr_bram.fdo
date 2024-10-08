@@ -1,0 +1,26 @@
+# flu_adapter.fdo: Functional simulation file for QDR_BRAM
+# Copyright (C) 2014 CESNET
+# Author: Vaclav Hummel <xhumme00@stud.fit.vutbr.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+
+set FIRMWARE_BASE    "../../../../../../.."
+
+set MATH_PKG_BASE    "$OFM_PATH/comp/base/pkg"
+
+set QDR_BRAM_BASE   ".."
+
+set SIG_FILE         "$QDR_BRAM_BASE/sim/qdr_bram_sig.fdo"
+set TB_FILE          "$QDR_BRAM_BASE/sim/testbench.vhd"
+
+
+set COMPONENTS [list \
+   [ list      "QDR_BRAM"       $QDR_BRAM_BASE        "FULL"         ] \
+   [ list      "MATH_PKG"        $MATH_PKG_BASE         "MATH"         ] \
+]
+
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+nb_sim_run 5us

@@ -1,0 +1,18 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2014 CESNET
+# Author: Mario Kuka <xkukam00@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# $Id$
+#
+
+proc blk_MUX48 { } {
+
+    global MUX48_PATH
+    add_wave "-noupdate -hex -label CE_IN" /$MUX48_PATH/CE_IN
+    add_wave "-noupdate -hex -label CE_OUT" /$MUX48_PATH/CE_OUT
+    add_wave "-noupdate -hex -label CE_LVL" /$MUX48_PATH/CE_LVL
+    add_wave "-noupdate -hex -label DATA_IN" /$MUX48_PATH/DATA_IN
+    add_wave "-noupdate -hex -label DATA_OUT" /$MUX48_PATH/DATA_OUT
+    add_wave "-noupdate -hex -label SEL" /$MUX48_PATH/SEL
+}
