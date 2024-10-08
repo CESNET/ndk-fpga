@@ -16,7 +16,7 @@ git_sha_short = git_repo.git.rev_parse(git_sha, short=8)
 
 # -- Project information -----------------------------------------------------
 
-project = 'Minimal NDK Application Docs'
+project = 'NDK-FPGA Docs'
 copyright = str(current_year) + ', CESNET z.s.p.o.'
 author = 'CESNET TMC'
 version = 'Git branch: ' + str(git_branch) + ', <br> Git hash: ' + str(git_sha_short)
@@ -27,7 +27,7 @@ version = 'Git branch: ' + str(git_branch) + ', <br> Git hash: ' + str(git_sha_s
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "ndk-app-minimal",
+    "ndk-fpga",
     "sphinx_rtd_theme",
     "sphinxvhdl.vhdl"
 ]

@@ -1,12 +1,12 @@
 .. _ndk_arch:
 .. _ndk_intel:
 
-NDK architecture
+NDK Architecture
 ================
 
 The Network Development Kit (NDK) is available for the selected card based on FPGA. The NDK allows users to quickly and easily develop new network appliances based on FPGA acceleration cards. The NDK is optimized for high throughput and scalable to support 10, 100 and 400 Gigabit Ethernet.
 
-.. image:: doc/img/card_with_ndk.drawio.svg
+.. image:: img/card_with_ndk.drawio.svg
     :align: center
     :width: 100 %
 
@@ -30,10 +30,10 @@ The NDK top level architecture consists of several building blocks:
    :maxdepth: 2
    :hidden:
 
-   doc/app
-   doc/mi
-   doc/eth
-   doc/dma
-   doc/pcie
-   doc/mem
-   doc/tsu
+   app
+   mi
+   eth
+   dma
+   pcie
+   mem
+   tsu
