@@ -9,18 +9,19 @@
 array set ARCHGRP_ARR $ARCHGRP
 
 # Paths
+set FPGA_COMMON_BASE      "$ARCHGRP_ARR(CORE_BASE)/top"
 set SPI_FLASH_DRIVER_BASE "$ENTITY_BASE/comp/spi_flash_driver/"
-set BOOT_CTRL_BASE        "$OFM_PATH/../core/intel/src/comp/boot_ctrl"
+set BOOT_CTRL_BASE        "$FPGA_COMMON_BASE/comp/boot_ctrl"
 set AXI2AVMM_BRIDGE_BASE  "$OFM_PATH/comp/mem_tools/convertors/axi2avmm_ddr_bridge"
 
 # Components
-lappend COMPONENTS [list "FPGA_COMMON"      $ARCHGRP_ARR(CORE_BASE)  $ARCHGRP]
+lappend COMPONENTS [list "FPGA_COMMON"      $FPGA_COMMON_BASE        $ARCHGRP]
 lappend COMPONENTS [list "BOOT_CTRL"        $BOOT_CTRL_BASE          "FULL"  ]
 lappend COMPONENTS [list "SPI_FLASH_DRIVER" $SPI_FLASH_DRIVER_BASE   "FULL"  ]
 lappend COMPONENTS [list "AXI2AVMM_BRIDGE"  $AXI2AVMM_BRIDGE_BASE    "FULL"  ]
 
 # IP components
-source $ARCHGRP_ARR(CORE_BASE)/src/ip/common.tcl
+source $ARCHGRP_ARR(CORE_BASE)/top/ip/common.tcl
 
 #set ARCHGRP_ARR(IP_TEMPLATE_BASE) $ARCHGRP_ARR(CORE_BASE)/src/ip/amd
 set ARCHGRP_ARR(IP_MODIFY_BASE)   $ENTITY_BASE/ip

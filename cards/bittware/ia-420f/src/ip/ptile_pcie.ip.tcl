@@ -1,7 +1,7 @@
 package require -exact qsys 21.3
 
 array set PARAMS $IP_PARAMS_L
-source $PARAMS(CORE_BASE)/src/ip/common.tcl
+source $PARAMS(IP_COMMON_TCL)
 
 proc do_adjust_ptile_pcie_ip_1x16 {} {
 	set_instance_parameter_value intel_pcie_ptile_ast_0 {core4_0_enable_rx_buffer_limit_ports_hwtcl} {1}

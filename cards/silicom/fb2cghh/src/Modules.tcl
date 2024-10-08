@@ -12,11 +12,12 @@ array set ARCHGRP_ARR $ARCHGRP
 set LED_SERIAL_CTRL_BASE            "$ENTITY_BASE/comp/led_ctrl"
 set BMC_BASE                        "$ENTITY_BASE/comp/bmc_driver"
 set AXI_QUAD_FLASH_CONTROLLER_BASE  "$ENTITY_BASE/comp/axi_quad_flash_controller"
-set BOOT_CTRL_BASE                  "$OFM_PATH/../core/intel/src/comp/boot_ctrl"
+set BOOT_CTRL_BASE                  "$ARCHGRP_ARR(CORE_BASE)/top/comp/boot_ctrl"
 set AXI2AVMM_BRIDGE_BASE            "$OFM_PATH/comp/mem_tools/convertors/axi2avmm_ddr_bridge"  
+set FPGA_COMMON_BASE                "$ARCHGRP_ARR(CORE_BASE)/top"
 
 # Components
-lappend COMPONENTS [list "FPGA_COMMON"                  $ARCHGRP_ARR(CORE_BASE)          $ARCHGRP]
+lappend COMPONENTS [list "FPGA_COMMON"                  $FPGA_COMMON_BASE                $ARCHGRP]
 lappend COMPONENTS [list "LED_SERIAL_CTRL"              $LED_SERIAL_CTRL_BASE            "FULL"  ]
 lappend COMPONENTS [list "BMC"                          $BMC_BASE                        "FULL"  ]
 lappend COMPONENTS [list "AXI_QUAD_FLASH_CONTROLLER"    $AXI_QUAD_FLASH_CONTROLLER_BASE  "FULL"  ]
@@ -24,7 +25,7 @@ lappend COMPONENTS [list "BOOT_CTRL"                    $BOOT_CTRL_BASE         
 lappend COMPONENTS [list "AXI2AVMM_BRIDGE"              $AXI2AVMM_BRIDGE_BASE            "FULL"  ]
 
 # IP components
-source $ARCHGRP_ARR(CORE_BASE)/src/ip/common.tcl
+source $ARCHGRP_ARR(CORE_BASE)/top/ip/common.tcl
 
 #set ARCHGRP_ARR(IP_TEMPLATE_BASE) $ARCHGRP_ARR(CORE_BASE)/src/ip/amd
 set ARCHGRP_ARR(IP_MODIFY_BASE)   $ENTITY_BASE/ip

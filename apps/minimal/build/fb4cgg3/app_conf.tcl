@@ -23,4 +23,4 @@ set DMA_RX_BLOCKING_MODE true
 # ------------------------------------------------------------------------------
 set PROJECT_NAME "NDK_MINIMAL"
 set PROJECT_VARIANT "$ETH_PORT_SPEED(0)G$ETH_PORTS"
-set PROJECT_VERSION [exec cat ../../VERSION]
+set PROJECT_VERSION [exec cat ../../../../VERSION]

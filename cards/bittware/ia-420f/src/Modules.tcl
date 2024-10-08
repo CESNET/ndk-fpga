@@ -5,21 +5,25 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-set IOEXP_BASE "$OFM_PATH/comp/ctrls/i2c_io_exp"
-set ASYNC_BASE "$OFM_PATH/comp/base/async"
-
 # converting input list to associative array
 array set ARCHGRP_ARR $ARCHGRP
 
-lappend COMPONENTS [list "FPGA_COMMON"       $ARCHGRP_ARR(CORE_BASE) $ARCHGRP]
+# Paths
+set FPGA_COMMON_BASE "$ARCHGRP_ARR(CORE_BASE)/top"
+set IOEXP_BASE "$OFM_PATH/comp/ctrls/i2c_io_exp"
+set ASYNC_BASE "$OFM_PATH/comp/base/async"
+
+lappend COMPONENTS [list "FPGA_COMMON"       $FPGA_COMMON_BASE       $ARCHGRP]
 lappend COMPONENTS [list "I2C IO EXPANDER"   $IOEXP_BASE               "FULL"]
 lappend COMPONENTS [list "OPEN_LOOP"         $ASYNC_BASE/open_loop     "FULL"]
 lappend COMPONENTS [list "RESET"             $ASYNC_BASE/reset         "FULL"]
 
 # IP components
-source $ARCHGRP_ARR(CORE_BASE)/src/ip/common.tcl
+set IP_COMMON_TCL $ARCHGRP_ARR(CORE_BASE)/top/ip/common.tcl
+source $IP_COMMON_TCL
 
-set ARCHGRP_ARR(IP_TEMPLATE_BASE) $ARCHGRP_ARR(CORE_BASE)/src/ip/intel
+set ARCHGRP_ARR(IP_COMMON_TCL)    $IP_COMMON_TCL
+set ARCHGRP_ARR(IP_TEMPLATE_BASE) $ARCHGRP_ARR(CORE_BASE)/top/ip/intel
 set ARCHGRP_ARR(IP_MODIFY_BASE)   $ENTITY_BASE/ip
 set ARCHGRP_ARR(IP_DEVICE_FAMILY) "Agilex"
 set ARCHGRP_ARR(IP_DEVICE)        $ARCHGRP_ARR(FPGA)

@@ -8,8 +8,11 @@
 # converting input list to associative array
 array set ARCHGRP_ARR $ARCHGRP
 
+# Paths
+set FPGA_COMMON_BASE "$ARCHGRP_ARR(CORE_BASE)/top"
+
 # Components
-lappend COMPONENTS [list "FPGA_COMMON"      $ARCHGRP_ARR(CORE_BASE)  $ARCHGRP]
+lappend COMPONENTS [list "FPGA_COMMON" $FPGA_COMMON_BASE  $ARCHGRP]
 
 # IP sources
 if {$ARCHGRP_ARR(PCIE_ENDPOINT_MODE) == 2} {

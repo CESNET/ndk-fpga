@@ -8,7 +8,10 @@
 # converting input list to associative array
 array set ARCHGRP_ARR $ARCHGRP
 
-lappend COMPONENTS [list "FPGA_COMMON" $ARCHGRP_ARR(CORE_BASE) $ARCHGRP]
+# Paths
+set FPGA_COMMON_BASE "$ARCHGRP_ARR(CORE_BASE)/top"
+
+lappend COMPONENTS [list "FPGA_COMMON" $FPGA_COMMON_BASE $ARCHGRP]
 
 # IP sources
 lappend MOD "$ENTITY_BASE/ip/iopll_ip.ip"

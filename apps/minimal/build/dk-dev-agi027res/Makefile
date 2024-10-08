@@ -8,8 +8,9 @@
 # NOTE: Usage of the configuration parameters in this file is described
 # in the Parametrization section of the NDK-CORE documentation.
 
-COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/intel/dk-dev-agi027res
+# Set path to top-level of NDK-FPGA repository
+COMBO_BASE = ../../../..
+CARD_BASE = $(COMBO_BASE)/cards/intel/dk-dev-agi027res
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = dk-dev-agi027res-minimal
 

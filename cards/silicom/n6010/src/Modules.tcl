@@ -4,18 +4,21 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-set PMCI_TOP_BASE "$ENTITY_BASE/comp/pmci"
-
 # converting input list to associative array
 array set ARCHGRP_ARR $ARCHGRP
 
-lappend COMPONENTS [list "FPGA_COMMON"       $ARCHGRP_ARR(CORE_BASE) $ARCHGRP]
+set PMCI_TOP_BASE "$ENTITY_BASE/comp/pmci"
+set FPGA_COMMON_BASE "$ARCHGRP_ARR(CORE_BASE)/top"
+
+lappend COMPONENTS [list "FPGA_COMMON"       $FPGA_COMMON_BASE       $ARCHGRP]
 lappend COMPONENTS [list "PMCI_TOP"          $PMCI_TOP_BASE            "FULL"]
 
 # IP components
-source $ARCHGRP_ARR(CORE_BASE)/src/ip/common.tcl
+set IP_COMMON_TCL $ARCHGRP_ARR(CORE_BASE)/top/ip/common.tcl
+source $IP_COMMON_TCL
 
-set ARCHGRP_ARR(IP_TEMPLATE_BASE) $ARCHGRP_ARR(CORE_BASE)/src/ip/intel
+set ARCHGRP_ARR(IP_COMMON_TCL)    $IP_COMMON_TCL
+set ARCHGRP_ARR(IP_TEMPLATE_BASE) $ARCHGRP_ARR(CORE_BASE)/top/ip/intel
 set ARCHGRP_ARR(IP_MODIFY_BASE)   $ENTITY_BASE/ip
 set ARCHGRP_ARR(IP_DEVICE_FAMILY) "Agilex"
 set ARCHGRP_ARR(IP_DEVICE)        $ARCHGRP_ARR(FPGA)

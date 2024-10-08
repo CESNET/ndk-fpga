@@ -16,7 +16,7 @@ set MFB_RECONFIG_BASE           "$OFM_PATH/comp/mfb_tools/flow/reconfigurator"
 set TSU_BASE                    "$OFM_PATH/comp/tsu/tsu_gen"
 set MFB_PIPE_BASE               "$OFM_PATH/comp/mfb_tools/flow/pipe"
 
-set DMA_MEDUSA_BASE             "$ENTITY_BASE/../../../../../../modules/ndk-mod-dma-medusa"
+set DMA_MEDUSA_BASE             "$OFM_PATH/extra/dma-medusa"
 set DMA_CALYPTE_BASE            "$OFM_PATH/comp/dma/dma_calypte"
 set DMA_TEST_CORE_BASE          "$OFM_PATH/comp/dma/dma_calypte/comp/test_core"
 

@@ -1,7 +1,7 @@
 package require -exact qsys 21.3
 
 array set PARAMS $IP_PARAMS_L
-source $PARAMS(CORE_BASE)/src/ip/common.tcl
+source $PARAMS(IP_COMMON_TCL)
 
 # adjust parameters in "ddr4_calibration_ip" system
 proc do_adjust_ddr4_calibration_ip {device family ipname filename} {

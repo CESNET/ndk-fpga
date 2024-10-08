@@ -1,7 +1,7 @@
 package require -exact qsys 21.3
 
 array set PARAMS $IP_PARAMS_L
-source $PARAMS(CORE_BASE)/src/ip/common.tcl
+source $PARAMS(IP_COMMON_TCL)
 
 proc do_adjust_onboard_ddr4_ip_0 {board_rev} {
 	set_instance_parameter_value emif_fm_0 {MEM_DDR4_BANK_GROUP_WIDTH} {1}

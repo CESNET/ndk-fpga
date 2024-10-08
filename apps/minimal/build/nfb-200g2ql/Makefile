@@ -7,8 +7,9 @@
 # NOTE: Usage of the configuration parameters in this file is described
 # in the Parametrization section of the NDK-CORE documentation.
 
-COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards_private/nfb-200g2ql
+# Set path to top-level of NDK-FPGA repository
+COMBO_BASE = ../../../..
+CARD_BASE = $(COMBO_BASE)/extra/nfb-200g2ql
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = nfb-200g2ql-minimal
 

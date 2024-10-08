@@ -7,8 +7,9 @@
 # NOTE: Usage of the configuration parameters in this file is described
 # in the Parametrization section of the NDK-CORE documentation.
 
-COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/amd/alveo-u200
+# Set path to top-level of NDK-FPGA repository
+COMBO_BASE = ../../../..
+CARD_BASE = $(COMBO_BASE)/cards/amd/alveo-u200
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = alveo-u200-minimal
 

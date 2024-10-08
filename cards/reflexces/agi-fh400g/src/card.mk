@@ -5,12 +5,6 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-# Mandatory parameters (needs to be set in user Makefile)
-###############################################################################
-
-# Load correct paths to build system
-include $(COMBO_BASE)/conf/ndk_paths.mk
-
 # Optional parameters (can be changed in user Makefile)
 ###############################################################################
 
@@ -29,7 +23,10 @@ BOARD_REV ?= 0
 # Get directory of this Makefile.inc
 CARD_BASE_LOCAL := $(dir $(lastword $(MAKEFILE_LIST)))
 CARD_BASE ?= $(CARD_BASE_LOCAL)/..
-CORE_BASE ?= $(COMBO_BASE)/ndk/core/intel
+CORE_BASE ?= $(COMBO_BASE)/core
+
+# Load correct paths to build system
+include $(CORE_BASE)/ndk_paths.mk
 
 NETCOPE_ENV = \
 	OFM_PATH=$(OFM_PATH)\

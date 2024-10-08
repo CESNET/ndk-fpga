@@ -7,8 +7,9 @@
 # NOTE: Usage of the configuration parameters in this file is described
 # in the Parametrization section of the NDK-CORE documentation.
 
-COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/bittware/ia-420f
+# Set path to top-level of NDK-FPGA repository
+COMBO_BASE = ../../../..
+CARD_BASE = $(COMBO_BASE)/cards/bittware/ia-420f
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = ia-420f-minimal
 

@@ -8,11 +8,12 @@
 array set ARCHGRP_ARR $ARCHGRP
 
 # Paths to components
+set FPGA_COMMON_BASE        "$ARCHGRP_ARR(CORE_BASE)/top"
 set ASYNC_OPEN_LOOP_BASE    "$OFM_PATH/comp/base/async/open_loop"
 set EMIF_REFRESH_BASE       "$OFM_PATH/comp/debug/mem_tester/emif_refresh"
 
 set COMPONENTS [concat $COMPONENTS [list \
-    [list "FPGA_COMMON"     $ARCHGRP_ARR(CORE_BASE) $ARCHGRP] \
+    [list "FPGA_COMMON"     $FPGA_COMMON_BASE       $ARCHGRP] \
     [list "ASYNC_OPEN_LOOP" $ASYNC_OPEN_LOOP_BASE   "FULL"  ] \
     [list "EMIF_REFRESH"    $EMIF_REFRESH_BASE      "FULL"  ] \
 ]]

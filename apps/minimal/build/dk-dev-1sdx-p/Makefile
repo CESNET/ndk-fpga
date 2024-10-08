@@ -8,8 +8,9 @@
 # NOTE: Usage of the configuration parameters in this file is described
 # in the Parametrization section of the NDK-CORE documentation.
 
-COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/intel/dk-dev-1sdx-p
+# Set path to top-level of NDK-FPGA repository
+COMBO_BASE = ../../../..
+CARD_BASE = $(COMBO_BASE)/cards/intel/dk-dev-1sdx-p
 APP_CONF = app_conf.tcl
 OUTPUT_NAME = dk-dev-1sdx-p-minimal
 

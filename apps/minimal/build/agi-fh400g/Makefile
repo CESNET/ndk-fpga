@@ -5,8 +5,9 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-COMBO_BASE = ../..
-CARD_BASE = $(COMBO_BASE)/ndk/cards/reflexces/agi-fh400g
+# Set path to top-level of NDK-FPGA repository
+COMBO_BASE = ../../../..
+CARD_BASE = $(COMBO_BASE)/cards/reflexces/agi-fh400g
 APP_CONF = app_conf.tcl
 
 ifndef BOARD_REV

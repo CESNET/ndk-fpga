@@ -1,7 +1,7 @@
 package require -exact qsys 21.3
 
 array set PARAMS $IP_PARAMS_L
-source $PARAMS(CORE_BASE)/src/ip/common.tcl
+source $PARAMS(IP_COMMON_TCL)
 
 proc do_adjust_ftile_eth_ip_1x400g {} {
 	set_instance_parameter_value eth_f_0 {ENABLE_ADME_GUI} {1}
