@@ -1,27 +1,23 @@
-# NDK Minimal Application
+# NDK-FPGA
 
-This repository contains a minimal (reference) application (NDK-APP-Minimal) built on top of the Network Development Kit (NDK) for FPGA acceleration cards. The NDK allows users to quickly and easily develop FPGA-accelerated network applications. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet.
+This repository contains FPGA part of the Network Development Kit (NDK) for FPGA acceleration cards. The NDK allows users to quickly and easily develop FPGA-accelerated network applications. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet. The NDK-based Minimal (reference) application is also included in this (NDK-FPGA) repository.
  
-The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-APP-Minimal documentation (devel branch) here](https://cesnet.github.io/ndk-app-minimal/devel/).
+The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-FPGA documentation (devel branch) here](https://cesnet.github.io/ndk-fpga/devel/).
 
 **The DMA Medusa IP is not part of the open-source NDK. If the DMA IP is disabled, it is replaced by a loopback. [You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic](https://support.brnologic.com/).**
 
 ## How to start
 
-Before you get started, there are a few requirements that you need to have. Among these are repositories. We describe how and which to clone.
+Before you get started, there are a few requirements that you need to have.
 
 ### Requirements and supported FPGA cards
 
-- To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 22.4** or **Xilinx Vivado 2022.2** (depending on the target card), including a valid license.
+- To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 24.1** or **Xilinx Vivado 2022.2** (depending on the target card), including a valid license.
 - We recommend using the **Questa Sim-64 2023.1_2** tool to run HDL verifications (UVM).
-- Basic additional repositories which are needed to build the NDK-based Minimal application:
-    - [Open FPGA Modules](https://github.com/CESNET/ofm/)
-    - [NDK Core](https://github.com/CESNET/ndk-core/)
-    - [FPGA cards files for the NDK](https://github.com/CESNET/ndk-cards-open/) (available as open-source)
 - Supported FPGA cards in the NDK framework available as open-source:
-    - ReflexCES XpressSX AGI-FH400G card
+    - ReflexCES XpressSX AGI-FH400G card (BOARD_REV=0 is deprecated)
     - Intel Stratix 10 DX FPGA Development Kit (DK-DEV-1SDX-P)
-    - Intel Agilex I-Series FPGA Development Kit (DK-DEV-AGI027RES)
+    - Intel Agilex I-Series FPGA Development Kit (DK-DEV-AGI027RES is deprecated)
     - Silicom fb4CGg3@VU9P card (also in variant fb2CGg3@VU9P)
     - Silicom fb2CGhh@KU15P card
     - Silicom N6010 card
@@ -36,30 +32,26 @@ Before you get started, there are a few requirements that you need to have. Amon
 
 ### How to clone the necessary repositories
 
-Anyone who wants to try the NDK-based Minimal application has to manually clone the repository with the Minimal application and some submodules. You certainly have to clone the OFM and Core submodules, though only the submodule with the target card is necessary:
+Just clone the NDK-FPGA repository from GitHub:
 
 ```
-git clone https://github.com/CESNET/ndk-app-minimal.git
-cd ndk-app-minimal
-git submodule update --init ndk/ofm
-git submodule update --init ndk/core
-git submodule update --init ndk/cards
+git clone https://github.com/CESNET/ndk-fpga.git
 ```
 
 CESNET developers who have access to closed-source repositories can use a single command to clone the repository, including its submodules (from private GitLab):
 ```
-git clone --recursive git@gitlab.liberouter.org:ndk/ndk-app-minimal.git
+git clone --recursive git@gitlab.liberouter.org:ndk/ndk-fpga.git
 ```
 
 ### Next steps
 
-The [NDK-APP-Minimal documentation (devel branch) in chapter "How to start"](https://cesnet.github.io/ndk-app-minimal/devel/ndk_core/doc/how_to_start.html) lists further steps for building the FPGA firmware, loading it into the FPGA card and also using it.
+The [NDK-FPGA documentation (devel branch) in chapter "How to start"](https://cesnet.github.io/ndk-fpga/devel/ndk_core/doc/how_to_start.html) lists further steps for building the FPGA firmware, loading it into the FPGA card and also using it.
 
 ## Documentation
 
 We use a documentation system based on the [Sphinx tool](https://www.sphinx-doc.org), which compiles complete documentation from source files in the [reStructuredText](https://docutils.sourceforge.io/rst.html) format. We also use the [Sphinx-vhdl](https://github.com/CESNET/sphinx-vhdl) for generating documentation from the VHDL code. The documentation automatically builds with each contribution to the devel/main branch and is available online here:
-- [**NDK-APP-Minimal documentation (main branch)**](https://cesnet.github.io/ndk-app-minimal/main/)
-- [**NDK-APP-Minimal documentation (devel branch)**](https://cesnet.github.io/ndk-app-minimal/devel/)
+- [**NDK-FPGA documentation (main branch)**](https://cesnet.github.io/ndk-fpga/main/)
+- [**NDK-FPGA documentation (devel branch)**](https://cesnet.github.io/ndk-fpga/devel/)
 
 ### How to manually build documentation
 
@@ -90,6 +82,16 @@ The output is in the `doc/build/index.html` file.
 Unless otherwise noted, the content of this repository is available under the BSD 3-Clause License. Please read [LICENSE file](LICENSE).
 
 - See also the license information (in README.md) in each Git submodule.
+
+### Modules/files taken from other sources
+
+- [I2C Master controller](comp/ctrls/i2c_hw/) by Richard Herveille from [opencores.org](https://opencores.org/projects/i2c) in `comp/ctrls/i2c_hw` under something like a BSD license.
+- [SPI Master controller](comp/ctrls/spi/) by Jonny Doin from [opencores.org](https://opencores.org/projects/spi_master_slave) in `comp/ctrls/spi` under LGPL license.
+- The .ip files located in the `/comp/base/misc/adc_sensors/` folder were generated in Intel Quartus Prime Pro, and their use may be subject to additional license agreements.
+- The .ip file `comp/ctrls/sdm_client/mailbox_client.ip` was generated in Intel Quartus Prime Pro, and their use may be subject to additional license agreements.
+- The .ip files located in the `cards/<VENDOR>/<CARD_NAME>/src/ip/` folder were generated in the Intel Quartus Prime Pro, and their use may be subject to additional license agreements.
+- The .xci files located in the `cards/<VENDOR>/<CARD_NAME>/src/ip/` folder were generated in the Xilinx Vivado, and their use may be subject to additional license agreements.
+- The files located in the `cards/silicom/n6010/src/comp/pmci/pmci_ip` and `cards/silicom/n6010/scripts` folders were taken from the [ofs-n6001 repository](https://github.com/OFS/ofs-n6001) and are subject to the MIT license. Please read [LICENSE.txt file](cards/silicom/n6010/scripts/LICENSE.txt).
 
 ## Repository Maintainer
 
