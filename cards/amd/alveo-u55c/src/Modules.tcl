@@ -9,7 +9,7 @@ array set ARCHGRP_ARR $ARCHGRP
 
 # Paths
 set FPGA_COMMON_BASE         "$ARCHGRP_ARR(CORE_BASE)/top"
-set BOOT_CTRL_BASE           "$FPGA_COMMON_BASE/comp/boot_ctrl"
+set BOOT_CTRL_BASE           "$OFM_PATH/core/comp/misc/boot_ctrl"
 set AXI_QSPI_FLASH_CTRL_BASE "$ENTITY_BASE/../../../silicom/fb2cghh/src/comp/axi_quad_flash_controller"
 #set MI2AXI4_BASE   "$OFM_PATH/comp/mi_tools/converters/mi2axi4"
 

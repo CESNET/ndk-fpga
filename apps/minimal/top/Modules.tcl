@@ -14,9 +14,9 @@ set MFB_PIPE_BASE       "$OFM_PATH/comp/mfb_tools/flow/pipe"
 set MFB_META_INS_BASE   "$OFM_PATH/comp/mfb_tools/flow/metadata_insertor"
 set MVB_PIPE_BASE       "$OFM_PATH/comp/mvb_tools/flow/pipe"
 set MVB_CHDIST_BASE     "$OFM_PATH/comp/mvb_tools/flow/channel_router"
-set APP_CORE_UTILS_BASE "$OFM_PATH/core/top/comp/app_core_utils"
-set STREAMS_MERGER_BASE "$APP_CORE_UTILS_BASE/dma_streams_merger"
-set DMA_CHAN_MOD_BASE   "$APP_CORE_UTILS_BASE/dma_chan_mod"
+set CORE_APP_COMP_BASE  "$OFM_PATH/core/comp/app"
+set STREAMS_MERGER_BASE "$CORE_APP_COMP_BASE/dma_streams_merger"
+set DMA_CHAN_MOD_BASE   "$CORE_APP_COMP_BASE/dma_chan_mod"
 set MEM_TESTER_BASE     "$OFM_PATH/comp/debug/mem_tester"
 set MEM_LOGGER_BASE     "$OFM_PATH/comp/debug/data_logger/mem_logger"
 set HBM_TESTER_BASE     "$OFM_PATH/comp/mem_tools/debug/hbm_tester"
@@ -45,7 +45,7 @@ if {$ARCHGRP_ARR(APP_CORE_ENABLE)} {
     lappend MOD "$ENTITY_BASE/app_subcore.vhd"
     lappend MOD "$ENTITY_BASE/application_core.vhd"
 } else {
-    lappend MOD "$APP_CORE_UTILS_BASE/app_core_empty_arch.vhd"
+    lappend MOD "$CORE_APP_COMP_BASE/app_core_empty_arch.vhd"
 }
 
 lappend MOD "$ENTITY_BASE/DevTree.tcl"

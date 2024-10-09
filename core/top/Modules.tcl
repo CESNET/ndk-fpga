@@ -11,21 +11,23 @@
 array set ARCHGRP_ARR $ARCHGRP
 
 # Paths to components
+set CORE_COMP_BASE "$OFM_PATH/core/comp"
+
 set ASYNC_RESET_BASE     "$OFM_PATH/comp/base/async/reset"
 set ASYNC_OPEN_LOOP_BASE "$OFM_PATH/comp/base/async/open_loop"
 set TSU_BASE             "$OFM_PATH/comp/tsu/tsu_gen"
-set PCIE_BASE            "$ENTITY_BASE/comp/pcie"
-set DMA_BASE             "$ENTITY_BASE/comp/dma"
-set NETWORK_MOD_BASE     "$ENTITY_BASE/comp/network_mod"
-set CLOCK_GEN_BASE       "$ENTITY_BASE/comp/clk_gen"
-set SDM_CTRL_BASE        "$ENTITY_BASE/comp/sdm_ctrl"
+set PCIE_BASE            "$CORE_COMP_BASE/pcie/pcie_mod"
+set DMA_BASE             "$CORE_COMP_BASE/dma/dma_mod"
+set NETWORK_MOD_BASE     "$CORE_COMP_BASE/eth/network_mod"
+set CLOCK_GEN_BASE       "$CORE_COMP_BASE/misc/clk_gen"
+set SDM_CTRL_BASE        "$CORE_COMP_BASE/misc/sdm_ctrl"
 set MI_SPLITTER_BASE     "$OFM_PATH/comp/mi_tools/splitter_plus_gen"
 set RESET_TREE_GEN_BASE  "$OFM_PATH/comp/base/misc/reset_tree_gen"
 set MI_TEST_SPACE_BASE   "$OFM_PATH/comp/mi_tools/test_space"
 set DMA_GENERATOR_BASE   "$OFM_PATH/comp/mfb_tools/debug/dma_generator"
 set HWID_BASE            "$OFM_PATH/comp/base/misc/hwid"
 set ETH_LED_CTRL_BASE    "$OFM_PATH/comp/nic/eth_leds/led_ctrl_top"
-set JTAG_OP_CTRL_BASE    "$ENTITY_BASE/comp/jtag_op_ctrl"
+set JTAG_OP_CTRL_BASE    "$CORE_COMP_BASE/misc/jtag_op_ctrl"
 
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
@@ -36,7 +38,7 @@ lappend PACKAGES "$ENTITY_BASE/../config/core_const.vhd"
 lappend PACKAGES "$ENTITY_BASE/mi_addr_space_pkg.vhd"
 
 if { $ARCHGRP_ARR(APPLICATION_CORE_ENTITY_ONLY) } {
-  lappend MOD "$ENTITY_BASE/application_ent.vhd"
+  lappend MOD "$CORE_COMP_BASE/app/application_ent.vhd"
 } else {
 
   set DMA_ARCH "EMPTY"
@@ -69,7 +71,7 @@ if { $ARCHGRP_ARR(APPLICATION_CORE_ENTITY_ONLY) } {
   lappend COMPONENTS [list "DMA_GENERATOR"   $DMA_GENERATOR_BASE   "FULL"                       ]
   lappend COMPONENTS [list "JTAG_OP_CTRL"    $JTAG_OP_CTRL_BASE    $JTAG_OP_ARCH                ]
 
-  lappend MOD "$ENTITY_BASE/application_ent.vhd"
+  lappend MOD "$CORE_COMP_BASE/app/application_ent.vhd"
   lappend MOD "$ENTITY_BASE/fpga_common.vhd"
   lappend MOD "$ENTITY_BASE/DevTree.tcl"
 }

@@ -11,7 +11,7 @@ array set ARCHGRP_ARR $ARCHGRP
 # Paths
 set FPGA_COMMON_BASE      "$ARCHGRP_ARR(CORE_BASE)/top"
 set SPI_FLASH_DRIVER_BASE "$ENTITY_BASE/comp/spi_flash_driver/"
-set BOOT_CTRL_BASE        "$FPGA_COMMON_BASE/comp/boot_ctrl"
+set BOOT_CTRL_BASE        "$OFM_PATH/core/comp/misc/boot_ctrl"
 set AXI2AVMM_BRIDGE_BASE  "$OFM_PATH/comp/mem_tools/convertors/axi2avmm_ddr_bridge"
 
 # Components
