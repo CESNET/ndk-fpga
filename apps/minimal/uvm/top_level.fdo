@@ -4,8 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-set FIRMWARE_BASE    "../.."
-set OFM_PATH         "$FIRMWARE_BASE/ndk/ofm/"
+set FIRMWARE_BASE    "../../../"
 set TB_FILE          "./testbench.sv"
 
 # RESET variable PACKAGES, MOD COMPONENTS
@@ -21,7 +20,7 @@ set ARCHGRP_UVM(APP_CORE_ENABLE) true
 set ARCHGRP_L [array get ARCHGRP_UVM]
 
 lappend PACKAGES   "./config/ndk_const.vhd"
-lappend COMPONENTS [list "DUT_ENTITY" "$FIRMWARE_BASE/ndk/core/intel" $ARCHGRP_L]
+lappend COMPONENTS [list "DUT_ENTITY" "$FIRMWARE_BASE/core/top"       $ARCHGRP_L]
 lappend COMPONENTS [list "DUT_INTEL"  "../top"                        $ARCHGRP_L]
 lappend COMPONENTS [list "VER"        "."                             "FULL"]
 
@@ -34,7 +33,7 @@ set SIM_FLAGS(UVM_TEST) "test::base"
 #set SIM_FLAGS(DEBUG) true
 
 # Global include file for compilation
-source "$OFM_PATH/build/Modelsim.inc.fdo"
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
 
 # Suppress warnings from arithm library
 puts "Std Numeric Warnings - Disabled"

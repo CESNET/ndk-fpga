@@ -17,7 +17,7 @@ lappend PACKAGES "$ENTITY_BASE/test_pkg.sv"
 #lappend COMPONENTS [ list "CHANNEL_ROUTER_MODEL" "$OFM_PATH/comp/mvb_tools/flow/channel_router/uvm"  "FULL" ]
 
 
-lappend COMPONENTS [ list "COMMON"     "../../ndk/core/intel/uvm"         "FULL" ]
+lappend COMPONENTS [ list "COMMON" "$OFM_PATH/core/comp/app/app_uvm" "FULL" ]
 
 
 lappend MOD "$ENTITY_BASE/env/pkg.sv"
