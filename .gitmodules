@@ -1,6 +1,6 @@
-[submodule "ndk/modules/ndk-mod-dma-medusa"]
+[submodule "extra/dma-medusa"]
 	path = extra/dma-medusa
 	url = ../ndk-mod-dma-medusa.git
-[submodule "ndk/cards_private/nfb-200g2ql"]
+[submodule "extra/nfb-200g2ql"]
 	path = extra/nfb-200g2ql
 	url = ../ndk-card-nfb-200g2ql.git
