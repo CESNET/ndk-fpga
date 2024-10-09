@@ -11,7 +11,7 @@ CARD_BASE = $(COMBO_BASE)/cards/reflexces/agi-fh400g
 APP_CONF = app_conf.tcl
 
 ifndef BOARD_REV
-BOARD_REV = 0
+BOARD_REV = 1
 endif
 
 ifeq ($(BOARD_REV),0)
