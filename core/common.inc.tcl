@@ -17,7 +17,7 @@ set CORE_ARCHGRP(SDM_SYSMON_ARCH)               $SDM_SYSMON_ARCH
 set CORE_ARCHGRP(DMA_TYPE)                      $DMA_TYPE
 set CORE_ARCHGRP(APPLICATION_CORE_ENTITY_ONLY)  false
 set CORE_ARCHGRP(VIRTUAL_DEBUG_ENABLE)          $VIRTUAL_DEBUG_ENABLE
-set CORE_ARCHGRP(IP_TEMPLATE_ROOT)              "$CORE_BASE/top/ip"
+set CORE_ARCHGRP(IP_TEMPLATE_ROOT)              "$CORE_BASE/ip"
 
 # Prerequisites for generated VHDL package
 set UCP_PREREQ [list $CARD_CONST $CORE_CONF $CARD_CONF [expr {[info exists APP_CONF] ? $APP_CONF : ""}]]
