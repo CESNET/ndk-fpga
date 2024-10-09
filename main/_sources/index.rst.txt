@@ -29,10 +29,10 @@ The NDK-based Minimal application is a simple example of how to build an FPGA ap
 
     ndk_core/doc/how_to_start
     ndk_core/doc/terminology
-    ndk_core/intel/readme
+    ndk_core/doc/readme
     ndk_core/doc/configuration
     ndk_core/doc/testing
-    ofm_doc/build/readme
+    ndk_build/readme
     ndk_core/doc/devtree
     ndk_core/doc/faq
 
@@ -51,19 +51,20 @@ The NDK-based Minimal application is a simple example of how to build an FPGA ap
     ndk_cards/amd/alveo-u200/readme
     ndk_cards/amd/alveo-u55c/readme
     ndk_cards/amd/vcu118/readme
-    ndk_cards_private/nfb-200g2ql/readme
+    ndk_extra/nfb-200g2ql/readme
+    ndk_cards/prodesign/pd-falcon/readme
 
 .. toctree::
     :maxdepth: 2
     :caption: VHDL components:
     :hidden:
 
-    ofm_doc/base
-    ofm_doc/ctrls
-    ofm_doc/mi
-    ofm_doc/mfb
-    ofm_doc/mvb
-    ofm_doc/nic
-    ofm_doc/pcie
-    ofm_doc/debug
-    ofm_doc/ver
+    base
+    ctrls
+    mi
+    mfb
+    mvb
+    nic
+    pcie
+    debug
+    ver

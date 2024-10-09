@@ -1,0 +1,190 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The DMA module &mdash; NDK-FPGA Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The PCIe module" href="pcie.html" />
+    <link rel="prev" title="The Network Module" href="eth.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            NDK-FPGA Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="readme.html">NDK Architecture</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="app.html">The Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mi.html">The MI bus interconnect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eth.html">The Network Module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">The DMA module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#selecting-a-dma-controller">Selecting a DMA controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dma-medusa-ip-notes">DMA Medusa IP notes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pcie.html">The PCIe module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mem.html">The Memory Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tsu.html">Time Stamp Unit</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NDK-FPGA Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="readme.html">NDK Architecture</a></li>
+      <li class="breadcrumb-item active">The DMA module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/ndk_core/doc/dma.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-dma-module">
+<span id="ndk-intel-dma"></span><span id="ndk-dma"></span><h1>The DMA module<a class="headerlink" href="#the-dma-module" title="Link to this heading"></a></h1>
+<p>The DMA module is a wrapper containing the DMA controller (DMA IP), auxiliary, and debug logic. The connection of the DMA module is shown in the block diagram below. The DMA module is parametric and handles different numbers of DMA streams. The number of DMA streams corresponds to the number of instantiated DMA controllers. The currently supported DMA controllers in NDK are:</p>
+<ul class="simple">
+<li><p><strong>DMA Medusa IP</strong> – Closed-source DMA controller optimized for high throughput (up to 400 Gbps) and support for multiple PCIe endpoints. See the <span class="xref std std-ref">DMA Medusa IP documentation</span> for a detailed description.</p></li>
+<li><p><strong>DMA Calypte IP</strong> – Open-source DMA controller optimized for low latency communication and supports only one PCIe endpoint. DMA Calypte IP is still under development and not yet ready for use! See the <a class="reference internal" href="../../comp/dma/dma_calypte/readme.html#dma-calypte"><span class="std std-ref">DMA Calypte IP documentation</span></a> for a detailed description.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The DMA Medusa IP is not part of the open-source NDK. <a class="reference external" href="https://support.brnologic.com/">You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic.</a></p>
+</div>
+<p>Each DMA stream consists of two buses: the <a class="reference internal" href="../../comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB bus</span></a> is used to transfer data packets, the <a class="reference internal" href="../../comp/mvb_tools/readme.html#mvb-bus"><span class="std std-ref">MVB bus</span></a> is used to transfer DMA instructions to each packet. How a user application should properly use these buses is described in <a class="reference internal" href="app.html#ndk-app"><span class="std std-ref">The Application chapter</span></a>.</p>
+<p>The DMA module optionally includes a <a class="reference internal" href="../../comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">Gen Loop Switch (GLS) module</span></a> for each DMA stream. The GLS module is used for debugging, contains packet generators and allows to enable loopback modes. The GLS module can be controlled through MI requests.</p>
+<a class="reference internal image-reference" href="../../_images/dma_module.drawio.svg"><img alt="../../_images/dma_module.drawio.svg" class="align-center" src="../../_images/dma_module.drawio.svg" style="width: 100%;" />
+</a>
+<section id="selecting-a-dma-controller">
+<h2>Selecting a DMA controller<a class="headerlink" href="#selecting-a-dma-controller" title="Link to this heading"></a></h2>
+<p>Before running the FPGA firmware compilation, the desired DMA controller can be selected using the makefile parameter <code class="docutils literal notranslate"><span class="pre">DMA_TYPE</span></code>. Without this parameter, the default DMA controller is automatically selected. These are the allowed values:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=0</span></code> – No DMA IP is instantiated. DMA IP is replaced by a loopback.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=3</span></code> – DMA Medusa IP (default DMA controller)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE=4</span></code> – DMA Calypte IP</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If DMA IP is replaced by a loopback (<code class="docutils literal notranslate"><span class="pre">DMA_TYPE=0</span></code>), packets sent from the user application to the DMA input are immediately forwarded to the DMA output and then continue back to the user application.</p>
+</div>
+</section>
+<section id="dma-medusa-ip-notes">
+<h2>DMA Medusa IP notes<a class="headerlink" href="#dma-medusa-ip-notes" title="Link to this heading"></a></h2>
+<p>The DMA Medusa IP has an internal architecture divided into several DMA endpoints, each rated for 100 Gbps throughput. See the <span class="xref std std-ref">DMA Medusa documentation</span> for a detailed description. Individual DMA endpoints are statically mapped to a physical PCIe endpoint (mapping is implemented in the <a class="reference internal" href="pcie.html#ndk-pcie-mod"><span class="std std-ref">PCIe module</span></a>). The current implementation allows one or two DMA endpoints to be mapped to one PCIe endpoint. Individual DMA channels of the DMA Medusa IP are controlled through MI requests, therefore, the <a class="reference internal" href="../../comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> is also mapped to the DMA Medusa from individual PCIe endpoints.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="eth.html" class="btn btn-neutral float-left" title="The Network Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pcie.html" class="btn btn-neutral float-right" title="The PCIe module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

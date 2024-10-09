@@ -1,0 +1,191 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SDM CLIENT &mdash; NDK-FPGA Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="TSU GEN" href="../../tsu/tsu_gen/readme.html" />
+    <link rel="prev" title="Controllers &amp; TSU" href="../../../ctrls.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            NDK-FPGA Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SDM CLIENT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#specification">Specification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#block-diagram">Block diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#more-references">More references</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tsu/tsu_gen/readme.html">TSU GEN</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">NDK-FPGA Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+      <li class="breadcrumb-item active">SDM CLIENT</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/comp/ctrls/sdm_client/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sdm-client">
+<span id="id1"></span><h1>SDM CLIENT<a class="headerlink" href="#sdm-client" title="Link to this heading"></a></h1>
+<p>This component acts as a bridge between a host and the SDM (Secure Device Manager) on Intel FPGAs (Stratix 10, Agilex).
+It converts MI to Avalon-MM interface and uses Mailbox Client FPGA IP to send commands and obtain status information from the SDM peripheral clients.
+There are multiple pre-defined functions available:</p>
+<ul class="simple">
+<li><p>Reading the Chip ID</p></li>
+<li><p>Reading temperature sensors</p></li>
+<li><p>Reading voltage sensors</p></li>
+<li><p>Reading and writing external QSPI (Quad Serial Peripheral Interface) flash memory</p></li>
+<li><p>Performing RSU (Remote System Update)</p></li>
+</ul>
+<section id="specification">
+<h2>Specification<a class="headerlink" href="#specification" title="Link to this heading"></a></h2>
+<p>Avalon-MM and Mailbox Client IP use 32bit word addressing.
+In order to avoid working with unaligned addresses, MI addresses are shifted 2 bits to the right (word align) and after that 4 lowest bits are used for Mailbox Client’s OFFSET (spans from 0 to 10).
+Mailbox Client IP uses a command fifo on OFFSET[0] where you should direct the commands and their arguments in a sequence.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Mailbox Client FPGA IP does not support <em>waitrequest</em> signal, thus the signal is set to ground (always able to accept requests) and capacity of its command fifo must be checked by reading client’s memory on OFFSET[2] in software.</p>
+</div>
+<p>MI bus does not support interrupt (<em>irq</em>) signal, so it is left open.
+Interrupt enable (IER) and status registers (ISR) are accessible by reading client’s memory on OFFSET[7] and OFFSET[8] respectively.</p>
+<p>See <a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug-20087.pdf">Mailbox Client Intel FPGA IP User Guide</a> for more detailed information.</p>
+</section>
+<section id="block-diagram">
+<h2>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h2>
+<a class="reference internal image-reference" href="../../../_images/sdm_client_arch.svg"><img alt="../../../_images/sdm_client_arch.svg" class="align-center" src="../../../_images/sdm_client_arch.svg" style="width: 50%;" />
+</a>
+</section>
+<section id="more-references">
+<h2>More references<a class="headerlink" href="#more-references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>See <a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/stratix-10/ug-s10-config.pdf">Intel Stratix 10 Configuration User Guide</a> or <a class="reference external" href="https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/agilex/ug-ag-config.pdf">Intel Agilex Configuration User Guide</a> (section 1.2.1.) for more information on SDM and (section 5) on RSU.</p></li>
+<li><p>See <a class="reference internal" href="../../mi_tools/converters/mi2avmm/readme.html#mi2avmm"><span class="std std-ref">MI2AVMM</span></a> for more information about the interface converter.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../../ctrls.html" class="btn btn-neutral float-left" title="Controllers &amp; TSU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../tsu/tsu_gen/readme.html" class="btn btn-neutral float-right" title="TSU GEN" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

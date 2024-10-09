@@ -1,0 +1,611 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MI Splitter Plus Gen &mdash; NDK-FPGA Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="MI2AVMM" href="../converters/mi2avmm/readme.html" />
+    <link rel="prev" title="MI Reconfigurator" href="../reconf/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            NDK-FPGA Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../mi.html">MI Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../readme.html">MI bus specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../async/readme.html">MI ASYNC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipe/readme.html">MI Pipe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../indirect_access/readme.html">MI indirect access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reconf/readme.html">MI Reconfigurator</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MI Splitter Plus Gen</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples-of-use">Examples of use</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-1-setting-up-addr-base">Example 1 - setting up ADDR_BASE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-2-masking-irrelevant-bits-of-the-address">Example 2 - masking irrelevant bits of the address</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-3-mapping-ports-to-differnt-abs">Example 3 - mapping ports to differnt ABs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../converters/mi2avmm/readme.html">MI2AVMM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../converters/mi2axi4/readme.html">MI2AXI4</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">NDK-FPGA Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../mi.html">MI Tools</a></li>
+      <li class="breadcrumb-item active">MI Splitter Plus Gen</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/comp/mi_tools/splitter_plus_gen/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mi-splitter-plus-gen">
+<span id="id1"></span><h1>MI Splitter Plus Gen<a class="headerlink" href="#mi-splitter-plus-gen" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mi_splitter_plus_gen">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MI_SPLITTER_PLUS_GEN</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mi_splitter_plus_gen" title="Link to this definition"></a></dt>
+<dd><p>This is another splitter for the MI bus. MI transactions are routed out
+of a certain port, depending on how the splitter is set and on the
+transaction’s address.</p>
+<p>The most significant advantage of this splitter is the possibility for
+the user to choose the number of output ports, and for each output port
+a range (or ranges) of addresses that are routed to (and out of)
+this port. These address ranges are specified by Address Bases (ABs),
+which are contained in generic ADDR_BASE.</p>
+<p>There can be more ABs than there is output ports, which means that more
+than one AB can be assigned to a single output port. It doesn’t work the
+other way around though.</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-addr_width"><td><p>ADDR_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>Width of MI address.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-data_width"><td><p>DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>Width of MI data.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-meta_width"><td><p>META_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>2</p></td>
+<td><p>Width of MI meta.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-ports"><td><p>PORTS</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Number of output ports.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-pipe_out"><td><p>PIPE_OUT</p></td>
+<td><p>b_array_t(PORTS-1 downto 0)</p></td>
+<td><p>(others =&gt; true)</p></td>
+<td><p>Output pipeline.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-pipe_type"><td><p>PIPE_TYPE</p></td>
+<td><p>string</p></td>
+<td><p>“SHREG”</p></td>
+<td><p>Output pipelines type (see entity of PIPE).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-pipe_outreg"><td><p>PIPE_OUTREG</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Output pipelines output register enable.
+Only for PIPE_TYPE = “SHREG”!</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-addr_bases"><td><p>ADDR_BASES</p></td>
+<td><p>integer</p></td>
+<td><p>PORTS</p></td>
+<td><p>Number of considered address bases (might be higher or equal to PORTS).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-addr_base"><td><p>ADDR_BASE</p></td>
+<td><p>slv_array_t(ADDR_BASES-1 downto 0)(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>init_addr_base_downto(ADDR_BASES, ADDR_WIDTH)</p></td>
+<td><p>Bases of address spaces (base 0 is 0x00000000).
+Default: Random Bases.
+CAUTION: ModelSim doesn’t likes directly specified value for slv_array_t generics. Assign predefined constant to this generic.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-addr_mask"><td><p>ADDR_MASK</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>init_addr_mask_downto(ADDR_BASE, ADDR_WIDTH)</p></td>
+<td><p>Bits of address that are needed to determine output port.
+The chain of ‘1’s must be continuous -&gt; no ‘0’s in-between!
+Default: OR combination of all Address Bases with any ‘0’s between the ‘1’s replaced by ‘1’s.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mi_splitter_plus_gen-port_mapping"><td><p>PORT_MAPPING</p></td>
+<td><p>i_array_t(ADDR_BASES-1 downto 0)</p></td>
+<td><p>init_port_mapping_downto(ADDR_BASES, PORTS)</p></td>
+<td><p>How Address Bases are mapped to ports.
+Constains target port index for each Address Base.
+Multiple Address Bases might target the same port.
+Default: Each Address Base is mapped to the Port on the same index (expects ADDR_BASES = PORTS).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mi_splitter_plus_gen-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“STRATIX10”</p></td>
+<td><p>Target FPGA.</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Input MI interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-rx_dwr"><td><p>RX_DWR</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-rx_mwr"><td><p>RX_MWR</p></td>
+<td><p>std_logic_vector(META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-rx_addr"><td><p>RX_ADDR</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-rx_be"><td><p>RX_BE</p></td>
+<td><p>std_logic_vector(DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-rx_rd"><td><p>RX_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-rx_wr"><td><p>RX_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-rx_ardy"><td><p>RX_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-rx_drd"><td><p>RX_DRD</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-rx_drdy"><td><p>RX_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Output MI interfaces</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_dwr"><td><p>TX_DWR</p></td>
+<td><p>slv_array_t     (PORTS-1 downto 0)(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_mwr"><td><p>TX_MWR</p></td>
+<td><p>slv_array_t     (PORTS-1 downto 0)(META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_addr"><td><p>TX_ADDR</p></td>
+<td><p>slv_array_t     (PORTS-1 downto 0)(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_be"><td><p>TX_BE</p></td>
+<td><p>slv_array_t     (PORTS-1 downto 0)(DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_rd"><td><p>TX_RD</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_wr"><td><p>TX_WR</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_ardy"><td><p>TX_ARDY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mi_splitter_plus_gen-tx_drd"><td><p>TX_DRD</p></td>
+<td><p>slv_array_t     (PORTS-1 downto 0)(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mi_splitter_plus_gen-tx_drdy"><td><p>TX_DRDY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
+<p>The splitter accepts standard MI transactions at its input.
+Output ports have a range(s) of addresses assigned and transactions addressed to this range are sent out of the according port.
+As was said before, the address ranges are defined by ABs.
+An AB is actually just an address specifying the start of the address range.
+The end of the address range is specified by the next AB - 1 address.
+This means that the address ranges follow up on each other - there aren’t any addresses that do not belong to an address range and therefore to a port.
+In theory, if we wanted some addresses or address ranges not to be used, we could all map them to one port and then not connect it to anything.</p>
+<p>The most common use case is that ABs are mapped one-on-one to ports (default PORT_MAPPING), which is also the case shown in the figure below.
+Then address range associated with port 0 is from AB(0) up to AB(1)-1, range associated with port 1 is from AB(1) up to AB(2)-1 and so on.</p>
+<a class="reference internal image-reference" href="../../../_images/mi_splitter_exm1.svg"><img alt="../../../_images/mi_splitter_exm1.svg" class="align-center" src="../../../_images/mi_splitter_exm1.svg" style="width: 50%;" />
+</a>
+</section>
+<section id="examples-of-use">
+<h2>Examples of use<a class="headerlink" href="#examples-of-use" title="Link to this heading"></a></h2>
+<p>The next 3 examples explain how to:</p>
+<ul class="simple">
+<li><p>set up ABs,</p></li>
+<li><p>mask irrelevant bits of address and</p></li>
+<li><p>map ABs to ports “abnormally”</p></li>
+</ul>
+<section id="example-1-setting-up-addr-base">
+<h3>Example 1 - setting up ADDR_BASE<a class="headerlink" href="#example-1-setting-up-addr-base" title="Link to this heading"></a></h3>
+<p>Perhaps we want to use the MI splitter with 7 outputs (as is in the figure above).
+We want transactions with addresses in range from 0x0 up to 0x3 to be routed out of port 0, addresses in range from 0x4 up to 0x7 to be routed out of port 1 an so on, just like the first 2 columns of table 1 show.
+Then we should set ABs like in the 3rd column of this table.
+Side note: generally, the ranges don’t have to be the same, but let’s keep it simple for now.</p>
+<table class="docutils align-center" id="id2">
+<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 40.0%" />
+<col style="width: 26.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Output port = AB index</p></th>
+<th class="head"><p>Address range</p></th>
+<th class="head"><p>Address base</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>0x00000000 - 0x00000003</p></td>
+<td><p>0x00000000</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>0x00000004 - 0x00000007</p></td>
+<td><p>0x00000004</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>0x00000008 - 0x0000000B</p></td>
+<td><p>0x00000008</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>0x0000000C - 0x0000000F</p></td>
+<td><p>0x0000000C</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>0x00000010 - 0x000000013</p></td>
+<td><p>0x00000010</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>0x00000014 - 0x000000017</p></td>
+<td><p>0x00000014</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>0x00000018 - 0xFFFFFFFFF</p></td>
+<td><p>0x00000018</p></td>
+</tr>
+</tbody>
+</table>
+<p>Now addresses 0x00000000, 0x00000001, 0x00000002 and 0x00000003 will be routed out of port 0, addresses 0x00000004, 0x00000005, 0x00000006 and 0x00000007 out of port 1 and so on.
+Out of port 6 will be routed all transactions with address 0x00000018 or higher.</p>
+<p>In this case (when we want all other transactions to be routed out of port 6), we would have to change the default value of ADDR_MASK to <cite>(others =&gt; ‘1’)</cite>.
+If we wanted the last range of addresses to be the same as the previous ones (i.e. from 0x00000018 up to 0x0000001C), we would use the default value of ADDR_MASK.
+This is explained in the following example.</p>
+</section>
+<section id="example-2-masking-irrelevant-bits-of-the-address">
+<h3>Example 2 - masking irrelevant bits of the address<a class="headerlink" href="#example-2-masking-irrelevant-bits-of-the-address" title="Link to this heading"></a></h3>
+<p>In this case, we want to choose the output port according to only a part of MI transaction’s address.
+If we want the port with highest associated AB to act as a default port (one that will  carry all transactions that don’t fall into any other range), we have to set ADDR_MASK to <cite>(others =&gt; ‘1’)</cite>, because we want to use all bits of the address.
+If we leave the mask in default state, all ABs are ORed together and interleaving ‘0’s are replaced by ‘1’s.
+If we want anything else, we have to set the mask accordingly.
+The mask is also useful for lowering resource consumption, as less wide signals can be compared.</p>
+<p>So how do we set it?
+Well it works like one might expect, the incoming address is logically multiplied (AND operation) with the mask and then it is compared with the ABs.
+That means the mask should have continuous chain of ‘1’s (no ‘0’ in-between) at positions that we want to compare, and ‘0’s at all other positions.</p>
+<p>In this example, we have specified the address ranges that are associated with respective ports.
+This is shown in the first two columns of table 2.
+According this, you can try to set the ADDR_BASE by yourselves and then compare it with the last column of table 2.
+In the third column are the same address ranges converted to binary.
+This makes it easier to determine, which bits of the mask have to be ‘1’s and which should be ‘0’s.</p>
+<table class="docutils align-center" id="id3">
+<caption><span class="caption-text">Tab. 2</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 18.2%" />
+<col style="width: 27.3%" />
+<col style="width: 36.4%" />
+<col style="width: 18.2%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Output port = AB index</p></th>
+<th class="head"><p>Address range</p></th>
+<th class="head"><p>Address range in bin code</p></th>
+<th class="head"><p>Address base</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>0x00000000 - 0x0000001F</p></td>
+<td><p>…0<strong>0 000000</strong>00 - …0<strong>0 000111</strong>11</p></td>
+<td><p>0x00000000</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>0x00000020 - 0x0000003F</p></td>
+<td><p>…0<strong>0 001000</strong>00 - …0<strong>0 001111</strong>11</p></td>
+<td><p>0x00000020</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>0x00000040 - 0x00000077</p></td>
+<td><p>…0<strong>0 010000</strong>00 - …0<strong>0 011101</strong>11</p></td>
+<td><p>0x00000040</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>0x00000078 - 0x000000AB</p></td>
+<td><p>…0<strong>0 011110</strong>00 - …0<strong>0 101010</strong>11</p></td>
+<td><p>0x00000078</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>0x000000AC - 0x000000CB</p></td>
+<td><p>…0<strong>0 101011</strong>00 - …0<strong>0 110010</strong>11</p></td>
+<td><p>0x000000AC</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>0x000000CC - 0x000000F7</p></td>
+<td><p>…0<strong>0 110011</strong>00 - …0<strong>0 111101</strong>11</p></td>
+<td><p>0x000000CC</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>0x000000F8 - 0x000001FB</p></td>
+<td><p>…0<strong>0 111110</strong>00 - …0<strong>1 111110</strong>11</p></td>
+<td><p>0x000000F8</p></td>
+</tr>
+</tbody>
+</table>
+<p>The address range always begins at a number with lowest two bits at ‘0’, which means that they are irrelevant to us.
+So the two lowest bits of the mask will be set to ‘0’.
+Then we have to decide, how many ‘1’s there will be, or what is the highest position in the mask that will be occupied by a ‘1’.
+That can be determined from the highest address of the highest address range.
+In our case, the highest address range is 0x000000F8 - 0x000001FB (port 6), the highest address in this range is 0x000001FB, which is …0<strong>1 111110</strong>11 when converted to binary.
+We can see, that the highest position that is occupied by a ‘1’ is 8.
+So address mask should consist of ‘0’s from MSB down to bit at position 9, then there will ‘1’s from position 8 all the way down to position 2 and the two lowest bits will be “00”, as was decided before.
+The final form of ADDR_MASK is then: …0<strong>1 111111</strong>00.</p>
+</section>
+<section id="example-3-mapping-ports-to-differnt-abs">
+<h3>Example 3 - mapping ports to differnt ABs<a class="headerlink" href="#example-3-mapping-ports-to-differnt-abs" title="Link to this heading"></a></h3>
+<p>In this advanced example, we would like to assign more ABs (i.e. more address ranges) to a single port.
+For that we’re gonna need to use PORT_MAPPING.
+Let’s take the first example we had.
+Now the ABs are going to stay the same, but instead of 7 ports we are going to have just 5.
+The routing is illustrated in the next figure.</p>
+<a class="reference internal image-reference" href="../../../_images/mi_splitter_exm3.svg"><img alt="../../../_images/mi_splitter_exm3.svg" class="align-center" src="../../../_images/mi_splitter_exm3.svg" style="width: 50%;" />
+</a>
+<p>We want to route transactions addressed to the first and last address ranges out of port 0,
+transactions addressed to the second and second last address ranges out of port 1,
+transactions addressed to the third address range out of port 2,
+transactions addressed to the fourth address range out of port 4 and
+transactions addressed to the fifth address range out of port 3.
+This is illustrated in the table below.
+As the table is somewhat messy, description follows below.</p>
+<a class="reference internal image-reference" href="../../../_images/port_mapping_exm3.svg"><img alt="../../../_images/port_mapping_exm3.svg" class="align-center" src="../../../_images/port_mapping_exm3.svg" style="width: 90%;" />
+</a>
+<p>Items in the table that have the same color belong together.
+The first 2 columns show how ABs are mapped to ports according to requirements stated above.
+In the third column are ABs that are associated with indices in the second column.
+Fourth column shows which address range(s) each port has actually associated (after port mapping).</p>
+<p>Now that we have specified our requirements we should talk about the realization.
+We are going to use the generic PORT_MAPPING.
+Each index of PORT_MAPPING is pretty much an index of ADDR_BASE.
+To each of these indices we assign the number of the port that should be associated with this AB (and therefore with this address range).
+As was mentioned before, one port can have more than one address range assigned.
+Both port 0 and port 1 have two address ranges assigned.
+According to the table, we want transactions with addresses in ranges from 0x0 up to 0x3 and from 0x18 up to 0xFFFFFFFF to be routed out of port 0.
+These ranges are associated with AB(0) and AB(6).
+So PORT_MAPPING(0) and PORT_MAPPING(6) should have both assigned (port number) 0.
+The same goes for all other indices; the final form of PORT_MAPPING should look like in table 3.</p>
+<table class="docutils align-center" id="id4">
+<caption><span class="caption-text">Tab. 3</span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>PORT_MAPPING index</p></th>
+<th class="head"><p>Port</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../reconf/readme.html" class="btn btn-neutral float-left" title="MI Reconfigurator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../converters/mi2avmm/readme.html" class="btn btn-neutral float-right" title="MI2AVMM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

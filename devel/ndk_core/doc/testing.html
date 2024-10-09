@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NDK testing &mdash; Minimal NDK Application Docs  documentation</title>
+  <title>NDK testing &mdash; NDK-FPGA Docs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Build System" href="../../ofm_doc/build/readme.html" />
+    <link rel="next" title="Build System" href="../../ndk_build/readme.html" />
     <link rel="prev" title="Configuration files and parameters" href="configuration.html" /> 
 </head>
 
@@ -34,11 +32,8 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            Minimal NDK Application Docs
+            NDK-FPGA Docs
           </a>
-              <div class="version">
-                Git branch: devel, <br> Git hash: c5a959df
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -55,14 +50,14 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">NDK Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">NDK testing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#testing-r-w-access-to-the-scratch-registers">Testing R/W access to the scratch registers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gls-module-tutorial">GLS module tutorial</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
@@ -78,18 +73,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/base.html">Basic Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mfb.html">MFB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mvb.html">MVB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ver.html">UVM Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -98,7 +94,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">Minimal NDK Application Docs</a>
+          <a href="../../index.html">NDK-FPGA Docs</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -121,13 +117,13 @@
 <p>This chapter describes how the NDK firmware and its HDL components can be tested:</p>
 <ul class="simple">
 <li><p>Test R/W access to scratch registers in the NDK firmware (<a class="reference internal" href="#ndk-testing-mi"><span class="std std-ref">see below</span></a>).</p></li>
-<li><p>Simple HW throughput tests can be executed using the <a class="reference internal" href="../../ofm_doc/comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">Gen Loop Switch (GLS) debug module</span></a> (<a class="reference internal" href="#ndk-testing-gls"><span class="std std-ref">see below</span></a>).</p></li>
-<li><p>HDL components are tested by <a class="reference internal" href="../../ofm_doc/ver.html#uvm-ver"><span class="std std-ref">verification, mainly using the UVM</span></a>.</p></li>
-<li><p>There is also a <a class="reference internal" href="../intel/cocotb/README.html#cocotb-sim"><span class="std std-ref">simulation of almost the entire firmware using cocotb</span></a> (however, it is not yet publicly available).</p></li>
+<li><p>Simple HW throughput tests can be executed using the <a class="reference internal" href="../../comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">Gen Loop Switch (GLS) debug module</span></a> (<a class="reference internal" href="#ndk-testing-gls"><span class="std std-ref">see below</span></a>).</p></li>
+<li><p>HDL components are tested by <a class="reference internal" href="../../ver.html#uvm-ver"><span class="std std-ref">verification, mainly using the UVM</span></a>.</p></li>
+<li><p>There is also a <a class="reference internal" href="../cocotb/README.html#cocotb-sim"><span class="std std-ref">simulation of almost the entire firmware using cocotb</span></a> (however, it is not yet publicly available).</p></li>
 </ul>
 <section id="testing-r-w-access-to-the-scratch-registers">
 <span id="ndk-testing-mi"></span><h2>Testing R/W access to the scratch registers<a class="headerlink" href="#testing-r-w-access-to-the-scratch-registers" title="Link to this heading"></a></h2>
-<p>The NDK firmware implements 64 32-bit scratch registers for testing purposes. Like other parts of the firmware, they are accessible via the <a class="reference internal" href="../intel/doc/mi.html#ndk-mi"><span class="std std-ref">MI bus</span></a>. This address space is (among other things) stored in the <a class="reference internal" href="devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a>. The <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-bus.html">nfb-bus tool</a> can be used for easy R/W access to any register in the firmware that is mapped to the MI bus. The following example shows how to:</p>
+<p>The NDK firmware implements 64 32-bit scratch registers for testing purposes. Like other parts of the firmware, they are accessible via the <a class="reference internal" href="mi.html#ndk-mi"><span class="std std-ref">MI bus</span></a>. This address space is (among other things) stored in the <a class="reference internal" href="devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a>. The <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-bus.html">nfb-bus tool</a> can be used for easy R/W access to any register in the firmware that is mapped to the MI bus. The following example shows how to:</p>
 <ul class="simple">
 <li><p>read the first scratch register (the offset is 0x0 in the byte format) in the MI TEST SPACE component (selected using the DeviceTree path),</p></li>
 <li><p>write a new value (0x42) to it, and</p></li>
@@ -144,7 +140,7 @@ $<span class="w"> </span>nfb-bus<span class="w"> </span>-p<span class="w"> </spa
 </section>
 <section id="gls-module-tutorial">
 <span id="ndk-testing-gls"></span><h2>GLS module tutorial<a class="headerlink" href="#gls-module-tutorial" title="Link to this heading"></a></h2>
-<p>The NDK firmware may include a GLS module that is instantiated in each DMA stream between the application core and the DMA controller. The GLS module is used for testing purposes and contains HW packet generators, speed meters, and datapath switches. Please refer to the <a class="reference internal" href="../../ofm_doc/comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">GLS module documentation</span></a> for a more information.</p>
+<p>The NDK firmware may include a GLS module that is instantiated in each DMA stream between the application core and the DMA controller. The GLS module is used for testing purposes and contains HW packet generators, speed meters, and datapath switches. Please refer to the <a class="reference internal" href="../../comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">GLS module documentation</span></a> for a more information.</p>
 <p>The GLS module also comes with a Python script (<code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/ofm/comp/mfb_tools/debug/gen_loop_switch/sw/gls_mod.py</span></code>) that can be used to quickly perform several basic tests (modes). For example, you can measure the throughput of the NDK firmware. A list of tests can be obtained by running this script without parameters:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 gls_mod.py
 gls_mod.py mode [port_list]
@@ -161,7 +157,7 @@ Supported modes:
 8: TX DMA --&gt; RX DMA     ### (internal DMA loopback)
 </pre></div>
 </div>
-<p>Some tests require an available DMA controller; others require an external QSFP loopback for Ethernet. Test 1 can be used for NDK firmware without a DMA controller. In this test, the <a class="reference internal" href="../../ofm_doc/comp/mfb_tools/debug/generator/readme.html#mfb-generator"><span class="std std-ref">HW generator</span></a> sends Ethernet packets of constant length to the output network interface at full speed. The script measures the transmission data rate and continues to repeat the test for incrementing packet lengths until the maximum packet length is reached.</p>
+<p>Some tests require an available DMA controller; others require an external QSFP loopback for Ethernet. Test 1 can be used for NDK firmware without a DMA controller. In this test, the <a class="reference internal" href="../../comp/mfb_tools/debug/generator/readme.html#mfb-generator"><span class="std std-ref">HW generator</span></a> sends Ethernet packets of constant length to the output network interface at full speed. The script measures the transmission data rate and continues to repeat the test for incrementing packet lengths until the maximum packet length is reached.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Some Ethernet Hard IPs (especially E-Tile and F-tile) may not receive data for transmission if they do not detect the Ethernet link. The test will not work in this case, so we recommend connecting an external QSFP loopback.</p>
@@ -212,7 +208,7 @@ Total Speed RX:             83.78 [Gbps]
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="configuration.html" class="btn btn-neutral float-left" title="Configuration files and parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../../ofm_doc/build/readme.html" class="btn btn-neutral float-right" title="Build System" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../../ndk_build/readme.html" class="btn btn-neutral float-right" title="Build System" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

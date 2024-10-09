@@ -1,0 +1,870 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The PCIe module &mdash; NDK-FPGA Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The Memory Controller" href="mem.html" />
+    <link rel="prev" title="The DMA module" href="dma.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            NDK-FPGA Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="readme.html">NDK Architecture</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="app.html">The Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mi.html">The MI bus interconnect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eth.html">The Network Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dma.html">The DMA module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">The PCIe module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#selecting-a-pcie-configuration">Selecting a PCIe configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-pcie-core-pcie-core">The PCIe Core (PCIE_CORE)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#supported-pcie-hard-ip">Supported PCIe Hard IP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#the-pcie-control-unit-pcie-ctrl">The PCIe Control unit (PCIE_CTRL)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-pcie-module-entity">The PCIe module entity</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mem.html">The Memory Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tsu.html">Time Stamp Unit</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NDK-FPGA Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="readme.html">NDK Architecture</a></li>
+      <li class="breadcrumb-item active">The PCIe module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/ndk_core/doc/pcie.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-pcie-module">
+<span id="ndk-intel-pcie-mod"></span><span id="ndk-pcie-mod"></span><h1>The PCIe module<a class="headerlink" href="#the-pcie-module" title="Link to this heading"></a></h1>
+<p>The PCIe module handles all PCIe communication. Its task is to forward/transform PCIe transactions for the DMA controller and the <a class="reference internal" href="../../comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a>. The architecture of the PCIe module is divided into two main parts: PCIE_CORE and PCIE_CTRL. Its diagram is shown below.</p>
+<a class="reference internal image-reference" href="../../_images/pcie_module_arch.drawio.svg"><img alt="../../_images/pcie_module_arch.drawio.svg" class="align-center" src="../../_images/pcie_module_arch.drawio.svg" style="width: 100%;" />
+</a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The PCIe module can support more than one PCIe endpoint. In this case, the individual parts of the PCIe module are appropriately duplicated for each PCIe endpoint. There is also bifurcation support for some PCIe HARD IPs.</p>
+</div>
+<section id="selecting-a-pcie-configuration">
+<h2>Selecting a PCIe configuration<a class="headerlink" href="#selecting-a-pcie-configuration" title="Link to this heading"></a></h2>
+<p>Before running the FPGA firmware compilation, the target PCIe configuration can be selected using the makefile parameter <code class="docutils literal notranslate"><span class="pre">PCIE_CONF</span></code>. Without this parameter, the card default configuration is automatically selected. Only some FPGA cards support multiple PCIe configurations. If you enter an unsupported value (for example: <code class="docutils literal notranslate"><span class="pre">PCIE_CONF=1xGen1x16</span></code>), the console will list the supported configurations on the target FPGA card.</p>
+<p><strong>Examples of some allowed configurations:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF=1xGen3x16</span></code>  – Single PCIe slot in Gen3 x16 mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF=2xGen4x8x8</span></code> – Two PCIe slots in Gen4 x8x8 (bifuracation) mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF=2xGen5x8x8</span></code> – Two PCIe slots in Gen5 x8x8 (bifuracation) mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF=1xGen3x8LL</span></code> – Single PCIe slot in Gen3 x8 Low-Latency mode (for Xilinx UltraScale+ only).</p></li>
+</ul>
+</section>
+<section id="the-pcie-core-pcie-core">
+<h2>The PCIe Core (PCIE_CORE)<a class="headerlink" href="#the-pcie-core-pcie-core" title="Link to this heading"></a></h2>
+<p>The PCIe Core varies according to the PCIe Hard IP or FPGA used. The PCIe Core contains the instance(s) of the used PCIe Hard IP, an adapter for converting the AXI/Avalon-ST buses to the <a class="reference internal" href="../../comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB buses</span></a>, the Vendor-Specific Extension Capability (VSEC) registers (implemented in the <a class="reference internal" href="../../comp/pcie/common/readme.html#pci-ext-cap"><span class="std std-ref">PCI_EXT_CAP module</span></a>) containing mainly the <a class="reference internal" href="devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a> firmware description and additional configuration logic. Thus, the main purpose of the PCIe Core is to unify the buses and provide the necessary information about the active PCIe link.</p>
+<section id="supported-pcie-hard-ip">
+<h3>Supported PCIe Hard IP<a class="headerlink" href="#supported-pcie-hard-ip" title="Link to this heading"></a></h3>
+<p>A list of the supported PCIe Hard IPs is below. You can select the target architecture by setting the NDK parameter <code class="docutils literal notranslate"><span class="pre">PCIE_MOD_ARCH</span></code>. According to this parameter, the correct PCIE_CORE module variant is used and the VHDL generic <code class="docutils literal notranslate"><span class="pre">PCIE_ENDPOINT_TYPE</span></code> is set appropriately.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">R_TILE</span></code> - <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/683501/">R-Tile Avalon Streaming Intel FPGA IP for PCI Express</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">P_TILE</span></code> - <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/683059/">P-Tile Avalon Streaming Intel FPGA IP for PCI Express</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">USP</span></code> - <a class="reference external" href="https://docs.xilinx.com/r/en-US/pg213-pcie4-ultrascale-plus">Xilinx UltraScale+ Device Integrated Block for PCI Express</a></p></li>
+</ul>
+</section>
+</section>
+<section id="the-pcie-control-unit-pcie-ctrl">
+<h2>The PCIe Control unit (PCIE_CTRL)<a class="headerlink" href="#the-pcie-control-unit-pcie-ctrl" title="Link to this heading"></a></h2>
+<p>The PCIe Control unit always includes the <a class="reference internal" href="../../comp/pcie/mtc/readme.html#mtc"><span class="std std-ref">MI Transaction Controller (MTC)</span></a>, which transforms the associated PCIe memory transactions into read or write requests on the MI bus. In the case of a read request, the MI response is also transformed back into a PCIe completition transaction and sent back to the host PC. PCIe transactions from the BAR0 address space are allocated to the MTC module. If the NDK uses a DMA controller that requires its own BAR, the PCIe transactions from the DMA-BAR address space (BAR2) are routed directly to the DMA module. This functionality must be enabled via the <code class="docutils literal notranslate"><span class="pre">DMA_BAR_ENABLE</span></code> parameter.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We assume that 64-bit PCIe BARs are used, meaning that half of them are available at most (BAR0, BAR2, and BAR4). You can find more information in the PCIe specification.</p>
+</div>
+<p>By default, this unit also contains the <a class="reference internal" href="../../comp/pcie/ptc/readme.html#ptc"><span class="std std-ref">PTC module</span></a>, which transforms memory requests (in a simplified format) coming from the DMA into the desired PCIe format and vice versa. The PTC module also implements a completion buffer and handles the allocation of the PCIe TAGs, etc. The PTC can be disabled using the <code class="docutils literal notranslate"><span class="pre">PTC_DISABLE</span></code> parameter, in which case the DMA requests (in the PCIe transaction format) are directly forwarded to the PCIe Hard IP and vice versa.</p>
+</section>
+<section id="the-pcie-module-entity">
+<h2>The PCIe module entity<a class="headerlink" href="#the-pcie-module-entity" title="Link to this heading"></a></h2>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-pcie">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">PCIE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-pcie" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>BAR base address configuration</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-bar0_base_addr"><td><p>BAR0_BASE_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>X”01000000”</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-bar1_base_addr"><td><p>BAR1_BASE_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>X”02000000”</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-bar2_base_addr"><td><p>BAR2_BASE_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>X”03000000”</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-bar3_base_addr"><td><p>BAR3_BASE_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>X”04000000”</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-bar4_base_addr"><td><p>BAR4_BASE_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>X”05000000”</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-bar5_base_addr"><td><p>BAR5_BASE_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>X”06000000”</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-exp_rom_base_addr"><td><p>EXP_ROM_BASE_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>X”0A000000”</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB configuration</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-cq_mfb_regions"><td><p>CQ_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-cq_mfb_region_size"><td><p>CQ_MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-cq_mfb_block_size"><td><p>CQ_MFB_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-cq_mfb_item_width"><td><p>CQ_MFB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-rc_mfb_regions"><td><p>RC_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-rc_mfb_region_size"><td><p>RC_MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-rc_mfb_block_size"><td><p>RC_MFB_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-rc_mfb_item_width"><td><p>RC_MFB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-cc_mfb_regions"><td><p>CC_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-cc_mfb_region_size"><td><p>CC_MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-cc_mfb_block_size"><td><p>CC_MFB_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-cc_mfb_item_width"><td><p>CC_MFB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-rq_mfb_regions"><td><p>RQ_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-rq_mfb_region_size"><td><p>RQ_MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-rq_mfb_block_size"><td><p>RQ_MFB_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-rq_mfb_item_width"><td><p>RQ_MFB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Other configuration</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-dma_ports"><td><p>DMA_PORTS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Total number of DMA_EP, DMA_EP=PCIE_EP or 2*DMA_EP=PCIE_EP</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-pcie_endpoint_type"><td><p>PCIE_ENDPOINT_TYPE</p></td>
+<td><p>string</p></td>
+<td><p>“P_TILE”</p></td>
+<td><p>Connected PCIe endpoint type</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-pcie_endpoint_mode"><td><p>PCIE_ENDPOINT_MODE</p></td>
+<td><p>natural</p></td>
+<td><p>0</p></td>
+<td><p>Connected PCIe endpoint mode: 0=x16, 1=x8x8, 2=x8</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-pcie_endpoints"><td><p>PCIE_ENDPOINTS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Number of PCIe endpoints</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-pcie_clks"><td><p>PCIE_CLKS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of PCIe clocks per PCIe connector</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-pcie_cons"><td><p>PCIE_CONS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Number of PCIe connectors</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-pcie_lanes"><td><p>PCIE_LANES</p></td>
+<td><p>natural</p></td>
+<td><p>16</p></td>
+<td><p>Number of PCIe lanes in each PCIe connector</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-card_id_width"><td><p>CARD_ID_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>0</p></td>
+<td><p>Width of CARD/FPGA ID number</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-ptc_disable"><td><p>PTC_DISABLE</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Disable PTC module and allows direct connection of the DMA module to
+the PCIe IP RQ and RC interfaces.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-dma_bar_enable"><td><p>DMA_BAR_ENABLE</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable CQ/CC interface for DMA-BAR, condition DMA_PORTS=PCIE_ENDPOINTS</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-xvc_enable"><td><p>XVC_ENABLE</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable of XCV IP, for Xilinx only</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“STRATIX10”</p></td>
+<td><p>FPGA device</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>CLOCKS AND RESETS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-pcie_sysclk_p"><td><p>PCIE_SYSCLK_P</p></td>
+<td><p>std_logic_vector(PCIE_CONS*PCIE_CLKS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Clock from PCIe port, 100 MHz</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-pcie_sysclk_n"><td><p>PCIE_SYSCLK_N</p></td>
+<td><p>std_logic_vector(PCIE_CONS*PCIE_CLKS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-pcie_sysrst_n"><td><p>PCIE_SYSRST_N</p></td>
+<td><p>std_logic_vector(PCIE_CONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>PCIe reset from PCIe port</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-init_done_n"><td><p>INIT_DONE_N</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>nINIT_DONE output of the Reset Release Intel Stratix 10 FPGA IP</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-pcie_user_clk"><td><p>PCIE_USER_CLK</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>PCIe user clock and reset</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-pcie_user_reset"><td><p>PCIE_USER_RESET</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_clk"><td><p>DMA_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>DMA module clock and reset</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_reset"><td><p>DMA_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>PCIE SERIAL INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-pcie_rx_p"><td><p>PCIE_RX_P</p></td>
+<td><p>std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Receive data</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-pcie_rx_n"><td><p>PCIE_RX_N</p></td>
+<td><p>std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-pcie_tx_p"><td><p>PCIE_TX_P</p></td>
+<td><p>std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Transmit data</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-pcie_tx_n"><td><p>PCIE_TX_N</p></td>
+<td><p>std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Configuration status interface (PCIE_USER_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-pcie_link_up"><td><p>PCIE_LINK_UP</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>PCIe link up flag per PCIe endpoint</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-pcie_mps"><td><p>PCIE_MPS</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>PCIe maximum payload size</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-pcie_mrrs"><td><p>PCIE_MRRS</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>PCIe maximum read request size</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-pcie_ext_tag_en"><td><p>PCIE_EXT_TAG_EN</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>PCIe extended tag enable (8-bit tag)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-pcie_10b_tag_req_en"><td><p>PCIE_10B_TAG_REQ_EN</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>PCIe 10-bit tag requester enable</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-pcie_rcb_size"><td><p>PCIE_RCB_SIZE</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>PCIe RCB size control</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-card_id"><td><p>CARD_ID</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(CARD_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Card ID / PCIe Device Serial Number</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>DMA RQ MFB+MVB interface (PCIE_CLK or DMA_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>PTC ENABLE: MFB+MVB bus for transferring RQ PTC-DMA transactions.
+MFB+MVB bus is clocked at DMA_CLK.
+PTC DISABLE: MFB bus only for transferring RQ PCIe transactions
+(format according to the PCIe IP used). Compared to the standard MFB
+specification, it does not allow gaps (SRC_RDY=0) inside transactions
+and requires that the first transaction in a word starts at byte 0.
+MFB bus is clocked at PCIE_CLK.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rq_mfb_data"><td><p>DMA_RQ_MFB_DATA</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RQ_MFB_REGIONS*RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE*RQ_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rq_mfb_meta"><td><p>DMA_RQ_MFB_META</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RQ_MFB_REGIONS*PCIE_RQ_META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rq_mfb_sof"><td><p>DMA_RQ_MFB_SOF</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RQ_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rq_mfb_eof"><td><p>DMA_RQ_MFB_EOF</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RQ_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rq_mfb_sof_pos"><td><p>DMA_RQ_MFB_SOF_POS</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RQ_MFB_REGIONS*max(1,log2(RQ_MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rq_mfb_eof_pos"><td><p>DMA_RQ_MFB_EOF_POS</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RQ_MFB_REGIONS*max(1,log2(RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rq_mfb_src_rdy"><td><p>DMA_RQ_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rq_mfb_dst_rdy"><td><p>DMA_RQ_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rq_mvb_data"><td><p>DMA_RQ_MVB_DATA</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RQ_MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rq_mvb_vld"><td><p>DMA_RQ_MVB_VLD</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RQ_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rq_mvb_src_rdy"><td><p>DMA_RQ_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rq_mvb_dst_rdy"><td><p>DMA_RQ_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>DMA RC MFB+MVB interface (PCIE_CLK or DMA_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>PTC ENABLE: MFB+MVB bus for transferring RC PTC-DMA transactions.
+MFB+MVB bus is clocked at DMA_CLK.
+PTC DISABLE: MFB bus only for transferring RC PCIe transactions
+(format according to the PCIe IP used). Compared to the standard MFB
+specification, it does not allow gaps (SRC_RDY=0) inside transactions
+and requires that the first transaction in a word starts at byte 0.
+MFB bus is clocked at PCIE_CLK.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rc_mfb_data"><td><p>DMA_RC_MFB_DATA</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RC_MFB_REGIONS*RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE*RC_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rc_mfb_meta"><td><p>DMA_RC_MFB_META</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RC_MFB_REGIONS*PCIE_RC_META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rc_mfb_sof"><td><p>DMA_RC_MFB_SOF</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RC_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rc_mfb_eof"><td><p>DMA_RC_MFB_EOF</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RC_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rc_mfb_sof_pos"><td><p>DMA_RC_MFB_SOF_POS</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RC_MFB_REGIONS*max(1,log2(RC_MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rc_mfb_eof_pos"><td><p>DMA_RC_MFB_EOF_POS</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RC_MFB_REGIONS*max(1,log2(RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rc_mfb_src_rdy"><td><p>DMA_RC_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rc_mfb_dst_rdy"><td><p>DMA_RC_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rc_mvb_data"><td><p>DMA_RC_MVB_DATA</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RC_MFB_REGIONS*DMA_DOWNHDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rc_mvb_vld"><td><p>DMA_RC_MVB_VLD</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(RC_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_rc_mvb_src_rdy"><td><p>DMA_RC_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_rc_mvb_dst_rdy"><td><p>DMA_RC_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>DMA CQ MFB interface - DMA-BAR (PCIE_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>MFB bus for transferring CQ DMA-BAR PCIe transactions (format
+according to the PCIe IP used). Compared to the standard MFB
+specification, it does not allow gaps (SRC_RDY=0) inside transactions
+and requires that the first transaction in a word starts at byte 0.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_cq_mfb_data"><td><p>DMA_CQ_MFB_DATA</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE*CQ_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_cq_mfb_meta"><td><p>DMA_CQ_MFB_META</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CQ_MFB_REGIONS*PCIE_CQ_META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_cq_mfb_sof"><td><p>DMA_CQ_MFB_SOF</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CQ_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_cq_mfb_eof"><td><p>DMA_CQ_MFB_EOF</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CQ_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_cq_mfb_sof_pos"><td><p>DMA_CQ_MFB_SOF_POS</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CQ_MFB_REGIONS*max(1,log2(CQ_MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_cq_mfb_eof_pos"><td><p>DMA_CQ_MFB_EOF_POS</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CQ_MFB_REGIONS*max(1,log2(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_cq_mfb_src_rdy"><td><p>DMA_CQ_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_cq_mfb_dst_rdy"><td><p>DMA_CQ_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>PCIE CC MFB interface - DMA-BAR (PCIE_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>MFB bus for transferring CC DMA-BAR PCIe transactions (format
+according to the PCIe IP used). Compared to the standard MFB
+specification, it does not allow gaps (SRC_RDY=0) inside transactions
+and requires that the first transaction in a word starts at byte 0.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_cc_mfb_data"><td><p>DMA_CC_MFB_DATA</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CC_MFB_REGIONS*CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE*CC_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_cc_mfb_meta"><td><p>DMA_CC_MFB_META</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CC_MFB_REGIONS*PCIE_CC_META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_cc_mfb_sof"><td><p>DMA_CC_MFB_SOF</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CC_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_cc_mfb_eof"><td><p>DMA_CC_MFB_EOF</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CC_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_cc_mfb_sof_pos"><td><p>DMA_CC_MFB_SOF_POS</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CC_MFB_REGIONS*max(1,log2(CC_MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_cc_mfb_eof_pos"><td><p>DMA_CC_MFB_EOF_POS</p></td>
+<td><p>slv_array_t(DMA_PORTS-1 downto 0)(CC_MFB_REGIONS*max(1,log2(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-dma_cc_mfb_src_rdy"><td><p>DMA_CC_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-dma_cc_mfb_dst_rdy"><td><p>DMA_CC_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MI32 interfaces (MI_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>MI - Root of the MI32 bus tree for each PCIe endpoint (connection to the MTC)
+MI_DBG - MI interface to PCIe registers (currently only debug registers)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_clk"><td><p>MI_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_reset"><td><p>MI_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>slv_array_t     (PCIE_ENDPOINTS-1 downto 0)(32-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>slv_array_t     (PCIE_ENDPOINTS-1 downto 0)(32-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_be"><td><p>MI_BE</p></td>
+<td><p>slv_array_t     (PCIE_ENDPOINTS-1 downto 0)(32/8-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>slv_array_t     (PCIE_ENDPOINTS-1 downto 0)(32-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_dbg_dwr"><td><p>MI_DBG_DWR</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_dbg_addr"><td><p>MI_DBG_ADDR</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_dbg_be"><td><p>MI_DBG_BE</p></td>
+<td><p>std_logic_vector(32/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_dbg_rd"><td><p>MI_DBG_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_dbg_wr"><td><p>MI_DBG_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_dbg_drd"><td><p>MI_DBG_DRD</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_dbg_ardy"><td><p>MI_DBG_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_dbg_drdy"><td><p>MI_DBG_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dma.html" class="btn btn-neutral float-left" title="The DMA module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mem.html" class="btn btn-neutral float-right" title="The Memory Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

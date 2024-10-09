@@ -1,0 +1,222 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MI bus specification &mdash; NDK-FPGA Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="MI ASYNC" href="async/readme.html" />
+    <link rel="prev" title="MI Tools" href="../../mi.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            NDK-FPGA Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../mi.html">MI Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MI bus specification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mi-bus-description">MI bus description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#a-few-timing-diagrams">A few timing diagrams</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="async/readme.html">MI ASYNC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipe/readme.html">MI Pipe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="indirect_access/readme.html">MI indirect access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reconf/readme.html">MI Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splitter_plus_gen/readme.html">MI Splitter Plus Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converters/mi2avmm/readme.html">MI2AVMM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="converters/mi2axi4/readme.html">MI2AXI4</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NDK-FPGA Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../mi.html">MI Tools</a></li>
+      <li class="breadcrumb-item active">MI bus specification</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/comp/mi_tools/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mi-bus-specification">
+<span id="mi-bus"></span><h1>MI bus specification<a class="headerlink" href="#mi-bus-specification" title="Link to this heading"></a></h1>
+<p>MI (Memory Interface) bus realizes software access to firmware components. These components (usually some control, state or statistics registers) can be either configured by <strong>write</strong> requests, or  their current data can be determined by <strong>read</strong> requests. These components are accessed by their addresses that are sent along with the requests. The default width used in this project is 32 bits for both, data and addresses. That is why the name MI32 is often used for this bus.</p>
+<section id="mi-bus-description">
+<h2>MI bus description<a class="headerlink" href="#mi-bus-description" title="Link to this heading"></a></h2>
+<p>MI bus has these 8 ports + 1 port optional divided into two channels (<em>the port directions in example are valid for slave MI components</em>):</p>
+<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="c1">-- ===========================================================================</span>
+<span class="c1">-- Ports of MI bus request channel (master to slave):</span>
+<span class="c1">-- ===========================================================================</span>
+<span class="n">ADDR</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">ADDR_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">-- ADDRess</span>
+<span class="n">DWR</span><span class="w">  </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">-- Data WRite</span>
+<span class="n">MWR</span><span class="w">  </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">META_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">-- Metadata WRite (optional)</span>
+<span class="n">BE</span><span class="w">   </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">/</span><span class="mi">8</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c1">-- Byte Enable</span>
+<span class="n">WR</span><span class="w">   </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic</span><span class="p">;</span><span class="w">                                 </span><span class="c1">-- WRite</span>
+<span class="n">RD</span><span class="w">   </span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w">  </span><span class="kt">std_logic</span><span class="p">;</span><span class="w">                                 </span><span class="c1">-- ReaD</span>
+<span class="n">ARDY</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">std_logic</span><span class="p">;</span><span class="w">                                 </span><span class="c1">-- Address ReaDY</span>
+<span class="c1">-- ===========================================================================</span>
+<span class="c1">-- Ports of MI bus response channel (slave to master):</span>
+<span class="c1">-- ===========================================================================</span>
+<span class="n">DRD</span><span class="w">  </span><span class="o">:</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">std_logic_vector</span><span class="p">(</span><span class="n">DATA_WIDTH</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">downto</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">-- Data ReaD</span>
+<span class="n">DRDY</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">out</span><span class="w"> </span><span class="kt">std_logic</span><span class="p">;</span><span class="w">                                 </span><span class="c1">-- Data ReaDY</span>
+</pre></div>
+</div>
+<p>Address and data widths are determined by respective generic parameters. It is not surprising, that <code class="docutils literal notranslate"><span class="pre">ADDR_WIDTH</span></code> states the width of addresses and can be any positive integer, while <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> states the width of the transferred data and it’s value can only be a multiple of 8. The <code class="docutils literal notranslate"><span class="pre">META_WIDTH</span></code> states the width of the transferred metadata.</p>
+<p>Through the <code class="docutils literal notranslate"><span class="pre">ADDR</span></code> port a slave component recieves addresses of target recipients. Target recipients can be addressed individually by their indices (indexes for Americans and such) - they are not influenced by the width of stored data. For example, their addresses can be 0, 1, 2, etc. This is shown on the left side of the picture below. But this approach is not commonly used in our project. In vast majority of cases, addresses of our components are mapped to an address space (of PCI for example). That means each following address is incremented by the number of stored items of data, which is usually one byte (can be more, but never less). This mapped addressing is shown on the right side of the picture below. Let’s say the data in the memory is stored in bytes, so each byte has a different address. The width of data stored in these registers is 32 bits, so each register can store four bytes of data, that is four addresses. Therefore in this example, the first register stores four bytes of data with addresses 0, 1, 2 and 3. However, only address of the first byte is sent with a request, so <code class="docutils literal notranslate"><span class="pre">ADDR</span></code> will carry value 0. The next four bytes of data will have <code class="docutils literal notranslate"><span class="pre">ADDR</span></code> equal to 4, the next will have 8 and so on.</p>
+<a class="reference internal image-reference" href="../../_images/mi_addresses_indexed_mapped.svg"><img alt="../../_images/mi_addresses_indexed_mapped.svg" class="align-center" src="../../_images/mi_addresses_indexed_mapped.svg" style="width: 50%;" />
+</a>
+<p>These addresses are only valid when a request is being sent, either read or write. If neither of these is active, address can be arbitrary. When multiple slave components are connected to the MI, they must have a defined disjointed address space and incomming requests must be distributed by address decoders (like the <em>MI_SPLITTER_PLUS_GEN</em>). That means the slave component recieves only requests that are meant for it and no final address checking is necessary.</p>
+<p><code class="docutils literal notranslate"><span class="pre">DWR</span></code> carries data to be written into the slave component stated by the address. These data are only valid when a write request is issued (<code class="docutils literal notranslate"><span class="pre">WR</span></code> is asserted). Please note that the written data can be recieved by slave components in different order, then in which they were sent, as each path to the slave component might have different latency. But data sent to one component will be recieved in order.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MWR</span></code> is used for the optional transfer of metadata (user-defined) from the master to the slave component. Metadata port is valid with each request (<code class="docutils literal notranslate"><span class="pre">WR</span></code> or <code class="docutils literal notranslate"><span class="pre">RD</span></code> is asserted).</p>
+<p>As <code class="docutils literal notranslate"><span class="pre">WR</span></code> signals a request to write, <code class="docutils literal notranslate"><span class="pre">RD</span></code> signals a request to read. If <code class="docutils literal notranslate"><span class="pre">WR</span></code> or <code class="docutils literal notranslate"><span class="pre">RD</span></code> is asserted, then ports: <code class="docutils literal notranslate"><span class="pre">ADDR</span></code>, <code class="docutils literal notranslate"><span class="pre">DWR</span></code>, <code class="docutils literal notranslate"><span class="pre">MWR</span></code> and <code class="docutils literal notranslate"><span class="pre">BE</span></code> must have valid values. The valid values of these ports must not change until the request is accepted. Also, <code class="docutils literal notranslate"><span class="pre">WR</span></code> and <code class="docutils literal notranslate"><span class="pre">RD</span></code> can not be asserted at the same time. The <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> indicates whether the slave component is able to accept the request. The request is received when the <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> is asserted in the same cycle as <code class="docutils literal notranslate"><span class="pre">WR</span></code> or <code class="docutils literal notranslate"><span class="pre">RD</span></code>. The behavior of the MI bus with a request sent to an undefined address space is not defined and can cause a critical error.</p>
+<p>Data comming to master as a response to a read request come from port <code class="docutils literal notranslate"><span class="pre">DRD</span></code>. These data can be ready at the output even before the read request, so with incoming read request, they can be immediately read. But the slave component can take theoretically as long as it wants to get the data ready. <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> validates the data that are being read (<code class="docutils literal notranslate"><span class="pre">DRD</span></code>). The requesting (master) component accepts the read data only when <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> is asserted. It is essential for the requesting component to recieve as many responses (asserted <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> signals) as it sent read requests <strong>in the same order</strong> as in which they were sent. It is also essential not to assert <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> before accepting a read request.</p>
+<p><code class="docutils literal notranslate"><span class="pre">BE</span></code> is there to define which bytes of the transferred data (<code class="docutils literal notranslate"><span class="pre">DWR</span></code> or <code class="docutils literal notranslate"><span class="pre">DRD</span></code>) are valid and should be worked with and which bytes should be ignored. Each bit validates one byte of the data, that is why it is <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH/8</span></code> bits wide. Usually, it is used in write transactions, but it may also be used in read transactions.</p>
+</section>
+<section id="a-few-timing-diagrams">
+<h2>A few timing diagrams<a class="headerlink" href="#a-few-timing-diagrams" title="Link to this heading"></a></h2>
+<p>to make sure you really understand, how the MI bus works. The optional <code class="docutils literal notranslate"><span class="pre">MWR</span></code> signal is not used in these examples.</p>
+<p><strong>A) Simple write transaction &amp; the ARDY occurrences</strong></p>
+<a class="reference internal image-reference" href="../../_images/wave_simple_write.svg"><img alt="A simple write transaction and ARDY" class="align-center" src="../../_images/wave_simple_write.svg" style="width: 100%;" />
+</a>
+<p>In the first clock cycle, when <code class="docutils literal notranslate"><span class="pre">WR</span></code> and <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> are both active, data D0 with byte enable B0 are sent to the slave component with the address A0. That is why there are new data (along with address and byte enable, which always go together in write request) in the next clock cycle. Then in the following clock cycle, the <code class="docutils literal notranslate"><span class="pre">WR</span></code> is inactive (as is <code class="docutils literal notranslate"><span class="pre">RD</span></code>), so the slave component can set <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> arbitrarily according to its current state.</p>
+<p>After the divider, <code class="docutils literal notranslate"><span class="pre">WR</span></code> is asserted and so is <code class="docutils literal notranslate"><span class="pre">ARDY</span></code>, so the data D2 are transferred. In the next clock cycle, new data D3 are ready to by transferred as <code class="docutils literal notranslate"><span class="pre">WR</span></code> is active, but now <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> is inactive for the next three clock cycles, meaning that the slave component is not ready to accept a write request (nor a read request). After those three clock cycles of inactive <code class="docutils literal notranslate"><span class="pre">ARDY</span></code>, it is then asserted and data D3 are transferred.</p>
+<p><strong>B) Simple read transaction &amp; the ARDY occurrences</strong></p>
+<a class="reference internal image-reference" href="../../_images/wave_simple_read.svg"><img alt="A simple read transaction and ARDY" class="align-center" src="../../_images/wave_simple_read.svg" style="width: 100%;" />
+</a>
+<p>This timing diagram is in principle very similar to the previous one. At first, there are two read requests addressed to A0 and A1. slave component/s are ready to immediately respond in this example, so <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> is always active when <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> is (<em>rather we recommend</em> <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> <em>delay of one clock cycle for better timing</em>). As long as <code class="docutils literal notranslate"><span class="pre">RD</span></code> is active, read requests are being generated (2 clock cycles). Then RD deasserts, causing <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> to deassert as well.</p>
+<p>After the divider, <code class="docutils literal notranslate"><span class="pre">RD</span></code> asserts and so does <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> (and <code class="docutils literal notranslate"><span class="pre">DRDY</span></code>) for one clock cycle. Then the slave component signals that it can not accept any more requests by deasserting <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> (and <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> as well, because it has no read request to respond to). The request does not change until it is accepted (i.e. when <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> is asserted again).</p>
+<p><strong>C) Simple read transaction &amp; the DRDY occurrences</strong></p>
+<a class="reference internal image-reference" href="../../_images/wave_adv_read.svg"><img alt="A simple read transaction and DRDY" class="align-center" src="../../_images/wave_adv_read.svg" style="width: 100%;" />
+</a>
+<p>This diagram focuses on the <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> signal. First, there is a simple transaction, a read request with immediate response. Two clock cycles later, when <code class="docutils literal notranslate"><span class="pre">RD</span></code> asserts once again, the request is sent but no response is recieved yet. Response comes in the next clock cycle, when <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> is asserted. At the same time, new request is issued, because the last one was accepted with <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> being asserted.</p>
+<p>After that, <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> is asserted for four clock cycles along with <code class="docutils literal notranslate"><span class="pre">RD</span></code>, which means that four read requests are sent. It also means that four responses must be recieved. Because the data in responses are not addressed (or anyhow else identified), the master component expects them to be returned in the same order as it requested them. But there is no time limit for when the responses must be recieved. You can notice this in the diagram. Regardless of when the responses come, they always come in the same order as in which requests were sent. First, data were requested from address A0, so the first response is D0, then data D1 respond to request addressed to A1 and so on.</p>
+<p><strong>D) Combined write and read transactions</strong></p>
+<a class="reference internal image-reference" href="../../_images/wave_rd_wr_combo.svg"><img alt="Read and write requests combined" class="align-center" src="../../_images/wave_rd_wr_combo.svg" style="width: 100%;" />
+</a>
+<p>In this diagram, there is a couple of combinations of read and write transactions to show how they can interact. First comes a read request which is accepted and immediately responded to (as <code class="docutils literal notranslate"><span class="pre">DRDY</span></code> is asserted), followed by a write request that is also accepted. Then there is no request for one clock cycle. Two read requests and two write requests follow to show that it is possible to recieve a response in the same clock cycle as a write request is being sent. A response (D2) comes as an answer to the first of these read requests (addressed as A2) one clock cycle later. Next comes one write request followed by another one. With that second write request (addressed as A5) comes a response (D3) to the other read request (addressed as A3).</p>
+<p>There are more examples of possible combinations of transactions on the MI. Four read requests are sent and only two responeses are recieved by the end of these four clock cycles. In the following clock cycle, a write request is sent with <code class="docutils literal notranslate"><span class="pre">ARDY</span></code> inactive, so it stays the same till the next clock cycle, and at the same time, third response (D8) is recieved. Then in the next clock cycle there is only a write request and in the one after that, there is a write request along with the fourth response (D9).</p>
+<p><strong>E) The byte enable occurrence</strong></p>
+<a class="reference internal image-reference" href="../../_images/wave_be_enh.svg"><img alt="Byte enable in transaction" class="align-center" src="../../_images/wave_be_enh.svg" style="width: 100%;" />
+</a>
+<p>This diagram aims to show possible utilization of <code class="docutils literal notranslate"><span class="pre">BE</span></code>. Addresses and data are in hexadecimal format and <code class="docutils literal notranslate"><span class="pre">ADDR_WIDTH</span></code> and <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> are both 16. In the first part of the diagram (before the divider), all requests are sent to a slave component with the address <code class="docutils literal notranslate"><span class="pre">1234</span></code>. First comes a write request with <code class="docutils literal notranslate"><span class="pre">BE</span> <span class="pre">=</span> <span class="pre">&quot;11&quot;</span></code>, saying both bytes of sent data are valid. The component accepts the data, then a read request is issued with <code class="docutils literal notranslate"><span class="pre">BE</span> <span class="pre">=</span> <span class="pre">&quot;10&quot;</span></code>, so only the higher byte of data is read. The lower byte of <code class="docutils literal notranslate"><span class="pre">DRD</span></code> is not valid, hence it has value <code class="docutils literal notranslate"><span class="pre">98XX</span></code>, <code class="docutils literal notranslate"><span class="pre">98</span></code> being the previously written data and <code class="docutils literal notranslate"><span class="pre">XX</span></code> being the invalid (“don’t care”) data. A write reques follows in the next clock cycle, with <code class="docutils literal notranslate"><span class="pre">BE</span> <span class="pre">=</span> <span class="pre">&quot;10&quot;</span></code>. That means the higher byte of <code class="docutils literal notranslate"><span class="pre">DWR</span></code> is valid and the lower is not. <code class="docutils literal notranslate"><span class="pre">54XX</span></code> then overwrites the current data, so the newly stored data are <code class="docutils literal notranslate"><span class="pre">5476</span></code>, which are read in the following read request with <code class="docutils literal notranslate"><span class="pre">BE</span> <span class="pre">=</span> <span class="pre">&quot;11&quot;</span></code>.</p>
+<p>Behind the divider, the slave component of the requests has address <code class="docutils literal notranslate"><span class="pre">4321</span></code>. <strong>This is a component that clears its stored data after each read request.</strong> First transaction is a write request with <code class="docutils literal notranslate"><span class="pre">BE</span> <span class="pre">=</span> <span class="pre">&quot;11&quot;</span></code>. Then a read request is issued with <code class="docutils literal notranslate"><span class="pre">BE</span> <span class="pre">=</span> <span class="pre">&quot;10&quot;</span></code>, so the higher byte of the stored data will be read (and then cleared) while the lower byte will be ignored. That is why the <code class="docutils literal notranslate"><span class="pre">DRD</span></code> has value <code class="docutils literal notranslate"><span class="pre">67XX</span></code>. Now the current data stored at this component are <code class="docutils literal notranslate"><span class="pre">0089</span></code>. The next write request overwrites the lower byte as <code class="docutils literal notranslate"><span class="pre">BE</span> <span class="pre">=</span> <span class="pre">&quot;01&quot;</span></code>, so now the stored data are <code class="docutils literal notranslate"><span class="pre">0045</span></code>. This value is read in the next clock cycle with <code class="docutils literal notranslate"><span class="pre">BE</span> <span class="pre">=</span> <span class="pre">&quot;11&quot;</span></code>. Then after the read, the stored data are <code class="docutils literal notranslate"><span class="pre">0000</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../mi.html" class="btn btn-neutral float-left" title="MI Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="async/readme.html" class="btn btn-neutral float-right" title="MI ASYNC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

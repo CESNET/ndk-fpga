@@ -1,0 +1,695 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MFB Frame Masker &mdash; NDK-FPGA Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="MFB FRAME TRIMMER" href="../../edit/frame_trimmer/readme.html" />
+    <link rel="prev" title="CROSSBARX STREAM2" href="../crossbarx_stream2/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_packer/readme.html">Frame Packer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html">MFB Merger Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html#id1">MFB Merger Simple GEN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cutter_simple/readme.html">MFB Cutter Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dropper/readme.html">MFB Dropper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metadata_insertor/readme.html">Metadata Insertor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformer/readme.html">MFB Trasformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipe/readme.html">MFB PIPE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger/readme.html">MFB Merger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html">MFB Splitter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html#id1">MFB Splitter Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enabler/readme.html">MFB Enabler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rate_limiter/readme.html">Rate Limiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../packet_delayer/readme.html">Packet Delayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../timestamp_limiter/readme.html">Timestamp Limiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../loopback/readme.html">MFB Loopback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Frame Masker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#component-specification">Component specification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#verification-plan">Verification plan</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../edit/frame_trimmer/readme.html">MFB FRAME TRIMMER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../edit/frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo_simple/readme.html">MFB PD ASFIFO SIMPLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MFB ASFIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MFB FIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debug/generator/readme.html">MFB Generator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mfb.html">MFB Tools</a></li>
+      <li class="breadcrumb-item active">MFB Frame Masker</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/mfb_tools/flow/frame_masker/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mfb-frame-masker">
+<span id="id1"></span><h1>MFB Frame Masker<a class="headerlink" href="#mfb-frame-masker" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_frame_masker">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_FRAME_MASKER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_frame_masker" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB parameters</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_frame_masker-regions"><td><p>REGIONS</p></td>
+<td><p>integer</p></td>
+<td><p>4</p></td>
+<td><p>Any power of two</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_frame_masker-region_size"><td><p>REGION_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Any power of two</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_frame_masker-block_size"><td><p>BLOCK_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Any power of two</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_frame_masker-item_width"><td><p>ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Any power of two</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_frame_masker-meta_width"><td><p>META_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td><p>Any power of two</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Other parameters</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_frame_masker-use_pipe"><td><p>USE_PIPE</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enables MFB_PIPE on RX side</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_frame_masker-pipe_type"><td><p>PIPE_TYPE</p></td>
+<td><p>string</p></td>
+<td><p>“SHREG”</p></td>
+<td><p>“SHREG” or “REG”</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_frame_masker-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“7SERIES”</p></td>
+<td><p>FPGA device name: 7SERIES, ULTRASCALE, STRATIX10, AGILEX, …</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MFB input interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-rx_data"><td><p>RX_DATA</p></td>
+<td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-rx_meta"><td><p>RX_META</p></td>
+<td><p>std_logic_vector(REGIONS*META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-rx_sof"><td><p>RX_SOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-rx_eof"><td><p>RX_EOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-rx_sof_pos"><td><p>RX_SOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-rx_eof_pos"><td><p>RX_EOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB output interface - MASKED</p></td>
+<td><p>=====</p></td>
+<td><p>With masked packets (current mask applied).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-tx_data"><td><p>TX_DATA</p></td>
+<td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-tx_meta"><td><p>TX_META</p></td>
+<td><p>std_logic_vector(REGIONS*META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-tx_sof_pos"><td><p>TX_SOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-tx_eof_pos"><td><p>TX_EOF_POS</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-tx_sof_masked"><td><p>TX_SOF_MASKED</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>SOF with current mask applied.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-tx_eof_masked"><td><p>TX_EOF_MASKED</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>EOF with current mask applied.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Auxiliary output interface - UNMASKED</p></td>
+<td><p>=====</p></td>
+<td><p>Withouth the current mask applied.
+Either there is a new word (no mask applied) or
+an older word that is partially masked by a previous mask (or masks when masking the same word more than two clock cycles).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-tx_sof_unmasked"><td><p>TX_SOF_UNMASKED</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>SOF before the current mask was applied.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-tx_eof_unmasked"><td><p>TX_EOF_UNMASKED</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>EOF before the current mask was applied.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-tx_src_rdy_unmasked"><td><p>TX_SRC_RDY_UNMASKED</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Auxiliary output interface - ORIGINAL</p></td>
+<td><p>=====</p></td>
+<td><p>With original packet layout (no mask applied).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-tx_sof_original"><td><p>TX_SOF_ORIGINAL</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Original SOF that was at input.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_frame_masker-tx_eof_original"><td><p>TX_EOF_ORIGINAL</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Original EOF that was at input.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-tx_src_rdy_original"><td><p>TX_SRC_RDY_ORIGINAL</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Mask signal</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_frame_masker-tx_mask"><td><p>TX_MASK</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Mask per each Region, ‘1’ specifies the request to read a packet starting in this Region.
+The Mask is valid with TX_DST_RDY and applied with SOF (TX_SOF_UNMASKED).</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<section id="component-specification">
+<h2>Component specification<a class="headerlink" href="#component-specification" title="Link to this heading"></a></h2>
+<p>The Frame Masker 2 outputs one or more frames according to the user’s specification through the TX_MASK port.
+This Mask (set by the user/verification) is valid with TX_DST_RDY and also with SOFs in the output word.
+The TX SOF and EOF ports with the suffix “MASKED” are part of the standard output MFB interface that contains the masked frames.
+However, this means that the user does not know the current available frames (SOFs) in the output word, according to which they could set the Mask.
+Hence, the currently masked word (SOFs and EOFs) is available in the “UNMASKED” interface.
+The “ORIGINAL” interface presents the current word that is being processed in its original form, meaning as it was on input without any Mask applied.</p>
+<p><strong>The standard (MASKED) MFB output interface</strong></p>
+<p>Here are the frames that the user wants to read according to the Mask.
+An import thing to note is that the components takes into accord previous Masks, so it is not possible to read the same frame twice.
+Once a frame is read, it will never be visible on this interface again.</p>
+<p><strong>The UNMASKED interface</strong></p>
+<p>This interface displays the frames that are currently available at the output.
+In the output word, there are either SOFs and EOFs masked by previous Mask(s) or a brand new data word from the input (one clock period delay).
+The <code class="docutils literal notranslate"><span class="pre">TX_SRC_RDY_UNMASKED</span></code> is set whenever masking is in process or a new valid word arrives.
+When the last frame is masked, new data word is automatically loaded.
+This means that there is never a word at the output where all frames have been read (= SOFs and EOFs were masked).</p>
+<p><strong>The ORIGINAL interface</strong></p>
+<p>Whenever a new data word arrives, it is stored in a register in the component.
+It does not change values during masking, only when a new data word is loaded into it.
+The ports of this interface are directly connected to the signals in this register.</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<p><strong>Example 1</strong> demonstates a common reading of 2 packets in one clock cycle.
+Note that the values of Mask can be arbitrary in Regions without SOF (SOF_UNMASKED).
+So instead of Mask <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">0</span> <span class="pre">1</span> <span class="pre">0</span></code>, it could be also written as <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">x</span> <span class="pre">1</span> <span class="pre">x</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">TX_DATA</span></code> and MASKED signals are the standard output of the component.
+The <code class="docutils literal notranslate"><span class="pre">TX_DATA</span> <span class="pre">(UNMASKED)</span></code> and <code class="docutils literal notranslate"><span class="pre">TX_DATA</span> <span class="pre">(ORIGINAL)</span></code> outputs serve just as a visual representation of the situation on the UNMASKED and ORIGINAL interfaces.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+-----------------------------------------------------------------------+</span>
+<span class="o">|</span>                                                                       <span class="o">|</span>
+<span class="o">|</span>    <span class="n">REGION</span><span class="p">:</span>                   <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">2</span>         <span class="mi">3</span>          <span class="o">|</span>
+<span class="o">|</span>                                                                       <span class="o">|</span>
+<span class="o">|</span>                                                                       <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_SOF</span><span class="p">:</span>                   <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>     <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_DATA</span><span class="p">:</span>             <span class="o">|</span>     <span class="o">@@@@|@@@@</span>     <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>     <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>     <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_EOF</span><span class="p">:</span>                   <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">|</span>                                                                       <span class="o">|</span>
+<span class="o">|</span>                                                                       <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_MASK</span><span class="p">:</span>                  <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">|</span>                                                                       <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>     <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span><span class="p">:</span>             <span class="o">|</span>     <span class="o">@@@@|@@@@</span>     <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>     <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>     <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_MASKED</span><span class="p">:</span>            <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_MASKED</span><span class="p">:</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">|</span>                                                                       <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>     <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span> <span class="p">(</span><span class="n">UNMASKED</span><span class="p">):</span>  <span class="o">|</span>     <span class="o">@@@@|@@@@</span>     <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>     <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>     <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_UNMASKED</span><span class="p">:</span>          <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_UNMASKED</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">|</span>                                                                       <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>     <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span> <span class="p">(</span><span class="n">ORIGINAL</span><span class="p">):</span>  <span class="o">|</span>     <span class="o">@@@@|@@@@</span>     <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>     <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>     <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_ORIGINAL</span><span class="p">:</span>          <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_ORIGINAL</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">|</span>                                                                       <span class="o">|</span>
+<span class="o">+-----------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+<p><strong>Example 2</strong> demonstrates reading 2 packets one-by-one, each in one clock cycle.
+Notice how in the second clock cycle (on the right), the SOF_ORIGINAL stays the same.
+It will stay the same until a new data word is loaded.
+Menawhile, the SOF_UNMASKED is without the SOF in Region 0, as that packet has already been read.
+These “rules” also apply for the respective EOF signals.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+-----------------------------------------------------------------------------------------------------------------+</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TIME</span><span class="p">:</span>                <span class="o">---------&gt;</span>                                                                              <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">REGION</span><span class="p">:</span>                   <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">2</span>         <span class="mi">3</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">2</span>         <span class="mi">3</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_SOF</span><span class="p">:</span>                   <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>                                                    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>                                               <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_DATA</span><span class="p">:</span>             <span class="o">|</span>     <span class="o">@@@@|@@@@</span>     <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>                                               <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>                                               <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_EOF</span><span class="p">:</span>                   <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>                                                    <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_MASK</span><span class="p">:</span>                  <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+----------+--------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span><span class="p">:</span>             <span class="o">|</span>      <span class="o">@@@@|@@@@</span>    <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>  <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+----------+--------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_MASKED</span><span class="p">:</span>            <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_MASKED</span><span class="p">:</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+----------+--------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span> <span class="p">(</span><span class="n">UNMASKED</span><span class="p">):</span>  <span class="o">|</span>      <span class="o">@@@@|@@@@</span>    <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>  <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+----------+--------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_UNMASKED</span><span class="p">:</span>          <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_UNMASKED</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+----------+--------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span> <span class="p">(</span><span class="n">ORIGINAL</span><span class="p">):</span>  <span class="o">|</span>      <span class="o">@@@@|@@@@</span>    <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>  <span class="o">|</span>      <span class="o">@@@@|@@@@</span>    <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+----------+--------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_ORIGINAL</span><span class="p">:</span>          <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_ORIGINAL</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">+-----------------------------------------------------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+<p><strong>Example 3</strong> shows that the packets are automatically read across multiple words (when the Mask is set so).
+Here, the second packet from the example 2 is extended to end in the following data word.
+The Mask is set to read the packet, so its first part is at the output immediately and the rest of it is sent in the following data word without any delays.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+-----------------------------------------------------------------------------------------------------------------+</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TIME</span><span class="p">:</span>                <span class="o">---------&gt;</span>                                                                              <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">REGION</span><span class="p">:</span>                   <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">2</span>         <span class="mi">3</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">2</span>         <span class="mi">3</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_SOF</span><span class="p">:</span>                   <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_DATA</span><span class="p">:</span>             <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>   <span class="o">@@@@@@|@@@@@@@@@|</span>  <span class="o">|@@@@@@@@@|@@@</span>      <span class="o">|</span>   <span class="o">@@@@@@|@@@@</span>     <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_EOF</span><span class="p">:</span>                   <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_MASK</span><span class="p">:</span>                  <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span><span class="p">:</span>             <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>   <span class="o">@@@@@@|@@@@@@@@@|</span>  <span class="o">|@@@@@@@@@|@@@</span>      <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_MASKED</span><span class="p">:</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_MASKED</span><span class="p">:</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span> <span class="p">(</span><span class="n">UNMASKED</span><span class="p">):</span>  <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>   <span class="o">@@@@@@|@@@@@@@@@|</span>  <span class="o">|@@@@@@@@@|@@@</span>      <span class="o">|</span>   <span class="o">@@@@@@|@@@@</span>     <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_UNMASKED</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_UNMASKED</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span> <span class="p">(</span><span class="n">ORIGINAL</span><span class="p">):</span>  <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>   <span class="o">@@@@@@|@@@@@@@@@|</span>  <span class="o">|@@@@@@@@@|@@@</span>      <span class="o">|</span>   <span class="o">@@@@@@|@@@@</span>     <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_ORIGINAL</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_ORIGINAL</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">+-----------------------------------------------------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In certain cases, the component allows the user to skip (=discard) some frames.
+This may or may not be an unwanted behaviour.
+It does not occur for a 1-Region configurations.
+The cases, when a frame is skipped, are as follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>there are multiple SOFs in the output word (the UNMASKED interface) and</p></li>
+<li><p>the Mask is <code class="docutils literal notranslate"><span class="pre">0</span></code> for one or more SOFs in the lower Regions and <code class="docutils literal notranslate"><span class="pre">1</span></code> in a higher Region.</p></li>
+</ul>
+</div></blockquote>
+<p>Such situation is displayed in the following example.</p>
+</div>
+<p><strong>Example 4</strong> shows how to skip (discard) a frame.
+After setting the Mask to <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">0</span> <span class="pre">1</span> <span class="pre">0</span></code>, only the second frame is read from the output.
+And because this is the last frame in the current data word, the next one is loaded.
+It is visible on the UNMASKED and ORIGINAL intefaces, but the user set the mask to <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">0</span> <span class="pre">0</span> <span class="pre">0</span></code>, so it is not read.
+However, this one will wait there until it is read, because it is the last (and only) packet in the data word.
+This packet cannot be skipped.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+-----------------------------------------------------------------------------------------------------------------+</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TIME</span><span class="p">:</span>                <span class="o">---------&gt;</span>                                                                              <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">REGION</span><span class="p">:</span>                   <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">2</span>         <span class="mi">3</span>            <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">2</span>         <span class="mi">3</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_SOF</span><span class="p">:</span>                   <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_DATA</span><span class="p">:</span>             <span class="o">|</span>     <span class="o">@@@@|@@@@</span>     <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>  <span class="o">|</span>   <span class="o">@@@@@@|@@@@@@@@@|@@@@@@@@@|@@</span>       <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">RX_EOF</span><span class="p">:</span>                   <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_MASK</span><span class="p">:</span>                  <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+----------+--------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span><span class="p">:</span>             <span class="o">|</span>          <span class="o">|</span>        <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>  <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>         <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+----------+--------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_MASKED</span><span class="p">:</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_MASKED</span><span class="p">:</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span> <span class="p">(</span><span class="n">UNMASKED</span><span class="p">):</span>  <span class="o">|</span>     <span class="o">@@@@|@@@@</span>     <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>  <span class="o">|</span>   <span class="o">@@@@@@|@@@@@@@@@|@@@@@@@@@|@@</span>       <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_UNMASKED</span><span class="p">:</span>          <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_UNMASKED</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_DATA</span> <span class="p">(</span><span class="n">ORIGINAL</span><span class="p">):</span>  <span class="o">|</span>     <span class="o">@@@@|@@@@</span>     <span class="o">|</span>  <span class="o">@@@@@</span>  <span class="o">|</span>         <span class="o">|</span>  <span class="o">|</span>   <span class="o">@@@@@@|@@@@@@@@@|@@@@@@@@@|@@</span>       <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span>                         <span class="o">+---------+---------+---------+---------+</span>  <span class="o">+---------+---------+---------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_SOF_ORIGINAL</span><span class="p">:</span>          <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">1</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">|</span>    <span class="n">TX_EOF_ORIGINAL</span><span class="p">:</span>          <span class="mi">0</span>         <span class="mi">1</span>         <span class="mi">1</span>         <span class="mi">0</span>            <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">1</span>         <span class="o">|</span>
+<span class="o">|</span>                                                                                                                 <span class="o">|</span>
+<span class="o">+-----------------------------------------------------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The examples are simplified and do not take into account the latency of the component.
+With the generic <code class="docutils literal notranslate"><span class="pre">USE_PIPE</span> <span class="pre">=</span> <span class="pre">False</span></code>, the OUTPUT DATA would be delayed one clock period.
+If it is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the delay would be two clock periods.</p>
+</div>
+</section>
+<section id="verification-plan">
+<h2>Verification plan<a class="headerlink" href="#verification-plan" title="Link to this heading"></a></h2>
+<table class="docutils align-center" id="id2">
+<caption><span class="caption-text">Tab. 1</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 11.1%" />
+<col style="width: 33.3%" />
+<col style="width: 11.1%" />
+<col style="width: 11.1%" />
+<col style="width: 22.2%" />
+<col style="width: 11.1%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Requirement level</p></th>
+<th class="head"><p>Checked by</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Test name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Skip (=discard) some packets.</p></td>
+<td><p>Obligatory</p></td>
+<td><p>Func. cover</p></td>
+<td><p>Verified</p></td>
+<td><p>test::ex_test</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>Read all packets without skipping any of them. This is the most realistic use-case of the component.</p></td>
+<td><p>Obligatory.</p></td>
+<td><p>Func. cover</p></td>
+<td><p>Unverified, the speed test needs adjustments to set the Mask to avoid skipping packets.</p></td>
+<td><p>test::speed</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>Read all packets (no skips) and no more than one in each clock cycle.</p></td>
+<td><p>Optional</p></td>
+<td><p>Func. cover</p></td>
+<td><p>Unverified</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>Verify that the UNMASKED interface behaves correctly. This interface is expected to be used intensly.</p></td>
+<td><p>Obligatory</p></td>
+<td><p>Func. cover (?)</p></td>
+<td><p>Partially Verified - the SOF_UNMASKED is tapped by a probe and used in the Model to skip packets.</p></td>
+<td><p>test::ex_test</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>Verify that the ORIGINAL interface behaves correctly.</p></td>
+<td><p>Optional</p></td>
+<td><p>Func. cover (?)</p></td>
+<td><p>Unverified</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../crossbarx_stream2/readme.html" class="btn btn-neutral float-left" title="CROSSBARX STREAM2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../edit/frame_trimmer/readme.html" class="btn btn-neutral float-right" title="MFB FRAME TRIMMER" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

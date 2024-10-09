@@ -1,0 +1,1363 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Application &mdash; NDK-FPGA Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The MI bus interconnect" href="mi.html" />
+    <link rel="prev" title="NDK Architecture" href="readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            NDK-FPGA Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="readme.html">NDK Architecture</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">The Application</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-use-the-application-interfaces">How to use the Application interfaces</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#receiving-packets-from-ethernet">Receiving packets from Ethernet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transmitting-packets-to-the-ethernet">Transmitting packets to the Ethernet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#receiving-packets-from-the-dma-module">Receiving packets from the DMA module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transmitting-packets-to-the-dma-module">Transmitting packets to the DMA module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#read-write-access-to-the-application-registers-from-sw">Read/write access to the Application registers from SW</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ports-and-generics-of-the-application">Ports and generics of the Application</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mi.html">The MI bus interconnect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eth.html">The Network Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dma.html">The DMA module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pcie.html">The PCIe module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mem.html">The Memory Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tsu.html">Time Stamp Unit</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NDK-FPGA Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="readme.html">NDK Architecture</a></li>
+      <li class="breadcrumb-item active">The Application</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/ndk_core/doc/app.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-application">
+<span id="ndk-app"></span><h1>The Application<a class="headerlink" href="#the-application" title="Link to this heading"></a></h1>
+<p>The NDK is designed for creating new network applications for packet processing in a deep pipeline. The NDK provides space for your application and defines several interfaces for communication with devices on the network, with software (control and data), or with external memory. We refer to this space in the NDK as <strong>the Application</strong>.</p>
+<p>Depending on the selected FPGA card, there are several ETH streams for communication over an Ethernet network and several DMA streams for communication with the host CPU through the DMA module. There are also several <a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/683091/22-3/introduction-to-memory-mapped-interfaces.html">Avalon-MM interfaces</a> for access to external memory (typically DDR4) and an MI interface for access to the CSR implemented in the application. ETH and DMA streams use a combination of MFB (for packet data) and MVB (for packet headers and metadata) buses to transfer Ethernet packets. The Application allows you to assign the selected user clock to individual parts of the design. A typical connection of the Application is shown in the block diagram below:</p>
+<a class="reference internal image-reference" href="../../_images/ndk_app.drawio.svg"><img alt="../../_images/ndk_app.drawio.svg" class="align-center" src="../../_images/ndk_app.drawio.svg" style="width: 100%;" />
+</a>
+<p>We recommend splitting the Application into several parts that we call Application cores. Typically, an Application core is instantiated for each Ethernet stream. Depending on the selected FPGA card, the number of ETH streams is equal to the number of DMA streams, or there are multiple ETH streams and only one DMA stream. For such cases, the NDK has prepared modules (see the <a class="reference external" href="https://github.com/CESNET/ndk-app-minimal/blob/main/app/intel/application_core.vhd">Application implementation in NDK-APP-Minimal</a>) to ensure that each Application Core is correctly connected to the available DMA interfaces. They also ensure proper distribution of the available DMA channels among the Application cores.</p>
+<section id="how-to-use-the-application-interfaces">
+<h2>How to use the Application interfaces<a class="headerlink" href="#how-to-use-the-application-interfaces" title="Link to this heading"></a></h2>
+<p>The following sections describe how to work with each of the Application interfaces. You will also learn in which formats you can receive data and in which you must send it. We also strongly recommend that you read the <a class="reference internal" href="../../comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB bus specification</span></a>, <a class="reference internal" href="../../comp/mvb_tools/readme.html#mvb-bus"><span class="std std-ref">MVB bus specification</span></a> and <a class="reference internal" href="../../comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus specification</span></a>. The MTU of packets transferred via DMA or Ethernet can be set using configuration parameters, see <a class="reference internal" href="configuration.html#ndk-configuration"><span class="std std-ref">chapter “Configuration files and parameters”</span></a>. The set MTU values are then available in the <a class="reference internal" href="devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a> description of the NDK firmware.</p>
+<section id="receiving-packets-from-ethernet">
+<h3>Receiving packets from Ethernet<a class="headerlink" href="#receiving-packets-from-ethernet" title="Link to this heading"></a></h3>
+<p>Ethernet packets enter the application over two buses (<code class="docutils literal notranslate"><span class="pre">ETH_RX_*</span></code>). The MVB bus carries the packet metadata, and the MFB bus carries the actual packet data. Both buses have independent flow control.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Even though the MVB and MFB buses are independent, data must be transferred over both of them. If they are not, for example, when one bus has the <code class="docutils literal notranslate"><span class="pre">*_DST_RDY</span></code> set permanently to 0, a buffer or a FIFO memory will fill up, and the data transfer will get stuck.</p>
+</div>
+<p>The packets are transferred as Ethernet frames without CRC. The <code class="docutils literal notranslate"><span class="pre">eth_hdr_pack</span></code> package defines the metadata format. The package is displayed below:</p>
+<dl class="vhdl autopackage">
+<dt class="sig sig-object vhdl">
+<span class="k"><span class="pre">PACKAGE</span> </span><span class="sig-name descname"><span class="pre">eth_hdr_pack</span></span><span class="k"> <span class="pre">IS</span></span></dt>
+<dd><p><strong>RX Ethernet HDR items description:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Item bit range</p></th>
+<th class="head"><p>Item name</p></th>
+<th class="head"><p>Item description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0  to 15</p></td>
+<td><p>LENGTH</p></td>
+<td><p>Length of Ethernet frame in bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p>16 to 23</p></td>
+<td><p>PORT</p></td>
+<td><p>Source port/channel number in global format for the entire card; Examples: card with 2 ports each with 4 channels; third channel of the second port = 6; second channel of the first port = 1)</p></td>
+</tr>
+<tr class="row-even"><td><p>24 to 24</p></td>
+<td><p>ERROR</p></td>
+<td><p>Flag of global error, masked OR of all error bits</p></td>
+</tr>
+<tr class="row-odd"><td><p>25 to 25</p></td>
+<td><p>ERRORFRAME</p></td>
+<td><p>Flag of frame error</p></td>
+</tr>
+<tr class="row-even"><td><p>26 to 26</p></td>
+<td><p>ERRORMINTU</p></td>
+<td><p>Flag of length below MINTU</p></td>
+</tr>
+<tr class="row-odd"><td><p>27 to 27</p></td>
+<td><p>ERRORMAXTU</p></td>
+<td><p>Flag of length over MAXTU</p></td>
+</tr>
+<tr class="row-even"><td><p>28 to 28</p></td>
+<td><p>ERRORCRC</p></td>
+<td><p>Flag of CRC error</p></td>
+</tr>
+<tr class="row-odd"><td><p>29 to 29</p></td>
+<td><p>ERRORMAC</p></td>
+<td><p>Flag of MAC error</p></td>
+</tr>
+<tr class="row-even"><td><p>30 to 30</p></td>
+<td><p>BROADCAST</p></td>
+<td><p>Flag of Broadcast MAC</p></td>
+</tr>
+<tr class="row-odd"><td><p>31 to 31</p></td>
+<td><p>MULTICAST</p></td>
+<td><p>Flag of Multicast MAC</p></td>
+</tr>
+<tr class="row-even"><td><p>32 to 32</p></td>
+<td><p>HITMACVLD</p></td>
+<td><p>Flag of hit MAC address in TCAM memory</p></td>
+</tr>
+<tr class="row-odd"><td><p>33 to 36</p></td>
+<td><p>HITMAC</p></td>
+<td><p>Index of hit MAC address in TCAM memory</p></td>
+</tr>
+<tr class="row-even"><td><p>37 to 37</p></td>
+<td><p>TIMESTAMPVLD</p></td>
+<td><p>Flag of valid timestamp</p></td>
+</tr>
+<tr class="row-odd"><td><p>38 to 101</p></td>
+<td><p>TIMESTAMP</p></td>
+<td><p>Timestamp of frame (see TSU module docs for format description)</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>TX Ethernet HDR items description:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Item bit range</p></th>
+<th class="head"><p>Item name</p></th>
+<th class="head"><p>Item description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0  to 15</p></td>
+<td><p>LENGTH</p></td>
+<td><p>Length of Ethernet frame in bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p>16 to 23</p></td>
+<td><p>PORT</p></td>
+<td><p>Destination port/channel number in global format for the entire card; Examples: card with 2 ports each with 4 channels; third channel of the second port = 6; second channel of the first port = 1)</p></td>
+</tr>
+<tr class="row-even"><td><p>24 to 24</p></td>
+<td><p>DISCARD</p></td>
+<td><p>DRAFT ONLY: Discard frame before transmit to network</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="transmitting-packets-to-the-ethernet">
+<h3>Transmitting packets to the Ethernet<a class="headerlink" href="#transmitting-packets-to-the-ethernet" title="Link to this heading"></a></h3>
+<p>The packets are sent to the Ethernet only through the MFB bus (<code class="docutils literal notranslate"><span class="pre">ETH_TX_MFB_*</span></code>). In this case, the metadata is transferred in a special signal: <code class="docutils literal notranslate"><span class="pre">ETH_TX_MFB_HDR</span></code>. This signal is valid for each MFB Region where an Ethernet packet starts. The packet data must contain an Ethernet frame without the CRC, which is calculated and inserted further in the design. The minimum allowed length of the packet data is 60B, if necessary, the application must add padding to the packet. The metadata format is also defined in the <code class="docutils literal notranslate"><span class="pre">eth_hdr_pack</span></code> package (see the previous section).</p>
+</section>
+<section id="receiving-packets-from-the-dma-module">
+<h3>Receiving packets from the DMA module<a class="headerlink" href="#receiving-packets-from-the-dma-module" title="Link to this heading"></a></h3>
+<p>The application receives packets from the DMA module over two buses, MVB and MFB (<code class="docutils literal notranslate"><span class="pre">DMA_TX_*</span></code>). As before, MVB carries the metadata, and MFB carries the actual packet data. Both buses have independent flow control.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Even though the MVB and MFB buses are independent, data must be transferred over both of them. If they are not, for example, when one bus has the <code class="docutils literal notranslate"><span class="pre">*_DST_RDY</span></code> set permanently to 0, a buffer or a FIFO memory will fill up, and the data transfer will get stuck.</p>
+</div>
+<p>The MVB metadata bus does not use a single <code class="docutils literal notranslate"><span class="pre">MVB_DATA</span></code> signal but  multiple data signals instead:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MVB_LEN</span></code> - the length of the packet in bytes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MVB_HDR_META</span></code> - metadata for the DMA header (see the format below)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MVB_CHANNEL</span></code> - the DMA channel number</p></li>
+</ul>
+<p>The MFB bus transfers the packet data, which may contain a user header before the payload data (e.g., an Ethernet packet). You can determine the presence of the user header and its length from the metadata in the <code class="docutils literal notranslate"><span class="pre">DMA_TX_MVB_HDR_META</span></code> signal (see below).</p>
+<p><strong>The format of the metadata for the DMA header (DMA_TX_MVB_HDR_META):</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Bit range</p></th>
+<th class="head"><p>Item name</p></th>
+<th class="head"><p>Item description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0  to 7</p></td>
+<td><p>HDR_LEN</p></td>
+<td><p>The size of the user header in bytes. HDR_LEN=0 means that the user header is not present in the packet.</p></td>
+</tr>
+<tr class="row-odd"><td><p>8  to 11</p></td>
+<td><p>HDR_ID</p></td>
+<td><p>A 4-bit identification of the type/format of the user header, the definition of each HDR_ID value is application-specific. HDR_ID is referred to as “Packet specific flags” in the <a class="reference external" href="https://cesnet.github.io/ndk-sw/libnfb-api-ndp.html">NDP API</a>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="transmitting-packets-to-the-dma-module">
+<h3>Transmitting packets to the DMA module<a class="headerlink" href="#transmitting-packets-to-the-dma-module" title="Link to this heading"></a></h3>
+<p>The application sends packets to the DMA module over two buses, MVB and MFB (<code class="docutils literal notranslate"><span class="pre">DMA_RX_*</span></code>), which have the same roles as stated in previous sections. As before, MVB carries the metadata, and MFB carries the actual packet data. Again, the MVB bus does not use a single <code class="docutils literal notranslate"><span class="pre">MVB_DATA</span></code> signal but multiple data signals instead:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MVB_LEN</span></code> - the length of the packet in bytes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MVB_HDR_META</span></code> - metadata for DMA header (see the format in the previous section)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MVB_CHANNEL</span></code> - the DMA channel number</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MVB_DISCARD</span></code> - A discard flag (the packet is discarded on the DMA input when you set this flag to 1)</p></li>
+</ul>
+<p>The MFB bus transfers the packet data, which may contain a user header before the payload data (e.g., an Ethernet packet).
+You can determine the presence of the user header and its length from the metadata in the <code class="docutils literal notranslate"><span class="pre">DMA_RX_MVB_HDR_META</span></code> signal (see the previous section).
+The minimum allowed length of the packet data is 60B, if necessary, the application must add padding to the packet.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The application must also send the corresponding MVB data with each MFB packet, or the data transfer will get stuck.</p>
+</div>
+</section>
+<section id="read-write-access-to-the-application-registers-from-sw">
+<h3>Read/write access to the Application registers from SW<a class="headerlink" href="#read-write-access-to-the-application-registers-from-sw" title="Link to this heading"></a></h3>
+<p>The application is typically controlled by a software tool. The NDK provides the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-bus.html#nfb-bus">nfb-bus tool</a> and an <a class="reference external" href="https://cesnet.github.io/ndk-sw/libnfb-quick-start-registers.html">API for generating read/write memory requests</a>. These are transferred via the <a class="reference internal" href="../../comp/mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a> in the NDK firmware. This memory-oriented bus is wired throughout the NDK firmware, and each part, including the application, has its own allocated address space. You can find more about the MI and the available address space in the <a class="reference internal" href="mi.html#ndk-mi"><span class="std std-ref">MI bus interconnect</span></a> chapter.</p>
+<p>The description of the components with a specific address space is implemented in the NDK using a <a class="reference internal" href="devtree.html#ndk-devtree"><span class="std std-ref">DeviceTree</span></a>. Also, the Application must have its own DeviceTree description, which can further refer to the internal components and their address spaces. It is a good idea to take inspiration from the <a class="reference external" href="https://github.com/CESNET/ndk-app-minimal/blob/main/app/intel/DevTree.tcl">NDK-APP-Minimal application DeviceTree file</a> when creating a DeviceTree file for your application.</p>
+</section>
+</section>
+<section id="ports-and-generics-of-the-application">
+<h2>Ports and generics of the Application<a class="headerlink" href="#ports-and-generics-of-the-application" title="Link to this heading"></a></h2>
+<p>In the tables below, you can see a detailed description of the Application interface, i.e., a description of all its generics and ports.</p>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-application_core">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">APPLICATION_CORE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-application_core" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-application_core-eth_streams"><td><p>ETH_STREAMS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>ETH: number of Ethernet streams from network module</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-eth_channels"><td><p>ETH_CHANNELS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>ETH: number of possible logical Ethernet links per Ethernet stream</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-eth_mfb_regions"><td><p>ETH_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>ETH MFB: number of regions in word</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-eth_mfb_region_size"><td><p>ETH_MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>ETH MFB: number of blocks in region</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-pcie_endpoints"><td><p>PCIE_ENDPOINTS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Number of instantiated PCIe endpoints</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-dma_streams"><td><p>DMA_STREAMS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>DMA: number of DMA streams</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-dma_rx_channels"><td><p>DMA_RX_CHANNELS</p></td>
+<td><p>natural</p></td>
+<td><p>16</p></td>
+<td><p>DMA: number of RX channel per DMA stream</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-dma_tx_channels"><td><p>DMA_TX_CHANNELS</p></td>
+<td><p>natural</p></td>
+<td><p>16</p></td>
+<td><p>DMA: number of TX channel per DMA stream</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-dma_hdr_meta_width"><td><p>DMA_HDR_META_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>12</p></td>
+<td><p>DMA: size of User Header Metadata in bits</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-dma_rx_frame_size_max"><td><p>DMA_RX_FRAME_SIZE_MAX</p></td>
+<td><p>natural</p></td>
+<td><p>2**12</p></td>
+<td><p>DMA: Maximum size of a frame on RX DMA interfaces (in bytes)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-dma_tx_frame_size_max"><td><p>DMA_TX_FRAME_SIZE_MAX</p></td>
+<td><p>natural</p></td>
+<td><p>2**12</p></td>
+<td><p>DMA: Maximum size of a frame on TX DMA interfaces (in bytes)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-dma_mfb_regions"><td><p>DMA_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>DMA MFB: number of regions in word</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-dma_mfb_region_size"><td><p>DMA_MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>DMA MFB: number of blocks in region</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>ETH_MFB_REGIONS</p></td>
+<td><p>MFB parameters: number of regions in word, DEPRECATED!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mfb_reg_size"><td><p>MFB_REG_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>ETH_MFB_REGION_SIZE</p></td>
+<td><p>MFB parameters: number of blocks in region, DEPRECATED!</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>MFB parameters: number of items in block</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>MFB parameters: width of one item in bits</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_ports"><td><p>HBM_PORTS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>HBM parameters: number of HBM ports</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_addr_width"><td><p>HBM_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>HBM parameters: width of AXI address signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_data_width"><td><p>HBM_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>256</p></td>
+<td><p>HBM parameters: width of AXI data signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_burst_width"><td><p>HBM_BURST_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>HBM parameters: width of AXI burst signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_id_width"><td><p>HBM_ID_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>6</p></td>
+<td><p>HBM parameters: width of AXI ID signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_len_width"><td><p>HBM_LEN_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>HBM parameters: width of AXI LEN signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_size_width"><td><p>HBM_SIZE_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>3</p></td>
+<td><p>HBM parameters: width of AXI size signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_resp_width"><td><p>HBM_RESP_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>HBM parameters: width of AXI resp signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_prot_width"><td><p>HBM_PROT_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>3</p></td>
+<td><p>HBM parameters: width of AXI prot signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_qos_width"><td><p>HBM_QOS_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>HBM parameters: width of AXI qos signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_user_width"><td><p>HBM_USER_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>HBM parameters: width of AXI user signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mem_ports"><td><p>MEM_PORTS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>MEM parameters: number of external memory ports (EMIFs)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_addr_width"><td><p>MEM_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>27</p></td>
+<td><p>MEM parameters: width of AVMM address signal</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mem_burst_width"><td><p>MEM_BURST_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>7</p></td>
+<td><p>MEM parameters: width of AVMM burst count signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_data_width"><td><p>MEM_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>MEM parameters: width of AVMM data signals</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mem_refr_period_width"><td><p>MEM_REFR_PERIOD_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>MEM parameters: width of user refresh period</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_def_refr_period"><td><p>MEM_DEF_REFR_PERIOD</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td><p>MEM parameters: default refresh periods for each interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-amm_freq_khz"><td><p>AMM_FREQ_KHZ</p></td>
+<td><p>integer</p></td>
+<td><p>266660</p></td>
+<td><p>Freq of the AMM bus with EMIF</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>MI parameters: width of data signals</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>MI parameters: width of address signal</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-fpga_id_width"><td><p>FPGA_ID_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>64</p></td>
+<td><p>Width of FPGA ID</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-reset_width"><td><p>RESET_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>2</p></td>
+<td><p>Width of reset signals</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-board"><td><p>BOARD</p></td>
+<td><p>string</p></td>
+<td><p>UNDEFINED</p></td>
+<td><p>Name of FPGA board</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>UNDEFINED</p></td>
+<td><p>Name of FPGA device</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>USER CLOCK AND RESET INPUTS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-clk_user"><td><p>CLK_USER</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>user clock input</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-clk_user_x2"><td><p>CLK_USER_X2</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>user clock input with double frequency</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-clk_user_x3"><td><p>CLK_USER_X3</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>user clock input with triple frequency</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-clk_user_x4"><td><p>CLK_USER_X4</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>user clock input with quadruple frequency</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-reset_user"><td><p>RESET_USER</p></td>
+<td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>reset input synchronized with CLK_USER</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-reset_user_x2"><td><p>RESET_USER_X2</p></td>
+<td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>reset input synchronized with CLK_USER_X2</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-reset_user_x3"><td><p>RESET_USER_X3</p></td>
+<td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>reset input synchronized with CLK_USER_X3</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-reset_user_x4"><td><p>RESET_USER_X4</p></td>
+<td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>reset input synchronized with CLK_USER_X4</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-clk_eth"><td><p>CLK_ETH</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>clock input with ethernet core frequency for each ETH stream</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-reset_eth"><td><p>RESET_ETH</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>reset input synchronized with CLK_ETH for each ETH stream</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>CLOCK AND RESET OUTPUTS (DEFINED BY APPLICATION)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_clk"><td><p>MI_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>clock output for MI interconnect</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_clk"><td><p>DMA_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>clock output for DMA Module</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_clk_x2"><td><p>DMA_CLK_X2</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>clock output for DMA Module with double frequency</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-app_clk"><td><p>APP_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>clock output for Application logic</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_reset"><td><p>MI_RESET</p></td>
+<td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>reset output synchronized with MI_CLK</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_reset"><td><p>DMA_RESET</p></td>
+<td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>reset output synchronized with DMA_CLK</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_reset_x2"><td><p>DMA_RESET_X2</p></td>
+<td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>reset output synchronized with DMA_CLK_X2</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-app_reset"><td><p>APP_RESET</p></td>
+<td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>reset output synchronized with APP_CLK</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>TIMESTAPS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-tsu_clk"><td><p>TSU_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>TSU clock input</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-tsu_reset"><td><p>TSU_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>reset input synchronized with TSU_CLK</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
+<td><p>std_logic_vector(64-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Timestamp from TSU in nanoseconds format</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-tsu_ts_vld"><td><p>TSU_TS_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Timestamp valid flag</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>STATUS INPUTS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-pcie_link_up"><td><p>PCIE_LINK_UP</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Link Up flags of each PCIe endpoints, active when PCIe EP is ready for data transfers.
+DMA channels are statically and evenly mapped to all PCIe EPs (clocked at APP_CLK)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_link_up"><td><p>ETH_RX_LINK_UP</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*ETH_CHANNELS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>RX Link Up flags of each Ethernet channel</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_phy_rdy"><td><p>ETH_TX_PHY_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*ETH_CHANNELS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>TX PHY Ready flags of each Ethernet channel</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-fpga_id"><td><p>FPGA_ID</p></td>
+<td><p>std_logic_vector(FPGA_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Unique identification number of the FPGA chip (clocked at MI_CLK)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-fpga_id_vld"><td><p>FPGA_ID_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX ETHERNET STREAMS (clocked at APP_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>MFB+MVB interface with incoming network packets
+Each data packet (MFB) must have an appropriate header (MVB)!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mvb_data"><td><p>ETH_RX_MVB_DATA</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH RX MVB streams: data word with MVB items (ETH RX headers see eth_hdr_pack)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mvb_vld"><td><p>ETH_RX_MVB_VLD</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH RX MVB streams: valid of each MVB item</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mvb_src_rdy"><td><p>ETH_RX_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH RX MVB streams: source ready of each MVB bus</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mvb_dst_rdy"><td><p>ETH_RX_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>ETH RX MVB streams: destination ready of each MVB bus</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_data"><td><p>ETH_RX_MFB_DATA</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*ETH_MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH RX MFB streams: data word with frames (packets)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_sof"><td><p>ETH_RX_MFB_SOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH RX MFB streams: Start Of Frame (SOF) flag for each MFB region</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_eof"><td><p>ETH_RX_MFB_EOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH RX MFB streams: End Of Frame (EOF) flag for each MFB region</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_sof_pos"><td><p>ETH_RX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*max(1,log2(ETH_MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH RX MFB streams: SOF position for each MFB region in MFB blocks</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_eof_pos"><td><p>ETH_RX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*max(1,log2(ETH_MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH RX MFB streams: EOF position for each MFB region in MFB items</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_rx_mfb_src_rdy"><td><p>ETH_RX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH RX MFB streams: source ready of each MFB bus</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_rx_mfb_dst_rdy"><td><p>ETH_RX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>ETH RX MFB streams: destination ready of each MFB bus</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX ETHERNET STREAMS (clocked at APP_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>MFB interface with outgoing network packets
+There is packet header the meta signal in MFB bus.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_data"><td><p>ETH_TX_MFB_DATA</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*ETH_MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>ETH TX MFB streams: data word with frames (packets)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_hdr"><td><p>ETH_TX_MFB_HDR</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>ETH TX MFB streams: header (see eth_hdr_pack) for each frame, is valid for each SOF</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_sof"><td><p>ETH_TX_MFB_SOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>ETH TX MFB streams: Start Of Frame (SOF) flag for each MFB region</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_eof"><td><p>ETH_TX_MFB_EOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>ETH TX MFB streams: End Of Frame (EOF) flag for each MFB region</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_sof_pos"><td><p>ETH_TX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*max(1,log2(ETH_MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>ETH TX MFB streams: SOF position for each MFB region in MFB blocks</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_eof_pos"><td><p>ETH_TX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*max(1,log2(ETH_MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>ETH TX MFB streams: EOF position for each MFB region in MFB items</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mfb_src_rdy"><td><p>ETH_TX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>ETH TX MFB streams: source ready of each MFB bus</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mfb_dst_rdy"><td><p>ETH_TX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>ETH TX MFB streams: destination ready of each MFB bus</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mvb_channel"><td><p>ETH_TX_MVB_CHANNEL</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>This interface is to transmit Channel IDs and Timestamps of packets
+from the APP Core to the demo/testing logic in the Network Mod Core (E-Tile).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-eth_tx_mvb_timestamp"><td><p>ETH_TX_MVB_TIMESTAMP</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* MFB_REGIONS*48-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mvb_vld"><td><p>ETH_TX_MVB_VLD</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX DMA STREAMS (clocked at APP_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>MFB+MVB interfaces to DMA module (to software)
+Each data packet (MFB) must have an appropriate header (MVB)!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_len"><td><p>DMA_RX_MVB_LEN</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MVB streams: length of data packet in bytes</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_hdr_meta"><td><p>DMA_RX_MVB_HDR_META</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MVB streams: user metadata for DMA header</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_channel"><td><p>DMA_RX_MVB_CHANNEL</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MVB streams: number of DMA channel</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_discard"><td><p>DMA_RX_MVB_DISCARD</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MVB streams: discard flag (when is set, packet is discarded in DMA module)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_vld"><td><p>DMA_RX_MVB_VLD</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MVB streams: valid of each MVB item</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mvb_src_rdy"><td><p>DMA_RX_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MVB streams: source ready of each MVB bus</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mvb_dst_rdy"><td><p>DMA_RX_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA RX MVB streams: destination ready of each MVB bus</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_data"><td><p>DMA_RX_MFB_DATA</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*DMA_MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MFB streams: data word with frames (packets)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_sof"><td><p>DMA_RX_MFB_SOF</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MFB streams: Start Of Frame (SOF) flag for each MFB region</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_eof"><td><p>DMA_RX_MFB_EOF</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MFB streams: End Of Frame (EOF) flag for each MFB region</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_sof_pos"><td><p>DMA_RX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*max(1,log2(DMA_MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MFB streams: SOF position for each MFB region in MFB blocks</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_eof_pos"><td><p>DMA_RX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*max(1,log2(DMA_MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MFB streams: EOF position for each MFB region in MFB items</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_rx_mfb_src_rdy"><td><p>DMA_RX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA RX MFB streams: source ready of each MFB bus</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_rx_mfb_dst_rdy"><td><p>DMA_RX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA RX MFB streams: destination ready of each MFB bus</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>TX DMA STREAMS (clocked at APP_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>MFB+MVB interface from DMA module (from software)
+Each data packet (MFB) must have an appropriate header (MVB)!</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mvb_len"><td><p>DMA_TX_MVB_LEN</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*log2(DMA_TX_FRAME_SIZE_MAX+1)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MVB streams: length of data packet in bytes</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mvb_hdr_meta"><td><p>DMA_TX_MVB_HDR_META</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MVB streams: user metadata for DMA header</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mvb_channel"><td><p>DMA_TX_MVB_CHANNEL</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MVB streams: number of DMA channel</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mvb_vld"><td><p>DMA_TX_MVB_VLD</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MVB streams: valid of each MVB item</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mvb_src_rdy"><td><p>DMA_TX_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MVB streams: source ready of each MVB bus</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mvb_dst_rdy"><td><p>DMA_TX_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA TX MVB streams: destination ready of each MVB bus</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_data"><td><p>DMA_TX_MFB_DATA</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*DMA_MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MFB streams: data word with frames (packets)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_sof"><td><p>DMA_TX_MFB_SOF</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MFB streams: Start Of Frame (SOF) flag for each MFB region</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_eof"><td><p>DMA_TX_MFB_EOF</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MFB streams: End Of Frame (EOF) flag for each MFB region</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_sof_pos"><td><p>DMA_TX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*max(1,log2(DMA_MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MFB streams: SOF position for each MFB region in MFB blocks</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_eof_pos"><td><p>DMA_TX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_MFB_REGIONS*max(1,log2(DMA_MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MFB streams: EOF position for each MFB region in MFB items</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-dma_tx_mfb_src_rdy"><td><p>DMA_TX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>DMA TX MFB streams: source ready of each MFB bus</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_mfb_dst_rdy"><td><p>DMA_TX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(DMA_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>DMA TX MFB streams: destination ready of each MFB bus</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Application specific signals</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-dma_tx_usr_choke_chans"><td><p>DMA_TX_USR_CHOKE_CHANS</p></td>
+<td><p>std_logic_vector(DMA_STREAMS* DMA_TX_CHANNELS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Selectively pause (choke) a DMA channel(s) from Application.
+Can be used to avoid stopping the whole DMA Module when just a single channel is slacking behind.</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>HBM AXI INTERFACES (clocked at HBM_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_clk"><td><p>HBM_CLK</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_reset"><td><p>HBM_RESET</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_init_done"><td><p>HBM_INIT_DONE</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_araddr"><td><p>HBM_AXI_ARADDR</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_arburst"><td><p>HBM_AXI_ARBURST</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_arid"><td><p>HBM_AXI_ARID</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_arlen"><td><p>HBM_AXI_ARLEN</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_arsize"><td><p>HBM_AXI_ARSIZE</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_arvalid"><td><p>HBM_AXI_ARVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_arready"><td><p>HBM_AXI_ARREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_arprot"><td><p>HBM_AXI_ARPROT</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_arqos"><td><p>HBM_AXI_ARQOS</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_aruser"><td><p>HBM_AXI_ARUSER</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rdata"><td><p>HBM_AXI_RDATA</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rdata_parity"><td><p>HBM_AXI_RDATA_PARITY</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rid"><td><p>HBM_AXI_RID</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rlast"><td><p>HBM_AXI_RLAST</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rresp"><td><p>HBM_AXI_RRESP</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_rvalid"><td><p>HBM_AXI_RVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_rready"><td><p>HBM_AXI_RREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awaddr"><td><p>HBM_AXI_AWADDR</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awburst"><td><p>HBM_AXI_AWBURST</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awid"><td><p>HBM_AXI_AWID</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awlen"><td><p>HBM_AXI_AWLEN</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awsize"><td><p>HBM_AXI_AWSIZE</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awvalid"><td><p>HBM_AXI_AWVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awready"><td><p>HBM_AXI_AWREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awprot"><td><p>HBM_AXI_AWPROT</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_awqos"><td><p>HBM_AXI_AWQOS</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_awuser"><td><p>HBM_AXI_AWUSER</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_wdata"><td><p>HBM_AXI_WDATA</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_wdata_parity"><td><p>HBM_AXI_WDATA_PARITY</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_wlast"><td><p>HBM_AXI_WLAST</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_wstrb"><td><p>HBM_AXI_WSTRB</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_wvalid"><td><p>HBM_AXI_WVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_wready"><td><p>HBM_AXI_WREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_bid"><td><p>HBM_AXI_BID</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_bresp"><td><p>HBM_AXI_BRESP</p></td>
+<td><p>slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-hbm_axi_bvalid"><td><p>HBM_AXI_BVALID</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-hbm_axi_bready"><td><p>HBM_AXI_BREADY</p></td>
+<td><p>std_logic_vector(HBM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>EXTERNAL MEMORY INTERFACES (clocked at MEM_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_clk"><td><p>MEM_CLK</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Clock for each memory port</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_rst"><td><p>MEM_RST</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Reset synchronized with MEM_CLK for each memory port</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_ready"><td><p>MEM_AVMM_READY</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MEM Avalon-MM: ready for request</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_read"><td><p>MEM_AVMM_READ</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MEM Avalon-MM: read request</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_write"><td><p>MEM_AVMM_WRITE</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MEM Avalon-MM: write request</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_address"><td><p>MEM_AVMM_ADDRESS</p></td>
+<td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MEM Avalon-MM: address of r/w request</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_burstcount"><td><p>MEM_AVMM_BURSTCOUNT</p></td>
+<td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_BURST_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MEM Avalon-MM: burst count of read/write request</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_writedata"><td><p>MEM_AVMM_WRITEDATA</p></td>
+<td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MEM Avalon-MM: write data, valid only with write request</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_avmm_readdata"><td><p>MEM_AVMM_READDATA</p></td>
+<td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MEM Avalon-MM: read data</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_avmm_readdatavalid"><td><p>MEM_AVMM_READDATAVALID</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MEM Avalon-MM: read data valid flag</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_refr_period"><td><p>MEM_REFR_PERIOD</p></td>
+<td><p>slv_array_t(MEM_PORTS-1 downto 0)(MEM_REFR_PERIOD_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MEM parameter: user refresh period</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mem_refr_req"><td><p>MEM_REFR_REQ</p></td>
+<td><p>std_logic_vector(MEM_PORTS - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MEM parameter: user refresh request</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mem_refr_ack"><td><p>MEM_REFR_ACK</p></td>
+<td><p>std_logic_vector(MEM_PORTS - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MEM parameter: user refresh ack</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_rst_req"><td><p>EMIF_RST_REQ</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>EMIF local reset request</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_rst_done"><td><p>EMIF_RST_DONE</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>EMIF local reset done flag</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_ecc_usr_int"><td><p>EMIF_ECC_USR_INT</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>EMIF ECC user interupt flag</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_cal_success"><td><p>EMIF_CAL_SUCCESS</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>EMIF calibration success flag</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-emif_cal_fail"><td><p>EMIF_CAL_FAIL</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>EMIF calibration fail flag</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-emif_auto_precharge"><td><p>EMIF_AUTO_PRECHARGE</p></td>
+<td><p>std_logic_vector(MEM_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>EMIF auto precharge request</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MI INTERFACE (clocked at MI_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MI bus: data from master to slave (write data)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MI bus: slave address</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MI bus: byte enable</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>MI bus: read request</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>MI bus: write request</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>MI bus: ready of slave module</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>MI bus: data from slave to master (read data)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>MI bus: valid of MI_DRD data signal</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="readme.html" class="btn btn-neutral float-left" title="NDK Architecture" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mi.html" class="btn btn-neutral float-right" title="The MI bus interconnect" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

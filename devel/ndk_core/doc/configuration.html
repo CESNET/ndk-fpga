@@ -1,28 +1,26 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuration files and parameters &mdash; Minimal NDK Application Docs  documentation</title>
+  <title>Configuration files and parameters &mdash; NDK-FPGA Docs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="NDK testing" href="testing.html" />
-    <link rel="prev" title="Time Stamp Unit" href="../intel/doc/tsu.html" /> 
+    <link rel="prev" title="Time Stamp Unit" href="tsu.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -34,11 +32,8 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            Minimal NDK Application Docs
+            NDK-FPGA Docs
           </a>
-              <div class="version">
-                Git branch: devel, <br> Git hash: c5a959df
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -55,7 +50,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">NDK Architecture</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration files and parameters</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#build-system-files">Build system files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parametrizing-ndk-core-design">Parametrizing NDK-CORE design</a><ul>
@@ -109,7 +104,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
@@ -125,18 +120,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/base.html">Basic Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mfb.html">MFB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/mvb.html">MVB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ofm_doc/ver.html">UVM Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -145,7 +141,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">Minimal NDK Application Docs</a>
+          <a href="../../index.html">NDK-FPGA Docs</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -268,7 +264,8 @@ configuration parameter files has its own hierarchy, which is shown in the
 configuration files used in the case of NDK-CORE design. For the description of
 the application and card-specific configuration, see following sections on this page.</p>
 <figure class="align-center" id="id6">
-<span id="fig-const-hierarchy"></span><a class="reference internal image-reference" href="../../_images/const_hierarchy.svg"><img alt="../../_images/const_hierarchy.svg" src="../../_images/const_hierarchy.svg" style="width: 463.04999999999995px; height: 458.4px;" /></a>
+<span id="fig-const-hierarchy"></span><a class="reference internal image-reference" href="../../_images/const_hierarchy.svg"><img alt="../../_images/const_hierarchy.svg" src="../../_images/const_hierarchy.svg" style="width: 463.04999999999995px; height: 458.4px;" />
+</a>
 <figcaption>
 <p><span class="caption-text">Hierarchy diagram</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
 <div class="legend">
@@ -351,7 +348,7 @@ there are two mechanisms provided for passing the parameters specified in the
 TCL shell to affect the final VHDL design.</p>
 <section id="passing-through-modules-tcl">
 <h4>Passing through Modules.tcl<a class="headerlink" href="#passing-through-modules-tcl" title="Link to this heading"></a></h4>
-<p>As described in the <a class="reference internal" href="../../ofm_doc/build/readme.html#ofm-build-system"><span class="std std-ref">Build System</span></a> section, the Modules.tcl files allow
+<p>As described in the <a class="reference internal" href="../../ndk_build/readme.html#ofm-build-system"><span class="std std-ref">Build System</span></a> section, the Modules.tcl files allow
 for modular and hierarchical organization of VHDL source files. The Modules.tcl files
 provide an <em>ARCHGRP</em> list to pass specific constants across the source file hierarchy. Each
 Modules.tcl file obtains such a list from its parent Modules.tcl file. It allows further
@@ -375,7 +372,7 @@ building a new design. The package is called <code class="docutils literal notra
 contains all parameters which were added in the <code class="docutils literal notranslate"><span class="pre">core_const.tcl</span></code> file described
 previously. The values are passed to the VHDL package with specific types using
 TCL procedures in the VhdlPkgGen.tcl script. This script can be found in the build folder
-in the OFM repository (<a class="reference internal" href="../../ofm_doc/build/readme.html#ofm-build-system"><span class="std std-ref">Build System</span></a>). Examples of some procedures are
+in the OFM repository (<a class="reference internal" href="../../ndk_build/readme.html#ofm-build-system"><span class="std std-ref">Build System</span></a>). Examples of some procedures are
 provided in the following code block:</p>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="c"># passing TCL parameters</span>
 <span class="nv">VhdlPkgString</span><span class="w"> </span>FANCY_STRING<span class="w"> </span><span class="nv">$FANCY_STRING</span>
@@ -686,7 +683,7 @@ and <cite>core_const.tcl</cite>).</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../intel/doc/tsu.html" class="btn btn-neutral float-left" title="Time Stamp Unit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tsu.html" class="btn btn-neutral float-left" title="Time Stamp Unit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="testing.html" class="btn btn-neutral float-right" title="NDK testing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

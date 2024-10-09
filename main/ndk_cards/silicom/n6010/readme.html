@@ -1,23 +1,21 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Silicom N6010 &mdash; Minimal NDK Application Docs  documentation</title>
+  <title>Silicom N6010 &mdash; NDK-FPGA Docs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -34,11 +32,8 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            Minimal NDK Application Docs
+            NDK-FPGA Docs
           </a>
-              <div class="version">
-                Git branch: main, <br> Git hash: b4addaa5
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -55,10 +50,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
 </ul>
@@ -77,18 +72,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../../amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/base.html">Basic Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mfb.html">MFB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mvb.html">MVB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -97,7 +93,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">Minimal NDK Application Docs</a>
+          <a href="../../../index.html">NDK-FPGA Docs</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -144,14 +140,14 @@
 <ul class="simple">
 <li><dl class="simple">
 <dt>Ethernet cores that are supported in the NDK firmware:</dt><dd><ul>
-<li><p><a class="reference internal" href="../../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">E-Tile in the Network Module</span></a></p></li>
+<li><p><a class="reference internal" href="../../../ndk_core/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">E-Tile in the Network Module</span></a></p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
 <dt>PCIe cores that are supported in the NDK firmware:</dt><dd><ul>
-<li><p><a class="reference internal" href="../../../ndk_core/intel/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">P-Tile in the PCIe Module</span></a></p></li>
+<li><p><a class="reference internal" href="../../../ndk_core/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">P-Tile in the PCIe Module</span></a></p></li>
 </ul>
 </dd>
 </dl>

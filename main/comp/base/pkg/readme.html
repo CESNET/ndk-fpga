@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Packages &mdash; NDK-FPGA Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            NDK-FPGA Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">NDK-FPGA Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Packages</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/comp/base/pkg/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="packages">
+<h1>Packages<a class="headerlink" href="#packages" title="Link to this heading"></a></h1>
+<dl class="vhdl autopackage">
+<dt class="sig sig-object vhdl">
+<span class="k"><span class="pre">PACKAGE</span> </span><span class="sig-name descname"><span class="pre">eth_hdr_pack</span></span><span class="k"> <span class="pre">IS</span></span></dt>
+<dd><p><strong>RX Ethernet HDR items description:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Item bit range</p></th>
+<th class="head"><p>Item name</p></th>
+<th class="head"><p>Item description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0  to 15</p></td>
+<td><p>LENGTH</p></td>
+<td><p>Length of Ethernet frame in bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p>16 to 23</p></td>
+<td><p>PORT</p></td>
+<td><p>Source port/channel number in global format for the entire card; Examples: card with 2 ports each with 4 channels; third channel of the second port = 6; second channel of the first port = 1)</p></td>
+</tr>
+<tr class="row-even"><td><p>24 to 24</p></td>
+<td><p>ERROR</p></td>
+<td><p>Flag of global error, masked OR of all error bits</p></td>
+</tr>
+<tr class="row-odd"><td><p>25 to 25</p></td>
+<td><p>ERRORFRAME</p></td>
+<td><p>Flag of frame error</p></td>
+</tr>
+<tr class="row-even"><td><p>26 to 26</p></td>
+<td><p>ERRORMINTU</p></td>
+<td><p>Flag of length below MINTU</p></td>
+</tr>
+<tr class="row-odd"><td><p>27 to 27</p></td>
+<td><p>ERRORMAXTU</p></td>
+<td><p>Flag of length over MAXTU</p></td>
+</tr>
+<tr class="row-even"><td><p>28 to 28</p></td>
+<td><p>ERRORCRC</p></td>
+<td><p>Flag of CRC error</p></td>
+</tr>
+<tr class="row-odd"><td><p>29 to 29</p></td>
+<td><p>ERRORMAC</p></td>
+<td><p>Flag of MAC error</p></td>
+</tr>
+<tr class="row-even"><td><p>30 to 30</p></td>
+<td><p>BROADCAST</p></td>
+<td><p>Flag of Broadcast MAC</p></td>
+</tr>
+<tr class="row-odd"><td><p>31 to 31</p></td>
+<td><p>MULTICAST</p></td>
+<td><p>Flag of Multicast MAC</p></td>
+</tr>
+<tr class="row-even"><td><p>32 to 32</p></td>
+<td><p>HITMACVLD</p></td>
+<td><p>Flag of hit MAC address in TCAM memory</p></td>
+</tr>
+<tr class="row-odd"><td><p>33 to 36</p></td>
+<td><p>HITMAC</p></td>
+<td><p>Index of hit MAC address in TCAM memory</p></td>
+</tr>
+<tr class="row-even"><td><p>37 to 37</p></td>
+<td><p>TIMESTAMPVLD</p></td>
+<td><p>Flag of valid timestamp</p></td>
+</tr>
+<tr class="row-odd"><td><p>38 to 101</p></td>
+<td><p>TIMESTAMP</p></td>
+<td><p>Timestamp of frame (see TSU module docs for format description)</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>TX Ethernet HDR items description:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Item bit range</p></th>
+<th class="head"><p>Item name</p></th>
+<th class="head"><p>Item description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0  to 15</p></td>
+<td><p>LENGTH</p></td>
+<td><p>Length of Ethernet frame in bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p>16 to 23</p></td>
+<td><p>PORT</p></td>
+<td><p>Destination port/channel number in global format for the entire card; Examples: card with 2 ports each with 4 channels; third channel of the second port = 6; second channel of the first port = 1)</p></td>
+</tr>
+<tr class="row-even"><td><p>24 to 24</p></td>
+<td><p>DISCARD</p></td>
+<td><p>DRAFT ONLY: Discard frame before transmit to network</p></td>
+</tr>
+</tbody>
+</table>
+<p>Ethernet Header Package</p>
+</dd></dl>
+
+<dl class="vhdl autopackage">
+<dt class="sig sig-object vhdl">
+<span class="k"><span class="pre">PACKAGE</span> </span><span class="sig-name descname"><span class="pre">dma_bus_pack</span></span><span class="k"> <span class="pre">IS</span></span></dt>
+<dd><p>Items description</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>LENGTH</p></td>
+<td><p>Lenght of data in current request/completion in DWORDs (4B); for read request it is a requested size</p></td>
+</tr>
+<tr class="row-even"><td><p>TYPE</p></td>
+<td><p>Request type, currently only read and write requests are supported</p></td>
+</tr>
+<tr class="row-odd"><td><p>FIRSTIB</p></td>
+<td><p>First invalid bytes - specifies, how many bytes at first data word are invalid; used to generate First BE</p></td>
+</tr>
+<tr class="row-even"><td><p>LASTIB</p></td>
+<td><p>Last invalid bytes - specifies, how many bytes at last data word are invalid; used to generate Last BE</p></td>
+</tr>
+<tr class="row-odd"><td><p>TAG</p></td>
+<td><p>Transaction ID unique in scope of current unit; it will be translated to an PCI tag together with UNITID</p></td>
+</tr>
+<tr class="row-even"><td><p>UNITID</p></td>
+<td><p>Transaction ID unique for each unit (in scope of 1 endpoint) and is used for routing of completions</p></td>
+</tr>
+<tr class="row-odd"><td><p>GLOBAL</p></td>
+<td><p>Global 64b address to main memory space of request</p></td>
+</tr>
+<tr class="row-even"><td><p>VFID</p></td>
+<td><p>Virtual function ID for specifying PCI function</p></td>
+</tr>
+<tr class="row-odd"><td><p>PASID</p></td>
+<td><p>Process Address Space ID for better granularity of virtualization</p></td>
+</tr>
+<tr class="row-even"><td><p>PASIDVLD</p></td>
+<td><p>PASID value is valid and will be used to generate TLP PASID prefix</p></td>
+</tr>
+<tr class="row-odd"><td><p>RELAXED</p></td>
+<td><p>Relaxed ordering in the mean of PCIe standard; typically needs to be set in all read requests</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,26 +1,26 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PRO DESIGN Falcon &mdash; Minimal NDK Application Docs  documentation</title>
+  <title>PRO DESIGN Falcon &mdash; NDK-FPGA Docs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Basic Tools" href="../../../base.html" />
+    <link rel="prev" title="AMD VCU118@VU9P" href="../../amd/vcu118/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,11 +32,8 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            Minimal NDK Application Docs
+            NDK-FPGA Docs
           </a>
-              <div class="version">
-                Git branch: devel, <br> Git hash: c5a959df
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -53,15 +50,15 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/intel/readme.html">NDK architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
@@ -72,18 +69,23 @@
 <li class="toctree-l1"><a class="reference internal" href="../../amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PRO DESIGN Falcon</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK Firmware Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#boot-instructions">Boot Instructions</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/base.html">Basic Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mfb.html">MFB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/mvb.html">MVB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ofm_doc/ver.html">UVM Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
 </ul>
 
         </div>
@@ -92,7 +94,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">Minimal NDK Application Docs</a>
+          <a href="../../../index.html">NDK-FPGA Docs</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -140,7 +142,7 @@
 <ul class="simple">
 <li><dl class="simple">
 <dt>Supported Ethernet Cores in the NDK Firmware:</dt><dd><ul>
-<li><p><a class="reference internal" href="../../../ndk_core/intel/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">E-Tile in the Network Module</span></a></p></li>
+<li><p><a class="reference internal" href="../../../ndk_core/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">E-Tile in the Network Module</span></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -190,7 +192,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../amd/vcu118/readme.html" class="btn btn-neutral float-left" title="AMD VCU118@VU9P" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../base.html" class="btn btn-neutral float-right" title="Basic Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

@@ -1,0 +1,910 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NETWORK MODULE &mdash; NDK-FPGA Docs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA Docs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">NETWORK MODULE</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/ndk_core/comp/eth/network_mod/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="network-module">
+<span id="ndk-network-mod"></span><h1>NETWORK MODULE<a class="headerlink" href="#network-module" title="Link to this heading"></a></h1>
+<section id="typical-configurations">
+<h2>Typical Configurations<a class="headerlink" href="#typical-configurations" title="Link to this heading"></a></h2>
+<table class="docutils align-center">
+<thead>
+<tr class="row-odd"><th class="head"><p>ETH_CORE_ARCH</p></th>
+<th class="head"><p>E_TILE</p></th>
+<th class="head"><p>F_TILE</p></th>
+<th class="head"><p>CMAC</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ETH_PORT_SPEED</p></td>
+<td><p>100, 25, 10</p></td>
+<td><p>400, 200, 100, 50, 40, 25, 10</p></td>
+<td><p>100</p></td>
+</tr>
+<tr class="row-odd"><td><p>ETH_PORT_CHAN (for each speed)</p></td>
+<td><p>1, 4, 4</p></td>
+<td><p>1, 2, 4, 8, 2, 8, 8</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>LANES</p></td>
+<td><p>4</p></td>
+<td><p>8</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>MFB Configuration</p></td>
+<td><p>1, 8, 8, 8 (512b)</p></td>
+<td><p>4, 8, 8, 8 (2048b)</p></td>
+<td><p>1, 8, 8, 8 (512b)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="verification-plan">
+<h2>Verification Plan<a class="headerlink" href="#verification-plan" title="Link to this heading"></a></h2>
+<p>It is necessary to test all supported Ethernet IP architectures (E-Tile, CMAC,…) and their supported speeds/channels.</p>
+<table class="docutils align-center">
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Requirement level</p></th>
+<th class="head"><p>Checked by</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Test name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Dropped packets (overflow, unmasked errors).</p></td>
+<td><p>Obligatory</p></td>
+<td><p>Func. cover</p></td>
+<td><p>TBD</p></td>
+<td><p>All tests</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>Checking the MAC address according to the values written in the configurable TCAM.</p></td>
+<td><p>Obligatory</p></td>
+<td><p>Func. cover</p></td>
+<td><p>TBD</p></td>
+<td><p>All tests</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>Test checking the setting of the minimum and maximum packet length and discarding packets outside the range.</p></td>
+<td><p>Obligatory</p></td>
+<td><p>Func. cover</p></td>
+<td><p>TBD</p></td>
+<td><p>All tests</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>Read out (via MI) and check statistics in RX/TX MAC.</p></td>
+<td><p>Obligatory</p></td>
+<td><p>Func. cover</p></td>
+<td><p>TBD</p></td>
+<td><p>All tests</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>Maximum speed test (output does not brake and input goes full speed), 100% throughput is expected for all packet lengths.</p></td>
+<td><p>Obligatory</p></td>
+<td><p>Func. cover</p></td>
+<td><p>TBD</p></td>
+<td><p>test::speed</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="entity-docs">
+<h2>Entity Docs<a class="headerlink" href="#entity-docs" title="Link to this heading"></a></h2>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-network_mod">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">NETWORK_MOD</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-network_mod" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_core_arch"><td><p>ETH_CORE_ARCH</p></td>
+<td><p>string</p></td>
+<td><p>“E_TILE”</p></td>
+<td><p>Ethernet core architecture: E_TILE, F_TILE, CMAC</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Network ports configuration:</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_ports"><td><p>ETH_PORTS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>max 2 (MI address space limit)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_streams"><td><p>ETH_STREAMS</p></td>
+<td><p>natural</p></td>
+<td><p>ETH_PORTS</p></td>
+<td><p>Number ETH streams, must be equal to ETH_PORTS or ETH_PORTS*ETH_PORT_CHAN!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_port_speed"><td><p>ETH_PORT_SPEED</p></td>
+<td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>(others =&gt; 25)</p></td>
+<td><p>Speed per Ethernet port.
+Options: F_TILE core: 400, 200, 100, 50, 40, 25, 10;</p>
+<blockquote>
+<div><p>E_TILE core: 100, 25, 10;
+CMAC   core: 100.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_port_chan"><td><p>ETH_PORT_CHAN</p></td>
+<td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>(others =&gt; 4)</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-ehip_port_type"><td><p>EHIP_PORT_TYPE</p></td>
+<td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>(others =&gt; 0)</p></td>
+<td><p>Type of used IP core default is F_Tile.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_port_rx_mtu"><td><p>ETH_PORT_RX_MTU</p></td>
+<td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>(others =&gt; 16383)</p></td>
+<td><p>Maximum allowed size of RX frame in bytes per Ethernet port.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_port_tx_mtu"><td><p>ETH_PORT_TX_MTU</p></td>
+<td><p>integer_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>(others =&gt; 16383)</p></td>
+<td><p>Maximum allowed size of TX frame in bytes per Ethernet port.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_mac_bypass"><td><p>ETH_MAC_BYPASS</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>Optional option to disable MAC Lite modules. Dangerously!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-lanes"><td><p>LANES</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Number of serial lanes.
+Options: F_TILE      core: 8;</p>
+<blockquote>
+<div><p>E_TILE/CMAC core: 4.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-qsfp_ports"><td><p>QSFP_PORTS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-qsfp_i2c_ports"><td><p>QSFP_I2C_PORTS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>max 2</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-qsfp_i2c_tristate"><td><p>QSFP_I2C_TRISTATE</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB configuration:</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-regions"><td><p>REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><dl class="simple">
+<dt>Recommended MFB parameters:</dt><dd><p>F_TILE core: 4,8,8,8.
+E_TILE core: 1,8,8,8.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-region_size"><td><p>REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-block_size"><td><p>BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-item_width"><td><p>ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MI configuration:</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-mi_data_width_phy"><td><p>MI_DATA_WIDTH_PHY</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-mi_addr_width_phy"><td><p>MI_ADDR_WIDTH_PHY</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Other configuration:</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-ts_demo_en"><td><p>TS_DEMO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable timestamp-limiting demo/testing.
+Timestamps and channel IDs are sent from the APP Core to the Network module
+via a special MVB-like interface. There, before entering the IP core,
+time between packets from the same DMA channel is measured.
+The measured data is presented to the user via a couple of dedicated registers.
+WARNING: works only for a single-channel (and single-Region) designs with E-Tile (Intel)!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-tx_dma_channels"><td><p>TX_DMA_CHANNELS</p></td>
+<td><p>natural</p></td>
+<td><p>16</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-lane_rx_polarity"><td><p>LANE_RX_POLARITY</p></td>
+<td><p>std_logic_vector(ETH_PORTS*LANES-1 downto 0)</p></td>
+<td><p>(others =&gt; ‘0’)</p></td>
+<td><p>Ethernet lanes polarity</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-lane_tx_polarity"><td><p>LANE_TX_POLARITY</p></td>
+<td><p>std_logic_vector(ETH_PORTS*LANES-1 downto 0)</p></td>
+<td><p>(others =&gt; ‘0’)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-reset_width"><td><p>RESET_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>Number of user resets.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“STRATIX10”</p></td>
+<td><p>Select correct FPGA device.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-board"><td><p>BOARD</p></td>
+<td><p>string</p></td>
+<td><p>“DK-DEV-1SDX-P”</p></td>
+<td><p>400G1, DK-DEV-AGI027RES, DK-DEV-1SDX-P</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>CLOCK AND RESET</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-clk_user"><td><p>CLK_USER</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-clk_eth"><td><p>CLK_ETH</p></td>
+<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-reset_user"><td><p>RESET_USER</p></td>
+<td><p>std_logic_vector(RESET_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-reset_eth"><td><p>RESET_ETH</p></td>
+<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>ETH SERIAL INTERFACES</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-eth_refclk_p"><td><p>ETH_REFCLK_P</p></td>
+<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-eth_refclk_n"><td><p>ETH_REFCLK_N</p></td>
+<td><p>std_logic_vector(ETH_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-eth_rx_p"><td><p>ETH_RX_P</p></td>
+<td><p>std_logic_vector(ETH_PORTS*LANES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-eth_rx_n"><td><p>ETH_RX_N</p></td>
+<td><p>std_logic_vector(ETH_PORTS*LANES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-eth_tx_p"><td><p>ETH_TX_P</p></td>
+<td><p>std_logic_vector(ETH_PORTS*LANES-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-eth_tx_n"><td><p>ETH_TX_N</p></td>
+<td><p>std_logic_vector(ETH_PORTS*LANES-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>QSFP Control</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-qsfp_i2c_scl"><td><p>QSFP_I2C_SCL</p></td>
+<td><p>std_logic_vector(QSFP_I2C_PORTS-1 downto 0)</p></td>
+<td><p>inout</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-qsfp_i2c_sda"><td><p>QSFP_I2C_SDA</p></td>
+<td><p>std_logic_vector(QSFP_I2C_PORTS-1 downto 0)</p></td>
+<td><p>inout</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-qsfp_i2c_sda_i"><td><p>QSFP_I2C_SDA_I</p></td>
+<td><p>std_logic_vector(QSFP_I2C_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-qsfp_i2c_scl_i"><td><p>QSFP_I2C_SCL_I</p></td>
+<td><p>std_logic_vector(QSFP_I2C_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-qsfp_i2c_scl_o"><td><p>QSFP_I2C_SCL_O</p></td>
+<td><p>std_logic_vector(QSFP_I2C_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-qsfp_i2c_scl_oe"><td><p>QSFP_I2C_SCL_OE</p></td>
+<td><p>std_logic_vector(QSFP_I2C_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-qsfp_i2c_sda_o"><td><p>QSFP_I2C_SDA_O</p></td>
+<td><p>std_logic_vector(QSFP_I2C_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-qsfp_i2c_sda_oe"><td><p>QSFP_I2C_SDA_OE</p></td>
+<td><p>std_logic_vector(QSFP_I2C_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-qsfp_i2c_dir"><td><p>QSFP_I2C_DIR</p></td>
+<td><p>std_logic_vector(QSFP_I2C_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-qsfp_modsel_n"><td><p>QSFP_MODSEL_N</p></td>
+<td><p>std_logic_vector(QSFP_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-qsfp_lpmode"><td><p>QSFP_LPMODE</p></td>
+<td><p>std_logic_vector(QSFP_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-qsfp_reset_n"><td><p>QSFP_RESET_N</p></td>
+<td><p>std_logic_vector(QSFP_PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-qsfp_modprs_n"><td><p>QSFP_MODPRS_N</p></td>
+<td><p>std_logic_vector(QSFP_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-qsfp_int_n"><td><p>QSFP_INT_N</p></td>
+<td><p>std_logic_vector(QSFP_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Link control/status - runs on CLK_ETH</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-activity_rx"><td><p>ACTIVITY_RX</p></td>
+<td><p>std_logic_vector(ETH_PORTS*ETH_PORT_CHAN(0)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>REPEATER_CTRL   : in  std_logic_vector(ETH_PORTS*2-1 downto 0);
+PORT_ENABLED    : out std_logic_vector(ETH_PORTS-1 downto 0);</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-activity_tx"><td><p>ACTIVITY_TX</p></td>
+<td><p>std_logic_vector(ETH_PORTS*ETH_PORT_CHAN(0)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-rx_link_up"><td><p>RX_LINK_UP</p></td>
+<td><p>std_logic_vector(ETH_PORTS*ETH_PORT_CHAN(0)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_link_up"><td><p>TX_LINK_UP</p></td>
+<td><p>std_logic_vector(ETH_PORTS*ETH_PORT_CHAN(0)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX interface (Packets for transmit to Ethernet)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-rx_mfb_hdr"><td><p>RX_MFB_HDR</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*ETH_TX_HDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>valid with SOF</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-eth_tx_mvb_channel"><td><p>ETH_TX_MVB_CHANNEL</p></td>
+<td><p>std_logic_vector(ETH_PORTS*REGIONS*max(1,log2(TX_DMA_CHANNELS))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>This interface is to transmit Channel IDs and Timestamps of packets
+from the APP Core to the demo/testing logic in the Network Mod Core (E-Tile).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-eth_tx_mvb_timestamp"><td><p>ETH_TX_MVB_TIMESTAMP</p></td>
+<td><p>std_logic_vector(ETH_PORTS*REGIONS*48-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-eth_tx_mvb_vld"><td><p>ETH_TX_MVB_VLD</p></td>
+<td><p>std_logic_vector(ETH_PORTS*REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>TX interface (Packets received from Ethernet)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*ETH_RX_HDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MI interface - ETH MAC</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_clk"><td><p>MI_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_reset"><td><p>MI_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MI interface - ETH PCS/PMA</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_clk_phy"><td><p>MI_CLK_PHY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_reset_phy"><td><p>MI_RESET_PHY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_dwr_phy"><td><p>MI_DWR_PHY</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_addr_phy"><td><p>MI_ADDR_PHY</p></td>
+<td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_rd_phy"><td><p>MI_RD_PHY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_wr_phy"><td><p>MI_WR_PHY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_be_phy"><td><p>MI_BE_PHY</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_drd_phy"><td><p>MI_DRD_PHY</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_ardy_phy"><td><p>MI_ARDY_PHY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_drdy_phy"><td><p>MI_DRDY_PHY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MI interface - ETH PMD (QSFP)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_clk_pmd"><td><p>MI_CLK_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_reset_pmd"><td><p>MI_RESET_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_dwr_pmd"><td><p>MI_DWR_PMD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_addr_pmd"><td><p>MI_ADDR_PMD</p></td>
+<td><p>std_logic_vector(MI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_rd_pmd"><td><p>MI_RD_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_wr_pmd"><td><p>MI_WR_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_be_pmd"><td><p>MI_BE_PMD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drd_pmd"><td><p>MI_DRD_PMD</p></td>
+<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-mi_ardy_pmd"><td><p>MI_ARDY_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-mi_drdy_pmd"><td><p>MI_DRDY_PMD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TSU interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tsu_clk"><td><p>TSU_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tsu_rst"><td><p>TSU_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
+<td><p>std_logic_vector(64-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-tsu_ts_dv"><td><p>TSU_TS_DV</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
