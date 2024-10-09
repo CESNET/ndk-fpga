@@ -1,7 +1,7 @@
 package require -exact qsys 21.3
 
 array set PARAMS $IP_PARAMS_L
-source $PARAMS(CORE_BASE)/top/ip/common.tcl
+source $PARAMS(IP_COMMON_TCL)
 
 # create the system "ftile_mr_eth_ip"
 proc do_create_ftile_mr_eth_ip {device family ipname filename} {
