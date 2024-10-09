@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 # SET Important paths
-set OFM_PATH      "../../../../../../ofm"
+set OFM_PATH      "../../../../../"
 set FIRMWARE_BASE $OFM_PATH
 
 set DUT_BASE     ".."

@@ -4,8 +4,8 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-set FIRMWARE_BASE  ".."
-set OFM_PATH       "../../../../../../ofm"
+set OFM_PATH      "../../../../../"
+set FIRMWARE_BASE $OFM_PATH
 
 set DUT_BASE              ".."
 set DUT_UVM_BASE          "."
