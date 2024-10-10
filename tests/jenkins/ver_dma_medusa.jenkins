@@ -7,13 +7,13 @@
 // /////////////////////////////////////////////////////////////////////////////
 // Add engines for automatic Jenkins verifications into the following list
 // FORMAT:
-//  [ 'name'                     , 'path_to_ver'                                    , 'fdo_file.fdo'       , 'test_pkg.sv/.vhd'   , 'settings.py'                    ]
+//  [ 'name'                     , 'path_to_ver'                      , 'fdo_file.fdo'       , 'test_pkg.sv/.vhd'   , 'settings.py'                    ]
 def COMPONENTS = [\
-    ['Basic Tests'               , 'ndk/modules/ndk-mod-dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_basic_tests.py'        ],\
-    ['Advanced Tests'            , 'ndk/modules/ndk-mod-dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_advanced_tests.py'     ],\
-    ['Small Packets'             , 'ndk/modules/ndk-mod-dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_small_packet_tests.py' ],\
-    ['Large Packets'             , 'ndk/modules/ndk-mod-dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_large_packet_tests.py' ],\
-    ['Multiple PCIe Endpoints'   , 'ndk/modules/ndk-mod-dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_multi_pcie_tests.py'   ],\
+    ['Basic Tests'               , 'extra/dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_basic_tests.py'        ],\
+    ['Advanced Tests'            , 'extra/dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_advanced_tests.py'     ],\
+    ['Small Packets'             , 'extra/dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_small_packet_tests.py' ],\
+    ['Large Packets'             , 'extra/dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_large_packet_tests.py' ],\
+    ['Multiple PCIe Endpoints'   , 'extra/dma-medusa/ver'             , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_comb_multi_pcie_tests.py'   ],\
 ]
 // /////////////////////////////////////////////////////////////////////////////
 
@@ -37,31 +37,29 @@ node('preklad') {
 
         def failed = []
         // run verification of every component
-        withEnv(["PATH+VSIM=/usr/local/fpga/Modeltech/linux_x86_64", 'LM_LICENSE_FILE=1717@license.liberouter.org']) {
-            for(c in COMPONENTS) {
-                // parse
-                def name      = c[0]
-                def path      = c[1]
-                def fdo       = c[2]
-                def pkg       = c[3]
-                def settings  = c[4]
-                def repo_root = pwd()
-                def multi_ver = "$repo_root/ndk/ofm/build/scripts/multi_ver/multi_ver.py"
-                // exec vsim
-                try { // try-catch is a hack to continue even after the first failed verification
-                    timeout(time: 12, unit: 'HOURS') {
-                        stage("$name") {
-                            dir("$path") {
-                                sh "python3 $multi_ver $fdo $pkg $settings"
-                            }
+        for(c in COMPONENTS) {
+            // parse
+            def name      = c[0]
+            def path      = c[1]
+            def fdo       = c[2]
+            def pkg       = c[3]
+            def settings  = c[4]
+            def repo_root = pwd()
+            def multi_ver = "$repo_root/build/scripts/multi_ver/multi_ver.py"
+            // exec vsim
+            try { // try-catch is a hack to continue even after the first failed verification
+                timeout(time: 12, unit: 'HOURS') {
+                    stage("$name") {
+                        dir("$path") {
+                            sh "python3 $multi_ver $fdo $pkg $settings"
                         }
                     }
-                } catch(err) {
-                    currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
-                    failed.add("$name")
-                } finally { // collect interesting files
-                    archiveArtifacts "$path/transcript*" // verification log
                 }
+            } catch(err) {
+                currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
+                failed.add("$name")
+            } finally { // collect interesting files
+                archiveArtifacts "$path/transcript*" // verification log
             }
         }
 
@@ -70,7 +68,7 @@ node('preklad') {
             println "FAILED on components: ${failed}."
             emailext \
                 recipientProviders: [culprits(), developers()],
-                to: 'cabal@cesnet.cz',
+                to: 'cabal@cesnet.cz, isa@cesnet.cz',
                 subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
                 body: """\
                     The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
