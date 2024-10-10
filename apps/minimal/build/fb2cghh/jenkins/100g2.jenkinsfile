@@ -1,7 +1,7 @@
 library 'liberouter'
 
 stagesFirmware(
-    dir: 'build/fb2cghh',
+    dir: 'apps/minimal/build/fb2cghh',
     target: '100g2',
     project: 'fb2cghh-minimal-100g2',
     pollscm: 'H H(0-11) * * 6',

@@ -1,7 +1,7 @@
 library 'liberouter'
 
 stagesFirmware(
-    dir: 'build/vcu118',
+    dir: 'apps/minimal/build/vcu118',
     target: '100g2',
     project: 'vcu118-minimal-100g2',
     pollscm: 'H H(0-11) * * 6',

@@ -1,7 +1,7 @@
 library 'liberouter'
 
 stagesFirmware(
-    dir: 'build/dk-dev-1sdx-p',
+    dir: 'apps/minimal/build/dk-dev-1sdx-p',
     target: '25g8',
     tool: 'quartus',
     project: 'dk-dev-1sdx-p-minimal-25g8',

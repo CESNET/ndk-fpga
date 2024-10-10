@@ -1,7 +1,7 @@
 library 'liberouter'
 
 stagesFirmware(
-    dir: 'build/alveo-u200',
+    dir: 'apps/minimal/build/alveo-u200',
     target: '100g2',
     project: 'alveo-u200-minimal-100g2',
     pollscm: 'H H(0-11) * * 6',

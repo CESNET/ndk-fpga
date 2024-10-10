@@ -1,7 +1,7 @@
 library 'liberouter'
 
 stagesFirmware(
-    dir: 'build/fb4cgg3',
+    dir: 'apps/minimal/build/fb4cgg3',
     target: '100g4',
     project: 'fb4cgg3-minimal-100g4',
     pollscm: 'H H(0-11) * * 6',

@@ -1,7 +1,7 @@
 library 'liberouter'
 
 stagesFirmware(
-    dir: 'build/agi-fh400g',
+    dir: 'apps/minimal/build/agi-fh400g',
     target: '200g2',
     tool: 'quartus',
     project: 'agi-fh400g-minimal-200g2',

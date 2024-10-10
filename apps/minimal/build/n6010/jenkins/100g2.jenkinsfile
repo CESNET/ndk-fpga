@@ -1,7 +1,7 @@
 library 'liberouter'
 
 stagesFirmware(
-    dir: 'build/n6010',
+    dir: 'apps/minimal/build/n6010',
     target: '100g2',
     tool: 'quartus',
     project: 'n6010-minimal-100g2',
