@@ -63,7 +63,7 @@ def commonPrekladVerRun(COMPONENTS) {
         println "FAILED on components: ${failed}."
         emailext \
             recipientProviders: [culprits(), developers()],
-            to: 'cabal@cesnet.cz',
+            to: 'cabal@cesnet.cz, isa@cesnet.cz',
             subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
             body: """\
                 The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
