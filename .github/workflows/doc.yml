@@ -21,9 +21,9 @@ jobs:
           mkdir public/html
           cp doc/source/index.html public/html/
           sphinx-build -M html doc/source public/devel
-          git checkout main
-          sphinx-build -M html doc/source public/main
-          mv public/main/html/ public/html/main
+          git checkout release
+          sphinx-build -M html doc/source public/release
+          mv public/release/html/ public/html/release
           mv public/devel/html/ public/html/devel
           touch public/html/.nojekyll
       - name: Deploy

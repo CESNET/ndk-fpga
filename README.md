@@ -1,7 +1,7 @@
 # NDK-FPGA
 
 This repository contains FPGA part of the Network Development Kit (NDK) for FPGA acceleration cards. The NDK allows users to quickly and easily develop FPGA-accelerated network applications. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet. The NDK-based Minimal (reference) application is also included in this (NDK-FPGA) repository.
- 
+
 The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-FPGA documentation (devel branch) here](https://cesnet.github.io/ndk-fpga/devel/).
 
 **The DMA Medusa IP is not part of the open-source NDK. If the DMA IP is disabled, it is replaced by a loopback. [You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic](https://support.brnologic.com/).**
@@ -49,8 +49,8 @@ The [NDK-FPGA documentation (devel branch) in chapter "How to start"](https://ce
 
 ## Documentation
 
-We use a documentation system based on the [Sphinx tool](https://www.sphinx-doc.org), which compiles complete documentation from source files in the [reStructuredText](https://docutils.sourceforge.io/rst.html) format. We also use the [Sphinx-vhdl](https://github.com/CESNET/sphinx-vhdl) for generating documentation from the VHDL code. The documentation automatically builds with each contribution to the devel/main branch and is available online here:
-- [**NDK-FPGA documentation (main branch)**](https://cesnet.github.io/ndk-fpga/main/)
+We use a documentation system based on the [Sphinx tool](https://www.sphinx-doc.org), which compiles complete documentation from source files in the [reStructuredText](https://docutils.sourceforge.io/rst.html) format. We also use the [Sphinx-vhdl](https://github.com/CESNET/sphinx-vhdl) for generating documentation from the VHDL code. The documentation automatically builds with each contribution to the devel/release branch and is available online here:
+- [**NDK-FPGA documentation (release branch)**](https://cesnet.github.io/ndk-fpga/release/)
 - [**NDK-FPGA documentation (devel branch)**](https://cesnet.github.io/ndk-fpga/devel/)
 
 ### How to manually build documentation
