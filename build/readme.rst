@@ -104,6 +104,20 @@ Those tags are currently not available, but show the way of potential extension 
 - **xilinx:usp** - Restrict for UltraScale+ platform.
 - **xilinx:sim:gty** - Inculde simulation models from highspeed transceivers.
 
+Priority for PLATFORM_TAGS
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PLATFORM_TAGS list can be potentially used also for specifying preference/priority (latter position in list means higher priority):
+``set PLATFORM_TAGS "xilinx:bram:behav xilinx:bram:macro"``
+The priority can be easily overriden simply by appending item to the list.
+(Also the ``lsearch`` can be easily used as returns -1 for non-existing item, which means lowest priority.)
+In general, the highest priority tag from set of supported tags can be obtained by the ``proc nb_preference_filter {PLATFORM_TAGS SUPPORTED_TAGS}``
+
+    .. code-block:: tcl
+
+        set SUPPORTED_PLATFORM_TAGS "xilinx altera"
+        set TARGET_TAG [nb_preference_filter $PLATFORM_TAGS $SUPPORTED_PLATFORM_TAGS]
+
 .. _extra file properties:
 
 List of properties used in MOD variables

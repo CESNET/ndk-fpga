@@ -36,6 +36,16 @@ proc nb_batch_finish {} {
     }
 }
 
+proc nb_preference_filter {PLATFORM_TAGS SUPPORTED_TAGS} {
+    set preferred ""
+    foreach tag $PLATFORM_TAGS {
+        if {$tag in $SUPPORTED_TAGS} {
+            set preferred $tag
+        }
+    }
+    return $preferred
+}
+
 # ---------------------- Common procedures ----------------------------
 # String Generation
 proc GenStr {NUM CH} {
