@@ -10,9 +10,8 @@ set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/type_pack.vhd"
 
 set MOD "$MOD $ENTITY_BASE/altdpram_wrap_ent.vhd"
 
-global SYNTH_FLAGS
-if { [info exists SYNTH_FLAGS(TOOL)] && $SYNTH_FLAGS(TOOL) != "quartus" } {
-    set MOD "$MOD $ENTITY_BASE/altdpram_wrap_empty.vhd"
-} else {
+if {"altera" in $PLATFORM_TAGS} {
     set MOD "$MOD $ENTITY_BASE/altdpram_wrap.vhd"
+} else {
+    set MOD "$MOD $ENTITY_BASE/altdpram_wrap_empty.vhd"
 }

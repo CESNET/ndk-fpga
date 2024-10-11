@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-global SYNTH_FLAGS
-
 # Set paths
 
 set PKG_BASE       "$OFM_PATH/comp/base/pkg"
@@ -19,17 +17,13 @@ set PACKAGES "$PACKAGES $OFM_PATH/comp/ver/vhdl_ver_tools/basics/basics_test_pkg
 
 set MOD "$MOD $ENTITY_BASE/dsp_comparator_intel_ent.vhd"
 
-if { [info exists SYNTH_FLAGS(TOOL)] && $SYNTH_FLAGS(TOOL) == "vivado" } {
-
-    set MOD "$MOD $ENTITY_BASE/dsp_comparator_intel_empty.vhd"
-
-} else {
-
+if {"altera" in $PLATFORM_TAGS} {
     set COMPONENTS [list \
         [list "AGILEX_COMP"    $AGILEX_BASE    "FULL"] \
         [list "STRATIX10_COMP" $STRATIX10_BASE "FULL"] \
     ]
 
     set MOD "$MOD $ENTITY_BASE/dsp_comparator_intel.vhd"
-
+} else {
+    set MOD "$MOD $ENTITY_BASE/dsp_comparator_intel_empty.vhd"
 }
