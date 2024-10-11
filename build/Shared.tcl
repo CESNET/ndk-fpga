@@ -347,8 +347,11 @@ proc ApplyToComponent {COMPONENT COMMAND FILES SV_LIBS LEVEL EVAL_COMP} {
 
     # script execution ----------------------------
     global NB_COMP_BASE
+    global NB_PLATFORM_TAGS
     global OFM_PATH
     global FIRMWARE_BASE
+
+    set PLATFORM_TAGS $NB_PLATFORM_TAGS
     set COMP_BASE $NB_COMP_BASE
     set MOD ""
     set SV_LIB ""

@@ -247,6 +247,10 @@ proc nb_sanitize_vars {synth_flags hierarchy} {
 
     set SYNTH_FLAGS(TOOL) "synplify"
 
+    global NB_PLATFORM_TAGS
+    global PLATFORM_TAGS
+    set NB_PLATFORM_TAGS "$PLATFORM_TAGS"
+
     # Set default values
     if {![info exists SYNTH_FLAGS(PROJ_ONLY)]} {
         set SYNTH_FLAGS(PROJ_ONLY) false
