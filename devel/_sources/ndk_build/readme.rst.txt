@@ -83,6 +83,41 @@ Variables ``ENTITY``, ``ENTITY_BASE`` and ``ARCHGRP`` are predefined (provided) 
   Prefer to use :tcl:`lappend MOD "myfile.vhd"` instead of :tcl:`set MOD "$MOD myfile.vhd"`,
   because the ``lappend`` better express the operation and is faster.
 
+PLATFORM_TAGS
+~~~~~~~~~~~~~
+
+In the situation, when a platform (build tool: Quartus, Vivado, simulator: Questa Sim, etc.) supports various architectures / implementation schemes,
+the PLATFORM_TAGS list variable can be used to distinguish, which source file should be included into project.
+
+List of available platforms:
+
+- **xilinx** - platform supports complete set of Xilinx component and products
+- **altera** - platform supports complete set of Intel/Altera component and products
+
+.. - **empty** - platform, on which the empty architectures are enabled; this is used e.g. when user wants to check the code syntax even if the codebase for toplevel is not completed yet.
+
+.. If the component doesn't have common/universal platform implementation and the "empty" tag is not in PLATFORM_TAGS, the process should exit with error.
+
+Those tags are currently not available, but show the way of potential extension and usage:
+
+- **vivado:ge_2024.0** - Vivado version is equal or greater than 2024.0 (this doesn't means automatic comparison)
+- **xilinx:usp** - Restrict for UltraScale+ platform.
+- **xilinx:sim:gty** - Inculde simulation models from highspeed transceivers.
+
+Priority for PLATFORM_TAGS
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PLATFORM_TAGS list can be potentially used also for specifying preference/priority (latter position in list means higher priority):
+``set PLATFORM_TAGS "xilinx:bram:behav xilinx:bram:macro"``
+The priority can be easily overriden simply by appending item to the list.
+(Also the ``lsearch`` can be easily used as returns -1 for non-existing item, which means lowest priority.)
+In general, the highest priority tag from set of supported tags can be obtained by the ``proc nb_preference_filter {PLATFORM_TAGS SUPPORTED_TAGS}``
+
+    .. code-block:: tcl
+
+        set SUPPORTED_PLATFORM_TAGS "xilinx altera"
+        set TARGET_TAG [nb_preference_filter $PLATFORM_TAGS $SUPPORTED_PLATFORM_TAGS]
+
 .. _extra file properties:
 
 List of properties used in MOD variables
