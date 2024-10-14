@@ -42,6 +42,15 @@ package type_pack is
   -- This function returns a new array where each element is a sliced portion of the original array's elements.
   function slv_array_slice (arr: slv_array_t; hi, lo: natural) return slv_array_t;
 
+  -- Functions to concatenate either items of one array and a bit(s) of a vector or items of 2 arrays.
+  -- Standard concatenation order: bits of the TOP vector/array are placed on top of the bits of the BASE array.
+  -- Reversed concatenation order: bits of the BASE array are placed on top of the bits of the TOP vector/array.
+  -- Concatenation MODE:
+  --  - 0: concatenate one bit of the top vector/one Item of the top array to the base array.
+  --  - 1: concatenate the whole top vector/all items(serialized) of the top array to the base array.
+  function concat_arr(base: slv_array_t; top: std_logic_vector; reverse: boolean := false; mode: integer := 0) return slv_array_t;
+  function concat_arr(base: slv_array_t; top: slv_array_t;      reverse: boolean := false; mode: integer := 0) return slv_array_t;
+
   -- Array of std_array_t
   -- type slv_array_2d_t is array (natural range <>) of slv_array_t
   type slv_array_2d_t is array (natural range <>) of slv_array_t;
@@ -294,6 +303,81 @@ package body type_pack is
       end loop;
       return ret;
    end function;
+
+   function concat_arr(base: slv_array_t; top: slv_array_t; reverse: boolean := false; mode: integer := 0) return slv_array_t is
+      variable arr_m0  : slv_array_t     (base'length-1 downto 0)(base(0)'length+top(0)'length           -1 downto 0);
+      variable arr_m1  : slv_array_t     (base'length-1 downto 0)(base(0)'length+top(0)'length*top'length-1 downto 0);
+      variable top_ser : std_logic_vector(                                       top(0)'length*top'length-1 downto 0);
+   begin
+      assert (top'length = base'length) or (mode = 1)
+         report "concat_arr: Arrays must have the same number of Items!"
+         severity Failure;
+
+      if (reverse) then
+         -- Reverse mode does not really make sense here, though.
+         -- You could just switch the order of the arrays when sending them to the function.
+         if (mode = 0) then
+            for i in 0 to base'length-1 loop
+                  arr_m0(i) := base(i) & top(i);
+            end loop;
+            return arr_m0;
+         else
+            top_ser := slv_array_ser(top);
+            for i in 0 to base'length-1 loop
+                  arr_m1(i) := base(i) & top_ser;
+            end loop;
+            return arr_m1;
+         end if;
+      else
+         if (mode = 0) then
+            for i in 0 to base'length-1 loop
+                  arr_m0(i) := top(i) & base(i);
+            end loop;
+            return arr_m0;
+         else
+            top_ser := slv_array_ser(top);
+            for i in 0 to base'length-1 loop
+                  arr_m1(i) := top_ser & base(i);
+            end loop;
+            return arr_m1;
+         end if;
+      end if;
+   end;
+
+   function concat_arr(base: slv_array_t; top: std_logic_vector; reverse: boolean := false; mode: integer := 0) return slv_array_t is
+      variable arr_m0 : slv_array_t(base'length-1 downto 0)(base(0)'length+1         -1 downto 0);
+      variable arr_m1 : slv_array_t(base'length-1 downto 0)(base(0)'length+top'length-1 downto 0);
+   begin
+      assert (top'length = base'length) or (mode = 1)
+         report "concat_arr: The Vector must be as wide as the Array has Items!"
+         severity Failure;
+
+      if (reverse) then
+         if (mode = 0) then
+            for i in 0 to base'length-1 loop
+                  arr_m0(i) := base(i) & top(i);
+            end loop;
+            return arr_m0;
+         else
+            for i in 0 to base'length-1 loop
+                  arr_m1(i) := base(i) & top;
+            end loop;
+            return arr_m1;
+         end if;
+      else
+         if (mode = 0) then
+            for i in 0 to base'length-1 loop
+                  arr_m0(i) := top(i) & base(i);
+            end loop;
+            return arr_m0;
+         else
+            for i in 0 to base'length-1 loop
+                  arr_m1(i) := top & base(i);
+            end loop;
+            return arr_m1;
+         end if;
+      end if;
+   end;
 
    function slv_array_2d_ser(slv_array_2d: slv_array_2d_t; ITEMS_X: integer; ITEMS_Y: integer; DATA_WIDTH: integer) return std_logic_vector is
       variable rv : std_logic_vector(ITEMS_X*ITEMS_Y*DATA_WIDTH-1 downto 0);
