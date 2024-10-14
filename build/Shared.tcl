@@ -36,6 +36,16 @@ proc nb_batch_finish {} {
     }
 }
 
+proc nb_preference_filter {PLATFORM_TAGS SUPPORTED_TAGS} {
+    set preferred ""
+    foreach tag $PLATFORM_TAGS {
+        if {$tag in $SUPPORTED_TAGS} {
+            set preferred $tag
+        }
+    }
+    return $preferred
+}
+
 # ---------------------- Common procedures ----------------------------
 # String Generation
 proc GenStr {NUM CH} {
@@ -347,8 +357,11 @@ proc ApplyToComponent {COMPONENT COMMAND FILES SV_LIBS LEVEL EVAL_COMP} {
 
     # script execution ----------------------------
     global NB_COMP_BASE
+    global NB_PLATFORM_TAGS
     global OFM_PATH
     global FIRMWARE_BASE
+
+    set PLATFORM_TAGS $NB_PLATFORM_TAGS
     set COMP_BASE $NB_COMP_BASE
     set MOD ""
     set SV_LIB ""

@@ -5,21 +5,16 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-global SYNTH_FLAGS
 
 # Set paths
 set MOD "$MOD $ENTITY_BASE/count_dsp_ent.vhd"
 
-if { [info exists SYNTH_FLAGS(TOOL)] && $SYNTH_FLAGS(TOOL) == "quartus" } {
-
-    set MOD "$MOD $ENTITY_BASE/count_dsp_empty.vhd"
-
-} else {
-
+if {"xilinx" in $PLATFORM_TAGS} {
     set MOD "$MOD $ENTITY_BASE/count48.vhd"
     set MOD "$MOD $ENTITY_BASE/count_dsp.vhd"
 
     # COUNT_TOP with input and output registers for measurements
     # set MOD "$MOD $ENTITY_BASE/synth/count_top.vhd"
-
+} else {
+    set MOD "$MOD $ENTITY_BASE/count_dsp_empty.vhd"
 }

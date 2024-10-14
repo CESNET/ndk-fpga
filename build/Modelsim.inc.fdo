@@ -294,6 +294,14 @@ proc nb_sim_sanitize_vars {user_sim_flags sim_flags hierarchy VARS} {
     lappend MOD
     lappend TB_FILE
 
+    global NB_PLATFORM_TAGS env
+
+    if {[info exists env(PLATFORM_TAGS)]} {
+        set NB_PLATFORM_TAGS "$env(PLATFORM_TAGS)"
+    } else {
+        set NB_PLATFORM_TAGS "altera xilinx"
+    }
+
     set HIERARCHY(PACKAGES) $PACKAGES
     set HIERARCHY(COMPONENTS) $COMPONENTS
     set HIERARCHY(MOD) $MOD

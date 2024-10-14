@@ -588,6 +588,13 @@ proc nb_sanitize_vars {synth_flags hierarchy} {
 
     set SYNTH_FLAGS(TOOL) "quartus"
 
+    global NB_PLATFORM_TAGS env
+    if {[info exists env(PLATFORM_TAGS)]} {
+        set NB_PLATFORM_TAGS "$env(PLATFORM_TAGS)"
+    } else {
+        set NB_PLATFORM_TAGS "altera"
+    }
+
     # Set default values
     if {![info exists SYNTH_FLAGS(PROJ_ONLY)]} {
         set SYNTH_FLAGS(PROJ_ONLY) false

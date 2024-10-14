@@ -9,10 +9,9 @@ set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/type_pack.vhd"
 
 set MOD "$MOD $ENTITY_BASE/fifo_bram_xilinx_ent.vhd"
 
-global SYNTH_FLAGS
-if { [info exists SYNTH_FLAGS(TOOL)] && $SYNTH_FLAGS(TOOL) == "quartus" } {
-    set MOD "$MOD $ENTITY_BASE/fifo_bram_xilinx_empty.vhd"
-} else {
+if {"xilinx" in $PLATFORM_TAGS} {
     set MOD "$MOD $ENTITY_BASE/fifo_bram_xilinx.vhd"
     lappend SRCS(CONSTR_VIVADO) [list $ENTITY_BASE/fifo_bram_xilinx.xdc SCOPED_TO_REF FIFO_BRAM_XILINX]
+} else {
+    set MOD "$MOD $ENTITY_BASE/fifo_bram_xilinx_empty.vhd"
 }
