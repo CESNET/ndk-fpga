@@ -100,7 +100,7 @@ class env #(
             cfg_eth_tx.interface_name = $sformatf("vif_eth_tx_%0d", it);
             uvm_config_db #(uvm_logic_vector_array_intel_mac_seg::config_item)::set(this, $sformatf("m_eth_tx_%0d", it), "m_config", cfg_eth_tx);
             m_eth_tx[it] = uvm_logic_vector_array_intel_mac_seg::env_tx #(SEGMENTS)::type_id::create($sformatf("m_eth_tx_%0d", it), this);
-            
+
             m_tx_error_trimmer[it] = tx_error_trimmer::type_id::create($sformatf("m_tx_error_trimmer_%0d", it), this);
         end
     endfunction

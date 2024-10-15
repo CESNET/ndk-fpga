@@ -46,7 +46,7 @@ set_location_assignment PIN_AU2 -to QSFP_TX_N[0]
 set_location_assignment PIN_AV1 -to QSFP_TX_P[0]
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 set_instance_assignment  -name IO_STANDARD "DIFFERENTIAL LVPECL" -to QSFP_REFCLK_156M
@@ -61,4 +61,4 @@ set_global_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_use_as_bti_clock=true" -to QSFP_REFCLK_156M
 
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP_TX_P
-set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP_RX_P                                                             
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP_RX_P

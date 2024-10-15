@@ -2,7 +2,7 @@
 // Copyright (C) 2022 CESNET z. s. p. o.
 // Author(s): Daniel Kondys <xkondy00@vutbr.cz>
 
-// SPDX-License-Identifier: BSD-3-Clause 
+// SPDX-License-Identifier: BSD-3-Clause
 
 class model_data#(ITEM_WIDTH, META_WIDTH) extends uvm_common::sequence_item;
     `uvm_object_param_utils(net_mod_logic_env::model_data#(ITEM_WIDTH, META_WIDTH))
@@ -127,7 +127,7 @@ class model #(CHANNELS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH) extends uvm_component
 
     task run_phase(uvm_phase phase);
         for (int unsigned ch = 0; ch < CHANNELS; ch++) begin
-            fork 
+            fork
                 automatic int unsigned index = ch;
                 rx_run(index);
             join_none;

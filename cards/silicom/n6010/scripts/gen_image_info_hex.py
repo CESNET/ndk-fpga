@@ -11,7 +11,8 @@ import sys
 import binascii
 
 logging.basicConfig(level=0)
-LOGGER= logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
+
 
 def checksum_calc(address, value):
     int_value = int(value, 16)
@@ -31,16 +32,18 @@ def checksum_calc(address, value):
     checksum_return = format(checksum_val, '02X')
     return checksum_return
 
+
 def bit_reversal(value):
     reversed_value = ""
-    for i in range(0,len(value),2): # Grab two hex digits (byte) and reverse the bits.
+    for i in range(0, len(value), 2): # Grab two hex digits (byte) and reverse the bits.
         byte = value[i:i+2]
-        byte_int = int(byte,16)
+        byte_int = int(byte, 16)
         byte_reversed = '{:08b}'.format(byte_int)[::-1]
-        byte_hex = int(byte_reversed,2)
+        byte_hex = int(byte_reversed, 2)
         byte_reversed_str = format(byte_hex, '02X')
         reversed_value = reversed_value + byte_reversed_str
     return reversed_value
+
 
 def main(args):
     address = 0x0000
@@ -79,7 +82,7 @@ def main(args):
     words = words + id_second
     id_second_bytes = id_second.encode()
     id_second_hex_bytes = binascii.hexlify(id_second_bytes)
-    id_second_hex = bit_reversal(str(id_second_hex_bytes, 'utf-8')) 
+    id_second_hex = bit_reversal(str(id_second_hex_bytes, 'utf-8'))
     id_second_hex_front_half = id_second_hex[:16]
     id_second_hex_back_half  = id_second_hex[16:]
     id_second_hex_front_half_checksum = checksum_calc(address, id_second_hex_front_half)

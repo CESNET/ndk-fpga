@@ -160,7 +160,7 @@ set_location_assignment PIN_AN47 -to PCIE1_TX_N[0]
 set_location_assignment PIN_AN48 -to PCIE1_TX_P[0]
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 set_instance_assignment -name IO_STANDARD HCSL -to PCIE0_SYSCLK1_P

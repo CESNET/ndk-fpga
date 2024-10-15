@@ -1,7 +1,7 @@
 /*
  * file       : test_pkg.sv
  * Copyright (C) 2021 CESNET z. s. p. o.
- * description: DUT configuration file. This file contains top level generic paramet 
+ * description: DUT configuration file. This file contains top level generic paramet
  * date       : 2021
  * author     : Radek Iša <isa@cesnet.ch>
  *

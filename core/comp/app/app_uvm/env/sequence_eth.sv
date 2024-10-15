@@ -452,7 +452,7 @@ class sequence_search_eth  #(
     };
 
     constraint c_eth{
-        foreach(eth_next_prot[it]) { 
+        foreach(eth_next_prot[it]) {
             eth_next_prot[it] >= 0;
             eth_next_prot[it]  < 10;
         }
@@ -460,7 +460,7 @@ class sequence_search_eth  #(
     };
 
     constraint c_vlan{
-        foreach(vlan_next_prot[it]) { 
+        foreach(vlan_next_prot[it]) {
             vlan_next_prot[it] >= 0;
             vlan_next_prot[it]  < 10;
         }
@@ -468,7 +468,7 @@ class sequence_search_eth  #(
     };
 
     constraint c_ppp{
-        foreach(ppp_next_prot[it]) { 
+        foreach(ppp_next_prot[it]) {
             ppp_next_prot[it] >= 0;
             ppp_next_prot[it]  < 10;
         }
@@ -476,7 +476,7 @@ class sequence_search_eth  #(
     };
 
     constraint c_mpls{
-        foreach(mpls_next_prot[it]) { 
+        foreach(mpls_next_prot[it]) {
             mpls_next_prot[it] >= 0;
             mpls_next_prot[it]  < 10;
         }
@@ -484,7 +484,7 @@ class sequence_search_eth  #(
     };
 
     constraint c_ipv4{
-        foreach(ipv4_next_prot[it]) { 
+        foreach(ipv4_next_prot[it]) {
             ipv4_next_prot[it] >= 0;
             ipv4_next_prot[it]  < 10;
         }
@@ -492,7 +492,7 @@ class sequence_search_eth  #(
     };
 
     constraint c_ipv6{
-        foreach(ipv6_next_prot[it]) { 
+        foreach(ipv6_next_prot[it]) {
             ipv6_next_prot[it] >= 0;
             ipv6_next_prot[it]  < 10;
         }
@@ -500,7 +500,7 @@ class sequence_search_eth  #(
     };
 
     constraint c_proto{
-        foreach(proto_next_prot[it]) { 
+        foreach(proto_next_prot[it]) {
             proto_next_prot[it] >= 0;
             proto_next_prot[it]  < 10;
         }

@@ -84,7 +84,7 @@ set_location_assignment PIN_E69  -to pcie_ep_tx_n[14]
 set_location_assignment PIN_P69  -to pcie_ep_tx_n[15]
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 set_instance_assignment -name IO_STANDARD "1.0 V" -to fpga_pcie_perstn

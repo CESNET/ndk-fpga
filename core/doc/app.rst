@@ -69,7 +69,7 @@ The application sends packets to the DMA module over two buses, MVB and MFB (``D
 - ``MVB_CHANNEL`` - the DMA channel number
 - ``MVB_DISCARD`` - A discard flag (the packet is discarded on the DMA input when you set this flag to 1)
 
-The MFB bus transfers the packet data, which may contain a user header before the payload data (e.g., an Ethernet packet). 
+The MFB bus transfers the packet data, which may contain a user header before the payload data (e.g., an Ethernet packet).
 You can determine the presence of the user header and its length from the metadata in the ``DMA_RX_MVB_HDR_META`` signal (see the previous section).
 The minimum allowed length of the packet data is 60B, if necessary, the application must add padding to the packet.
 

@@ -15,7 +15,7 @@ class virt_sequence_port #(
     int unsigned BLOCK_SIZE,
 
     int unsigned ETH_PORT_CHAN,
-    
+
     int unsigned MI_DATA_WIDTH,
     int unsigned MI_ADDR_WIDTH
 ) extends uvm_network_mod_env::virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH);
@@ -158,7 +158,7 @@ class virt_sequence_port #(
                 rx_stats.start(null);
                 tx_stats.start(null);
             join
- 
+
             `uvm_info(this.get_full_name(),
                 $sformatf("RX channel %s base [%0d]\n\tSTATS trfc %0d cfc %0d dfc %0d bodfc %0d oroc %0d\n", m_sequencer.get_full_name(), it, rx_stats.trfc, rx_stats.cfc, rx_stats.dfc, rx_stats.bodfc, rx_stats.oroc),
                 UVM_LOW);
@@ -221,7 +221,7 @@ endclass
 class virt_sequence_port_stop #(
     int unsigned ETH_TX_HDR_WIDTH,
     int unsigned ETH_RX_HDR_WIDTH,
-    
+
     int unsigned ITEM_WIDTH,
     int unsigned REGIONS,
     int unsigned REGION_SIZE,
@@ -354,7 +354,7 @@ class virt_sequence_simple #(
 
     task pre_body();
         super.pre_body();
-        
+
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) cast_virt_sequence_port;
             assert($cast(cast_virt_sequence_port, port[it]))
@@ -443,7 +443,7 @@ class virt_sequence_stop #(
     int unsigned ETH_PORTS,
     int unsigned ETH_TX_HDR_WIDTH,
     int unsigned ETH_RX_HDR_WIDTH,
-    
+
     int unsigned ITEM_WIDTH,
     int unsigned REGIONS,
     int unsigned REGION_SIZE,
@@ -457,7 +457,7 @@ class virt_sequence_stop #(
     `uvm_object_param_utils(uvm_network_mod_f_tile_env::virt_sequence_stop #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
     protected uvm_logic_vector_array::config_sequence eth_rx_seq_cfg[ETH_PORTS];
-    
+
     function new(string name = "virt_sequence_stop");
         super.new(name);
     endfunction

@@ -18,17 +18,17 @@ set_location_assignment PIN_BK21 -to LED_USR_Y_RGY2
 set_location_assignment PIN_BL21 -to LED_USR_G_RGY2
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
-set_instance_assignment -name IO_STANDARD LVDS -to UFPGA_CLK100 
+set_instance_assignment -name IO_STANDARD LVDS -to UFPGA_CLK100
 
-set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_R_RGY1  
-set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_Y_RGY1  
-set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_G_RGY1  
-set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_R_RGY2  
-set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_Y_RGY2  
-set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_G_RGY2  
+set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_R_RGY1
+set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_Y_RGY1
+set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_G_RGY1
+set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_R_RGY2
+set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_Y_RGY2
+set_instance_assignment -name IO_STANDARD "1.8 V" -to LED_USR_G_RGY2
 
 # ==============================================================================
 # Others assignments

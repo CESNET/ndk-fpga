@@ -30,8 +30,8 @@ class mac_control extends uvm_reg;
                           0   , // Value on reset
                           1   , // Can the value be reset?
                           0   , // Can the value be randomized?
-                          0     // Does the field occupy an entire byte lane? 
+                          0     // Does the field occupy an entire byte lane?
                                );
-        
+
     endfunction
 endclass

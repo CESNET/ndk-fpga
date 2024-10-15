@@ -10,7 +10,8 @@ import re
 import sys
 
 logging.basicConfig(level=0)
-LOGGER= logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
+
 
 def main(args):
     pof_map = args.map_file.read().decode('utf-8')
@@ -28,6 +29,7 @@ def main(args):
     args.in_file.seek(start)
     bs = args.in_file.read(bs_len)
     args.out_file.write(bs)
+
 
 if __name__ == '__main__':
 

@@ -12,18 +12,18 @@ set_property PACKAGE_PIN BE21    [get_ports {QSFP0_INT_N}]
 set_property PACKAGE_PIN AV21    [get_ports {QSFP1_INT_N}]
 set_property IOSTANDARD LVCMOS12 [get_ports {QSFP?_INT_N}]
 set_property PULLUP true         [get_ports {QSFP?_INT_N}]
-                                                                 
+
 set_property PACKAGE_PIN BD18    [get_ports {QSFP0_LPMODE}]
 set_property PACKAGE_PIN AV22    [get_ports {QSFP1_LPMODE}]
 set_property IOSTANDARD LVCMOS12 [get_ports {QSFP?_LPMODE}]
 set_property SLEW SLOW           [get_ports {QSFP?_LPMODE}]
 set_property DRIVE 8             [get_ports {QSFP?_LPMODE}]
-                                                                 
+
 set_property PACKAGE_PIN BE20    [get_ports {QSFP0_MODPRS_N}]
 set_property PACKAGE_PIN BC19    [get_ports {QSFP1_MODPRS_N}]
 set_property IOSTANDARD LVCMOS12 [get_ports {QSFP?_MODPRS_N}]
 set_property PULLUP true         [get_ports {QSFP?_MODPRS_N}]
-                                                                 
+
 set_property PACKAGE_PIN BE17    [get_ports {QSFP0_RESET_N}]
 set_property PACKAGE_PIN BC18    [get_ports {QSFP1_RESET_N}]
 set_property IOSTANDARD LVCMOS12 [get_ports {QSFP?_RESET_N}]
@@ -44,13 +44,13 @@ set_property SLEW SLOW           [get_ports {QSFP?_RESET_N}]
 #set_property SLEW SLOW           [get_ports {QSFP?_FREQ_SEL[*]}]
 #set_property DRIVE 8             [get_ports {QSFP?_FREQ_SEL[*]}]
 
-#TODO I2C                                                              
+#TODO I2C
 #set_property PACKAGE_PIN B8      [get_ports {QSFP0_SCL}]
 #set_property PACKAGE_PIN C9      [get_ports {QSFP1_SCL}]
 #set_property IOSTANDARD LVCMOS12 [get_ports {QSFP?_SCL}]
 #set_property DRIVE 4             [get_ports {QSFP?_SCL}]
 #set_property SLEW SLOW           [get_ports {QSFP?_SCL}]
-#                                                                 
+#
 #set_property PACKAGE_PIN B7      [get_ports {QSFP0_SDA}]
 #set_property PACKAGE_PIN D8      [get_ports {QSFP1_SDA}]
 #set_property IOSTANDARD LVCMOS12 [get_ports {QSFP?_SDA}]

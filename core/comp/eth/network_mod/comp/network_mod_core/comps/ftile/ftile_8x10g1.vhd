@@ -187,7 +187,7 @@ architecture FULL of FTILE_8x10g1 is
     signal drpaddr  : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0);
     signal drpardy  : std_logic;
     signal drpdi    : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal drpsel   : std_logic_vector(4-1 downto 0); 
+    signal drpsel   : std_logic_vector(4-1 downto 0);
 
     -- signals for mi_sel => IP core interface
     signal reconfig_addr           :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
@@ -297,7 +297,7 @@ begin
         BLK_ERR_CNTR             => (others => '0'),
         BLK_ERR_CLR              => open,
         SCR_BYPASS               => open,
-        PCS_RESET                => mgmt_pcs_reset, --TODO 
+        PCS_RESET                => mgmt_pcs_reset, --TODO
         PCS_LPBCK                => open,
         PCS_CONTROL(0)           => mgmt_mac_loop,
         PCS_CONTROL(15 downto 1) => mgmt_pcs_control_dummy,
@@ -313,7 +313,7 @@ begin
         PMA_LOPWR                => open,
         PMA_LPBCK                => open,
         PMA_REM_LPBCK            => open,
-        PMA_RESET                => mgmt_pma_reset, --TODO 
+        PMA_RESET                => mgmt_pma_reset, --TODO
         PMA_RETUNE               => open,
         PMA_CONTROL              => open,
         PMA_STATUS               => (others => '0'),
@@ -605,7 +605,7 @@ begin
             OUT_MAC_READY      => ftile_tx_mac_ready
         );
 
-    
+
     ftile_tx_mux: process(all)
     begin
         if sync_repeater_ctrl = '1' then

@@ -306,7 +306,7 @@ are visible in the `*.inc.tcl` files and can be added to the array.
 Adding constants to the VHDL package
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 It is recommended to add card-specific constants to the ``combo_user_const`` VHDL
-package in `card_const.tcl` file. The way of adding these constants was described in 
+package in `card_const.tcl` file. The way of adding these constants was described in
 the :ref:`core_config_vhdl_pkg_const` section in the documentation of NDK-CORE
 configuration.
 

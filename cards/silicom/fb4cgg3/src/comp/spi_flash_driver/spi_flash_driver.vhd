@@ -57,7 +57,7 @@ architecture FULL of SPI_FLASH_DRIVER is
     signal rd_cnt_next        : unsigned(log2(RD_CLK_TIME)-1 downto 0);
     signal spi_done           : std_logic;
     signal spi_rd_data        : std_logic_vector(WORD_SIZE-1 downto 0);
-    
+
     signal spi_clk_reg        : std_logic;
     signal spi_cs_n_reg       : std_logic;
     signal spi_mosi_reg       : std_logic;
@@ -66,7 +66,7 @@ architecture FULL of SPI_FLASH_DRIVER is
     signal spi_mosi_next      : std_logic;
 
 begin
- 
+
     process(CLK)
     begin
         if rising_edge(CLK) then
@@ -80,7 +80,7 @@ begin
                 else -- second part of flash need more time before read
                     rd_start_delay_reg <= X"800";
                 end if;
-            end if; 
+            end if;
         end if;
     end process;
 
@@ -124,7 +124,7 @@ begin
             end if;
         end if;
     end process;
-    
+
     process (all)
     begin
         spi_fsm_nst   <= spi_fsm_pst;
@@ -225,7 +225,7 @@ begin
                     wait_cnt_next <= wait_cnt_reg + 1;
                     spi_fsm_nst <= st_read_sample;
                 end if;
- 
+
             when st_read_done =>
                 miso_reg_next <= miso_reg(miso_reg'high-1 downto 0) & SPI_MISO;
                 spi_done <= '1';

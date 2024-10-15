@@ -50,7 +50,7 @@ port (
     AG_M10_REBOOT_N  : out   std_logic; -- MAX10 reboot request
     M10_AG_STATUS_N  : in    std_logic; -- MAX10 status
     M10_AG_DONE      : in    std_logic; -- MAX10 configuration done
-        
+
     -- =========================================================================
     --  AGILEX CONFIGURATION REUEST INTERFACE
     -- =========================================================================
@@ -70,7 +70,7 @@ port (
     --FLASH_RY_BY_N           : in    std_logic;                     -- Memory Ready/busy signal (both)
     --FLASH_BYTE_N            : out   std_logic;                     -- Memory data bus width (8bits for both, active is LOW)
     --FLASH_WP_N              : out   std_logic;                     -- Memory data Write protect signal (for both, active is LOW)
-    --FLASH_RST_N             : out   std_logic;                     -- Memory reset signal (for both, active is LOW)     
+    --FLASH_RST_N             : out   std_logic;                     -- Memory reset signal (for both, active is LOW)
 
     -- =========================================================================
     --  PCIE INTERFACES
@@ -273,7 +273,7 @@ begin
 
     AG_I2C_SCLK	<= 'Z';
     AG_I2C_SDA	<= 'Z';
-    
+
     AG_SOFT_RST  <= '0';
     AG_M10_RST_N <= '1';
 

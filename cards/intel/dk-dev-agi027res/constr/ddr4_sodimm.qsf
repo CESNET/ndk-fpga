@@ -156,7 +156,7 @@ set_location_assignment PIN_L32     -to DDR4_DDIMM_DQS_N[2]
 set_location_assignment PIN_AD30    -to DDR4_DDIMM_DQS_N[0]
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_DIMM_SCL

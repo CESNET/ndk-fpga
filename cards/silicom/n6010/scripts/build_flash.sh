@@ -27,13 +27,13 @@ FACTORY_SOF_PRESENT="0"
 FACTORY_HPS_SOF_PRESENT="0"
 GEN_TYPE=""
 
-# This script assumes that the calling shell has already changed the CWD 
+# This script assumes that the calling shell has already changed the CWD
 # to this directory.
 SCRIPT=$(realpath "$0")
 WORK_DIR=`realpath .`
 LOCAL_SCRIPT_DIR=$(dirname "$SCRIPT")
 
-# check for factory_image.sof, if not available, 
+# check for factory_image.sof, if not available,
 # copy over the ofs_fim.sof as the factory
 if [ -e ${WORK_DIR}/${FACTORY_HPS_SOF} ]; then
    echo "Using ${FACTORY_HPS_SOF} as the factory image."
@@ -69,7 +69,7 @@ python3 ${LOCAL_SCRIPT_DIR}/gen_image_info_hex.py ${LOCAL_SCRIPT_DIR}/${fme_mif_
 #objcopy -I binary -O ihex ${LOCAL_SCRIPT_DIR}/blank_bmc_root_hash.reversed ${LOCAL_SCRIPT_DIR}/blank_bmc_root_hash.reversed.hex
 
 ## blank sr (FIM) key - 4 bytes of FF
-#python ${LOCAL_SCRIPT_DIR}/reverse.py ${LOCAL_SCRIPT_DIR}/blank_sr_key_programmed ${LOCAL_SCRIPT_DIR}/blank_sr_key_programmed.reversed 
+#python ${LOCAL_SCRIPT_DIR}/reverse.py ${LOCAL_SCRIPT_DIR}/blank_sr_key_programmed ${LOCAL_SCRIPT_DIR}/blank_sr_key_programmed.reversed
 #objcopy -I binary -O ihex blank_sr_key_programmed.reversed blank_sr_key_programmed.reversed.hex
 
 ## blank sr (FIM) root key hash - 32 bytes of FF
@@ -141,7 +141,7 @@ python3 ${LOCAL_SCRIPT_DIR}/extract_bitstream.py ${WORK_DIR}/${GEN_TYPE}_pof.map
 python3 ${LOCAL_SCRIPT_DIR}/extract_bitstream.py ${WORK_DIR}/${GEN_TYPE}_pof.map ${WORK_DIR}/${GEN_TYPE}.bin ${WORK_DIR}/$pacsign_infile_user1 "User_Image_1"
 python3 ${LOCAL_SCRIPT_DIR}/extract_bitstream.py ${WORK_DIR}/${GEN_TYPE}_pof.map ${WORK_DIR}/${GEN_TYPE}.bin ${WORK_DIR}/$pacsign_infile_user2 "User_Image_2"
 
-# -- read the image info txt string to pass to pacsign 
+# -- read the image info txt string to pass to pacsign
 value_factory=$(<${LOCAL_SCRIPT_DIR}/../${factory_image_info_text})
 value_user1=$(<${LOCAL_SCRIPT_DIR}/../${user1_image_info_text})
 value_user2=$(<${LOCAL_SCRIPT_DIR}/../${user2_image_info_text})
@@ -151,7 +151,7 @@ value_user2=$(<${LOCAL_SCRIPT_DIR}/../${user2_image_info_text})
 # uncomment following line if mfg image is desired
 #python3 ${LOCAL_SCRIPT_DIR}/reverse.py ${LOCAL_SCRIPT_DIR}/../${GEN_TYPE}.bin ${LOCAL_SCRIPT_DIR}/../mfg_ofs_fim_reversed.bin
 
-# -- create unsigned FIM user image for fpgasupdate tool 
+# -- create unsigned FIM user image for fpgasupdate tool
 if which PACSign &> /dev/null ; then
     PACSign FACTORY -y -v -t UPDATE -H openssl_manager  -b ${value_factory} -i ${WORK_DIR}/$pacsign_infile_factory -o ${WORK_DIR}/$pacsign_outfile_factory
     PACSign SR -s 0 -y -v -t UPDATE -H openssl_manager  -b ${value_factory} -i ${WORK_DIR}/$pacsign_infile_user1 -o ${WORK_DIR}/$pacsign_outfile_user1

@@ -67,7 +67,7 @@ entity FTILE_MULTIRATE_ETH_8x25G1_8x10G1 is
         CLK_ETH_OUT              : out std_logic;
         RESET_ETH                : in  std_logic;
         -- ===================================================================
-        -- ADAPTERS link up 
+        -- ADAPTERS link up
         -- ===================================================================
         RX_LINK_UP               : out std_logic;
         TX_LINK_UP               : out std_logic;
@@ -155,7 +155,7 @@ architecture FULL of FTILE_MULTIRATE_ETH_8x25G1_8x10G1 is
     );
     end component ftile_multirate_eth_1x25g_1x10g;
 
-    -- Dynamic reconfiguration controller for the multirate IP 
+    -- Dynamic reconfiguration controller for the multirate IP
     component dr_ctrl is
     port (
         i_csr_clk                     : in  std_logic                     := 'X';             -- clk
@@ -199,7 +199,7 @@ architecture FULL of FTILE_MULTIRATE_ETH_8x25G1_8x10G1 is
     -- constants for IP core setup
     constant NUM_LANES     : natural   :=  1;
     constant PMA_LANES     : natural   :=  1;
-    constant ETH_PORT_CHAN : natural   :=  1;    
+    constant ETH_PORT_CHAN : natural   :=  1;
     constant SPEED         : natural   := 25;
     constant SPEED_CAP     : std_logic_vector(15 downto 0) :=  X"0800";
     constant DEVICE        : string    :=  "AGILEX";
@@ -212,7 +212,7 @@ architecture FULL of FTILE_MULTIRATE_ETH_8x25G1_8x10G1 is
     ---- Adress and data range constants for eth and xcvr
     constant MI_ADDR_WIDTH_PHY : natural := 32;
     constant MI_DATA_WIDTH_PHY : natural := 32;
-    
+
     --  monitoring RX link state
     constant RX_LINK_CNT_W : natural := 27;
 
@@ -233,7 +233,7 @@ architecture FULL of FTILE_MULTIRATE_ETH_8x25G1_8x10G1 is
     signal drpaddr  : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0);
     signal drpardy  : std_logic;
     signal drpdi    : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal drpsel   : std_logic_vector(4-1 downto 0); 
+    signal drpsel   : std_logic_vector(4-1 downto 0);
 
     -- signals for mi_sel => IP core interface
     signal reconfig_addr           :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
@@ -251,7 +251,7 @@ architecture FULL of FTILE_MULTIRATE_ETH_8x25G1_8x10G1 is
     signal reconfig_writedata_drp   :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
     signal reconfig_waitrequest_drp : std_logic_vector(MI_SEL_RANGE-1 downto 0) := (others => '0');
 
-    -- signal for Ftile interface 
+    -- signal for Ftile interface
     signal ftile_rx_rst_n             : std_logic;
     signal ftile_rx_rst_ack_n         : std_logic;
     signal ftile_tx_lanes_stable      : std_logic;
@@ -516,7 +516,7 @@ begin
     mi_ardy_conversion_g: for i in PMA_LANES downto 0 generate
         reconfig_waitrequest_drp(i) <= not reconfig_waitrequest(i);
     end generate;
- 
+
     CLK_ETH_OUT <= ftile_clk_out;
     -- =========================================================================
     -- DR_CTRL

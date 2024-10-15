@@ -1,4 +1,4 @@
-//-- scoreboard.sv: scoreboard 
+//-- scoreboard.sv: scoreboard
 //-- Copyright (C) 2023 CESNET z. s. p. o.
 //-- Author(s): Radek Iša <isa@cesnet.cz>
 
@@ -76,7 +76,7 @@ class scoreboard #(ETH_CORE_ARCH, ETH_PORTS, int unsigned ETH_PORT_SPEED[ETH_POR
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
-            m_eth_tx_data[it] = uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create($sformatf("m_eth_tx_data_%0d", it), this); 
+            m_eth_tx_data[it] = uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create($sformatf("m_eth_tx_data_%0d", it), this);
             m_eth_tx_hdr [it] = uvm_common::comparer_ordered#(uvm_logic_vector::sequence_item#(1))::type_id::create($sformatf("m_eth_tx_hdr_%0d", it), this);
 
             m_usr_tx_data[it] = uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create($sformatf("m_usr_tx_data_%0d", it), this);

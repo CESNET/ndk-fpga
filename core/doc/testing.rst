@@ -42,7 +42,7 @@ The GLS module also comes with a Python script (``<NDK-APP-XXX_root_directory>/n
 
 .. code-block::
 
-    $ python3 gls_mod.py 
+    $ python3 gls_mod.py
     gls_mod.py mode [port_list]
     Example: gls_mod.py 1 "0,1"
 

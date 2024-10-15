@@ -105,7 +105,7 @@ entity PCIE_CTRL is
         --
         -- PTC ENABLE: MFB+MVB bus for transferring RQ PTC-DMA transactions.
         -- MFB+MVB bus is clocked at DMA_CLK.
-        -- PTC DISABLE: MFB bus only for transferring RQ PCIe transactions 
+        -- PTC DISABLE: MFB bus only for transferring RQ PCIe transactions
         -- (format according to the PCIe IP used). Compared to the standard MFB
         -- specification, it does not allow gaps (SRC_RDY=0) inside transactions
         -- and requires that the first transaction in a word starts at byte 0.
@@ -147,7 +147,7 @@ entity PCIE_CTRL is
         --
         -- PTC ENABLE: MFB+MVB bus for transferring RC PTC-DMA transactions.
         -- MFB+MVB bus is clocked at DMA_CLK.
-        -- PTC DISABLE: MFB bus only for transferring RC PCIe transactions 
+        -- PTC DISABLE: MFB bus only for transferring RC PCIe transactions
         -- (format according to the PCIe IP used). Compared to the standard MFB
         -- specification, it does not allow gaps (SRC_RDY=0) inside transactions
         -- and requires that the first transaction in a word starts at byte 0.
@@ -394,7 +394,7 @@ begin
         pcie_rq_mfb_prefix_arr <= slv_array_deser(pcie_rq_mfb_prefix,RQ_MFB_REGIONS);
         pcie_rq_mfb_be_arr     <= slv_array_deser(pcie_rq_mfb_be,RQ_MFB_REGIONS);
 
-        rq_mfb_meta_g: for i in 0 to RQ_MFB_REGIONS-1 generate    
+        rq_mfb_meta_g: for i in 0 to RQ_MFB_REGIONS-1 generate
             pcie_rq_mfb_meta_arr(i)(PCIE_RQ_META_HEADER) <= pcie_rq_mfb_hdr_arr(i);
             pcie_rq_mfb_meta_arr(i)(PCIE_RQ_META_PREFIX) <= pcie_rq_mfb_prefix_arr(i);
             pcie_rq_mfb_meta_arr(i)(PCIE_RQ_META_FBE) <= pcie_rq_mfb_be_arr(i)(PCIE_META_FBE_W-1 downto 0);
@@ -405,7 +405,7 @@ begin
 
         pcie_rc_mfb_meta_arr <= slv_array_deser(PCIE_RC_MFB_META,RC_MFB_REGIONS);
 
-        rc_mfb_meta_g: for i in 0 to RC_MFB_REGIONS-1 generate    
+        rc_mfb_meta_g: for i in 0 to RC_MFB_REGIONS-1 generate
             pcie_rc_mfb_hdr_arr(i)    <= pcie_rc_mfb_meta_arr(i)(PCIE_RC_META_HEADER);
             pcie_rc_mfb_prefix_arr(i) <= pcie_rc_mfb_meta_arr(i)(PCIE_RC_META_PREFIX);
         end generate;
@@ -506,7 +506,7 @@ begin
         DMA_RC_MVB_SRC_RDY <= (others => '0');
 
         PCIE_RQ_MFB_DATA      <= DMA_RQ_MFB_DATA(0);
-        PCIE_RQ_MFB_META      <= DMA_RQ_MFB_META(0); 
+        PCIE_RQ_MFB_META      <= DMA_RQ_MFB_META(0);
         PCIE_RQ_MFB_SOF       <= DMA_RQ_MFB_SOF(0);
         PCIE_RQ_MFB_EOF       <= DMA_RQ_MFB_EOF(0);
         PCIE_RQ_MFB_SOF_POS   <= DMA_RQ_MFB_SOF_POS(0);
@@ -515,7 +515,7 @@ begin
         DMA_RQ_MFB_DST_RDY(0) <= PCIE_RQ_MFB_DST_RDY;
 
         DMA_RC_MFB_DATA(0)    <= PCIE_RC_MFB_DATA;
-        DMA_RC_MFB_META(0)    <= PCIE_RC_MFB_META; 
+        DMA_RC_MFB_META(0)    <= PCIE_RC_MFB_META;
         DMA_RC_MFB_SOF(0)     <= PCIE_RC_MFB_SOF;
         DMA_RC_MFB_EOF(0)     <= PCIE_RC_MFB_EOF;
         DMA_RC_MFB_SOF_POS(0) <= PCIE_RC_MFB_SOF_POS;
@@ -556,7 +556,7 @@ begin
         port map(
             CLK             => PCIE_CLK,
             RST             => PCIE_RESET(3),
-    
+
             RX_MFB_SEL      => pcie_cq_mfb_sel,
             RX_MFB_DATA     => PCIE_CQ_MFB_DATA,
             RX_MFB_META     => PCIE_CQ_MFB_META,
@@ -566,7 +566,7 @@ begin
             RX_MFB_EOF_POS  => PCIE_CQ_MFB_EOF_POS,
             RX_MFB_SRC_RDY  => PCIE_CQ_MFB_SRC_RDY,
             RX_MFB_DST_RDY  => PCIE_CQ_MFB_DST_RDY,
-    
+
             TX0_MFB_DATA    => mtc_fifo_mfb_data,
             TX0_MFB_META    => mtc_fifo_mfb_meta,
             TX0_MFB_SOF     => mtc_fifo_mfb_sof,
@@ -575,7 +575,7 @@ begin
             TX0_MFB_EOF_POS => mtc_fifo_mfb_eof_pos,
             TX0_MFB_SRC_RDY => mtc_fifo_mfb_src_rdy,
             TX0_MFB_DST_RDY => mtc_fifo_mfb_dst_rdy,
-     
+
             TX1_MFB_DATA    => DMA_CQ_MFB_DATA(0),
             TX1_MFB_META    => DMA_CQ_MFB_META(0),
             TX1_MFB_SOF     => DMA_CQ_MFB_SOF(0),
@@ -599,7 +599,7 @@ begin
         port map(
             CLK             => PCIE_CLK,
             RST             => PCIE_RESET(4),
-    
+
             RX_MFB0_DATA    => mtc_cc_mfb_data,
             RX_MFB0_META    => mtc_cc_mfb_meta,
             RX_MFB0_SOF     => mtc_cc_mfb_sof,
@@ -608,7 +608,7 @@ begin
             RX_MFB0_EOF_POS => mtc_cc_mfb_eof_pos,
             RX_MFB0_SRC_RDY => mtc_cc_mfb_src_rdy,
             RX_MFB0_DST_RDY => mtc_cc_mfb_dst_rdy,
-    
+
             RX_MFB1_DATA    => DMA_CC_MFB_DATA(0),
             RX_MFB1_META    => DMA_CC_MFB_META(0),
             RX_MFB1_SOF     => DMA_CC_MFB_SOF(0),
@@ -617,7 +617,7 @@ begin
             RX_MFB1_EOF_POS => DMA_CC_MFB_EOF_POS(0),
             RX_MFB1_SRC_RDY => DMA_CC_MFB_SRC_RDY(0),
             RX_MFB1_DST_RDY => DMA_CC_MFB_DST_RDY(0),
-     
+
             TX_MFB_DATA     => PCIE_CC_MFB_DATA,
             TX_MFB_META     => PCIE_CC_MFB_META,
             TX_MFB_SOF      => PCIE_CC_MFB_SOF,
@@ -681,7 +681,7 @@ begin
         BAR4_BASE_ADDR    => BAR4_BASE_ADDR,
         BAR5_BASE_ADDR    => BAR5_BASE_ADDR,
         EXP_ROM_BASE_ADDR => EXP_ROM_BASE_ADDR,
-        
+
         ENDPOINT_TYPE     => ENDPOINT_TYPE,
         DEVICE            => DEVICE
     )
@@ -802,7 +802,7 @@ begin
         -- Common interface
         CLK      => MI_CLK,
         RESET    => MI_RESET,
-        
+
         -- Input MI interface
         IN_DWR   => mi_sync_dwr,
         IN_ADDR  => mi_sync_addr,
@@ -812,7 +812,7 @@ begin
         IN_DRD   => mi_sync_drd,
         IN_ARDY  => mi_sync_ardy,
         IN_DRDY  => mi_sync_drdy,
-        
+
         -- Output MI interface
         OUT_DWR  => MI_DWR,
         OUT_ADDR => MI_ADDR,

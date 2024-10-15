@@ -75,7 +75,7 @@ entity PCIE_CORE is
         PCIE_SYSRST_N       : in  std_logic_vector(PCIE_CONS-1 downto 0);
         -- nINIT_DONE output of the Reset Release Intel Stratix 10 FPGA IP
         INIT_DONE_N         : in  std_logic;
-        
+
         -- =====================================================================
         -- PCIe serial interface
         -- =====================================================================

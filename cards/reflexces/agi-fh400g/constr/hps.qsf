@@ -67,7 +67,7 @@ set_location_assignment PIN_BF34 -to HPS_DDR4_PAR
 
 set_location_assignment PIN_AA31 -to HPS_DDR4_REFCLK_P
 set_location_assignment PIN_AD32 -to HPS_DDR4_REFCLK_N
-set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to HPS_DDR4_REFCLK_P 
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to HPS_DDR4_REFCLK_P
 set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to HPS_DDR4_REFCLK_P
 
 set_location_assignment PIN_N33 -to HPS_DDR4_ADDR[0]
@@ -179,15 +179,15 @@ set_location_assignment PIN_W4 -to HPS_DDR4_DQ[3]
 
 set_location_assignment PIN_AN31 -to HPS_DDR4_OCT_RZQ
 
-set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_CLK_100MHZ 
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_CLK_100MHZ
 
 set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_LED_R
 set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_LED_G
 
-set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_CLK 
-set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_STP 
-set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DIR 
-set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_NXT 
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_CLK
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_STP
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DIR
+set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_NXT
 set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[0]
 set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[1]
 set_instance_assignment -name IO_STANDARD "1.8 V" -to HPS_USB_DATA[2]

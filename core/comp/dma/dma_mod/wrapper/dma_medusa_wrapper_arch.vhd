@@ -329,7 +329,7 @@ begin
             UP_MVB_VLD           => PCIE_RQ_MVB_VLD(DPE),
             UP_MVB_SRC_RDY       => PCIE_RQ_MVB_SRC_RDY(DPE),
             UP_MVB_DST_RDY       => PCIE_RQ_MVB_DST_RDY(DPE),
-                                                        
+
             UP_MFB_DATA          => PCIE_RQ_MFB_DATA(DPE),
             UP_MFB_SOF           => PCIE_RQ_MFB_SOF(DPE),
             UP_MFB_EOF           => PCIE_RQ_MFB_EOF(DPE),
@@ -337,12 +337,12 @@ begin
             UP_MFB_EOF_POS       => PCIE_RQ_MFB_EOF_POS(DPE),
             UP_MFB_SRC_RDY       => PCIE_RQ_MFB_SRC_RDY(DPE),
             UP_MFB_DST_RDY       => PCIE_RQ_MFB_DST_RDY(DPE),
-                                                        
+
             DOWN_MVB_DATA        => PCIE_RC_MVB_DATA(DPE),
             DOWN_MVB_VLD         => PCIE_RC_MVB_VLD(DPE),
             DOWN_MVB_SRC_RDY     => PCIE_RC_MVB_SRC_RDY(DPE),
             DOWN_MVB_DST_RDY     => PCIE_RC_MVB_DST_RDY(DPE),
-                                                        
+
             DOWN_MFB_DATA        => PCIE_RC_MFB_DATA(DPE),
             DOWN_MFB_SOF         => PCIE_RC_MFB_SOF(DPE),
             DOWN_MFB_EOF         => PCIE_RC_MFB_EOF(DPE),

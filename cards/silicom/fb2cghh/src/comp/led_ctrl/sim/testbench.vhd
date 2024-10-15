@@ -1,4 +1,4 @@
--- testbench.vhd: Simulation file 
+-- testbench.vhd: Simulation file
 -- Copyright (C) 2022 CESNET z. s. p. o.
 -- Author(s): David Beneš <benes.david2000@seznam.cz>
 --
@@ -9,13 +9,13 @@ USE ieee.std_logic_1164.ALL;
 USE IEEE.std_logic_textio.ALL;
 USE ieee.numeric_std.ALL;
 USE std.textio.ALL;
- 
+
 ENTITY TESTBENCH IS
 END TESTBENCH;
- 
-ARCHITECTURE FULL OF TESTBENCH IS 
 
-    
+ARCHITECTURE FULL OF TESTBENCH IS
+
+
    --Inputs
    signal CLK        : std_logic := '0';
    signal RST        : std_logic := '0';
@@ -29,9 +29,9 @@ ARCHITECTURE FULL OF TESTBENCH IS
 
    -- Clock period definitions
    constant clk_period : time := 20 ns;
-                          
+
 BEGIN
- 
+
     -- Instantiate the Unit Under Test (UUT)
    uut_i: entity work.LED_SERIAL_CTRL
     PORT MAP (
@@ -41,7 +41,7 @@ BEGIN
           GREEN_LED     => green_LED,
           LED_SDI       => LED_SDI,
           LED_CLK       => LED_CLK,
-          LED_LE        => LED_LE 
+          LED_LE        => LED_LE
         );
 
    -- Clock process definitions
@@ -52,11 +52,11 @@ BEGIN
         clk <= '1';
         wait for clk_period/2;
    end process;
- 
+
 
    -- Stimulus process
    stim_proc: process
-   begin        
+   begin
       RST <= '1', '0' after CLK_PERIOD*5;
       wait for CLK_PERIOD*5;
       --RST           <= '0';

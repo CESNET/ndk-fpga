@@ -4,10 +4,10 @@
 //
 // Description
 //-----------------------------------------------------------------------------
-// MCTP over PCIe VDM Controller module is used to parse MCTP over PCIe VDM 
+// MCTP over PCIe VDM Controller module is used to parse MCTP over PCIe VDM
 // TLPs and forward the MCTP payloads to MAX10’s MCTP over PCIe VDM buffer.
-// Similarlly in the other direction, this module receives the MCTP payload 
-// from MAX10’s MCTP over PCIe VDM buffer and constructs PCIe VDM TLPs and 
+// Similarlly in the other direction, this module receives the MCTP payload
+// from MAX10’s MCTP over PCIe VDM buffer and constructs PCIe VDM TLPs and
 // forwards it.
 //-----------------------------------------------------------------------------
 
@@ -19,11 +19,11 @@ module mctp_pcievdm_ctrlr #(
    parameter   MCTP_BASELINE_MTU        = 16,  //in DWORDs, i.e. 64/4 = 16 (should be aligned to 64bits)
    parameter   DEBUG_REG_EN             = 0,
    parameter   DEBUG_REG_WIDTH          = 8
-   
+
 )(
    input  logic                            clk,
    input  logic                            reset,
-   
+
    //CSR i/f
    input  logic [SS_ADDR_WIDTH-1:0]        pcievdm_afu_addr,
    input  logic                            pcievdm_afu_addr_vld,
@@ -33,7 +33,7 @@ module mctp_pcievdm_ctrlr #(
    output logic [63:0]                     pcie_vdm_sts3_dbg,
    output logic [63:0]                     pcie_vdm_sts4_dbg,
    output logic [63:0]                     pcie_vdm_sts5_dbg,
-   
+
    //Ingress AVMM slave (connected to IOFS-shell/AFU)
    input  logic [0:0]                      avmm_ingr_slv_addr,
    input  logic                            avmm_ingr_slv_write,
@@ -53,7 +53,7 @@ module mctp_pcievdm_ctrlr #(
    input  logic [31:0]                     avmm_ingr_mstr_rddata,
    input  logic                            avmm_ingr_mstr_rddvld,
    input  logic                            avmm_ingr_mstr_waitreq,
-   
+
    //Egress AVMM slave (connected to SPI Slave)
    input  logic [EGRS_SLV_ADDR_WIDTH-1:0]  avmm_egrs_slv_addr,
    input  logic                            avmm_egrs_slv_write,
@@ -107,7 +107,7 @@ mctp_pcievdm_ingr #(
 )mctp_pcievdm_ingr_inst(
    .clk                    (clk                    ),
    .reset                  (reset                  ),
-   
+
    //CSR i/f
    .pcievdm_mctp_eid       (pcievdm_mctp_eid       ),
 // .pcievdm_mctp_mtu_wsize (),
@@ -116,7 +116,7 @@ mctp_pcievdm_ingr #(
    .pcie_vdm_sts2_dbg      (pcie_vdm_sts2_dbg      ),
    .pcie_vdm_sts3_dbg      (pcie_vdm_sts3_dbg      ),
    .pulse_1us              (pulse_1us              ),
-   
+
    //Ingress AVMM slave (connected to IOFS-shell/AFU)
    .avmm_ingr_slv_addr     (avmm_ingr_slv_addr     ),
    .avmm_ingr_slv_write    (avmm_ingr_slv_write    ),
@@ -152,14 +152,14 @@ mctp_pcievdm_egrs #(
 )mctp_pcievdm_egrs_inst(
    .clk                    (clk                   ),
    .reset                  (reset                 ),
-   
+
    //CSR i/f
    .pcievdm_afu_addr       (pcievdm_afu_addr      ),
    .pcievdm_mctp_eid       (pcievdm_mctp_eid      ),
    .pcie_vdm_sts4_dbg      (pcie_vdm_sts4_dbg     ),
    .pcie_vdm_sts5_dbg      (pcie_vdm_sts5_dbg     ),
    .pulse_1us              (pulse_1us             ),
-   
+
    //Egress AVMM slave (connected to SPI Slave)
    .avmm_egrs_slv_addr     (avmm_egrs_slv_addr    ),
    .avmm_egrs_slv_write    (avmm_egrs_slv_write   ),
@@ -180,4 +180,4 @@ mctp_pcievdm_egrs #(
    .avmm_egrs_mstr_waitreq (avmm_egrs_mstr_waitreq)
 );
 
-endmodule 
+endmodule

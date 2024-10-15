@@ -2,7 +2,7 @@
 //-- Copyright (C) 2023 CESNET z. s. p. o.
 //-- Author(s): Daniel Kriz <danielkriz@cesnet.cz>
 
-//-- SPDX-License-Identifier: BSD-3-Clause 
+//-- SPDX-License-Identifier: BSD-3-Clause
 
 // Definition of AVST credit control monitor
 class monitor extends uvm_monitor;
@@ -18,7 +18,7 @@ class monitor extends uvm_monitor;
     // ------------------------------------------------------------------------
     // Reference to the virtual interface
     virtual crdt_if.monitor vif;
-    
+
     // ------------------------------------------------------------------------
     // Analysis port used to send transactions to all connected components.
     uvm_analysis_port #(sequence_item) analysis_port;

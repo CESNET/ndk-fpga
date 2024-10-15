@@ -32,7 +32,7 @@ class sequence_data extends uvm_sequence #(uvm_logic_vector_array::sequence_item
 
     task body();
         assert(uvm_config_db #(req_fifo#(uvm_pcie::header))::get(m_sequencer, "", "seq_fifo", fifo)) else begin
-            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo data"); 
+            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo data");
         end;
 
         forever begin
@@ -67,7 +67,7 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
     localparam int unsigned BAR_RANGE_WIDTH = 3;
 
 
-    req_fifo#(uvm_pcie::header) fifo; 
+    req_fifo#(uvm_pcie::header) fifo;
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_rc");
@@ -77,7 +77,7 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
     task body();
 
         assert(uvm_config_db #(req_fifo#(uvm_pcie::header))::get(m_sequencer, "", "seq_fifo", fifo)) else begin
-            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo data"); 
+            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo data");
         end;
 
         forever begin

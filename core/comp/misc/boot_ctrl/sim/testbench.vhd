@@ -1,4 +1,4 @@
--- testbench.vhd: Simulation file 
+-- testbench.vhd: Simulation file
 -- Copyright (C) 2024 CESNET z. s. p. o.
 -- Author(s): Jakub Cabal <cabal@cesnet.cz>
 --
@@ -9,11 +9,11 @@ USE ieee.std_logic_1164.ALL;
 USE IEEE.std_logic_textio.ALL;
 USE ieee.numeric_std.ALL;
 USE std.textio.ALL;
- 
+
 ENTITY TESTBENCH IS
 END TESTBENCH;
- 
-ARCHITECTURE FULL OF TESTBENCH IS 
+
+ARCHITECTURE FULL OF TESTBENCH IS
 
     signal mi_clk        : std_logic;
     signal mi_reset      : std_logic;
@@ -56,9 +56,9 @@ ARCHITECTURE FULL OF TESTBENCH IS
 
     constant PERIOD_MI_CLK   : time := 5 ns;
     constant PERIOD_BOOT_CLK : time := 10 ns;
-                          
+
 BEGIN
- 
+
     -- Instantiate the Unit Under Test (UUT)
     uut_i: entity work.BOOT_CTRL
     generic map(
@@ -110,7 +110,7 @@ BEGIN
         BMC_MI_DRD    => bmc_mi_drd,
         BMC_MI_DRDY   => bmc_mi_drdy
     );
-   
+
     process
     begin
         mi_clk <= '0';
@@ -126,10 +126,10 @@ BEGIN
         boot_clk <= '1';
         wait for PERIOD_BOOT_CLK/2;
     end process;
-    
+
     process
-    begin   
-        icap_avail <= '0';     
+    begin
+        icap_avail <= '0';
         boot_reset <= '1', '0' after PERIOD_BOOT_CLK*3;
         wait for 3*PERIOD_BOOT_CLK;
         icap_avail <= '1';

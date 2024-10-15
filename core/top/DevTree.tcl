@@ -75,7 +75,7 @@ proc dts_build_netcope {} {
     if { [llength [info procs dts_card_specific]] > 0 } {
         append ret [ dts_card_specific ]
     }
-    
+
     # TSU component
     global TSU_ENABLE
     if {$TSU_ENABLE} {

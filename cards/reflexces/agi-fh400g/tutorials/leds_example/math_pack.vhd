@@ -19,7 +19,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
---! \brief Package with basic math functions 
+--! \brief Package with basic math functions
 --! \details This package contains math functions: log2, max, min and div_roundup.
 package math_pack is
 
@@ -71,7 +71,7 @@ package math_pack is
    function tsel(cond : boolean; true_val: std_logic_vector; false_val: std_logic_vector) return std_logic_vector;
    function tsel(cond : boolean; true_val: string; false_val: string) return string;
 
-   --!\brief returns smalest value witch is diveded by base and is not smallest that x 
+   --!\brief returns smalest value witch is diveded by base and is not smallest that x
    function ceil(x,base : integer) return integer;
 
    -- Round the given 'value' up, so that the lower 'rounding_width' bits are zero
@@ -107,10 +107,10 @@ package math_pack is
    function enlarge_left(vector : signed; width_addition : integer) return signed;
    function enlarge_right(vector : unsigned; width_addition : integer) return unsigned;
    function enlarge_right(vector : signed; width_addition : integer) return signed;
-   
+
 end math_pack;
 
---! \brief Body of package with basic math functions 
+--! \brief Body of package with basic math functions
 package body math_pack is
 
    --! \brief Logarithm with base 2.
@@ -157,7 +157,7 @@ package body math_pack is
          return R;
       end if;
    end;
-   
+
    --! \brief Selects lower number from two given.
    function min(L, R: integer) return integer is
    begin
@@ -167,7 +167,7 @@ package body math_pack is
          return R;
       end if;
    end;
-   
+
    --! \brief Selects lower number from two given.
    function minimum(L, R: integer) return integer is
    begin

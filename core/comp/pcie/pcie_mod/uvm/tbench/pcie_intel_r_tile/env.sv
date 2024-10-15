@@ -87,7 +87,7 @@ class env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_MET
         m_transaction_approver = transaction_approver::type_id::create("m_transaction_approver", this);
         m_valuer = valuer #(AVST_UP_META_W)::type_id::create("m_valuer", this);
         m_balance_splitter = balance_splitter::type_id::create("m_balance_splitter", this);
-        
+
         // THE CURRENT IMPLEMENTATION OF PCIE-TOP DOES NOT TAKE INTO ACCOUNT UP-SIDE CREDITS SENT FROM VERIFICATION
         // UNCOMMENT BELOW IF YOU WANT TO ENABLE CHECKING OF THIS FEATURE
         // m_transaction_checker = transaction_checker #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_UP_META_W, 3)::type_id::create("m_transaction_checker", this);
@@ -158,7 +158,7 @@ class env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_MET
         uvm_pcie_intel::sequence_data                     seq_data;
         uvm_pcie_intel::sequence_meta #(AVST_DOWN_META_W) seq_meta;
         uvm_avst::sequence_lib_tx #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_UP_META_W) seq_up_rdy;
-        
+
         for (int unsigned i = 0; i < 3; i++) begin
             m_crdt_up_hdr_sequence_init [i] = uvm_avst_crdt::sequence_rx_initializing_hdr::type_id::create($sformatf("m_crdt_up_hdr_sequence_init_%0d", i));
             m_crdt_up_data_sequence_init[i] = uvm_avst_crdt::sequence_rx_initializing_data::type_id::create($sformatf("m_crdt_up_data_sequence_init_%0d", i));
@@ -218,7 +218,7 @@ class env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_MET
         for (int unsigned i = 0; i < 3; i++) begin
             fork
                 int unsigned j = i;
-                
+
                 forever begin
                     assert(m_crdt_up_hdr_sequence_returning[j].randomize());
                     m_crdt_up_hdr_sequence_returning[j].start(m_avst_crdt_up_hdr[j].m_sequencer);

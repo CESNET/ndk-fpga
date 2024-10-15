@@ -2,7 +2,7 @@
 // Copyright (C) 2022 CESNET z. s. p. o.
 // Author(s): Daniel Kondys <xkondy00@vutbr.cz>
 
-// SPDX-License-Identifier: BSD-3-Clause 
+// SPDX-License-Identifier: BSD-3-Clause
 
 `ifndef NET_MOD_LOGIC_ENV_SV
 `define NET_MOD_LOGIC_ENV_SV

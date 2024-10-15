@@ -98,6 +98,6 @@ package test;
     `include "sequence_xilinx.sv"
     `include "sequence_intel.sv"
     `include "test.sv"
-    
+
 endpackage
 `endif

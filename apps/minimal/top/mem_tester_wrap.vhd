@@ -60,7 +60,7 @@ port (
     -- =========================================================================
     CLK      : in  std_logic;
     RESET    : in  std_logic;
-    
+
     -- =========================================================================
     -- HBM AXI INTERFACES (clocked at HBM_CLK)
     -- =========================================================================
@@ -217,7 +217,7 @@ begin
     port map(
         CLK        => CLK,
         RESET      => RESET,
-        
+
         RX_DWR     => MI_DWR,
         RX_ADDR    => MI_ADDR,
         RX_BE      => MI_BE,
@@ -251,7 +251,7 @@ begin
 
             MI_DATA_WIDTH               => MI_DATA_WIDTH,
             MI_ADDR_WIDTH               => MI_ADDR_WIDTH,
-     
+
             RAND_GEN_DATA_WIDTH         => MT_RND_GEN_DATA_WIDTH,
             RAND_GEN_ADDR_WIDTH         => MT_RND_GEN_ADDR_WIDTH,
             RANDOM_DATA_SEED            => ddr_random_data_seed_f,
@@ -267,7 +267,7 @@ begin
         port map(
             AMM_CLK                     => DDR_CLK                  (i),
             AMM_RST                     => DDR_RESET                (i),
-     
+
             AMM_READY                   => DDR_AVMM_READY           (i),
             AMM_READ                    => DDR_AVMM_READ            (i),
             AMM_WRITE                   => DDR_AVMM_WRITE           (i),
@@ -287,8 +287,8 @@ begin
             EMIF_CAL_SUCCESS            => EMIF_CAL_SUCCESS         (i),
             EMIF_CAL_FAIL               => EMIF_CAL_FAIL            (i),
             EMIF_AUTO_PRECHARGE         => EMIF_AUTO_PRECHARGE      (i),
-     
-            MI_CLK                      => CLK, 
+
+            MI_CLK                      => CLK,
             MI_RST                      => RESET,
             MI_DWR                      => split_mi_dwr             (i),
             MI_ADDR                     => split_mi_addr            (i),
@@ -331,7 +331,7 @@ begin
         );
 
         ddr_logger_i : entity work.MEM_LOGGER
-        generic map (    
+        generic map (
             MEM_DATA_WIDTH          => DDR_DATA_WIDTH       ,
             MEM_ADDR_WIDTH          => DDR_ADDR_WIDTH       ,
             MEM_BURST_COUNT_WIDTH   => DDR_BURST_WIDTH      ,
@@ -339,10 +339,10 @@ begin
             MI_DATA_WIDTH           => MI_DATA_WIDTH        ,
             MI_ADDR_WIDTH           => MI_ADDR_WIDTH
         )
-        port map (    
+        port map (
             CLK                     => DDR_CLK                  (i),
             RST                     => DDR_RESET                (i),
-        
+
             MEM_READY               => DDR_AVMM_READY           (i),
             MEM_READ                => DDR_AVMM_READ            (i),
             MEM_WRITE               => DDR_AVMM_WRITE           (i),
@@ -351,7 +351,7 @@ begin
             MEM_WRITE_DATA          => DDR_AVMM_WRITEDATA       (i),
             MEM_BURST_COUNT         => DDR_AVMM_BURSTCOUNT      (i),
             MEM_READ_DATA_VALID     => DDR_AVMM_READDATAVALID   (i),
-        
+
             MI_DWR                  => ddr_log_mi_dwr           (i),
             MI_ADDR                 => ddr_log_mi_addr          (i),
             MI_BE                   => ddr_log_mi_be            (i),

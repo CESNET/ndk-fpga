@@ -17,24 +17,24 @@ import ftile
 p_mi_bus = 11
 
 # Create the parser
-args = argparse.ArgumentParser(description = "Multirate config setup Tool")
+args = argparse.ArgumentParser(description="Multirate config setup Tool")
 # Add an argument
-args.add_argument("-s_ch","--start_channel", type=int, required=False, help="start channel for profile swap default value is 0", default=0)
-args.add_argument("-ch","--channels", type=int, required=True, help="num. of channels to be changed (depends on type of used IP_core)")
-args.add_argument("-s_p","--start_profile", type=int, required=False,help="which profile is used right now", default=1)
-args.add_argument("-e_p","--end_profile", type=int, required=True,help="which profile you want to use as next")
-args.add_argument("-sp","--speed", type=str, required=True,help="speed of used IP_Core you can use \n'2x100G-4'\n'8x25G-1'", default="8x25G-1")
-args.add_argument("-d","--device", type=int, required=True,help="Choose device, in which you have implemented design", default=0)
+args.add_argument("-s_ch", "--start_channel", type=int, required=False, help="start channel for profile swap default value is 0", default=0)
+args.add_argument("-ch", "--channels", type=int, required=True, help="num. of channels to be changed (depends on type of used IP_core)")
+args.add_argument("-s_p", "--start_profile", type=int, required=False, help="which profile is used right now", default=1)
+args.add_argument("-e_p", "--end_profile", type=int, required=True, help="which profile you want to use as next")
+args.add_argument("-sp", "--speed", type=str, required=True, help="speed of used IP_Core you can use \n'2x100G-4'\n'8x25G-1'", default="8x25G-1")
+args.add_argument("-d", "--device", type=int, required=True, help="Choose device, in which you have implemented design", default=0)
 arguments = args.parse_args()
 
 # =========================
-# Definition of parameters 
+# Definition of parameters
 # =========================
 # for start channel you need to count from 0 it is beacose first IP core is declarated on channel 0
 # for channels you need to remember that total number of channels + start channel must be smaller or equal as number of channels that means for example
-# for 100GE is correct combination start channel = 0 and channels = 2 and 
+# for 100GE is correct combination start channel = 0 and channels = 2 and
 # for 100GE is wrong combination start channel = 1 and channels = 2 beacose there are only 2 IP cores and this combination means there must be 3 or more IP cores
-# start profile represent current profile which is used default for our IP cores is profile 1 also dont forget if you change profile start profile must be last used profile 
+# start profile represent current profile which is used default for our IP cores is profile 1 also dont forget if you change profile start profile must be last used profile
 # end profile represent profile, which you want to set as new profile  for use look for range of profile numbers for each IP core or use value of profile_difs
 # speed represent speed of Reconfiguration IP (default IP used in build) so if you use 10G variant form 25G IP core you need still for profile swap use 25G IP core declaration
 
@@ -56,14 +56,14 @@ if arguments.speed == "2x100G-4":
         exit()
     if arguments.start_profile <= 0 or arguments.start_profile >= 3:
         print("There are not that many start_profiles, only 2 \n1\n2")
-        exit()   
+        exit()
     if arguments.end_profile <= 0 or arguments.end_profile >= 3:
         print("There are not that many end_profiles, only 2 \n1\n2")
-        exit()      
+        exit()
     # inicialization
     profiles_difs = 2
     eth_channels = 2
-    FEC_TYPE = [2,0]
+    FEC_TYPE = [2, 0]
     FEC = FEC_TYPE[arguments.end_profile - 1]
     profile_sel = 0
     Eth_25G_10G = 0
@@ -86,9 +86,9 @@ elif arguments.speed == "8x25G-1":
     # inicialization
     profiles_difs = 4
     eth_channels = 8
-    FEC_TYPE = [0,2,3,0]
+    FEC_TYPE = [0, 2, 3, 0]
     FEC = FEC_TYPE[arguments.end_profile - 1]
-    ETH_SPEED = [0,0,0,1]
+    ETH_SPEED = [0, 0, 0, 1]
     Eth_25G_10G = ETH_SPEED[arguments.end_profile - 1]
     profile_sel = 0
 
@@ -98,12 +98,12 @@ else:
     exit()
 
 # generator for full list of profiles, devices, components
-for j in range (profiles_difs):
+for j in range(profiles_difs):
     PROFILES_GROUPS.append([])
-    for i in range (eth_channels):
+    for i in range(eth_channels):
         device_v.append(i)
         component.append(i)
-        PROFILES_GROUPS[j].append(j + i*profiles_difs+1 )
+        PROFILES_GROUPS[j].append(j + i*profiles_difs+1)
 
 # initial initialization + line opening
 dev = nfb.open(path=str(arguments.device))
@@ -113,7 +113,7 @@ node = []
 comp = []
 
 # initialization to open eth channels
-for i in range (eth_channels):
+for i in range(eth_channels):
     node.append(nodes[component[i]])
     comp.append(dev.comp_open(node[i]))
 
@@ -135,16 +135,16 @@ print()
 # This process is repeated value of parameter cahnnels times
 
 # MAIN LOOP
-for i in range (arguments.channels):
+for i in range(arguments.channels):
     # print old config before swap
-    print ("\nold config is:")
+    print("\nold config is:")
     eth = ftile.ftile_eth(comp[arguments.start_channel + i])
 
     # wait for moment when dr_controler is ready for switching profile
-    val = ftile.drp_read_drc(comp[0], 0x0, p_mi_bus)  
+    val = ftile.drp_read_drc(comp[0], 0x0, p_mi_bus)
     while val != 2:
         print("It is not yet possible to switch a profile, wait\n")
-        val = ftile.drp_read_drc(comp[0], 0x0, p_mi_bus)  
+        val = ftile.drp_read_drc(comp[0], 0x0, p_mi_bus)
 
     # dr_controler is ready, reset eth line for setup
     eth.set_reset()
@@ -173,5 +173,5 @@ for i in range (arguments.channels):
     eth.clr_reset()
 
     # print new set config after swap
-    print ("\nnew config is:")
+    print("\nnew config is:")
     eth = ftile.ftile_eth(comp[arguments.start_channel + i])

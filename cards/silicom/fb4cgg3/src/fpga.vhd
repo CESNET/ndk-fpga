@@ -194,7 +194,7 @@ architecture FULL of FPGA is
 
     signal eth_led_g        : std_logic_vector(4*4-1 downto 0);
     signal eth_led_r        : std_logic_vector(4*4-1 downto 0);
-    
+
     signal eth_refclk_p     : std_logic_vector(4-1 downto 0);
     signal eth_refclk_n     : std_logic_vector(4-1 downto 0);
     signal eth_rx_p         : std_logic_vector(4*ETH_LANES-1 downto 0);
@@ -208,7 +208,7 @@ architecture FULL of FPGA is
     signal qsfp_sda         : std_logic_vector(4-1 downto 0) := (others => 'Z');
     signal qsfp_modprs_n    : std_logic_vector(4-1 downto 0);
     signal qsfp_int_n       : std_logic_vector(4-1 downto 0);
-    
+
     signal misc_in          : std_logic_vector(MISC_IN_WIDTH-1 downto 0) := (others => '0');
     signal misc_out         : std_logic_vector(MISC_OUT_WIDTH-1 downto 0);
 
@@ -269,7 +269,7 @@ architecture FULL of FPGA is
     signal ddr_s_axi_rresp              : slv_array_t     (DDR_PORTS-1 downto 0)(1 DOWNTO 0);
     signal ddr_s_axi_rid                : slv_array_t     (DDR_PORTS-1 downto 0)(3 DOWNTO 0);
     signal ddr_s_axi_rdata              : slv_array_t     (DDR_PORTS-1 downto 0)(DDR_AXI_DATA_WIDTH-1 DOWNTO 0);
-    
+
     -- DDR4A interface
     signal ddr4a_rst        : std_logic;
     signal ddr4a_app_hi_pri : std_logic;
@@ -282,8 +282,8 @@ architecture FULL of FPGA is
     signal ddr4b_app_hi_pri : std_logic;
     signal ddr4b_dqs_p      : std_logic_vector(DDR_BYTES-1 downto 0);
     signal ddr4b_dqs_n      : std_logic_vector(DDR_BYTES-1 downto 0);
-    signal ddr4b_dm         : std_logic_vector(DDR_BYTES-1 downto 0);  
-    
+    signal ddr4b_dm         : std_logic_vector(DDR_BYTES-1 downto 0);
+
     -- MEM_TESTER signals
     signal mem_avmm_ready           : std_logic_vector(DDR_PORTS -1 downto 0);
     signal mem_avmm_read            : std_logic_vector(DDR_PORTS -1 downto 0);
@@ -476,30 +476,30 @@ begin
         DDR4A_TEN                                               <= '0';
 
         -- Insert differential buffers
-        A_CK_BUF: OBUFDS 
+        A_CK_BUF: OBUFDS
         port map (
-            I   => '1', 
-            O   => DDR4A_CK_P(0), 
+            I   => '1',
+            O   => DDR4A_CK_P(0),
             OB  => DDR4A_CK_N(0)
         );
 
         A_ldqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
-            LDQS_BUF: IOBUFDS 
+            LDQS_BUF: IOBUFDS
             port map (
-                O       => open, 
-                I       => '0', 
-                T       => '0', 
-                IO      => DDR4A_LDQS_P(p), 
+                O       => open,
+                I       => '0',
+                T       => '0',
+                IO      => DDR4A_LDQS_P(p),
                 IOB     => DDR4A_LDQS_N(p)
             );
         end generate;
 
         A_udqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
-            UDQS_BUF: IOBUFDS 
+            UDQS_BUF: IOBUFDS
             port map (
-                O       => open, 
-                I       => '0', 
-                T       => '0', 
+                O       => open,
+                I       => '0',
+                T       => '0',
                 IO      => DDR4A_UDQS_P(p),
                 IOB     => DDR4A_UDQS_N(p)
             );
@@ -601,30 +601,30 @@ begin
         DDR4B_TEN                                               <= '0';
 
         -- Insert differential buffers
-        B_CK_BUF: OBUFDS 
+        B_CK_BUF: OBUFDS
         port map (
-            I   => '1', 
-            O   => DDR4B_CK_P(0), 
+            I   => '1',
+            O   => DDR4B_CK_P(0),
             OB  => DDR4B_CK_N(0)
         );
 
         B_ldqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
-            LDQS_BUF: IOBUFDS 
+            LDQS_BUF: IOBUFDS
             port map (
-                O       => open, 
-                I       => '0', 
-                T       => '0', 
-                IO      => DDR4B_LDQS_P(p), 
+                O       => open,
+                I       => '0',
+                T       => '0',
+                IO      => DDR4B_LDQS_P(p),
                 IOB     => DDR4B_LDQS_N(p)
             );
         end generate;
 
         B_udqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
-            UDQS_BUF: IOBUFDS 
+            UDQS_BUF: IOBUFDS
             port map (
-                O       => open, 
-                I       => '0', 
-                T       => '0', 
+                O       => open,
+                I       => '0',
+                T       => '0',
                 IO      => DDR4B_UDQS_P(p),
                 IOB     => DDR4B_UDQS_N(p)
             );
@@ -638,7 +638,7 @@ begin
         port map(
             MEM_CLK                 => ddr_ui_clk(i),
             MEM_RST                 => ddr_ui_clk_sync_rst(i),
-                
+
             -- DDR4_AXI interface
             DDR_S_AXI_AWID          => ddr_s_axi_awid(i),
             DDR_S_AXI_AWADDR        => ddr_s_axi_awaddr(i),
@@ -669,7 +669,7 @@ begin
             DDR_S_AXI_RRESP         => ddr_s_axi_rresp(i),
             DDR_S_AXI_RID           => ddr_s_axi_rid(i),
             DDR_S_AXI_RDATA         => ddr_s_axi_rdata(i),
-        
+
             -- EMIF interface
             AMM_READY               => mem_avmm_ready(i),
             AMM_READ                => mem_avmm_read(i),
@@ -774,7 +774,7 @@ begin
         FLASH_WR_DATA => boot_wr_data,
         FLASH_WR_EN   => boot_wr_en,
         FLASH_RD_DATA => boot_rd_data
-    ); 
+    );
 
     spi_flash_driver_i : entity work.SPI_FLASH_DRIVER
     port map (
@@ -884,7 +884,7 @@ begin
 
         PCIE_CLK                => pcie_clk,
         PCIE_RESET              => pcie_reset,
-    
+
         BOOT_MI_CLK             => boot_mi_clk,
         BOOT_MI_RESET           => boot_mi_reset,
         BOOT_MI_DWR             => boot_mi_dwr,

@@ -1,14 +1,10 @@
-import sys
-import logging
-
 import cocotb
 import cocotb.utils
-from cocotb.triggers import Timer, RisingEdge, Combine, Join, First, with_timeout
+from cocotb.triggers import Timer, RisingEdge, First
 
 import cocotbext.ofm.utils.sim.modelsim as ms
-import cocotbext.ofm.utils.sim.modelsim as ms
 
-from cocotbext.ofm.utils.sim.bus import *
+from cocotbext.ofm.utils.sim.bus import MfbBus, DmaDownMvbBus
 from cocotbext.ofm.utils.scapy import simple_tcp_bytes
 
 from ndk_core import NFBDevice

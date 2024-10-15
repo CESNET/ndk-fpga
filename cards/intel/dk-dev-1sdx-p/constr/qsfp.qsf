@@ -59,7 +59,7 @@ set_location_assignment PIN_BJ1 -to QSFP2_TX_P[0]
 set_location_assignment PIN_BJ2 -to QSFP2_TX_N[0]
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 set_instance_assignment -name IO_STANDARD "1.8 V" -to ZQSFP_1V8_PORT_EN
@@ -79,6 +79,6 @@ set_instance_assignment -name HSSI_PARAMETER "refclk_divider_use_as_bti_clock=TR
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to CLK_156P25M_QSFP1_P
 
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_TX_P
-set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_RX_P                                                             
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_RX_P
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP2_TX_P
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP2_RX_P

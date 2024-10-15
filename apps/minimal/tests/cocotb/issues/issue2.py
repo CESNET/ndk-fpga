@@ -1,14 +1,9 @@
-import sys
-import logging
-
 import cocotb
 import cocotb.utils
-from cocotb.triggers import Timer, RisingEdge, Combine, Join, First, with_timeout
 
 import cocotbext.ofm.utils.sim.modelsim as ms
 
-from cocotbext.ofm.utils.sim.bus import *
-from cocotbext.ofm.utils.scapy import simple_tcp_bytes
+from cocotbext.ofm.utils.sim.bus import MiBus
 
 from ndk_core import NFBDevice
 
@@ -17,12 +12,14 @@ print = ms.print
 e = cocotb.external
 st = cocotb.utils.get_sim_time
 
+
 def ms_add_cursor(name, time=None):
     if time is None:
         time = st()
 
-    ms.cmd(f"wave cursor add")
+    ms.cmd("wave cursor add")
     ms.cmd(f'wave cursor configure -name {{{name}}} -time {{{time}}} -lock 1')
+
 
 async def get_dev_init(dut):
     dev = NFBDevice(dut)
@@ -31,7 +28,7 @@ async def get_dev_init(dut):
 
 
 async def wr_rd(c, length, offset=0):
-    data = bytes([(j%256) for j in range(length)])
+    data = bytes([(j % 256) for j in range(length)])
     await e(c.write)(offset, data)
     rdata = await e(c.read)(offset, length)
     assert rdata == data, f'writen: {list(data)}, readen: {list(rdata)}'
@@ -43,10 +40,6 @@ async def mtc_big_write_tr(dut):
     c = nfb.comp_open("cesnet,ofm,mi_test_space")
 
     await wr_rd(c, 126, 3)
-
-
-
-
 
 
 core = NFBDevice.core_instance_from_top(cocotb.top)

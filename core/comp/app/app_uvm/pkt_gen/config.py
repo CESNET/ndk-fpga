@@ -8,19 +8,19 @@
 #  Author(s):
 #    Radek Iša <isa@cesnet.cz>
 
-import json
 
 def json_object_get(json, path):
     index = 0
-    obj   = json 
-    while (index < len(path) and obj != None):
+    obj   = json
+    while index < len(path) and obj is not None:
         obj = obj.get(path[index])
         index += 1
 
-    return obj;
+    return obj
+
 
 class packet_config:
-    def __init__(self, constraints = None):
+    def __init__(self, constraints=None):
         #init values
         self.trill   = 1
         self.vlan    = 4
@@ -29,17 +29,17 @@ class packet_config:
 
         self.constraints = constraints
 
-        mpls_stack = self.object_get(["mpls", "stack"]);
-        if (mpls_stack != None):
-            self.mpls = int(mpls_stack.get("max"));
+        mpls_stack = self.object_get(["mpls", "stack"])
+        if mpls_stack is not None:
+            self.mpls = int(mpls_stack.get("max"))
 
-        vlan_stack = self.object_get(["vlan", "stack"]);
-        if (vlan_stack != None):
-            self.vlan = int(vlan_stack.get("max"));
+        vlan_stack = self.object_get(["vlan", "stack"])
+        if vlan_stack is not None:
+            self.vlan = int(vlan_stack.get("max"))
 
-        ipv6ext_stack = self.object_get(["ipv6ext", "stack"]);
-        if (ipv6ext_stack != None):
-            self.ipv6ext = int(ipv6ext.get("max"));
+        ipv6ext_stack = self.object_get(["ipv6ext", "stack"])
+        if ipv6ext_stack is not None:
+            self.ipv6ext = int(ipv6ext.get("max"))
 
     def copy(self):
         ret = packet_config(self.constraints)
@@ -47,8 +47,7 @@ class packet_config:
         ret.vlan    = self.vlan
         ret.mpls    = self.mpls
         ret.ipv6ext = self.ipv6ext
-        return ret;
+        return ret
 
     def object_get(self, path):
         return json_object_get(self.constraints, path)
-

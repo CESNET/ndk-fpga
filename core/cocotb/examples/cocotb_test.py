@@ -1,28 +1,31 @@
 import cocotb
-from cocotb.triggers import Timer, RisingEdge, Combine
+from cocotb.triggers import Timer
 
 from ndk_core import NFBDevice
 
 import sys
 sys.stderr = None # disable warnings from Scapy
-from scapy.all import TCP, Ether, IP, raw
+from scapy.all import TCP, Ether, IP, raw  # noqa
 sys.stderr = sys.__stderr__
+
 
 def s2b(pkt):
     return list(bytes(raw(pkt)))
+
 
 @cocotb.test()
 async def cocotb_test_idcomp_invert(dut):
     nfb = NFBDevice(dut)
     await nfb.init()
 
-    mi, dma = nfb.mi[0], nfb.dma
+    mi = nfb.mi[0]
 
     node = [nfb._fdt.get_node(path) for path in nfb.fdt_get_compatible("netcope,idcomp")][0]
     mi_base = node.get_property('reg')[0]
 
     await mi.write32(mi_base, 0x12345678)
     assert await mi.read32(mi_base) == 0x12345678 ^ 0xFFFFFFFF
+
 
 @cocotb.test()
 async def cocotb_test_rx_scapy_packet(dut):
@@ -47,6 +50,7 @@ async def cocotb_test_rx_scapy_packet(dut):
     stats = await mac.read_stats()
     assert stats['received'] == 1
 
+
 @cocotb.test()
 async def cocotb_test_tx_scapy_packet(dut):
     nfb = NFBDevice(dut)
@@ -63,6 +67,6 @@ async def cocotb_test_tx_scapy_packet(dut):
 
     await nfb.dma.tx[0].send(s2b(pkt))
     await Timer(10, units='us')
-    
+
     stats = await mac.read_stats()
     assert stats['sent'] == 1

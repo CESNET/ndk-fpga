@@ -4,7 +4,7 @@
 //
 // Description
 //-----------------------------------------------------------------------------
-// MCTP over PCIe VDM Egress module receives the MCTP payload from MAX10’s MCTP 
+// MCTP over PCIe VDM Egress module receives the MCTP payload from MAX10’s MCTP
 // over PCIe VDM buffer and constructs PCIe VDM TLPs and forwards it to AFU.
 //-----------------------------------------------------------------------------
 
@@ -18,14 +18,14 @@ module mctp_pcievdm_egrs #(
 )(
    input  logic                            clk,
    input  logic                            reset,
-   
+
    //CSR i/f
    input  logic [SS_ADDR_WIDTH-1:0]        pcievdm_afu_addr,
    input  logic [7:0]                      pcievdm_mctp_eid,
    output logic [63:0]                     pcie_vdm_sts4_dbg,
    output logic [63:0]                     pcie_vdm_sts5_dbg,
    input  logic                            pulse_1us,
-   
+
    //Egress AVMM slave (connected to SPI Slave)
    input  logic [EGRS_SLV_ADDR_WIDTH-1:0]  avmm_egrs_slv_addr,
    input  logic                            avmm_egrs_slv_write,
@@ -77,7 +77,7 @@ enum logic [8:0] {
    EGRS_HDR_2_ST    = 9'h1 << EGRS_HDR_2_BIT  ,
    EGRS_PLOAD_ST    = 9'h1 << EGRS_PLOAD_BIT  ,
    EGRS_EOP_ST      = 9'h1 << EGRS_EOP_BIT    ,
-   EGRS_WAIT_ST     = 9'h1 << EGRS_WAIT_BIT   
+   EGRS_WAIT_ST     = 9'h1 << EGRS_WAIT_BIT
 } egrs_state, egrs_next, egrs_state_r1;
 
 logic                      mctp_msg_rdy_reg  ;
@@ -127,7 +127,7 @@ logic [63:0]               pcie_tlp_hdr_2    ;
 //    [28]     RW    Null Source EID (1-null EID; 0-configured EID)
 //    [29]     RW    PCIe VDM routing (0-route to root complex, 1-route by ID)
 //    [31:28]  R     Reserved
-//Egress Tx Packet Buffer - address 0x400 ~ 0x7FC 
+//Egress Tx Packet Buffer - address 0x400 ~ 0x7FC
 //-----------------------------------------------------------------------------
 always_ff @(posedge clk, posedge reset)
 begin : xmtr_reg_wr
@@ -141,15 +141,15 @@ begin : xmtr_reg_wr
       mctp_src_eid_reg   <= 8'd0;
       tlp_pcie_route_reg <= 3'd0;
    end else begin
-      if(avmm_egrs_slv_addr == EGRS_CNS_REG_ADDR && avmm_egrs_slv_write && 
+      if(avmm_egrs_slv_addr == EGRS_CNS_REG_ADDR && avmm_egrs_slv_write &&
                                             egrs_state[EGRS_IDLE_BIT]) begin
          mctp_msg_rdy_reg   <= avmm_egrs_slv_wrdata[0];
          mctp_msg_len_reg   <= avmm_egrs_slv_wrdata[14:6];
          tlp_pad_len_reg    <= avmm_egrs_slv_wrdata[5:4];
       end else
          mctp_msg_rdy_reg   <= 1'b0;
-      
-      if(avmm_egrs_slv_addr == EGRS_PH_REG_ADDR && avmm_egrs_slv_write && 
+
+      if(avmm_egrs_slv_addr == EGRS_PH_REG_ADDR && avmm_egrs_slv_write &&
                                                 egrs_state[EGRS_IDLE_BIT]) begin
          tlp_trgt_id_reg    <= avmm_egrs_slv_wrdata[29] ? avmm_egrs_slv_wrdata[15:0] : 16'd0;
          mctp_dst_eid_reg   <= avmm_egrs_slv_wrdata[23:16];
@@ -157,7 +157,7 @@ begin : xmtr_reg_wr
          mctp_src_eid_reg   <= avmm_egrs_slv_wrdata[28] ? 8'h00 : pcievdm_mctp_eid;
          tlp_pcie_route_reg <= avmm_egrs_slv_wrdata[29] ? 3'd2 : 3'd0;
       end
-   end 
+   end
 end : xmtr_reg_wr
 
 always_ff @(posedge clk, posedge reset)
@@ -179,15 +179,15 @@ end : xmtr_reg_rd
 always_comb
 begin : egrs_bfr_wr
    egrs_bfr_wraddr = avmm_egrs_slv_addr[EGRS_BFR_AMSB-1:0];
-   egrs_bfr_wrdata = avmm_egrs_slv_wrdata; 
-   egrs_bfr_wren   = egrs_state[EGRS_IDLE_BIT] & avmm_egrs_slv_write & 
-                                          avmm_egrs_slv_addr[EGRS_BFR_AMSB]; 
+   egrs_bfr_wrdata = avmm_egrs_slv_wrdata;
+   egrs_bfr_wren   = egrs_state[EGRS_IDLE_BIT] & avmm_egrs_slv_write &
+                                          avmm_egrs_slv_addr[EGRS_BFR_AMSB];
 end : egrs_bfr_wr
 
 //-----------------------------------------------------------------------------
 // Egress Buffer Instantiation
 //-----------------------------------------------------------------------------
-altera_syncram egress_buffer 
+altera_syncram egress_buffer
 (
    .clock0           (clk              ),
    .address_a        (egrs_bfr_wraddr  ),
@@ -244,7 +244,7 @@ defparam
 
 //-----------------------------------------------------------------------------
 // Egress PCIe VDM TLP FSM.
-// This FSM reads the MCTP payload from egress buffer and constructs MCTP over 
+// This FSM reads the MCTP payload from egress buffer and constructs MCTP over
 // PCIe VDM TLP and then forwards it to AFU .
 // Top "always_ff" simply switches the state of the state machine registers.
 // Following "always_comb" contains all of the next-state decoding logic.
@@ -269,40 +269,40 @@ begin : egrs_fsm_comb
             egrs_next = EGRS_RESET_ST;
          else
             egrs_next = EGRS_IDLE_ST;
-            
-      egrs_state[EGRS_IDLE_BIT]:    //EGRS_IDLE_ST   
+
+      egrs_state[EGRS_IDLE_BIT]:    //EGRS_IDLE_ST
          if(mctp_msg_rdy_reg)
             egrs_next = EGRS_AFU_RDY_ST;
-            
+
       egrs_state[EGRS_AFU_RDY_BIT]: //EGRS_AFU_RDY_ST
          if(avmm_egrs_mstr_rddvld && !avmm_egrs_mstr_rddata[2])
             egrs_next = EGRS_SOP_ST;
 
-      egrs_state[EGRS_SOP_BIT]:     //EGRS_SOP_ST    
+      egrs_state[EGRS_SOP_BIT]:     //EGRS_SOP_ST
          if(avmm_egrs_mstr_write && !avmm_egrs_mstr_waitreq)
             egrs_next = EGRS_HDR_1_ST;
 
-      egrs_state[EGRS_HDR_1_BIT]:   //EGRS_HDR_1_ST  
+      egrs_state[EGRS_HDR_1_BIT]:   //EGRS_HDR_1_ST
          if(avmm_egrs_mstr_write && !avmm_egrs_mstr_waitreq)
             egrs_next = EGRS_HDR_2_ST;
 
-      egrs_state[EGRS_HDR_2_BIT]:   //EGRS_HDR_2_ST  
+      egrs_state[EGRS_HDR_2_BIT]:   //EGRS_HDR_2_ST
          if(avmm_egrs_mstr_write && !avmm_egrs_mstr_waitreq)
             egrs_next = EGRS_PLOAD_ST;
 
-      egrs_state[EGRS_PLOAD_BIT]:   //EGRS_PLOAD_ST  
+      egrs_state[EGRS_PLOAD_BIT]:   //EGRS_PLOAD_ST
          if(pkt_rd_done && avmm_egrs_mstr_write && !avmm_egrs_mstr_waitreq)
             egrs_next = EGRS_EOP_ST;
 
-      egrs_state[EGRS_EOP_BIT]:     //EGRS_EOP_ST    
+      egrs_state[EGRS_EOP_BIT]:     //EGRS_EOP_ST
          if(avmm_egrs_mstr_write && !avmm_egrs_mstr_waitreq) begin
              if(not_last_pkt)
                egrs_next = EGRS_WAIT_ST; //EGRS_AFU_RDY_ST;
             else
                egrs_next = EGRS_IDLE_ST;
-         end 
-         
-      egrs_state[EGRS_WAIT_BIT]:    //EGRS_WAIT_ST   
+         end
+
+      egrs_state[EGRS_WAIT_BIT]:    //EGRS_WAIT_ST
          if(pulse_1us)
             egrs_next = EGRS_AFU_RDY_ST;
 
@@ -344,20 +344,20 @@ begin : egrs_bfr_rd
          bufr_rd_vld1    <= 1'b1;
       else
          bufr_rd_vld1    <= 1'b0;
-      
+
       if(egrs_state[EGRS_IDLE_BIT])
          egrs_bfr_rdaddr   <= 8'd0;
-      else if(egrs_state[EGRS_PLOAD_BIT] && !avmm_egrs_mstr_write && 
+      else if(egrs_state[EGRS_PLOAD_BIT] && !avmm_egrs_mstr_write &&
                                  !bufr_rd_vld2 && !bufr_rd_vld3 && !pkt_rd_done)
          egrs_bfr_rdaddr   <= egrs_bfr_rdaddr + 8'd1;
-      
+
       bufr_rd_vld2       <= bufr_rd_vld1;
       bufr_rd_vld3       <= bufr_rd_vld2;
       egrs_bfr_rddata_r1 <= egrs_bfr_rddata;
-         
+
       if(!egrs_state[EGRS_PLOAD_BIT])
          pkt_rd_done    <= 1'b0;
-      else if(!avmm_egrs_mstr_write && !bufr_rd_vld1 && !bufr_rd_vld2 && 
+      else if(!avmm_egrs_mstr_write && !bufr_rd_vld1 && !bufr_rd_vld2 &&
               !bufr_rd_vld3 && tlp_payload_len == 'd1 || tlp_payload_len == 'd0)
          pkt_rd_done    <= 1'b1;
    end
@@ -382,7 +382,7 @@ begin : mctp_flgs
          not_last_pkt   <= 1'b1;
       else
          not_last_pkt   <= 1'b0;
-         
+
       if(egrs_state[EGRS_IDLE_BIT])
          mctp_pndng_len  <= mctp_msg_len_reg;
       else if(egrs_state[EGRS_WAIT_BIT] && !egrs_state_r1[EGRS_WAIT_BIT])
@@ -399,17 +399,17 @@ begin : mctp_flgs
          tlp_pad_len     <= 2'd0;
       else if(egrs_state[EGRS_SOP_BIT])
          tlp_pad_len     <= tlp_pad_len_reg;
-         
+
       if(egrs_state[EGRS_IDLE_BIT])
          mctp_pkt_som   <= 1'b1;
       else if (egrs_state[EGRS_PLOAD_BIT])
          mctp_pkt_som   <= 1'b0;
-      
+
       if(egrs_state[EGRS_HDR_1_BIT] && not_last_pkt)
          mctp_pkt_eom   <= 1'b0;
       else if (egrs_state[EGRS_HDR_1_BIT])
          mctp_pkt_eom   <= 1'b1;
-      
+
       if (egrs_state[EGRS_EOP_BIT] && avmm_egrs_mstr_write && !avmm_egrs_mstr_waitreq)
          mctp_pkt_seq   <= mctp_pkt_seq + 1'b1;
    end
@@ -422,7 +422,7 @@ end : mctp_flgs
 always_comb
 begin : egrs_tlp_hdr
    pcie_tlp_len   = {{(10-TLP_LEN_WIDTH){1'b0}}, tlp_payload_len};
-   
+
    pcie_tlp_hdr_1 = {8'h7F,                                            //Byte-7
                      2'd0, tlp_pad_len, 4'd0,                          //Byte-6
                      16'd0,                                            //Byte-5 & 4
@@ -430,9 +430,9 @@ begin : egrs_tlp_hdr
                      3'd0, TLP_NO_SNOOP_ATTR, 2'd0, pcie_tlp_len[9:8], //Byte-2
                      8'd0,                                             //Byte-1
                      5'h0E, tlp_pcie_route_reg};                       //Byte-0
-                     
-                     
-                     
+
+
+
    pcie_tlp_hdr_2 = {mctp_pkt_som, mctp_pkt_eom, mctp_pkt_seq, mctp_tag_reg, //Byte-7
                      mctp_src_eid_reg,        //Byte-6
                      mctp_dst_eid_reg,        //Byte-5
@@ -441,7 +441,7 @@ begin : egrs_tlp_hdr
                      8'h1A,                   //Byte-2
                      tlp_trgt_id_reg[7:0],    //Byte-1
                      tlp_trgt_id_reg[15:8]};  //Byte-0
-                     
+
 end : egrs_tlp_hdr
 
 always_ff @(posedge clk, posedge reset)
@@ -458,39 +458,39 @@ begin : egrs_avmm_mstr
          dly_busy_rechk       <= 1'b1;
       else if(pulse_1us)
          dly_busy_rechk       <= 1'b0;
-      
+
       if(egrs_state[EGRS_AFU_RDY_BIT] && !egrs_state_r1[EGRS_AFU_RDY_BIT] ||
          egrs_state[EGRS_AFU_RDY_BIT] && dly_busy_rechk && pulse_1us)
          avmm_egrs_mstr_read     <= 1'b1;
       else if(!avmm_egrs_mstr_waitreq)
          avmm_egrs_mstr_read     <= 1'b0;
-      
+
       if(egrs_state[EGRS_SOP_BIT] && !egrs_state_r1[EGRS_SOP_BIT] ||
-         egrs_state[EGRS_HDR_1_BIT] && !egrs_state_r1[EGRS_HDR_1_BIT] || 
+         egrs_state[EGRS_HDR_1_BIT] && !egrs_state_r1[EGRS_HDR_1_BIT] ||
          egrs_state[EGRS_HDR_2_BIT] && !egrs_state_r1[EGRS_HDR_2_BIT] ||
-         egrs_state[EGRS_PLOAD_BIT] && bufr_rd_vld3 || 
+         egrs_state[EGRS_PLOAD_BIT] && bufr_rd_vld3 ||
          egrs_state[EGRS_EOP_BIT] && !egrs_state_r1[EGRS_EOP_BIT])
          avmm_egrs_mstr_write    <= 1'b1;
       else if(!avmm_egrs_mstr_waitreq)
          avmm_egrs_mstr_write    <= 1'b0;
-         
-      if(egrs_state[EGRS_HDR_1_BIT] || egrs_state[EGRS_HDR_2_BIT] || 
+
+      if(egrs_state[EGRS_HDR_1_BIT] || egrs_state[EGRS_HDR_2_BIT] ||
                                        egrs_state[EGRS_PLOAD_BIT])
          avmm_egrs_mstr_addr  <= {pcievdm_afu_addr[SS_ADDR_WIDTH-1:4], 4'd8};
-      else 
+      else
          avmm_egrs_mstr_addr  <= {pcievdm_afu_addr[SS_ADDR_WIDTH-1:4], 4'd0};
-         
+
       if(egrs_state[EGRS_HDR_1_BIT])
          avmm_egrs_mstr_wrdata <= pcie_tlp_hdr_1;
       else if(egrs_state[EGRS_HDR_2_BIT])
          avmm_egrs_mstr_wrdata <= pcie_tlp_hdr_2;
       else if(egrs_state[EGRS_PLOAD_BIT] && bufr_rd_vld3)
          avmm_egrs_mstr_wrdata <= {egrs_bfr_rddata, egrs_bfr_rddata_r1};
-      else if(!egrs_state[EGRS_PLOAD_BIT]) 
-         avmm_egrs_mstr_wrdata <= {62'd0, 
-                                   egrs_state[EGRS_EOP_BIT], 
+      else if(!egrs_state[EGRS_PLOAD_BIT])
+         avmm_egrs_mstr_wrdata <= {62'd0,
+                                   egrs_state[EGRS_EOP_BIT],
                                    egrs_state[EGRS_SOP_BIT]};
-      
+
       if(!egrs_state[EGRS_PLOAD_BIT])
          avmm_egrs_mstr_byteen <= 8'hFF;
       else if(tlp_payload_len == 'd1 && bufr_rd_vld1)
@@ -502,13 +502,13 @@ end : egrs_avmm_mstr
 //-----------------------------------------------------------------------------
 // Debug registers
 //-----------------------------------------------------------------------------
-generate 
+generate
 if (DEBUG_REG_EN == 1) begin
    logic [DEBUG_REG_WIDTH-2:0] msg_rx_cntr_dbg_i  ;
    logic                       msg_rx_of_dbg_i    ;
    logic [DEBUG_REG_WIDTH-2:0] tlp_tx_cntr_dbg_i  ;
    logic                       tlp_tx_of_dbg_i    ;
-   
+
    always_ff @(posedge clk, posedge reset)
    begin : dbg_reg
       if (reset) begin
@@ -520,24 +520,24 @@ if (DEBUG_REG_EN == 1) begin
          //Total number of MCTP messages received
          if(mctp_msg_rdy_reg)
             msg_rx_cntr_dbg_i <= msg_rx_cntr_dbg_i + 1'b1;
-         
+
          if(mctp_msg_rdy_reg && (&msg_rx_cntr_dbg_i))
             msg_rx_of_dbg_i   <= 1'b1;
-         
+
          //Total number of TLPs transmitted
-         if(egrs_state[EGRS_EOP_BIT] && 
+         if(egrs_state[EGRS_EOP_BIT] &&
                                 avmm_egrs_mstr_write && !avmm_egrs_mstr_waitreq)
             tlp_tx_cntr_dbg_i <= tlp_tx_cntr_dbg_i + 1'b1;
-         
-         if(egrs_state[EGRS_EOP_BIT] && avmm_egrs_mstr_write && 
+
+         if(egrs_state[EGRS_EOP_BIT] && avmm_egrs_mstr_write &&
                                 !avmm_egrs_mstr_waitreq && (&tlp_tx_cntr_dbg_i))
             tlp_tx_of_dbg_i   <= 1'b1;
       end
    end : dbg_reg
-   
+
    assign pcie_vdm_sts4_dbg       = {55'd0,
                                      egrs_state};     //[8:0]  - Egress FSM state
-   
+
    //[63:32] - Reserved
    //[31:16] - Number of MCTP message received
    //[15:0]  - Number of TLPs transmitted

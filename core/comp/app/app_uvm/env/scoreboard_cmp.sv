@@ -1,7 +1,7 @@
 /*
  * file       : scoreboard_cmp.sv
  * Copyright (C) 2021 CESNET z. s. p. o.
- * description:  Scoreboard comparator 
+ * description:  Scoreboard comparator
  * date       : 2021
  * author     : Radek Iša <isa@cesnet.ch>
  *

@@ -85,8 +85,8 @@ port (
     P1_DDR4_DQS_P        : inout std_logic_vector(8 downto 0);
     P1_DDR4_DQS_N        : inout std_logic_vector(8 downto 0);
     P1_DDR4_DQ           : inout std_logic_vector(71 downto 0);
-    P1_RZQ               : in    std_logic;  
-  
+    P1_RZQ               : in    std_logic;
+
     -- =========================================================================
     -- I2C
     -- =========================================================================
@@ -244,7 +244,7 @@ architecture FULL of FPGA is
     constant AMM_FREQ_KHZ    : natural := 333333;
 
     signal status_led_g           : std_logic_vector(STATUS_LEDS-1 downto 0);
-    signal status_led_r           : std_logic_vector(STATUS_LEDS-1 downto 0);  
+    signal status_led_r           : std_logic_vector(STATUS_LEDS-1 downto 0);
     -- IO Expander
     signal io_reset               : std_logic;
     signal io_reset_sync          : std_logic;
@@ -283,7 +283,7 @@ architecture FULL of FPGA is
     signal mem_rst_n              : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_pll_locked         : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_pll_locked_sync    : std_logic_vector(MEM_PORTS-1 downto 0);
-    
+
     signal mem_avmm_ready         : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_avmm_read          : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_avmm_write         : std_logic_vector(MEM_PORTS-1 downto 0);
@@ -293,7 +293,7 @@ architecture FULL of FPGA is
     signal mem_avmm_readdata      : slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0);
     signal mem_avmm_readdata_full : slv_array_t(MEM_PORTS-1 downto 0)(576-1 downto 0);
     signal mem_avmm_readdatavalid : std_logic_vector(MEM_PORTS-1 downto 0);
-     
+
     signal emif_rst_req           : std_logic_vector(MEM_PORTS-1 downto 0);
     signal emif_rst_done          : std_logic_vector(MEM_PORTS-1 downto 0);
     signal emif_ecc_usr_int       : std_logic_vector(MEM_PORTS-1 downto 0);
@@ -418,7 +418,7 @@ begin
         ETH_PORT_CHAN           => ETH_PORT_CHAN,
         ETH_PORT_LEDS           => 1, -- fake, this board has no ETH LEDs
         ETH_LANES               => ETH_LANES,
-        
+
         QSFP_PORTS              => 1,
         QSFP_I2C_PORTS          => 1,
         QSFP_I2C_TRISTATE       => false,
@@ -426,17 +426,17 @@ begin
         STATUS_LEDS             => STATUS_LEDS,
         MISC_IN_WIDTH           => MISC_IN_WIDTH,
         MISC_OUT_WIDTH          => MISC_OUT_WIDTH,
-        
+
         PCIE_ENDPOINTS          => PCIE_ENDPOINTS,
         PCIE_ENDPOINT_TYPE      => PCIE_MOD_ARCH,
         PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE,
-        
+
         DMA_ENDPOINTS           => DMA_ENDPOINTS,
         DMA_MODULES             => DMA_MODULES,
-        
+
         DMA_RX_CHANNELS         => DMA_RX_CHANNELS/DMA_MODULES,
         DMA_TX_CHANNELS         => DMA_TX_CHANNELS/DMA_MODULES,
-        
+
         MEM_PORTS               => MEM_PORTS,
         MEM_ADDR_WIDTH          => MEM_ADDR_WIDTH,
         MEM_DATA_WIDTH          => MEM_DATA_WIDTH,
@@ -458,10 +458,10 @@ begin
         PCIE_RX_N              => PCIE_RX_N,
         PCIE_TX_P              => PCIE_TX_P,
         PCIE_TX_N              => PCIE_TX_N,
-        
+
         ETH_REFCLK_P           => QSFP_REFCLK_156M & QSFP_REFCLK_156M,
         ETH_REFCLK_N           => (others => '0'),
-        
+
         ETH_RX_P               => QSFP_RX_P,
         ETH_RX_N               => QSFP_RX_N,
         ETH_TX_P               => QSFP_TX_P,
@@ -469,7 +469,7 @@ begin
 
         ETH_LED_R              => open,
         ETH_LED_G              => open,
-        
+
         QSFP_I2C_SCL_I(0)      => qsfp_scl,
         QSFP_I2C_SDA_I(0)      => qsfp_sda,
         QSFP_I2C_SCL_O(0)      => qsfp_scl_o,
@@ -563,11 +563,11 @@ begin
 
     ddr4_cal_p0_i : component ddr4_calibration
     port map (
-        calbus_read_0               => calbus_read(0),              
-        calbus_write_0              => calbus_write(0),       
-        calbus_address_0            => calbus_address(0),     
-        calbus_wdata_0              => calbus_wdata(0),    
-        calbus_rdata_0              => calbus_rdata(0),       
+        calbus_read_0               => calbus_read(0),
+        calbus_write_0              => calbus_write(0),
+        calbus_address_0            => calbus_address(0),
+        calbus_wdata_0              => calbus_wdata(0),
+        calbus_rdata_0              => calbus_rdata(0),
         calbus_seq_param_tbl_0      => calbus_seq_param_tbl(0),
         calbus_clk                  => calbus_clk(0)
     );
@@ -617,14 +617,14 @@ begin
         calbus_seq_param_tbl => calbus_seq_param_tbl(1),
         calbus_clk           => calbus_clk(1)
     );
-    
+
     ddr4_cal_p1_i : component ddr4_calibration
     port map (
-        calbus_read_0               => calbus_read(1),              
-        calbus_write_0              => calbus_write(1),       
-        calbus_address_0            => calbus_address(1),     
-        calbus_wdata_0              => calbus_wdata(1),    
-        calbus_rdata_0              => calbus_rdata(1),       
+        calbus_read_0               => calbus_read(1),
+        calbus_write_0              => calbus_write(1),
+        calbus_address_0            => calbus_address(1),
+        calbus_wdata_0              => calbus_wdata(1),
+        calbus_rdata_0              => calbus_rdata(1),
         calbus_seq_param_tbl_0      => calbus_seq_param_tbl(1),
         calbus_clk                  => calbus_clk(1)
     );

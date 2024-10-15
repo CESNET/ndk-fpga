@@ -163,7 +163,7 @@ architecture FULL of FTILE_8x25g1 is
     -- Adress and data range constants for eth and xcvr
     constant MI_ADDR_WIDTH_PHY : natural := 32;  -- not sure
     constant MI_DATA_WIDTH_PHY : natural := 32;
-    
+
     --  monitoring RX link state
     constant RX_LINK_CNT_W : natural := 27;
 
@@ -172,7 +172,7 @@ architecture FULL of FTILE_8x25g1 is
 
     -- eneable for drp_bridge (xcvr + eth)
     constant MI_EN_MAP   : std_logic_vector(16-1 downto 0) := "0000000000000011";
-    
+
     -- constant for segments for macseg_loop size
     constant SEGMENTS_LOOP : natural := 1;
 
@@ -190,7 +190,7 @@ architecture FULL of FTILE_8x25g1 is
     signal drpaddr  : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0);
     signal drpardy  : std_logic;
     signal drpdi    : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal drpsel   : std_logic_vector(4-1 downto 0); 
+    signal drpsel   : std_logic_vector(4-1 downto 0);
 
     -- signals for mi_sel => IP core interface
     signal reconfig_addr           :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
@@ -300,7 +300,7 @@ begin
        BLK_ERR_CNTR             => (others => '0'),
        BLK_ERR_CLR              => open,
        SCR_BYPASS               => open,
-       PCS_RESET                => mgmt_pcs_reset, --TODO 
+       PCS_RESET                => mgmt_pcs_reset, --TODO
        PCS_LPBCK                => open,
        PCS_CONTROL(0)           => mgmt_mac_loop,
        PCS_CONTROL(15 downto 1) => mgmt_pcs_control_dummy,
@@ -316,7 +316,7 @@ begin
        PMA_LOPWR                => open,
        PMA_LPBCK                => open,
        PMA_REM_LPBCK            => open,
-       PMA_RESET                => mgmt_pma_reset, --TODO 
+       PMA_RESET                => mgmt_pma_reset, --TODO
        PMA_RETUNE               => open,
        PMA_CONTROL              => open,
        PMA_STATUS               => (others => '0'),
@@ -343,7 +343,7 @@ begin
     mgmt_pcs_control(15 downto 1) <= (others => '0');
     mgmt_pcs_control(0)           <= sync_repeater_ctrl; -- MAC loopback active
     -- MDIO reg 3.4001 (vendor specific PCS status/abilities)
-    mgmt_pcs_status(15 downto 1) <= (others => '0'); 
+    mgmt_pcs_status(15 downto 1) <= (others => '0');
     mgmt_pcs_status(0)           <= '1';        -- MAC loopback ability supported
 
     drp_bridge_i : entity work.bridge_drp
@@ -363,7 +363,7 @@ begin
        DRPARDY                 => drpardy,
        DRPDI                   => drpdi,
        DRPSEL                  => drpsel,
-    
+
        RECONFIG_ADDR           => reconfig_addr_drp,
        RECONFIG_READDATA_VALID => reconfig_readdata_valid,
        RECONFIG_READ           => reconfig_read_drp,

@@ -39,7 +39,7 @@ begin
             end if;
         end if;
     end process;
-    
+
     process (all)
     begin
         crdt_dw_fsm_nst   <= crdt_dw_fsm_pst;

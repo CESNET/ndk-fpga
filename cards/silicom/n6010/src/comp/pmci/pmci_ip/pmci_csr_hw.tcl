@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Intel Corporation.
 # SPDX-License-Identifier: MIT
 
-# 
+#
 # Description
 # -----------------------------------------------------------------------------
 # This is the _hw.tcl of PMCI CSR
@@ -437,38 +437,38 @@ add_interface_port m10_if fpga_seu_error fpga_seu_error Output 1
 # -----------------------------------------------------------------------------
 # Port - SEU IP AvST Sink
 # -----------------------------------------------------------------------------
-add_interface seu_avst_sink avalon_streaming end                            
-set_interface_property seu_avst_sink associatedClock clock                      
-set_interface_property seu_avst_sink associatedReset reset                    
-set_interface_property seu_avst_sink dataBitsPerSymbol 64                     
-set_interface_property seu_avst_sink errorDescriptor ""                       
-set_interface_property seu_avst_sink firstSymbolInHighOrderBits true          
-set_interface_property seu_avst_sink maxChannel 0                             
-set_interface_property seu_avst_sink readyAllowance 0                         
-set_interface_property seu_avst_sink readyLatency 0                           
-set_interface_property seu_avst_sink ENABLED true                             
-set_interface_property seu_avst_sink EXPORT_OF ""                             
-set_interface_property seu_avst_sink PORT_NAME_MAP ""                         
-set_interface_property seu_avst_sink CMSIS_SVD_VARIABLES ""                   
-set_interface_property seu_avst_sink SVD_ADDRESS_GROUP ""                     
-set_interface_property seu_avst_sink IPXACT_REGISTER_MAP_VARIABLES ""         
+add_interface seu_avst_sink avalon_streaming end
+set_interface_property seu_avst_sink associatedClock clock
+set_interface_property seu_avst_sink associatedReset reset
+set_interface_property seu_avst_sink dataBitsPerSymbol 64
+set_interface_property seu_avst_sink errorDescriptor ""
+set_interface_property seu_avst_sink firstSymbolInHighOrderBits true
+set_interface_property seu_avst_sink maxChannel 0
+set_interface_property seu_avst_sink readyAllowance 0
+set_interface_property seu_avst_sink readyLatency 0
+set_interface_property seu_avst_sink ENABLED true
+set_interface_property seu_avst_sink EXPORT_OF ""
+set_interface_property seu_avst_sink PORT_NAME_MAP ""
+set_interface_property seu_avst_sink CMSIS_SVD_VARIABLES ""
+set_interface_property seu_avst_sink SVD_ADDRESS_GROUP ""
+set_interface_property seu_avst_sink IPXACT_REGISTER_MAP_VARIABLES ""
 
-add_interface_port seu_avst_sink seu_avst_sink_data data Input 64          
-add_interface_port seu_avst_sink seu_avst_sink_vld valid Input 1         
-add_interface_port seu_avst_sink seu_avst_sink_rdy ready Output 1   
+add_interface_port seu_avst_sink seu_avst_sink_data data Input 64
+add_interface_port seu_avst_sink seu_avst_sink_vld valid Input 1
+add_interface_port seu_avst_sink seu_avst_sink_rdy ready Output 1
 
 # -----------------------------------------------------------------------------
 # Port - SEU IP System Error (conduit)
 # -----------------------------------------------------------------------------
-add_interface seu_sys_err conduit end                                             
-set_interface_property seu_sys_err associatedClock clock                            
-set_interface_property seu_sys_err associatedReset reset                          
-set_interface_property seu_sys_err ENABLED true                                   
-set_interface_property seu_sys_err EXPORT_OF ""                                   
-set_interface_property seu_sys_err PORT_NAME_MAP ""                               
-set_interface_property seu_sys_err CMSIS_SVD_VARIABLES ""                         
-set_interface_property seu_sys_err SVD_ADDRESS_GROUP ""                           
-set_interface_property seu_sys_err IPXACT_REGISTER_MAP_VARIABLES ""               
+add_interface seu_sys_err conduit end
+set_interface_property seu_sys_err associatedClock clock
+set_interface_property seu_sys_err associatedReset reset
+set_interface_property seu_sys_err ENABLED true
+set_interface_property seu_sys_err EXPORT_OF ""
+set_interface_property seu_sys_err PORT_NAME_MAP ""
+set_interface_property seu_sys_err CMSIS_SVD_VARIABLES ""
+set_interface_property seu_sys_err SVD_ADDRESS_GROUP ""
+set_interface_property seu_sys_err IPXACT_REGISTER_MAP_VARIABLES ""
 
 add_interface_port seu_sys_err seu_sys_error sys_error Input 1
 
@@ -476,7 +476,7 @@ add_interface_port seu_sys_err seu_sys_error sys_error Input 1
 # Validate IP
 # -----------------------------------------------------------------------------
 proc ip_validate { } {
-   
+
 
 }
 
@@ -484,11 +484,11 @@ proc ip_validate { } {
 # Elaborate IP
 # -----------------------------------------------------------------------------
 proc ip_elaborate { } {
-   
+
    set fadr_width [ get_parameter_value FLASH_ADDR_WIDTH ]
    set fbm_fdepth [ get_parameter_value FBM_FIFO_DEPTH ]
    set ssa_awidth [ get_parameter_value SS_ADDR_WIDTH ]
-   
+
    set_port_property flash_addr width_expr $fadr_width
    set_port_property read_count width_expr [expr {$fbm_fdepth + 1}]
    set_port_property fifo_dcount width_expr [expr {$fbm_fdepth + 1}]

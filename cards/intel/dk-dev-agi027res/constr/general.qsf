@@ -37,7 +37,7 @@ set_location_assignment PIN_KU60 -to qsfpdd_1v2_port_en
 set_location_assignment PIN_KJ59 -to qsfpdd_1v2_port_int_n
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to clk_sys_100m_p
@@ -65,7 +65,7 @@ set_instance_assignment -name IO_STANDARD "1.2 V" -to qsfpdd_1v2_port_int_n
 
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
-set_global_assignment -name DEVICE AGIB027R29A1E2VR0 
+set_global_assignment -name DEVICE AGIB027R29A1E2VR0
 set_global_assignment -name FAMILY Agilex
 
 set_global_assignment -name USE_CONF_DONE SDM_IO16

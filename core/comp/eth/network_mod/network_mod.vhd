@@ -1,4 +1,4 @@
--- network_mod.vhd: this is the top component of the Network module; 
+-- network_mod.vhd: this is the top component of the Network module;
 --                  it contains MI splitter(s) and one or more of the
 --                  Network module cores (based on mode of the ethernet
 --                  port) which is connected to a pair of MAC lites (RX + TX).
@@ -53,7 +53,7 @@ architecture FULL of NETWORK_MOD is
     -- =========================================================================
     --                               CONSTANTS
     -- =========================================================================
-    constant EHIP_TYPE         : natural := EHIP_PORT_TYPE(0); -- Define type of used IP core 
+    constant EHIP_TYPE         : natural := EHIP_PORT_TYPE(0); -- Define type of used IP core
 
     constant REGIONS_CORE      : natural := tsel(ETH_PORT_SPEED(0) = 400, 2, 1); -- TODO: support different speeds/number of channels for each port
     constant REGION_SIZE_CORE  : natural := region_size_core_f;
@@ -428,8 +428,8 @@ begin
 
         -- =====================================================================
         -- Network Module Core
-        -- =====================================================================    
-        network_mod_core_i: entity work.NETWORK_MOD_CORE 
+        -- =====================================================================
+        network_mod_core_i: entity work.NETWORK_MOD_CORE
         generic map (
             ETH_PORT_SPEED    => ETH_PORT_SPEED(p),
             ETH_PORT_CHAN     => ETH_PORT_CHAN (p),
@@ -565,7 +565,7 @@ begin
                 if (asfifox_ts_dv_n(p) = '0') then
                     synced_ts_ns(p) <= asfifox_ts_ns(p);
                 end if;
-                
+
                 synced_ts_dv(p) <= (not asfifox_ts_dv_n(p)) or
                                    (asfifox_ts_last_vld(p) and not asfifox_ts_timeout(p)(TS_TIMEOUT_W-1));
 

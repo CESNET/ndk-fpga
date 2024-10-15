@@ -7,10 +7,10 @@
 
 `timescale 1ns / 100ps
 module altera_avalon_st_packets_to_bytes
-//if ENCODING ==0, CHANNEL_WIDTH must be 8 
+//if ENCODING ==0, CHANNEL_WIDTH must be 8
 //else CHANNEL_WIDTH can be from 0 to 127
 #(    parameter CHANNEL_WIDTH = 8,
-      parameter ENCODING      = 0) 
+      parameter ENCODING      = 0)
 (
       // Interface: clk
       input              clk,
@@ -126,16 +126,16 @@ if( CHANNEL_WIDTH > 0) begin
                                    end
                               end else begin
                                // Sending out MSB=0, last 7 bits of Channel
-                                   if (channel_needs_esc) begin 
-                                      channel_needs_esc <= 0; 
+                                   if (channel_needs_esc) begin
+                                      channel_needs_esc <= 0;
                                       out_data <= {1'b0, stored_varchannel[((CHN_EFFECTIVE/7+1)*7)-1:((CHN_EFFECTIVE/7+1)*7)-7]} ^ 8'h20;
                                    end else   out_data <= {1'b0, stored_varchannel[((CHN_EFFECTIVE/7+1)*7)-1:((CHN_EFFECTIVE/7+1)*7)-7]};
                                    sent_channel <= 1;
                               end
                        end else begin
-                            if (channel_needs_esc) begin 
-                               channel_needs_esc <= 0; 
-                               out_data <= in_channel ^ 8'h20; 
+                            if (channel_needs_esc) begin
+                               channel_needs_esc <= 0;
+                               out_data <= in_channel ^ 8'h20;
                             end else out_data <= in_channel;
                             sent_channel <= 1;
                        end
@@ -237,7 +237,7 @@ assign need_channel = (need_sop);
          end
      end
    end
-   
+
  always @* begin
       in_ready = (out_ready | !out_valid) & in_valid & (~need_esc | sent_esc)
                  & (~need_sop | sent_sop)

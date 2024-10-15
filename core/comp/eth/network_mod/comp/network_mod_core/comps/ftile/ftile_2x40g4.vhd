@@ -60,7 +60,7 @@ entity FTILE_2x40g4 is
         CLK_ETH_OUT              : out std_logic;
         RESET_ETH                : in  std_logic;
         -- ===================================================================
-        -- ADAPTERS link up 
+        -- ADAPTERS link up
         -- ===================================================================
         RX_LINK_UP               : out std_logic;
         TX_LINK_UP               : out std_logic;
@@ -73,7 +73,7 @@ entity FTILE_2x40g4 is
 end entity;
 
 architecture FULL of FTILE_2x40g4 is
-    
+
     component ftile_eth_2x40g is
     port (
         i_clk_tx                        : in  std_logic                      := 'X';             -- clk
@@ -166,7 +166,7 @@ architecture FULL of FTILE_2x40g4 is
         i_tx_pause                      : in  std_logic                      := 'X';             -- i_tx_pause
         o_rx_pause                      : out std_logic                                          -- o_rx_pause
     );
-    end component ftile_eth_2x40g;    
+    end component ftile_eth_2x40g;
 
     -- ===================================================================
     -- Constants
@@ -188,7 +188,7 @@ architecture FULL of FTILE_2x40g4 is
     constant MI_ADDR_WIDTH_PHY : natural := 32;
     constant MI_DATA_WIDTH_PHY : natural := 32;
 
-    --  monitoring RX link state 
+    --  monitoring RX link state
     constant RX_LINK_CNT_W : natural := 27;
 
     -- eneable for drp_bridge (xcvr + eth)
@@ -214,9 +214,9 @@ architecture FULL of FTILE_2x40g4 is
     signal drpaddr  : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0);
     signal drpardy  : std_logic;
     signal drpdi    : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal drpsel   : std_logic_vector(4-1 downto 0); 
+    signal drpsel   : std_logic_vector(4-1 downto 0);
 
-    -- signals for mi_sel => IP core interface 
+    -- signals for mi_sel => IP core interface
     signal reconfig_addr           :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
     signal reconfig_readdata_valid :  std_logic_vector(MI_SEL_RANGE-1 downto 0);
     signal reconfig_read           :  std_logic_vector(MI_SEL_RANGE-1 downto 0);
@@ -231,7 +231,7 @@ architecture FULL of FTILE_2x40g4 is
     signal reconfig_addr_drp       :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
     signal reconfig_writedata_drp  :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
 
-    -- signal for Ftile interface 
+    -- signal for Ftile interface
     signal ftile_rx_rst_n             : std_logic;
     signal ftile_rx_rst_ack_n         : std_logic;
     signal ftile_tx_lanes_stable      : std_logic;
@@ -290,7 +290,7 @@ architecture FULL of FTILE_2x40g4 is
     signal rx_link_rst    : std_logic;
 
     signal ftile_clk_out  : std_logic;
-    
+
 begin
     mgmt_i : entity work.mgmt
     generic map (
@@ -324,7 +324,7 @@ begin
         BLK_ERR_CNTR             => (others => '0'),
         BLK_ERR_CLR              => open,
         SCR_BYPASS               => open,
-        PCS_RESET                => mgmt_pcs_reset, --TODO 
+        PCS_RESET                => mgmt_pcs_reset, --TODO
         PCS_LPBCK                => open,
         PCS_CONTROL(0)           => mgmt_mac_loop,
         PCS_CONTROL(15 downto 1) => mgmt_pcs_control_dummy,
@@ -340,7 +340,7 @@ begin
         PMA_LOPWR                => open,
         PMA_LPBCK                => open,
         PMA_REM_LPBCK            => open,
-        PMA_RESET                => mgmt_pma_reset, --TODO 
+        PMA_RESET                => mgmt_pma_reset, --TODO
         PMA_RETUNE               => open,
         PMA_CONTROL              => open,
         PMA_STATUS               => (others => '0'),
@@ -367,7 +367,7 @@ begin
     mgmt_pcs_control(15 downto 1) <= (others => '0');
     mgmt_pcs_control(0)           <= sync_repeater_ctrl; -- MAC loopback active
     -- MDIO reg 3.4001 (vendor specific PCS status/abilities)
-    mgmt_pcs_status(15 downto 1) <= (others => '0'); 
+    mgmt_pcs_status(15 downto 1) <= (others => '0');
     mgmt_pcs_status(0)           <= '1';        -- MAC loopback ability supported
 
     drp_bridge_i : entity work.bridge_drp
@@ -430,7 +430,7 @@ begin
     end process;
 
     ftile_rx_rst_n <= not rx_link_rst;
-        
+
     xcvr_reconfig_inf_res_g: for xcvr in PMA_LANES-1 downto 0 generate
 
         constant IA_INDEX : natural := 1 + xcvr;
@@ -458,7 +458,7 @@ begin
         reconfig_writedata (IA_INDEX) <=
             init_writedata                when init_busy = '1'  else
             reconfig_writedata_drp (IA_INDEX);
-            
+
         init_done_g: if (xcvr = 0) generate
             init_ready(0) <= ftile_tx_lanes_stable;
         else generate
@@ -493,7 +493,7 @@ begin
     mi_ardy_conversion_g: for i in PMA_LANES downto 0 generate
         mi_ardy_phy(i) <= not reconfig_waitrequest(i);
     end generate;
- 
+
     CLK_ETH_OUT <= ftile_clk_out;
 
     -- =========================================================================

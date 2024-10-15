@@ -1,7 +1,7 @@
 /*
  * file       : test.sv
  * Copyright (C) 2021 CESNET z. s. p. o.
- * description:  base test 
+ * description:  base test
  * date       : 2021
  * author     : Radek Iša <isa@cesnet.ch>
  *

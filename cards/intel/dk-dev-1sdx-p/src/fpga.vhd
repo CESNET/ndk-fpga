@@ -47,13 +47,13 @@ port (
     -- =========================================================================
     ZQSFP_1V8_PORT_EN       : out   std_logic;
     ZQSFP_1V8_PORT_INT_N    : in    std_logic;
-    
+
     CLK_312P5M_QSFP0_P      : in    std_logic;
     CLK_156P25M_QSFP0_P     : in    std_logic;
     CLK_312P5M_QSFP1_P      : in    std_logic;
     CLK_156P25M_QSFP1_P     : in    std_logic;
     CLK_312P5M_QSFP2_P      : in    std_logic;
-    
+
     QSFP1_RX_P              : in    std_logic_vector(4-1 downto 0);
     QSFP1_RX_N              : in    std_logic_vector(4-1 downto 0);
     QSFP1_TX_P              : out   std_logic_vector(4-1 downto 0);
@@ -68,7 +68,7 @@ port (
     -- =========================================================================
     -- I2C interface with temperature sensor
     --I2C_DDR4_DIMM_SDA       : inout std_logic;
-    --I2C_DDR4_DIMM_SCL       : inout std_logic;   
+    --I2C_DDR4_DIMM_SCL       : inout std_logic;
 
     -- EMIF DIMM0 interface
     CLK_133M_DIMM_1_P       : in    std_logic;  -- DIMM1 CLK = CH0 CLK
@@ -90,10 +90,10 @@ port (
     DDR4_DIMM_CH0_DQ        : inout std_logic_vector(72-1 downto 0);
     --DDR4_DIMM_CH0_RZQ       : inout std_logic;
     DDR4_DIMM_CH0_RZQ       : in    std_logic;
-    
+
     --DDR4_DIMM_CH0_C2        : out   std_logic;  --Module rank address (select of the whole memory?)
     --DDR4_DIMM_CH0_EVENT_N   : in    std_logic;  --Asserted on critical temperature
-    --DDR4_DIMM_CH0_SAVE_N    : in    std_logic; 
+    --DDR4_DIMM_CH0_SAVE_N    : in    std_logic;
 
     -- EMIF DIMM1 interface
     CLK_133M_DIMM_0_P       : in    std_logic;
@@ -107,9 +107,9 @@ port (
     DDR4_DIMM_CH1_CKE       : out   std_logic_vector(2-1 downto 0);
     DDR4_DIMM_CH1_CS_N      : out   std_logic_vector(4-1 downto 0);
     DDR4_DIMM_CH1_ODT       : out   std_logic_vector(2-1 downto 0);
-    DDR4_DIMM_CH1_RESET_N   : out   std_logic_vector(0 downto 0); 
-    DDR4_DIMM_CH1_PAR       : out   std_logic_vector(0 downto 0); 
-    DDR4_DIMM_CH1_ALERT_N   : in    std_logic_vector(0 downto 0); 
+    DDR4_DIMM_CH1_RESET_N   : out   std_logic_vector(0 downto 0);
+    DDR4_DIMM_CH1_PAR       : out   std_logic_vector(0 downto 0);
+    DDR4_DIMM_CH1_ALERT_N   : in    std_logic_vector(0 downto 0);
     DDR4_DIMM_CH1_DQS_P     : inout std_logic_vector(18-1 downto 0);
     DDR4_DIMM_CH1_DQS_N     : inout std_logic_vector(18-1 downto 0);
     DDR4_DIMM_CH1_DQ        : inout std_logic_vector(72-1 downto 0);
@@ -117,9 +117,9 @@ port (
     DDR4_DIMM_CH1_RZQ       : in    std_logic;
 --
     --DDR4_DIMM_CH1_C2        : out   std_logic;
-    --DDR4_DIMM_CH1_EVENT_N   : in    std_logic;                    
-    --DDR4_DIMM_CH1_SAVE_N    : in    std_logic;          
-  
+    --DDR4_DIMM_CH1_EVENT_N   : in    std_logic;
+    --DDR4_DIMM_CH1_SAVE_N    : in    std_logic;
+
     -- I2C
     -- =========================================================================
     I2C1_1V8_SCL            : inout std_logic;
@@ -139,45 +139,45 @@ architecture FULL of FPGA is
 
     component emif_s10dx is
     port (
-        local_reset_req           : in    std_logic                      := 'X';             
-        local_reset_done          : out   std_logic;                                         
-        pll_ref_clk               : in    std_logic                      := 'X';             
-        pll_ref_clk_out           : out   std_logic;                                         
-        pll_locked                : out   std_logic;                                         
-        oct_rzqin                 : in    std_logic                      := 'X';             
-        mem_ck                    : out   std_logic_vector(0 downto 0);                      
-        mem_ck_n                  : out   std_logic_vector(0 downto 0);                      
-        mem_a                     : out   std_logic_vector(16 downto 0);                     
-        mem_act_n                 : out   std_logic_vector(0 downto 0);                      
-        mem_ba                    : out   std_logic_vector(1 downto 0);                      
-        mem_bg                    : out   std_logic_vector(1 downto 0);                      
-        mem_cke                   : out   std_logic_vector(0 downto 0);                      
-        mem_cs_n                  : out   std_logic_vector(0 downto 0);                      
-        mem_odt                   : out   std_logic_vector(0 downto 0);                      
-        mem_reset_n               : out   std_logic_vector(0 downto 0);                      
-        mem_par                   : out   std_logic_vector(0 downto 0);                      
-        mem_alert_n               : in    std_logic_vector(0 downto 0)   := (others => 'X'); 
-        mem_dqs                   : inout std_logic_vector(8 downto 0)   := (others => 'X'); 
-        mem_dqs_n                 : inout std_logic_vector(8 downto 0)   := (others => 'X'); 
-        mem_dq                    : inout std_logic_vector(71 downto 0)  := (others => 'X'); 
-        mem_dbi_n                 : inout std_logic_vector(8 downto 0)   := (others => 'X'); 
-        local_cal_success         : out   std_logic;                                         
-        local_cal_fail            : out   std_logic;                                         
-        emif_usr_reset_n          : out   std_logic;                                         
-        emif_usr_clk              : out   std_logic;                                         
-        ctrl_ecc_user_interrupt_0 : out   std_logic;                                         
-        amm_ready_0               : out   std_logic;                                         
-        amm_read_0                : in    std_logic                      := 'X';             
-        amm_write_0               : in    std_logic                      := 'X';             
-        amm_address_0             : in    std_logic_vector(26 downto 0)  := (others => 'X'); 
-        amm_readdata_0            : out   std_logic_vector(511 downto 0);                    
-        amm_writedata_0           : in    std_logic_vector(511 downto 0) := (others => 'X'); 
-        amm_burstcount_0          : in    std_logic_vector(6 downto 0)   := (others => 'X'); 
-        amm_byteenable_0          : in    std_logic_vector(63 downto 0)  := (others => 'X'); 
-        amm_readdatavalid_0       : out   std_logic                                          
+        local_reset_req           : in    std_logic                      := 'X';
+        local_reset_done          : out   std_logic;
+        pll_ref_clk               : in    std_logic                      := 'X';
+        pll_ref_clk_out           : out   std_logic;
+        pll_locked                : out   std_logic;
+        oct_rzqin                 : in    std_logic                      := 'X';
+        mem_ck                    : out   std_logic_vector(0 downto 0);
+        mem_ck_n                  : out   std_logic_vector(0 downto 0);
+        mem_a                     : out   std_logic_vector(16 downto 0);
+        mem_act_n                 : out   std_logic_vector(0 downto 0);
+        mem_ba                    : out   std_logic_vector(1 downto 0);
+        mem_bg                    : out   std_logic_vector(1 downto 0);
+        mem_cke                   : out   std_logic_vector(0 downto 0);
+        mem_cs_n                  : out   std_logic_vector(0 downto 0);
+        mem_odt                   : out   std_logic_vector(0 downto 0);
+        mem_reset_n               : out   std_logic_vector(0 downto 0);
+        mem_par                   : out   std_logic_vector(0 downto 0);
+        mem_alert_n               : in    std_logic_vector(0 downto 0)   := (others => 'X');
+        mem_dqs                   : inout std_logic_vector(8 downto 0)   := (others => 'X');
+        mem_dqs_n                 : inout std_logic_vector(8 downto 0)   := (others => 'X');
+        mem_dq                    : inout std_logic_vector(71 downto 0)  := (others => 'X');
+        mem_dbi_n                 : inout std_logic_vector(8 downto 0)   := (others => 'X');
+        local_cal_success         : out   std_logic;
+        local_cal_fail            : out   std_logic;
+        emif_usr_reset_n          : out   std_logic;
+        emif_usr_clk              : out   std_logic;
+        ctrl_ecc_user_interrupt_0 : out   std_logic;
+        amm_ready_0               : out   std_logic;
+        amm_read_0                : in    std_logic                      := 'X';
+        amm_write_0               : in    std_logic                      := 'X';
+        amm_address_0             : in    std_logic_vector(26 downto 0)  := (others => 'X');
+        amm_readdata_0            : out   std_logic_vector(511 downto 0);
+        amm_writedata_0           : in    std_logic_vector(511 downto 0) := (others => 'X');
+        amm_burstcount_0          : in    std_logic_vector(6 downto 0)   := (others => 'X');
+        amm_byteenable_0          : in    std_logic_vector(63 downto 0)  := (others => 'X');
+        amm_readdatavalid_0       : out   std_logic
     );
     end component;
-    
+
     constant PCIE_LANES     : integer := 16;
     constant PCIE_CLKS      : integer := 2;
     constant PCIE_CONS      : integer := 2;
@@ -205,7 +205,7 @@ architecture FULL of FPGA is
     constant MEM_ADDR_WIDTH     : integer := 27;
     constant MEM_DATA_WIDTH     : integer := 512;
     constant MEM_BURST_WIDTH    : integer := 7;
-   
+
     signal ddr4_reset_n         : std_logic_vector(1 downto 0);
     signal ddr4_act_n           : std_logic_vector(1 downto 0);
     signal ddr4_par             : std_logic_vector(1 downto 0);
@@ -214,7 +214,7 @@ architecture FULL of FPGA is
     -- External memory interfaces (clocked at MEM_CLK)
     signal mem_clk                : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_rst_n              : std_logic_vector(MEM_PORTS-1 downto 0);
-    
+
     signal mem_avmm_ready         : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_avmm_read          : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_avmm_write         : std_logic_vector(MEM_PORTS-1 downto 0);
@@ -223,7 +223,7 @@ architecture FULL of FPGA is
     signal mem_avmm_writedata     : slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0);
     signal mem_avmm_readdata      : slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0);
     signal mem_avmm_readdatavalid : std_logic_vector(MEM_PORTS-1 downto 0);
-     
+
     signal emif_rst_req           : std_logic_vector(MEM_PORTS-1 downto 0);
     signal emif_rst_done          : std_logic_vector(MEM_PORTS-1 downto 0);
     signal emif_ecc_usr_int       : std_logic_vector(MEM_PORTS-1 downto 0);

@@ -395,7 +395,7 @@ begin
         MI_DRD             => MI_DRD,
         MI_ARDY            => MI_ARDY,
         MI_DRDY            => MI_DRDY,
-        
+
         AVMM_ADDRESS       => avmm_addr,
         AVMM_WRITE         => avmm_wr,
         AVMM_READ          => avmm_rd,

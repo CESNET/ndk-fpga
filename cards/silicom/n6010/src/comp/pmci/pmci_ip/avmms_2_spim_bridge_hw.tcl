@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Intel Corporation.
 # SPDX-License-Identifier: MIT
 
-# 
+#
 # Description
 # -----------------------------------------------------------------------------
 # This is the _hw.tcl of Avalon Slave to SPI Master Bridge Core
@@ -348,7 +348,7 @@ add_interface_port spi spim_mosi mosi Output 1
 # Validate IP
 # -----------------------------------------------------------------------------
 proc ip_validate { } {
-   
+
    set csr_dwidth [ get_parameter_value CSR_DATA_WIDTH ]
    set dir_awidth [ get_parameter_value DIR_ADDR_WIDTH ]
    set dir_baddr  [ get_parameter_value DIR_BASE_ADDR ]
@@ -364,16 +364,16 @@ proc ip_validate { } {
    } else {
       set_parameter_value CSR_ADDR_WIDTH -1
    }
-   
+
    set addr_span  [expr {int(4 * pow(2, $dir_awidth))}]
    set max_bcount [expr {int(2 * pow(2, $dir_bcount))}]
-   
+
    if { $max_bcount > $addr_span } {
       send_message Error "Addressable bytes derived from DIR_ADDR_WIDTH is lesser than maximum burst length derived from DIR_BRST_WIDTH"
       send_message Info "Address width spans $addr_span bytes."
       send_message Info "Maximum burst count is $max_bcount bytes."
    }
-   
+
    if { $dir_baddr == 0 } {
       send_message Error "'Base Address of Direct Slave Access' cannot be zero"
    }
@@ -384,35 +384,35 @@ proc ip_validate { } {
    if { [expr {$dir_baddr & ($addr_span - 1)}] != 0 } {
       send_message Error [format "Base address 0x%X is not aligned to address range $addr_span bytes" $dir_baddr]
    }
-   
+
    set bit_pos 31
    set all_fs 0xFFFFFFFF
    while { ([expr {$dir_baddr & ($all_fs << $bit_pos)}] != $dir_baddr) && ($bit_pos >= 0) } {
       set bit_pos [expr {$bit_pos - 1}]
    }
    set_parameter_value SLV_CSR_AWIDTH $bit_pos
-   
+
    if { $miso_dly > [expr {$clk_div + 1}] } {
       send_message Warning "MISO Capture delay is more than clock period. Please make sure master can capture MISO at this delay"
    }
-    
+
 }
 
 # -----------------------------------------------------------------------------
 # Elaborate IP
 # -----------------------------------------------------------------------------
 proc ip_elaborate { } {
-   
+
    set csr_awidth [ get_parameter_value CSR_ADDR_WIDTH ]
    set csr_dwidth [ get_parameter_value CSR_DATA_WIDTH ]
    set dir_awidth [ get_parameter_value DIR_ADDR_WIDTH ]
    set dir_bcount [ get_parameter_value DIR_BRST_WIDTH ]
-   
+
    set_port_property avmm_csr_addr width_expr $csr_awidth
    set_port_property avmm_csr_rddata width_expr $csr_dwidth
    set_port_property avmm_csr_wrdata width_expr $csr_dwidth
    set_port_property avmm_csr_byteen width_expr [expr {$csr_dwidth / 8}]
-   
+
    set_port_property avmm_dir_addr width_expr $dir_awidth
    set_port_property avmm_dir_burstcnt width_expr $dir_bcount
 

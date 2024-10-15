@@ -154,12 +154,12 @@ class sequence_xilinx#(CQ_MFB_REGIONS, CC_MFB_REGIONS, RQ_MFB_REGIONS, RC_MFB_RE
             run_axi_cq_data();
             run_axi_rc_data();
             run_mfb_rq_data();
-            forever begin 
+            forever begin
                 m_mfb_rq_meta_sq.randomize();
                 m_mfb_rq_meta_sq.start(p_sequencer.m_rq_mfb_meta_sqr);
             end
             run_mfb_cc_data();
-            forever begin 
+            forever begin
                 m_mfb_cc_meta_sq.randomize();
                 m_mfb_cc_meta_sq.start(p_sequencer.m_cc_mfb_meta_sqr);
             end
