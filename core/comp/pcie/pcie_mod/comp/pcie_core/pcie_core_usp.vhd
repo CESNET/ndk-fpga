@@ -151,7 +151,7 @@ architecture USP of PCIE_CORE is
         end loop;
         return mi_addr_base;
     end function;
-        
+
     -- Address bases for all Debug Probes and Event Counters in a single Endpoint
     function mi_addr_base_dbg_f return slv_array_t is
         variable mi_addr_base : slv_array_t(1+DBG_EVENTS-1 downto 0)(MI_WIDTH-1 downto 0);
@@ -481,7 +481,7 @@ architecture USP of PCIE_CORE is
     signal pcie_clk                 : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_rst_async           : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_rst                 : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(RESET_WIDTH+1-1 downto 0);
-    
+
     signal cfg_rcb_status           : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3 downto 0);
     signal cfg_max_payload          : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(1 downto 0);
     signal cfg_max_read_req         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2 downto 0);
@@ -631,7 +631,7 @@ architecture USP of PCIE_CORE is
     signal eve_ph             : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);
     signal eve_pd             : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);
     signal eve_nph            : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);
-    signal eve_npd            : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);    
+    signal eve_npd            : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);
 
     signal eve_ph_reg         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);
     signal eve_pd_reg         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);
@@ -1342,7 +1342,7 @@ begin
         port map (
             PCIE_CLK            => pcie_clk(i),
             PCIE_RESET          => pcie_rst(i)(0),
-    
+
             AVST_DOWN_DATA      => (others => '0'),
             AVST_DOWN_HDR       => (others => '0'),
             AVST_DOWN_PREFIX    => (others => '0'),
@@ -1352,7 +1352,7 @@ begin
             AVST_DOWN_BAR_RANGE => (others => '0'),
             AVST_DOWN_VALID     => (others => '0'),
             AVST_DOWN_READY     => open,
-    
+
             AVST_UP_DATA        => open,
             AVST_UP_HDR         => open,
             AVST_UP_PREFIX      => open,
@@ -1361,7 +1361,7 @@ begin
             AVST_UP_ERROR       => open,
             AVST_UP_VALID       => open,
             AVST_UP_READY       => '0',
-    
+
             CRDT_DOWN_INIT_DONE => '0',
             CRDT_DOWN_UPDATE    => open,
             CRDT_DOWN_CNT_PH    => open,
@@ -1370,7 +1370,7 @@ begin
             CRDT_DOWN_CNT_PD    => open,
             CRDT_DOWN_CNT_NPD   => open,
             CRDT_DOWN_CNT_CPLD  => open,
-    
+
             CRDT_UP_INIT_DONE   => '0',
             CRDT_UP_UPDATE      => (others => '0'),
             CRDT_UP_CNT_PH      => (others => '0'),
@@ -1379,7 +1379,7 @@ begin
             CRDT_UP_CNT_PD      => (others => '0'),
             CRDT_UP_CNT_NPD     => (others => '0'),
             CRDT_UP_CNT_CPLD    => (others => '0'),
-    
+
             CQ_AXI_DATA         => pcie_cq_axi_data(i),
             CQ_AXI_USER         => pcie_cq_axi_user(i),
             CQ_AXI_LAST         => pcie_cq_axi_last(i),
@@ -1407,7 +1407,7 @@ begin
             RQ_AXI_KEEP         => pcie_rq_axi_keep(i),
             RQ_AXI_VALID        => pcie_rq_axi_valid(i),
             RQ_AXI_READY        => pcie_rq_axi_ready(i),
-    
+
             CQ_MFB_DATA         => CQ_MFB_DATA(i),
             CQ_MFB_META         => CQ_MFB_META(i),
             CQ_MFB_SOF          => CQ_MFB_SOF(i),

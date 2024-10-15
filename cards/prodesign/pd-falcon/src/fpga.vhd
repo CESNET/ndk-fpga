@@ -33,22 +33,22 @@ port (
     REFCLK_R9A2         : in std_logic; -- 156.25 MHZ
     REFCLK_R9C2         : in std_logic; -- 156.25 MHZ
 
-    QSFP1_RX_P          : in std_logic_vector(4-1 downto 0); 
+    QSFP1_RX_P          : in std_logic_vector(4-1 downto 0);
     QSFP1_RX_N          : in std_logic_vector(4-1 downto 0);
     QSFP1_TX_P          : out std_logic_vector(4-1 downto 0);
     QSFP1_TX_N          : out std_logic_vector(4-1 downto 0);
 
-    QSFP2_RX_P          : in std_logic_vector(4-1 downto 0); 
+    QSFP2_RX_P          : in std_logic_vector(4-1 downto 0);
     QSFP2_RX_N          : in std_logic_vector(4-1 downto 0);
     QSFP2_TX_P          : out std_logic_vector(4-1 downto 0);
     QSFP2_TX_N          : out std_logic_vector(4-1 downto 0);
 
-    QSFP3_RX_P          : in std_logic_vector(4-1 downto 0); 
+    QSFP3_RX_P          : in std_logic_vector(4-1 downto 0);
     QSFP3_RX_N          : in std_logic_vector(4-1 downto 0);
     QSFP3_TX_P          : out std_logic_vector(4-1 downto 0);
     QSFP3_TX_N          : out std_logic_vector(4-1 downto 0);
 
-    QSFP4_RX_P          : in std_logic_vector(4-1 downto 0); 
+    QSFP4_RX_P          : in std_logic_vector(4-1 downto 0);
     QSFP4_RX_N          : in std_logic_vector(4-1 downto 0);
     QSFP4_TX_P          : out std_logic_vector(4-1 downto 0);
     QSFP4_TX_N          : out std_logic_vector(4-1 downto 0);

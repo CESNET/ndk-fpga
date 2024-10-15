@@ -198,7 +198,7 @@ SETTINGS = {
     "dma_ports_2" : {
         "DMA_PORTS"            : 2,
     },
-    
+
     "_combinations_" : {
         "P_TILE_512"           : ("intel_p_tile_512",              ),
         "P_TILE_256_BIF"       : ("intel_p_tile_256_bif",          ),

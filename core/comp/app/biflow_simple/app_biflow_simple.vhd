@@ -32,7 +32,7 @@ port (
     -- =========================================================================
     CLK              : in  std_logic;
     RESET            : in  std_logic;
-    
+
     -- =========================================================================
     -- Input MFB+MVB interface
     -- =========================================================================
@@ -49,7 +49,7 @@ port (
     IN_MFB_EOF_POS   : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
     IN_MFB_SRC_RDY   : in  std_logic_vector(IN_STREAMS-1 downto 0);
     IN_MFB_DST_RDY   : out std_logic_vector(IN_STREAMS-1 downto 0);
-    
+
     -- =========================================================================
     -- Output MFB+MVB interface
     -- =========================================================================
@@ -57,7 +57,7 @@ port (
     OUT_MVB_VLD      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     OUT_MVB_SRC_RDY  : out std_logic_vector(OUT_STREAMS-1 downto 0);
     OUT_MVB_DST_RDY  : in  std_logic_vector(OUT_STREAMS-1 downto 0);
-    
+
     OUT_MFB_DATA     : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
     OUT_MFB_SOF      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     OUT_MFB_EOF      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
@@ -182,7 +182,7 @@ begin
                 port_out_mvb_vld(i*IN_STREAMS+j)     <= port_in_mvb_vld(j*OUT_STREAMS+i);
                 port_out_mvb_src_rdy(i*IN_STREAMS+j) <= port_in_mvb_src_rdy(j*OUT_STREAMS+i);
                 port_in_mvb_dst_rdy(j*OUT_STREAMS+i)  <= port_out_mvb_dst_rdy(i*IN_STREAMS+j);
-                
+
                 port_out_mfb_data(i*IN_STREAMS+j)    <= port_in_mfb_data(j*OUT_STREAMS+i);
                 port_out_mfb_sof(i*IN_STREAMS+j)     <= port_in_mfb_sof(j*OUT_STREAMS+i);
                 port_out_mfb_eof(i*IN_STREAMS+j)     <= port_in_mfb_eof(j*OUT_STREAMS+i);
@@ -210,7 +210,7 @@ begin
             port map(
                 CLK             => CLK,
                 RESET           => RESET,
-                    
+
                 RX_MVB_DATA     => port_out_mvb_data(IPO_RANGE),
                 RX_MVB_PAYLOAD  => (others => (others => '1')),
                 RX_MVB_VLD      => port_out_mvb_vld(IPO_RANGE),

@@ -124,7 +124,7 @@ if { $ARCHGRP == "E_TILE"} {
     lappend MOD "$ENTITY_BASE/ts_demo_logic.vhd"
     lappend MOD "$ENTITY_BASE/network_mod_core_etile.vhd"
 }
- 
+
 if { $ARCHGRP == "CMAC" } {
     lappend COMPONENTS [list "ASYNC_RESET"     "$ASYNC_BASE/reset"     "FULL"]
     lappend COMPONENTS [list "ASYNC_OPEN_LOOP" "$ASYNC_BASE/open_loop" "FULL"]

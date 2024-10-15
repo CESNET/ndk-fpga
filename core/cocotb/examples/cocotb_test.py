@@ -63,6 +63,6 @@ async def cocotb_test_tx_scapy_packet(dut):
 
     await nfb.dma.tx[0].send(s2b(pkt))
     await Timer(10, units='us')
-    
+
     stats = await mac.read_stats()
     assert stats['sent'] == 1

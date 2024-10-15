@@ -174,7 +174,7 @@ class env #(
     function void connect_phase(uvm_phase phase);
         for (int unsigned cons = 0; cons < PCIE_CONS; cons++) begin
             for (int unsigned pcie_logic = 0; pcie_logic < PCIE_ENDPOINTS/PCIE_CONS; pcie_logic++) begin
-                const int unsigned pcie = cons*PCIE_ENDPOINTS/PCIE_CONS + pcie_logic; 
+                const int unsigned pcie = cons*PCIE_ENDPOINTS/PCIE_CONS + pcie_logic;
                 //PCIE CONNECT
                 m_pcie_env[pcie].rc_analysis_port.connect(m_scoreboard.pcie_rc[pcie]);
                 m_pcie_env[pcie].cq_analysis_port.connect(m_scoreboard.pcie_cq[pcie]);

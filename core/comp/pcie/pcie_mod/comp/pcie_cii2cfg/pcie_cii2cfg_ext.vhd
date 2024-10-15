@@ -38,7 +38,7 @@ entity PCIE_CII2CFG_EXT is
 end entity;
 
 architecture FULL of PCIE_CII2CFG_EXT is
-    
+
     signal pcie_cii_req_reg          : std_logic;
     signal pcie_cii_wr_reg           : std_logic;
     signal pcie_cii_addr_reg         : std_logic_vector(9 downto 0);

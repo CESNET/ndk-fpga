@@ -1,4 +1,4 @@
-// driver.sv: pcie driver 
+// driver.sv: pcie driver
 // Copyright (C) 2024 CESNET z. s. p. o.
 // Author(s): Radek Iša <isa@cesnet.cz>
 

@@ -31,7 +31,7 @@ entity PMCI_TOP is
         MI_DRD                   : out std_logic_vector(32-1 downto 0);
         MI_ARDY                  : out std_logic;
         MI_DRDY                  : out std_logic;
-        
+
         -- =====================================================================
         -- BMC interface
         -- =====================================================================
@@ -77,7 +77,7 @@ architecture FULL of PMCI_TOP is
         axi_mstr_wvalid                                            : out std_logic;
         axi_mstr_wready                                            : in  std_logic;
         axi_mstr_bid                                               : in  std_logic_vector(8-1 downto 0);
-        axi_mstr_bresp                                             : in  std_logic_vector(2-1 downto 0);    
+        axi_mstr_bresp                                             : in  std_logic_vector(2-1 downto 0);
         axi_mstr_bvalid                                            : in  std_logic;
         axi_mstr_bready                                            : out std_logic;
         axi_mstr_arid                                              : out std_logic_vector(8-1 downto 0);
@@ -104,7 +104,7 @@ architecture FULL of PMCI_TOP is
         axi_slave_wvalid                                           : in  std_logic;
         axi_slave_wready                                           : out std_logic;
         axi_slave_bid                                              : out std_logic_vector(8-1 downto 0);
-        axi_slave_bresp                                            : out std_logic_vector(2-1 downto 0);    
+        axi_slave_bresp                                            : out std_logic_vector(2-1 downto 0);
         axi_slave_bvalid                                           : out std_logic;
         axi_slave_bready                                           : in  std_logic;
         axi_slave_arid                                             : in  std_logic_vector(8-1 downto 0);
@@ -161,7 +161,7 @@ architecture FULL of PMCI_TOP is
     signal axi_mstr_wvalid  : std_logic;
     signal axi_mstr_wready  : std_logic;
     signal axi_mstr_bid     : std_logic_vector(8-1 downto 0);
-    signal axi_mstr_bresp   : std_logic_vector(2-1 downto 0);    
+    signal axi_mstr_bresp   : std_logic_vector(2-1 downto 0);
     signal axi_mstr_bvalid  : std_logic;
     signal axi_mstr_bready  : std_logic;
     signal axi_mstr_arid    : std_logic_vector(8-1 downto 0);
@@ -188,7 +188,7 @@ architecture FULL of PMCI_TOP is
     signal csr_wvalid       : std_logic;
     signal csr_wready       : std_logic;
     signal csr_bid          : std_logic_vector(8-1 downto 0);
-    signal csr_bresp        : std_logic_vector(2-1 downto 0);    
+    signal csr_bresp        : std_logic_vector(2-1 downto 0);
     signal csr_bvalid       : std_logic;
     signal csr_bready       : std_logic;
     signal csr_arid         : std_logic_vector(8-1 downto 0);

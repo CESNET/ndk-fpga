@@ -2,7 +2,7 @@
 // Copyright (C) 2024 CESNET z. s. p. o.
 // Author(s): Radek Iša <isa@cesnet.cz>
 
-// SPDX-License-Identifier: BSD-3-Clause 
+// SPDX-License-Identifier: BSD-3-Clause
 
 
 class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH) extends uvm_component;

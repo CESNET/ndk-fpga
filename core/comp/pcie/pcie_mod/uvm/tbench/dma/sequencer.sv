@@ -1,6 +1,6 @@
-// sequencer.sv :  
+// sequencer.sv :
 // Copyright (C) 2024 CESNET z. s. p. o.
-// Author(s): Radek Iša <isa@cesnet.cz> 
+// Author(s): Radek Iša <isa@cesnet.cz>
 
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -63,12 +63,12 @@ class sequencer extends uvm_sequencer #(sequence_item_rq);
     task run_phase(uvm_phase phase);
         uvm_dma::sequence_item_rc resp;
 
-        forever begin 
+        forever begin
             fifo_rsp.get(resp);
             if (resp.completed == 1) begin
-                info.tag_remove(resp.unit_id, resp.tag); 
+                info.tag_remove(resp.unit_id, resp.tag);
             end
-        end 
+        end
     endtask
 endclass
 

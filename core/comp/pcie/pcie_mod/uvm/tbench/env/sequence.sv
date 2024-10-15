@@ -9,21 +9,21 @@ class sequence_base #(
     RC_MFB_REGION_SIZE,
     RC_MFB_BLOCK_SIZE,
     RC_MFB_META_W,
-    
+
     CQ_MFB_REGIONS,
     CQ_MFB_REGION_SIZE,
     CQ_MFB_BLOCK_SIZE,
     CQ_MFB_META_W,
-        
+
     RQ_MFB_META_W,
 
     CC_MFB_REGIONS,
     CC_MFB_REGION_SIZE,
     CC_MFB_BLOCK_SIZE,
     CC_MFB_META_W,
-    
+
     ITEM_WIDTH,
-    DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS) extends uvm_sequence; 
+    DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS) extends uvm_sequence;
     `uvm_object_param_utils(uvm_pcie_top::sequence_base#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W, CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE,  CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
                                                          RQ_MFB_META_W,  CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_META_W, ITEM_WIDTH, DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS))
 
@@ -191,7 +191,7 @@ class sequence_base #(
                         run_cq(index_pcie, index_dma);
                     join_none
                 end
-                run_pcie(index_pcie); 
+                run_pcie(index_pcie);
                 run_mi(index_pcie);
             join_none
         end

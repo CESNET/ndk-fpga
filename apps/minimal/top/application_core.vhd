@@ -135,7 +135,7 @@ architecture FULL of APPLICATION_CORE is
     signal split_mi_wr                   : std_logic_vector(MI_PORTS-1 downto 0);
     signal split_mi_ardy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');
     signal split_mi_drd                  : slv_array_t     (MI_PORTS-1 downto 0)(MI_DATA_WIDTH-1 downto 0);
-    signal split_mi_drdy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');   
+    signal split_mi_drdy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');
 
 begin
 
@@ -210,7 +210,7 @@ begin
     port map(
         CLK        => APP_CLK,
         RESET      => APP_RESET(0),
-        
+
         RX_DWR     => sync_mi_dwr,
         RX_ADDR    => sync_mi_addr,
         RX_BE      => sync_mi_be,
@@ -301,7 +301,7 @@ begin
             DMA_TX_MFB_EOF_POS      => app_dma_tx_mfb_eof_pos_deser(i),
             DMA_TX_MFB_SRC_RDY      => app_dma_tx_mfb_src_rdy_deser(i),
             DMA_TX_MFB_DST_RDY      => app_dma_tx_mfb_dst_rdy_deser(i),
-        
+
             ETH_RX_MVB_DATA         => eth_rx_mvb_data_deser(i),
             ETH_RX_MVB_VLD          => eth_rx_mvb_vld_deser(i),
             ETH_RX_MVB_SRC_RDY      => ETH_RX_MVB_SRC_RDY(i),
@@ -314,7 +314,7 @@ begin
             ETH_RX_MFB_EOF_POS      => eth_rx_mfb_eof_pos_deser(i),
             ETH_RX_MFB_SRC_RDY      => ETH_RX_MFB_SRC_RDY(i),
             ETH_RX_MFB_DST_RDY      => ETH_RX_MFB_DST_RDY(i),
-        
+
             ETH_TX_MFB_DATA         => eth_tx_mfb_data_deser(i),
             ETH_TX_MFB_HDR          => eth_tx_mfb_hdr_deser(i),
             ETH_TX_MFB_SOF          => eth_tx_mfb_sof_deser(i),
@@ -323,7 +323,7 @@ begin
             ETH_TX_MFB_EOF_POS      => eth_tx_mfb_eof_pos_deser(i),
             ETH_TX_MFB_SRC_RDY      => ETH_TX_MFB_SRC_RDY(i),
             ETH_TX_MFB_DST_RDY      => ETH_TX_MFB_DST_RDY(i),
-            
+
             MI_DWR                  => split_mi_dwr(i),
             MI_ADDR                 => split_mi_addr(i),
             MI_BE                   => split_mi_be(i),
@@ -538,7 +538,7 @@ begin
         HBM_AXI_BRESP          => HBM_AXI_BRESP,
         HBM_AXI_BVALID         => HBM_AXI_BVALID,
         HBM_AXI_BREADY         => HBM_AXI_BREADY,
-    
+
         DDR_CLK                => MEM_CLK,
         DDR_RESET              => MEM_RST,
         DDR_AVMM_READY         => MEM_AVMM_READY,
@@ -558,7 +558,7 @@ begin
         EMIF_CAL_SUCCESS       => EMIF_CAL_SUCCESS,
         EMIF_CAL_FAIL          => EMIF_CAL_FAIL,
         EMIF_AUTO_PRECHARGE    => EMIF_AUTO_PRECHARGE,
-    
+
         MI_DWR                 => split_mi_dwr(ETH_STREAMS),
         MI_ADDR                => split_mi_addr(ETH_STREAMS),
         MI_BE                  => split_mi_be(ETH_STREAMS),

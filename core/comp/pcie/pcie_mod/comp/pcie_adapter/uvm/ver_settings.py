@@ -152,7 +152,7 @@ SETTINGS = {
         "RQ_MFB_BLOCK_SIZE"    : "8"                 ,
         "RQ_MFB_ITEM_WIDTH"    : "32"                ,
     },
-    "_combinations_" : (  
+    "_combinations_" : (
     (), # Works the same as '("default",),' as the "default" is applied in every combination
     # ("ultrascale_256",                      ),
     ("ultrascale_512",                      ),

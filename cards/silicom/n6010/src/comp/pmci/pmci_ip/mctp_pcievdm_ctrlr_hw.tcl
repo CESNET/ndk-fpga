@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Intel Corporation.
 # SPDX-License-Identifier: MIT
 
-# 
+#
 # Description
 # -----------------------------------------------------------------------------
 # This is the _hw.tcl of MCTP over PCIeVDM Controller
@@ -351,7 +351,7 @@ add_interface_port csr_if pcie_vdm_sts5_dbg pcie_vdm_sts5_dbg Output 64
 # Validate IP
 # -----------------------------------------------------------------------------
 proc ip_validate { } {
-   
+
    set ingrm_awidth [ get_parameter_value INGR_MSTR_ADDR_WIDTH ]
    set ingrm_bwidth [ get_parameter_value INGR_MSTR_BRST_WIDTH ]
 #  set egrss_awidth [ get_parameter_value EGRS_SLV_ADDR_WIDTH ]
@@ -359,7 +359,7 @@ proc ip_validate { } {
 
    set addr_span  [expr {pow(2, $ingrm_awidth)}]
    set max_bcount [expr {2 * pow(2, $ingrm_bwidth)}]
-   
+
    if { $max_bcount > $addr_span } {
             send_message Error "Addressable bytes are lesser than maximum burst length"
             send_message Info "Address width spans $addr_span bytes."
@@ -371,12 +371,12 @@ proc ip_validate { } {
 # Elaborate IP
 # -----------------------------------------------------------------------------
 proc ip_elaborate { } {
-   
+
    set ingrm_awidth [ get_parameter_value INGR_MSTR_ADDR_WIDTH ]
    set ingrm_bwidth [ get_parameter_value INGR_MSTR_BRST_WIDTH ]
    set egrss_awidth [ get_parameter_value EGRS_SLV_ADDR_WIDTH ]
    set egrsm_awidth [ get_parameter_value SS_ADDR_WIDTH ]
-   
+
    set_port_property avmm_ingr_mstr_addr     width_expr $ingrm_awidth
    set_port_property avmm_ingr_mstr_burstcnt width_expr $ingrm_bwidth
    set_port_property avmm_egrs_slv_addr      width_expr $egrss_awidth

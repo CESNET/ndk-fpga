@@ -87,8 +87,8 @@ set_location_assignment PIN_P31  -to NCSI_RBT_NCSI_TXD[1]
 set_location_assignment PIN_M31  -to NCSI_RBT_NCSI_TX_EN
 set_location_assignment PIN_H29  -to NCSI_RBT_NCSI_RXD[0]
 set_location_assignment PIN_J30  -to NCSI_RBT_NCSI_RXD[1]
-set_location_assignment PIN_L30  -to NCSI_RBT_NCSI_CRS_DV 
-set_location_assignment PIN_N30  -to NCSI_RBT_NCSI_ARB_IN 
+set_location_assignment PIN_L30  -to NCSI_RBT_NCSI_CRS_DV
+set_location_assignment PIN_N30  -to NCSI_RBT_NCSI_ARB_IN
 set_location_assignment PIN_F29  -to NCSI_RBT_NCSI_ARB_OUT
 
 set_instance_assignment -name IO_STANDARD "1.2 V" -to QSPI_NCS

@@ -15,7 +15,7 @@ architecture FULL of TESTBENCH is
     constant CLK_PERIOD : time := 4 ns;
     constant WORD_SIZE  : natural := 16;
     constant TRANS_COUNT: natural := 16;
-    
+
 
     signal clk         : std_logic := '0';
     signal reset       : std_logic;

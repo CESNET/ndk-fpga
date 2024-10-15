@@ -23,7 +23,7 @@ endclass
 class sequence_rc extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(32));
     `uvm_object_param_utils(uvm_pcie_xilinx::sequence_rc)
 
-    req_fifo#(uvm_pcie::completer_header) fifo; 
+    req_fifo#(uvm_pcie::completer_header) fifo;
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_rc");
@@ -32,7 +32,7 @@ class sequence_rc extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(
 
     task body();
         assert(uvm_config_db #(req_fifo#(uvm_pcie::completer_header))::get(m_sequencer, "", "seq_fifo_rc", fifo)) else begin
-            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo rc"); 
+            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo rc");
         end;
 
         forever begin
@@ -58,7 +58,7 @@ class sequence_rc extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(
             logic [32-1:0] hdr[3];
             int unsigned   move;
 
-            //get header from 
+            //get header from
 
             wait(fifo.size() != 0);
             pcie_cc = fifo.pop_front();
@@ -89,7 +89,7 @@ class sequence_rc extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(
             attr[0]                = pcie_cc.no_snoop;
             r_3                    = 0;
 
-            {hdr[2], hdr[1], hdr[0]} = 
+            {hdr[2], hdr[1], hdr[0]} =
             {r_3, attr, tc, r_2, completer_id, tag, requester_id, r_1, poisoned, completion_status, dword_count, r_0, request_completed,
             locked_read_completion, byte_count, err_code, lower_addr};
 
@@ -102,7 +102,7 @@ endclass
 class sequence_cq extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(32));
     `uvm_object_param_utils(uvm_pcie_xilinx::sequence_cq)
 
-    req_fifo#(uvm_pcie::request_header) fifo; 
+    req_fifo#(uvm_pcie::request_header) fifo;
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_cq");
@@ -112,7 +112,7 @@ class sequence_cq extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(
     task body();
 
         assert(uvm_config_db #(req_fifo#(uvm_pcie::request_header)  )::get(m_sequencer, "", "seq_fifo_cq", fifo)) else begin
-            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo cq") 
+            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo cq")
         end;
 
         forever begin

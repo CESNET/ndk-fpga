@@ -39,7 +39,7 @@ proc do_adjust_ftile_mr_eth_ip_1x100g {} {
 	set_instance_parameter_value eth_f_dr_0 {RCFG_GRP_GUI} {100G-4}
 	set_instance_parameter_value eth_f_dr_0 {RSFEC_TYPE_P0_GUI} {2}
 	set_instance_parameter_value eth_f_dr_0 {START_PROF_GUI} {1x100GE-4}
-	
+
 	set_interface_property o_p1_clk_tx_div EXPORT_OF eth_f_dr_0.o_p1_clk_tx_div
 	set_interface_property o_p1_clk_rec_div64 EXPORT_OF eth_f_dr_0.o_p1_clk_rec_div64
 	set_interface_property o_p1_clk_rec_div EXPORT_OF eth_f_dr_0.o_p1_clk_rec_div

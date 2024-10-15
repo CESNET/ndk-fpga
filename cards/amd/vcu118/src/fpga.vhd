@@ -120,7 +120,7 @@ architecture FULL of FPGA is
     signal boot_mi_drd      : std_logic_vector(31 downto 0);
     signal boot_mi_ardy     : std_logic;
     signal boot_mi_drdy     : std_logic;
-    
+
     signal misc_in          : std_logic_vector(MISC_IN_WIDTH-1 downto 0) := (others => '0');
     signal misc_out         : std_logic_vector(MISC_OUT_WIDTH-1 downto 0);
 

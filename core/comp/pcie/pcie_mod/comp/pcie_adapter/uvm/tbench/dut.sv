@@ -1,4 +1,4 @@
-//-- dut.sv: Design under test 
+//-- dut.sv: Design under test
 //-- Copyright (C) 2023 CESNET z. s. p. o.
 //-- Author(s): Daniel Kriz <danielkriz@cesnet.cz>
 
@@ -124,7 +124,7 @@ module DUT (
         // =====================================================================
 
         .AVST_DOWN_SEG      (CQ_MFB_REGIONS),
-        .AVST_UP_SEG        (CC_MFB_REGIONS) 
+        .AVST_UP_SEG        (CC_MFB_REGIONS)
     ) VHDL_DUT_U (
         .PCIE_CLK            (CLK),
         .PCIE_RESET          (RST),
@@ -233,7 +233,7 @@ module DUT (
 
         // =====================================================================
         // AXI Requester Request (RQ) Interface - Xilinx FPGA Only
-        // 
+        //
         // See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express).
         // =====================================================================
         .RQ_AXI_DATA       (rq_axi.TDATA),

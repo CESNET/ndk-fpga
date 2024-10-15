@@ -150,7 +150,7 @@ architecture FULL of FTILE_8x50g1 is
     -- constants for IP core setup
     constant NUM_LANES     : natural   :=  4;
     constant PMA_LANES     : natural   :=  1;
-    constant ETH_PORT_CHAN : natural   :=  1;    
+    constant ETH_PORT_CHAN : natural   :=  1;
     constant SPEED         : natural   := 50;
     constant SPEED_CAP     : std_logic_vector(15 downto 0) :=  X"0008";
     constant DEVICE        : string    :=  "AGILEX";
@@ -190,7 +190,7 @@ architecture FULL of FTILE_8x50g1 is
     signal drpaddr  : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0);
     signal drpardy  : std_logic;
     signal drpdi    : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal drpsel   : std_logic_vector(4-1 downto 0); 
+    signal drpsel   : std_logic_vector(4-1 downto 0);
 
     -- signals for mi_sel => IP core interface
     signal reconfig_addr           :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
@@ -343,7 +343,7 @@ begin
     mgmt_pcs_control(15 downto 1) <= (others => '0');
     mgmt_pcs_control(0)           <= sync_repeater_ctrl; -- MAC loopback active
     -- MDIO reg 3.4001 (vendor specific PCS status/abilities)
-    mgmt_pcs_status(15 downto 1) <= (others => '0'); 
+    mgmt_pcs_status(15 downto 1) <= (others => '0');
     mgmt_pcs_status(0)           <= '1';        -- MAC loopback ability supported
 
     drp_bridge_i : entity work.bridge_drp
@@ -433,7 +433,7 @@ begin
         reconfig_writedata (IA_INDEX) <=
             init_writedata                when init_busy = '1'  else
             reconfig_writedata_drp (IA_INDEX);
-            
+
         init_done_g: if (xcvr = 0) generate
             init_ready(0) <= ftile_tx_lanes_stable;
         else generate
@@ -468,7 +468,7 @@ begin
     mi_ardy_conversion_g: for i in PMA_LANES downto 0 generate
         mi_ardy_phy(i) <= not reconfig_waitrequest(i);
     end generate;
- 
+
     CLK_ETH_OUT <= ftile_clk_out;
 
     -- =========================================================================

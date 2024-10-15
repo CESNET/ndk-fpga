@@ -1,4 +1,4 @@
-// dut.sv: Design under test 
+// dut.sv: Design under test
 // Copyright (C) 2024 CESNET z. s. p. o.
 // Author(s): Daniel Kriz <danielkriz@cesnet.cz>
 
@@ -284,7 +284,7 @@ module DUT (
         //
         // PTC ENABLE: MFB+MVB bus for transferring RQ PTC-DMA transactions.
         // MFB+MVB bus is clocked at DMA_CLK.
-        // PTC DISABLE: MFB bus only for transferring RQ PCIe transactions 
+        // PTC DISABLE: MFB bus only for transferring RQ PCIe transactions
         // (format according to the PCIe IP used). Compared to the standard MFB
         // specification, it does not allow gaps (SRC_RDY=0) inside transactions
         // and requires that the first transaction in a word starts at byte 0.
@@ -309,7 +309,7 @@ module DUT (
         //
         // PTC ENABLE: MFB+MVB bus for transferring RC PTC-DMA transactions.
         // MFB+MVB bus is clocked at DMA_CLK.
-        // PTC DISABLE: MFB bus only for transferring RC PCIe transactions 
+        // PTC DISABLE: MFB bus only for transferring RC PCIe transactions
         // (format according to the PCIe IP used). Compared to the standard MFB
         // specification, it does not allow gaps (SRC_RDY=0) inside transactions
         // and requires that the first transaction in a word starts at byte 0.

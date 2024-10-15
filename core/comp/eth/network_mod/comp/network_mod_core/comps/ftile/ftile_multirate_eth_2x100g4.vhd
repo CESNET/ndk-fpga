@@ -281,7 +281,7 @@ architecture FULL of FTILE_MULTIRATE_ETH_2x100G4 is
     );
     end component ftile_multirate_eth_1x100g;
 
-    -- Dynamic reconfiguration controller for the multirate IP 
+    -- Dynamic reconfiguration controller for the multirate IP
     component dr_ctrl is
     port (
         i_csr_clk                     : in  std_logic                     := 'X';             -- clk
@@ -478,7 +478,7 @@ begin
         BLK_ERR_CNTR             => (others => '0'),
         BLK_ERR_CLR              => open,
         SCR_BYPASS               => open,
-        PCS_RESET                => mgmt_pcs_reset, --TODO 
+        PCS_RESET                => mgmt_pcs_reset, --TODO
         PCS_LPBCK                => open,
         PCS_CONTROL(0)           => mgmt_mac_loop,
         PCS_CONTROL(15 downto 1) => mgmt_pcs_control_dummy,
@@ -494,7 +494,7 @@ begin
         PMA_LOPWR                => open,
         PMA_LPBCK                => open,
         PMA_REM_LPBCK            => open,
-        PMA_RESET                => mgmt_pma_reset, --TODO 
+        PMA_RESET                => mgmt_pma_reset, --TODO
         PMA_RETUNE               => open,
         PMA_CONTROL              => open,
         PMA_STATUS               => (others => '0'),
@@ -521,7 +521,7 @@ begin
     mgmt_pcs_control(15 downto 1) <= (others => '0');
     mgmt_pcs_control(0)           <= sync_repeater_ctrl; -- MAC loopback active
     -- MDIO reg 3.4001 (vendor specific PCS status/abilities)
-    mgmt_pcs_status(15 downto 1) <= (others => '0'); 
+    mgmt_pcs_status(15 downto 1) <= (others => '0');
     mgmt_pcs_status(0)           <= '1';        -- MAC loopback ability supported
 
     drp_bridge_i : entity work.bridge_drp
@@ -616,7 +616,7 @@ begin
         reconfig_writedata (IA_INDEX) <=
             init_writedata                when init_busy = '1'  else
             reconfig_writedata_drp (IA_INDEX);
-            
+
         init_done_g: if (xcvr = 0) generate
             init_ready(0) <= ftile_tx_lanes_stable;
         else generate

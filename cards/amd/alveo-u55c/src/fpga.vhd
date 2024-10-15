@@ -24,7 +24,7 @@ use unisim.vcomponents.all;
 
 entity FPGA is
 port (
-    -- 100 MHz external clocks 
+    -- 100 MHz external clocks
     SYSCLK2_P           : in    std_logic;
     SYSCLK2_N           : in    std_logic;
     SYSCLK3_P           : in    std_logic;
@@ -68,7 +68,7 @@ port (
     QSFP_STA_LED_G      : out   std_logic_vector(1 downto 0);
     QSFP_STA_LED_Y      : out   std_logic_vector(1 downto 0);
 
-    -- HBM CATTRIP 
+    -- HBM CATTRIP
     HBM_CATTRIP         : out   std_logic
 );
 end entity;
@@ -94,7 +94,7 @@ architecture FULL of FPGA is
     constant HBM_LEN_WIDTH   : natural := 4;
     constant HBM_SIZE_WIDTH  : natural := 3;
     constant HBM_RESP_WIDTH  : natural := 2;
-    
+
     signal sysclk_ibuf      : std_logic;
     signal sysclk_bufg      : std_logic;
     signal sysrst_cnt       : unsigned(4 downto 0) := (others => '0');
@@ -102,7 +102,7 @@ architecture FULL of FPGA is
 
     signal pcie_ref_clk_p   : std_logic_vector(PCIE_CLKS-1 downto 0);
     signal pcie_ref_clk_n   : std_logic_vector(PCIE_CLKS-1 downto 0);
-    
+
     signal eth_refclk_p     : std_logic_vector(2-1 downto 0);
     signal eth_refclk_n     : std_logic_vector(2-1 downto 0);
     signal eth_rx_p         : std_logic_vector(2*ETH_LANES-1 downto 0);
@@ -1272,7 +1272,7 @@ architecture FULL of FPGA is
         DRAM_0_STAT_CATTRIP : OUT STD_LOGIC;
         DRAM_0_STAT_TEMP : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
         DRAM_1_STAT_CATTRIP : OUT STD_LOGIC;
-        DRAM_1_STAT_TEMP : OUT STD_LOGIC_VECTOR(6 DOWNTO 0) 
+        DRAM_1_STAT_TEMP : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
     );
 end component;
 
@@ -1303,7 +1303,7 @@ begin
     end process;
 
     -- QSFP MAPPING ------------------------------------------------------------
-    eth_refclk_p <= QSFP1_REFCLK_P & QSFP0_REFCLK_P; 
+    eth_refclk_p <= QSFP1_REFCLK_P & QSFP0_REFCLK_P;
     eth_refclk_n <= QSFP1_REFCLK_N & QSFP0_REFCLK_N;
 
     eth_rx_p <= QSFP1_RX_P & QSFP0_RX_P;
@@ -1433,7 +1433,7 @@ begin
         PLL_OUT3_DIV            => 12,
 
         USE_PCIE_CLK            => False,
-        
+
         PCIE_LANES              => PCIE_LANES,
         PCIE_CLKS               => PCIE_CLKS,
         PCIE_CONS               => PCIE_CONS,

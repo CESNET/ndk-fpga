@@ -18,7 +18,7 @@ entity AXI_QUAD_FLASH_CONTROLLER is
       G_AXI_ADDR_WIDTH : integer := 7;
       G_MI_ADDR_WIDTH  : integer := 8;
       G_AXI_DATA_WIDTH : integer := 32
-      
+
       );
    port (
 
@@ -27,7 +27,7 @@ entity AXI_QUAD_FLASH_CONTROLLER is
       SPI_CLK      : in std_logic;
       RST          : in std_logic;
 
-      -- MI32 protocol 
+      -- MI32 protocol
       AXI_MI_ADDR : in  std_logic_vector(G_MI_ADDR_WIDTH - 1 downto 0);
       AXI_MI_DWR  : in  std_logic_vector(G_AXI_DATA_WIDTH - 1 downto 0);
       AXI_MI_WR   : in  std_logic;
@@ -62,9 +62,9 @@ architecture FULL of AXI_QUAD_FLASH_CONTROLLER is
          ext_spi_clk   : in  std_logic;
          -- AXI clock is expected to be faster than ext_spi_clk.
          s_axi_aclk    : in  std_logic;
-         -- Negative reset 
+         -- Negative reset
          s_axi_aresetn : in  std_logic;
-         -- AXI_LITE interface 
+         -- AXI_LITE interface
          s_axi_awaddr  : in  std_logic_vector(6 downto 0);
          s_axi_awvalid : in  std_logic;
          s_axi_awready : out std_logic;
@@ -82,7 +82,7 @@ architecture FULL of AXI_QUAD_FLASH_CONTROLLER is
          s_axi_rresp   : out std_logic_vector(1 downto 0);
          s_axi_rvalid  : out std_logic;
          s_axi_rready  : in  std_logic;
-         
+
          -- STARTUP_IO_S
          cfgclk        : out std_logic;
          cfgmclk       : out std_logic;
@@ -97,8 +97,8 @@ architecture FULL of AXI_QUAD_FLASH_CONTROLLER is
          );
    end component;
 
-   -- Signals 
-   -- Write Address Channel 
+   -- Signals
+   -- Write Address Channel
    signal awaddr_s     : std_logic_vector(G_AXI_ADDR_WIDTH - 1 downto 0);
    signal awvalid_s    : std_logic;
    signal awready_s    : std_logic;
@@ -107,7 +107,7 @@ architecture FULL of AXI_QUAD_FLASH_CONTROLLER is
    signal wdata_s      : std_logic_vector(G_AXI_DATA_WIDTH - 1 downto 0);
    signal wstrb_s      : std_logic_vector((G_AXI_DATA_WIDTH/8)-1 downto 0);
    signal wvalid_s     : std_logic;
-   signal wready_s     : std_logic;   
+   signal wready_s     : std_logic;
 
    --Write Response Channel
    signal bresp_s      : std_logic_vector(1 downto 0);
@@ -115,9 +115,9 @@ architecture FULL of AXI_QUAD_FLASH_CONTROLLER is
    signal bready_s     : std_logic;
 
    -- Read Address Channel
-   signal araddr_s     : std_logic_vector(G_AXI_ADDR_WIDTH - 1 downto 0); 
-   signal arvalid_s    : std_logic;   
-   signal arready_s    : std_logic;   
+   signal araddr_s     : std_logic_vector(G_AXI_ADDR_WIDTH - 1 downto 0);
+   signal arvalid_s    : std_logic;
+   signal arready_s    : std_logic;
 
    --Read Data Channel
    signal rdata_s      : std_logic_vector(G_AXI_DATA_WIDTH - 1 downto 0);
@@ -130,7 +130,7 @@ begin
    axi_bridge_i : entity work.AXI4_LITE_MI_BRIDGE
       generic map(
          G_AXI_ADDR_WIDTH => G_AXI_ADDR_WIDTH,
-         G_MI_ADDR_WIDTH  => G_MI_ADDR_WIDTH, 
+         G_MI_ADDR_WIDTH  => G_MI_ADDR_WIDTH,
          G_AXI_DATA_WIDTH => G_AXI_DATA_WIDTH
       )
       port map (

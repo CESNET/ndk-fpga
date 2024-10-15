@@ -32,7 +32,7 @@ port (
     -- =========================================================================
     CLK             : in  std_logic;
     RESET           : in  std_logic;
-    
+
     -- =========================================================================
     -- Input MFB+MVB interface
     -- =========================================================================
@@ -49,7 +49,7 @@ port (
     IN_MFB_EOF_POS   : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
     IN_MFB_SRC_RDY   : in  std_logic_vector(IN_STREAMS-1 downto 0);
     IN_MFB_DST_RDY   : out std_logic_vector(IN_STREAMS-1 downto 0);
-    
+
     -- =========================================================================
     -- Output MFB+MVB interface
     -- =========================================================================
@@ -57,7 +57,7 @@ port (
     OUT_MVB_VLD      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     OUT_MVB_SRC_RDY  : out std_logic_vector(OUT_STREAMS-1 downto 0);
     OUT_MVB_DST_RDY  : in  std_logic_vector(OUT_STREAMS-1 downto 0);
-    
+
     OUT_MFB_DATA     : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
     OUT_MFB_SOF      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     OUT_MFB_EOF      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
@@ -114,7 +114,7 @@ begin
         port map(
             CLK             => CLK,
             RESET           => RESET,
-                
+
             RX_MVB_DATA     => IN_MVB_DATA,
             RX_MVB_PAYLOAD  => (others => (others => '1')),
             RX_MVB_VLD      => IN_MVB_VLD,
@@ -157,7 +157,7 @@ begin
             port map (
                 CLK         => CLK,
                 RST         => RESET,
-            
+
                 RX_DATA     => fi_mfb_data(0),
                 RX_SOF_POS  => fi_mfb_sof_pos(0),
                 RX_EOF_POS  => fi_mfb_eof_pos(0),
@@ -165,7 +165,7 @@ begin
                 RX_EOF      => fi_mfb_eof(0),
                 RX_SRC_RDY  => fi_mfb_src_rdy(0),
                 RX_DST_RDY  => fi_mfb_dst_rdy(0),
-            
+
                 TX_DATA     => OUT_MFB_DATA(0),
                 TX_SOF_POS  => OUT_MFB_SOF_POS(0),
                 TX_EOF_POS  => OUT_MFB_EOF_POS(0),
@@ -247,7 +247,7 @@ begin
                 port map (
                     CLK         => CLK,
                     RST         => RESET,
-                
+
                     RX_DATA     => fi_mfb_data(i),
                     RX_SOF_POS  => fi_mfb_sof_pos(i),
                     RX_EOF_POS  => fi_mfb_eof_pos(i),
@@ -255,7 +255,7 @@ begin
                     RX_EOF      => fi_mfb_eof(i),
                     RX_SRC_RDY  => fi_mfb_src_rdy(i),
                     RX_DST_RDY  => fi_mfb_dst_rdy(i),
-                
+
                     TX_DATA     => OUT_MFB_DATA(i),
                     TX_SOF_POS  => OUT_MFB_SOF_POS(i),
                     TX_EOF_POS  => OUT_MFB_EOF_POS(i),

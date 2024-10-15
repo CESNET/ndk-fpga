@@ -1,4 +1,4 @@
--- testbench.vhd: Simulation file 
+-- testbench.vhd: Simulation file
 -- Copyright (C) 2022 CESNET z. s. p. o.
 -- Author(s): David Beneš <benes.david2000@seznam.cz>
 --
@@ -9,11 +9,11 @@ USE ieee.std_logic_1164.ALL;
 USE IEEE.std_logic_textio.ALL;
 USE ieee.numeric_std.ALL;
 USE std.textio.ALL;
- 
+
 ENTITY TESTBENCH IS
 END TESTBENCH;
- 
-ARCHITECTURE FULL OF TESTBENCH IS 
+
+ARCHITECTURE FULL OF TESTBENCH IS
 
    --Inputs
    signal clk200              : std_logic;
@@ -32,24 +32,24 @@ ARCHITECTURE FULL OF TESTBENCH IS
 
    --Outputs
    signal spi_clk             : std_logic;
-   signal spi_nss             : std_logic;     
-   signal spi_mosi            : std_logic;     
+   signal spi_nss             : std_logic;
+   signal spi_mosi            : std_logic;
    signal bmc_mi_ardy         : std_logic;
    signal bmc_mi_drd          : std_logic_vector(32 - 1 downto 0);
-   signal bmc_mi_drdy         : std_logic; 
+   signal bmc_mi_drdy         : std_logic;
 
-      
-   
+
+
    -- Clock period definitions
    constant clk_period250 : time := 4 ns;
    constant clk_period200 : time := 5 ns;
 
    signal miso_data       : std_logic_vector(15 downto 0):= x"F0F0";
-                          
+
 BEGIN
- 
+
     -- Instantiate the Unit Under Test (UUT)
-        
+
    uut_i: entity work.BMC_DRIVER
       PORT MAP(
             CLK                => clk250,
@@ -68,7 +68,7 @@ BEGIN
             BMC_MI_DRD         => bmc_mi_drd,
             BMC_MI_DRDY        => bmc_mi_drdy
       );
-   
+
    -- Clock process definitions
    clk250_p :process
    begin
@@ -86,7 +86,7 @@ BEGIN
          clk200 <= '1';
          wait for clk_period200/2;
    end process;
- 
+
 
    rd_p: process
    begin
@@ -107,7 +107,7 @@ BEGIN
 
    -- Stimulus process
    stim_proc: process
-   begin        
+   begin
       rst <= '1', '0' after clk_period250*5;
       spi_miso    <= '1';
 
@@ -143,7 +143,7 @@ BEGIN
       bmc_mi_wr         <= '0';
 
 
-      wait for clk_period250*100;  
+      wait for clk_period250*100;
 
       WAIT;
    end process;

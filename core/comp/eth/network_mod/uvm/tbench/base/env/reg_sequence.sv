@@ -27,7 +27,7 @@ class read_rx_counters#(RX_MAC_COUNT) extends uvm_sequence;
     logic [64-1:0] frames_512_1023_addr;
     logic [64-1:0] frames_1024_1518_addr;
     logic [64-1:0] frames_over_1518_addr;
-    logic [64-1:0] frames_below_64_addr; 
+    logic [64-1:0] frames_below_64_addr;
 
     function new(string name = "mi_sequence");
         super.new(name);
@@ -184,7 +184,7 @@ class read_rx_counters#(RX_MAC_COUNT) extends uvm_sequence;
                 regmodel.rfc.frames_65_127_h_addr.read(status, data);
                 frames_65_127_addr[64-1:32] = data;
             end
-        
+
             begin
                 uvm_status_e   status;
                 uvm_reg_data_t data;

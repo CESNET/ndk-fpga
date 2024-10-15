@@ -57,7 +57,7 @@ port (
     AG_M10_REBOOT_N  : out   std_logic; -- MAX10 reboot request
     M10_AG_STATUS_N  : in    std_logic; -- MAX10 status
     M10_AG_DONE      : in    std_logic; -- MAX10 configuration done
-        
+
     -- =========================================================================
     --  AGILEX CONFIGURATION REUEST INTERFACE
     -- =========================================================================
@@ -77,7 +77,7 @@ port (
     --FLASH_RY_BY_N           : in    std_logic;                     -- Memory Ready/busy signal (both)
     --FLASH_BYTE_N            : out   std_logic;                     -- Memory data bus width (8bits for both, active is LOW)
     --FLASH_WP_N              : out   std_logic;                     -- Memory data Write protect signal (for both, active is LOW)
-    --FLASH_RST_N             : out   std_logic;                     -- Memory reset signal (for both, active is LOW)     
+    --FLASH_RST_N             : out   std_logic;                     -- Memory reset signal (for both, active is LOW)
 
     -- =========================================================================
     --  PCIE INTERFACES
@@ -347,7 +347,7 @@ architecture FULL of FPGA is
         cal_debug_reset_n_reset : in  std_logic                       := 'X'              -- reset
     );
     end component sodimm_cal;
-    
+
     component emif_agi027_cal is
     port (
         calbus_read_0           : out std_logic;                                          -- calbus_read
@@ -397,7 +397,7 @@ architecture FULL of FPGA is
     signal pcie_ext_rx_n          : std_logic_vector(15 downto 0);
     signal pcie_ext_tx_p          : std_logic_vector(15 downto 0);
     signal pcie_ext_tx_n          : std_logic_vector(15 downto 0);
- 
+
     signal calbus_read            : std_logic_vector(MEM_PORTS-1 downto 0);
     signal calbus_write           : std_logic_vector(MEM_PORTS-1 downto 0);
     signal calbus_address         : slv_array_t(MEM_PORTS-1 downto 0)(19 downto 0);
@@ -411,7 +411,7 @@ architecture FULL of FPGA is
     signal mem_rst_n              : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_pll_locked         : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_pll_locked_sync    : std_logic_vector(MEM_PORTS-1 downto 0);
-    
+
     signal mem_avmm_ready         : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_avmm_read          : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_avmm_write         : std_logic_vector(MEM_PORTS-1 downto 0);
@@ -422,7 +422,7 @@ architecture FULL of FPGA is
     signal mem_avmm_writedata_f   : slv_array_t(MEM_PORTS-1 downto 0)(576-1 downto 0) := (others => (others => '0'));
     signal mem_avmm_readdata_f    : slv_array_t(MEM_PORTS-1 downto 0)(576-1 downto 0) := (others => (others => '0'));
     signal mem_avmm_readdatavalid : std_logic_vector(MEM_PORTS-1 downto 0);
-     
+
     signal emif_rst_req           : std_logic_vector(MEM_PORTS-1 downto 0);
     signal emif_rst_done          : std_logic_vector(MEM_PORTS-1 downto 0);
     signal emif_ecc_usr_int       : std_logic_vector(MEM_PORTS-1 downto 0);
@@ -462,7 +462,7 @@ begin
 
     AG_I2C_SCLK	<= 'Z';
     AG_I2C_SDA	<= 'Z';
-    
+
     AG_SOFT_RST  <= '0';
     AG_M10_RST_N <= '1';
 
@@ -512,7 +512,7 @@ begin
         PCI_DEVICE_ID           => X"C400",
         PCI_SUBVENDOR_ID        => X"0000",
         PCI_SUBDEVICE_ID        => X"0000",
-        
+
         ETH_CORE_ARCH           => NET_MOD_ARCH,
         ETH_PORTS               => ETH_PORTS,
         ETH_PORT_SPEED          => ETH_PORT_SPEED,
@@ -606,7 +606,7 @@ begin
 
         PCIE_CLK                => pcie_clk,
         PCIE_RESET              => pcie_reset,
-    
+
         BOOT_MI_CLK             => boot_mi_clk,
         BOOT_MI_RESET           => boot_mi_reset,
         BOOT_MI_DWR             => boot_mi_dwr,
@@ -650,7 +650,7 @@ begin
         FLASH_WR_DATA => flash_wr_data,
         FLASH_WR_EN   => flash_wr_en,
         FLASH_RD_DATA => flash_rd_data
-    ); 
+    );
 
     FLASHCTRL_I: entity work.flashctrl
     generic map (
@@ -725,8 +725,8 @@ begin
             mem_dq(71 downto 64)      => SODIMM0_CHKB,
             mem_dbi_n                 => SODIMM0_DM_DBI,
             local_cal_success         => emif_cal_success(0),
-            local_cal_fail            => emif_cal_fail(0),              
-            emif_usr_reset_n          => mem_rst_n(0), 
+            local_cal_fail            => emif_cal_fail(0),
+            emif_usr_reset_n          => mem_rst_n(0),
             emif_usr_clk              => mem_clk(0),
             amm_ready_0               => mem_avmm_ready(0),
             amm_read_0                => mem_avmm_read(0),
@@ -737,12 +737,12 @@ begin
             amm_burstcount_0          => mem_avmm_burstcount(0),
             amm_readdatavalid_0       => mem_avmm_readdatavalid(0),
             amm_byteenable_0          => (others => '1'),
-            calbus_read               => calbus_read(0),   
-            calbus_write              => calbus_write(0),  
+            calbus_read               => calbus_read(0),
+            calbus_write              => calbus_write(0),
             calbus_address            => calbus_address(0),
-            calbus_wdata              => calbus_wdata(0),  
-            calbus_rdata              => calbus_rdata(0),  
-            calbus_seq_param_tbl      => calbus_seq_param_tbl(0), 
+            calbus_wdata              => calbus_wdata(0),
+            calbus_rdata              => calbus_rdata(0),
+            calbus_seq_param_tbl      => calbus_seq_param_tbl(0),
             calbus_clk                => calbus_clk(0)
         );
 
@@ -771,8 +771,8 @@ begin
             mem_dq(71 downto 64)      => SODIMM1_CHKB,
             mem_dbi_n                 => SODIMM1_DM_DBI,
             local_cal_success         => emif_cal_success(1),
-            local_cal_fail            => emif_cal_fail(1),              
-            emif_usr_reset_n          => mem_rst_n(1), 
+            local_cal_fail            => emif_cal_fail(1),
+            emif_usr_reset_n          => mem_rst_n(1),
             emif_usr_clk              => mem_clk(1),
             amm_ready_0               => mem_avmm_ready(1),
             amm_read_0                => mem_avmm_read(1),
@@ -783,12 +783,12 @@ begin
             amm_burstcount_0          => mem_avmm_burstcount(1),
             amm_readdatavalid_0       => mem_avmm_readdatavalid(1),
             amm_byteenable_0          => (others => '1'),
-            calbus_read               => calbus_read(1),   
-            calbus_write              => calbus_write(1),  
+            calbus_read               => calbus_read(1),
+            calbus_write              => calbus_write(1),
             calbus_address            => calbus_address(1),
-            calbus_wdata              => calbus_wdata(1),  
-            calbus_rdata              => calbus_rdata(1),  
-            calbus_seq_param_tbl      => calbus_seq_param_tbl(1), 
+            calbus_wdata              => calbus_wdata(1),
+            calbus_rdata              => calbus_rdata(1),
+            calbus_seq_param_tbl      => calbus_seq_param_tbl(1),
             calbus_clk                => calbus_clk(1)
         );
 
@@ -881,11 +881,11 @@ begin
 
         emif_cal_i : component emif_agi027_cal
         port map (
-            calbus_read_0               => calbus_read(0),              
-            calbus_write_0              => calbus_write(0),       
-            calbus_address_0            => calbus_address(0),     
-            calbus_wdata_0              => calbus_wdata(0),    
-            calbus_rdata_0              => calbus_rdata(0),       
+            calbus_read_0               => calbus_read(0),
+            calbus_write_0              => calbus_write(0),
+            calbus_address_0            => calbus_address(0),
+            calbus_wdata_0              => calbus_wdata(0),
+            calbus_rdata_0              => calbus_rdata(0),
             calbus_seq_param_tbl_0      => calbus_seq_param_tbl(0),
             calbus_clk                  => calbus_clk(0),
             cal_debug_clk_clk           => mem_clk(0),

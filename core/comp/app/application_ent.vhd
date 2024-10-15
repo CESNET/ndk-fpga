@@ -177,7 +177,7 @@ port (
     -- Unique identification number of the FPGA chip (clocked at MI_CLK)
     FPGA_ID                 : in  std_logic_vector(FPGA_ID_WIDTH-1 downto 0);
     FPGA_ID_VLD             : in  std_logic;
- 
+
     -- =========================================================================
     -- RX ETHERNET STREAMS (clocked at APP_CLK)
     --
@@ -193,7 +193,7 @@ port (
     ETH_RX_MVB_SRC_RDY      : in  std_logic_vector(ETH_STREAMS-1 downto 0);
     -- ETH RX MVB streams: destination ready of each MVB bus
     ETH_RX_MVB_DST_RDY      : out std_logic_vector(ETH_STREAMS-1 downto 0);
-    
+
     -- ETH RX MFB streams: data word with frames (packets)
     ETH_RX_MFB_DATA         : in  std_logic_vector(ETH_STREAMS* ETH_MFB_REGIONS*ETH_MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
     -- ETH RX MFB streams: Start Of Frame (SOF) flag for each MFB region
@@ -275,7 +275,7 @@ port (
     DMA_RX_MFB_SRC_RDY       : out std_logic_vector(DMA_STREAMS-1 downto 0);
     -- DMA RX MFB streams: destination ready of each MFB bus
     DMA_RX_MFB_DST_RDY       : in  std_logic_vector(DMA_STREAMS-1 downto 0);
- 
+
     -- =========================================================================
     -- TX DMA STREAMS (clocked at APP_CLK)
     --
@@ -310,7 +310,7 @@ port (
     DMA_TX_MFB_SRC_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
     -- DMA TX MFB streams: destination ready of each MFB bus
     DMA_TX_MFB_DST_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
- 
+
     -- =====================================================================
     --  Application specific signals
     -- =====================================================================

@@ -237,12 +237,12 @@ architecture FULL of NETWORK_MOD_LOGIC is
 
 begin
 
-    assert (ETH_STREAMS = ETH_PORT_CHAN or ETH_STREAMS = 1) 
-        report "NETWORK_MOD_LOGIC: ETH_STREAMS must be equal to 1 or ETH_PORT_CHAN!" 
+    assert (ETH_STREAMS = ETH_PORT_CHAN or ETH_STREAMS = 1)
+        report "NETWORK_MOD_LOGIC: ETH_STREAMS must be equal to 1 or ETH_PORT_CHAN!"
         severity failure;
 
-    assert ((ETH_STREAMS = ETH_PORT_CHAN and ETH_MAC_BYPASS = True) or (ETH_MAC_BYPASS = False)) 
-        report "NETWORK_MOD_LOGIC: ETH_MAC_BYPASS is supported only when ETH_STREAMS = ETH_PORT_CHAN!" 
+    assert ((ETH_STREAMS = ETH_PORT_CHAN and ETH_MAC_BYPASS = True) or (ETH_MAC_BYPASS = False))
+        report "NETWORK_MOD_LOGIC: ETH_MAC_BYPASS is supported only when ETH_STREAMS = ETH_PORT_CHAN!"
         severity failure;
 
     mi_splitter_g: if not ETH_MAC_BYPASS generate
@@ -272,7 +272,7 @@ begin
             RX_ARDY     => MI_ARDY        ,
             RX_DRD      => MI_DRD         ,
             RX_DRDY     => MI_DRDY        ,
-            
+
             TX_DWR     => mi_split_dwr    ,
             TX_MWR     => open            ,
             TX_ADDR    => mi_split_addr   ,
@@ -286,7 +286,7 @@ begin
     else generate
         MI_ARDY <= MI_RD or MI_WR;
         MI_DRDY <= MI_RD;
-        MI_DRD  <= X"DEADCAFE"; 
+        MI_DRD  <= X"DEADCAFE";
     end generate;
 
     -- =========================================================================
@@ -300,7 +300,7 @@ begin
             split_addr_arr     (r) <= eth_hdr_tx_port_arr(r)(max(1,log2(ETH_PORT_CHAN))-1 downto 0);
         end generate;
         split_addr <= slv_array_ser(split_addr_arr);
-    
+
         -- Split one ETH_STREAM into ETH_CHANNELS for each TX MAC Lite
         mfb_splitter_tree_i : entity work.MFB_SPLITTER_SIMPLE_GEN
         generic map(

@@ -64,7 +64,7 @@ package test;
     // =====================================================================
     // Common configuration
     // =====================================================================
-    // DMA ports per PCIE_ENDPOINT. Total number of dma_ports is PCIE_ENDPOINTS*DMA_PORTS 
+    // DMA ports per PCIE_ENDPOINT. Total number of dma_ports is PCIE_ENDPOINTS*DMA_PORTS
     parameter DMA_PORTS = 16;
     // Connected PCIe endpoint type
     // P_TILE, R_TILE

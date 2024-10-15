@@ -44,11 +44,11 @@ The NDK-based Minimal application also contains :ref:`Memory Tester <mem_tester>
 
     Mem_logger statistics:
     ----------------------
-    write requests       33554431        
-      write words        134217724       
-    read requests        33554431        
-      requested words    134217724       
-      received words     134217724       
+    write requests       33554431
+      write words        134217724
+    read requests        33554431
+      requested words    134217724
+      received words     134217724
     Flow:
       write               160.78 [Gb/s]
       read                161.68 [Gb/s]
@@ -62,23 +62,23 @@ The NDK-based Minimal application also contains :ref:`Memory Tester <mem_tester>
       max                 555.00 [ns]
       avg                 131.56 [ns]
       histogram [ns]:
-        93.4 - 117.5 ... 12613618        
-        117.5 - 141.6 ... 13893635        
-        141.6 - 165.7 ... 6618217         
-        503.0 - 527.1 ... 74899           
-        527.1 - 551.2 ... 265549          
-        551.2 - 575.3 ... 88513           
+        93.4 - 117.5 ... 12613618
+        117.5 - 141.6 ... 13893635
+        141.6 - 165.7 ... 6618217
+        503.0 - 527.1 ... 74899
+        527.1 - 551.2 ... 265549
+        551.2 - 575.3 ... 88513
     Errors:
-      zero burst count   0               
-      simultaneous r+w   0               
+      zero burst count   0
+      simultaneous r+w   0
     Paralel reads count:
-      min                0               
-      max                13              
-      avg                 10.83 
-        0.0 -   4.0 ... 4               
-        4.0 -   8.0 ... 27238           
-        8.0 -  12.0 ... 4294967295      
-        12.0 -  16.0 ... 13345442        
+      min                0
+      max                13
+      avg                 10.83
+        0.0 -   4.0 ... 4
+        4.0 -   8.0 ... 27238
+        8.0 -  12.0 ... 4294967295
+        12.0 -  16.0 ... 13345442
 
 .. note::
 

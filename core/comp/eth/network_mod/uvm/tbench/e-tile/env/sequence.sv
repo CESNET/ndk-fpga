@@ -147,7 +147,7 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
                 rx_stats.start(null);
                 tx_stats.start(null);
             join
- 
+
             `uvm_info(this.get_full_name(),
                 $sformatf("RX channel %s base [%0d]\n\tSTATS trfc %0d cfc %0d dfc %0d bodfc %0d oroc %0d\n", m_sequencer.get_full_name(), it, rx_stats.trfc, rx_stats.cfc, rx_stats.dfc, rx_stats.bodfc, rx_stats.oroc),
                 UVM_LOW);
@@ -319,7 +319,7 @@ class virt_sequence_simple #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM
 
     task pre_body();
         super.pre_body();
-        
+
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) cast_virt_sequence_port;
             assert($cast(cast_virt_sequence_port, port[it]))
@@ -408,7 +408,7 @@ class virt_sequence_stop #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_W
     `uvm_object_param_utils(uvm_network_mod_e_tile_env::virt_sequence_stop #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
     protected uvm_logic_vector_array::config_sequence eth_rx_seq_cfg[ETH_PORTS];
-    
+
     function new(string name = "virt_sequence_stop");
         super.new(name);
     endfunction

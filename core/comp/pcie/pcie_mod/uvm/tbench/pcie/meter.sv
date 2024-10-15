@@ -1,8 +1,8 @@
 // meter.sv: measure pcie statistic
 // Copyright (C) 2024 CESNET z. s. p. o.
-// Author(s): Radek Iša <isa@cesnet.cz> 
+// Author(s): Radek Iša <isa@cesnet.cz>
 
-// SPDX-License-Identifier: BSD-3-Clause 
+// SPDX-License-Identifier: BSD-3-Clause
 
 
 
@@ -182,7 +182,7 @@ class stats  extends uvm_component;
             msg = {msg, $sformatf("\n\tCC DATA:\n\t\tMIN : %0.2f (%0.2f b) \n\t\tMAX : %0.2f (%0.2f b)\n\t\tAVG STD_DEV : %0.2f %0.2f (%0.2f b %0.2f b)\n", min, min*KOEF, max, max*KOEF, avg, std_dev, avg*KOEF, std_dev*KOEF)};
             cc_speed.count(min, max, avg, std_dev);
             msg = {msg, $sformatf("\tCC SPEED :\n\t\tMIN : %0.2f Gb/s \n\t\tMAX : %0.2f Gb/s\n\t\tAVG STD_DEV : %0.2f Gb/s %0.2f Gb/s\n", min*KOEF, max*KOEF, avg*KOEF, std_dev*KOEF)};
-            `uvm_info(this.get_full_name(), msg, UVM_LOW);            
+            `uvm_info(this.get_full_name(), msg, UVM_LOW);
         end
     endtask
 

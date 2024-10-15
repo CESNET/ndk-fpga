@@ -29,7 +29,7 @@ port (
     fpga_i2c2_en          : out   std_logic;
     fpga_i2c2_scl         : inout std_logic;
     fpga_i2c2_sda         : inout std_logic;
-    
+
     -- User LEDs
     fpga_led              : out   std_logic_vector(3 downto 0);
 
@@ -63,10 +63,10 @@ port (
     -- =========================================================================
     qsfpdd1_fpga_led      : out   std_logic_vector(3-1 downto 0);
     qsfpdd0_fpga_led      : out   std_logic_vector(3-1 downto 0);
-    
+
     qsfpdd_1v2_port_en    : out   std_logic;
     qsfpdd_1v2_port_int_n : in    std_logic;
-    
+
     -- QSFPDD reference clock 100MHz from U22
     --refclk_fgt12ach0_p    : in    std_logic;
     -- QSFPDD reference clock 153.6MHz from U22
@@ -77,7 +77,7 @@ port (
     --refclk_fgt12ach5_p    : in    std_logic;
     -- QSFPDD reference clock 184.32MHz from U22
     --refclk_fgt12ach6_p    : in    std_logic;
-    
+
     --qsfpdd0_rx_p          : in    std_logic_vector(8-1 downto 0);
     --qsfpdd0_rx_n          : in    std_logic_vector(8-1 downto 0);
     --qsfpdd0_tx_p          : out   std_logic_vector(8-1 downto 0);
@@ -129,45 +129,45 @@ architecture FULL of FPGA is
 
     component emif_agi027 is
     port (
-        local_reset_req           : in    std_logic                       := 'X';             
-        local_reset_done          : out   std_logic;                                          
-        pll_ref_clk               : in    std_logic                       := 'X';             
-        pll_locked                : out   std_logic;                                          
-        oct_rzqin                 : in    std_logic                       := 'X';             
-        mem_ck                    : out   std_logic_vector(0 downto 0);                       
-        mem_ck_n                  : out   std_logic_vector(0 downto 0);                       
-        mem_a                     : out   std_logic_vector(16 downto 0);                      
-        mem_act_n                 : out   std_logic_vector(0 downto 0);                       
-        mem_ba                    : out   std_logic_vector(1 downto 0);                       
-        mem_bg                    : out   std_logic_vector(1 downto 0);                       
-        mem_cke                   : out   std_logic_vector(0 downto 0);                       
-        mem_cs_n                  : out   std_logic_vector(0 downto 0);                       
-        mem_odt                   : out   std_logic_vector(0 downto 0);                       
-        mem_reset_n               : out   std_logic_vector(0 downto 0);                       
-        mem_par                   : out   std_logic_vector(0 downto 0);                       
-        mem_alert_n               : in    std_logic_vector(0 downto 0)    := (others => 'X'); 
-        mem_dqs                   : inout std_logic_vector(17 downto 0)   := (others => 'X'); 
-        mem_dqs_n                 : inout std_logic_vector(17 downto 0)   := (others => 'X'); 
-        mem_dq                    : inout std_logic_vector(71 downto 0)   := (others => 'X'); 
-        local_cal_success         : out   std_logic;                                          
-        local_cal_fail            : out   std_logic;                                          
-        calbus_read               : in    std_logic                       := 'X';             
-        calbus_write              : in    std_logic                       := 'X';             
-        calbus_address            : in    std_logic_vector(19 downto 0)   := (others => 'X'); 
-        calbus_wdata              : in    std_logic_vector(31 downto 0)   := (others => 'X'); 
-        calbus_rdata              : out   std_logic_vector(31 downto 0);                      
-        calbus_seq_param_tbl      : out   std_logic_vector(4095 downto 0);                    
-        calbus_clk                : in    std_logic                       := 'X';             
-        emif_usr_reset_n          : out   std_logic;                                          
-        emif_usr_clk              : out   std_logic;                                          
-        ctrl_ecc_user_interrupt_0 : out   std_logic;                                          
-        amm_ready_0               : out   std_logic;                                          
-        amm_read_0                : in    std_logic                       := 'X';             
-        amm_write_0               : in    std_logic                       := 'X';             
-        amm_address_0             : in    std_logic_vector(27 downto 0)   := (others => 'X'); 
-        amm_readdata_0            : out   std_logic_vector(511 downto 0);                     
-        amm_writedata_0           : in    std_logic_vector(511 downto 0)  := (others => 'X'); 
-        amm_burstcount_0          : in    std_logic_vector(6 downto 0)    := (others => 'X'); 
+        local_reset_req           : in    std_logic                       := 'X';
+        local_reset_done          : out   std_logic;
+        pll_ref_clk               : in    std_logic                       := 'X';
+        pll_locked                : out   std_logic;
+        oct_rzqin                 : in    std_logic                       := 'X';
+        mem_ck                    : out   std_logic_vector(0 downto 0);
+        mem_ck_n                  : out   std_logic_vector(0 downto 0);
+        mem_a                     : out   std_logic_vector(16 downto 0);
+        mem_act_n                 : out   std_logic_vector(0 downto 0);
+        mem_ba                    : out   std_logic_vector(1 downto 0);
+        mem_bg                    : out   std_logic_vector(1 downto 0);
+        mem_cke                   : out   std_logic_vector(0 downto 0);
+        mem_cs_n                  : out   std_logic_vector(0 downto 0);
+        mem_odt                   : out   std_logic_vector(0 downto 0);
+        mem_reset_n               : out   std_logic_vector(0 downto 0);
+        mem_par                   : out   std_logic_vector(0 downto 0);
+        mem_alert_n               : in    std_logic_vector(0 downto 0)    := (others => 'X');
+        mem_dqs                   : inout std_logic_vector(17 downto 0)   := (others => 'X');
+        mem_dqs_n                 : inout std_logic_vector(17 downto 0)   := (others => 'X');
+        mem_dq                    : inout std_logic_vector(71 downto 0)   := (others => 'X');
+        local_cal_success         : out   std_logic;
+        local_cal_fail            : out   std_logic;
+        calbus_read               : in    std_logic                       := 'X';
+        calbus_write              : in    std_logic                       := 'X';
+        calbus_address            : in    std_logic_vector(19 downto 0)   := (others => 'X');
+        calbus_wdata              : in    std_logic_vector(31 downto 0)   := (others => 'X');
+        calbus_rdata              : out   std_logic_vector(31 downto 0);
+        calbus_seq_param_tbl      : out   std_logic_vector(4095 downto 0);
+        calbus_clk                : in    std_logic                       := 'X';
+        emif_usr_reset_n          : out   std_logic;
+        emif_usr_clk              : out   std_logic;
+        ctrl_ecc_user_interrupt_0 : out   std_logic;
+        amm_ready_0               : out   std_logic;
+        amm_read_0                : in    std_logic                       := 'X';
+        amm_write_0               : in    std_logic                       := 'X';
+        amm_address_0             : in    std_logic_vector(27 downto 0)   := (others => 'X');
+        amm_readdata_0            : out   std_logic_vector(511 downto 0);
+        amm_writedata_0           : in    std_logic_vector(511 downto 0)  := (others => 'X');
+        amm_burstcount_0          : in    std_logic_vector(6 downto 0)    := (others => 'X');
         amm_readdatavalid_0       : out   std_logic;
         mmr_slave_waitrequest_0        : out   std_logic;                                          -- waitrequest
         mmr_slave_read_0               : in    std_logic                       := 'X';             -- read
@@ -231,13 +231,13 @@ architecture FULL of FPGA is
     constant MEM_MMR_ADDR_WIDTH     : integer := 10;
     constant MEM_MMR_DATA_WIDTH     : integer := 32;
     constant MEM_MMR_BURST_WIDTH    : integer := 2;
- 
-    signal calbus_read              : std_logic;                                          
-    signal calbus_write             : std_logic;                                          
-    signal calbus_address           : std_logic_vector(19 downto 0);                      
-    signal calbus_wdata             : std_logic_vector(31 downto 0);                      
-    signal calbus_rdata             : std_logic_vector(31 downto 0)   := (others => 'X'); 
-    signal calbus_seq_param_tbl     : std_logic_vector(4095 downto 0) := (others => 'X'); 
+
+    signal calbus_read              : std_logic;
+    signal calbus_write             : std_logic;
+    signal calbus_address           : std_logic_vector(19 downto 0);
+    signal calbus_wdata             : std_logic_vector(31 downto 0);
+    signal calbus_rdata             : std_logic_vector(31 downto 0)   := (others => 'X');
+    signal calbus_seq_param_tbl     : std_logic_vector(4095 downto 0) := (others => 'X');
     signal calbus_clk               : std_logic;
 
     -- External memory interfaces (clocked at MEM_CLK)
@@ -246,7 +246,7 @@ architecture FULL of FPGA is
     signal mem_rst_n                        : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_pll_locked                   : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_pll_locked_sync              : std_logic_vector(MEM_PORTS-1 downto 0);
-    
+
     signal mem_avmm_ready                   : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_avmm_read                    : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_avmm_write                   : std_logic_vector(MEM_PORTS-1 downto 0);
@@ -260,16 +260,16 @@ architecture FULL of FPGA is
     signal mem_mmr_read_data                : slv_array_t(MEM_PORTS - 1 downto 0)(MEM_MMR_DATA_WIDTH-1 downto 0);
     signal mem_mmr_write_data               : slv_array_t(MEM_PORTS - 1 downto 0)(MEM_MMR_DATA_WIDTH-1 downto 0);
     signal mem_mmr_burst_count              : slv_array_t(MEM_PORTS - 1 downto 0)(MEM_MMR_BURST_WIDTH-1 downto 0);
-    signal mem_mmr_waitrequest              : std_logic_vector(MEM_PORTS - 1 downto 0);                   
+    signal mem_mmr_waitrequest              : std_logic_vector(MEM_PORTS - 1 downto 0);
     signal mem_mmr_read                     : std_logic_vector(MEM_PORTS - 1 downto 0);
     signal mem_mmr_write                    : std_logic_vector(MEM_PORTS - 1 downto 0);
     signal mem_mmr_begin_burst_transfer     : std_logic_vector(MEM_PORTS - 1 downto 0);
-    signal mem_mmr_read_data_valid          : std_logic_vector(MEM_PORTS - 1 downto 0);                   
+    signal mem_mmr_read_data_valid          : std_logic_vector(MEM_PORTS - 1 downto 0);
 
     signal mem_refr_req                     : std_logic_vector(MEM_PORTS - 1 downto 0);
     signal mem_refr_ack                     : std_logic_vector(MEM_PORTS - 1 downto 0);
     signal mem_refr_period                  : slv_array_t(MEM_PORTS - 1 downto 0)(MEM_REFR_PERIOD_WIDTH - 1 downto 0);
-     
+
     signal emif_rst_req                     : std_logic_vector(MEM_PORTS-1 downto 0);
     signal emif_rst_done                    : std_logic_vector(MEM_PORTS-1 downto 0);
     signal emif_ecc_usr_int                 : std_logic_vector(MEM_PORTS-1 downto 0);
@@ -467,16 +467,16 @@ begin
         mem_dq                          => DDR4_DDIMM_DQ,
         local_cal_success               => emif_cal_success(0),
         local_cal_fail                  => emif_cal_fail(0),
-        calbus_read                     => calbus_read,   
-        calbus_write                    => calbus_write,  
+        calbus_read                     => calbus_read,
+        calbus_write                    => calbus_write,
         calbus_address                  => calbus_address,
-        calbus_wdata                    => calbus_wdata,  
-        calbus_rdata                    => calbus_rdata,  
-        calbus_seq_param_tbl            => calbus_seq_param_tbl, 
-        calbus_clk                      => calbus_clk,                
-        emif_usr_reset_n                => mem_rst_n(0), 
-        emif_usr_clk                    => mem_clk(0), 
-        ctrl_ecc_user_interrupt_0       => emif_ecc_usr_int(0), 
+        calbus_wdata                    => calbus_wdata,
+        calbus_rdata                    => calbus_rdata,
+        calbus_seq_param_tbl            => calbus_seq_param_tbl,
+        calbus_clk                      => calbus_clk,
+        emif_usr_reset_n                => mem_rst_n(0),
+        emif_usr_clk                    => mem_clk(0),
+        ctrl_ecc_user_interrupt_0       => emif_ecc_usr_int(0),
         amm_ready_0                     => mem_avmm_ready(0),
         amm_read_0                      => mem_avmm_read(0),
         amm_write_0                     => mem_avmm_write(0),
@@ -486,29 +486,29 @@ begin
         amm_burstcount_0                => mem_avmm_burstcount(0),
         amm_readdatavalid_0             => mem_avmm_readdatavalid(0),
         mmr_slave_waitrequest_0         => mem_mmr_waitrequest(0),
-        mmr_slave_read_0                => mem_mmr_read(0), 
-        mmr_slave_write_0               => mem_mmr_write(0),      
-        mmr_slave_address_0             => mem_mmr_address(0),    
-        mmr_slave_readdata_0            => mem_mmr_read_data(0),   
-        mmr_slave_writedata_0           => mem_mmr_write_data(0),  
-        mmr_slave_burstcount_0          => mem_mmr_burst_count(0), 
+        mmr_slave_read_0                => mem_mmr_read(0),
+        mmr_slave_write_0               => mem_mmr_write(0),
+        mmr_slave_address_0             => mem_mmr_address(0),
+        mmr_slave_readdata_0            => mem_mmr_read_data(0),
+        mmr_slave_writedata_0           => mem_mmr_write_data(0),
+        mmr_slave_burstcount_0          => mem_mmr_burst_count(0),
         mmr_slave_beginbursttransfer_0  => mem_mmr_begin_burst_transfer(0),
-        mmr_slave_readdatavalid_0       => mem_mmr_read_data_valid(0),     
+        mmr_slave_readdatavalid_0       => mem_mmr_read_data_valid(0),
         ctrl_auto_precharge_req_0       => emif_auto_precharge(0)
     );
-     
+
     -- Each EMIF instance must be connected to the I/O SSM.
     -- Only one calibration IP is allowed for each I/O row. All the EMIFs in the same I/O row
     -- must be connected to the same calibration I/P. You can specify the number of EMIF
-    -- interfaces to be connected to the calibration IP when parameterizing the IP. 
-    
+    -- interfaces to be connected to the calibration IP when parameterizing the IP.
+
     emif_cal_0 : component emif_agi027_cal
     port map (
-        calbus_read_0               => calbus_read,              
-        calbus_write_0              => calbus_write,       
-        calbus_address_0            => calbus_address,     
-        calbus_wdata_0              => calbus_wdata,    
-        calbus_rdata_0              => calbus_rdata,       
+        calbus_read_0               => calbus_read,
+        calbus_write_0              => calbus_write,
+        calbus_address_0            => calbus_address,
+        calbus_wdata_0              => calbus_wdata,
+        calbus_rdata_0              => calbus_rdata,
         calbus_seq_param_tbl_0      => calbus_seq_param_tbl,
         calbus_clk                  => calbus_clk,
         cal_debug_clk_clk           => mem_clk(0),
@@ -535,13 +535,13 @@ begin
         REFRESH_PERIOD_TICKS    => mem_refr_period          (0),
         REFRESH_DONE_ANY        => mem_refr_ack             (0),
 
-        AMM_READY               => not mem_mmr_waitrequest  (0), 
-        AMM_READ                => mem_mmr_read             (0), 
-        AMM_WRITE               => mem_mmr_write            (0), 
-        AMM_ADDRESS             => mem_mmr_address          (0), 
-        AMM_READ_DATA           => mem_mmr_read_data        (0), 
-        AMM_WRITE_DATA          => mem_mmr_write_data       (0), 
-        AMM_BURST_COUNT         => mem_mmr_burst_count      (0), 
+        AMM_READY               => not mem_mmr_waitrequest  (0),
+        AMM_READ                => mem_mmr_read             (0),
+        AMM_WRITE               => mem_mmr_write            (0),
+        AMM_ADDRESS             => mem_mmr_address          (0),
+        AMM_READ_DATA           => mem_mmr_read_data        (0),
+        AMM_WRITE_DATA          => mem_mmr_write_data       (0),
+        AMM_BURST_COUNT         => mem_mmr_burst_count      (0),
         AMM_READ_DATA_VALID     => mem_mmr_read_data_valid  (0)
     );
 

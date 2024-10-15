@@ -31,7 +31,7 @@ port (
     PCIE_TX_P           : out   std_logic_vector(PCIE_LANES -1 downto 0);
     PCIE_TX_N           : out   std_logic_vector(PCIE_LANES -1 downto 0);
 
-    -- 50 MHz external clock 
+    -- 50 MHz external clock
     REFCLK              : in    std_logic;
 
     -- Pulse per second
@@ -146,7 +146,7 @@ architecture FULL of FPGA is
     constant DDR_PORTS           : integer := MEM_PORTS;
     constant DDR_ADDR_WIDTH      : integer := 29;
     constant DDR_BYTES           : integer := 9;
-    --These values are IP core specific ... 
+    --These values are IP core specific ...
     constant DDR_AXI_ADDR_WIDTH  : integer := 32;
     constant DDR_AXI_DATA_WIDTH  : integer := 512;
     -- 1/4 of Memory Device interface Speed in Hz
@@ -155,8 +155,8 @@ architecture FULL of FPGA is
     constant AMM_DATA_WIDTH         : integer := 512;
     constant AMM_BURST_COUNT_WIDTH  : integer := 8;
     constant AMM_ADDR_WIDTH         : integer := 26;
-    constant REFR_PERIOD_WIDTH      : integer := 32;  
-    
+    constant REFR_PERIOD_WIDTH      : integer := 32;
+
     signal sysclk_ibuf      : std_logic;
     signal sysclk_bufg      : std_logic;
     signal sysrst_cnt       : unsigned(4 downto 0) := (others => '0');
@@ -164,7 +164,7 @@ architecture FULL of FPGA is
 
     signal eth_led_g        : std_logic_vector(2*4-1 downto 0);
     signal eth_led_r        : std_logic_vector(2*4-1 downto 0);
-    
+
     signal eth_refclk_p     : std_logic_vector(2-1 downto 0);
     signal eth_refclk_n     : std_logic_vector(2-1 downto 0);
     signal eth_rx_p         : std_logic_vector(2*ETH_LANES-1 downto 0);
@@ -178,7 +178,7 @@ architecture FULL of FPGA is
     signal qsfp_sda         : std_logic_vector(2-1 downto 0) := (others => 'Z');
     signal qsfp_modprs_n    : std_logic_vector(2-1 downto 0);
     signal qsfp_int_n       : std_logic_vector(2-1 downto 0);
-    
+
     signal misc_in          : std_logic_vector(MISC_IN_WIDTH-1 downto 0) := (others => '0');
     signal misc_out         : std_logic_vector(MISC_OUT_WIDTH-1 downto 0);
 
@@ -201,17 +201,17 @@ architecture FULL of FPGA is
     signal boot_reset       : std_logic;
     signal boot_clk         : std_logic;
 
-    -- AXI Flash Controller 
-    signal axi_mi_addr_s    : std_logic_vector(8 - 1 downto 0);           
-    signal axi_mi_dwr_s     : std_logic_vector(32 - 1 downto 0);         
-    signal axi_mi_wr_s      : std_logic;        
-    signal axi_mi_rd_s      : std_logic;        
-    signal axi_mi_be_s      : std_logic_vector((32/8)-1 downto 0);        
-    signal axi_mi_ardy_s    : std_logic;          
-    signal axi_mi_drd_s     : std_logic_vector(32 - 1 downto 0);         
+    -- AXI Flash Controller
+    signal axi_mi_addr_s    : std_logic_vector(8 - 1 downto 0);
+    signal axi_mi_dwr_s     : std_logic_vector(32 - 1 downto 0);
+    signal axi_mi_wr_s      : std_logic;
+    signal axi_mi_rd_s      : std_logic;
+    signal axi_mi_be_s      : std_logic_vector((32/8)-1 downto 0);
+    signal axi_mi_ardy_s    : std_logic;
+    signal axi_mi_drd_s     : std_logic_vector(32 - 1 downto 0);
     signal axi_mi_drdy_s    : std_logic;
 
-    --BMC controller 
+    --BMC controller
     signal bmc_mi_addr_s    : std_logic_vector(8 - 1 downto 0);
     signal bmc_mi_dwr_s     : std_logic_vector(32 - 1 downto 0);
     signal bmc_mi_wr_s      : std_logic;
@@ -260,7 +260,7 @@ architecture FULL of FPGA is
     signal ddr_s_axi_rresp              : slv_array_t     (DDR_PORTS-1 downto 0)(1 DOWNTO 0);
     signal ddr_s_axi_rid                : slv_array_t     (DDR_PORTS-1 downto 0)(3 DOWNTO 0);
     signal ddr_s_axi_rdata              : slv_array_t     (DDR_PORTS-1 downto 0)(DDR_AXI_DATA_WIDTH-1 DOWNTO 0);
-    
+
     -- DDR4A interface
     signal ddr4a_rst        : std_logic;
     signal ddr4a_app_hi_pri : std_logic;
@@ -273,7 +273,7 @@ architecture FULL of FPGA is
     signal ddr4b_app_hi_pri : std_logic;
     signal ddr4b_dqs_p      : std_logic_vector(DDR_BYTES-1 downto 0);
     signal ddr4b_dqs_n      : std_logic_vector(DDR_BYTES-1 downto 0);
-    signal ddr4b_dm         : std_logic_vector(DDR_BYTES-1 downto 0); 
+    signal ddr4b_dm         : std_logic_vector(DDR_BYTES-1 downto 0);
 
     -- MEM_TESTER signals
     signal mem_clk                  : std_logic_vector(DDR_PORTS -1 downto 0);
@@ -316,7 +316,7 @@ architecture FULL of FPGA is
     signal ddr_dqs_p                    : std_logic_vector(DDR_PORTS*DDR_BYTES-1 downto 0);
     signal ddr_dqs_n                    : std_logic_vector(DDR_PORTS*DDR_BYTES-1 downto 0);
     signal ddr_dm                       : std_logic_vector(DDR_PORTS*DDR_BYTES-1 downto 0);
-    
+
     -- DDR IP core with AXI4 interface
     component DDR4_AXI
         port (
@@ -400,7 +400,7 @@ architecture FULL of FPGA is
             c0_ddr4_s_axi_ctrl_rready   : in    std_logic;
             c0_ddr4_s_axi_ctrl_rdata    : out   std_logic_vector(31 downto 0);
             c0_ddr4_s_axi_ctrl_rresp    : out   std_logic_vector(1 downto 0)
-            
+
             );
         end component;
 
@@ -420,7 +420,7 @@ begin
             ddr4a_dqs_n(i*2+1)    <= DDR4A_UDQS_N(i);
             ddr4a_dm(i*2+1)       <= DDR4A_UDM(i);
         end generate;
-        
+
         -- FB2CGHH specific (DDR_BYTES=9)
         ddr4a_dqs_n(DDR_BYTES-1)    <= DDR4A_LDQS_N((DDR_BYTES/2));
         ddr4a_dqs_p(DDR_BYTES-1)    <= DDR4A_LDQS_P((DDR_BYTES/2));
@@ -526,36 +526,36 @@ begin
         DDR4A_ACT_N                                 <= '0';
 
         -- Insert differential buffers
-        CK_BUF: OBUFDS 
+        CK_BUF: OBUFDS
         port map (
-            I   => '1', 
-            O   => DDR4A_CK_P(0), 
+            I   => '1',
+            O   => DDR4A_CK_P(0),
             OB  => DDR4A_CK_N(0)
         );
 
         ldqs_buf_g: for p in 0 to ((DDR_BYTES/2)+1)-1 generate
-            LDQS_BUF: IOBUFDS 
+            LDQS_BUF: IOBUFDS
             port map (
-                O   => open, 
-                I   => '0', 
-                T   => '0', 
-                IO  => DDR4A_LDQS_P(p), 
+                O   => open,
+                I   => '0',
+                T   => '0',
+                IO  => DDR4A_LDQS_P(p),
                 IOB => DDR4A_LDQS_N(p)
             );
         end generate;
 
         udqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
-            UDQS_BUF: IOBUFDS 
+            UDQS_BUF: IOBUFDS
             port map (
-                O   => open, 
-                I   => '0', 
-                T   => '0', 
+                O   => open,
+                I   => '0',
+                T   => '0',
                 IO  => DDR4A_UDQS_P(p),
                 IOB => DDR4A_UDQS_N(p)
             );
         end generate;
 
-    end generate; 
+    end generate;
 
     ddr4b_en_g : if DDR_PORTS >= 2 generate
         ddr4b_rst           <= sysrst;
@@ -570,7 +570,7 @@ begin
             ddr4b_dqs_n(i*2+1)    <= DDR4B_UDQS_N(i);
             ddr4b_dm(i*2+1)       <= DDR4B_UDM(i);
         end generate;
-        
+
         -- FB2CGHH specific (DDR_BYTES=9)
         ddr4b_dqs_n(DDR_BYTES-1)    <= DDR4B_LDQS_N((DDR_BYTES/2));
         ddr4b_dqs_p(DDR_BYTES-1)    <= DDR4B_LDQS_P((DDR_BYTES/2));
@@ -676,43 +676,43 @@ begin
         DDR4B_ACT_N                                 <= '0';
 
         -- Insert differential buffers
-        CK_BUF: OBUFDS 
+        CK_BUF: OBUFDS
         port map (
-            I   => '1', 
-            O   => DDR4B_CK_P(0), 
+            I   => '1',
+            O   => DDR4B_CK_P(0),
             OB  => DDR4B_CK_N(0)
         );
 
         ldqs_buf_g: for p in 0 to ((DDR_BYTES/2)+1)-1 generate
-            LDQS_BUF: IOBUFDS 
+            LDQS_BUF: IOBUFDS
             port map (
-                O   => open, 
-                I   => '0', 
-                T   => '0', 
-                IO  => DDR4B_LDQS_P(p), 
+                O   => open,
+                I   => '0',
+                T   => '0',
+                IO  => DDR4B_LDQS_P(p),
                 IOB => DDR4B_LDQS_N(p)
             );
         end generate;
 
         udqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
-            UDQS_BUF: IOBUFDS 
+            UDQS_BUF: IOBUFDS
             port map (
-                O   => open, 
-                I   => '0', 
-                T   => '0', 
+                O   => open,
+                I   => '0',
+                T   => '0',
                 IO  => DDR4B_UDQS_P(p),
                 IOB => DDR4B_UDQS_N(p)
             );
         end generate;
 
-    end generate;         
+    end generate;
 
     ddr4bridge_g : for i in DDR_PORTS -1 downto 0 generate
         ddr4bridge_i : entity work.AXI2AVMM_BRIDGE
         port map(
             MEM_CLK                 => ddr_ui_clk(i),
             MEM_RST                 => ddr_ui_clk_sync_rst(i),
-                
+
             -- DDR4_AXI interface
             DDR_S_AXI_AWID          => ddr_s_axi_awid(i),
             DDR_S_AXI_AWADDR        => ddr_s_axi_awaddr(i),
@@ -743,7 +743,7 @@ begin
             DDR_S_AXI_RRESP         => ddr_s_axi_rresp(i),
             DDR_S_AXI_RID           => ddr_s_axi_rid(i),
             DDR_S_AXI_RDATA         => ddr_s_axi_rdata(i),
-        
+
             -- EMIF interface
             AMM_READY               => mem_avmm_ready(i),
             AMM_READ                => mem_avmm_read(i),
@@ -782,7 +782,7 @@ begin
     PPS_OUT <= PPS_IN;
 
     -- QSFP MAPPING ------------------------------------------------------------
-    eth_refclk_p <= QSFP1_REFCLK_P & QSFP0_REFCLK_P; 
+    eth_refclk_p <= QSFP1_REFCLK_P & QSFP0_REFCLK_P;
     eth_refclk_n <= QSFP1_REFCLK_N & QSFP0_REFCLK_N;
 
     eth_rx_p <= QSFP1_RX_P & QSFP0_RX_P;
@@ -835,16 +835,16 @@ begin
         BOOT_IMAGE    => open,
 
         BMC_MI_ADDR   => bmc_mi_addr_s,
-        BMC_MI_DWR    => bmc_mi_dwr_s, 
+        BMC_MI_DWR    => bmc_mi_dwr_s,
         BMC_MI_WR     => bmc_mi_wr_s,
         BMC_MI_RD     => bmc_mi_rd_s,
         BMC_MI_BE     => bmc_mi_be_s,
         BMC_MI_ARDY   => bmc_mi_ardy_s,
         BMC_MI_DRD    => bmc_mi_drd_s,
         BMC_MI_DRDY   => bmc_mi_drdy_s,
-        
+
         AXI_MI_ADDR   => axi_mi_addr_s,
-        AXI_MI_DWR    => axi_mi_dwr_s, 
+        AXI_MI_DWR    => axi_mi_dwr_s,
         AXI_MI_WR     => axi_mi_wr_s,
         AXI_MI_RD     => axi_mi_rd_s,
         AXI_MI_BE     => axi_mi_be_s,
@@ -864,7 +864,7 @@ begin
         SPI_MISO       => SF2_MISO,
         SPI_INT        => SF2_INT,
 
-        -- MI32 protocol signals 
+        -- MI32 protocol signals
         BMC_MI_ADDR    => bmc_mi_addr_s,
         BMC_MI_DWR     => bmc_mi_dwr_s,
         BMC_MI_WR      => bmc_mi_wr_s,
@@ -882,8 +882,8 @@ begin
         SPI_CLK      => axi_spi_clk,
         RST          => boot_reset,
 
-        -- MI32 protocol 
-        AXI_MI_ADDR => axi_mi_addr_s, 
+        -- MI32 protocol
+        AXI_MI_ADDR => axi_mi_addr_s,
         AXI_MI_DWR  => axi_mi_dwr_s,
         AXI_MI_WR   => axi_mi_wr_s,
         AXI_MI_RD   => axi_mi_rd_s,
@@ -915,7 +915,7 @@ begin
         LED_CLK         => QLED_CLK,
         LED_LE          => QLED_LE
     );
- 
+
     -- FPGA COMMON -------------------------------------------------------------
     usp_i : entity work.FPGA_COMMON
     generic map (
@@ -1007,7 +1007,7 @@ begin
 
         PCIE_CLK                => pcie_clk,
         PCIE_RESET              => pcie_reset,
-    
+
         BOOT_MI_CLK             => boot_mi_clk,
         BOOT_MI_RESET           => boot_mi_reset,
         BOOT_MI_DWR             => boot_mi_dwr,

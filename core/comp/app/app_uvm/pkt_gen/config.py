@@ -12,7 +12,7 @@ import json
 
 def json_object_get(json, path):
     index = 0
-    obj   = json 
+    obj   = json
     while (index < len(path) and obj != None):
         obj = obj.get(path[index])
         index += 1

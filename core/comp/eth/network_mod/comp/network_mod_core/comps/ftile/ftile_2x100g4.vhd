@@ -73,7 +73,7 @@ entity FTILE_2x100g4 is
 end entity;
 
 architecture FULL of FTILE_2x100g4 is
-    
+
     -- 100g2 (NRZ)
     component ftile_eth_2x100g is
     port (
@@ -169,7 +169,7 @@ architecture FULL of FTILE_2x100g4 is
         o_reconfig_xcvr3_waitrequest    : out std_logic;                                         -- waitrequest
         i_clk_pll                       : in  std_logic                      := 'X'              -- clk
     );
-    end component ftile_eth_2x100g;    
+    end component ftile_eth_2x100g;
 
     -- ===================================================================
     -- Constants
@@ -190,8 +190,8 @@ architecture FULL of FTILE_2x100g4 is
     -- Adress and data range constants for eth and xcvr
     constant MI_ADDR_WIDTH_PHY : natural := 32;
     constant MI_DATA_WIDTH_PHY : natural := 32;
-    
-    --  monitoring RX link state 
+
+    --  monitoring RX link state
     constant RX_LINK_CNT_W : natural := 27;
 
     -- eneable for drp_bridge (xcvr + eth)
@@ -217,7 +217,7 @@ architecture FULL of FTILE_2x100g4 is
     signal drpaddr  : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0);
     signal drpardy  : std_logic;
     signal drpdi    : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal drpsel   : std_logic_vector(4-1 downto 0); 
+    signal drpsel   : std_logic_vector(4-1 downto 0);
 
     -- signals for mi_sel => IP core interface
     signal reconfig_addr           :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
@@ -234,7 +234,7 @@ architecture FULL of FTILE_2x100g4 is
     signal reconfig_addr_drp       :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
     signal reconfig_writedata_drp  :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
 
-    -- signal for Ftile interface 
+    -- signal for Ftile interface
     signal ftile_rx_rst_n             : std_logic;
     signal ftile_rx_rst_ack_n         : std_logic;
     signal ftile_tx_lanes_stable      : std_logic;
@@ -327,7 +327,7 @@ begin
         BLK_ERR_CNTR             => (others => '0'),
         BLK_ERR_CLR              => open,
         SCR_BYPASS               => open,
-        PCS_RESET                => mgmt_pcs_reset, --TODO 
+        PCS_RESET                => mgmt_pcs_reset, --TODO
         PCS_LPBCK                => open,
         PCS_CONTROL(0)           => mgmt_mac_loop,
         PCS_CONTROL(15 downto 1) => mgmt_pcs_control_dummy,
@@ -343,7 +343,7 @@ begin
         PMA_LOPWR                => open,
         PMA_LPBCK                => open,
         PMA_REM_LPBCK            => open,
-        PMA_RESET                => mgmt_pma_reset, --TODO 
+        PMA_RESET                => mgmt_pma_reset, --TODO
         PMA_RETUNE               => open,
         PMA_CONTROL              => open,
         PMA_STATUS               => (others => '0'),
@@ -495,7 +495,7 @@ begin
     mi_ardy_conversion_g: for i in PMA_LANES downto 0 generate
         mi_ardy_phy(i) <= not reconfig_waitrequest(i);
     end generate;
- 
+
     CLK_ETH_OUT <= ftile_clk_out;
 
     -- =========================================================================

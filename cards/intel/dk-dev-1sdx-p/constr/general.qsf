@@ -28,10 +28,10 @@ set_location_assignment PIN_G33 -to I2C3_1V8_SCL
 set_location_assignment PIN_C33 -to I2C3_1V8_SDA
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
-set_instance_assignment -name IO_STANDARD LVDS -to FPGA_SYSCLK0_100M_P 
+set_instance_assignment -name IO_STANDARD LVDS -to FPGA_SYSCLK0_100M_P
 set_instance_assignment -name IO_STANDARD "1.8 V" -to USER_LED_G
 
 set_instance_assignment -name IO_STANDARD "1.8 V" -to I2C1_1V8_SCL

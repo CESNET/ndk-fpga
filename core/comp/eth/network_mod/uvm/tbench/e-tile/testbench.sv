@@ -82,7 +82,7 @@ module testbench;
     // CONFIGURE and RUN VERIFICATION
     initial begin
         automatic uvm_root m_root;
-        automatic virtual reset_if vif_rst_eth[ETH_PORTS] = rst_eth; 
+        automatic virtual reset_if vif_rst_eth[ETH_PORTS] = rst_eth;
         automatic virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH) vif_usr_rx     [ETH_PORTS] = usr_rx;
         automatic virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)                              vif_usr_tx_data[ETH_PORTS] = usr_tx_data;
         automatic virtual mvb_if #(REGIONS, ETH_RX_HDR_WIDTH)                                                                                vif_usr_tx_hdr [ETH_PORTS] = usr_tx_hdr;
@@ -104,7 +104,7 @@ module testbench;
             uvm_config_db#(virtual mvb_if #(REGIONS, ETH_RX_HDR_WIDTH)                                                                               )::set(null, "", $sformatf("vif_usr_tx_hdr_%0d", it) , vif_usr_tx_hdr[it]);
 
             uvm_config_db#(virtual avst_if #(ETH_PORT_CHAN[0], 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 6))::set(null, "", $sformatf("vif_eth_rx_%0d", it) , vif_eth_rx[it]);
-            uvm_config_db#(virtual avst_if #(ETH_PORT_CHAN[0], 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1))::set(null, "", $sformatf("vif_eth_tx_%0d", it) , vif_eth_tx[it]);        
+            uvm_config_db#(virtual avst_if #(ETH_PORT_CHAN[0], 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1))::set(null, "", $sformatf("vif_eth_tx_%0d", it) , vif_eth_tx[it]);
         end
         uvm_config_db#(virtual mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH))::set(null, "", "vif_mi"    , mi);
         uvm_config_db#(virtual mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH))::set(null, "", "vif_mi_phy", mi_phy);
@@ -244,6 +244,6 @@ module testbench;
 
         .tsu (tsu)
     );
-    
+
 endmodule
 

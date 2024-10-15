@@ -141,7 +141,7 @@ begin
     rx_usr_arr_mvb_vld      <= RX_USR_MVB_VLD;
     rx_usr_arr_mvb_src_rdy  <= RX_USR_MVB_SRC_RDY;
     RX_USR_MVB_DST_RDY      <= rx_usr_arr_mvb_dst_rdy;
-    
+
     rx_usr_arr_mfb_data     <= RX_USR_MFB_DATA;
     rx_usr_arr_mfb_sof      <= RX_USR_MFB_SOF;
     rx_usr_arr_mfb_eof      <= RX_USR_MFB_EOF;
@@ -236,7 +236,7 @@ begin
                 SAME_CLK          => false              ,
                 MI_PIPE_EN        => true               ,
                 DEVICE            => DEVICE
-            ) 
+            )
             port map(
                 MI_CLK              => MI_CLK,
                 MI_RESET            => MI_RESET,
@@ -305,7 +305,7 @@ begin
                 DMA_TX_MVB_VLD      => dma_tx_usr_mvb_vld(i)     ,
                 DMA_TX_MVB_SRC_RDY  => dma_tx_usr_mvb_src_rdy(i) ,
                 DMA_TX_MVB_DST_RDY  => dma_tx_usr_mvb_dst_rdy(i) ,
-                
+
                 DMA_TX_MFB_DATA     => dma_tx_usr_mfb_data(i)    ,
                 DMA_TX_MFB_SOF      => dma_tx_usr_mfb_sof(i)     ,
                 DMA_TX_MFB_EOF      => dma_tx_usr_mfb_eof(i)     ,

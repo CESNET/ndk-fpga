@@ -32,7 +32,7 @@ class model_input_fifo#(ITEM_WIDTH, META_WIDTH) extends uvm_component;
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
-        analysis_export_data = new("analysis_export_data", this); 
+        analysis_export_data = new("analysis_export_data", this);
         analysis_export_meta = new("analysis_export_meta", this);
         port                 = new("port", this);
     endfunction
@@ -107,7 +107,7 @@ class scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_
     // TX path
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))         tx_input_data;
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(META_WIDTH))              tx_input_meta;
-    protected model_input_fifo#(ITEM_WIDTH, META_WIDTH)                               tx_input; 
+    protected model_input_fifo#(ITEM_WIDTH, META_WIDTH)                               tx_input;
 
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))         tx_out[CHANNELS];
     //comparesrs

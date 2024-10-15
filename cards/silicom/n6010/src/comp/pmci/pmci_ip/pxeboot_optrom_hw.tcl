@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Intel Corporation.
 # SPDX-License-Identifier: MIT
 
-# 
+#
 # Description
 # -----------------------------------------------------------------------------
 # This is the _hw.tcl of PXEBoot OptionROM core
@@ -176,7 +176,7 @@ add_interface_port avalon_master avmm_mstr_waitreq waitrequest Input 1
 
 # -----------------------------------------------------------------------------
 # Port - Avalon-MM slave (to IOFS-shell/host)
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------
 add_interface avalon_slave avalon end
 set_interface_property avalon_slave addressGroup 0
 set_interface_property avalon_slave addressUnits WORDS
@@ -238,18 +238,18 @@ add_interface_port csr_if pxeboot_status pxeboot_status Output 32
 # Validate IP
 # -----------------------------------------------------------------------------
 proc ip_validate { } {
-   
+
    set orom_baddr [ get_parameter_value OPTROM_AREA_BADDR ]
    set fadr_width [ get_parameter_value FLASH_ADDR_WIDTH ]
    set hadr_width [ get_parameter_value HOST_RDADDR_WIDTH ]
    set orom_size  [ get_parameter_value OPTROM_SIZE ]
 
    set addr_span     [expr {pow(2, $fadr_width)}]
-   
+
    if { $addr_span <= $orom_baddr } {
       send_message Error "Option ROM flash base addres is out of bound of flash address range. Please correct Option ROM base address or flash address width"
    }
-   
+
    if { [expr {$orom_size * 1024}] > [expr {pow(2, $hadr_width)}] } {
       send_message Error "Option ROM size is out of bound of host address. Please correct Option ROM size or host address width"
    }
@@ -259,7 +259,7 @@ proc ip_validate { } {
 # Elaborate IP
 # -----------------------------------------------------------------------------
 proc ip_elaborate { } {
-   
+
    set fadr_width [ get_parameter_value FLASH_ADDR_WIDTH ]
    set hadr_width [ get_parameter_value HOST_RDADDR_WIDTH ]
 

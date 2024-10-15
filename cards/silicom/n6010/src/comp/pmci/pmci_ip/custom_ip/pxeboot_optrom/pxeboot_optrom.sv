@@ -5,8 +5,8 @@
 // Description
 //-----------------------------------------------------------------------------
 // This module acts as a OptionROM of the PXEboot flow.
-// This module reads the OptionROM contents from FPGA flash on every 
-// configuration and stores it in the internal buffer. Host BIOS will read 
+// This module reads the OptionROM contents from FPGA flash on every
+// configuration and stores it in the internal buffer. Host BIOS will read
 // this buffer for OptionROM contents.
 //-----------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ module pxeboot_optrom #(
    output logic [63:0]                    avmm_slv_rddata,
    output logic                           avmm_slv_rddvld,
    output logic                           avmm_slv_waitreq,
-   
+
    //AVMM master to flash
    output logic [FLASH_ADDR_WIDTH-1:0]    avmm_mstr_addr,
    output logic                           avmm_mstr_read,
@@ -48,7 +48,7 @@ localparam DIS_OPTROM       = "YES"; //Disable PXEboot OROM logic & buffer = YES
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // PXEboot OptionROM Enabled
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-generate 
+generate
 if (DIS_OPTROM == "NO") begin
 //------------------------------------------------------------------------------
 // Internal Declarations
@@ -59,7 +59,7 @@ enum {
    OPTROM_RD_REQ_BIT    = 2,
    OPTROM_RD_DATA_BIT   = 3,
    OPTROM_RD_DONE_BIT   = 4
-   
+
 } optrom_state_bit;
 
 enum logic [4:0] {
@@ -80,7 +80,7 @@ logic                      orom_rden_r2;
 
 
 //------------------------------------------------------------------------------
-// Option ROM copying FSM 
+// Option ROM copying FSM
 // Top "always_ff" simply switches the state of the state machine registers.
 // Following "always_comb" contains all of the next-state decoding logic.
 //------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ begin : optrom_sm_comb
             optrom_next = OPTROM_RESET_ST;
          else
             optrom_next = OPTROM_READY_ST;
-      
+
       optrom_state[OPTROM_READY_BIT]:   //OPTROM_READY_ST
          if(pxeboot_rd_start)
             optrom_next = OPTROM_RD_REQ_ST;
@@ -111,11 +111,11 @@ begin : optrom_sm_comb
             optrom_next = OPTROM_RD_DONE_ST;
          else
             optrom_next = OPTROM_RD_DATA_ST;
-      
+
       optrom_state[OPTROM_RD_DATA_BIT]: //OPTROM_RD_DATA_ST
          if(flsh_rd_offset[7:2] == 6'd63 && avmm_mstr_rddvld)
             optrom_next = OPTROM_RD_REQ_ST;
-      
+
       optrom_state[OPTROM_RD_DONE_BIT]: //OPTROM_RD_DONE_ST
          optrom_next = OPTROM_RD_DONE_ST;
    endcase
@@ -136,20 +136,20 @@ begin : fsm_ctrl_seq
          flsh_rd_offset <= OPTROM_AREA_BADDR;
       else if (optrom_state[OPTROM_RD_DATA_BIT] && avmm_mstr_rddvld)
          flsh_rd_offset <= flsh_rd_offset + 3'd4;
-      
+
       if(optrom_state[OPTROM_RD_REQ_BIT] && !rd_complete)
          avmm_mstr_read    <= 1'b1;
-      else if(!avmm_mstr_waitreq)   
+      else if(!avmm_mstr_waitreq)
          avmm_mstr_read    <= 1'b0;
-         
-      if(optrom_state[OPTROM_RD_DATA_BIT] && avmm_mstr_rddvld && 
+
+      if(optrom_state[OPTROM_RD_DATA_BIT] && avmm_mstr_rddvld &&
                           (flsh_rd_offset[OPTROM_AWID+1:2] == OPTROM_DW_SIZE-1))
          rd_complete <= 1'b1;
    end
 end : fsm_ctrl_seq
 
 always_comb
-begin : fsm_ctrl_comb   
+begin : fsm_ctrl_comb
  //avmm_mstr_addr                   = OPTROM_AREA_BADDR;
    avmm_mstr_addr[FLASH_ADDR_WIDTH-1:OPTROM_AWID+2] = OPTROM_AREA_BADDR >> (OPTROM_AWID+2);
    avmm_mstr_addr[OPTROM_AWID+1:0]  = flsh_rd_offset;
@@ -216,7 +216,7 @@ defparam
 //------------------------------------------------------------------------------
 // HOst OptionROM reading
 //------------------------------------------------------------------------------
-assign orom_addr_range = (HOST_RDADDR_WIDTH == OPTROM_AWID+2) ? 1'b1 : 
+assign orom_addr_range = (HOST_RDADDR_WIDTH == OPTROM_AWID+2) ? 1'b1 :
                            ~(|avmm_slv_addr[HOST_RDADDR_WIDTH-4:OPTROM_AWID-1]);
 
 always_ff @(posedge clk, posedge reset)
@@ -231,14 +231,14 @@ begin : host_rd
          orom_rden_r1   <= 1'b1;
       else
          orom_rden_r1   <= 1'b0;
-      
+
       orom_rden_r2 <= orom_rden_r1;
-      
+
       if(!orom_addr_range && avmm_slv_read || orom_rden_r2)
          avmm_slv_rddvld   <= 1'b1;
       else
          avmm_slv_rddvld   <= 1'b0;
-      
+
       if(orom_rden_r2)
          avmm_slv_rddata   <= orom_rddata;
       else
@@ -253,7 +253,7 @@ assign avmm_slv_waitreq = 1'b0;
 // PXEboot OptionROM status
 //------------------------------------------------------------------------------
 always_comb
-begin : orom_sts   
+begin : orom_sts
    pxeboot_status[31:16+OPTROM_AWID] = '0;
    pxeboot_status[16+:OPTROM_AWID]   = flsh_rd_offset[OPTROM_AWID+1:2];
    pxeboot_status[15:13]             = '0;
@@ -273,12 +273,12 @@ end else begin
    assign avmm_mstr_addr       = '0;
    assign avmm_mstr_read       = '0;
    assign avmm_mstr_burstcnt   = '0;
-   
+
    always_ff @(posedge clk, posedge reset)
    begin : host_rd
       if(reset)
          avmm_slv_rddvld      <= 1'b0;
-      else 
+      else
          avmm_slv_rddvld      <= avmm_slv_read;
    end : host_rd
 end

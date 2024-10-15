@@ -1,6 +1,6 @@
 // pkg.sv: Package for pcie convet intel to pcie
 // Copyright (C) 2024 CESNET z. s. p. o.
-// Author:  Radek Iša <isa@cesnet.cz> 
+// Author:  Radek Iša <isa@cesnet.cz>
 
 // SPDX-License-Identifier: BSD-3-Clause
 

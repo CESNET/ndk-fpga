@@ -2,7 +2,7 @@
 //-- Copyright (C) 2023 CESNET z. s. p. o.
 //-- Author(s): Daniel Kriz <danielkriz@cesnet.cz>
 
-//-- SPDX-License-Identifier: BSD-3-Clause 
+//-- SPDX-License-Identifier: BSD-3-Clause
 
 class model_intel #(CQ_MFB_ITEM_WIDTH, CC_MFB_ITEM_WIDTH, RQ_MFB_ITEM_WIDTH, RC_MFB_ITEM_WIDTH, AVST_DOWN_META_W, AVST_UP_META_W, RQ_MFB_META_W, RC_MFB_META_W, CQ_MFB_META_W, CC_MFB_META_W, ENDPOINT_TYPE)
 extends model_base #(CQ_MFB_ITEM_WIDTH, CC_MFB_ITEM_WIDTH, RQ_MFB_ITEM_WIDTH, RC_MFB_ITEM_WIDTH, RQ_MFB_META_W, RC_MFB_META_W, CQ_MFB_META_W, CC_MFB_META_W);
@@ -88,7 +88,7 @@ extends model_base #(CQ_MFB_ITEM_WIDTH, CC_MFB_ITEM_WIDTH, RQ_MFB_ITEM_WIDTH, RC
             rw = solve_type(tlp_type);
             rws.push_back(rw);
 
-            if (rw == 1'b0) begin 
+            if (rw == 1'b0) begin
                 tr_mfb_cq_meta_out      = uvm_logic_vector::sequence_item #(CQ_MFB_META_W)::type_id::create("tr_mfb_cq_meta_out", this);
                 tr_mfb_cq_meta_out.data = '0;
                 tr_mfb_cq_meta_out.data = {tr_avst_down_meta_in.data[163-1 : 160], tr_avst_down_meta_in.data[160-1 : 128], tr_avst_down_meta_in.data[32-1 : 0], tr_avst_down_meta_in.data[64-1 : 32], tr_avst_down_meta_in.data[96-1 : 64], tr_avst_down_meta_in.data[128-1 : 96]};

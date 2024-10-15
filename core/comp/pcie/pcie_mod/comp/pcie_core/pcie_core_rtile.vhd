@@ -432,7 +432,7 @@ architecture RTILE of PCIE_CORE is
             pin_perst_n_o                : out std_logic                                          -- reset_n
         );
     end component rtile_pcie_1x16;
-    
+
     constant VSEC_BASE_ADDRESS : integer := 16#D00#;
     constant PCIE_HIPS         : natural := tsel(ENDPOINT_MODE=0,PCIE_ENDPOINTS,PCIE_ENDPOINTS/2);
     constant MAX_PAYLOAD_SIZE  : natural := 512;
@@ -507,7 +507,7 @@ architecture RTILE of PCIE_CORE is
     signal crdt_up_cnt_pd           : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);
     signal crdt_up_cnt_npd          : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);
     signal crdt_up_cnt_cpld         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(4-1 downto 0);
-    
+
     signal crdt_down_init_done      : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal crdt_down_update         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(6-1 downto 0);
     signal crdt_down_cnt_ph         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2-1 downto 0);
@@ -1007,7 +1007,7 @@ begin
 
     pcie_adapter_g : for i in 0 to PCIE_ENDPOINTS-1 generate
         --TODO insert pcie function to HDR
-    
+
         -- Global valid created as OR data and header valids
         pcie_avst_down_valid(i) <= pcie_avst_down_dvalid(i) or pcie_avst_down_hvalid(i);
 
@@ -1066,7 +1066,7 @@ begin
         port map (
             PCIE_CLK            => pcie_clk(i),
             PCIE_RESET          => pcie_rst(i)(0),
-    
+
             AVST_DOWN_DATA      => pcie_avst_down_data(i),
             AVST_DOWN_HDR       => pcie_avst_down_hdr(i),
             AVST_DOWN_PREFIX    => pcie_avst_down_prefix(i),
@@ -1076,7 +1076,7 @@ begin
             AVST_DOWN_BAR_RANGE => pcie_avst_down_bar_range(i),
             AVST_DOWN_VALID     => pcie_avst_down_valid(i),
             AVST_DOWN_READY     => pcie_avst_down_ready(i),
-    
+
             AVST_UP_DATA        => pcie_avst_up_data(i),
             AVST_UP_HDR         => pcie_avst_up_hdr(i),
             AVST_UP_PREFIX      => pcie_avst_up_prefix(i),
@@ -1085,7 +1085,7 @@ begin
             AVST_UP_ERROR       => pcie_avst_up_error(i),
             AVST_UP_VALID       => pcie_avst_up_valid(i),
             AVST_UP_READY       => pcie_avst_up_ready(i),
-    
+
             CRDT_DOWN_INIT_DONE => crdt_down_init_done(i),
             CRDT_DOWN_UPDATE    => crdt_down_update(i),
             CRDT_DOWN_CNT_PH    => crdt_down_cnt_ph(i),
@@ -1094,7 +1094,7 @@ begin
             CRDT_DOWN_CNT_PD    => crdt_down_cnt_pd(i),
             CRDT_DOWN_CNT_NPD   => crdt_down_cnt_npd(i),
             CRDT_DOWN_CNT_CPLD  => crdt_down_cnt_cpld(i),
-    
+
             CRDT_UP_INIT_DONE   => crdt_up_init_done(i),
             CRDT_UP_UPDATE      => crdt_up_update(i),
             CRDT_UP_CNT_PH      => crdt_up_cnt_ph(i),
@@ -1103,7 +1103,7 @@ begin
             CRDT_UP_CNT_PD      => crdt_up_cnt_pd(i),
             CRDT_UP_CNT_NPD     => crdt_up_cnt_npd(i),
             CRDT_UP_CNT_CPLD    => crdt_up_cnt_cpld(i),
-    
+
             CQ_AXI_DATA         => (others => '0'),
             CQ_AXI_USER         => (others => '0'),
             CQ_AXI_LAST         => '0',
@@ -1131,7 +1131,7 @@ begin
             RQ_AXI_KEEP         => open,
             RQ_AXI_VALID        => open,
             RQ_AXI_READY        => '0',
-    
+
             CQ_MFB_DATA         => CQ_MFB_DATA(i),
             CQ_MFB_META         => CQ_MFB_META(i),
             CQ_MFB_SOF          => CQ_MFB_SOF(i),
@@ -1196,7 +1196,7 @@ begin
             PCIE_DCRDT_UP_INIT_ACK   => pcie_dcrdt_up_init_ack(i),
             PCIE_DCRDT_UP_UPDATE     => pcie_dcrdt_up_update(i),
             PCIE_DCRDT_UP_UPDATE_CNT => pcie_dcrdt_up_update_cnt(i),
-        
+
             PCIE_HCRDT_DW_INIT       => pcie_hcrdt_dw_init(i),
             PCIE_HCRDT_DW_INIT_ACK   => pcie_hcrdt_dw_init_ack(i),
             PCIE_HCRDT_DW_UPDATE     => pcie_hcrdt_dw_update(i),

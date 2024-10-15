@@ -2,7 +2,7 @@
 //-- Copyright (C) 2023 CESNET z. s. p. o.
 //-- Author(s): Daniel Kriz <danielkriz@cesnet.cz>
 
-//-- SPDX-License-Identifier: BSD-3-Clause 
+//-- SPDX-License-Identifier: BSD-3-Clause
 
 class sequence_simple extends uvm_common::sequence_base #(config_sequence, sequence_item);
     `uvm_object_utils(uvm_crdt::sequence_simple)

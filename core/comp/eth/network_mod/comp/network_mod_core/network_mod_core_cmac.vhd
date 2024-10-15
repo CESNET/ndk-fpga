@@ -451,7 +451,7 @@ architecture CMAC of NETWORK_MOD_CORE is
     signal cmac_rx_pcsl_number     : std_logic_vector(NUM_LANES*5-1 downto 0);
     signal cmac_rx_synced          : std_logic_vector(NUM_LANES-1 downto 0);
     signal mgmt_pma_loopback       : std_logic;
-    signal mgmt_pma_rem_loopback   : std_logic;  
+    signal mgmt_pma_rem_loopback   : std_logic;
     signal mgmt_pcs_rev_loopback   : std_logic;
     signal mgmt_pma_reset          : std_logic;
     signal mgmt_gt_precursor       : std_logic_vector(32-1 downto 0);
@@ -580,9 +580,9 @@ begin
         SPEED               => ETH_PORT_SPEED,
         SPEED_CAP           => SPEED_CAP,
         RSFEC_ABLE          => '1',
-        PMA_PRECURSOR_INIT  => X"000" & GTY_TX_EQ(3*20-1 downto 2*20),  
+        PMA_PRECURSOR_INIT  => X"000" & GTY_TX_EQ(3*20-1 downto 2*20),
         PMA_POSTCURSOR_INIT => X"000" & GTY_TX_EQ(2*20-1 downto 1*20),
-        PMA_DRIVE_INIT      => X"000" & GTY_TX_EQ(1*20-1 downto 0*20),   
+        PMA_DRIVE_INIT      => X"000" & GTY_TX_EQ(1*20-1 downto 0*20),
         DEVICE              => DEVICE
     )
     port map (
@@ -619,7 +619,7 @@ begin
         -- PMA & PMD status/control
         PMA_LOPWR     => open,
         PMA_LPBCK     => mgmt_pma_loopback,
-        PMA_REM_LPBCK => mgmt_pma_rem_loopback,      
+        PMA_REM_LPBCK => mgmt_pma_rem_loopback,
         PMA_RESET     => mgmt_pma_reset,
         PMA_RETUNE    => open,
         PMA_CONTROL   => open,
@@ -649,7 +649,7 @@ begin
         -- FEC PCS stats
         FEC_TX_BIP        => (others => '0'),
         FEC_TX_LANE_MAP   => X"0013001200110010000f000e000d000c000b000a0009000800070006000500040003000200010000",
-        FEC_TX_BLK_LOCK   => (others => '1'), 
+        FEC_TX_BLK_LOCK   => (others => '1'),
         FEC_TX_ALGN_STAT  => (others => '1'),
         -- DRP interface
         DRPCLK            => MI_CLK_PHY,
@@ -965,10 +965,10 @@ begin
 
     cmac_clk_322m <= cmac_gt_tx_clk_322m;
     CLK_ETH <= cmac_clk_322m;
-    
+
     -- CMAC reset
     cmac_rst_async <= RESET_ETH or (not (and cmac_gt_pwrgood));
-   
+
     cmac_rst_322m_i : entity work.ASYNC_RESET
     generic map (
         TWO_REG  => false,
@@ -985,10 +985,10 @@ begin
     cmac_gt_loopback <= "010010010010" when (mgmt_pma_loopback = '1')     else -- Near end PMA loopback
                         "100100100100" when (mgmt_pma_rem_loopback = '1') or (mgmt_pcs_rev_loopback = '1') else -- Far end PMA loopback
                         "000000000000"; -- Normal operation
-        
-    -- Disable polarity swaps when loopback is active             
+
+    -- Disable polarity swaps when loopback is active
     gt_rxpolarity <= (others => '0') when cmac_gt_loopback(1) = '1' else LANE_RX_POLARITY;
-    gt_txpolarity <= (others => '0') when cmac_gt_loopback(1) = '1' else LANE_TX_POLARITY;  
+    gt_txpolarity <= (others => '0') when cmac_gt_loopback(1) = '1' else LANE_TX_POLARITY;
 
     rxpol_g: for i in LANE_RX_POLARITY'range generate
         rxpol_sync_i : entity work.ASYNC_OPEN_LOOP
@@ -1100,12 +1100,12 @@ begin
         gt_rxrate         => (others => '0'),
         gt_txpolarity     => cmac_gt_txpolarity,
         gt_txinhibit      => (others => '0'),
-        -- 
-        gt_txdiffctrl     => mgmt_gt_txdiffctrl(19 downto 0),         
+        --
+        gt_txdiffctrl     => mgmt_gt_txdiffctrl(19 downto 0),
         gt_txpostcursor   => mgmt_gt_postcursor(19 downto 0),
         gt_txprecursor    => mgmt_gt_precursor(19 downto 0),
         --
-        gt_txprbsforceerr => (others => '0'),         
+        gt_txprbsforceerr => (others => '0'),
         gt_eyescandataerror => open,
         gt_txbufstatus      => open,
         gt_rxdfelpmreset    => (others => '0'),

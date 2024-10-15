@@ -109,7 +109,7 @@ set_location_assignment PIN_LR25 -to SODIMM0_DQ[26]
 set_location_assignment PIN_LN26 -to SODIMM0_DQ[30]
 
 set_location_assignment PIN_KU36 -to SODIMM0_REFCLK_P
-set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to SODIMM0_REFCLK_P 
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to SODIMM0_REFCLK_P
 set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to SODIMM0_REFCLK_P
 #set_location_assignment PIN_KR37 -to SODIMM0_REFCLK_N
 set_location_assignment PIN_KJ37 -to SODIMM0_OCT_RZQ
@@ -256,7 +256,7 @@ set_location_assignment PIN_KR53 -to SODIMM1_NDQS[4]
 set_location_assignment PIN_KF52 -to SODIMM1_DM_DBI[4]
 
 set_location_assignment PIN_MA56 -to SODIMM1_REFCLK_P
-set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to SODIMM1_REFCLK_P 
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to SODIMM1_REFCLK_P
 set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to SODIMM1_REFCLK_P
 #set_location_assignment PIN_LW55 -to SODIMM1_REFCLK_N
 set_location_assignment PIN_LN56 -to SODIMM1_OCT_RZQ

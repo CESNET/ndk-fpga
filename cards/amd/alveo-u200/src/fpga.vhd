@@ -32,7 +32,7 @@ port (
     PCIE_TX_P           : out   std_logic_vector(PCIE_LANES -1 downto 0);
     PCIE_TX_N           : out   std_logic_vector(PCIE_LANES -1 downto 0);
 
-    -- 156.250 MHz external clock 
+    -- 156.250 MHz external clock
     SYSCLK_P            : in    std_logic;
     SYSCLK_N            : in    std_logic;
 
@@ -83,12 +83,12 @@ architecture FULL of FPGA is
     constant ETH_LANE_RXPOLARITY : std_logic_vector(2*ETH_LANES-1 downto 0) := "00000000";
     constant ETH_LANE_TXPOLARITY : std_logic_vector(2*ETH_LANES-1 downto 0) := "00000000";
     constant DEVICE              : string  := "ULTRASCALE";
-    
+
     signal sysclk_ibuf      : std_logic;
     signal sysclk_bufg      : std_logic;
     signal sysrst_cnt       : unsigned(4 downto 0) := (others => '0');
     signal sysrst           : std_logic := '1';
-    
+
     signal eth_refclk_p     : std_logic_vector(2-1 downto 0);
     signal eth_refclk_n     : std_logic_vector(2-1 downto 0);
     signal eth_rx_p         : std_logic_vector(2*ETH_LANES-1 downto 0);
@@ -142,7 +142,7 @@ begin
     end process;
 
     -- QSFP MAPPING ------------------------------------------------------------
-    eth_refclk_p <= QSFP1_REFCLK_P & QSFP0_REFCLK_P; 
+    eth_refclk_p <= QSFP1_REFCLK_P & QSFP0_REFCLK_P;
     eth_refclk_n <= QSFP1_REFCLK_N & QSFP0_REFCLK_N;
 
     eth_rx_p <= QSFP1_RX_P & QSFP0_RX_P;
@@ -187,7 +187,7 @@ begin
         PLL_OUT3_DIV            => 12,
 
         USE_PCIE_CLK            => false,
-        
+
         PCIE_LANES              => PCIE_LANES,
         PCIE_CLKS               => PCIE_CLKS,
         PCIE_CONS               => PCIE_CONS,

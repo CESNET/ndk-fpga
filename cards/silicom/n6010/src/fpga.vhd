@@ -298,7 +298,7 @@ architecture FULL of FPGA is
     signal mem_clk                : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
     signal mem_rst_n              : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
     signal mem_pll_locked         : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
-    
+
     signal mem_avmm_ready         : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
     signal mem_avmm_read          : std_logic_vector(MEM_PORTS-1 downto 0);
     signal mem_avmm_write         : std_logic_vector(MEM_PORTS-1 downto 0);
@@ -307,7 +307,7 @@ architecture FULL of FPGA is
     signal mem_avmm_writedata     : slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0);
     signal mem_avmm_readdata      : slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
     signal mem_avmm_readdatavalid : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
-     
+
     signal emif_rst_req           : std_logic_vector(MEM_PORTS-1 downto 0);
     signal emif_rst_done          : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
     signal emif_ecc_usr_int       : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
@@ -338,24 +338,24 @@ begin
         ETH_PORT_CHAN           => ETH_PORT_CHAN,
         ETH_PORT_LEDS           => 1,
         ETH_LANES               => ETH_LANES,
-        
+
         QSFP_PORTS              => ETH_PORTS,
         QSFP_I2C_PORTS          => ETH_PORTS,
 
         STATUS_LEDS             => STATUS_LEDS,
         MISC_IN_WIDTH           => MISC_IN_WIDTH,
         MISC_OUT_WIDTH          => MISC_OUT_WIDTH,
-        
+
         PCIE_ENDPOINTS          => PCIE_ENDPOINTS,
         PCIE_ENDPOINT_TYPE      => PCIE_MOD_ARCH,
         PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE,
-        
+
         DMA_ENDPOINTS           => DMA_ENDPOINTS,
         DMA_MODULES             => DMA_MODULES,
-        
+
         DMA_RX_CHANNELS         => DMA_RX_CHANNELS/DMA_MODULES,
         DMA_TX_CHANNELS         => DMA_TX_CHANNELS/DMA_MODULES,
-        
+
         MEM_PORTS               => MEM_PORTS,
         MEM_ADDR_WIDTH          => MEM_ADDR_WIDTH,
         MEM_DATA_WIDTH          => MEM_DATA_WIDTH,
@@ -377,10 +377,10 @@ begin
         PCIE_RX_N              => PCIE_RX_N,
         PCIE_TX_P              => PCIE_TX_P,
         PCIE_TX_N              => PCIE_TX_N,
-        
+
         ETH_REFCLK_P           => eth_refclk_p,
         ETH_REFCLK_N           => eth_refclk_n,
-        
+
         ETH_RX_P               => eth_rx_p,
         ETH_RX_N               => eth_rx_n,
         ETH_TX_P               => eth_tx_p,
@@ -421,7 +421,7 @@ begin
         EMIF_ECC_USR_INT       => emif_ecc_usr_int,
         EMIF_CAL_SUCCESS       => emif_cal_success,
         EMIF_CAL_FAIL          => emif_cal_fail,
-        
+
         BOOT_MI_CLK            => boot_mi_clk,
         BOOT_MI_RESET          => boot_mi_reset,
         BOOT_MI_DWR            => boot_mi_dwr,
@@ -438,7 +438,7 @@ begin
     );
 
     -- QSFP MAPPING ------------------------------------------------------------
-    eth_refclk_p <= QSFP_REFCLK_156M & QSFP_REFCLK_156M; 
+    eth_refclk_p <= QSFP_REFCLK_156M & QSFP_REFCLK_156M;
     eth_refclk_n <= (others => '0'); -- Quartus will handle the connection itself
 
     eth_rx_p <= QSFP1_RX_P & QSFP0_RX_P;
@@ -672,17 +672,17 @@ begin
 
         ddr4_cal0_i : component ddr4_calibration
         port map (
-            calbus_read_0          => calbus_read(0),              
-            calbus_write_0         => calbus_write(0),       
-            calbus_address_0       => calbus_address(0),     
-            calbus_wdata_0         => calbus_wdata(0),    
-            calbus_rdata_0         => calbus_rdata(0),       
+            calbus_read_0          => calbus_read(0),
+            calbus_write_0         => calbus_write(0),
+            calbus_address_0       => calbus_address(0),
+            calbus_wdata_0         => calbus_wdata(0),
+            calbus_rdata_0         => calbus_rdata(0),
             calbus_seq_param_tbl_0 => calbus_seq_param_tbl(0),
-            calbus_read_1          => calbus_read(1),              
-            calbus_write_1         => calbus_write(1),       
-            calbus_address_1       => calbus_address(1),     
-            calbus_wdata_1         => calbus_wdata(1),    
-            calbus_rdata_1         => calbus_rdata(1),       
+            calbus_read_1          => calbus_read(1),
+            calbus_write_1         => calbus_write(1),
+            calbus_address_1       => calbus_address(1),
+            calbus_wdata_1         => calbus_wdata(1),
+            calbus_rdata_1         => calbus_rdata(1),
             calbus_seq_param_tbl_1 => calbus_seq_param_tbl(1),
             calbus_clk             => calbus_clk(0)
         );
@@ -691,17 +691,17 @@ begin
 
         ddr4_cal1_i : component ddr4_calibration
         port map (
-            calbus_read_0          => calbus_read(2),              
-            calbus_write_0         => calbus_write(2),       
-            calbus_address_0       => calbus_address(2),     
-            calbus_wdata_0         => calbus_wdata(2),    
-            calbus_rdata_0         => calbus_rdata(2),       
+            calbus_read_0          => calbus_read(2),
+            calbus_write_0         => calbus_write(2),
+            calbus_address_0       => calbus_address(2),
+            calbus_wdata_0         => calbus_wdata(2),
+            calbus_rdata_0         => calbus_rdata(2),
             calbus_seq_param_tbl_0 => calbus_seq_param_tbl(2),
-            calbus_read_1          => calbus_read(3),              
-            calbus_write_1         => calbus_write(3),       
-            calbus_address_1       => calbus_address(3),     
-            calbus_wdata_1         => calbus_wdata(3),    
-            calbus_rdata_1         => calbus_rdata(3),       
+            calbus_read_1          => calbus_read(3),
+            calbus_write_1         => calbus_write(3),
+            calbus_address_1       => calbus_address(3),
+            calbus_wdata_1         => calbus_wdata(3),
+            calbus_rdata_1         => calbus_rdata(3),
             calbus_seq_param_tbl_1 => calbus_seq_param_tbl(3),
             calbus_clk             => calbus_clk(2)
         );

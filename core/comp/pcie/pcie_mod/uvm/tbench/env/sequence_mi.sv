@@ -44,11 +44,11 @@ class mi_cc_sequence #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_mi::sequence_ma
 
 
             get_response(rsp);
-            if (req.ardy == 1'b1 && rsp.rd == 1'b1) begin 
+            if (req.ardy == 1'b1 && rsp.rd == 1'b1) begin
                 read_active++;
                 read_cnt++;
             end
-            if (req.ardy == 1'b1 && rsp.wr == 1'b1) begin 
+            if (req.ardy == 1'b1 && rsp.wr == 1'b1) begin
                 write_cnt++;
             end
             save_request();

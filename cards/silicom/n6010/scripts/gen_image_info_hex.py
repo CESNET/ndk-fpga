@@ -79,7 +79,7 @@ def main(args):
     words = words + id_second
     id_second_bytes = id_second.encode()
     id_second_hex_bytes = binascii.hexlify(id_second_bytes)
-    id_second_hex = bit_reversal(str(id_second_hex_bytes, 'utf-8')) 
+    id_second_hex = bit_reversal(str(id_second_hex_bytes, 'utf-8'))
     id_second_hex_front_half = id_second_hex[:16]
     id_second_hex_back_half  = id_second_hex[16:]
     id_second_hex_front_half_checksum = checksum_calc(address, id_second_hex_front_half)

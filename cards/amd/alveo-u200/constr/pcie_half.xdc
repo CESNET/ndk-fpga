@@ -44,8 +44,8 @@ set_property PACKAGE_PIN BD21    [get_ports {PCIE_SYSRST_N}]
 set_property IOSTANDARD LVCMOS12 [get_ports {PCIE_SYSRST_N}]
 set_property PULLUP true         [get_ports {PCIE_SYSRST_N}]
 
-set_property PACKAGE_PIN AM11    [get_ports {PCIE_SYSCLK_P}] 
-set_property PACKAGE_PIN AM10    [get_ports {PCIE_SYSCLK_N}] 
+set_property PACKAGE_PIN AM11    [get_ports {PCIE_SYSCLK_P}]
+set_property PACKAGE_PIN AM10    [get_ports {PCIE_SYSCLK_N}]
 
 create_clock -period 10.000 -name pcie_clk_p -waveform {0.000 5.000} [get_ports {PCIE_SYSCLK_P}]
 

@@ -34,7 +34,7 @@ generic(
     LANES           : natural := 8;
     -- Type of used IP core
     -- Options: "EHIP=0" , "F-Tile"          ;
-    --          "EHIP>=1", "F-Tile_Multirate";  
+    --          "EHIP>=1", "F-Tile_Multirate";
     EHIP_TYPE       : natural := 0;
     -- =====================================================================
     -- MFB configuration:
@@ -88,8 +88,8 @@ port(
     QSFP_TX_N       : out std_logic_vector(LANES-1 downto 0); -- QSFP XCVR TX Data
 
     -- =====================================================================
-    -- Link control/status 
-    -- =====================================================================        
+    -- Link control/status
+    -- =====================================================================
     -- REPEATER_CTRL   : in  std_logic_vector(1 downto 0);
     -- PORT_ENABLED    : out std_logic;
     RX_LINK_UP      : out std_logic_vector(ETH_PORT_CHAN-1 downto 0);
@@ -114,7 +114,7 @@ port(
 
     TSU_TS_NS        : in  std_logic_vector(64-1 downto 0);
     TSU_TS_DV        : in  std_logic;
-    
+
     -- =====================================================================
     -- TX interface (Packets received from Ethernet, for transmit to MFB)
     -- =====================================================================
