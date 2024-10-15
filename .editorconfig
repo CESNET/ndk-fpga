@@ -10,7 +10,7 @@ charset = utf-8
 indent_style = tab
 
 # Ignore section
-[*.{pcap,ip}]
+[*.{pcap,ip,qsys}]
 end_of_line = unset
 insert_final_newline = unset
 trim_trailing_whitespace = unset
