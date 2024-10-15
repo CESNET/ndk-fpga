@@ -4,14 +4,15 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-class WbTransaction #(DATA_WIDTH = 64, ADDR_WIDTH = 8, FRAGMENTED_MEM = FALSE) extends Transaction;
+class WbTransaction #(DATA_WIDTH = 64, ADDR_WIDTH = 8, FRAGMENTED_MEM = FALSE, ITEMS = 2**ADDR_WIDTH, BLOCK_ITEMS = 20) extends Transaction;
 
     rand bit [DATA_WIDTH-1 : 0] data;
     rand bit [DATA_WIDTH-1 : 0] mask;
     rand bit [ADDR_WIDTH-1 : 0] addr;
 
-    // in fragmented mode MLAB addresses 21-32 are not used
-    constraint frag_mem_constr { addr[4 : 0] < 20 || !FRAGMENTED_MEM; }
+    constraint mem_items_constr { addr < ITEMS; }
+    // in fragmented mode top BLOCK addresses are not used
+    constraint frag_mem_constr { !FRAGMENTED_MEM || addr[$clog2(BLOCK_ITEMS)-1 : 0] < BLOCK_ITEMS; }
 
     virtual function void display(string prefix = "");
         if(prefix != "") begin
@@ -25,7 +26,7 @@ class WbTransaction #(DATA_WIDTH = 64, ADDR_WIDTH = 8, FRAGMENTED_MEM = FALSE) e
     endfunction
 
     virtual function Transaction copy(Transaction to = null);
-        WbTransaction #(DATA_WIDTH, ADDR_WIDTH, FRAGMENTED_MEM) tr;
+        WbTransaction #(DATA_WIDTH, ADDR_WIDTH, FRAGMENTED_MEM, ITEMS, BLOCK_ITEMS) tr;
         if(to == null) begin
             tr = new();
         end else begin
@@ -38,7 +39,7 @@ class WbTransaction #(DATA_WIDTH = 64, ADDR_WIDTH = 8, FRAGMENTED_MEM = FALSE) e
     endfunction
 
     virtual function bit compare(input Transaction to, output string diff, input int kind = -1);
-        WbTransaction #(DATA_WIDTH, ADDR_WIDTH, FRAGMENTED_MEM) tr;
+        WbTransaction #(DATA_WIDTH, ADDR_WIDTH, FRAGMENTED_MEM, ITEMS, BLOCK_ITEMS) tr;
         $cast(tr, to);
         // TODO!!!
         return data == tr.data;

@@ -4,7 +4,7 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-class WbDriver #(DATA_WIDTH = 64, ADDR_WIDTH = 8, FRAGMENTED_MEM = FALSE) extends Driver;
+class WbDriver #(DATA_WIDTH = 64, ADDR_WIDTH = 8, FRAGMENTED_MEM = FALSE, ITEMS = 2**ADDR_WIDTH, BLOCK_ITEMS = 20) extends Driver;
 
     protected virtual iWbRx#(DATA_WIDTH,ADDR_WIDTH).tb vif;
     protected bit [DATA_WIDTH-1 : 0] data;
@@ -55,7 +55,7 @@ class WbDriver #(DATA_WIDTH = 64, ADDR_WIDTH = 8, FRAGMENTED_MEM = FALSE) extend
 
     task run();
         Transaction transaction;
-        WbTransaction #(DATA_WIDTH, ADDR_WIDTH, FRAGMENTED_MEM) tr;
+        WbTransaction #(DATA_WIDTH, ADDR_WIDTH, FRAGMENTED_MEM, ITEMS, BLOCK_ITEMS) tr;
         @(vif.cb); // initial sync
         while(enabled) begin
             while(transMbx.try_get(transaction) == 0) begin // wait for transaction

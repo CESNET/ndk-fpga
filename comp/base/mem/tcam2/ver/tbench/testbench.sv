@@ -14,8 +14,8 @@ module testbench;
     iWbRx  #(DATA_WIDTH, ADDR_WIDTH  ) WRITE     (CLK, RESET);
     iMvbRx #(1,          ADDR_WIDTH  ) READ      (CLK, RESET);
     iMvbTx #(1,          2*DATA_WIDTH) READ_OUT  (CLK, RESET);
-    iMvbRx #(1,          DATA_WIDTH  ) MATCH     (CLK, RESET);
-    iMvbTx #(1,          ITEMS+1     ) MATCH_OUT (CLK, RESET);
+    iMvbRx #(REPLICAS,   DATA_WIDTH  ) MATCH     (CLK, RESET);
+    iMvbTx #(REPLICAS,   ITEMS+1     ) MATCH_OUT (CLK, RESET);
 
     always #(CLK_PERIOD/2) CLK = ~CLK;
 

@@ -7,6 +7,7 @@
 import sv_common_pkg::*;
 import sv_mvb_pkg::*;
 import sv_wb_pkg::*;
+import sv_rb_pkg::*;
 import test_pkg::*;
 
 program TEST (
@@ -21,24 +22,24 @@ program TEST (
     iMvbTx.monitor MATCH_MONITOR
 );
 
-    WbTransaction  #(DATA_WIDTH, ADDR_WIDTH, USE_FRAGMENTED_MEM) write_bp;
-    MvbTransaction #(ADDR_WIDTH)             read_bp;
-    MvbTransaction #(DATA_WIDTH)             match_bp;
+    WbTransaction  #(DATA_WIDTH, ADDR_WIDTH, USE_FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) write_bp;
+    RbTransaction  #(ADDR_WIDTH, USE_FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS)             read_bp;
+    MvbTransaction #(DATA_WIDTH) match_bp;
 
     Generator write_gen;
     Generator read_gen;
     Generator match_gen;
 
-    WbDriver  #(DATA_WIDTH, ADDR_WIDTH, USE_FRAGMENTED_MEM) write_driver;
-    MvbDriver #(1, ADDR_WIDTH)          read_driver;
-    MvbDriver #(1, DATA_WIDTH)          match_driver;
+    WbDriver  #(DATA_WIDTH, ADDR_WIDTH, USE_FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) write_driver;
+    MvbDriver #(1, ADDR_WIDTH) read_driver;
+    MvbDriver #(REPLICAS, DATA_WIDTH) match_driver;
 
     MvbResponder #(1, 2*DATA_WIDTH) read_responder;
-    MvbResponder #(1, ITEMS+1)      match_responder;
+    MvbResponder #(REPLICAS, ITEMS+1) match_responder;
     MvbMonitor   #(1, 2*DATA_WIDTH) read_monitor;
-    MvbMonitor   #(1, ITEMS+1)      match_monitor;
+    MvbMonitor   #(REPLICAS, ITEMS+1) match_monitor;
 
-    Scoreboard #(DATA_WIDTH, ITEMS, USE_FRAGMENTED_MEM) scoreboard;
+    Scoreboard #(DATA_WIDTH, ITEMS, USE_FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) scoreboard;
 
     task createGeneratorEnvironment();
         write_gen = new("Write Generator", 0);
@@ -84,6 +85,7 @@ program TEST (
     task enableTestEnvironment();
         write_driver.setEnabled();
         read_driver.setEnabled();
+        read_driver.mode = 1;
         match_driver.setEnabled();
         read_responder.setEnabled();
         match_responder.setEnabled();
