@@ -86,7 +86,7 @@ set_location_assignment PIN_GW80 -to qsfpdd1_tx_p[1]
 set_location_assignment PIN_GG78 -to qsfpdd1_tx_p[0]
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 # Quartus sets automatically

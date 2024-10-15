@@ -1,6 +1,6 @@
-// model_mtc.sv: Model of mtc 
+// model_mtc.sv: Model of mtc
 // Copyright (C) 2024 CESNET z. s. p. o.
-// Author(s): Radek Iša <isa@cesnet.cz> 
+// Author(s): Radek Iša <isa@cesnet.cz>
 
 // SPDX-License-Identifier: BSD-3-Clause
 

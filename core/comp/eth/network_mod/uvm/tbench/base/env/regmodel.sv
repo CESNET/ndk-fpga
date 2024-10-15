@@ -50,7 +50,7 @@ class reg_model_port#(ETH_CHANNELS) extends uvm_reg_block;
     `uvm_object_param_utils(uvm_network_mod_env::reg_model_port#(ETH_CHANNELS))
 
     rand reg_model_channel channel[ETH_CHANNELS];
-    
+
     function new(string name = "reg_model_port");
         super.new(name, build_coverage(UVM_NO_COVERAGE));
     endfunction

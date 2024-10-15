@@ -1,6 +1,6 @@
 // env.sv: Verification environment dma
 // Copyright (C) 2024 CESNET z. s. p. o.
-// Author(s): Radek Iša <isa@cesnet.cz> 
+// Author(s): Radek Iša <isa@cesnet.cz>
 
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -27,7 +27,7 @@ class env#(
     uvm_reset::sync_cbs reset_sync;
 
     protected monitor   m_monitor;
-    protected driver    m_driver; 
+    protected driver    m_driver;
 
     protected uvm_logic_vector_array_mfb::env_rx #(RQ_REGIONS, RQ_REGION_SIZE, RQ_BLOCK_SIZE, RQ_ITEM_WIDTH, RQ_META_WIDTH)     m_rq_mfb_env;
     protected uvm_logic_vector_mvb::env_rx #(RQ_REGIONS, DMA_UPHDR_WIDTH)                                                       m_rq_mvb_env;

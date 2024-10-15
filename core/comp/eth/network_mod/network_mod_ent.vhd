@@ -19,7 +19,7 @@ generic(
     ETH_CORE_ARCH     : string := "E_TILE";
     -- =====================================================================
     -- Network ports configuration:
-    -- =====================================================================    
+    -- =====================================================================
     ETH_PORTS         : natural := 2; -- max 2 (MI address space limit)
     -- Number ETH streams, must be equal to ETH_PORTS or ETH_PORTS*ETH_PORT_CHAN!
     ETH_STREAMS       : natural := ETH_PORTS;
@@ -66,7 +66,7 @@ generic(
     -- =====================================================================
     MI_DATA_WIDTH     : natural := 32;
     MI_ADDR_WIDTH     : natural := 32;
-    
+
     MI_DATA_WIDTH_PHY : natural := 32;
     MI_ADDR_WIDTH_PHY : natural := 32;
 
@@ -111,7 +111,7 @@ port(
     ETH_TX_N        : out std_logic_vector(ETH_PORTS*LANES-1 downto 0);
     -- =====================================================================
     -- QSFP Control
-    -- =====================================================================        
+    -- =====================================================================
     QSFP_I2C_SCL    : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
     QSFP_I2C_SDA    : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
     QSFP_I2C_SDA_I  : in    std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => '1');
@@ -130,7 +130,7 @@ port(
 
     -- =====================================================================
     -- Link control/status - runs on CLK_ETH
-    -- =====================================================================        
+    -- =====================================================================
     -- REPEATER_CTRL   : in  std_logic_vector(ETH_PORTS*2-1 downto 0);
     -- PORT_ENABLED    : out std_logic_vector(ETH_PORTS-1 downto 0);
     ACTIVITY_RX     : out std_logic_vector(ETH_PORTS*ETH_PORT_CHAN(0)-1 downto 0);

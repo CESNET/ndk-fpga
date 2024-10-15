@@ -47,8 +47,8 @@ class sequence_dma_rq#(DMA_PORTS) extends uvm_sequence#(uvm_dma::sequence_item_r
                 req.hdr.firstib inside {0};
                 req.hdr.lastib  inside {0};
                 req.hdr.length > 0;
-                (req.hdr.type_ide == 1) -> req.hdr.length <= MAX_PAYLOAD_SIZE; 
-                (req.hdr.type_ide == 0) -> req.hdr.length <= MAX_REQUEST_SIZE; 
+                (req.hdr.type_ide == 1) -> req.hdr.length <= MAX_PAYLOAD_SIZE;
+                (req.hdr.type_ide == 0) -> req.hdr.length <= MAX_REQUEST_SIZE;
             }) else begin
                 `uvm_fatal(m_sequencer.get_full_name(), "\n\tsequence_dma_rq cannot randomize");
             end

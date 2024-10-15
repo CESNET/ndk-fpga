@@ -387,7 +387,7 @@ architecture PTILE of PCIE_CORE is
             ninit_done                 : in  std_logic                      := 'X'              -- ninit_done
         );
     end component ptile_pcie_2x8;
-    
+
     constant VSEC_BASE_ADDRESS : integer := 16#D00#;
     constant PCIE_EPS_INST     : natural := tsel(ENDPOINT_MODE=0,PCIE_CONS,2*PCIE_CONS);
 
@@ -569,7 +569,7 @@ begin
     --  PCIE IP CORE
     -- =========================================================================
 
-    pcie_core_g : for i in 0 to PCIE_CONS-1 generate       
+    pcie_core_g : for i in 0 to PCIE_CONS-1 generate
         pcie_core_1x16_g : if ENDPOINT_MODE = 0 generate
             pcie_core_i : component ptile_pcie_1x16
             port map (
@@ -744,7 +744,7 @@ begin
                 p0_cii_addr_o                => pcie_cii_addr(i*2),               --                  .addr
                 p0_cii_wr_o                  => pcie_cii_wr(i*2),                 --                  .write
                 p0_cii_override_din_i        => pcie_cii_override_din(i*2),       --                  .override_din
-                
+
                 p1_rx_st_ready_i             => pcie_avst_down_ready(i*2+1),             --          p0_rx_st.ready
                 p1_rx_st_sop_o               => pcie_avst_down_sop(i*2+1),               --                  .startofpacket
                 p1_rx_st_eop_o               => pcie_avst_down_eop(i*2+1),               --                  .endofpacket
@@ -903,7 +903,7 @@ begin
         port map (
             PCIE_CLK            => pcie_clk(i),
             PCIE_RESET          => pcie_rst(i)(0),
-    
+
             AVST_DOWN_DATA      => pcie_avst_down_data(i),
             AVST_DOWN_HDR       => pcie_avst_down_hdr(i),
             AVST_DOWN_PREFIX    => pcie_avst_down_prefix(i),
@@ -913,7 +913,7 @@ begin
             AVST_DOWN_BAR_RANGE => pcie_avst_down_bar_range(i),
             AVST_DOWN_VALID     => pcie_avst_down_valid(i),
             AVST_DOWN_READY     => pcie_avst_down_ready(i),
-    
+
             AVST_UP_DATA        => pcie_avst_up_data(i),
             AVST_UP_HDR         => pcie_avst_up_hdr(i),
             AVST_UP_PREFIX      => pcie_avst_up_prefix(i),
@@ -922,7 +922,7 @@ begin
             AVST_UP_ERROR       => pcie_avst_up_error(i),
             AVST_UP_VALID       => pcie_avst_up_valid(i),
             AVST_UP_READY       => pcie_avst_up_ready(i),
-    
+
             CRDT_DOWN_INIT_DONE => '0',
             CRDT_DOWN_UPDATE    => open,
             CRDT_DOWN_CNT_PH    => open,
@@ -931,7 +931,7 @@ begin
             CRDT_DOWN_CNT_PD    => open,
             CRDT_DOWN_CNT_NPD   => open,
             CRDT_DOWN_CNT_CPLD  => open,
-    
+
             CRDT_UP_INIT_DONE   => '0',
             CRDT_UP_UPDATE      => (others => '0'),
             CRDT_UP_CNT_PH      => (others => '0'),
@@ -940,7 +940,7 @@ begin
             CRDT_UP_CNT_PD      => (others => '0'),
             CRDT_UP_CNT_NPD     => (others => '0'),
             CRDT_UP_CNT_CPLD    => (others => '0'),
-    
+
             CQ_AXI_DATA         => (others => '0'),
             CQ_AXI_USER         => (others => '0'),
             CQ_AXI_LAST         => '0',
@@ -968,7 +968,7 @@ begin
             RQ_AXI_KEEP         => open,
             RQ_AXI_VALID        => open,
             RQ_AXI_READY        => '0',
-    
+
             CQ_MFB_DATA         => CQ_MFB_DATA(i),
             CQ_MFB_META         => CQ_MFB_META(i),
             CQ_MFB_SOF          => CQ_MFB_SOF(i),

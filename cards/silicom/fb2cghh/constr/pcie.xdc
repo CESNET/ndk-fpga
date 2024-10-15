@@ -10,7 +10,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports {PCIE_SYSRST_N}]
 set_property PACKAGE_PIN AL16    [get_ports {PCIE_RST1V2_N}]
 set_property IOSTANDARD LVCMOS12 [get_ports {PCIE_RST1V2_N}]
 
-set_property PACKAGE_PIN AN10    [get_ports {PCIE_SYSCLK_P}] 
-set_property PACKAGE_PIN AN9     [get_ports {PCIE_SYSCLK_N}] 
+set_property PACKAGE_PIN AN10    [get_ports {PCIE_SYSCLK_P}]
+set_property PACKAGE_PIN AN9     [get_ports {PCIE_SYSCLK_N}]
 
 create_clock -period 10.000 -name pcie_clk_p -waveform {0.000 5.000} [get_ports PCIE_SYSCLK_P]

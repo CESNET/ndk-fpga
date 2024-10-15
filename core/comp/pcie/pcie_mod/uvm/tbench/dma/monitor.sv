@@ -1,4 +1,4 @@
-// monitor.sv : Convert dma to mvb and mfb 
+// monitor.sv : Convert dma to mvb and mfb
 // Copyright (C) 2024 CESNET z. s. p. o.
 // Author(s): Radek Iša <isa@cesnet.cz>
 
@@ -28,7 +28,7 @@ class monitor extends uvm_monitor;
         rq_analysis_port = new("rq_analysis_port", this);
         rc_analysis_port = new("rc_analysis_port", this);
     endfunction
-    
+
     task run_rq();
         uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)   tr_data;
         uvm_logic_vector::sequence_item#(sv_dma_bus_pack::DMA_UPHDR_WIDTH)  tr_meta;
@@ -84,13 +84,13 @@ class monitor extends uvm_monitor;
             rc_mvb.get(meta);
             rc_mfb.get(data);
 
-            {unit_id, tag, completed, length} = meta.data; 
+            {unit_id, tag, completed, length} = meta.data;
             dma_rc = uvm_dma::sequence_item_rc::type_id::create("dma_rc", this);
-            dma_rc.length    = length; 
-            dma_rc.completed = completed; 
-            dma_rc.tag       = tag; 
-            dma_rc.unit_id   = unit_id; 
-            dma_rc.data      = data.data; 
+            dma_rc.length    = length;
+            dma_rc.completed = completed;
+            dma_rc.tag       = tag;
+            dma_rc.unit_id   = unit_id;
+            dma_rc.data      = data.data;
 
             rc_analysis_port.write(dma_rc);
         end

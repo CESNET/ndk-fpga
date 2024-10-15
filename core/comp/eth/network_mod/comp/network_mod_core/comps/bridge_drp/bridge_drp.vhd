@@ -39,7 +39,7 @@ entity BRIDGE_DRP is
     );
 end entity;
 
-architecture FULL of BRIDGE_DRP is 
+architecture FULL of BRIDGE_DRP is
     signal drp_sel   : std_logic_vector (DRPSEL'range);
     signal drpardy_vld : std_logic;
     signal drp_rd_sig  : std_logic;
@@ -54,7 +54,7 @@ begin
             end if;
             -- DRPARDY is valid one clock cycle after DRPEN at the earliest
             drpardy_vld <= DRPEN;
-            if (DRP_DRDY = '1') then 
+            if (DRP_DRDY = '1') then
                 drp_rd_sig <= '0';
             elsif (DRPEN = '1') and (DRPWE = '0') then
                 drp_rd_sig <= '1';
@@ -65,7 +65,7 @@ begin
     -- Assign WR/RD signals for Eth blocks
     drd_mux_p: process(all)
     begin
-        for j in 0 to MI_SEL_RANGE-1 loop 
+        for j in 0 to MI_SEL_RANGE-1 loop
             if (MI_EN_MAP(j) = '1') then
                 RECONFIG_ADDR     (j) <= DRPADDR(RECONFIG_ADDR(j)'range);
                 RECONFIG_WRITEDATA(j) <= DRPDI;

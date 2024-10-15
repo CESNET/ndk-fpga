@@ -21,7 +21,7 @@ entity AXI4_LITE_MI_BRIDGE is
         G_MI_ADDR_WIDTH  : integer := 8;
         -- Data width of AXI
         G_AXI_DATA_WIDTH : integer := 32
-        
+
         );
     port(
         CLK         : in  std_logic;
@@ -29,10 +29,10 @@ entity AXI4_LITE_MI_BRIDGE is
 
         -- Write Address Channel ports
         AWADDR      : out std_logic_vector(G_AXI_ADDR_WIDTH - 1 downto 0);
-        AWVALID     : out std_logic; 
+        AWVALID     : out std_logic;
         AWREADY     : in  std_logic;
 
-        -- Write Data Channel ports 
+        -- Write Data Channel ports
         WDATA       : out std_logic_vector(G_AXI_DATA_WIDTH - 1 downto 0);
         WSTRB       : out std_logic_vector((G_AXI_DATA_WIDTH/8)-1 downto 0);
         WVALID      : out std_logic;
@@ -44,17 +44,17 @@ entity AXI4_LITE_MI_BRIDGE is
         BREADY      : out std_logic;
 
         -- Read Address Channel ports
-        ARADDR      : out std_logic_vector(G_AXI_ADDR_WIDTH - 1 downto 0); 
-        ARVALID     : out std_logic; 
-        ARREADY     : in  std_logic; 
+        ARADDR      : out std_logic_vector(G_AXI_ADDR_WIDTH - 1 downto 0);
+        ARVALID     : out std_logic;
+        ARREADY     : in  std_logic;
 
-        -- Read Data Channel ports 
+        -- Read Data Channel ports
         RDATA       : in  std_logic_vector(G_AXI_DATA_WIDTH - 1 downto 0);
         RRESP       : in  std_logic_vector(1 downto 0);
         RVALID      : in  std_logic;
         RREADY      : out std_logic;
 
-        -- MI32 protocol signals 
+        -- MI32 protocol signals
         AXI_MI_ADDR : in  std_logic_vector(G_MI_ADDR_WIDTH - 1 downto 0);
         AXI_MI_DWR  : in  std_logic_vector(G_AXI_DATA_WIDTH - 1 downto 0);
         AXI_MI_WR   : in  std_logic;
@@ -69,10 +69,10 @@ end entity;
 architecture FULL of AXI4_LITE_MI_BRIDGE is
 
     type t_fsm_axi_bridge is (
-                            st_idle,        -- waiting for MI request 
+                            st_idle,        -- waiting for MI request
                             st_wr_response, -- response to WR flag
                             st_rd_response  -- response to RD flag
-                            );       
+                            );
 
     -- Control logic (FSM)
     signal state, next_state: t_fsm_axi_bridge := st_idle;
@@ -95,13 +95,13 @@ begin
 
     AWADDR  <= AXI_MI_ADDR(6 downto 0);
     ARADDR  <= AXI_MI_ADDR(6 downto 0);
-    
+
     AWVALID <= AXI_MI_WR when awvalid_reg_q = '1' else '0';
     WVALID  <= AXI_MI_WR when wvalid_reg_q  = '1' else '0';
     ARVALID <= AXI_MI_RD when arvalid_reg_q = '1' else '0';
 
     process (clk)
-    begin 
+    begin
         if rising_edge(clk) then
             if RST = '1' then
                 state             <= st_idle;
@@ -117,8 +117,8 @@ begin
                 bvalid_reg_q      <= bvalid_reg_d;
             end if;
         end if;
-    end process;  
-   
+    end process;
+
     --delay register
     bvalid_reg_d <= BVALID;
 
@@ -133,14 +133,14 @@ begin
         AXI_MI_ARDY     <= '0';
         AXI_MI_DRDY     <= '0';
         RREADY          <= '0';
-        
+
         case (state) is
             when st_idle     =>
                 awvalid_reg_d <= '0';
                 wvalid_reg_d  <= '0';
-                
+
                 --Request for write
-                if AXI_MI_WR = '1' then 
+                if AXI_MI_WR = '1' then
                     next_state    <= st_wr_response;
                     awvalid_reg_d <= '1';
                     wvalid_reg_d  <= '1';
@@ -153,7 +153,7 @@ begin
                 end if;
 
             when st_wr_response =>
-                -- AXI protocol 
+                -- AXI protocol
                 BREADY  <= '1';
                 if AWREADY = '1' then
                     awvalid_reg_d <= '0';
@@ -163,30 +163,30 @@ begin
                     wvalid_reg_d  <= '0';
                 end if;
 
-                -- Write process is done, ready for new data 
+                -- Write process is done, ready for new data
                 if BVALID = '1' and BRESP /= "11"  then
                     next_state      <= st_idle;
                     AXI_MI_ARDY     <= '1';
                 end if;
-            
+
             when st_rd_response =>
                 -- AXI protocol
                 RREADY      <= '1';
 
-                if ARREADY = '1' then 
+                if ARREADY = '1' then
                     arvalid_reg_d <= '0';
                 end if;
-                
+
                 -- Read process is done, back to st_idle
                 if RVALID = '1' and RRESP /= "11" then
                     next_state  <= st_idle;
                     AXI_MI_DRDY <= '1';
                     AXI_MI_ARDY <= '1';
                 end if;
-                
+
             when others      =>
                 next_state <= st_idle;
         end case;
     end process;
-    
+
 end architecture;

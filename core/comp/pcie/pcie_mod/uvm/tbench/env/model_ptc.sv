@@ -1,6 +1,6 @@
 // model_ptc.sv: Model of ptc
 // Copyright (C) 2024 CESNET z. s. p. o.
-// Author(s): Radek Iša <isa@cesnet.cz> 
+// Author(s): Radek Iša <isa@cesnet.cz>
 
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -178,7 +178,7 @@ class model_ptc#(RQ_REGIONS, DMA_PORTS, ITEM_WIDTH) extends uvm_component;
     protected uvm_pcie_top::tag_register#(PTC_TAG_WIDTH)  tags;
     protected int unsigned rq_transactions[DMA_PORTS];
     protected int unsigned rc_transactions;
-    protected model_ptc_config cfg; 
+    protected model_ptc_config cfg;
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
@@ -295,14 +295,14 @@ class model_ptc#(RQ_REGIONS, DMA_PORTS, ITEM_WIDTH) extends uvm_component;
             rsp_tr.data              = rq_tr.hdr.type_ide == 1'b1 ? rq_tr.data : {};
             rsp_tr.requester_id      = {8'b0,  rq_tr.hdr.vfid};
             tags.get_dma2pcie(rq_tr.hdr.type_ide, dma, rq_tr.hdr.tag, rq_tr.hdr.unitid, rsp_tr.tag);
-            case(rq_tr.hdr.lastib) 
+            case(rq_tr.hdr.lastib)
                 0 : rsp_tr.lbe = 4'b1111;
                 1 : rsp_tr.lbe = 4'b0111;
                 2 : rsp_tr.lbe = 4'b0011;
                 3 : rsp_tr.lbe = 4'b0001;
                 default : rsp_tr.lbe = 'x;
             endcase
-            case(rq_tr.hdr.firstib) 
+            case(rq_tr.hdr.firstib)
                 0 : rsp_tr.fbe = 4'b1111;
                 1 : rsp_tr.fbe = 4'b1110;
                 2 : rsp_tr.fbe = 4'b1100;

@@ -102,7 +102,7 @@ def test_check_ndk_sw():
     assert check_ndk_sw() == 0
 
 @pytest.mark.depends(on=['test_check_ndk_sw'])
-@pytest.mark.parametrize("frame_size", range(64, 1518, 32)) 
+@pytest.mark.parametrize("frame_size", range(64, 1518, 32))
 def test_eth_loopback_mac_filter(frame_size):
     error = 0
     generator_stop(tx_gen_offset)

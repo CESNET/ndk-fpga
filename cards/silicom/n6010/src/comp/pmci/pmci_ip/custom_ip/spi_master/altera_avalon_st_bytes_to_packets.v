@@ -7,10 +7,10 @@
 
 `timescale 1ns / 100ps
 module altera_avalon_st_bytes_to_packets
-//if ENCODING ==0, CHANNEL_WIDTH must be 8 
+//if ENCODING ==0, CHANNEL_WIDTH must be 8
 //else CHANNEL_WIDTH can be from 0 to 127
 #(    parameter CHANNEL_WIDTH = 8,
-      parameter ENCODING      = 0 ) 
+      parameter ENCODING      = 0 )
 (
       // Interface: clk
       input              clk,
@@ -23,7 +23,7 @@ module altera_avalon_st_bytes_to_packets
       output reg         out_startofpacket,
       output reg         out_endofpacket,
 
-      // Interface: ST in 
+      // Interface: ST in
       output reg         in_ready,
       input              in_valid,
       input      [7: 0]  in_data
@@ -36,8 +36,8 @@ module altera_avalon_st_bytes_to_packets
    reg  received_esc, received_channel, received_varchannel;
    wire escape_char, sop_char, eop_char, channel_char, varchannelesc_char;
 
-   // data out mux.  
-   // we need it twice (data & channel out), so use a wire here 
+   // data out mux.
+   // we need it twice (data & channel out), so use a wire here
    wire [7:0] data_out;
 
    // ---------------------------------------------------------------------
@@ -53,7 +53,7 @@ module altera_avalon_st_bytes_to_packets
 
 generate
 if (CHANNEL_WIDTH == 0) begin
-    // Synchorous block -- reset and registers 
+    // Synchorous block -- reset and registers
     always @(posedge clk or negedge reset_n) begin
       if (!reset_n) begin
          received_esc      <= 0;
@@ -73,7 +73,7 @@ if (CHANNEL_WIDTH == 0) begin
             if (out_ready  & out_valid) begin
                out_startofpacket <= 0;
                out_endofpacket   <= 0;
-            end 
+            end
          end
       end
    end
@@ -93,12 +93,12 @@ if (CHANNEL_WIDTH == 0) begin
          out_valid = 1;
             if (sop_char | eop_char | escape_char | channel_char) out_valid = 0;
       end
-      out_data = data_out; 
+      out_data = data_out;
    end
 
 end else begin
     assign varchannelesc_char = in_data[7];
-    // Synchorous block -- reset and registers 
+    // Synchorous block -- reset and registers
     always @(posedge clk or negedge reset_n) begin
       if (!reset_n) begin
          received_esc <= 0;
@@ -128,7 +128,7 @@ end else begin
             if (out_ready  & out_valid) begin
                out_startofpacket <= 0;
                out_endofpacket <= 0;
-            end 
+            end
          end
       end
    end
@@ -139,21 +139,21 @@ end else begin
       out_valid = 0;
       if ((out_ready | ~out_valid) && in_valid) begin
          out_valid = 1;
-         if (received_esc) begin 
+         if (received_esc) begin
            if (received_channel | received_varchannel) out_valid = 0;
          end else begin
             if (sop_char | eop_char | escape_char | channel_char | received_channel | received_varchannel) out_valid = 0;
          end
       end
-      out_data = data_out; 
+      out_data = data_out;
    end
-end 
+end
 
 endgenerate
 
 // Channel block
 generate
-if (CHANNEL_WIDTH == 0) begin    
+if (CHANNEL_WIDTH == 0) begin
    always @(posedge clk) begin
       out_channel <= 'h0;
    end
@@ -174,7 +174,7 @@ end else if (CHANNEL_WIDTH < 8) begin
       end
    end
 
-end else begin   
+end else begin
    always @(posedge clk or negedge reset_n) begin
       if (!reset_n) begin
          out_channel <= 'h0;
@@ -193,7 +193,7 @@ end else begin
          end
       end
    end
-   
+
 end
 endgenerate
 

@@ -7,14 +7,14 @@
 class sequencer_port #(
     int unsigned ETH_TX_HDR_WIDTH,
     int unsigned ETH_RX_HDR_WIDTH,
-    
+
     int unsigned ITEM_WIDTH,
     int unsigned REGIONS,
     int unsigned REGION_SIZE,
     int unsigned BLOCK_SIZE,
-    
+
     int unsigned ETH_PORT_CHAN,
-    
+
     int unsigned MI_DATA_WIDTH,
     int unsigned MI_ADDR_WIDTH
 ) extends uvm_network_mod_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH);

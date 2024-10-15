@@ -16,11 +16,11 @@ module pmci_csr #(
    parameter   PCIEVDM_AFU_ADDR   = 21'h42000,
    parameter   QSFPA_CTRL_ADDR    = 21'h12000,
    parameter   QSFPB_CTRL_ADDR    = 21'h13000,
-   
+
    parameter   QSPI_BAUDRATE      = 5'd2,     //SPI Clock Baud-rate Register of flash controller
-                                              //Valid values 0x2 -> /4, 0x3 -> /6 & 0x4 -> /8, 
+                                              //Valid values 0x2 -> /4, 0x3 -> /6 & 0x4 -> /8,
    parameter   FLASH_MFC          = 1'b0,     //Flash device manufacturer 0 -> Micron, 1 -> Macronix
-   
+
    parameter   END_OF_LIST        = 1'b0,     //DFH End of List
    parameter   NEXT_DFH_OFFSET    = 24'h20000,//Next DFH Offset
    parameter   FEAT_VER           = 4'h1,     //DFH Feature Revision
@@ -38,7 +38,7 @@ module pmci_csr #(
    output logic [63:0]                 host_avmm_slv_rddata,
    output logic                        host_avmm_slv_rddvld,
    output logic                        host_avmm_slv_waitreq,
- 
+
    //PMCI Nios AVMM slave
    input  logic [2:0]                  pnios_avmm_slv_addr,
    input  logic                        pnios_avmm_slv_write,
@@ -47,7 +47,7 @@ module pmci_csr #(
    output logic [31:0]                 pnios_avmm_slv_rddata,
    output logic                        pnios_avmm_slv_rddvld,
    output logic                        pnios_avmm_slv_waitreq,
-   
+
    //MAX10 Nios AVMM slave
    input  logic [1:0]                  mnios_avmm_slv_addr,
    input  logic                        mnios_avmm_slv_write,
@@ -56,7 +56,7 @@ module pmci_csr #(
    output logic [31:0]                 mnios_avmm_slv_rddata,
    output logic                        mnios_avmm_slv_rddvld,
    output logic                        mnios_avmm_slv_waitreq,
-   
+
    //Flash burst master interface
    output logic                        write_mode,
    output logic                        read_mode,
@@ -75,17 +75,17 @@ module pmci_csr #(
    input  logic [63:0]                 pcie_vdm_sts3_dbg,
    input  logic [63:0]                 pcie_vdm_sts4_dbg,
    input  logic [63:0]                 pcie_vdm_sts5_dbg,
-   
+
    //PXeboot OptionROM module interface
    output logic                        pxeboot_rd_start,
    input  logic [31:0]                 pxeboot_status,
-   
+
    //SEU IP interface
    input  logic                        seu_sys_error,
    input  logic [63:0]                 seu_avst_sink_data,
    input  logic                        seu_avst_sink_vld,
    output logic                        seu_avst_sink_rdy,
-   
+
    //MAX10-PMCI extra pins  (temporary assignment)
    input  logic                        fpga_usr_100m,
    input  logic                        fpga_m10_hb,
@@ -97,7 +97,7 @@ module pmci_csr #(
 localparam PMCI_DBG_MODE      = 0;
 localparam PMCI_RTL_VERSION   = 16'h22;
 localparam PMCI_DFH_FTYPE     = 4'h3;     //DFH Feature Type
-localparam PMCI_DFH_RSVD      = 19'h0;    //DFH Reserved 
+localparam PMCI_DFH_RSVD      = 19'h0;    //DFH Reserved
 
 localparam TIME_CNTR_1_VAL    = 10'd998;  //10us counter
 localparam TIME_CNTR_2_VAL    = 10'd399;  //4ms counter
@@ -168,7 +168,7 @@ always_comb
 begin : ss_baddr_comb
    pcievdm_afu_addr     = PCIEVDM_AFU_ADDR;
    pcievdm_afu_addr_vld = 1'b1; //if this is not OK then delay until DFH read detect
-   
+
    pcie_ss_addr         = PCIE_SS_ADDR;
    hssi_ss_addr         = HSSI_SS_ADDR;
    qsfpa_ctrl_addr      = QSFPA_CTRL_ADDR;
@@ -191,7 +191,7 @@ begin : host_csr_wr
          read_mode         <= host_avmm_slv_wrdata[1];
          read_count        <= host_avmm_slv_wrdata[16+:10];
       end
-      
+
       if (host_avmm_slv_addr == 5'h8 && host_avmm_slv_byteen[7:4] == 4'hF)
          flash_addr        <= host_avmm_slv_wrdata[32+:FLASH_ADDR_WIDTH];
    end
@@ -205,7 +205,7 @@ begin : host_csr_comb
    pmci_dfh_reg[39:16] = NEXT_DFH_OFFSET;
    pmci_dfh_reg[15:12] = FEAT_VER;
    pmci_dfh_reg[11:0]  = FEAT_ID;
-   
+
    fbm_ctrl_sts_reg[0]      = write_mode;
    fbm_ctrl_sts_reg[1]      = read_mode;
    fbm_ctrl_sts_reg[2]      = flash_busy;
@@ -216,14 +216,14 @@ begin : host_csr_comb
    fbm_ctrl_sts_reg[31:26]  = '0;
    fbm_ctrl_sts_reg[32+:FLASH_ADDR_WIDTH]    = flash_addr;
    fbm_ctrl_sts_reg[63:32+FLASH_ADDR_WIDTH]  = '0;
-   
+
    pmci_error_reg[0]    = m10_seu_err_sync;
    pmci_error_reg[1]    = fpga_seu_error;
    pmci_error_reg[2]    = m10_nios_stuck;
    pmci_error_reg[3]    = pmci_nios_stuck;
    pmci_error_reg[4]    = seu_sys_error;
    pmci_error_reg[63:5] = '0;
-   
+
 end : host_csr_comb
 
 //-----------------------------------------------------------------------------
@@ -236,10 +236,10 @@ begin : host_csr_rd_seq
       host_avmm_slv_rddata    <= 64'd0;
    end else if (host_avmm_slv_read && !host_avmm_slv_waitreq) begin
       host_avmm_slv_rddvld    <= 1'b1;
-      
+
       case (host_avmm_slv_addr)
          5'h0    : host_avmm_slv_rddata <= pmci_dfh_reg;
-         
+
          5'h8    : host_avmm_slv_rddata <= fbm_ctrl_sts_reg;
          5'h9    : host_avmm_slv_rddata <= pmci_error_reg;
          5'hA    : host_avmm_slv_rddata <= {32'd0, pxeboot_status};
@@ -251,7 +251,7 @@ begin : host_csr_rd_seq
          5'h1E   : host_avmm_slv_rddata <= fbm_dbg_sts_reg;
          5'h1F   : host_avmm_slv_rddata <= {32'd0, pmci_fw_version, PMCI_RTL_VERSION};
          default : host_avmm_slv_rddata <= 64'hBAADBEEF_DEADBEEF;
-      endcase 
+      endcase
    end else begin
       host_avmm_slv_rddvld <= 1'b0;
    end
@@ -272,13 +272,13 @@ begin : pnios_csr_wr
    end else if (pnios_avmm_slv_write && !pnios_avmm_slv_waitreq) begin
       if (pnios_avmm_slv_addr == 3'h0)
          pmci_fw_version   <= pnios_avmm_slv_wrdata[31:16];
-      
+
       if (pnios_avmm_slv_addr == 3'h1)
          fpga_therm_shdn_i <= pnios_avmm_slv_wrdata[0];
-      
+
       if (pnios_avmm_slv_addr == 3'h2)
          pmci_nios_hb      <= pnios_avmm_slv_wrdata[0];
-      
+
       if (pnios_avmm_slv_addr == 3'h3)
          pnios_flsh_cfg_done  <= pnios_avmm_slv_wrdata[0];
    end
@@ -334,7 +334,7 @@ begin : mnios_csr_wr
    end else begin
       if (mnios_avmm_slv_write && !mnios_avmm_slv_waitreq && mnios_avmm_slv_addr == 2'h1)
          rsu_mode  <= mnios_avmm_slv_wrdata[0];
-      
+
       if (mnios_avmm_slv_write && !mnios_avmm_slv_waitreq && mnios_avmm_slv_addr == 2'h2)
          pcievdm_mctp_eid  <= mnios_avmm_slv_wrdata[7:0];
    end
@@ -387,14 +387,14 @@ begin : time_pulse_seq
          time_cntr_1 <= 10'd0;
       else
          time_cntr_1 <= time_cntr_1 + 1'b1;
-      
+
       time_tick_1    <= (time_cntr_1 == TIME_CNTR_1_VAL) ? 1'b1 : 1'b0;
 
       if(time_tick_2)
          time_cntr_2 <= 10'd0;
       else if(time_tick_1)
          time_cntr_2 <= time_cntr_2 + 1'b1;
-      
+
       time_tick_2    <= (time_tick_1 && time_cntr_2 == TIME_CNTR_2_VAL) ? 1'b1 : 1'b0;
    end
 end : time_pulse_seq
@@ -412,12 +412,12 @@ begin : nios_hb_mon
    end else begin
       m10_nios_hb_r1  <= m10_nios_hb;
       pmci_nios_hb_r1 <= pmci_nios_hb;
-      
+
       if(m10_nios_hb_r1 != m10_nios_hb)
          m10_nhb_timer <= {(M10_NHB_TO_BIT+1){1'b0}};
       else if(time_tick_2 && !m10_nios_stuck)
          m10_nhb_timer <= m10_nhb_timer + 1'b1;
-      
+
       if(pmci_nios_hb_r1 != pmci_nios_hb)
          pmci_nhb_timer <= {(PMCI_NHB_TO_BIT+1){1'b0}};
       else if(time_tick_2 && !pmci_nios_stuck)
@@ -431,7 +431,7 @@ assign pmci_nios_stuck = pmci_nhb_timer[PMCI_NHB_TO_BIT];
 
 //-----------------------------------------------------------------------------
 // PXEBoot Option ROM start reading flash indication.
-// Start PXEboot Option ROM flash reading after flash controller is initialized 
+// Start PXEboot Option ROM flash reading after flash controller is initialized
 // and after 10us after PMCI is out of reset.
 //-----------------------------------------------------------------------------
 always_ff @(posedge clk, posedge reset)
@@ -460,21 +460,21 @@ begin : dbg_flsh_wr_time
          flsh_wr_mode   <= 1'b1;
       else if(!flash_busy)
          flsh_wr_mode   <= 1'b0;
-         
+
       if ((write_mode || rsu_mode) && !flsh_wr_mode)
          rst_time_cntr   <= 1'b1;
       else
          rst_time_cntr   <= 1'b0;
-         
+
       if (rst_time_cntr)
          dbg_flsh_wr_tmr1  <= 10'd0;
       else if(flsh_wr_mode && time_tick_2)
          dbg_flsh_wr_tmr1  <= dbg_flsh_wr_tmr1 + 1'b1;
-      
-      if(!rst_time_cntr && flsh_wr_mode && time_tick_2 && 
+
+      if(!rst_time_cntr && flsh_wr_mode && time_tick_2 &&
                                                    dbg_flsh_wr_tmr1 == 10'h3FF)
          incr_time_cntr2 <= 1'b1;
-      else 
+      else
          incr_time_cntr2 <= 1'b0;
 
       if (rst_time_cntr)
@@ -496,4 +496,4 @@ begin
    fbm_dbg_sts_reg[63:24] = '0;
 end
 
-endmodule 
+endmodule

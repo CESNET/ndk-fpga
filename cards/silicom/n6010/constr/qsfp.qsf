@@ -52,7 +52,7 @@ set_location_assignment PIN_CY29 -to QSFP1_LED_R
 set_location_assignment PIN_DB29 -to QSFP1_LED_G
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 set_instance_assignment  -name IO_STANDARD "DIFFERENTIAL LVPECL" -to QSFP_REFCLK_156M
@@ -105,4 +105,4 @@ set_instance_assignment -name SLEW_RATE 0 -to QSFP1_RESET_N
 set_instance_assignment -name SLEW_RATE 0 -to QSFP1_LPMODE
 set_instance_assignment -name SLEW_RATE 0 -to QSFP1_MODESEL_N
 set_instance_assignment -name SLEW_RATE 0 -to QSFP1_I2C_SCL
-set_instance_assignment -name SLEW_RATE 0 -to QSFP1_I2C_SDA                                                     
+set_instance_assignment -name SLEW_RATE 0 -to QSFP1_I2C_SDA

@@ -177,7 +177,7 @@ entity PCIE_ADAPTER is
 
         -- =====================================================================
         -- AXI Requester Request (RQ) Interface - Xilinx FPGA Only
-        -- 
+        --
         -- See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express).
         -- =====================================================================
         RQ_AXI_DATA       : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
@@ -337,7 +337,7 @@ begin
         cq_mfb_meta_g: for i in 0 to CQ_MFB_REGIONS-1 generate
             cq_mfb_meta_arr(i)(PCIE_CQ_META_HEADER)        <= (others => '0');
             cq_mfb_meta_arr(i)(PCIE_CQ_META_PREFIX)        <= (others => '0');
-            cq_mfb_meta_arr(i)(PCIE_CQ_META_BAR)           <= (others => '0'); 
+            cq_mfb_meta_arr(i)(PCIE_CQ_META_BAR)           <= (others => '0');
             cq_mfb_meta_arr(i)(PCIE_CQ_META_FBE)           <= cq_fbe((i+1)*PCIE_META_FBE_W-1 downto i*PCIE_META_FBE_W);
             cq_mfb_meta_arr(i)(PCIE_CQ_META_LBE)           <= cq_lbe((i+1)*PCIE_META_LBE_W-1 downto i*PCIE_META_LBE_W);
             cq_mfb_meta_arr(i)(PCIE_CQ_META_TPH_PRESENT_O) <= cq_tph_present(i);
@@ -365,7 +365,7 @@ begin
             RX_AXI_TUSER   => RC_AXI_USER,
             RX_AXI_TVALID  => RC_AXI_VALID,
             RX_AXI_TREADY  => RC_AXI_READY,
-      
+
             TX_MFB_DATA    => RC_MFB_DATA,
             TX_MFB_SOF     => RC_MFB_SOF,
             TX_MFB_EOF     => RC_MFB_EOF,
@@ -488,8 +488,8 @@ begin
             TX_AVST_HDR         => AVST_UP_HDR,
             TX_AVST_PREFIX      => AVST_UP_PREFIX,
             TX_AVST_SOP         => AVST_UP_SOP,
-            TX_AVST_EOP         => AVST_UP_EOP, 
-            TX_AVST_ERROR       => AVST_UP_ERROR, 
+            TX_AVST_EOP         => AVST_UP_EOP,
+            TX_AVST_ERROR       => AVST_UP_ERROR,
             TX_AVST_VALID       => AVST_UP_VALID,
             TX_AVST_READY       => AVST_UP_READY,
             -- DOWN stream credits - R-TILE only
@@ -564,17 +564,17 @@ begin
             cq_mfb_meta_arr(i)(PCIE_CQ_META_TPH_ST_TAG)    <= (others => '0');
         end generate;
 
-        rc_mfb_meta_g: for i in 0 to RC_MFB_REGIONS-1 generate    
+        rc_mfb_meta_g: for i in 0 to RC_MFB_REGIONS-1 generate
             rc_mfb_meta_arr(i)(PCIE_RC_META_HEADER) <= cblk_rc_mfb_meta_arr(i)(96-1 downto 0);
             rc_mfb_meta_arr(i)(PCIE_RC_META_PREFIX) <= cblk_rc_mfb_meta_arr(i)(128-1 downto 96);
         end generate;
 
-        cc_mfb_meta_g: for i in 0 to CC_MFB_REGIONS-1 generate    
+        cc_mfb_meta_g: for i in 0 to CC_MFB_REGIONS-1 generate
             cblk_cc_mfb_meta_arr(i)(96-1 downto 0)   <= cc_mfb_meta_arr(i)(PCIE_CC_META_HEADER);
             cblk_cc_mfb_meta_arr(i)(128-1 downto 96) <= cc_mfb_meta_arr(i)(PCIE_CC_META_PREFIX);
         end generate;
 
-        rq_mfb_meta_g: for i in 0 to RQ_MFB_REGIONS-1 generate    
+        rq_mfb_meta_g: for i in 0 to RQ_MFB_REGIONS-1 generate
             cblk_rq_mfb_meta_arr(i)(PCIE_RQ_META_HEADER) <= rq_mfb_meta_arr(i)(PCIE_RQ_META_HEADER);
             cblk_rq_mfb_meta_arr(i)(PCIE_RQ_META_PREFIX) <= rq_mfb_meta_arr(i)(PCIE_RQ_META_PREFIX);
         end generate;

@@ -10,11 +10,11 @@ proc all {NAME PATH} {
 }
 
 proc rx {NAME PATH} {
-    add wave -divider "$NAME"      
+    add wave -divider "$NAME"
     add_wave "-noupdate  -hex"       $PATH/RX_*
 }
 
 proc tx {NAME PATH} {
-    add wave -divider "$NAME"      
+    add wave -divider "$NAME"
     add_wave "-noupdate  -hex"       $PATH/TX_*
 }

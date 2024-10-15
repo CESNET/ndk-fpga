@@ -1,4 +1,4 @@
-// driver.sv: 
+// driver.sv:
 // Copyright (C) 2024 CESNET z. s. p. o.
 // Author(s): Radek Iša <isa@cesnet.cz>
 
@@ -22,7 +22,7 @@ class driver extends uvm_driver#(uvm_dma::sequence_item_rq);
 
 
     task run_phase(uvm_phase phase);
-       
+
         assert(uvm_config_db #(req_fifo#(uvm_logic_vector_array::sequence_item#(32)))
             ::get(this, "", "fifo_rq_mfb_data", fifo_rq_mfb_data)) else begin
             `uvm_fatal(this.get_full_name(), "\n\tCannot get mfb data");
@@ -43,7 +43,7 @@ class driver extends uvm_driver#(uvm_dma::sequence_item_rq);
             seq_item_port.get_next_item(req);
 
             dma_data = uvm_logic_vector_array::sequence_item#(32)::type_id::create("dma_data", this);
-            dma_hdr  = uvm_logic_vector::sequence_item#(DMA_UPHDR_WIDTH_W)::type_id::create("dma_hdr", this);            
+            dma_hdr  = uvm_logic_vector::sequence_item#(DMA_UPHDR_WIDTH_W)::type_id::create("dma_hdr", this);
 
             dma_data.data = new[req.data.size()](req.data);
             dma_hdr.data = {req.hdr.relaxed, req.hdr.pasidvld, req.hdr.pasid, req.hdr.vfid, req.hdr.global_id,

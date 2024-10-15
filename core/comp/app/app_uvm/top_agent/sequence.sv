@@ -1,8 +1,8 @@
-//-- sequence.sv: create from packet transaction mfb and mvb transaction 
+//-- sequence.sv: create from packet transaction mfb and mvb transaction
 //-- Copyright (C) 2024 CESNET z. s. p. o.
 //-- Author(s): Radek Iša <isa@cesnet.cz>
 
-//-- SPDX-License-Identifier: BSD-3-Clause 
+//-- SPDX-License-Identifier: BSD-3-Clause
 
 
 class sequence_base#(type TR_TYPE) extends uvm_sequence #(TR_TYPE);
@@ -39,7 +39,7 @@ class sequence_base#(type TR_TYPE) extends uvm_sequence #(TR_TYPE);
         while(it < transactions && (state == null || !state.stopped())) begin
             //generat new packet
             start_item(req);
-            req.randomize() with {req.data.size() inside {[60:1500]}; }; 
+            req.randomize() with {req.data.size() inside {[60:1500]}; };
             finish_item(req);
 
             it++;
@@ -77,7 +77,7 @@ class logic_vector_array#(ITEM_WIDTH, META_WIDTH) extends uvm_sequence #(uvm_log
 
             //generat new packet
             start_item(req);
-            req.data = tmp_packet.data; 
+            req.data = tmp_packet.data;
             finish_item(req);
         end
     endtask
@@ -120,7 +120,7 @@ class logic_vector_sequence #(ITEM_WIDTH, META_WIDTH) extends uvm_sequence #(uvm
             //generat new packet
             start_item(req);
             req.data = high_tr.item2meta();
-            //high_tr.pack(bitstream);            
+            //high_tr.pack(bitstream);
             //req.data = { >> {bitstream}};
 
             finish_item(req);

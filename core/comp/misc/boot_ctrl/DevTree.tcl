@@ -5,10 +5,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 # 1. base - base address on MI bus
-# 2. type - type of card 
+# 2. type - type of card
 proc dts_boot_controller {base type} {
     set    ret ""
-    
+
     append ret "boot_controller {"
     append ret "compatible = \"netcope,boot_controller\";"
     append ret "reg = <$base 8>;"

@@ -48,7 +48,7 @@ port (
     QSFP_I2C_SDA_OE     : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
     -- Select which QSFP port is targetting during MI read/writes
     MI_QSFP_SEL           : in  std_logic_vector(max(log2(QSFP_PORTS)-1, 0) downto 0);
-    -- MI32 interface - 
+    -- MI32 interface -
     MI_CLK_PHY            : in  std_logic;
     MI_RESET_PHY          : in  std_logic;
     MI_DWR_PHY            : in  std_logic_vector(31 downto 0);
@@ -58,7 +58,7 @@ port (
     MI_BE_PHY             : in  std_logic_vector( 3 downto 0);
     MI_DRD_PHY            : out std_logic_vector(31 downto 0);
     MI_ARDY_PHY           : out std_logic;
-    MI_DRDY_PHY           : out std_logic   
+    MI_DRDY_PHY           : out std_logic
 );
 end entity;
 
@@ -67,7 +67,7 @@ architecture full of qsfp_ctrl is
     constant QSFP_RST_W    : natural := 20;
     constant QSFP_STATUS_W : natural := 8;
 
-    signal i2c_mi_wr             : std_logic;   
+    signal i2c_mi_wr             : std_logic;
     signal i2c_qsfp_scl_o        : std_logic;
     signal i2c_qsfp_scl_oen      : std_logic;
     signal i2c_qsfp_sda_o        : std_logic;
@@ -93,7 +93,7 @@ architecture full of qsfp_ctrl is
     signal fpc_conf_st           : unsigned(2-1 downto 0);
     signal fpc_conf_st_reg       : unsigned(2-1 downto 0);
     signal sleep_timer           : unsigned(25-1 downto 0);
-      
+
     signal trans_ctrl            : std_logic_vector(3*QSFP_PORTS-1 downto 0);
     signal qsfp_modsel_r         : std_logic_vector(QSFP_PORTS-1 downto 0) := (0 => '1', others => '0');
     signal qsfp_i2c_scl_in       : std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
@@ -101,19 +101,19 @@ architecture full of qsfp_ctrl is
     signal qsfp_i2c_sda_in       : std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
     signal qsfp_i2c_sda_int      : std_logic;
     signal qsfp_status           : std_logic_vector(QSFP_PORTS*QSFP_STATUS_W-1 downto 0);
-    
-    signal qsfp_mi_sel_i         : natural;   
-    
+
+    signal qsfp_mi_sel_i         : natural;
+
     signal qsfp_modprs_n_sync    : std_logic_vector(QSFP_PORTS-1 downto 0);
     signal qsfp_modprs_n_sync2   : std_logic_vector(QSFP_PORTS-1 downto 0);
     signal qsfp_insert_detect    : std_logic_vector(QSFP_PORTS-1 downto 0);
     signal qsfp_rst_start        : std_logic_vector(QSFP_PORTS-1 downto 0);
     signal qsfp_rst_timer        : u_array_t (QSFP_PORTS-1 downto 0)(QSFP_RST_W-1 downto 0);
-  
+
 begin
-    
+
     qsfp_mi_sel_i <= to_integer(unsigned(MI_QSFP_SEL));
-  
+
     gen_qsfp_status: for i in 0 to QSFP_PORTS-1 generate
         qsfp_status((i+1)*QSFP_STATUS_W-1 downto i*QSFP_STATUS_W) <= TX_READY(i) & QSFP_RESET_N(i) & QSFP_INT_N(i) & QSFP_MODPRS_N(i) & trans_ctrl((i+1)*3-1 downto i*3) & '1';
     end generate;
@@ -125,7 +125,7 @@ begin
             MI_DRDY_PHY <= '0';
             MI_DRD_PHY  <= (others => '0');
             -- Read from I2C controller or from QSFP status reg
-            if (MI_RD_PHY = '1') then 
+            if (MI_RD_PHY = '1') then
                 MI_DRDY_PHY <= '1';
                 if (MI_ADDR_PHY(3 downto 2) = "00") then    -- I2C reg 0x00
                     MI_DRD_PHY  <= i2c_qsfp_drd(31 downto 0);
@@ -139,7 +139,7 @@ begin
     end process mi_regs_rd_p;
 
    MI_ARDY_PHY <= (MI_RD_PHY or MI_WR_PHY) and fpc_fsm_done;
-  
+
    -- ----------------------------------------------------------------------------
    -- QSFP I2C control and management
    -------------------------------------------------------------------------------
@@ -164,18 +164,18 @@ begin
             if (MI_ADDR_PHY(3 downto 2) = "11") then -- 0x1C - QSFP control reg
                trans_ctrl(qsfp_mi_sel_i*3+2 downto qsfp_mi_sel_i*3) <= MI_DWR_PHY(3 downto 1);
             end if;
-            
+
             -- Turn on module select on targeted QSFP
             qsfp_modsel_r <= (others => '0');
             qsfp_modsel_r(qsfp_mi_sel_i) <= '1';
          end if;
-         
+
          if RST = '1' then
              for i in 0 to QSFP_PORTS-1 loop
                  trans_ctrl(3*i+2 downto 3*i) <= "001";
              end loop;
          end if;
-         
+
       end if;
    end process i2c_regs_wr_p;
 
@@ -325,7 +325,7 @@ begin
         fpc_fsm_done     <= '1';
     end generate;
 
-   -- QSFP28 I2C controller 
+   -- QSFP28 I2C controller
    i2c_qsfp_i : entity work.i2c_master_top
    generic map (
       PRER_INIT    => X"0271"  -- 250MHz CLK -> 100KHz SCL
@@ -403,7 +403,7 @@ begin
     ----------------------------------------------------------------------------
     -- QSFP reset logic
     ----------------------------------------------------------------------------
-    
+
     qsfp_rst_g: for i in 0 to QSFP_PORTS-1 generate
         -- TODO glitch filtering on the QSFP_MODPRS_N signal
         sync_qsfp_modprs_n_i: entity work.ASYNC_OPEN_LOOP
@@ -445,9 +445,9 @@ begin
             end if;
         end process;
     end generate;
-    
+
     ----------------------------------------------------------------------------
-    -- Assign outputs 
+    -- Assign outputs
     ----------------------------------------------------------------------------
 
     qsfp_outs_g: for i in 0 to QSFP_PORTS-1 generate
@@ -457,5 +457,5 @@ begin
         QSFP_MODSEL_N(i) <= not qsfp_modsel_r(i);
     end generate;
     QSFP_I2C_DIR   <= (others => not i2c_qsfp_sda_oen); -- I2C bus direction: 0 = QSFP -> FPGA, 1 = FPGA -> QSFP
-     
+
 end architecture;

@@ -385,7 +385,7 @@ begin
         port map(
             CLK        => USR_CLK,
             RESET      => USR_RESET,
-    
+
             RX_DATA    => rx_usr_mfb_data_res(i),
             RX_META    => rx_usr_mfb_meta_res(i),
             RX_SOF     => rx_usr_mfb_sof_res(i),
@@ -394,7 +394,7 @@ begin
             RX_EOF_POS => rx_usr_mfb_eof_pos_res(i),
             RX_SRC_RDY => rx_usr_mfb_src_rdy_res(i),
             RX_DST_RDY => rx_usr_mfb_dst_rdy_res(i),
-    
+
             TX_DATA    => rx_usr_mfb_data_async(i),
             TX_META    => rx_usr_mfb_meta_async(i),
             TX_SOF     => rx_usr_mfb_sof_async(i),
@@ -404,7 +404,7 @@ begin
             TX_SRC_RDY => rx_usr_mfb_src_rdy_async(i),
             TX_DST_RDY => rx_usr_mfb_dst_rdy_async(i)
         );
-    
+
         urs_tx_mfb_reconf_i : entity work.MFB_RECONFIGURATOR
         generic map(
             RX_REGIONS           => DMA_MFB_REGIONS,
@@ -424,7 +424,7 @@ begin
         port map(
             CLK        => USR_CLK,
             RESET      => USR_RESET,
-    
+
             RX_DATA    => tx_usr_mfb_data_async(i),
             RX_META    => tx_usr_mfb_meta_async(i),
             RX_SOF     => tx_usr_mfb_sof_async(i),
@@ -433,7 +433,7 @@ begin
             RX_EOF_POS => tx_usr_mfb_eof_pos_async(i),
             RX_SRC_RDY => tx_usr_mfb_src_rdy_async(i),
             RX_DST_RDY => tx_usr_mfb_dst_rdy_async(i),
-    
+
             TX_DATA    => tx_usr_mfb_data_res(i),
             TX_META    => tx_usr_mfb_meta_res(i),
             TX_SOF     => tx_usr_mfb_sof_res(i),

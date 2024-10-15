@@ -13,7 +13,7 @@ set LED_SERIAL_CTRL_BASE            "$ENTITY_BASE/comp/led_ctrl"
 set BMC_BASE                        "$ENTITY_BASE/comp/bmc_driver"
 set AXI_QUAD_FLASH_CONTROLLER_BASE  "$ENTITY_BASE/comp/axi_quad_flash_controller"
 set BOOT_CTRL_BASE                  "$OFM_PATH/core/comp/misc/boot_ctrl"
-set AXI2AVMM_BRIDGE_BASE            "$OFM_PATH/comp/mem_tools/convertors/axi2avmm_ddr_bridge"  
+set AXI2AVMM_BRIDGE_BASE            "$OFM_PATH/comp/mem_tools/convertors/axi2avmm_ddr_bridge"
 set FPGA_COMMON_BASE                "$ARCHGRP_ARR(CORE_BASE)/top"
 
 # Components

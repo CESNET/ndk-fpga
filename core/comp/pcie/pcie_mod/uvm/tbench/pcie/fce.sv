@@ -1,4 +1,4 @@
-// fce.sv: pcie function to simplify manipulation 
+// fce.sv: pcie function to simplify manipulation
 // Copyright (C) 2024 CESNET z. s. p. o.
 // Author(s): Radek Iša <isa@cesnet.cz>
 

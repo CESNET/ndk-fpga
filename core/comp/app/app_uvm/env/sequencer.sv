@@ -1,7 +1,7 @@
 /*
  * file       :  sequencer.sv
  * Copyright (C) 2024 CESNET z. s. p. o.
- * description: verification top sequencer 
+ * description: verification top sequencer
  * date       : 2021
  * author     : Radek Iša <isa@cesnet.ch>
  *

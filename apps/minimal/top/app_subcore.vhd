@@ -42,11 +42,11 @@ port (
     -- =========================================================================
     CLK      : in  std_logic;
     RESET    : in  std_logic;
-    
+
     -- =========================================================================
     --  DMA INTERFACES
     -- =========================================================================
-    
+
     -- MFB+MVB interface to DMA module (to software)
     -- -------------------------------------------------------------------------
     DMA_RX_MVB_LEN           : out std_logic_vector(MFB_REGIONS*log2(USR_PKT_SIZE_MAX+1)-1 downto 0);
@@ -65,7 +65,7 @@ port (
     DMA_RX_MFB_EOF_POS       : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
     DMA_RX_MFB_SRC_RDY       : out std_logic;
     DMA_RX_MFB_DST_RDY       : in  std_logic;
-    
+
     -- MFB+MVB interface from DMA module (from software)
     -- -------------------------------------------------------------------------
     -- MVB interface (aligned to SOF)
@@ -89,7 +89,7 @@ port (
     -- =========================================================================
     --  ETH INTERFACES
     -- =========================================================================
-    
+
     -- MFB+MVB interface with incoming network packets
     -- -------------------------------------------------------------------------
     -- MVB interface with packet headers (aligned to EOF)
@@ -117,7 +117,7 @@ port (
     ETH_TX_MFB_EOF_POS      : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
     ETH_TX_MFB_SRC_RDY      : out std_logic;
     ETH_TX_MFB_DST_RDY      : in  std_logic;
-    
+
     -- =========================================================================
     --  MI INTERFACE
     -- =========================================================================
@@ -222,7 +222,7 @@ begin
         RX_MVB_VLD      => DMA_TX_MVB_VLD,
         RX_MVB_SRC_RDY  => DMA_TX_MVB_SRC_RDY,
         RX_MVB_DST_RDY  => DMA_TX_MVB_DST_RDY,
-    
+
         RX_MFB_DATA     => DMA_TX_MFB_DATA,
         RX_MFB_SOF      => DMA_TX_MFB_SOF,
         RX_MFB_EOF      => DMA_TX_MFB_EOF,
@@ -230,7 +230,7 @@ begin
         RX_MFB_EOF_POS  => DMA_TX_MFB_EOF_POS,
         RX_MFB_SRC_RDY  => DMA_TX_MFB_SRC_RDY,
         RX_MFB_DST_RDY  => DMA_TX_MFB_DST_RDY,
-    
+
         TX_MFB_DATA     => ethi_tx_mfb_data,
         TX_MFB_META_NEW => ethi_tx_mfb_hdr,
         TX_MFB_SOF      => ethi_tx_mfb_sof,

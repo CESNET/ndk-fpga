@@ -264,7 +264,7 @@ architecture FULL of NETWORK_MOD_CORE is
             in_refclk_fgt_0           => QSFP_REFCLK_P
         );
 
-        -- devide input data to x lines serial lines 
+        -- devide input data to x lines serial lines
         qsfp_rx_p_sig <= slv_array_deser(QSFP_RX_P, ETH_PORT_CHAN);
         qsfp_rx_n_sig <= slv_array_deser(QSFP_RX_N, ETH_PORT_CHAN);
         QSFP_TX_P     <= slv_array_ser(qsfp_tx_p_sig);
@@ -277,7 +277,7 @@ architecture FULL of NETWORK_MOD_CORE is
         ftile_1x400g8_g : if ((ETH_PORT_SPEED = 400) and (EHIP_TYPE = 0))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_1x400g8_i: entity work.FTILE_1x400G8 
+            FTILE_1x400g8_i: entity work.FTILE_1x400G8
             port map(
                 MI_RESET_PHY             => MI_RESET_PHY        ,
                 MI_CLK_PHY               => MI_CLK_PHY          ,
@@ -326,7 +326,7 @@ architecture FULL of NETWORK_MOD_CORE is
     ftile_2x200g4_g : if ((ETH_PORT_SPEED = 200) and (EHIP_TYPE = 0))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            ftile_2x200g4_i: entity work.FTILE_2x200g4 
+            ftile_2x200g4_i: entity work.FTILE_2x200g4
             port map(
                 MI_RESET_PHY             => MI_RESET_PHY        ,
                 MI_CLK_PHY               => MI_CLK_PHY          ,
@@ -375,7 +375,7 @@ architecture FULL of NETWORK_MOD_CORE is
     ftile_4x100g2_g : if (((ETH_PORT_SPEED = 100) and (EHIP_TYPE = 0)) and (ETH_PORT_CHAN = 4))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_4x100g2_i: entity work.FTILE_4x100g2 
+            FTILE_4x100g2_i: entity work.FTILE_4x100g2
             port map(
                 MI_RESET_PHY             => MI_RESET_PHY        ,
                 MI_CLK_PHY               => MI_CLK_PHY          ,
@@ -465,7 +465,7 @@ architecture FULL of NETWORK_MOD_CORE is
 
                 RX_LINK_UP               => RX_LINK_UP(i),
                 TX_LINK_UP               => TX_LINK_UP(i),
-    
+
                 FTILE_PLL_CLK            => ftile_pll_clk,
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
@@ -523,7 +523,7 @@ architecture FULL of NETWORK_MOD_CORE is
     -- generic for 50G 1 line F-Tile IP core 8 times for one card
     ftile_8x50g1_g : if ((ETH_PORT_SPEED = 50) and (EHIP_TYPE = 0))  generate
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_8x50g1_i: entity work.FTILE_8x50g1 
+            FTILE_8x50g1_i: entity work.FTILE_8x50g1
             port map(
                 MI_RESET_PHY             => MI_RESET_PHY        ,
                 MI_CLK_PHY               => MI_CLK_PHY          ,
@@ -571,7 +571,7 @@ architecture FULL of NETWORK_MOD_CORE is
     -- generic for 40G 4 line F-Tile IP core 2 times for one card
     ftile_2x40g4_g : if ((ETH_PORT_SPEED = 40) and (EHIP_TYPE = 0))  generate
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_2x40g4_i: entity work.FTILE_2x40g4 
+            FTILE_2x40g4_i: entity work.FTILE_2x40g4
             port map(
                 MI_RESET_PHY             => MI_RESET_PHY        ,
                 MI_CLK_PHY               => MI_CLK_PHY          ,
@@ -620,7 +620,7 @@ architecture FULL of NETWORK_MOD_CORE is
     ftile_8x25g1_g : if ((ETH_PORT_SPEED = 25) and (EHIP_TYPE = 0))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_8x25g1_i: entity work.FTILE_8x25g1 
+            FTILE_8x25g1_i: entity work.FTILE_8x25g1
             port map(
                 MI_RESET_PHY             => MI_RESET_PHY        ,
                 MI_CLK_PHY               => MI_CLK_PHY          ,
@@ -721,7 +721,7 @@ architecture FULL of NETWORK_MOD_CORE is
     ftile_8x10g1_g : if ((ETH_PORT_SPEED = 10) and (EHIP_TYPE = 0))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_8x10g1_i: entity work.FTILE_8x10g1 
+            FTILE_8x10g1_i: entity work.FTILE_8x10g1
             port map(
                 MI_RESET_PHY             => MI_RESET_PHY        ,
                 MI_CLK_PHY               => MI_CLK_PHY          ,

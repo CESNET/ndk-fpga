@@ -1,4 +1,4 @@
-//-- config.sv:  
+//-- config.sv:
 //-- Copyright (C) 2024 CESNET z. s. p. o.
 //-- Author(s): Radek Iša <isa@cesnet.cz>
 

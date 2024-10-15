@@ -135,52 +135,52 @@ set_location_assignment PIN_BM64 -to FLASH_BYTE_N
 set_location_assignment PIN_BC65 -to FLASH_WP_N
 set_location_assignment PIN_AY66 -to FLASH_RST_N
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[0] 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[1] 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[2] 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[0]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[1]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[2]
 set_instance_assignment -name IO_STANDARD "1.2 V" -to HW_ID[3]
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_G[0] 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_G[1] 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_R[0] 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_R[1] 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_G[0]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_G[1]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_R[0]
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_LED_R[1]
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_I2C_SCLK 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_I2C_SDA 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_I2C_SCLK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_I2C_SDA
 
-set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to AG_SYSCLK0_P 
-set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to AG_SYSCLK1_P 
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to AG_SYSCLK0_P
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to AG_SYSCLK1_P
 set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to AG_SYSCLK0_P
 set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to AG_SYSCLK1_P
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_EXT_SYNC_1HZ 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_EXT_SYNC_1HZ
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_CLK_INT_N 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_CLK_GEN_LOL_N 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_CLK_INT_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_CLK_GEN_LOL_N
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_DEV_POR_N 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_RST_N 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_SOFT_RST 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_M10_RST_N 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_DEV_POR_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_RST_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_SOFT_RST
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_M10_RST_N
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_M10_IMG_SEL_N 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_M10_REBOOT_N 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_AG_DONE 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_AG_STATUS_N 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_M10_IMG_SEL_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_M10_REBOOT_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_AG_DONE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to M10_AG_STATUS_N
 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_REQ_CONF_N 
-set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_CFG_IMG_SEL 
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_REQ_CONF_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to AG_CFG_IMG_SEL
 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_A[*] 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_D[*] 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_CE0_N 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_CE1_N 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_OE_N 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_WE_N 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_RY_BY_N 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_BYTE_N 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_WP_N 
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_RST_N 
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_A[*]
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_D[*]
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_CE0_N
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_CE1_N
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_OE_N
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_WE_N
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_RY_BY_N
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_BYTE_N
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_WP_N
+#set_instance_assignment -name IO_STANDARD "1.2 V" -to FLASH_RST_N
 
 set_global_assignment -name OCP_HW_EVAL DISABLE
 # this parameter was set as disable beacouse it makes problem with build for ftile IP cores

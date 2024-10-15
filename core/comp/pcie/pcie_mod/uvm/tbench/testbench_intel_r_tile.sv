@@ -310,7 +310,7 @@ module testbench;
                 assign down_hdr_init_ack[i] = avst_crdt_down_hdr[pcie_e][i].INIT_ACK;
                 // DOWN DATA
                 assign down_data_init_ack[i] = avst_crdt_down_data[pcie_e][i].INIT_ACK;
-               
+
                 // UP HDR
                 assign avst_crdt_up_hdr[pcie_e][i].INIT_ACK = up_hdr_init_ack[i];
                 // UP DATA
@@ -348,5 +348,5 @@ module testbench;
             end
         end
     endgenerate
-    
+
 endmodule

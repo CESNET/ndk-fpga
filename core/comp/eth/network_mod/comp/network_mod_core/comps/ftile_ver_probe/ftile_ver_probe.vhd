@@ -30,7 +30,7 @@ port (
     IN_MAC_ERROR     : in  slv_array_t      (CHANNELS-1 downto 0)(ERROR_WIDTH    -1 downto 0);
     IN_MAC_STATUS    : in  slv_array_t      (CHANNELS-1 downto 0)(STATUS_WIDTH   -1 downto 0);
     IN_MAC_VALID     : in  std_logic_vector (CHANNELS-1 downto 0);
-    
+
     -- OUTPUT
     OUT_MAC_DATA      : out  slv_array_t      (CHANNELS-1 downto 0)(DATA_WIDTH     -1 downto 0);
     OUT_MAC_INFRAME   : out  slv_array_t      (CHANNELS-1 downto 0)(INFRAME_WIDTH  -1 downto 0);

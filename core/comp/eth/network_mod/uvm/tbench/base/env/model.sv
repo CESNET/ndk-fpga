@@ -1,4 +1,4 @@
-//-- model.sv: model 
+//-- model.sv: model
 //-- Copyright (C) 2023 CESNET z. s. p. o.
 //-- Author(s): Radek Iša <isa@cesnet.cz>
 
@@ -33,7 +33,7 @@ class drop_cbs #(string ETH_CORE_ARCH, int unsigned ETH_PORT_SPEED) extends uvm_
 
         $cast(c_data, data);
         {pkt_eof, pkt_drop} = c_data.data;
-        
+
         for (int unsigned it = 0; it < RESIZED_REGIONS; it++) begin
             if (pkt_eof[it] == 1) begin
                 queue.push_back(pkt_drop[it]);
@@ -61,7 +61,7 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
     uvm_analysis_port    #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) usr_tx_data[ETH_PORTS];
     uvm_analysis_port    #(uvm_logic_vector::sequence_item#(ETH_RX_HDR_WIDTH)) usr_tx_hdr[ETH_PORTS];
 
-    //SYNCHRONIZATION 
+    //SYNCHRONIZATION
     protected drop_cbs #(ETH_CORE_ARCH, ETH_PORT_SPEED[0]) drop_sync[ETH_PORTS][];
 
     protected int unsigned eth_recv[ETH_PORTS];
@@ -253,7 +253,7 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
                 hdr_out = uvm_logic_vector::sequence_item#(1)::type_id::create("hdr_out", this);
                 hdr_out.start[$sformatf("USR_RX[%0d]", index)] = $time();
                 hdr_out.tag = "ETH_TX";
-                hdr_out.data = 1'b0; 
+                hdr_out.data = 1'b0;
 
                 data_out = data;
                 //data_out = uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)::type_id::create("data_out", this);

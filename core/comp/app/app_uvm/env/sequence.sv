@@ -1,7 +1,7 @@
 /*
  * file       : sequence.sv
  * Copyright (C) 2024 CESNET z. s. p. o.
- * description: verification sequence 
+ * description: verification sequence
  * date       : 2021
  * author     : Radek Iša <isa@cesnet.ch>
  *

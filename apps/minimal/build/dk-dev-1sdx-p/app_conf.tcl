@@ -19,7 +19,7 @@ set DMA_TX_CHANNELS      16
 # In blocking mode, packets are dropped only when the RX DMA channel is off.
 # In non-blocking mode, packets are dropped whenever they cannot be sent.
 set DMA_RX_BLOCKING_MODE true
-# Special example of 400G DMA, Ethernet is not connected to DMA and must be set 
+# Special example of 400G DMA, Ethernet is not connected to DMA and must be set
 # special PCIe config.: 2x PCIe Gen4 x8x8, requires PCIe expansion connector.
 set DMA_400G_DEMO        false
 

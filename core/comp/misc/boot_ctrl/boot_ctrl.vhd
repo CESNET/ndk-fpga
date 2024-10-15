@@ -15,7 +15,7 @@ entity BOOT_CTRL is
     generic(
         -- ICAP WBSTAR register value (see UG570) for boot image 0 (Xilinx Only):
         -- [31:30] = RS[1:0] pin value on next warm boot in BPI mode. The default is 00.
-        --    [29] = RS[1:0] pins 3-state enable: 
+        --    [29] = RS[1:0] pins 3-state enable:
         --             0 = 3-state enabled (RS[1:0] disabled) (default)
         --             1 = 3-state disabled (RS[1:0] enabled)
         --  [28:0] = START_ADDR: Next bitstream start address.
@@ -23,11 +23,11 @@ entity BOOT_CTRL is
         ICAP_WBSTAR0   : std_logic_vector(31 downto 0) := X"00000000";
         -- ICAP WBSTAR register value (see UG570) for boot image 1 (Xilinx Only):
         -- [31:30] = RS[1:0] pin value on next warm boot in BPI mode. The default is 00.
-        --    [29] = RS[1:0] pins 3-state enable: 
+        --    [29] = RS[1:0] pins 3-state enable:
         --             0 = 3-state enabled (RS[1:0] disabled) (default)
         --             1 = 3-state disabled (RS[1:0] enabled)
         --  [28:0] = START_ADDR: Next bitstream start address.
-        --           The default start address is address zero. 
+        --           The default start address is address zero.
         ICAP_WBSTAR1   : std_logic_vector(31 downto 0) := X"01002000";
         -- FPGA device (ULTRASCALE, AGILEX,...)
         DEVICE         : string  := "ULTRASCALE";
@@ -35,7 +35,7 @@ entity BOOT_CTRL is
         BOOT_TYPE      : natural := 2;
         -- BOOT timeout width in bites
         BOOT_TIMEOUT_W : natural := 26
-    ); 
+    );
     port(
         -- =====================================================================
         -- MAIN MI slave interface (MI_CLK)
@@ -107,7 +107,7 @@ architecture FULL of BOOT_CTRL is
     constant MI_BOOT_PORTS : natural := 2;
     constant MI_BOOT_ADDR_BASE : slv_array_t(MI_BOOT_PORTS-1 downto 0)(32-1 downto 0)
     := ( 0 => X"0000_0000",     -- BMC
-         1 => X"0000_2100");    -- AXI Quad SPI 
+         1 => X"0000_2100");    -- AXI Quad SPI
     constant MASK :std_logic_vector(32 -1 downto 0):=(8 => '1', others => '0');
 
     -- MI ASYNC
@@ -212,7 +212,7 @@ begin
         port map(
             CLK        => BOOT_CLK,
             RESET      => BOOT_RESET,
-    
+
             RX_DWR     => mi_sync_dwr,
             RX_ADDR    => mi_sync_addr,
             RX_BE      => mi_sync_be,
@@ -221,7 +221,7 @@ begin
             RX_ARDY    => mi_sync_ardy,
             RX_DRD     => mi_sync_drd,
             RX_DRDY    => mi_sync_drdy,
-    
+
             TX_DWR     => mi_split_dwr,
             TX_ADDR    => mi_split_addr,
             TX_BE      => mi_split_be,
@@ -289,13 +289,13 @@ begin
                     when others => mi_boot_drd <= (others => '0');
                 end case;
                 mi_boot_drdy <= mi_boot_rd;
-                    
+
                 if (BOOT_RESET = '1') then
                     mi_boot_drdy <= '0';
                 end if;
             end if;
         end process;
-    
+
         mi_wr_p : process(BOOT_CLK)
         begin
             if rising_edge(BOOT_CLK) then
@@ -313,17 +313,17 @@ begin
                                 boot_cmd <= '1';
                                 boot_img <= not flash_wr_data_reg(0);
                             end if;
-            
+
                         when others => null;
-                    end case;            
+                    end case;
                 end if;
-    
+
                 if (BOOT_RESET = '1') then
                     boot_cmd <= '0';
                 end if;
             end if;
         end process;
-        
+
         boot_timeout_p : process(BOOT_CLK)
         begin
             if rising_edge(BOOT_CLK) then
@@ -334,7 +334,7 @@ begin
                 end if;
             end if;
         end process;
-    
+
         BOOT_REQUEST <= boot_cmd and (boot_timeout(BOOT_TIMEOUT_W-1));
         BOOT_IMAGE   <= boot_img;
     end generate;
@@ -376,8 +376,8 @@ begin
         icap_di_swap_g: for i in 0 to 3 generate
             icap_di_swap_g2: for j in 0 to 7 generate
                 icap_di_swap((i*8)+j) <= icap_di_orig((i*8)+(7-j));
-            end generate; 
-        end generate; 
+            end generate;
+        end generate;
 
         ICAP_RDWRB <= '0';
         ICAP_DI    <= icap_di_swap;
@@ -386,5 +386,5 @@ begin
         ICAP_RDWRB <= '0';
         ICAP_DI    <= (others => '0');
     end generate;
-    
+
 end architecture;

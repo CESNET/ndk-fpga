@@ -117,7 +117,7 @@ class env #(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_ST
             mfb_rx_config.active         = UVM_ACTIVE;
             mfb_rx_config.interface_name = {"ETH_RX_MFB_", it_num};
             uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_eth_mfb_rx_", it_num}, "m_config", mfb_rx_config);
-            m_eth_mfb_rx[it] = uvm_logic_vector_array_mfb::env_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create({"m_eth_mfb_rx_", it_num}, this); 
+            m_eth_mfb_rx[it] = uvm_logic_vector_array_mfb::env_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create({"m_eth_mfb_rx_", it_num}, this);
             // TX MFB
             mfb_tx_config = new();
             mfb_tx_config.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_SOF;
@@ -136,7 +136,7 @@ class env #(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_ST
             uvm_logic_vector_array_mfb::config_item mfb_tx_config;
             string it_num;
             it_num.itoa(it);
-    
+
             //DMA
             m_dma_rx_config = new();
             m_dma_rx_config.active         = UVM_ACTIVE;
@@ -331,7 +331,7 @@ class env #(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_ST
         end
     endtask
 
-    task run_eth_packet(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr); 
+    task run_eth_packet(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr);
         uvm_app_core_top_agent::logic_vector_array#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH) seq;
         seq = uvm_app_core_top_agent::logic_vector_array#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("seq", this);
         forever begin
@@ -352,7 +352,7 @@ class env #(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_ST
         end
     endtask
 
-    task run_dma_packet(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr); 
+    task run_dma_packet(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr);
         uvm_app_core_top_agent::logic_vector_array#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH) seq;
         seq = uvm_app_core_top_agent::logic_vector_array#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)::type_id::create("seq", this);
         forever begin

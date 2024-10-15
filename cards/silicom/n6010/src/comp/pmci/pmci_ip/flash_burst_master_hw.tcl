@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Intel Corporation.
 # SPDX-License-Identifier: MIT
 
-# 
+#
 # Description
 # -----------------------------------------------------------------------------
 # This is the _hw.tcl of Flash Burst Master core
@@ -183,7 +183,7 @@ add_interface_port avalon_master avmm_mstr_waitreq waitrequest Input 1
 
 # -----------------------------------------------------------------------------
 # Port - Avalon-MM slave (to IOFS-shell/host)
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------
 add_interface avalon_slave avalon end
 set_interface_property avalon_slave addressGroup 0
 set_interface_property avalon_slave addressUnits WORDS
@@ -253,13 +253,13 @@ add_interface_port csr_if flash_addr flash_addr Input -1
 # Validate IP
 # -----------------------------------------------------------------------------
 proc ip_validate { } {
-   
+
    set sa_baddr [ get_parameter_value STAGING_AREA_BADDR ]
    set fadr_width [ get_parameter_value FLASH_ADDR_WIDTH ]
    set fifo_depth [ get_parameter_value FIFO_DEPTH_LOG2 ]
 
    set addr_span     [expr {pow(2, $fadr_width)}]
-   
+
    if { $addr_span <= $sa_baddr } {
       send_message Error "Staging area base addres is out of bound of flash address range"
    } elseif {$sa_baddr < [expr {($addr_span * 3) / 4}]} {
@@ -271,7 +271,7 @@ proc ip_validate { } {
 # Elaborate IP
 # -----------------------------------------------------------------------------
 proc ip_elaborate { } {
-   
+
    set sa_baddr [ get_parameter_value STAGING_AREA_BADDR ]
    set fadr_width [ get_parameter_value FLASH_ADDR_WIDTH ]
    set fifo_depth [ get_parameter_value FIFO_DEPTH_LOG2 ]

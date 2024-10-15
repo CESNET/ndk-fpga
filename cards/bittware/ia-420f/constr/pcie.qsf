@@ -82,7 +82,7 @@ set_location_assignment PIN_BR56 -to PCIE_TX_N[0]
 set_location_assignment PIN_BP55 -to PCIE_TX_P[0]
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 set_instance_assignment -name IO_STANDARD HCSL -to PCIE_REFCLK0

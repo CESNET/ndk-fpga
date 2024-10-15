@@ -1,4 +1,4 @@
-// sequence.sv: 
+// sequence.sv:
 // Copyright (C) 2024 CESNET z. s. p. o.
 // Author(s): Radek Iša <isa@cesnet.cz>
 
@@ -25,7 +25,7 @@ endclass
 class sequence_void#(type T_TYPE) extends uvm_sequence #(T_TYPE);
     `uvm_object_param_utils(uvm_dma::sequence_void#(T_TYPE))
 
-    req_fifo#(T_TYPE) fifo; 
+    req_fifo#(T_TYPE) fifo;
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_mfb_data");
@@ -34,7 +34,7 @@ class sequence_void#(type T_TYPE) extends uvm_sequence #(T_TYPE);
 
     task body();
         assert(uvm_config_db #(req_fifo#(T_TYPE))::get(m_sequencer, "", "fifo", fifo)) else begin
-            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo"); 
+            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo");
         end;
 
         forever begin

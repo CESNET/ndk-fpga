@@ -37,7 +37,7 @@ begin
             end if;
         end if;
     end process;
-    
+
     process (all)
     begin
         crdt_up_fsm_nst   <= crdt_up_fsm_pst;

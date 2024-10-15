@@ -1,4 +1,4 @@
--- bmc_driver.vhd: Board Management Controller driver 
+-- bmc_driver.vhd: Board Management Controller driver
 -- Copyright (C) 2022 CESNET z. s. p. o.
 -- Author(s): David Beneš <benes.david2000@seznam.cz>
 --
@@ -14,7 +14,7 @@ use work.type_pack.all;
 -- This component is bridge unit between MI32 protocol and SPI protocol
 -- for communication with BMC device.
 -- BMC device is capable of rebooting FPGA and changing boot flash.
--- This component supports 200 MHz clock. Default SPI frequency is 
+-- This component supports 200 MHz clock. Default SPI frequency is
 -- 806 kHz and can be changed by divide ratio. SPI_CLK = (CLK/(4*spi_freq_div))
 entity BMC_DRIVER is
     generic(
@@ -27,14 +27,14 @@ entity BMC_DRIVER is
         CLK            : in  std_logic;
         RST            : in  std_logic;
 
-        -- SPI interface for communication with BMC device 
+        -- SPI interface for communication with BMC device
         SPI_CLK        : out std_logic;
         SPI_NSS        : out std_logic;
         SPI_MOSI       : out std_logic;
         SPI_MISO       : in  std_logic;
         SPI_INT        : in  std_logic;
 
-        -- MI32 protocol signals 
+        -- MI32 protocol signals
         BMC_MI_ADDR : in  std_logic_vector(G_MI_ADDR_WIDTH - 1 downto 0);
         BMC_MI_DWR  : in  std_logic_vector(G_MI_DATA_WIDTH - 1 downto 0);
         BMC_MI_WR   : in  std_logic;
@@ -48,7 +48,7 @@ end BMC_DRIVER;
 
 architecture FULL of BMC_DRIVER is
     type t_fsm_led_ctrl is (
-        st_idle,                -- waiting for commands 
+        st_idle,                -- waiting for commands
         st_boot_request,        -- reboot
         st_write,               -- writing 1 byte to SPI slave device
         st_write_delay,         -- delay between bytes
@@ -56,7 +56,7 @@ architecture FULL of BMC_DRIVER is
         st_read,                -- reading 1 byte data from SPI
         st_read_delay,          -- delay between bytes
         st_eos                  -- end of sequence
-    );    
+    );
 
     -- Control logic (FSM)
     signal state, next_state: t_fsm_led_ctrl := st_idle;
@@ -83,7 +83,7 @@ architecture FULL of BMC_DRIVER is
     signal miso_word_cnt_d     : unsigned(2 downto 0) :=(others => '0');
     signal miso_word_cnt_q     : unsigned(2 downto 0) :=(others => '0');
 
-    -- Pulse generator 
+    -- Pulse generator
     signal pulse_cnt           : unsigned(17 downto 0):=(others => '0');
     signal pulse_event         : std_logic;
     signal pulse_gen_en        : std_logic;
@@ -94,7 +94,7 @@ architecture FULL of BMC_DRIVER is
     signal delay_cnt_d         : unsigned(7 downto 0);
     signal delay_cnt_q         : unsigned(7 downto 0);
 
-    -- Delay between write and read in ms 
+    -- Delay between write and read in ms
     signal wait_duration_d     : std_logic_vector(15 downto 0):= (others => '0');
     signal wait_duration_q     : std_logic_vector(15 downto 0):= (others => '0');
     signal wait_cnt_d          : unsigned(15 downto 0):= (others => '0');
@@ -102,7 +102,7 @@ architecture FULL of BMC_DRIVER is
     signal timeout_event_d     : std_logic;
     signal timeout_event_q     : std_logic;
 
-    -- Interrupt 
+    -- Interrupt
     signal interrupt_event     : std_logic;
     signal interrupt_re0       : std_logic;
     signal interrupt_re1       : std_logic;
@@ -114,7 +114,7 @@ architecture FULL of BMC_DRIVER is
     signal status_ready_d      : std_logic;
     signal status_ready_q      : std_logic;
 
-    -- SPI buffer 
+    -- SPI buffer
     signal spi_clk_s           : std_logic:= '0';
     signal spi_clk_d           : std_logic:= '0';
     signal spi_clk_q           : std_logic:= '0';
@@ -144,24 +144,24 @@ architecture FULL of BMC_DRIVER is
 begin
     -----------------------------------------------------------------------------
     --                          INTERRUPT DETECTION
-    -----------------------------------------------------------------------------    
+    -----------------------------------------------------------------------------
     int_p: process(CLK)
     begin
-        if rising_edge(CLK) then 
+        if rising_edge(CLK) then
             -- Detection of interrupt rising_edge(re)
             interrupt_re0   <= SPI_INT;
             interrupt_re1   <= interrupt_re0;
             interrupt_event <= interrupt_re0 and (not interrupt_re1);
 
-            -- Saving 're' information 
-            if interrupt_event = '1' then 
+            -- Saving 're' information
+            if interrupt_event = '1' then
                 interrupt_detected <= '1';
             end if;
 
-            if RST = '1' then 
+            if RST = '1' then
                 interrupt_detected <= '0';
                 interrupt_event    <= '0';
-            elsif state = st_idle then 
+            elsif state = st_idle then
                 interrupt_detected <= '0';
             end if;
         end if;
@@ -172,7 +172,7 @@ begin
     -----------------------------------------------------------------------------
 
     mem_p: process (CLK)
-    begin 
+    begin
         if rising_edge(CLK) then
             if RST = '1' then
                 state                <= st_idle;
@@ -241,13 +241,13 @@ begin
                 bmc_mi_drd_d(16)              <= status_done_q;   -- Status done, occurs when the transaction is done or clock is set up
                 bmc_mi_drd_d(17)              <= '0';
                 bmc_mi_drd_d(18)              <= timeout_event_q; -- Timeout indication due to missing interrupt from BMC device (device is not ready to transmit data)
-                bmc_mi_drd_d(19)              <= status_ready_q;  -- Ready for another transaction (st_idle) 
+                bmc_mi_drd_d(19)              <= status_ready_q;  -- Ready for another transaction (st_idle)
                 bmc_mi_drd_d(23 downto 20)    <= (others => '0');
                 bmc_mi_drd_d(31 downto 24)    <= x"02";           -- Controller version
             when others =>
                 bmc_mi_drd_d <= (others => '0');
         end case;
-        bmc_mi_drdy_d    <= bmc_mi_rd_s;  
+        bmc_mi_drdy_d    <= bmc_mi_rd_s;
     end process;
 
     fsm_p: process(all)
@@ -273,13 +273,13 @@ begin
         spi_clk_d           <= spi_clk_s;
         spi_freq_div_d      <= spi_freq_div_q;
         boot_cmd_d          <= boot_cmd_q;
-           
+
         case(state) is
             when st_idle        =>
                 spi_nss_d           <= '1';
                 spi_mosi_d          <= '1';
                 status_ready_d      <= '1';
-                status_done_d       <= '0';      
+                status_done_d       <= '0';
 
                 mosi_data_cnt_d     <= (others => '0');
                 mosi_word_cnt_d     <= (others => '0');
@@ -293,7 +293,7 @@ begin
                             mosi_data_d(31 downto 0)    <= BMC_MI_DWR;
                         when "01" =>
                             -- 31 downto 28: CMD configuration
-                            -- 27 downto 16: SUB_CMD configuration 
+                            -- 27 downto 16: SUB_CMD configuration
                             mosi_data_d(47 downto 32)   <= BMC_MI_DWR(31 downto 16);
 
                             -- Reboot
@@ -328,15 +328,15 @@ begin
                             end if;
 
                         when others => null;
-                    end case; 
+                    end case;
                 end if;
 
-                if boot_cmd_q = '1' then 
+                if boot_cmd_q = '1' then
                     next_state <= st_boot_request;
                 end if;
 
             when st_boot_request    =>
-                if boot_timeout(25) = '1' then 
+                if boot_timeout(25) = '1' then
                     status_done_d       <= '0';
                     timeout_event_d     <= '0';
                     next_state          <= st_write;
@@ -346,10 +346,10 @@ begin
                 spi_clk_en      <= '1';
                 delay_cnt_d     <= (others => '0');
 
-                if spi_clk_event = '1' then 
+                if spi_clk_event = '1' then
                     spi_nss_d       <= '0';
 
-                    if spi_clk_s = '0' then 
+                    if spi_clk_s = '0' then
                         mosi_data_d     <= mosi_data_q(mosi_data_q'high - 1 downto 0) & '0';
                         spi_mosi_d      <= mosi_data_q(mosi_data_q'high);
                         mosi_data_cnt_d <= mosi_data_cnt_q + 1;
@@ -364,7 +364,7 @@ begin
             when st_write_delay     =>
                 spi_clk_en          <= '1';
                 mosi_data_cnt_d     <= (others => '0');
-                
+
                 if spi_clk_event = '1' then
                     spi_nss_d   <= '1';
                     delay_cnt_d <= delay_cnt_q + 1;
@@ -373,7 +373,7 @@ begin
                         next_state      <= st_write;
 
                         mosi_word_cnt_d <= mosi_word_cnt_q + 1;
-                        if mosi_word_cnt_q = 6 - 1 then 
+                        if mosi_word_cnt_q = 6 - 1 then
                             next_state <= st_wait;
                         end if;
                     end if;
@@ -382,17 +382,17 @@ begin
             when st_wait            =>
                 pulse_gen_en <= '1';
 
-                if pulse_event = '1' then 
+                if pulse_event = '1' then
                     wait_cnt_d <= wait_cnt_q + 1;
                 end if;
 
-                if interrupt_detected = '1' then 
+                if interrupt_detected = '1' then
                     next_state      <= st_read;
                 elsif wait_cnt_q = to_integer(unsigned(wait_duration_q)) then
                     next_state      <= st_read;
                     timeout_event_d <= '1';
-                end if; 
-                    
+                end if;
+
             when st_read            =>
                 spi_clk_en      <= '1';
                 delay_cnt_d     <= (others => '0');
@@ -400,7 +400,7 @@ begin
                 if spi_clk_event = '1' then
                     spi_nss_d   <= '0';
 
-                    if spi_clk_s = '1' then 
+                    if spi_clk_s = '1' then
                         miso_data_d     <= miso_data_q(miso_data_q'high - 1 downto 0)  & spi_miso_s;
                         miso_data_cnt_d <= miso_data_cnt_q + 1;
                     end if;
@@ -417,30 +417,30 @@ begin
             when st_read_delay      =>
                 spi_clk_en      <= '1';
                 miso_data_cnt_d <= (others => '0');
-                    
+
                 if spi_clk_event = '1' then
                     spi_nss_d   <= '1';
                     delay_cnt_d <= delay_cnt_q + 1;
-                    
+
                     if delay_cnt_q = to_integer(unsigned(delay_duration_q(7 downto 1))) then
                         next_state      <= st_read;
 
                         miso_word_cnt_d <= miso_word_cnt_q + 1;
-                        if miso_word_cnt_q = 2 - 1 then 
+                        if miso_word_cnt_q = 2 - 1 then
                             next_state <= st_eos;
                         end if;
                     end if;
-                end if;            
+                end if;
 
             when st_eos             =>
-                status_done_d   <= '1'; 
+                status_done_d   <= '1';
                 next_state      <= st_idle;
 
-            when others             => 
-                status_done_d   <= '1'; 
+            when others             =>
+                status_done_d   <= '1';
                 next_state      <= st_idle;
 
-        end case;               
+        end case;
     end process;
 
     -----------------------------------------------------------------------------
@@ -463,13 +463,13 @@ begin
                 else
                     spi_clk_cnt <= spi_clk_cnt + 1;
                 end if;
-            else 
+            else
                spi_clk_cnt     <= (others => '0');
                spi_clk_event   <= '0';
                spi_clk_s       <= '1';
             end if;
 
-            if state = st_write_delay or state = st_read_delay then 
+            if state = st_write_delay or state = st_read_delay then
                 spi_clk_s       <= '1';
             end if;
         end if;
@@ -478,7 +478,7 @@ begin
     -----------------------------------------------------------------------------
     --                   1 ms PULSE GENERATOR (200 MHz CLK)
     -----------------------------------------------------------------------------
-    
+
     ms_gen_i: process(CLK)
     begin
         if rising_edge(CLK) then
@@ -486,15 +486,15 @@ begin
             if RST = '1' then
                 pulse_event <= '0';
                 pulse_cnt   <= (others => '0');
-            elsif pulse_gen_en = '1' then 
-                if pulse_cnt = 200000 - 1 then 
+            elsif pulse_gen_en = '1' then
+                if pulse_cnt = 200000 - 1 then
 
                     pulse_event <= '1';
                     pulse_cnt   <= (others => '0');
                 else
                     pulse_cnt   <= pulse_cnt + 1;
                 end if;
-            else 
+            else
                 pulse_event <= '0';
                 pulse_cnt   <= (others => '0');
             end if;
@@ -502,7 +502,7 @@ begin
     end process;
 
     -----------------------------------------------------------------------------
-    --                              SPI BUFFER 
+    --                              SPI BUFFER
     -----------------------------------------------------------------------------
 
     spi_buf_p: process(CLK)
@@ -516,7 +516,7 @@ begin
     end process;
 
     -----------------------------------------------------------------------------
-    --                              REBOOT 
+    --                              REBOOT
     -----------------------------------------------------------------------------
 
     boot_timeout_p : process(CLK)

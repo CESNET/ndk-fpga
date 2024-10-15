@@ -1,8 +1,8 @@
-// dut.sv: Design under test 
+// dut.sv: Design under test
 // Copyright (C) 2022 CESNET z. s. p. o.
 // Author(s): Daniel Kondys <xkondy00@vutbr.cz>
 
-// SPDX-License-Identifier: BSD-3-Clause 
+// SPDX-License-Identifier: BSD-3-Clause
 
 import test::*;
 
@@ -166,6 +166,6 @@ module DUT (
             assign  mvb_vld[j]  = VHDL_DUT_U.rx_g[j].rx_mac_g.rx_mac_i.s_stin_valid;
         end
     endgenerate
-    
+
 
 endmodule

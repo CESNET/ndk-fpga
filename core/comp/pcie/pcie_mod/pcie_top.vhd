@@ -126,7 +126,7 @@ entity PCIE is
         --
         -- PTC ENABLE: MFB+MVB bus for transferring RQ PTC-DMA transactions.
         -- MFB+MVB bus is clocked at DMA_CLK.
-        -- PTC DISABLE: MFB bus only for transferring RQ PCIe transactions 
+        -- PTC DISABLE: MFB bus only for transferring RQ PCIe transactions
         -- (format according to the PCIe IP used). Compared to the standard MFB
         -- specification, it does not allow gaps (SRC_RDY=0) inside transactions
         -- and requires that the first transaction in a word starts at byte 0.
@@ -151,7 +151,7 @@ entity PCIE is
         --
         -- PTC ENABLE: MFB+MVB bus for transferring RC PTC-DMA transactions.
         -- MFB+MVB bus is clocked at DMA_CLK.
-        -- PTC DISABLE: MFB bus only for transferring RC PCIe transactions 
+        -- PTC DISABLE: MFB bus only for transferring RC PCIe transactions
         -- (format according to the PCIe IP used). Compared to the standard MFB
         -- specification, it does not allow gaps (SRC_RDY=0) inside transactions
         -- and requires that the first transaction in a word starts at byte 0.
@@ -243,15 +243,15 @@ architecture FULL of PCIE is
         variable pcie_mfb_regions : natural;
     begin
         pcie_mfb_regions := MFB_REGIONS;
-        
+
         -- PTC conversion
         if ((not PTC_DISABLE)) then
             if (PCIE_ENDPOINT_TYPE="P_TILE" and PCIE_ENDPOINT_MODE = 1) then
-                -- 256b PTC-DMA stream to 512b PCIe stream 
+                -- 256b PTC-DMA stream to 512b PCIe stream
                 pcie_mfb_regions := pcie_mfb_regions/2;
             end if;
             if (PCIE_ENDPOINT_TYPE="R_TILE" and PCIE_ENDPOINT_MODE = 0) then
-                -- 512b PTC-DMA stream to 1024b PCIe stream 
+                -- 512b PTC-DMA stream to 1024b PCIe stream
                 pcie_mfb_regions := pcie_mfb_regions*2;
             end if;
         end if;
@@ -385,7 +385,7 @@ begin
         PCIE_SYSCLK_N       => PCIE_SYSCLK_N,
         PCIE_SYSRST_N       => PCIE_SYSRST_N,
         INIT_DONE_N         => INIT_DONE_N,
-        
+
         PCIE_RX_P           => PCIE_RX_P,
         PCIE_RX_N           => PCIE_RX_N,
         PCIE_TX_P           => PCIE_TX_P,

@@ -20,7 +20,7 @@ class transaction_info extends uvm_component;
 
 
     task run_phase(uvm_phase phase);
-       
+
         forever begin
             wait (fifo_cc.used() != 0 || fifo_rq.used() != 0);
 

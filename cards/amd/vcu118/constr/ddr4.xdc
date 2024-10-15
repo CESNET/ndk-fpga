@@ -165,7 +165,7 @@ set_property IOSTANDARD DIFF_SSTL12_DCI [get_ports DDR4A_CK_P[*]]
 
 set_property PACKAGE_PIN BD36 [get_ports DDR4A_TEN]
 set_property IOSTANDARD LVCMOS12 [get_ports DDR4A_TEN]
- 
+
 #DDR4B interface
 # Internal Clocks
 set_property PACKAGE_PIN C36 [get_ports DDR4B_REFCLK_P]

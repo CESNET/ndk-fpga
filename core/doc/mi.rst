@@ -3,7 +3,7 @@
 The MI bus interconnect
 =======================
 
-The NDK provides the `nfb-bus tool <https://cesnet.github.io/ndk-sw/tools/nfb-bus.html#nfb-bus>`_ and an `API for generating read/write memory requests <https://cesnet.github.io/ndk-sw/libnfb-quick-start-registers.html>`_. These requests are transferred via the :ref:`MI bus <mi_bus>` in the NDK firmware. This memory-oriented bus is wired throughout the NDK firmware and each part has an allocated address space. The components accessible over the MI bus and their specific address spaces are described in the NDK using a :ref:`DeviceTree <ndk_devtree>`. 
+The NDK provides the `nfb-bus tool <https://cesnet.github.io/ndk-sw/tools/nfb-bus.html#nfb-bus>`_ and an `API for generating read/write memory requests <https://cesnet.github.io/ndk-sw/libnfb-quick-start-registers.html>`_. These requests are transferred via the :ref:`MI bus <mi_bus>` in the NDK firmware. This memory-oriented bus is wired throughout the NDK firmware and each part has an allocated address space. The components accessible over the MI bus and their specific address spaces are described in the NDK using a :ref:`DeviceTree <ndk_devtree>`.
 
 The MI bus interconnection allows easy access to implemented Control/Status Registers (CSR). Communication via the :ref:`MI bus <mi_bus>` is always initiated by the software via direct memory access to the PCIe device (FPGA card) memory space. The software sends a read or write PCIe transaction, which is then processed by the :ref:`MTC module <mtc>` implemented in the FPGA. The MTC module acts as a Master point on the MI bus. It translates requests from the PCIe bus to the MI bus and handles their execution.
 

@@ -37,7 +37,7 @@ port (
     -- =========================================================================
     CLK                     : in  std_logic;
     RESET                   : in  std_logic;
-    
+
     -- =========================================================================
     -- APP2DMA PATH
     -- =========================================================================
@@ -56,7 +56,7 @@ port (
     APP_DMA_RX_MFB_EOF_POS  : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
     APP_DMA_RX_MFB_SRC_RDY  : in  std_logic_vector(APP_STREAMS-1 downto 0);
     APP_DMA_RX_MFB_DST_RDY  : out std_logic_vector(APP_STREAMS-1 downto 0);
-    
+
     DMA_RX_MVB_LEN          : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0);
     DMA_RX_MVB_HDR_META     : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
     DMA_RX_MVB_CHANNEL      : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);

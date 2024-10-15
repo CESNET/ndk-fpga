@@ -24,7 +24,7 @@ begin
     PCIE_EXT_TAG_EN     <= (others => '0');
     PCIE_10B_TAG_REQ_EN <= (others => '0');
     PCIE_RCB_SIZE       <= (others => '0');
- 
+
     PCIE_USER_CLK       <= (others => '0');
     PCIE_USER_RESET     <= (others => (others => '0'));
 

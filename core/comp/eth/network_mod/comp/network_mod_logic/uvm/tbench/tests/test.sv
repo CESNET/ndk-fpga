@@ -2,7 +2,7 @@
 // Copyright (C) 2022 CESNET z. s. p. o.
 // Author(s): Daniel Kondys <xkondy00@vutbr.cz>
 
-// SPDX-License-Identifier: BSD-3-Clause 
+// SPDX-License-Identifier: BSD-3-Clause
 
 
 class ex_test extends uvm_test;
@@ -121,7 +121,7 @@ class ex_test extends uvm_test;
         user_tx_seq(phase);
 
         //Run MFB RX (USER) sequence
-        m_vseq = virt_seq #(ITEM_WIDTH, META_WIDTH, ETH_CHANNELS)::type_id::create("m_vseq"); 
+        m_vseq = virt_seq #(ITEM_WIDTH, META_WIDTH, ETH_CHANNELS)::type_id::create("m_vseq");
         m_vseq.randomize();
         m_vseq.start(m_env.m_user_rx_mfb_env.m_sequencer);
 

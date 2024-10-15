@@ -36,7 +36,7 @@ entity PCIE_CRDT_LOGIC is
         PCIE_DCRDT_UP_INIT_ACK   : out std_logic_vector(2 downto 0);
         PCIE_DCRDT_UP_UPDATE     : in  std_logic_vector(2 downto 0);
         PCIE_DCRDT_UP_UPDATE_CNT : in  std_logic_vector(11 downto 0);
-    
+
         PCIE_HCRDT_DW_INIT       : out std_logic_vector(2 downto 0);
         PCIE_HCRDT_DW_INIT_ACK   : in  std_logic_vector(2 downto 0);
         PCIE_HCRDT_DW_UPDATE     : out std_logic_vector(2 downto 0);
@@ -62,7 +62,7 @@ entity PCIE_CRDT_LOGIC is
         CRDT_UP_CNT_PD           : out std_logic_vector(4-1 downto 0);
         CRDT_UP_CNT_NPD          : out std_logic_vector(4-1 downto 0);
         CRDT_UP_CNT_CPLD         : out std_logic_vector(4-1 downto 0);
-        
+
         -- In init phase the receiver must set the total number of credits using
         -- incremental credit updates. The user logic only waits for
         -- CRDT_DOWN_INIT_DONE to be high.

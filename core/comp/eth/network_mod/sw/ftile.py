@@ -16,7 +16,7 @@ FEC_MODE_STR    = {0: 'No FEC', 1: 'Firecode (CL 74)', 2: '2:RS(528,514) (Clause
 def drp_read(regs, reg, page=0, verbose=False):
      reg = reg >> 2
      cmd = (page << 4) + 0
-     # Write DRP address 
+     # Write DRP address
      regs.write32(0x18014,reg)
      # Set page & start the operation
      regs.write32(0x18018, cmd)
@@ -30,9 +30,9 @@ def drp_read(regs, reg, page=0, verbose=False):
 def drp_write(comp, reg, val, page=0):
      reg = reg >> 2
      cmd = (page << 4) + 1
-     # Write value 
+     # Write value
      comp.write32(0x18010,val)
-     # Write DRP address 
+     # Write DRP address
      comp.write32(0x18014,reg)
      # Set page & start the operation
      #print('Writing reg {:08x}, cmd {:08x}'.format(reg, cmd))
@@ -41,7 +41,7 @@ def drp_write(comp, reg, val, page=0):
 
 def drp_read_drc(regs, reg, page=0, verbose=False):
      cmd = (page << 4) + 0
-     # Write DRP address 
+     # Write DRP address
      regs.write32(0x18014,reg)
      # Set page & start the operation
      regs.write32(0x18018, cmd)
@@ -54,14 +54,14 @@ def drp_read_drc(regs, reg, page=0, verbose=False):
 
 def drp_write_drc(comp, reg, val, page=0):
      cmd = (page << 4) + 1
-     # Write value 
+     # Write value
      comp.write32(0x18010,val)
-     # Write DRP address 
+     # Write DRP address
      comp.write32(0x18014,reg)
      # Set page & start the operation
      #print('Writing reg {:08x}, cmd {:08x}'.format(reg, cmd))
      comp.write32(0x18018, cmd)
-     time.sleep(0.001) # !!!!!!!!!!!!!!!     
+     time.sleep(0.001) # !!!!!!!!!!!!!!!
 
 
 def bit(val, b):
@@ -95,7 +95,7 @@ class ftile_rsfec():
 
     def read64(self, reg, lane=0):
         # Get offset to PCS lane
-        addr = self.base + lane * 0x200 + reg 
+        addr = self.base + lane * 0x200 + reg
         #print('Reading lane {} reg {:08x}, addr {:08x}'.format(lane, reg, addr))
         lo = drp_read(self.comp, addr,   0)
         hi = drp_read(self.comp, addr+4, 0)
@@ -128,7 +128,7 @@ class ftile_pma():
 
     def cpi_request(self, data, option, lane, opcode):
         #  See https://www.intel.com/content/www/us/en/docs/programmable/683872/22-4-4-3-0/fgt-attribute-access-method.html
-        # Get transceiver index 
+        # Get transceiver index
         index = self.read(0xffffc, lane) ## !!!! Not working after design boot !!! Why???????????????????????????????????????????????????????????????
         print(f'Phy lane readout {index:08x}')
         index &= 0x00000003
@@ -148,7 +148,7 @@ class ftile_pma():
         for lane in range(self.lanes):
              self.cpi_request(val,0xA, lane, 0x40)
              self.cpi_request(val,0x2, lane, 0x40)
-     
+
     def set_lane_media_mode(self, lane, media=0x14):
         # See ttk_helper_ftile.tcl
         self.cpi_request(data=media, option=0xA, lane=lane, opcode=0x64)
@@ -168,14 +168,14 @@ class ftile_pcs():
         self.lanes = lanes
 
     def read(self, reg):
-        # Get offset to PCS 
+        # Get offset to PCS
         addr = self.base + (reg - 0x1000)
         val = drp_read(self.comp, addr, 0)
         #print('Reading PCS reg {:08x}, addr {:08x}, value = {:08x}'.format(reg, addr, val))
         return val
 
     def read64(self, reg):
-        # Get offset to PCS 
+        # Get offset to PCS
         addr = self.base + (reg - 0x1000)
         lo = drp_read(self.comp, addr,   0)
         hi = drp_read(self.comp, addr+4, 0)
@@ -196,7 +196,7 @@ class ftile_pcs():
         # Reset TX stats
         self.write(0x1274, 1)
         self.write(0x1274, 0)
-      
+
 
 class ftile_eth():
 
@@ -218,7 +218,7 @@ class ftile_eth():
             0
         # Assign PMA
         self.pma = ftile_pma(pcsregs, self.lanes)
-        # Assign PCS 
+        # Assign PCS
         pcsbase = FTILE_ETH_BASES[self.speed]
         pcslanes = ETH_LANES[self.speed]
         self.pcs = ftile_pcs(pcsregs, pcsbase, pcslanes)
@@ -228,7 +228,7 @@ class ftile_eth():
         fec_base = 0
         if self.speed in FTILE_RSFEC_BASES:
             fec_base = FTILE_RSFEC_BASES[self.speed]
-            if fec_mode: 
+            if fec_mode:
                 self.rsfec = ftile_rsfec(pcsregs, fec_base, self.speed//25, fec_mode)
         self.print_config()
 
@@ -237,7 +237,7 @@ class ftile_eth():
         fec_mode = bits(config, 10, 3)
         fec_base = 0
         if self.speed in FTILE_RSFEC_BASES:
-            fec_base = FTILE_RSFEC_BASES[self.speed]    
+            fec_base = FTILE_RSFEC_BASES[self.speed]
         print(f'\nEth init: config = {config:08x}, speed = {self.speed}, modulation : {self.modulation}, lanes = {self.lanes}, rsfec mode = "{FEC_MODE_STR[fec_mode]}", base = {fec_base:04x}')
 
     def read(self, reg):
@@ -256,14 +256,14 @@ class ftile_eth():
 
     def set_rxreset(self):
         self.write(0x108, 4)
-        
+
     def clr_rxreset(self):
         self.write(0x108, 0)
 
     def set_reset(self):
         self.write(0x108, 6)
         time.sleep(0.5)
-        
+
     def clr_reset(self):
         self.write(0x108, 0)
         time.sleep(0.5)
@@ -277,7 +277,7 @@ class ftile_eth():
 dev = nfb.open(path='0')
 nodes = dev.fdt_get_compatible("netcope,pcsregs")
 
-eths = [] 
+eths = []
 for i, node in enumerate(nodes):
     comp = dev.comp_open(node)
     eth = ftile_eth(comp)

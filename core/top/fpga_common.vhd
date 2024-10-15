@@ -38,7 +38,7 @@ generic (
     PLL_OUT3_DIV    : natural := 12;
 
     -- Switch CLK_GEN ref clock to clk_pci, default SYSCLK
-    USE_PCIE_CLK            : boolean := false; 
+    USE_PCIE_CLK            : boolean := false;
 
     -- Number of PCIe connectors present on board
     PCIE_CONS               : natural := 1;
@@ -106,7 +106,7 @@ generic (
     MEM_REFR_PERIOD_WIDTH   : natural := 32;
     MEM_DEF_REFR_PERIOD     : integer := 0;
     AMM_FREQ_KHZ            : natural := 0;
-    
+
     STATUS_LEDS             : natural := 2;
     MISC_IN_WIDTH           : natural := 0;
     MISC_OUT_WIDTH          : natural := 0;
@@ -462,7 +462,7 @@ architecture FULL of FPGA_COMMON is
     signal clk_dma                       : std_logic;
     signal clk_dma_x2                    : std_logic;
     signal clk_app                       : std_logic;
-    
+
     signal rst_pci                       : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal rst_eth_phy                   : std_logic_vector(ETH_PORTS-1 downto 0);
     signal rst_eth_streams               : std_logic_vector(ETH_STREAMS-1 downto 0);
@@ -638,22 +638,22 @@ architecture FULL of FPGA_COMMON is
     signal boot_request                  : std_logic;
     signal boot_image                    : std_logic;
 
-    signal axi_mi_addr_s                 : std_logic_vector(8 - 1 downto 0);           
-    signal axi_mi_dwr_s                  : std_logic_vector(32 - 1 downto 0);         
-    signal axi_mi_wr_s                   : std_logic;        
-    signal axi_mi_rd_s                   : std_logic;        
+    signal axi_mi_addr_s                 : std_logic_vector(8 - 1 downto 0);
+    signal axi_mi_dwr_s                  : std_logic_vector(32 - 1 downto 0);
+    signal axi_mi_wr_s                   : std_logic;
+    signal axi_mi_rd_s                   : std_logic;
     signal axi_mi_be_s                   : std_logic_vector((32/8)-1 downto 0) := (others => '0');
-    signal axi_mi_ardy_s                 : std_logic;          
-    signal axi_mi_drd_s                  : std_logic_vector(32 - 1 downto 0);         
+    signal axi_mi_ardy_s                 : std_logic;
+    signal axi_mi_drd_s                  : std_logic_vector(32 - 1 downto 0);
     signal axi_mi_drdy_s                 : std_logic;
 
-    signal bmc_mi_addr_s                 : std_logic_vector(8 - 1 downto 0);           
-    signal bmc_mi_dwr_s                  : std_logic_vector(32 - 1 downto 0);         
-    signal bmc_mi_wr_s                   : std_logic;        
-    signal bmc_mi_rd_s                   : std_logic;        
+    signal bmc_mi_addr_s                 : std_logic_vector(8 - 1 downto 0);
+    signal bmc_mi_dwr_s                  : std_logic_vector(32 - 1 downto 0);
+    signal bmc_mi_wr_s                   : std_logic;
+    signal bmc_mi_rd_s                   : std_logic;
     signal bmc_mi_be_s                   : std_logic_vector((32/8)-1 downto 0) := (others => '0');
-    signal bmc_mi_ardy_s                 : std_logic;          
-    signal bmc_mi_drd_s                  : std_logic_vector(32 - 1 downto 0);         
+    signal bmc_mi_ardy_s                 : std_logic;
+    signal bmc_mi_drd_s                  : std_logic_vector(32 - 1 downto 0);
     signal bmc_mi_drdy_s                 : std_logic;
 
     -- clk_gen reference clock
@@ -815,7 +815,7 @@ begin
 
         DMA_CLK            => clk_dma,
         DMA_RESET          => rst_dma(0),
-        
+
         DMA_RQ_MFB_DATA    => dma_rq_mfb_data,
         DMA_RQ_MFB_META    => dma_rq_mfb_meta,
         DMA_RQ_MFB_SOF     => dma_rq_mfb_sof,
@@ -888,29 +888,29 @@ begin
         cdc_pcie_up_dma_i: entity work.ASYNC_OPEN_LOOP
         generic map (
             IN_REG  => true,
-            TWO_REG => false     
-        )  
+            TWO_REG => false
+        )
         port map(
             ACLK     => clk_pci(i),
             BCLK     => clk_dma,
             ARST     => '0',
             BRST     => '0',
-            ADATAIN  => pcie_link_up(i),                
-            BDATAOUT => dma_pcie_link_up(i) 
+            ADATAIN  => pcie_link_up(i),
+            BDATAOUT => dma_pcie_link_up(i)
         );
 
         cdc_pcie_up_app_i: entity work.ASYNC_OPEN_LOOP
         generic map (
             IN_REG  => true,
-            TWO_REG => false     
-        )  
+            TWO_REG => false
+        )
         port map(
             ACLK     => clk_pci(i),
             BCLK     => clk_app,
             ARST     => '0',
             BRST     => '0',
-            ADATAIN  => pcie_link_up(i),                
-            BDATAOUT => app_pcie_link_up(i) 
+            ADATAIN  => pcie_link_up(i),
+            BDATAOUT => app_pcie_link_up(i)
         );
 
         cdc_pcie_fpga_id_i: entity work.ASYNC_OPEN_LOOP_SMD
@@ -1301,7 +1301,7 @@ begin
         CLK_USER_X2        => clk_usr_x2,
         CLK_USER_X3        => clk_usr_x3,
         CLK_USER_X4        => clk_usr_x4,
-    
+
         RESET_USER         => rst_usr_x1,
         RESET_USER_X2      => rst_usr_x2,
         RESET_USER_X3      => rst_usr_x3,
@@ -1423,7 +1423,7 @@ begin
         HBM_AXI_AWPROT       => HBM_AXI_AWPROT,
         HBM_AXI_AWQOS        => HBM_AXI_AWQOS,
         HBM_AXI_AWUSER       => HBM_AXI_AWUSER,
-        
+
         HBM_AXI_WDATA        => HBM_AXI_WDATA,
         HBM_AXI_WDATA_PARITY => HBM_AXI_WDATA_PARITY,
         HBM_AXI_WLAST        => HBM_AXI_WLAST,
@@ -1438,7 +1438,7 @@ begin
 
         MEM_CLK                => MEM_CLK,
         MEM_RST                => MEM_RST,
-                               
+
         MEM_AVMM_READY         => MEM_AVMM_READY,
         MEM_AVMM_READ          => MEM_AVMM_READ,
         MEM_AVMM_WRITE         => MEM_AVMM_WRITE,
@@ -1451,7 +1451,7 @@ begin
         MEM_REFR_PERIOD        => MEM_REFR_PERIOD,
         MEM_REFR_REQ           => MEM_REFR_REQ,
         MEM_REFR_ACK           => MEM_REFR_ACK,
-    
+
         EMIF_RST_REQ           => EMIF_RST_REQ,
         EMIF_RST_DONE          => EMIF_RST_DONE,
         EMIF_ECC_USR_INT       => EMIF_ECC_USR_INT,
@@ -1621,13 +1621,13 @@ begin
         ETH_CLK          => clk_eth_phy,
         SYS_CLK          => clk_usr_x2,
         SYS_RESET        => rst_usr_x2(0),
-    
+
         ETH_RX_LINK_UP   => eth_rx_link_up_ser,
         ETH_RX_ACTIVITY  => eth_rx_activity_ser,
         ETH_TX_ACTIVITY  => eth_tx_activity_ser,
         ETH_PORT_ENABLED => (others => '1'),
         ETH_MODPRS_N     => eth_modprs_n,
-    
+
         ETH_LED_G        => ETH_LED_G,
         ETH_LED_R        => ETH_LED_R
     );

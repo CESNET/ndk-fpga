@@ -230,7 +230,7 @@ module testbench;
 
             assign DUT_U.VHDL_DUT_U.pcie_core_i.cfg_rcb_status[pcie_e][0] = 1'b0;
         end
-        
+
     endgenerate
 
 endmodule

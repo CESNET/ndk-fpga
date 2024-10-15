@@ -1,4 +1,4 @@
-Documentation of Minimal NDK Application 
+Documentation of Minimal NDK Application
 ****************************************
 
 **Welcome to documentation of Minimal NDK Application!**

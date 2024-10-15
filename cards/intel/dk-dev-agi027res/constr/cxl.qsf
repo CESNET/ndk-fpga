@@ -85,7 +85,7 @@ set_location_assignment PIN_ER22 -to cxl_tx_n[14]
 set_location_assignment PIN_FD16 -to cxl_tx_n[15]
 
 # ==============================================================================
-# Pin IO Standards & Input Termination 
+# Pin IO Standards & Input Termination
 # ==============================================================================
 
 set_instance_assignment -name IO_STANDARD "1.0 V" -to fpga_cxl_perstn

@@ -235,7 +235,7 @@ def mi_bus_random_rw_access():
         if drd != (dwr_list[i]):
             error_cnt = error_cnt + 1
     if error_cnt > 0:
-        print("Error: Some MI requests failed. Read error counts: %d" %(error_cnt)) 
+        print("Error: Some MI requests failed. Read error counts: %d" %(error_cnt))
     return error_cnt
 
 @pytest.mark.depends(on=['test_check_pcie_device_in_lspci','test_check_ndk_sw'])
@@ -247,7 +247,7 @@ def test_mi_bus_random_rw_access():
 @pytest.mark.parametrize("frame_size", [64,256,1024])
 def test_dma_rx_channels(channels,frame_size):
     assert dma_channel_check(channels,frame_size,True) == 0
-    
+
 @pytest.mark.depends(on=['test_check_pcie_device_in_lspci','test_check_ndk_sw'])
 @pytest.mark.parametrize("channels", range(32))
 @pytest.mark.parametrize("frame_size", [64,256,1024])
