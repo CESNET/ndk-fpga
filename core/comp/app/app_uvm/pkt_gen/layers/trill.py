@@ -15,6 +15,7 @@ import scapy.fields
 import scapy.utils
 import scapy.volatile
 
+
 class MyStrLenField(scapy.fields.StrLenField):
 
     __slots__ = ["rand_item"]
@@ -26,7 +27,7 @@ class MyStrLenField(scapy.fields.StrLenField):
             length_from=None,  # type: Optional[Callable[[Packet], int]]
             max_length=None,  # type: Optional[Any]
     ):
-        super(MyStrLenField, self).__init__(name, default, length_from = length_from, max_length = max_length)
+        super(MyStrLenField, self).__init__(name, default, length_from=length_from, max_length=max_length)
 
     def randval(self):
         # Randomization is move to Trill protocol.
@@ -51,18 +52,18 @@ class Trill(scapy.packet.Packet):
     ]
 
     def do_build(self):
-        field_opt_length = self.opt_length;
-        field_data       = self.data;
+        field_opt_length = self.opt_length
+        field_data       = self.data
 
         if (isinstance(field_opt_length, scapy.volatile.RandNum)):
-            if (field_data == None): # randomize opt_length and data
+            if field_data is None: # randomize opt_length and data
                 field_opt_length = field_opt_length._fix()
                 field_data       = scapy.volatile.RandBin(field_opt_length*4)
             else: # get length from data
                 field_data += b"\0" * ((-len(field_data)) % 4)
                 field_opt_length = len(field_data)/4
         else: # randomize data depends on length
-            if (field_data == None):
+            if field_data is None:
                 field_data = scapy.volatile.RandBin(field_opt_length*4)
             else:  # Cannot randomize because all is set
                 pass
@@ -70,8 +71,8 @@ class Trill(scapy.packet.Packet):
         if not self.explicit:
             self = next(iter(self))
 
-        self.opt_length = field_opt_length;
-        self.data       = field_data;
+        self.opt_length = field_opt_length
+        self.data       = field_data
 
         pkt = self.self_build()
         for t in self.post_transforms:
@@ -86,5 +87,3 @@ class Trill(scapy.packet.Packet):
 scapy.packet.bind_layers(scapy.all.Ether, Trill, type=0x22f3)
 scapy.packet.bind_layers(scapy.all.Dot1Q, Trill, type=0x22f3)
 scapy.packet.bind_layers(Trill, scapy.all.Ether)
-
-
