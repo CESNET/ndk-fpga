@@ -1,6 +1,6 @@
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import Timer, RisingEdge, FallingEdge, Combine
+from cocotb.triggers import Timer, RisingEdge, FallingEdge
 from cocotb.utils import get_sim_steps
 
 from cocotb import simulator
@@ -21,15 +21,20 @@ from cocotbext.ofm.lbus.drivers import LBusDriver
 from cocotbext.ofm.avst_eth.monitors import AvstEthMonitor
 from cocotbext.ofm.avst_eth.drivers import AvstEthDriver
 
+
 class Axi4StreamMasterV(Axi4StreamMaster):
     _signals = {"TVALID": "VALID"}
-    _optional_signals = {"TREADY": "READY", "TDATA": "DATA", "TLAST": "LAST", "TKEEP" :"KEEP", "TUSER": "USER"}
+    _optional_signals = {"TREADY": "READY", "TDATA": "DATA", "TLAST": "LAST", "TKEEP": "KEEP", "TUSER": "USER"}
+
+
 class Axi4StreamSlaveV(Axi4StreamSlave):
     _signals = {"TVALID": "VALID"}
-    _optional_signals = {"TREADY": "READY", "TDATA": "DATA", "TLAST": "LAST", "TKEEP" :"KEEP", "TUSER": "USER"}
+    _optional_signals = {"TREADY": "READY", "TDATA": "DATA", "TLAST": "LAST", "TKEEP": "KEEP", "TUSER": "USER"}
+
+
 class Axi4StreamV(Axi4Stream):
     _signals = {"TVALID": "VALID"}
-    _optional_signals = {"TREADY": "READY", "TDATA": "DATA", "TLAST": "LAST", "TKEEP" :"KEEP", "TUSER": "USER"}
+    _optional_signals = {"TREADY": "READY", "TDATA": "DATA", "TLAST": "LAST", "TKEEP": "KEEP", "TUSER": "USER"}
 
 
 class NFBDevice(cocotbext.nfb.NfbDevice):
@@ -37,7 +42,7 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
     def core_instance_from_top(dut):
         try:
             core = [getattr(dut, core) for core in ["usp_i", "fpga_i", "ag_i", "cm_i"] if hasattr(dut, core)][0]
-        except:
+        except Exception:
             # No fpga_common instance in card, try fpga_common directly
             core = dut
 
@@ -123,7 +128,7 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
 
         try:
             self._core = NFBDevice.core_instance_from_top(self._dut)
-        except:
+        except Exception:
             # No fpga_common instance in card, try fpga_common directly
             self._core = self._dut
 
@@ -195,7 +200,7 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
 
             # FIXME: some strange loopback on ALVEO_U200
             if self._core.USE_PCIE_CLK.value == 1:
-                await cocotb.triggers.FallingEdge(self._core.global_reset)
+                await FallingEdge(self._core.global_reset)
         elif hasattr(pcie_i, 'pcie_reset_status_n'):
             for rst in pcie_i.pcie_reset_status_n:
                 rst.value = 0
@@ -206,9 +211,9 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
             raise NotImplementedError("Unknown signals for PCI/device reset")
 
         if self._core.rst_pci[0].value == 1:
-            await cocotb.triggers.FallingEdge(self._core.rst_pci[0])
+            await FallingEdge(self._core.rst_pci[0])
 
-    async def _pcie_cfg_ext_reg_access(self, addr, index = 0, fn = 0, sync=True, data=None):
+    async def _pcie_cfg_ext_reg_access(self, addr, index=0, fn=0, sync=True, data=None):
         pcie_i = self._core.pcie_i.pcie_core_i
         clk = pcie_i.pcie_hip_clk[index]
 
@@ -217,23 +222,23 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
 
         pcie_i.cfg_ext_function[index].value = fn
         pcie_i.cfg_ext_register[index].value = addr >> 2
-        pcie_i.cfg_ext_read[index].value = 1 if data == None else 0
-        pcie_i.cfg_ext_write[index].value = 0 if data == None else 1
+        pcie_i.cfg_ext_read[index].value = 1 if data is None else 0
+        pcie_i.cfg_ext_write[index].value = 0 if data is None else 1
         if data:
             pcie_i.cfg_ext_write_data[index].value = data
         await RisingEdge(clk)
         pcie_i.cfg_ext_read[index].value = 0
         pcie_i.cfg_ext_write[index].value = 0
-        if data == None:
+        if data is None:
             return pcie_i.cfg_ext_read_data[index].value.integer
 
-    async def _pcie_cfg_ext_reg_read(self, addr, index = 0, fn = 0, sync=True):
+    async def _pcie_cfg_ext_reg_read(self, addr, index=0, fn=0, sync=True):
         return await self._pcie_cfg_ext_reg_access(addr, index, fn, sync)
 
-    async def _pcie_cfg_ext_reg_write(self, addr, data, index = 0, fn = 0, sync=True):
+    async def _pcie_cfg_ext_reg_write(self, addr, data, index=0, fn=0, sync=True):
         await self._pcie_cfg_ext_reg_access(addr, index, fn, sync, data)
 
-    async def _read_dtb_raw(self, cap_dtb = 0x480):
+    async def _read_dtb_raw(self, cap_dtb=0x480):
         dtb_length = await self._pcie_cfg_ext_reg_read(cap_dtb + 0x0c)
         data = []
         for i in range(dtb_length // 4):

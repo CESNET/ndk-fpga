@@ -1,12 +1,14 @@
 # -- Path setup --------------------------------------------------------------
 import os
 import sys
-sys.path.append(os.path.abspath("./_ext"))
 
-import sphinx_rtd_theme
 from pathlib import Path
 from datetime import date
 from git import Repo
+
+
+# path for ndk-fpga extension
+sys.path.append(os.path.abspath("./_ext"))
 
 current_year = date.today().year
 git_repo = Repo(search_parent_directories=True)

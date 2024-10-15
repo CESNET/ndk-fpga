@@ -9,8 +9,9 @@
 #  Author(s):
 #    Radek Iša <isa@cesnet.cz>
 
-from config import *
-from parser import *
+from config import packet_config
+from parser import parser as Parser
+
 
 class dfs_item:
     def __init__(self, protocol, cfg):
@@ -24,10 +25,10 @@ class dfs_item:
                 self.protocols_next.append(it)
 
     def last(self):
-        return len(self.protocols_next) == 0;
+        return len(self.protocols_next) == 0
 
     def next(self):
-        if (self.protocols_next == None or self.index >= len(self.protocols_next)):
+        if self.protocols_next is None or self.index >= len(self.protocols_next):
             return None
 
         ret = self.protocols_next[self.index]
@@ -35,27 +36,27 @@ class dfs_item:
         return ret
 
 
-class parser_dfs(parser):
+class parser_dfs(Parser):
     def __init__(self, pcap_file, cfg, seed):
-        super().__init__(pcap_file, cfg, seed);
+        super().__init__(pcap_file, cfg, seed)
 
     def gen(self):
         next_items = []
 
-        cfg_act  = packet_config(self.cfg);
-        item = dfs_item(self.protocols["ETH"], cfg_act);
+        cfg_act  = packet_config(self.cfg)
+        item = dfs_item(self.protocols["ETH"], cfg_act)
         next_items.append(item)
 
         packets = 0
-        while (len(next_items) > 0):
+        while len(next_items) > 0:
             # get last item
-            item = next_items[-1];
+            item = next_items[-1]
             # get next generated protocol
             proto_next = item.next()
 
-            if (not item.last()):
-                if (proto_next != None):
-                    item_next = dfs_item(self.protocols[proto_next], item.cfg);
+            if not item.last():
+                if proto_next is not None:
+                    item_next = dfs_item(self.protocols[proto_next], item.cfg)
                     next_items.append(item_next)
                 else:
                     #remove last index there is no next protocol
@@ -67,14 +68,13 @@ class parser_dfs(parser):
 
                 for it in next_items:
                     pkt_proto = it.protocol.protocol_add(it.cfg)
-                    if (pkt_proto != None):
-                        packet     = packet/pkt_proto
+                    if pkt_proto is not None:
+                        packet = packet / pkt_proto
 
                 #write packet
                 self.write(packet)
                 #remove last index
                 del next_items[-1]
 
-        print ("PACKETS %d" % (packets))
+        print("PACKETS %d" % (packets))
         pass
-

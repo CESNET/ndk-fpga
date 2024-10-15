@@ -1,12 +1,15 @@
 import sys
 import cocotb
-import logging
-from cocotb.triggers import Timer, RisingEdge, Combine, Join, First, with_timeout
+#import logging
+from cocotb.triggers import Timer
 
 from ndk_core import NFBDevice
 
 import cocotbext.ofm.utils.sim.modelsim as ms
 import cocotb.utils
+
+from cocotbext.ofm.utils.sim.bus import MfbBus, MiBus, DmaUpMvbBus, DmaDownMvbBus
+
 
 e = cocotb.external
 st = cocotb.utils.get_sim_time
@@ -30,7 +33,7 @@ async def test_mi_access_unaligned(dut):
     #for i in range(46, 64): # FIXME: Test fails (for US+)
     for i in range(24, 42):
         for x in range(0, 5):
-            data = bytes([(j%256) for j in range(i)])
+            data = bytes([(j % 256) for j in range(i)])
             await e(c.write)(x, data)
             rdata = await e(c.read)(x, len(data))
             assert data == rdata, f"{list(data)}, {list(rdata)}"
@@ -85,6 +88,7 @@ async def _test_ndp_sendmsg(dut, dev=None, nfb=None):
         await e(eth.txmac.enable)()
 
     pkt = bytes([i for i in range(72)])
+
     def eth_tx_monitor_cb(p):
         print(len(p), bytes(p).hex())
         #assert bytes(p) == pkt
@@ -93,7 +97,7 @@ async def _test_ndp_sendmsg(dut, dev=None, nfb=None):
 
     count = 1
     for i in range(count):
-        pkt = bytes([(i%256) for i in range(72 + i)])
+        pkt = bytes([(i % 256) for i in range(72 + i)])
         await e(nfb.ndp.tx[0].sendmsg)([(pkt, bytes(), 0)])
 
     await Timer(20, units='us')
@@ -117,7 +121,7 @@ async def _test_ndp_sendmsg_burst(dut, dev=None, nfb=None):
 
     pkts = range(20, 28)
     for i in pkts:
-        pkt = bytes([(i%256) for i in range(72 + i)])
+        pkt = bytes([(i % 256) for i in range(72 + i)])
         await e(nfb.ndp.tx[0].sendmsg)([(pkt, bytes(), 0)])
 
     await Timer(15, units='us')
@@ -133,8 +137,6 @@ async def test_ndp_send_msgs(dut):
     await _test_ndp_sendmsg(dut, dev, nfb)
     await _test_ndp_sendmsg_burst(dut, dev, nfb)
 
-
-from cocotbext.ofm.utils.sim.bus import *
 
 core = NFBDevice.core_instance_from_top(cocotb.top)
 

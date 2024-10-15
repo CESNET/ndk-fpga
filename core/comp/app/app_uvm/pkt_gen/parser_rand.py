@@ -9,12 +9,13 @@
 #  Author(s):
 #    Radek Iša <isa@cesnet.cz>
 
-from config import *
-from parser import *
+from config import packet_config
+from parser import parser as Parser
 
-class parser_rand(parser):
+
+class parser_rand(Parser):
     def __init__(self, pcap_file, cfg, seed, packets):
-        super().__init__(pcap_file, cfg, seed);
+        super().__init__(pcap_file, cfg, seed)
         self.packets = packets
 
     def gen(self):
@@ -23,18 +24,17 @@ class parser_rand(parser):
             proto_act = self.protocols["ETH"]
             packet = scapy.packet.Packet()
 
-            while (proto_act != None):
+            while proto_act is not None:
                 pkt_proto = proto_act.protocol_add(cfg)
-                if (pkt_proto != None):
+                if pkt_proto is not None:
                     packet     = packet/pkt_proto
                 proto_next = proto_act.protocol_next(cfg)
-                if (len(proto_next) > 0):
+                if len(proto_next) > 0:
                     (proto_next_indexs, proto_next_weights) = self.proto_weight_get(proto_next)
                     protocol_next_name = random.choices(proto_next_indexs, proto_next_weights)[0]
-                    proto_act = self.protocols.get(protocol_next_name);
+                    proto_act = self.protocols.get(protocol_next_name)
                 else:
                     proto_act = None
 
             # End While
             self.write(packet)
-
