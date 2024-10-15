@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-set SV_CRC_BASE      "$OFM_PATH/../modules/internal/base/ff/crc32"
+set SV_CRC_BASE      "$OFM_PATH/../extra/internal/base/ff/crc32"
 set SV_COMMON_BASE   "$OFM_PATH/comp/ver"
 
 set COMPONENTS [list \
