@@ -45,7 +45,10 @@ end entity;
 
 architecture STRUCT of DSP_COUNTER_AGILEX_ATOM is
 
+    constant COUNT_BY_WIDTH_FIX : natural := max(2, COUNT_BY_WIDTH);
+
     signal clr0 : std_logic; -- input registers do not reset when they are disabled
+    signal count_by_fix : std_logic_vector(COUNT_BY_WIDTH_FIX-1 downto 0);
 
     -- this function enables the input register in the DSP counter according to generic INPUT_REGS
     function input_reg_0_en (REG_0_EN : boolean) return string is
@@ -59,7 +62,7 @@ architecture STRUCT of DSP_COUNTER_AGILEX_ATOM is
 
 begin
 
-    assert ((COUNT_BY_WIDTH <= 27) and (RESULT_WIDTH <= 64))
+    assert ((COUNT_BY_WIDTH_FIX > 1) and (COUNT_BY_WIDTH_FIX <= 27) and (RESULT_WIDTH <= 64))
     report "Incorrect input or output width." severity failure;
 
     -- the reset signal is passed down to the input registers only when they are enabled
@@ -69,10 +72,14 @@ begin
         clr0 <= RESET;
     end generate;
 
+    -- Bugfix: Quartus 24.1 has a problem with the counter, which has a single-bit input and is implemented using AGILEX DSP.
+    -- This error is manifested by the message: "has unconnected port CLK[1] -- port must be connected because corresponding register is used"
+    count_by_fix <= std_logic_vector(resize(unsigned(COUNT_BY), COUNT_BY_WIDTH_FIX));
+
     dsp_i: component tennm_mac
 	generic map (
             ax_width         => 1,                        -- the value is always 1, so signal ax is 1-bit wide and by assigning value (others => '1') it then has value of 1 in dec
-            ay_scan_in_width => COUNT_BY_WIDTH,           -- input width
+            ay_scan_in_width => COUNT_BY_WIDTH_FIX,       -- input width
             result_a_width   => RESULT_WIDTH,
             operation_mode   => "m27x27",                 -- mode with inputs up to 27 bits wide
             ay_scan_in_clken => input_reg_0_en(REG_0_EN), -- input registers are enabled by ena(0) if input registers are enabled
@@ -89,7 +96,7 @@ begin
             clr(1)           => RESET,            -- resets output registers (and pipeline registers, which are not used here)
             accumulate       => '1',              -- always '1' in the counter arrangement
             negate           => COUNT_DOWN,       -- option to count down (it makes 2's complement of the COUNT_BY signal)
-            ay               => COUNT_BY,         -- increment (or decrement) by this value
+            ay               => count_by_fix,     -- increment (or decrement) by this value
             ax               => (others => '1'),  -- this is the other input of the multiplier, must be always 1 else the counter will incerment by the input data multiplied by this number
             cy               => (others => '0'),
             cx               => (others => '0'),

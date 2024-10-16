@@ -8,7 +8,7 @@ set PKG_BASE "$OFM_PATH/comp/base/pkg"
 
 # This submodule is not open-source.
 # Due to licensing reasons, it is not available in the OFM repository.
-set MFB_CRC32_ETH_BASE "$OFM_PATH/../modules/fokus/mfb_tools/proc/crc32_ethernet"
+set MFB_CRC32_ETH_BASE "$OFM_PATH/../extra/fokus/mfb_tools/proc/crc32_ethernet"
 
 set PACKAGES "$PACKAGES $PKG_BASE/math_pack.vhd"
 set PACKAGES "$PACKAGES $PKG_BASE/type_pack.vhd"
