@@ -1,10 +1,12 @@
 # signals_sig.fdo : Include file with signals
 # Copyright (C) 2023 CESNET z. s. p. o.
-# Author: Tomas Fukac <fukac@cesnet.cz>
+# Author(s): Tomas Fukac <fukac@cesnet.cz>
+#            Tomas Hak <hak@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-source "./signals.fdo"
+set SV_TCAM2_BASE "../../../../base/mem/tcam2/ver"
+source "$SV_TCAM2_BASE/signals.fdo"
 
 add wave -divider "TCAM"
 add_wave "-noupdate -color yellow -label RESET"   /testbench/DUT_U/VHDL_DUT_U/RESET

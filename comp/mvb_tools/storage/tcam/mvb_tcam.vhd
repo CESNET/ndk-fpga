@@ -23,8 +23,8 @@ entity MVB_TCAM is
         DATA_WIDTH         : integer := 36;
 
         -- TCAM2 storage capacity
-        --     for XILINX (7SERIES, ULTRASCALE) optimal is a multiple of 1*(2^RS)
-        --     for INTEL (ARRIA10, STRATIX10) optimal is a multiple of 16*(2^RS), if memory fragmentation is not enabled, otherwise a multiple of 32*(2^RS)
+        --     optimal is a multiple of L*(2^RS), where L is number of LUTRAMs in each SLICEM/MLAB
+        --     this also applies to fragmented mem (see INTEL_DATA_WIDTH, XILINX_DATA_WIDTH generics/constants below)
         ITEMS              : integer := 16;
 
         -- TCAM2 resources saving
@@ -51,12 +51,26 @@ entity MVB_TCAM is
         --    But if the bit is 1, then it is UNMATCHABLE!
         USE_UNMATCHABLE    : boolean := false;
 
-        -- set as true to use the entire Intel MLAB data width (20 instead of 16), but TCAM rows are addressed discontinuously (rows 21-32 are unused)
+        -- set as true to use the data widths more efficiently, but TCAM rows are addressed discontinuously
+        --    for Intel, rows 21-32 are unused
+        --    for Xilinx, rows 15-16/7-8 are unused
         USE_FRAGMENTED_MEM : boolean := false;
 
         -- FPGA device
         --    available are "7SERIES", "ULTRASCALE", "ARRIA10", "STRATIX10", "AGILEX"
-        DEVICE             : string := "ULTRASCALE"
+        DEVICE             : string  := "ULTRASCALE";
+
+        -- Manufacturer of FPGA device
+        IS_XILINX          : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE");
+        IS_INTEL           : boolean := (DEVICE = "ARRIA10" or DEVICE = "STRATIX10" or DEVICE = "AGILEX");
+
+        -- Optimal parameters by FPGA device
+        INTEL_DATA_WIDTH   : integer := tsel(USE_FRAGMENTED_MEM, 20, 16);
+        XILINX_DATA_WIDTH  : integer := tsel(DEVICE = "ULTRASCALE", tsel(USE_FRAGMENTED_MEM, 14, 8), tsel(USE_FRAGMENTED_MEM, 6, 4));
+        MEMORY_DATA_WIDTH  : integer := tsel(IS_XILINX, XILINX_DATA_WIDTH, INTEL_DATA_WIDTH);
+        ALIGNED_DATA_WIDTH : integer := 2**log2(MEMORY_DATA_WIDTH);
+        ITEMS_ALIGNED      : natural := tsel(USE_FRAGMENTED_MEM, div_roundup(ITEMS,MEMORY_DATA_WIDTH)*ALIGNED_DATA_WIDTH, ITEMS);
+        ADDR_WIDTH         : natural := max(1, log2(ITEMS_ALIGNED))
     );
     Port (
         -- CLOCK AND RESET
@@ -64,7 +78,7 @@ entity MVB_TCAM is
         RESET              : in  std_logic;
 
         -- READ INTERFACE (READ_FROM_TCAM must be set as true)
-        READ_ADDR          : in  std_logic_vector(max(1,log2(ITEMS))-1 downto 0);
+        READ_ADDR          : in  std_logic_vector(ADDR_WIDTH-1 downto 0);
         READ_EN            : in  std_logic;
         READ_RDY           : out std_logic;
         READ_DATA          : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -74,7 +88,7 @@ entity MVB_TCAM is
         -- WRITE INTERFACE
         WRITE_DATA         : in  std_logic_vector(DATA_WIDTH-1 downto 0);
         WRITE_MASK         : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-        WRITE_ADDR         : in  std_logic_vector(max(1,log2(ITEMS))-1 downto 0);
+        WRITE_ADDR         : in  std_logic_vector(ADDR_WIDTH-1 downto 0);
         WRITE_EN           : in  std_logic;
         WRITE_RDY          : out std_logic;
 

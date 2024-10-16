@@ -1,6 +1,7 @@
 # ver_settings.py
 # Copyright (C) 2023 CESNET z. s. p. o.
-# Author: Tomas Fukac <fukac@cesnet.cz>
+# Author(s): Tomas Fukac <fukac@cesnet.cz>
+#            Tomas Hak <hak@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
