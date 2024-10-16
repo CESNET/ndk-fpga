@@ -7,21 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- Added CHANGELOG.md file.
-
-### Changed
-
-- Update persistent recipients for notifications of verifications in Jenkins.
-
-### Removed
-
-- Removed build jenkins files of APP-Minimal for DK-DEV-AGI027RES card.
+## [0.7.1] - 2024-10-16
 
 ### Fixed
 
-- Fixed paths in build jenkins files of APP-Minimal.
+- Fixed PCIE0 path for pblock to SLR1 on Netcope NFB-200G2QL card (private submodule).
+- Fixed single-bit input problem on Agilex DSP counters in new Quartus.
+- Fixed coding style in lots of files.
+- Fixed Modules.tcl paths due to compatibility with new NDK-FPGA in external APPs.
+- Fixed verification jenkins files.
+- Fixed build jenkins files of APP-Minimal.
 
 ## [0.7.0] - 2024-10-09
 
