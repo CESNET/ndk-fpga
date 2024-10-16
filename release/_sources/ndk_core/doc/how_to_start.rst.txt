@@ -62,7 +62,7 @@ The NDK platform uses the `nfb-info tool <https://cesnet.github.io/ndk-sw/tools/
 
 .. code-block:: bash
 
-    $ nfb-info 
+    $ nfb-info
     --------------------------------------- Board info ----
     Board name                 : COMBO-GENERIC
     Serial number              : 0

@@ -1,9 +1,9 @@
 .. _ndk_f-tile_multirate:
 
-F-Tile Multirate IP 
+F-Tile Multirate IP
 ===================
 
-Implemented IP cores 
+Implemented IP cores
 --------------------
 
 Right now, you can use two designs with Multirate IP. These designs have optimized parameters, so you do not need to change anything.
@@ -13,7 +13,7 @@ If you want to make a build with Multirate IP, check the ``Makefile`` file for a
 Build tips
 ----------
 
-The first step is to make a build. If an error during the build occurs, here are a few tips to help you to fix them. 
+The first step is to make a build. If an error during the build occurs, here are a few tips to help you to fix them.
 If you have a problem during the build with Timing analysis and it seems that it could be because of asynchronous clk signals, look into the ``timing.sdc`` file. There is the declaration of asynchronous clocks for both Multirate IP cores.
 If you have a problem with the Profile ID setup for Dynamic Reconfiguration, look into ``multirate.qsf``. There is the declaration of profiles for both types of IP cores (100G and 25G) and it is set by its setup (the order of profiles when the IP was generated). These assignments allow you to set the order of all profiles (from 0 to ...) for all IP cores.
 If you have other problems, look into Intel's documentation: :ref:`Intel F-Tile Ethernet Multirate Intel FPGA IP User Guide <https://cdrdv2-public.intel.com/773503/ug-714307-773503.pdf>` and :ref:`Intel F-Tile Dynamic Reconfiguration Suite Intel FPGA IP User Guide <https://www.intel.com/programmable/technical-pdfs/711009.pdf>`.

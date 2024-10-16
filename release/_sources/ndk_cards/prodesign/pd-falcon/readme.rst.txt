@@ -3,7 +3,7 @@ PRO DESIGN Falcon
 ---------------------------
 
 - Card Information:
-    - Vendor: PRO DESIGN 
+    - Vendor: PRO DESIGN
     - Name: PRO DESIGN Falcon (PD-FALCON-1SM21BEU2F55E2VG-DS-AP-PCIE-150)
     - Ethernet Ports: 4x QSFP-DD
     - PCIe Connectors: 1x
