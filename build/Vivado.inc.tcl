@@ -389,7 +389,7 @@ proc ImplementDesignSetup {synth_flags} {
     PrintLabel "Implementation Properties Setting"
     # Run script wbs_pre.tcl before writing the bitstream
     global OFM_PATH
-    set_property STEPS.WRITE_BITSTREAM.TCL.PRE [file normalize $OFM_PATH/build/misc/vivado_wbs_pre.tcl] [get_runs impl_1]
+    set_property [list_property [get_runs impl_1] STEPS.WRITE_*.TCL.PRE] [file normalize $OFM_PATH/build/misc/vivado_wbs_pre.tcl] [get_runs impl_1]
 
     if {[info exist SYNTH_FLAGS(SOPT_DIRECTIVE)] } {
         puts "Implementation optimization directive set to: $SYNTH_FLAGS(SOPT_DIRECTIVE)"
@@ -533,7 +533,11 @@ proc SaveDesign {synth_flags} {
 
     PrintLabel "Write bitstream"
     set ROOTNAME [pwd]/$SYNTH_FLAGS(OUTPUT)
-    write_bitstream -force $ROOTNAME.bit
+    if {[list_property [get_runs impl_1] STEPS.WRITE_*.TCL.PRE] eq "STEPS.WRITE_DEVICE_IMAGE.TCL.PRE"} {
+        write_device_image -force $ROOTNAME.pdi
+    } else {
+        write_bitstream -force $ROOTNAME.bit
+    }
 
     close_project
 
@@ -552,7 +556,11 @@ proc nb_nfw_archive_create {synth_flags} {
     lappend NFW_FILES
 
     # FIXME: Add output bitstream to .nfw archive
-    lappend SYNTH_FLAGS(NFW_FILES) [list $SYNTH_FLAGS(OUTPUT).bit $SYNTH_FLAGS(FPGA).bit]
+    if {[file exists $SYNTH_FLAGS(OUTPUT).bit]} {
+        lappend SYNTH_FLAGS(NFW_FILES) [list $SYNTH_FLAGS(OUTPUT).bit $SYNTH_FLAGS(FPGA).bit]
+    } else {
+        lappend SYNTH_FLAGS(NFW_FILES) [list $SYNTH_FLAGS(OUTPUT).pdi $SYNTH_FLAGS(FPGA).pdi]
+    }
 
     # Copy each file from SYNTH_FLAGS(NFW_FILES) list to temporary directory
     foreach f $SYNTH_FLAGS(NFW_FILES) {
