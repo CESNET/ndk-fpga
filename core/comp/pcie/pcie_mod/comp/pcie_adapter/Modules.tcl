@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 # Paths
+set AXIS_PIPE_BASE "$OFM_PATH/comp/axis_tools/flow/pipe"
 set PCIE_CONV_BASE "$OFM_PATH/comp/pcie/convertors"
 set PCIE_CBLK_BASE "$OFM_PATH/comp/pcie/others/connection_block"
 set PTC_COMP_BASE  "$OFM_PATH/comp/pcie/ptc/comp"
@@ -15,6 +16,7 @@ lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/pcie_meta_pack.vhd"
 
 # Components
+lappend COMPONENTS [ list "AXIS_PIPE"  $AXIS_PIPE_BASE               "FULL" ]
 lappend COMPONENTS [ list "CONN_BLOCK" $PCIE_CBLK_BASE               "FULL" ]
 lappend COMPONENTS [ list "CQ_AXI2MFB" "$PCIE_CONV_BASE/cq_axi2mfb"  "FULL" ]
 lappend COMPONENTS [ list "CC_MFB2AXI" "$PCIE_CONV_BASE/cc_mfb2axi"  "FULL" ]

@@ -16,7 +16,7 @@ use work.pcie_meta_pack.all;
 --                                Description
 -- ============================================================================
 
--- The part of the PCIE_CORE architectures USP and CIPS (Versal) that does not
+-- The part of the PCIE_CORE architectures USP and VERSAL that does not
 -- depend on how the PCIe IP is connected. For each PCIe endpoint it contains
 --
 -- * the PCIE_ADAPTER between the AXI interfaces of the IP and the MFB ports,
@@ -64,6 +64,8 @@ entity PCIE_CORE_AXI_COMMON is
         DTB_NEXT_POINTER  : natural := 0;
         -- Register the configuration extension interface in both directions
         CFG_EXT_REG       : boolean := false;
+        -- Register the RC and RQ AXI interfaces in PCIE_ADAPTER
+        AXI_PIPE_EN       : boolean := false;
 
         -- =====================================================================
         -- Other configuration (see PCIE_CORE)
@@ -235,7 +237,8 @@ begin
             AXI_CCUSER_WIDTH   => AXI_CCUSER_WIDTH,
             AXI_RQUSER_WIDTH   => AXI_RQUSER_WIDTH,
             AXI_RCUSER_WIDTH   => AXI_RCUSER_WIDTH,
-            AXI_STRADDLING     => false
+            AXI_STRADDLING     => false,
+            AXI_PIPE_EN        => AXI_PIPE_EN
         )
         port map (
             PCIE_CLK            => PCIE_CLK(i),

@@ -71,13 +71,33 @@ begin
     -- RQ PCIE Header construction
     -- -------------------------------------------------------------------------
 
-    xilinx_pcie_hdr_gen : if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL") generate
+    xilinx_pcie_hdr_gen : if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
 
         OUT_HEADER <=
                       '0'                        & -- force ECRC
                       IN_ATTRIBUTES              & -- attributes
                       "000"                      & -- transaction class
                       '0'                        & -- requester ID enable
+                      X"0000"                    & -- completer ID
+                      IN_TAG(7 downto 0)         & -- tag
+                      X"00" & IN_VFID            & -- requester ID
+                      '0'                        & -- poisoned request
+                      "000" & IN_REQ_TYPE        & -- request type
+                      IN_DW_CNT                  & -- Dword count
+                      IN_ADDRESS                 & -- address
+                      "00";                        -- address type
+
+    end generate;
+
+    -- PG346, Requester Request Descriptor Fields for Memory, I/O, and Atomic Operation Requests.
+    -- With 10-bit tags, Tag[8] is bit 120 (Requester ID Enable) and Tag[9] is bit 127 (Force ECRC).
+    xilinxv_pcie_hdr_gen : if (DEVICE = "VERSAL") generate
+
+        OUT_HEADER <=
+                      IN_TAG(9)                  & -- force ECRC / TAG_9
+                      IN_ATTRIBUTES              & -- attributes
+                      "000"                      & -- transaction class
+                      IN_TAG(8)                  & -- requester ID enable / TAG_8
                       X"0000"                    & -- completer ID
                       IN_TAG(7 downto 0)         & -- tag
                       X"00" & IN_VFID            & -- requester ID

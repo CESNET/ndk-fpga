@@ -18,7 +18,7 @@ entity PTC_MFB2PCIE_AXI is
         -- =======================================================================
         -- MFB BUS CONFIGURATION:
         -- =======================================================================
-        -- Supported configurations are: (2,1,8,32), (1,1,8,32)
+        -- Supported configurations are: (4,1,8,32), (2,1,8,32), (1,1,8,32)
         MFB_REGIONS      : natural := 2;
         MFB_REGION_SIZE  : natural := 1;
         MFB_BLOCK_SIZE   : natural := 8;
@@ -26,6 +26,8 @@ entity PTC_MFB2PCIE_AXI is
         -- =======================================================================
         -- AXI BUS CONFIGURATION:
         -- =======================================================================
+        -- RQ_USER_WIDTH = 373 for Gen4x16 PCIe - with straddling!
+        -- RQ_USER_WIDTH = 183 for Gen3x16 PCIe - with straddling!
         -- RQ_USER_WIDTH = 137 for Gen3x16 PCIe - with straddling!
         -- RQ_USER_WIDTH = 62  for Gen3x8 PCIe - without straddling!
         -- RQ_USER_WIDTH = 60  for Gen3x8 PCIe - without straddling!
@@ -68,7 +70,15 @@ end entity;
 
 architecture FULL of PTC_MFB2PCIE_AXI is
 
-    constant EOF_POS_WIDTH : natural := log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE);
+    constant EOF_POS_WIDTH  : natural := log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE);
+    -- is_sop_ptr has four positions in a word, the start of region r is position r*4/MFB_REGIONS
+    constant SOP_PTR_STEP   : natural := 4/MFB_REGIONS;
+    -- is_eop_ptr is the last dword of the packet in the word
+    constant EOP_PTR_WIDTH  : natural := log2(MFB_REGIONS) + EOF_POS_WIDTH;
+    -- addr_offset field between the byte enables and is_sop, unused
+    constant ADDR_OFS_WIDTH : natural := tsel(MFB_REGIONS = 4, 16, 4);
+    -- byte enables, addr_offset, is_sop, is_sop_ptr, is_eop, is_eop_ptr
+    constant RQ_USER_USED   : natural := MFB_REGIONS*8 + ADDR_OFS_WIDTH + MFB_REGIONS*(1+2+1+EOP_PTR_WIDTH);
 
     signal s_rx_mfb_eof_pos_arr : slv_array_t(MFB_REGIONS-1 downto 0)(EOF_POS_WIDTH-1 downto 0);
     signal s_rx_mfb_be_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(8-1 downto 0);
@@ -76,33 +86,28 @@ architecture FULL of PTC_MFB2PCIE_AXI is
     signal s_rq_last : std_logic;
     signal s_rq_keep : std_logic_vector(RQ_DATA'length/32-1 downto 0);
 
-    signal s_is_sop      : std_logic_vector(1 downto 0);
-    signal s_is_sop0_ptr : std_logic_vector(1 downto 0);
-    signal s_is_sop1_ptr : std_logic_vector(1 downto 0);
+    -- SOP and EOP slots of the k-th packet starting and ending in the word
+    signal s_is_sop     : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_is_sop_ptr : slv_array_t(MFB_REGIONS-1 downto 0)(2-1 downto 0);
+    signal s_is_eop     : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_is_eop_ptr : slv_array_t(MFB_REGIONS-1 downto 0)(EOP_PTR_WIDTH-1 downto 0);
 
-    signal s_is_eop      : std_logic_vector(1 downto 0);
-    signal s_is_eop0_ptr : std_logic_vector(3 downto 0);
-    signal s_is_eop1_ptr : std_logic_vector(3 downto 0);
-
-    signal s_first_be0 : std_logic_vector(3 downto 0);
-    signal s_last_be0  : std_logic_vector(3 downto 0);
-
-    signal s_first_be1 : std_logic_vector(3 downto 0);
-    signal s_last_be1  : std_logic_vector(3 downto 0);
-
-    signal s_first_be : std_logic_vector(7 downto 0);
-    signal s_last_be  : std_logic_vector(7 downto 0);
+    signal s_first_be : std_logic_vector(MFB_REGIONS*4-1 downto 0);
+    signal s_last_be  : std_logic_vector(MFB_REGIONS*4-1 downto 0);
 
     signal s_rq_user : std_logic_vector(AXI_RQUSER_WIDTH-1 downto 0);
 
 begin
 
-    assert ((MFB_REGIONS = 1 or MFB_REGIONS = 2) and MFB_REGION_SIZE = 1 and MFB_BLOCK_SIZE = 8 and MFB_ITEM_WIDTH = 32)
-        report "PTC_MFB2PCIE_AXI: Unsupported MFB configuration, the allowed are: (2,1,8,32), (1,1,8,32)"
+    assert ((MFB_REGIONS = 1 or MFB_REGIONS = 2 or MFB_REGIONS = 4) and MFB_REGION_SIZE = 1 and MFB_BLOCK_SIZE = 8 and MFB_ITEM_WIDTH = 32)
+        report "PTC_MFB2PCIE_AXI: Unsupported MFB configuration, the allowed are: (4,1,8,32), (2,1,8,32), (1,1,8,32)"
         severity FAILURE;
 
-    assert (AXI_RQUSER_WIDTH = 60 or AXI_RQUSER_WIDTH = 62 or AXI_RQUSER_WIDTH = 137)
-        report "PTC_MFB2PCIE_AXI: Unsupported AXI RQ USER port width, the supported are: 60, 62, 137"
+    assert ((MFB_REGIONS = 1 and (AXI_RQUSER_WIDTH = 60 or AXI_RQUSER_WIDTH = 62))
+            or (MFB_REGIONS = 2 and (AXI_RQUSER_WIDTH = 137 or AXI_RQUSER_WIDTH = 183))
+            or (MFB_REGIONS = 4 and AXI_RQUSER_WIDTH = 373))
+        report "PTC_MFB2PCIE_AXI: Unsupported combination of MFB_REGIONS and AXI_RQUSER_WIDTH, "
+               & "the supported are: 1 and 60 or 62, 2 and 137 or 183, 4 and 373"
         severity FAILURE;
 
     -- --------------------------------------------------------------------------
@@ -112,43 +117,53 @@ begin
     -- is high when is word with end of packet, in straddle mode is not useful
     s_rq_last <= or RX_MFB_EOF;
 
-    two_region_tuser_gen : if (MFB_REGIONS = 2) generate
-        -- create array of end of frame position
-        s_rx_mfb_eof_pos_arr <= slv_array_downto_deser(RX_MFB_EOF_POS, MFB_REGIONS, EOF_POS_WIDTH);
-
-        -- create array of byte enables
-        s_rx_mfb_be_arr <= slv_array_downto_deser(RX_MFB_BE, MFB_REGIONS, 8);
+    straddling_tuser_gen : if (MFB_REGIONS > 1) generate
+        s_rx_mfb_eof_pos_arr <= slv_array_deser(RX_MFB_EOF_POS, MFB_REGIONS);
+        s_rx_mfb_be_arr      <= slv_array_deser(RX_MFB_BE, MFB_REGIONS);
 
         -- keep in straddle mode is not useful therefore, all bits are set to VCC
         s_rq_keep <= (others => '1');
 
-        -- create SOP flags and pointers for AXI
-        s_is_sop(0)   <= or RX_MFB_SOF;
-        s_is_sop(1)   <= and RX_MFB_SOF;
-        s_is_sop0_ptr <= "10" when (RX_MFB_SOF = "10") else "00";
-        s_is_sop1_ptr <= "10";
+        -- The k-th packet starting (ending) in the word takes the k-th SOP (EOP) slot (PG213, PG346).
+        s_sop_eop_pr : process (all)
+            variable sop_slot : natural range 0 to MFB_REGIONS;
+            variable eop_slot : natural range 0 to MFB_REGIONS;
+        begin
+            s_is_sop     <= (others => '0');
+            s_is_sop_ptr <= (others => (others => '0'));
+            s_is_eop     <= (others => '0');
+            s_is_eop_ptr <= (others => (others => '0'));
+            s_first_be   <= (others => '0');
+            s_last_be    <= (others => '0');
+            sop_slot     := 0;
+            eop_slot     := 0;
 
-        -- create EOP flags and pointers for AXI
-        s_is_eop(0)   <= or RX_MFB_EOF;
-        s_is_eop(1)   <= and RX_MFB_EOF;
-        s_is_eop0_ptr <= '1' & s_rx_mfb_eof_pos_arr(1) when (RX_MFB_EOF = "10") else '0' & s_rx_mfb_eof_pos_arr(0);
-        s_is_eop1_ptr <= '1' & s_rx_mfb_eof_pos_arr(1);
+            for r in 0 to MFB_REGIONS-1 loop
+                if (RX_MFB_SOF(r) = '1') then
+                    s_is_sop(sop_slot)     <= '1';
+                    s_is_sop_ptr(sop_slot) <= std_logic_vector(to_unsigned(r*SOP_PTR_STEP, 2));
 
-        -- set byte enables for first packet in word
-        s_first_be0 <= s_rx_mfb_be_arr(0)(3 downto 0) when RX_MFB_SOF(0) = '1' else s_rx_mfb_be_arr(1)(3 downto 0);
-        s_last_be0  <= s_rx_mfb_be_arr(0)(7 downto 4) when RX_MFB_SOF(0) = '1' else s_rx_mfb_be_arr(1)(7 downto 4);
+                    s_first_be(sop_slot*4+3 downto sop_slot*4) <= s_rx_mfb_be_arr(r)(3 downto 0);
+                    s_last_be(sop_slot*4+3 downto sop_slot*4)  <= s_rx_mfb_be_arr(r)(7 downto 4);
 
-        -- set byte enables for second packet in word
-        s_first_be1 <= s_rx_mfb_be_arr(1)(3 downto 0);
-        s_last_be1  <= s_rx_mfb_be_arr(1)(7 downto 4);
+                    sop_slot := sop_slot + 1;
+                end if;
 
-        -- prepare byte enables for request interface
-        s_first_be <= s_first_be1 & s_first_be0;
-        s_last_be  <= s_last_be1 & s_last_be0;
+                if (RX_MFB_EOF(r) = '1') then
+                    s_is_eop(eop_slot)     <= '1';
+                    s_is_eop_ptr(eop_slot) <= std_logic_vector(to_unsigned(r, log2(MFB_REGIONS)))
+                                              & s_rx_mfb_eof_pos_arr(r);
 
-        -- create request user signal
-        s_rq_user <= (AXI_RQUSER_WIDTH-1 downto 36 => '0') & s_is_eop1_ptr & s_is_eop0_ptr & s_is_eop &
-                   s_is_sop1_ptr & s_is_sop0_ptr & s_is_sop & "0000" & s_last_be & s_first_be;
+                    eop_slot := eop_slot + 1;
+                end if;
+            end loop;
+        end process;
+
+        s_rq_user <= (AXI_RQUSER_WIDTH-1 downto RQ_USER_USED => '0')
+                     & slv_array_ser(s_is_eop_ptr) & s_is_eop
+                     & slv_array_ser(s_is_sop_ptr) & s_is_sop
+                     & std_logic_vector(to_unsigned(0, ADDR_OFS_WIDTH))
+                     & s_last_be & s_first_be;
     end generate;
 
     one_region_tuser_gen : if (MFB_REGIONS = 1) generate

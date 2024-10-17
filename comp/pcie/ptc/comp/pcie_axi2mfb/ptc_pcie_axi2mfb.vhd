@@ -32,7 +32,8 @@ entity PTC_PCIE_AXI2MFB is
         -- =======================================================================
         -- MFB BUS CONFIGURATION:
         -- =======================================================================
-        -- Supported configuration is MFB(4,1,4,32) for PCIe on UltraScale+
+        -- Supported configuration is MFB(8,1,4,32) for PCIe on Versal with 1024b Bus
+        -- Supported configuration is MFB(4,1,4,32) for PCIe on UltraScale+  or Versal with 512b Bus
         -- Supported configuration is MFB(2,1,4,32) for PCIe on Virtex 7 Series
         MFB_REGIONS      : natural := 4;
         MFB_REG_SIZE     : natural := 1;
@@ -41,12 +42,13 @@ entity PTC_PCIE_AXI2MFB is
         -- =======================================================================
         -- AXI BUS CONFIGURATION:
         -- =======================================================================
-        -- DATA=512, RC=161 for Gen3x16 PCIe (Virtex UltraScale+) - with straddling!
+        -- DATA=1024, RC=337 for Gen4x16 PCIe (Versal) - with straddling!
+        -- DATA=512, RC=161 for Gen3x16 PCIe (Virtex UltraScale+ or Versal) - with straddling!
         -- DATA=256, RC=70  for Gen3x16 PCIe (Virtex 7 Series) - with straddling!
         AXI_DATA_WIDTH   : natural := 512;
         AXI_RCUSER_WIDTH : natural := 161
 
-    -- UltraScale+ RC user:
+    -- UltraScale+ and Versal RC user:
     -- (
     -- MFB_REGOINS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH/8   -- parity (don't care)
     -- 1                                                          -- disctontinue (error) (don't care)

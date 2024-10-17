@@ -13,14 +13,14 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 -- The Purpose of this component is to convert AXI to MFB bus.
--- Supported are 512b and 256b with and without straddling, but
--- variants with straddling and all 256 variant has not been tested.
+-- Supported are 1024b, 512b and 256b with and without straddling, but
+-- the 256b variants have not been tested.
 entity PCIE_CQ_AXI2MFB is
     generic (
         -- =======================================================================
         -- MFB BUS CONFIGURATION:
         --
-        -- Supported configurations are: (2,1,8,32), (1,1,8,32)
+        -- Supported configurations are: (4,1,8,32), (2,1,8,32), (1,1,8,32)
         -- =======================================================================
 
         MFB_REGIONS       : natural := 2;
@@ -33,16 +33,18 @@ entity PCIE_CQ_AXI2MFB is
         -- =======================================================================
         -- AXI BUS CONFIGURATION:
         --
-        -- CQ_USER_WIDTH = 183 for Gen3x16 PCIe - with straddling and without straddling!
-        -- CQ_USER_WIDTH = 88  for Gen3x8 PCIe - without straddling!
-        -- CQ_USER_WIDTH = 85  for Gen3x8 PCIe - without straddling!
+        -- CQ_USER_WIDTH = 465 for Gen4x16 and Gen5x8 PCIe - with straddling and without straddling!
+        -- CQ_USER_WIDTH = 231 for Gen3x16 PCIe            - with straddling and without straddling!
+        -- CQ_USER_WIDTH = 183 for Gen3x16 PCIe            - with straddling and without straddling!
+        -- CQ_USER_WIDTH = 88  for Gen3x8 PCIe             - without straddling!
+        -- CQ_USER_WIDTH = 85  for Gen3x8 PCIe             - without straddling!
         -- =======================================================================
 
         AXI_CQUSER_WIDTH  : natural := 183;
         AXI_DATA_WIDTH    : natural := MFB_REGIONS*MFB_REGION_WIDTH;
-        -- Straddling is permited only for CQ_USER_WIDTH = 183
+        -- Straddling is permitted only for CQ_USER_WIDTH = 183, 231 or 465
         STRADDLING        : boolean := false;
-        -- Select correct FPGA device: "ULTRASCALE", "VIRTEX7"
+        -- Select correct FPGA device: "VERSAL", "ULTRASCALE", "VIRTEX7"
         DEVICE            : string := "ULTRASCALE"
 
     );
@@ -123,6 +125,19 @@ architecture FULL of PCIE_CQ_AXI2MFB is
 
     constant SOF_POS_WIDTH     : integer := max(1,log2(MFB_REGION_SIZE));
     constant EOP_POS_WIDTH     : integer := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
+    -- Number of is_sop_ptr encodings per MFB region
+    constant SOP_PTR_DIV       : natural := max(1, 4/MFB_REGIONS);
+    constant VERSAL_STRADDLING : boolean := STRADDLING and
+                                            (AXI_CQUSER_WIDTH = 231 or AXI_CQUSER_WIDTH = 465);
+
+    -- ========================================================================
+    -- Functions
+    -- ========================================================================
+
+    function sop_ptr_region (ptr : std_logic_vector(2-1 downto 0)) return natural is
+    begin
+        return to_integer(unsigned(ptr)) / SOP_PTR_DIV;
+    end function;
 
     -- ========================================================================
     -- Signals
@@ -139,9 +154,9 @@ architecture FULL of PCIE_CQ_AXI2MFB is
 
     -- RX AXI TUSER division
     signal cq_axi_user_sop         : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal cq_axi_user_sop_ptr     : slv_array_t(MFB_REGIONS-1 downto 0)(2-1 downto 0);
+    signal cq_axi_user_sop_ptr     : slv_array_t(MFB_REGIONS-1 downto 0)(2-1 downto 0) := (others => (others => '0'));
     signal cq_axi_user_eop         : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal cq_axi_user_eop_ptr     : slv_array_t(MFB_REGIONS-1 downto 0)(4-1 downto 0);
+    signal cq_axi_user_eop_ptr     : slv_array_t(MFB_REGIONS-1 downto 0)(5-1 downto 0);
     signal cq_axi_user_tph_present : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal cq_axi_user_tph_type    : std_logic_vector(MFB_REGIONS*2-1 downto 0);
     signal cq_axi_user_tph_st_tag  : std_logic_vector(MFB_REGIONS*8-1 downto 0);
@@ -152,8 +167,14 @@ architecture FULL of PCIE_CQ_AXI2MFB is
 begin
     assert ((MFB_REGIONS = 1 and (AXI_CQUSER_WIDTH = 85 or AXI_CQUSER_WIDTH = 88) and not STRADDLING)
             or (MFB_REGIONS = 2 and AXI_CQUSER_WIDTH = 183 and STRADDLING)
-            or (MFB_REGIONS = 2 and AXI_CQUSER_WIDTH = 183 and not STRADDLING))
-        report "PCIE_CQ_AXI2MFB: Unsupported AXI CQ USER port width, the supported are: 85 (MFB_REGIONS = 1), 88 (MFB_REGIONS = 1), 183 (MFB_REGIONS = 2)"
+            or (MFB_REGIONS = 2 and AXI_CQUSER_WIDTH = 183 and not STRADDLING)
+            or (MFB_REGIONS = 2 and AXI_CQUSER_WIDTH = 231 and STRADDLING)
+            or (MFB_REGIONS = 2 and AXI_CQUSER_WIDTH = 231 and not STRADDLING)
+            or (MFB_REGIONS = 4 and AXI_CQUSER_WIDTH = 465 and STRADDLING)
+            or (MFB_REGIONS = 4 and AXI_CQUSER_WIDTH = 465 and not STRADDLING))
+        report "PCIE_CQ_AXI2MFB: Unsupported AXI CQ USER port width, the supported are: " &
+               "85 (MFB_REGIONS = 1), 88 (MFB_REGIONS = 1), 183 (MFB_REGIONS = 2), " &
+               "231 (MFB_REGIONS = 2), 465 (MFB_REGIONS = 4)"
         severity FAILURE;
 
     -- =========================================================================
@@ -168,49 +189,33 @@ begin
         cq_axi_user_lbe        <= CQ_AXI_USER(8-1 downto 4);
 
         conv_256_pr : process (all)
-            variable eof_pos   : unsigned(3-1 downto 0) := (others => '0');
-            variable eof       : std_logic_vector(1 downto 0);
         begin
-            eof_pos        := (others => '0');
             CQ_TPH_PRESENT <= (others => '0');
             CQ_TPH_TYPE    <= (others => '0');
             CQ_TPH_ST_TAG  <= (others => '0');
-            CQ_MFB_EOF_POS <= (others => '0');
 
             if (cq_axi_user_sop(0) = '1') then
                 CQ_TPH_PRESENT(0) <= CQ_AXI_USER(42);
                 CQ_TPH_TYPE       <= CQ_AXI_USER(44 downto 43);
                 CQ_TPH_ST_TAG     <= CQ_AXI_USER(52 downto 45);
             end if;
-
-            if (CQ_AXI_LAST = '1') then
-
-                for i in 0 to ((AXI_DATA_WIDTH/32)-1) loop
-                    exit when (CQ_AXI_KEEP(i) = '0');
-                    eof_pos := eof_pos + 1;
-                end loop;
-
-                CQ_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0) <= std_logic_vector((eof_pos-1));
-            end if;
-
         end process;
 
         CQ_MFB_SOF     <= cq_axi_user_sop;
         CQ_MFB_SOF_POS <= (others => '0');
-        CQ_MFB_EOF(0)  <= CQ_AXI_LAST;
     end generate;
 
     -- =========================================================================
     -- Conversion AXI to MFB for ULTRASCALE 512b variant with straddling
     -- =========================================================================
 
-    axi_512b_g: if (AXI_CQUSER_WIDTH = 183 and STRADDLING) generate
-        cq_axi_user_sop         <= CQ_AXI_USER(81 downto 80);
-        cq_axi_user_sop_ptr(0)  <= CQ_AXI_USER(83 downto 82);
-        cq_axi_user_sop_ptr(1)  <= CQ_AXI_USER(85 downto 84);
-        cq_axi_user_eop         <= CQ_AXI_USER(87 downto 86);
-        cq_axi_user_eop_ptr(0)  <= CQ_AXI_USER(91 downto 88);
-        cq_axi_user_eop_ptr(1)  <= CQ_AXI_USER(95 downto 92);
+    axi_usp_512b_g: if (AXI_CQUSER_WIDTH = 183 and STRADDLING) generate
+        cq_axi_user_sop         <=       CQ_AXI_USER(81 downto 80);
+        cq_axi_user_sop_ptr(0)  <=       CQ_AXI_USER(83 downto 82);
+        cq_axi_user_sop_ptr(1)  <=       CQ_AXI_USER(85 downto 84);
+        cq_axi_user_eop         <=       CQ_AXI_USER(87 downto 86);
+        cq_axi_user_eop_ptr(0)  <= '0' & CQ_AXI_USER(91 downto 88);
+        cq_axi_user_eop_ptr(1)  <= '0' & CQ_AXI_USER(95 downto 92);
 
         -- conversion process
         sop_eop_sof_eof_conv_pr : process (all)
@@ -269,10 +274,68 @@ begin
     end generate;
 
     -- =========================================================================
+    -- Conversion AXI to MFB for VERSAL 512b and 1024b variants with straddling
+    --
+    -- See PG346, Completer Request Interface, tables of the CQ tuser signals.
+    -- The is_sopN_ptr selects a byte lane of the start (512b: 00 = lane 0,
+    -- 10 = lane 32; 1024b: 00, 01, 10, 11 = lane 0, 32, 64, 96), i.e. a 256b
+    -- MFB region. The is_eopN_ptr is the offset of the last dword of the TLP.
+    -- =========================================================================
+
+    axi_versal_straddling_g: if VERSAL_STRADDLING generate
+        constant IS_1024B      : boolean := (AXI_CQUSER_WIDTH = 465);
+        constant SOP_LSB       : natural := tsel(IS_1024B, 160, 80);
+        constant SOP_PTR_LSB   : natural := SOP_LSB + MFB_REGIONS;
+        constant EOP_LSB       : natural := tsel(IS_1024B, 172, 86);
+        constant EOP_PTR_LSB   : natural := EOP_LSB + MFB_REGIONS;
+        constant EOP_PTR_WIDTH : natural := tsel(IS_1024B, 5, 4);
+        constant EP_PAD        : std_logic_vector(5-EOP_PTR_WIDTH-1 downto 0) := (others => '0');
+    begin
+        cq_axi_user_sop <= CQ_AXI_USER(SOP_LSB+MFB_REGIONS-1 downto SOP_LSB);
+        cq_axi_user_eop <= CQ_AXI_USER(EOP_LSB+MFB_REGIONS-1 downto EOP_LSB);
+
+        user_ptr_g : for i in 0 to MFB_REGIONS-1 generate
+            constant SP_LSB : natural := SOP_PTR_LSB + i*2;
+            constant EP_LSB : natural := EOP_PTR_LSB + i*EOP_PTR_WIDTH;
+        begin
+            cq_axi_user_sop_ptr(i) <= CQ_AXI_USER(SP_LSB+2-1 downto SP_LSB);
+            cq_axi_user_eop_ptr(i) <= EP_PAD & CQ_AXI_USER(EP_LSB+EOP_PTR_WIDTH-1 downto EP_LSB);
+        end generate;
+
+        sop_eop_sof_eof_conv_pr : process (all)
+            variable region  : natural range 0 to MFB_REGIONS-1;
+            variable eof_pos : slv_array_t(MFB_REGIONS-1 downto 0)(EOP_POS_WIDTH-1 downto 0);
+        begin
+            CQ_MFB_SOF     <= (others => '0');
+            CQ_MFB_EOF     <= (others => '0');
+            CQ_MFB_SOF_POS <= (others => '0');
+            CQ_TPH_PRESENT <= (others => '0');
+            CQ_TPH_TYPE    <= (others => '0');
+            CQ_TPH_ST_TAG  <= (others => '0');
+            eof_pos        := (others => (others => '0'));
+
+            for i in 0 to MFB_REGIONS-1 loop
+                if (cq_axi_user_sop(i) = '1') then
+                    region             := sop_ptr_region(cq_axi_user_sop_ptr(i));
+                    CQ_MFB_SOF(region) <= '1';
+                end if;
+
+                if (cq_axi_user_eop(i) = '1') then
+                    region             := to_integer(unsigned(cq_axi_user_eop_ptr(i))) / 8;
+                    CQ_MFB_EOF(region) <= '1';
+                    eof_pos(region)    := cq_axi_user_eop_ptr(i)(EOP_POS_WIDTH-1 downto 0);
+                end if;
+            end loop;
+
+            CQ_MFB_EOF_POS <= slv_array_ser(eof_pos);
+        end process;
+    end generate;
+
+    -- =========================================================================
     -- Conversion AXI to MFB for ULTRASCALE 512b variant
     -- =========================================================================
 
-    axi_512b_no_straddling_g: if (AXI_CQUSER_WIDTH = 183 and not STRADDLING) generate
+    axi_usp_512b_no_straddling_g: if (AXI_CQUSER_WIDTH = 183 and not STRADDLING) generate
         cq_axi_user_tph_present <= CQ_AXI_USER(99-1 downto 97);
         cq_axi_user_tph_type    <= CQ_AXI_USER(103-1 downto 99);
         cq_axi_user_tph_st_tag  <= CQ_AXI_USER(119-1 downto 103);
@@ -284,48 +347,107 @@ begin
         cq_axi_user_lbe         <= "0000" & CQ_AXI_USER(12-1 downto 8);
 
         conv_pr : process (all)
-            variable eof_pos : unsigned(3-1 downto 0) := (others => '0');
-            variable eof     : std_logic_vector(1 downto 0);
         begin
-            eof_pos        := (others => '0');
-            eof            := (others => '0');
             CQ_TPH_PRESENT <= (others => '0');
             CQ_TPH_TYPE    <= (others => '0');
             CQ_TPH_ST_TAG  <= (others => '0');
-            CQ_MFB_EOF     <= (others => '0');
-            CQ_MFB_EOF_POS <= (others => '0');
 
             if (CQ_AXI_USER(80) = '1') then
                 CQ_TPH_PRESENT <= cq_axi_user_tph_present;
                 CQ_TPH_TYPE    <= cq_axi_user_tph_type;
                 CQ_TPH_ST_TAG  <= cq_axi_user_tph_st_tag;
             end if;
-            if (CQ_AXI_LAST = '1') then
+        end process;
+    end generate;
 
-                for i in 0 to ((AXI_DATA_WIDTH/32)/2-1) loop
-                    if ((CQ_AXI_KEEP(i) = '1' and not (CQ_AXI_KEEP(i+1) = '0')) or (CQ_AXI_KEEP(i) = '1' and unsigned(CQ_AXI_KEEP) = 1)) then
-                        eof(0) := '1';
-                    end if;
-                    if (CQ_AXI_KEEP(i+1) = '1' and i = ((AXI_DATA_WIDTH/32)/2-1)) then
-                        eof(0) := '0';
-                        eof(1) := '1';
-                    end if;
-                    exit when (CQ_AXI_KEEP(i) = '0');
-                    eof_pos := eof_pos + 1;
-                end loop;
+    -- =========================================================================
+    -- Conversion AXI to MFB for VERSAL 512b variant
+    -- =========================================================================
 
-                CQ_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0) <= std_logic_vector((eof_pos-1));
-                eof_pos                                  := (others => '0');
+    axi_versal_512b_no_straddling_g: if (AXI_CQUSER_WIDTH = 231 and not STRADDLING) generate
+        cq_axi_user_sop(0)      <= CQ_AXI_USER(80);
+        cq_axi_user_sop(1)      <= '0';
+        CQ_MFB_SOF              <= cq_axi_user_sop;
+        CQ_MFB_SOF_POS          <= (others => '0');
+        cq_axi_user_fbe         <= "0000" & CQ_AXI_USER(4-1 downto 0);
+        cq_axi_user_lbe         <= "0000" & CQ_AXI_USER(12-1 downto 8);
+        CQ_TPH_PRESENT          <= (others => '0');
+        CQ_TPH_TYPE             <= (others => '0');
+        CQ_TPH_ST_TAG           <= (others => '0');
+    end generate;
 
-                -- Check keep in second region
-                for i in (AXI_DATA_WIDTH/32)/2 to ((AXI_DATA_WIDTH/32)-1) loop
-                    exit when (CQ_AXI_KEEP(i) = '0');
-                    eof_pos := eof_pos + 1;
-                end loop;
+    -- =========================================================================
+    -- Conversion AXI to MFB for VERSAL 1024b variant
+    -- =========================================================================
 
-                CQ_MFB_EOF_POS(2*EOP_POS_WIDTH-1 downto EOP_POS_WIDTH) <= std_logic_vector((eof_pos-1));
-                CQ_MFB_EOF                                             <= eof;
+    axi_1024b_no_straddling_g: if (AXI_CQUSER_WIDTH = 465 and not STRADDLING) generate
+        cq_axi_user_sop(0)      <= CQ_AXI_USER(160);
+        cq_axi_user_sop(1)      <= '0';
+        cq_axi_user_sop(2)      <= '0';
+        cq_axi_user_sop(3)      <= '0';
+        CQ_MFB_SOF_POS          <= (others => '0');
+        cq_axi_user_fbe         <= "0000" & "0000" & "0000" & CQ_AXI_USER(132-1 downto 128);
+        cq_axi_user_lbe         <= "0000" & "0000" & "0000" & CQ_AXI_USER(148-1 downto 144);
+
+        cq_axi_user_sop_ptr(0)  <= CQ_AXI_USER(166 -  1 downto 164);
+
+        conv_pr : process (all)
+            variable ptr_sop : integer := 0;
+        begin
+            CQ_TPH_PRESENT <= (others => '0');
+            CQ_TPH_TYPE    <= (others => '0');
+            CQ_TPH_ST_TAG  <= (others => '0');
+            CQ_MFB_SOF     <= (others => '0');
+
+            case cq_axi_user_sop_ptr(0) is
+                when "00"   => ptr_sop := 0;
+                when "01"   => ptr_sop := 1;
+                when "10"   => ptr_sop := 2;
+                when "11"   => ptr_sop := 3;
+                when others => ptr_sop := 0;
+            end case;
+
+            if (cq_axi_user_sop(0) = '1') then
+                CQ_MFB_SOF(ptr_sop) <= '1';
             end if;
+        end process;
+    end generate;
+
+    -- =========================================================================
+    -- EOF and EOF_POS of all variants without straddling
+    --
+    -- The frame ends in the last region with a valid dword.
+    -- =========================================================================
+
+    no_straddling_eof_g : if not STRADDLING generate
+        constant REGION_DWORDS : natural := AXI_DATA_WIDTH/32/MFB_REGIONS;
+    begin
+        assert ((AXI_DATA_WIDTH/32) mod MFB_REGIONS = 0)
+            report "PCIE_CQ_AXI2MFB: AXI_DATA_WIDTH/32 must be divisible by MFB_REGIONS!"
+            severity failure;
+
+        eof_pr : process (all)
+            -- The extra invalid dword ends the frame in the last region.
+            variable keep    : std_logic_vector(AXI_DATA_WIDTH/32 downto 0);
+            variable eof_pos : slv_array_t(MFB_REGIONS-1 downto 0)(EOP_POS_WIDTH-1 downto 0);
+        begin
+            keep    := '0' & CQ_AXI_KEEP;
+            eof_pos := (others => (others => '0'));
+
+            CQ_MFB_EOF <= (others => '0');
+
+            if (CQ_AXI_LAST = '1') then
+                for r in 0 to MFB_REGIONS-1 loop
+                    CQ_MFB_EOF(r) <= keep(r*REGION_DWORDS) and not keep((r+1)*REGION_DWORDS);
+                    for i in 0 to REGION_DWORDS-1 loop
+                        if (keep(r*REGION_DWORDS+i) = '1') then
+                            eof_pos(r) := std_logic_vector(to_unsigned(i, EOP_POS_WIDTH));
+                        end if;
+                    end loop;
+                end loop;
+            end if;
+
+            CQ_MFB_EOF_POS <= slv_array_ser(eof_pos);
         end process;
     end generate;
 
@@ -335,24 +457,28 @@ begin
     -- It's defined for STRADDLING and non STRADDLING operation
     -- =========================================================================
 
-    axi_straddling_g: if MFB_REGIONS = 2 generate
+    axi_straddling_g: if MFB_REGIONS > 1 generate
+        constant FBE_LSB : natural := tsel(AXI_CQUSER_WIDTH = 465, 128, 0);
+        constant LBE_LSB : natural := FBE_LSB + MFB_REGIONS*4;
+    begin
+        -- The first_be and last_be fields belong to the N-th TLP starting in the word.
         fbe_lbe_str_pr : process (all)
+            variable region : natural range 0 to MFB_REGIONS-1;
+            variable fbe    : natural;
+            variable lbe    : natural;
         begin
             CQ_FBE <= (others => '0');
             CQ_LBE <= (others => '0');
 
-            if (cq_axi_user_sop = "11") then
-                CQ_FBE <= CQ_AXI_USER(8-1 downto 0);
-                CQ_LBE <= CQ_AXI_USER(16-1 downto 8);
-            elsif (cq_axi_user_sop = "01") then
-                if (cq_axi_user_sop_ptr(0) = "10") then
-                    CQ_FBE <= CQ_AXI_USER(4-1 downto 0) & "0000";
-                    CQ_LBE <= CQ_AXI_USER(12-1 downto 8) & "0000";
-                else
-                    CQ_FBE <= "0000" & CQ_AXI_USER(4-1 downto 0);
-                    CQ_LBE <= "0000" & CQ_AXI_USER(12-1 downto 8);
+            for i in 0 to MFB_REGIONS-1 loop
+                if (cq_axi_user_sop(i) = '1') then
+                    region                             := sop_ptr_region(cq_axi_user_sop_ptr(i));
+                    fbe                                := FBE_LSB + i*4;
+                    lbe                                := LBE_LSB + i*4;
+                    CQ_FBE(region*4+3 downto region*4) <= CQ_AXI_USER(fbe+3 downto fbe);
+                    CQ_LBE(region*4+3 downto region*4) <= CQ_AXI_USER(lbe+3 downto lbe);
                 end if;
-            end if;
+            end loop;
         end process;
     else generate
         CQ_FBE <= cq_axi_user_fbe when cq_axi_user_sop(0) = '1' else (others => '0');

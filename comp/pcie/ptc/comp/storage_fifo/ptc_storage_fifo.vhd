@@ -122,6 +122,8 @@ architecture FULL of PTC_STORAGE_FIFO is
     constant SOF_POS_WIDTH     : integer := max(1,log2(MFB_REG_SIZE));
     constant EOF_POS_WIDTH     : integer := max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE));
 
+    constant FIFO_RAM_TYPE : string := tsel(DEVICE = "VERSAL", "URAM", "AUTO");
+
     ---------------------------------------------------------------------------
 
     ---------------------------------------------------------------------------
@@ -211,7 +213,7 @@ begin
         ITEM_WIDTH          => MFB_ITEM_WIDTH,
         META_WIDTH          => 0,
         FIFO_DEPTH          => MAIN_FIFO_ITEMS,
-        RAM_TYPE            => "AUTO",
+        RAM_TYPE            => FIFO_RAM_TYPE,
         DEVICE              => DEVICE,
         ALMOST_FULL_OFFSET  => 1,
         ALMOST_EMPTY_OFFSET => 1

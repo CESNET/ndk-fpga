@@ -376,13 +376,14 @@ architecture FULL of FPGA_COMMON is
     constant PCIE_MPS     : natural := 256;
     constant PCIE_MRRS    : natural := 512;
 
-    constant IS_USP_PCIE_EP : boolean := (PCIE_ENDPOINT_TYPE = "USP" or PCIE_ENDPOINT_TYPE = "USP_PCIE4" or PCIE_ENDPOINT_TYPE = "USP_PCIE4C");
+    constant IS_USP_PCIE_EP    : boolean := (PCIE_ENDPOINT_TYPE = "USP" or PCIE_ENDPOINT_TYPE = "USP_PCIE4" or PCIE_ENDPOINT_TYPE = "USP_PCIE4C");
+    constant IS_VERSAL_PCIE_EP : boolean := (PCIE_ENDPOINT_TYPE = "VERSAL");
 
     constant RESET_WIDTH       : natural := 10;
-    constant TS_MULT_SMART_DSP : boolean := (DEVICE = "ULTRASCALE");
+    constant TS_MULT_SMART_DSP : boolean := (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL");
     constant TS_MULT_USE_DSP   : boolean := (DEVICE = "AGILEX" or DEVICE = "STRATIX10");
 
-    constant FPGA_ID_WIDTH : natural := tsel(DEVICE = "ULTRASCALE", 96, 64);
+    constant FPGA_ID_WIDTH : natural := tsel(DEVICE = "ULTRASCALE" or DEVICE = "VERSAL", 96, 64);
 
     constant MI_DATA_WIDTH      : integer := 32;
     constant MI_ADDR_WIDTH      : integer := 32;
@@ -435,13 +436,36 @@ architecture FULL of FPGA_COMMON is
             end if;
         end if;
 
+        if (IS_VERSAL_PCIE_EP = True) then
+            assert (PCIE_ENDPOINT_MODE = 0 and (PCIE_GEN = 3 or PCIE_GEN = 4))
+                or (PCIE_ENDPOINT_MODE = 1 and PCIE_GEN = 5)
+                report "FPGA_COMMON: Versal PCIe supports only Gen3x16, Gen4x16 " &
+                       "(PCIE_ENDPOINT_MODE = 0) and Gen5x8x8 (PCIE_ENDPOINT_MODE = 1)!"
+                severity failure;
+            if (PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 3) then    -- gen3x16
+                pcie_mfb_regions := 2;                           -- 2x256b AXI
+            elsif (PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 4) then -- gen4x16
+                pcie_mfb_regions := 4;                           -- 4x256b AXI
+            elsif (PCIE_ENDPOINT_MODE = 1 and PCIE_GEN = 5) then -- gen5x8x8
+                pcie_mfb_regions := 4;                           -- 4x256b AXI
+            end if;
+            -- VERSAL RC supports up to 4/8 TLPs in a word
+            if (PCIE_DIR = "RC") then
+                pcie_mfb_regions := pcie_mfb_regions*2;
+            end if;
+        end if;
+
         -- PTC conversion to DMA streams for DMA_TYPE=3
         if ((PCIE_DIR = "RQ" or PCIE_DIR = "RC") and PTC_ENABLE) then
             if (PCIE_ENDPOINT_TYPE = "P_TILE" and PCIE_ENDPOINT_MODE = 1) then
                 -- 256b@~500MHz PCIe stream to 512b@200MHz PTC-DMA stream
                 pcie_mfb_regions := pcie_mfb_regions*2;
             end if;
-            if (PCIE_ENDPOINT_TYPE = "R_TILE" and PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 5) then -- TODO
+            if (PCIE_ENDPOINT_TYPE = "R_TILE" and PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 5) then                               -- TODO
+                -- 1024b@~250MHz PCIe stream to 512b@200MHz PTC-DMA stream
+                pcie_mfb_regions := pcie_mfb_regions/2;
+            end if;
+            if (PCIE_ENDPOINT_TYPE = "VERSAL" and (PCIE_ENDPOINT_MODE = 0 or PCIE_ENDPOINT_MODE = 1) and (PCIE_GEN > 3)) then -- TODO
                 -- 1024b@~250MHz PCIe stream to 512b@200MHz PTC-DMA stream
                 pcie_mfb_regions := pcie_mfb_regions/2;
             end if;
@@ -469,7 +493,7 @@ architecture FULL of FPGA_COMMON is
     -- DMA MFB RC parameters
     constant DMA_RC_MFB_REGIONS     : natural := pcie_mfb_regions_calc_f("RC");
     constant DMA_RC_MFB_REGION_SIZE : natural := 1;
-    constant DMA_RC_MFB_BLOCK_SIZE  : natural := tsel(IS_USP_PCIE_EP,4,8);
+    constant DMA_RC_MFB_BLOCK_SIZE  : natural := tsel(IS_USP_PCIE_EP or IS_VERSAL_PCIE_EP,4,8);
     constant DMA_RC_MFB_ITEM_WIDTH  : natural := 32;
 
     constant DMA_CQ_MFB_REGIONS     : natural := pcie_mfb_regions_calc_f("CQ");
@@ -1277,7 +1301,7 @@ begin
         XILINX_DNA_VLD  => xilinx_dna_vld
     );
 
-    fpga_id_usp_g: if (DEVICE = "ULTRASCALE") generate
+    fpga_id_usp_g: if (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL") generate
         fpga_id     <= xilinx_dna;
         fpga_id_vld <= xilinx_dna_vld;
     end generate;
