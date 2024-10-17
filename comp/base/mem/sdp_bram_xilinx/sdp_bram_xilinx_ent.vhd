@@ -21,7 +21,7 @@ use IEEE.std_logic_unsigned.all;
 --! \brief Entity of simple dual port Xilinx BRAM declaration
 entity SDP_BRAM_XILINX is
     generic (
-        --! Select target device "VIRTEX5", "VIRTEX6", "7SERIES", "SPARTAN6", "ULTRASCALE".
+        --! Select target device "VIRTEX5", "VIRTEX6", "7SERIES", "SPARTAN6", "ULTRASCALE", "VERSAL".
         DEVICE : string := "ULTRASCALE";
 
         --! A read operation is implicitly performed to address ADDR[B] combinatorially,
@@ -43,7 +43,7 @@ entity SDP_BRAM_XILINX is
         ENABLE_OUT_REG : boolean := true;
 
         --! Clocking mode: "common_clock" (sync), "independent_clock" (async).
-        --! - Only for ULTRASCALE devices (DEVICE = "ULTRASCALE")!
+        --! - Only for ULTRASCALE and VERSAL devices (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL")!
         --! - When the attribute “CLOCKING_MODE” is set to “common_clock”, all read/write operations
         --! - to memory through port A and port B are performed on CLKA. If this attribute is set to
         --! - “independent_clock”, then read/write operations through port A are performed based on
@@ -51,7 +51,7 @@ entity SDP_BRAM_XILINX is
         CLOCKING_MODE  : string := "common_clock";
 
         --! Block RAM type, 18Kb or 36Kb blocks.
-        --! - Only for non ULTRASCALE devices (DEVICE /= "ULTRASCALE")!
+        --! - Only for non ULTRASCALE and non VERSAL devices (DEVICE /= "ULTRASCALE" and DEVICE /= "VERSAL")!
         BRAM_TYPE         : integer := 36;
         --! Enable check write before read. For more info check *.psl file
         PSL_WR_BEFFORE_RD : boolean := true

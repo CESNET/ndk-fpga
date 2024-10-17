@@ -53,16 +53,16 @@ entity TCAM2 is
         USE_FRAGMENTED_MEM : boolean := false;
 
         -- FPGA device
-        --    available are "7SERIES", "ULTRASCALE", "ARRIA10", "STRATIX10", "AGILEX"
+        --    available are "7SERIES", "ULTRASCALE", "VERSAL", "ARRIA10", "STRATIX10", "AGILEX"
         DEVICE             : string  := "ULTRASCALE";
 
         -- Manufacturer of FPGA device
-        IS_XILINX          : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE");
+        IS_XILINX          : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE" or DEVICE = "VERSAL");
         IS_INTEL           : boolean := (DEVICE = "ARRIA10" or DEVICE = "STRATIX10" or DEVICE = "AGILEX");
 
         -- Optimal parameters by FPGA device
         INTEL_DATA_WIDTH   : integer := tsel(USE_FRAGMENTED_MEM, 20, 16);
-        XILINX_DATA_WIDTH  : integer := tsel(DEVICE = "ULTRASCALE", tsel(USE_FRAGMENTED_MEM, 14, 8), tsel(USE_FRAGMENTED_MEM, 6, 4));
+        XILINX_DATA_WIDTH  : integer := tsel(DEVICE = "ULTRASCALE" or DEVICE = "VERSAL", tsel(USE_FRAGMENTED_MEM, 14, 8), tsel(USE_FRAGMENTED_MEM, 6, 4));
         MEMORY_ADDR_WIDTH  : integer := 5;
         MEMORY_DATA_WIDTH  : integer := tsel(IS_XILINX, XILINX_DATA_WIDTH, INTEL_DATA_WIDTH);
         ALIGNED_DATA_WIDTH : integer := 2**log2(MEMORY_DATA_WIDTH);

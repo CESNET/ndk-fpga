@@ -45,7 +45,7 @@ begin
     --! Code for non ULTRASCALE devices.
     --! Based on BRAM_TDP_MACRO, for more details see UG768 (Xilinx 7 Series FPGA
     --! and Zynq-7000 All Programmable SoC Libraries Guide for HDL Designs).
-    nonus_gen : if DEVICE /= "ULTRASCALE" generate
+    nonus_gen : if DEVICE /= "ULTRASCALE" and DEVICE /= "VERSAL" generate
 
         --! Constants -----------------------------------------------------------
         --! The number of rows of the BRAM.
@@ -371,10 +371,10 @@ begin
         end generate;
     end generate;
 
-    --! Code for ULTRASCALE devices.
+    --! Code for ULTRASCALE and VERSAL devices.
     --! Based on XPM_MEMORY_TDPRAM macro, for more details
     --! see UG974 (UltraScale Architecture Libraries Guide).
-    us_gen : if DEVICE = "ULTRASCALE" generate
+    us_gen : if DEVICE = "ULTRASCALE" or DEVICE = "VERSAL" generate
 
         --! Deleyed validity signal for readed data.
         signal reg_data_a_vld_d  : std_logic;

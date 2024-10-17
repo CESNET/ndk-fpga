@@ -15,7 +15,7 @@ use IEEE.numeric_std.all;
 -- The Purpose of this component is to fill PCIE RQ header.
 entity PCIE_RQ_HDR_GEN is
     generic (
-        -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE"
+        -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE", "VERSAL"
         DEVICE        : string  := "STRATIX10"
     );
     port (
@@ -63,7 +63,7 @@ architecture FULL of PCIE_RQ_HDR_GEN is
 
 begin
 
-    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL")
         report "PCIE_RQ_HDR_GEN: unsupported device!"
         severity failure;
 
@@ -71,7 +71,7 @@ begin
     -- RQ PCIE Header construction
     -- -------------------------------------------------------------------------
 
-    xilinx_pcie_hdr_gen : if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
+    xilinx_pcie_hdr_gen : if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL") generate
 
         OUT_HEADER <=
                       '0'                        & -- force ECRC

@@ -70,7 +70,7 @@ architecture FULL of PTC_PCIE2DMA_HDR_TRANSFORM is
 
 begin
 
-    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL")
         report "PTC_PCIE2DMA_HDR_TRANSFORM: unsupported device!"
         severity failure;
 

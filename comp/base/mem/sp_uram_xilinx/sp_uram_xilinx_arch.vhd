@@ -96,7 +96,7 @@ architecture SP_URAM_XILINX_ARCH of SP_URAM_XILINX is
 begin
 
     -- Macro instantiation
-    macro_gen : if (DEVICE = "ULTRASCALE") generate
+    macro_gen : if (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL") generate
         macro_mem_inst: component xpm_memory_spram
         generic map (
             MEMORY_SIZE          => 2**ADDRESS_WIDTH*DATA_WIDTH,

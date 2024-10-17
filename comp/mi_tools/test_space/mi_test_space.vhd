@@ -10,7 +10,7 @@ use IEEE.numeric_std.all;
 
 entity MI_TEST_SPACE is
     generic (
-        -- Supported devices: AGILEX, STRATIX10, ULTRASCALE, 7SERIES
+        -- Supported devices: AGILEX, STRATIX10, ULTRASCALE, 7SERIES, VERSAL
         DEVICE  : string := "ULTRASCALE"
     );
     port (
@@ -48,7 +48,7 @@ architecture FULL of MI_TEST_SPACE is
 
 begin
 
-    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL")
         report "MI_TEST_SPACE: unsupported device!"
         severity failure;
 
@@ -83,7 +83,7 @@ begin
         MI_DRD(32-1 downto 24) <= rd_data(3);
     end generate;
 
-    be_bram_xilinx_g : if DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" generate
+    be_bram_xilinx_g : if DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL" generate
         bram_xilinx_p : process (CLK)
         begin
             if (rising_edge(CLK)) then

@@ -15,7 +15,7 @@ use IEEE.numeric_std.all;
 -- The Purpose of this component is to deparse PCIE CQ header.
 entity PCIE_CQ_HDR_DEPARSER is
     generic (
-        -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE"
+        -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE", "VERSAL"
         DEVICE       : string  := "STRATIX10";
         -- width of CQ user word in bits (Supported value are 88, 85 and 183)
         CQUSER_WIDTH : natural := 183
@@ -87,7 +87,7 @@ architecture FULL of PCIE_CQ_HDR_DEPARSER is
     signal cq_addr64 : std_logic_vector(62-1 downto 0);
 begin
 
-    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL")
         report "PCIE_CQ_HDR_DEPARSER: unsupported device!"
         severity failure;
 
@@ -95,7 +95,7 @@ begin
     -- CQ Header deparsing
     -- -------------------------------------------------------------------------
 
-    cq_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
+    cq_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL") generate
         OUT_ADDRESS_TYPE <= IN_HEADER(1 downto 0);
         OUT_ADDRESS      <= IN_HEADER(63 downto 2) & "00";
         OUT_DW_CNT       <= IN_HEADER(74 downto 64);

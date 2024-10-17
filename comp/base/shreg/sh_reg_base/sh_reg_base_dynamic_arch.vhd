@@ -33,7 +33,7 @@ architecture SH_REG_DYNAMIC_ARCH of SH_REG_BASE_DYNAMIC is
     -- constants
     constant OPT_THRESHOLD : integer := 16;
 
-    constant DEVICE_HAS_SRL16E : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE");
+    constant DEVICE_HAS_SRL16E : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE" or DEVICE = "VERSAL");
 
 
     -- signals in/out data

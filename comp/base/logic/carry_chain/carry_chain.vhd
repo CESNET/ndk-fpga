@@ -18,7 +18,7 @@ use unisim.vcomponents.all;
 entity CARRY_CHAIN is
     generic (
         CARRY_WIDTH    : integer := 12;
-        DEVICE         : string := "7SERIES" --! "VIRTEX6", "7SERIES", "ULTRASCALE", "none" (behavioral)
+        DEVICE         : string := "7SERIES" --! "VIRTEX6", "7SERIES", "ULTRASCALE", "VERSAL", "none" (behavioral)
     );
     port (
         -- Initial input carry
@@ -55,7 +55,7 @@ architecture STRUCTURAL of CARRY_CHAIN is
 
 begin
 
-    behavioral_gen : if DEVICE /= "7SERIES" and DEVICE /= "VIRTEX6" and DEVICE /= "ULTRASCALE" generate
+    behavioral_gen : if DEVICE /= "7SERIES" and DEVICE /= "VIRTEX6" and DEVICE /= "ULTRASCALE" and DEVICE /= "VERSAL"  generate
     begin
         carry_i : process (CI, DI, S)
             variable sig_co : std_logic_vector(CARRY_WIDTH downto 0) := (others => '0');
@@ -74,7 +74,7 @@ begin
     end generate;
 
 
-    v6_v7_gen : if DEVICE = "7SERIES" or DEVICE = "VIRTEX6" or DEVICE = "ULTRASCALE" generate
+    v6_v7_gen : if DEVICE = "7SERIES" or DEVICE = "VIRTEX6" or DEVICE = "ULTRASCALE" or DEVICE = "VERSAL" generate
         constant CARRY_COUNT : integer := (CARRY_WIDTH-1)/4 + 1;
         signal   sig_do      : std_logic_vector(CARRY_COUNT*4-1 downto 0);
         signal   sig_di      : std_logic_vector(CARRY_COUNT*4-1 downto 0);

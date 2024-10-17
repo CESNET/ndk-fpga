@@ -136,7 +136,7 @@ architecture DP_URAM_XILINX_ARCH of DP_URAM_XILINX is
 
 begin
     -- Genrate UltraRAM using XPM macro
-    macro : if (DEVICE = "ULTRASCALE") generate
+    macro : if (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL") generate
 
         macro_inst : component xpm_memory_tdpram
         generic map (

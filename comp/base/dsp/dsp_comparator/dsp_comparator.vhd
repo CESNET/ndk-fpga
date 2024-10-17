@@ -42,6 +42,7 @@ entity DSP_COMPARATOR is
         -- * "STRATIX10"
         -- * "AGILEX"
         -- * "ULTRASCALE"
+        -- * "VERSAL"
         -- * "7SERIES"
         DEVICE           : string  := "AGILEX"
     );
@@ -67,7 +68,7 @@ architecture FULL of DSP_COMPARATOR is
     -- this function enables the usage of DSP blocks for the comparator
     function use_dsp return boolean is
     begin
-        if ((DEVICE = "STRATIX10") or (DEVICE = "AGILEX") or (DEVICE = "ULTRASCALE") or (DEVICE = "7SERIES")) then
+        if ((DEVICE = "STRATIX10") or (DEVICE = "AGILEX") or (DEVICE = "ULTRASCALE") or (DEVICE = "7SERIES") or (DEVICE = "VERSAL")) then
             return DSP_ENABLE;
         else
             return false;
@@ -76,7 +77,7 @@ architecture FULL of DSP_COMPARATOR is
 
 begin
 
-    device_g : if (((DEVICE = "ULTRASCALE") or (DEVICE = "7SERIES")) and use_dsp) generate
+    device_g : if (((DEVICE = "ULTRASCALE") or (DEVICE = "7SERIES") or (DEVICE = "VERSAL")) and use_dsp) generate
 
         signal cmp_dsp_output        : std_logic_vector(1 downto 0); -- Xilinx cmp result in its format
         signal dsp_comparator_output : std_logic_vector(1 downto 0); -- Xilinx cmp result converted to local format

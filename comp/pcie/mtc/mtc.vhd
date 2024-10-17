@@ -60,7 +60,7 @@ entity MTC is
         MI_DATA_WIDTH     : natural := 32;
         -- MI bus: width of address word in bits, must be 32.
         MI_ADDR_WIDTH     : natural := 32;
-        -- Select correct FPGA device: "ULTRASCALE", "STRATIX10", "AGILEX"
+        -- Select correct FPGA device: "ULTRASCALE", "VERSAL", "STRATIX10", "AGILEX"
         DEVICE            : string := "ULTRASCALE";
         -- Intel PCIe endpoint type:
         ENDPOINT_TYPE     : string := "USP"
@@ -132,7 +132,7 @@ end entity;
 
 architecture FULL of MTC is
 
-    constant IS_XILINX_DEV   : boolean := DEVICE = "ULTRASCALE" or DEVICE = "7SERIES";
+    constant IS_XILINX_DEV   : boolean := DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL";
     constant IS_INTEL_DEV    : boolean := DEVICE = "STRATIX10" or DEVICE = "AGILEX";
     constant IS_MFB_META_DEV : boolean := (ENDPOINT_TYPE = "P_TILE" or ENDPOINT_TYPE = "R_TILE") and IS_INTEL_DEV;
     constant RD_INDEX_BEGIN  : natural := tsel(IS_MFB_META_DEV,0,3);
@@ -335,7 +335,7 @@ architecture FULL of MTC is
     -- attribute mark_debug of cc_fsm_pst : signal is "true";
 begin
 
-    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL")
         report "MTC: unsupported DEVICE!"
         severity failure;
 

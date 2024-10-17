@@ -32,11 +32,11 @@ architecture BEHAV of GEN_NOR_FIXED is
 
 begin
 
-    gen_norg: if DATA_WIDTH <= 6 or (DEVICE /= "ULTRASCALE" and DEVICE /= "7SERIES" and DEVICE /= "VIRTEX6") generate
+    gen_norg: if DATA_WIDTH <= 6 or (DEVICE /= "ULTRASCALE" and DEVICE /= "VERSAL" and DEVICE /= "7SERIES" and DEVICE /= "VIRTEX6") generate
         DO <= nor DI;
     end generate;
 
-    gen_norgg: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VIRTEX6") and DATA_WIDTH > 6 generate
+    gen_norgg: if (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL" or DEVICE = "7SERIES" or DEVICE = "VIRTEX6") and DATA_WIDTH > 6 generate
 
         di_ext(DATA_WIDTH-1 downto 0) <= DI;
 

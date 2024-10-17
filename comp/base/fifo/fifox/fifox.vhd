@@ -77,6 +77,7 @@ entity FIFOX is
         --
         -- - "ULTRASCALE" (Xilinx)
         -- - "7SERIES"    (Xilinx)
+        -- - "VERSAL"     (Xilinx)
         -- - "ARRIA10"    (Intel)
         -- - "STRATIX10"  (Intel)
         -- - "AGILEX"     (Intel)
@@ -199,17 +200,17 @@ architecture BEHAVIORAL of FIFOX is
             return "LUT";
         elsif (RAM_TYPE = "BRAM") then
             return "BRAM";
-        elsif (RAM_TYPE = "URAM" and DEVICE = "ULTRASCALE") then
+        elsif (RAM_TYPE = "URAM" and (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL")) then
             return "URAM";
         elsif (RAM_TYPE = "SHIFT" ) then
             return "SHIFT";
         elsif (RAM_TYPE = "AUTO") then
-            if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") then
+            if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL") then
                 if (ITEMS_INTER <= 16) then
                     return "SHIFT";
                 elsif (ITEMS_INTER <= 64) then
                     return "LUT";
-                elsif ((ITEMS_INTER * DATA_WIDTH) >= 288000 and DATA_WIDTH >= 72 and DEVICE = "ULTRASCALE") then
+                elsif ((ITEMS_INTER * DATA_WIDTH) >= 288000 and DATA_WIDTH >= 72 and (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL")) then
                     return "URAM";
                 else
                     return "BRAM";

@@ -134,7 +134,7 @@ entity PCIE_TRANSACTION_CTRL_WRAPPER is
         AUTO_ASSIGN_TAGS    : boolean := true;
 
         -- Target device
-        -- "VIRTEX6", "7SERIES", "ULTRASCALE", "STRATIX10"
+        -- "VIRTEX6", "7SERIES", "ULTRASCALE", "VERSAL", "STRATIX10"
         DEVICE              : string  := "ULTRASCALE";
         -- Connected PCIe endpoint type ("H_TILE" or "P_TILE" or "R_TILE") (only relevant on Intel FPGAs)
         ENDPOINT_TYPE       : string  := "H_TILE"

@@ -38,6 +38,7 @@ entity SDP_BRAM is
         --
         -- * "7SERIES"
         -- * "ULTRASCALE"
+        -- * "VERSAL"
         -- * "STRATIX10"
         -- * "ARRIA10"
         -- * "AGILEX"
@@ -109,7 +110,7 @@ architecture FULL of SDP_BRAM is
 
 begin
 
-    assert ((DEVICE = "STRATIX10") or (DEVICE = "ARRIA10") or (DEVICE = "AGILEX") or (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") or (DEVICE = "SIM"))
+    assert ((DEVICE = "STRATIX10") or (DEVICE = "ARRIA10") or (DEVICE = "AGILEX") or (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") or (DEVICE = "VERSAL") or (DEVICE = "SIM"))
         report "SDP_BRAM: Illegal value of parameter DEVICE '" & DEVICE & "'; allowed devices are: SIM, 7SERIES, ULTRASCALE, STRATIX10, ARRIA10, AGILEX!"
         severity failure;
 
@@ -147,7 +148,7 @@ begin
         );
     end generate;
 
-    xilinx_g : if (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") generate
+    xilinx_g : if (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") or (DEVICE = "VERSAL") generate
         core_i : entity work.SDP_BRAM_XILINX2
         generic map (
             DATA_WIDTH     => DATA_WIDTH,
