@@ -30,28 +30,35 @@ class statistic #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
                     const int unsigned eof_pos = (REGION_SIZE*BLOCK_SIZE) > 1 ? t.eof_pos[it] : 0;
 
                     if (indata == 1) begin
+                        //Data end in this region
                         if (t.eof[it]) begin
                             data_size += (eof_pos+1)*ITEM_WIDTH;
                             indata = 0;
+                            // Next data start in this region
+                            if (t.sof[it]) begin
+                                data_size += (REGION_SIZE - sof_pos)*BLOCK_SIZE*ITEM_WIDTH;
+                                indata = 1;
+                            end
                         end else begin
+                            // Data is all acros this region
                             data_size += REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
                         end
-
-                        if (t.sof[it]) begin
-                            data_size += (REGION_SIZE - sof_pos)*BLOCK_SIZE*ITEM_WIDTH;
-                            indata = 1;
-                        end
                     end else begin
+                        // This path is outside frame. If there is EOF then there have to
+                        // sof before it.
                         if (t.sof[it]) begin
-                            data_size += (REGION_SIZE - sof_pos)*BLOCK_SIZE*ITEM_WIDTH;
-                            indata = 1;
+                            // Data start and end in same region
+                            if (t.eof[it]) begin
+                                data_size += (eof_pos+1 - sof_pos*BLOCK_SIZE)*ITEM_WIDTH;
+                                indata = 0;
+                            // Data only start in this region
+                            end else begin
+                                data_size += (REGION_SIZE - sof_pos)*BLOCK_SIZE*ITEM_WIDTH;
+                                indata = 1;
+                            end
                         end else begin
+                            //There is no data in region
                             data_size += 0;
-                        end
-
-                        if (t.eof[it]) begin
-                            data_size -= (REGION_SIZE*BLOCK_SIZE - eof_pos)*ITEM_WIDTH;
-                            indata = 0;
                         end
                     end
             end
