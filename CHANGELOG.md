@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2024-10-17
+
+### Fixed
+
+- Fixed missing prefix DMA Medusa jenkins verification script.
+- NFB-200G2QL: Fixed missing lock DNA_PORT2E to X0Y1 due to different Chip ID in each SLRs (private submodule).
+- NFB-200G2QL: Fixed all PCIE paths for pblock (private submodule).
+
 ## [0.7.1] - 2024-10-16
 
 ### Fixed
