@@ -6,6 +6,7 @@
 
 SETTINGS = {
     "default" : { # The default setting of verification
+        "REPLICAS"               : "1"                  ,
         "DATA_WIDTH"             : "8"                  ,
         "ITEMS"                  : "64"                 ,
         "RESOURCES_SAVING"       : "0"                  ,

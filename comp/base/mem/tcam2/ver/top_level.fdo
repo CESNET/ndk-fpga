@@ -12,13 +12,11 @@ set DUT_VER_BASE          "."
 set TB_FILE               "./tbench/testbench.sv"
 set SIG_FILE              "./signals_sig.fdo"
 
-set COMPONENTS [list \
-    [list "DUT"      $DUT_BASE       "FULL"]\
-    [list "DUT_VER"  $DUT_VER_BASE   "FULL"]\
-]
+lappend COMPONENTS [ list "DUT"     $DUT_BASE     "FULL" ]
+lappend COMPONENTS [ list "DUT_VER" $DUT_VER_BASE "FULL" ]
 
-# Disable Code Coverage
-set CODE_COVERAGE "false"
+set SIM_FLAGS(CODE_COVERAGE) false
+set SIM_FLAGS(DEBUG)         false
 
 # Global include file for compilation
 source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"

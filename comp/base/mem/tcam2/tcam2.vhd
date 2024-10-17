@@ -54,7 +54,20 @@ entity TCAM2 is
 
         -- FPGA device
         --    available are "7SERIES", "ULTRASCALE", "ARRIA10", "STRATIX10", "AGILEX"
-        DEVICE             : string := "ULTRASCALE"
+        DEVICE             : string  := "ULTRASCALE";
+
+        -- Manufacturer of FPGA device
+        IS_XILINX          : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE");
+        IS_INTEL           : boolean := (DEVICE = "ARRIA10" or DEVICE = "STRATIX10" or DEVICE = "AGILEX");
+
+        -- Optimal parameters by FPGA device
+        INTEL_DATA_WIDTH   : integer := tsel(USE_FRAGMENTED_MEM, 20, 16);
+        XILINX_DATA_WIDTH  : integer := tsel(DEVICE = "ULTRASCALE", tsel(USE_FRAGMENTED_MEM, 14, 8), tsel(USE_FRAGMENTED_MEM, 6, 4));
+        MEMORY_ADDR_WIDTH  : integer := 5;
+        MEMORY_DATA_WIDTH  : integer := tsel(IS_XILINX, XILINX_DATA_WIDTH, INTEL_DATA_WIDTH);
+        ALIGNED_DATA_WIDTH : integer := 2**log2(MEMORY_DATA_WIDTH);
+        ITEMS_ALIGNED      : integer := tsel(USE_FRAGMENTED_MEM, div_roundup(ITEMS,MEMORY_DATA_WIDTH)*ALIGNED_DATA_WIDTH, ITEMS);
+        ADDR_WIDTH         : integer := max(1, log2(ITEMS_ALIGNED))
     );
     Port (
         -- CLOCK AND RESET
@@ -62,7 +75,7 @@ entity TCAM2 is
         RST            : in  std_logic;
 
         -- READ INTERFACE (READ_FROM_TCAM must be set as true)
-        READ_ADDR      : in  std_logic_vector(max(1,log2(ITEMS))-1 downto 0);
+        READ_ADDR      : in  std_logic_vector(ADDR_WIDTH-1 downto 0);
         READ_EN        : in  std_logic;
         READ_RDY       : out std_logic;
         READ_DATA      : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -72,7 +85,7 @@ entity TCAM2 is
         -- WRITE INTERFACE
         WRITE_DATA     : in  std_logic_vector(DATA_WIDTH-1 downto 0);
         WRITE_MASK     : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-        WRITE_ADDR     : in  std_logic_vector(max(1,log2(ITEMS))-1 downto 0);
+        WRITE_ADDR     : in  std_logic_vector(ADDR_WIDTH-1 downto 0);
         WRITE_EN       : in  std_logic;
         WRITE_RDY      : out std_logic;
 
@@ -92,24 +105,13 @@ end entity;
 -- =====================================================================
 architecture FULL of TCAM2 is
 
-    -- Manufacturer of FPGA device
-    constant IS_XILINX           : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE");
-    constant IS_INTEL            : boolean := (DEVICE = "ARRIA10" or DEVICE = "STRATIX10" or DEVICE = "AGILEX");
-
-    -- Optimal parameters by FPGA device
-    constant INTEL_DATA_WIDTH    : integer := tsel(USE_FRAGMENTED_MEM, 20, 16);
-    constant XILINX_DATA_WIDTH    : integer := tsel(DEVICE = "ULTRASCALE", tsel(USE_FRAGMENTED_MEM, 14, 8), tsel(USE_FRAGMENTED_MEM, 6, 4));
-    constant MEMORY_ADDR_WIDTH   : integer := 5;
-    constant MEMORY_DATA_WIDTH   : integer := tsel(IS_XILINX, XILINX_DATA_WIDTH, INTEL_DATA_WIDTH);
-    constant ALIGNED_DATA_WIDTH  : integer := 2**log2(MEMORY_DATA_WIDTH);
-
     -- Setting TCAM2 resources parameters
     constant CELL_WIDTH          : integer := MEMORY_ADDR_WIDTH - RESOURCES_SAVING;
     constant CELL_HEIGHT         : integer := MEMORY_DATA_WIDTH * (2**RESOURCES_SAVING);
     constant ALIGNED_CELL_HEIGHT : integer := ALIGNED_DATA_WIDTH * (2**RESOURCES_SAVING);
     constant CELL_HEIGHT_RATIO   : integer := CELL_HEIGHT/MEMORY_DATA_WIDTH;
     constant COLUMNS             : integer := div_roundup(DATA_WIDTH, CELL_WIDTH);
-    constant ROWS                : integer := div_roundup(ITEMS, ALIGNED_CELL_HEIGHT);
+    constant ROWS                : integer := div_roundup(ITEMS_ALIGNED, ALIGNED_CELL_HEIGHT);
 
     -- --------------------------------------------------------------------------
     --  I/O data signals
@@ -125,7 +127,6 @@ architecture FULL of TCAM2 is
     signal input_m_data_reg_aug      : std_logic_vector(COLUMNS*CELL_WIDTH-1 downto 0);
     signal input_wr_data_reg_aug     : std_logic_vector(COLUMNS*CELL_WIDTH-1 downto 0) := (others => '0');
     signal input_wr_mask_reg_aug     : std_logic_vector(COLUMNS*CELL_WIDTH-1 downto 0) := (others => '0');
-    signal input_wr_addr_reg_aug     : std_logic_vector(log2(ROWS*ALIGNED_CELL_HEIGHT)-1 downto 0) := (others => '0');
 
     -- Input registers augmented arrays
     signal input_m_data_reg_aug_arr  : slv_array_t(COLUMNS-1 downto 0)(CELL_WIDTH-1 downto 0);
@@ -218,14 +219,9 @@ architecture FULL of TCAM2 is
     signal sf_cnt_en         : std_logic;
     signal sf_cnt_en_reg     : std_logic;
 
-    -- output match register write enable
-    signal m_aug_reg_we      : std_logic_vector(CELL_HEIGHT_RATIO-1 downto 0);
-
-    -- output match vector register
-    signal m_aug_reg         : slv_array_2d_t(ROWS-1 downto 0)(CELL_HEIGHT_RATIO-1 downto 0)(ALIGNED_DATA_WIDTH-1 downto 0);
-
-    -- fit output match
-    signal m_aug             : std_logic_vector(ROWS*ALIGNED_CELL_HEIGHT-1 downto 0);
+    -- output match register
+    signal m_reg_we          : std_logic_vector(CELL_HEIGHT_RATIO-1 downto 0);
+    signal m_reg             : slv_array_2d_t(ROWS-1 downto 0)(CELL_HEIGHT_RATIO-1 downto 0)(MEMORY_DATA_WIDTH-1 downto 0);
 
 begin
 
@@ -289,60 +285,27 @@ begin
     -- memory element generate
     mem_rows_g : for r in 0 to ROWS-1 generate
         mem_colums_g : for c in 0 to COLUMNS-1 generate
-
-            memory_xilinx_g : if IS_XILINX generate
-                -- write data block (backup other records and add new)
-                mem_wr_data_block(c)(r) <= (mem_match_vector(c)(r) and not mem_wr_bit_en_reg) or ((MEMORY_DATA_WIDTH-1 downto 0 => mem_wr_data_reg(c)) and mem_wr_bit_en_reg);
-
-                -- Xilinx Single Port RAM
-                sp_distmem_i : entity work.GEN_LUTRAM
-                generic map (
-                    DATA_WIDTH         => MEMORY_DATA_WIDTH,
-                    ITEMS              => 2**MEMORY_ADDR_WIDTH,
-                    RD_PORTS           => 1,
-                    RD_LATENCY         => 1,
-                    WRITE_USE_RD_ADDR0 => False,
-                    MLAB_CONSTR_RDW_DC => False,
-                    DEVICE             => DEVICE
-                )
-                port map (
-                    CLK        => CLK,
-                    WR_EN      => mem_wr_en_reg(r),
-                    WR_ADDR    => mem_wr_addr_reg,
-                    WR_DATA    => mem_wr_data_block(c)(r),
-                    RD_ADDR    => mem_addr_arr(c),
-                    RD_DATA    => mem_match_vector(c)(r)
-                );
-            end generate;
-
-            storage_intel_g : if IS_INTEL generate
-                -- write data block (backup other records and add new)
-                mem_wr_data_block(c)(r) <= (mem_match_vector(c)(r) and not mem_wr_bit_en_reg) or ((MEMORY_DATA_WIDTH-1 downto 0 => mem_wr_data_reg(c)) and mem_wr_bit_en_reg);
-
-                -- INTEL MLAB simple dual port RAM
-                sdp_mlab_ram_i : entity work.GEN_LUTRAM
-                generic map (
-                    DATA_WIDTH         => MEMORY_DATA_WIDTH,
-                    ITEMS              => 2**MEMORY_ADDR_WIDTH,
-                    RD_PORTS           => 1,
-                    RD_LATENCY         => 1,
-                    WRITE_USE_RD_ADDR0 => False,
-                    MLAB_CONSTR_RDW_DC => True,
-                    DEVICE             => DEVICE
-                )
-                port map (
-                    CLK     => CLK,
-                    WR_EN   => mem_wr_en_reg(r),
-                    WR_ADDR => mem_wr_addr_reg,
-                    WR_DATA => mem_wr_data_block(c)(r),
-                    RD_ADDR => mem_addr_arr(c),
-                    RD_DATA => mem_match_vector(c)(r)
-                );
-            end generate;
-
-            -- propagating match
+            -- write data block (backup other records and add new)
+            mem_wr_data_block(c)(r) <= (mem_match_vector(c)(r) and not mem_wr_bit_en_reg) or ((MEMORY_DATA_WIDTH-1 downto 0 => mem_wr_data_reg(c)) and mem_wr_bit_en_reg);
+            sp_distmem_i : entity work.GEN_LUTRAM
+            generic map (
+                DATA_WIDTH         => MEMORY_DATA_WIDTH,
+                ITEMS              => 2**MEMORY_ADDR_WIDTH,
+                RD_PORTS           => 1,
+                RD_LATENCY         => 1,
+                WRITE_USE_RD_ADDR0 => False,
+                MLAB_CONSTR_RDW_DC => IS_INTEL,
+                DEVICE             => DEVICE
+            )
+            port map (
+                CLK        => CLK,
+                WR_EN      => mem_wr_en_reg(r),
+                WR_ADDR    => mem_wr_addr_reg,
+                WR_DATA    => mem_wr_data_block(c)(r),
+                RD_ADDR    => mem_addr_arr(c),
+                RD_DATA    => mem_match_vector(c)(r)
+            );
             mem_match_carry(c+1)(r) <= mem_match_carry(c)(r) and mem_match_vector(c)(r);
-
         end generate;
     end generate;
 
@@ -359,7 +322,7 @@ begin
         write_data_storage_i : entity work.SDP_BRAM_BEHAV
         generic map (
             DATA_WIDTH  => DATA_WIDTH,
-            ITEMS       => ITEMS,
+            ITEMS       => ITEMS_ALIGNED,
             OUTPUT_REG  => OUTPUT_READ_REGS
         )
         port map (
@@ -382,7 +345,7 @@ begin
         write_mask_storage_i : entity work.SDP_BRAM_BEHAV
         generic map (
             DATA_WIDTH  => DATA_WIDTH,
-            ITEMS       => ITEMS,
+            ITEMS       => ITEMS_ALIGNED,
             OUTPUT_REG  => OUTPUT_READ_REGS
         )
         port map (
@@ -434,7 +397,6 @@ begin
     -- write signals registers padding
     input_wr_data_reg_aug(input_wr_data_reg'range) <= input_wr_data_reg;
     input_wr_mask_reg_aug(input_wr_mask_reg'range) <= input_wr_mask_reg;
-    input_wr_addr_reg_aug(input_wr_addr_reg'range) <= input_wr_addr_reg;
     -- write data and mask registers arrays
     input_wr_data_reg_aug_arr <= slv_array_deser(input_wr_data_reg_aug,COLUMNS);
     input_wr_mask_reg_aug_arr <= slv_array_deser(input_wr_mask_reg_aug,COLUMNS);
@@ -469,7 +431,7 @@ begin
             ITEMS => ROWS
         )
         port map (
-            ADDR   => input_wr_addr_reg_aug(input_wr_addr_reg_aug'high downto log2(ALIGNED_CELL_HEIGHT)),
+            ADDR   => input_wr_addr_reg(input_wr_addr_reg'high downto log2(ALIGNED_CELL_HEIGHT)),
             ENABLE => wr_cnt_en,
             DO     => mem_wr_en
         );
@@ -480,7 +442,7 @@ begin
 
     -- cell height address
     mem_sf_addr_g : if CELL_HEIGHT_RATIO > 1 generate
-        mem_sf_addr <= input_wr_addr_reg_aug(log2(ALIGNED_CELL_HEIGHT)-1 downto log2(ALIGNED_DATA_WIDTH));
+        mem_sf_addr <= input_wr_addr_reg(log2(ALIGNED_CELL_HEIGHT)-1 downto log2(ALIGNED_DATA_WIDTH));
     end generate;
     fake_mem_sf_addr_g : if CELL_HEIGHT_RATIO = 1 generate
         mem_sf_addr(0) <= '0';
@@ -493,7 +455,7 @@ begin
             ITEMS => ALIGNED_DATA_WIDTH
         )
         port map (
-            ADDR => input_wr_addr_reg_aug(log2(ALIGNED_DATA_WIDTH)-1 downto 0),
+            ADDR => input_wr_addr_reg(log2(ALIGNED_DATA_WIDTH)-1 downto 0),
             DO   => mem_wr_bit_en
         );
     end generate;
@@ -603,35 +565,32 @@ begin
     mem_match_en <= sf_cnt_en;
 
     -- output match register write enable decoder
-    m_aug_reg_we_dec_i : entity work.dec1fn_enable
+    m_reg_we_dec_i : entity work.dec1fn_enable
     generic map (
         ITEMS => CELL_HEIGHT_RATIO
     )
     port map (
         ADDR   => sf_cnt_reg,
         ENABLE => sf_cnt_en_reg,
-        DO     => m_aug_reg_we
+        DO     => m_reg_we
     );
 
     -- output match vector register
     match_bits_reg_g : for i in 0 to ROWS-1 generate
         match_words_reg_g : for j in 0 to CELL_HEIGHT_RATIO-1 generate
-            m_aug_reg_p : process (CLK)
+            m_reg_p : process (CLK)
             begin
                 if rising_edge(CLK) then
-                    if (m_aug_reg_we(j) = '1') then
-                        m_aug_reg(i)(j) <= (others=>'0');
-                        m_aug_reg(i)(j)(mem_match_out(i)'range) <= mem_match_out(i);
+                    if (m_reg_we(j) = '1') then
+                        m_reg(i)(j) <= mem_match_out(i);
                     end if;
                 end if;
             end process;
         end generate;
     end generate;
-    -- array conversion
-    m_aug <= slv_array_2d_ser(m_aug_reg);
 
     -- output length fit
-    MATCH_OUT_ADDR <= m_aug(MATCH_OUT_ADDR'range);
+    MATCH_OUT_ADDR <= slv_array_2d_ser(m_reg)(MATCH_OUT_ADDR'range);
 
     -- match hit
     MATCH_OUT_HIT <= or MATCH_OUT_ADDR;

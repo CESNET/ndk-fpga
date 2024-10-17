@@ -6,9 +6,10 @@
 
 import sv_common_pkg::*;
 import sv_wb_pkg::*;
+import sv_rb_pkg::*;
 import sv_mvb_pkg::*;
 
-class tcam_model #(int DATA_WIDTH, int ITEMS);
+class tcam_model #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM, int ITEMS_ALIGNED, int BLOCK_ITEMS);
 
     local bit [DATA_WIDTH-1 : 0] data[];
     local bit [DATA_WIDTH-1 : 0] mask[];
@@ -25,22 +26,29 @@ class tcam_model #(int DATA_WIDTH, int ITEMS);
         end
     endfunction
 
-    function int record(bit [log2(ITEMS)-1 : 0] a);
-        record = vld[a];
+    function int trim_rw_addr(bit [log2(ITEMS_ALIGNED)-1 : 0] a);
+        if (FRAGMENTED_MEM) begin
+            int block_items_aligned = 2**$clog2(BLOCK_ITEMS);
+            return a/block_items_aligned*BLOCK_ITEMS + a%block_items_aligned;
+        end else begin
+            return a;
+        end
     endfunction
 
-    function void write(bit [DATA_WIDTH-1 : 0] d, bit [DATA_WIDTH-1 : 0] m, bit [log2(ITEMS)-1 : 0] a);
-        busy    = 1;
-        data[a] = d;
-        mask[a] = m;
-        vld[a]  = 1;
-        busy    = 0;
+    function void write(bit [DATA_WIDTH-1 : 0] d, bit [DATA_WIDTH-1 : 0] m, bit [log2(ITEMS_ALIGNED)-1 : 0] a);
+        int addr = trim_rw_addr(a);
+        busy       = 1;
+        data[addr] = d;
+        mask[addr] = m;
+        vld[addr]  = 1;
+        busy       = 0;
     endfunction
 
-    function void read(bit [log2(ITEMS)-1 : 0] a, output bit [DATA_WIDTH-1 : 0] d, output bit [DATA_WIDTH-1 : 0] m);
+    function void read(bit [log2(ITEMS_ALIGNED)-1 : 0] a, output bit [DATA_WIDTH-1 : 0] d, output bit [DATA_WIDTH-1 : 0] m);
+        int addr = trim_rw_addr(a);
         busy = 1;
-        d    = data[a];
-        m    = mask[a];
+        d    = vld[addr] ? data[addr] : 0;
+        m    = vld[addr] ? mask[addr] : 0;
         busy = 0;
     endfunction
 
@@ -74,10 +82,10 @@ class tcam_model #(int DATA_WIDTH, int ITEMS);
 endclass
 
 
-class ScoreboardWriteDriverCbs #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM) extends DriverCbs;
-    tcam_model #(DATA_WIDTH, ITEMS) tcam;
+class ScoreboardWriteDriverCbs #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM, int ITEMS_ALIGNED, int BLOCK_ITEMS) extends DriverCbs;
+    tcam_model #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) tcam;
 
-    function new(tcam_model #(DATA_WIDTH, ITEMS) tcam_i);
+    function new(tcam_model #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) tcam_i);
         this.tcam = tcam_i;
     endfunction
 
@@ -86,7 +94,7 @@ class ScoreboardWriteDriverCbs #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM) 
 
     virtual task post_tx(Transaction transaction, string inst);
         //$write("Write transaction\n");
-        WbTransaction #(DATA_WIDTH, log2(ITEMS), FRAGMENTED_MEM) tr;
+        WbTransaction #(DATA_WIDTH, log2(ITEMS_ALIGNED), FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) tr;
         $cast(tr, transaction);
         if(FULL_PRINT == TRUE) begin
             $write("Write to TCAM model\n");
@@ -97,11 +105,11 @@ class ScoreboardWriteDriverCbs #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM) 
     endtask
 endclass
 
-class ScoreboardReadDriverCbs #(int DATA_WIDTH, int ITEMS) extends DriverCbs;
-    tcam_model       #(DATA_WIDTH, ITEMS) tcam;
-    TransactionTable #(0)                 sc_table;
+class ScoreboardReadDriverCbs #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM, int ITEMS_ALIGNED, int BLOCK_ITEMS) extends DriverCbs;
+    tcam_model       #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) tcam;
+    TransactionTable #(0) sc_table;
 
-    function new(tcam_model #(DATA_WIDTH, ITEMS) tcam_i, TransactionTable #(0) sc_table_i);
+    function new(tcam_model #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) tcam_i, TransactionTable #(0) sc_table_i);
         this.tcam     = tcam_i;
         this.sc_table = sc_table_i;
     endfunction
@@ -110,7 +118,7 @@ class ScoreboardReadDriverCbs #(int DATA_WIDTH, int ITEMS) extends DriverCbs;
     endtask
 
     virtual task post_tx(Transaction transaction, string inst);
-        MvbTransaction #(log2(ITEMS)) tr;
+        MvbTransaction #(log2(ITEMS_ALIGNED)) tr;
         MvbTransaction #(2*DATA_WIDTH) read_out_tr;
         bit [DATA_WIDTH-1 : 0] read_data = {DATA_WIDTH{1'b0}};
         bit [DATA_WIDTH-1 : 0] read_mask = {DATA_WIDTH{1'b0}};
@@ -122,9 +130,7 @@ class ScoreboardReadDriverCbs #(int DATA_WIDTH, int ITEMS) extends DriverCbs;
             tr.display();
         end
         wait(!tcam.busy);
-        if(tcam.record(tr.data)) begin
-            tcam.read(tr.data, read_data, read_mask);
-        end
+        tcam.read(tr.data, read_data, read_mask);
 
         read_out_tr = new();
         read_out_tr.data[2*DATA_WIDTH-1 : DATA_WIDTH] = read_data;
@@ -134,11 +140,11 @@ class ScoreboardReadDriverCbs #(int DATA_WIDTH, int ITEMS) extends DriverCbs;
     endtask
 endclass
 
-class ScoreboardMatchDriverCbs #(int DATA_WIDTH, int ITEMS) extends DriverCbs;
-    tcam_model       #(DATA_WIDTH,ITEMS) tcam;
-    TransactionTable #(0)                sc_table;
+class ScoreboardMatchDriverCbs #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM, int ITEMS_ALIGNED, int BLOCK_ITEMS) extends DriverCbs;
+    tcam_model       #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) tcam;
+    TransactionTable #(0) sc_table;
 
-    function new(tcam_model #(DATA_WIDTH, ITEMS) tcam_i, TransactionTable #(0) sc_table_i);
+    function new(tcam_model #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) tcam_i, TransactionTable #(0) sc_table_i);
         this.tcam     = tcam_i;
         this.sc_table = sc_table_i;
     endfunction
@@ -195,15 +201,15 @@ class ScoreboardMonitorCbs extends MonitorCbs;
 endclass
 
 
-class Scoreboard #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM);
+class Scoreboard #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM, int ITEMS_ALIGNED, int BLOCK_ITEMS);
 
-    ScoreboardWriteDriverCbs  #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM) writeDriverCbs;
-    ScoreboardReadDriverCbs   #(DATA_WIDTH, ITEMS) readDriverCbs;
-    ScoreboardMatchDriverCbs  #(DATA_WIDTH, ITEMS) matchDriverCbs;
-    ScoreboardMonitorCbs                           readMonitorCbs;
-    ScoreboardMonitorCbs                           matchMonitorCbs;
-    tcam_model                #(DATA_WIDTH,ITEMS)  tcam;
-    TransactionTable          #(0)                 scoreTable;
+    ScoreboardWriteDriverCbs  #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) writeDriverCbs;
+    ScoreboardReadDriverCbs   #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) readDriverCbs;
+    ScoreboardMatchDriverCbs  #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) matchDriverCbs;
+    ScoreboardMonitorCbs                                                                       readMonitorCbs;
+    ScoreboardMonitorCbs                                                                       matchMonitorCbs;
+    tcam_model                #(DATA_WIDTH, ITEMS, FRAGMENTED_MEM, ITEMS_ALIGNED, BLOCK_ITEMS) tcam;
+    TransactionTable          #(0)                                                             scoreTable;
 
     function new();
         tcam            = new();
