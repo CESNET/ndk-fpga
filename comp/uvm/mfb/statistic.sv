@@ -46,7 +46,7 @@ class statistic #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
                             data_size += (REGION_SIZE - sof_pos)*BLOCK_SIZE*ITEM_WIDTH;
                             indata = 1;
                         end else begin
-                            data_size += REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
+                            data_size += 0;
                         end
 
                         if (t.eof[it]) begin
