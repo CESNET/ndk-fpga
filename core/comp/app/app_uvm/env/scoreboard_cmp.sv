@@ -35,11 +35,19 @@ class scoreboard_cmp_header #(type MODEL_ITEM, type DUT_ITEM, int unsigned META_
 
     virtual function string model_item2string(MODEL_ITEM tr);
         string msg; //ETH [%0d] header
+        logic [8-1:0] hdr_len;
+        logic [4-1:0] hdr_id;
+
+        {hdr_id, hdr_len} = tr.meta;
+
         msg = tr.time2string();
-        msg = {msg, $sformatf("\n\t\tdiscard %b",  tr.discard)};
-        msg = {msg, $sformatf("\n\t\tchannel %0d", tr.channel)};
-        msg = {msg, $sformatf("\n\t\tmeta    0x%h",  tr.meta)};
-        msg = {msg, $sformatf("\n\t\tpacket_size %0d", tr.data.size())};
+        msg = {msg, $sformatf("\n\t\tDiscard         : %b",   tr.discard)};
+        msg = {msg, $sformatf("\n\t\tChannel         : %0d",  tr.channel)};
+        msg = {msg, $sformatf("\n\t\tDMA META        : 0x%h", tr.meta)};
+        msg = {msg, $sformatf("\n\t\t - HDR ID       : 0x%h (%0d)", hdr_id, hdr_id)};
+        msg = {msg, $sformatf("\n\t\t - HDR LEN      : 0x%h (%0d)", hdr_len, hdr_len)};
+        msg = {msg, $sformatf("\n\t\tDMA packet size : %0d",  tr.data.size())};
+        msg = {msg, $sformatf("\n\t\t - Payload size : %0d",  (tr.data.size() - hdr_len))};
 
         return msg;
     endfunction
@@ -47,6 +55,8 @@ class scoreboard_cmp_header #(type MODEL_ITEM, type DUT_ITEM, int unsigned META_
     virtual function string dut_item2string(DUT_ITEM tr);
         string error_msg; //ETH [%0d] header
         logic [META_WIDTH-1:0]meta = 'x;
+        logic [8-1:0] hdr_len = 'x;
+        logic [4-1:0] hdr_id = 'x;
         logic [$clog2(CHANNELS)-1:0] channel;
         logic [$clog2(PKT_MTU+1)] packet_size;
         logic discard;
@@ -55,13 +65,17 @@ class scoreboard_cmp_header #(type MODEL_ITEM, type DUT_ITEM, int unsigned META_
             {discard, channel, packet_size} = tr.data;
         end else begin
             {discard, channel, meta, packet_size} = tr.data;
+            {hdr_id, hdr_len} = meta;
         end
 
         error_msg = tr.time2string();
-        error_msg = {error_msg, $sformatf("\n\t\tdiscard %b", discard)};
-        error_msg = {error_msg, $sformatf("\n\t\tchannel %0d", channel)};
-        error_msg = {error_msg, $sformatf("\n\t\tmeta    0x%h",  meta)};
-        error_msg = {error_msg, $sformatf("\n\t\tpacket_size %0d", packet_size)};
+        error_msg = {error_msg, $sformatf("\n\t\tDiscard         : %b",   discard)};
+        error_msg = {error_msg, $sformatf("\n\t\tChannel         : %0d",  channel)};
+        error_msg = {error_msg, $sformatf("\n\t\tDMA META        : 0x%h", meta)};
+        error_msg = {error_msg, $sformatf("\n\t\t - HDR ID       : 0x%h (%0d)", hdr_id, hdr_id)};
+        error_msg = {error_msg, $sformatf("\n\t\t - HDR LEN      : 0x%h (%0d)", hdr_len, hdr_len)};
+        error_msg = {error_msg, $sformatf("\n\t\tDMA packet size : %0d",  packet_size)};
+        error_msg = {error_msg, $sformatf("\n\t\t - Payload size : %0d",  (packet_size-hdr_len))};
 
         return error_msg;
     endfunction
