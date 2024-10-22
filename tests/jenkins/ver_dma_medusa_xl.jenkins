@@ -51,7 +51,7 @@ node('preklad') {
                 timeout(time: 4, unit: 'DAYS') {
                     stage("$name") {
                         dir("$path") {
-                            sh "python3 $multi_ver -p $name $fdo $pkg $settings"
+                            sh "python3 $multi_ver -p \"$name\" $fdo $pkg $settings"
                         }
                     }
                 }
