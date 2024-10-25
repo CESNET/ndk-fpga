@@ -3,9 +3,17 @@ Memory modules
 
 **CAM** - Ternary content addressable memory implemented in memory LUTs, optimized for Xilinx only. Also there is **light variant** implemented using register array, simpler but less effective.
 
-**DP_BMEM** - Behavioral implementation of dual clock BRAM memory with two read/write port. ``OBSOLETE, use DP_BRAM or DP_BRAM_XILINX!``
+**DP_BMEM** - Behavioral implementation of dual clock BRAM memory with two read/write ports.
 
-**DP_BMEM_V7** - Structural implementation of dual clock BRAM memory based on Virtex 7 specific primitives with two read/write ports. ``OBSOLETE, use DP_BRAM or DP_BRAM_XILINX!``
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **DP_BRAM** or **DP_BRAM_XILINX** instead.
+
+**DP_BMEM_V7** - Structural implementation of dual clock BRAM memory based on Virtex 7 specific primitives with two read/write ports.
+
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **DP_BRAM** or **DP_BRAM_XILINX** instead.
 
 **DP_BRAM** - Behavioral implementation of single clock BRAM memory with two read/write port. Optimized for Xilinx and Intel FPGAs.
 
@@ -25,21 +33,28 @@ The read latency is 0 clock cycles. Optimized for same FPGAs as GEN_LUTRAM.
 **NP_LUTRAM_PRO** - An alternative version of NP_LUTRAM, which uses additional multiple frequency clock signal.
 Ports are registered and the read latency is 2 clock cycles. Expert knowledge is required to use this component!
 
-**SDP_BMEM** - Behavioral implementation of dual clock BRAM memory with one read port and one write port. Located in the same folder as DP_BMEM. ``OBSOLETE, use DP_BRAM or DP_BRAM_XILINX!``
+**SDP_BMEM** - Behavioral implementation of dual clock BRAM memory with one read port and one write port. Located in the same folder as DP_BMEM.
+
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **DP_BRAM** or **DP_BRAM_XILINX** instead.
 
 **SDP_BMEM_V7** - Structural implementation of dual clock BRAM memory based on Virtex 7 specific primitives with one read port and one write port.
-Located in the same folder as DP_BMEM_V7. ``OBSOLETE, use SDP_BRAM or SDP_BRAM_XILINX!``
+Located in the same folder as DP_BMEM_V7.
+
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **DP_BRAM** or **DP_BRAM_XILINX** instead.
 
 **SDP_BRAM** - Structural implementation of dual clock BRAM memory based on Xilinx and Intel specific primitives (xpm_memory_sdpram, altera_syncram) with one read port and one write port.
 It supports the byte enable feature!
 
-**MP_BRAM** - Generic multiported single clock BRAM memory based on **SDP_BRAM**. Currently supports only 1 write port. Amount of read ports is not restricted. Also supports byte enable
-feature.
+**MP_BRAM** - Generic multi-port single-clock BRAM memory based on **SDP_BRAM**.
 
-**LVT_MEM** - Multiported memory implemented suitable for shallow memories, supports generic amount of write/read ports and has customizable read during write behaviour.
+**LVT_MEM** - Multi-port memory is suitable for shallow memories, supports a generic amount of write/read ports, and has customizable read during write behavior.
 
 **SDP_BRAM_BEHAV** - Another behavioral implementation of dual clock BRAM memory with one read port and one write port.
-Located in the same folder as SDP_BRAM. ``OBSOLETE, use DP_BRAM or DP_BRAM_XILINX!``
+Located in the same folder as SDP_BRAM.
 
 **SDP_BRAM_XILINX** - Structural implementation of dual clock BRAM memory based on Xilinx specific primitives with one read port and one write port. Only for Xilinx FPGAs.
 
@@ -48,7 +63,11 @@ Allows setting type of memory (LUT, BRAM, URAM) or automatic mode. Optimized for
 
 **SDP_URAM_XILINX** - Structural implementation of single clock URAM memory based on Xilinx specific primitives with one read port and one write port. Only for Xilinx UltraScale+ FPGAs.
 
-**SP_BMEM** -  Old behavioral implementation of single clock BRAM memory with one read/write port. ``OBSOLETE, use SP_BRAM or SP_BRAM_XILINX!``
+**SP_BMEM** -  Old behavioral implementation of a single-clock BRAM memory with one read/write port.
+
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **SP_BRAM** or **SP_BRAM_XILINX** instead.
 
 **SP_BRAM** - Behavioral implementation of single clock BRAM memory with one read/write port. Optimized for Xilinx and Intel FPGAs.
 

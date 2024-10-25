@@ -8,7 +8,6 @@ Components using the MI bus are typically located in the ``comp/mi_tools/`` dire
    :maxdepth: 1
    :caption: Content:
 
-   comp/mi_tools/readme
    comp/mi_tools/async/readme
    comp/mi_tools/pipe/readme
    comp/mi_tools/indirect_access/readme

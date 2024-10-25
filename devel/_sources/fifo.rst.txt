@@ -6,9 +6,17 @@ FIFO components
 Dual clock (asynchronous) FIFOs
 -------------------------------
 
-**ASFIFO** - Behavioral dual clock FIFO implementation based on LUTMEMs and optimized for Xilinx only. Include status signal. ``OBSOLETE, use ASFIFOX!``
+**ASFIFO** - Behavioral dual clock FIFO implementation, based on LUTMEMs and optimized for Xilinx only. Includes status signal.
 
-**ASFIFO_BRAM** - Behavioral dual clock FIFO implementation based on BRAMs and optimized for Xilinx only. Include status signal. ``OBSOLETE, use ASFIFOX!``
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **ASFIFOX** instead.
+
+**ASFIFO_BRAM** - Behavioral dual clock FIFO implementation, based on BRAMs and optimized for Xilinx only. Includes status signal.
+
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **ASFIFOX** instead.
 
 **ASFIFO_BRAM_BLOCK** - Similar to ASFIFO_BRAM but with extra signal to mark end of input data block, output remains in empty state until such mark is received. Located in the same folder as ASFIFO_BRAM.
 
@@ -34,13 +42,25 @@ Detailed :ref:`documentation can be found here<asfifox>`.
 Single clock FIFOs
 ------------------
 
-**FIFO** - Behavioral FIFO implementation based on LUTMEMs and optimized for Xilinx only. Include status signal. ``OBSOLETE, use FIFOX!``
+**FIFO** - Behavioral FIFO implementation, based on LUTMEMs and optimized for Xilinx only. Includes status signal.
 
-**FIFO_BRAM** - Behavioral FIFO implementation based on BRAMs and optimized for Xilinx only. Include status signal. ``OBSOLETE, use FIFOX!``
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **FIFOX** instead.
+
+**FIFO_BRAM** - Behavioral FIFO implementation, based on BRAMs and optimized for Xilinx only. Includes status signal.
+
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **FIFOX** instead.
 
 **FIFO_BRAM_XILINX** - Structural implementation of FIFO based on Xilinx specific BRAM FIFO primitives (no extra logic). Include almost full and almost empty signal.
 
-**FIFO_N1** - Behavioral implementation of FIFO with multiple write ports, it based on LUTMEMs and optimized for Xilinx only. ``OBSOLETE, use FIFOX_MULTI!``
+**FIFO_N1** - Behavioral implementation of FIFO with multiple write ports, it is based on LUTMEMs and optimized for Xilinx only.
+
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **FIFOX** instead.
 
 **FIFOX** - Universal FIFO for Xilinx and Intel FPGAs. It support various memory implementation: LUTMEMs, BRAMs, URAMs (Xilinx only) and shift-registers in LUT slices (effective on Xilinx only).
 Include almost full, almost empty and status signal. Possible automatic selection of a suitable memory implementation. Detailed :ref:`documentation can be found here<fifox>`.
@@ -50,7 +70,11 @@ Include almost full, almost empty and status signal. Possible automatic selectio
 **MULTI_FIFO** - Behavioral implementation of FIFO for Xilinx and Intel FPGAs with multiple independent channels. It support various memory implementation: LUTMEMs, BRAMs, URAMs (Xilinx only).
 The memory type is selected automatically.
 
-**SH_FIFO** - Behavioral FIFO implementation based on shift-registers in LUT slices and optimized for Xilinx only. ``OBSOLETE, use FIFOX!``
+**SH_FIFO** - Behavioral FIFO implementation, based on shift-registers in LUT slices and optimized for Xilinx only.
+
+.. warning::
+   .. deprecated:: 0.7.0
+      This component is obsolete and is a candidate for removal, use **FIFOX** instead.
 
 .. toctree::
    :maxdepth: 1

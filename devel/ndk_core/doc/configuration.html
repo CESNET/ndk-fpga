@@ -1,114 +1,169 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuration files and parameters &mdash; NDK-FPGA Docs  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
-      <script src="../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <title>Configuration files and parameters &#8212; NDK-FPGA  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic_mod.css?v=9b2032db" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
+    <script src="../../_static/js/petite-vue.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="NDK testing" href="testing.html" />
     <link rel="prev" title="Time Stamp Unit" href="tsu.html" /> 
-</head>
+  </head>
+<body
+    data-dark_mode_code_blocks="true"
+>
+    
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+    <div id="top_nav">
+        
 
-          
-          
-          <a href="../../index.html" class="icon icon-home">
-            NDK-FPGA Docs
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+        <nav>
+              
+
+            <p id="toggle_sidebar">
+                <a href="#" title="Toggle sidebar">|||</a>
+            </p>
+            <h1>
+                <a href="../../index.html" title="Go to homepage"
+                    >NDK-FPGA  documentation</a
+                >
+            </h1> <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="../../search.html" title="Search">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 65 64"
+                        fill-rule="evenodd"
+                        stroke-linejoin="round"
+                        stroke-miterlimit="2"
+                    >
+                        <path
+                            d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z"
+                            fill="#fff"
+                        />
+                    </svg>
+                </a>
+            </p>
+            
+
+            <div class="searchbox_wrapper">
+                
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+            </div>
+        </nav>
+    </div>
+     
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html">NDK Architecture</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration files and parameters</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#build-system-files">Build system files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#parametrizing-ndk-core-design">Parametrizing NDK-CORE design</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#file-description">File description</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#core-conf-tcl">core_conf.tcl</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core-const-tcl">core_const.tcl</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core-mk">core.mk</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core-bootstrap-tcl">core_bootstrap.tcl</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#further-work-with-parameters">Further work with parameters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#passing-through-modules-tcl">Passing through Modules.tcl</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#adding-constants-to-the-vhdl-package">Adding constants to the VHDL package</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#parametrizing-a-specific-card-type">Parametrizing a specific card type</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id1">File description</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#card-conf-tcl">card_conf.tcl</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#card-const-tcl">card_const.tcl</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#card-mk">card.mk</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#id2">Further work with parameters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id3">Passing through Modules.tcl</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id4">Adding constants to the VHDL package</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#parametrizing-the-user-application">Parametrizing the user application</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#configuration-files">Configuration files</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#build-card-name-makefile">build/&lt;card_name&gt;/Makefile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#build-card-name-vivado-quartus-tcl">build/&lt;card_name&gt;/{Vivado,Quartus}.tcl</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#build-card-name-app-conf-tcl">build/&lt;card_name&gt;/app_conf.tcl</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#tl-dr">TL;DR</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value">I need to include specific component in CORE depending on a given parameter value</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-core-conf-tcl-file">What can I do with the <cite>core_conf.tcl</cite> file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-core-const-tcl-file">What can I do with the <cite>core_const.tcl</cite> file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-card-conf-tcl-file">What can I do with the <cite>card_conf.tcl</cite> file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-card-const-tcl-file">What can I do with the <cite>card_const.tcl</cite> file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-app-conf-tcl-file">What can I do with the <cite>app_conf.tcl</cite> file</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#contact-for-author">Contact for author</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
@@ -122,51 +177,23 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
-</ul>
 
         </div>
-      </div>
-    </nav>
+      </div> 
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">NDK-FPGA Docs</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Configuration files and parameters</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/ndk_core/doc/configuration.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <section id="configuration-files-and-parameters">
-<span id="ndk-configuration"></span><h1>Configuration files and parameters<a class="headerlink" href="#configuration-files-and-parameters" title="Link to this heading"></a></h1>
+<span id="ndk-configuration"></span><h1>Configuration files and parameters<a class="headerlink" href="#configuration-files-and-parameters" title="Link to this heading">¶</a></h1>
 <p>This chapter describes the NDK configuration files and parameters. The
 configuration has three levels: the CORE, the card, and the user application. A
 detailed description of each level is below (the abreviated version is provided
 via the <a class="reference internal" href="#ndk-conf-tldr"><span class="std std-ref">following link</span></a>).</p>
 <section id="build-system-files">
-<span id="ndk-build-files"></span><h2>Build system files<a class="headerlink" href="#build-system-files" title="Link to this heading"></a></h2>
+<span id="ndk-build-files"></span><h2>Build system files<a class="headerlink" href="#build-system-files" title="Link to this heading">¶</a></h2>
 <p>The following table provides an overview of files used for building a project/design.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -174,7 +201,7 @@ via the <a class="reference internal" href="#ndk-conf-tldr"><span class="std std
 The placeholder {TOOL} refers to the tool-specific filename, for example: Vivado, Quartus.</p>
 </div>
 <table class="docutils align-default" id="id5">
-<caption><span class="caption-text">Configuration files</span><a class="headerlink" href="#id5" title="Link to this table"></a></caption>
+<caption><span class="caption-text">Configuration files</span><a class="headerlink" href="#id5" title="Link to this table">¶</a></caption>
 <colgroup>
 <col style="width: 25.0%" />
 <col style="width: 25.0%" />
@@ -255,7 +282,7 @@ The placeholder {TOOL} refers to the tool-specific filename, for example: Vivado
 </table>
 </section>
 <section id="parametrizing-ndk-core-design">
-<span id="ndk-core-configuration"></span><h2>Parametrizing NDK-CORE design<a class="headerlink" href="#parametrizing-ndk-core-design" title="Link to this heading"></a></h2>
+<span id="ndk-core-configuration"></span><h2>Parametrizing NDK-CORE design<a class="headerlink" href="#parametrizing-ndk-core-design" title="Link to this heading">¶</a></h2>
 <p>The files in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/config</span></code> directory and the
 <code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/core.mk</span></code> file contain CORE parameters. Some
 of these parameters are configurable (more info below). The sourcing of
@@ -267,7 +294,7 @@ the application and card-specific configuration, see following sections on this 
 <span id="fig-const-hierarchy"></span><a class="reference internal image-reference" href="../../_images/const_hierarchy.svg"><img alt="../../_images/const_hierarchy.svg" src="../../_images/const_hierarchy.svg" style="width: 463.04999999999995px; height: 458.4px;" />
 </a>
 <figcaption>
-<p><span class="caption-text">Hierarchy diagram</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
+<p><span class="caption-text">Hierarchy diagram</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
 <div class="legend">
 <p>Numbers show the order in which these parameter files are sourced. Sourcing
 takes place in the <cite>core_boostrap.tcl</cite> file.</p>
@@ -275,9 +302,9 @@ takes place in the <cite>core_boostrap.tcl</cite> file.</p>
 </figcaption>
 </figure>
 <section id="file-description">
-<h3>File description<a class="headerlink" href="#file-description" title="Link to this heading"></a></h3>
+<h3>File description<a class="headerlink" href="#file-description" title="Link to this heading">¶</a></h3>
 <section id="core-conf-tcl">
-<span id="ndk-core-conf-core-conf-tcl"></span><h4>core_conf.tcl<a class="headerlink" href="#core-conf-tcl" title="Link to this heading"></a></h4>
+<span id="ndk-core-conf-core-conf-tcl"></span><h4>core_conf.tcl<a class="headerlink" href="#core-conf-tcl" title="Link to this heading">¶</a></h4>
 <p>This file provides a listing of all parameters that can be changed by the user.
 Each parameter contains a comment with allowed values and the meaning of
 these values. Because the NDK-CORE design is independent of the underlying
@@ -287,7 +314,7 @@ and may cause errors during the synthesis/implementation process. The user can a
 other configuration parameters to this file according to their need.</p>
 </section>
 <section id="core-const-tcl">
-<span id="ndk-core-conf-core-const-tcl"></span><h4>core_const.tcl<a class="headerlink" href="#core-const-tcl" title="Link to this heading"></a></h4>
+<span id="ndk-core-conf-core-const-tcl"></span><h4>core_const.tcl<a class="headerlink" href="#core-const-tcl" title="Link to this heading">¶</a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This file contains parameters that should not be changed deliberately by the
@@ -318,13 +345,13 @@ TCL shell will raise an error and stop the compilation process. You should
 implement these checks only for the parameters used in the NDK-CORE.</p>
 </section>
 <section id="core-mk">
-<span id="core-mk-include"></span><h4>core.mk<a class="headerlink" href="#core-mk" title="Link to this heading"></a></h4>
+<span id="core-mk-include"></span><h4>core.mk<a class="headerlink" href="#core-mk" title="Link to this heading">¶</a></h4>
 <p>This file contains default values for the parameters specified in the Makefile.
 The allowed values of each parameter are provided in the comments. The user of the
 design can change these values freely.</p>
 </section>
 <section id="core-bootstrap-tcl">
-<h4>core_bootstrap.tcl<a class="headerlink" href="#core-bootstrap-tcl" title="Link to this heading"></a></h4>
+<h4>core_bootstrap.tcl<a class="headerlink" href="#core-bootstrap-tcl" title="Link to this heading">¶</a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The features in this file are for development and should not be changed.</p>
@@ -336,7 +363,7 @@ priority last. The <code class="docutils literal notranslate"><span class="pre">
 </section>
 </section>
 <section id="further-work-with-parameters">
-<h3>Further work with parameters<a class="headerlink" href="#further-work-with-parameters" title="Link to this heading"></a></h3>
+<h3>Further work with parameters<a class="headerlink" href="#further-work-with-parameters" title="Link to this heading">¶</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>These features are for development and should not be used in regular
@@ -347,7 +374,7 @@ parameters during compilation/synthesis of the VHDL source files. For this purpo
 there are two mechanisms provided for passing the parameters specified in the
 TCL shell to affect the final VHDL design.</p>
 <section id="passing-through-modules-tcl">
-<h4>Passing through Modules.tcl<a class="headerlink" href="#passing-through-modules-tcl" title="Link to this heading"></a></h4>
+<h4>Passing through Modules.tcl<a class="headerlink" href="#passing-through-modules-tcl" title="Link to this heading">¶</a></h4>
 <p>As described in the <a class="reference internal" href="../../ndk_build/readme.html#ofm-build-system"><span class="std std-ref">Build System</span></a> section, the Modules.tcl files allow
 for modular and hierarchical organization of VHDL source files. The Modules.tcl files
 provide an <em>ARCHGRP</em> list to pass specific constants across the source file hierarchy. Each
@@ -366,7 +393,7 @@ to the associative array when a specific array value is needed. An example is sh
 <code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/Modules.tcl</span></code> file.</p>
 </section>
 <section id="adding-constants-to-the-vhdl-package">
-<span id="core-config-vhdl-pkg-const"></span><h4>Adding constants to the VHDL package<a class="headerlink" href="#adding-constants-to-the-vhdl-package" title="Link to this heading"></a></h4>
+<span id="core-config-vhdl-pkg-const"></span><h4>Adding constants to the VHDL package<a class="headerlink" href="#adding-constants-to-the-vhdl-package" title="Link to this heading">¶</a></h4>
 <p>A dynamic VHDL package is generated each time a user starts
 building a new design. The package is called <code class="docutils literal notranslate"><span class="pre">combo_user_const</span></code> and
 contains all parameters which were added in the <code class="docutils literal notranslate"><span class="pre">core_const.tcl</span></code> file described
@@ -396,16 +423,16 @@ name.</p>
 </section>
 </section>
 <section id="parametrizing-a-specific-card-type">
-<span id="ndk-card-configuration"></span><h2>Parametrizing a specific card type<a class="headerlink" href="#parametrizing-a-specific-card-type" title="Link to this heading"></a></h2>
+<span id="ndk-card-configuration"></span><h2>Parametrizing a specific card type<a class="headerlink" href="#parametrizing-a-specific-card-type" title="Link to this heading">¶</a></h2>
 <p>The final design of the NDK application depends on the underlying
 platform, e.g., the card type on which the design should run.
 The system provides mechanism to configure card specific parameters.</p>
 <section id="id1">
-<h3>File description<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<h3>File description<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
 <p>The file structure is similar to the one described in the configuration of the
 <cite>NDK-CORE</cite> design.</p>
 <section id="card-conf-tcl">
-<h4>card_conf.tcl<a class="headerlink" href="#card-conf-tcl" title="Link to this heading"></a></h4>
+<h4>card_conf.tcl<a class="headerlink" href="#card-conf-tcl" title="Link to this heading">¶</a></h4>
 <p>This file lists user-configurable parameters and their possible values in the
 comments. The file contains parameters relevant to a specific card. Those
 parameters are mostly tied to the underlying hardware, like the number of Ethernet
@@ -414,7 +441,7 @@ same as that of the <code class="docutils literal notranslate"><span class="pre"
 difference is that it has a higher priority.</p>
 </section>
 <section id="card-const-tcl">
-<span id="card-conf-card-const-tcl"></span><h4>card_const.tcl<a class="headerlink" href="#card-const-tcl" title="Link to this heading"></a></h4>
+<span id="card-conf-card-const-tcl"></span><h4>card_const.tcl<a class="headerlink" href="#card-const-tcl" title="Link to this heading">¶</a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This file contains features for development. It is not recommended for the user to change
@@ -433,7 +460,7 @@ component is card-specific too).</p>
 they are used in the <cite>core_const.tcl</cite> file.</p>
 </section>
 <section id="card-mk">
-<h4>card.mk<a class="headerlink" href="#card-mk" title="Link to this heading"></a></h4>
+<h4>card.mk<a class="headerlink" href="#card-mk" title="Link to this heading">¶</a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This file contains features for development. It is not recommended for the user to change
@@ -447,7 +474,7 @@ these is described in the <a class="reference internal" href="#app-config-makefi
 </section>
 </section>
 <section id="id2">
-<h3>Further work with parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<h3>Further work with parameters<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>These features are for development and should not be used in regular
@@ -456,7 +483,7 @@ application use.</p>
 <p>Passing the parameter values to other parts of the design or build system is
 very similar to the case of <cite>NDK-CORE</cite>.</p>
 <section id="id3">
-<h4>Passing through Modules.tcl<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
+<h4>Passing through Modules.tcl<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
 <p>The card-specific parameters are passed to the Modules.tcl file of the top-level
 entity using the <code class="docutils literal notranslate"><span class="pre">CARD_ARCHGRP</span></code> associative array. This array is initialized in
 the <code class="docutils literal notranslate"><span class="pre">&lt;card_root_directory&gt;/src/Vivado.inc.tcl</span></code> file for Xilinx-based cards and
@@ -468,7 +495,7 @@ in the <a class="reference internal" href="#ndk-core-conf-core-conf-tcl"><span c
 are visible in the <cite>*.inc.tcl</cite> files and can be added to the array.</p>
 </section>
 <section id="id4">
-<h4>Adding constants to the VHDL package<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
+<h4>Adding constants to the VHDL package<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h4>
 <p>It is recommended to add card-specific constants to the <code class="docutils literal notranslate"><span class="pre">combo_user_const</span></code> VHDL
 package in <cite>card_const.tcl</cite> file. The way of adding these constants was described in
 the <a class="reference internal" href="#core-config-vhdl-pkg-const"><span class="std std-ref">Adding constants to the VHDL package</span></a> section in the documentation of NDK-CORE
@@ -477,19 +504,19 @@ configuration.</p>
 </section>
 </section>
 <section id="parametrizing-the-user-application">
-<span id="ndk-app-configuration"></span><h2>Parametrizing the user application<a class="headerlink" href="#parametrizing-the-user-application" title="Link to this heading"></a></h2>
+<span id="ndk-app-configuration"></span><h2>Parametrizing the user application<a class="headerlink" href="#parametrizing-the-user-application" title="Link to this heading">¶</a></h2>
 <p>The user application can also be parametrized using specific configuration
 files. Configuration parameters can be handed to the subcomponents of the
 <code class="docutils literal notranslate"><span class="pre">APPLICATION_CORE</span></code> design entity. It also allows the user to choose one of,
 sometimes, multiple configurations for a specific card before launching the
 build process.</p>
 <section id="configuration-files">
-<h3>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h3>
+<h3>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading">¶</a></h3>
 <p>The configuration of the application is less constrained than <cite>NDK-CORE</cite> and
 card configuration. The application repository provides three files in which the user
 application is or can be configured.</p>
 <section id="build-card-name-makefile">
-<span id="app-config-makefile"></span><h4>build/&lt;card_name&gt;/Makefile<a class="headerlink" href="#build-card-name-makefile" title="Link to this heading"></a></h4>
+<span id="app-config-makefile"></span><h4>build/&lt;card_name&gt;/Makefile<a class="headerlink" href="#build-card-name-makefile" title="Link to this heading">¶</a></h4>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This file contains features for development. It is not recommended for the user to change
@@ -516,7 +543,7 @@ make<span class="w"> </span>100g4<span class="w"> </span><span class="nv">DMA_TY
 </div>
 </section>
 <section id="build-card-name-vivado-quartus-tcl">
-<h4>build/&lt;card_name&gt;/{Vivado,Quartus}.tcl<a class="headerlink" href="#build-card-name-vivado-quartus-tcl" title="Link to this heading"></a></h4>
+<h4>build/&lt;card_name&gt;/{Vivado,Quartus}.tcl<a class="headerlink" href="#build-card-name-vivado-quartus-tcl" title="Link to this heading">¶</a></h4>
 <p>This file adds the <code class="docutils literal notranslate"><span class="pre">APPLICATION_CORE</span></code> architecture where a logic of a
 user application is. The <cite>APP_ARCHGRP</cite> associative array is
 initialized in this file and allows the user to pass one or more user-specified
@@ -525,7 +552,7 @@ components. All configuration parameters in the <a class="reference internal" hr
 are visible here and can be added to the array as well.</p>
 </section>
 <section id="build-card-name-app-conf-tcl">
-<span id="ndk-app-conf-app-conf-tcl"></span><h4>build/&lt;card_name&gt;/app_conf.tcl<a class="headerlink" href="#build-card-name-app-conf-tcl" title="Link to this heading"></a></h4>
+<span id="ndk-app-conf-app-conf-tcl"></span><h4>build/&lt;card_name&gt;/app_conf.tcl<a class="headerlink" href="#build-card-name-app-conf-tcl" title="Link to this heading">¶</a></h4>
 <p>This file has the highest priority of all user-configurable
 constants (for more details, refer to the <a class="reference internal" href="#fig-const-hierarchy"><span class="std std-ref">Hierarchy diagram</span></a>). The user
 can change the parameters specified in this file or add others according to
@@ -535,10 +562,10 @@ their needs. Adding a parameter to the VHDL package is also possible because the
 </section>
 </section>
 <section id="tl-dr">
-<span id="ndk-conf-tldr"></span><h2>TL;DR<a class="headerlink" href="#tl-dr" title="Link to this heading"></a></h2>
+<span id="ndk-conf-tldr"></span><h2>TL;DR<a class="headerlink" href="#tl-dr" title="Link to this heading">¶</a></h2>
 <p>This section contains specific recipes for achieving specific goals.</p>
 <section id="i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value">
-<h3>I need to include specific component in CORE depending on a given parameter value<a class="headerlink" href="#i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value" title="Link to this heading"></a></h3>
+<h3>I need to include specific component in CORE depending on a given parameter value<a class="headerlink" href="#i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value" title="Link to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>First, you should write your parameter to the
 <code class="docutils literal notranslate"><span class="pre">core/intel/config/core_conf.tcl</span></code> with a specific value (if the parameter
@@ -598,7 +625,7 @@ which they were added to the array.</p></li>
 </div>
 </section>
 <section id="what-can-i-do-with-the-core-conf-tcl-file">
-<h3>What can I do with the <cite>core_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-conf-tcl-file" title="Link to this heading"></a></h3>
+<h3>What can I do with the <cite>core_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-conf-tcl-file" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>You can declare new configuration parameters (and assign their default
 values) so they would be visible across all supported cards. These default
@@ -608,7 +635,7 @@ Especially when new configuration parameter or parameter value is added.</p></li
 </ul>
 </section>
 <section id="what-can-i-do-with-the-core-const-tcl-file">
-<h3>What can I do with the <cite>core_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-const-tcl-file" title="Link to this heading"></a></h3>
+<h3>What can I do with the <cite>core_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-core-const-tcl-file" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>You can add a dependent parameter (the value of such a parameter depends on
 the value of another parameter). The developer should add CORE-specific
@@ -644,13 +671,13 @@ the <cite>fpga.vhd</cite> and <cite>fpga_common.vhd</cite> components:</p></li>
 </div>
 </section>
 <section id="what-can-i-do-with-the-card-conf-tcl-file">
-<h3>What can I do with the <cite>card_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-conf-tcl-file" title="Link to this heading"></a></h3>
+<h3>What can I do with the <cite>card_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-conf-tcl-file" title="Link to this heading">¶</a></h3>
 <p>You can change parameters specified in the <cite>core_conf.tcl</cite> file for a specific
 card type (because some parameters are directly dependent on an underlying
 hardware), e.g., the number of Ethernet ports or Ethernet channels.</p>
 </section>
 <section id="what-can-i-do-with-the-card-const-tcl-file">
-<h3>What can I do with the <cite>card_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-const-tcl-file" title="Link to this heading"></a></h3>
+<h3>What can I do with the <cite>card_const.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-card-const-tcl-file" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>You can add a dependent parameter when a card requiers it. CORE specific
 parameters belong to the <cite>core_const.tcl</cite>.</p></li>
@@ -660,7 +687,7 @@ parameters belong to the <cite>core_const.tcl</cite>.</p></li>
 </ul>
 </section>
 <section id="what-can-i-do-with-the-app-conf-tcl-file">
-<h3>What can I do with the <cite>app_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-app-conf-tcl-file" title="Link to this heading"></a></h3>
+<h3>What can I do with the <cite>app_conf.tcl</cite> file<a class="headerlink" href="#what-can-i-do-with-the-app-conf-tcl-file" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>You can add parameters for the given application (component
 <cite>application_core.vhd</cite>).</p></li>
@@ -673,41 +700,130 @@ and <cite>core_const.tcl</cite>).</p></li>
 </section>
 </section>
 <section id="contact-for-author">
-<h2>Contact for author<a class="headerlink" href="#contact-for-author" title="Link to this heading"></a></h2>
+<h2>Contact for author<a class="headerlink" href="#contact-for-author" title="Link to this heading">¶</a></h2>
 <p>Send suggestions regarding missing information or unanswered questions to
 <cite>valekv&#64;cesnet.cz</cite>.</p>
 </section>
 </section>
 
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="tsu.html" class="btn btn-neutral float-left" title="Time Stamp Unit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="testing.html" class="btn btn-neutral float-right" title="NDK testing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        </div>
+      </div> 
+    <div id="show_right_sidebar">
+        <p>
+            <a class="toggle_right_sidebar" href="#"
+                ><span class="icon">&lt;</span><span>Page contents</span></a
+            >
+        </p>
     </div>
 
-  <hr/>
+    <div id="right_sidebar">
+        <p>
+            <a class="toggle_right_sidebar" href="#"
+                ><span class="icon">&gt;</span><span>Page contents:</span></a
+            >
+        </p>
+        <div class="page_toc"><ul>
+<li><a class="reference internal" href="#">Configuration files and parameters</a><ul>
+<li><a class="reference internal" href="#build-system-files">Build system files</a></li>
+<li><a class="reference internal" href="#parametrizing-ndk-core-design">Parametrizing NDK-CORE design</a><ul>
+<li><a class="reference internal" href="#file-description">File description</a><ul>
+<li><a class="reference internal" href="#core-conf-tcl">core_conf.tcl</a></li>
+<li><a class="reference internal" href="#core-const-tcl">core_const.tcl</a></li>
+<li><a class="reference internal" href="#core-mk">core.mk</a></li>
+<li><a class="reference internal" href="#core-bootstrap-tcl">core_bootstrap.tcl</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#further-work-with-parameters">Further work with parameters</a><ul>
+<li><a class="reference internal" href="#passing-through-modules-tcl">Passing through Modules.tcl</a></li>
+<li><a class="reference internal" href="#adding-constants-to-the-vhdl-package">Adding constants to the VHDL package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parametrizing-a-specific-card-type">Parametrizing a specific card type</a><ul>
+<li><a class="reference internal" href="#id1">File description</a><ul>
+<li><a class="reference internal" href="#card-conf-tcl">card_conf.tcl</a></li>
+<li><a class="reference internal" href="#card-const-tcl">card_const.tcl</a></li>
+<li><a class="reference internal" href="#card-mk">card.mk</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">Further work with parameters</a><ul>
+<li><a class="reference internal" href="#id3">Passing through Modules.tcl</a></li>
+<li><a class="reference internal" href="#id4">Adding constants to the VHDL package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parametrizing-the-user-application">Parametrizing the user application</a><ul>
+<li><a class="reference internal" href="#configuration-files">Configuration files</a><ul>
+<li><a class="reference internal" href="#build-card-name-makefile">build/&lt;card_name&gt;/Makefile</a></li>
+<li><a class="reference internal" href="#build-card-name-vivado-quartus-tcl">build/&lt;card_name&gt;/{Vivado,Quartus}.tcl</a></li>
+<li><a class="reference internal" href="#build-card-name-app-conf-tcl">build/&lt;card_name&gt;/app_conf.tcl</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tl-dr">TL;DR</a><ul>
+<li><a class="reference internal" href="#i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value">I need to include specific component in CORE depending on a given parameter value</a></li>
+<li><a class="reference internal" href="#what-can-i-do-with-the-core-conf-tcl-file">What can I do with the <cite>core_conf.tcl</cite> file</a></li>
+<li><a class="reference internal" href="#what-can-i-do-with-the-core-const-tcl-file">What can I do with the <cite>core_const.tcl</cite> file</a></li>
+<li><a class="reference internal" href="#what-can-i-do-with-the-card-conf-tcl-file">What can I do with the <cite>card_conf.tcl</cite> file</a></li>
+<li><a class="reference internal" href="#what-can-i-do-with-the-card-const-tcl-file">What can I do with the <cite>card_const.tcl</cite> file</a></li>
+<li><a class="reference internal" href="#what-can-i-do-with-the-app-conf-tcl-file">What can I do with the <cite>app_conf.tcl</cite> file</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contact-for-author">Contact for author</a></li>
+</ul>
+</li>
+</ul>
+</div>
+    </div>
+     
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="tsu.html">
+                    <span class="icon">&lt;</span
+                    ><span>Time Stamp Unit</span></a
+                >
+                
+            </div>
 
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+            <div class="right">
+                
+                <a href="testing.html"
+                    ><span>NDK testing</span
+                    ><span class="icon">&gt;</span></a
+                >
+                
+            </div>
         </div>
-      </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+    </div>
+     
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, CESNET z.s.p.o..
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+    <div
+        style="
+            box-sizing: border-box;
+            padding-top: 0.2rem;
+            font-size: 0.7rem;
+            text-align: center;
+            color: var(--faintFontColor);
+        "
+    >
+        Git branch: devel<br>Git hash: ea2302fb
+    </div>
 
-</body>
+    <p id="theme_credit">
+        
+    </p>
+  </body>
 </html>
