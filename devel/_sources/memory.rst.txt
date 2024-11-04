@@ -75,6 +75,9 @@ Allows setting type of memory (LUT, BRAM, URAM) or automatic mode. Optimized for
 
 **SP_URAM_XILINX** - Structural implementation of single clock URAM memory based on Xilinx specific primitives with one read/write port. Only for Xilinx UltraScale+ FPGAs.
 
+**<MEMORY>_CLEAR** - Wrap around **<MEMORY>** with additional clear logic.
+Detailed :ref:`documentation can be found here<mem_clear>`.
+
 .. toctree::
    :maxdepth: 1
    :hidden:
@@ -83,6 +86,7 @@ Allows setting type of memory (LUT, BRAM, URAM) or automatic mode. Optimized for
    comp/base/mem/sdp_bram/readme
    comp/base/mem/mp_bram/readme
    comp/base/mem/lvt_mem/readme
+   comp/base/mem/mem_clear/readme
 ..   comp/base/mem/<something>
 
 References

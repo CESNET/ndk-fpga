@@ -263,6 +263,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../base/mem/sdp_bram/readme.html#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../base/mem/mp_bram/readme.html">Multi-port BRAM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../base/mem/lvt_mem/readme.html">Live value table memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../base/mem/mem_clear/readme.html">Memory clear</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../fifo.html">FIFO components</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of FIFO components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -572,18 +573,19 @@
 <tr class="row-even" id="vhdl-gengeneric-histogramer-input_width"><td><p>INPUT_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>UNDEFINED</p></td>
-<td><p>Width of input values</p></td>
+<td><p>Input values width</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-histogramer-box_width"><td><p>BOX_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>UNDEFINED</p></td>
-<td><p>Width of one histogram box (number of values in a given range)
+<td><p>Histogram box width (number of occurences in a given range)
 Box probably overflowed when its value equals 2**BOX_WIDTH-1</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-histogramer-box_cnt"><td><p>BOX_CNT</p></td>
 <td><p>integer</p></td>
 <td><p>UNDEFINED</p></td>
-<td><p>Number of histogram boxes (defines histogram precision)</p></td>
+<td><p>Number of histogram boxes (defines histogram precision)
+Must be power of 2</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-histogramer-read_prior"><td><p>READ_PRIOR</p></td>
 <td><p>boolean</p></td>
@@ -747,7 +749,7 @@ Box probably overflowed when its value equals 2**BOX_WIDTH-1</p></td>
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: bf3c4314
+                            Git branch: devel<br>Git hash: aa7c0691
                         </div>
                         
                     </div>
