@@ -875,6 +875,103 @@ Common used files are DevTree.dts/dtb/vhd and user_const.vhd.</p>
 <p>For other values and their purpose see the Vivado.inc.tcl or Quartus.inc.tcl file in the build directory.</p>
 </section>
 </section>
+<section id="device-tree-nodes">
+<h2>Device Tree nodes<a class="headerlink" href="#device-tree-nodes" title="Link to this heading">¶</a></h2>
+<p>For the software to find internal firmware components, a <em>Device Tree (DT)</em> is
+used. This provides a tree of available parts (called nodes in the DT
+terminology) of the design that can be accessed from the host without
+restriction. A developer creates TCL procedures that generate nodes to <em>DT
+string (DTS)</em> for the components he finds fit. Since the creation of the DTS can
+be challenging, there are several TCL procedures provided that simplify the
+process. These procedures are contained within the <code class="docutils literal notranslate"><span class="pre">dts_templates.tcl</span></code> file
+with clarifying comments. The following examples provide an overview of their
+usage.</p>
+<section id="example-1">
+<h3>Example 1<a class="headerlink" href="#example-1" title="Link to this heading">¶</a></h3>
+<p>This presents a least viable code that creates a node
+<code class="docutils literal notranslate"><span class="pre">dma_calypte_rx_perf_cntrs0</span></code> with the base address <em>0x8000</em>
+and the size <em>0x30</em>. It also contains a compatible string
+<code class="docutils literal notranslate"><span class="pre">cesnet,dma_calypte_rx_perf_cntrs</span></code>. The string property is appended to <code class="docutils literal notranslate"><span class="pre">dts</span></code>
+variable that contains a reference to the required Device Tree string (DTS).</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_rx_perf_cntrs0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="mh">0x8000</span><span class="w"> </span><span class="mh">0x30</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_calypte_rx_perf_cntrs&quot;</span>
+<span class="k">}</span>
+</pre></div>
+</div>
+</section>
+<section id="example-2">
+<h3>Example 2<a class="headerlink" href="#example-2" title="Link to this heading">¶</a></h3>
+<p>A second, more complex example demonstrates addition of multiple properties to a
+node called <code class="docutils literal notranslate"><span class="pre">dma_ctrl_calypte_$dir$id</span></code> (string can be further adjusted through
+parameters <code class="docutils literal notranslate"><span class="pre">dir</span></code> and <code class="docutils literal notranslate"><span class="pre">id</span></code>).</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">proc</span><span class="w"> </span>dts_dma_calypte_ctrl<span class="w"> </span><span class="k">{</span><span class="nv">DTS</span><span class="w"> </span>dir<span class="w"> </span>id<span class="w"> </span>base<span class="w"> </span>pcie<span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="k">upvar</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nv">$DTS</span><span class="w"> </span>dts
+
+<span class="w">    </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_ctrl_calypte_$dir$id&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">        </span><span class="c"># Adding compatible string &quot;cesnet,dma_ctrl_calypte_$dir&quot; and the</span>
+<span class="w">        </span><span class="c"># reg property with base address $base and the size 0x80.</span>
+<span class="w">        </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$base</span><span class="w"> </span><span class="mh">0x80</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_ctrl_calypte_$dir&quot;</span>
+<span class="w">        </span><span class="c"># Integer property called &quot;version&quot; with the value 0x10000</span>
+<span class="w">        </span><span class="nv">dts_appendprop_int</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;version&quot;</span><span class="w"> </span><span class="mh">0x10000</span>
+<span class="w">        </span><span class="c"># Integer prperty &quot;pcie&quot; with the value of $pcie</span>
+<span class="w">        </span><span class="nv">dts_appendprop_int</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;pcie&quot;</span><span class="w"> </span><span class="nv">$pcie</span>
+
+<span class="w">        </span><span class="c"># The addition of custom properties (customly named) can be done</span>
+<span class="w">        </span><span class="c"># through a standard &quot;append&quot; macro.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="w"> </span><span class="nv">$dir</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;tx&quot;</span><span class="w"> </span><span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nb">append</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;data_buff = &lt;&amp;dma_calypte_tx_data_buff$id&gt;;&quot;</span>
+<span class="w">            </span><span class="nb">append</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;hdr_buff = &lt;&amp;dma_calypte_tx_hdr_buff$id&gt;;&quot;</span>
+<span class="w">        </span><span class="k">}</span>
+<span class="w">        </span><span class="nb">append</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;params = &lt;&amp;dma_params_$dir$pcie&gt;;&quot;</span>
+<span class="w">    </span><span class="k">}</span>
+<span class="k">}</span>
+</pre></div>
+</div>
+</section>
+<section id="example-3">
+<h3>Example 3<a class="headerlink" href="#example-3" title="Link to this heading">¶</a></h3>
+<p>This example shows how complex node with multiple subnodes is created. The parent
+node is called <code class="docutils literal notranslate"><span class="pre">dma_calypte_test_core0</span></code> and contains subnodes
+<code class="docutils literal notranslate"><span class="pre">mfb_loopback0</span></code>, <code class="docutils literal notranslate"><span class="pre">dma_calypte_debug_core0</span></code>, <code class="docutils literal notranslate"><span class="pre">dma_calypte_latency_meter0</span></code>
+and <code class="docutils literal notranslate"><span class="pre">dma_calypte_reset_fsm0</span></code>. Further nesting of nodes is possible as can be
+seen when adding the <code class="docutils literal notranslate"><span class="pre">mfb_generator0</span></code> node. Each of the called procedures
+contain a reference to the same DTS from the <code class="docutils literal notranslate"><span class="pre">dts</span></code> variable.</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">proc</span><span class="w"> </span>dts_calypte_test_core<span class="w"> </span><span class="k">{</span><span class="nv">DTS</span><span class="w"> </span>base_addr<span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="c"># Populate reference from the calling environment</span>
+<span class="w">    </span><span class="k">upvar</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nv">$DTS</span><span class="w"> </span>dts
+
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>LOOPBACK_BASE_ADDR<span class="w">      </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$base_addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0x0</span><span class="k">]</span>
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>TX_DBG_CORE_BASE_ADDR<span class="w">   </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$base_addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0x10000</span><span class="k">]</span>
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>LATENCY_METER_BASE_ADDR<span class="w"> </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$base_addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0x20000</span><span class="k">]</span>
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>RESET_FSM_BASE_ADDR<span class="w">     </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$base_addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0x30000</span><span class="k">]</span>
+
+<span class="w">    </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_test_core0&quot;</span><span class="w"> </span><span class="k">{</span>
+
+<span class="w">        </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;mfb_loopback0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$LOOPBACK_BASE_ADDR</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="s2">&quot;cesnet,mfb_loopback&quot;</span>
+<span class="w">        </span><span class="k">}</span>
+
+<span class="w">        </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_debug_core0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$TX_DBG_CORE_BASE_ADDR</span><span class="w"> </span><span class="mh">0x1600</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_calypte_debug_core&quot;</span>
+
+<span class="w">            </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;mfb_generator0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">                </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$TX_DBG_CORE_BASE_ADDR</span><span class="o">+</span><span class="mh">0x8000</span><span class="k">]</span><span class="w"> </span><span class="mh">0x40</span><span class="w"> </span><span class="s2">&quot;cesnet,mfb_generator&quot;</span>
+<span class="w">            </span><span class="k">}</span>
+<span class="w">        </span><span class="k">}</span>
+
+<span class="w">        </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_latency_meter0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$LATENCY_METER_BASE_ADDR</span><span class="w"> </span><span class="mh">0x30</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_calypte_latency_meter&quot;</span>
+<span class="w">        </span><span class="k">}</span>
+
+<span class="w">        </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_reset_fsm0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$RESET_FSM_BASE_ADDR</span><span class="w"> </span><span class="mh">0x4</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_calypte_reset_fsm&quot;</span>
+<span class="w">        </span><span class="k">}</span>
+<span class="w">    </span><span class="k">}</span>
+<span class="k">}</span>
+</pre></div>
+</div>
+</section>
+</section>
 </section>
 
                 </article>
@@ -921,7 +1018,7 @@ Common used files are DevTree.dts/dtb/vhd and user_const.vhd.</p>
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: f1cd361c
+                            Git branch: devel<br>Git hash: 9251cc20
                         </div>
                         
                     </div>
@@ -973,6 +1070,12 @@ Common used files are DevTree.dts/dtb/vhd and user_const.vhd.</p>
 <li><a class="reference internal" href="#batch-feature-in-evalfile">Batch feature in EvalFile</a></li>
 <li><a class="reference internal" href="#makefile">Makefile</a></li>
 <li><a class="reference internal" href="#the-incomplete-list-of-synth-flags-array-items">The (incomplete) list of SYNTH_FLAGS array items</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#device-tree-nodes">Device Tree nodes</a><ul>
+<li><a class="reference internal" href="#example-1">Example 1</a></li>
+<li><a class="reference internal" href="#example-2">Example 2</a></li>
+<li><a class="reference internal" href="#example-3">Example 3</a></li>
 </ul>
 </li>
 </ul>

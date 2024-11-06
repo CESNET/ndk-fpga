@@ -681,18 +681,23 @@ the maximum is 2**16 - 1</p></td>
 <td><p>Enables an additional register of the transaction buffer that improves
 throughput</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-perf_cntr_en"><td><p>PERF_CNTR_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enables performance counters alowing metrics generation.</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>TX DMA settings</p></td>
 <td><p>=====</p></td>
 <td><p>Settings for TX direction of DMA Module</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_channels"><td><p>TX_CHANNELS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_channels"><td><p>TX_CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Total number of TX DMA Channels
 Minimum value: TX_SEL_CHANNELS*DMA_ENDPOINTS</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_ptr_width"><td><p>TX_PTR_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_ptr_width"><td><p>TX_PTR_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>14</p></td>
 <td><p>Width of Software and Hardware Descriptor Pointer
@@ -700,40 +705,40 @@ Defines width of signals used for these values in DMA Module
 Affects logic complexity
 Maximum value: 32 (restricted by size of SDP and HDP MI register)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-usr_tx_pkt_size_max"><td><p>USR_TX_PKT_SIZE_MAX</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-usr_tx_pkt_size_max"><td><p>USR_TX_PKT_SIZE_MAX</p></td>
 <td><p>natural</p></td>
 <td><p>2**12</p></td>
 <td><p>Maximum size of a User packet (in bytes)
 Defines width of Packet length signals.
 the maximum is 2**16 - 1</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>Optional settings</p></td>
 <td><p>=====</p></td>
 <td><p>Settings for testing and debugging, settings usually left unchanged
 at entity-area constants.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-dsp_cnt_width"><td><p>DSP_CNT_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-dsp_cnt_width"><td><p>DSP_CNT_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>64</p></td>
 <td><p>Width of DSP packet and byte statistics counters</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-rx_gen_en"><td><p>RX_GEN_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-rx_gen_en"><td><p>RX_GEN_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
 <td><p>Enable generation of RX/TX side of DMA Module</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_gen_en"><td><p>TX_GEN_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_gen_en"><td><p>TX_GEN_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-mi_width"><td><p>MI_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-mi_width"><td><p>MI_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>Width of MI bus</p></td>
@@ -1087,7 +1092,7 @@ configurations.</p>
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: f1cd361c
+                            Git branch: devel<br>Git hash: 9251cc20
                         </div>
                         
                     </div>
