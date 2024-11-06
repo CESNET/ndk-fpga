@@ -107,6 +107,7 @@ support a subset of these cards. A complete list of supported FPGA cards can be 
     ndk_cards/amd/vcu118/readme
     extra/nfb-200g2ql/readme
     ndk_cards/prodesign/pd-falcon/readme
+    ndk_cards/terasic/a2700/readme
 
 --------
 
