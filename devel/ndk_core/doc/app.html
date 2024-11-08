@@ -932,6 +932,16 @@ The minimum allowed length of the packet data is 60B, if necessary, the applicat
 <td><p>2</p></td>
 <td><p>Width of reset signals</p></td>
 </tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-misc_top2app_width"><td><p>MISC_TOP2APP_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Width of MISC signal between Top-Level FPGA design and APP core logic</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-misc_app2top_width"><td><p>MISC_APP2TOP_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Width of MISC signal between APP core logic and Top-Level FPGA design</p></td>
+</tr>
 <tr class="row-odd" id="vhdl-gengeneric-application_core-board"><td><p>BOARD</p></td>
 <td><p>string</p></td>
 <td><p>UNDEFINED</p></td>
@@ -1742,6 +1752,21 @@ Can be used to avoid stopping the whole DMA Module when just a single channel is
 <td><p>out</p></td>
 <td><p>MI bus: valid of MI_DRD data signal</p></td>
 </tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MISC SIGNALS (the clock signal is not defined)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-application_core-misc_top2app"><td><p>MISC_TOP2APP</p></td>
+<td><p>std_logic_vector(MISC_TOP2APP_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Optional signal for MISC connection from Top-Level FPGA design to APP core.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-application_core-misc_app2top"><td><p>MISC_APP2TOP</p></td>
+<td><p>std_logic_vector(MISC_APP2TOP_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Optional signal for MISC connection from APP core to Top-Level FPGA design.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1794,7 +1819,7 @@ Can be used to avoid stopping the whole DMA Module when just a single channel is
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: d9a84761
+                            Git branch: devel<br>Git hash: abcb471e
                         </div>
                         
                     </div>

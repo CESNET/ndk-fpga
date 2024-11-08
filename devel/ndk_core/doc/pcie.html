@@ -783,6 +783,16 @@ the PCIe IP RQ and RC interfaces.</p></td>
 <td><p>false</p></td>
 <td><p>Enable of XCV IP, for Xilinx only</p></td>
 </tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-misc_top2pcie_width"><td><p>MISC_TOP2PCIE_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Width of MISC signal between Top-Level FPGA design and PCIE core logic</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-misc_pcie2top_width"><td><p>MISC_PCIE2TOP_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Width of MISC signal between PCIE core logic and Top-Level FPGA design</p></td>
+</tr>
 <tr class="row-odd" id="vhdl-gengeneric-pcie-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
@@ -1245,6 +1255,21 @@ MI_DBG - MI interface to PCIe registers (currently only debug registers)</p></td
 <td><p>out</p></td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MISC SIGNALS (the clock signal is not defined)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-misc_top2pcie"><td><p>MISC_TOP2PCIE</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(MISC_TOP2PCIE_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Optional signal for MISC connection from Top-Level FPGA design to PCIE core.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-misc_pcie2top"><td><p>MISC_PCIE2TOP</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(MISC_PCIE2TOP_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Optional signal for MISC connection from PCIE core to Top-Level FPGA design.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1297,7 +1322,7 @@ MI_DBG - MI interface to PCIe registers (currently only debug registers)</p></td
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: d9a84761
+                            Git branch: devel<br>Git hash: abcb471e
                         </div>
                         
                     </div>

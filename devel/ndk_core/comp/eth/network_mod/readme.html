@@ -818,6 +818,16 @@ WARNING: works only for a single-channel (and single-Region) designs with E-Tile
 <td><p>8</p></td>
 <td><p>Number of user resets.</p></td>
 </tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-misc_top2net_width"><td><p>MISC_TOP2NET_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Width of MISC signal between Top-Level FPGA design and NET_MOD core logic</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-misc_net2top_width"><td><p>MISC_NET2TOP_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Width of MISC signal between NET_MOD core logic and Top-Level FPGA design</p></td>
+</tr>
 <tr class="row-even" id="vhdl-gengeneric-network_mod-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
@@ -1313,6 +1323,21 @@ from the APP Core to the demo/testing logic in the Network Mod Core (E-Tile).</p
 <td><p>in</p></td>
 <td></td>
 </tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MISC SIGNALS (the clock signal is not defined)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-network_mod-misc_top2net"><td><p>MISC_TOP2NET</p></td>
+<td><p>slv_array_t(ETH_PORTS-1 downto 0)(MISC_TOP2NET_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Optional signal for MISC connection from Top-Level FPGA design to NET_MOD core.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-network_mod-misc_net2top"><td><p>MISC_NET2TOP</p></td>
+<td><p>slv_array_t(ETH_PORTS-1 downto 0)(MISC_NET2TOP_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Optional signal for MISC connection from NET_MOD core to Top-Level FPGA design.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1343,7 +1368,7 @@ from the APP Core to the demo/testing logic in the Network Mod Core (E-Tile).</p
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: d9a84761
+                            Git branch: devel<br>Git hash: abcb471e
                         </div>
                         
                     </div>
