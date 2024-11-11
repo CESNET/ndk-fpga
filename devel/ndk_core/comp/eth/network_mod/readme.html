@@ -1059,18 +1059,18 @@ PORT_ENABLED    : out std_logic_vector(ETH_PORTS-1 downto 0);</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-network_mod-eth_tx_mvb_channel"><td><p>ETH_TX_MVB_CHANNEL</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*max(1,log2(TX_DMA_CHANNELS))-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*max(1,log2(TX_DMA_CHANNELS))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>This interface is to transmit Channel IDs and Timestamps of packets
 from the APP Core to the demo/testing logic in the Network Mod Core (E-Tile).</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-network_mod-eth_tx_mvb_timestamp"><td><p>ETH_TX_MVB_TIMESTAMP</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS*48-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS*48-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-network_mod-eth_tx_mvb_vld"><td><p>ETH_TX_MVB_VLD</p></td>
-<td><p>std_logic_vector(ETH_PORTS*REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS*REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -1369,7 +1369,7 @@ from the APP Core to the demo/testing logic in the Network Mod Core (E-Tile).</p
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: 5916ccda
+                            Git branch: devel<br>Git hash: aad65d35
                         </div>
                         
                     </div>
