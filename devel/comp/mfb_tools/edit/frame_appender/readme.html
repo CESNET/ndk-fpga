@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="Live value table memory" href="../lvt_mem/readme.html" /><link rel="prev" title="Simple dual-port BRAM" href="../sdp_bram/readme.html" />
+<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="MFB FRAME EXTENDER" href="../frame_extender/readme.html" /><link rel="prev" title="MFB Generator" href="../../debug/generator/readme.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Multi-port BRAM - NDK-FPGA documentation</title>
+        <title>MFB MVB Appender - NDK-FPGA documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -253,43 +253,43 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../../base.html">Basic Tools</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Basic Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../base.html">Basic Tools</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Basic Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../async.html">Asynchronous modules</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Asynchronous modules</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2 current has-children"><a class="reference internal" href="../../../../memory.html">Memory modules</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Memory modules</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../np_lutram/readme.html">NP LUT RAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../sdp_bram/readme.html">Simple dual-port BRAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../sdp_bram/readme.html#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Multi-port BRAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../lvt_mem/readme.html">Live value table memory</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../mem_clear/readme.html">Memory clear</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../memory.html">Memory modules</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Memory modules</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/mem/np_lutram/readme.html">NP LUT RAM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/mem/sdp_bram/readme.html">Simple dual-port BRAM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/mem/sdp_bram/readme.html#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/mem/mp_bram/readme.html">Multi-port BRAM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/mem/lvt_mem/readme.html">Live value table memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/mem/mem_clear/readme.html">Memory clear</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../fifo.html">FIFO components</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of FIFO components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../fifo/asfifox/readme.html">ASFIFOX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../fifo/fifox/readme.html">FIFOX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../fifo/fifox_multi/readme.html">FIFOX Multi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/fifo/asfifox/readme.html">ASFIFOX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/fifo/fifox/readme.html">FIFOX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/fifo/fifox_multi/readme.html">FIFOX Multi</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../dsp.html">DSP components</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of DSP components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../dsp/dsp_comparator/readme.html">DSP Comparator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/dsp/dsp_comparator/readme.html">DSP Comparator</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../logic.html">Basic logic elements</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Basic logic elements</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/n_loop_op/readme.html">N_LOOP_OP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/sr_sync_latch/readme.html">Synchronous SR latch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/barrel_shifter/readme.html">Barrel Shifter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/cnt_multi_memx/readme.html">Multi MEMx Counter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/h3hash/readme.html">H3 Class Hash</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/logic/n_loop_op/readme.html">N_LOOP_OP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/logic/sr_sync_latch/readme.html">Synchronous SR latch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/logic/barrel_shifter/readme.html">Barrel Shifter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/logic/cnt_multi_memx/readme.html">Multi MEMx Counter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/logic/h3hash/readme.html">H3 Class Hash</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../misc.html">Miscellaneous</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of Miscellaneous</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../misc/crossbarx/readme.html">CrossbarX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../misc/trans_sorter/readme.html">Transaction Sorter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../misc/packet_planner/readme.html">Packet Planner</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../misc/event_counter/readme.html">Event Counter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../misc/pulse_short/readme.html">Pulse short</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/misc/crossbarx/readme.html">CrossbarX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/misc/trans_sorter/readme.html">Transaction Sorter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/misc/packet_planner/readme.html">Packet Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/misc/event_counter/readme.html">Event Counter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../base/misc/pulse_short/readme.html">Pulse short</a></li>
 </ul>
 </li>
 </ul>
@@ -309,42 +309,42 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/converters/mi2axi4/readme.html">MI2AXI4</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of MFB Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/debug/generator/readme.html">MFB Generator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/edit/frame_appender/readme.html">MFB MVB Appender</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/edit/frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/edit/frame_trimmer/readme.html">MFB FRAME TRIMMER</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/cutter_simple/readme.html">MFB Cutter Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/dropper/readme.html">MFB Dropper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/enabler/readme.html">MFB Enabler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/frame_masker/readme.html">MFB Frame Masker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/frame_packer/readme.html">Frame Packer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/frame_unpacker/readme.html">Frame Unpacker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/loopback/readme.html">MFB Loopback</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/merger/readme.html">MFB Merger</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/merger_simple/readme.html">MFB Merger Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/merger_simple/readme.html#id1">MFB Merger Simple GEN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/metadata_insertor/readme.html">Metadata Insertor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/packet_delayer/readme.html">Packet Delayer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/pipe/readme.html">MFB PIPE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/rate_limiter/readme.html">Rate Limiter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/reconfigurator/readme.html">MFB Reconfigurator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/splitter/readme.html">MFB Splitter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/splitter/readme.html#id1">MFB Splitter Gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/splitter_simple/readme.html">MFB Splitter Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/timestamp_limiter/readme.html">Timestamp Limiter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/transformer/readme.html">MFB Trasformer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/asfifox/readme.html">MFB ASFIFOX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/fifox/readme.html">MFB FIFOX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/pd_asfifo_simple/readme.html">MFB PD ASFIFO SIMPLE</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of MFB Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debug/generator/readme.html">MFB Generator</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">MFB MVB Appender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_trimmer/readme.html">MFB FRAME TRIMMER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/cutter_simple/readme.html">MFB Cutter Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/dropper/readme.html">MFB Dropper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/enabler/readme.html">MFB Enabler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/frame_masker/readme.html">MFB Frame Masker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/frame_packer/readme.html">Frame Packer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/frame_unpacker/readme.html">Frame Unpacker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/loopback/readme.html">MFB Loopback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merger/readme.html">MFB Merger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merger_simple/readme.html">MFB Merger Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merger_simple/readme.html#id1">MFB Merger Simple GEN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/metadata_insertor/readme.html">Metadata Insertor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/packet_delayer/readme.html">Packet Delayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/pipe/readme.html">MFB PIPE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/rate_limiter/readme.html">Rate Limiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/reconfigurator/readme.html">MFB Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/splitter/readme.html">MFB Splitter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/splitter/readme.html#id1">MFB Splitter Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/splitter_simple/readme.html">MFB Splitter Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/timestamp_limiter/readme.html">Timestamp Limiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/transformer/readme.html">MFB Trasformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MFB ASFIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MFB FIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/pd_asfifo_simple/readme.html">MFB PD ASFIFO SIMPLE</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../mvb.html">MVB Components</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle navigation of MVB Components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -466,7 +466,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
@@ -504,7 +504,7 @@
                 </a>
                 <div class="content-icon-container">
                     <div class="view-this-page">
-  <a class="muted-link" href="../../../../_sources/comp/base/mem/mp_bram/readme.rst.txt" title="View this page">
+  <a class="muted-link" href="../../../../_sources/comp/mfb_tools/edit/frame_appender/readme.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -541,13 +541,35 @@
                     </label>
                 </div>
                 <article role="main" id="furo-main-content">
-                    <section id="multi-port-bram">
-<span id="mp-bram"></span><h1>Multi-port BRAM<a class="headerlink" href="#multi-port-bram" title="Link to this heading">¶</a></h1>
+                    <section id="mfb-mvb-appender">
+<span id="id1"></span><h1>MFB MVB Appender<a class="headerlink" href="#mfb-mvb-appender" title="Link to this heading">¶</a></h1>
 <dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-mp_bram">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MP_BRAM</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mp_bram" title="Link to this definition">¶</a></dt>
-<dd><p>Multi-port BRAM. Currently supports only one write port. This will change in future.
-Amount of read ports is not restricted.</p>
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_mvb_appender">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_MVB_APPENDER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_mvb_appender" title="Link to this definition">¶</a></dt>
+<dd><p>This component appends input MVB Items to packets (moves EOF).
+Its simple architecture utilizes MFB reconfigurators:
+Input MFB words are first reconfigured to MFB#(1,1,MFB_REGION_SIZE*MFB_BLOCK_SIZE,MFB_ITEM_WIDTH),
+so SOFs are aligned to the start of word (MFB Block 0).
+The appending process occurs in two steps:</p>
+<ol class="arabic simple">
+<li><p>MVB append data are inserted onto a (temporary) MFB word and
+shifted according to the EOF (POS) of the original packet.</p></li>
+<li><p>This word is multiplexed with the MFB word containing the original packet
+according to the so-called “append vector”, which contains 1s from
+the EOF of the original packet to the offset created by the append data.</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In this first version, the component has certain limitations:</p>
+<ol class="arabic simple">
+<li><p>Only one MFB Region is supported.
+Multiple MFB Reagions are difficult to handle for the shifting mechanism.</p></li>
+<li><p>MVB Items cannot be wider than the MFB word.
+This would also cause problems for the shifting mechanism.</p></li>
+</ol>
+</div>
+<p>Further versions could remove these limitations.
+They could also utilize MFB Frame Masker instead of the Reconfigurators.</p>
 <span class="sig-name descname">Generics</span><div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -558,77 +580,71 @@ Amount of read ports is not restricted.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-gengeneric-mp_bram-data_width"><td><p>DATA_WIDTH</p></td>
-<td><p>integer</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<td><p>natural</p></td>
 <td><p>1</p></td>
-<td><p>Data word width in bits. If BLOCK_ENABLE is True then DATA_WIDTH must
-be N*BLOCK_WIDTH.</p></td>
+<td><p>Number of Regions within a data word, must be power of 2.
+In this version, only one MFB Region is supported.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mp_bram-block_width"><td><p>BLOCK_WIDTH</p></td>
-<td><p>integer</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
 <td><p>8</p></td>
-<td><p>[1, inf] -&gt; block width</p></td>
+<td><p>Region size (in Blocks).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mp_bram-block_enable"><td><p>BLOCK_ENABLE</p></td>
-<td><p>boolean</p></td>
-<td><p>False</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mp_bram-items"><td><p>ITEMS</p></td>
-<td><p>integer</p></td>
-<td><p>4096</p></td>
-<td><p>Depth of BRAM in number of the data words.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-mp_bram-output_reg"><td><p>OUTPUT_REG</p></td>
-<td><p>boolean</p></td>
-<td><p>True</p></td>
-<td><p>Output directly from BRAM or throw register (better timing).</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mp_bram-write_ports"><td><p>WRITE_PORTS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
-<td><p>1</p></td>
-<td><p>Amount of write ports, currently supports just 1 write port.</p></td>
+<td><p>8</p></td>
+<td><p>Block size (in Items), must be 8.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mp_bram-read_ports"><td><p>READ_PORTS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>2</p></td>
-<td><p>Amount of read ports. For each read port, BRAM is replicated to provide one
-read port.</p></td>
+<td><p>8</p></td>
+<td><p>Item width (in bits), must be 8.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mp_bram-metadata_width"><td><p>METADATA_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mfb_meta_width"><td><p>MFB_META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
-<td><p>metadata is data which is send with read request</p></td>
+<td><p>Metadata width (in bits).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mp_bram-undef_behaw_when_wr_to_same_address"><td><p>UNDEF_BEHAW_WHEN_WR_TO_SAME_ADDRESS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-pkt_mtu_in"><td><p>PKT_MTU_IN</p></td>
+<td><p>natural</p></td>
+<td><p>2**14</p></td>
+<td><p>Maximum size of input packets (in Items).
+Output packets’ MTU is PKT_MTU_IN + MVB_ITEM_SIZE.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mvb_items"><td><p>MVB_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Number of MVB Items in one word.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-mvb_item_size"><td><p>MVB_ITEM_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>16</p></td>
+<td><p>Size of each MVB Item (in MFB Items!).
+MVB_ITEMS*MVB_ITEM_SIZE must not be greater than
+the number of MFB Items in a word (MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mfb_fifo_depth"><td><p>MFB_FIFO_DEPTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Number of Items in the Input MFB_FIFOX.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-append_fifo_depth"><td><p>APPEND_FIFO_DEPTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Number of Items in the Input APPEND FIFOX.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-rx_mfb_conf_eq_tx"><td><p>RX_MFB_CONF_EQ_TX</p></td>
 <td><p>boolean</p></td>
 <td><p>True</p></td>
-<td><p>when this generic is disabled then two port can write to same address in one clock cycle.
-Result are going to be undefined. This mean user have to secure there is no write to same
-address in same clock.
-Port wit lower id is prioritised and write data.
-If this generic is true then this architecture desnt support write to same address
-in same clock cycle from two ports</p></td>
+<td><p>Whether the input and output MFB configurations are the same.
+If “false”, TX MFB configuration is 1,1,MFB_REGION_SIZE*MFB_BLOCK_SIZE,MFB_ITEM_WIDTH.
+Disabling backward configuration saves resources.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mp_bram-one_clk_write"><td><p>ONE_CLK_WRITE</p></td>
-<td><p>boolean</p></td>
-<td><p>False</p></td>
-<td><p>If This generic is set to true then Write delay is shorter by bypassing
-Normal write delay is two clock cycles. If this generic is set  to true tehn write delay is one clock.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-mp_bram-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
-<td><p>“AGILEX”</p></td>
-<td><p>The DEVICE parameter allows the correct selection of the RAM
-implementation according to the FPGA used. Supported values are:</p>
-<ul class="simple">
-<li><p>“7SERIES”</p></li>
-<li><p>“ULTRASCALE”</p></li>
-<li><p>“STRATIX10”</p></li>
-<li><p>“ARRIA10”</p></li>
-<li><p>“AGILEX”</p></li>
-</ul>
-</td>
+<td><p>“STRATIX10”</p></td>
+<td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
 </tr>
 </tbody>
 </table>
@@ -643,75 +659,134 @@ implementation according to the FPGA used. Supported values are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-mp_bram-clk"><td><p>CLK</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mp_bram-reset"><td><p>RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-reset"><td><p>RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX MFB inf</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Valid with SOF.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>WRITE PORTS</p></td>
+<td><p>RX MVB inf (append data)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mp_bram-wr_en"><td><p>WR_EN</p></td>
-<td><p>std_logic_vector(WRITE_PORTS - 1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mvb_data"><td><p>RX_MVB_DATA</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*MVB_ITEM_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Enable of write port.</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mp_bram-wr_addr"><td><p>WR_ADDR</p></td>
-<td><p>slv_array_t(WRITE_PORTS - 1 downto 0)(log2(ITEMS)-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Write address.</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mp_bram-wr_data"><td><p>WR_DATA</p></td>
-<td><p>slv_array_t(WRITE_PORTS - 1 downto 0)(DATA_WIDTH-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td><p>Write data input.</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mp_bram-wr_be"><td><p>WR_BE</p></td>
-<td><p>slv_array_t(WRITE_PORTS - 1 downto 0)(DATA_WIDTH/tsel(BLOCK_ENABLE, BLOCK_WIDTH, DATA_WIDTH+1)-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>ENABLE block. you can write only part of data into memory (“0011”) =&gt; write only down 16 bits
-Use work around when  BOCK_WIDTH is zero then width of signal is NULL. (DATA_WIDTH/(DATA_WIDTH +1) == 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>READ PORTS</p></td>
+<td><p>TX MFB inf (frames with appended MVB data)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mp_bram-rd_en"><td><p>RD_EN</p></td>
-<td><p>std_logic_vector(READ_PORTS - 1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>Read enable signal, it is only used to generate RD_DATA_VLD.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mp_bram-rd_addr"><td><p>RD_ADDR</p></td>
-<td><p>slv_array_t(READ_PORTS - 1 downto 0)(log2(ITEMS)-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mp_bram-rd_meta_in"><td><p>RD_META_IN</p></td>
-<td><p>slv_array_t(READ_PORTS - 1 downto 0)(METADATA_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mp_bram-rd_data_vld"><td><p>RD_DATA_VLD</p></td>
-<td><p>std_logic_vector(READ_PORTS - 1 downto 0)</p></td>
-<td><p>out</p></td>
-<td><p>Read data output.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mp_bram-rd_data"><td><p>RD_DATA</p></td>
-<td><p>slv_array_t(READ_PORTS - 1 downto 0)(DATA_WIDTH-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mp_bram-rd_meta_out"><td><p>RD_META_OUT</p></td>
-<td><p>slv_array_t(READ_PORTS - 1 downto 0)(METADATA_WIDTH-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
+<td><p>Valid with SOF.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(tsel(RX_MFB_CONF_EQ_TX, MFB_REGION_SIZE, 1)))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
 <td></td>
 </tr>
 </tbody>
@@ -726,17 +801,17 @@ Use work around when  BOCK_WIDTH is zero then width of signal is NULL. (DATA_WID
             <footer>
                 
                 <div class="related-pages">
-                    <a class="next-page" href="../lvt_mem/readme.html">
+                    <a class="next-page" href="../frame_extender/readme.html">
                         <div class="page-info">
                             <div class="context">
                                 <span>Next</span>
                             </div>
-                            <div class="title">Live value table memory</div>
+                            <div class="title">MFB FRAME EXTENDER</div>
                         </div>
                         <svg class="furo-related-icon">
                             <use href="#svg-arrow-right"></use>
                         </svg>
-                    </a> <a class="prev-page" href="../sdp_bram/readme.html">
+                    </a> <a class="prev-page" href="../../debug/generator/readme.html">
                         <svg class="furo-related-icon">
                             <use href="#svg-arrow-right"></use>
                         </svg>
@@ -745,7 +820,7 @@ Use work around when  BOCK_WIDTH is zero then width of signal is NULL. (DATA_WID
                                 <span>Previous</span>
                             </div>
                             
-                            <div class="title">Simple dual-port BRAM</div>
+                            <div class="title">MFB Generator</div>
                             
                         </div>
                     </a>
