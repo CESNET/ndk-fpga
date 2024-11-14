@@ -1,8 +1,6 @@
 Memory modules
 ==============
 
-**CAM** - Ternary content addressable memory implemented in memory LUTs, optimized for Xilinx only. Also there is **light variant** implemented using register array, simpler but less effective.
-
 **DP_BMEM** - Behavioral implementation of dual clock BRAM memory with two read/write ports.
 
 .. warning::
