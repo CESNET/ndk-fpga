@@ -1031,12 +1031,17 @@ and Inter Packet Gaps (IPG) are included on RX MFB stream.</p></td>
 <td><p>Maximum number of Transactions waiting for space insertion
 Ignored when IPG_GENERATE_EN==false</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_mac_lite-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_mac_lite-ll_mode"><td><p>LL_MODE</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Low-latency mode: do not discard errornous frames</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_mac_lite-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device name.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_mac_lite-eth_version"><td><p>ETH_VERSION</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_mac_lite-eth_version"><td><p>ETH_VERSION</p></td>
 <td><p>string</p></td>
 <td><p>“over10Gb”</p></td>
 <td><p>Targeted version of Ethernet standart
@@ -1279,7 +1284,7 @@ Possible values: “10Gb”, “over10Gb”</p></td>
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: 1652fe95
+                            Git branch: devel<br>Git hash: 17c1279f
                         </div>
                         
                     </div>
