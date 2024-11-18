@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="MFB Tools" href="../../../../mfb.html" /><link rel="prev" title="MI2AVMM" href="../mi2avmm/readme.html" />
+<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="MVB Lookup Table" href="../../storage/lookup_table/readme.html" /><link rel="prev" title="MVB2MFB" href="../mvb2mfb/readme.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>MI2AXI4 - NDK-FPGA documentation</title>
+        <title>MVB Gate - NDK-FPGA documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -299,14 +299,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tsu/tsu_gen/readme.html">TSU GEN</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../../mi.html">MI Tools</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of MI Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../../async/readme.html">MI ASYNC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../pipe/readme.html">MI Pipe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../indirect_access/readme.html">MI indirect access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../reconf/readme.html">MI Reconfigurator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../splitter_plus_gen/readme.html">MI Splitter Plus Gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mi2avmm/readme.html">MI2AVMM</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">MI2AXI4</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../mi.html">MI Tools</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of MI Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/async/readme.html">MI ASYNC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/pipe/readme.html">MI Pipe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/indirect_access/readme.html">MI indirect access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/reconf/readme.html">MI Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/splitter_plus_gen/readme.html">MI Splitter Plus Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/converters/mi2avmm/readme.html">MI2AVMM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/converters/mi2axi4/readme.html">MI2AXI4</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of MFB Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -347,23 +347,23 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/pd_asfifo_simple/readme.html">MFB PD ASFIFO SIMPLE</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../mvb.html">MVB Components</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle navigation of MVB Components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/channel_router/readme.html">MVB Channel Router</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/discard/readme.html">MVB DISCARD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/item_collision_resolver/readme.html">MVB Item Collision Resolver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_items/readme.html">MVB Merge Items</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_streams/readme.html">MVB Merge Streams</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/demux/readme.html">MVB DEMUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/mux/readme.html">MVB MUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_n_to_m/readme.html">SHAKEDOWN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/shakedown/readme.html">MVB Shakedown</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/operation/readme.html">MVB Operation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/mvb2mfb/readme.html">MVB2MFB</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/gate/readme.html">MVB Gate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/storage/lookup_table/readme.html">MVB Lookup Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/storage/fifox/readme.html">MVB FIFOX</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../../mvb.html">MVB Components</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle navigation of MVB Components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../channel_router/readme.html">MVB Channel Router</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../discard/readme.html">MVB DISCARD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../item_collision_resolver/readme.html">MVB Item Collision Resolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merge_items/readme.html">MVB Merge Items</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merge_streams/readme.html">MVB Merge Streams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../demux/readme.html">MVB DEMUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mux/readme.html">MVB MUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merge_n_to_m/readme.html">SHAKEDOWN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../shakedown/readme.html">MVB Shakedown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../operation/readme.html">MVB Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mvb2mfb/readme.html">MVB2MFB</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">MVB Gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/lookup_table/readme.html">MVB Lookup Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MVB FIFOX</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../nic.html">Network Tools</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Network Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -465,8 +465,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">MI bus specification</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
@@ -505,7 +505,7 @@
                 </a>
                 <div class="content-icon-container">
                     <div class="view-this-page">
-  <a class="muted-link" href="../../../../_sources/comp/mi_tools/converters/mi2axi4/readme.rst.txt" title="View this page">
+  <a class="muted-link" href="../../../../_sources/comp/mvb_tools/flow/gate/readme.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -542,12 +542,13 @@
                     </label>
                 </div>
                 <article role="main" id="furo-main-content">
-                    <section id="mi2axi4">
-<span id="id1"></span><h1>MI2AXI4<a class="headerlink" href="#mi2axi4" title="Link to this heading">¶</a></h1>
+                    <section id="mvb-gate">
+<span id="id1"></span><h1>MVB Gate<a class="headerlink" href="#mvb-gate" title="Link to this heading">¶</a></h1>
 <dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-mi2axi4">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MI2AXI4</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mi2axi4" title="Link to this definition">¶</a></dt>
-<dd><p>This component converts MI interface (slave) to AXI4 interface (master).</p>
+<dt class="sig sig-object vhdl" id="vhdl-entity-mvb_gate">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_GATE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_gate" title="Link to this definition">¶</a></dt>
+<dd><p>Simple gate for MVB bus. Has option for instation of FIFO,
+which can smooth out stopping of the bus.</p>
 <span class="sig-name descname">Generics</span><div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -558,30 +559,30 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-gengeneric-mi2axi4-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_gate-items"><td><p>ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_gate-item_width"><td><p>ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_gate-rx_fifo_en"><td><p>RX_FIFO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_gate-rx_fifo_depth"><td><p>RX_FIFO_DEPTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
-<td><p>MI data word width in bits, must be 32</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mi2axi4-axi_data_width"><td><p>AXI_DATA_WIDTH</p></td>
-<td><p>natural</p></td>
-<td><p>64</p></td>
-<td><p>AXI data word width in bits, 32 or 64</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-mi2axi4-addr_width"><td><p>ADDR_WIDTH</p></td>
-<td><p>natural</p></td>
-<td><p>32</p></td>
-<td><p>Address word width in bits</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mi2axi4-addr_mask"><td><p>ADDR_MASK</p></td>
-<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
-<td><p>(others =&gt; ‘1’)</p></td>
-<td><p>Address mask vector</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-mi2axi4-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_gate-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
-<td><p>Target device</p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -596,220 +597,76 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>Clock and Reset</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-clk"><td><p>CLK</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_gate-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-reset"><td><p>RESET</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_gate-reset"><td><p>RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX MVB interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_gate-rx_data"><td><p>RX_DATA</p></td>
+<td><p>std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_gate-rx_vld"><td><p>RX_VLD</p></td>
+<td><p>std_logic_vector(ITEMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_gate-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_gate-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>MI interface (slave)</p></td>
+<td><p>TX MVB interface</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-mi_dwr"><td><p>MI_DWR</p></td>
-<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-mi_addr"><td><p>MI_ADDR</p></td>
-<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-mi_rd"><td><p>MI_RD</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-mi_wr"><td><p>MI_WR</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-mi_be"><td><p>MI_BE</p></td>
-<td><p>std_logic_vector((MI_DATA_WIDTH/8)-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-mi_drd"><td><p>MI_DRD</p></td>
-<td><p>std_logic_vector(MI_DATA_WIDTH-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_gate-tx_data"><td><p>TX_DATA</p></td>
+<td><p>std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_gate-tx_vld"><td><p>TX_VLD</p></td>
+<td><p>std_logic_vector(ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_gate-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_gate-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
 <td><p>std_logic</p></td>
-<td><p>out</p></td>
+<td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>AXI4 interface (master)</p></td>
+<td><p>Control interface</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_awid"><td><p>AXI_AWID</p></td>
-<td><p>std_logic_vector(8-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_awaddr"><td><p>AXI_AWADDR</p></td>
-<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_awlen"><td><p>AXI_AWLEN</p></td>
-<td><p>std_logic_vector(8-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_awsize"><td><p>AXI_AWSIZE</p></td>
-<td><p>std_logic_vector(3-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_awburst"><td><p>AXI_AWBURST</p></td>
-<td><p>std_logic_vector(2-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_awprot"><td><p>AXI_AWPROT</p></td>
-<td><p>std_logic_vector(3-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_awvalid"><td><p>AXI_AWVALID</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_awready"><td><p>AXI_AWREADY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_gate-stop_en"><td><p>STOP_EN</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_wdata"><td><p>AXI_WDATA</p></td>
-<td><p>std_logic_vector(AXI_DATA_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_wstrb"><td><p>AXI_WSTRB</p></td>
-<td><p>std_logic_vector((AXI_DATA_WIDTH/8)-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_wvalid"><td><p>AXI_WVALID</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_wready"><td><p>AXI_WREADY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_bid"><td><p>AXI_BID</p></td>
-<td><p>std_logic_vector(8-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_bresp"><td><p>AXI_BRESP</p></td>
-<td><p>std_logic_vector(2-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_bvalid"><td><p>AXI_BVALID</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_bready"><td><p>AXI_BREADY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_arid"><td><p>AXI_ARID</p></td>
-<td><p>std_logic_vector(8-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_araddr"><td><p>AXI_ARADDR</p></td>
-<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_arlen"><td><p>AXI_ARLEN</p></td>
-<td><p>std_logic_vector(8-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_arsize"><td><p>AXI_ARSIZE</p></td>
-<td><p>std_logic_vector(3-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_arburst"><td><p>AXI_ARBURST</p></td>
-<td><p>std_logic_vector(2-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_arprot"><td><p>AXI_ARPROT</p></td>
-<td><p>std_logic_vector(3-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_arvalid"><td><p>AXI_ARVALID</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_arready"><td><p>AXI_ARREADY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_rid"><td><p>AXI_RID</p></td>
-<td><p>std_logic_vector(8-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_rdata"><td><p>AXI_RDATA</p></td>
-<td><p>std_logic_vector(AXI_DATA_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_rresp"><td><p>AXI_RRESP</p></td>
-<td><p>std_logic_vector(2-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_rlast"><td><p>AXI_RLAST</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mi2axi4-axi_rvalid"><td><p>AXI_RVALID</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mi2axi4-axi_rready"><td><p>AXI_RREADY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
+<td><p>When this signal is asserted, transmission from RX -&gt; TX
+is disabled.</p></td>
 </tr>
 </tbody>
 </table>
@@ -823,17 +680,17 @@
             <footer>
                 
                 <div class="related-pages">
-                    <a class="next-page" href="../../../../mfb.html">
+                    <a class="next-page" href="../../storage/lookup_table/readme.html">
                         <div class="page-info">
                             <div class="context">
                                 <span>Next</span>
                             </div>
-                            <div class="title">MFB Tools</div>
+                            <div class="title">MVB Lookup Table</div>
                         </div>
                         <svg class="furo-related-icon">
                             <use href="#svg-arrow-right"></use>
                         </svg>
-                    </a> <a class="prev-page" href="../mi2avmm/readme.html">
+                    </a> <a class="prev-page" href="../mvb2mfb/readme.html">
                         <svg class="furo-related-icon">
                             <use href="#svg-arrow-right"></use>
                         </svg>
@@ -842,7 +699,7 @@
                                 <span>Previous</span>
                             </div>
                             
-                            <div class="title">MI2AVMM</div>
+                            <div class="title">MVB2MFB</div>
                             
                         </div>
                     </a>
