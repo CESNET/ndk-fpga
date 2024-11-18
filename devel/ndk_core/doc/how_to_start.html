@@ -551,13 +551,13 @@
 <li><p>The NDK build system is for Linux operating systems only. We recommend using any RHEL-compatible OS, for example, Rocky Linux 8+.</p></li>
 <li><p>The dtc/libfdt package is required. On RHEL-compatible OS, you can use the following command: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">dnf</span> <span class="pre">install</span> <span class="pre">dtc</span></code>.</p></li>
 <li><p>To build the FPGA firmware, you must have Intel Quartus Prime Pro or Xilinx Vivado (depending on the target card) installed, including a valid license.</p></li>
-<li><p>You can always find information about the required version of the synthesis tools (Quartus/Vivado) in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/README.md</span></code> file.</p></li>
+<li><p>You can always find information about the required version of the synthesis tools (Quartus/Vivado) in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/README.md</span></code> file.</p></li>
 </ul>
 </section>
 <section id="how-to-build-an-fpga-firmware-with-an-ndk-based-application">
 <h2>How to build an FPGA firmware with an NDK-based application<a class="headerlink" href="#how-to-build-an-fpga-firmware-with-an-ndk-based-application" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Go to the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/build/&lt;your_card&gt;/</span></code> directory.</p></li>
+<li><p>Go to the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/apps/minimal/build/&lt;your_card&gt;/</span></code> directory.</p></li>
 <li><p>Check or modify the <code class="docutils literal notranslate"><span class="pre">app_conf.tcl</span></code> file, where you can change the firmware configuration.</p></li>
 <li><p>Build the FPGA firmware with Quartus/Vivado by the <code class="docutils literal notranslate"><span class="pre">make</span></code> command in the same folder.</p></li>
 <li><p>If you do not have a DMA IP (it is not part of the open-source NDK), you must use the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">DMA_TYPE=0</span></code> command to disable the DMA and create a loopback instead.</p></li>
@@ -605,28 +605,28 @@
 <section id="how-to-check-the-ndk-firmware-in-the-fpga">
 <h2>How to check the NDK firmware in the FPGA<a class="headerlink" href="#how-to-check-the-ndk-firmware-in-the-fpga" title="Link to this heading">¶</a></h2>
 <p>The NDK platform uses the <a class="reference external" href="https://cesnet.github.io/ndk-sw/tools/nfb-info.html">nfb-info tool</a> to read the basic information about the NDK firmware from the FPGA card. Using this tool, we can check that our NDK firmware has booted correctly. An example of the output of the nfb-info tool can be seen below:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>nfb-info
----------------------------------------<span class="w"> </span>Board<span class="w"> </span>info<span class="w"> </span>----
-Board<span class="w"> </span>name<span class="w">                 </span>:<span class="w"> </span>COMBO-GENERIC
-Serial<span class="w"> </span>number<span class="w">              </span>:<span class="w"> </span><span class="m">0</span>
-Network<span class="w"> </span>interfaces<span class="w">         </span>:<span class="w"> </span><span class="m">2</span>
-------------------------------------<span class="w"> </span>Firmware<span class="w"> </span>info<span class="w"> </span>----
-Card<span class="w"> </span>name<span class="w">                  </span>:<span class="w"> </span>N6010
-Project<span class="w"> </span>name<span class="w">               </span>:<span class="w"> </span>NDK_MINIMAL
-Project<span class="w"> </span>variant<span class="w">            </span>:<span class="w"> </span>100G2
-Project<span class="w"> </span>version<span class="w">            </span>:<span class="w"> </span><span class="m">0</span>.5.8
-Built<span class="w"> </span>at<span class="w">                   </span>:<span class="w"> </span><span class="m">2024</span>-02-07<span class="w"> </span><span class="m">08</span>:45:45
-Build<span class="w"> </span>tool<span class="w">                 </span>:<span class="w"> </span>Quartus<span class="w"> </span>Version<span class="w"> </span><span class="m">22</span>.4.0<span class="w"> </span>Build<span class="w"> </span><span class="m">94</span><span class="w"> </span><span class="m">12</span>/07/2022<span class="w"> </span>SC<span class="w"> </span>Pro<span class="w"> </span>Edition
-Build<span class="w"> </span>author<span class="w">               </span>:<span class="w"> </span>no-reply@liberouter.org
-RX<span class="w"> </span>queues<span class="w">                  </span>:<span class="w"> </span><span class="m">16</span>
-TX<span class="w"> </span>queues<span class="w">                  </span>:<span class="w"> </span><span class="m">16</span>
-ETH<span class="w"> </span>channels<span class="w">               </span>:<span class="w"> </span><span class="m">2</span>
---------------------------------------<span class="w"> </span>System<span class="w"> </span>info<span class="w"> </span>----
-PCIe<span class="w"> </span>Endpoint<span class="w"> </span><span class="m">0</span>:
-*<span class="w"> </span>PCI<span class="w"> </span>slot<span class="w">                </span>:<span class="w"> </span><span class="m">0000</span>:17:00.0
-*<span class="w"> </span>PCI<span class="w"> </span>speed<span class="w">               </span>:<span class="w"> </span><span class="m">16</span><span class="w"> </span>GT/s
-*<span class="w"> </span>PCI<span class="w"> </span>link<span class="w"> </span>width<span class="w">          </span>:<span class="w"> </span>x16
-*<span class="w"> </span>NUMA<span class="w"> </span>node<span class="w">               </span>:<span class="w"> </span><span class="m">0</span>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ nfb-info
+--------------------------------------- Board info ----
+Board name                 : COMBO-GENERIC
+Serial number              : 0
+Network interfaces         : 2
+------------------------------------ Firmware info ----
+Card name                  : N6010
+Project name               : NDK_MINIMAL
+Project variant            : 100G2
+Project version            : 0.5.8
+Built at                   : 2024-02-07 08:45:45
+Build tool                 : Quartus Version 22.4.0 Build 94 12/07/2022 SC Pro Edition
+Build author               : no-reply@liberouter.org
+RX queues                  : 16
+TX queues                  : 16
+ETH channels               : 2
+-------------------------------------- System info ----
+PCIe Endpoint 0:
+* PCI slot                : 0000:17:00.0
+* PCI speed               : 16 GT/s
+* PCI link width          : x16
+* NUMA node               : 0
 </pre></div>
 </div>
 </section>
@@ -687,7 +687,7 @@ The following references provide the information to do just that.</p>
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: daaec2e5
+                            Git branch: devel<br>Git hash: 527e3085
                         </div>
                         
                     </div>

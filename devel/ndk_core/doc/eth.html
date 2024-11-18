@@ -573,7 +573,7 @@ A more implementation-based look at the top level of the Network Module follows.
 The number of their instances depends on the number of physical ports of the target card.
 The following sections describe each of the main blocks in more detail: <a class="reference internal" href="#newtwork-module-core"><span class="std std-ref">Network Module Core</span></a> and <a class="reference internal" href="#newtwork-module-logic"><span class="std std-ref">Network Module Logic</span></a>.
 Then there is the QSFP Control unit that enables the configuration of the QSFP transceivers of the NIC over the I2C bus.
-The Network Module has three separate address spaces (see the <a class="reference external" href="https://github.com/CESNET/ndk-core/blob/main/intel/src/mi_addr_space_pkg.vhd">MI address space package</a>).
+The Network Module has three separate address spaces (see the <a class="reference external" href="https://github.com/CESNET/ndk-fpga/blob/devel/core/top/mi_addr_space_pkg.vhd">MI address space package</a>).
 Each is represented by one of the three MI buses.
 Two (MI and MI PHY) are connected to MI Splitters, and one (MI PMD) is directly connected to QSFP Control.
 The MI PHY Splitter forwards requests to one or more instances of the Network Module Core.
@@ -947,7 +947,7 @@ If there are multiple channels, the following two outputs are connected to the s
 MAC Lite pairs for the following channels are connected subsequently in the same way.
 The MAC Lites are offset by 0x200, and MAC Lites in different ports are additionally offset by 0x2000 (enough for 8 Ethernet channels per port).
 However, that is not the concern of the MI Splitter here but in the top-level of the <a class="reference internal" href="#newtwork-module-big-picture"><span class="std std-ref">Network Module</span></a>.
-To create a complete address of a MAC Lite register, add the address of the register, the channel offset, the port offset, and the offset of the Network Module Logic (MI_ADC_PORT_NETMOD in the <a class="reference external" href="https://github.com/CESNET/ndk-core/blob/main/intel/src/mi_addr_space_pkg.vhd">MI address space package</a>).
+To create a complete address of a MAC Lite register, add the address of the register, the channel offset, the port offset, and the offset of the Network Module Logic (MI_ADC_PORT_NETMOD in the <a class="reference external" href="https://github.com/CESNET/ndk-fpga/blob/devel/core/top/mi_addr_space_pkg.vhd">MI address space package</a>).
 To show the connections of the MAC Lites, an example of the MAC Lite address spaces for a configuration with two 4x25 GE ports follows.</p>
 <p>Notation: TX_MAC_LITE(port_id)(channel_id), RX_MAC_LITE(port_id)(channel_id).</p>
 <div class="table-wrapper colwidths-given docutils container" id="id9">
@@ -1113,7 +1113,7 @@ To show the connections of the MAC Lites, an example of the MAC Lite address spa
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: daaec2e5
+                            Git branch: devel<br>Git hash: 527e3085
                         </div>
                         
                     </div>

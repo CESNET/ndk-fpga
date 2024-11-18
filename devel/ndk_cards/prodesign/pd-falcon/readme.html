@@ -580,13 +580,13 @@
 <li><dl class="simple">
 <dt>Supported PCIe Cores in the NDK Firmware:</dt><dd><ul>
 <li><p>H-Tile is supported.</p></li>
-<li><p>Refer to the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory&gt;/ndk/cards/prodesign/pd-falcon/config/card_conf.tcl</span></code> file for supported PCIe configurations.</p></li>
+<li><p>Refer to the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/cards/prodesign/pd-falcon/config/card_conf.tcl</span></code> file for supported PCIe configurations.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Makefile Targets for Building NDK Firmware (for NDK-APP-Minimal, may vary for other applications):</dt><dd><ul>
+<dt>Makefile Targets for Building NDK Firmware (for Minimal app, may vary for other applications):</dt><dd><ul>
 <li><p>Use the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g2</span></code> command to build firmware with 2x100GE (default).</p></li>
 </ul>
 </dd>
@@ -609,7 +609,7 @@
 <h2>Boot Instructions<a class="headerlink" href="#boot-instructions" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>First, build the NDK firmware. Note that the first build will fail—this is expected.</p></li>
-<li><p>After the first failed implementation, run the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory&gt;/ndk/cards/prodesign/pd-falcon/src/ip/htile_pcie_fix.sh</span></code> script to fix the generated H-Tile IP core.</p></li>
+<li><p>After the first failed implementation, run the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/cards/prodesign/pd-falcon/src/ip/htile_pcie_fix.sh</span></code> script to fix the generated H-Tile IP core.</p></li>
 <li><p>The next build should complete successfully.</p></li>
 <li><p>Once the NDK firmware build is complete, a bitstream file will be generated.</p></li>
 <li><p>To load the firmware, attach the USB-Blaster II Download Cable via the Edge Debug Board to the card.</p></li>
@@ -663,7 +663,7 @@
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: daaec2e5
+                            Git branch: devel<br>Git hash: 527e3085
                         </div>
                         
                     </div>

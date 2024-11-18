@@ -15,7 +15,7 @@ Build system files
 The following table provides an overview of files used for building a project/design.
 
 .. note::
-    Path ``build/card`` reduced to build, ``ndk/core/intel`` reduced to ``core``, ``ndk/cards/vendor/dev`` reduced to card.
+    Path ``apps/minimal/card`` reduced to ``build``, ``cards/vendor/dev`` reduced to card.
     The placeholder {TOOL} refers to the tool-specific filename, for example: Vivado, Quartus.
 
 .. list-table:: Configuration files
@@ -62,7 +62,7 @@ The following table provides an overview of files used for building a project/de
     * - core/config/core_func.tcl
       - Configuration
       - helper procedures used in _conf.tcl (e.g. ParsePcieConf)
-    * - core/Modules.tcl
+    * - core/top/Modules.tcl
       - Build
       - Top-level components and modules common for all designs (TSU, DMA, etc.)
     * - core/{TOOL}.inc.tcl
@@ -77,14 +77,14 @@ The following table provides an overview of files used for building a project/de
 
 .. _ndk_core_configuration:
 
-Parametrizing NDK-CORE design
+Parametrizing NDK-FPGA design
 =============================
-The files in the ``<NDK-CORE_root_directory>/intel/config`` directory and the
-``<NDK-CORE_root_directory>/intel/core.mk`` file contain CORE parameters. Some
+The files in the ``<NDK-FPGA_root_directory>/core/config`` directory and the
+``<NDK-FPGA_root_directory>/core/core.mk`` file contain CORE parameters. Some
 of these parameters are configurable (more info below). The sourcing of
 configuration parameter files has its own hierarchy, which is shown in the
 :ref:`fig_const_hierarchy`. This section describes the
-configuration files used in the case of NDK-CORE design. For the description of
+configuration files used in the case of NDK-FPGA design. For the description of
 the application and card-specific configuration, see following sections on this page.
 
 .. _fig_const_hierarchy:
@@ -106,7 +106,7 @@ core_conf.tcl
 ^^^^^^^^^^^^^
 This file provides a listing of all parameters that can be changed by the user.
 Each parameter contains a comment with allowed values and the meaning of
-these values. Because the NDK-CORE design is independent of the underlying
+these values. Because the NDK-FPGA design is independent of the underlying
 platform (e.g. card type) there are many allowed combinations of parameters.
 However, the user can find many combinations of parameters that are unsupported
 and may cause errors during the synthesis/implementation process. The user can add
@@ -145,7 +145,7 @@ file. An example of a conditional assignment follows:
 The third purpose of this file is to implement statements that check compatible
 combinations of parameters. When an incompatible combination is detected, the
 TCL shell will raise an error and stop the compilation process. You should
-implement these checks only for the parameters used in the NDK-CORE.
+implement these checks only for the parameters used in the NDK-FPGA.
 
 .. _core_mk_include:
 
@@ -184,9 +184,9 @@ provide an *ARCHGRP* list to pass specific constants across the source file hier
 Modules.tcl file obtains such a list from its parent Modules.tcl file. It allows further
 adjustments of the ARCHGRP list(s) of its descendant(s).
 
-The parameters specified in the NDK-CORE repository are passed using the
+The parameters specified in the NDK-FPGA repository are passed using the
 ``CORE_ARCHGRP`` associative array. The array is initialized in the
-``<NDK-CORE_root_directory>/intel/common.inc.tcl`` file. Parameters are specified in
+``<NDK-FPGA_root_directory>/core/common.inc.tcl`` file. Parameters are specified in
 the ``core_conf.tcl`` and ``core_const.tcl`` files. This means that the configuration
 parameters of a chosen card are visible in this file and can be added to the
 array. The associative array was chosen for clarity purposes. Because the
@@ -194,7 +194,7 @@ ARCHGRP is declared as a simple list, the associative array is converted to it
 and added to the ``FPGA`` entity. As the ARCHGRP list is passed through
 the hierarchy, it is converted back
 to the associative array when a specific array value is needed. An example is shown in the
-``<NDK-CORE_root_directory>/intel/Modules.tcl`` file.
+``<NDK-FPGA_root_directory>/core/top/Modules.tcl`` file.
 
 .. _core_config_vhdl_pkg_const:
 
@@ -237,7 +237,7 @@ The system provides mechanism to configure card specific parameters.
 File description
 ----------------
 The file structure is similar to the one described in the configuration of the
-`NDK-CORE` design.
+`NDK-FPGA` design.
 
 card_conf.tcl
 ^^^^^^^^^^^^^
@@ -245,7 +245,7 @@ This file lists user-configurable parameters and their possible values in the
 comments. The file contains parameters relevant to a specific card. Those
 parameters are mostly tied to the underlying hardware, like the number of Ethernet
 ports or the PCIe generation of the used PCIe core. The purpose of this file is the
-same as that of the ``core_conf.tcl`` file in the `NDK-CORE` repository. The only
+same as that of the ``core_conf.tcl`` file in the `NDK-FPGA` repository. The only
 difference is that it has a higher priority.
 
 .. _card_conf_card_const_tcl:
@@ -289,7 +289,7 @@ Further work with parameters
    application use.
 
 Passing the parameter values to other parts of the design or build system is
-very similar to the case of `NDK-CORE`.
+very similar to the case of `NDK-FPGA`.
 
 Passing through Modules.tcl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -307,7 +307,7 @@ Adding constants to the VHDL package
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 It is recommended to add card-specific constants to the ``combo_user_const`` VHDL
 package in `card_const.tcl` file. The way of adding these constants was described in
-the :ref:`core_config_vhdl_pkg_const` section in the documentation of NDK-CORE
+the :ref:`core_config_vhdl_pkg_const` section in the documentation of NDK-FPGA
 configuration.
 
 .. _ndk_app_configuration:
@@ -322,7 +322,7 @@ build process.
 
 Configuration files
 -------------------
-The configuration of the application is less constrained than `NDK-CORE` and
+The configuration of the application is less constrained than `NDK-FPGA` and
 card configuration. The application repository provides three files in which the user
 application is or can be configured.
 
@@ -385,11 +385,11 @@ This section contains specific recipes for achieving specific goals.
 I need to include specific component in CORE depending on a given parameter value
 ---------------------------------------------------------------------------------
 1. First, you should write your parameter to the
-   ``core/intel/config/core_conf.tcl`` with a specific value (if the parameter
-   stays only in the ``core/intel/config/core_conf.tcl``) or with a default
+   ``core/config/core_conf.tcl`` with a specific value (if the parameter
+   stays only in the ``core/config/core_conf.tcl``) or with a default
    value (if the parameter will be set in other configuration files).
 2. Then add this parameter to the *CORE_ARCHGRP* array in the
-   ``core/intel/common.inc.tcl`` file.
+   ``core/common.inc.tcl`` file.
 
 .. code-block:: tcl
 
@@ -471,7 +471,7 @@ What can I do with the `core_const.tcl` file
         error "Unsupported value of MY_PARAM_1: $MY_PARAM_1!"
     }
 
-* You can add a parameter value to the generated VHDL package, which is then icluded in
+* You can add a parameter value to the generated VHDL package, which is then included in
   the `fpga.vhd` and `fpga_common.vhd` components:
 
 .. code-block:: tcl

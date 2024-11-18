@@ -23,8 +23,8 @@ NDK firmware support
     - :ref:`E-Tile in the Network Module <ndk_intel_net_mod>`
 - PCIe cores that are supported in the NDK firmware:
     - :ref:`P-Tile in the PCIe Module <ndk_intel_pcie_mod>`
-    - See the ``<NDK-APP_root_directory>/ndk/card/dk-dev-1sdx-p/config/card_conf.tcl`` file for supported PCIe configurations.
-- Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):
+    - See the ``<NDK-FPGA_root_directory>/card/intel/dk-dev-1sdx-p/config/card_conf.tcl`` file for supported PCIe configurations.
+- Makefile targets for building the NDK firmware (valid for Minimal app, may vary for other apps):
     - Use ``make 100g2`` command for firmware with 2x100GE (default).
     - Use ``make 25g8`` command for firmware with 8x25GE.
     - Use ``make 10g8`` command for firmware with 8x10GE.
@@ -39,8 +39,8 @@ Boot instructions
 ^^^^^^^^^^^^^^^^^
 
 - After the NDK firmware build is complete, you will have a bitstream file called ``my_bitstream.sof``.
-- Use the ``<NDK-APP_root_directory>/ndk/cards/dk-dev-1sdx-p/scripts/generate_pof.sh my_bitstream.sof`` command to convert the bitstream file to .pof format for flash memory.
-- On the host PC where the card is connected, write the .pof bitstream to the flash memory with the command ``<NDK-APP_root_directory>/ndk/cards/dk-dev-1sdx-p/scripts/write_pof.sh my_bitstream.pof``.
+- Use the ``<NDK-FPGA_root_directory>/cards/intel/dk-dev-1sdx-p/scripts/generate_pof.sh my_bitstream.sof`` command to convert the bitstream file to .pof format for flash memory.
+- On the host PC where the card is connected, write the .pof bitstream to the flash memory with the command ``<NDK-FPGA_root_directory>/cards/intel/dk-dev-1sdx-p/scripts/write_pof.sh my_bitstream.pof``.
 - You must power off and on the PC to power cycle it completely. Only then is the new NDK firmware loaded into the FPGA.
 
 .. note::

@@ -13,9 +13,9 @@ The MI bus interconnection allows easy access to implemented Control/Status Regi
 The main allocation of the MI address space
 *******************************************
 
-An address range of 26 bits is available for the whole NDK firmware. It is divided between the individual parts of the design. The main allocation of the MI address space must be identically described in the VHDL package ``<NDK-APP-XXX_root_directory>/ndk/core/intel/src/mi_addr_space_pkg.vhd`` and in the DeviceTree file of the NDK-CORE ``<NDK-APP-XXX_root_directory>/ndk/core/intel/src/DevTree.tcl``. This allocation can also be found below:
+An address range of 26 bits is available for the whole NDK firmware. It is divided between the individual parts of the design. The main allocation of the MI address space must be identically described in the VHDL package ``<NDK-FPGA_root_directory>/core/top/mi_addr_space_pkg.vhd`` and in the DeviceTree file of the NDK-CORE ``<NDK-FPGA_root_directory>/core/top/DevTree.tcl``. This allocation can also be found below:
 
-.. code-block::
+.. code-block:: text
 
     0x00000000-0x000000FF -- Test space (debug R/W registers)
     0x00000100-0x00000FFF -- Reserved space

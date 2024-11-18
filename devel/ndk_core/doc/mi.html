@@ -552,23 +552,23 @@
 </div>
 <section id="the-main-allocation-of-the-mi-address-space">
 <h2>The main allocation of the MI address space<a class="headerlink" href="#the-main-allocation-of-the-mi-address-space" title="Link to this heading">¶</a></h2>
-<p>An address range of 26 bits is available for the whole NDK firmware. It is divided between the individual parts of the design. The main allocation of the MI address space must be identically described in the VHDL package <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/core/intel/src/mi_addr_space_pkg.vhd</span></code> and in the DeviceTree file of the NDK-CORE <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/core/intel/src/DevTree.tcl</span></code>. This allocation can also be found below:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x00000000</span><span class="o">-</span><span class="mh">0x000000FF</span> <span class="o">--</span> <span class="n">Test</span> <span class="n">space</span> <span class="p">(</span><span class="n">debug</span> <span class="n">R</span><span class="o">/</span><span class="n">W</span> <span class="n">registers</span><span class="p">)</span>
-<span class="mh">0x00000100</span><span class="o">-</span><span class="mh">0x00000FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
-<span class="mh">0x00001000</span><span class="o">-</span><span class="mh">0x00001FFF</span> <span class="o">--</span> <span class="n">SDM</span><span class="o">/</span><span class="n">SYSMON</span> <span class="n">controller</span> <span class="p">(</span><span class="n">FPGA</span> <span class="n">temp</span><span class="p">,</span> <span class="n">Intel</span> <span class="n">ASx4</span> <span class="n">boot</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
-<span class="mh">0x00002000</span><span class="o">-</span><span class="mh">0x00002FFF</span> <span class="o">--</span> <span class="n">BOOT</span> <span class="n">controller</span> <span class="p">(</span><span class="n">generic</span> <span class="n">flash</span> <span class="n">access</span><span class="p">)</span>
-<span class="mh">0x00003000</span><span class="o">-</span><span class="mh">0x00003FFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">PMD</span> <span class="p">(</span><span class="n">QSFP</span> <span class="n">controller</span><span class="p">)</span>
-<span class="mh">0x00004000</span><span class="o">-</span><span class="mh">0x000040FF</span> <span class="o">--</span> <span class="n">Timestamp</span> <span class="n">unit</span>
-<span class="mh">0x00004100</span><span class="o">-</span><span class="mh">0x00004FFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
-<span class="mh">0x00005000</span><span class="o">-</span><span class="mh">0x00007FFF</span> <span class="o">--</span> <span class="n">Debug</span> <span class="n">GLS</span> <span class="n">modules</span>
-<span class="mh">0x00008000</span><span class="o">-</span><span class="mh">0x0000BFFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">MACs</span>
-<span class="mh">0x0000C000</span><span class="o">-</span><span class="mh">0x0000FFFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
-<span class="mh">0x00010000</span><span class="o">-</span><span class="mh">0x0001FFFF</span> <span class="o">--</span> <span class="n">JTAG</span> <span class="n">IP</span> <span class="p">(</span><span class="n">Intel</span> <span class="n">JTAG</span><span class="o">-</span><span class="n">over</span><span class="o">-</span><span class="n">protocol</span> <span class="n">IP</span><span class="p">)</span>
-<span class="mh">0x00020000</span><span class="o">-</span><span class="mh">0x007FFFFF</span> <span class="o">--</span> <span class="n">Reserved</span> <span class="n">space</span>
-<span class="mh">0x00800000</span><span class="o">-</span><span class="mh">0x00FFFFFF</span> <span class="o">--</span> <span class="n">Ethernet</span> <span class="n">PCS</span><span class="o">/</span><span class="n">PMA</span>
-<span class="mh">0x01000000</span><span class="o">-</span><span class="mh">0x013FFFFF</span> <span class="o">--</span> <span class="n">DMA</span> <span class="n">controller</span>
-<span class="mh">0x01400000</span><span class="o">-</span><span class="mh">0x01FFFFFF</span> <span class="o">--</span> <span class="n">DRAFT</span><span class="p">:</span> <span class="n">MSIX</span> <span class="n">controller</span>
-<span class="mh">0x02000000</span><span class="o">-</span><span class="mh">0x03FFFFFF</span> <span class="o">--</span> <span class="n">The</span> <span class="n">Application</span>
+<p>An address range of 26 bits is available for the whole NDK firmware. It is divided between the individual parts of the design. The main allocation of the MI address space must be identically described in the VHDL package <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/core/top/mi_addr_space_pkg.vhd</span></code> and in the DeviceTree file of the NDK-CORE <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/core/top/DevTree.tcl</span></code>. This allocation can also be found below:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>0x00000000-0x000000FF -- Test space (debug R/W registers)
+0x00000100-0x00000FFF -- Reserved space
+0x00001000-0x00001FFF -- SDM/SYSMON controller (FPGA temp, Intel ASx4 boot,...)
+0x00002000-0x00002FFF -- BOOT controller (generic flash access)
+0x00003000-0x00003FFF -- Ethernet PMD (QSFP controller)
+0x00004000-0x000040FF -- Timestamp unit
+0x00004100-0x00004FFF -- Reserved space
+0x00005000-0x00007FFF -- Debug GLS modules
+0x00008000-0x0000BFFF -- Ethernet MACs
+0x0000C000-0x0000FFFF -- Reserved space
+0x00010000-0x0001FFFF -- JTAG IP (Intel JTAG-over-protocol IP)
+0x00020000-0x007FFFFF -- Reserved space
+0x00800000-0x00FFFFFF -- Ethernet PCS/PMA
+0x01000000-0x013FFFFF -- DMA controller
+0x01400000-0x01FFFFFF -- DRAFT: MSIX controller
+0x02000000-0x03FFFFFF -- The Application
 </pre></div>
 </div>
 <div class="admonition note">
@@ -622,7 +622,7 @@
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: daaec2e5
+                            Git branch: devel<br>Git hash: 527e3085
                         </div>
                         
                     </div>

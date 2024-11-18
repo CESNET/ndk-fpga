@@ -81,7 +81,7 @@ Read/write access to the Application registers from SW
 
 The application is typically controlled by a software tool. The NDK provides the `nfb-bus tool <https://cesnet.github.io/ndk-sw/tools/nfb-bus.html#nfb-bus>`_ and an `API for generating read/write memory requests <https://cesnet.github.io/ndk-sw/libnfb-quick-start-registers.html>`_. These are transferred via the :ref:`MI bus <mi_bus>` in the NDK firmware. This memory-oriented bus is wired throughout the NDK firmware, and each part, including the application, has its own allocated address space. You can find more about the MI and the available address space in the :ref:`MI bus interconnect <ndk_mi>` chapter.
 
-The description of the components with a specific address space is implemented in the NDK using a :ref:`DeviceTree <ndk_devtree>`. Also, the Application must have its own DeviceTree description, which can further refer to the internal components and their address spaces. It is a good idea to take inspiration from the `NDK-APP-Minimal application DeviceTree file <https://github.com/CESNET/ndk-app-minimal/blob/main/app/intel/DevTree.tcl>`_ when creating a DeviceTree file for your application.
+The description of the components with a specific address space is implemented in the NDK using a :ref:`DeviceTree <ndk_devtree>`. Also, the Application must have its own DeviceTree description, which can further refer to the internal components and their address spaces. It is a good idea to take inspiration from the `Minimal application DeviceTree file <https://github.com/CESNET/ndk-fpga/blob/devel/apps/minimal/top/DevTree.tcl>`_ when creating a DeviceTree file for your application.
 
 Ports and generics of the Application
 *************************************

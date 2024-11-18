@@ -593,12 +593,13 @@
 <li><dl class="simple">
 <dt>PCIe cores that are supported in the NDK firmware:</dt><dd><ul>
 <li><p><a class="reference internal" href="../../../ndk_core/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">R-Tile in the PCIe Module</span></a></p></li>
+<li><p>See the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/card/terasic/a2700/config/card_conf.tcl</span></code> file for supported PCIe configurations.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):</dt><dd><ul>
+<dt>Makefile targets for building the NDK firmware (valid for Minimal app, may vary for other apps):</dt><dd><ul>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">400g1</span></code> command for firmware with 1x400GE (default).</p></li>
 </ul>
 </dd>
@@ -606,7 +607,7 @@
 </li>
 <li><dl class="simple">
 <dt>Support for booting the NDK firmware using the nfb-boot tool:</dt><dd><ul>
-<li><p>TODO</p></li>
+<li><p>YES, starting with the nfb-framework version 6.24.0.</p></li>
 </ul>
 </dd>
 </dl>
@@ -638,14 +639,14 @@ It is possible to use Micro-USB port marked as ‘USB/UART’ on the Terasic car
 <li><p>Build your application calling <code class="docutils literal notranslate"><span class="pre">make</span></code> in the build folder with ‘Makefile’.</p></li>
 <li><p>After the NDK firmware build is complete, you will have a bitstream file called <code class="docutils literal notranslate"><span class="pre">my_bitstream.sof</span></code>.</p></li>
 <li><dl class="simple">
-<dt>Use the <code class="docutils literal notranslate"><span class="pre">NDK-APP_root_directory/ndk_fpga/cards/terasic/a2700/scripts/generate_jic.sh</span> <span class="pre">my_bitstream.sof</span> <span class="pre">my_bitstream.sof</span></code> command to convert the two bitstream files to .jic format for flash memory.</dt><dd><ul>
+<dt>Use the <code class="docutils literal notranslate"><span class="pre">NDK-FPGA_root_directory/cards/terasic/a2700/scripts/generate_jic.sh</span> <span class="pre">my_bitstream.sof</span> <span class="pre">my_bitstream.sof</span></code> command to convert the two bitstream files to .jic format for flash memory.</dt><dd><ul>
 <li><p>This creates a flash image and sets address spaces in the flash to hold the factory and user images.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>On the host PC where the card is connected, write the .jic bitstream to the flash memory with the command <code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP_root_directory/ndk_fpga/cards/terasic/a2700/scripts/write_jic.sh</span> <span class="pre">my_bitstream.jic</span></code>.</dt><dd><ul>
+<dt>On the host PC where the card is connected, write the .jic bitstream to the flash memory with the command <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory/cards/terasic/a2700/scripts/write_jic.sh</span> <span class="pre">my_bitstream.jic</span></code>.</dt><dd><ul>
 <li><p>You must power off and on the PC to power cycle it completely. Only then is the new NDK firmware loaded into the FPGA. (Do not simply reboot, otherwise the factory design will still be loaded on the FPGA.)</p></li>
 </ul>
 </dd>
@@ -706,7 +707,7 @@ Loading new design to the boot flash is performed by calling <code class="docuti
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: daaec2e5
+                            Git branch: devel<br>Git hash: 527e3085
                         </div>
                         
                     </div>

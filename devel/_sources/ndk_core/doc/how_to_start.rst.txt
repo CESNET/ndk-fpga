@@ -11,12 +11,12 @@ What dependencies are needed to build an FPGA firmware
 - The NDK build system is for Linux operating systems only. We recommend using any RHEL-compatible OS, for example, Rocky Linux 8+.
 - The dtc/libfdt package is required. On RHEL-compatible OS, you can use the following command: ``sudo dnf install dtc``.
 - To build the FPGA firmware, you must have Intel Quartus Prime Pro or Xilinx Vivado (depending on the target card) installed, including a valid license.
-- You can always find information about the required version of the synthesis tools (Quartus/Vivado) in the ``<NDK-APP-XXX_root_directory>/README.md`` file.
+- You can always find information about the required version of the synthesis tools (Quartus/Vivado) in the ``<NDK-FPGA_root_directory>/README.md`` file.
 
 How to build an FPGA firmware with an NDK-based application
 ===========================================================
 
-- Go to the ``<NDK-APP-XXX_root_directory>/build/<your_card>/`` directory.
+- Go to the ``<NDK-FPGA_root_directory>/apps/minimal/build/<your_card>/`` directory.
 - Check or modify the ``app_conf.tcl`` file, where you can change the firmware configuration.
 - Build the FPGA firmware with Quartus/Vivado by the ``make`` command in the same folder.
 - If you do not have a DMA IP (it is not part of the open-source NDK), you must use the ``make DMA_TYPE=0`` command to disable the DMA and create a loopback instead.
@@ -60,7 +60,7 @@ How to check the NDK firmware in the FPGA
 
 The NDK platform uses the `nfb-info tool <https://cesnet.github.io/ndk-sw/tools/nfb-info.html>`_ to read the basic information about the NDK firmware from the FPGA card. Using this tool, we can check that our NDK firmware has booted correctly. An example of the output of the nfb-info tool can be seen below:
 
-.. code-block:: bash
+.. code-block:: text
 
     $ nfb-info
     --------------------------------------- Board info ----

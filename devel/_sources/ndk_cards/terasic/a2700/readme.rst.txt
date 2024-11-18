@@ -25,10 +25,11 @@ NDK firmware support
     - :ref:`F-Tile in the Network Module <ndk_intel_net_mod>`
 - PCIe cores that are supported in the NDK firmware:
     - :ref:`R-Tile in the PCIe Module <ndk_intel_pcie_mod>`
-- Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):
+    - See the ``<NDK-FPGA_root_directory>/card/terasic/a2700/config/card_conf.tcl`` file for supported PCIe configurations.
+- Makefile targets for building the NDK firmware (valid for Minimal app, may vary for other apps):
     - Use ``make 400g1`` command for firmware with 1x400GE (default).
 - Support for booting the NDK firmware using the nfb-boot tool:
-    - TODO
+    - YES, starting with the nfb-framework version 6.24.0.
 
 .. note::
 
@@ -49,9 +50,9 @@ It is possible to use Micro-USB port marked as 'USB/UART' on the Terasic card fo
 
 - Build your application calling ``make`` in the build folder with 'Makefile'.
 - After the NDK firmware build is complete, you will have a bitstream file called ``my_bitstream.sof``.
-- Use the ``NDK-APP_root_directory/ndk_fpga/cards/terasic/a2700/scripts/generate_jic.sh my_bitstream.sof my_bitstream.sof`` command to convert the two bitstream files to .jic format for flash memory.
+- Use the ``NDK-FPGA_root_directory/cards/terasic/a2700/scripts/generate_jic.sh my_bitstream.sof my_bitstream.sof`` command to convert the two bitstream files to .jic format for flash memory.
     - This creates a flash image and sets address spaces in the flash to hold the factory and user images.
-- On the host PC where the card is connected, write the .jic bitstream to the flash memory with the command ``<NDK-APP_root_directory/ndk_fpga/cards/terasic/a2700/scripts/write_jic.sh my_bitstream.jic``.
+- On the host PC where the card is connected, write the .jic bitstream to the flash memory with the command ``<NDK-FPGA_root_directory/cards/terasic/a2700/scripts/write_jic.sh my_bitstream.jic``.
     - You must power off and on the PC to power cycle it completely. Only then is the new NDK firmware loaded into the FPGA. (Do not simply reboot, otherwise the factory design will still be loaded on the FPGA.)
 
 Check that the procedure was successful by running ``nfb-boot -l``. This command should list the recovery and application slots in the boot flash.

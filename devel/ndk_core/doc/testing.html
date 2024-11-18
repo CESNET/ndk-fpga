@@ -544,6 +544,10 @@
                 <article role="main" id="furo-main-content">
                     <section id="ndk-testing">
 <span id="id1"></span><h1>NDK testing<a class="headerlink" href="#ndk-testing" title="Link to this heading">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Attention, this chapter may not be up to date, we are looking for a volunteer to update it.</p>
+</div>
 <p>This chapter describes how the NDK firmware and its HDL components can be tested:</p>
 <ul class="simple">
 <li><p>Test R/W access to scratch registers in the NDK firmware (<a class="reference internal" href="#ndk-testing-mi"><span class="std std-ref">see below</span></a>).</p></li>
@@ -571,8 +575,8 @@ $<span class="w"> </span>nfb-bus<span class="w"> </span>-p<span class="w"> </spa
 <section id="gls-module-tutorial">
 <span id="ndk-testing-gls"></span><h2>GLS module tutorial<a class="headerlink" href="#gls-module-tutorial" title="Link to this heading">¶</a></h2>
 <p>The NDK firmware may include a GLS module that is instantiated in each DMA stream between the application core and the DMA controller. The GLS module is used for testing purposes and contains HW packet generators, speed meters, and datapath switches. Please refer to the <a class="reference internal" href="../../comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">GLS module documentation</span></a> for a more information.</p>
-<p>The GLS module also comes with a Python script (<code class="docutils literal notranslate"><span class="pre">&lt;NDK-APP-XXX_root_directory&gt;/ndk/ofm/comp/mfb_tools/debug/gen_loop_switch/sw/gls_mod.py</span></code>) that can be used to quickly perform several basic tests (modes). For example, you can measure the throughput of the NDK firmware. A list of tests can be obtained by running this script without parameters:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 gls_mod.py
+<p>The GLS module also comes with a Python script (<code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/comp/mfb_tools/debug/gen_loop_switch/sw/gls_mod.py</span></code>) that can be used to quickly perform several basic tests (modes). For example, you can measure the throughput of the NDK firmware. A list of tests can be obtained by running this script without parameters:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ python3 gls_mod.py
 gls_mod.py mode [port_list]
 Example: gls_mod.py 1 &quot;0,1&quot;
 
@@ -597,7 +601,7 @@ Supported modes:
 <p>If you do not have an external QSFP loopback available, you can simply enable the Ethernet PMA loopback directly in the FPGA using the nfb-eth tool: <code class="docutils literal notranslate"><span class="pre">nfb-eth</span> <span class="pre">-Pc</span> <span class="pre">&quot;+PMA</span> <span class="pre">local</span> <span class="pre">loopback&quot;</span></code>.</p>
 </div>
 <p>If an external QSFP loopback is connected, the transmitted packets are received back into the FPGA, where the script measures the receiving speed. In this test, packets pass through the application core so that the measured throughput corresponds with the throughput of the implemented application. The throughput calculation considers L2 packets from the destination MAC address to the end of the payload. Below is an example of the script output after running test 1:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 gls_mod.py 1
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ python3 gls_mod.py 1
 Test # 1 started...
 Selected DMA channels: 0,1,2,3,4,5,6,7
 
@@ -677,7 +681,7 @@ Total Speed RX:             83.78 [Gbps]
                     </div>
                     <div class="right-details">
                         <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: daaec2e5
+                            Git branch: devel<br>Git hash: 527e3085
                         </div>
                         
                     </div>
