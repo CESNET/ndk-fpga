@@ -1,246 +1,52 @@
-<!doctype html>
-<html class="no-js" lang="en" data-content_root="../../../../">
-  <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="Pulse short" href="../pulse_short/readme.html" /><link rel="prev" title="Packet Planner" href="../packet_planner/readme.html" />
-
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Event Counter - NDK-FPGA documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=302659d7" />
-    
-    
 
 
-<style>
-  body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Counter &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
   
-  }
-  @media not print {
-    body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-    }
-    @media (prefers-color-scheme: dark) {
-      body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-      }
-    }
-  }
-</style></head>
-  <body>
-    
-    <script>
-      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
-    </script>
-     
-<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-  <symbol id="svg-toc" viewBox="0 0 24 24">
-    <title>Contents</title>
-    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
-      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-menu" viewBox="0 0 24 24">
-    <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-  </symbol>
-  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
-    <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
-  </symbol>
-  <symbol id="svg-sun" viewBox="0 0 24 24">
-    <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
-      <circle cx="12" cy="12" r="5"></circle>
-      <line x1="12" y1="1" x2="12" y2="3"></line>
-      <line x1="12" y1="21" x2="12" y2="23"></line>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-      <line x1="1" y1="12" x2="3" y2="12"></line>
-      <line x1="21" y1="12" x2="23" y2="12"></line>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    </svg>
-  </symbol>
-  <symbol id="svg-moon" viewBox="0 0 24 24">
-    <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
-    </svg>
-  </symbol>
-  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
-    <title>Auto light/dark, in light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
-      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
-      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
-      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
-      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
-      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
-      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
-      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
-      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
-      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
-      <circle cx="14.5" cy="9.55" r="3.6"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
-    <title>Auto light/dark, in dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
-      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
-      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
-      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
-      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
-      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
-      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
-      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
-      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
-      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
-      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-pencil" viewBox="0 0 24 24">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
-      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-      <path d="M13.5 6.5l4 4" />
-      <path d="M20 21l2 -2l-2 -2" />
-      <path d="M17 17l-2 2l2 2" />
-    </svg>
-  </symbol>
-  <symbol id="svg-eye" viewBox="0 0 24 24">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-      <path
-        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
-      <path d="M20 21l2 -2l-2 -2" />
-      <path d="M17 17l-2 2l2 2" />
-    </svg>
-  </symbol>
-</svg>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Pulse short" href="../pulse_short/readme.html" />
+    <link rel="prev" title="Packet Planner" href="../packet_planner/readme.html" /> 
+</head>
 
-<input
-    type="checkbox"
-    class="sidebar-toggle"
-    name="__navigation"
-    id="__navigation"
-/>
-<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" />
-<label class="overlay sidebar-overlay" for="__navigation">
-    <div class="visually-hidden">Hide navigation sidebar</div>
-</label>
-<label class="overlay toc-overlay" for="__toc">
-    <div class="visually-hidden">Hide table of contents sidebar</div>
-</label>
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
-
-
-
-<div class="page">
-    <header class="mobile-header">
-        <div class="header-left">
-            <label class="nav-overlay-icon" for="__navigation">
-                <div class="visually-hidden">
-                    Toggle site navigation sidebar
-                </div>
-                <i class="icon"
-                    ><svg><use href="#svg-menu"></use></svg
-                ></i>
-            </label>
-        </div>
-        <div class="header-center">
-            <a href="../../../../index.html"
-                ><div class="brand">
-                    NDK-FPGA  documentation
-                </div></a
-            >
-        </div>
-        <div class="header-right">
-            <div class="theme-toggle-container theme-toggle-header">
-                <button class="theme-toggle">
-                    <div class="visually-hidden">
-                        Toggle Light / Dark / Auto color theme
-                    </div>
-                    <svg class="theme-icon-when-auto-light">
-                        <use href="#svg-sun-with-moon"></use>
-                    </svg>
-                    <svg class="theme-icon-when-auto-dark">
-                        <use href="#svg-moon-with-sun"></use>
-                    </svg>
-                    <svg class="theme-icon-when-dark">
-                        <use href="#svg-moon"></use>
-                    </svg>
-                    <svg class="theme-icon-when-light">
-                        <use href="#svg-sun"></use>
-                    </svg>
-                </button>
-            </div>
-            <label
-                class="toc-overlay-icon toc-header-icon"
-                for="__toc"
-            >
-                <div class="visually-hidden">
-                    Toggle table of contents sidebar
-                </div>
-                <i class="icon"
-                    ><svg><use href="#svg-toc"></use></svg
-                ></i>
-            </label>
-        </div>
-    </header>
-    <aside class="sidebar-drawer">
-        <div class="sidebar-container">
-            
-            <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
-  
-  
-  <span class="sidebar-brand-text">NDK-FPGA  documentation</span>
-  
-</a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
-  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
-  <input type="hidden" name="check_keywords" value="yes">
-  <input type="hidden" name="area" value="default">
-</form>
-<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of NDK Architecture</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../../ndk_core/doc/app.html">The Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../ndk_core/doc/mi.html">The MI bus interconnect</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../ndk_core/doc/eth.html">The Network Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../ndk_core/doc/dma.html">The DMA module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../ndk_core/doc/pcie.html">The PCIe module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../ndk_core/doc/mem.html">The Memory Controller</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../ndk_core/doc/tsu.html">Time Stamp Unit</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
@@ -253,215 +59,34 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../../base.html">Basic Tools</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Basic Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../async.html">Asynchronous modules</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Asynchronous modules</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../memory.html">Memory modules</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Memory modules</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../mem/np_lutram/readme.html">NP LUT RAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../mem/sdp_bram/readme.html">Simple dual-port BRAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../mem/sdp_bram/readme.html#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../mem/mp_bram/readme.html">Multi-port BRAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../mem/lvt_mem/readme.html">Live value table memory</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../mem/mem_clear/readme.html">Memory clear</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../fifo.html">FIFO components</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of FIFO components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../fifo/asfifox/readme.html">ASFIFOX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../fifo/fifox/readme.html">FIFOX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../fifo/fifox_multi/readme.html">FIFOX Multi</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../dsp.html">DSP components</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of DSP components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../dsp/dsp_comparator/readme.html">DSP Comparator</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../logic.html">Basic logic elements</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Basic logic elements</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/n_loop_op/readme.html">N_LOOP_OP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/sr_sync_latch/readme.html">Synchronous SR latch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/barrel_shifter/readme.html">Barrel Shifter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/cnt_multi_memx/readme.html">Multi MEMx Counter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../logic/h3hash/readme.html">H3 Class Hash</a></li>
-</ul>
-</li>
-<li class="toctree-l2 current has-children"><a class="reference internal" href="../../../../misc.html">Miscellaneous</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of Miscellaneous</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../base.html">Basic Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../async.html">Asynchronous modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../memory.html">Memory modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../fifo.html">FIFO components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dsp.html">DSP components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../logic.html">Basic logic elements</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../misc.html">Miscellaneous</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../crossbarx/readme.html">CrossbarX</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../trans_sorter/readme.html">Transaction Sorter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../packet_planner/readme.html">Packet Planner</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Event Counter</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Event Counter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#architecture">Architecture</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#capture-feature">Capture feature</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../pulse_short/readme.html">Pulse short</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle navigation of Controllers &amp; TSU</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../ctrls/sdm_client/readme.html">SDM CLIENT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tsu/tsu_gen/readme.html">TSU GEN</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../mi.html">MI Tools</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of MI Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/async/readme.html">MI ASYNC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/pipe/readme.html">MI Pipe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/indirect_access/readme.html">MI indirect access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/reconf/readme.html">MI Reconfigurator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/splitter_plus_gen/readme.html">MI Splitter Plus Gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/converters/mi2avmm/readme.html">MI2AVMM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mi_tools/converters/mi2axi4/readme.html">MI2AXI4</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of MFB Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/debug/generator/readme.html">MFB Generator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/edit/frame_appender/readme.html">MFB MVB Appender</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/edit/frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/edit/frame_trimmer/readme.html">MFB FRAME TRIMMER</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/cutter_simple/readme.html">MFB Cutter Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/dropper/readme.html">MFB Dropper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/enabler/readme.html">MFB Enabler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/frame_masker/readme.html">MFB Frame Masker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/frame_packer/readme.html">Frame Packer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/frame_unpacker/readme.html">Frame Unpacker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/loopback/readme.html">MFB Loopback</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/merger/readme.html">MFB Merger</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/merger_simple/readme.html">MFB Merger Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/merger_simple/readme.html#id1">MFB Merger Simple GEN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/metadata_insertor/readme.html">Metadata Insertor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/packet_delayer/readme.html">Packet Delayer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/pipe/readme.html">MFB PIPE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/rate_limiter/readme.html">Rate Limiter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/reconfigurator/readme.html">MFB Reconfigurator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/splitter/readme.html">MFB Splitter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/splitter/readme.html#id1">MFB Splitter Gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/splitter_simple/readme.html">MFB Splitter Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/timestamp_limiter/readme.html">Timestamp Limiter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/flow/transformer/readme.html">MFB Trasformer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/asfifox/readme.html">MFB ASFIFOX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/fifox/readme.html">MFB FIFOX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mfb_tools/storage/pd_asfifo_simple/readme.html">MFB PD ASFIFO SIMPLE</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../mvb.html">MVB Components</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle navigation of MVB Components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/channel_router/readme.html">MVB Channel Router</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/discard/readme.html">MVB DISCARD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/item_collision_resolver/readme.html">MVB Item Collision Resolver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_items/readme.html">MVB Merge Items</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_streams/readme.html">MVB Merge Streams</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/demux/readme.html">MVB DEMUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/mux/readme.html">MVB MUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_n_to_m/readme.html">SHAKEDOWN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/shakedown/readme.html">MVB Shakedown</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/operation/readme.html">MVB Operation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/mvb2mfb/readme.html">MVB2MFB</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/flow/gate/readme.html">MVB Gate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/storage/lookup_table/readme.html">MVB Lookup Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../mvb_tools/storage/fifox/readme.html">MVB FIFOX</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../nic.html">Network Tools</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Network Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../nic/mac_lite/rx_mac_lite/readme.html">RX MAC LITE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../nic/mac_lite/tx_mac_lite/readme.html">TX MAC LITE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../nic/mac_lite/tx_mac_lite/comp/adapters/lbus/reconf/readme.html">MFB -&gt; LBUS reconfigurator (TX LBUS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../nic/eth_phy/40ge/readme.html">40GE Ethernet PHY for Ultrascale+ FPGAs</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle navigation of PCIe Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../pcie/mtc/readme.html">MTC (MI Transaction Controller)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pcie/ptc/readme.html">PTC (PCIe Transaction Controller)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pcie/ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pcie/common/readme.html">PCI_EXT_CAP</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pcie/logic/byte_count/readme.html">PCIE Byte Count</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pcie/logic/byte_en_decoder/readme.html">PCIe Byte Enable Decoder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dma/dma_calypte/readme.html">DMA Calypte</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><div class="visually-hidden">Toggle navigation of DMA Calypte</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../dma/dma_calypte/comp/rx/readme.html">RX DMA Calypte</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of RX DMA Calypte</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../dma/dma_calypte/comp/rx/comp/input_buffer/readme.html">Input Buffer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../dma/dma_calypte/comp/rx/comp/trans_buffer/readme.html">Transaction Buffer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../dma/dma_calypte/comp/rx/comp/hdr_insertor/readme.html">Header Insertor</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../../../dma/dma_calypte/comp/rx/comp/hdr_manager/readme.html">Header Manager</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" role="switch" type="checkbox"/><label for="toctree-checkbox-17"><div class="visually-hidden">Toggle navigation of Header Manager</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../../dma/dma_calypte/comp/rx/comp/hdr_manager/addr_manager/readme.html">Address Manager</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="../../../dma/dma_calypte/comp/rx/comp/software_manager/readme.html">Software Manager</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../dma/dma_calypte/comp/tx/readme.html">TX DMA Calypte</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" role="switch" type="checkbox"/><label for="toctree-checkbox-18"><div class="visually-hidden">Toggle navigation of TX DMA Calypte</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../dma/dma_calypte/comp/tx/comp/metadata_extractor/readme.html">Metadata Extractor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../dma/dma_calypte/comp/tx/comp/chan_start_stop_ctrl/readme.html">Channel Start/stop control</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../dma/dma_calypte/comp/tx/comp/packet_dispatcher/readme.html">Packet Dispatcher</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../dma/dma_calypte/comp/tx/comp/pcie_trans_buffer/readme.html">Transaction buffer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../dma/dma_calypte/comp/tx/comp/software_manager/readme.html">Software Manager</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../debug.html">Debug Tools</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" role="switch" type="checkbox"/><label for="toctree-checkbox-19"><div class="visually-hidden">Toggle navigation of Debug Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../debug/mem_tester/readme.html">DDR4 Memory Tester</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" role="switch" type="checkbox"/><label for="toctree-checkbox-20"><div class="visually-hidden">Toggle navigation of DDR4 Memory Tester</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../debug/mem_tester/amm_gen/readme.html">AMM_GEN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../debug/mem_tester/amm_probe/readme.html">AMM_PROBE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../debug/mem_tester/sw/readme.html">MEM_TESTER Software</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../debug/histogramer/readme.html">Histogramer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../debug/latency_meter/readme.html">Latency meter</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../debug/data_logger/readme.html">Data logger</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" role="switch" type="checkbox"/><label for="toctree-checkbox-21"><div class="visually-hidden">Toggle navigation of Data logger</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../debug/data_logger/mem_logger/readme.html">Mem logger</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../debug/jtag_op_client/readme.html">JTAG-over-protocol Client</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../ver.html">UVM Verification</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" role="switch" type="checkbox"/><label for="toctree-checkbox-22"><div class="visually-hidden">Toggle navigation of UVM Verification</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../uvm/manual.html">SystemVerilog and UVM tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../uvm/sim_manual.html">UVM simulation</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../uvm/componets.html">Components</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" role="switch" type="checkbox"/><label for="toctree-checkbox-23"><div class="visually-hidden">Toggle navigation of Components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/reset/readme.html">RESET agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/logic_vector/readme.html">Logic vector agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/logic_vector_mvb/readme.html">logic_vector_mvb environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/logic_vector_array/readme.html">Logic Vector Array agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/logic_vector_array_mfb/readme.html">logic_vector_array_mfb environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/byte_array/readme.html">Byte Array agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/logic_vector_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/byte_array_mii/readme.html">Byte array to MII transitional environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/common/readme.html">Common package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/lii/readme.html">LII agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/lii_rx/readme.html">LII agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/lii_rx/readme.html#lii-interface">LII interface</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/lii_rx/readme.html#lii-monitor">LII monitor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/lii_rx/readme.html#lii-driver">LII driver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/mvb/readme.html">MVB agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/mfb/readme.html">MFB Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/mi/readme.html">MI agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/pma/readme.html">PMA agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/intel_mac_seg/readme.html">Intel MAC SEG</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/axi/readme.html">AXI Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/packet_generators/flowtest/readme.html">FlowTest Sequence</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/avmm/readme.html">AVMM Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/avst_crdt/readme.html">AVST CRDT Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/probe/readme.html">probe agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/lbus/readme.html">LBUS Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../uvm/logic_vector_array_lbus/readme.html">LOGIC VECTOR ARRAY LBUS Environment</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
 <ul>
@@ -474,76 +99,45 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3@VU9P</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh@KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118@VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 </ul>
 
-</div>
-</div>
-
-            </div>
-            
         </div>
-    </aside>
-    <div class="main">
-        <div class="content">
-            <div class="article-container">
-                <a href="#" class="back-to-top muted-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path
-                            d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"
-                        ></path>
-                    </svg>
-                    <span>Back to top</span>
-                </a>
-                <div class="content-icon-container">
-                    <div class="view-this-page">
-  <a class="muted-link" href="../../../../_sources/comp/base/misc/event_counter/readme.rst.txt" title="View this page">
-    <svg><use href="#svg-eye"></use></svg>
-    <span class="visually-hidden">View this page</span>
-  </a>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../base.html">Basic Tools</a></li>
+          <li class="breadcrumb-item"><a href="../../../../misc.html">Miscellaneous</a></li>
+      <li class="breadcrumb-item active">Event Counter</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/base/misc/event_counter/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
 </div>
-<div class="theme-toggle-container theme-toggle-content">
-                        <button class="theme-toggle">
-                            <div class="visually-hidden">
-                                Toggle Light / Dark / Auto color theme
-                            </div>
-                            <svg class="theme-icon-when-auto-light">
-                                <use href="#svg-sun-with-moon"></use>
-                            </svg>
-                            <svg class="theme-icon-when-auto-dark">
-                                <use href="#svg-moon-with-sun"></use>
-                            </svg>
-                            <svg class="theme-icon-when-dark">
-                                <use href="#svg-moon"></use>
-                            </svg>
-                            <svg class="theme-icon-when-light">
-                                <use href="#svg-sun"></use>
-                            </svg>
-                        </button>
-                    </div>
-                    <label
-                        class="toc-overlay-icon toc-content-icon"
-                        for="__toc"
-                    >
-                        <div class="visually-hidden">
-                            Toggle table of contents sidebar
-                        </div>
-                        <i class="icon"
-                            ><svg><use href="#svg-toc"></use></svg
-                        ></i>
-                    </label>
-                </div>
-                <article role="main" id="furo-main-content">
-                    <section id="event-counter">
-<span id="id1"></span><h1>Event Counter<a class="headerlink" href="#event-counter" title="Link to this heading">¶</a></h1>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="event-counter">
+<span id="id1"></span><h1>Event Counter<a class="headerlink" href="#event-counter" title="Link to this heading"></a></h1>
 <p>The Event Counter is a debuging unit for receiving statistics of occurence frequency of a certain event.
 It is made accessible through MI interface using the Event Counter MI Wrapper.
 The MI address space consists of 4 addresses which are configured by the user as generics.</p>
@@ -556,12 +150,12 @@ It is thus recomended to read the number of cycles from this register as the act
 <p>Once a whole interval has been counted, the events counter and the cycles counter are reset and the counting automatically continues to the next interval.
 From the view of the user this means, that the values read from the output register can change all the time.</p>
 <section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">¶</a></h2>
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
 <a class="reference internal image-reference" href="../../../../_images/event_counter.svg" id="event-counter-diagram"><img alt="" class="align-center" id="event-counter-diagram" src="../../../../_images/event_counter.svg" style="width: 100%;" />
 </a>
 </section>
 <section id="capture-feature">
-<h2>Capture feature<a class="headerlink" href="#capture-feature" title="Link to this heading">¶</a></h2>
+<h2>Capture feature<a class="headerlink" href="#capture-feature" title="Link to this heading"></a></h2>
 <p>Sometimes it is useful to be able to see the evolution of the event’s occurence across time.
 The user can read the output counter register to get the rough idea.
 (e.g. NOW events are occuring a lot. A second later there are none.)
@@ -604,9 +198,8 @@ The size of the FIFO can therefore be set to <code class="docutils literal notra
 </div></blockquote>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-event_counter_mi_wrapper">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">EVENT_COUNTER_MI_WRAPPER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-event_counter_mi_wrapper" title="Link to this definition">¶</a></dt>
-<dd><span class="sig-name descname">Generics</span><div class="table-wrapper docutils container">
-<table class="docutils align-default">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">EVENT_COUNTER_MI_WRAPPER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-event_counter_mi_wrapper" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
 <th class="head"><p>Type</p></th>
@@ -675,9 +268,7 @@ Automatically rounded to the closes higher (2**N-1).</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<span class="sig-name descname">Ports</span><div class="table-wrapper docutils container">
-<table class="docutils align-default">
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Port</p></th>
 <th class="head"><p>Type</p></th>
@@ -703,87 +294,40 @@ Automatically rounded to the closes higher (2**N-1).</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </dd></dl>
 
 </section>
 </section>
 
-                </article>
-            </div>
-            <footer>
-                
-                <div class="related-pages">
-                    <a class="next-page" href="../pulse_short/readme.html">
-                        <div class="page-info">
-                            <div class="context">
-                                <span>Next</span>
-                            </div>
-                            <div class="title">Pulse short</div>
-                        </div>
-                        <svg class="furo-related-icon">
-                            <use href="#svg-arrow-right"></use>
-                        </svg>
-                    </a> <a class="prev-page" href="../packet_planner/readme.html">
-                        <svg class="furo-related-icon">
-                            <use href="#svg-arrow-right"></use>
-                        </svg>
-                        <div class="page-info">
-                            <div class="context">
-                                <span>Previous</span>
-                            </div>
-                            
-                            <div class="title">Packet Planner</div>
-                            
-                        </div>
-                    </a>
-                </div>
-                <div class="bottom-of-page">
-                    <div class="left-details">
-                        <div class="copyright"> Copyright &#169; 2024, CESNET z.s.p.o.
-                        </div> Made with <a
-                            href="https://www.sphinx-doc.org/"
-                            >Sphinx</a
-                        >
-                        and <a class="muted-link" href="https://pradyunsg.me"
-                            >@pradyunsg</a
-                        >'s 
-                        <a href="https://github.com/pradyunsg/furo">Furo</a>
-                        
-                    </div>
-                    <div class="right-details">
-                        <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: b46ddbdd
-                        </div>
-                        
-                    </div>
-                </div>
-                
-            </footer>
-        </div>
-        <aside class="toc-drawer">
-             
-            <div class="toc-sticky toc-scroll">
-                <div class="toc-title-container">
-                    <span class="toc-title"> On this page </span>
-                </div>
-                <div class="toc-tree-container">
-                    <div class="toc-tree"><ul>
-<li><a class="reference internal" href="#">Event Counter</a><ul>
-<li><a class="reference internal" href="#architecture">Architecture</a></li>
-<li><a class="reference internal" href="#capture-feature">Capture feature</a></li>
-</ul>
-</li>
-</ul>
-</div>
-                </div>
-            </div>
-             
-        </aside>
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../packet_planner/readme.html" class="btn btn-neutral float-left" title="Packet Planner" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../pulse_short/readme.html" class="btn btn-neutral float-right" title="Pulse short" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-</div><script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../../_static/scripts/furo.js?v=5fa4622c"></script>
-    </body>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

@@ -1,246 +1,52 @@
-<!doctype html>
-<html class="no-js" lang="en" data-content_root="../../">
-  <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="UVM simulation" href="sim_manual.html" /><link rel="prev" title="UVM Verification" href="../../ver.html" />
-
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>SystemVerilog and UVM tutorial - NDK-FPGA documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
-    
-    
 
 
-<style>
-  body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SystemVerilog and UVM tutorial &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
+
   
-  }
-  @media not print {
-    body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-    }
-    @media (prefers-color-scheme: dark) {
-      body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-      }
-    }
-  }
-</style></head>
-  <body>
-    
-    <script>
-      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
-    </script>
-     
-<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-  <symbol id="svg-toc" viewBox="0 0 24 24">
-    <title>Contents</title>
-    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
-      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-menu" viewBox="0 0 24 24">
-    <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-  </symbol>
-  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
-    <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
-  </symbol>
-  <symbol id="svg-sun" viewBox="0 0 24 24">
-    <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
-      <circle cx="12" cy="12" r="5"></circle>
-      <line x1="12" y1="1" x2="12" y2="3"></line>
-      <line x1="12" y1="21" x2="12" y2="23"></line>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-      <line x1="1" y1="12" x2="3" y2="12"></line>
-      <line x1="21" y1="12" x2="23" y2="12"></line>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    </svg>
-  </symbol>
-  <symbol id="svg-moon" viewBox="0 0 24 24">
-    <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
-    </svg>
-  </symbol>
-  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
-    <title>Auto light/dark, in light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
-      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
-      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
-      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
-      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
-      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
-      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
-      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
-      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
-      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
-      <circle cx="14.5" cy="9.55" r="3.6"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
-    <title>Auto light/dark, in dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
-      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
-      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
-      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
-      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
-      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
-      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
-      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
-      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
-      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
-      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-pencil" viewBox="0 0 24 24">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
-      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-      <path d="M13.5 6.5l4 4" />
-      <path d="M20 21l2 -2l-2 -2" />
-      <path d="M17 17l-2 2l2 2" />
-    </svg>
-  </symbol>
-  <symbol id="svg-eye" viewBox="0 0 24 24">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-      <path
-        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
-      <path d="M20 21l2 -2l-2 -2" />
-      <path d="M17 17l-2 2l2 2" />
-    </svg>
-  </symbol>
-</svg>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="UVM simulation" href="sim_manual.html" />
+    <link rel="prev" title="UVM Verification" href="../../ver.html" /> 
+</head>
 
-<input
-    type="checkbox"
-    class="sidebar-toggle"
-    name="__navigation"
-    id="__navigation"
-/>
-<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" />
-<label class="overlay sidebar-overlay" for="__navigation">
-    <div class="visually-hidden">Hide navigation sidebar</div>
-</label>
-<label class="overlay toc-overlay" for="__toc">
-    <div class="visually-hidden">Hide table of contents sidebar</div>
-</label>
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
-
-
-
-<div class="page">
-    <header class="mobile-header">
-        <div class="header-left">
-            <label class="nav-overlay-icon" for="__navigation">
-                <div class="visually-hidden">
-                    Toggle site navigation sidebar
-                </div>
-                <i class="icon"
-                    ><svg><use href="#svg-menu"></use></svg
-                ></i>
-            </label>
-        </div>
-        <div class="header-center">
-            <a href="../../index.html"
-                ><div class="brand">
-                    NDK-FPGA  documentation
-                </div></a
-            >
-        </div>
-        <div class="header-right">
-            <div class="theme-toggle-container theme-toggle-header">
-                <button class="theme-toggle">
-                    <div class="visually-hidden">
-                        Toggle Light / Dark / Auto color theme
-                    </div>
-                    <svg class="theme-icon-when-auto-light">
-                        <use href="#svg-sun-with-moon"></use>
-                    </svg>
-                    <svg class="theme-icon-when-auto-dark">
-                        <use href="#svg-moon-with-sun"></use>
-                    </svg>
-                    <svg class="theme-icon-when-dark">
-                        <use href="#svg-moon"></use>
-                    </svg>
-                    <svg class="theme-icon-when-light">
-                        <use href="#svg-sun"></use>
-                    </svg>
-                </button>
-            </div>
-            <label
-                class="toc-overlay-icon toc-header-icon"
-                for="__toc"
-            >
-                <div class="visually-hidden">
-                    Toggle table of contents sidebar
-                </div>
-                <i class="icon"
-                    ><svg><use href="#svg-toc"></use></svg
-                ></i>
-            </label>
-        </div>
-    </header>
-    <aside class="sidebar-drawer">
-        <div class="sidebar-container">
-            
-            <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
-  
-  
-  <span class="sidebar-brand-text">NDK-FPGA  documentation</span>
-  
-</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
-  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
-  <input type="hidden" name="check_keywords" value="yes">
-  <input type="hidden" name="area" value="default">
-</form>
-<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ndk_core/doc/readme.html">NDK Architecture</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of NDK Architecture</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../ndk_core/doc/app.html">The Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../ndk_core/doc/mi.html">The MI bus interconnect</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../ndk_core/doc/eth.html">The Network Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../ndk_core/doc/dma.html">The DMA module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../ndk_core/doc/pcie.html">The PCIe module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../ndk_core/doc/mem.html">The Memory Controller</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../ndk_core/doc/tsu.html">Time Stamp Unit</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/readme.html">NDK Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
@@ -253,213 +59,77 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../base.html">Basic Tools</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Basic Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../async.html">Asynchronous modules</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Asynchronous modules</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SystemVerilog and UVM tutorial</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#other-tutorials">Other tutorials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#basic-usage-of-the-uvm-methodology-in-the-ofm-repository">Basic usage of the UVM methodology in the OFM repository</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#interface">Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#properties">Properties</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#driver">Driver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#agent">Agent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-object">Configuration object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequence">Sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequence-library">Sequence library</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#package">Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#layered-agents">Layered agents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#environment">Environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#low-level-sequence">Low-level sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#high-level-monitor">High-level monitor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Configuration object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Sequence library</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run-of-a-specific-sequence">Run of a specific sequence</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../memory.html">Memory modules</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Memory modules</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../base/mem/np_lutram/readme.html">NP LUT RAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/mem/sdp_bram/readme.html">Simple dual-port BRAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/mem/sdp_bram/readme.html#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/mem/mp_bram/readme.html">Multi-port BRAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/mem/lvt_mem/readme.html">Live value table memory</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/mem/mem_clear/readme.html">Memory clear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#common-environment">Common environment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#virtual-sequencer">Virtual sequencer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#virtual-sequence-and-synchronization">Virtual sequence and synchronization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scoreboard">Scoreboard</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../fifo.html">FIFO components</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of FIFO components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../base/fifo/asfifox/readme.html">ASFIFOX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/fifo/fifox/readme.html">FIFOX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/fifo/fifox_multi/readme.html">FIFOX Multi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#request-response-agents">Request-response Agents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reset">Reset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Scoreboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coverage">Coverage</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#functional-coverage">Functional coverage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#code-coverage">Code coverage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generating-coverage-reports">Generating coverage reports</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../dsp.html">DSP components</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of DSP components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../base/dsp/dsp_comparator/readme.html">DSP Comparator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#verification-example">Verification example</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#byte-array-port-environment">Byte_array_port environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model">Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-model-input-fifo">Create model input fifo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test-environment">Test environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test">Test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Properties</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testbench">Testbench</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../logic.html">Basic logic elements</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Basic logic elements</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../base/logic/n_loop_op/readme.html">N_LOOP_OP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/logic/sr_sync_latch/readme.html">Synchronous SR latch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/logic/barrel_shifter/readme.html">Barrel Shifter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/logic/cnt_multi_memx/readme.html">Multi MEMx Counter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/logic/h3hash/readme.html">H3 Class Hash</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes">NOTES</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#uvm-info">UVM_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#uvm-error-vs-uvm-fatal">UVM_error vs UVM_fatal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parametrized-object">Parametrized object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#synchronization">Synchronization</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../misc.html">Miscellaneous</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of Miscellaneous</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../base/misc/crossbarx/readme.html">CrossbarX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/misc/trans_sorter/readme.html">Transaction Sorter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/misc/packet_planner/readme.html">Packet Planner</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/misc/event_counter/readme.html">Event Counter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/misc/pulse_short/readme.html">Pulse short</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle navigation of Controllers &amp; TSU</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../ctrls/sdm_client/readme.html">SDM CLIENT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tsu/tsu_gen/readme.html">TSU GEN</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../mi.html">MI Tools</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of MI Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../mi_tools/async/readme.html">MI ASYNC</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mi_tools/pipe/readme.html">MI Pipe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mi_tools/indirect_access/readme.html">MI indirect access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mi_tools/reconf/readme.html">MI Reconfigurator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mi_tools/splitter_plus_gen/readme.html">MI Splitter Plus Gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mi_tools/converters/mi2avmm/readme.html">MI2AVMM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mi_tools/converters/mi2axi4/readme.html">MI2AXI4</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../mfb.html">MFB Tools</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of MFB Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/debug/generator/readme.html">MFB Generator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/edit/frame_appender/readme.html">MFB MVB Appender</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/edit/frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/edit/frame_trimmer/readme.html">MFB FRAME TRIMMER</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/cutter_simple/readme.html">MFB Cutter Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/dropper/readme.html">MFB Dropper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/enabler/readme.html">MFB Enabler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/frame_masker/readme.html">MFB Frame Masker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/frame_packer/readme.html">Frame Packer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/frame_unpacker/readme.html">Frame Unpacker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/loopback/readme.html">MFB Loopback</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/merger/readme.html">MFB Merger</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/merger_simple/readme.html">MFB Merger Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/merger_simple/readme.html#id1">MFB Merger Simple GEN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/metadata_insertor/readme.html">Metadata Insertor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/packet_delayer/readme.html">Packet Delayer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/pipe/readme.html">MFB PIPE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/rate_limiter/readme.html">Rate Limiter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/reconfigurator/readme.html">MFB Reconfigurator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/splitter/readme.html">MFB Splitter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/splitter/readme.html#id1">MFB Splitter Gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/splitter_simple/readme.html">MFB Splitter Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/timestamp_limiter/readme.html">Timestamp Limiter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/flow/transformer/readme.html">MFB Trasformer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/storage/asfifox/readme.html">MFB ASFIFOX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/storage/fifox/readme.html">MFB FIFOX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/storage/pd_asfifo/readme.html">MFB Packet Discard ASFIFO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mfb_tools/storage/pd_asfifo_simple/readme.html">MFB PD ASFIFO SIMPLE</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../mvb.html">MVB Components</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle navigation of MVB Components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/channel_router/readme.html">MVB Channel Router</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/discard/readme.html">MVB DISCARD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/item_collision_resolver/readme.html">MVB Item Collision Resolver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/merge_items/readme.html">MVB Merge Items</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/merge_streams/readme.html">MVB Merge Streams</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/demux/readme.html">MVB DEMUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/mux/readme.html">MVB MUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/merge_n_to_m/readme.html">SHAKEDOWN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/shakedown/readme.html">MVB Shakedown</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/operation/readme.html">MVB Operation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/mvb2mfb/readme.html">MVB2MFB</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/flow/gate/readme.html">MVB Gate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/storage/lookup_table/readme.html">MVB Lookup Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_tools/storage/fifox/readme.html">MVB FIFOX</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../nic.html">Network Tools</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Network Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../nic/mac_lite/rx_mac_lite/readme.html">RX MAC LITE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../nic/mac_lite/tx_mac_lite/readme.html">TX MAC LITE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../nic/mac_lite/tx_mac_lite/comp/adapters/lbus/reconf/readme.html">MFB -&gt; LBUS reconfigurator (TX LBUS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../nic/eth_phy/40ge/readme.html">40GE Ethernet PHY for Ultrascale+ FPGAs</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../pcie.html">PCIe Tools</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle navigation of PCIe Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../pcie/mtc/readme.html">MTC (MI Transaction Controller)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcie/ptc/readme.html">PTC (PCIe Transaction Controller)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcie/ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcie/common/readme.html">PCI_EXT_CAP</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcie/logic/byte_count/readme.html">PCIE Byte Count</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcie/logic/byte_en_decoder/readme.html">PCIe Byte Enable Decoder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcie/others/hdr_gen/readme.html">PCIE Header parsing/deparsing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../dma/dma_calypte/readme.html">DMA Calypte</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><div class="visually-hidden">Toggle navigation of DMA Calypte</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../dma/dma_calypte/comp/rx/readme.html">RX DMA Calypte</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of RX DMA Calypte</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../dma/dma_calypte/comp/rx/comp/input_buffer/readme.html">Input Buffer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../dma/dma_calypte/comp/rx/comp/trans_buffer/readme.html">Transaction Buffer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../dma/dma_calypte/comp/rx/comp/hdr_insertor/readme.html">Header Insertor</a></li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="../dma/dma_calypte/comp/rx/comp/hdr_manager/readme.html">Header Manager</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" role="switch" type="checkbox"/><label for="toctree-checkbox-17"><div class="visually-hidden">Toggle navigation of Header Manager</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l5"><a class="reference internal" href="../dma/dma_calypte/comp/rx/comp/hdr_manager/addr_manager/readme.html">Address Manager</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="../dma/dma_calypte/comp/rx/comp/software_manager/readme.html">Software Manager</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../dma/dma_calypte/comp/tx/readme.html">TX DMA Calypte</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" role="switch" type="checkbox"/><label for="toctree-checkbox-18"><div class="visually-hidden">Toggle navigation of TX DMA Calypte</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../dma/dma_calypte/comp/tx/comp/metadata_extractor/readme.html">Metadata Extractor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../dma/dma_calypte/comp/tx/comp/chan_start_stop_ctrl/readme.html">Channel Start/stop control</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../dma/dma_calypte/comp/tx/comp/packet_dispatcher/readme.html">Packet Dispatcher</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../dma/dma_calypte/comp/tx/comp/pcie_trans_buffer/readme.html">Transaction buffer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../dma/dma_calypte/comp/tx/comp/software_manager/readme.html">Software Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ofm-verification-environment">OFM verification environment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#modules-tcl">Modules.tcl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#main-fdo-script-for-running-the-verification">Main .fdo script for running the verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../debug.html">Debug Tools</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" role="switch" type="checkbox"/><label for="toctree-checkbox-19"><div class="visually-hidden">Toggle navigation of Debug Tools</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../debug/mem_tester/readme.html">DDR4 Memory Tester</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" role="switch" type="checkbox"/><label for="toctree-checkbox-20"><div class="visually-hidden">Toggle navigation of DDR4 Memory Tester</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../debug/mem_tester/amm_gen/readme.html">AMM_GEN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../debug/mem_tester/amm_probe/readme.html">AMM_PROBE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../debug/mem_tester/sw/readme.html">MEM_TESTER Software</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../debug/histogramer/readme.html">Histogramer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../debug/latency_meter/readme.html">Latency meter</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../debug/data_logger/readme.html">Data logger</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" role="switch" type="checkbox"/><label for="toctree-checkbox-21"><div class="visually-hidden">Toggle navigation of Data logger</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../debug/data_logger/mem_logger/readme.html">Mem logger</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../debug/jtag_op_client/readme.html">JTAG-over-protocol Client</a></li>
-</ul>
-</li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../../ver.html">UVM Verification</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" role="switch" type="checkbox"/><label for="toctree-checkbox-22"><div class="visually-hidden">Toggle navigation of UVM Verification</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">SystemVerilog and UVM tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sim_manual.html">UVM simulation</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="componets.html">Components</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" role="switch" type="checkbox"/><label for="toctree-checkbox-23"><div class="visually-hidden">Toggle navigation of Components</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="reset/readme.html">RESET agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logic_vector/readme.html">Logic vector agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logic_vector_mvb/readme.html">logic_vector_mvb environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logic_vector_array/readme.html">Logic Vector Array agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logic_vector_array_mfb/readme.html">logic_vector_array_mfb environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="byte_array/readme.html">Byte Array agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="byte_array_mfb/readme.html">Byte_array_mfb environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logic_vector_array_intel_mac_seg/readme.html">byte array to MAC SEG</a></li>
-<li class="toctree-l3"><a class="reference internal" href="byte_array_pma/readme.html">Byte array to pma convert enviroment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="byte_array_mii/readme.html">Byte array to MII transitional environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="byte_array_lii/readme.html">Byte Array to LII convert enviroment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="byte_array_lii_rx/readme.html">Byte Array to LII convert enviroment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="common/readme.html">Common package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lii/readme.html">LII agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lii_rx/readme.html">LII agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lii_rx/readme.html#lii-interface">LII interface</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lii_rx/readme.html#lii-sequence-item">LII sequence item</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lii_rx/readme.html#lii-monitor">LII monitor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lii_rx/readme.html#lii-driver">LII driver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mvb/readme.html">MVB agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mfb/readme.html">MFB Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mi/readme.html">MI agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pma/readme.html">PMA agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="intel_mac_seg/readme.html">Intel MAC SEG</a></li>
-<li class="toctree-l3"><a class="reference internal" href="axi/readme.html">AXI Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="packet_generators/flowtest/readme.html">FlowTest Sequence</a></li>
-<li class="toctree-l3"><a class="reference internal" href="avmm/readme.html">AVMM Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="avst_crdt/readme.html">AVST CRDT Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="probe/readme.html">probe agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lbus/readme.html">LBUS Agent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logic_vector_array_lbus/readme.html">LOGIC VECTOR ARRAY LBUS Environment</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="componets.html">Components</a></li>
 </ul>
 </li>
 </ul>
@@ -474,80 +144,48 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3@VU9P</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh@KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118@VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 </ul>
 
-</div>
-</div>
-
-            </div>
-            
         </div>
-    </aside>
-    <div class="main">
-        <div class="content">
-            <div class="article-container">
-                <a href="#" class="back-to-top muted-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path
-                            d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"
-                        ></path>
-                    </svg>
-                    <span>Back to top</span>
-                </a>
-                <div class="content-icon-container">
-                    <div class="view-this-page">
-  <a class="muted-link" href="../../_sources/comp/uvm/manual.rst.txt" title="View this page">
-    <svg><use href="#svg-eye"></use></svg>
-    <span class="visually-hidden">View this page</span>
-  </a>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../ver.html">UVM Verification</a></li>
+      <li class="breadcrumb-item active">SystemVerilog and UVM tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/comp/uvm/manual.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
 </div>
-<div class="theme-toggle-container theme-toggle-content">
-                        <button class="theme-toggle">
-                            <div class="visually-hidden">
-                                Toggle Light / Dark / Auto color theme
-                            </div>
-                            <svg class="theme-icon-when-auto-light">
-                                <use href="#svg-sun-with-moon"></use>
-                            </svg>
-                            <svg class="theme-icon-when-auto-dark">
-                                <use href="#svg-moon-with-sun"></use>
-                            </svg>
-                            <svg class="theme-icon-when-dark">
-                                <use href="#svg-moon"></use>
-                            </svg>
-                            <svg class="theme-icon-when-light">
-                                <use href="#svg-sun"></use>
-                            </svg>
-                        </button>
-                    </div>
-                    <label
-                        class="toc-overlay-icon toc-content-icon"
-                        for="__toc"
-                    >
-                        <div class="visually-hidden">
-                            Toggle table of contents sidebar
-                        </div>
-                        <i class="icon"
-                            ><svg><use href="#svg-toc"></use></svg
-                        ></i>
-                    </label>
-                </div>
-                <article role="main" id="furo-main-content">
-                    <section id="systemverilog-and-uvm-tutorial">
-<span id="uvm-manual"></span><h1>SystemVerilog and UVM tutorial<a class="headerlink" href="#systemverilog-and-uvm-tutorial" title="Link to this heading">¶</a></h1>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="systemverilog-and-uvm-tutorial">
+<span id="uvm-manual"></span><h1>SystemVerilog and UVM tutorial<a class="headerlink" href="#systemverilog-and-uvm-tutorial" title="Link to this heading"></a></h1>
 <p>This is manual describes how the UVM verification in our environment should be
 written.</p>
 <section id="other-tutorials">
-<h2>Other tutorials<a class="headerlink" href="#other-tutorials" title="Link to this heading">¶</a></h2>
+<h2>Other tutorials<a class="headerlink" href="#other-tutorials" title="Link to this heading"></a></h2>
 <p>This document does not serve as a general UVM or a SystemVerilog manual. Various
 tutorials can be found at:</p>
 <ul class="simple">
@@ -562,10 +200,10 @@ tutorials can be found at:</p>
 </ul>
 </section>
 <section id="basic-usage-of-the-uvm-methodology-in-the-ofm-repository">
-<h2>Basic usage of the UVM methodology in the OFM repository<a class="headerlink" href="#basic-usage-of-the-uvm-methodology-in-the-ofm-repository" title="Link to this heading">¶</a></h2>
+<h2>Basic usage of the UVM methodology in the OFM repository<a class="headerlink" href="#basic-usage-of-the-uvm-methodology-in-the-ofm-repository" title="Link to this heading"></a></h2>
 <p>This document describes one of the possible solutions for some common verification issues.</p>
 <section id="interface">
-<h3>Interface<a class="headerlink" href="#interface" title="Link to this heading">¶</a></h3>
+<h3>Interface<a class="headerlink" href="#interface" title="Link to this heading"></a></h3>
 <p>An Interface creates connections between the Device Under Test(DUT) and the
 verification environment. If there is no serious reason to do otherwise, use
 <em>wire logic</em> instead of <em>logic</em>. <em>Wire logic</em> is a net whereas <em>logic</em>
@@ -577,7 +215,7 @@ do otherwise. Interfaces do not have namespaces therefore each one must have a
 unique name.</p>
 </section>
 <section id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Link to this heading">¶</a></h3>
+<h3>Properties<a class="headerlink" href="#properties" title="Link to this heading"></a></h3>
 <p>The DUT often communicates with its surroundings using a specific protocol which
 usually has some restrictions. These restrictions can be controlled by the
 Properties module which can be instantiated and connected to an Interface. The
@@ -597,7 +235,7 @@ the given communication protocol.</p>
 </div>
 </section>
 <section id="driver">
-<h3>Driver<a class="headerlink" href="#driver" title="Link to this heading">¶</a></h3>
+<h3>Driver<a class="headerlink" href="#driver" title="Link to this heading"></a></h3>
 <p>A Driver writes data to an Interface. It is required to use the <strong>try_get</strong> or
 <strong>try_next_item</strong> function to get the next item. Using the <strong>get</strong> or
 <strong>get_next_item</strong> function is not recommended. For example, if a Sequence uses
@@ -656,7 +294,7 @@ and a race condition can occur.</p>
 </div>
 </section>
 <section id="agent">
-<h3>Agent<a class="headerlink" href="#agent" title="Link to this heading">¶</a></h3>
+<h3>Agent<a class="headerlink" href="#agent" title="Link to this heading"></a></h3>
 <p>Please stick to the following rules when writing agents, environments or
 packages:</p>
 <ol class="arabic simple">
@@ -723,7 +361,7 @@ own directory together with a package file <em>pkg.sv</em> and interface file
 </div>
 </section>
 <section id="configuration-object">
-<h3>Configuration object<a class="headerlink" href="#configuration-object" title="Link to this heading">¶</a></h3>
+<h3>Configuration object<a class="headerlink" href="#configuration-object" title="Link to this heading"></a></h3>
 <p>Every agent has its own configuration object, which can modify its behavior.
 There are two most commonly used variables in the configuration object. The
 first one is the <em>active</em> variable which indicates whether the agent is active
@@ -735,7 +373,7 @@ The agent finds the correct interface in the UVM configuration database under
 the <em>interface_name</em>.</p>
 </section>
 <section id="sequence">
-<h3>Sequence<a class="headerlink" href="#sequence" title="Link to this heading">¶</a></h3>
+<h3>Sequence<a class="headerlink" href="#sequence" title="Link to this heading"></a></h3>
 <p>The sequence contains three functions that can change the randomization output
 (<em>pre_do</em>, <em>mid_do</em>, <em>post_do</em>). Function <em>pre_do</em> is called before the
 randomization. It is suitable for changing the randomization rules. Function
@@ -770,7 +408,7 @@ processing.</p>
 </div>
 </section>
 <section id="sequence-library">
-<h3>Sequence library<a class="headerlink" href="#sequence-library" title="Link to this heading">¶</a></h3>
+<h3>Sequence library<a class="headerlink" href="#sequence-library" title="Link to this heading"></a></h3>
 <p>For all agents, it is recommended to create a Sequence library that contains
 multiple sequences. More sequences help to uncover more bugs and it also
 improves coverage with small effort. The Sequence library randomly selects a
@@ -883,7 +521,7 @@ packets, sequential read/write operations on the same address and more.</p>
 </div>
 </section>
 <section id="package">
-<h3>Package<a class="headerlink" href="#package" title="Link to this heading">¶</a></h3>
+<h3>Package<a class="headerlink" href="#package" title="Link to this heading"></a></h3>
 <p>In all registration macros (those are `uvm_components_* and `uvm_object_*), it
 is required to use a class name together with a package name, for example:
 <strong>`uvm_components_utils(pkg::class)</strong></p>
@@ -897,7 +535,7 @@ use <strong>import pkg::*</strong> command unless it is necessary. The only situ
 you can use it is to import the uvm_package.</p>
 </section>
 <section id="layered-agents">
-<h3>Layered agents<a class="headerlink" href="#layered-agents" title="Link to this heading">¶</a></h3>
+<h3>Layered agents<a class="headerlink" href="#layered-agents" title="Link to this heading"></a></h3>
 <p>Most of the verification tests do not need to generate low-level data (i.e.
 individual signals). That is why there are high-level generators that can create
 whole packets. This allows for a packet approach and separates it from a
@@ -907,7 +545,7 @@ design pattern called the <em>abstract factory</em> as well as how it is used in
 UVM methodology.</p>
 </section>
 <section id="environment">
-<h3>Environment<a class="headerlink" href="#environment" title="Link to this heading">¶</a></h3>
+<h3>Environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h3>
 <p>The environment groups together other environments and agents in logical order.
 In this case, the environment groups high- and low-level agents. Required steps
 are:</p>
@@ -976,7 +614,7 @@ tests.</p></li>
 </div>
 </section>
 <section id="low-level-sequence">
-<h3>Low-level sequence<a class="headerlink" href="#low-level-sequence" title="Link to this heading">¶</a></h3>
+<h3>Low-level sequence<a class="headerlink" href="#low-level-sequence" title="Link to this heading"></a></h3>
 <p>The purpose of the low-level sequence is to create low-level sequence_items from
 a high-level sequence_item. For example, we use byte_array as the high-level
 sequence_item and 32bit word as the low-level transaction. The following example shows
@@ -1016,7 +654,7 @@ task as was shown in the previous example.</p>
 </div>
 </section>
 <section id="high-level-monitor">
-<h3>High-level monitor<a class="headerlink" href="#high-level-monitor" title="Link to this heading">¶</a></h3>
+<h3>High-level monitor<a class="headerlink" href="#high-level-monitor" title="Link to this heading"></a></h3>
 <p>The purpose of the high-level monitor is to create a high-level sequence_item
 from low-level sequence_items. Unfortunately, the general high-level monitor
 cannot cooperate with the low-level transaction. Therefore, the common approach
@@ -1057,7 +695,7 @@ high-level monitor.</p>
 </div>
 </section>
 <section id="id1">
-<h3>Configuration object<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<h3>Configuration object<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>The environment creates one or multiple configuration objects for its
 subenvironments or internal agents. The following example shows how to create
 two configuration objects for agents which are instantiated in the current
@@ -1099,7 +737,7 @@ environment.</p>
 <img alt="configuration object" class="align-center" src="../../_images/cofiguration_object.svg" />
 </section>
 <section id="id2">
-<h3>Sequence library<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<h3>Sequence library<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <p>It is recommended to use a sequence library as the lower sequence. This is going
 to improve the coverage.</p>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">sequence_library</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_sequence_library</span><span class="p">;</span>
@@ -1131,7 +769,7 @@ to improve the coverage.</p>
 </div>
 </section>
 <section id="run-of-a-specific-sequence">
-<h3>Run of a specific sequence<a class="headerlink" href="#run-of-a-specific-sequence" title="Link to this heading">¶</a></h3>
+<h3>Run of a specific sequence<a class="headerlink" href="#run-of-a-specific-sequence" title="Link to this heading"></a></h3>
 <p>This example shows how to run a specific sequence on the lower sequencer in the
 environment from the Test.</p>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">sequence_lib</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">byte_array_mfb</span><span class="o">::</span><span class="n">sequence_library</span><span class="p">;</span>
@@ -1180,7 +818,7 @@ factory.</p>
 </section>
 </section>
 <section id="common-environment">
-<h2>Common environment<a class="headerlink" href="#common-environment" title="Link to this heading">¶</a></h2>
+<h2>Common environment<a class="headerlink" href="#common-environment" title="Link to this heading"></a></h2>
 <p>Environment (uvm_env) puts agents, subenvironments, and other components into a
 logical unit. A common use of the environment is to connect the high-level agent
 with the low-level one. The picture below shows an Environment with two agents,
@@ -1188,7 +826,7 @@ one subenvironment containing a high-level agent connected to a low-level agent,
 and one virtual sequencer.</p>
 <img alt="environment" class="align-center" src="../../_images/enviroment.svg" />
 <section id="virtual-sequencer">
-<h3>Virtual sequencer<a class="headerlink" href="#virtual-sequencer" title="Link to this heading">¶</a></h3>
+<h3>Virtual sequencer<a class="headerlink" href="#virtual-sequencer" title="Link to this heading"></a></h3>
 <p>A virtual sequencer connects all highest-level sequencers into one which runs a
 virtual sequence. It serves to synchronize all highest-level sequencers (so the
 agents start sending data at the same time). If the environment contains
@@ -1235,11 +873,11 @@ only to the highest-level sequencer in each subenvironment.</p>
 </div>
 </section>
 <section id="virtual-sequence-and-synchronization">
-<h3>Virtual sequence and synchronization<a class="headerlink" href="#virtual-sequence-and-synchronization" title="Link to this heading">¶</a></h3>
+<h3>Virtual sequence and synchronization<a class="headerlink" href="#virtual-sequence-and-synchronization" title="Link to this heading"></a></h3>
 <p>TODO</p>
 </section>
 <section id="scoreboard">
-<h3>Scoreboard<a class="headerlink" href="#scoreboard" title="Link to this heading">¶</a></h3>
+<h3>Scoreboard<a class="headerlink" href="#scoreboard" title="Link to this heading"></a></h3>
 <p>A Scoreboard is connected to the DUT, receives transactions from it, and
 compares them with transactions received from a Model. Operations performed in a
 Model (there can be more than one) are according to the DUT’s specified
@@ -1317,7 +955,7 @@ verification, the Scoreboard has to check if some errors occurred.</p>
 </section>
 </section>
 <section id="request-response-agents">
-<h2>Request-response Agents<a class="headerlink" href="#request-response-agents" title="Link to this heading">¶</a></h2>
+<h2>Request-response Agents<a class="headerlink" href="#request-response-agents" title="Link to this heading"></a></h2>
 <p>Some agents may require bidirectional communications. For this purpose, the UVM
 has the Request-Response mechanism.</p>
 <p>For example, the read request on MI has two transactions. The first transaction
@@ -1326,7 +964,7 @@ response from that slave back to the master.</p>
 <img alt="question response" class="align-center" src="../../_images/MI_agent.svg" />
 </section>
 <section id="reset">
-<h2>Reset<a class="headerlink" href="#reset" title="Link to this heading">¶</a></h2>
+<h2>Reset<a class="headerlink" href="#reset" title="Link to this heading"></a></h2>
 <p>One possible solution to the problem when a reset is generated in the middle of
 the verification (not only at its start) is to use the wait task to wait for all
 required inputs. An example is provided below showing this type of the solution.
@@ -1334,7 +972,7 @@ However, there is a problem taking place when the process reads the input A and
 waits for the input B, then the reset happens and all data should be flushed.</p>
 </section>
 <section id="id3">
-<h2>Scoreboard<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<h2>Scoreboard<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">scoreboard</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_scoreboard</span><span class="p">;</span>
 <span class="w">    </span><span class="no">`uvm_component_utils</span><span class="p">(</span><span class="n">env</span><span class="o">::</span><span class="n">scoreboard</span><span class="p">)</span>
 
@@ -1359,7 +997,7 @@ waits for the input B, then the reset happens and all data should be flushed.</p
 </div>
 </section>
 <section id="coverage">
-<h2>Coverage<a class="headerlink" href="#coverage" title="Link to this heading">¶</a></h2>
+<h2>Coverage<a class="headerlink" href="#coverage" title="Link to this heading"></a></h2>
 <p>Coverage is one of the essential metrics for checking a verification status.
 Coverage can tell whether the verification of the design has been done properly
 or not. Every verification should check whether its coverage is high enough. If
@@ -1396,7 +1034,7 @@ it’s not, the verification engineer should explain why.</p>
 </pre></div>
 </div>
 <section id="functional-coverage">
-<h3>Functional coverage<a class="headerlink" href="#functional-coverage" title="Link to this heading">¶</a></h3>
+<h3>Functional coverage<a class="headerlink" href="#functional-coverage" title="Link to this heading"></a></h3>
 <p>Every model should contain a functional coverage to check if all of its
 functionalities have been tested (if all instances/states that could occur have
 occurred). Functional coverage can be measured in the model.</p>
@@ -1425,7 +1063,7 @@ occurred). Functional coverage can be measured in the model.</p>
 </div>
 </section>
 <section id="code-coverage">
-<h3>Code coverage<a class="headerlink" href="#code-coverage" title="Link to this heading">¶</a></h3>
+<h3>Code coverage<a class="headerlink" href="#code-coverage" title="Link to this heading"></a></h3>
 <p>In contrast to the functional coverage, code coverage reports how many lines,
 conditional jumps and expressions were checked during the verification.</p>
 <p>A simple metric is usually generated by the verification tool. In the OFM
@@ -1433,7 +1071,7 @@ verification environment, this can be set up by adding <em>set
 SIM_FLAGS(CODE_COVERAGE) “true”</em> into the <em>top_level.fdo</em> simulation macro.</p>
 </section>
 <section id="generating-coverage-reports">
-<h3>Generating coverage reports<a class="headerlink" href="#generating-coverage-reports" title="Link to this heading">¶</a></h3>
+<h3>Generating coverage reports<a class="headerlink" href="#generating-coverage-reports" title="Link to this heading"></a></h3>
 <p>ModelSim can generate coverage reports in the HTML format:</p>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nv">coverage</span><span class="w"> </span>report<span class="w"> </span><span class="o">-</span>html<span class="w"> </span><span class="o">-</span>output<span class="w"> </span>cov_html<span class="w"> </span><span class="o">-</span>instance<span class="err">=</span><span class="o">/</span>testbench<span class="o">/</span>DUT_U<span class="w"> </span><span class="o">-</span>annotate<span class="w"> </span><span class="o">-</span>details<span class="w"> </span><span class="o">-</span>assert<span class="w"> </span><span class="o">-</span>directive<span class="w"> </span><span class="o">-</span>cvg<span class="w"> </span><span class="o">-</span>code<span class="w"> </span>bcefst<span class="w"> </span><span class="o">-</span>verbose<span class="w"> </span><span class="o">-</span>threshL<span class="w"> </span><span class="mi">50</span><span class="w"> </span><span class="o">-</span>threshH<span class="w"> </span><span class="mi">90</span>
 </pre></div>
@@ -1455,7 +1093,7 @@ earlier.</p></li>
 </section>
 </section>
 <section id="verification-example">
-<h2>Verification example<a class="headerlink" href="#verification-example" title="Link to this heading">¶</a></h2>
+<h2>Verification example<a class="headerlink" href="#verification-example" title="Link to this heading"></a></h2>
 <p>In this example, we introduce the MFB splitter component which divides a single
 MFB input stream into N MFB output streams. With every incoming packet on the
 MFB comes also information about the output port. That information is received
@@ -1465,7 +1103,7 @@ ordering of the MFB and MVB streams.</p>
 <p>The following image shows the connections between the blocks of such verification:</p>
 <img alt="Verification connection" class="align-center" src="../../_images/mfb_splitter.svg" />
 <section id="byte-array-port-environment">
-<h3>Byte_array_port environment<a class="headerlink" href="#byte-array-port-environment" title="Link to this heading">¶</a></h3>
+<h3>Byte_array_port environment<a class="headerlink" href="#byte-array-port-environment" title="Link to this heading"></a></h3>
 <p>The environment is used for grouping the byte_array and the port. The advantage of this
 approach lies in generating data for the MVB and the MFB in one roll.</p>
 <div class="admonition note">
@@ -1621,7 +1259,7 @@ to divide each sequence into two pieces.</p>
 </div>
 </section>
 <section id="model">
-<h3>Model<a class="headerlink" href="#model" title="Link to this heading">¶</a></h3>
+<h3>Model<a class="headerlink" href="#model" title="Link to this heading"></a></h3>
 <p>Inputs and outputs of the model are implemented by the Transaction Level Model
 (TLM) in the UVM where the <em>uvm_analysis_*</em>, <em>uvm_tlm_analysis_*</em> macros are used.</p>
 <p>The model can have a slightly different output and input than the DUT. The reason for this
@@ -1697,7 +1335,7 @@ is example of how you can impement model.</p>
 </div>
 </section>
 <section id="create-model-input-fifo">
-<h3>Create model input fifo<a class="headerlink" href="#create-model-input-fifo" title="Link to this heading">¶</a></h3>
+<h3>Create model input fifo<a class="headerlink" href="#create-model-input-fifo" title="Link to this heading"></a></h3>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="no">`uvm_analysis_imp_decl</span><span class="p">(</span><span class="n">_data</span><span class="p">)</span>
 <span class="no">`uvm_analysis_imp_decl</span><span class="p">(</span><span class="n">_meta</span><span class="p">)</span>
 
@@ -1762,7 +1400,7 @@ is example of how you can impement model.</p>
 </div>
 </section>
 <section id="id4">
-<h3>Scoreboard<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<h3>Scoreboard<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">comparer_meta</span><span class="w"> </span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">META_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_common</span><span class="o">::</span><span class="n">comparer_base_tagged</span><span class="p">#(</span><span class="n">model_data</span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">META_WIDTH</span><span class="p">),</span><span class="w"> </span><span class="n">uvm_logic_vector</span><span class="o">::</span><span class="n">sequence_item</span><span class="p">#(</span><span class="n">META_WIDTH</span><span class="p">));</span>
 <span class="w">    </span><span class="no">`uvm_component_param_utils</span><span class="p">(</span><span class="n">net_mod_logic_env</span><span class="o">::</span><span class="n">comparer_meta</span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">META_WIDTH</span><span class="p">))</span>
 
@@ -1938,7 +1576,7 @@ is example of how you can impement model.</p>
 </div>
 </section>
 <section id="test-environment">
-<h3>Test environment<a class="headerlink" href="#test-environment" title="Link to this heading">¶</a></h3>
+<h3>Test environment<a class="headerlink" href="#test-environment" title="Link to this heading"></a></h3>
 <p>After creating the model and the scoreboard, we can assemble a test environment
 <em>env</em>. We use the <em>byte_array_port</em> environment, which we have created earlier,
 and the <em>byte_array_mfb</em> environment, which is located in the OFM repository in
@@ -1989,7 +1627,7 @@ the <em>Modules.tcl</em> file.</p>
 </div>
 </section>
 <section id="test">
-<h3>Test<a class="headerlink" href="#test" title="Link to this heading">¶</a></h3>
+<h3>Test<a class="headerlink" href="#test" title="Link to this heading"></a></h3>
 <p>The test runs the highest level sequence and creates specific adjustments to the
 verification environment. For some tests, we want to generate a full-speed
 traffic for the MFB without any inter-frame gaps or gaps between the frames.
@@ -2051,7 +1689,7 @@ see the <em>sequence library</em> section on this page.</p>
 </div>
 </section>
 <section id="id5">
-<h3>Properties<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<h3>Properties<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
 <p>Properties contain interfacing protocol rules to which the DUT must adhere
 as well as other DUT properties.</p>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">module</span><span class="w"> </span><span class="n">mfb_splitter_properties</span><span class="w"> </span><span class="p">#(</span><span class="n">OUTPUTS</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">logic</span><span class="w"> </span><span class="n">CLK</span><span class="p">,</span><span class="w"> </span><span class="n">reset_if</span><span class="w"> </span><span class="n">RESET</span><span class="p">,</span><span class="w"> </span><span class="n">mfb_if</span><span class="w"> </span><span class="n">RX_MFB</span><span class="p">,</span><span class="w"> </span><span class="n">mvb_if</span><span class="w"> </span><span class="n">RX_MFB</span><span class="p">,</span><span class="w"> </span><span class="n">mfb_if</span><span class="w"> </span><span class="n">TX_MFB</span><span class="p">[</span><span class="n">OUTPUTS</span><span class="p">]);</span>
@@ -2075,7 +1713,7 @@ as well as other DUT properties.</p>
 </div>
 </section>
 <section id="testbench">
-<h3>Testbench<a class="headerlink" href="#testbench" title="Link to this heading">¶</a></h3>
+<h3>Testbench<a class="headerlink" href="#testbench" title="Link to this heading"></a></h3>
 <p>It is required to put the <em>$stop()</em> command after the <em>run_test</em> command. If you
 do not want to quit ModelSim after <em>drop_objection</em>, you must set the
 <em>finish_on_completion</em> variable to zero. If you set the variable
@@ -2153,14 +1791,13 @@ generate coverage.</p>
 </section>
 </section>
 <section id="notes">
-<h2>NOTES<a class="headerlink" href="#notes" title="Link to this heading">¶</a></h2>
+<h2>NOTES<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
 <section id="uvm-info">
-<h3>UVM_info<a class="headerlink" href="#uvm-info" title="Link to this heading">¶</a></h3>
+<h3>UVM_info<a class="headerlink" href="#uvm-info" title="Link to this heading"></a></h3>
 <p>Please use this macro to print information about the verification. The following table
 lists the available log levels in the UVM and the specific information they provide</p>
-<div class="table-wrapper colwidths-given docutils container" id="id6">
 <table class="docutils align-default" id="id6">
-<caption><span class="caption-text">uvm_info</span><a class="headerlink" href="#id6" title="Link to this table">¶</a></caption>
+<caption><span class="caption-text">uvm_info</span><a class="headerlink" href="#id6" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 2.4%" />
 <col style="width: 97.6%" />
@@ -2191,10 +1828,9 @@ lists the available log levels in the UVM and the specific information they prov
 </tr>
 </tbody>
 </table>
-</div>
 </section>
 <section id="uvm-error-vs-uvm-fatal">
-<h3>UVM_error vs UVM_fatal<a class="headerlink" href="#uvm-error-vs-uvm-fatal" title="Link to this heading">¶</a></h3>
+<h3>UVM_error vs UVM_fatal<a class="headerlink" href="#uvm-error-vs-uvm-fatal" title="Link to this heading"></a></h3>
 <p>The difference between the <em>UVM_error</em> and the <em>UVM_fatal</em> macros is in the
 meaning. The <em>UVM_fatal</em> macro represents an error in the verification
 environment. For example, when an agent cannot find an interface. The
@@ -2211,7 +1847,7 @@ automatically add it to the end of the string.</p></li>
 </ol>
 </section>
 <section id="parametrized-object">
-<h3>Parametrized object<a class="headerlink" href="#parametrized-object" title="Link to this heading">¶</a></h3>
+<h3>Parametrized object<a class="headerlink" href="#parametrized-object" title="Link to this heading"></a></h3>
 <p>If you need a parametrized <em>uvm_object</em> or <em>uvm_component</em>, use registration
 macros <em>uvm_component_param_utils</em> and <em>uvm_object_param_utils</em>. Parametrized
 object can be required when an interface uses a signal with parametrized width.</p>
@@ -2235,7 +1871,7 @@ object can be required when an interface uses a signal with parametrized width.<
 </div>
 </section>
 <section id="synchronization">
-<h3>Synchronization<a class="headerlink" href="#synchronization" title="Link to this heading">¶</a></h3>
+<h3>Synchronization<a class="headerlink" href="#synchronization" title="Link to this heading"></a></h3>
 <p>The UVM provides the <em>uvm_event</em> class to achieve synchronization. This class
 offers even more functionalities, such as the standard barrier in SystemVerilog.
 There is also the <em>uvm_pool</em>, which provides access to the <em>uvm_barrier</em> using a
@@ -2243,7 +1879,7 @@ name.</p>
 </section>
 </section>
 <section id="ofm-verification-environment">
-<h2>OFM verification environment<a class="headerlink" href="#ofm-verification-environment" title="Link to this heading">¶</a></h2>
+<h2>OFM verification environment<a class="headerlink" href="#ofm-verification-environment" title="Link to this heading"></a></h2>
 <p>When you need to create a new agent, you can get inspiration from: <a class="reference external" href="https://gitlab.liberouter.org/ndk/ofm/-/tree/devel/comp/uvm/mfb">MVB agent</a>. You should
 place all classes related to one agent or an environment into one directory. A
 package (pkg.sv) includes all files in that directory. It should also contain an
@@ -2255,7 +1891,7 @@ interface. Also, the slave side has to be able to respond in the same clock
 cycle as a request occurs (this is not implemented).</p>
 <img alt="interface direction" class="align-center" src="../../_images/interface_direction.svg" />
 <section id="modules-tcl">
-<h3>Modules.tcl<a class="headerlink" href="#modules-tcl" title="Link to this heading">¶</a></h3>
+<h3>Modules.tcl<a class="headerlink" href="#modules-tcl" title="Link to this heading"></a></h3>
 <p>Written in TCL language, this file contains the required components and
 dependencies for the package. The following command adds a package that will be
 compiled first. One of the commonly used packages is <em>math_pkg.sv</em> which
@@ -2278,7 +1914,7 @@ following commands:</p>
 </div>
 </section>
 <section id="main-fdo-script-for-running-the-verification">
-<h3>Main .fdo script for running the verification<a class="headerlink" href="#main-fdo-script-for-running-the-verification" title="Link to this heading">¶</a></h3>
+<h3>Main .fdo script for running the verification<a class="headerlink" href="#main-fdo-script-for-running-the-verification" title="Link to this heading"></a></h3>
 <p>This file is typically named <em>top_level.fdo</em> and contains the <em>COMPONENT</em>
 variable which typically holds two items:</p>
 <ol class="arabic simple">
@@ -2324,136 +1960,35 @@ using the “-c” switch :</p>
 </section>
 </section>
 
-                </article>
-            </div>
-            <footer>
-                
-                <div class="related-pages">
-                    <a class="next-page" href="sim_manual.html">
-                        <div class="page-info">
-                            <div class="context">
-                                <span>Next</span>
-                            </div>
-                            <div class="title">UVM simulation</div>
-                        </div>
-                        <svg class="furo-related-icon">
-                            <use href="#svg-arrow-right"></use>
-                        </svg>
-                    </a> <a class="prev-page" href="../../ver.html">
-                        <svg class="furo-related-icon">
-                            <use href="#svg-arrow-right"></use>
-                        </svg>
-                        <div class="page-info">
-                            <div class="context">
-                                <span>Previous</span>
-                            </div>
-                            
-                            <div class="title">UVM Verification</div>
-                            
-                        </div>
-                    </a>
-                </div>
-                <div class="bottom-of-page">
-                    <div class="left-details">
-                        <div class="copyright"> Copyright &#169; 2024, CESNET z.s.p.o.
-                        </div> Made with <a
-                            href="https://www.sphinx-doc.org/"
-                            >Sphinx</a
-                        >
-                        and <a class="muted-link" href="https://pradyunsg.me"
-                            >@pradyunsg</a
-                        >'s 
-                        <a href="https://github.com/pradyunsg/furo">Furo</a>
-                        
-                    </div>
-                    <div class="right-details">
-                        <div style="font-size: var(--font-size--small)">
-                            Git branch: devel<br>Git hash: b46ddbdd
-                        </div>
-                        
-                    </div>
-                </div>
-                
-            </footer>
-        </div>
-        <aside class="toc-drawer">
-             
-            <div class="toc-sticky toc-scroll">
-                <div class="toc-title-container">
-                    <span class="toc-title"> On this page </span>
-                </div>
-                <div class="toc-tree-container">
-                    <div class="toc-tree"><ul>
-<li><a class="reference internal" href="#">SystemVerilog and UVM tutorial</a><ul>
-<li><a class="reference internal" href="#other-tutorials">Other tutorials</a></li>
-<li><a class="reference internal" href="#basic-usage-of-the-uvm-methodology-in-the-ofm-repository">Basic usage of the UVM methodology in the OFM repository</a><ul>
-<li><a class="reference internal" href="#interface">Interface</a></li>
-<li><a class="reference internal" href="#properties">Properties</a></li>
-<li><a class="reference internal" href="#driver">Driver</a></li>
-<li><a class="reference internal" href="#agent">Agent</a></li>
-<li><a class="reference internal" href="#configuration-object">Configuration object</a></li>
-<li><a class="reference internal" href="#sequence">Sequence</a></li>
-<li><a class="reference internal" href="#sequence-library">Sequence library</a></li>
-<li><a class="reference internal" href="#package">Package</a></li>
-<li><a class="reference internal" href="#layered-agents">Layered agents</a></li>
-<li><a class="reference internal" href="#environment">Environment</a></li>
-<li><a class="reference internal" href="#low-level-sequence">Low-level sequence</a></li>
-<li><a class="reference internal" href="#high-level-monitor">High-level monitor</a></li>
-<li><a class="reference internal" href="#id1">Configuration object</a></li>
-<li><a class="reference internal" href="#id2">Sequence library</a></li>
-<li><a class="reference internal" href="#run-of-a-specific-sequence">Run of a specific sequence</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#common-environment">Common environment</a><ul>
-<li><a class="reference internal" href="#virtual-sequencer">Virtual sequencer</a></li>
-<li><a class="reference internal" href="#virtual-sequence-and-synchronization">Virtual sequence and synchronization</a></li>
-<li><a class="reference internal" href="#scoreboard">Scoreboard</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#request-response-agents">Request-response Agents</a></li>
-<li><a class="reference internal" href="#reset">Reset</a></li>
-<li><a class="reference internal" href="#id3">Scoreboard</a></li>
-<li><a class="reference internal" href="#coverage">Coverage</a><ul>
-<li><a class="reference internal" href="#functional-coverage">Functional coverage</a></li>
-<li><a class="reference internal" href="#code-coverage">Code coverage</a></li>
-<li><a class="reference internal" href="#generating-coverage-reports">Generating coverage reports</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#verification-example">Verification example</a><ul>
-<li><a class="reference internal" href="#byte-array-port-environment">Byte_array_port environment</a></li>
-<li><a class="reference internal" href="#model">Model</a></li>
-<li><a class="reference internal" href="#create-model-input-fifo">Create model input fifo</a></li>
-<li><a class="reference internal" href="#id4">Scoreboard</a></li>
-<li><a class="reference internal" href="#test-environment">Test environment</a></li>
-<li><a class="reference internal" href="#test">Test</a></li>
-<li><a class="reference internal" href="#id5">Properties</a></li>
-<li><a class="reference internal" href="#testbench">Testbench</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#notes">NOTES</a><ul>
-<li><a class="reference internal" href="#uvm-info">UVM_info</a></li>
-<li><a class="reference internal" href="#uvm-error-vs-uvm-fatal">UVM_error vs UVM_fatal</a></li>
-<li><a class="reference internal" href="#parametrized-object">Parametrized object</a></li>
-<li><a class="reference internal" href="#synchronization">Synchronization</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#ofm-verification-environment">OFM verification environment</a><ul>
-<li><a class="reference internal" href="#modules-tcl">Modules.tcl</a></li>
-<li><a class="reference internal" href="#main-fdo-script-for-running-the-verification">Main .fdo script for running the verification</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-                </div>
-            </div>
-             
-        </aside>
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../ver.html" class="btn btn-neutral float-left" title="UVM Verification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sim_manual.html" class="btn btn-neutral float-right" title="UVM simulation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
-    </body>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>
