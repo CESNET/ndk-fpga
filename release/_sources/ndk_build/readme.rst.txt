@@ -83,6 +83,41 @@ Variables ``ENTITY``, ``ENTITY_BASE`` and ``ARCHGRP`` are predefined (provided) 
   Prefer to use :tcl:`lappend MOD "myfile.vhd"` instead of :tcl:`set MOD "$MOD myfile.vhd"`,
   because the ``lappend`` better express the operation and is faster.
 
+PLATFORM_TAGS
+~~~~~~~~~~~~~
+
+In the situation, when a platform (build tool: Quartus, Vivado, simulator: Questa Sim, etc.) supports various architectures / implementation schemes,
+the PLATFORM_TAGS list variable can be used to distinguish, which source file should be included into project.
+
+List of available platforms:
+
+- **xilinx** - platform supports complete set of Xilinx component and products
+- **altera** - platform supports complete set of Intel/Altera component and products
+
+.. - **empty** - platform, on which the empty architectures are enabled; this is used e.g. when user wants to check the code syntax even if the codebase for toplevel is not completed yet.
+
+.. If the component doesn't have common/universal platform implementation and the "empty" tag is not in PLATFORM_TAGS, the process should exit with error.
+
+Those tags are currently not available, but show the way of potential extension and usage:
+
+- **vivado:ge_2024.0** - Vivado version is equal or greater than 2024.0 (this doesn't means automatic comparison)
+- **xilinx:usp** - Restrict for UltraScale+ platform.
+- **xilinx:sim:gty** - Inculde simulation models from highspeed transceivers.
+
+Priority for PLATFORM_TAGS
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PLATFORM_TAGS list can be potentially used also for specifying preference/priority (latter position in list means higher priority):
+``set PLATFORM_TAGS "xilinx:bram:behav xilinx:bram:macro"``
+The priority can be easily overriden simply by appending item to the list.
+(Also the ``lsearch`` can be easily used as returns -1 for non-existing item, which means lowest priority.)
+In general, the highest priority tag from set of supported tags can be obtained by the ``proc nb_preference_filter {PLATFORM_TAGS SUPPORTED_TAGS}``
+
+    .. code-block:: tcl
+
+        set SUPPORTED_PLATFORM_TAGS "xilinx altera"
+        set TARGET_TAG [nb_preference_filter $PLATFORM_TAGS $SUPPORTED_PLATFORM_TAGS]
+
 .. _extra file properties:
 
 List of properties used in MOD variables
@@ -350,3 +385,107 @@ The (incomplete) list of SYNTH_FLAGS array items
    - USE_XPM_LIBRARIES: includes XPM_CDC XPM_MEMORY XPM_FIFO in Vivado projects
 
 For other values and their purpose see the Vivado.inc.tcl or Quartus.inc.tcl file in the build directory.
+
+Device Tree nodes
+-----------------
+
+For the software to find internal firmware components, a *Device Tree (DT)* is
+used. This provides a tree of available parts (called nodes in the DT
+terminology) of the design that can be accessed from the host without
+restriction. A developer creates TCL procedures that generate nodes to *DT
+string (DTS)* for the components he finds fit. Since the creation of the DTS can
+be challenging, there are several TCL procedures provided that simplify the
+process. These procedures are contained within the ``dts_templates.tcl`` file
+with clarifying comments. The following examples provide an overview of their
+usage.
+
+Example 1
+~~~~~~~~~
+
+This presents a least viable code that creates a node
+``dma_calypte_rx_perf_cntrs0`` with the base address *0x8000*
+and the size *0x30*. It also contains a compatible string
+``cesnet,dma_calypte_rx_perf_cntrs``. The string property is appended to ``dts``
+variable that contains a reference to the required Device Tree string (DTS).
+
+.. code-block:: tcl
+
+    dts_create_node dts "dma_calypte_rx_perf_cntrs0" {
+        dts_appendprop_comp_node dts 0x8000 0x30 "cesnet,dma_calypte_rx_perf_cntrs"
+    }
+
+Example 2
+~~~~~~~~~
+
+A second, more complex example demonstrates addition of multiple properties to a
+node called ``dma_ctrl_calypte_$dir$id`` (string can be further adjusted through
+parameters ``dir`` and ``id``).
+
+.. code-block:: tcl
+
+    proc dts_dma_calypte_ctrl {DTS dir id base pcie} {
+        upvar 1 $DTS dts
+
+        dts_create_node dts "dma_ctrl_calypte_$dir$id" {
+            # Adding compatible string "cesnet,dma_ctrl_calypte_$dir" and the
+            # reg property with base address $base and the size 0x80.
+            dts_appendprop_comp_node dts $base 0x80 "cesnet,dma_ctrl_calypte_$dir"
+            # Integer property called "version" with the value 0x10000
+            dts_appendprop_int dts "version" 0x10000
+            # Integer prperty "pcie" with the value of $pcie
+            dts_appendprop_int dts "pcie" $pcie
+
+            # The addition of custom properties (customly named) can be done
+            # through a standard "append" macro.
+            if { $dir == "tx" } {
+                append dts "data_buff = <&dma_calypte_tx_data_buff$id>;"
+                append dts "hdr_buff = <&dma_calypte_tx_hdr_buff$id>;"
+            }
+            append dts "params = <&dma_params_$dir$pcie>;"
+        }
+    }
+
+Example 3
+~~~~~~~~~
+
+This example shows how complex node with multiple subnodes is created. The parent
+node is called ``dma_calypte_test_core0`` and contains subnodes
+``mfb_loopback0``, ``dma_calypte_debug_core0``, ``dma_calypte_latency_meter0``
+and ``dma_calypte_reset_fsm0``. Further nesting of nodes is possible as can be
+seen when adding the ``mfb_generator0`` node. Each of the called procedures
+contain a reference to the same DTS from the ``dts`` variable.
+
+.. code-block:: tcl
+
+    proc dts_calypte_test_core {DTS base_addr} {
+        # Populate reference from the calling environment
+        upvar 1 $DTS dts
+
+        set LOOPBACK_BASE_ADDR      [expr $base_addr + 0x0]
+        set TX_DBG_CORE_BASE_ADDR   [expr $base_addr + 0x10000]
+        set LATENCY_METER_BASE_ADDR [expr $base_addr + 0x20000]
+        set RESET_FSM_BASE_ADDR     [expr $base_addr + 0x30000]
+
+        dts_create_node dts "dma_calypte_test_core0" {
+
+            dts_create_node dts "mfb_loopback0" {
+                dts_appendprop_comp_node dts $LOOPBACK_BASE_ADDR 8 "cesnet,mfb_loopback"
+            }
+
+            dts_create_node dts "dma_calypte_debug_core0" {
+                dts_appendprop_comp_node dts $TX_DBG_CORE_BASE_ADDR 0x1600 "cesnet,dma_calypte_debug_core"
+
+                dts_create_node dts "mfb_generator0" {
+                    dts_appendprop_comp_node dts [expr $TX_DBG_CORE_BASE_ADDR+0x8000] 0x40 "cesnet,mfb_generator"
+                }
+            }
+
+            dts_create_node dts "dma_calypte_latency_meter0" {
+                dts_appendprop_comp_node dts $LATENCY_METER_BASE_ADDR 0x30 "cesnet,dma_calypte_latency_meter"
+            }
+
+            dts_create_node dts "dma_calypte_reset_fsm0" {
+                dts_appendprop_comp_node dts $RESET_FSM_BASE_ADDR 0x4 "cesnet,dma_calypte_reset_fsm"
+            }
+        }
+    }

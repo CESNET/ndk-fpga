@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MVB Specification &mdash; NDK-FPGA Docs  documentation</title>
+  <title>MVB Specification &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -19,8 +19,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="MVB Channel Router" href="flow/channel_router/readme.html" />
-    <link rel="prev" title="MVB Tools" href="../../mvb.html" /> 
+    <link rel="next" title="MFB specification" href="../mfb_tools/readme.html" />
+    <link rel="prev" title="MI bus specification" href="../mi_tools/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,7 +32,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            NDK-FPGA Docs
+            NDK-FPGA
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -42,11 +42,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
@@ -57,7 +53,42 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MVB Specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#operation">Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generic-parameters">Generic parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#port-description">Port description</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#examples-of-various-vld-signal-values">Examples of various VLD signal values</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#timing-diagrams">Timing diagrams</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scenario-1">Scenario 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scenario-2">Scenario 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
@@ -70,48 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../mvb.html">MVB Tools</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB Specification</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#operation">Operation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#generic-parameters">Generic parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#port-description">Port description</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#examples-of-various-vld-signal-values">Examples of various VLD signal values</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#timing-diagrams">Timing diagrams</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#scenario-1">Scenario 1</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#scenario-2">Scenario 2</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="flow/channel_router/readme.html">MVB Channel Router</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/discard/readme.html">MVB DISCARD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/merge_items/readme.html">MVB Merge Items</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/merge_streams/readme.html">MVB Merge Streams</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/demux/readme.html">MVB DEMUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/mux/readme.html">MVB MUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/merge_n_to_m/readme.html">SHAKEDOWN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/shakedown/readme.html">MVB Shakedown</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/operation/readme.html">MVB Operation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flow/mvb2mfb/readme.html">MVB2MFB</a></li>
-<li class="toctree-l2"><a class="reference internal" href="storage/lookup_table/readme.html">MVB Lookup Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="storage/fifox/readme.html">MVB FIFOX</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 </ul>
 
         </div>
@@ -120,7 +110,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">NDK-FPGA Docs</a>
+          <a href="../../index.html">NDK-FPGA</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -128,7 +118,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../mvb.html">MVB Tools</a></li>
       <li class="breadcrumb-item active">MVB Specification</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/comp/mvb_tools/readme.rst.txt" rel="nofollow"> View page source</a>
@@ -308,8 +297,8 @@ the lowest index range.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../../mvb.html" class="btn btn-neutral float-left" title="MVB Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="flow/channel_router/readme.html" class="btn btn-neutral float-right" title="MVB Channel Router" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../mi_tools/readme.html" class="btn btn-neutral float-left" title="MI bus specification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../mfb_tools/readme.html" class="btn btn-neutral float-right" title="MFB specification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

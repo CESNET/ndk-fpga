@@ -171,22 +171,124 @@ Instance template (full usage)
 Control SW
 ^^^^^^^^^^
 
-Folder ``data_logger/sw/`` contains ``Python3`` package that provides:
+Folder ``data_logger/sw/`` contains following ``Python3`` packages:
 
-* Module for basic interaction with ``DATA_LOGGER``
-* Modules for ``DATA_LOGGER`` wraps like ``MEM_LOGGER``
-* Simple graph generator based on `matplotlib` library
-* Simple PDF / Markdown report generator
-* Common tools
+* ``data_logger`` ... basic interaction with ``DATA_LOGGER``
+* ``mem_logger`` ... basic interaction with ``MEM_LOGGER``
+* ``logger_stats`` ... loading firmware statistics (multiple ``DATA_LOGGERS`` can be organized in tree hierarchy)
+* ``graph_tools`` ... simple plot functions for statistics from ``logger_stats``
 
 Package can be installed using this command:
 
 * You also need to install ``python nfb`` package
 
 .. code-block::
+    python3 -m pip install --upgrade pip
 
+    # Install nfb:
+    cd swbase/pynfb
+    python3 -m pip install Cython
+    python3 -m pip install .
+    cd -
+
+    # Install this package:
     cd data_logger/sw
-    python3 setup.py install --user
+    python3 -m pip install .
+
+Example usage of ``logger_stats`` (for more usage see `mem_logger/mem_logger.py`):
+
+.. code-block::
+
+
+    import logger_stats as Stats
+    from data_logger.data_logger import DataLogger
+
+    def create_stats():
+        # Create DataLoggers
+        logger_0 = DataLogger(index=0, dev='/dev/nfb0')
+        logger_1 = DataLogger(index=1, dev='/dev/nfb0')
+
+        # Create Stats hierarchy
+        stats = Stats.LoggerStats('Example stats')
+        stats_0 = Stats.LoggerStats('Logger 0 stats', logger=logger_0)
+        stats_1 = Stats.LoggerStats('Logger 1 stats', logger=logger_1)
+        stats.add_stat(stats_0)
+        stats.add_stat(stats_1)
+
+        # Add basic statistics
+        stats_0.add_stat(Stats.Constant(index=7, name='X'))
+        stats_0.add_stat(Stats.Counter(index=7, name='Y'))
+        stats_0.add_stat(Stats.Value(index=7, name='Z'))
+
+        # FSM state statistic
+        def fms_convert(v):
+            states = [
+                'IDLE',
+                ...
+            ]
+            if v >= len(states):
+                return "???"
+            else:
+                return states[int(v)]
+
+        fsm_format = Stats.FormatDefaultValue(format=Stats.FormatNone)
+        stats_1.add_stat(Stats.Value(2, 'FSM states', convert=fms_convert, format=fsm_format))
+
+        # Latency statistic
+        FREQ = 200 * 10**6
+        time_conv = Stats.ConvertTime(FREQ)
+        time_form = Stats.FormatDefaultValue(units='ns')
+        stats_1.add_stat(Stats.Value(9, 'Latency', convert=time_conv, format=time_form))
+
+        # Add value statistic which includes multiple commands
+        CMDS = [
+            'CMD_A',
+            ...
+        ]
+        stats_1.add_stat(Stats.ValueCMD(7, 'Latency of CMDs', cmd_width=2, cmds=CMDS, convert=time_conv, format=time_form))
+
+        # Add multiple counters
+        counters = [
+            'Counter A',
+            ...
+        ]
+        stats_1.add_stats(
+            name='Counters',
+            names=counters,
+            indexes=list(range(len(counters))),
+            constructor=lambda i, n: Stats.Counter(i, n)
+        )
+
+    return stats
+
+
+    stats = create_stats()
+    stats.load()
+    print(stats.to_str())
+    stats.save('stats.npz')
+
+
+Example usage of ``graph_tools``:
+
+    from graph_tools.graph_tools import load_data, plot_counter, plot_value, plot_value_2d
+
+    stats = load_data('stats.npz')
+
+    node = pd.DataFrame.from_dict(stats['Stats A']['Counters'])
+    selected = ['Counter A', 'Counter B']
+
+    # Plot single counter
+    plot_counter(node['Counter X'], 'Time', 'Requests', 'Plot title')
+
+    # Plot multiple counters
+    plot_counter(node[selected], 'Time', 'Requests', 'Plot title')
+
+    # Plot histogram of the value interface
+    plot_value(node['Value A'], 'Time', 'Blocks', 'Title' log=True)
+
+    # Plot 2D histogram of the value interface history
+    plot_value_2d(node['Value A'], 'Time', 'Blocks', 'Title' log=True)
+
 
 
 MI address space

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuration files and parameters &mdash; NDK-FPGA Docs  documentation</title>
+  <title>Configuration files and parameters &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -32,7 +32,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            NDK-FPGA Docs
+            NDK-FPGA
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -42,18 +42,14 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html">NDK Architecture</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration files and parameters</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#build-system-files">Build system files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#parametrizing-ndk-core-design">Parametrizing NDK-CORE design</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#parametrizing-ndk-fpga-design">Parametrizing NDK-FPGA design</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#file-description">File description</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#core-conf-tcl">core_conf.tcl</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#core-const-tcl">core_const.tcl</a></li>
@@ -108,7 +104,29 @@
 <li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
@@ -121,18 +139,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 </ul>
 
         </div>
@@ -141,7 +148,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">NDK-FPGA Docs</a>
+          <a href="../../index.html">NDK-FPGA</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -170,7 +177,7 @@ via the <a class="reference internal" href="#ndk-conf-tldr"><span class="std std
 <p>The following table provides an overview of files used for building a project/design.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Path <code class="docutils literal notranslate"><span class="pre">build/card</span></code> reduced to build, <code class="docutils literal notranslate"><span class="pre">ndk/core/intel</span></code> reduced to <code class="docutils literal notranslate"><span class="pre">core</span></code>, <code class="docutils literal notranslate"><span class="pre">ndk/cards/vendor/dev</span></code> reduced to card.
+<p>Path <code class="docutils literal notranslate"><span class="pre">apps/minimal/card</span></code> reduced to <code class="docutils literal notranslate"><span class="pre">build</span></code>, <code class="docutils literal notranslate"><span class="pre">cards/vendor/dev</span></code> reduced to card.
 The placeholder {TOOL} refers to the tool-specific filename, for example: Vivado, Quartus.</p>
 </div>
 <table class="docutils align-default" id="id5">
@@ -235,7 +242,7 @@ The placeholder {TOOL} refers to the tool-specific filename, for example: Vivado
 <td><p>Configuration</p></td>
 <td><p>helper procedures used in _conf.tcl (e.g. ParsePcieConf)</p></td>
 </tr>
-<tr class="row-even"><td><p>core/Modules.tcl</p></td>
+<tr class="row-even"><td><p>core/top/Modules.tcl</p></td>
 <td><p>Build</p></td>
 <td><p>Top-level components and modules common for all designs (TSU, DMA, etc.)</p></td>
 </tr>
@@ -254,14 +261,14 @@ The placeholder {TOOL} refers to the tool-specific filename, for example: Vivado
 </tbody>
 </table>
 </section>
-<section id="parametrizing-ndk-core-design">
-<span id="ndk-core-configuration"></span><h2>Parametrizing NDK-CORE design<a class="headerlink" href="#parametrizing-ndk-core-design" title="Link to this heading"></a></h2>
-<p>The files in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/config</span></code> directory and the
-<code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/core.mk</span></code> file contain CORE parameters. Some
+<section id="parametrizing-ndk-fpga-design">
+<span id="ndk-core-configuration"></span><h2>Parametrizing NDK-FPGA design<a class="headerlink" href="#parametrizing-ndk-fpga-design" title="Link to this heading"></a></h2>
+<p>The files in the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/core/config</span></code> directory and the
+<code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/core/core.mk</span></code> file contain CORE parameters. Some
 of these parameters are configurable (more info below). The sourcing of
 configuration parameter files has its own hierarchy, which is shown in the
 <a class="reference internal" href="#fig-const-hierarchy"><span class="std std-ref">Hierarchy diagram</span></a>. This section describes the
-configuration files used in the case of NDK-CORE design. For the description of
+configuration files used in the case of NDK-FPGA design. For the description of
 the application and card-specific configuration, see following sections on this page.</p>
 <figure class="align-center" id="id6">
 <span id="fig-const-hierarchy"></span><a class="reference internal image-reference" href="../../_images/const_hierarchy.svg"><img alt="../../_images/const_hierarchy.svg" src="../../_images/const_hierarchy.svg" style="width: 463.04999999999995px; height: 458.4px;" />
@@ -280,7 +287,7 @@ takes place in the <cite>core_boostrap.tcl</cite> file.</p>
 <span id="ndk-core-conf-core-conf-tcl"></span><h4>core_conf.tcl<a class="headerlink" href="#core-conf-tcl" title="Link to this heading"></a></h4>
 <p>This file provides a listing of all parameters that can be changed by the user.
 Each parameter contains a comment with allowed values and the meaning of
-these values. Because the NDK-CORE design is independent of the underlying
+these values. Because the NDK-FPGA design is independent of the underlying
 platform (e.g. card type) there are many allowed combinations of parameters.
 However, the user can find many combinations of parameters that are unsupported
 and may cause errors during the synthesis/implementation process. The user can add
@@ -315,7 +322,7 @@ file. An example of a conditional assignment follows:</p>
 <p>The third purpose of this file is to implement statements that check compatible
 combinations of parameters. When an incompatible combination is detected, the
 TCL shell will raise an error and stop the compilation process. You should
-implement these checks only for the parameters used in the NDK-CORE.</p>
+implement these checks only for the parameters used in the NDK-FPGA.</p>
 </section>
 <section id="core-mk">
 <span id="core-mk-include"></span><h4>core.mk<a class="headerlink" href="#core-mk" title="Link to this heading"></a></h4>
@@ -353,9 +360,9 @@ for modular and hierarchical organization of VHDL source files. The Modules.tcl 
 provide an <em>ARCHGRP</em> list to pass specific constants across the source file hierarchy. Each
 Modules.tcl file obtains such a list from its parent Modules.tcl file. It allows further
 adjustments of the ARCHGRP list(s) of its descendant(s).</p>
-<p>The parameters specified in the NDK-CORE repository are passed using the
+<p>The parameters specified in the NDK-FPGA repository are passed using the
 <code class="docutils literal notranslate"><span class="pre">CORE_ARCHGRP</span></code> associative array. The array is initialized in the
-<code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/common.inc.tcl</span></code> file. Parameters are specified in
+<code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/core/common.inc.tcl</span></code> file. Parameters are specified in
 the <code class="docutils literal notranslate"><span class="pre">core_conf.tcl</span></code> and <code class="docutils literal notranslate"><span class="pre">core_const.tcl</span></code> files. This means that the configuration
 parameters of a chosen card are visible in this file and can be added to the
 array. The associative array was chosen for clarity purposes. Because the
@@ -363,7 +370,7 @@ ARCHGRP is declared as a simple list, the associative array is converted to it
 and added to the <code class="docutils literal notranslate"><span class="pre">FPGA</span></code> entity. As the ARCHGRP list is passed through
 the hierarchy, it is converted back
 to the associative array when a specific array value is needed. An example is shown in the
-<code class="docutils literal notranslate"><span class="pre">&lt;NDK-CORE_root_directory&gt;/intel/Modules.tcl</span></code> file.</p>
+<code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/core/top/Modules.tcl</span></code> file.</p>
 </section>
 <section id="adding-constants-to-the-vhdl-package">
 <span id="core-config-vhdl-pkg-const"></span><h4>Adding constants to the VHDL package<a class="headerlink" href="#adding-constants-to-the-vhdl-package" title="Link to this heading"></a></h4>
@@ -403,14 +410,14 @@ The system provides mechanism to configure card specific parameters.</p>
 <section id="id1">
 <h3>File description<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>The file structure is similar to the one described in the configuration of the
-<cite>NDK-CORE</cite> design.</p>
+<cite>NDK-FPGA</cite> design.</p>
 <section id="card-conf-tcl">
 <h4>card_conf.tcl<a class="headerlink" href="#card-conf-tcl" title="Link to this heading"></a></h4>
 <p>This file lists user-configurable parameters and their possible values in the
 comments. The file contains parameters relevant to a specific card. Those
 parameters are mostly tied to the underlying hardware, like the number of Ethernet
 ports or the PCIe generation of the used PCIe core. The purpose of this file is the
-same as that of the <code class="docutils literal notranslate"><span class="pre">core_conf.tcl</span></code> file in the <cite>NDK-CORE</cite> repository. The only
+same as that of the <code class="docutils literal notranslate"><span class="pre">core_conf.tcl</span></code> file in the <cite>NDK-FPGA</cite> repository. The only
 difference is that it has a higher priority.</p>
 </section>
 <section id="card-const-tcl">
@@ -454,7 +461,7 @@ these is described in the <a class="reference internal" href="#app-config-makefi
 application use.</p>
 </div>
 <p>Passing the parameter values to other parts of the design or build system is
-very similar to the case of <cite>NDK-CORE</cite>.</p>
+very similar to the case of <cite>NDK-FPGA</cite>.</p>
 <section id="id3">
 <h4>Passing through Modules.tcl<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
 <p>The card-specific parameters are passed to the Modules.tcl file of the top-level
@@ -471,7 +478,7 @@ are visible in the <cite>*.inc.tcl</cite> files and can be added to the array.</
 <h4>Adding constants to the VHDL package<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
 <p>It is recommended to add card-specific constants to the <code class="docutils literal notranslate"><span class="pre">combo_user_const</span></code> VHDL
 package in <cite>card_const.tcl</cite> file. The way of adding these constants was described in
-the <a class="reference internal" href="#core-config-vhdl-pkg-const"><span class="std std-ref">Adding constants to the VHDL package</span></a> section in the documentation of NDK-CORE
+the <a class="reference internal" href="#core-config-vhdl-pkg-const"><span class="std std-ref">Adding constants to the VHDL package</span></a> section in the documentation of NDK-FPGA
 configuration.</p>
 </section>
 </section>
@@ -485,7 +492,7 @@ sometimes, multiple configurations for a specific card before launching the
 build process.</p>
 <section id="configuration-files">
 <h3>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h3>
-<p>The configuration of the application is less constrained than <cite>NDK-CORE</cite> and
+<p>The configuration of the application is less constrained than <cite>NDK-FPGA</cite> and
 card configuration. The application repository provides three files in which the user
 application is or can be configured.</p>
 <section id="build-card-name-makefile">
@@ -541,11 +548,11 @@ their needs. Adding a parameter to the VHDL package is also possible because the
 <h3>I need to include specific component in CORE depending on a given parameter value<a class="headerlink" href="#i-need-to-include-specific-component-in-core-depending-on-a-given-parameter-value" title="Link to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>First, you should write your parameter to the
-<code class="docutils literal notranslate"><span class="pre">core/intel/config/core_conf.tcl</span></code> with a specific value (if the parameter
-stays only in the <code class="docutils literal notranslate"><span class="pre">core/intel/config/core_conf.tcl</span></code>) or with a default
+<code class="docutils literal notranslate"><span class="pre">core/config/core_conf.tcl</span></code> with a specific value (if the parameter
+stays only in the <code class="docutils literal notranslate"><span class="pre">core/config/core_conf.tcl</span></code>) or with a default
 value (if the parameter will be set in other configuration files).</p></li>
 <li><p>Then add this parameter to the <em>CORE_ARCHGRP</em> array in the
-<code class="docutils literal notranslate"><span class="pre">core/intel/common.inc.tcl</span></code> file.</p></li>
+<code class="docutils literal notranslate"><span class="pre">core/common.inc.tcl</span></code> file.</p></li>
 </ol>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">set</span><span class="w"> </span>CORE_ARCHGRP<span class="k">(</span><span class="nv">DMA_TYPE</span><span class="k">)</span><span class="w">                      </span><span class="nv">$DMA_TYPE</span>
 <span class="k">set</span><span class="w"> </span>CORE_ARCHGRP<span class="k">(</span><span class="nv">APPLICATION_CORE_ENTITY_ONLY</span><span class="k">)</span><span class="w">  </span>false
@@ -633,7 +640,7 @@ stops the compilation process.</p></li>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>You can add a parameter value to the generated VHDL package, which is then icluded in
+<li><p>You can add a parameter value to the generated VHDL package, which is then included in
 the <cite>fpga.vhd</cite> and <cite>fpga_common.vhd</cite> components:</p></li>
 </ul>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nv">VhdlPkgInt</span><span class="w">  </span>PCIE_GEN<span class="w">             </span><span class="nv">$PCIE_GEN</span>

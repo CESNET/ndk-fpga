@@ -3,6 +3,10 @@
 NDK testing
 -----------
 
+.. warning::
+
+    Attention, this chapter may not be up to date, we are looking for a volunteer to update it.
+
 This chapter describes how the NDK firmware and its HDL components can be tested:
 
 - Test R/W access to scratch registers in the NDK firmware (:ref:`see below <ndk_testing_mi>`).
@@ -38,9 +42,9 @@ GLS module tutorial
 
 The NDK firmware may include a GLS module that is instantiated in each DMA stream between the application core and the DMA controller. The GLS module is used for testing purposes and contains HW packet generators, speed meters, and datapath switches. Please refer to the :ref:`GLS module documentation <gls_debug>` for a more information.
 
-The GLS module also comes with a Python script (``<NDK-APP-XXX_root_directory>/ndk/ofm/comp/mfb_tools/debug/gen_loop_switch/sw/gls_mod.py``) that can be used to quickly perform several basic tests (modes). For example, you can measure the throughput of the NDK firmware. A list of tests can be obtained by running this script without parameters:
+The GLS module also comes with a Python script (``<NDK-FPGA_root_directory>/comp/mfb_tools/debug/gen_loop_switch/sw/gls_mod.py``) that can be used to quickly perform several basic tests (modes). For example, you can measure the throughput of the NDK firmware. A list of tests can be obtained by running this script without parameters:
 
-.. code-block::
+.. code-block:: text
 
     $ python3 gls_mod.py
     gls_mod.py mode [port_list]
@@ -68,7 +72,7 @@ Some tests require an available DMA controller; others require an external QSFP 
 
 If an external QSFP loopback is connected, the transmitted packets are received back into the FPGA, where the script measures the receiving speed. In this test, packets pass through the application core so that the measured throughput corresponds with the throughput of the implemented application. The throughput calculation considers L2 packets from the destination MAC address to the end of the payload. Below is an example of the script output after running test 1:
 
-.. code-block::
+.. code-block:: text
 
     $ python3 gls_mod.py 1
     Test # 1 started...

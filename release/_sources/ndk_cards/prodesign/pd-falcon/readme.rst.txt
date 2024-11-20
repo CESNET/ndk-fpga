@@ -21,8 +21,8 @@ NDK Firmware Support
     - :ref:`E-Tile in the Network Module <ndk_intel_net_mod>`
 - Supported PCIe Cores in the NDK Firmware:
     - H-Tile is supported.
-    - Refer to the ``<NDK-APP_root_directory>/ndk/cards/prodesign/pd-falcon/config/card_conf.tcl`` file for supported PCIe configurations.
-- Makefile Targets for Building NDK Firmware (for NDK-APP-Minimal, may vary for other applications):
+    - Refer to the ``<NDK-FPGA_root_directory>/cards/prodesign/pd-falcon/config/card_conf.tcl`` file for supported PCIe configurations.
+- Makefile Targets for Building NDK Firmware (for Minimal app, may vary for other applications):
     - Use the ``make 100g2`` command to build firmware with 2x100GE (default).
 - Support for Booting NDK Firmware Using the nfb-boot Tool:
     - Not supported. Refer to the card manual for booting instructions.
@@ -35,7 +35,7 @@ Boot Instructions
 ^^^^^^^^^^^^^^^^^
 
 - First, build the NDK firmware. Note that the first build will fail—this is expected.
-- After the first failed implementation, run the ``<NDK-APP_root_directory>/ndk/cards/prodesign/pd-falcon/src/ip/htile_pcie_fix.sh`` script to fix the generated H-Tile IP core.
+- After the first failed implementation, run the ``<NDK-FPGA_root_directory>/cards/prodesign/pd-falcon/src/ip/htile_pcie_fix.sh`` script to fix the generated H-Tile IP core.
 - The next build should complete successfully.
 - Once the NDK firmware build is complete, a bitstream file will be generated.
 - To load the firmware, attach the USB-Blaster II Download Cable via the Edge Debug Board to the card.

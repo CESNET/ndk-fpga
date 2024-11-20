@@ -3,8 +3,6 @@ Miscellaneous
 
 **ADC_SENSORS** - Controller of the Temperature and Voltage ADC IPs for Intel Stratix 10 FPGA. It is controlled via the MI bus. ``CANDIDATE FOR MOVE to CTRLs folder!``
 
-**CLK_GEN** - Old clock generator, is used in some simulation only. ``CANDIDATE FOR REMOVAL!``
-
 **CROSSBARX** - This unit performs data transfer between two buffers connected on SRC_BUF and DST_BUF interfaces based on Transactions passed on the TRANS interface.
 Detailed :ref:`documentation can be found here<crossbarx>`.
 
@@ -13,11 +11,7 @@ Detailed :ref:`documentation can be found here<crossbarx>`.
 **EVENT_COUNTER** - The Event Counter is a debuging unit for receiving statistics of occurence frequency of a certain event.
 It is made accessible through MI interface using the Event Counter MI Wrapper. Detailed :ref:`documentation can be found here<event_counter>`.
 
-**FIFO_PIPE** - Generic pipe implemented using registers and FIFO memory in almost full mode. ``UNUSED, CANDIDATE FOR REMOVAL!``
-
 **FIRST_ONE_DETECTOR** - Old behavioral implementation of first one detector in vector. ``CANDIDATE FOR REMOVAL! Use FIRST_ONE from base logic!``
-
-**HYPER_PIPE** - Generic hyper pipe implemented using registers, optimized for Intel Stratix 10 FPGA. ``UNUSED, CANDIDATE FOR REMOVAL!``
 
 **ID32** - Identification component, is a small component, which is used to detect design inside FPGA. Informations are stored inside registers which are accessible through dedicated 32 bit interface.
 
@@ -38,8 +32,6 @@ so that they are placed one after another with the needed inter-packet gaps and 
 
 **TRANS_SORTER** - This unit converts out-of-order confirmations of transactions to the original order of the transactions.
 Detailed :ref:`documentation can be found here<trans_sorter>`.
-
-**WATCHDOG** - Data flow watchdog module, which checks whether the monitored bus is not stuck. TODO
 
 .. toctree::
    :maxdepth: 1

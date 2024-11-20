@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Basic Tools &mdash; NDK-FPGA Docs  documentation</title>
+  <title>Basic Tools &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme_overrides.css?v=b530091d" />
 
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Asynchronous modules" href="async.html" />
-    <link rel="prev" title="PRO DESIGN Falcon" href="ndk_cards/prodesign/pd-falcon/readme.html" /> 
+    <link rel="prev" title="Minimal NDK application" href="app-minimal.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,7 +32,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            NDK-FPGA Docs
+            NDK-FPGA
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -42,11 +42,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/terminology.html">NDK Terminology</a></li>
@@ -57,7 +53,37 @@
 <li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Basic Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="memory.html">Memory modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fifo.html">FIFO components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dsp.html">DSP components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logic.html">Basic logic elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
@@ -70,27 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Basic Tools</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous modules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="memory.html">Memory modules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fifo.html">FIFO components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dsp.html">DSP components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shift.html">Shift registers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logic.html">Basic logic elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ver.html">UVM Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 </ul>
 
         </div>
@@ -99,7 +105,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">NDK-FPGA Docs</a>
+          <a href="index.html">NDK-FPGA</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -120,7 +126,7 @@
   <section id="basic-tools">
 <h1>Basic Tools<a class="headerlink" href="#basic-tools" title="Link to this heading"></a></h1>
 <p>This chapter describes the basic components such as FIFOs, RAMs, multiplexers, encoders, decoders, etc.
-The basic components are typically located in the <code class="docutils literal notranslate"><span class="pre">comp/base/</span></code> directory in the OFM repository.</p>
+The basic components are typically located in the <code class="docutils literal notranslate"><span class="pre">comp/base/</span></code> directory in the NDK-FPGA repository.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Content:</span></p>
 <ul>
@@ -128,7 +134,6 @@ The basic components are typically located in the <code class="docutils literal 
 <li class="toctree-l1"><a class="reference internal" href="memory.html">Memory modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fifo.html">FIFO components</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dsp.html">DSP components</a></li>
-<li class="toctree-l1"><a class="reference internal" href="shift.html">Shift registers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logic.html">Basic logic elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
 </ul>
@@ -139,7 +144,7 @@ The basic components are typically located in the <code class="docutils literal 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="ndk_cards/prodesign/pd-falcon/readme.html" class="btn btn-neutral float-left" title="PRO DESIGN Falcon" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="app-minimal.html" class="btn btn-neutral float-left" title="Minimal NDK application" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="async.html" class="btn btn-neutral float-right" title="Asynchronous modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

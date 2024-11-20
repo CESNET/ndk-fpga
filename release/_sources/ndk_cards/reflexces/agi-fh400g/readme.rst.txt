@@ -10,7 +10,7 @@ ReflexCES XpressSX AGI-FH400G
     - PCIe conectors: Edge connector + optional HSI connectors
     - `FPGA Card Website <https://www.reflexces.com/pcie-boards/intel-agilex-soc/xpresssx-agi-fh400g-agilex-soc-full-height-half-length-pcie-board>`_
 - FPGA specification:
-    - FPGA part number: ``AGIB027R29A1E2VR0`` or ``AGIB027R29A1E2VR3``
+    - FPGA part number: ``AGIB027R29A1E2V``, ``AGIB027R29A1E2VR3``, ``AGIB027R29A1E2VR0``
     - Ethernet Hard IP: F-Tile (up to 400G Ethernet)
     - PCIe Hard IP: R-Tile (up to PCIe Gen5 x16)
 
@@ -21,8 +21,8 @@ NDK firmware support
     - :ref:`F-Tile in the Network Module <ndk_intel_net_mod>`
 - PCIe cores that are supported in the NDK firmware:
     - :ref:`R-Tile in the PCIe Module <ndk_intel_pcie_mod>`
-    - See the ``<NDK-APP_root_directory>/ndk/card/agi-fh400g/config/card_conf.tcl`` file for supported PCIe configurations.
-- Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):
+    - See the ``<NDK-FPGA_root_directory>/card/reflexces/agi-fh400g/config/card_conf.tcl`` file for supported PCIe configurations.
+- Makefile targets for building the NDK firmware (valid for Minimal app, may vary for other apps):
     - Use ``make 400g1`` command for firmware with 1x400GbE (default).
     - Use ``make 200g2`` command for firmware with 2x200GbE.
     - Use ``make 100g4`` command for firmware with 4x100GbE.
@@ -40,18 +40,19 @@ NDK firmware support
 Board Revision
 ^^^^^^^^^^^^^^
 
-This card exists in multiple revisions. The default revision for the firmware build is BOARD_REV=0.
+This card exists in multiple revisions. The default revision for the firmware build is BOARD_REV=1.
 The correct revision for the firmware build can be selected using the Makefile parameter BOARD_REV, for example as follows:
 
 .. code::
 
-    $ cd <NDK-APP_root_directory>/build/agi-fh400g
-    $ make BOARD_REV=1
+    $ cd <NDK-FPGA_root_directory>/apps/minimal/build/agi-fh400g
+    $ make BOARD_REV=2
 
 **Allowed values of BOARD_REV parameter**
 
-- ``BOARD_REV=0`` - The first prototypes use FPGA part number ``AGIB027R29A1E2VR0``.
+- ``BOARD_REV=2`` - The production revision uses FPGA part number ``AGIB027R29A1E2V``.
 - ``BOARD_REV=1`` - The second board revision uses FPGA part number ``AGIB027R29A1E2VR3``.
+- ``BOARD_REV=0`` - The first prototypes use FPGA part number ``AGIB027R29A1E2VR0``.
 
 Board Test Scripts
 ^^^^^^^^^^^^^^^^^^
@@ -74,7 +75,7 @@ The test scripts themselves are written in `Python 3 <https://www.python.org/>`_
 
 .. code:: bash
 
-    $ pytest --html=test_pcie.html --self-contained-html ndk/cards/agi-fh400g/bts/test_pcie.py
+    $ pytest --html=test_pcie.html --self-contained-html cards/reflexces/agi-fh400g/bts/test_pcie.py
 
 The whole test takes approximately 14 minutes. The test script displays test results and generates an HTML file containing a detailed description of the test results.
 

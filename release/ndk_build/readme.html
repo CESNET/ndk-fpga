@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Build System &mdash; NDK-FPGA Docs  documentation</title>
+  <title>Build System &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -32,7 +32,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            NDK-FPGA Docs
+            NDK-FPGA
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -42,11 +42,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../app-minimal.html">Minimal NDK application</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/terminology.html">NDK Terminology</a></li>
@@ -56,6 +52,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Build System</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#hierarchy-description-in-modules-tcl">Hierarchy description in Modules.tcl</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#variables-in-modules-tcl-obtained-by-the-build-system">Variables in Modules.tcl obtained by the build system</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#platform-tags">PLATFORM_TAGS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#priority-for-platform-tags">Priority for PLATFORM_TAGS</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#list-of-properties-used-in-mod-variables">List of properties used in MOD variables</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example-of-using-properties">Example of using properties</a></li>
 </ul>
@@ -87,12 +87,40 @@
 <li class="toctree-l3"><a class="reference internal" href="#the-incomplete-list-of-synth-flags-array-items">The (incomplete) list of SYNTH_FLAGS array items</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#device-tree-nodes">Device Tree nodes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-1">Example 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-2">Example 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-3">Example 3</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
@@ -105,18 +133,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../base.html">Basic Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../mfb.html">MFB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../mvb.html">MVB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ver.html">UVM Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 </ul>
 
         </div>
@@ -125,7 +142,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">NDK-FPGA Docs</a>
+          <a href="../index.html">NDK-FPGA</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -217,6 +234,36 @@ Makefile in the same directory and executes make.</p></li>
 <p>Prefer to use <code class="code highlight tcl docutils literal highlight-tcl"><span class="nb">lappend</span><span class="w"> </span>MOD<span class="w"> </span><span class="s2">&quot;myfile.vhd&quot;</span></code> instead of <code class="code highlight tcl docutils literal highlight-tcl"><span class="k">set</span><span class="w"> </span>MOD<span class="w"> </span><span class="s2">&quot;$MOD myfile.vhd&quot;</span></code>,
 because the <code class="docutils literal notranslate"><span class="pre">lappend</span></code> better express the operation and is faster.</p>
 </div>
+</section>
+<section id="platform-tags">
+<h3>PLATFORM_TAGS<a class="headerlink" href="#platform-tags" title="Link to this heading"></a></h3>
+<p>In the situation, when a platform (build tool: Quartus, Vivado, simulator: Questa Sim, etc.) supports various architectures / implementation schemes,
+the PLATFORM_TAGS list variable can be used to distinguish, which source file should be included into project.</p>
+<p>List of available platforms:</p>
+<ul class="simple">
+<li><p><strong>xilinx</strong> - platform supports complete set of Xilinx component and products</p></li>
+<li><p><strong>altera</strong> - platform supports complete set of Intel/Altera component and products</p></li>
+</ul>
+<p>Those tags are currently not available, but show the way of potential extension and usage:</p>
+<ul class="simple">
+<li><p><strong>vivado:ge_2024.0</strong> - Vivado version is equal or greater than 2024.0 (this doesn’t means automatic comparison)</p></li>
+<li><p><strong>xilinx:usp</strong> - Restrict for UltraScale+ platform.</p></li>
+<li><p><strong>xilinx:sim:gty</strong> - Inculde simulation models from highspeed transceivers.</p></li>
+</ul>
+<section id="priority-for-platform-tags">
+<h4>Priority for PLATFORM_TAGS<a class="headerlink" href="#priority-for-platform-tags" title="Link to this heading"></a></h4>
+<p>The PLATFORM_TAGS list can be potentially used also for specifying preference/priority (latter position in list means higher priority):
+<code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">PLATFORM_TAGS</span> <span class="pre">&quot;xilinx:bram:behav</span> <span class="pre">xilinx:bram:macro&quot;</span></code>
+The priority can be easily overriden simply by appending item to the list.
+(Also the <code class="docutils literal notranslate"><span class="pre">lsearch</span></code> can be easily used as returns -1 for non-existing item, which means lowest priority.)
+In general, the highest priority tag from set of supported tags can be obtained by the <code class="docutils literal notranslate"><span class="pre">proc</span> <span class="pre">nb_preference_filter</span> <span class="pre">{PLATFORM_TAGS</span> <span class="pre">SUPPORTED_TAGS}</span></code></p>
+<blockquote>
+<div><div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">set</span><span class="w"> </span>SUPPORTED_PLATFORM_TAGS<span class="w"> </span><span class="s2">&quot;xilinx altera&quot;</span>
+<span class="k">set</span><span class="w"> </span>TARGET_TAG<span class="w"> </span><span class="k">[</span><span class="nv">nb_preference_filter</span><span class="w"> </span><span class="nv">$PLATFORM_TAGS</span><span class="w"> </span><span class="nv">$SUPPORTED_PLATFORM_TAGS</span><span class="k">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</section>
 </section>
 <section id="list-of-properties-used-in-mod-variables">
 <span id="extra-file-properties"></span><h3>List of properties used in MOD variables<a class="headerlink" href="#list-of-properties-used-in-mod-variables" title="Link to this heading"></a></h3>
@@ -446,6 +493,103 @@ Common used files are DevTree.dts/dtb/vhd and user_const.vhd.</p>
 </li>
 </ul>
 <p>For other values and their purpose see the Vivado.inc.tcl or Quartus.inc.tcl file in the build directory.</p>
+</section>
+</section>
+<section id="device-tree-nodes">
+<h2>Device Tree nodes<a class="headerlink" href="#device-tree-nodes" title="Link to this heading"></a></h2>
+<p>For the software to find internal firmware components, a <em>Device Tree (DT)</em> is
+used. This provides a tree of available parts (called nodes in the DT
+terminology) of the design that can be accessed from the host without
+restriction. A developer creates TCL procedures that generate nodes to <em>DT
+string (DTS)</em> for the components he finds fit. Since the creation of the DTS can
+be challenging, there are several TCL procedures provided that simplify the
+process. These procedures are contained within the <code class="docutils literal notranslate"><span class="pre">dts_templates.tcl</span></code> file
+with clarifying comments. The following examples provide an overview of their
+usage.</p>
+<section id="example-1">
+<h3>Example 1<a class="headerlink" href="#example-1" title="Link to this heading"></a></h3>
+<p>This presents a least viable code that creates a node
+<code class="docutils literal notranslate"><span class="pre">dma_calypte_rx_perf_cntrs0</span></code> with the base address <em>0x8000</em>
+and the size <em>0x30</em>. It also contains a compatible string
+<code class="docutils literal notranslate"><span class="pre">cesnet,dma_calypte_rx_perf_cntrs</span></code>. The string property is appended to <code class="docutils literal notranslate"><span class="pre">dts</span></code>
+variable that contains a reference to the required Device Tree string (DTS).</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_rx_perf_cntrs0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="mh">0x8000</span><span class="w"> </span><span class="mh">0x30</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_calypte_rx_perf_cntrs&quot;</span>
+<span class="k">}</span>
+</pre></div>
+</div>
+</section>
+<section id="example-2">
+<h3>Example 2<a class="headerlink" href="#example-2" title="Link to this heading"></a></h3>
+<p>A second, more complex example demonstrates addition of multiple properties to a
+node called <code class="docutils literal notranslate"><span class="pre">dma_ctrl_calypte_$dir$id</span></code> (string can be further adjusted through
+parameters <code class="docutils literal notranslate"><span class="pre">dir</span></code> and <code class="docutils literal notranslate"><span class="pre">id</span></code>).</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">proc</span><span class="w"> </span>dts_dma_calypte_ctrl<span class="w"> </span><span class="k">{</span><span class="nv">DTS</span><span class="w"> </span>dir<span class="w"> </span>id<span class="w"> </span>base<span class="w"> </span>pcie<span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="k">upvar</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nv">$DTS</span><span class="w"> </span>dts
+
+<span class="w">    </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_ctrl_calypte_$dir$id&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">        </span><span class="c"># Adding compatible string &quot;cesnet,dma_ctrl_calypte_$dir&quot; and the</span>
+<span class="w">        </span><span class="c"># reg property with base address $base and the size 0x80.</span>
+<span class="w">        </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$base</span><span class="w"> </span><span class="mh">0x80</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_ctrl_calypte_$dir&quot;</span>
+<span class="w">        </span><span class="c"># Integer property called &quot;version&quot; with the value 0x10000</span>
+<span class="w">        </span><span class="nv">dts_appendprop_int</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;version&quot;</span><span class="w"> </span><span class="mh">0x10000</span>
+<span class="w">        </span><span class="c"># Integer prperty &quot;pcie&quot; with the value of $pcie</span>
+<span class="w">        </span><span class="nv">dts_appendprop_int</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;pcie&quot;</span><span class="w"> </span><span class="nv">$pcie</span>
+
+<span class="w">        </span><span class="c"># The addition of custom properties (customly named) can be done</span>
+<span class="w">        </span><span class="c"># through a standard &quot;append&quot; macro.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="k">{</span><span class="w"> </span><span class="nv">$dir</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;tx&quot;</span><span class="w"> </span><span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nb">append</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;data_buff = &lt;&amp;dma_calypte_tx_data_buff$id&gt;;&quot;</span>
+<span class="w">            </span><span class="nb">append</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;hdr_buff = &lt;&amp;dma_calypte_tx_hdr_buff$id&gt;;&quot;</span>
+<span class="w">        </span><span class="k">}</span>
+<span class="w">        </span><span class="nb">append</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;params = &lt;&amp;dma_params_$dir$pcie&gt;;&quot;</span>
+<span class="w">    </span><span class="k">}</span>
+<span class="k">}</span>
+</pre></div>
+</div>
+</section>
+<section id="example-3">
+<h3>Example 3<a class="headerlink" href="#example-3" title="Link to this heading"></a></h3>
+<p>This example shows how complex node with multiple subnodes is created. The parent
+node is called <code class="docutils literal notranslate"><span class="pre">dma_calypte_test_core0</span></code> and contains subnodes
+<code class="docutils literal notranslate"><span class="pre">mfb_loopback0</span></code>, <code class="docutils literal notranslate"><span class="pre">dma_calypte_debug_core0</span></code>, <code class="docutils literal notranslate"><span class="pre">dma_calypte_latency_meter0</span></code>
+and <code class="docutils literal notranslate"><span class="pre">dma_calypte_reset_fsm0</span></code>. Further nesting of nodes is possible as can be
+seen when adding the <code class="docutils literal notranslate"><span class="pre">mfb_generator0</span></code> node. Each of the called procedures
+contain a reference to the same DTS from the <code class="docutils literal notranslate"><span class="pre">dts</span></code> variable.</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">proc</span><span class="w"> </span>dts_calypte_test_core<span class="w"> </span><span class="k">{</span><span class="nv">DTS</span><span class="w"> </span>base_addr<span class="k">}</span><span class="w"> </span><span class="k">{</span>
+<span class="w">    </span><span class="c"># Populate reference from the calling environment</span>
+<span class="w">    </span><span class="k">upvar</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nv">$DTS</span><span class="w"> </span>dts
+
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>LOOPBACK_BASE_ADDR<span class="w">      </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$base_addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0x0</span><span class="k">]</span>
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>TX_DBG_CORE_BASE_ADDR<span class="w">   </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$base_addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0x10000</span><span class="k">]</span>
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>LATENCY_METER_BASE_ADDR<span class="w"> </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$base_addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0x20000</span><span class="k">]</span>
+<span class="w">    </span><span class="k">set</span><span class="w"> </span>RESET_FSM_BASE_ADDR<span class="w">     </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$base_addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">0x30000</span><span class="k">]</span>
+
+<span class="w">    </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_test_core0&quot;</span><span class="w"> </span><span class="k">{</span>
+
+<span class="w">        </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;mfb_loopback0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$LOOPBACK_BASE_ADDR</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="s2">&quot;cesnet,mfb_loopback&quot;</span>
+<span class="w">        </span><span class="k">}</span>
+
+<span class="w">        </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_debug_core0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$TX_DBG_CORE_BASE_ADDR</span><span class="w"> </span><span class="mh">0x1600</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_calypte_debug_core&quot;</span>
+
+<span class="w">            </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;mfb_generator0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">                </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="k">[expr</span><span class="w"> </span><span class="nv">$TX_DBG_CORE_BASE_ADDR</span><span class="o">+</span><span class="mh">0x8000</span><span class="k">]</span><span class="w"> </span><span class="mh">0x40</span><span class="w"> </span><span class="s2">&quot;cesnet,mfb_generator&quot;</span>
+<span class="w">            </span><span class="k">}</span>
+<span class="w">        </span><span class="k">}</span>
+
+<span class="w">        </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_latency_meter0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$LATENCY_METER_BASE_ADDR</span><span class="w"> </span><span class="mh">0x30</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_calypte_latency_meter&quot;</span>
+<span class="w">        </span><span class="k">}</span>
+
+<span class="w">        </span><span class="nv">dts_create_node</span><span class="w"> </span>dts<span class="w"> </span><span class="s2">&quot;dma_calypte_reset_fsm0&quot;</span><span class="w"> </span><span class="k">{</span>
+<span class="w">            </span><span class="nv">dts_appendprop_comp_node</span><span class="w"> </span>dts<span class="w"> </span><span class="nv">$RESET_FSM_BASE_ADDR</span><span class="w"> </span><span class="mh">0x4</span><span class="w"> </span><span class="s2">&quot;cesnet,dma_calypte_reset_fsm&quot;</span>
+<span class="w">        </span><span class="k">}</span>
+<span class="w">    </span><span class="k">}</span>
+<span class="k">}</span>
+</pre></div>
+</div>
 </section>
 </section>
 </section>

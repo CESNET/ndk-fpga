@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Memory modules &mdash; NDK-FPGA Docs  documentation</title>
+  <title>Memory modules &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme_overrides.css?v=b530091d" />
 
@@ -32,7 +32,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            NDK-FPGA Docs
+            NDK-FPGA
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -42,11 +42,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Application:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/terminology.html">NDK Terminology</a></li>
@@ -57,7 +53,46 @@
 <li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Supported cards:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="base.html">Basic Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous modules</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Memory modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/np_lutram/readme.html">NP LUT RAM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/sdp_bram/readme.html">Simple dual-port BRAM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/sdp_bram/readme.html#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/mp_bram/readme.html">Multi-port BRAM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/lvt_mem/readme.html">Live value table memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/mem_clear/readme.html">Memory clear</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fifo.html">FIFO components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dsp.html">DSP components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logic.html">Basic logic elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
@@ -70,35 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">VHDL components:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="base.html">Basic Tools</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous modules</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Memory modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/np_lutram/readme.html">NP LUT RAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/sdp_bram/readme.html">Simple dual-port BRAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/sdp_bram/readme.html#simple-dual-port-bram-with-byte-enable">Simple dual-port BRAM with Byte Enable</a></li>
-<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/mp_bram/readme.html">Multi-port BRAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="comp/base/mem/lvt_mem/readme.html">Live value table memory</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="fifo.html">FIFO components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dsp.html">DSP components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shift.html">Shift registers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logic.html">Basic logic elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ver.html">UVM Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 </ul>
 
         </div>
@@ -107,7 +114,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">NDK-FPGA Docs</a>
+          <a href="index.html">NDK-FPGA</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -128,9 +135,20 @@
              
   <section id="memory-modules">
 <h1>Memory modules<a class="headerlink" href="#memory-modules" title="Link to this heading"></a></h1>
-<p><strong>CAM</strong> - Ternary content addressable memory implemented in memory LUTs, optimized for Xilinx only. Also there is <strong>light variant</strong> implemented using register array, simpler but less effective.</p>
-<p><strong>DP_BMEM</strong> - Behavioral implementation of dual clock BRAM memory with two read/write port. <code class="docutils literal notranslate"><span class="pre">OBSOLETE,</span> <span class="pre">use</span> <span class="pre">DP_BRAM</span> <span class="pre">or</span> <span class="pre">DP_BRAM_XILINX!</span></code></p>
-<p><strong>DP_BMEM_V7</strong> - Structural implementation of dual clock BRAM memory based on Virtex 7 specific primitives with two read/write ports. <code class="docutils literal notranslate"><span class="pre">OBSOLETE,</span> <span class="pre">use</span> <span class="pre">DP_BRAM</span> <span class="pre">or</span> <span class="pre">DP_BRAM_XILINX!</span></code></p>
+<p><strong>DP_BMEM</strong> - Behavioral implementation of dual clock BRAM memory with two read/write ports.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>This component is obsolete and is a candidate for removal, use <strong>DP_BRAM</strong> or <strong>DP_BRAM_XILINX</strong> instead.</p>
+</div>
+</div>
+<p><strong>DP_BMEM_V7</strong> - Structural implementation of dual clock BRAM memory based on Virtex 7 specific primitives with two read/write ports.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>This component is obsolete and is a candidate for removal, use <strong>DP_BRAM</strong> or <strong>DP_BRAM_XILINX</strong> instead.</p>
+</div>
+</div>
 <p><strong>DP_BRAM</strong> - Behavioral implementation of single clock BRAM memory with two read/write port. Optimized for Xilinx and Intel FPGAs.</p>
 <p><strong>DP_BRAM_XILINX</strong> - Structural implementation of dual clock BRAM memory based on Xilinx specific primitives with two read/write ports. Only for Xilinx FPGAs.</p>
 <p><strong>DP_URAM_XILINX</strong> - Structural implementation of single clock URAM memory based on Xilinx specific primitives with two read/write ports. Only for Xilinx UltraScale+ FPGAs.</p>
@@ -142,24 +160,43 @@ Effective only for small data arrays.</p>
 The read latency is 0 clock cycles. Optimized for same FPGAs as GEN_LUTRAM.</p>
 <p><strong>NP_LUTRAM_PRO</strong> - An alternative version of NP_LUTRAM, which uses additional multiple frequency clock signal.
 Ports are registered and the read latency is 2 clock cycles. Expert knowledge is required to use this component!</p>
-<p><strong>SDP_BMEM</strong> - Behavioral implementation of dual clock BRAM memory with one read port and one write port. Located in the same folder as DP_BMEM. <code class="docutils literal notranslate"><span class="pre">OBSOLETE,</span> <span class="pre">use</span> <span class="pre">DP_BRAM</span> <span class="pre">or</span> <span class="pre">DP_BRAM_XILINX!</span></code></p>
+<p><strong>SDP_BMEM</strong> - Behavioral implementation of dual clock BRAM memory with one read port and one write port. Located in the same folder as DP_BMEM.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>This component is obsolete and is a candidate for removal, use <strong>DP_BRAM</strong> or <strong>DP_BRAM_XILINX</strong> instead.</p>
+</div>
+</div>
 <p><strong>SDP_BMEM_V7</strong> - Structural implementation of dual clock BRAM memory based on Virtex 7 specific primitives with one read port and one write port.
-Located in the same folder as DP_BMEM_V7. <code class="docutils literal notranslate"><span class="pre">OBSOLETE,</span> <span class="pre">use</span> <span class="pre">SDP_BRAM</span> <span class="pre">or</span> <span class="pre">SDP_BRAM_XILINX!</span></code></p>
+Located in the same folder as DP_BMEM_V7.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>This component is obsolete and is a candidate for removal, use <strong>DP_BRAM</strong> or <strong>DP_BRAM_XILINX</strong> instead.</p>
+</div>
+</div>
 <p><strong>SDP_BRAM</strong> - Structural implementation of dual clock BRAM memory based on Xilinx and Intel specific primitives (xpm_memory_sdpram, altera_syncram) with one read port and one write port.
 It supports the byte enable feature!</p>
-<p><strong>MP_BRAM</strong> - Generic multiported single clock BRAM memory based on <strong>SDP_BRAM</strong>. Currently supports only 1 write port. Amount of read ports is not restricted. Also supports byte enable
-feature.</p>
-<p><strong>LVT_MEM</strong> - Multiported memory implemented suitable for shallow memories, supports generic amount of write/read ports and has customizable read during write behaviour.</p>
+<p><strong>MP_BRAM</strong> - Generic multi-port single-clock BRAM memory based on <strong>SDP_BRAM</strong>.</p>
+<p><strong>LVT_MEM</strong> - Multi-port memory is suitable for shallow memories, supports a generic amount of write/read ports, and has customizable read during write behavior.</p>
 <p><strong>SDP_BRAM_BEHAV</strong> - Another behavioral implementation of dual clock BRAM memory with one read port and one write port.
-Located in the same folder as SDP_BRAM. <code class="docutils literal notranslate"><span class="pre">OBSOLETE,</span> <span class="pre">use</span> <span class="pre">DP_BRAM</span> <span class="pre">or</span> <span class="pre">DP_BRAM_XILINX!</span></code></p>
+Located in the same folder as SDP_BRAM.</p>
 <p><strong>SDP_BRAM_XILINX</strong> - Structural implementation of dual clock BRAM memory based on Xilinx specific primitives with one read port and one write port. Only for Xilinx FPGAs.</p>
 <p><strong>SDP_MEMX</strong> - Universal behavioral implementation of single clock memory with one read port and one write port.
 Allows setting type of memory (LUT, BRAM, URAM) or automatic mode. Optimized for Xilinx and Intel FPGAs.</p>
 <p><strong>SDP_URAM_XILINX</strong> - Structural implementation of single clock URAM memory based on Xilinx specific primitives with one read port and one write port. Only for Xilinx UltraScale+ FPGAs.</p>
-<p><strong>SP_BMEM</strong> -  Old behavioral implementation of single clock BRAM memory with one read/write port. <code class="docutils literal notranslate"><span class="pre">OBSOLETE,</span> <span class="pre">use</span> <span class="pre">SP_BRAM</span> <span class="pre">or</span> <span class="pre">SP_BRAM_XILINX!</span></code></p>
+<p><strong>SP_BMEM</strong> -  Old behavioral implementation of a single-clock BRAM memory with one read/write port.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>This component is obsolete and is a candidate for removal, use <strong>SP_BRAM</strong> or <strong>SP_BRAM_XILINX</strong> instead.</p>
+</div>
+</div>
 <p><strong>SP_BRAM</strong> - Behavioral implementation of single clock BRAM memory with one read/write port. Optimized for Xilinx and Intel FPGAs.</p>
 <p><strong>SP_BRAM_XILINX</strong> - Structural implementation of single clock BRAM memory based on Xilinx specific primitives with one read/write port. Only for Xilinx FPGAs.</p>
 <p><strong>SP_URAM_XILINX</strong> - Structural implementation of single clock URAM memory based on Xilinx specific primitives with one read/write port. Only for Xilinx UltraScale+ FPGAs.</p>
+<p><strong>&lt;MEMORY&gt;_CLEAR</strong> - Wrap around <strong>&lt;MEMORY&gt;</strong> with additional clear logic.
+Detailed <a class="reference internal" href="comp/base/mem/mem_clear/readme.html#mem-clear"><span class="std std-ref">documentation can be found here</span></a>.</p>
 <div class="toctree-wrapper compound">
 </div>
 <section id="references">
