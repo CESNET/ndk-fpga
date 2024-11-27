@@ -4,15 +4,12 @@
 The Network Module
 ==================
 
-Network Module enables connection of the NDK platform to an Ethernet interface(s).
+The Network Module enables connection of the NDK platform to an Ethernet interface(s).
 The basic architecture is displayed below.
 
 .. image:: img/network_module_arch.svg
     :align: center
     :width: 65 %
-
-The Network Module enables connection of the NDK platform to an Ethernet interface(s).
-The basic architecture is displayed below.
 
 The Network Module utilizes Ethernet hard IP blocks of the FPGA (Stratix 10, Agilex, or UltraScale+) to implement functions of the Ethernet sublayers.
 These hard IP blocks have their unique client interface.
