@@ -205,8 +205,8 @@ Example usage of ``logger_stats`` (for more usage see `mem_logger/mem_logger.py`
 
     def create_stats():
         # Create DataLoggers
-        logger_0 = DataLogger(index=0, dev='/dev/nfb0')
-        logger_1 = DataLogger(index=1, dev='/dev/nfb0')
+        logger_0 = DataLogger(index=0)
+        logger_1 = DataLogger(index=1)
 
         # Create Stats hierarchy
         stats = Stats.LoggerStats('Example stats')
