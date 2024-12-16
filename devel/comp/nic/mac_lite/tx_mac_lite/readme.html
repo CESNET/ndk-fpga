@@ -785,11 +785,16 @@ Possible values: “10Gb”, “over10Gb”</p></td>
 <td><p>TX MFB: destination ready of each MFB bus</p></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>OUTPUT LINK STATUS INTERFACE (TX_CLK)</p></td>
+<td><p>CONTROL/STATUS INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_mac_lite-outgoing_frame"><td><p>OUTGOING_FRAME</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_mac_lite-eth_link_up"><td><p>ETH_LINK_UP</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>ETH link UP status (ASYNC)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_mac_lite-outgoing_frame"><td><p>OUTGOING_FRAME</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Links status (TX_CLK): Active during frame transmission</p></td>
