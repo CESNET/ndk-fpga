@@ -14,6 +14,8 @@ lappend MOD "$ENTITY_BASE/clk_gen_ent.vhd"
 if {$ARCHGRP == "INTEL"} {
     lappend MOD "$ENTITY_BASE/clk_gen_intel.vhd"
     # IPs (PLL and Reset Release) must be loaded in top-level Modules.tcl
+} elseif {$ARCHGRP == "ALTERA"} {
+    lappend MOD "$ENTITY_BASE/clk_gen_altera.vhd"
 } elseif {$ARCHGRP == "USP"} {
     lappend MOD "$ENTITY_BASE/clk_gen_usp.vhd"
 }
