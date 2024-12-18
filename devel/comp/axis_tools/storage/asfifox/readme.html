@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AXIS_ASFIFOX &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">AXIS_ASFIFOX</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/axis_tools/storage/asfifox/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="axis-asfifox">
+<span id="id1"></span><h1>AXIS_ASFIFOX<a class="headerlink" href="#axis-asfifox" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-axis_asfifox">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">AXIS_ASFIFOX</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-axis_asfifox" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-axis_asfifox-tdata_width"><td><p>TDATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Width of AXI-Stream data signal in bits.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axis_asfifox-tuser_width"><td><p>TUSER_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>64</p></td>
+<td><p>Width of AXI-Stream user signal in bits.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axis_asfifox-fifo_items"><td><p>FIFO_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>FIFO depth in number of data words, must be power of two!
+Minimum value is 2.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axis_asfifox-ram_type"><td><p>RAM_TYPE</p></td>
+<td><p>string</p></td>
+<td><p>“BRAM”</p></td>
+<td><p>Select memory implementation. Options:
+“LUT”  - effective for shallow FIFO (approx. ITEMS &lt;= 64),
+“BRAM” - effective for deep FIFO (approx. ITEMS &gt; 64).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axis_asfifox-fwft_mode"><td><p>FWFT_MODE</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>First Word Fall Through mode. If FWFT_MODE=True, valid data will be
+ready at the ASFIFOX output without TX_AXIS_TREADY requests.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axis_asfifox-output_reg"><td><p>OUTPUT_REG</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>Enabled output registers allow better timing for a few flip-flops.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axis_asfifox-afull_offset"><td><p>AFULL_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>FIFO_ITEMS/2</p></td>
+<td><p>Sets the maximum number of remaining free data words in the ASFIFOX
+that triggers the RX_FIFO_AFULL signal.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axis_asfifox-aempty_offset"><td><p>AEMPTY_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>FIFO_ITEMS/2</p></td>
+<td><p>Sets the maximum number of data words stored in the ASFIFOX that
+triggers the TX_FIFO_AEMPTY signal.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axis_asfifox-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“AGILEX”</p></td>
+<td><p>Target device: AGILEX, STRATIX10, ULTRASCALE,…</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX AXI-Stream interface (RX_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-rx_clk"><td><p>RX_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-rx_reset"><td><p>RX_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-rx_axis_tdata"><td><p>RX_AXIS_TDATA</p></td>
+<td><p>std_logic_vector(TDATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-rx_axis_tuser"><td><p>RX_AXIS_TUSER</p></td>
+<td><p>std_logic_vector(TUSER_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-rx_axis_tkeep"><td><p>RX_AXIS_TKEEP</p></td>
+<td><p>std_logic_vector(TDATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-rx_axis_tlast"><td><p>RX_AXIS_TLAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-rx_axis_tvalid"><td><p>RX_AXIS_TVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-rx_axis_tready"><td><p>RX_AXIS_TREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-rx_fifo_afull"><td><p>RX_FIFO_AFULL</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-rx_fifo_status"><td><p>RX_FIFO_STATUS</p></td>
+<td><p>std_logic_vector(log2(FIFO_ITEMS) downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX AXI-Stream interface (TX_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-tx_clk"><td><p>TX_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-tx_reset"><td><p>TX_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-tx_axis_tdata"><td><p>TX_AXIS_TDATA</p></td>
+<td><p>std_logic_vector(TDATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-tx_axis_tuser"><td><p>TX_AXIS_TUSER</p></td>
+<td><p>std_logic_vector(TUSER_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-tx_axis_tkeep"><td><p>TX_AXIS_TKEEP</p></td>
+<td><p>std_logic_vector(TDATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-tx_axis_tlast"><td><p>TX_AXIS_TLAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-tx_axis_tvalid"><td><p>TX_AXIS_TVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-tx_axis_tready"><td><p>TX_AXIS_TREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_asfifox-tx_fifo_aempty"><td><p>TX_FIFO_AEMPTY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_asfifox-tx_fifo_status"><td><p>TX_FIFO_STATUS</p></td>
+<td><p>std_logic_vector(log2(FIFO_ITEMS) downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
