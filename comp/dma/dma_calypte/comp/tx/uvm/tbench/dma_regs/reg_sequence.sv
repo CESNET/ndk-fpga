@@ -65,11 +65,6 @@ class stop_channel_seq extends uvm_sequence;
         m_regmodel_channel.control_reg.write(status,  32'h0,  .parent(this));
 
         do begin
-            m_regmodel_channel.hw_data_pointer_reg.read (status, data, .parent(this));
-            m_regmodel_channel.sw_data_pointer_reg.write(status, data, .parent(this));
-            m_regmodel_channel.hw_hdr_pointer_reg .read (status, data, .parent(this));
-            m_regmodel_channel.sw_hdr_pointer_reg .write(status, data, .parent(this));
-
             #(500ns);
 
             m_regmodel_channel.sw_data_pointer_reg.read(status, data, .parent(this));
