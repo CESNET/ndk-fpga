@@ -24,6 +24,7 @@ set SDM_CTRL_BASE        "$CORE_COMP_BASE/misc/sdm_ctrl"
 set MI_SPLITTER_BASE     "$OFM_PATH/comp/mi_tools/splitter_plus_gen"
 set RESET_TREE_GEN_BASE  "$OFM_PATH/comp/base/misc/reset_tree_gen"
 set MI_TEST_SPACE_BASE   "$OFM_PATH/comp/mi_tools/test_space"
+set FREQ_COUNTER_BASE    "$OFM_PATH/comp/base/misc/frequency_meter"
 set DMA_GENERATOR_BASE   "$OFM_PATH/comp/mfb_tools/debug/dma_generator"
 set HWID_BASE            "$OFM_PATH/comp/base/misc/hwid"
 set ETH_LED_CTRL_BASE    "$OFM_PATH/comp/nic/eth_leds/led_ctrl_top"
@@ -65,6 +66,7 @@ if { $ARCHGRP_ARR(APPLICATION_CORE_ENTITY_ONLY) } {
   lappend COMPONENTS [list "PCIE"            $PCIE_BASE            $ARCHGRP_ARR(PCIE_MOD_ARCH)  ]
   lappend COMPONENTS [list "MI_SPLITTER"     $MI_SPLITTER_BASE     "FULL"                       ]
   lappend COMPONENTS [list "MI_TEST_SPACE"   $MI_TEST_SPACE_BASE   "FULL"                       ]
+  lappend COMPONENTS [list "FREQ_COUNTER"    $FREQ_COUNTER_BASE    "FULL"                       ]
   lappend COMPONENTS [list "NETWORK_MOD"     $NETWORK_MOD_BASE     $ARCHGRP_ARR(NET_MOD_ARCH)   ]
   lappend COMPONENTS [list "ETH_LED_CTRL"    $ETH_LED_CTRL_BASE    "FULL"                       ]
   lappend COMPONENTS [list "DMA"             $DMA_BASE             $DMA_ARCH                    ]

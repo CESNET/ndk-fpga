@@ -149,6 +149,9 @@ set PCIE_CORE_DEBUG_ENABLE false
 # Enables debug probes in the PCIe Module (PCIe Ctrl)
 set PCIE_CTRL_DEBUG_ENABLE false
 
+# Enables the frequency_meter component (see fpga_common)
+set MEASURE_FREQUENCIES    true
+
 # Enables Timstamp limit demo/testing logic
 set TS_DEMO_EN             false
 

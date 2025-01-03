@@ -5,6 +5,7 @@ proc dts_build_netcope {} {
     # <NDK-CORE_root_directory>/intel/src/mi_addr_space_pkg.vhd
     # =========================================================================
     set ADDR_TEST_SPACE "0x00000000"
+    set ADDR_FREQ_METER "0x00000800"
     set ADDR_SDM_SYSMON "0x00001000"
     set ADDR_BOOT_CTRL  "0x00002000"
     set ADDR_ETH_PMD    "0x00003000"
@@ -70,6 +71,12 @@ proc dts_build_netcope {} {
     }
 
     append ret [dts_mi_test_space "mi_test_space" $ADDR_TEST_SPACE]
+
+    # Frequency meter component
+    global MEASURE_FREQUENCIES
+    if {$MEASURE_FREQUENCIES} {
+        append ret [dts_frequency_counter $ADDR_FREQ_METER]
+    }
 
     # Card specific components
     if { [llength [info procs dts_card_specific]] > 0 } {
