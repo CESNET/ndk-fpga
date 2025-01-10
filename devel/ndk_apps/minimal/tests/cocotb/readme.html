@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Top-level simulations &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Top-level simulations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/ndk_apps/minimal/tests/cocotb/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="top-level-simulations">
+<h1>Top-level simulations<a class="headerlink" href="#top-level-simulations" title="Link to this heading"></a></h1>
+<p>The top-level simulations (TLS) are suitable for:</p>
+<ul class="simple">
+<li><p>software testing without access to real acceleration card</p></li>
+<li><p>whole design compile and basic functionality check</p></li>
+<li><p>address space debugging</p></li>
+<li><p>resets, clocks, clock domain crossings check</p></li>
+</ul>
+<section id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Link to this heading"></a></h2>
+<section id="what-simulation-includes-excludes">
+<h3>What simulation includes / excludes<a class="headerlink" href="#what-simulation-includes-excludes" title="Link to this heading"></a></h3>
+<p>The TLS doesn’t simulate IP cores but emulates their I/O signals. The
+primary effort is to emulate the Ethernet and PCIe I/O and DMA for the most used FPGA families
+(Xilinx US+, Intel P-TILE, Intel E-TILE, …).</p>
+</section>
+<section id="common-tips-for-cocotb">
+<h3>Common tips for cocotb<a class="headerlink" href="#common-tips-for-cocotb" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">sys.stderr</span></code> stream for ModelSim / Questa to achieve instant
+display of log:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verbose messages for all loggers except some:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;cocotbext.nfb.ext.grpc.server&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="grpc-example">
+<h2>gRPC example<a class="headerlink" href="#grpc-example" title="Link to this heading"></a></h2>
+<p>This variant enables the usage of external processes and is intended for
+manual interaction. The TLS doesn’t contain any real test cases. Instead, it
+starts the gRPC server, runs for a specified simulation time (e.g., 10ms), and
+expects the user to execute an application that uses the acceleration
+card through the <code class="docutils literal notranslate"><span class="pre">libnfb</span></code> gRPC extension. The application then generates
+I/O read and write requests and the simulator translates them to the bus
+interface and back.</p>
+<p>A feature in <code class="docutils literal notranslate"><span class="pre">libnfb-ext-grpc</span></code> enables simple handling of DMA requests
+from the simulated design. If the <code class="docutils literal notranslate"><span class="pre">dma_vas</span></code> tag is present in the device
+string, the library opens a reverse stream. As soon as the DMA request
+arrives in the process, <code class="docutils literal notranslate"><span class="pre">libnfb-ext-grpc</span></code> copies data from/to the virtual
+address space of the process. Just use the virtual address for
+descriptor values. There are no boundary checks and the request can
+potentially harm the process, which probably gets killed by <code class="docutils literal notranslate"><span class="pre">SIGSEGV</span></code>
+signal in the case of an error.</p>
+<p>The simple DMA request handling is most suitable for a DPDK application;
+see the section below.</p>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h3>
+<p>libnfb-ext-grpc.so from the libnfb-ext-grpc package (RPM)</p>
+</section>
+<section id="running">
+<h3>Running<a class="headerlink" href="#running" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p>Prepare a Python environment and install packages</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>.<span class="w"> </span>./prepare.sh
+</pre></div>
+</div>
+</li>
+<li><p>Install specific dependencies for the gRPC-based simulation</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>grpc<span class="o">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Run the simulation</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">COCOTB_MODULE</span><span class="o">=</span>cocotb_grpc
+</pre></div>
+</div>
+</li>
+<li><p>Wait until this message appears in the console</p>
+<p><code class="docutils literal notranslate"><span class="pre">gRPC</span> <span class="pre">server</span> <span class="pre">started,</span> <span class="pre">listening</span> <span class="pre">on</span> <span class="pre">50051.</span> <span class="pre">Device</span> <span class="pre">string:</span> <span class="pre">libnfb-ext-grpc.so:grpc:localhost:50051</span></code></p>
+</li>
+<li><p>Run your software application and specify the device string</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>nfb-eth<span class="w"> </span>-ri0<span class="w"> </span>-d<span class="w"> </span>libnfb-ext-grpc.so:grpc:localhost:50051
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="dpdk-usage">
+<h3>DPDK usage<a class="headerlink" href="#dpdk-usage" title="Link to this heading"></a></h3>
+<p>DPDK needs to be executed with the <code class="docutils literal notranslate"><span class="pre">--vdev</span></code> argument:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>dpdk-testpmd<span class="w"> </span>--vdev<span class="o">=</span>eth_vdev_nfb,dev<span class="o">=</span>libnfb-ext-grpc.so:grpc+dma_vas:localhost:50051,queue_driver<span class="o">=</span>native<span class="w"> </span>--iova-mode<span class="o">=</span>va<span class="w"> </span>--<span class="w"> </span>-i
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">queue_driver=native</span></code> is currently the only supported mode, for which the
+<code class="docutils literal notranslate"><span class="pre">--iova-mode=va</span></code> is essential. The <code class="docutils literal notranslate"><span class="pre">dma_vas</span></code> tag also
+must be stated in the device string:
+<code class="docutils literal notranslate"><span class="pre">libnfb-ext-grpc.so:grpc+dma_vas:localhost:50051</span></code>.</p>
+<p>Do not forget to alloc hugepages.</p>
+</section>
+<section id="tips">
+<h3>Tips<a class="headerlink" href="#tips" title="Link to this heading"></a></h3>
+<section id="concurrent-processes">
+<h4>Concurrent processes<a class="headerlink" href="#concurrent-processes" title="Link to this heading"></a></h4>
+<p>The simulation environment can handle requests from multiple running
+applications at once. For example: start the <code class="docutils literal notranslate"><span class="pre">dpdk-testpmd</span></code> in
+interactive mode, enable MACs with <code class="docutils literal notranslate"><span class="pre">nfb-eth</span> <span class="pre">-e1</span></code> and then type
+<code class="docutils literal notranslate"><span class="pre">start</span></code> in the DPDK app prompt. Be aware that only one application should use
+the <code class="docutils literal notranslate"><span class="pre">dma_vas</span></code> tag in the device string at a time.</p>
+<p><em>There is an issue with nfb locks: nfb_comp_lock / nfb_comp_unlock is not
+implemented. Two processes mixing requests on one lock-aware component
+will probably break its function.</em></p>
+</section>
+<section id="locally-build-libnfb-ext-grpc-so">
+<h4>Locally build libnfb-ext-grpc.so<a class="headerlink" href="#locally-build-libnfb-ext-grpc-so" title="Link to this heading"></a></h4>
+<p>If the gRPC client library is not in the standard system path (<code class="docutils literal notranslate"><span class="pre">/usr/lib</span></code>),
+use the full path in the device parameter:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>nfb-info<span class="w"> </span>-d<span class="w"> </span>/home/joe/ndk-sw/cmake-build/ext/libnfb-ext-grpc/libnfb-ext-grpc.so:grpc:localhost:50051
+</pre></div>
+</div>
+</section>
+<section id="remote-access-to-tls">
+<h4>Remote access to TLS<a class="headerlink" href="#remote-access-to-tls" title="Link to this heading"></a></h4>
+<p>Listen on all IP addresses:</p>
+<p><code class="docutils literal notranslate"><span class="pre">NfbDmaThreadedGrpcServer(ram,</span> <span class="pre">dev,</span> <span class="pre">addr='0.0.0.0')</span></code></p>
+<p>and run the application on another machine with the <code class="docutils literal notranslate"><span class="pre">target_addr:port</span></code> string in the device parameter.</p>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
