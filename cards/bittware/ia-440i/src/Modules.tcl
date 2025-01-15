@@ -2,6 +2,7 @@
 # Copyright (C) 2024 CESNET z. s. p. o.
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
 #            Tomas Hak <hak@cesnet.cz>
+#            Martin Spinler <spinler@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -10,11 +11,11 @@ array set ARCHGRP_ARR $ARCHGRP
 
 # Paths
 set FPGA_COMMON_BASE "$ARCHGRP_ARR(CORE_BASE)/top"
-#set BOOT_CTRL_BASE   "$OFM_PATH/core/comp/misc/boot_ctrl"
 
 # Components
 lappend COMPONENTS [list "FPGA_COMMON" $FPGA_COMMON_BASE $ARCHGRP]
-#lappend COMPONENTS [list "BOOT_CTRL"   $BOOT_CTRL_BASE   "FULL"  ]
+lappend COMPONENTS [list "MI2AXI4"  $OFM_PATH/comp/mi_tools/converters/mi2axi4      "FULL"]
+lappend COMPONENTS [list "BMC"      $OFM_PATH/extra/ip-3rdparty/bittware/bmc_3v0    "FULL"]
 
 # IP components
 set IP_COMMON_TCL $ARCHGRP_ARR(IP_TEMPLATE_ROOT)/common.tcl
@@ -58,3 +59,5 @@ lappend MOD {*}[get_ip_mod_files $IP_COMPONENTS [array get ARCHGRP_ARR]]
 
 # Top-level
 lappend MOD "$ENTITY_BASE/fpga.vhd"
+
+lappend MOD "$ENTITY_BASE/DevTree.tcl"
