@@ -14,6 +14,7 @@ Overview
     ndk_core/doc/how_to_start
     ndk_core/doc/terminology
     ndk_core/doc/readme
+    ndk_core/doc/performance
     ndk_core/doc/configuration
     ndk_core/doc/testing
     ndk_build/readme
