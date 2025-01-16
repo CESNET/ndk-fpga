@@ -82,7 +82,7 @@ port (
 
     STOP_REQ_CHAN        : out std_logic_vector(log2(CHANNELS)-1 downto 0);
     STOP_REQ_VLD         : out std_logic;
-    STOP_REQ_ACK         : in  std_logic;
+    STOP_REQ_ACK         : in  std_logic; --logic request one CLK delay between VLD request and ACK reponse
 
     -- general vector of all channels with their activity
     ENABLED_CHAN         : out std_logic_vector(CHANNELS-1 downto 0);
@@ -594,7 +594,7 @@ architecture FULL of TX_DMA_SW_MANAGER is
     -- =====================================================================
     --  Stop request logic
     -- =====================================================================
-    type stop_fsm_type is (IDLE, WAIT_FOR_REQ_ACK, WAIT_FOR_POINTERS);
+    type stop_fsm_type is (IDLE, WAIT_FOR_REQ_ACK, DELAY_FOR_DSP_1, DELAY_FOR_DSP_2, WAIT_FOR_POINTERS, WAIT_FOR_STATUS_UPDATE);
     signal stop_fsm_pst : stop_fsm_type;
     signal stop_fsm_nst : stop_fsm_type;
 
@@ -1115,9 +1115,23 @@ begin
             when IDLE =>
 
                 if (reg_dob_opt(R_CONTROL)(1)(0) = '0' and reg_dob_opt(R_STATUS)(1)(0) = '1') then
-                    stop_fsm_nst     <= WAIT_FOR_REQ_ACK;
+                    stop_fsm_nst     <= DELAY_FOR_DSP_1;
                     stop_fsm_channel <= active_chan_reg;
-                    STOP_REQ_CHAN    <= active_chan_reg;
+                end if;
+
+
+            when DELAY_FOR_DSP_1 =>
+
+                stop_fsm_nst     <= DELAY_FOR_DSP_2;
+
+            when DELAY_FOR_DSP_2 =>
+
+                stop_fsm_nst     <= WAIT_FOR_POINTERS;
+
+            when WAIT_FOR_POINTERS =>
+
+                if (stop_chan_ok = '1' and stop_ptr_ok = '1') then
+                    stop_fsm_nst     <= WAIT_FOR_REQ_ACK;
                     STOP_REQ_VLD     <= '1';
                 end if;
 
@@ -1125,13 +1139,13 @@ begin
             when WAIT_FOR_REQ_ACK =>
 
                 if (STOP_REQ_ACK = '1') then
-                    stop_fsm_nst <= WAIT_FOR_POINTERS;
+                    stop_fsm_nst <= WAIT_FOR_STATUS_UPDATE;
                 end if;
 
-            when WAIT_FOR_POINTERS =>
+            when WAIT_FOR_STATUS_UPDATE =>
 
-                if (stop_chan_ok = '1' and stop_ptr_ok = '1') then
-                    stop_fsm_nst                                                 <= IDLE;
+                if (stop_chan_ok = '1') then
+                    stop_fsm_nst <= IDLE;
                     stop_acked                                                   <= '1';
                     enabled_chan_rst(to_integer(unsigned(stop_fsm_channel_reg))) <= '1';
                 end if;
