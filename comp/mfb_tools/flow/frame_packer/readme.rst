@@ -78,3 +78,16 @@ The length and the channel ID are sent to the ``MVB_FIFO`` which is directly con
 References
 ~~~~~~~~~~
 For more detailed description refer to `David Beneš's master thesis <https://www.vut.cz/www_base/zav_prace_soubor_verejne.php?file_id=267988>`_  (2023/2024)
+
+Known bugs
+~~~~~~~~~~
+
+There is a possible bug when sending the combination of small and large packets. In 400G
+version this could result in sending a packet larger than USR_PKT_SIZE_MAX.
+
+Another bug considers incomplete resetting logic of a signal that blocks the activation of the Timeout counter in the FP_TIMEOUT_EXT component.
+This bug occures in a verification when, at the end of the run, a Superpacket is sent due to a Timeout on a channel, and then one more packet
+(smaller than the size of the MFB word) arrives on this channel. It gets stuck in the Assembly/Temporary register forever as the Timeout counter
+gets unblocked only when the register "overflows" (i.e., a packet continues over this word). The solution should be to fix the reset logic for
+the `timeout_block` signal.
+
