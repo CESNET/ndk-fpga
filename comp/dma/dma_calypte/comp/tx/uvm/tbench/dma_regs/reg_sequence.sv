@@ -80,7 +80,7 @@ class stop_channel_seq extends uvm_sequence;
             stop_attempts++;
 
             assert (stop_attempts < 500) else
-                `uvm_warning(this.get_type_name(), "\n\nThe stop of a channel takes suspiciously long time!\n")
+                `uvm_warning(m_regmodel_channel.get_full_name(), $sformatf("\nThe stop of a channel takes suspiciously long time!\n\tDATA SW(%0d) HW(%0d)\n\tHDR SW(%0d) HW(%0d)\n\tSTATUS %0d\n-----------------------\n", sw_data, hw_data, sw_hdr, hw_hdr, (data & 32'h1)));
 
         end while (sw_data != hw_data || sw_hdr != hw_hdr || (data & 32'h1) != 0);
     endtask
