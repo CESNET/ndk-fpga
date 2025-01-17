@@ -7,7 +7,7 @@ The DMA module
 The DMA module is a wrapper containing the DMA controller (DMA IP), auxiliary, and debug logic. The connection of the DMA module is shown in the block diagram below. The DMA module is parametric and handles different numbers of DMA streams. The number of DMA streams corresponds to the number of instantiated DMA controllers. The currently supported DMA controllers in NDK are:
 
 - **DMA Medusa IP** -- Closed-source DMA controller optimized for high throughput (up to 400 Gbps) and support for multiple PCIe endpoints. See the :ref:`DMA Medusa IP documentation <dma_medusa>` for a detailed description.
-- **DMA Calypte IP** -- Open-source DMA controller optimized for low latency communication and supports only one PCIe endpoint. DMA Calypte IP is still under development and not yet ready for use! See the :ref:`DMA Calypte IP documentation <dma_calypte>` for a detailed description.
+- **DMA Calypte IP** -- Open-source DMA controller optimized for low latency communication and supports only one PCIe endpoint. See the :ref:`DMA Calypte IP documentation <dma_calypte>` for a detailed description.
 
 .. note::
 
