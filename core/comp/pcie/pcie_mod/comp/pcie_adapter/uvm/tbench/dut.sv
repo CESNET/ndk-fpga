@@ -57,8 +57,11 @@ module DUT (
             assign down_prefix    [(r+1)*PREFIX_WIDTH-1    : r*PREFIX_WIDTH]    = avst_down.META[(r+1)*AVST_DOWN_META_W - BAR_RANGE_WIDTH-1                : (r+1)*AVST_DOWN_META_W - PREFIX_WIDTH - BAR_RANGE_WIDTH];
             assign down_hdr       [(r+1)*HDR_WIDTH-1       : r*HDR_WIDTH]       = avst_down.META[(r+1)*AVST_DOWN_META_W - PREFIX_WIDTH - BAR_RANGE_WIDTH-1 : (r+1)*AVST_DOWN_META_W - HDR_WIDTH - PREFIX_WIDTH - BAR_RANGE_WIDTH];
 
-            //assign down_valid[r] = avst_down.VALID[r];
-            assign down_valid[r] = avst_down.VALID[r] & down_ready;
+            if (ENDPOINT_TYPE == "R_TILE") begin
+                assign down_valid[r] = avst_down.VALID[r] & down_ready;
+            end else begin
+                assign down_valid[r] = avst_down.VALID[r];
+            end
         end
 
         for (genvar r = 0; r < CC_MFB_REGIONS; r++) begin

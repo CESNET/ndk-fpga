@@ -97,6 +97,8 @@ module testbench;
 
 
     PROPERTY #(
+       .ENDPOINT_TYPE     (ENDPOINT_TYPE),
+
        .RC_MFB_REGIONS    (RC_MFB_REGIONS    ),
        .RC_MFB_REGION_SIZE(RC_MFB_REGION_SIZE),
        .RC_MFB_BLOCK_SIZE (RC_MFB_BLOCK_SIZE ),

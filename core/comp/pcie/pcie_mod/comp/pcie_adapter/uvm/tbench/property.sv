@@ -9,6 +9,8 @@ import uvm_pkg::*;
 
 
 module PROPERTY #(
+    string ENDPOINT_TYPE,
+
     int unsigned RC_MFB_REGIONS,
     int unsigned RC_MFB_REGION_SIZE,
     int unsigned RC_MFB_BLOCK_SIZE,
@@ -81,14 +83,16 @@ module PROPERTY #(
         .vif   (cq_mfb)
     );
 
-    property no_fall_init;
-        @(posedge avst_down.CLK) disable iff(RST || START)
-        $rose(avst_down.READY) |=> always avst_down.READY;
-    endproperty
+    generate if (ENDPOINT_TYPE == "R_TILE") begin
+        property no_fall_init;
+            @(posedge avst_down.CLK) disable iff(RST || START)
+            $rose(avst_down.READY) |=> always avst_down.READY;
+        endproperty
 
-    assert property (no_fall_init)
-        else begin
-            `uvm_error(module_name, "\n\tAVST DONW interface brouke protocol. READY signal fall down after inintialization");
-        end
+        assert property (no_fall_init)
+            else begin
+                `uvm_error(module_name, "\n\tAVST DOWN interface broke protocol R_TILE. The READY signal falls down after inintialization");
+            end
+    end endgenerate
 endmodule
 
