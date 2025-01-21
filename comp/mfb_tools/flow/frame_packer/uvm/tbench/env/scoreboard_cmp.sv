@@ -13,14 +13,7 @@ class comparer_superpacket #(type CLASS_TYPE) extends uvm_common::comparer_taged
     endfunction
 
     virtual function int unsigned compare(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
-        int unsigned ret = 1;
-        if (tr_model.data.size() < tr_dut.data.size()) return 0;
-        for (int unsigned it = 0; it < tr_model.size(); it++) begin
-            if (!$isunknown(tr_model.data[it]) && tr_model.data[it] !== tr_dut.data[it]) begin
-                return 0;
-            end
-        end
-        return ret;
+        return ((tr_dut.data ==? tr_model.data) === 1'b1);
     endfunction
 
 endclass

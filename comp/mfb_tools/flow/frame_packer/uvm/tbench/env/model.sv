@@ -22,8 +22,11 @@ class model #(RX_CHANNELS, PKT_MTU, META_WIDTH,  MFB_ITEM_WIDTH) extends uvm_com
 
 
     // FIFO to store SUPERPACKET
+    protected uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)                     channel_fifo_data[RX_CHANNELS][$];
+    protected uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1))  channel_fifo_meta[RX_CHANNELS][$];
     protected logic [MFB_ITEM_WIDTH-1 : 0] sp_fifo[RX_CHANNELS][$];
     protected int unsigned pkt_num;
+    protected int unsigned sp_num_cnt;
 
     function new(string name = "model", uvm_component parent = null);
         super.new(name, parent);
@@ -46,30 +49,104 @@ class model #(RX_CHANNELS, PKT_MTU, META_WIDTH,  MFB_ITEM_WIDTH) extends uvm_com
         int unsigned ret = 0;
         ret |= (data_in.used() != 0);
         ret |= (meta_in.used() != 0);
+        for (int unsigned it = 0; it < RX_CHANNELS; it++) begin
+            ret |= (channel_fifo_data[it].size() != 0);
+            ret |= (channel_fifo_meta[it].size() != 0);
+            ret |= (sp_fifo[it].size() != 0);
+        end
         return ret;
     endfunction
 
-    task run_phase(uvm_phase phase);
-
-        string msg = "";
-        string dbg = "";
-
-        uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) tr_mfb_in;
-        uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1)) tr_mvb_in;
-
+    task run_channel(int unsigned channel, uvm_phase phase);
+        const string tag = $sformatf("CHANNEL %0d", channel);
         // EOF of SUPERPACKET
         uvm_logic_vector::sequence_item #(2) tr_last;
-
-        // SUPERPACKET counter
-        int unsigned sp_num_cnt = 0;
-
-        //Channel
-        logic[$clog2(RX_CHANNELS)-1 : 0] rx_channel;
-        logic[$clog2(PKT_MTU+1  )-1 : 0] rx_length;
         logic[$clog2(PKT_MTU+1  )-1 : 0] tx_length;
         logic[$clog2(RX_CHANNELS)-1 : 0] tx_channel;
         logic[META_WIDTH-1 : 0]          tx_meta;
         logic                            tx_discard;
+        string msg = "";
+        int unsigned chan_pkt_num;
+        uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) tr_mfb_in;
+        uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1)) tr_mvb_in;
+        int unsigned it;
+
+        forever begin
+
+            wait (channel_fifo_data[channel].size() != 0 && channel_fifo_meta[channel].size());
+
+            tr_mfb_in = channel_fifo_data[channel].pop_front();
+            tr_mvb_in = channel_fifo_meta[channel].pop_front();
+
+            chan_pkt_num++;
+            //SUPERPACKET assemble
+            for (it = 0; it < tr_mfb_in.data.size(); it++) begin
+                sp_fifo[channel].push_back(tr_mfb_in.data[it]);
+            end
+            //pealing
+            it = it%8;
+            if (it != 0) begin
+                for (; it < 8; it++) begin
+                    sp_fifo[channel].push_back('x);
+                end
+            end
+
+            //GET if packet is last
+            analysis_export_flow_ctrl[channel].get(tr_last);
+            `uvm_info(this.get_full_name(), $sformatf("Received pakcet %0d\nCHANNEL %0d\n\nEOF:        %0d\nLAST:       %0d\nMODEL_IN:   %0s\n", pkt_num, channel, tr_last.data[0], tr_last.data[1], tr_mfb_in.convert2string()), UVM_MEDIUM);
+
+            if (tr_last.data[1] == 1) begin
+                uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) tr_mfb_out;
+                uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1) + META_WIDTH + 1) tr_mvb_out;
+
+                tr_mfb_out = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("tr_mfb_out", this);
+                tr_mfb_out.tag  = tag;
+                sp_num_cnt++;
+                tr_mfb_out.data = sp_fifo[channel];
+                sp_fifo[channel].delete();
+
+                tr_mvb_out = uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1) + META_WIDTH + 1)::type_id::create("tr_mvb_out", this);
+                tr_mvb_out.tag  = tag;
+                tx_length = tr_mfb_out.data.size();
+                tx_meta   = 'x;
+                tx_discard = 'x;
+                tx_channel = channel;
+                tr_mvb_out.data = {tx_length, tx_meta, tx_discard, tx_channel};
+
+                //DEBUG
+                msg = $sformatf({"\n**************************************************************************",
+                              "\nTIME:               %0t ps",
+                              "\nCHANNEL             %0d",
+                              "\nSUPERPACKET_NO:     %0d",
+                              "\nSUPERPACKET_SIZE:   %0d bytes",
+                              "\n**************************************************************************\n"}
+                              , $time, channel, sp_num_cnt, tr_mfb_out.data.size());
+                //`uvm_info(this.get_full_name(), msg, UVM_MEDIUM);
+                data_out.write(tr_mfb_out);
+                meta_out.write(tr_mvb_out);
+            end
+        end
+    endtask
+
+
+
+    task run_phase(uvm_phase phase);
+        uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) tr_mfb_in;
+        uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1)) tr_mvb_in;
+        logic[$clog2(PKT_MTU+1  )-1 : 0] rx_length;
+
+        //Channel
+        logic[$clog2(RX_CHANNELS)-1 : 0] rx_channel;
+        sp_num_cnt = 0;
+        pkt_num    = 0;
+
+        for(int unsigned it = 0; it < RX_CHANNELS; it++) begin
+            fork
+                automatic int index = it;
+                run_channel(index, phase);
+            join_none;
+        end
+
 
         forever begin
             int unsigned it;
@@ -80,59 +157,19 @@ class model #(RX_CHANNELS, PKT_MTU, META_WIDTH,  MFB_ITEM_WIDTH) extends uvm_com
             {rx_length, rx_channel} = tr_mvb_in.data;
             assert (rx_length == tr_mfb_in.data.size()) else begin `uvm_fatal(this.get_full_name(), $sformatf("RX length %0d is different from mfb length %0d\n", rx_length, tr_mfb_in.data.size())); end
 
-
-            analysis_export_flow_ctrl[rx_channel].get(tr_last);
-            msg = $sformatf("Received pakcet %0d\nCHANNEL %0d\n\nEOF:        %0d\nLAST:       %0d\nMODEL_IN:   %0s\n", pkt_num, rx_channel, tr_last.data[0], tr_last.data[1], tr_mfb_in.convert2string());
-            `uvm_info(this.get_full_name(), msg, UVM_MEDIUM);
-
-            //SUPERPACKET assemble
-            for (it = 0; it < tr_mfb_in.data.size(); it++) begin
-                sp_fifo[unsigned'(rx_channel)].push_back(tr_mfb_in.data[it]);
-            end
-            //pealing
-            it = it%8;
-            if (it != 0) begin
-                for (; it < 8; it++) begin
-                    sp_fifo[unsigned'(rx_channel)].push_back('x);
-                end
-            end
-
-            // // DEBUG
-            // debug_fifo_state.item.data = sp_fifo[int'(channel)];
-            // $write(dbg, "FIFO_STATE \n %0s \n", debug_fifo_state.convert2string());
-            // `uvm_info(this.get_full_name(), dbg, UVM_MEDIUM);
-
-            if (tr_last.data[1] == 1) begin
-                uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) tr_mfb_out;
-                uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1) + META_WIDTH + 1) tr_mvb_out;
-
-                tr_mfb_out = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("tr_mfb_out", this);
-                tr_mfb_out.tag  = $sformatf("CHANNEL %0d", rx_channel);
-                sp_num_cnt++;
-                tr_mfb_out.data = sp_fifo[unsigned'(rx_channel)];
-
-                tr_mvb_out = uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1) + META_WIDTH + 1)::type_id::create("tr_mvb_out", this);
-                tr_mvb_out.tag  = $sformatf("CHANNEL %0d", rx_channel);
-                tx_length = tr_mfb_out.data.size();
-                tx_meta   = 'x;
-                tx_discard = 'x;
-                tx_channel = rx_channel;
-                tr_mvb_out.data = {tx_length, tx_meta, tx_discard, tx_channel};
-
-                //DEBUG
-                msg = $sformatf({"\n**************************************************************************",
-                              "\nTIME:               %0t ps",
-                              "\nCHANNEL             %0d",
-                              "\nSUPERPACKET_NO:     %0d",
-                              "\nSUPERPACKET_SIZE:   %0d bytes",
-                              "\n**************************************************************************\n"}
-                              , $time, rx_channel, sp_num_cnt, sp_fifo[unsigned'(rx_channel)].size());
-                //`uvm_info(this.get_full_name(), msg, UVM_MEDIUM);
-
-                sp_fifo[unsigned'(rx_channel)].delete();
-                data_out.write(tr_mfb_out);
-                meta_out.write(tr_mvb_out);
-            end
+            channel_fifo_data[rx_channel].push_back(tr_mfb_in);
+            channel_fifo_meta[rx_channel].push_back(tr_mvb_in);
         end
     endtask
+
+     function void report_phase(uvm_phase phase);
+         string msg = "\n";
+
+         msg = {msg, $sformatf("\tData (%0d) meta (%0d)\n", data_in.used(), meta_in.used())};
+         msg = {msg, $sformatf("\tPacket processed %0d megapacket created %0d\n", pkt_num, sp_num_cnt)};
+         for (int unsigned it = 0; it < RX_CHANNELS; it++) begin
+            msg = {msg, $sformatf("\t\tchannel %0d Data (%0d) meta (%0d) internal superpacket data (%0d)\n", it, channel_fifo_data[it].size(), channel_fifo_meta[it].size(), sp_fifo[it].size())};
+         end
+         `uvm_info(this.get_full_name(), msg, UVM_NONE);
+    endfunction
 endclass

@@ -44,7 +44,6 @@ class speed extends uvm_test;
 
     // declare the Environment reference variable
     uvm_framepacker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX, RX_CHANNELS, USR_RX_PKT_SIZE_MAX, HDR_META_WIDTH) m_env;
-    int unsigned timeout;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -75,6 +74,7 @@ class speed extends uvm_test;
     // ------------------------------------------------------------------------
     // Create environment and Run sequences on their sequencers
     virtual task run_phase(uvm_phase phase);
+        time timeout;
         virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, USR_RX_PKT_SIZE_MAX) m_vseq;
         m_vseq = virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, USR_RX_PKT_SIZE_MAX)::type_id::create("m_vseq");
 
@@ -86,30 +86,18 @@ class speed extends uvm_test;
         m_vseq.randomize();
         m_vseq.start(m_env.vscr);
 
-        timeout = 1;
-        fork
-            test_wait_timeout(1000);
-            test_wait_result();
-        join_any;
+
+        timeout =  $time();
+        while ((timeout + 0.5ms) > $time() && m_env.m_scoreboard.used() != 0) begin
+            #(600ns);
+        end
 
         phase.drop_objection(this);
-
-    endtask
-
-    task test_wait_timeout(int unsigned time_length);
-        #(time_length*1us);
-    endtask
-
-    task test_wait_result();
-        do begin
-            #(600ns);
-        end while (m_env.m_scoreboard.used() != 0);
-        timeout = 0;
     endtask
 
     function void report_phase(uvm_phase phase);
         `uvm_info(this.get_full_name(), {"\n\tTEST : ", this.get_type_name(), " END\n"}, UVM_NONE);
-        if (timeout) begin
+        if (m_env.m_scoreboard.used()) begin
             `uvm_error(this.get_full_name(), "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n");
         end
     endfunction
