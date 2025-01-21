@@ -9,6 +9,7 @@ import os
 from os import system
 from importlib.machinery import SourceFileLoader
 from random import randint
+import time
 
 FAIL = False
 
@@ -200,11 +201,14 @@ if args.setting is None and args.test_name is None:
         comb_name = " ".join(comb)
         print(f"Running combination: {key} ({comb_name})")
         if (not args.dry_run):
+            vsim_time_start = time.time()
             result = run_modelsim(args.fdo_file, f'{test_name_prefix}{key}', coverage=args.coverage, env=env)
+            vsim_time_stop = time.time()
+            time_vsim_consumption = (vsim_time_stop - vsim_time_start)/60
             if result == 0: # detect failure
-                print(f"Run SUCCEEDED ({test_name_prefix}{key})")
+                print(f"Run SUCCEEDED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
             else:
-                print(f"Run FAILED ({test_name_prefix}{key})")
+                print(f"Run FAILED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
                 FAIL = True
 
         # backup transcript
