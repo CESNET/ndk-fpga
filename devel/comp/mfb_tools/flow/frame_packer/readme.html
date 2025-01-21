@@ -77,6 +77,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Frame Packer</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#known-bugs">Known bugs</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
@@ -458,6 +459,16 @@ The length and the channel ID are sent to the <code class="docutils literal notr
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <p>For more detailed description refer to <a class="reference external" href="https://www.vut.cz/www_base/zav_prace_soubor_verejne.php?file_id=267988">David Beneš’s master thesis</a>  (2023/2024)</p>
+</section>
+<section id="known-bugs">
+<h2>Known bugs<a class="headerlink" href="#known-bugs" title="Link to this heading"></a></h2>
+<p>There is a possible bug when sending the combination of small and large packets. In 400G
+version this could result in sending a packet larger than USR_PKT_SIZE_MAX.</p>
+<p>Another bug considers incomplete resetting logic of a signal that blocks the activation of the Timeout counter in the FP_TIMEOUT_EXT component.
+This bug occures in a verification when, at the end of the run, a Superpacket is sent due to a Timeout on a channel, and then one more packet
+(smaller than the size of the MFB word) arrives on this channel. It gets stuck in the Assembly/Temporary register forever as the Timeout counter
+gets unblocked only when the register “overflows” (i.e., a packet continues over this word). The solution should be to fix the reset logic for
+the <cite>timeout_block</cite> signal.</p>
 </section>
 </section>
 
