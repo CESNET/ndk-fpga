@@ -172,7 +172,7 @@ begin
         OUTPUT_PORTS    => 2,
         ITEMS           => MVB_ITEMS,
         ITEM_WIDTH      => ITEM_WIDTH + 1 + CONSUME_ITEM_WIDTH,
-        VERSION         => "register",
+        VERSION         => "logic",
         USE_DST_RDY     => true
     ) port map (
         CLK             => CLK,
