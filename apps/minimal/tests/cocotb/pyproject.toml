@@ -3,6 +3,7 @@ name = "cocotb-ndk-minimal-test-toplevel"
 version = "0.1.0"
 dependencies = [
 	"cocotbext-ofm[nfb] @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
+	"ofm @ ${NDK_FPGA_OFM_URL}",
 ]
 
 [project.optional-dependencies]
