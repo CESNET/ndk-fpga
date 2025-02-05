@@ -82,4 +82,6 @@ set TSU_ENABLE true
 # ------------------------------------------------------------------------------
 # DDR4 parameters:
 # ------------------------------------------------------------------------------
-set MEM_PORTS 0
+
+# The allowed values for the number of memory ports are 0 or 2.
+set MEM_PORTS 2
