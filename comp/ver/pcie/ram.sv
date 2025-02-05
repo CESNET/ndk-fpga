@@ -82,7 +82,7 @@ class ram #(ADDR_WIDTH, MPS, MRRS) extends sv_common_pkg::Driver;
         end
     endtask
 
-    function data_display(string dir, byte unsigned data[], logic [ADDR_WIDTH-1:0] addr, int unsigned tag);
+    function void data_display(string dir, byte unsigned data[], logic [ADDR_WIDTH-1:0] addr, int unsigned tag);
             $timeformat(-9, 3, " ns", 8);
             $write("Time: %t: ", $time);
             $write("PCIe %s %s : %6d B <= %x (tag %x)\n", inst, dir, data.size(), addr, tag);

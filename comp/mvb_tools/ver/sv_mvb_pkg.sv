@@ -27,5 +27,6 @@ package sv_mvb_pkg;
     `include "mvb_responder.sv"
     `include "mvb_driver.sv"
     `include "mvb_coverage.sv"
+    `include "mvb_speed.sv"
 
 endpackage
