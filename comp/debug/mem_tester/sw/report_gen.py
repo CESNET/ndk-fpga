@@ -276,14 +276,20 @@ if __name__ == '__main__':
             req_cnt = np.array(data['Requests']["rd req cnt"]).reshape(-1, 1)
 
             hist_arr = hist_arr / req_cnt
-            offset = hist_x[1] - hist_x[0]
+            hist_arr = hist_arr.T
+
+            # Delete all empty rows
+            # But leave last one empty row for better visuals
+            while hist_arr.shape[0] > 0 and np.all(hist_arr[-2:] <= 0):
+                hist_arr = hist_arr[:-1]
+                hist_x   = hist_x[:-1]
+
             limits = (
                 min(burst_seq_b), max(burst_seq_b),
-                min(data['Values']['latency']['min']) - offset,
-                max(data['Values']['latency']['max']) - offset
+                hist_x[0], hist_x[-1]
             )
 
-            graph_gen.init_plots()  # title="Read latency")
+            graph_gen.init_plots()
             graph_gen.basic_plot(burst_seq_b, [
                 data['Values']['latency']["min"],
                 data['Values']['latency']["max"],
@@ -292,15 +298,6 @@ if __name__ == '__main__':
             graph_gen.set_xlabel("burst size [B]")
             graph_gen.set_ylabel("latency [ns]")
             graph_gen.plot_save(f"{index}_latency_" + type)
-
-            #zoom_burst = 0
-            #x = list(data['latency']['hist_ns'].keys())
-            #y = [i[zoom_burst] for i in data['latency']['hist_ns'].values()]
-            #graph_gen.init_plots()  #title="Read latency")
-            #graph_gen.histogram_plot(x, [y], log=True)
-            #graph_gen.set_xlabel("latency [ns]")
-            #graph_gen.set_ylabel("occurrence")
-            #graph_gen.plot_save(f"{index}_latency_" + type + f'_zoom_{zoom_burst}')
 
     ## Generate PDF ##
     print_progress(progress, 'generating report')

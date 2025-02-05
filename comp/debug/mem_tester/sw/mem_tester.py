@@ -205,13 +205,14 @@ class MemTester(nfb.BaseComp):
         }
 
     def check_test_result(self, config, status, stats):
+        burst = status['burst_cnt']
         errs = ""
         if status["err_cnt"] != 0 and not config["rand_addr"]:
             errs += f"{status['err_cnt']} words were wrong\n"
         if status["ecc_err_occ"]:
             errs += "ECC error occurred\n"
-        if stats['Requests']["rd req words"] != stats['Requests']["rd resp words"]:
-            errs += f"{stats['Requests']['rd req words'] - stats['Requests']['rd resp words']} words were not received\n"
+        if stats['Requests']["rd req cnt"][-1] * burst != stats['Requests']["rd resp words"][-1]:
+            errs += f"{stats['Requests']['rd req cnt'][-1] * burst - stats['Requests']['rd resp words'][-1]} words were not received\n"
         if not status["test_succ"] and errs == "" and not config["rand_addr"]:
             errs += "Unknown error occurred\n"
         return errs
