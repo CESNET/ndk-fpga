@@ -49,6 +49,8 @@ entity PCIE_CORE is
         PCIE_CONS        : natural := 1;
         -- Number of PCIe lanes in each PCIe connector
         PCIE_LANES       : natural := 16;
+        -- PCIe generation number
+        PCIE_GEN         : natural := 4;
 
         -- =====================================================================
         -- Other configuration

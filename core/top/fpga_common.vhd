@@ -814,6 +814,7 @@ begin
         PCIE_CLKS           => PCIE_CLKS,
         PCIE_CONS           => PCIE_CONS,
         PCIE_LANES          => PCIE_LANES,
+        PCIE_GEN            => PCIE_GEN,
 
         PTC_DISABLE         => not PTC_ENABLE,
         DMA_BAR_ENABLE      => (DMA_TYPE = 4),
