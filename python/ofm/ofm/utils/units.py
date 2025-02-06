@@ -4,6 +4,9 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+from typing import Tuple, Optional
+
+
 decadic_conversions = {
     "p": 0.000_000_000_001,
     "n": 0.000_000_001,
@@ -17,7 +20,7 @@ decadic_conversions = {
 }
 
 
-def convert_units(value: float, in_units: str = "", out_units: str = None) -> (float, str):
+def convert_units(value: float, in_units: str = "", out_units: Optional[str] = None) -> Tuple[float, str]:
     """
     Converts a value from one type of unit to another. If no out_units are passed,
     units are chosen automatically based on the value.

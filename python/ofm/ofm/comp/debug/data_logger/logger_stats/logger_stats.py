@@ -226,8 +226,8 @@ class LoggerStats:
         self.name = name
         self.logger = logger
 
-        self.stats = []
-        self.time = []
+        self.stats: list = []
+        self.time: list = []
 
         def calc_stats(data):
             return data
@@ -420,7 +420,7 @@ class DefaultStat:
         self.format = format
 
         self._raw_data = None
-        self._data = []
+        self._data: Any = []
 
     def set_logger(self, logger):
         if self.logger is None:
@@ -470,7 +470,9 @@ class Constant(DefaultStat):
                 Optional format function
         """
 
-        super().__init__(*args, format=format, **kwargs)
+        if "format" not in kwargs:
+            kwargs["format"] = format
+        super().__init__(*args, **kwargs)
         self.index = index
 
         self._raw_data = None
@@ -688,7 +690,9 @@ class Value(DefaultStat):
                 Optional format function
         """
 
-        super().__init__(*args, format=format, **kwargs)
+        if "format" not in kwargs:
+            kwargs["format"] = format
+        super().__init__(*args, **kwargs)
         self.index = index
         self._data = {
             'min': [],
@@ -773,7 +777,9 @@ class ValueCMD(DefaultStat):
                 Optional format function
         """
 
-        super().__init__(*args, format=format, **kwargs)
+        if "format" not in kwargs:
+            kwargs["format"] = format
+        super().__init__(*args, **kwargs)
         self.index = index
 
         self.cmd_width = cmd_width

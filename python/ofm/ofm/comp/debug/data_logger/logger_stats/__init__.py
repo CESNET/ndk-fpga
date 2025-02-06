@@ -6,7 +6,7 @@ from .logger_stats import ConvertDefault, ConvertTime, ConvertStates, FormatDefa
                           FormatDefaultValue
 
 __all__ = [
-    "LoggerStats", "DefaultStat", "Constant", "Counter", "TimeCounter", "FlowCounter", "Value", \
-    "ValueCMD", "Custom", "CustomJSON", "ConvertDefault", "ConvertTime", "ConvertStates", \
-    "FormatDefault", "FormatDefaultValue"
+    "LoggerStats", "DefaultStat", "Constant", "Counter", "TimeCounter", "FlowCounter", "Value",
+    "ValueCMD", "Custom", "CustomJSON", "ConvertDefault", "ConvertTime", "ConvertStates",
+    "FormatDefault", "FormatDefaultValue",
 ]
