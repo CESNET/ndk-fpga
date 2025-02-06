@@ -26,7 +26,7 @@ set ARCHGRP_ARR(IP_DEVICE_FAMILY) "Agilex"
 set ARCHGRP_ARR(IP_DEVICE)        $ARCHGRP_ARR(FPGA)
 
 set PCIE_CONF [dict create 0 "1x16" 1 "2x8"]
-set RTILE_PCIE_IP_NAME "rtile_pcie_[dict get $PCIE_CONF $ARCHGRP_ARR(PCIE_ENDPOINT_MODE)]"
+set RTILE_PCIE_IP_NAME "rtile_pcie_gen$ARCHGRP_ARR(PCIE_GEN)_[dict get $PCIE_CONF $ARCHGRP_ARR(PCIE_ENDPOINT_MODE)]"
 
 set ETH_CONF [dict create 400 "1x400g"]
 set FTILE_ETH_IP_NAME "ftile_eth_1x400g"
