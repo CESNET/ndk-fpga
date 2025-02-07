@@ -293,26 +293,13 @@ architecture FULL of FPGA is
         );
     end component sodimm_cal;
 
-    function f_dma_endpoints(PCIE_ENDPOINTS : natural; PCIE_EP_MODE : natural; PCIE_GEN : natural) return natural is
-        variable dma_ep_v : natural;
-    begin
-        dma_ep_v := PCIE_ENDPOINTS;
-        if (PCIE_EP_MODE = 0) then
-            dma_ep_v := 2*dma_ep_v;
-        end if;
-        if (PCIE_GEN = 5) then
-            dma_ep_v := 2*dma_ep_v;
-        end if;
-        return dma_ep_v;
-    end function;
-
     constant PCIE_LANES      : integer := 16;
     constant PCIE_CLKS       : integer := 2;
     constant PCIE_CONS       : integer := 1;
     constant MISC_IN_WIDTH   : integer := 64;
     constant MISC_OUT_WIDTH  : integer := 64 + 5;
     constant ETH_LANES       : integer := 8;
-    constant DMA_ENDPOINTS   : integer := f_dma_endpoints(PCIE_ENDPOINTS,PCIE_ENDPOINT_MODE,PCIE_GEN);
+    constant DMA_ENDPOINTS   : integer := tsel(DMA_TYPE=3, 4, 1); -- 400G DMA Medusa = 4x DMA_ENDPOINT
     constant MEM_PORTS       : integer := DDR4_PORTS;
     constant MEM_ADDR_WIDTH  : integer := 27;
     constant MEM_DATA_WIDTH  : integer := 512;

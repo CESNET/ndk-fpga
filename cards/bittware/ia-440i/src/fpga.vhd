@@ -74,7 +74,7 @@ architecture FULL of FPGA is
     constant MISC_IN_WIDTH   : natural := 4;
     constant MISC_OUT_WIDTH  : natural := 4;
     constant ETH_LANES       : natural := 8;
-    constant DMA_ENDPOINTS   : natural := tsel(PCIE_ENDPOINT_MODE=1,PCIE_ENDPOINTS,2*PCIE_ENDPOINTS);
+    constant DMA_ENDPOINTS   : natural := tsel(DMA_TYPE=3, 4, 1); -- 400G DMA Medusa = 4x DMA_ENDPOINT
     constant STATUS_LEDS     : natural := 2; -- fake, this board has only 1 status LED
 
     signal status_led_g      : std_logic_vector(STATUS_LEDS-1 downto 0);
