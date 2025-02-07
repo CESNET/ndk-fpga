@@ -205,6 +205,10 @@ architecture CALYPTE of DMA_WRAPPER is
     signal st_sp_dbg_chan  : slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*log2(TX_CHANNELS) -1 downto 0);
     signal st_sp_dbg_meta  : slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*ST_SP_DBG_META_WIDTH -1 downto 0);
     signal force_reset_dbg : std_logic_vector(DMA_STREAMS-1 downto 0);
+
+    signal s_dma_reset_async : std_logic_vector(DMA_STREAMS-1 downto 0);
+    signal s_dma_reset       : std_logic_vector(DMA_STREAMS-1 downto 0);
+
 begin
 
     assert (DMA_STREAMS = PCIE_ENDPOINTS)
@@ -696,6 +700,20 @@ begin
                 MI_DRDY            => mi_dmagen_drdy(i)(1)
                 );
 
+        s_dma_reset_async(i) <= PCIE_USR_RESET(i) or force_reset_dbg(i);
+
+        dma_rst_i : entity work.ASYNC_RESET
+        generic map (
+            TWO_REG  => false,
+            OUT_REG  => true,
+            REPLICAS => 1
+        )
+        port map (
+            CLK         => PCIE_USR_CLK(i),
+            ASYNC_RST   => s_dma_reset_async(i),
+            OUT_RST(0)  => s_dma_reset(i)
+        );
+
         --==============================================================================================
         --  DMA Calypte Module
         --==============================================================================================
@@ -740,7 +758,7 @@ begin
                 )
             port map(
                 CLK   => PCIE_USR_CLK(i),
-                RESET => PCIE_USR_RESET(i) or force_reset_dbg(i),
+                RESET => s_dma_reset(i),
 
                 USR_RX_MFB_META_HDR_META => rx_usr_mfb_meta_hdr_meta_tst(i),
                 USR_RX_MFB_META_CHAN     => rx_usr_mfb_meta_channel_tst(i),
