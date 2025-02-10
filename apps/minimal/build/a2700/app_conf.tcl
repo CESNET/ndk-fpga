@@ -9,9 +9,17 @@
 # ------------------------------------------------------------------------------
 # DMA parameters:
 # ------------------------------------------------------------------------------
-# The minimum number of RX/TX DMA channels for this card is 32.
-set DMA_RX_CHANNELS      32
-set DMA_TX_CHANNELS      32
+
+if {$env(DMA_TYPE) == 4} {
+    # DMA Calypte not meet timing on R-Tile FPGAs with more than 16 channels.
+    set DMA_RX_CHANNELS 16
+    set DMA_TX_CHANNELS 16
+} else {
+    # 400G DMA Medusa requires at least 32 channels.
+    set DMA_RX_CHANNELS 32
+    set DMA_TX_CHANNELS 32
+}
+
 # In blocking mode, packets are dropped only when the RX DMA channel is off.
 # In non-blocking mode, packets are dropped whenever they cannot be sent.
 set DMA_RX_BLOCKING_MODE true
