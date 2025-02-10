@@ -126,8 +126,12 @@
 <p>The <strong>Network Development Kit (NDK) for FPGAs</strong> is a comprehensive framework designed
 for the rapid and efficient development of FPGA-accelerated network applications. Optimized
 for scalability and high throughput, the NDK supports speeds up to <strong>400 Gigabit Ethernet</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>New features and changes in the latest version of NDK-FPGA are described in the <a class="reference external" href="https://github.com/CESNET/ndk-fpga/blob/devel/CHANGELOG.md">CHANGELOG.md file</a>.</p>
+</div>
 <hr class="docutils" />
-<p>The NDK provides a minimal example application. The <strong>NDK Minimal Application</strong>
+<p>The NDK-FPGA provides a minimal example application. The <strong>NDK Minimal Application</strong>
 demonstrates how to build an FPGA application using the NDK and serves as a starting point
 for your own development. The minimal application doesn’t process network packets; it simply
 sends and receives them. If a DMA IP is enabled (see the <a class="reference internal" href="ndk_core/doc/dma.html#ndk-dma"><span class="std std-ref">DMA Module</span></a>),
@@ -141,7 +145,7 @@ a loopback and packets may be forwarded from RX to TX ethernet interface.</p>
 </ul>
 </div>
 <hr class="docutils" />
-<p>In addition, the NDK provides a collection of reusable components, some of which are vendor and
+<p>In addition, the NDK-FPGA provides a collection of reusable components, some of which are vendor and
 vendor- and tool-independent, while others are optimized for specific FPGA vendors and architectures.
 For transferring packets (frames) and auxiliary data at such high rates, the NDK uses its own set of what are called
 “multibuses” that can transfer multiple frames and values, respectively, within a single clock cycle.
@@ -181,7 +185,7 @@ it also provides converters:</p>
 </ul>
 </div>
 <hr class="docutils" />
-<p>The NDK supports a wide range of FPGA cards, providing access to features such as DDR and HBM
+<p>The NDK-FPGA supports a wide range of FPGA cards, providing access to features such as DDR and HBM
 memories, PCIe, and Ethernet in your applications. However, different applications may only
 support a subset of these cards. A complete list of supported FPGA cards can be found below
 (minimal app supports all of them).</p>
@@ -205,18 +209,18 @@ support a subset of these cards. A complete list of supported FPGA cards can be 
 </ul>
 </div>
 <hr class="docutils" />
-<p>NDK provides two implementations of DMA IPs:</p>
+<p>NDK-FPGA supports two implementations of DMA IPs:</p>
 <ul class="simple">
 <li><p>DMA Medusa</p></li>
 <li><p>DMA Calypte</p></li>
 </ul>
-<p>DMA Medusa is a state-of-the-art DMA module that supports up to 400Gbps of throughput to
+<p>DMA Medusa is a state-of-the-art DMA module that supports up to 400 Gbps of throughput to
 host memory. DMA Calypte is an open-source low-latency DMA supporting throughput up
-to tens of Gigabits per second. However, the DMA Calypte is still under development
-and is not yet officially released (stay tuned).</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The DMA Medusa IP is not included in the open-source version of the NDK. <a class="reference external" href="https://support.brnologic.com/">You can obtain the full NDK package, including DMA Medusa IP and professional support, from our partner BrnoLogic.</a></p>
+to 100 Gbps.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The DMA Medusa IP is not part of the open-source NDK-FPGA.
+For more information about IP availability, <a class="reference external" href="https://github.com/CESNET/ndk-fpga/blob/devel/README.md#partners">see the section Partners in README.md file</a>.</p>
 </div>
 <a class="reference internal image-reference" href="_images/liberouter_logo.svg"><img alt="_images/liberouter_logo.svg" class="align-center" src="_images/liberouter_logo.svg" style="width: 50%;" />
 </a>

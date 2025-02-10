@@ -11,7 +11,8 @@ The DMA module is a wrapper containing the DMA controller (DMA IP), auxiliary, a
 
 .. note::
 
-    The DMA Medusa IP is not part of the open-source NDK. `You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic. <https://support.brnologic.com/>`_
+    The DMA Medusa IP is not part of the open-source NDK-FPGA.
+    For more information about IP availability, `see the section Partners in README.md file <https://github.com/CESNET/ndk-fpga/blob/devel/README.md#partners>`_.
 
 Each DMA stream consists of two buses: the :ref:`MFB bus <mfb_bus>` is used to transfer data packets, the :ref:`MVB bus <mvb_bus>` is used to transfer DMA instructions to each packet. How a user application should properly use these buses is described in :ref:`The Application chapter <ndk_app>`.
 

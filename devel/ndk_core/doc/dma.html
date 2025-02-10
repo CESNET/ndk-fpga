@@ -141,7 +141,8 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The DMA Medusa IP is not part of the open-source NDK. <a class="reference external" href="https://support.brnologic.com/">You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic.</a></p>
+<p>The DMA Medusa IP is not part of the open-source NDK-FPGA.
+For more information about IP availability, <a class="reference external" href="https://github.com/CESNET/ndk-fpga/blob/devel/README.md#partners">see the section Partners in README.md file</a>.</p>
 </div>
 <p>Each DMA stream consists of two buses: the <a class="reference internal" href="../../comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB bus</span></a> is used to transfer data packets, the <a class="reference internal" href="../../comp/mvb_tools/readme.html#mvb-bus"><span class="std std-ref">MVB bus</span></a> is used to transfer DMA instructions to each packet. How a user application should properly use these buses is described in <a class="reference internal" href="app.html#ndk-app"><span class="std std-ref">The Application chapter</span></a>.</p>
 <p>The DMA module optionally includes a <a class="reference internal" href="../../comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">Gen Loop Switch (GLS) module</span></a> for each DMA stream. The GLS module is used for debugging, contains packet generators and allows to enable loopback modes. The GLS module can be controlled through MI requests.</p>

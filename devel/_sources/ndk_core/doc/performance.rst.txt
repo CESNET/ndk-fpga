@@ -44,6 +44,11 @@ The throughput test is performed in three phases:
     :align: center
     :width: 100 %
 
+.. note::
+
+    The DMA Medusa IP is not part of the open-source NDK-FPGA.
+    For more information about IP availability, `see the section Partners in README.md file <https://github.com/CESNET/ndk-fpga/blob/devel/README.md#partners>`_.
+
 DMA Calypte IP
 **************
 
