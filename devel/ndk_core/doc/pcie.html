@@ -358,38 +358,43 @@
 <td><p>16</p></td>
 <td><p>Number of PCIe lanes in each PCIe connector</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie-card_id_width"><td><p>CARD_ID_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-pcie_gen"><td><p>PCIE_GEN</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>PCIe generation number</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-card_id_width"><td><p>CARD_ID_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Width of CARD/FPGA ID number</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie-ptc_disable"><td><p>PTC_DISABLE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-ptc_disable"><td><p>PTC_DISABLE</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Disable PTC module and allows direct connection of the DMA module to
 the PCIe IP RQ and RC interfaces.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie-dma_bar_enable"><td><p>DMA_BAR_ENABLE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie-dma_bar_enable"><td><p>DMA_BAR_ENABLE</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enable CQ/CC interface for DMA-BAR, condition DMA_PORTS=PCIE_ENDPOINTS</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie-xvc_enable"><td><p>XVC_ENABLE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-xvc_enable"><td><p>XVC_ENABLE</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enable of XCV IP, for Xilinx only</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie-misc_top2pcie_width"><td><p>MISC_TOP2PCIE_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie-misc_top2pcie_width"><td><p>MISC_TOP2PCIE_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between Top-Level FPGA design and PCIE core logic</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie-misc_pcie2top_width"><td><p>MISC_PCIE2TOP_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-misc_pcie2top_width"><td><p>MISC_PCIE2TOP_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between PCIE core logic and Top-Level FPGA design</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device</p></td>
