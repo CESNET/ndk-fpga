@@ -38,13 +38,13 @@ set EHIP_PORT_TYPE(0)  $env(EHIP_PORT_TYPE)
 # PCIe parameters (not all combinations work):
 # ------------------------------------------------------------------------------
 # Supported combinations for this card:
-# 1x PCIe Gen5 x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1
-# 2x PCIe Gen4 x8x8 -- PCIE_GEN=4, PCIE_ENDPOINTS=4, PCIE_ENDPOINT_MODE=1 (Note: default configuration)
-# 1x PCIe Gen4 x8x8 -- PCIE_GEN=4, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1 (Note: limited DMA performance)
+# 1x PCIe Gen5 x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1 (Note: for DMA Medusa only)
+# 2x PCIe Gen5 x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=4, PCIE_ENDPOINT_MODE=1 (Note: for DMA Medusa only)
+# 1x PCIe Gen4 x16  -- PCIE_GEN=4, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0 (Note: for DMA Calypte only)
 # ------------------------------------------------------------------------------
 
 # Set default PCIe configuration
-set PCIE_CONF "2xGen4x8x8"
+set PCIE_CONF "2xGen5x8x8"
 if { [info exist env(PCIE_CONF)] } {
     set PCIE_CONF $env(PCIE_CONF)
 }

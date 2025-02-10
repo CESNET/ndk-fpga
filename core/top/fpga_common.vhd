@@ -379,10 +379,12 @@ architecture FULL of FPGA_COMMON is
             end if;
         end if;
 
-        if (PCIE_ENDPOINT_TYPE="R_TILE") then -- Gen5 mode only
-            if (PCIE_ENDPOINT_MODE = 0) then -- x16
+        if (PCIE_ENDPOINT_TYPE="R_TILE") then -- Gen4/Gen5 mode only
+            if (PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 4) then -- x16
+                pcie_mfb_regions := 2; --2x256b AVST
+            elsif (PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 5) then -- x16
                 pcie_mfb_regions := 4; --4x256b AVST
-            elsif (PCIE_ENDPOINT_MODE = 1) then --x8x8
+            elsif (PCIE_ENDPOINT_MODE = 1 and PCIE_GEN = 5) then --x8x8
                 pcie_mfb_regions := 2; --2x256b AVST
             end if;
         end if;
@@ -412,7 +414,7 @@ architecture FULL of FPGA_COMMON is
                 -- 256b@~500MHz PCIe stream to 512b@200MHz PTC-DMA stream
                 pcie_mfb_regions := pcie_mfb_regions*2;
             end if;
-            if (PCIE_ENDPOINT_TYPE="R_TILE" and PCIE_ENDPOINT_MODE = 0) then --TODO
+            if (PCIE_ENDPOINT_TYPE="R_TILE" and PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 5) then --TODO
                 -- 1024b@~250MHz PCIe stream to 512b@200MHz PTC-DMA stream
                 pcie_mfb_regions := pcie_mfb_regions/2;
             end if;
@@ -814,6 +816,7 @@ begin
         PCIE_CLKS           => PCIE_CLKS,
         PCIE_CONS           => PCIE_CONS,
         PCIE_LANES          => PCIE_LANES,
+        PCIE_GEN            => PCIE_GEN,
 
         PTC_DISABLE         => not PTC_ENABLE,
         DMA_BAR_ENABLE      => (DMA_TYPE = 4),

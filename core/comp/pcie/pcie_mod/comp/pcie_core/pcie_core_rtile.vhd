@@ -13,7 +13,7 @@ use work.type_pack.all;
 
 architecture RTILE of PCIE_CORE is
 
-    component rtile_pcie_2x8 is
+    component rtile_pcie_gen5_2x8 is
         port (
             p0_rx_st_ready_i             : in  std_logic                      := 'X';             -- ready
             p0_rx_st0_data_o             : out std_logic_vector(255 downto 0);                    -- data
@@ -239,9 +239,9 @@ architecture RTILE of PCIE_CORE is
             tx_p_out14                   : out std_logic;                                         -- tx_p_out14
             tx_p_out15                   : out std_logic                                          -- tx_p_out15
         );
-    end component rtile_pcie_2x8;
+    end component rtile_pcie_gen5_2x8;
 
-    component rtile_pcie_1x16 is
+    component rtile_pcie_gen5_1x16 is
         port (
             p0_rx_st_ready_i             : in  std_logic                      := 'X';             -- ready
             p0_rx_st0_data_o             : out std_logic_vector(255 downto 0);                    -- data
@@ -431,7 +431,161 @@ architecture RTILE of PCIE_CORE is
             pin_perst_n                  : in  std_logic                      := 'X';             -- reset_n
             pin_perst_n_o                : out std_logic                                          -- reset_n
         );
-    end component rtile_pcie_1x16;
+    end component rtile_pcie_gen5_1x16;
+
+	component rtile_pcie_gen4_1x16 is
+		port (
+			p0_reset_status_n            : out std_logic;                                         -- reset_n
+			p0_slow_reset_status_n       : out std_logic;                                         -- reset_n
+			p0_link_up_o                 : out std_logic;                                         -- link_up
+			p0_dl_up_o                   : out std_logic;                                         -- dl_up
+			p0_surprise_down_err_o       : out std_logic;                                         -- surprise_down_err
+			p0_dl_timer_update_o         : out std_logic;                                         -- dl_timer_update
+			p0_ltssm_state_delay_o       : out std_logic_vector(5 downto 0);                      -- ltssm_state_delay
+			p0_ltssm_st_hipfifo_ovrflw_o : out std_logic;                                         -- ltssm_st_hipfifo_ovrflw
+			p0_app_xfer_pending_i        : in  std_logic                      := 'X';             -- app_xfer_pending
+			p0_pld_gp_status_i           : in  std_logic_vector(7 downto 0)   := (others => 'X'); -- status
+			p0_pld_gp_ctrl_o             : out std_logic_vector(7 downto 0);                      -- ctrl
+			p0_pld_gp_status_ready_o     : out std_logic;                                         -- status_ready
+			p0_cii_req_o                 : out std_logic;                                         -- req
+			p0_cii_hdr_poisoned_o        : out std_logic;                                         -- hdr_poisoned
+			p0_cii_hdr_first_be_o        : out std_logic_vector(3 downto 0);                      -- hdr_first_be
+			p0_cii_wr_o                  : out std_logic;                                         -- wr
+			p0_cii_addr_o                : out std_logic_vector(9 downto 0);                      -- addr
+			p0_cii_dout_o                : out std_logic_vector(31 downto 0);                     -- dout
+			p0_cii_override_en_i         : in  std_logic                      := 'X';             -- override_en
+			p0_cii_override_din_i        : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- override_din
+			p0_cii_halt_i                : in  std_logic                      := 'X';             -- halt
+			rx_n_in0                     : in  std_logic                      := 'X';             -- rx_n_in0
+			rx_n_in1                     : in  std_logic                      := 'X';             -- rx_n_in1
+			rx_n_in2                     : in  std_logic                      := 'X';             -- rx_n_in2
+			rx_n_in3                     : in  std_logic                      := 'X';             -- rx_n_in3
+			rx_n_in4                     : in  std_logic                      := 'X';             -- rx_n_in4
+			rx_n_in5                     : in  std_logic                      := 'X';             -- rx_n_in5
+			rx_n_in6                     : in  std_logic                      := 'X';             -- rx_n_in6
+			rx_n_in7                     : in  std_logic                      := 'X';             -- rx_n_in7
+			rx_n_in8                     : in  std_logic                      := 'X';             -- rx_n_in8
+			rx_n_in9                     : in  std_logic                      := 'X';             -- rx_n_in9
+			rx_n_in10                    : in  std_logic                      := 'X';             -- rx_n_in10
+			rx_n_in11                    : in  std_logic                      := 'X';             -- rx_n_in11
+			rx_n_in12                    : in  std_logic                      := 'X';             -- rx_n_in12
+			rx_n_in13                    : in  std_logic                      := 'X';             -- rx_n_in13
+			rx_n_in14                    : in  std_logic                      := 'X';             -- rx_n_in14
+			rx_n_in15                    : in  std_logic                      := 'X';             -- rx_n_in15
+			rx_p_in0                     : in  std_logic                      := 'X';             -- rx_p_in0
+			rx_p_in1                     : in  std_logic                      := 'X';             -- rx_p_in1
+			rx_p_in2                     : in  std_logic                      := 'X';             -- rx_p_in2
+			rx_p_in3                     : in  std_logic                      := 'X';             -- rx_p_in3
+			rx_p_in4                     : in  std_logic                      := 'X';             -- rx_p_in4
+			rx_p_in5                     : in  std_logic                      := 'X';             -- rx_p_in5
+			rx_p_in6                     : in  std_logic                      := 'X';             -- rx_p_in6
+			rx_p_in7                     : in  std_logic                      := 'X';             -- rx_p_in7
+			rx_p_in8                     : in  std_logic                      := 'X';             -- rx_p_in8
+			rx_p_in9                     : in  std_logic                      := 'X';             -- rx_p_in9
+			rx_p_in10                    : in  std_logic                      := 'X';             -- rx_p_in10
+			rx_p_in11                    : in  std_logic                      := 'X';             -- rx_p_in11
+			rx_p_in12                    : in  std_logic                      := 'X';             -- rx_p_in12
+			rx_p_in13                    : in  std_logic                      := 'X';             -- rx_p_in13
+			rx_p_in14                    : in  std_logic                      := 'X';             -- rx_p_in14
+			rx_p_in15                    : in  std_logic                      := 'X';             -- rx_p_in15
+			tx_n_out0                    : out std_logic;                                         -- tx_n_out0
+			tx_n_out1                    : out std_logic;                                         -- tx_n_out1
+			tx_n_out2                    : out std_logic;                                         -- tx_n_out2
+			tx_n_out3                    : out std_logic;                                         -- tx_n_out3
+			tx_n_out4                    : out std_logic;                                         -- tx_n_out4
+			tx_n_out5                    : out std_logic;                                         -- tx_n_out5
+			tx_n_out6                    : out std_logic;                                         -- tx_n_out6
+			tx_n_out7                    : out std_logic;                                         -- tx_n_out7
+			tx_n_out8                    : out std_logic;                                         -- tx_n_out8
+			tx_n_out9                    : out std_logic;                                         -- tx_n_out9
+			tx_n_out10                   : out std_logic;                                         -- tx_n_out10
+			tx_n_out11                   : out std_logic;                                         -- tx_n_out11
+			tx_n_out12                   : out std_logic;                                         -- tx_n_out12
+			tx_n_out13                   : out std_logic;                                         -- tx_n_out13
+			tx_n_out14                   : out std_logic;                                         -- tx_n_out14
+			tx_n_out15                   : out std_logic;                                         -- tx_n_out15
+			tx_p_out0                    : out std_logic;                                         -- tx_p_out0
+			tx_p_out1                    : out std_logic;                                         -- tx_p_out1
+			tx_p_out2                    : out std_logic;                                         -- tx_p_out2
+			tx_p_out3                    : out std_logic;                                         -- tx_p_out3
+			tx_p_out4                    : out std_logic;                                         -- tx_p_out4
+			tx_p_out5                    : out std_logic;                                         -- tx_p_out5
+			tx_p_out6                    : out std_logic;                                         -- tx_p_out6
+			tx_p_out7                    : out std_logic;                                         -- tx_p_out7
+			tx_p_out8                    : out std_logic;                                         -- tx_p_out8
+			tx_p_out9                    : out std_logic;                                         -- tx_p_out9
+			tx_p_out10                   : out std_logic;                                         -- tx_p_out10
+			tx_p_out11                   : out std_logic;                                         -- tx_p_out11
+			tx_p_out12                   : out std_logic;                                         -- tx_p_out12
+			tx_p_out13                   : out std_logic;                                         -- tx_p_out13
+			tx_p_out14                   : out std_logic;                                         -- tx_p_out14
+			tx_p_out15                   : out std_logic;                                         -- tx_p_out15
+			refclk0                      : in  std_logic                      := 'X';             -- clk
+			refclk1                      : in  std_logic                      := 'X';             -- clk
+			coreclkout_hip               : out std_logic;                                         -- clk
+			ninit_done                   : in  std_logic                      := 'X';             -- reset
+			slow_clk                     : out std_logic;                                         -- clk
+			p0_rx_st_ready_i             : in  std_logic                      := 'X';             -- ready
+			p0_rx_st0_data_o             : out std_logic_vector(255 downto 0);                    -- data
+			p0_rx_st0_sop_o              : out std_logic;                                         -- startofpacket
+			p0_rx_st0_eop_o              : out std_logic;                                         -- endofpacket
+			p0_rx_st0_dvalid_o           : out std_logic;                                         -- valid
+			p0_rx_st0_empty_o            : out std_logic_vector(2 downto 0);                      -- empty
+			p0_rx_st0_hdr_o              : out std_logic_vector(127 downto 0);                    -- rx_st0_hdr
+			p0_rx_st0_prefix_o           : out std_logic_vector(31 downto 0);                     -- rx_st0_prefix
+			p0_rx_st0_hvalid_o           : out std_logic;                                         -- rx_st0_hvalid
+			p0_rx_st0_pvalid_o           : out std_logic;                                         -- rx_st0_pvalid
+			p0_rx_st0_bar_o              : out std_logic_vector(2 downto 0);                      -- rx_st0_bar
+			p0_rx_st0_pt_parity_o        : out std_logic;                                         -- rx_st0_pt_parity
+			p0_rx_st1_hdr_o              : out std_logic_vector(127 downto 0);                    -- rx_st1_hdr
+			p0_rx_st1_prefix_o           : out std_logic_vector(31 downto 0);                     -- rx_st1_prefix
+			p0_rx_st1_hvalid_o           : out std_logic;                                         -- rx_st1_hvalid
+			p0_rx_st1_pvalid_o           : out std_logic;                                         -- rx_st1_pvalid
+			p0_rx_st1_bar_o              : out std_logic_vector(2 downto 0);                      -- rx_st1_bar
+			p0_rx_st1_pt_parity_o        : out std_logic;                                         -- rx_st1_pt_parity
+			p0_rx_st_hcrdt_init_i        : in  std_logic_vector(2 downto 0)   := (others => 'X'); -- rx_st_Hcrdt_init
+			p0_rx_st_hcrdt_update_i      : in  std_logic_vector(2 downto 0)   := (others => 'X'); -- rx_st_Hcrdt_update
+			p0_rx_st_hcrdt_update_cnt_i  : in  std_logic_vector(5 downto 0)   := (others => 'X'); -- rx_st_Hcrdt_update_cnt
+			p0_rx_st_hcrdt_init_ack_o    : out std_logic_vector(2 downto 0);                      -- rx_st_Hcrdt_init_ack
+			p0_rx_st_dcrdt_init_i        : in  std_logic_vector(2 downto 0)   := (others => 'X'); -- rx_st_Dcrdt_init
+			p0_rx_st_dcrdt_update_i      : in  std_logic_vector(2 downto 0)   := (others => 'X'); -- rx_st_Dcrdt_update
+			p0_rx_st_dcrdt_update_cnt_i  : in  std_logic_vector(11 downto 0)  := (others => 'X'); -- rx_st_Dcrdt_update_cnt
+			p0_rx_st_dcrdt_init_ack_o    : out std_logic_vector(2 downto 0);                      -- rx_st_Dcrdt_init_ack
+			p0_rx_st1_data_o             : out std_logic_vector(255 downto 0);                    -- data
+			p0_rx_st1_sop_o              : out std_logic;                                         -- startofpacket
+			p0_rx_st1_eop_o              : out std_logic;                                         -- endofpacket
+			p0_rx_st1_dvalid_o           : out std_logic;                                         -- valid
+			p0_rx_st1_empty_o            : out std_logic_vector(2 downto 0);                      -- empty
+			p0_tx_st_hcrdt_init_o        : out std_logic_vector(2 downto 0);                      -- tx_st_Hcrdt_init
+			p0_tx_st_hcrdt_update_o      : out std_logic_vector(2 downto 0);                      -- tx_st_Hcrdt_update
+			p0_tx_st_hcrdt_update_cnt_o  : out std_logic_vector(5 downto 0);                      -- tx_st_Hcrdt_update_cnt
+			p0_tx_st_hcrdt_init_ack_i    : in  std_logic_vector(2 downto 0)   := (others => 'X'); -- tx_st_Hcrdtt_init_ack
+			p0_tx_st_dcrdt_init_o        : out std_logic_vector(2 downto 0);                      -- tx_st_Dcrdt_init
+			p0_tx_st_dcrdt_update_o      : out std_logic_vector(2 downto 0);                      -- tx_st_Dcrdt_update
+			p0_tx_st_dcrdt_update_cnt_o  : out std_logic_vector(11 downto 0);                     -- tx_st_Dcrdt_update_cnt
+			p0_tx_st_dcrdt_init_ack_i    : in  std_logic_vector(2 downto 0)   := (others => 'X'); -- tx_st_Dcrdt_init_ack
+			p0_tx_st0_hdr_i              : in  std_logic_vector(127 downto 0) := (others => 'X'); -- tx_st0_hdr
+			p0_tx_st0_prefix_i           : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- tx_st0_prefix
+			p0_tx_st0_hvalid_i           : in  std_logic                      := 'X';             -- tx_st0_hvalid
+			p0_tx_st0_pvalid_i           : in  std_logic                      := 'X';             -- tx_st0_pvalid
+			p0_tx_st1_hdr_i              : in  std_logic_vector(127 downto 0) := (others => 'X'); -- tx_st1_hdr
+			p0_tx_st1_prefix_i           : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- tx_st1_prefix
+			p0_tx_st1_hvalid_i           : in  std_logic                      := 'X';             -- tx_st1_hvalid
+			p0_tx_st1_pvalid_i           : in  std_logic                      := 'X';             -- tx_st1_pvalid
+			p0_tx_st_ready_o             : out std_logic;                                         -- ready
+			p0_tx_st0_data_i             : in  std_logic_vector(255 downto 0) := (others => 'X'); -- data
+			p0_tx_st0_sop_i              : in  std_logic                      := 'X';             -- startofpacket
+			p0_tx_st0_eop_i              : in  std_logic                      := 'X';             -- endofpacket
+			p0_tx_st0_dvalid_i           : in  std_logic                      := 'X';             -- valid
+			p0_tx_st1_data_i             : in  std_logic_vector(255 downto 0) := (others => 'X'); -- data
+			p0_tx_st1_sop_i              : in  std_logic                      := 'X';             -- startofpacket
+			p0_tx_st1_eop_i              : in  std_logic                      := 'X';             -- endofpacket
+			p0_tx_st1_dvalid_i           : in  std_logic                      := 'X';             -- valid
+			p0_tx_ehp_deallocate_empty_o : out std_logic;                                         -- tx_ehp_deallocate_empty
+			pin_perst_n                  : in  std_logic                      := 'X';             -- reset_n
+			pin_perst_n_o                : out std_logic                                          -- reset_n
+		);
+	end component rtile_pcie_gen4_1x16;
 
     constant VSEC_BASE_ADDRESS : integer := 16#D00#;
     constant PCIE_HIPS         : natural := tsel(ENDPOINT_MODE=0,PCIE_ENDPOINTS,PCIE_ENDPOINTS/2);
@@ -549,8 +703,8 @@ begin
     -- =========================================================================
 
     pcie_core_g : for i in 0 to PCIE_HIPS-1 generate
-        pcie_core_2x8_g : if ENDPOINT_MODE = 1 generate
-            rtile_i : component rtile_pcie_2x8
+        pcie_core_2x8_g : if (ENDPOINT_MODE = 1 and PCIE_GEN = 5) generate
+            rtile_i : component rtile_pcie_gen5_2x8
             port map (
                 p0_rx_st_ready_i             => pcie_avst_down_ready(i*2),             --              p0_rx_st0.ready
                 p0_rx_st0_data_o             => pcie_avst_down_data(i*2)(256-1 downto 0),             --                       .data
@@ -793,8 +947,9 @@ begin
             pcie_slow_clk(i*2+1) <= pcie_hip_slow_clk(i);
             pcie_init_done_n(i) <= INIT_DONE_N;
         end generate;
-        pcie_core_1x16_g : if ENDPOINT_MODE = 0 generate
-            rtile_i : component rtile_pcie_1x16
+
+        pcie_core_1x16_g : if (ENDPOINT_MODE = 0 and PCIE_GEN = 5) generate
+            rtile_i : component rtile_pcie_gen5_1x16
             port map (
                 p0_rx_st_ready_i             => pcie_avst_down_ready(i),
 
@@ -889,6 +1044,173 @@ begin
                 p0_tx_st3_sop_i              => pcie_avst_up_sop(i)(3),
                 p0_tx_st3_eop_i              => pcie_avst_up_eop(i)(3),
                 p0_tx_st3_dvalid_i           => pcie_avst_up_dvalid(i)(3),
+
+                p0_tx_st_hcrdt_init_o        => pcie_hcrdt_up_init(i),        --          p0_tx_st_misc.tx_st_Hcrdt_init
+                p0_tx_st_hcrdt_update_o      => pcie_hcrdt_up_update(i),      --                       .tx_st_Hcrdt_update
+                p0_tx_st_hcrdt_update_cnt_o  => pcie_hcrdt_up_update_cnt(i),  --                       .tx_st_Hcrdt_update_cnt
+                p0_tx_st_hcrdt_init_ack_i    => pcie_hcrdt_up_init_ack(i),    --                       .tx_st_Hcrdtt_init_ack
+                p0_tx_st_dcrdt_init_o        => pcie_dcrdt_up_init(i),        --                       .tx_st_Dcrdt_init
+                p0_tx_st_dcrdt_update_o      => pcie_dcrdt_up_update(i),      --                       .tx_st_Dcrdt_update
+                p0_tx_st_dcrdt_update_cnt_o  => pcie_dcrdt_up_update_cnt(i),  --                       .tx_st_Dcrdt_update_cnt
+                p0_tx_st_dcrdt_init_ack_i    => pcie_dcrdt_up_init_ack(i),    --                       .tx_st_Dcrdt_init_ack
+
+                p0_reset_status_n            => pcie_reset_status_n(i),            --      p0_reset_status_n.reset_n
+                p0_slow_reset_status_n       => open,       -- p0_slow_reset_status_n.reset_n
+                p0_link_up_o                 => pcie_link_up_comb(i),                 --          p0_hip_status.link_up
+                p0_dl_up_o                   => open,                   --                       .dl_up
+                p0_surprise_down_err_o       => open,       --                       .surprise_down_err
+                p0_dl_timer_update_o         => open,         --                       .dl_timer_update
+                p0_ltssm_state_delay_o       => open,       --                       .ltssm_state_delay
+                p0_ltssm_st_hipfifo_ovrflw_o => open, --                       .ltssm_st_hipfifo_ovrflw
+                p0_app_xfer_pending_i        => '0',        --          p0_power_mgnt.app_xfer_pending
+                p0_pld_gp_status_i           => (others => '0'),           --              p0_pld_gp.status
+                p0_pld_gp_ctrl_o             => open,             --                       .ctrl
+                p0_pld_gp_status_ready_o     => open,     --                       .status_ready
+                p0_cii_req_o                 => pcie_cii_req(i),                 --                 p0_cii.req
+                p0_cii_hdr_poisoned_o        => pcie_cii_hdr_poisoned(i),        --                       .hdr_poisoned
+                p0_cii_hdr_first_be_o        => pcie_cii_hdr_first_be(i),        --                       .hdr_first_be
+                p0_cii_wr_o                  => pcie_cii_wr(i),                  --                       .wr
+                p0_cii_addr_o                => pcie_cii_addr(i),                --                       .addr
+                p0_cii_dout_o                => pcie_cii_dout(i),                --                       .dout
+                p0_cii_override_en_i         => pcie_cii_override_en(i),         --                       .override_en
+                p0_cii_override_din_i        => pcie_cii_override_din(i),        --                       .override_din
+                p0_cii_halt_i                => pcie_cii_halt(i),                --                       .halt
+
+                rx_n_in0                     => PCIE_RX_N(i*PCIE_LANES+0),                     --             hip_serial.rx_n_in0
+                rx_n_in1                     => PCIE_RX_N(i*PCIE_LANES+1),                     --                       .rx_n_in1
+                rx_n_in2                     => PCIE_RX_N(i*PCIE_LANES+2),                     --                       .rx_n_in2
+                rx_n_in3                     => PCIE_RX_N(i*PCIE_LANES+3),                     --                       .rx_n_in3
+                rx_n_in4                     => PCIE_RX_N(i*PCIE_LANES+4),                     --                       .rx_n_in4
+                rx_n_in5                     => PCIE_RX_N(i*PCIE_LANES+5),                     --                       .rx_n_in5
+                rx_n_in6                     => PCIE_RX_N(i*PCIE_LANES+6),                     --                       .rx_n_in6
+                rx_n_in7                     => PCIE_RX_N(i*PCIE_LANES+7),                     --                       .rx_n_in7
+                rx_n_in8                     => PCIE_RX_N(i*PCIE_LANES+8),                     --                       .rx_n_in8
+                rx_n_in9                     => PCIE_RX_N(i*PCIE_LANES+9),                     --                       .rx_n_in9
+                rx_n_in10                    => PCIE_RX_N(i*PCIE_LANES+10),                    --                       .rx_n_in10
+                rx_n_in11                    => PCIE_RX_N(i*PCIE_LANES+11),                    --                       .rx_n_in11
+                rx_n_in12                    => PCIE_RX_N(i*PCIE_LANES+12),                    --                       .rx_n_in12
+                rx_n_in13                    => PCIE_RX_N(i*PCIE_LANES+13),                    --                       .rx_n_in13
+                rx_n_in14                    => PCIE_RX_N(i*PCIE_LANES+14),                    --                       .rx_n_in14
+                rx_n_in15                    => PCIE_RX_N(i*PCIE_LANES+15),                    --                       .rx_n_in15
+                rx_p_in0                     => PCIE_RX_P(i*PCIE_LANES+0),                     --                       .rx_p_in0
+                rx_p_in1                     => PCIE_RX_P(i*PCIE_LANES+1),                     --                       .rx_p_in1
+                rx_p_in2                     => PCIE_RX_P(i*PCIE_LANES+2),                     --                       .rx_p_in2
+                rx_p_in3                     => PCIE_RX_P(i*PCIE_LANES+3),                     --                       .rx_p_in3
+                rx_p_in4                     => PCIE_RX_P(i*PCIE_LANES+4),                     --                       .rx_p_in4
+                rx_p_in5                     => PCIE_RX_P(i*PCIE_LANES+5),                     --                       .rx_p_in5
+                rx_p_in6                     => PCIE_RX_P(i*PCIE_LANES+6),                     --                       .rx_p_in6
+                rx_p_in7                     => PCIE_RX_P(i*PCIE_LANES+7),                     --                       .rx_p_in7
+                rx_p_in8                     => PCIE_RX_P(i*PCIE_LANES+8),                     --                       .rx_p_in8
+                rx_p_in9                     => PCIE_RX_P(i*PCIE_LANES+9),                     --                       .rx_p_in9
+                rx_p_in10                    => PCIE_RX_P(i*PCIE_LANES+10),                    --                       .rx_p_in10
+                rx_p_in11                    => PCIE_RX_P(i*PCIE_LANES+11),                    --                       .rx_p_in11
+                rx_p_in12                    => PCIE_RX_P(i*PCIE_LANES+12),                    --                       .rx_p_in12
+                rx_p_in13                    => PCIE_RX_P(i*PCIE_LANES+13),                    --                       .rx_p_in13
+                rx_p_in14                    => PCIE_RX_P(i*PCIE_LANES+14),                    --                       .rx_p_in14
+                rx_p_in15                    => PCIE_RX_P(i*PCIE_LANES+15),                    --                       .rx_p_in15
+                tx_n_out0                    => PCIE_TX_N(i*PCIE_LANES+0),                    --                       .tx_n_out0
+                tx_n_out1                    => PCIE_TX_N(i*PCIE_LANES+1),                    --                       .tx_n_out1
+                tx_n_out2                    => PCIE_TX_N(i*PCIE_LANES+2),                    --                       .tx_n_out2
+                tx_n_out3                    => PCIE_TX_N(i*PCIE_LANES+3),                    --                       .tx_n_out3
+                tx_n_out4                    => PCIE_TX_N(i*PCIE_LANES+4),                    --                       .tx_n_out4
+                tx_n_out5                    => PCIE_TX_N(i*PCIE_LANES+5),                    --                       .tx_n_out5
+                tx_n_out6                    => PCIE_TX_N(i*PCIE_LANES+6),                    --                       .tx_n_out6
+                tx_n_out7                    => PCIE_TX_N(i*PCIE_LANES+7),                    --                       .tx_n_out7
+                tx_n_out8                    => PCIE_TX_N(i*PCIE_LANES+8),                    --                       .tx_n_out8
+                tx_n_out9                    => PCIE_TX_N(i*PCIE_LANES+9),                    --                       .tx_n_out9
+                tx_n_out10                   => PCIE_TX_N(i*PCIE_LANES+10),                   --                       .tx_n_out10
+                tx_n_out11                   => PCIE_TX_N(i*PCIE_LANES+11),                   --                       .tx_n_out11
+                tx_n_out12                   => PCIE_TX_N(i*PCIE_LANES+12),                   --                       .tx_n_out12
+                tx_n_out13                   => PCIE_TX_N(i*PCIE_LANES+13),                   --                       .tx_n_out13
+                tx_n_out14                   => PCIE_TX_N(i*PCIE_LANES+14),                   --                       .tx_n_out14
+                tx_n_out15                   => PCIE_TX_N(i*PCIE_LANES+15),                   --                       .tx_n_out15
+                tx_p_out0                    => PCIE_TX_P(i*PCIE_LANES+0),                    --                       .tx_p_out0
+                tx_p_out1                    => PCIE_TX_P(i*PCIE_LANES+1),                    --                       .tx_p_out1
+                tx_p_out2                    => PCIE_TX_P(i*PCIE_LANES+2),                    --                       .tx_p_out2
+                tx_p_out3                    => PCIE_TX_P(i*PCIE_LANES+3),                    --                       .tx_p_out3
+                tx_p_out4                    => PCIE_TX_P(i*PCIE_LANES+4),                    --                       .tx_p_out4
+                tx_p_out5                    => PCIE_TX_P(i*PCIE_LANES+5),                    --                       .tx_p_out5
+                tx_p_out6                    => PCIE_TX_P(i*PCIE_LANES+6),                    --                       .tx_p_out6
+                tx_p_out7                    => PCIE_TX_P(i*PCIE_LANES+7),                    --                       .tx_p_out7
+                tx_p_out8                    => PCIE_TX_P(i*PCIE_LANES+8),                    --                       .tx_p_out8
+                tx_p_out9                    => PCIE_TX_P(i*PCIE_LANES+9),                    --                       .tx_p_out9
+                tx_p_out10                   => PCIE_TX_P(i*PCIE_LANES+10),                   --                       .tx_p_out10
+                tx_p_out11                   => PCIE_TX_P(i*PCIE_LANES+11),                   --                       .tx_p_out11
+                tx_p_out12                   => PCIE_TX_P(i*PCIE_LANES+12),                   --                       .tx_p_out12
+                tx_p_out13                   => PCIE_TX_P(i*PCIE_LANES+13),                   --                       .tx_p_out13
+                tx_p_out14                   => PCIE_TX_P(i*PCIE_LANES+14),                   --                       .tx_p_out14
+                tx_p_out15                   => PCIE_TX_P(i*PCIE_LANES+15),                   --                       .tx_p_out15
+
+                refclk0                      => PCIE_SYSCLK_P(i*PCIE_CLKS),                      --                refclk0.clk
+                refclk1                      => PCIE_SYSCLK_P(i*PCIE_CLKS+1),                      --                refclk1.clk
+                coreclkout_hip               => pcie_hip_clk(i),               --         coreclkout_hip.clk
+                ninit_done                   => pcie_init_done_n(i),                   --             ninit_done.ninit_done
+                slow_clk                     => pcie_hip_slow_clk(i),                    --               slow_clk.clk
+                pin_perst_n                  => PCIE_SYSRST_N(i),                  --              pin_perst.pin_perst
+                pin_perst_n_o                => open
+            );
+
+            pcie_clk(i)         <= pcie_hip_clk(i);
+            pcie_slow_clk(i)    <= pcie_hip_slow_clk(i);
+            pcie_init_done_n(i) <= INIT_DONE_N;
+        end generate;
+
+        pcie_core_gen4_1x16_g : if (ENDPOINT_MODE = 0 and PCIE_GEN = 4) generate
+            rtile_i : component rtile_pcie_gen4_1x16
+            port map (
+                p0_rx_st_ready_i             => pcie_avst_down_ready(i),
+
+                p0_rx_st0_data_o             => pcie_avst_down_data(i)(256-1 downto 0),
+                p0_rx_st0_sop_o              => pcie_avst_down_sop(i)(0),
+                p0_rx_st0_eop_o              => pcie_avst_down_eop(i)(0),
+                p0_rx_st0_dvalid_o           => pcie_avst_down_dvalid(i)(0),
+                p0_rx_st0_empty_o            => pcie_avst_down_empty(i)(3-1 downto 0),
+                p0_rx_st0_hdr_o              => pcie_avst_down_hdr(i)(128-1 downto 0),
+                p0_rx_st0_prefix_o           => pcie_avst_down_prefix(i)(32-1 downto 0),
+                p0_rx_st0_hvalid_o           => pcie_avst_down_hvalid(i)(0),
+                p0_rx_st0_pvalid_o           => open,
+                p0_rx_st0_bar_o              => pcie_avst_down_bar_range(i)(3-1 downto 0),
+
+                p0_rx_st1_data_o             => pcie_avst_down_data(i)(512-1 downto 256),
+                p0_rx_st1_sop_o              => pcie_avst_down_sop(i)(1),
+                p0_rx_st1_eop_o              => pcie_avst_down_eop(i)(1),
+                p0_rx_st1_dvalid_o           => pcie_avst_down_dvalid(i)(1),
+                p0_rx_st1_empty_o            => pcie_avst_down_empty(i)(6-1 downto 3),
+                p0_rx_st1_hdr_o              => pcie_avst_down_hdr(i)(256-1 downto 128),
+                p0_rx_st1_prefix_o           => pcie_avst_down_prefix(i)(64-1 downto 32),
+                p0_rx_st1_hvalid_o           => pcie_avst_down_hvalid(i)(1),
+                p0_rx_st1_pvalid_o           => open,
+                p0_rx_st1_bar_o              => pcie_avst_down_bar_range(i)(6-1 downto 3),
+
+                p0_rx_st_hcrdt_init_i        => pcie_hcrdt_dw_init(i),        --                       .rx_st_Hcrdt_init
+                p0_rx_st_hcrdt_update_i      => pcie_hcrdt_dw_update(i),      --                       .rx_st_Hcrdt_update
+                p0_rx_st_hcrdt_update_cnt_i  => pcie_hcrdt_dw_update_cnt(i),  --                       .rx_st_Hcrdt_update_cnt
+                p0_rx_st_hcrdt_init_ack_o    => pcie_hcrdt_dw_init_ack(i),    --                       .rx_st_Hcrdt_init_ack
+                p0_rx_st_dcrdt_init_i        => pcie_dcrdt_dw_init(i),        --                       .rx_st_Dcrdt_init
+                p0_rx_st_dcrdt_update_i      => pcie_dcrdt_dw_update(i),      --                       .rx_st_Dcrdt_update
+                p0_rx_st_dcrdt_update_cnt_i  => pcie_dcrdt_dw_update_cnt(i),  --                       .rx_st_Dcrdt_update_cnt
+                p0_rx_st_dcrdt_init_ack_o    => pcie_dcrdt_dw_init_ack(i),    --                       .rx_st_Dcrdt_init_ack
+
+                p0_tx_st_ready_o             => pcie_avst_up_ready(i),
+                p0_tx_ehp_deallocate_empty_o => open,
+
+                p0_tx_st0_hdr_i              => pcie_avst_up_hdr(i)(128-1 downto 0),
+                p0_tx_st0_prefix_i           => pcie_avst_up_prefix(i)(32-1 downto 0),
+                p0_tx_st0_hvalid_i           => pcie_avst_up_hvalid(i)(0),
+                p0_tx_st0_pvalid_i           => '0',
+                p0_tx_st0_data_i             => pcie_avst_up_data(i)(256-1 downto 0),
+                p0_tx_st0_sop_i              => pcie_avst_up_sop(i)(0),
+                p0_tx_st0_eop_i              => pcie_avst_up_eop(i)(0),
+                p0_tx_st0_dvalid_i           => pcie_avst_up_dvalid(i)(0),
+
+                p0_tx_st1_hdr_i              => pcie_avst_up_hdr(i)(256-1 downto 128),
+                p0_tx_st1_prefix_i           => pcie_avst_up_prefix(i)(64-1 downto 32),
+                p0_tx_st1_hvalid_i           => pcie_avst_up_hvalid(i)(1),
+                p0_tx_st1_pvalid_i           => '0',
+                p0_tx_st1_data_i             => pcie_avst_up_data(i)(512-1 downto 256),
+                p0_tx_st1_sop_i              => pcie_avst_up_sop(i)(1),
+                p0_tx_st1_eop_i              => pcie_avst_up_eop(i)(1),
+                p0_tx_st1_dvalid_i           => pcie_avst_up_dvalid(i)(1),
 
                 p0_tx_st_hcrdt_init_o        => pcie_hcrdt_up_init(i),        --          p0_tx_st_misc.tx_st_Hcrdt_init
                 p0_tx_st_hcrdt_update_o      => pcie_hcrdt_up_update(i),      --                       .tx_st_Hcrdt_update

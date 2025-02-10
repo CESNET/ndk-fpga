@@ -63,6 +63,8 @@ entity PCIE is
         PCIE_CONS          : natural := 1;
         -- Number of PCIe lanes in each PCIe connector
         PCIE_LANES         : natural := 16;
+        -- PCIe generation number
+        PCIE_GEN           : natural := 4;
         -- Width of CARD/FPGA ID number
         CARD_ID_WIDTH      : natural := 0;
         -- Disable PTC module and allows direct connection of the DMA module to
@@ -386,6 +388,7 @@ begin
         PCIE_CLKS          => PCIE_CLKS,
         PCIE_CONS          => PCIE_CONS,
         PCIE_LANES         => PCIE_LANES,
+        PCIE_GEN           => PCIE_GEN,
         MI_WIDTH           => 32,
         XVC_ENABLE         => XVC_ENABLE,
         CARD_ID_WIDTH      => CARD_ID_WIDTH,

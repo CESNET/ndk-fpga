@@ -17,6 +17,7 @@ source $CORE_BASE/Quartus.inc.tcl
 set CARD_ARCHGRP(CORE_BASE)          $CORE_BASE
 set CARD_ARCHGRP(IP_BUILD_DIR)       $CARD_BASE/src/ip
 set CARD_ARCHGRP(PCIE_ENDPOINT_MODE) $PCIE_ENDPOINT_MODE
+set CARD_ARCHGRP(PCIE_GEN)           $PCIE_GEN
 set CARD_ARCHGRP(NET_MOD_ARCH)       $NET_MOD_ARCH
 # Second dimension because of addition of an element of another array, just for clarity.
 set CARD_ARCHGRP(ETH_PORT_SPEED,0)   $ETH_PORT_SPEED(0)
