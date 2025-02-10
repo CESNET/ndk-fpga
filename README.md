@@ -4,7 +4,7 @@ This repository contains FPGA part of the Network Development Kit (NDK) for FPGA
 
 The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-FPGA documentation (devel branch) here](https://cesnet.github.io/ndk-fpga/devel/).
 
-**The DMA Medusa IP is not part of the open-source NDK. If the DMA IP is disabled, it is replaced by a loopback. [You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic](https://support.brnologic.com/).**
+**Please note that some integrated IP (e.g. DMA Medusa IP) are not part of the open-source NDK-FPGA. These IPs can only be obtained through our partners, [see the section Partners](#partners).**
 
 ## How to start
 
@@ -74,6 +74,12 @@ $ make html
 ```
 
 The output is in the `doc/build/index.html` file.
+
+## Partners
+
+### DYNANIC (formerly BrnoLogic)
+
+The NDK including the DMA Medusa IP and professional support is [available through our partner DYNANIC](https://dyna-nic.com/ndk-and-dma-engine/).
 
 ## Related publications
 
