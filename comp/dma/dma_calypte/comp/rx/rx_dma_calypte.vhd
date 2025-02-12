@@ -622,44 +622,32 @@ begin
             HDRM_DMA_HDR_SRC_RDY => hdrm_dma_hdr_src_rdy,
             HDRM_DMA_HDR_DST_RDY => hdrm_dma_hdr_dst_rdy);
 
-    tr_buff_g : if (BUFFERED_DATA_SIZE = MFB_REGION_SIZE_INBUF2TRBUF*MFB_BLOCK_SIZE_INBUF2TRBUF) generate
+    transaction_buffer_i : entity work.RX_DMA_CALYPTE_TRANS_BUFFER
+        generic map (
+            RX_REGION_SIZE => MFB_REGION_SIZE_INBUF2TRBUF,
+            RX_BLOCK_SIZE  => MFB_BLOCK_SIZE_INBUF2TRBUF,
+            RX_ITEM_WIDTH  => MFB_ITEM_WIDTH_INBUF2TRBUF,
 
-        mfb_data_trbuf    <= mfb_data_inbuf;
-        mfb_sof_trbuf     <= mfb_sof_inbuf;
-        mfb_eof_trbuf     <= mfb_eof_inbuf;
-        mfb_src_rdy_trbuf <= mfb_src_rdy_inbuf;
-        mfb_dst_rdy_inbuf <= mfb_dst_rdy_trbuf;
+            BUFFERED_DATA_SIZE => BUFFERED_DATA_SIZE,
+            REG_OUT_EN         => TRBUF_REG_EN)
+        port map (
+            CLK => CLK,
+            RST => RESET,
 
-    else generate
+            RX_MFB_DATA    => mfb_data_lng_check,
+            RX_MFB_EOF_POS => mfb_eof_pos_lng_check,
+            RX_MFB_SOF     => mfb_sof_lng_check(0),
+            RX_MFB_EOF     => mfb_eof_lng_check(0),
+            RX_MFB_SRC_RDY => mfb_src_rdy_lng_check,
+            RX_MFB_DST_RDY => mfb_dst_rdy_lng_check,
 
-        transaction_buffer_i : entity work.RX_DMA_CALYPTE_TRANS_BUFFER
-            generic map (
-                RX_REGION_SIZE => MFB_REGION_SIZE_INBUF2TRBUF,
-                RX_BLOCK_SIZE  => MFB_BLOCK_SIZE_INBUF2TRBUF,
-                RX_ITEM_WIDTH  => MFB_ITEM_WIDTH_INBUF2TRBUF,
-
-                BUFFERED_DATA_SIZE => BUFFERED_DATA_SIZE,
-                REG_OUT_EN         => TRBUF_REG_EN)
-            port map (
-                CLK => CLK,
-                RST => RESET,
-
-                RX_MFB_DATA    => mfb_data_lng_check,
-                RX_MFB_EOF_POS => mfb_eof_pos_lng_check,
-                RX_MFB_SOF     => mfb_sof_lng_check(0),
-                RX_MFB_EOF     => mfb_eof_lng_check(0),
-                RX_MFB_SRC_RDY => mfb_src_rdy_lng_check,
-                RX_MFB_DST_RDY => mfb_dst_rdy_lng_check,
-
-                TX_MFB_DATA    => mfb_data_trbuf,
-                TX_MFB_SOF_POS => mfb_sof_pos_trbuf,
-                TX_MFB_EOF_POS => mfb_eof_pos_trbuf,
-                TX_MFB_SOF     => mfb_sof_trbuf,
-                TX_MFB_EOF     => mfb_eof_trbuf,
-                TX_MFB_SRC_RDY => mfb_src_rdy_trbuf,
-                TX_MFB_DST_RDY => mfb_dst_rdy_trbuf);
-
-    end generate;
+            TX_MFB_DATA    => mfb_data_trbuf,
+            TX_MFB_SOF_POS => mfb_sof_pos_trbuf,
+            TX_MFB_EOF_POS => mfb_eof_pos_trbuf,
+            TX_MFB_SOF     => mfb_sof_trbuf,
+            TX_MFB_EOF     => mfb_eof_trbuf,
+            TX_MFB_SRC_RDY => mfb_src_rdy_trbuf,
+            TX_MFB_DST_RDY => mfb_dst_rdy_trbuf);
 
     -- The counter of packet length that is provided to the HDR_MANAGER in order to generate
     -- a correct amount of PCIe headers  for the data transactions.
