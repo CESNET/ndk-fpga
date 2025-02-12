@@ -108,16 +108,10 @@ entity RX_DMA_CALYPTE_HDR_MANAGER is
         -- =====================================================================
         -- PCIE HEADERs
         -- =====================================================================
-        -- PCIE header size, the values can be (also applies for DATA_PCIE_HDR_SIZE):
-        --
-        -- * 0 => DMA_PCIE_HDR(3*32-1 downto 0) bits are valid,
-        -- * 1 => DMA_PCIE_HDR(4*32-1 downto 0) bits are valid
-        DMA_PCIE_HDR_SIZE    : out std_logic;
         DMA_PCIE_HDR         : out std_logic_vector(128-1 downto 0);
         DMA_PCIE_HDR_SRC_RDY : out std_logic;
         DMA_PCIE_HDR_DST_RDY : in  std_logic;
 
-        DATA_PCIE_HDR_SIZE    : out std_logic;
         DATA_PCIE_HDR         : out std_logic_vector(128-1 downto 0);
         DATA_PCIE_HDR_SRC_RDY : out std_logic;
         DATA_PCIE_HDR_DST_RDY : in  std_logic;
@@ -201,10 +195,10 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     -- PCIe header FIFOs
     -- =============================================================================================
     -- Width of data in the FIFO for PCIe headers of transactions carrying DMA header
-    constant PCIE_HDR_DMA_TRAN_FIFO_W     : natural := 1 + 128;
+    constant PCIE_HDR_DMA_TRAN_FIFO_W     : natural := 128;
     constant PCIE_HDR_DMA_TRAN_FIFO_SIZE  : natural := 8;
     -- Width of data in the FIFO for PCIe headers of transactions carrying user data
-    constant PCIE_HDR_DATA_TRAN_FIFO_W    : natural := 1 + 128;
+    constant PCIE_HDR_DATA_TRAN_FIFO_W    : natural := 128;
     constant PCIE_HDR_DATA_TRAN_FIFO_SIZE : natural := 8;
 
     -- Signals for the FIFO that carries the PCIe headers for transactions with DMA headers
@@ -850,7 +844,7 @@ begin
         end if;
     end process;
 
-    pcie_hdr_dma_hdr_tran_fifo_in <= pcie_addr_len_dma_hdr_tran & pcie_hdr_dma_hdr_tran;
+    pcie_hdr_dma_hdr_tran_fifo_in <= pcie_hdr_dma_hdr_tran;
 
     pcie_hdr_dma_hdr_tran_fifo_i : entity work.FIFOX
         generic map (
@@ -876,9 +870,9 @@ begin
             EMPTY  => pcie_hdr_dma_hdr_tran_fifo_empty,
             AEMPTY => open);
 
-    (DMA_PCIE_HDR_SIZE, DMA_PCIE_HDR) <= pcie_hdr_dma_hdr_tran_fifo_do;
-    DMA_PCIE_HDR_SRC_RDY              <= not pcie_hdr_dma_hdr_tran_fifo_empty;
-    pcie_hdr_dma_hdr_tran_fifo_rd     <= DMA_PCIE_HDR_DST_RDY;
+    DMA_PCIE_HDR                  <= pcie_hdr_dma_hdr_tran_fifo_do;
+    DMA_PCIE_HDR_SRC_RDY          <= not pcie_hdr_dma_hdr_tran_fifo_empty;
+    pcie_hdr_dma_hdr_tran_fifo_rd <= DMA_PCIE_HDR_DST_RDY;
 
     pcie_hdr_data_tran_reg_p : process (CLK) is
     begin
@@ -889,7 +883,7 @@ begin
         end if;
     end process;
 
-    pcie_hdr_data_tran_fifo_in <= pcie_addr_len_data_tran & pcie_hdr_data_tran;
+    pcie_hdr_data_tran_fifo_in <= pcie_hdr_data_tran;
 
     pcie_hdr_data_tran_fifo_i : entity work.FIFOX
         generic map (
@@ -915,9 +909,9 @@ begin
             EMPTY  => pcie_hdr_data_tran_fifo_empty,
             AEMPTY => open);
 
-    (DATA_PCIE_HDR_SIZE, DATA_PCIE_HDR) <= pcie_hdr_data_tran_fifo_do;
-    DATA_PCIE_HDR_SRC_RDY               <= not pcie_hdr_data_tran_fifo_empty;
-    pcie_hdr_data_tran_fifo_rd          <= DATA_PCIE_HDR_DST_RDY;
+    DATA_PCIE_HDR              <= pcie_hdr_data_tran_fifo_do;
+    DATA_PCIE_HDR_SRC_RDY      <= not pcie_hdr_data_tran_fifo_empty;
+    pcie_hdr_data_tran_fifo_rd <= DATA_PCIE_HDR_DST_RDY;
 
     -- =============================================================================================
     -- FIFOs for DMA header parts

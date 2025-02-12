@@ -168,12 +168,10 @@ architecture FULL of RX_DMA_CALYPTE is
     signal hdrm_hhp_update_data : std_logic_vector(POINTER_WIDTH-1 downto 0);
     signal hdrm_hhp_update_en   : std_logic;
 
-    signal hdrm_dma_pcie_hdr_size    : std_logic;
     signal hdrm_dma_pcie_hdr         : std_logic_vector (127 downto 0);
     signal hdrm_dma_pcie_hdr_src_rdy : std_logic;
     signal hdrm_dma_pcie_hdr_dst_rdy : std_logic;
 
-    signal hdrm_data_pcie_hdr_size    : std_logic;
     signal hdrm_data_pcie_hdr         : std_logic_vector (127 downto 0);
     signal hdrm_data_pcie_hdr_src_rdy : std_logic;
     signal hdrm_data_pcie_hdr_dst_rdy : std_logic;
@@ -555,12 +553,10 @@ begin
             MFB_SRC_RDY  => mfb_src_rdy_lng_check,
             MFB_DST_RDY  => mfb_dst_rdy_lng_check,
 
-            DMA_PCIE_HDR_SIZE    => hdrm_dma_pcie_hdr_size,
             DMA_PCIE_HDR         => hdrm_dma_pcie_hdr,
             DMA_PCIE_HDR_SRC_RDY => hdrm_dma_pcie_hdr_src_rdy,
             DMA_PCIE_HDR_DST_RDY => hdrm_dma_pcie_hdr_dst_rdy,
 
-            DATA_PCIE_HDR_SIZE    => hdrm_data_pcie_hdr_size,
             DATA_PCIE_HDR         => hdrm_data_pcie_hdr,
             DATA_PCIE_HDR_SRC_RDY => hdrm_data_pcie_hdr_src_rdy,
             DATA_PCIE_HDR_DST_RDY => hdrm_data_pcie_hdr_dst_rdy,
@@ -613,12 +609,10 @@ begin
             TX_MFB_SRC_RDY => PCIE_UP_MFB_SRC_RDY,
             TX_MFB_DST_RDY => PCIE_UP_MFB_DST_RDY,
 
-            HDRM_DMA_PCIE_HDR_SIZE    => hdrm_dma_pcie_hdr_size,
             HDRM_DMA_PCIE_HDR         => hdrm_dma_pcie_hdr,
             HDRM_DMA_PCIE_HDR_SRC_RDY => hdrm_dma_pcie_hdr_src_rdy,
             HDRM_DMA_PCIE_HDR_DST_RDY => hdrm_dma_pcie_hdr_dst_rdy,
 
-            HDRM_DATA_PCIE_HDR_SIZE    => hdrm_data_pcie_hdr_size,
             HDRM_DATA_PCIE_HDR         => hdrm_data_pcie_hdr,
             HDRM_DATA_PCIE_HDR_SRC_RDY => hdrm_data_pcie_hdr_src_rdy,
             HDRM_DATA_PCIE_HDR_DST_RDY => hdrm_data_pcie_hdr_dst_rdy,
