@@ -17,7 +17,12 @@ set PCIE_MOD_ARCH "R_TILE"
 # Achitecture of Network module
 set NET_MOD_ARCH "F_TILE"
 # Achitecture of SDM/SYSMON module
-set SDM_SYSMON_ARCH "INTEL_SDM"
+if {$BOARD_REV == 0} {
+    set SDM_SYSMON_ARCH "INTEL_SDM_OLD"
+} else {
+    set SDM_SYSMON_ARCH "INTEL_SDM"
+}
+
 # Boot controller type
 set BOOT_TYPE 2
 
