@@ -106,7 +106,7 @@ entity DMA_CALYPTE is
         RX_GEN_EN          : boolean := TRUE;
         TX_GEN_EN          : boolean := TRUE;
         -- Width of the debug signal, do not use unless you know what you are doing
-        ST_SP_DBG_SIGNAL_W : natural := 2;
+        ST_SP_DBG_SIGNAL_W : natural := 4;
         -- Width of MI bus
         MI_WIDTH           : natural := 32
         );
