@@ -1,4 +1,4 @@
-.. _tx_dma_pkt_dispatcher:
+.. _tx_dma_calypte_pkt_dispatcher:
 
 Packet Dispatcher
 =================

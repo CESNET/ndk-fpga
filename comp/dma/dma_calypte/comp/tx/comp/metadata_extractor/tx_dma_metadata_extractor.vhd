@@ -15,18 +15,29 @@ use work.math_pack.all;
 use work.type_pack.all;
 use work.pcie_meta_pack.all;
 
--- This component processes the incoming PCIe transactions. This does not care about whole DMA
--- frames delimited by the DMA header but processes all frames in general. The metadata on the
--- output are chosen according their usefullness later in the design.
+-- This component pre-processes the incoming PCIe transactions by extracting metadata from the PCIe
+-- header. These metadata include:
+--
+-- * Status if the current transaction contains a DMA header
+-- * PCIe address
+-- * Index of a channel that should process the transaction
+-- * A byte enable signal assessing the validity of individual bytes within a one bus-word of
+--   :vhdl:portsignal:`USR_MFB_DATA`.
+-- * The amount of bytes being transfered within the transaction.
+-- * The First and Last Byte Enable field from the PCIe header of the
+--   transaction (used for creating the bus-word-wide byte enable signal)
 entity TX_DMA_METADATA_EXTRACTOR is
     generic (
         DEVICE : string := "ULTRASCALE";
 
-        -- For generating outputs and calculating the DMA buffers address space
+        -- The amount of instantiated channels to correctly specify the fields within the PCIe
+        -- address.
         CHANNELS       : natural := 8;
-        -- Pointer with respect to bytes
+        -- Width of a pointer to the data buffer to correctly specify the fields within the PCIe
+        -- address
         POINTER_WIDTH  : natural := 16;
 
+        -- Configuration of the input and output MFB interface
         PCIE_MFB_REGIONS     : natural := 2;
         PCIE_MFB_REGION_SIZE : natural := 1;
         PCIE_MFB_BLOCK_SIZE  : natural := 8;

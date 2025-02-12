@@ -30,7 +30,7 @@ generic(
     -- * Maximum value: 32 (restricted by size of pointer MI registers)
     POINTER_WIDTH      : natural := 16;
 
-    -- Width of RAM address
+    -- Width of the address to the host memory
     SW_ADDR_WIDTH      : natural := 64;
 
     -- Actual width of packet and byte counters
@@ -66,7 +66,7 @@ port (
     MI_DRDY              : out std_logic;
 
     -- =====================================================================
-    -- Input packet discart/sent interface
+    -- Packet counter increment interface
     -- =====================================================================
     PKT_SENT_CHAN        : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     PKT_SENT_INC         : in  std_logic;
@@ -92,15 +92,15 @@ port (
     ENABLED_CHAN         : out std_logic_vector(CHANNELS-1 downto 0);
 
     -- =====================================================================
-    -- Header manager interface
+    -- Pointer update interface
     -- =====================================================================
-    -- Software pointers reading interface
+    -- Software pointer read interface
     SDP_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     SDP_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
     SHP_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     SHP_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
 
-    -- Hardware pointers writing interface
+    -- Hardware pointer write interface
     HDP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     HDP_WR_DATA     : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
     HDP_WR_EN       : in  std_logic;
@@ -108,19 +108,21 @@ port (
     HHP_WR_DATA     : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
     HHP_WR_EN       : in  std_logic;
 
-    -- Base addresses reading interface
+    -- Read base addresses
     DBA_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     DBA_RD_DATA     : out std_logic_vector(SW_ADDR_WIDTH-1 downto 0);
     HBA_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     HBA_RD_DATA     : out std_logic_vector(SW_ADDR_WIDTH-1 downto 0);
 
-    -- Pointers' masks reading interface
+    -- Read pointer masks
     DPM_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     DPM_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
     HPM_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     HPM_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
 
-    -- Performance counters
+    -- =========================================================================================
+    -- Performance counters increment interface
+    -- =========================================================================================
     DATA_BUFF_FULL_CHAN         : out std_logic_vector(log2(CHANNELS) -1 downto 0);
     DATA_BUFF_FULL_CNTR_INCR    : out std_logic;
     DMA_HDR_BUFF_FULL_CHAN      : out std_logic_vector(log2(CHANNELS) -1 downto 0);

@@ -17,7 +17,6 @@ use work.pcie_meta_pack.all;
 -- This component accepts buffered PCIe transactions (currently set to the
 -- length of 128 Bytes). And sends them with appropriate PCIe header. When end of a
 -- packet is processed, the DMA header is sent after that in a separate transaction.
---
 entity RX_DMA_CALYPTE_HDR_INSERTOR is
     generic (
         -- =========================================================================================

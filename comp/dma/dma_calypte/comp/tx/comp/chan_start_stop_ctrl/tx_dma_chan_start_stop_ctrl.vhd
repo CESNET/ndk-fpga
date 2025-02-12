@@ -1,4 +1,4 @@
--- tx_dma_chan_start_stop_ctrl.vhd: controls the acception of packets according to the running state
+-- tx_dma_chan_start_stop_ctrl.vhd: controls the acception of packets according to the activity state
 -- of the DMA channels
 -- Copyright (C) 2023 CESNET z.s.p.o.
 -- Author(s): Vladislav Valek  <xvalek14@vutbr.cz>
@@ -16,15 +16,21 @@ use work.math_pack.all;
 use work.type_pack.all;
 use work.dma_hdr_pkg.all;
 
--- This component controls the acception of incoming frames according to the running state of a
--- specific DMA channel. When channel is stopped, all incoming frames to that channel are dropped.
--- When channel is running, all incoming frames on that channel are accepted and reach the
--- output *USR_MFB_* bus. When a stop request of a channel comes when a frame is received on this
--- channel, the frame is received till its end and all other frames will be dropped. The system
--- works vice versa when a start request comes and a frame is dropped on a single channel.
+-- This component accepts the incoming packets according to the running state (active/inactive) of a
+-- specific DMA channel. When channel is stopped, all incoming packets on that channel are dropped.
+-- When a channel is running, all incoming packets on that channel are accepted and passed to the
+-- output *USR_MFB_* interface. This component is a primary responder during the start/stop sequence
+-- on a channel. When a stop request is received on a channel during packet reception, the currently
+-- processed frame is received and all following packets are dropped. The system works vice versa
+-- when a start request arrives on a channel where the currently processed packet is dropped and the
+-- following ones are accepted.
 --
--- .. NOTE::
---    A frame can consist out of multiple smaller frames that are delimited by the DMA header.
+-- .. NOTE:: A packet comes split between multiple PCIe transactions followed by a PCIe transaction
+--           containing the DMA header.
+--
+-- .. NOTE:: The complexity of the architecture stems mostly from the pkt_acc_{pst,nst} FSM which
+--           gets more complex as MFB_REGIONS increase. Although the state of packet reception is
+--           channel-specific, it still needs to be established on a common MFB bus.
 --
 entity TX_DMA_CHAN_START_STOP_CTRL is
     generic (
@@ -33,20 +39,16 @@ entity TX_DMA_CHAN_START_STOP_CTRL is
         -- Total number of DMA Channels within this DMA Endpoint
         CHANNELS : natural := 8;
 
-        -- =========================================================================================
-        -- Input PCIe interface parameters
-        -- =========================================================================================
+        -- Input/output MFB interface parameters
         PCIE_MFB_REGIONS     : natural := 2;
         PCIE_MFB_REGION_SIZE : natural := 1;
         PCIE_MFB_BLOCK_SIZE  : natural := 8;
         PCIE_MFB_ITEM_WIDTH  : natural := 32;
 
-        -- =========================================================================================
-        -- Others
-        -- =========================================================================================
-        -- Largest packet (in bytes) which can come out of USR_MFB interface
+        -- Largest packet (in bytes) which can be transported by the TX DMA Calypte controller
         PKT_SIZE_MAX : natural := 2**16 - 1;
 
+        -- WARNING: Only for debug purposes. Determines the width of the debug signal in bits.
         DBG_SIGNAL_WIDTH : natural := 4
     );
     port (
@@ -95,7 +97,7 @@ entity TX_DMA_CHAN_START_STOP_CTRL is
         PKT_DISC_BYTES : out std_logic_vector(log2(PKT_SIZE_MAX+1) -1 downto 0);
 
         -- =========================================================================================
-        -- Debug signals
+        -- Debug signal
         -- =========================================================================================
         ST_SP_DBG_CHAN : out std_logic_vector(log2(CHANNELS) -1 downto 0);
         ST_SP_DBG_META : out std_logic_vector(DBG_SIGNAL_WIDTH -1 downto 0)

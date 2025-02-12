@@ -11,24 +11,24 @@ use ieee.numeric_std.all;
 use work.math_pack.all;
 
 -- This component generates PCIe headers and DMA header for the incoming packet
--- Fist step is to generate the DMA header. Second is to generate PCIe headers
--- for the packet number of pcie headers is ceil(PKT_SIZE/128) if DMA_DISCARD is
--- not set. Third action is generate pcie header for dma header if DMA_DISCARD
--- is not set. In case when DMA_DISCARD is set then no pcie headers are
--- generated.
+-- The first step is to generate the DMA header; the second is to generate PCIe headers
+-- for the packet. The number of PCIe headers is ceil(PKT_SIZE/128) if
+-- DMA_DISCARD is not set. The third action is to generate the PCIe header for the
+-- transaction with the DMA header if DMA_DISCARD is not set. In case the
+-- DMA_DISCARD is set, no PCIe headers are generated.
 entity RX_DMA_CALYPTE_HDR_MANAGER is
     generic (
         MFB_REGIONS : natural := 1;
 
-        -- Number of channels
+        -- Number of DMA channels
         CHANNELS      : integer := 16;
         -- Maximum packet size in bytes
         PKT_MTU       : integer := 2**12;
         -- Size of the metadata in the DMA header
         METADATA_SIZE : integer := 24;
-        -- RAM address width
+        -- Host address width
         ADDR_WIDTH    : integer := 64;
-        -- width of a pointer to the ring buffer log2(NUMBER_OF_ITEMS)
+        -- Width of a pointer to the buffer in the host memory.
         POINTER_WIDTH : integer := 16;
         -- The DEVICE parameter allows the correct selection of the RAM
         -- implementation according to the FPGA used. Supported values are:
@@ -51,7 +51,7 @@ entity RX_DMA_CALYPTE_HDR_MANAGER is
         -- Channel start confirmation
         START_REQ_DONE    : out std_logic;
 
-        -- Index of channel for whic a stop is requested
+        -- Index of channel for which a stop is requested
         STOP_REQ_CHANNEL : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
         STOP_REQ_VLD     : in  std_logic;
         -- Channel stop confirmation
@@ -97,7 +97,8 @@ entity RX_DMA_CALYPTE_HDR_MANAGER is
         -- =========================================================================================
         -- Input from data stream
         -- =========================================================================================
-        -- Lenght of a currently transported packet in bytes
+        -- Lenght of a currently transported packet in bytes. Valid when MFB_EOF, MFB_SRC_RDY and
+        -- MFB_DST_RDY are all asserted..
         STAT_PKT_LNG : in std_logic_vector(log2(PKT_MTU+1) -1 downto 0);
         -- Part of the MFB signals
         MFB_EOF      : in std_logic_vector(MFB_REGIONS -1 downto 0);
@@ -105,7 +106,7 @@ entity RX_DMA_CALYPTE_HDR_MANAGER is
         MFB_DST_RDY  : in std_logic;
 
         -- =====================================================================
-        -- PCIE HEADERs (MVB OUTPUT)
+        -- PCIE HEADERs
         -- =====================================================================
         -- PCIE header size, the values can be (also applies for DATA_PCIE_HDR_SIZE):
         --
@@ -124,7 +125,7 @@ entity RX_DMA_CALYPTE_HDR_MANAGER is
         -- =====================================================================
         -- PCIE HEADER (MVB OUTPUT)
         -- =====================================================================
-        -- Signals if the current packet should be discarded
+        -- Asserts if the current packet should be discarded
         DMA_DISCARD     : out std_logic;
         -- DMA header content
         DMA_HDR         : out std_logic_vector(64-1 downto 0);
@@ -921,7 +922,6 @@ begin
     -- =============================================================================================
     -- FIFOs for DMA header parts
     -- =============================================================================================
-
     dma_discard_fifo_i : entity work.FIFOX
         generic map (
             DATA_WIDTH          => 1,
@@ -1072,7 +1072,7 @@ begin
     end process;
 
     -- the response for an address request comes usually one clock period delayed. If that is not a
-    -- case, the stalling occurs.
+    -- case, the stalling occurs.and the counter is increment to gather this to the statistics.
     DATA_ADDR_STALL_INC    <= dbg_data_addr_next_reg    and (not dbg_data_pcie_addr_vld);
     DMA_HDR_ADDR_STALL_INC <= dbg_dma_hdr_addr_next_reg and (not dbg_dma_hdr_pcie_addr_vld);
 

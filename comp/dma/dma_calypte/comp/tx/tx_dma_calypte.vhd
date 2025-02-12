@@ -20,25 +20,18 @@ entity TX_DMA_CALYPTE is
 
         MI_WIDTH : natural := 32;
 
-        -- =========================================================================================
-        -- Output interface to the FPGA user logic
-        -- =========================================================================================
+        -- User Logic MFB cofiguration
         USR_TX_MFB_REGIONS     : natural := 1;
         USR_TX_MFB_REGION_SIZE : natural := 8;
         USR_TX_MFB_BLOCK_SIZE  : natural := 8;
         USR_TX_MFB_ITEM_WIDTH  : natural := 8;
 
-        -- =========================================================================================
-        -- Input PCIe interface (Completer Request)
-        -- =========================================================================================
+        -- PCIe MFB configuration (Completer Request interface)
         PCIE_CQ_MFB_REGIONS     : natural := 2;
         PCIE_CQ_MFB_REGION_SIZE : natural := 1;
         PCIE_CQ_MFB_BLOCK_SIZE  : natural := 8;
         PCIE_CQ_MFB_ITEM_WIDTH  : natural := 32;
 
-        -- =========================================================================================
-        -- Setting of internal components
-        -- =========================================================================================
         -- Pointer width for data and hdr buffers. The data pointer points to bytes of the packet.
         -- The header pointer points to the header of a current packet.
         DATA_POINTER_WIDTH    : natural := 13;
@@ -47,18 +40,18 @@ entity TX_DMA_CALYPTE is
         -- Set the number of DMA channels, each channel has its separate buffer
         CHANNELS              : natural := 32;
 
-        -- =========================================================================================
-        -- Others
-        -- =========================================================================================
         -- Set the width of counters of packets for each channel which are there to provide some
         -- entry level statistics.
-        CNTRS_WIDTH    : natural := 64;
-        -- Width of the metadata in bits which are stored in the DMA header.
-        HDR_META_WIDTH : natural := 24;
-
-        ST_SP_DBG_SIGNAL_W : natural := 4;
-        -- Size of the largest packets that can be transmitted on the USR_TX_MFB interface.
-        PKT_SIZE_MAX   : natural := 2**12
+        CNTRS_WIDTH        : natural := 64;
+        -- Width of application metadata transported within the DMA headers.
+        -- In bits.
+        HDR_META_WIDTH     : natural := 24;
+        -- Size of the largest packet in bytes that can be transmitted on the USR_TX_MFB interface.
+        PKT_SIZE_MAX       : natural := 2**12;
+        -- * Bit width of a debug signal form START_STOP_CTRL component.
+        -- * WARNING: A user should not deliberately change this value since this
+        --   is only used for the purpose of development.
+        ST_SP_DBG_SIGNAL_W : natural := 4
         );
     port (
         CLK   : in std_logic;
@@ -66,6 +59,8 @@ entity TX_DMA_CALYPTE is
 
         -- =========================================================================================
         -- User MFB signals
+        --
+        -- Dispatches packets toward the application logic
         -- =========================================================================================
         USR_TX_MFB_META_PKT_SIZE : out std_logic_vector(log2(PKT_SIZE_MAX + 1) -1 downto 0);
         USR_TX_MFB_META_CHAN     : out std_logic_vector(log2(CHANNELS) -1 downto 0);
@@ -82,7 +77,7 @@ entity TX_DMA_CALYPTE is
         -- =========================================================================================
         -- PCIe Completer Request MFB interface
         --
-        -- Accepts PCIe write and read requests
+        -- Receives transactions from the PCIe domain
         -- =========================================================================================
         PCIE_CQ_MFB_DATA    : in  std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_MFB_REGION_SIZE*PCIE_CQ_MFB_BLOCK_SIZE*PCIE_CQ_MFB_ITEM_WIDTH-1 downto 0);
         PCIE_CQ_MFB_META    : in  std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0);
@@ -95,12 +90,14 @@ entity TX_DMA_CALYPTE is
 
         -- =========================================================================================
         -- Debugging signals
+        --
+        -- WARNING: Not suited to be used by the users of this controller
         -- =========================================================================================
         ST_SP_DBG_CHAN : out std_logic_vector(log2(CHANNELS) -1 downto 0);
         ST_SP_DBG_META : out std_logic_vector(ST_SP_DBG_SIGNAL_W -1 downto 0);
 
         -- =========================================================================================
-        -- Control MI bus
+        -- Control MI bus for software access
         -- =========================================================================================
         MI_ADDR : in  std_logic_vector(MI_WIDTH -1 downto 0);
         MI_DWR  : in  std_logic_vector(MI_WIDTH -1 downto 0);

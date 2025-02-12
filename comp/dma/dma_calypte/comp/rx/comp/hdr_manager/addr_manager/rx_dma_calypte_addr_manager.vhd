@@ -14,10 +14,11 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 -- This component manages addresses and pointer for each channel. Component is
--- working as follows: After receiving address request for the specific
--- channel, the HW pointers are increased and the address for storing the data
--- in RAM is created. The addres is valid as soon as the corresponding
--- area in a host memory is free.
+-- working as follows: After receiving an address request for the specific channel,
+-- the HW pointers are increased and the address for storing the data in RAM is
+-- created. The address is valid only if the underlying area in the host memory is
+-- free, i.e. the new pointer value (which is a writing pointer) does not
+-- overtake the value of the reading pointer.
 entity RX_DMA_CALYPTE_ADDR_MANAGER is
     generic (
         -- number of managed channels

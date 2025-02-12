@@ -12,19 +12,26 @@ use ieee.numeric_std.all;
 use work.type_pack.all;
 use work.math_pack.all;
 
--- This component contols the successfull buffering of input data on the block specified by the
--- `BUFFERED_DATA_SIZE` generic parameter. Whole buffer content is then set on the output MFB bus.
+-- This component buffers input bus words to a bigger word of the size specified by the
+-- :vhdl:genconstant:`BUFFERED_DATA_SIZE` parameter. This buffered word is then set  on the output
+-- MFB bus. The buffering takes place even if the :vhdl:portsignal:`TX_MFB_DST_RDY` input is low in
+-- order to have a buffered word ready on the output.
 entity RX_DMA_CALYPTE_TRANS_BUFFER is
     generic (
-        -- The amount of data which needs to be buffered in bytes
+        -- The amount of data which needs to be buffered (in bytes).
+        -- Currently, only 128 is supported
         BUFFERED_DATA_SIZE : integer := 128;
-        -- Adds a skid buffer on the output
+        -- Adds a skid buffer on the output, i.e. the output register FIFO that buffers data even when
+        -- the receiver's TX_MFB_DST_RDY is low.
         REG_OUT_EN         : boolean := TRUE;
 
         -- =========================================================================================
         -- MFB bus parameters
         --
-        -- The amount of regions is always set to 1
+        -- The amount of regions is always set to 1, the supported combinations are
+        --
+        -- * (1, 32, 8)
+        -- * (1, 64, 8)
         -- =========================================================================================
         RX_REGION_SIZE : integer := 1;
         RX_BLOCK_SIZE  : integer := 4*8;
@@ -50,7 +57,7 @@ entity RX_DMA_CALYPTE_TRANS_BUFFER is
         -- Output MFB to Header insertor
         -- =========================================================================================
         TX_MFB_DATA    : out std_logic_vector((BUFFERED_DATA_SIZE/(RX_REGION_SIZE*RX_BLOCK_SIZE))*RX_REGION_SIZE*RX_BLOCK_SIZE*RX_ITEM_WIDTH-1 downto 0);
-        -- The SOF_POS is propably useless because each output packet is aligned to the beginning of a word, only
+        -- The SOF_POS is probably useless because each output packet is aligned to the beginning of a word, only
         -- one block is used
         TX_MFB_SOF_POS : out std_logic_vector(max(1, log2(RX_REGION_SIZE))-1 downto 0) := (others => '0');
         TX_MFB_EOF_POS : out std_logic_vector(max(1, log2((BUFFERED_DATA_SIZE/(RX_REGION_SIZE*RX_BLOCK_SIZE))*RX_REGION_SIZE*RX_BLOCK_SIZE))-1 downto 0);
@@ -64,6 +71,7 @@ end entity;
 
 architecture FULL of RX_DMA_CALYPTE_TRANS_BUFFER is
 
+    -- Buffer depth in the amount of buffered MFB words, each of size (RX_MFB_DATA'length)
     constant BUFFER_DEPTH : positive := BUFFERED_DATA_SIZE/(RX_REGION_SIZE*RX_BLOCK_SIZE);
 
     type packing_fsm_state_t is (S_IDLE, S_PACKING, S_WAIT);
@@ -84,6 +92,7 @@ architecture FULL of RX_DMA_CALYPTE_TRANS_BUFFER is
     signal recalc_eof_pos_pst : unsigned(TX_MFB_EOF_POS'range);
     signal recalc_eof_pos_nst : unsigned(TX_MFB_EOF_POS'range);
 
+    -- Pointer to a segment in the output word
     signal segment_ptr_pst : unsigned(log2(BUFFER_DEPTH) -1 downto 0);
     signal segment_ptr_nst : unsigned(log2(BUFFER_DEPTH) -1 downto 0);
 
@@ -265,6 +274,9 @@ begin
         end case;
     end process;
 
+    -- =============================================================================================
+    -- Output register FIFO for throughput improvement
+    -- =============================================================================================
     reg_fifo_i : entity work.REG_FIFO
         generic map (
             DATA_WIDTH => FIFO_TX_DATA_WIDTH,
