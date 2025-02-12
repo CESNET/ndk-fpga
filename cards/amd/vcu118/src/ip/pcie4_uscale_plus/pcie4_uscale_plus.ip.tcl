@@ -61,6 +61,7 @@ if {$PARAMS(PCIE_ENDPOINT_MODE) == 2} {
     set_property -dict [list \
         CONFIG.axisten_if_width {256_bit} \
         CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X8} \
+        CONFIG.coreclk_freq {500} \
     ] $IP
 } else {
     # x16 properties
