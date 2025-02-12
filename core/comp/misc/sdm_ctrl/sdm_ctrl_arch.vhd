@@ -12,21 +12,6 @@ architecture FULL of SDM_CTRL is
 
     constant MC_ADDR_WIDTH : natural := 4;
 
-    component mailbox_client_ip is
-    port (
-        in_clk_clk         : in  std_logic                     := 'X';             -- clk
-        in_reset_reset     : in  std_logic                     := 'X';             -- reset
-        avmm_address       : in  std_logic_vector(3 downto 0)  := (others => 'X'); -- address
-        avmm_write         : in  std_logic                     := 'X';             -- write
-        avmm_writedata     : in  std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
-        avmm_read          : in  std_logic                     := 'X';             -- read
-        avmm_readdata      : out std_logic_vector(31 downto 0);                    -- readdata
-        avmm_readdatavalid : out std_logic;                                        -- readdatavalid
-        avmm_waitrequest   : out std_logic;                                        -- waitrequest
-        irq_irq            : out std_logic                                         -- irq
-    );
-    end component mailbox_client_ip;
-
     -- mi2avmm out signals
     signal avmm_addr    : std_logic_vector(ADDR_WIDTH-1 downto 0);
     signal avmm_wr      : std_logic;
@@ -407,18 +392,17 @@ begin
     );
 
     -- Mailbox Client IP component
-    mailbox_client_i : component mailbox_client_ip
+    mailbox_client_i : entity work.SDM_CTRL_MAILBOX_CLIENT_WRAP
     port map (
-        in_clk_clk         => CLK,
-        in_reset_reset     => RESET,
-        avmm_address       => mc_offset,
-        avmm_write         => mc_wr,
-        avmm_writedata     => mc_dwr,
-        avmm_read          => mc_rd,
-        avmm_readdata      => mc_drd,
-        avmm_readdatavalid => mc_drd_vld,
-        avmm_waitrequest   => mc_wait,
-        irq_irq            => open
+        CLK                => CLK,
+        RESET              => RESET,
+        AVMM_ADDRESS       => mc_offset,
+        AVMM_WRITE         => mc_wr,
+        AVMM_WRITEDATA     => mc_dwr,
+        AVMM_READ          => mc_rd,
+        AVMM_READDATA      => mc_drd,
+        AVMM_READDATAVALID => mc_drd_vld,
+        AVMM_WAITREQUEST   => mc_wait
     );
 
 end architecture;

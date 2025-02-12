@@ -15,6 +15,16 @@ lappend MOD "$ENTITY_BASE/sdm_ctrl_ent.vhd"
 if {$ARCHGRP == "INTEL_SDM"} {
     lappend COMPONENTS [ list "MI2AVMM" $MI2AVMM_BASE "FULL" ]
 
+    lappend MOD "$ENTITY_BASE/mailbox_client_wrap_ent.vhd"
+    lappend MOD "$ENTITY_BASE/mailbox_client_wrap.vhd"
+    lappend MOD "$ENTITY_BASE/sdm_ctrl_arch.vhd"
+    lappend MOD "$ENTITY_BASE/DevTree.tcl"
+
+} elseif {$ARCHGRP == "INTEL_SDM_OLD"} {
+    lappend COMPONENTS [ list "MI2AVMM" $MI2AVMM_BASE "FULL" ]
+
+    lappend MOD "$ENTITY_BASE/mailbox_client_wrap_ent.vhd"
+    lappend MOD "$ENTITY_BASE/mailbox_client_wrap_q224.vhd"
     lappend MOD "$ENTITY_BASE/sdm_ctrl_arch.vhd"
     lappend MOD "$ENTITY_BASE/DevTree.tcl"
 
