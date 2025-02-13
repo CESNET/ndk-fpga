@@ -1,6 +1,6 @@
 # monitors.py: MVBMonitor
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -27,7 +27,7 @@ class MVBMonitor(BusMonitor):
     """
 
     _signals = ["vld", "src_rdy", "dst_rdy"]
-    _optional_signals = ["data", "meta", "addr", "discard", "length"]
+    _optional_signals = ["data", "meta", "addr", "discard", "length", "match"]
 
     def __init__(self, entity, name, clock, array_idx=None, tr_type=bytes) -> None:
         super().__init__(entity, name, clock, array_idx=array_idx)
@@ -126,7 +126,7 @@ class MVBMonitor(BusMonitor):
 
         for i in range(self.__items):
             if (vld & 1):
-                mvb_tr = self.__tr_type
+                mvb_tr = self.__tr_type()
                 for s in self.__os:
                     if hasattr(mvb_tr, s):
                         setattr(mvb_tr, s, data_dict_items[s][i])
