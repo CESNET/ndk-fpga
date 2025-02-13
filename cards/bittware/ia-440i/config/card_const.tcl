@@ -42,6 +42,10 @@ Allowed PCIe configurations:
 - 1xGen5x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1 (for DMA Medusa)"
 }
 
+if {!(($MEM_PORTS == 0) || ($MEM_PORTS == 2)) } {
+    error "Unsupported value MEM_PORTS=$MEM_PORTS. Allowed values are only: 0 or 2."
+}
+
 # ------------------------------------------------------------------------------
 # Other parameters:
 # ------------------------------------------------------------------------------

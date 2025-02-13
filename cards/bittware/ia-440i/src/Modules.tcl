@@ -38,6 +38,9 @@ set FTILE_ETH_IP_NAME "ftile_eth_[dict get $ETH_CONF $ARCHGRP_ARR(ETH_PORT_SPEED
 lappend IP_COMPONENTS [list  "clk"     "iopll"             "iopll_ip"             0      1]
 lappend IP_COMPONENTS [list  "misc"    "mailbox_client"    "mailbox_client_ip"    0      0]
 lappend IP_COMPONENTS [list  "misc"    "reset_release"     "reset_release_ip"     0      0]
+lappend IP_COMPONENTS [list  "mem"     "ddr4_calibration"  "ddr4_calibration"     0      0]
+lappend IP_COMPONENTS [list  "mem"     "onboard_ddr4"      "onboard_ddr4_0"       0      1]
+lappend IP_COMPONENTS [list  "mem"     "onboard_ddr4"      "onboard_ddr4_1"       1      1]
 lappend IP_COMPONENTS [list  "pcie"    "rtile_pcie"        $RTILE_PCIE_IP_NAME    0      1]
 
 if {$ARCHGRP_ARR(VIRTUAL_DEBUG_ENABLE)} {
