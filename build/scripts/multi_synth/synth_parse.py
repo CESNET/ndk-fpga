@@ -49,7 +49,7 @@ def grep(string, file, cut, cut_1=None):
 
 
 def grep_awk(string, file, cut1, cut2):
-    tmp = popen(f"""grep "{string}" "{file}" | awk '{{print ${cut1} " (" ${cut2} "%)"}}'""")
+    tmp = popen(f"""grep "{string}" {file} | awk '{{print ${cut1} " (" ${cut2} "%)"}}'""")
     ret = tmp.readline().strip().replace(",", "")
     tmp.close()
     return ret
