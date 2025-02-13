@@ -88,7 +88,8 @@ with open(of_name, "w") as of:
               "Vivado Synthesis Memory LUTs;"
               "Vivado Synthesis Registers;"
               "Vivado Synthesis CARRYs;"
-              "Vivado Synthesis BRAMs;"
+              "Vivado Synthesis RAMB36;"
+              "Vivado Synthesis RAMB18;"
               "Vivado Synthesis URAMs;"
               "Vivado Synthesis DSPs;"
 
@@ -152,7 +153,8 @@ with open(of_name, "w") as of:
         v_syn_mlut = grep_awk("LUT as Memory ", d + vivado_syn_util, 6, 14)
         v_syn_reg = grep_awk("CLB Registers ", d + vivado_syn_util, 5, 13)
         v_syn_carry = grep_awk("CARRY8        ", d + vivado_syn_util, 4, 12)
-        v_syn_bram = grep_awk("Block RAM Tile", d + vivado_syn_util, 6, 14)
+        v_syn_bram36 = grep_awk("RAMB36", d + vivado_syn_util, 4, 12)
+        v_syn_bram18 = grep_awk("RAMB18", d + vivado_syn_util, 4, 12)
         v_syn_uram = grep_awk("URAM          ", d + vivado_syn_util, 4, 12)
         v_syn_dsp = grep_awk("DSPs          ", d + vivado_syn_util, 4, 12)
 
@@ -208,7 +210,8 @@ with open(of_name, "w") as of:
                     v_syn_mlut,
                     v_syn_reg,
                     v_syn_carry,
-                    v_syn_bram,
+                    v_syn_bram36,
+                    v_syn_bram18,
                     v_syn_uram,
                     v_syn_dsp,
 
