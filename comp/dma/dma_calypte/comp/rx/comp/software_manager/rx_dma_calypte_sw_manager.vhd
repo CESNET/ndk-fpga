@@ -17,117 +17,117 @@ use work.dma_bus_pack.all;
 -- implementation allows to create configuration space for arbitrary number of channels. It also
 -- provides the access to registers from MI interface connected to designated software driver.
 entity RX_DMA_CALYPTE_SW_MANAGER is
-generic(
-    -- Traget device
-    DEVICE             : string  := "STRATIX10";
+    generic(
+        -- Traget device
+        DEVICE             : string  := "STRATIX10";
 
-    -- Total number of DMA Channels within this DMA Endpoint
-    CHANNELS           : natural := 8;
+        -- Total number of DMA Channels within this DMA Endpoint
+        CHANNELS           : natural := 8;
 
-    -- * Width of Software and Hardware Descriptor/Header Pointer
-    -- * Defines width of signals used for these values in DMA Module
-    -- * Affects logic complexity
-    -- * Maximum value: 32 (restricted by size of pointer MI registers)
-    POINTER_WIDTH      : natural := 16;
+        -- * Width of Software and Hardware Descriptor/Header Pointer
+        -- * Defines width of signals used for these values in DMA Module
+        -- * Affects logic complexity
+        -- * Maximum value: 32 (restricted by size of pointer MI registers)
+        POINTER_WIDTH      : natural := 16;
 
-    -- Width of the address to the host memory
-    SW_ADDR_WIDTH      : natural := 64;
+        -- Width of the address to the host memory
+        SW_ADDR_WIDTH      : natural := 64;
 
-    -- Actual width of packet and byte counters
-    RECV_PKT_CNT_WIDTH : natural := 64;
-    RECV_BTS_CNT_WIDTH : natural := 64;
-    DISC_PKT_CNT_WIDTH : natural := 64;
-    DISC_BTS_CNT_WIDTH : natural := 64;
+        -- Actual width of packet and byte counters
+        RECV_PKT_CNT_WIDTH : natural := 64;
+        RECV_BTS_CNT_WIDTH : natural := 64;
+        DISC_PKT_CNT_WIDTH : natural := 64;
+        DISC_BTS_CNT_WIDTH : natural := 64;
 
-    -- * Maximum size of a packet (in bytes)
-    -- * Defines width of Packet length signals.
-    PKT_SIZE_MAX       : natural := 2**12;
+        -- * Maximum size of a packet (in bytes)
+        -- * Defines width of Packet length signals.
+        PKT_SIZE_MAX       : natural := 2**12;
 
-    -- Width of MI bus
-    MI_WIDTH           : natural := 32
-);
-port (
-    -- =====================================================================
-    -- Clock and Reset
-    -- =====================================================================
-    CLK                  : in  std_logic;
-    RESET                : in  std_logic;
+        -- Width of MI bus
+        MI_WIDTH           : natural := 32
+    );
+    port (
+        -- =====================================================================
+        -- Clock and Reset
+        -- =====================================================================
+        CLK                  : in  std_logic;
+        RESET                : in  std_logic;
 
-    -- =====================================================================
-    -- MI interface for SW access
-    -- =====================================================================
-    MI_ADDR              : in  std_logic_vector(MI_WIDTH-1 downto 0);
-    MI_DWR               : in  std_logic_vector(MI_WIDTH-1 downto 0);
-    MI_BE                : in  std_logic_vector(MI_WIDTH/8-1 downto 0);
-    MI_RD                : in  std_logic;
-    MI_WR                : in  std_logic;
-    MI_DRD               : out std_logic_vector(MI_WIDTH-1 downto 0);
-    MI_ARDY              : out std_logic;
-    MI_DRDY              : out std_logic;
+        -- =====================================================================
+        -- MI interface for SW access
+        -- =====================================================================
+        MI_ADDR              : in  std_logic_vector(MI_WIDTH-1 downto 0);
+        MI_DWR               : in  std_logic_vector(MI_WIDTH-1 downto 0);
+        MI_BE                : in  std_logic_vector(MI_WIDTH/8-1 downto 0);
+        MI_RD                : in  std_logic;
+        MI_WR                : in  std_logic;
+        MI_DRD               : out std_logic_vector(MI_WIDTH-1 downto 0);
+        MI_ARDY              : out std_logic;
+        MI_DRDY              : out std_logic;
 
-    -- =====================================================================
-    -- Packet counter increment interface
-    -- =====================================================================
-    PKT_SENT_CHAN        : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    PKT_SENT_INC         : in  std_logic;
-    PKT_SENT_BYTES       : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
-    PKT_DISCARD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    PKT_DISCARD_INC      : in  std_logic;
-    PKT_DISCARD_BYTES    : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
+        -- =====================================================================
+        -- Packet counter increment interface
+        -- =====================================================================
+        PKT_SENT_CHAN        : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        PKT_SENT_INC         : in  std_logic;
+        PKT_SENT_BYTES       : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
+        PKT_DISCARD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        PKT_DISCARD_INC      : in  std_logic;
+        PKT_DISCARD_BYTES    : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
 
-    -- =====================================================================
-    -- Channel status interface
-    -- =====================================================================
-    START_REQ_CHAN       : out std_logic_vector(log2(CHANNELS)-1 downto 0);
-    START_REQ_VLD        : out std_logic;
-    START_REQ_ACK        : in  std_logic;
+        -- =====================================================================
+        -- Channel status interface
+        -- =====================================================================
+        START_REQ_CHAN       : out std_logic_vector(log2(CHANNELS)-1 downto 0);
+        START_REQ_VLD        : out std_logic;
+        START_REQ_ACK        : in  std_logic;
 
-    STOP_FORCE_CHAN      : out std_logic_vector(log2(CHANNELS)-1 downto 0);
-    STOP_FORCE           : out std_logic;
+        STOP_FORCE_CHAN      : out std_logic_vector(log2(CHANNELS)-1 downto 0);
+        STOP_FORCE           : out std_logic;
 
-    STOP_REQ_CHAN        : out std_logic_vector(log2(CHANNELS)-1 downto 0);
-    STOP_REQ_VLD         : out std_logic;
-    STOP_REQ_ACK         : in  std_logic;
+        STOP_REQ_CHAN        : out std_logic_vector(log2(CHANNELS)-1 downto 0);
+        STOP_REQ_VLD         : out std_logic;
+        STOP_REQ_ACK         : in  std_logic;
 
-    ENABLED_CHAN         : out std_logic_vector(CHANNELS-1 downto 0);
+        ENABLED_CHAN         : out std_logic_vector(CHANNELS-1 downto 0);
 
-    -- =====================================================================
-    -- Pointer update interface
-    -- =====================================================================
-    -- Software pointer read interface
-    SDP_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    SDP_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
-    SHP_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    SHP_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
+        -- =====================================================================
+        -- Pointer update interface
+        -- =====================================================================
+        -- Software pointer read interface
+        SDP_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        SDP_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
+        SHP_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        SHP_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
 
-    -- Hardware pointer write interface
-    HDP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    HDP_WR_DATA     : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
-    HDP_WR_EN       : in  std_logic;
-    HHP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    HHP_WR_DATA     : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
-    HHP_WR_EN       : in  std_logic;
+        -- Hardware pointer write interface
+        HDP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        HDP_WR_DATA     : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
+        HDP_WR_EN       : in  std_logic;
+        HHP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        HHP_WR_DATA     : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
+        HHP_WR_EN       : in  std_logic;
 
-    -- Read base addresses
-    DBA_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    DBA_RD_DATA     : out std_logic_vector(SW_ADDR_WIDTH-1 downto 0);
-    HBA_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    HBA_RD_DATA     : out std_logic_vector(SW_ADDR_WIDTH-1 downto 0);
+        -- Read base addresses
+        DBA_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        DBA_RD_DATA     : out std_logic_vector(SW_ADDR_WIDTH-1 downto 0);
+        HBA_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        HBA_RD_DATA     : out std_logic_vector(SW_ADDR_WIDTH-1 downto 0);
 
-    -- Read pointer masks
-    DPM_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    DPM_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
-    HPM_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    HPM_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
+        -- Read pointer masks
+        DPM_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        DPM_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
+        HPM_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        HPM_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
 
-    -- =========================================================================================
-    -- Performance counters increment interface
-    -- =========================================================================================
-    DATA_BUFF_FULL_CHAN         : out std_logic_vector(log2(CHANNELS) -1 downto 0);
-    DATA_BUFF_FULL_CNTR_INCR    : out std_logic;
-    DMA_HDR_BUFF_FULL_CHAN      : out std_logic_vector(log2(CHANNELS) -1 downto 0);
-    DMA_HDR_BUFF_FULL_CNTR_INCR : out std_logic
-);
+        -- =========================================================================================
+        -- Performance counters increment interface
+        -- =========================================================================================
+        DATA_BUFF_FULL_CHAN         : out std_logic_vector(log2(CHANNELS) -1 downto 0);
+        DATA_BUFF_FULL_CNTR_INCR    : out std_logic;
+        DMA_HDR_BUFF_FULL_CHAN      : out std_logic_vector(log2(CHANNELS) -1 downto 0);
+        DMA_HDR_BUFF_FULL_CNTR_INCR : out std_logic
+    );
 end entity;
 
 architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is

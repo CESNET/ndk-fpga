@@ -37,7 +37,8 @@ entity RX_DMA_CALYPTE_TRANS_BUFFER is
         -- =========================================================================================
         RX_REGION_SIZE : integer := 1;
         RX_BLOCK_SIZE  : integer := 4*8;
-        RX_ITEM_WIDTH  : integer := 8);
+        RX_ITEM_WIDTH  : integer := 8
+        );
 
     port (
         CLK : in std_logic;
