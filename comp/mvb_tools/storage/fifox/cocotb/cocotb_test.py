@@ -1,6 +1,6 @@
 # cocotb_test.py:
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -69,7 +69,7 @@ async def run_test(dut, pkt_count=10000):
     data_width = tb.stream_in.item_widths["data"]
     for transaction in random_integers(0, 2**data_width-1, pkt_count):
         cocotb.log.debug(f"generated transaction: {hex(transaction)}")
-        mvb_tr = MvbTrClassic
+        mvb_tr = MvbTrClassic()
         mvb_tr.data = transaction
         tb.model(mvb_tr)
         tb.stream_in.append(mvb_tr)
