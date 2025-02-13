@@ -1,10 +1,6 @@
-#!/usr/bin/env python
-
-# cocotb_test.py: MVB_HASH_TABLE_SIMPLE component test
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
-#
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 
 """
 This test requires a configuration file to function.
@@ -14,22 +10,23 @@ script in the 'sw' directory and running it with -i (interactive)
 argument.
 """
 
+
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
-from cocotbext.ofm.mi.drivers import MIMasterDriver as MIDriver
-from drivers import MVB_HASH_TABLE_SIMPLE_Driver as MVBDriver
-from monitors import MVB_HASH_TABLE_SIMPLE_Monitor as MVBMonitor
+from cocotbext.ofm.mi.drivers import MIRequestDriver as MIDriver
+from cocotbext.ofm.mvb.drivers import MVBDriver
+from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 
 import nfb
-from sw.toolkit import MVB_HASH_TABLE_SIMPLE_TOOLKIT, toeplitz_hash, simple_xor_hash
+from ofm.comp.mvb_tools.storage.mvb_hash_table_simple.mvb_hash_table_simple import MvbHashTableSimple, toeplitz_hash, simple_xor_hash
 from cocotbext.ofm.utils.servicer import Servicer
 from cocotbext.ofm.utils.device import get_dtb
 from cocotbext.ofm.utils.math import ceildiv
-from cocotbext.ofm.mvb.transaction import MvbTrClassic
+from transaction import MvbReqTrHashTableSimple, MvbResTrHashTableSimple
 
 import itertools
 from math import log2
@@ -59,7 +56,7 @@ class testbench():
         self.dut = dut
         self.stream_in = MVBDriver(dut, "RX_MVB", dut.CLK)
         self.backpressure = BitDriver(dut.TX_MVB_DST_RDY, dut.CLK)
-        self.stream_out = MVBMonitor(dut, "TX_MVB", dut.CLK)
+        self.stream_out = MVBMonitor(dut, "TX_MVB", dut.CLK, tr_type=MvbResTrHashTableSimple)
         self.mi_interface = MIDriver(dut, "MI", dut.CLK)
 
         self.stream_out.bus.dst_rdy.value = 1
@@ -156,12 +153,12 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
     tb.backpressure.start((1, i % 5) for i in itertools.count())
 
     """Reading configuration from the component."""
-    mvb_items = int.from_bytes(await tb.mi_interface.read32(_MVB_ITEMS), 'little')
-    mvb_key_width = int.from_bytes(await tb.mi_interface.read32(_MVB_KEY_WIDTH), 'little')
-    data_out_width = int.from_bytes(await tb.mi_interface.read32(_DATA_OUT_WIDTH), 'little')
-    hash_width = int.from_bytes(await tb.mi_interface.read32(_HASH_WIDTH), 'little')
-    hash_key_width = int.from_bytes(await tb.mi_interface.read32(_HASH_KEY_WIDTH), 'little')
-    table_capacity = int.from_bytes(await tb.mi_interface.read32(_TABLE_CAPACITY), 'little')
+    mvb_items = await tb.mi_interface.read32(_MVB_ITEMS)
+    mvb_key_width = await tb.mi_interface.read32(_MVB_KEY_WIDTH)
+    data_out_width = await tb.mi_interface.read32(_DATA_OUT_WIDTH)
+    hash_width = await tb.mi_interface.read32(_HASH_WIDTH)
+    hash_key_width = await tb.mi_interface.read32(_HASH_KEY_WIDTH)
+    table_capacity = await tb.mi_interface.read32(_TABLE_CAPACITY)
 
     mvb_key_width_bytes = mvb_key_width // 8
     data_out_width_bytes = data_out_width // 8
@@ -177,7 +174,7 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
 
     """Asserting that the read configuration match configuration of the drivers connected to the component."""
     assert mvb_items == tb.stream_in.items
-    assert mvb_key_width_bytes == tb.stream_in.item_widths["data"] // 8 # FIXME
+    assert mvb_key_width_bytes == tb.stream_in.item_widths["key"] // 8 # FIXME
     assert data_out_width_bytes == tb.stream_out.item_widths["data"] // 8 # FIXME
     assert hash_width == log2(table_capacity)
 
@@ -198,23 +195,23 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
         hash_key_bytes = comp_conf["hash_key"].to_bytes(comp_conf["hash_key_width"] // 8, 'little')
 
         for i in range(ceildiv(4, len(hash_key_bytes))):
-            await tb.mi_interface.write32(_HASH_KEY_REG, hash_key_bytes[4*i:4*(i+1)])
+            await tb.mi_interface.write(_HASH_KEY_REG, hash_key_bytes[4*i:4*(i+1)])
 
-        await tb.mi_interface.write32(_COMMAND_REG, _CLEAR_TABLES.to_bytes(1, 'little'))
+        await tb.mi_interface.write(_COMMAND_REG, _CLEAR_TABLES.to_bytes(1, 'little'))
 
         for i in range(len(config)):
-            await tb.mi_interface.write32(_COMMAND_REG, (i).to_bytes(1, "little"))
+            await tb.mi_interface.write(_COMMAND_REG, (i).to_bytes(1, "little"))
 
             for j in range(len(config[i])):
                 address_bytes = config[i][j][0].to_bytes(mvb_key_width_bytes, 'little')
                 data_bytes = config[i][j][1].to_bytes(mvb_key_width_bytes + data_out_width_bytes + 1, 'little')
 
-                await tb.mi_interface.write32(_ADDR_REG, address_bytes)
+                await tb.mi_interface.write(_ADDR_REG, address_bytes)
 
                 for k in range(ceildiv(4, len(data_bytes))):
-                    await tb.mi_interface.write32(_DATA_REG, data_bytes[4*k:4*(k+1)])
+                    await tb.mi_interface.write(_DATA_REG, data_bytes[4*k:4*(k+1)])
 
-                await tb.mi_interface.write32(_COMMIT_REG, b'\x00')
+                await tb.mi_interface.write(_COMMIT_REG, b'\x00')
 
     elif config_method == "script":
         dtb = get_dtb(
@@ -228,7 +225,7 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
         servicer = Servicer(device=tb.mi_interface, dtb=dtb)
         dev = await cocotb.external(nfb.open)(servicer.path())
 
-        await cocotb.external(MVB_HASH_TABLE_SIMPLE_TOOLKIT)(mod_path=config_file, dev=dev)
+        await cocotb.external(MvbHashTableSimple)(mod_path=config_file, dev=dev)
 
     else:
         raise RuntimeError("Invalid configuration setting.")
@@ -238,17 +235,22 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
     for transaction in random_packets(item_width, item_width, pkt_count):
         int_transaction = int.from_bytes(transaction, "little")
 
-        mvb_tr = MvbTrClassic()
+        # creating response transactions to be compared with transactions generated by the monitor
+        mvb_res_tr = MvbResTrHashTableSimple()
         if int_transaction in model_keys:
-            mvb_tr.data = model_data[int_transaction]
-            vld = 1
+            mvb_res_tr.data = model_data[int_transaction]
+            mvb_res_tr.match = 1
         else:
-            mvb_tr.data = 0
-            vld = 0
-        tb.model((mvb_tr, vld))
+            mvb_res_tr.data = 0
+            mvb_res_tr.match = 0
+        tb.model(mvb_res_tr)
 
-        cocotb.log.info(f"generated transaction: {transaction.hex()}")
-        tb.stream_in.append(transaction)
+        # creating request transaction to be send by the driver
+        mvb_req_tr = MvbReqTrHashTableSimple()
+        mvb_req_tr.key = int_transaction
+
+        cocotb.log.info(f"generated transaction: {hex(mvb_req_tr.key)}")
+        tb.stream_in.append(mvb_req_tr)
 
     last_num = 0
 
