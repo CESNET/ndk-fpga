@@ -73,7 +73,12 @@ proc dts_build_netcope {} {
 
     # Card specific components
     if { [llength [info procs dts_card_specific]] > 0 } {
-        append ret [ dts_card_specific ]
+        set cs_args [info args dts_card_specific]
+        lappend cs_params
+        if {[llength cs_args] > 0} {
+            lappend cs_params $ADDR_BOOT_CTRL
+        }
+        append ret [dts_card_specific {*}$cs_params]
     }
 
     # TSU component
