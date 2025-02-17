@@ -35,12 +35,6 @@ entity TX_DMA_PKT_DISPATCHER is
         HDR_META_WIDTH      : natural := 24;
         PKT_SIZE_MAX        : natural := 2**16 -1;
 
-        -- allowed values for PCIE_MFB_REGIONS are 1 or 2
-        PCIE_MFB_REGIONS        : natural := 2; -- 1/2
-        PCIE_MFB_REGION_SIZE    : natural := 1;
-        PCIE_MFB_BLOCK_SIZE     : natural := 8;
-        PCIE_MFB_ITEM_WIDTH     : natural := 32;
-
         MFB_REGIONS         : natural := 1;
         -- Either 4 or 8
         MFB_REGION_SIZE     : natural := 4;
