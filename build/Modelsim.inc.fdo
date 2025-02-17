@@ -483,10 +483,13 @@ proc nb_sim_main {{user_sim_flags SIM_FLAGS} {sim_generics SIM_GENERICS}} {
     nb_vsim_set_flags VSIM_FLAGS SIM_FLAGS
     nb_sim_expand_generics VSIM_FLAGS SIM_FLAGS
 
-
     # Run simulation
     if {!$SIM_FLAGS(VSIM_MANUAL_START)} {
         vsim {*}$VSIM_FLAGS
+
+        # break when assertion failed
+        # Have to be set after design is loaded
+        assertion fail -r / -action break
     }
 }
 
