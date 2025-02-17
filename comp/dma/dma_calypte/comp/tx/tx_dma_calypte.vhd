@@ -319,10 +319,10 @@ begin
             CHANNELS      => CHANNELS,
             POINTER_WIDTH => POINTER_WIDTH,
 
-            PCIE_MFB_REGIONS     => PCIE_CQ_MFB_REGIONS,
-            PCIE_MFB_REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
-            PCIE_MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
-            PCIE_MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH)
+            MFB_REGIONS     => PCIE_CQ_MFB_REGIONS,
+            MFB_REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH)
         port map (
             CLK   => CLK,
             RESET => RESET,
