@@ -346,13 +346,12 @@ begin
                 PCIE_CQ_MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
                 PCIE_CQ_MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
 
-                DATA_POINTER_WIDTH    => TX_PTR_WIDTH,
-                DMA_HDR_POINTER_WIDTH => TX_PTR_WIDTH-3,
-                CHANNELS              => TX_CHANNELS,
-                CNTRS_WIDTH           => DSP_CNT_WIDTH,
-                HDR_META_WIDTH        => HDR_META_WIDTH,
-                ST_SP_DBG_SIGNAL_W    => ST_SP_DBG_SIGNAL_W,
-                PKT_SIZE_MAX          => USR_TX_PKT_SIZE_MAX)
+                POINTER_WIDTH      => TX_PTR_WIDTH,
+                CHANNELS           => TX_CHANNELS,
+                CNTRS_WIDTH        => DSP_CNT_WIDTH,
+                HDR_META_WIDTH     => HDR_META_WIDTH,
+                ST_SP_DBG_SIGNAL_W => ST_SP_DBG_SIGNAL_W,
+                PKT_SIZE_MAX       => USR_TX_PKT_SIZE_MAX)
             port map (
                 CLK   => CLK,
                 RESET => RESET,

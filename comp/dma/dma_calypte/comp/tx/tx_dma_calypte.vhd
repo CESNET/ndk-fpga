@@ -32,13 +32,11 @@ entity TX_DMA_CALYPTE is
         PCIE_CQ_MFB_BLOCK_SIZE  : natural := 8;
         PCIE_CQ_MFB_ITEM_WIDTH  : natural := 32;
 
-        -- Pointer width for data and hdr buffers. The data pointer points to bytes of the packet.
-        -- The header pointer points to the header of a current packet.
-        DATA_POINTER_WIDTH    : natural := 13;
-        -- NOTE: Depracated, the width of the header pointer is calculated from DATA_POINTER_WIDTH
-        DMA_HDR_POINTER_WIDTH : natural := 10;
         -- Set the number of DMA channels, each channel has its separate buffer
         CHANNELS              : natural := 32;
+        -- Pointer width for data and hdr buffers. The data pointer points to bytes of the packet.
+        -- The header pointer points to the header of a current packet.
+        POINTER_WIDTH    : natural := 13;
 
         -- Set the width of counters of packets for each channel which are there to provide some
         -- entry level statistics.
@@ -157,11 +155,11 @@ architecture FULL of TX_DMA_CALYPTE is
     signal stop_req_ack  : std_logic;
 
     signal upd_hdp_chan : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    signal upd_hdp_data : std_logic_vector(DATA_POINTER_WIDTH -1 downto 0);
+    signal upd_hdp_data : std_logic_vector(POINTER_WIDTH -1 downto 0);
     signal upd_hdp_en   : std_logic;
 
     signal upd_hhp_chan : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    signal upd_hhp_data : std_logic_vector(DATA_POINTER_WIDTH-3 -1 downto 0);
+    signal upd_hhp_data : std_logic_vector(POINTER_WIDTH-3 -1 downto 0);
     signal upd_hhp_en   : std_logic;
 
     signal ext_mfb_data    : std_logic_vector(PCIE_CQ_MFB_WIDTH -1 downto 0);
@@ -181,7 +179,7 @@ architecture FULL of TX_DMA_CALYPTE is
 
     signal trbuff_rd_chan         : std_logic_vector(log2(CHANNELS) -1 downto 0);
     signal trbuff_rd_data         : std_logic_vector(PCIE_CQ_MFB_WIDTH -1 downto 0);
-    signal trbuff_rd_addr         : std_logic_vector(DATA_POINTER_WIDTH -1 downto 0);
+    signal trbuff_rd_addr         : std_logic_vector(POINTER_WIDTH -1 downto 0);
     signal trbuff_rd_en           : std_logic;
     signal trbuff_rd_data_vld     : std_logic;
 
@@ -253,11 +251,11 @@ begin
         report "TX_DMA_CALYPTE: unsupported PCIE_CQ_MFB configuration, the allowed are: (1,1,8,32), (2,1,8,32)"
         severity FAILURE;
 
-    assert (PKT_SIZE_MAX <= 2**DATA_POINTER_WIDTH)
-        report "TX_DMA_CALYPTE: too large PKT_SIZE_MAX, the internal buffer must be able to fit at least one packet of the size of the PKT_SIZE_MAX. Either change DATA_POINTER_WIDTH or PKT_SIZE_MAX generic."
+    assert (PKT_SIZE_MAX <= 2**POINTER_WIDTH)
+        report "TX_DMA_CALYPTE: too large PKT_SIZE_MAX, the internal buffer must be able to fit at least one packet of the size of the PKT_SIZE_MAX. Either change POINTER_WIDTH or PKT_SIZE_MAX generic."
         severity FAILURE;
 
-    assert (DATA_POINTER_WIDTH <= 16)
+    assert (POINTER_WIDTH <= 16)
         report "TX_DMA_CALYPTE: Too large data pointer, the length of 16 already allows to store 64KiB of data."
         severity FAILURE;
 
@@ -275,8 +273,8 @@ begin
             DISC_PKT_CNT_WIDTH => CNTRS_WIDTH,
             DISC_BTS_CNT_WIDTH => CNTRS_WIDTH,
 
-            DATA_POINTER_WIDTH    => DATA_POINTER_WIDTH,
-            DMA_HDR_POINTER_WIDTH => DATA_POINTER_WIDTH-3,
+            DATA_POINTER_WIDTH    => POINTER_WIDTH,
+            DMA_HDR_POINTER_WIDTH => POINTER_WIDTH-3,
             PKT_SIZE_MAX          => PKT_SIZE_MAX,
             MI_WIDTH              => MI_WIDTH)
         port map (
@@ -319,7 +317,7 @@ begin
         generic map (
             DEVICE        => DEVICE,
             CHANNELS      => CHANNELS,
-            POINTER_WIDTH => DATA_POINTER_WIDTH,
+            POINTER_WIDTH => POINTER_WIDTH,
 
             PCIE_MFB_REGIONS     => PCIE_CQ_MFB_REGIONS,
             PCIE_MFB_REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
@@ -424,7 +422,7 @@ begin
             MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
             MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
 
-            POINTER_WIDTH => DATA_POINTER_WIDTH)
+            POINTER_WIDTH => POINTER_WIDTH)
         port map (
             CLK   => CLK,
             RESET => RESET,
@@ -464,7 +462,7 @@ begin
     dma_hdr_fifo_i : entity work.FIFOX_MULTI
     generic map(
         DATA_WIDTH      => 62 + log2(CHANNELS) + 64,
-        ITEMS           => (2**(DATA_POINTER_WIDTH-3)) * CHANNELS,
+        ITEMS           => (2**(POINTER_WIDTH-3)) * CHANNELS,
         WRITE_PORTS     => PCIE_CQ_MFB_REGIONS,
         READ_PORTS      => 1,
         RAM_TYPE        => "AUTO",
@@ -505,8 +503,8 @@ begin
             MFB_BLOCK_SIZE  => USR_TX_MFB_BLOCK_SIZE,
             MFB_ITEM_WIDTH  => USR_TX_MFB_ITEM_WIDTH,
 
-            DATA_POINTER_WIDTH    => DATA_POINTER_WIDTH,
-            DMA_HDR_POINTER_WIDTH => DATA_POINTER_WIDTH-3)
+            DATA_POINTER_WIDTH    => POINTER_WIDTH,
+            DMA_HDR_POINTER_WIDTH => POINTER_WIDTH-3)
         port map (
             CLK   => CLK,
             RESET => RESET,
