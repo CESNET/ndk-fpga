@@ -12,8 +12,8 @@ import argparse
 import numpy as np
 
 import nfb
+from ofm.comp.debug.data_logger.mem_logger import MemLogger
 from mem_tester import MemTester
-from mem_logger.mem_logger import MemLogger
 from logger_tools import LoggerTools
 from graph_gen import GraphGen
 from pdf_gen import PDFGen

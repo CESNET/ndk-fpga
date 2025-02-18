@@ -7,8 +7,8 @@
 import argparse
 import numpy as np
 import nfb
-from data_logger.data_logger import DataLogger
-import logger_stats.logger_stats as Stats
+from ofm.comp.debug.data_logger.data_logger import DataLogger
+import ofm.comp.debug.data_logger.logger_stats as Stats
 
 
 class MemLogger(DataLogger):
@@ -190,7 +190,7 @@ def parseParams():
     return args
 
 
-if __name__ == '__main__':
+def main():
     args = parseParams()
     logger = MemLogger(dev=args.device, index=args.index)
     logger.stats.load()
@@ -204,3 +204,7 @@ if __name__ == '__main__':
         print(logger.stats.data())
 
     #logger.set_config(latency_to_first=True)
+
+
+if __name__ == '__main__':
+    main()
