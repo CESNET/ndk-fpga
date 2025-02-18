@@ -68,9 +68,10 @@ architecture FULL of SHAKEDOWN is
    signal s_dout_arr       : slv_array_t(OUTPUTS-1 downto 0)(DATA_WIDTH-1 downto 0);
 
 begin
-   assert (RESET = '1') or (count_ones(DIN_VLD) <= OUTPUTS)
-      report "[SHAKEDOWN] There are more items valid on DIN interface than DOUT ITEMS, items might be getting lost!"
-      severity error;
+
+   -- psl assert_input_less_output :
+   --      assert always (count_ones(DIN_VLD) <= OUTPUTS) abort (RESET) @rising_edge(CLK)
+   --      report "[SHAKEDOWN] There are more items valid on DIN interface than DOUT ITEMS, items might be getting lost!";
 
    s_din_arr <= slv_array_downto_deser(DIN,INPUTS,DATA_WIDTH);
 

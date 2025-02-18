@@ -1094,11 +1094,10 @@ begin
     -- ========================================================================
     -- Concatenate RX MVB headers and extracted headers of the indv packets
     -- ========================================================================
+    -- psl assert_rx_mvb_fifo_rdy :
+    --      assert always (fifoxm_hdr_dst_rdy = '1') abort (RESET) @rising_edge(CLK)
+    --      report "MVB_MERGE_ITEMS: FIFO at RX1 full! CR Increase FIFO DEPTH or use the fifoxm_hdr_dst_rdy signal.";
 
-    assert (fifoxm_hdr_dst_rdy = '1')
-        report "MVB_MERGE_ITEMS: FIFO at RX1 full!" & CR &
-               "Increase FIFO DEPTH or use the fifoxm_hdr_dst_rdy signal."
-        severity note;
 
     mvb_merge_items_i : entity work.MVB_MERGE_ITEMS
     generic map(

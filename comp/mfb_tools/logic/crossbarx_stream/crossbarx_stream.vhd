@@ -692,26 +692,13 @@ begin
     --     end if;
     -- end process;
 
-    length_checking_p : process (RX_CLK)
-    variable pacp_pkt_len_uns : unsigned(log2(PKT_MTU+1)-1 downto 0);
-    variable pkt_len_with_gap : natural;
-    begin
-        if (rising_edge(RX_CLK)) then
-            for i in 0 to MFB_REGIONS-1 loop
-                if (pacp_rx_pkt_vld(0)(i) = '1') then
-                    pacp_pkt_len_uns := unsigned(pacp_rx_pkt_len_mod3(0)(i));
-                    pkt_len_with_gap := to_integer(pacp_pkt_len_uns) + GAP_SIZE_MIN + MFB_BLOCK_SIZE-1;
-                    assert (pkt_len_with_gap >= MFB_REGION_SIZE*MFB_BLOCK_SIZE)
-                        -- 2 SOFs in one Region will occur
-                        report "Packet's length + minimal gap size (+ packet alignment) is too small: " &
-                                to_string(pkt_len_with_gap) &
-                                ", must be at least " &
-                                to_string(MFB_REGION_SIZE*MFB_BLOCK_SIZE)
-                        severity failure;
-                end if;
-            end loop;
-        end if;
-    end process;
+
+    -- psl assert_length :
+    --      assert forall i in {0 to MFB_REGIONS-1}:
+    --      always (pacp_rx_pkt_vld(0)(i) = '1' and
+    --                     (to_integer(unsigned(pacp_rx_pkt_len_mod3(0)(i))) + GAP_SIZE_MIN + MFB_BLOCK_SIZE-1) >= MFB_REGION_SIZE*MFB_BLOCK_SIZE) @rising_edge(RX_CLK)
+    --      report "Packet's length + minimal gap size (+ packet alignment) is too small: to_string(pkt_len_with_gap), must be at least to_string(MFB_REGION_SIZE*MFB_BLOCK_SIZE)";
+
 
     pacp_rx_pkt_src_rdy(0) <= or (pacp_rx_pkt_vld(0));
     pacp_space_rd_ptr      <= std_logic_vector(resize_right(unsigned(tx_buf_rd_ptr_addr), pacp_space_rd_ptr'length));

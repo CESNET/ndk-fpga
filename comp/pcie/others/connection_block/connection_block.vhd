@@ -277,12 +277,6 @@ architecture FULL of PCIE_CONNECTION_BLOCK is
     signal tx_avst_prefix_arr     : slv_array_t(MFB_REGIONS-1 downto 0)(32-1 downto 0);
 
     signal tx_inc_frame                : std_logic_vector(MFB_REGIONS+1-1 downto 0);
-    signal tx_gap_inside_frame_dbg     : std_logic;
-    signal tx_gap_inside_frame_dbg_reg : std_logic;
-
-    attribute preserve_for_debug : boolean;
-    attribute preserve_for_debug of tx_gap_inside_frame_dbg_reg : signal is true;
-
 begin
 
     -- =========================================================================
@@ -1023,22 +1017,8 @@ begin
         end if;
     end process;
 
-    tx_gap_inside_frame_dbg <= tx_inc_frame(0) and not up_pipe_mfb_src_rdy;
-
-    process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            if (tx_gap_inside_frame_dbg = '1') then
-                tx_gap_inside_frame_dbg_reg <= '1';
-            end if;
-            if (RESET = '1') then
-                tx_gap_inside_frame_dbg_reg <= '0';
-            end if;
-        end if;
-    end process;
-
-    assert (tx_gap_inside_frame_dbg_reg /= '1')
-        report "PCIE_CONNECTION_BLOCK: Gap inside frame on TX stream!"
-        severity failure;
+    -- psl assert_tlp_vld :
+    --      assert always (not(tx_inc_frame(0) and not up_pipe_mfb_src_rdy)) abort (RESET) @rising_edge(CLK)
+    --      report "PCIE_CONNECTION_BLOCK: Gap inside frame on TX stream!";
 
 end architecture;

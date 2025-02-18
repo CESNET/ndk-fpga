@@ -78,18 +78,12 @@ architecture FULL of CB_RTILE_CRDT_UP is
     signal tlp_compl         : std_logic_vector(REGIONS-1 downto 0);
     signal tlp_error         : std_logic_vector(REGIONS-1 downto 0);
     signal tlp_error_vld     : std_logic_vector(REGIONS-1 downto 0);
-    signal tlp_error_vld_or  : std_logic;
-    signal tlp_error_vld_reg : std_logic;
 
     signal some_tlp_hdr      : std_logic;
     signal crdt_tlp          : u_array_t(6-1 downto 0)(CRDT_CNT_DEC_W-1 downto 0);
     signal crdt_ok           : std_logic_vector(6-1 downto 0);
     signal crdt_word_ok      : std_logic;
     signal crdt_dec_en       : std_logic;
-
-    attribute preserve_for_debug : boolean;
-    attribute preserve_for_debug of tlp_error_vld_reg : signal is true;
-
 begin
 
     en_g: if CRDT_ENABLE generate
@@ -207,24 +201,9 @@ begin
 
         TLP_CRDT_OK <= (not some_tlp_hdr) or crdt_word_ok;
 
-        tlp_error_vld_or <= or tlp_error_vld;
-
-        process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (tlp_error_vld_or = '1') then
-                    tlp_error_vld_reg <= '1';
-                end if;
-                if (RESET = '1') then
-                    tlp_error_vld_reg <= '0';
-                end if;
-            end if;
-        end process;
-
-        assert (tlp_error_vld_reg /= '1')
-            report "CB_RTILE_CRDT_UP: Unsupported TLP type!"
-            severity failure;
-
+        -- psl assert_tlp_vld :
+        --      assert always (or tlp_error_vld) abort (RESET) @rising_edge(CLK)
+        --      report "RX_DMA_MEDUSA_DESC_FIFO: dfifo_i reset error!";
     end generate;
 
     off_g: if not CRDT_ENABLE generate

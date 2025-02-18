@@ -100,8 +100,6 @@ architecture FULL of MFB_PD_ASFIFO_SIMPLE is
     signal tx_dfifo_src_rdy  : std_logic;
     signal tx_dfifo_dst_rdy  : std_logic;
 
-    signal dfifo_ovf_err_reg : std_logic;
-
     signal tx_mins_data      : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
     signal tx_mins_meta      : std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
     signal tx_mins_discard   : std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -223,21 +221,9 @@ begin
         TX_STATUS  => open
     );
 
-    process (RX_CLK)
-    begin
-        if (rising_edge(RX_CLK)) then
-            if (rx_dfifo_dst_rdy = '0' and rx_dfifo_src_rdy = '1') then
-                dfifo_ovf_err_reg <= '1';
-            end if;
-            if (RX_RESET = '1') then
-                dfifo_ovf_err_reg <= '0';
-            end if;
-        end if;
-    end process;
-
-    assert (dfifo_ovf_err_reg /= '1')
-       report "MFB_PD_ASFIFO_SIMPLE: Illegal write to full dfifo_i FIFO!"
-       severity failure;
+    -- psl assert_dfifo_overflow :
+    --      assert always (rx_dfifo_dst_rdy = '1' or rx_dfifo_src_rdy = '0') abort (RX_RESET) @rising_edge(RX_CLK)
+    --      report "MFB_PD_ASFIFO_SIMPLE: Illegal write to full dfifo_i FIFO!";
 
     mins_i : entity work.METADATA_INSERTOR
     generic map(

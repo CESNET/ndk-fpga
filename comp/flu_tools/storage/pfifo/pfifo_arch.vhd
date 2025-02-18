@@ -79,8 +79,6 @@ architecture full of FLU_PFIFO is
    signal sig_pipe_dst_rdy   : std_logic;
 
    --------------------------------------------------------
-   --! SOP detector for asertion
-   signal assert_trans_on     : std_logic;
    --! EOP block detector
    signal assert_eop_block    : std_logic_vector(SOP_POS_WIDTH-1 downto 0);
    --! SOP block detector
@@ -94,34 +92,11 @@ begin
    --! EOP bloc detection
    assert_eop_block <= sig_tx_eop_pos(EOP_BLOCK_HINDEX downto EOP_BLOCK_LINDEX);
 
-   --! \brief This register helps to detect assertion during transfer
-   trans_detp:process(TX_CLK)
-   begin
-      if(TX_CLK = '1' and TX_CLK'event)then
-         if(TX_RESET = '1')then
-            assert_trans_on <= '0';
-         else
-            if(TX_DST_RDY = '1' and sig_tx_src_rdy = '1' and sig_tx_sop = '1' and assert_eop_block < assert_sop_block)then
-               assert_trans_on <= '1';
-            elsif(TX_DST_RDY = '1' and sig_tx_src_rdy = '1'and sig_tx_eop = '1')then
-               assert_trans_on <= '0';
-            end if;
-         end if;
-      end if;
-   end process;
-
    --! Assertion for Store-and-forward
-   assertTX_SF:process(TX_CLK)
-   begin
-      if(TX_CLK = '1' and TX_CLK'event)then
-         if(assert_trans_on = '1')then
-            --If the transaction is enabled, control that ...
-            assert (sig_tx_src_rdy = '1')
-                   report "Store-and-forward condition broken. There was detected SRC_RDY=0 during packet transfer"
-                   severity error;
-         end if;
-      end if;
-   end process;
+   -- psl assert_TX_SF :
+   --      assert always ((TX_DST_RDY = '1' and sig_tx_src_rdy = '1' and sig_tx_sop = '1' and assert_eop_block < assert_sop_block) |=> sig_tx_src_rdy = '1') abort (TX_RESET) @rising_edge(TX_CLK)
+   --      report "Store-and-forward condition broken. There was detected SRC_RDY=0 during packet transfer";
+
 
    --------------------------------------------------------
    --! Asynchronous FIFO for clock domain cross (ASFIFO from base library)

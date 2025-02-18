@@ -307,6 +307,11 @@ begin
     -----------------------------------------------------------------------------
     -- run-time checks for unsupported protocol
     -----------------------------------------------------------------------------
+    -- AXI stream empty data transaction
+    -- psl assert_tkeep :
+    --      assert always (RX_AXI_TVALID = '1' and OR(RX_AXI_TKEEP) /= '0') abort (RESET) @rising_edge(CLK)
+    --      report "AXI2MFB: RX_AXI_TKEEP == 0 while RX_AXI_TVALID == 1";
+
     -- pragma synthesis_off
     -- TKEEP invalid format
     axi_check_p: process(CLK)
@@ -316,9 +321,6 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RX_AXI_TVALID = '1') then
-                -- AXI stream empty data transaction
-                assert (OR(RX_AXI_TKEEP) /= '0')   report "AXI2MFB: RX_AXI_TKEEP == 0 while RX_AXI_TVALID == 1"   severity FAILURE;
-
                 ls_zero_index := 0;
                 ms_one_index := 0;
 

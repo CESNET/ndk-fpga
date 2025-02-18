@@ -831,14 +831,12 @@ begin
         -- DMA in FIFO read by tag map unit
         dma_fifo_rd_gen : for i in 0 to MVB_UP_ITEMS-1 generate
             dma_in_fifoxm_rd(i) <= '1' when pcie_in_fifoxm_rd(i)='1' and pcie_in_fifoxm_empty(i)='0' else '0';
-        end generate;
 
-        -- check reading from empty fifo
-        dma_fifo_read_check : for i in 0 to MVB_UP_ITEMS-1 generate
-            assert ((dma_in_fifoxm_rd(i)='1' and dma_in_fifoxm_empty(i)='1')=false)
-                report "Reading from empty FIFO! Invalid state in this case!" severity failure;
+            -- check reading from empty fifo
+            -- psl assert_in_fifo_underflow :
+            --      assert always ((dma_in_fifoxm_rd(i)='1' and dma_in_fifoxm_empty(i)='1')=false) @rising_edge(CLK)
+            --      report "Reading from empty FIFO! Invalid state in this case!";
         end generate;
-
     end generate;
 
     -- -------------------------------------------------------------------------
@@ -917,8 +915,9 @@ begin
 
     -- check writing in full fifo
     pcie_fifo_write_check : for i in 0 to MVB_UP_ITEMS-1 generate
-        assert ((pcie_in_fifoxm_wr(i)='1' and pcie_in_fifoxm_full='1' and RESET='0')=false)
-            report "Writing in full FIFO! Invalid state in this case!" severity failure;
+        -- psl assert_fifo_owerflow :
+        --      assert always (not (pcie_in_fifoxm_wr(i)='1' and pcie_in_fifoxm_full='1')) abort (RESET) @rising_edge(CLK)
+        --      report "Writing in full FIFO! Invalid state in this case!";
     end generate;
 
     pcie_tag_write <= pcie_in_fifoxm_wr and not pcie_in_fifoxm_full;

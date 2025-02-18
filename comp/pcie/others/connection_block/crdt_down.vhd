@@ -68,12 +68,6 @@ architecture FULL of CB_RTILE_CRDT_DOWN is
     signal crdt_pd_cnt      : u_array_t(3-1 downto 0)(CRDT_PD_CNT_W-1 downto 0);
 
     signal cnt_last_bit             : std_logic_vector(6-1 downto 0);
-    signal dbg_err_cnt_overflow     : std_logic;
-    signal dbg_err_cnt_overflow_reg : std_logic;
-
-    attribute preserve_for_debug : boolean;
-    attribute preserve_for_debug of dbg_err_cnt_overflow_reg : signal is true;
-
 begin
 
     crdt_on_g : if CRDT_ENABLE generate
@@ -196,23 +190,9 @@ begin
             cnt_last_bit(i+3) <= crdt_pd_cnt(i)(CRDT_PD_CNT_W-1);
         end generate;
 
-        dbg_err_cnt_overflow <= or cnt_last_bit;
-
-        process(CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (dbg_err_cnt_overflow = '1') then
-                    dbg_err_cnt_overflow_reg <= '1';
-                end if;
-                if (RESET = '1') then
-                    dbg_err_cnt_overflow_reg <= '0';
-                end if;
-            end if;
-        end process;
-
-        assert (dbg_err_cnt_overflow_reg /= '1')
-            report "CB_RTILE_CRDT_DOWN: some credit counter overflow!"
-            severity failure;
+        -- psl assert_cnt_last :
+        --      assert always (not (or cnt_last_bit)) abort(RESET) @rising_edge(CLK)
+        --      report "CB_RTILE_CRDT_DOWN: some credit counter overflow!";
     end generate;
 
     crdt_off_g : if not CRDT_ENABLE generate
