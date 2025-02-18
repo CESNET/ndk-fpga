@@ -86,10 +86,66 @@ chip (``xcvu7p-flvb2104-2-i``) for *Gen3 x8* and *Gen3 x16* PCIe configurations.
 | DSPs          | 4 (0.09%)        | 4 (0.09%)     | 4 (0.09%)     | 4 (0.09%)     |
 +---------------+------------------+---------------+---------------+---------------+
 
-Performance statistics
-----------------------
+Latency report
+--------------
 
+Since this module has been designed for low latency, this is our primary concern. Even though its
+RTL design reaches the minimum latency, the PCI Express protocol remains the biggest contributor to
+the overall latency. From our observations, the latency is also influenced by the vendor
+of the CPU where Intel devices perform slightly better than AMD devices. Some PCIe IPs for FPGAs
+provide a special low-latency mode such as the PCIE4 block used in *AMD UltraScale+* architecture, which
+is enabled on all AMD cards whose measurements we provide. The latency is always measured as a
+*Round-Trip-Time (RTT)* latency either on the path: *Host -> H2F Controller -> FPGA -> F2H Controller
+-> Host (HFH)*, or *FPGA -> F2H Controller -> Host -> H2F Controller -> FPGA (FHF)*, which will be
+denoted for specific results. Every time the data are looped back, either in the Host for the FHF path
+or in the FPGA for the HFH path, the loopback is established with the shortest path possible (E.g., for the
+HFH to directly connect *USR_TX_MFB* to the *USR_RX_MFB* interface).
 
+Test case 1 (AMD FPGA)
+^^^^^^^^^^^^^^^^^^^^^^
+
+* Card: AMD Alveo X3522PV
+
+  CPU: Intel(R) Xeon(R) E-2226G CPU @ 3.40GHz
+
+  RAM: 64 GB (4 x 16GB)
+
+  PCIe configuration: Gen3x8
+
+* FHF latency (1000 repetitions)
+
+        .. figure:: img/fhf_latency_alveo_x3522pv.jpg
+                :align: center
+                :scale: 60
+
+* HFH latency (64 byte packets, 1000000 repetitions)
+
+  ~811 ns (median)
+
+  ~1.3 us (0.99-quantile)
+
+Test case 2 (Intel FPGA)
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Card: Silicom FPGA SmartNIC N6010
+
+  CPU: Intel(R) Xeon(R) Gold 6348 CPU @ 2.60GHz
+
+  RAM: 64 GB (4 x 16GB)
+
+  PCIe configuration: Gen3x8
+
+* FHF latency (1000 repetitions)
+
+        .. figure:: img/latency_n6010_tramin.png
+                :align: center
+                :height: 450
+
+* HFH latency (64 byte packets, 1000000 repetitions)
+
+  ~1100 ns (median)
+
+  ~1.7 us (0.99-quantile)
 
 Local Subcomponents
 -------------------
