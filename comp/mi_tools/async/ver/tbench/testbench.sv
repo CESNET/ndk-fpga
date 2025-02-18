@@ -47,4 +47,19 @@ module testbench;
               );
 
   asfifo_cov COV();
+
+
+    MI_PROPERTY #(
+        .DIRECTION(1) //  0 => ASSERT(TX), 1 => ASSUME(RX)
+    )
+    MI_PROPERTY_RX (
+        .inf(MASTER)
+    )
+
+    MI_PROPERTY #(
+        .DIRECTION(0)//  0 => ASSERT(TX), 1 => ASSUME(RX)
+    )
+    MI_PROPERTY_TX (
+        .inf(SLAVE)
+    )
 endmodule : testbench

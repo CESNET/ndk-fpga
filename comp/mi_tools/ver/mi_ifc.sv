@@ -38,65 +38,79 @@ interface iMi #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH = 0) (input wire logic CLK, R
 
   //verification modports
   modport monitor   (clocking monitor_cb);
-
-  property valid;
-      @(posedge CLK) disable iff(RESET)
-      !$isunknown(RD) && !$isunknown(WR);
-  endproperty
-
-  property valid_request;
-     @(posedge CLK) disable iff(RESET)
-     (RD || WR) |-> (!$isunknown(ADDR) && !$isunknown(BE));
-  endproperty
-
-  property valid_request_write_data;
-     @(posedge CLK) disable iff(RESET)
-     (WR) |-> (!$isunknown(DWR));
-  endproperty
-
-  property valid_request_write_meta;
-     @(posedge CLK) disable iff(RESET)
-     ((RD || WR) && META_WIDTH > 0) |-> (!$isunknown(MWR));
-  endproperty
-
-  property valid_response;
-     @(posedge CLK) disable iff(RESET)
-     (DRDY) |-> (!$isunknown(DRD));
-  endproperty
-
-  assert property (valid) else begin $error("signlas RD and WR have to be allways valid"); $stop(); end
-  assert property (valid_request) else begin $error("signal addr and be have to be valid when RD or WR signal is asserted"); $stop(); end
-  assert property (valid_request_write_data) else begin $error("when signal WR is asserted then signal DWR have to be valid"); $stop(); end
-  assert property (valid_request_write_meta) else begin $error("when signal WR is asserted and META_WIDTH > 0 then signal MWR have to be valid"); $stop(); end
-  assert property (valid_response) else begin $error("when signal DRDY is asserted then signal DRD have to be valid"); $stop(); end
-  // --------------------------------------------------------------------------
-  // -- Interface properties/assertions
-  // --------------------------------------------------------------------------
-  // -- While RESET RD inactive ----------------------------------------
-  // RD may be active only if RESET is inactive.
-  property RESETR;
-     @(posedge CLK) (RESET)|->(not RD);
-  endproperty
-
-  assert property (RESETR)
-     else $error("RD is active during reset.");
-
-  // -- While RESET WR inactive ----------------------------------------
-  // WR may be active only if RESET is inactive.
-  property RESETW;
-     @(posedge CLK) (RESET)|->(not WR);
-  endproperty
-
-  assert property (RESETW)
-     else $error("WR is active during reset.");
-
-  // -- WR never together with RD ---------------------------------------
-  // WR can not be active together with RD.
-  property RDnottogetherWR;
-     @(posedge CLK) (RD)|->(!WR);
-  endproperty
-
-  assert property (RDnottogetherWR)
-     else $error("RD and WR signals can not be active at the same cycle.");
-
 endinterface
+
+
+module MI_PROPERTY #(
+    parameter int unsigned DIRECTION = 0 //  0 => ASSERT(TX), 1 => ASSUME(RX)
+)
+(
+    iMi inf
+);
+
+    property valid;
+        @(posedge inf.CLK) disable iff(inf.RESET)
+        !$isunknown(inf.RD) && !$isunknown(inf.WR);
+    endproperty
+
+    property valid_request;
+       @(posedge inf.CLK) disable iff(inf.RESET)
+       (inf.RD || inf.WR) |-> (!$isunknown(inf.ADDR) && !$isunknown(inf.BE));
+    endproperty
+
+    property valid_request_write_data;
+       @(posedge inf.CLK) disable iff(inf.RESET)
+       (inf.WR) |-> (!$isunknown(inf.DWR));
+    endproperty
+
+    property valid_request_write_meta;
+       @(posedge inf.CLK) disable iff(inf.RESET)
+       ((inf.RD || inf.WR) && inf.META_WIDTH > 0) |-> (!$isunknown(inf.MWR));
+    endproperty
+
+    property valid_response;
+       @(posedge inf.CLK) disable iff(inf.RESET)
+       (inf.DRDY) |-> (!$isunknown(inf.DRD));
+    endproperty
+
+    // --------------------------------------------------------------------------
+    // -- Interface properties/assertions
+    // --------------------------------------------------------------------------
+    // -- While RESET RD inactive ----------------------------------------
+    // RD or WR may be active only if RESET is inactive.
+    property prop_inactive_when_reset;
+       @(posedge inf.CLK) (inf.RESET)|->(not (inf.RD || inf.WR));
+    endproperty
+
+    // -- WR never together with RD ---------------------------------------
+    // WR can not be active together with RD.
+    property no_RDWR ;
+       @(posedge inf.CLK) disable iff (inf.RESET)
+       !(inf.RD & inf.WR);
+    endproperty
+
+
+    generate
+        if (DIRECTION == 0) begin
+            assert property (prop_inactive_when_reset) else begin $error("RD or WR is active during reset."); $stop(); end;
+            assert property (valid)                    else begin $error("signlas RD and WR have to be allways valid"); $stop(); end
+            assert property (valid_request)            else begin $error("signal addr and be have to be valid when RD or WR signal is asserted"); $stop(); end
+            assert property (valid_request_write_data) else begin $error("when signal WR is asserted then signal DWR have to be valid"); $stop(); end
+            assert property (valid_request_write_meta) else begin $error("when signal WR is asserted and META_WIDTH > 0 then signal MWR have to be valid"); $stop(); end
+            assert property (valid_response)           else begin $error("when signal DRDY is asserted then signal DRD have to be valid"); $stop(); end
+            assert property (no_RDWR)                  else begin $error("RD and WR signals can not be active at the same cycle."); $stop(); end
+        end else if (DIRECTION == 1) begin
+            assume property (prop_inactive_when_reset) else begin $warning("RD or WR is active during reset."); end;
+            assume property (valid)                    else begin $warning("signlas RD and WR have to be allways valid");end
+            assume property (valid_request)            else begin $warning("signal addr and be have to be valid when RD or WR signal is asserted"); end
+            assume property (valid_request_write_data) else begin $warning("when signal WR is asserted then signal DWR have to be valid"); end
+            assume property (valid_request_write_meta) else begin $warning("when signal WR is asserted and META_WIDTH > 0 then signal MWR have to be valid"); end
+            assume property (valid_response)           else begin $warning("when signal DRDY is asserted then signal DRD have to be valid"); end
+            assume property (no_RDWR)                  else begin $warning("RD and WR signals can not be active at the same cycle."); end
+        end else begin
+            initial assert (0) else begin $error("%s\nUNSUPORTED DIRECTION %0d", `__FILE__, DIRECTION); $stop(); end
+        end
+    endgenerate
+endmodule
+
+
