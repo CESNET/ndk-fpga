@@ -74,6 +74,9 @@
       unlock();
    endtask: remove
 
+    function int unsigned empty();
+        return (tr_table.size() == 0);
+    endfunction
 
     // ------------------------------------------------------------------------
     // Lock scoreboard
