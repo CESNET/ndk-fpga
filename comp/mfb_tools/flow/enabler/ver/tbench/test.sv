@@ -99,6 +99,7 @@ program TEST (
     task test1();
         $write("\n\n############ TEST CASE 1 ############\n\n");
         enableTestEnvironment();
+        resetDesign();
         reg_generator.setEnabled(1000);
         generator.setEnabled(TRANSACTION_COUNT);
         wait(!generator.enabled);
@@ -107,7 +108,6 @@ program TEST (
     endtask
 
     initial begin
-        resetDesign();
         createGeneratorEnvironment(FRAME_SIZE_MAX, FRAME_SIZE_MIN);
         createEnvironment();
         test1();

@@ -76,7 +76,6 @@ class ScoreboardMonitorCbs extends MonitorCbs;
          sc_table.display();
          $stop;
       end;
-      $write("%d. Transaction received.\n", rx_cnt);
    endtask
 endclass
 

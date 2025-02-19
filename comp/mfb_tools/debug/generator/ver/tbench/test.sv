@@ -198,8 +198,8 @@ program TEST (
         // Max burst size the burst mode is tested on
         const int max_bst_size = 10;
 
-        resetDesign();
         createEnvironment();
+        resetDesign();
 
         // Test with different packet lengths and different burst sizes.
         if (USE_PACP_ARCH != 1'b1) begin
