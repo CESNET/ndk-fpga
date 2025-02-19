@@ -214,7 +214,6 @@ program TEST (
         for (int length = 64; length < 4*MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE; length=length+3) begin
             test(length, 0, 64);
         end
-
         $write("Verification finished successfully!\n");
         $stop();
     end

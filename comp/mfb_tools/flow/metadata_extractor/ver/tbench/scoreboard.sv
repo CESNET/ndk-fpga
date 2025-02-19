@@ -122,6 +122,10 @@ class Scoreboard;
         mvb_monitorCbs = new(mvb_scoreTable);
     endfunction
 
+    function int unsigned done();
+        return (scoreTable.empty() != 0) && (mvb_scoreTable.empty() != 0);
+    endfunction
+
     task display();
         scoreTable.display();
         mvb_scoreTable.display();

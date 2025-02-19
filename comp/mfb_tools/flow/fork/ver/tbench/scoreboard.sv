@@ -80,6 +80,14 @@ class Scoreboard;
         driverCbs  = new(scoreTable);
     endfunction
 
+    function int unsigned done();
+        int unsigned ret = 1;
+        for (int unsigned it = 0; it < OUTPUT_PORTS; it++) begin
+            ret &= (scoreTable[it].empty() != 0);
+        end
+        return ret;
+    endfunction
+
     task display();
         foreach(scoreTable[i]) begin
             scoreTable[i].display();

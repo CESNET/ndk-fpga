@@ -177,6 +177,14 @@ class Scoreboard;
 
    endfunction
 
+   function int unsigned done();
+        int unsigned ret = 1;
+        for (int unsigned it = 0; it < SPLITTER_OUTPUTS; it ++) begin
+            ret &= (scoreTable[it].empty() != 0);
+        end
+        return ret;
+   endfunction
+
    task setEnabled();
       for (int i = 0; i < SPLITTER_OUTPUTS; i++) begin
          dutCheck[i].setEnabled();

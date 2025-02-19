@@ -84,6 +84,10 @@ class Scoreboard #(int ITEM_WIDTH, int LNG_WIDTH, bit SATURATION);
       driverCbs  = new(scoreTable);
     endfunction
 
+    function int unsigned done();
+        return (scoreTable.empty() != 0);
+    endfunction
+
     task display();
       scoreTable.display();
     endtask
