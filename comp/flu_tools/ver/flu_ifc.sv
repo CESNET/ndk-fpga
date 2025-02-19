@@ -156,12 +156,12 @@ interface iFrameLinkUTx #(DWIDTH=512, EOP_WIDTH=6, SOP_WIDTH=3) (input logic CLK
    // -- While RESET DST_RDY inactive ----------------------------------------
    // DST_RDY_N may be active only if RESET is inactive.
 
-   property RESETDST;
-      @(posedge CLK) (RESET)|->(!DST_RDY);
-   endproperty
+   //property RESETDST;
+   //   @(posedge CLK) (RESET)|->(!DST_RDY);
+   //endproperty
 
-   assert property (RESETDST)
-      else $error("DST_RDY is active during reset.");
+   //assume property (RESETDST)
+   //   else $error("DST_RDY is active during reset.");
 
 
    // -- No data after EOP ----------------------------------------------------

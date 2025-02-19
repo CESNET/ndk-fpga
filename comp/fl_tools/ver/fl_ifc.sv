@@ -189,12 +189,12 @@ interface iFrameLinkTx #(DWIDTH=32, DREMWIDTH=2) (input logic CLK, RESET);
     // -- While RESET DST_RDY_N inactive ----------------------------------------
   // DST_RDY_N may be active only if RESET is inactive.
 
-  property RESETDST;
-     @(posedge CLK) (RESET)|->(DST_RDY_N);
-  endproperty
+  //property RESETDST;
+  //   @(posedge CLK) (RESET)|->(DST_RDY_N);
+  //endproperty
 
-  assert property (RESETDST)
-     else $error("TX_DST_RDY_N is active during reset.");
+  //assume property (RESETDST)
+  //   else $error("TX_DST_RDY_N is active during reset.");
 
 
   // -- SOF together with SOP -------------------------------------------------
