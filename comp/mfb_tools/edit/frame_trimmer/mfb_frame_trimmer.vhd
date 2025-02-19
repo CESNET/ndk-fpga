@@ -204,9 +204,15 @@ begin
         s_nl_pos_off_prev(r)    <= s_rx_new_len_ext(r)(log2(REGION_ITEMS)-1 downto 0);
 
         s_nl_word_ok(r)        <= '1' when ((s_nl_word_off(r) = s_rx_word_cnt(r)))           else '0';
-        s_nl_region_ok(r)      <= '1' when ((REGIONS = 1) or (s_nl_region_off(r) = r))       else '0';
         s_nl_word_prev_ok(r)   <= '1' when ((s_nl_word_off_prev(r) = s_rx_word_cnt_prev(r))) else '0';
-        s_nl_region_prev_ok(r) <= '1' when ((REGIONS = 1) or (s_nl_region_off_prev(r) = r))  else '0';
+
+        one_region_new_len_g : if (REGIONS = 1) generate
+            s_nl_region_ok(r)      <= '1';
+            s_nl_region_prev_ok(r) <= '1';
+        else generate
+            s_nl_region_ok(r)      <= '1' when (s_nl_region_off(r) = r)      else '0';
+            s_nl_region_prev_ok(r) <= '1' when (s_nl_region_off_prev(r) = r) else '0';
+        end generate;
 
         s_nl_ok(r)      <= s_nl_word_ok(r) and s_nl_region_ok(r) and s_trim_lvld(r+1);
         s_nl_prev_ok(r) <= s_nl_word_prev_ok(r) and s_nl_region_prev_ok(r) and s_trim_lvld(r) and s_rx_sof_after_eof_vld(r);
