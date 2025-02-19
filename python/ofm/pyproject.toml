@@ -6,7 +6,6 @@ description = "Open FPGA Modules package - modules and tools for NDK FW componen
 requires-python = ">=3.11"
 readme = "README.md"
 dependencies = [
-    "nfb @ ${NDK_SW_PYTHON_URL}pynfb",
     "tabulate",
     "numpy",
     "pandas",
@@ -24,6 +23,13 @@ ofm-mem-logger = "ofm.comp.debug.data_logger.mem_logger.mem_logger:main"
 test = [
     "flake8",
     "mypy",
+]
+
+nfb-pypi = [
+    "nfb",
+]
+nfb-env = [
+    "nfb @ ${NDK_SW_PYTHON_URL}pynfb",
 ]
 
 [build-system]
