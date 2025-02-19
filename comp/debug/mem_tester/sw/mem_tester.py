@@ -10,6 +10,7 @@ import argparse
 
 from ofm.comp.debug.data_logger.mem_logger import MemLogger
 
+
 class MemTester(nfb.BaseComp):
 
     DT_COMPATIBLE = "netcope,mem_tester"
