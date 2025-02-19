@@ -20,8 +20,13 @@ pycodestyle:
   stage: check
   needs: []
   image:
-    name: plone/code-quality
+    name: python:3.11-slim
     entrypoint: [""]
+  before_script:
+    - source env.sh
+    - pip install uv # get a package manager that can just install dependencies
+    - uv pip install --system -r python/ofm/pyproject.toml --extra test --extra nfb-pypi
+    - mypy python/ofm --config-file=python/ofm/pyproject.toml --install-types --non-interactive
   script:
     - sh tests/ci/pycodestyle.sh
 
