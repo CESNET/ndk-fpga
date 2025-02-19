@@ -4,3 +4,6 @@
 [submodule "extra/nfb-200g2ql"]
 	path = extra/nfb-200g2ql
 	url = ../ndk-card-nfb-200g2ql.git
+[submodule "extra/ip-3rdparty"]
+	path = extra/ip-3rdparty
+	url = ../ip-3rdparty.git

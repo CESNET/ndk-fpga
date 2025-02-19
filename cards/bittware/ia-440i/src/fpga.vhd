@@ -230,10 +230,10 @@ architecture FULL of FPGA is
     constant MEM_BURST_WIDTH : natural := 7;
     constant AMM_FREQ_KHZ    : natural := 400000;
 
+    constant QSFP_PORTS      : natural := 1;
+
     signal status_led_g      : std_logic_vector(STATUS_LEDS-1 downto 0);
     signal status_led_r      : std_logic_vector(STATUS_LEDS-1 downto 0);
-
-    constant BMC_IF_PRESENT  : boolean := false;
 
     signal bmc_mi_clk        : std_logic;
     signal bmc_mi_reset      : std_logic;
@@ -274,6 +274,42 @@ architecture FULL of FPGA is
     signal emif_cal_success       : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
     signal emif_cal_fail          : std_logic_vector(MEM_PORTS-1 downto 0) := (others => '1');
 
+    signal qsfp_modprs_n    : std_logic_vector(QSFP_PORTS-1 downto 0);
+    signal qsfp_int_n       : std_logic_vector(QSFP_PORTS-1 downto 0);
+    signal qsfp_reset_n     : std_logic_vector(QSFP_PORTS-1 downto 0);
+    signal qsfp_lpmode      : std_logic_vector(QSFP_PORTS-1 downto 0);
+
+    signal axi_awid         : std_logic_vector(8-1 downto 0);
+    signal axi_awaddr       : std_logic_vector(8-1 downto 0);
+    signal axi_awlen        : std_logic_vector(8-1 downto 0);
+    signal axi_awsize       : std_logic_vector(3-1 downto 0);
+    signal axi_awburst      : std_logic_vector(2-1 downto 0);
+    signal axi_awprot       : std_logic_vector(3-1 downto 0);
+    signal axi_awvalid      : std_logic;
+    signal axi_awready      : std_logic;
+    signal axi_wdata        : std_logic_vector(32-1 downto 0);
+    signal axi_wstrb        : std_logic_vector((32/8)-1 downto 0);
+    signal axi_wvalid       : std_logic;
+    signal axi_wready       : std_logic;
+    signal axi_bid          : std_logic_vector(8-1 downto 0);
+    signal axi_bresp        : std_logic_vector(2-1 downto 0);
+    signal axi_bvalid       : std_logic;
+    signal axi_bready       : std_logic;
+    signal axi_arid         : std_logic_vector(8-1 downto 0);
+    signal axi_araddr       : std_logic_vector(8-1 downto 0);
+    signal axi_arlen        : std_logic_vector(8-1 downto 0);
+    signal axi_arsize       : std_logic_vector(3-1 downto 0);
+    signal axi_arburst      : std_logic_vector(2-1 downto 0);
+    signal axi_arprot       : std_logic_vector(3-1 downto 0);
+    signal axi_arvalid      : std_logic;
+    signal axi_arready      : std_logic;
+    signal axi_rid          : std_logic_vector(8-1 downto 0);
+    signal axi_rdata        : std_logic_vector(32-1 downto 0);
+    signal axi_rresp        : std_logic_vector(2-1 downto 0);
+    signal axi_rlast        : std_logic;
+    signal axi_rvalid       : std_logic;
+    signal axi_rready       : std_logic;
+
 begin
 
     cm_i : entity work.FPGA_COMMON
@@ -292,7 +328,7 @@ begin
         ETH_PORT_LEDS           => 1, -- fake, this board has no ETH LEDs
         ETH_LANES               => ETH_LANES,
 
-        QSFP_PORTS              => 1,
+        QSFP_PORTS              => QSFP_PORTS,
         QSFP_I2C_PORTS          => 1,
         -- QSFP_I2C_TRISTATE       => ??,
 
@@ -338,21 +374,10 @@ begin
         ETH_TX_P               => QSFP_TX_P,
         ETH_TX_N               => QSFP_TX_N,
 
-        -- QSFP_MODPRS_N          => ??,
-        -- QSFP_INT_N             => ??,
-
-        -- QSFP_I2C_SCL_I(0)      => qsfp_scl,
-        -- QSFP_I2C_SDA_I(0)      => qsfp_sda,
-        -- QSFP_I2C_SCL_O(0)      => qsfp_scl_o,
-        -- QSFP_I2C_SCL_OE(0)     => qsfp_scl_oe,
-        -- QSFP_I2C_SDA_O(0)      => qsfp_sda_o,
-        -- QSFP_I2C_SDA_OE(0)     => qsfp_sda_oe,
-
-        -- QSFP_MODSEL_N          => open,
-        -- QSFP_LPMODE(0)         => ioexp_o(4),
-        -- QSFP_RESET_N(0)        => ioexp_o(7),
-        -- QSFP_MODPRS_N          => (others => ioexp_i(6)),
-        -- QSFP_INT_N             => (others => ioexp_i(5)),
+        QSFP_MODPRS_N          => qsfp_modprs_n,
+        QSFP_INT_N             => qsfp_int_n,
+        QSFP_LPMODE            => qsfp_lpmode,
+        QSFP_RESET_N           => qsfp_reset_n,
 
         MEM_CLK                => mem_clk,
         MEM_RST                => not mem_rst_n,
@@ -393,28 +418,148 @@ begin
     USER_LED_G <= status_led_g(0);
     USER_LED_R <= status_led_r(0);
 
-    bmc_if_open_g: if not BMC_IF_PRESENT generate
-        BMC_IF_PRESENT_N <= '1';
-    end generate;
+    mi2axi: entity work.MI2AXI4
+        generic map(
+            AXI_DATA_WIDTH => 32,
+            ADDR_WIDTH     => 8
+        )
+        port map(
+        CLK         => bmc_mi_clk,
+        RESET       => bmc_mi_reset,
 
-    -- TODO: custom BMC boot controller
-    -- boot_ctrl_i : entity work.BOOT_CTRL
-    -- generic map (
-    --     DEVICE    => DEVICE,
-    --     BOOT_TYPE => 3
-    -- )
-    -- port map (
-    --     MI_CLK        => boot_mi_clk,
-    --     MI_RESET      => boot_mi_reset,
-    --     MI_DWR        => boot_mi_dwr,
-    --     MI_ADDR       => boot_mi_addr,
-    --     MI_BE         => boot_mi_be,
-    --     MI_RD         => boot_mi_rd,
-    --     MI_WR         => boot_mi_wr,
-    --     MI_ARDY       => boot_mi_ardy,
-    --     MI_DRD        => boot_mi_drd,
-    --     MI_DRDY       => boot_mi_drdy,
-    -- ...
+        MI_DWR      => bmc_mi_dwr,
+        MI_ADDR     => bmc_mi_addr(7 downto 0),
+        MI_RD       => bmc_mi_rd,
+        MI_WR       => bmc_mi_wr,
+        MI_BE       => bmc_mi_be,
+        MI_DRD      => bmc_mi_drd,
+        MI_ARDY     => bmc_mi_ardy,
+        MI_DRDY     => bmc_mi_drdy,
+
+        AXI_AWID    => axi_awid,
+        AXI_AWADDR  => axi_awaddr,
+        AXI_AWLEN   => axi_awlen,
+        AXI_AWSIZE  => axi_awsize,
+        AXI_AWBURST => axi_awburst,
+        AXI_AWPROT  => axi_awprot,
+        AXI_AWVALID => axi_awvalid,
+        AXI_AWREADY => axi_awready,
+        AXI_WDATA   => axi_wdata,
+        AXI_WSTRB   => axi_wstrb,
+        AXI_WVALID  => axi_wvalid,
+        AXI_WREADY  => axi_wready,
+        AXI_BID     => axi_bid,
+        AXI_BRESP   => axi_bresp,
+        AXI_BVALID  => axi_bvalid,
+        AXI_BREADY  => axi_bready,
+        AXI_ARID    => axi_arid,
+        AXI_ARADDR  => axi_araddr,
+        AXI_ARLEN   => axi_arlen,
+        AXI_ARSIZE  => axi_arsize,
+        AXI_ARBURST => axi_arburst,
+        AXI_ARPROT  => axi_arprot,
+        AXI_ARVALID => axi_arvalid,
+        AXI_ARREADY => axi_arready,
+        AXI_RID     => axi_rid,
+        AXI_RDATA   => axi_rdata,
+        AXI_RRESP   => axi_rresp,
+        AXI_RLAST   => axi_rlast,
+        AXI_RVALID  => axi_rvalid,
+        AXI_RREADY  => axi_rready
+    );
+
+    bmc_3v0_top_i : entity work.bmc_3v0_top
+    port map (
+        -- Host0 AXI Interface - MCTP
+        host0_aclk              => bmc_mi_clk,
+        host0_areset            => bmc_mi_reset,
+        host0_awaddr            => axi_awaddr,
+        host0_awvalid           => axi_awvalid,
+        host0_awready           => axi_awready,
+        host0_awprot            => axi_awprot,
+        host0_wdata             => axi_wdata,
+        host0_wstrb             => axi_wstrb,
+        host0_wvalid            => axi_wvalid,
+        host0_wready            => axi_wready,
+        host0_bresp             => axi_bresp,
+        host0_bvalid            => axi_bvalid,
+        host0_bready            => axi_bready,
+        host0_araddr            => axi_araddr,
+        host0_arvalid           => axi_arvalid,
+        host0_arready           => axi_arready,
+        host0_arprot            => axi_arprot,
+        host0_rdata             => axi_rdata,
+        host0_rresp             => axi_rresp,
+        host0_rvalid            => axi_rvalid,
+        host0_rready            => axi_rready,
+        -- Host1 AXI Interface - I2C
+        host1_aclk              => bmc_mi_clk,
+        host1_areset            => bmc_mi_reset,
+        host1_awaddr            => (others => '0'),
+        host1_awvalid           => '0',
+        host1_awready           => open,
+        host1_awprot            => (others=> '0'),
+        host1_wdata             => (others => '0'),
+        host1_wstrb             => (others => '0'),
+        host1_wvalid            => '0',
+        host1_wready            => open,
+        host1_bresp             => open,
+        host1_bvalid            => open,
+        host1_bready            => '1',
+        host1_araddr            => (others => '0'),
+        host1_arvalid           => '0',
+        host1_arready           => open,
+        host1_arprot            => (others => '0'),
+        host1_rdata             => open,
+        host1_rresp             => open,
+        host1_rvalid            => open,
+        host1_rready            => '1',
+        -- Capability ROM AXI Interface
+        cap_rom_aclk              => bmc_mi_clk,
+        cap_rom_areset            => bmc_mi_reset,
+        cap_rom_awaddr            => (others => '0'),
+        cap_rom_awvalid           => '0',
+        cap_rom_awready           => open,
+        cap_rom_awprot            => (others=> '0'),
+        cap_rom_wdata             => (others => '0'),
+        cap_rom_wstrb             => (others => '0'),
+        cap_rom_wvalid            => '0',
+        cap_rom_wready            => open,
+        cap_rom_bresp             => open,
+        cap_rom_bvalid            => open,
+        cap_rom_bready            => '1',
+        cap_rom_araddr            => (others => '0'),
+        cap_rom_arvalid           => '0',
+        cap_rom_arready           => open,
+        cap_rom_arprot            => (others => '0'),
+        cap_rom_rdata             => open,
+        cap_rom_rresp             => open,
+        cap_rom_rvalid            => open,
+        cap_rom_rready            => '1',
+        -- SPI System Clock and Reset
+        spi_sys_clk             => bmc_mi_clk,
+        spi_sys_reset           => bmc_mi_reset,
+        -- SPI Interface
+        bmc_if_ready_n          => BMC_IF_PRESENT_N,
+        spi_slv_sclk            => FPGA_IG_SPI_SCK,
+        spi_slv_ss_n            => FPGA_IG_SPI_PCS0,
+        spi_slv_mosi            => FPGA_IG_SPI_MOSI,
+        spi_slv_miso            => FPGA_IG_SPI_MISO,
+        f2b_irq_n               => FPGA_TO_BMC_IRQ,
+        spi_mst_sclk            => FPGA_EG_SPI_SCK,
+        spi_mst_ss_n            => FPGA_EG_SPI_PCS0,
+        spi_mst_mosi            => FPGA_EG_SPI_MOSI,
+        spi_mst_miso            => FPGA_EG_SPI_MISO,
+        b2f_irq_n               => BMC_TO_FPGA_IRQ,
+        -- Telemetry Vectors
+        telemetry_clk           => bmc_mi_clk,
+        telemetry_reset         => bmc_mi_reset,
+
+        qsfpdd0_rst_n           => qsfp_reset_n(0),
+        qsfpdd0_lpmode          => qsfp_lpmode(0),
+        qsfpdd0_int_n           => qsfp_int_n(0),
+        qsfpdd0_present_n       => qsfp_modprs_n(0)
+    );
 
     -- =========================================================================
     -- DRAM
