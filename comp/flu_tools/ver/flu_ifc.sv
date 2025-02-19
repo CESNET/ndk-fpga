@@ -61,7 +61,7 @@ interface iFrameLinkURx #(DWIDTH=512, EOPWIDTH=6, SOPWIDTH=3) (input logic CLK, 
       @(posedge CLK) (RESET)|->(!SRC_RDY);
    endproperty
 
-   assert property (RESETSRC)
+   assume property (RESETSRC)
       else $error("SRC_RDY is active during reset.");
 
 
@@ -82,7 +82,7 @@ interface iFrameLinkURx #(DWIDTH=512, EOPWIDTH=6, SOPWIDTH=3) (input logic CLK, 
 	    !(!SOP && (SRC_RDY && DST_RDY)) throughout sop_seq;
    endproperty
 
-   assert property (NoDataAfterEOP)
+   assume property (NoDataAfterEOP)
       else $error("FrameLinkUnaligned transaction continued after RX_EOP.");
 
 
@@ -102,7 +102,7 @@ interface iFrameLinkURx #(DWIDTH=512, EOPWIDTH=6, SOPWIDTH=3) (input logic CLK, 
        !(((SOP && !EOP) || (SOP && EOP && SOP_POS*2**(EOPWIDTH-SOPWIDTH) <= EOP_POS)) && (SRC_RDY && DST_RDY)) throughout eop_seq;
    endproperty
 
-   assert property (EOPMatchSOP)
+   assume property (EOPMatchSOP)
       else $error("RX_SOP was not followed by matching RX_EOP.");
 
 endinterface : iFrameLinkURx
