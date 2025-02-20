@@ -70,7 +70,7 @@ architecture FULL of SHAKEDOWN is
 begin
 
    -- psl assert_input_less_output :
-   --      assert always (count_ones(DIN_VLD) <= OUTPUTS) abort (RESET) @rising_edge(CLK)
+   --      assert always ({DIN_SRC_RDY = '1'} |-> (count_ones(DIN_VLD) <= OUTPUTS)) abort (RESET) @rising_edge(CLK)
    --      report "[SHAKEDOWN] There are more items valid on DIN interface than DOUT ITEMS, items might be getting lost!";
 
    s_din_arr <= slv_array_downto_deser(DIN,INPUTS,DATA_WIDTH);
