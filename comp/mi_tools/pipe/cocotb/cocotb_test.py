@@ -1,8 +1,6 @@
-# cocotb_test.py: MI Pipe test
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
-#
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import cocotb
 from cocotb.clock import Clock
@@ -13,7 +11,7 @@ from cocotbext.ofm.mi.monitors import MIMonitor
 from cocotbext.ofm.ver.generators import random_packets
 from cocotbext.ofm.utils.math import ceildiv
 from cocotb_bus.drivers import BitDriver
-from scoreboard import Scoreboard
+from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.mi.transaction import MiRequestTransaction, MiResponseTransaction, MiTransaction, MiTransactionType
 from cocotb.binary import BinaryValue
 from cocotbext.ofm.utils.signals import filter_bytes_by_bitmask
