@@ -804,7 +804,8 @@ begin
         end generate;
 
     else generate
-        gshk_afull <= '0';
+        TX_GLB_PKT_VLD <= (others => '0');
+        gshk_afull     <= '0';
     end generate;
 
     -- =====================================================================
