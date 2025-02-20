@@ -177,6 +177,12 @@ class MIRequestDriver(BusDriver):
 
         return bytes(drd[start_offset: byte_count-end_offset])
 
+    async def read32(self, addr: int, byte_enable: Optional[int] = None) -> int:
+        return int.from_bytes(await self.read(addr, byte_count=4, byte_enable=byte_enable), 'little')
+
+    async def read64(self, addr: int, byte_enable: Optional[int] = None) -> int:
+        return int.from_bytes(await self.read(addr, byte_count=8, byte_enable=byte_enable), 'little')
+
 
 class MIResponseDriver(BusDriver):
     """Response driver intended for the MI BUS that allows sending data to the read signals of the bus.
