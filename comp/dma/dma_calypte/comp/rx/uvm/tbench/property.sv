@@ -19,15 +19,11 @@ module DMA_LL_PROPERTY  #(DEVICE, USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZ
 
 
     string module_name = "";
-    logic START = 1'b1;
 
     ///////////////////
     // Start check properties after first clock
     initial begin
         module_name = $sformatf("%m");
-        @(posedge mfb_tx.CLK)
-        #(10ps)
-        START = 1'b0;
     end
 
     ////////////////////////////////////
@@ -61,7 +57,7 @@ module DMA_LL_PROPERTY  #(DEVICE, USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZ
 
     generate if (PCIE_UP_REGIONS > 1) begin
         property sof_after_eof;
-            @(posedge mfb_tx.CLK) disable iff(RESET || START)
+            @(posedge mfb_tx.CLK) disable iff(RESET)
             mfb_tx.SRC_RDY |-> (( ~(mfb_tx.EOF[PCIE_UP_REGIONS-2:0]) & mfb_tx.SOF[PCIE_UP_REGIONS-1:1]) == 0);
         endproperty
 
@@ -74,7 +70,7 @@ module DMA_LL_PROPERTY  #(DEVICE, USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZ
 
     //simplyfied rule. No space in middle of packet
     property sof_eof_src_rdy;
-        @(posedge mfb_tx.CLK) disable iff(RESET || START)
+        @(posedge mfb_tx.CLK) disable iff(RESET)
         (mfb_tx.SRC_RDY && (mfb_tx.SOF != 0)) |-> mfb_tx.SRC_RDY s_until_with (mfb_tx.EOF != 0);
     endproperty
 

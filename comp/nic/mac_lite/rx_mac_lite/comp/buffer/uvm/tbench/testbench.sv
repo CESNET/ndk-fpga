@@ -19,6 +19,7 @@ module testbench;
     // Signals
     logic RX_CLK = 0;
     logic TX_CLK = 0;
+    logic RST = 1;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
@@ -34,6 +35,7 @@ module testbench;
     // Define clock ticking
     always #(RX_CLK_PERIOD) RX_CLK = ~RX_CLK;
     always #(TX_CLK_PERIOD) TX_CLK = ~TX_CLK;
+    initial #(10ns) RST <= 0;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -69,9 +71,9 @@ module testbench;
         .DEVICE           (DEVICE)
     ) DUT_U (
         .RX_CLK     (RX_CLK),
-        .RX_RST     (reset_rx.RESET),
+        .RX_RST     (RST | reset_rx.RESET),
         .TX_CLK     (TX_CLK),
-        .TX_RST     (reset_tx.RESET),
+        .TX_RST     (RST | reset_tx.RESET),
         .mfb_rx     (mfb_rx),
         .mvb_tx     (mvb_tx),
         .mfb_tx     (mfb_tx)

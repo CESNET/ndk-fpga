@@ -72,11 +72,17 @@ module testbench;
         $stop(2);
     end
 
+    //RESET on start to prevent fire assertions
+    initial begin
+        RST <= 1'b1;
+        #(4*CLK_PERIOD) RST <= 1'b0;
+    end
+
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // DUT
     DUT DUT_U (
         .CLK      (CLK),
-        .RST      (reset.RESET),
+        .RST      (reset.RESET || RST),
         // For Intel
         .avst_up   (avst_up),
         .avst_down (avst_down),
@@ -112,7 +118,7 @@ module testbench;
        .CQ_MFB_META_W     (CQ_MFB_META_W     )
     )
     PROPERTY_U (
-        .RST      (reset.RESET),
+        .RST      (reset.RESET || RST),
         // For Intel
         .avst_up   (avst_up),
         .avst_down (avst_down),
