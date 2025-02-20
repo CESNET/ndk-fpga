@@ -12,12 +12,15 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "Pillow",
+    "colorama",
+    "pyyaml",
 ]
 
 [project.scripts]
 ofm-frequency-meter = "ofm.comp.base.misc.frequency_meter.frequency_meter:main"
 ofm-data-logger = "ofm.comp.debug.data_logger.data_logger.data_logger:main"
 ofm-mem-logger = "ofm.comp.debug.data_logger.mem_logger.mem_logger:main"
+ofm-mvb-hash-table-simple = "ofm.comp.mvb_tools.storage.mvb_hash_table_simple:main"
 
 [project.optional-dependencies]
 test = [
@@ -41,5 +44,7 @@ build-backend = "pdm.backend"
 [[tool.mypy.overrides]]
 module = [
     "nfb.*",
+    "cocotb.types.*",
+    "cocotbext.ofm.utils.math.*",
 ]
 ignore_missing_imports = true
