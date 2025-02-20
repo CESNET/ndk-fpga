@@ -3,7 +3,7 @@
 # Author(s): Lukas Nevrkla <xnevrk03@stud.fit.vutbr.cz>
 
 from mem_tester import MemTester
-from mem_logger.mem_logger import MemLogger
+from ofm.comp.debug.data_logger.mem_logger import MemLogger
 
 import nfb
 
@@ -17,6 +17,7 @@ import nfb
 #########
 
 device = nfb.default_dev_path
+#device = '/dev/nfb1'
 logger_offset = 0
 allow_more_loggers = False
 

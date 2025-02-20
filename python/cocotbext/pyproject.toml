@@ -4,6 +4,7 @@ version = "0.1.0"
 dependencies = [
 	"cocotb",
 	"cocotb-bus",
+	"ofm @ ${NDK_FPGA_OFM_URL}",
 ]
 
 [project.optional-dependencies]

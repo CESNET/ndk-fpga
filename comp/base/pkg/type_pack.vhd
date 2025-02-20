@@ -114,6 +114,10 @@ package type_pack is
   -- Same as function "absolute2uns" with a conversion to std_logic_vector at the end.
   function absolute2slv(v : signed) return std_logic_vector;
 
+  -- Resize items of the in_arr array to new_size (add/remove bits from the left side).
+  function array_item_resize_l(in_arr : u_array_t; new_size : natural) return u_array_t;
+  function array_item_resize_l(in_arr : slv_array_t; new_size : natural) return slv_array_t;
+
   pure function resize(in_val : std_logic_vector; in_size : natural) return std_logic_vector;
 
 end type_pack;
@@ -506,6 +510,21 @@ package body type_pack is
    pure function resize(in_val : std_logic_vector; in_size : natural) return std_logic_vector is
    begin
         return std_logic_vector(resize(unsigned(in_val), in_size));
+   end function;
+
+   function array_item_resize_l(in_arr : u_array_t; new_size : natural) return u_array_t is
+      variable out_arr : u_array_t(in_arr'range)(new_size-1 downto 0);
+   begin
+      for i in 0 to in_arr'high loop
+         out_arr(i) := resize(in_arr(i), new_size);
+      end loop;
+      return out_arr;
+   end function;
+
+   function array_item_resize_l(in_arr : slv_array_t; new_size : natural) return slv_array_t is
+      variable out_arr : slv_array_t(in_arr'range)(new_size-1 downto 0);
+   begin
+      return u_arr_to_slv_arr(array_item_resize_l(slv_arr_to_u_arr(in_arr), new_size));
    end function;
 
    function str_array_ser(str_array: str_array_t) return string is

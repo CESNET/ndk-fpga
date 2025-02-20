@@ -8,7 +8,7 @@ import sys
 import math
 import argparse
 
-from mem_logger.mem_logger import MemLogger
+from ofm.comp.debug.data_logger.mem_logger import MemLogger
 
 
 class MemTester(nfb.BaseComp):

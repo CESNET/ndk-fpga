@@ -1,3 +1,15 @@
+variables:
+  BASE_COMMIT_SHA: $CI_COMMIT_SHA
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      variables:
+        BASE_COMMIT_SHA: $CI_MERGE_REQUEST_DIFF_BASE_SHA
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        BASE_COMMIT_SHA: $CI_COMMIT_SHA
+
 editorconfig:
   stage: check
   needs: []
@@ -8,8 +20,13 @@ pycodestyle:
   stage: check
   needs: []
   image:
-    name: plone/code-quality
+    name: python:3.11-slim
     entrypoint: [""]
+  before_script:
+    - source env.sh
+    - pip install uv # get a package manager that can just install dependencies
+    - uv pip install --system -r python/ofm/pyproject.toml --extra test --extra nfb-pypi
+    - mypy python/ofm --config-file=python/ofm/pyproject.toml --install-types --non-interactive
   script:
     - sh tests/ci/pycodestyle.sh
 
@@ -19,10 +36,8 @@ commitlint:
   image: registry.hub.docker.com/library/node:alpine
   variables:
     GIT_DEPTH: 0
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   before_script:
     - apk add --no-cache git
     - npm install --save-dev @commitlint/config-conventional @commitlint/cli
   script:
-    - npx commitlint --extends '@commitlint/config-conventional' --from "${CI_MERGE_REQUEST_DIFF_BASE_SHA}" --to "${CI_COMMIT_SHA}"
+    - npx commitlint --extends '@commitlint/config-conventional' --from "${BASE_COMMIT_SHA}" --to "${CI_COMMIT_SHA}"

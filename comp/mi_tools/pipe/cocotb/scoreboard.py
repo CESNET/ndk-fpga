@@ -27,7 +27,7 @@ class Scoreboard(BaseScoreboard):
         """
 
         # Type comparison
-        if strict_type and type(got) != type(exp):
+        if strict_type and type(got) is not type(exp):
             self.errors += 1
             log.error("Received transaction type is different than expected")
             log.info("Received: %s but expected %s" %

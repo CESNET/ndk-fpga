@@ -8,7 +8,7 @@ import cocotb
 from cocotb.triggers import RisingEdge
 from cocotb.log import SimLog
 from cocotb.utils import get_sim_time
-from cocotbext.ofm.utils.units import convert_units
+from ofm.utils.units import convert_units
 from abc import ABC, abstractmethod
 from typing import Any
 

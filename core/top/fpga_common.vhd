@@ -463,6 +463,8 @@ architecture FULL of FPGA_COMMON is
     constant DMA_CROX_EQ_DMA     : boolean := (DMA_CROX_CLK_SEL=1);
     constant DMA_CROX_DOUBLE_DMA : boolean := (DMA_CROX_CLK_SEL=0);
 
+    constant MEASURED_FREQUENCIES   : natural := 7;
+
     signal heartbeat_cnt                 : unsigned(HEARTBEAT_CNT_W-1 downto 0);
     signal init_done_n                   : std_logic;
     signal pll_locked                    : std_logic;
@@ -685,6 +687,10 @@ architecture FULL of FPGA_COMMON is
     signal ref_clk_in                    : std_logic;
     signal ref_rst_in                    : std_logic;
 
+    -- clock vectors for frequency measuring
+    signal measured_freq_clk_vec         : std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
+    signal measured_freq_rst_vec         : std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
+
 begin
 
     -- =========================================================================
@@ -722,6 +728,55 @@ begin
         OUTCLK_2    => clk_usr_x2, -- 200 MHz
         OUTCLK_3    => clk_usr_x1  -- 100 MHz
     );
+
+    measure_clk_frequencies_g : if MEASURE_FREQUENCIES generate
+
+        measured_freq_clk_vec <= clk_usr_x1     & -- 100 MHz clock to serve for "verification"
+                                 clk_usr_x3     & -- 300 MHz clock to serve for "verification"
+                                 clk_pci    (0) &
+                                 clk_dma        &
+                                 clk_mi         &
+                                 clk_app        &
+                                 clk_eth_phy(0);
+
+        measured_freq_rst_vec <= rst_usr_x1 (0) & -- 100 MHz clock to serve for "verification"
+                                 rst_usr_x3 (0) & -- 300 MHz clock to serve for "verification"
+                                 rst_pci    (0) &
+                                 rst_dma    (0) &
+                                 rst_mi     (0) &
+                                 rst_app    (0) &
+                                 rst_eth_phy(0);
+
+        frequency_meter_i : entity work.FREQUENCY_METER
+        generic map(
+            MI_DATA_WIDTH        => 32,
+            MI_ADDR_WIDTH        => 32,
+            INTERVAL_LEN_WIDTH   => 32,
+            REFERENCE_CNTR_WIDTH => 31,
+            MEASURED_CNTR_WIDTH  => 31,
+            MEASURED_FREQUENCIES => MEASURED_FREQUENCIES,
+            REFERENCE_CLK_FREQ   => 200_000_000, -- 200 MHz
+            DSP_CNTR_EN          => False,
+            DEVICE               => DEVICE
+        )
+        port map (
+            REFERENCE_CLK   => clk_usr_x2, -- 200 MHz clock used as reference
+            REFERENCE_RESET => rst_usr_x2(0),
+            MEASURED_CLK    => measured_freq_clk_vec,
+            MEASURED_RESET  => measured_freq_rst_vec,
+            MI_CLK          => clk_mi,
+            MI_RESET        => rst_mi(1),
+            MI_DWR          => mi_adc_dwr (MI_ADC_PORT_FMETER),
+            MI_ADDR         => mi_adc_addr(MI_ADC_PORT_FMETER),
+            MI_RD           => mi_adc_rd  (MI_ADC_PORT_FMETER),
+            MI_WR           => mi_adc_wr  (MI_ADC_PORT_FMETER),
+            MI_ARDY         => mi_adc_ardy(MI_ADC_PORT_FMETER),
+            MI_DRD          => mi_adc_drd (MI_ADC_PORT_FMETER),
+            MI_DRDY         => mi_adc_drdy(MI_ADC_PORT_FMETER)
+        );
+
+    end generate;
+
 
     clk_vector <= clk_eth_phy & clk_usr_x4 & clk_usr_x3 & clk_usr_x2 & clk_usr_x1;
 

@@ -10,6 +10,7 @@ import cocotb.utils
 
 from cocotbext.ofm.utils.sim.bus import MfbBus, MiBus, DmaUpMvbBus, DmaDownMvbBus
 
+from ofm.comp.base.misc.frequency_meter import FrequencyMeter, tabulate_data
 
 #logging.basicConfig(stream=sys.stderr, force=True)
 #logging.getLogger().setLevel(logging.INFO)
@@ -52,6 +53,21 @@ async def test_enable_rxmac_and_check_status(dut):
     await e(mac.enable)()
     await e(mac.is_enabled)()
     await e(nfb.ndp.rx[0].read_stats)()
+
+
+@cocotb.test(skip=False, timeout_time=100, timeout_unit='us')
+async def test_frequency_meter(dut):
+    dev, nfb = await get_dev(dut)
+    fm = await e(FrequencyMeter)(dev=nfb)
+
+    def make_a_measurement():
+        fm.interval = 1000
+        data = fm.measure()
+        table = tabulate_data(data)
+        assert table is not None
+        # print(table)
+
+    await e(make_a_measurement)()
 
 
 @cocotb.test(timeout_time=200, timeout_unit='us')

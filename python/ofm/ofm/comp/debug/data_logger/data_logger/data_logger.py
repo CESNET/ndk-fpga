@@ -276,7 +276,7 @@ def parseParams():
     return args
 
 
-if __name__ == '__main__':
+def main():
     args = parseParams()
     logger = DataLogger(dev=args.device, index=args.index)
 
@@ -286,3 +286,7 @@ if __name__ == '__main__':
 
     if args.rst:
         logger.rst()
+
+
+if __name__ == '__main__':
+    main()

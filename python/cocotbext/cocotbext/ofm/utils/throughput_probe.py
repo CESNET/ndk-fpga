@@ -6,7 +6,7 @@
 
 from cocotbext.ofm.base.probe import Probe, ProbeInterface
 from cocotb.utils import get_sim_time
-from cocotbext.ofm.utils.units import convert_units
+from ofm.utils import convert_units
 from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.mfb.monitors import MFBMonitor
 

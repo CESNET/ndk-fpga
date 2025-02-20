@@ -12,8 +12,13 @@ NDK_FPGA_REALPATH=$(realpath $NDK_FPGA_PATH)
 # ####################################################################
 # Default package paths
 
+NDK_FPGA_PYTHON_PATH="file://${NDK_FPGA_REALPATH}/python/"
+
+# OFM package
+export NDK_FPGA_OFM_URL="${NDK_FPGA_PYTHON_PATH}/ofm/"
+
 # OFM extension for cocotb
-export NDK_FPGA_COCOTBEXT_OFM_URL="file://${NDK_FPGA_REALPATH}/python/cocotbext/"
+export NDK_FPGA_COCOTBEXT_OFM_URL="${NDK_FPGA_PYTHON_PATH}/cocotbext/"
 
 # NDK software Python packages are dependencies of cocotbext-ofm[nfb]
 export NDK_SW_PYTHON_URL="git+https://github.com/CESNET/ndk-sw.git#subdirectory="

@@ -1,0 +1,45 @@
+[project]
+name = "ofm"
+version = "0.1.0"
+authors = [{ name = "Daniel Kondys", email = "kondys@cesnet.cz" }]
+description = "Open FPGA Modules package - modules and tools for NDK FW components and more!"
+requires-python = ">=3.11"
+readme = "README.md"
+dependencies = [
+    "tabulate",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "Pillow",
+]
+
+[project.scripts]
+ofm-frequency-meter = "ofm.comp.base.misc.frequency_meter.frequency_meter:main"
+ofm-data-logger = "ofm.comp.debug.data_logger.data_logger.data_logger:main"
+ofm-mem-logger = "ofm.comp.debug.data_logger.mem_logger.mem_logger:main"
+
+[project.optional-dependencies]
+test = [
+    "flake8",
+    "mypy",
+]
+
+nfb-pypi = [
+    "nfb",
+]
+nfb-env = [
+    "nfb @ ${NDK_SW_PYTHON_URL}pynfb",
+]
+
+[build-system]
+requires = [
+    "pdm-backend",
+]
+build-backend = "pdm.backend"
+
+[[tool.mypy.overrides]]
+module = [
+    "nfb.*",
+]
+ignore_missing_imports = true
