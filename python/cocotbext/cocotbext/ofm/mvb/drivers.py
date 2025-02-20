@@ -1,9 +1,8 @@
-# drivers.py: MVBDriver
+# SPDX-License-Identifier: BSD-3-Clause
 # Copyright (C) 2025 CESNET z. s. p. o.
 # Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
-#
-# SPDX-License-Identifier: BSD-3-Clause
+
 
 from cocotb.handle import ModifiableObject
 
