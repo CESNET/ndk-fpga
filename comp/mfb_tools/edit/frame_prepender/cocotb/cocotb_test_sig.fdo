@@ -1,0 +1,15 @@
+# coctb_test_sig.fdo : Include file with signals
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <kondys@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {Prepender} -noupdate -hex /mfb_mvb_prepender/*
+add_wave                    -noupdate -bin /mfb_mvb_prepender/CLK
+add_wave                    -noupdate -bin /mfb_mvb_prepender/RESET
+
+
+config wave -signalnamewidth 1
