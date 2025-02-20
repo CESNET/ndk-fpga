@@ -142,6 +142,7 @@ program TEST (
         automatic int remaining    = TRANSACTION_COUNT;
         $write("\n\n############ TEST CASE 1 ############\n\n");
         enableTestEnvironment();
+        resetDesign();
 
         for (int i = 0; i < MERGER_INPUTS; i++) begin
             if (i == MERGER_INPUTS-1)
@@ -164,7 +165,6 @@ program TEST (
     endtask
 
     initial begin
-        resetDesign();
         createEnvironment(FRAME_SIZE_MAX, FRAME_SIZE_MIN);
         test1();
         $write("Verification finished successfully!\n");
