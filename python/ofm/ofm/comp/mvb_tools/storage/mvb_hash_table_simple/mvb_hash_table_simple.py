@@ -1,10 +1,7 @@
 #!/usr/bin/env python
-
-# main.py: Simple MVB Search Engine Toolkit
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
-#
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 """
 This is a script for creating, editing and applying configuration files for MVB_HASH_TABLE_SIMPLE component (later just component).
@@ -22,6 +19,7 @@ Arguments:
 
 """
 
+
 import nfb
 from cocotb.types import LogicArray, Range
 from cocotbext.ofm.utils.math import ceildiv
@@ -31,7 +29,7 @@ from math import log2
 import yaml
 
 
-class MVB_HASH_TABLE_SIMPLE_TOOLKIT(nfb.BaseComp):
+class MvbHashTableSimple(nfb.BaseComp):
     """Class used for creating, editing and applying configuration files for MVB_HASH_TABLE_SIMPLE component.
 
     Atributes:
@@ -888,7 +886,7 @@ def main() -> None:
     except Exception:
         print(f"{colorama.Fore.RED}Error:{colorama.Style.RESET_ALL} Failed to open '{dev_path}' Starting in offline mode.")
 
-    MVB_HASH_TABLE_SIMPLE_TOOLKIT(inter, mod_path, dev=dev)
+    MvbHashTableSimple(inter, mod_path, dev=dev)
 
 
 if __name__ == "__main__":
