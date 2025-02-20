@@ -27,6 +27,7 @@ import colorama
 import sys
 from math import log2
 import yaml
+from typing import Optional, Any, Callable
 
 
 class MvbHashTableSimple(nfb.BaseComp):
@@ -48,40 +49,40 @@ class MvbHashTableSimple(nfb.BaseComp):
     DT_COMPATIBLE = "cesnet,ndk,mvb_hash_table_simple"
 
     # MI ADDRESS SPACE
-    _COMMAND_REG    = 0x00
-    _ADDR_REG       = 0x04
-    _DATA_REG       = 0x08
-    _COMMIT_REG     = 0x0C
-    _HASH_KEY_REG   = 0x10
+    _COMMAND_REG    : int = 0x00
+    _ADDR_REG       : int = 0x04
+    _DATA_REG       : int = 0x08
+    _COMMIT_REG     : int = 0x0C
+    _HASH_KEY_REG   : int = 0x10
 
     # COMMAND REGISTER COMMANDS
-    _CHOOSE_TAB0    = 0x00
-    _CHOOSE_TAB1    = 0x01
-    _CLEAR_TABLES   = 0x02
+    _CHOOSE_TAB0    : int = 0x00
+    _CHOOSE_TAB1    : int = 0x01
+    _CLEAR_TABLES   : int = 0x02
 
     # Read interface commands and returned data
-    _MVB_ITEMS      = 0x00
-    _MVB_KEY_WIDTH  = 0x04
-    _DATA_OUT_WIDTH = 0x08
-    _HASH_WIDTH     = 0x0C
-    _HASH_KEY_WIDTH = 0x10
-    _TABLE_CAPACITY = 0x14
+    _MVB_ITEMS      : int = 0x00
+    _MVB_KEY_WIDTH  : int = 0x04
+    _DATA_OUT_WIDTH : int = 0x08
+    _HASH_WIDTH     : int = 0x0C
+    _HASH_KEY_WIDTH : int = 0x10
+    _TABLE_CAPACITY : int = 0x14
 
     def __init__(self, inter=False, mod_path="", **kwargs) -> None:
-        self._name = "MVB_HASH_TABLE_SIMPLE"
+        self._name: str = "MVB_HASH_TABLE_SIMPLE"
 
-        self.hash_key = 2534237992  # 10884469298454947624
+        self.hash_key: int = 2534237992  # 10884469298454947624
 
         """Setting defaults to component configuration parametres."""
-        self.conected_to_comp = False
-        self.mvb_key_width = 8
-        self.data_out_width = 8
-        self.table_capacity = 256
-        self.hash_width = int(log2(self.table_capacity))
-        self.hash_key_width = 32
-        self.num_of_tables = 2
+        self.conected_to_comp : bool = False
+        self.mvb_key_width    : int = 8
+        self.data_out_width   : int = 8
+        self.table_capacity   : int = 256
+        self.hash_width       : int = int(log2(self.table_capacity))
+        self.hash_key_width   : int = 32
+        self.num_of_tables    : int = 2
 
-        self.hash_func_params = {
+        self.hash_func_params: dict[str, int] = {
             "hash_key": self.hash_key,
             "mvb_key_width": self.mvb_key_width,
             "hash_key_width": self.hash_key_width,
@@ -89,31 +90,15 @@ class MvbHashTableSimple(nfb.BaseComp):
         }
 
         """Setting script parametres."""
-        self.t_keys = list()
-        self.t_hash_table = self.table_capacity * [[False, 0]]
-        self.t_used = 0
-        self.t_params = ["TOEPLITZ", toeplitz_hash, self.t_keys, self.t_hash_table, self.t_used]
+        self.t_keys: list[str] = list()
+        self.t_hash_table: list[list[Any]] = self.table_capacity * [[False, 0]]
+        self.t_used: int = 0
+        self.t_params: list[Any] = ["TOEPLITZ", toeplitz_hash, self.t_keys, self.t_hash_table, self.t_used]
 
-        self.x_keys = list()
-        self.x_hash_table = self.table_capacity * [[False, 0]]
-        self.x_used = 0
-        self.x_params = ["SIMPLE_XOR", simple_xor_hash, self.x_keys, self.x_hash_table, self.x_used]
-
-        self.commands = {
-            "add": self.comm_add,
-            "replace": self.comm_replace,
-            "remove": self.comm_remove,
-            "clear": self.comm_clear,
-            "list": self.comm_list,
-            "commit": self.comm_commit,
-            "save": self.comm_save,
-            "load": self.comm_load,
-            "hash": self.comm_hash,
-            "testkey": self.comm_testkey,
-            "comparehashes": self.comm_comparehashes,
-            "hwconfig": self.comm_hwconfig,
-            "help": self.comm_help
-        }
+        self.x_keys: list[str] = list()
+        self.x_hash_table: list[list[Any]] = self.table_capacity * [[False, 0]]
+        self.x_used: int = 0
+        self.x_params: list[Any] = ["SIMPLE_XOR", simple_xor_hash, self.x_keys, self.x_hash_table, self.x_used]
 
         """Setting up servicer."""
         try:
@@ -136,7 +121,7 @@ class MvbHashTableSimple(nfb.BaseComp):
         else:
             self.comm_commit(silent=True)
 
-    def get_params(self, table: str) -> list:
+    def get_params(self, table: str) -> list[Any]:
         """Gets parametres of the requested table.
             Args:
                 table: name of the table
@@ -146,8 +131,13 @@ class MvbHashTableSimple(nfb.BaseComp):
 
         """
 
-        params = self.t_params if table == "toeplitz" else None
-        params = self.x_params if table == "xor" else params
+        match table:
+            case "toeplitz":
+                params = self.t_params
+            case "xor":
+                params = self.x_params
+            case _:
+                self.error()
 
         return params
 
@@ -247,11 +237,11 @@ class MvbHashTableSimple(nfb.BaseComp):
                 return
             else:
                 try:
-                    self.commands.get(command, self.error)(*arguments)
+                    getattr(self, f"comm_{command}")(*arguments)
                 except Exception:
                     self.error()
 
-    def comm_add(self, key: int = None, data: int = None, table: str = "toeplitz", recurse=False) -> None:
+    def comm_add(self, key: Optional[int] = None, data: Optional[int] = None, table: str = "toeplitz", recurse: bool = False) -> None:
         """Adds a value to a chosen table, the position of the value is decided by the hash of the key.
 
         Args:
@@ -288,11 +278,11 @@ class MvbHashTableSimple(nfb.BaseComp):
             print(f"{colorama.Fore.RED}Error:{colorama.Style.RESET_ALL} Invalid table. Possible tables are both, toeplitz, xor.")
             return
 
-        name = params[0]
-        hash_function = params[1]
-        keys = params[2]
-        hash_table = params[3]
-        used = params[4]
+        name: str = params[0]
+        hash_function: Callable[[Any, Any], Any] = params[1]
+        keys: list[int] = params[2]
+        hash_table: list[list[Any]] = params[3]
+        used: int = params[4]
 
         if used < self.table_capacity:
             hash_key = hash_function(key, self.hash_func_params)
@@ -318,7 +308,7 @@ class MvbHashTableSimple(nfb.BaseComp):
         else:
             print(f"{colorama.Fore.RED}Error:{colorama.Style.RESET_ALL} Record can't be added, because {name} TABLE is full. You can save it to a different one or use replace (table=[toeplitz, xor]) (record_num) (key) (data)  or remove (mode=[record, hash]) (table=[toeplitz, xor]) (num) to make space.")
 
-    def comm_list(self, mode: str = None, table: str = "both") -> None:
+    def comm_list(self, mode: Optional[str] = None, table: str = "both") -> None:
         """Lists the contents of the table(s).
 
             Args:
@@ -376,7 +366,7 @@ class MvbHashTableSimple(nfb.BaseComp):
                 print(f"{colorama.Fore.RED}Error:{colorama.Style.RESET_ALL} Invalid arguments. Usage of list: list (mode=[records, table]) (table=[*both, toeplitz, xor]).")
                 return
 
-    def comm_replace(self, table: str = None, record_num: int = None, key: str = None, data: str = None) -> None:
+    def comm_replace(self, table: Optional[str] = None, record_num: Optional[int] = None, key: Optional[str] = None, data: Optional[str] = None) -> None:
         """Replaces record with a diffent one.
 
         Args:
@@ -419,7 +409,7 @@ class MvbHashTableSimple(nfb.BaseComp):
         else:
             print(f"{colorama.Fore.RED}Error:{colorama.Style.RESET_ALL} Record {record_num} is out of range of 0:{self.t_used - 1} indexes of records.")
 
-    def comm_remove(self, mode: str = None, table: str = None, num: int = None, silent: bool = False) -> None:
+    def comm_remove(self, mode: Optional[str] = None, table: Optional[str] = None, num: Optional[int] = None, silent: bool = False) -> None:
         """Removes record from the chosen table, or data directly from the table and the tied record.
 
         Args:
@@ -483,7 +473,7 @@ class MvbHashTableSimple(nfb.BaseComp):
         else:
             print(f"{colorama.Fore.RED}Error:{colorama.Style.RESET_ALL} Invalid mode. The possible modes are: record, hash")
 
-    def comm_clear(self, table: str = None, silent=False) -> None:
+    def comm_clear(self, table: Optional[str] = None, silent: bool = False) -> None:
         """Clears all data in the chosen table.
 
         Args:
@@ -569,7 +559,7 @@ class MvbHashTableSimple(nfb.BaseComp):
 
                 self._comp.write32(self._COMMIT_REG, 0)
 
-    def comm_save(self, path: str = None, silent: bool = False) -> None:
+    def comm_save(self, path: Optional[str] = None, silent: bool = False) -> None:
         """Save configuration to a file.
 
         Args:
@@ -586,8 +576,8 @@ class MvbHashTableSimple(nfb.BaseComp):
             print(f"{colorama.Fore.RED}Error:{colorama.Style.RESET_ALL} Failed to create file {path}.")
             return
 
-        yaml_data = dict()
-        comp_conf = dict()
+        yaml_data: dict[str, dict] = dict()
+        comp_conf: dict[str, int] = dict()
 
         yaml_data["mvb_hash_table_simple"] = comp_conf
 
@@ -602,17 +592,16 @@ class MvbHashTableSimple(nfb.BaseComp):
         params = [self.t_params, self.x_params]
 
         for i in range(self.num_of_tables):
-            name = params[i][0]
             hash_function = params[i][1]
             keys = params[i][2]
             hash_table = params[i][3]
             used = params[i][4]
 
-            yaml_hash_table = comp_conf[name] = list()
+            yaml_hash_table: list[dict] = list()
 
             for j in range(used):
-                record_wrap = dict()
-                record = dict()
+                record_wrap: dict[str, dict[str, Any]] = dict()
+                record: dict[str, Any] = dict()
                 h = hash_function(keys[j], self.hash_func_params)
 
                 record_wrap["record"] = record
@@ -628,7 +617,7 @@ class MvbHashTableSimple(nfb.BaseComp):
         if not silent:
             print(f"{colorama.Fore.GREEN}Success:{colorama.Style.RESET_ALL} Configuration successfully saved to {path}.")
 
-    def comm_load(self, path: str = None, silent: bool = False) -> None:
+    def comm_load(self, path: Optional[str] = None, silent: bool = False) -> None:
         """Loads config file.
 
         Args:
@@ -680,12 +669,12 @@ class MvbHashTableSimple(nfb.BaseComp):
                 return
 
         else:
-            self.mvb_key_width = comp_conf["mvb_key_width"]
-            self.data_out_width = comp_conf["data_out_width"]
-            self.table_capacity = comp_conf["table_capacity"]
-            self.hash_width = comp_conf["hash_width"]
-            self.hash_key_width = comp_conf["hash_key_width"]
-            self.num_of_tables = comp_conf["num_of_tables"]
+            self.mvb_key_width   = comp_conf["mvb_key_width"]
+            self.data_out_width  = comp_conf["data_out_width"]
+            self.table_capacity  = comp_conf["table_capacity"]
+            self.hash_width      = comp_conf["hash_width"]
+            self.hash_key_width  = comp_conf["hash_key_width"]
+            self.num_of_tables   = comp_conf["num_of_tables"]
 
         self.hash_func_params = {
             "hash_key": self.hash_key,
@@ -726,7 +715,7 @@ class MvbHashTableSimple(nfb.BaseComp):
         if not silent:
             print(f"{colorama.Fore.GREEN}Success:{colorama.Style.RESET_ALL} Configuration successfully loaded.")
 
-    def comm_hash(self, hash_function: str = None, num: int = None) -> None:
+    def comm_hash(self, hash_function: Optional[str] = None, num: Optional[int] = None) -> None:
         """Calculates hash from the passed number using the chosen hash function (used for testing).
 
         Args:
