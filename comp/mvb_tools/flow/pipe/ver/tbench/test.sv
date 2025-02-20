@@ -96,7 +96,9 @@ program TEST (
         createGeneratorEnvironment();
         createEnvironment();
         test1();
-        $write("Verification finished successfully!\n");
+        if (scoretable.done()) begin
+            $write("Verification finished successfully!\n");
+        end
         $stop();
     end
 

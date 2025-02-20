@@ -183,6 +183,10 @@ class Scoreboard;
       driverCbs  = new(scoreTable, register);
     endfunction
 
+    function int unsigned done();
+        return (scoreTable.empty() != 0);
+    endfunction
+
     task display();
       scoreTable.display();
     endtask
