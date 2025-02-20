@@ -47,6 +47,11 @@ interface iMvbRx #(ITEMS = 4, ITEM_WIDTH = 8) (input logic CLK, RESET);
 
     modport monitor (clocking monitor_cb);
 
+
+
+    assume property ( @(posedge CLK) disable iff (RESET) (SRC_RDY == 1) -> | VLD) else $stop();
+    assert property ( @(posedge CLK) disable iff (RESET) !$isunknown(DST_RDY)) else $stop();
+    assume property ( @(posedge CLK) disable iff (RESET) !$isunknown(SRC_RDY)) else $stop();
 endinterface
 
 
@@ -83,4 +88,7 @@ interface iMvbTx #(ITEMS = 4, ITEM_WIDTH = 8) (input logic CLK, RESET);
 
     modport monitor (clocking monitor_cb);
 
+    assert property ( @(posedge CLK) disable iff (RESET) (SRC_RDY == 1) -> | VLD) else $stop();
+    assume property ( @(posedge CLK) disable iff (RESET) !$isunknown(DST_RDY)) else $stop();
+    assert property ( @(posedge CLK) disable iff (RESET) !$isunknown(SRC_RDY)) else $stop();
 endinterface
