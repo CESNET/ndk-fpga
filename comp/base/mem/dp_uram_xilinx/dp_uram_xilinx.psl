@@ -1,0 +1,36 @@
+
+
+vunit dp_bram_v7_assert (DP_URAM_XILINX(DP_URAM_XILINX_arch)) {
+
+    signal debug_item_vldA : std_logic := '1'; -- Dont fire assertion on start of simulation
+    signal debug_item_vldB : std_logic := '1'; -- Dont fire assertion on start of simulation
+    signal debug_item_written  : std_logic_vector(2**ADDRESS_WIDTH-1 downto 0) := (others => '0');
+
+   --test : assert always (false) @rising_edge(CLK) report "TEST ERROR";
+   dbg_init_control : process(CLK)
+   begin
+      if rising_edge(CLK) then
+         if RSTA='1' then
+            debug_item_written <= (others => '0');
+         elsif  PIPE_ENA='1' and WEA='1' then
+            debug_item_written(to_integer(unsigned(ADDRA))) <= '1';
+         end if;
+         debug_item_vldA <= debug_item_written(to_integer(unsigned(ADDRA)));
+      end if;
+      if rising_edge(CLK) then
+         if RSTB='1' then
+            debug_item_written <= (others => '0');
+         elsif  PIPE_ENB='1' and WEB='1' then
+            debug_item_written(to_integer(unsigned(ADDRB))) <= '1';
+         end if;
+         debug_item_vldB <= debug_item_written(to_integer(unsigned(ADDRB)));
+      end if;
+   end process;
+
+   property prop_rd_vld(boolean item_vld; boolean rd_vld) is {PSL_WR_BEFFORE_RD -> (item_vld or rd_vld)};
+
+   assert_portA : assert always prop_rd_vld(debug_item_vldA = '1', reg_data_a_vld(READ_LATENCY-1) = '0') abort(RSTA) @rising_edge(CLK) report "Reading uninitialized item from DP_BMEM_V7 on port A!";
+   assert_portB : assert always prop_rd_vld(debug_item_vldB = '1', reg_data_b_vld(READ_LATENCY-1) = '0') abort(RSTB) @rising_edge(CLK) report "Reading uninitialized item from DP_BMEM_V7 on port B!";
+
+}
+
