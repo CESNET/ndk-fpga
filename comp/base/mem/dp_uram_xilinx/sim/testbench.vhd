@@ -23,7 +23,6 @@ architecture behavioral of testbench is
    constant DEVICE            : string := "ULTRASCALE";
    constant ADDITIONAL_REG      : integer := 0;
    constant INTERNAL_OUT_REG      : boolean := false;
-   constant DEBUG_ASSERT_UNINITIALIZED : boolean := true;
    --! Clock and reset signals
    signal CLK        : std_logic;
    signal RESET      : std_logic;
@@ -56,8 +55,7 @@ begin
       ADDITIONAL_REG   => ADDITIONAL_REG,
       --! Select target device "VIRTEX5", "VIRTEX6", "7SERIES", "SPARTAN6"
       DEVICE         => DEVICE,
-      INTERNAL_OUT_REG   => INTERNAL_OUT_REG,
-      DEBUG_ASSERT_UNINITIALIZED => DEBUG_ASSERT_UNINITIALIZED
+      INTERNAL_OUT_REG   => INTERNAL_OUT_REG
    )
    port map (
        --! \name Interface A

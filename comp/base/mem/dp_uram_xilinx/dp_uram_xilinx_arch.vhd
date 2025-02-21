@@ -125,37 +125,7 @@ architecture DP_URAM_XILINX_arch of DP_URAM_XILINX is
    signal reg_data_a_vld : std_logic_vector(READ_LATENCY-1 downto 0);     --Data valid registers
    signal reg_data_b_vld : std_logic_vector(READ_LATENCY-1 downto 0);
 
-   signal debug_item_vldA : std_logic := '1';
-   signal debug_item_vldB : std_logic := '1';
-
-
-
    begin
-      -- Generate reports of reading from uninitialized memory
-      assert_gen : if DEBUG_ASSERT_UNINITIALIZED = true generate
-         dbg_assertA : process(CLK)
-         variable debug_item_written : std_logic_vector(2**ADDRESS_WIDTH-1 downto 0);
-         begin
-            if CLK'event and CLK = '1' then
-               if RSTA = '1' then
-                  debug_item_written := (others => '0');
-               elsif PIPE_ENA = '1' and WEA = '1' then
-                  debug_item_written(to_integer(unsigned(ADDRA))) := '1';
-               end if;
-               debug_item_vldA <= debug_item_written(to_integer(unsigned(ADDRA)));
-
-               if RSTB = '1' then
-                  debug_item_written := (others => '0');
-               elsif PIPE_ENB = '1' and WEB = '1' then
-                  debug_item_written(to_integer(unsigned(ADDRB))) := '1';
-               end if;
-               debug_item_vldB <= debug_item_written(to_integer(unsigned(ADDRB)));
-            end if;
-         end process;
-         assert debug_item_vldA = '1' or reg_data_a_vld(READ_LATENCY-1) = '0' or RSTA /= '0' or not CLK'event or CLK = '0' report "Reading uninitialized data on DP_URAM_XILINX port A" severity error;
-         assert debug_item_vldB = '1' or reg_data_b_vld(READ_LATENCY-1) = '0' or RSTB /= '0' or not CLK'event or CLK = '0' report "Reading uninitialized data on DP_URAM_XILINX port B" severity error;
-      end generate;
-
       -- Genrate UltraRAM using XPM macro
       macro : if (DEVICE = "ULTRASCALE") generate
 
@@ -317,11 +287,7 @@ architecture DP_URAM_XILINX_arch of DP_URAM_XILINX is
       begin
          if CLK'event and CLK = '1' then
             if PIPE_ENA = '1' then
-               if(debug_item_vldA = '1') then
-                  DOA <= out_mema;
-               else
-                  DOA <= (others => 'U');
-               end if;
+                DOA <= out_mema;
             end if;
          end if;
       end process;
@@ -343,11 +309,7 @@ architecture DP_URAM_XILINX_arch of DP_URAM_XILINX is
       begin
          if CLK'event and CLK = '1' then
             if PIPE_ENB = '1' then
-               if(debug_item_vldB = '1') then
-                  DOB <= out_memb;
-               else
-                  DOB <= (others => 'U');
-               end if;
+                DOB <= out_memb;
             end if;
          end if;
       end process;
@@ -367,8 +329,8 @@ architecture DP_URAM_XILINX_arch of DP_URAM_XILINX is
 
    -- Output register disable
    disable_out_reg : if (EXTERNAL_OUT_REG = false) generate
-      DOA <= out_mema when debug_item_vldA = '1' else (others => 'U');
-      DOB <= out_memb when debug_item_vldB = '1' else (others => 'U');
+      DOA <= out_mema;
+      DOB <= out_memb;
       DOA_DV <= reg_data_a_vld(READ_LATENCY-1);
       DOB_DV <= reg_data_b_vld(READ_LATENCY-1);
    end generate;

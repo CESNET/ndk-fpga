@@ -37,44 +37,7 @@ architecture FULL of DP_BRAM_XILINX is
    --! Validity signal for readed data.
    signal reg_data_a_vld  : std_logic;
    signal reg_data_b_vld  : std_logic;
-
-   --! Auxiliary signal for debugging uninitaliazed data
-   signal debug_item_vldA : std_logic := '1';
-   signal debug_item_vldB : std_logic := '1';
-
 begin
-
--- pragma translate_off
--- pragma synthesis_off
-   --! Support for DEBUG_ASSERT_UNINITIALIZED in simulations.
-   assert_gen: if DEBUG_ASSERT_UNINITIALIZED generate
-      dbg_init_control: process(CLKA, CLKB)
-         variable debug_item_written: std_logic_vector(2**ADDRESS_WIDTH-1 downto 0);
-      begin
-         if CLKA'event and CLKA = '1' then
-            if RSTA = '1' then
-               debug_item_written := (others => '0');
-            elsif PIPE_ENA = '1' and WEA = '1' then
-               debug_item_written(conv_integer(ADDRA)) := '1';
-            end if;
-            debug_item_vldA <= debug_item_written(conv_integer(ADDRA));
-         end if;
-
-         if CLKB'event and CLKB = '1' then
-            if RSTB = '1' then
-               debug_item_written := (others => '0');
-            elsif PIPE_ENB = '1' and WEB = '1' then
-               debug_item_written(conv_integer(ADDRB)) := '1';
-            end if;
-            debug_item_vldB <= debug_item_written(conv_integer(ADDRB));
-         end if;
-      end process;
-      assert debug_item_vldA = '1' or reg_data_a_vld = '0' or RSTA /= '0' or not CLKA'event or CLKA = '0' report "Reading uninitialized item from DP_BRAM_XILINX on port A!" severity error;
-      assert debug_item_vldB = '1' or reg_data_b_vld = '0' or RSTB /= '0' or not CLKB'event or CLKB = '0' report "Reading uninitialized item from DP_BRAM_XILINX on port B!" severity error;
-   end generate;
--- pragma synthesis_on
--- pragma translate_on
-
    --! Code for non ULTRASCALE devices.
    --! Based on BRAM_TDP_MACRO, for more details see UG768 (Xilinx 7 Series FPGA
    --! and Zynq-7000 All Programmable SoC Libraries Guide for HDL Designs).
@@ -170,14 +133,14 @@ begin
       doa_noreg_gen: if (ENABLE_OUT_REG = false) generate
          pipe_ena_in <= '1'; --! Enable pipeline by default
          DOA_DV <= reg_data_a_vld; --! Deal with data output
-         DOA <= portA_data_out(conv_integer(unsigned(reg_row_address_a))) when (debug_item_vldA = '1') else (others => 'U');
+         DOA <= portA_data_out(conv_integer(unsigned(reg_row_address_a)));
       end generate;
 
       --! No output register for port B
       dob_noreg_gen: if (ENABLE_OUT_REG = false) generate
          pipe_enb_in <= '1'; --! Enable pipeline by default
          DOB_DV <= reg_data_b_vld; --! Deal with data output
-         DOB <= portB_data_out(conv_integer(unsigned(reg_row_address_b))) when (debug_item_vldB = '1') else (others => 'U');
+         DOB <= portB_data_out(conv_integer(unsigned(reg_row_address_b)));
       end generate;
 
       --! Output register for port A
@@ -190,11 +153,7 @@ begin
                   DOA_DV <= '0';
                else
                   if (PIPE_ENA = '1') then
-                     if (debug_item_vldA = '1') then
-                        DOA <= portA_data_out(conv_integer(unsigned(reg_row_address_a)));
-                     else
-                        DOA <= (others => 'U');
-                     end if;
+                     DOA <= portA_data_out(conv_integer(unsigned(reg_row_address_a)));
                      DOA_DV <= reg_data_a_vld;
                   end if;
                end if;
@@ -212,11 +171,7 @@ begin
                   DOB_DV <= '0';
                else
                   if (PIPE_ENB = '1') then
-                     if (debug_item_vldB = '1') then
-                        DOB <= portB_data_out(conv_integer(unsigned(reg_row_address_b)));
-                     else
-                        DOB <= (others => 'U');
-                     end if;
+                     DOB <= portB_data_out(conv_integer(unsigned(reg_row_address_b)));
                      DOB_DV <= reg_data_b_vld;
                   end if;
                end if;

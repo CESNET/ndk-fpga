@@ -42,9 +42,6 @@ entity SDP_BRAM_XILINX is
       --! Enable output register.
       ENABLE_OUT_REG : boolean := true;
 
-      --! Asserts will report reading of uinitialized items from memory in verification.
-      DEBUG_ASSERT_UNINITIALIZED : boolean := false;
-
       --! Clocking mode: "common_clock" (sync), "independent_clock" (async).
       --! - Only for ULTRASCALE devices (DEVICE = "ULTRASCALE")!
       --! - When the attribute “CLOCKING_MODE” is set to “common_clock”, all read/write operations
@@ -55,7 +52,9 @@ entity SDP_BRAM_XILINX is
 
       --! Block RAM type, 18Kb or 36Kb blocks.
       --! - Only for non ULTRASCALE devices (DEVICE /= "ULTRASCALE")!
-      BRAM_TYPE      : integer := 36
+      BRAM_TYPE      : integer := 36;
+      --! Enable check write before read. For more info check *.psl file
+      PSL_WR_BEFFORE_RD : boolean := true
    );
    port (
       --! Port A clock.

@@ -43,8 +43,7 @@ begin
       ADDRESS_WIDTH                 => 12,
       ADDITIONAL_REG                => 0,
       EXTERNAL_OUT_REG              => false,
-      INTERNAL_OUT_REG              => false,
-      DEBUG_ASSERT_UNINITIALIZED    => true
+      INTERNAL_OUT_REG              => false
    )
    port map(
       CLK            => CLK,

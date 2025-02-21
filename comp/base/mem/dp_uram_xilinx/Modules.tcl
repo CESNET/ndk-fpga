@@ -8,3 +8,4 @@ set PKG_BASE  "$OFM_PATH/comp/base/pkg"
 
 set MOD  "$MOD $ENTITY_BASE/dp_uram_xilinx_ent.vhd"
 set MOD  "$MOD $ENTITY_BASE/dp_uram_xilinx_arch.vhd"
+set MOD  "$MOD $ENTITY_BASE/dp_uram_xilinx.psl"

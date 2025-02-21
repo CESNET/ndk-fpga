@@ -16,6 +16,7 @@ set PACKAGES      "$PACKAGES $ENTITY_BASE/sdp_bmem_V7_func.vhd"
 
 set MOD           "$MOD $ENTITY_BASE/dp_bmem_V7_ent.vhd"
 set MOD           "$MOD $ENTITY_BASE/sdp_bmem_V7_ent.vhd"
+set MOD           "$MOD $ENTITY_BASE/dp_bmem_V7.psl"
 
 # Extra simulation source files (DISABLED)
 if {false && [info exists SIMULATION] && $SIMULATION} then {

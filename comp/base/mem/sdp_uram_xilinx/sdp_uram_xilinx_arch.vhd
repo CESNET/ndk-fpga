@@ -32,7 +32,7 @@ begin
             ADDITIONAL_REG => ADDITIONAL_REG,
             EXTERNAL_OUT_REG => EXTERNAL_OUT_REG,
             INTERNAL_OUT_REG => INTERNAL_OUT_REG,
-            DEBUG_ASSERT_UNINITIALIZED => DEBUG_ASSERT_UNINITIALIZED
+            PSL_WR_BEFFORE_RD => PSL_WR_BEFFORE_RD
             )
          port map(
             CLK => CLK,
@@ -66,7 +66,7 @@ begin
             ADDITIONAL_REG => ADDITIONAL_REG,
             EXTERNAL_OUT_REG => EXTERNAL_OUT_REG,
             INTERNAL_OUT_REG => INTERNAL_OUT_REG,
-            DEBUG_ASSERT_UNINITIALIZED => DEBUG_ASSERT_UNINITIALIZED
+            PSL_WR_BEFFORE_RD => PSL_WR_BEFFORE_RD
             )
          port map(
             CLK => CLK,
