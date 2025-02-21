@@ -60,7 +60,7 @@ class MfbMonitor #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8,
                 busy = inframe || vif.monitor_cb.SRC_RDY;
                 if(eof_checked == 1)
                     gap_size = gap_size + ITEMS;
-            end while(enabled && !(vif.monitor_cb.SRC_RDY && vif.monitor_cb.DST_RDY)); // wait for valid data
+            end while(enabled && !(vif.monitor_cb.SRC_RDY === 1'b1 && vif.monitor_cb.DST_RDY === 1'b1)); // wait for valid data
             if(!enabled) break;
             if(start) begin // clean old data from buffer
                 buffer = {buffer[start : $]};
