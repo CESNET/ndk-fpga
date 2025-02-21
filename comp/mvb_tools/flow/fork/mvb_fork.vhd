@@ -57,6 +57,7 @@ begin
 
   -- Control forking
   no_dst_rdy_gen: if not USE_DST_RDY generate
+    RX_DST_RDY <= '1';
     TX_SRC_RDY <= (others => RX_SRC_RDY);
   end generate;
 
