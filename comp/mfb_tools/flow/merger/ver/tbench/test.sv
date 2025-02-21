@@ -17,16 +17,14 @@ import test_pkg::*;
 program TEST (
     input  logic CLK,
     output logic RESET,
-    iMvbRx.tb RX_MVB[MERGER_INPUTS-1:0],
-    iMfbRx.tb RX_MFB[MERGER_INPUTS-1:0],
-    iMvbTx.tb TX_MVB,
-    iMfbTx.tb TX_MFB,
-    iMvbTx.monitor MO_MVB,
-    iMfbTx.monitor MO_MFB
+    iMvbRx.tb RX_MVB[MERGER_INPUTS],
+    iMfbRx.tb RX_MFB[MERGER_INPUTS],
+    iMvbTx TX_MVB,
+    iMfbTx TX_MFB
 );
 
-    virtual iMvbRx #(MVB_ITEMS,MVB_ITEM_WIDTH)                                              vRX_MVB[MERGER_INPUTS-1:0] = RX_MVB;
-    virtual iMfbRx #(MFB_REGIONS,MFB_REG_SIZE,MFB_BLOCK_SIZE,MFB_ITEM_WIDTH,MFB_META_WIDTH) vRX_MFB[MERGER_INPUTS-1:0] = RX_MFB;
+    virtual iMvbRx #(MVB_ITEMS,MVB_ITEM_WIDTH)                                              vRX_MVB[MERGER_INPUTS] = RX_MVB;
+    virtual iMfbRx #(MFB_REGIONS,MFB_REG_SIZE,MFB_BLOCK_SIZE,MFB_ITEM_WIDTH,MFB_META_WIDTH) vRX_MFB[MERGER_INPUTS] = RX_MFB;
 
     CustomTransaction #(MVB_ITEM_WIDTH,MFB_ITEM_WIDTH,MFB_META_WIDTH) blueprint;
     CustomTransGenerator                                              generator [MERGER_INPUTS-1:0];
@@ -81,30 +79,28 @@ program TEST (
         mvb_responder.wordDelayHigh = TX_MVB_DST_RDY_FALL_TIME_MAX;
         mfb_responder.wordDelayHigh = TX_MFB_DST_RDY_FALL_TIME_MAX;
 
-        mvb_monitor = new("Monitor MVB", MO_MVB);
-        mfb_monitor = new("Monitor MFB", MO_MFB);
+        mvb_monitor = new("Monitor MVB", TX_MVB);
+        mfb_monitor = new("Monitor MFB", TX_MFB);
 
         mvb_monitor.setCallbacks(scoreboard.monitorCbs);
         mfb_monitor.setCallbacks(scoreboard.monitorCbs);
     endtask
 
     task resetDesign();
-        RESET=1;
+        RESET = 1;
         #RESET_TIME RESET = 0;
     endtask
 
     task enableTestEnvironment();
-        scoreboard.setEnabled();
-
         for (int i = 0; i < MERGER_INPUTS; i++) begin
              mvb_driver[i].setEnabled();
              mfb_driver[i].setEnabled();
         end
 
-        mvb_monitor.setEnabled();
-        mfb_monitor.setEnabled();
         mvb_responder.setEnabled();
         mfb_responder.setEnabled();
+        mvb_monitor.setEnabled();
+        mfb_monitor.setEnabled();
     endtask
 
     task disableTestEnvironment();
@@ -134,7 +130,6 @@ program TEST (
         mfb_responder.setDisabled();
         mvb_monitor.setDisabled();
         mvb_responder.setDisabled();
-        scoreboard.setDisabled();
     endtask
 
     task test1();
@@ -143,6 +138,7 @@ program TEST (
         $write("\n\n############ TEST CASE 1 ############\n\n");
         enableTestEnvironment();
         resetDesign();
+        scoreboard.setEnabled();
 
         for (int i = 0; i < MERGER_INPUTS; i++) begin
             if (i == MERGER_INPUTS-1)
