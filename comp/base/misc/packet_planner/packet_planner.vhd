@@ -712,6 +712,7 @@ begin
         end generate;
 
     else generate
+        TX_STR_PKT_VLD <= (others => (others => '0'));
         oshk_afull <= (others => '0');
     end generate;
 
