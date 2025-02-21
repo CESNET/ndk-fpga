@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+
 from random import choices
 
 from .transaction import Transaction, IdleTransaction

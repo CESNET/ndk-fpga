@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Daniel Kriz <xkrizd01@vutbr.cz>
+#            Martin Spinler <spinler@cesnet.cz>
+
 import sys
 import re
 

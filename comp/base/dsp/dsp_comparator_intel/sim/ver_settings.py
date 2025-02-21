@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#            Martin Spinler <spinler@cesnet.cz>
+
 SETTINGS = {
 	"default" : {
 		"INPUT_REGS_EN"	 : "true"       	  ,

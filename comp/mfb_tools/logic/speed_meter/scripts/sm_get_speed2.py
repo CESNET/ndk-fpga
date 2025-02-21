@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <kondys@cesnet.cz>
+#            Martin Spinler <spinler@cesnet.cz>
+
 
 # This is a simple script that uses the Speed Meter python application to get and print the Speed meter's throughput speed
 

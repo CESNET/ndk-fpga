@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#            Martin Spinler <spinler@cesnet.cz>
+
 import cocotb
 from cocotb.triggers import Timer
 
