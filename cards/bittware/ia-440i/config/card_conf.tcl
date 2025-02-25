@@ -43,7 +43,7 @@ set EHIP_PORT_TYPE(0)  $env(EHIP_PORT_TYPE)
 # ------------------------------------------------------------------------------
 
 # Set default PCIe configuration
-set PCIE_CONF "1xGen5x16"
+set PCIE_CONF "1xGen5x8x8"
 if { [info exist env(PCIE_CONF)] } {
     set PCIE_CONF $env(PCIE_CONF)
 }
