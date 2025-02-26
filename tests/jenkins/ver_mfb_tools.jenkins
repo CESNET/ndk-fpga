@@ -68,6 +68,7 @@ def COMPONENTS_MULTIVER = [\
     ['TIMESTAMP_LIMITER'                  , 'comp/mfb_tools/flow/timestamp_limiter/uvm'                                       , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
     ['FRAME_MASKER'                       , 'comp/mfb_tools/flow/frame_masker/uvm'                                            , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
     ['FRAME_PACKER'                       , 'comp/mfb_tools/flow/frame_packer/uvm'                                            , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
+    ['MFB_FRAME_TRIMMER'                  , 'comp/mfb_tools/edit/frame_trimmer/uvm'                                           , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
 ]
 // /////////////////////////////////////////////////////////////////////////////
 
