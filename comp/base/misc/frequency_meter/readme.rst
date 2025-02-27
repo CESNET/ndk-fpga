@@ -1,6 +1,6 @@
-.. _frequency_counter:
+.. _frequency_meter:
 
-Frequency counter
------------------
+Frequency meter
+---------------
 
-.. vhdl:autoentity:: FREQUENCY_COUNTER
+.. vhdl:autoentity:: FREQUENCY_METER
