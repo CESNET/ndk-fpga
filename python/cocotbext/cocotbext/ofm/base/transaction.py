@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+
 class BaseTransaction():
     """Base class for transactions"""
 
@@ -13,6 +16,7 @@ class IdleTransaction(BaseTransaction):
     """
 
 
+@dataclass
 class Transaction(BaseTransaction):
     """Transactions with real data to be written into bus"""
 
