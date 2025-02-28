@@ -206,7 +206,7 @@ begin
         if (rising_edge(CLK)) then
             if (s_timeout_rst = '1') then
                 s_timeout_cnt <= (others => '0');
-            elsif (s_timeout_en = '1' and s_timeout = '0') then
+            elsif (s_timeout_en = '1') then
                 s_timeout_cnt <= s_timeout_cnt + 1;
             end if;
         end if;
