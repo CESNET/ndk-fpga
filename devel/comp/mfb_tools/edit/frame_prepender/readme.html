@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MFB MVB Appender &mdash; NDK-FPGA  documentation</title>
+  <title>MFB MVB Prepender &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -19,8 +19,8 @@
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="MFB FRAME EXTENDER" href="../frame_extender/readme.html" />
-    <link rel="prev" title="MFB Generator" href="../../debug/generator/readme.html" /> 
+    <link rel="next" title="MFB FRAME TRIMMER" href="../frame_trimmer/readme.html" />
+    <link rel="prev" title="MFB FRAME EXTENDER" href="../frame_extender/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -66,9 +66,9 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../debug/gen_loop_switch/readme.html">Gen Loop Switch (GLS)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../debug/generator/readme.html">MFB Generator</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB MVB Appender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_appender/readme.html">MFB MVB Appender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../frame_prepender/readme.html">MFB MVB Prepender</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB MVB Prepender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_trimmer/readme.html">MFB FRAME TRIMMER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/cutter_simple/readme.html">MFB Cutter Simple</a></li>
@@ -146,9 +146,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../../mfb.html">MFB Tools</a></li>
-      <li class="breadcrumb-item active">MFB MVB Appender</li>
+      <li class="breadcrumb-item active">MFB MVB Prepender</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../../_sources/comp/mfb_tools/edit/frame_appender/readme.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../_sources/comp/mfb_tools/edit/frame_prepender/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -156,35 +156,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mfb-mvb-appender">
-<span id="id1"></span><h1>MFB MVB Appender<a class="headerlink" href="#mfb-mvb-appender" title="Link to this heading"></a></h1>
+  <section id="mfb-mvb-prepender">
+<span id="id1"></span><h1>MFB MVB Prepender<a class="headerlink" href="#mfb-mvb-prepender" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_mvb_appender">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_MVB_APPENDER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_mvb_appender" title="Link to this definition"></a></dt>
-<dd><p>This component appends input MVB Items to packets (moves EOF).
-Its simple architecture utilizes MFB reconfigurators:
-Input MFB words are first reconfigured to MFB#(1,1,MFB_REGION_SIZE*MFB_BLOCK_SIZE,MFB_ITEM_WIDTH),
-so SOFs are aligned to the start of word (MFB Block 0).
-The appending process occurs in two steps:</p>
-<ol class="arabic simple">
-<li><p>MVB append data are inserted onto a (temporary) MFB word and
-shifted according to the EOF (POS) of the original packet.</p></li>
-<li><p>This word is multiplexed with the MFB word containing the original packet
-according to the so-called “append vector”, which contains 1s from
-the EOF of the original packet to the offset created by the append data.</p></li>
-</ol>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>In this first version, the component has certain limitations:</p>
-<ol class="arabic simple">
-<li><p>Only one MFB Region is supported.
-Multiple MFB Reagions are difficult to handle for the shifting mechanism.</p></li>
-<li><p>MVB Items cannot be wider than the MFB word.
-This would also cause problems for the shifting mechanism.</p></li>
-</ol>
-</div>
-<p>Further versions could remove these limitations.
-They could also utilize MFB Frame Masker instead of the Reconfigurators.</p>
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_mvb_prepender">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_MVB_PREPENDER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_mvb_prepender" title="Link to this definition"></a></dt>
+<dd><p>This component inserts MVB Items to the start of input packets.
+One MVB Item is prepended to one MFB packet.
+The MVB Items must be as wide as N MFB Blocks (see generic <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">MVB_ITEM_SIZE</span></code>).
+Metadata are currently not supported (see generic <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">MFB_META_WIDTH</span></code>).</p>
+<p><strong>Architecture</strong></p>
+<p>MFB_MVB_PREPENDER uses MFB Extender to create space for the MVB Items (moves SOF and EOF).
+Then it calculates a “Prepend vector”, where each each bit corresponds to a MFB Block in the dataword.
+Before the MVB Item is inserted into the dataword according to the Prepend vector,
+it is shifted to start at SOF_POS of the current frame.</p>
+<p>Does not meet timing constrains with MFB_REGIONS=4!</p>
+<p>Resource consumption increases with the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">MVB_ITEM_SIZE</span></code>
+generic! (Or more precisely, with the MAX_PREPEND_REGIONS constant, which depends on this generic.)</p>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -194,70 +182,70 @@ They could also utilize MFB Frame Masker instead of the Reconfigurators.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_prepender-mfb_regions"><td><p>MFB_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Number of Regions within a data word, must be power of 2.
 In this version, only one MFB Region is supported.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_prepender-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
-<td><p>Region size (in Blocks).</p></td>
+<td><p>Region size (in Blocks).
+Values under 2 might cause unwanted behaviour.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_prepender-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Block size (in Items), must be 8.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_prepender-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Item width (in bits), must be 8.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mfb_meta_width"><td><p>MFB_META_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_prepender-mfb_meta_width"><td><p>MFB_META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
-<td><p>Metadata width (in bits).</p></td>
+<td><p>Metadata width (in bits).
+Currently not supported!
+MFB Frame Extender doesn’t support standard MFB metadata, only metadata on its
+MVB interface (RX_MVB_USERMETA port). Metadata Extractor could be used to extract
+metadata on to MVB. These could be then merged with the MVB Items (from
+MFB Frame Length’s output) going to MFB Frame Extender’s RX_MVB_* interface.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-pkt_mtu_in"><td><p>PKT_MTU_IN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_prepender-pkt_mtu_in"><td><p>PKT_MTU_IN</p></td>
 <td><p>natural</p></td>
 <td><p>2**14</p></td>
 <td><p>Maximum size of input packets (in Items).
-Output packets’ MTU is PKT_MTU_IN + MVB_ITEM_SIZE.</p></td>
+Output packets’ MTU is PKT_MTU_IN + MVB_ITEM_SIZE*MFB_BLOCK_SIZE.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mvb_items"><td><p>MVB_ITEMS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_prepender-mvb_items"><td><p>MVB_ITEMS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
-<td><p>Number of MVB Items in one word.</p></td>
+<td><p>Number of MVB Items in a single word.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-mvb_item_size"><td><p>MVB_ITEM_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_prepender-mvb_item_size"><td><p>MVB_ITEM_SIZE</p></td>
 <td><p>natural</p></td>
-<td><p>16</p></td>
-<td><p>Size of each MVB Item (in MFB Items!).
+<td><p>2</p></td>
+<td><p>Size of each MVB Item (in MFB Blocks!).
+MVB Items cannot be wider than the MFB word, hence:
 MVB_ITEMS*MVB_ITEM_SIZE must not be greater than
-the number of MFB Items in a word (MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE).</p></td>
+the number of MFB Blocks in a word (MFB_REGIONS*MFB_REGION_SIZE).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-mfb_fifo_depth"><td><p>MFB_FIFO_DEPTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_prepender-mfb_fifo_depth"><td><p>MFB_FIFO_DEPTH</p></td>
 <td><p>natural</p></td>
-<td><p>32</p></td>
-<td><p>Number of Items in the Input MFB_FIFOX.</p></td>
+<td><p>1024</p></td>
+<td><p>Number of Items (MFB words) in the Input MFB_FIFOX.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-append_fifo_depth"><td><p>APPEND_FIFO_DEPTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_prepender-mvb_fifo_depth"><td><p>MVB_FIFO_DEPTH</p></td>
 <td><p>natural</p></td>
-<td><p>32</p></td>
-<td><p>Number of Items in the Input APPEND FIFOX.</p></td>
+<td><p>512</p></td>
+<td><p>Number of Items (MVB words) in the Input MVB FIFOX.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_appender-rx_mfb_conf_eq_tx"><td><p>RX_MFB_CONF_EQ_TX</p></td>
-<td><p>boolean</p></td>
-<td><p>True</p></td>
-<td><p>Whether the input and output MFB configurations are the same.
-If “false”, TX MFB configuration is 1,1,MFB_REGION_SIZE*MFB_BLOCK_SIZE,MFB_ITEM_WIDTH.
-Disabling backward configuration saves resources.</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_appender-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_prepender-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
-<td><p>“STRATIX10”</p></td>
+<td><p>“AGILEX”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
 </tr>
 </tbody>
@@ -276,12 +264,12 @@ Disabling backward configuration saves resources.</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-clk"><td><p>CLK</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-reset"><td><p>RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-reset"><td><p>RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
@@ -291,112 +279,112 @@ Disabling backward configuration saves resources.</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>RX MVB inf (append data)</p></td>
+<td><p>RX MVB inf (prepend data)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mvb_data"><td><p>RX_MVB_DATA</p></td>
-<td><p>std_logic_vector(MVB_ITEMS*MVB_ITEM_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-rx_mvb_data"><td><p>RX_MVB_DATA</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*MVB_ITEM_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>TX MFB inf (frames with appended MVB data)</p></td>
+<td><p>TX MFB inf (frames with prepended MVB data)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Valid with SOF.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(tsel(RX_MFB_CONF_EQ_TX, MFB_REGION_SIZE, 1)))-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_mvb_prepender-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_appender-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_mvb_prepender-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
@@ -411,8 +399,8 @@ Disabling backward configuration saves resources.</p></td>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../../debug/generator/readme.html" class="btn btn-neutral float-left" title="MFB Generator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../frame_extender/readme.html" class="btn btn-neutral float-right" title="MFB FRAME EXTENDER" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../frame_extender/readme.html" class="btn btn-neutral float-left" title="MFB FRAME EXTENDER" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../frame_trimmer/readme.html" class="btn btn-neutral float-right" title="MFB FRAME TRIMMER" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
