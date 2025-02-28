@@ -118,6 +118,11 @@ package type_pack is
   function array_item_resize_l(in_arr : u_array_t; new_size : natural) return u_array_t;
   function array_item_resize_l(in_arr : slv_array_t; new_size : natural) return slv_array_t;
 
+  -- OR all items of an slv array.
+  -- Masking: optionally enable masking to select array's items to be ORed.
+  function or_array     (arr: slv_array_t) return std_logic_vector;
+  function or_array_mask(arr: slv_array_t; mask_vec: std_logic_vector) return std_logic_vector;
+
   pure function resize(in_val : std_logic_vector; in_size : natural) return std_logic_vector;
 
 end type_pack;
@@ -525,6 +530,29 @@ package body type_pack is
       variable out_arr : slv_array_t(in_arr'range)(new_size-1 downto 0);
    begin
       return u_arr_to_slv_arr(array_item_resize_l(slv_arr_to_u_arr(in_arr), new_size));
+   end function;
+
+   function or_array(arr: slv_array_t) return std_logic_vector is
+      variable vec : std_logic_vector(arr(arr'low)'range) := (others => '0');
+   begin
+      for i in 0 to arr'high loop
+         vec := vec or arr(i);
+      end loop;
+      return vec;
+   end function;
+
+   function or_array_mask(arr: slv_array_t; mask_vec: std_logic_vector) return std_logic_vector is
+      variable vec : std_logic_vector(arr(arr'low)'range) := (others => '0');
+   begin
+      assert arr'length = mask_vec'length
+         report "Mask vector does not correspond with the size of the array!"
+         severity failure;
+      for i in 0 to arr'high loop
+         if (mask_vec(i) = '1') then
+            vec := vec or arr(i);
+         end if;
+      end loop;
+      return vec;
    end function;
 
    function str_array_ser(str_array: str_array_t) return string is
