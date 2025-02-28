@@ -42,6 +42,7 @@ Detailed :ref:`documentation can be found here<trans_sorter>`.
    comp/base/misc/packet_planner/readme
    comp/base/misc/event_counter/readme
    comp/base/misc/pulse_short/readme
+   comp/base/misc/frequency_meter/readme
 ..   comp/base/misc/<something>
 .. Add more references here...
 
