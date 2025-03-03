@@ -308,6 +308,35 @@ class sequence_simple_meas #(int unsigned ITEM_WIDTH) extends uvm_common::sequen
 
 endclass
 
+class sequence_min_max #(int unsigned ITEM_WIDTH) extends sequence_simple #(ITEM_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array::sequence_min_max #(ITEM_WIDTH))
+    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_min_max);
+
+    // Constructor
+    function new(string name = "sequence_min_max");
+        super.new(name);
+    endfunction
+
+    task body;
+        uvm_common::sequence_cfg state;
+        void'(uvm_config_db #(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state));
+
+        `uvm_info(m_sequencer.get_full_name(), "\n\tsequence_min_max is running", UVM_DEBUG)
+
+        repeat (transaction_count) begin
+            if (state != null) begin
+                if (!state.next()) begin
+                    break;
+                end
+            end
+
+            `uvm_do_with(req, {
+                data.size inside { cfg.array_size_min, cfg.array_size_max };
+            });
+        end
+    endtask
+
+endclass
 
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY
@@ -329,5 +358,6 @@ class sequence_lib #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_libra
         this.add_sequence(sequence_simple_gauss#(ITEM_WIDTH)::get_type());
         this.add_sequence(sequence_simple_inc#(ITEM_WIDTH)::get_type());
         this.add_sequence(sequence_simple_dec#(ITEM_WIDTH)::get_type());
+        this.add_sequence(sequence_min_max   #(ITEM_WIDTH)::get_type());
     endfunction
 endclass
