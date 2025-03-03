@@ -19,8 +19,8 @@ package uvm_mfb;
     `include "driver.sv"
     `include "monitor.sv"
     `include "statistic.sv"
+    `include "coverage_model.sv"
     `include "agent.sv"
-    //`include "coverage.sv"
 endpackage
 
 `endif
