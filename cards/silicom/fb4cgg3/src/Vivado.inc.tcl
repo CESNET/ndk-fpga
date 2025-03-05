@@ -20,7 +20,7 @@ set SYNTH_FLAGS(BOARD)     $CARD_NAME
 # Optimization directives for implementation
 set SYNTH_FLAGS(SOPT_DIRECTIVE)  "Explore"
 set SYNTH_FLAGS(PLACE_DIRECTIVE) "Explore"
-set SYNTH_FLAGS(POPT_DIRECTIVE)  "Explore"
+set SYNTH_FLAGS(PPLACE_PHYS_OPT_DIRECTIVE)  "Explore"
 set SYNTH_FLAGS(ROUTE_DIRECTIVE) "Explore"
 
 # Propagating card constants to the Modules.tcl files of the underlying components.
