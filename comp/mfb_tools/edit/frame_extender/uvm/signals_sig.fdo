@@ -1,0 +1,19 @@
+# signal_sig.fdo: Include file with signals
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "./signals.fdo"
+
+add wave -divider "MFB_FRAME_EXTENDER"
+
+add_wave "-noupdate -color yellow -label CLK" /testbench/CLK
+
+all ALL /testbench/DUT_U/VHDL_DUT_U
+
+add_wave "-noupdate -hex -group USER_PACKET_GEN" testbench/DUT_U/VHDL_DUT_U/pkt_gen_i/*
+add_wave "-noupdate -hex -group DM_CTRL" testbench/DUT_U/VHDL_DUT_U/dm_ctrl_i/*
+add_wave "-noupdate -hex -group DATAMOVER" testbench/DUT_U/VHDL_DUT_U/data_mover_i/*
+add_wave "-noupdate -hex -group DATAMOVER/FIFOX_MULTI" testbench/DUT_U/VHDL_DUT_U/data_mover_i/fifox_multi_i/*
+
+config wave -signalnamewidth 1
