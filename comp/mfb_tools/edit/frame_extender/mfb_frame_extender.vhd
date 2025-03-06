@@ -53,8 +53,12 @@ port (
     -- =========================================================================
     RX_MVB_USERMETA        : in  std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
     -- RX MFB frame size in MFB items
+    -- Maximum size is PKT_MTU MFB items
     RX_MVB_FRAME_LENGTH    : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
     -- Frame extension size in MFB items, but must be divisible by MFB_BLOCK_SIZE
+    -- Minimum size is 60 MFB items
+    -- If EXT_EN is active and EXT_ONLY is not, then the sum of RX_MVB_FRAME_LENGTH and RX_MVB_EXT_SIZE cannot be higher than PKT_MTU
+    -- If both EXT_EN and EXT_ONLY are active, then RX_MVB_EXT_SIZE cannot be higher than PKT_MTU
     RX_MVB_EXT_SIZE        : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
     -- It only uses the new part (EXT_SIZE) of the frame, the rest is discarded.
     -- This can be useful, for example, when we need to send only metadata instead of the frame.
