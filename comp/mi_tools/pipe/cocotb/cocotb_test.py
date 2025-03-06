@@ -98,7 +98,7 @@ async def run_test(dut, pkt_count: int = 1000, item_width_min: int = 1, item_wid
             test_trans = MiTransaction()
             test_trans.trans_type = request_type
             test_trans.addr = addr + i*tb.request_stream_in.addr_width
-            test_trans.data = int.from_bytes(enabled_data, 'little')
+            test_trans.data = enabled_data
             test_trans.be = be_slice
             tb.model(test_trans)
             item_count += 1
