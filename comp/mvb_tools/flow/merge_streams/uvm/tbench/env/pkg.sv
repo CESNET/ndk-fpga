@@ -12,6 +12,8 @@ package uvm_mvb_merge_streams;
     import uvm_pkg::*;
 
     `include "stream_splitter.sv"
+    `include "hl_coverage_model.sv"
+    `include "ll_coverage_model.sv"
     `include "scoreboard.sv"
     `include "virtual_sequencer.sv"
     `include "env.sv"

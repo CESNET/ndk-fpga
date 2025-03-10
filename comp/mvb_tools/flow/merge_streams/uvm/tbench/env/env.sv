@@ -16,8 +16,10 @@ class env #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX
     uvm_logic_vector_mvb::env_tx #(MVB_ITEMS, MVB_ITEM_WIDTH) m_env_tx_mvb;
 
     // Coverage models
-    uvm_mvb::coverage #(MVB_ITEMS, MVB_ITEM_WIDTH) m_coverage_rx_mvb[RX_STREAMS];
-    uvm_mvb::coverage #(MVB_ITEMS, MVB_ITEM_WIDTH) m_coverage_tx_mvb;
+    hl_coverage_model #(MVB_ITEM_WIDTH, RX_STREAMS)            m_hl_coverage_model;
+    ll_coverage_model #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) m_ll_coverage_model;
+    uvm_mvb::coverage #(MVB_ITEMS, MVB_ITEM_WIDTH)             m_coverage_rx_mvb[RX_STREAMS];
+    uvm_mvb::coverage #(MVB_ITEMS, MVB_ITEM_WIDTH)             m_coverage_tx_mvb;
 
     // Scoreboard
     scoreboard #(MVB_ITEM_WIDTH, RX_STREAMS) m_scoreboard;
@@ -67,6 +69,8 @@ class env #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX
         // Coverage model creation //
         // ----------------------- //
 
+        m_hl_coverage_model = hl_coverage_model #(MVB_ITEM_WIDTH, RX_STREAMS)           ::type_id::create("m_hl_coverage_model", this);
+        m_ll_coverage_model = ll_coverage_model #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_ll_coverage_model", this);
         for (int unsigned i = 0; i < RX_STREAMS; i++) begin
             m_coverage_rx_mvb[i] = new($sformatf("m_coverage_rx_mvb_%0d", i));
         end
@@ -101,6 +105,10 @@ class env #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX
         // Coverage model connection //
         // ------------------------- //
 
+        for (int unsigned i = 0; i < RX_STREAMS; i++) begin
+            m_env_rx_mvb[i].analysis_port.connect(m_hl_coverage_model.analysis_export);
+            m_env_rx_mvb[i].m_mvb_agent.analysis_port.connect(m_ll_coverage_model.in[i].analysis_export);
+        end
         for (int unsigned i = 0; i < RX_STREAMS; i++) begin
             m_env_rx_mvb[i].m_mvb_agent.analysis_port.connect(m_coverage_rx_mvb[i].analysis_export);
         end
