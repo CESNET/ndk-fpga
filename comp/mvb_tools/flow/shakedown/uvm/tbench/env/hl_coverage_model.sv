@@ -3,7 +3,7 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class hl_coverage_model #(int unsigned TX_ITEMS) extends uvm_subscriber #(int unsigned);
+class hl_coverage_model #(int unsigned TX_ITEMS) extends uvm_subscriber #(read_command_item #(TX_ITEMS));
     `uvm_component_param_utils(uvm_mvb_shakedown::hl_coverage_model #(TX_ITEMS))
 
     // ----------- //
@@ -34,8 +34,12 @@ class hl_coverage_model #(int unsigned TX_ITEMS) extends uvm_subscriber #(int un
         port_covergroup = new(convert_to_full_name("port_covergroup"));
     endfunction
 
-    function void write(int unsigned t);
-        port_covergroup.sample(t);
+    function void write(read_command_item #(TX_ITEMS) t);
+        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
+            if (t.read[i] === 1'b1) begin
+                port_covergroup.sample(i);
+            end
+        end
     endfunction
 
 endclass

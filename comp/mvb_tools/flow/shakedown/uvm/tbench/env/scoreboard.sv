@@ -11,14 +11,13 @@ class scoreboard #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned IT
 
     // TX analysis exports
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(ITEM_WIDTH)) analysis_export_tx_mvb[TX_ITEMS];
+    uvm_analysis_export #(read_command_item #(TX_ITEMS))                 analysis_export_tx_read_command;
 
     // Comparers
     uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(ITEM_WIDTH)) comparer[TX_ITEMS];
 
     // Model
     model #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH) m_model;
-    // Port activity detector
-    activity_detector #(TX_ITEMS, ITEM_WIDTH) m_activity_detector;
 
     // High-level coverage model
     hl_coverage_model #(TX_ITEMS) m_coverage_model;
@@ -31,6 +30,7 @@ class scoreboard #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned IT
         for (int unsigned i = 0; i < TX_ITEMS; i++) begin
             analysis_export_tx_mvb[i] = new($sformatf("analysis_export_tx_mvb_%0d", i), this);
         end
+        analysis_export_tx_read_command = new("analysis_export_tx_read_command", this);
     endfunction
 
     function int unsigned success();
@@ -57,8 +57,7 @@ class scoreboard #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned IT
             comparer[i].model_tr_timeout_set(200us);
         end
 
-        m_model             = model             #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH)::type_id::create("m_model", this);
-        m_activity_detector = activity_detector #(TX_ITEMS, ITEM_WIDTH)          ::type_id::create("m_activity_detector", this);
+        m_model = model #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH)::type_id::create("m_model", this);
 
         m_coverage_model = hl_coverage_model #(TX_ITEMS)::type_id::create("m_coverage_model", this);
     endfunction
@@ -72,16 +71,12 @@ class scoreboard #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned IT
             m_model.out[i].connect(comparer[i].analysis_imp_model);
         end
 
-        // TX => Activity Detector -> Model
-        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            analysis_export_tx_mvb[i].connect(m_activity_detector.analysis_export[i]);
-        end
-        m_activity_detector.analysis_port.connect(m_model.in_port_number.analysis_export);
+        // TX read commands -> Model
+        analysis_export_tx_read_command.connect(m_model.in_read_command.analysis_export);
+        // TX read commands -> Coverage model
+        analysis_export_tx_read_command.connect(m_coverage_model.analysis_export);
 
-        // Activity Detector -> Coverage model
-        m_activity_detector.analysis_port.connect(m_coverage_model.analysis_export);
-
-        // TX => Comparers
+        // TX data => Comparers
         for (int unsigned i = 0; i < TX_ITEMS; i++) begin
             analysis_export_tx_mvb[i].connect(comparer[i].analysis_imp_dut);
         end
@@ -92,8 +87,8 @@ class scoreboard #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned IT
 
         super.report_phase(phase);
 
-        if (m_model.in_data.used() > 0 || m_model.in_port_number.used() > 0) begin
-            msg = { msg, $sformatf("\n\tSOME TRANSACTIONS ARE STUCK INSIDE THE MODEL\n\tDATA:%0d\n\tPORT NUMBER:%0d", m_model.in_data.used(), m_model.in_port_number.used()) };
+        if (m_model.in_data.used() > 0 || m_model.in_read_command.used() > 0) begin
+            msg = { msg, $sformatf("\n\tSOME TRANSACTIONS ARE STUCK INSIDE THE MODEL\n\tDATA:%0d\n\tPORT NUMBER:%0d", m_model.in_data.used(), m_model.in_read_command.used()) };
         end
 
         if (this.success() && this.used() == 0) begin

@@ -8,7 +8,7 @@ class model #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WI
 
     // Model inputs
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(ITEM_WIDTH)) in_data;
-    uvm_tlm_analysis_fifo #(int unsigned)                                  in_port_number;
+    uvm_tlm_analysis_fifo #(read_command_item #(TX_ITEMS))                 in_read_command;
 
     // Model outputs
     uvm_analysis_port #(uvm_logic_vector::sequence_item #(ITEM_WIDTH)) out[TX_ITEMS];
@@ -19,8 +19,8 @@ class model #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WI
     function new(string name = "model", uvm_component parent = null);
         super.new(name, parent);
 
-        in_data        = new("in_data", this);
-        in_port_number = new("in_port_number", this);
+        in_data         = new("in_data", this);
+        in_read_command = new("in_read_command", this);
         for (int unsigned i = 0; i < TX_ITEMS; i++) begin
             out[i] = new($sformatf("out_%0d", i), this);
         end
@@ -29,11 +29,10 @@ class model #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WI
     task run_phase(uvm_phase phase);
         uvm_logic_vector::sequence_item #(ITEM_WIDTH) out_item;
 
-        int unsigned port_number;
+        read_command_item #(TX_ITEMS) in_read_command_item;
+        int unsigned highest_port_number;
 
         forever begin
-            // Get the port number from which an item was read
-            in_port_number.get(port_number);
 
             //   Direction | Dequeue <------------------------------------------- Enqueue |
             //             |===================================|                          |
@@ -52,20 +51,39 @@ class model #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WI
             //
             //             | < ---------- TX_ITEMS --------- > |
 
-            // Ensure there is an item on the port
-            while (port_number+1 > port_data.size()) begin
+            // Get a read command
+            in_read_command.get(in_read_command_item);
+
+            assert($countones(in_read_command_item.read) > 0)
+            else begin
+                `uvm_error(get_full_name(), "\n\tGot a read command item with no read bits set")
+            end
+
+            // Find out the highest port number
+            for (int i = TX_ITEMS-1; i >= 0; i--) begin
+                if (in_read_command_item.read[i] === 1'b1) begin
+                    highest_port_number = i;
+                    break;
+                end
+            end
+
+            // Ensure there is an item on the highest port
+            while (highest_port_number+1 > port_data.size()) begin
                 uvm_logic_vector::sequence_item #(ITEM_WIDTH) temp_item;
                 in_data.get(temp_item);
                 port_data.push_back(temp_item);
             end
 
-            out_item = uvm_logic_vector::sequence_item #(ITEM_WIDTH)::type_id::create("out_item");
-
-            // Read an item from the port
-            out_item = port_data[port_number];
-            port_data.delete(port_number);
-
-            out[port_number].write(out_item);
+            for (int i = highest_port_number; i >= 0; i--) begin
+                if (in_read_command_item.read[i] === 1'b1) begin
+                    out_item = uvm_logic_vector::sequence_item #(ITEM_WIDTH)::type_id::create("out_item");
+                    // Read an item from the port
+                    out_item = port_data[i];
+                    port_data.delete(i);
+                    // Output an item
+                    out[i].write(out_item);
+                end
+            end
         end
     endtask
 

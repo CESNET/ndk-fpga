@@ -1,4 +1,4 @@
-// activity_detector.sv: Generates a sequence of port numbers from which items are read
+// activity_detector.sv: Generates read commands
 // Copyright (C) 2025 CESNET z. s. p. o.
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
@@ -7,39 +7,42 @@ class activity_detector #(int unsigned TX_ITEMS, int unsigned ITEM_WIDTH) extend
     `uvm_component_param_utils(uvm_mvb_shakedown::activity_detector #(TX_ITEMS, ITEM_WIDTH))
 
     // Inputs
-    uvm_analysis_export #(uvm_logic_vector::sequence_item #(ITEM_WIDTH)) analysis_export[TX_ITEMS];
+    uvm_tlm_analysis_fifo #(uvm_mvb::sequence_item #(1, ITEM_WIDTH)) in[TX_ITEMS];
 
     // Outputs
-    uvm_analysis_port #(int unsigned) analysis_port;
-
-    // Watchdogs for the ports
-    port_watchdog #(ITEM_WIDTH) m_port_watchdog[TX_ITEMS];
+    uvm_analysis_port #(read_command_item #(TX_ITEMS)) analysis_port;
 
     function new(string name = "activity_detector", uvm_component parent = null);
         super.new(name, parent);
 
         for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            analysis_export[i] = new($sformatf("analysis_export_%0d", i), this);
+            in[i] = new($sformatf("in_%0d", i), this);
         end
         analysis_port = new("analysis_port", this);
     endfunction
 
-    function void build_phase(uvm_phase phase);
-        super.build_phase(phase);
+    task run_phase(uvm_phase phase);
+        uvm_mvb::sequence_item #(1, ITEM_WIDTH) in_item;
+        read_command_item #(TX_ITEMS) out_read_command_item;
 
-        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            m_port_watchdog[i] = port_watchdog #(ITEM_WIDTH)::type_id::create($sformatf("port_watchdog_%0d", i), this);
-            m_port_watchdog[i].port_number = i;
+        forever begin
+            out_read_command_item = read_command_item #(TX_ITEMS)::type_id::create("out_read_command_item");
+
+            for (int unsigned i = 0; i < TX_ITEMS; i++) begin
+                in[i].get(in_item);
+
+                if (in_item.src_rdy === 1'b1 && in_item.dst_rdy === 1'b1 && in_item.vld === 1'b1) begin
+                    out_read_command_item.read[i] = 1'b1;
+                end
+                else begin
+                    out_read_command_item.read[i] = 1'b0;
+                end
+            end
+
+            if (|out_read_command_item.read > 0) begin
+                analysis_port.write(out_read_command_item);
+            end
         end
-    endfunction
-
-    function void connect_phase(uvm_phase phase);
-        super.connect_phase(phase);
-
-        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            analysis_export[i].connect(m_port_watchdog[i].analysis_export);
-            m_port_watchdog[i].analysis_port.connect(analysis_port);
-        end
-    endfunction
+    endtask
 
 endclass

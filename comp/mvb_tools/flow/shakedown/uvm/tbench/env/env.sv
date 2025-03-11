@@ -25,6 +25,9 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
     // Virtual sequencer
     virtual_sequencer #(TX_ITEMS, ITEM_WIDTH) m_virtual_sequencer;
 
+    // Port activity detector
+    activity_detector #(TX_ITEMS, ITEM_WIDTH) m_activity_detector;
+
     // Constructor
     function new(string name = "env", uvm_component parent = null);
         super.new(name, parent);
@@ -76,6 +79,8 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
 
         m_scoreboard        = scoreboard        #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH)::type_id::create("m_scoreboard", this);
         m_virtual_sequencer = virtual_sequencer #(TX_ITEMS, ITEM_WIDTH)          ::type_id::create("m_virtual_sequencer", this);
+
+        m_activity_detector = activity_detector #(TX_ITEMS, ITEM_WIDTH)::type_id::create("m_activity_detector", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -121,6 +126,15 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
         for (int unsigned i = 0; i < TX_ITEMS; i++) begin
             m_virtual_sequencer.m_tx_mvb[i] = m_env_tx_mvb[i].m_sequencer;
         end
+
+        // ---------------------------- //
+        // Activity Detector connection //
+        // ---------------------------- //
+
+        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
+            m_env_tx_mvb[i].m_mvb_agent.analysis_port.connect(m_activity_detector.in[i].analysis_export);
+        end
+        m_activity_detector.analysis_port.connect(m_scoreboard.analysis_export_tx_read_command);
     endfunction
 
 endclass
