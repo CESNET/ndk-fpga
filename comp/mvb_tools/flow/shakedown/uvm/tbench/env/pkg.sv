@@ -11,12 +11,12 @@ package uvm_mvb_shakedown;
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 
-    `include "port_watchdog.sv"
-    `include "activity_detector.sv"
+    `include "read_command_item.sv"
     `include "model.sv"
     `include "hl_coverage_model.sv"
     `include "ll_coverage_model.sv"
     `include "scoreboard.sv"
+    `include "activity_detector.sv"
     `include "virtual_sequencer.sv"
     `include "env.sv"
 

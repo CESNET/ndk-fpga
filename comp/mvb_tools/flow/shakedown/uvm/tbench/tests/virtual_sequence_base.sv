@@ -26,8 +26,8 @@ class virtual_sequence_base #(int unsigned TX_ITEMS, int unsigned ITEM_WIDTH) ex
         // Create the RX MVB sequence
         m_rx_mvb = uvm_logic_vector::sequence_simple #(ITEM_WIDTH)::type_id::create("m_rx_mvb");
         // Configure the RX MVB sequence
-        m_rx_mvb.transaction_count_min = ($clog2(TX_ITEMS)+1)*300;
-        m_rx_mvb.transaction_count_max = ($clog2(TX_ITEMS)+1)*500;
+        m_rx_mvb.transaction_count_min = TX_ITEMS*300;
+        m_rx_mvb.transaction_count_max = TX_ITEMS*500;
 
         // ---------------- //
         // TX MVB sequences //
