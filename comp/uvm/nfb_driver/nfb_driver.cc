@@ -3,7 +3,7 @@
  * Copyright (C) 2022 CESNET z. s. p. o.
  * description: create interprocess comunication with nfb program. This framework use POSIX queue
  * date       : 2022
- * author     : Radek Iša <isa@cesnet.ch>
+ * author     : Radek Iša <isa@cesnet.cz>
  *
  * SPDX-License-Identifier: BSD-3-Clause
 */
@@ -17,7 +17,12 @@
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/health_check_service_interface.h>
 
+#if defined NFB_PROTO_API_V1
+#include "nfb/ext/protobuf/v1/nfb.grpc.pb.h"
+namespace nfb_grpc = nfb::ext::protobuf::v1;
+#else
 #include "nfb_grpc.grpc.pb.h"
+#endif
 extern "C" {
 #include <libfdt.h>
 }
@@ -79,9 +84,16 @@ public:
 
 class req_fdt : public req_base {
 private :
+
+#if defined NFB_PROTO_API_V1
+    google::protobuf::Empty request;
+    nfb_grpc::FdtResponse    reply;
+    grpc::ServerAsyncResponseWriter<nfb_grpc::FdtResponse> responder;
+#else
     nfb_grpc::nfb_rpc_device request;
     nfb_grpc::nfb_fdt        reply;
     grpc::ServerAsyncResponseWriter<nfb_grpc::nfb_fdt> responder;
+#endif
 
 public:
     req_fdt(req_base ** base_ptr) : req_base(base_ptr), responder(&ctx)
@@ -93,7 +105,11 @@ public:
     {
         this->cq = cq;
         this->service = service;
+#if defined NFB_PROTO_API_V1
+        this->service->RequestGetFdt(&ctx, &request, &responder, cq, cq, this);
+#else
         this->service->RequestNfb_fdt_get(&ctx, &request, &responder, cq, cq, this);
+#endif
         status = PROCESS;
     }
 
@@ -136,9 +152,15 @@ public:
 
 class req_read : public req_base {
 private :
+#if defined NFB_PROTO_API_V1
+    nfb_grpc::ReadCompRequest request;
+    nfb_grpc::ReadCompResponse reply;
+    grpc::ServerAsyncResponseWriter<nfb_grpc::ReadCompResponse> responder;
+#else
     nfb_grpc::nfb_read_req  request;
     nfb_grpc::nfb_read_resp reply;
     grpc::ServerAsyncResponseWriter<nfb_grpc::nfb_read_resp> responder;
+#endif
 
 public:
     req_read(req_base ** base_ptr) : req_base(base_ptr), responder(&ctx)
@@ -149,7 +171,11 @@ public:
     {
         this->cq = cq;
         this->service = service;
+#if defined NFB_PROTO_API_V1
+        this->service->RequestReadComp(&ctx, &request, &responder, cq, cq, this);
+#else
         this->service->RequestNfb_comp_read(&ctx, &request, &responder, cq, cq, this);
+#endif
         status = PROCESS;
     }
 
@@ -160,10 +186,16 @@ public:
             uint64_t offset_tmp;
             int proplen;
             const fdt32_t *prop;
+            int fdt_offset;
 
+#if defined NFB_PROTO_API_V1
+            fdt_offset = fdt_path_offset(fdt, request.path().c_str());
+#else
+            fdt_offset = request.fdt_offset();
+#endif
 
             *cmd = 3;
-            prop = (fdt32_t*) fdt_getprop(fdt, request.fdt_offset(), "reg", &proplen);
+            prop = (fdt32_t*) fdt_getprop(fdt, fdt_offset, "reg", &proplen);
 
             if (proplen == sizeof(*prop) * 2) {
                 offset_tmp = fdt32_to_cpu(prop[0]);
@@ -211,9 +243,15 @@ public:
 
 class req_write : public req_base {
 private :
+#if defined NFB_PROTO_API_V1
+    nfb_grpc::WriteCompRequest request;
+    nfb_grpc::WriteCompResponse reply;
+    grpc::ServerAsyncResponseWriter<nfb_grpc::WriteCompResponse> responder;
+#else
     nfb_grpc::nfb_write_req request;
     nfb_grpc::nfb_write_resp reply;
     grpc::ServerAsyncResponseWriter<nfb_grpc::nfb_write_resp> responder;
+#endif
 
 public:
     req_write(req_base ** base_ptr) : req_base(base_ptr), responder(&ctx)
@@ -224,7 +262,11 @@ public:
     {
         this->cq = cq;
         this->service = service;
+#if defined NFB_PROTO_API_V1
+        this->service->RequestWriteComp(&ctx, &request, &responder, cq, cq, this);
+#else
         this->service->RequestNfb_comp_write(&ctx, &request, &responder, cq, cq, this);
+#endif
         status = PROCESS;
     }
 
@@ -236,9 +278,16 @@ public:
             uint64_t offset_tmp = 0;
             int proplen;
             const fdt32_t *prop;
+            int fdt_offset;
+
+#if defined NFB_PROTO_API_V1
+            fdt_offset = fdt_path_offset(fdt, request.path().c_str());
+#else
+            fdt_offset = request.fdt_offset();
+#endif
 
            *cmd = 2;
-            prop = (fdt32_t*) fdt_getprop(fdt, request.fdt_offset(), "reg", &proplen);
+            prop = (fdt32_t*) fdt_getprop(fdt, fdt_offset, "reg", &proplen);
 
             if (proplen == sizeof(*prop) * 2) {
                 offset_tmp = fdt32_to_cpu(prop[0]);
