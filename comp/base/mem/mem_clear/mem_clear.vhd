@@ -33,28 +33,36 @@ end entity;
 architecture FULL of MEM_CLEAR is
 
     type FSM_STATES_T is (
+        INIT,
         CLEAR,
         RUNNING
     );
+
+    constant CNTR_W             : natural := log2(ITEMS);
 
     -- State machine --
 
     signal curr_state           : FSM_STATES_T;
     signal next_state           : FSM_STATES_T;
 
-    signal addr_i               : std_logic_vector(log2(ITEMS)-1 downto 0);
-    signal addr_r               : std_logic_vector(log2(ITEMS)-1 downto 0);
-    signal rst_r                : std_logic;
+    signal addr_r               : unsigned(CNTR_W-1 downto 0);
+    signal addr_r_clr           : std_logic;
+    signal addr_r_inc           : std_logic;
 
  begin
 
-    CLEAR_ADDR          <= addr_i;
+    CLEAR_ADDR          <= std_logic_vector(addr_r);
 
     reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            addr_r      <= addr_i;
-            rst_r       <= RST;
+            if addr_r_clr = '1' then
+                addr_r <= (others => '0');
+            else
+                if addr_r_inc = '1' then
+                    addr_r <= addr_r + 1;
+                end if;
+            end if;
         end if;
     end process;
 
@@ -66,11 +74,7 @@ architecture FULL of MEM_CLEAR is
     begin
         if (rising_edge(CLK)) then
             if (RST = '1') then
-                if (CLEAR_EN = true) then
-                    curr_state <= CLEAR;
-                else
-                    curr_state <= RUNNING;
-                end if;
+                curr_state <= INIT;
             else
                 curr_state <= next_state;
             end if;
@@ -82,23 +86,27 @@ architecture FULL of MEM_CLEAR is
     begin
         CLEAR_DONE          <= '0';
         CLEAR_WR            <= '0';
+        addr_r_clr          <= '0';
+        addr_r_inc          <= '0';
         next_state          <= curr_state;
 
         case curr_state is
-            when CLEAR =>
-                if (RST = '0') then
-                    CLEAR_wR    <= '1';
-
-                    if (rst_r = '1') then
-                        addr_i  <= (others => '0');
-                    else
-                        addr_i  <= std_logic_vector(unsigned(addr_r) + 1);
-                    end if;
-
-                    if (unsigned(addr_i) = (ITEMS - 1)) then
-                        next_state  <= RUNNING;
-                    end if;
+            when INIT =>
+                if (CLEAR_EN) then
+                    next_state <= CLEAR;
+                else
+                    next_state <= RUNNING;
                 end if;
+
+                addr_r_clr <= '1';
+
+            when CLEAR =>
+                if (addr_r = (ITEMS - 1)) then
+                    next_state <= RUNNING;
+                end if;
+
+                CLEAR_WR    <= '1';
+                addr_r_inc  <= '1';
 
             when RUNNING =>
                 CLEAR_DONE      <= '1';
