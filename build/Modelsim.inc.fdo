@@ -15,6 +15,7 @@ if {![info exists OFM_PATH]} {
 
 # Source scripts with further procedures utilized during design compilation
 source $OFM_PATH/build/Shared.tcl
+source $OFM_PATH/build/DevTree.tcl
 
 # ---------------------------------------------------------------------
 #                     Procedures and Functions
@@ -73,6 +74,11 @@ proc CompileMod {FNAME OPT} {
         # Generate netlist using Vivado
         exec vivado -mode tcl -journal ${IP_GEN_PATH}${IP_NAME}_vivado.jou -log ${IP_GEN_PATH}${IP_NAME}_vivado.log -source $IP_GEN_SCRIPT >&@stdout
       }
+    }
+
+    if {$opt(TYPE) == "DEVTREE"} {
+        puts "LOAD Device tree file: $FNAME"
+        source "$FNAME"
     }
 
     # Skip unknown file types
