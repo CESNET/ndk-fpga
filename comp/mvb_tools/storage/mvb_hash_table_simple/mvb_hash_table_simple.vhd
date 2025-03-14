@@ -1,8 +1,7 @@
--- mvb_hash_table_simple.vhd
+-- SPDX-License-Identifier: BSD-3-Clause
 -- Copyright (C) 2024 CESNET z. s. p. o
 -- Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
---
--- SPDX-License-Identifier: BSD-3-Clause
+
 
 library IEEE;
 use IEEE.std_logic_1164.all;

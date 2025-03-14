@@ -1,9 +1,8 @@
-# drivers.py: MVBDriver
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
-#            Daniel Kondys <kondys@cesnet.cz>
-#
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
+#            Daniel Kondys <kondys@cesnet.cz>
+
 
 from cocotb.handle import ModifiableObject
 
@@ -25,7 +24,7 @@ class MVBDriver(BusDriver):
     """
 
     _signals = ["vld", "src_rdy", "dst_rdy"]
-    _optional_signals = ["data", "meta", "addr", "discard", "length"]
+    _optional_signals = ["data", "meta", "addr", "discard", "length", "key"]
 
     def __init__(self, entity, name, clock, array_idx=None) -> None:
         super().__init__(entity, name, clock, array_idx=array_idx)
@@ -133,7 +132,7 @@ class MVBDriver(BusDriver):
     async def _driver_send(self, transaction: Any, sync: bool = True, **kwargs: Any) -> None:
         """Prepares and sends transaction to the MVB bus."""
 
-        self.log.debug(f"Recieved item: {transaction}")
+        self.log.debug(f"Received item: {transaction}")
 
         if isinstance(transaction, IdleTransaction):
             mvb_tr = self._clear_item()

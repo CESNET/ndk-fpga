@@ -6,10 +6,11 @@
 NDK_FPGA_PATH=../../../../..
 source $NDK_FPGA_PATH/env.sh
 
-ndk_fpga_venv_prepare "venv-fifox"
+ndk_fpga_venv_prepare "venv-mvb_hash_table_simple"
 
 pip install -e .
 
 echo ""
 echo "Now activate environment with:"
-echo "source venv-fifox/bin/activate"
+echo "source venv-mvb_hash_table_simple/bin/activate"
+

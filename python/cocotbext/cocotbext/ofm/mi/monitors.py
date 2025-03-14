@@ -73,11 +73,11 @@ class MIMonitor(BusMonitor):
 
                 recv_trans = self.read_transactions.pop(0)
 
-                recv_trans.data = int.from_bytes(filter_bytes_by_bitmask(drd_bytes, recv_trans.be), 'little')
+                recv_trans.data = filter_bytes_by_bitmask(drd_bytes, recv_trans.be)
 
                 self.log.debug(f"ITEM {self._item_cnt}")
                 self.log.debug(f"ADDR {hex(recv_trans.addr)}")
-                self.log.debug(f"DRD  {hex(recv_trans.data)}")
+                self.log.debug(f"DRD  {recv_trans.data.hex()}")
 
                 self._recv(recv_trans)
                 self._item_cnt += 1
@@ -104,7 +104,7 @@ class MIMonitor(BusMonitor):
                 recv_trans = MiTransaction()
                 recv_trans.trans_type = MiTransactionType.Response
                 recv_trans.addr = int.from_bytes(addr_bytes, 'little')
-                recv_trans.data = int.from_bytes(dwr_recv, 'little')
+                recv_trans.data = dwr_recv
                 recv_trans.be = be_int
 
                 self._recv(recv_trans)

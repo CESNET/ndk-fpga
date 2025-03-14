@@ -1,5 +1,5 @@
 import sys
-from typing import Any, List
+from typing import Any
 
 import nfb
 
@@ -174,7 +174,7 @@ class MfbGenerator(nfb.BaseComp):
     # Destination MAC address register
     # ################################
     @property
-    def dst_mac_address(self) -> int:
+    def dst_mac_address(self) -> bytes:
         """Get the destination MAC address that is a part of the generated frames.
 
         Returned value is six bytes in the little-endian format.
@@ -194,7 +194,7 @@ class MfbGenerator(nfb.BaseComp):
         self._comp.write(self._REG_DST_MAC_LOW, dmac)
 
     @property
-    def src_mac_address(self) -> int:
+    def src_mac_address(self) -> bytes:
         """Get the source MAC address that is a part of the generated frames.
 
         Returned value is six bytes in the little-endian format.
@@ -266,7 +266,8 @@ class MfbGenerator(nfb.BaseComp):
                 sep = mac[2] # select the third character as the separator
             try:
                 mac_parts = mac.split(sep)
-                if len(mac_parts) != 6: raise ValueError
+                if len(mac_parts) != 6:
+                    raise ValueError
             except ValueError:
                 raise ValueError(f"Could not split the input MAC address ({mac}) using the '{sep}' as a separator.")
             # Hoping all parts will be hexadecimal values, else another try-except needed.

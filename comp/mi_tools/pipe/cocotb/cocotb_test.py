@@ -1,8 +1,6 @@
-# cocotb_test.py: MI Pipe test
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
-#
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import cocotb
 from cocotb.clock import Clock
@@ -13,7 +11,7 @@ from cocotbext.ofm.mi.monitors import MIMonitor
 from cocotbext.ofm.ver.generators import random_packets
 from cocotbext.ofm.utils.math import ceildiv
 from cocotb_bus.drivers import BitDriver
-from scoreboard import Scoreboard
+from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.mi.transaction import MiRequestTransaction, MiResponseTransaction, MiTransaction, MiTransactionType
 from cocotb.binary import BinaryValue
 from cocotbext.ofm.utils.signals import filter_bytes_by_bitmask
@@ -100,7 +98,7 @@ async def run_test(dut, pkt_count: int = 1000, item_width_min: int = 1, item_wid
             test_trans = MiTransaction()
             test_trans.trans_type = request_type
             test_trans.addr = addr + i*tb.request_stream_in.addr_width
-            test_trans.data = int.from_bytes(enabled_data, 'little')
+            test_trans.data = enabled_data
             test_trans.be = be_slice
             tb.model(test_trans)
             item_count += 1

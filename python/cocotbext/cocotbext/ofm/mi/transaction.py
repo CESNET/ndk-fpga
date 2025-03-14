@@ -1,19 +1,19 @@
-# transaction.py: MI transactions
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
-#
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 
-from cocotbext.ofm.base.transaction import Transaction
+
 from dataclasses import dataclass
 from enum import Enum
+from cocotbext.ofm.base.transaction import Transaction
 
 
 class MiTransactionType(Enum):
-    Request = 0
+    Request  = 0
     Response = 1
 
 
+@dataclass
 class MiBaseTransaction(Transaction):
     """Base class for MI Transactions with configurable data items"""
 
@@ -21,17 +21,17 @@ class MiBaseTransaction(Transaction):
 @dataclass
 class MiRequestTransaction(MiBaseTransaction):
     """Transaction for MI Request driver."""
-    trans_type: MiTransactionType = None
-    addr: int = 0
-    data: bytes = b""
-    data_len: int = 0
+    trans_type : MiTransactionType = None
+    addr       : int = 0
+    data       : bytes = b""
+    data_len   : int = 0
 
 
 @dataclass
 class MiResponseTransaction(MiBaseTransaction):
     """Transaction for MI Response driver."""
-    trans_type: MiTransactionType = None
-    data: bytes = b""
+    trans_type : MiTransactionType = None
+    data       : bytes = b""
 
 
 @dataclass
