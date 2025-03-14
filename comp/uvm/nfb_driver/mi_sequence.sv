@@ -15,34 +15,22 @@ class mi_sequence extends controler;
 
     protected uvm_mem mem;
     protected string  dev_tree;
-    protected string  inf_name;
 
     function new (string name = "controler");
         int pid;
         super.new(name);
-
-        inf_name = "nic";
     endfunction
 
-    function void component_set(uvm_mem comp, string dev_tree);
+    function void component_set(uvm_mem comp);
         this.mem      = comp;
-        this.dev_tree = dev_tree;
-    endfunction
-
-    virtual function string tree_components();
-        return dev_tree;
     endfunction
 
     virtual task run_program();
     endtask
 
-    //virtual task run_backhand();
-    //    this.serve();
-    //endtask
-
     task body();
         //Create interface
-        this.open(inf_name);
+        this.open();
         fork
             this.serve();
         join_none

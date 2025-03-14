@@ -25,6 +25,7 @@ package nfb_driver;
 
     import "DPI-C" function int      getpid();
 
+    `include "DevTree.sv"
     `include "controler.sv"
     `include "mi_sequence.sv"
 
