@@ -20,91 +20,93 @@ entity DMA_CALYPTE is
         -- Settings affecting both RX and TX or the top level entity itself
         -- ==========================================================================================
         -- Name of target device, the supported are:
-        -- "ULTRASCALE"
+        --
+        -- * "ULTRASCALE"
+        -- * "STRATIX10"
+        -- * "AGILEX"
         DEVICE : string := "ULTRASCALE";
 
-        -- USER MFB data bus configuration
-        -- Defines the total width of User data stream.
+        -- USER MFB interface configuration that is used for user data stream. The alowed
+        -- configurations are:
+        --
+        -- * (1,4,8,8)
+        -- * (1,8,8,8)
         USR_MFB_REGIONS     : natural := 1;
         USR_MFB_REGION_SIZE : natural := 8;
         USR_MFB_BLOCK_SIZE  : natural := 8;
         USR_MFB_ITEM_WIDTH  : natural := 8;
 
+        -- Width of User Header Metadata information
+        --
+        -- * on RX: added to the DMA header
+        -- * on TX: extracted from a DMA header
+        HDR_META_WIDTH : natural := 24;
+
         -- ==========================================================================================
-        -- PCIe-side bus settings
+        -- Requester Request (RQ) MFB interface settings. The allowed configurations are:
+        --
+        -- * (1,1,8,32)
+        -- * (2,1,8,32)
         -- ==========================================================================================
-        -- Requester Request MFB interface configration, allowed configurations are:
-        -- (1,1,8,32)
         PCIE_RQ_MFB_REGIONS     : natural := 2;
         PCIE_RQ_MFB_REGION_SIZE : natural := 1;
         PCIE_RQ_MFB_BLOCK_SIZE  : natural := 8;
         PCIE_RQ_MFB_ITEM_WIDTH  : natural := 32;
 
-        -- Completer Request MFB interface configration, allowed configurations are:
-        -- (1,1,8,32)
+        -- =========================================================================================
+        -- Completer Request (CQ) MFB interface settings. The allowed configurations are:
+        --
+        -- * (1,1,8,32)
+        -- * (2,1,8,32)
+        -- =========================================================================================
         PCIE_CQ_MFB_REGIONS     : natural := 2;
         PCIE_CQ_MFB_REGION_SIZE : natural := 1;
         PCIE_CQ_MFB_BLOCK_SIZE  : natural := 8;
         PCIE_CQ_MFB_ITEM_WIDTH  : natural := 32;
 
-        -- Width of User Header Metadata information
-        -- on RX: added to header sent to header Buffer in RAM
-        -- on TX: extracted from descriptor and propagated to output
-        HDR_META_WIDTH : natural := 24;
-
         -- ==========================================================================================
-        -- RX DMA settings
-        --
-        -- Settings for RX direction of DMA Module
+        -- RX DMA controller settings
         -- ==========================================================================================
-        -- Total number of RX DMA Channels (multiples of 2 at best)
-        -- Minimum: 4
+        -- Total number of RX DMA Channels (powers of 2, starting at 2)
         RX_CHANNELS         : natural := 8;
-        -- Width of Software and Hardware Descriptor Pointer
-        -- Defines width of signals used for these values in DMA Module
-        -- Affects logic complexity
-        -- Maximum value: 32 (restricted by size of SDP and HDP MI register)
+        -- * Width of Software and Hardware Header/DataPointer.
+        -- * Affects logic complexity (MI C/S registers especially)
+        -- * Maximum value: 16
         RX_PTR_WIDTH        : natural := 16;
-        -- Maximum size of a User packet (in bytes)
-        -- Defines width of Packet length signals.
-        -- the maximum is 2**16 - 1
+        -- Maximum size of a User packet in bytes (in interval between 60 and  2**12, inclusively)
         USR_RX_PKT_SIZE_MAX : natural := 2**12;
         -- Enables an additional register of the transaction buffer that improves
-        -- throughput
+        -- throughput (see :ref:`rx_dma_calypte_trans_buffer`)
         TRBUF_REG_EN        : boolean := false;
         -- Enables performance counters alowing metrics generation.
         PERF_CNTR_EN        : boolean := false;
 
-        -- =====================================================================
-        -- TX DMA settings
-        --
-        -- Settings for TX direction of DMA Module
-        -- =====================================================================
-        -- Total number of TX DMA Channels
-        -- Minimum value: TX_SEL_CHANNELS*DMA_ENDPOINTS
+        -- =========================================================================================
+        -- TX DMA controller settings
+        -- =========================================================================================
+        -- Total number of TX DMA Channels (powers of 2, starting at 2)
         TX_CHANNELS         : natural := 8;
-        -- Width of Software and Hardware Descriptor Pointer
-        -- Defines width of signals used for these values in DMA Module
-        -- Affects logic complexity
-        -- Maximum value: 32 (restricted by size of SDP and HDP MI register)
-        TX_PTR_WIDTH        : natural := 14;
-        -- Maximum size of a User packet (in bytes)
-        -- Defines width of Packet length signals.
-        -- the maximum is 2**16 - 1
+        -- * Width of the Hardware Descriptor Pointer
+        -- * Significantly affects the complexity of the controller (the C/S registers as well as
+        --   buffers to store packets within each channel).
+        -- * Maximum value: 13 (restricted as a compromise between the size of a controller and
+        --   maximum intact size of a packet that the software can dispatch)
+        TX_PTR_WIDTH        : natural := 13;
+        -- Maximum size of a User packet in bytes (in an interval between 60 and 2**12, inclusively)
         USR_TX_PKT_SIZE_MAX : natural := 2**12;
 
-        -- =====================================================================
+        -- =========================================================================================
         -- Optional settings
         --
-        -- Settings for testing and debugging, settings usually left unchanged
-        -- at entity-area constants.
-        -- =====================================================================
-        -- Width of DSP packet and byte statistics counters
+        -- Settings for testing and debugging, usually left at default values..
+        -- =========================================================================================
+        -- Width of statistical counters within each channel
         DSP_CNT_WIDTH      : natural := 64;
-        -- Enable generation of RX/TX side of DMA Module
+        -- Allows to disable one of the controllers in the DMA module
         RX_GEN_EN          : boolean := TRUE;
         TX_GEN_EN          : boolean := TRUE;
-        ST_SP_DBG_SIGNAL_W : natural := 2;
+        -- Width of the debug signal, do not use unless you know what you are doing
+        ST_SP_DBG_SIGNAL_W : natural := 4;
         -- Width of MI bus
         MI_WIDTH           : natural := 32
         );
@@ -112,9 +114,9 @@ entity DMA_CALYPTE is
         CLK   : in std_logic;
         RESET : in std_logic;
 
-        -- =====================================================================
+        -- =========================================================================================
         -- RX DMA User-side MFB
-        -- =====================================================================
+        -- =========================================================================================
         USR_RX_MFB_META_CHAN     : in std_logic_vector(log2(RX_CHANNELS) -1 downto 0);
         USR_RX_MFB_META_HDR_META : in std_logic_vector(HDR_META_WIDTH -1 downto 0);
 
@@ -126,9 +128,9 @@ entity DMA_CALYPTE is
         USR_RX_MFB_SRC_RDY : in  std_logic;
         USR_RX_MFB_DST_RDY : out std_logic := '1';
 
-        -- =====================================================================
+        -- =========================================================================================
         -- TX DMA User-side MFB
-        -- =====================================================================
+        -- =========================================================================================
         USR_TX_MFB_META_PKT_SIZE : out std_logic_vector(log2(USR_TX_PKT_SIZE_MAX + 1) -1 downto 0) := (others => '0');
         USR_TX_MFB_META_CHAN     : out std_logic_vector(log2(TX_CHANNELS) -1 downto 0)             := (others => '0');
         USR_TX_MFB_META_HDR_META : out std_logic_vector(HDR_META_WIDTH -1 downto 0)                := (others => '0');
@@ -141,13 +143,19 @@ entity DMA_CALYPTE is
         USR_TX_MFB_SRC_RDY : out std_logic                                                                                              := '0';
         USR_TX_MFB_DST_RDY : in  std_logic;
 
+        -- =========================================================================================
+        -- Debug signals
+        --
+        -- Should not be used by the user of the component
+        -- =========================================================================================
         ST_SP_DBG_CHAN : out std_logic_vector(log2(TX_CHANNELS) -1 downto 0);
         ST_SP_DBG_META : out std_logic_vector(ST_SP_DBG_SIGNAL_W -1 downto 0);
 
-        -- =====================================================================
-        -- PCIe-side interfaces
-        -- =====================================================================
-        -- Upstream MFB interface (for sending data to PCIe Endpoints)
+        -- =========================================================================================
+        -- RQ PCIe interface
+        --
+        -- Upstream MFB interface (for sending data to the PCIe Endpoint)
+        -- =========================================================================================
         PCIE_RQ_MFB_DATA    : out std_logic_vector(PCIE_RQ_MFB_REGIONS*PCIE_RQ_MFB_REGION_SIZE*PCIE_RQ_MFB_BLOCK_SIZE*PCIE_RQ_MFB_ITEM_WIDTH-1 downto 0);
         PCIE_RQ_MFB_META    : out std_logic_vector(PCIE_RQ_MFB_REGIONS*PCIE_RQ_META_WIDTH -1 downto 0);
         PCIE_RQ_MFB_SOF     : out std_logic_vector(PCIE_RQ_MFB_REGIONS -1 downto 0);
@@ -157,7 +165,11 @@ entity DMA_CALYPTE is
         PCIE_RQ_MFB_SRC_RDY : out std_logic;
         PCIE_RQ_MFB_DST_RDY : in  std_logic;
 
-        -- Downstream MFB interface (for sending data from PCIe Endpoints)
+        -- =========================================================================================
+        -- CQ PCIe interface
+        --
+        -- Downstream MFB interface (for receiving data from the PCIe Endpoint)
+        -- =========================================================================================
         PCIE_CQ_MFB_DATA    : in  std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_MFB_REGION_SIZE*PCIE_CQ_MFB_BLOCK_SIZE*PCIE_CQ_MFB_ITEM_WIDTH-1 downto 0);
         PCIE_CQ_MFB_META    : in  std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0);
         PCIE_CQ_MFB_SOF     : in  std_logic_vector(PCIE_CQ_MFB_REGIONS -1 downto 0);
@@ -184,8 +196,7 @@ end entity;
 
 architecture FULL of DMA_CALYPTE is
 
-    constant TX_INP_FIFO_EN : boolean := FALSE;
-
+    -- Address space mapping between the controllers
     constant MI_SPLIT_BASES : slv_array_t(2 -1 downto 0)(MI_WIDTH-1 downto 0) := (
         -- RX DMA
         0 => X"00000000",
@@ -320,57 +331,6 @@ begin
 
     tx_dma_calypte_g : if (TX_GEN_EN) generate
     begin
-
-        inp_tx_fifo_g : if (TX_INP_FIFO_EN) generate
-            inp_fifo_i : entity work.MFB_FIFOX
-                generic map (
-                    REGIONS     => PCIE_CQ_MFB_REGIONS,
-                    REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
-                    BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
-                    ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
-
-                    META_WIDTH          => PCIE_CQ_META_WIDTH,
-                    FIFO_DEPTH          => 512,
-                    RAM_TYPE            => "AUTO",
-                    DEVICE              => DEVICE,
-                    ALMOST_FULL_OFFSET  => 2,
-                    ALMOST_EMPTY_OFFSET => 2)
-                port map (
-                    CLK => CLK,
-                    RST => RESET,
-
-                    RX_DATA    => PCIE_CQ_MFB_DATA,
-                    RX_META    => PCIE_CQ_MFB_META,
-                    RX_SOF_POS => PCIE_CQ_MFB_SOF_POS,
-                    RX_EOF_POS => PCIE_CQ_MFB_EOF_POS,
-                    RX_SOF     => PCIE_CQ_MFB_SOF,
-                    RX_EOF     => PCIE_CQ_MFB_EOF,
-                    RX_SRC_RDY => PCIE_CQ_MFB_SRC_RDY,
-                    RX_DST_RDY => PCIE_CQ_MFB_DST_RDY,
-
-                    TX_DATA    => inp_fifo_mfb_data,
-                    TX_META    => inp_fifo_mfb_meta,
-                    TX_SOF_POS => inp_fifo_mfb_sof_pos,
-                    TX_EOF_POS => inp_fifo_mfb_eof_pos,
-                    TX_SOF     => inp_fifo_mfb_sof,
-                    TX_EOF     => inp_fifo_mfb_eof,
-                    TX_SRC_RDY => inp_fifo_mfb_src_rdy,
-                    TX_DST_RDY => inp_fifo_mfb_dst_rdy,
-
-                    FIFO_STATUS => inp_fifo_status,
-                    FIFO_AFULL  => open,
-                    FIFO_AEMPTY => open);
-        else generate
-            inp_fifo_mfb_data    <= PCIE_CQ_MFB_DATA;
-            inp_fifo_mfb_meta    <= PCIE_CQ_MFB_META;
-            inp_fifo_mfb_sof_pos <= PCIE_CQ_MFB_SOF_POS;
-            inp_fifo_mfb_eof_pos <= PCIE_CQ_MFB_EOF_POS;
-            inp_fifo_mfb_sof     <= PCIE_CQ_MFB_SOF;
-            inp_fifo_mfb_eof     <= PCIE_CQ_MFB_EOF;
-            inp_fifo_mfb_src_rdy <= PCIE_CQ_MFB_SRC_RDY;
-            PCIE_CQ_MFB_DST_RDY  <= inp_fifo_mfb_dst_rdy;
-        end generate;
-
         tx_dma_calypte_i : entity work.TX_DMA_CALYPTE
             generic map (
                 DEVICE   => DEVICE,
@@ -386,13 +346,12 @@ begin
                 PCIE_CQ_MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
                 PCIE_CQ_MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
 
-                DATA_POINTER_WIDTH    => TX_PTR_WIDTH,
-                DMA_HDR_POINTER_WIDTH => TX_PTR_WIDTH-3,
-                CHANNELS              => TX_CHANNELS,
-                CNTRS_WIDTH           => DSP_CNT_WIDTH,
-                HDR_META_WIDTH        => HDR_META_WIDTH,
-                ST_SP_DBG_SIGNAL_W    => ST_SP_DBG_SIGNAL_W,
-                PKT_SIZE_MAX          => USR_TX_PKT_SIZE_MAX)
+                POINTER_WIDTH      => TX_PTR_WIDTH,
+                CHANNELS           => TX_CHANNELS,
+                CNTRS_WIDTH        => DSP_CNT_WIDTH,
+                HDR_META_WIDTH     => HDR_META_WIDTH,
+                ST_SP_DBG_SIGNAL_W => ST_SP_DBG_SIGNAL_W,
+                PKT_SIZE_MAX       => USR_TX_PKT_SIZE_MAX)
             port map (
                 CLK   => CLK,
                 RESET => RESET,
@@ -409,14 +368,14 @@ begin
                 USR_TX_MFB_SRC_RDY => USR_TX_MFB_SRC_RDY,
                 USR_TX_MFB_DST_RDY => USR_TX_MFB_DST_RDY,
 
-                PCIE_CQ_MFB_DATA    => inp_fifo_mfb_data,
-                PCIE_CQ_MFB_META    => inp_fifo_mfb_meta,
-                PCIE_CQ_MFB_SOF     => inp_fifo_mfb_sof,
-                PCIE_CQ_MFB_EOF     => inp_fifo_mfb_eof,
-                PCIE_CQ_MFB_SOF_POS => inp_fifo_mfb_sof_pos,
-                PCIE_CQ_MFB_EOF_POS => inp_fifo_mfb_eof_pos,
-                PCIE_CQ_MFB_SRC_RDY => inp_fifo_mfb_src_rdy,
-                PCIE_CQ_MFB_DST_RDY => inp_fifo_mfb_dst_rdy,
+                PCIE_CQ_MFB_DATA    => PCIE_CQ_MFB_DATA,
+                PCIE_CQ_MFB_META    => PCIE_CQ_MFB_META,
+                PCIE_CQ_MFB_SOF     => PCIE_CQ_MFB_SOF,
+                PCIE_CQ_MFB_EOF     => PCIE_CQ_MFB_EOF,
+                PCIE_CQ_MFB_SOF_POS => PCIE_CQ_MFB_SOF_POS,
+                PCIE_CQ_MFB_EOF_POS => PCIE_CQ_MFB_EOF_POS,
+                PCIE_CQ_MFB_SRC_RDY => PCIE_CQ_MFB_SRC_RDY,
+                PCIE_CQ_MFB_DST_RDY => PCIE_CQ_MFB_DST_RDY,
 
                 ST_SP_DBG_CHAN => ST_SP_DBG_CHAN,
                 ST_SP_DBG_META => ST_SP_DBG_META,

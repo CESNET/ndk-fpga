@@ -21,7 +21,7 @@ SETTINGS = {
         "PCIE_CQ_MFB_BLOCK_SIZE"  : "8",
         "PCIE_CQ_MFB_ITEM_WIDTH"  : "32",
 
-        "HDR_META_WIDTH"          : "24",
+        "HDR_META_WIDTH"          : "12",
 
         "RX_CHANNELS"             : "8",
         "RX_PTR_WIDTH"            : "16",

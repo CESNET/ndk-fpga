@@ -13,11 +13,37 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
--- This component instantiaties data buffers for all channels. Internally, the component constists
--- of Block RAMs. This component has the largest footprint since data are stored by bytes for every
--- channel. The component behaves as quasi buffer to which data can by written with the resolution
--- to DWords and read with the resolution to bytes, i.e. as a RAM with different widths of addresses
--- for each port.
+-- This component instantiaties data buffer for every channel.Each buffer consists from an array of
+-- BRAMs which total to the size of the input MFB bus in bytes, i.e. 32 \* *MFB_REGIONS*. This buffer
+-- architecture has been chosen because of the address alignment to individual bytes for the
+-- incoming PCIe transactions. This also causes the largest resource footprint this entity has in
+-- the TX DMA Calypte controller. Since one array of BRAMs can contain much more data than the
+-- largest packet able to be transmitted on a channel, the BRAM array is shared between multiple
+-- channels. The amount  of channels sharing one array depends on :vhdl:genconstant:`POINTER_WIDTH`
+-- and :vhdl:genconstant:`MFB_REGIONS` generic parameters. The extent of buffer sharing is shown
+-- in the following table:
+--
+-- +--------------------+---------------------------+---------------------+
+-- | BRAM Size          |           2048 B          |        4096 B       |
+-- +--------------------+---------------------------+---------------------+
+-- | BRAM Type          | RAMB16 (AMD)/M20K (Intel) |     RAMB36 (AMD)    |
+-- +====================+=============+=============+==========+==========+
+-- | MFB_REGIONS        | 1           | 2           | 1        | 2        |
+-- +--------------------+-------------+-------------+----------+----------+
+-- | BRAMs per array    | 32          | 64          | 32       | 64       |
+-- +--------------------+-------------+-------------+----------+----------+
+-- | Channels per array | up to 8     | up to 16    | up to 16 | up to 32 |
+-- +--------------------+-------------+-------------+----------+----------+
+--
+-- .. NOTE:: Requiring more channels than the maximum amount per array results in an instantiation
+--           of multiple BRAM arrays.
+--
+-- On the output, there is a standard RAM reading interface for multiple channels. Upon setting the
+-- address on the :vhdl:portsignal:`RD_ADDR`, an index of a channel on :vhdl:portsignal:`RD_CHAN` and
+-- asserting :vhdl:portsignal:`RD_EN`, the
+-- core asserts :vhdl:portsignal:`RD_DATA_VLD` 1 or more clock periods later when valid data are
+-- available on the :vhdl:portsignal:`RD_DATA` output port.
+--
 entity TX_DMA_PCIE_TRANS_BUFFER is
     generic (
         DEVICE : string := "ULTRASCALE";
@@ -25,15 +51,14 @@ entity TX_DMA_PCIE_TRANS_BUFFER is
         -- Total number of DMA Channels within this DMA Endpoint
         CHANNELS : natural := 8;
 
-        -- =========================================================================================
-        -- Input PCIe interface parameters
-        -- =========================================================================================
+        -- Input MFB interface
         MFB_REGIONS     : natural := 2;
         MFB_REGION_SIZE : natural := 1;
         MFB_BLOCK_SIZE  : natural := 8;
         MFB_ITEM_WIDTH  : natural := 32;
 
         -- Determines the number of bytes that can be stored in the buffer.
+        -- The amount of bytes equals 2\*\*POINTER_WIDTH
         POINTER_WIDTH : natural := 16
         );
     port (
@@ -41,7 +66,7 @@ entity TX_DMA_PCIE_TRANS_BUFFER is
         RESET : in std_logic;
 
         -- =========================================================================================
-        -- Input MFB bus (quasi writing interface)
+        -- Input MFB bus (quasi BRAM writing interface)
         -- =========================================================================================
         PCIE_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
         PCIE_MFB_META    : in  std_logic_vector(MFB_REGIONS*((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0);
@@ -53,7 +78,7 @@ entity TX_DMA_PCIE_TRANS_BUFFER is
         --
         -- Similar to BRAM block.
         -- =========================================================================================
-        -- Note: This will be shared for both regions
+        -- Note: This will be shared for both regions.
         RD_CHAN     : in  std_logic_vector(log2(CHANNELS) -1 downto 0);
         RD_DATA     : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
         RD_ADDR     : in  std_logic_vector(POINTER_WIDTH -1 downto 0);

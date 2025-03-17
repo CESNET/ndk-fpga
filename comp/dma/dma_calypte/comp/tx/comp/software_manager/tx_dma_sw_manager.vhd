@@ -1,6 +1,5 @@
 -- tx_dma software_manager.vhd: software manager which serves as an interface
--- between MI bus (software side) and the TX DMA system as a whole. Provides MI configuration
--- registers.
+-- between MI bus (software side) and the TX DMA system as a whole.
 -- Copyright (c) 2023 CESNET z.s.p.o.
 -- Author(s): Vladislav Valek  <xvalek14@vutbr.cz>
 
@@ -13,11 +12,10 @@ use work.type_pack.all;
 
 use work.dma_bus_pack.all;
 
--- This component provides control interface for TX DMA Calypte controller. It contains MI
--- configuration registers which allows acces from the SW to control some behavior of the controller
--- or to read status information. Each channel has its own set of registers. The component serves as
--- a master when start/stop of a specific channel needs to be done. When start/stop of multiple
--- channels is requested, the channels are started/stopped one after anoter, not all at once.
+-- This component provides a control interface between the TX DMA Calypte controller and the host. The
+-- Control/Status (C/S) register address space is initialized for each channel. This component drives the
+-- start/stop sequences when requested. When the start/stop of multiple channels is requested, the
+-- routine is performed sequentially in a Round-Robin fashion.
 entity TX_DMA_SW_MANAGER is
 generic(
     -- Traget device
@@ -32,9 +30,11 @@ generic(
     DISC_PKT_CNT_WIDTH : natural := 64;
     DISC_BTS_CNT_WIDTH : natural := 64;
 
-    -- Width of the pointer to data and DMA header buffers
-    -- signify depth of the internal buffers in the CHANNEL_CORE
+    -- Width of pointers to data buffers specifying the depth of the
+    -- internal buffers in the :ref:`tx_dma_calypte_trans_buffer`.
     DATA_POINTER_WIDTH    : natural := 14;
+    -- Width of a virtual DMA header pointer since the buffer is established by a single
+    -- FIFO shared among multiple channels. This pointer is to determine the depth of the FIFO.
     DMA_HDR_POINTER_WIDTH : natural := 9;
 
     -- * Maximum size of a packet (in bytes)
@@ -45,15 +45,12 @@ generic(
     MI_WIDTH           : natural := 32
 );
 port (
-    -- =====================================================================
-    -- Clock and Reset
-    -- =====================================================================
     CLK                  : in  std_logic;
     RESET                : in  std_logic;
 
-    -- =====================================================================
+    -- =============================================================================================
     -- MI interface for SW access
-    -- =====================================================================
+    -- =============================================================================================
     MI_ADDR              : in  std_logic_vector(MI_WIDTH-1 downto 0);
     MI_DWR               : in  std_logic_vector(MI_WIDTH-1 downto 0);
     MI_BE                : in  std_logic_vector(MI_WIDTH/8-1 downto 0);
@@ -63,9 +60,9 @@ port (
     MI_ARDY              : out std_logic;
     MI_DRDY              : out std_logic;
 
-    -- =====================================================================
-    -- Input packet discart/sent counter interface
-    -- =====================================================================
+    -- =============================================================================================
+    -- Packet counter increment interface
+    -- =============================================================================================
     PKT_SENT_CHAN        : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     PKT_SENT_INC         : in  std_logic;
     PKT_SENT_BYTES       : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
@@ -73,9 +70,11 @@ port (
     PKT_DISCARD_INC      : in  std_logic;
     PKT_DISCARD_BYTES    : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
 
-    -- =====================================================================
+    -- =============================================================================================
     -- Channel status interface
-    -- =====================================================================
+    --
+    -- To signal initiation of a start/stop routine to other components
+    -- =============================================================================================
     START_REQ_CHAN       : out std_logic_vector(log2(CHANNELS)-1 downto 0);
     START_REQ_VLD        : out std_logic;
     START_REQ_ACK        : in  std_logic;
@@ -84,10 +83,14 @@ port (
     STOP_REQ_VLD         : out std_logic;
     STOP_REQ_ACK         : in  std_logic; --logic request one CLK delay between VLD request and ACK reponse
 
-    -- general vector of all channels with their activity
+    -- Mask of active channels
     ENABLED_CHAN         : out std_logic_vector(CHANNELS-1 downto 0);
 
-    -- Hardware pointers writing interface
+    -- =============================================================================================
+    -- Pointer update interface
+    --
+    -- To update pointer values in the C/S registers
+    -- =============================================================================================
     HDP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
     HDP_WR_DATA     : in  std_logic_vector(DATA_POINTER_WIDTH-1 downto 0);
     HDP_WR_EN       : in  std_logic;

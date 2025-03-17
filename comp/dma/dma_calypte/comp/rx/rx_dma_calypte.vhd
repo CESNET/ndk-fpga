@@ -17,7 +17,6 @@ entity RX_DMA_CALYPTE is
     generic (
         DEVICE : string := "ULTRASCALE";
 
-        -- Width of MI bus
         MI_WIDTH : natural := 32;
 
         -- User Logic MFB configuration
@@ -26,38 +25,35 @@ entity RX_DMA_CALYPTE is
         USER_RX_MFB_BLOCK_SIZE  : natural := 8;
         USER_RX_MFB_ITEM_WIDTH  : natural := 8;
 
-        -- PCIe MFB configuration
+        -- PCIe MFB configuration (Requester Request interface)
         PCIE_UP_MFB_REGIONS     : natural := 2;
         PCIE_UP_MFB_REGION_SIZE : natural := 1;
         PCIE_UP_MFB_BLOCK_SIZE  : natural := 8;
         PCIE_UP_MFB_ITEM_WIDTH  : natural := 32;
 
-        -- Total number of DMA Channels within this DMA Endpoint
-        CHANNELS : natural := 8;
-
+        -- Total number of DMA Channels, each with its separate buffers in the host memory.
+        CHANNELS       : natural := 8;
         -- * Width of Software and Hardware Descriptor/Header Pointer
         -- * Defines width of signals used for these values in DMA Module
         -- * Affects logic complexity
         -- * Maximum value: 32 (restricted by size of pointer MI registers)
         POINTER_WIDTH  : natural := 16;
-
         -- Width of RAM address
         SW_ADDR_WIDTH  : natural := 64;
-
         -- Actual width of packet and byte counters
         CNTRS_WIDTH    : natural := 64;
-
+        -- Width of application metadata transported within the DMA headers.
+        -- In bits.
         HDR_META_WIDTH : natural := 24;
-
-        -- * Maximum size of a packet (in bytes).
+        -- * Maximum size of a packet in bytes.
         -- * Defines width of Packet length signals.
         -- * Maximum allowed value is 2**16 - 1
-        PKT_SIZE_MAX : natural := 2**16 - 1;
-
-        -- Enables a register in the transaction buffer that improves throughput (but increases latency).
-        TRBUF_REG_EN : boolean := FALSE;
+        PKT_SIZE_MAX   : natural := 2**16 - 1;
+        -- Enables a register in the transaction buffer that improves throughput (but increases
+        -- latency by one clock period).
+        TRBUF_REG_EN   : boolean := FALSE;
         -- Enables performance counters in the design for metrics.
-        PERF_CNTR_EN : boolean := FALSE
+        PERF_CNTR_EN   : boolean := FALSE
         );
 
     port (
@@ -77,7 +73,9 @@ entity RX_DMA_CALYPTE is
         MI_DRDY : out std_logic;
 
         -- =========================================================================================================
-        -- MFB input interface
+        -- User MFB interface
+        --
+        -- Receives packets from the application logic
         -- =========================================================================================================
         USER_RX_MFB_META_HDR_META : in  std_logic_vector(HDR_META_WIDTH-1 downto 0)       := (others => '0');
         USER_RX_MFB_META_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0)       := (others => '0');
@@ -90,9 +88,10 @@ entity RX_DMA_CALYPTE is
         USER_RX_MFB_SRC_RDY  : in  std_logic;
         USER_RX_MFB_DST_RDY  : out std_logic;
 
-
-        -- =========================================================================================================
-        -- MFB output interface
+        --=========================================================================================================
+        -- (PCIe Requester Request) MFB interface
+        --
+        -- Dispatches packets to the PCIe domain
         -- =========================================================================================================
         PCIE_UP_MFB_DATA    : out std_logic_vector(PCIE_UP_MFB_REGIONS*PCIE_UP_MFB_REGION_SIZE*PCIE_UP_MFB_BLOCK_SIZE*PCIE_UP_MFB_ITEM_WIDTH-1 downto 0);
         PCIE_UP_MFB_META    : out std_logic_vector(PCIE_UP_MFB_REGIONS*PCIE_RQ_META_WIDTH - 1 downto 0);
@@ -169,12 +168,10 @@ architecture FULL of RX_DMA_CALYPTE is
     signal hdrm_hhp_update_data : std_logic_vector(POINTER_WIDTH-1 downto 0);
     signal hdrm_hhp_update_en   : std_logic;
 
-    signal hdrm_dma_pcie_hdr_size    : std_logic;
     signal hdrm_dma_pcie_hdr         : std_logic_vector (127 downto 0);
     signal hdrm_dma_pcie_hdr_src_rdy : std_logic;
     signal hdrm_dma_pcie_hdr_dst_rdy : std_logic;
 
-    signal hdrm_data_pcie_hdr_size    : std_logic;
     signal hdrm_data_pcie_hdr         : std_logic_vector (127 downto 0);
     signal hdrm_data_pcie_hdr_src_rdy : std_logic;
     signal hdrm_data_pcie_hdr_dst_rdy : std_logic;
@@ -556,12 +553,10 @@ begin
             MFB_SRC_RDY  => mfb_src_rdy_lng_check,
             MFB_DST_RDY  => mfb_dst_rdy_lng_check,
 
-            DMA_PCIE_HDR_SIZE    => hdrm_dma_pcie_hdr_size,
             DMA_PCIE_HDR         => hdrm_dma_pcie_hdr,
             DMA_PCIE_HDR_SRC_RDY => hdrm_dma_pcie_hdr_src_rdy,
             DMA_PCIE_HDR_DST_RDY => hdrm_dma_pcie_hdr_dst_rdy,
 
-            DATA_PCIE_HDR_SIZE    => hdrm_data_pcie_hdr_size,
             DATA_PCIE_HDR         => hdrm_data_pcie_hdr,
             DATA_PCIE_HDR_SRC_RDY => hdrm_data_pcie_hdr_src_rdy,
             DATA_PCIE_HDR_DST_RDY => hdrm_data_pcie_hdr_dst_rdy,
@@ -614,12 +609,10 @@ begin
             TX_MFB_SRC_RDY => PCIE_UP_MFB_SRC_RDY,
             TX_MFB_DST_RDY => PCIE_UP_MFB_DST_RDY,
 
-            HDRM_DMA_PCIE_HDR_SIZE    => hdrm_dma_pcie_hdr_size,
             HDRM_DMA_PCIE_HDR         => hdrm_dma_pcie_hdr,
             HDRM_DMA_PCIE_HDR_SRC_RDY => hdrm_dma_pcie_hdr_src_rdy,
             HDRM_DMA_PCIE_HDR_DST_RDY => hdrm_dma_pcie_hdr_dst_rdy,
 
-            HDRM_DATA_PCIE_HDR_SIZE    => hdrm_data_pcie_hdr_size,
             HDRM_DATA_PCIE_HDR         => hdrm_data_pcie_hdr,
             HDRM_DATA_PCIE_HDR_SRC_RDY => hdrm_data_pcie_hdr_src_rdy,
             HDRM_DATA_PCIE_HDR_DST_RDY => hdrm_data_pcie_hdr_dst_rdy,
@@ -629,45 +622,35 @@ begin
             HDRM_DMA_HDR_SRC_RDY => hdrm_dma_hdr_src_rdy,
             HDRM_DMA_HDR_DST_RDY => hdrm_dma_hdr_dst_rdy);
 
-    tr_buff_g : if (BUFFERED_DATA_SIZE = MFB_REGION_SIZE_INBUF2TRBUF*MFB_BLOCK_SIZE_INBUF2TRBUF) generate
+    transaction_buffer_i : entity work.RX_DMA_CALYPTE_TRANS_BUFFER
+        generic map (
+            RX_REGION_SIZE => MFB_REGION_SIZE_INBUF2TRBUF,
+            RX_BLOCK_SIZE  => MFB_BLOCK_SIZE_INBUF2TRBUF,
+            RX_ITEM_WIDTH  => MFB_ITEM_WIDTH_INBUF2TRBUF,
 
-        mfb_data_trbuf    <= mfb_data_inbuf;
-        mfb_sof_trbuf     <= mfb_sof_inbuf;
-        mfb_eof_trbuf     <= mfb_eof_inbuf;
-        mfb_src_rdy_trbuf <= mfb_src_rdy_inbuf;
-        mfb_dst_rdy_inbuf <= mfb_dst_rdy_trbuf;
+            BUFFERED_DATA_SIZE => BUFFERED_DATA_SIZE,
+            REG_OUT_EN         => TRBUF_REG_EN)
+        port map (
+            CLK => CLK,
+            RST => RESET,
 
-    else generate
+            RX_MFB_DATA    => mfb_data_lng_check,
+            RX_MFB_EOF_POS => mfb_eof_pos_lng_check,
+            RX_MFB_SOF     => mfb_sof_lng_check(0),
+            RX_MFB_EOF     => mfb_eof_lng_check(0),
+            RX_MFB_SRC_RDY => mfb_src_rdy_lng_check,
+            RX_MFB_DST_RDY => mfb_dst_rdy_lng_check,
 
-        transaction_buffer_i : entity work.RX_DMA_CALYPTE_TRANS_BUFFER
-            generic map (
-                RX_REGION_SIZE => MFB_REGION_SIZE_INBUF2TRBUF,
-                RX_BLOCK_SIZE  => MFB_BLOCK_SIZE_INBUF2TRBUF,
-                RX_ITEM_WIDTH  => MFB_ITEM_WIDTH_INBUF2TRBUF,
+            TX_MFB_DATA    => mfb_data_trbuf,
+            TX_MFB_SOF_POS => mfb_sof_pos_trbuf,
+            TX_MFB_EOF_POS => mfb_eof_pos_trbuf,
+            TX_MFB_SOF     => mfb_sof_trbuf,
+            TX_MFB_EOF     => mfb_eof_trbuf,
+            TX_MFB_SRC_RDY => mfb_src_rdy_trbuf,
+            TX_MFB_DST_RDY => mfb_dst_rdy_trbuf);
 
-                BUFFERED_DATA_SIZE => BUFFERED_DATA_SIZE,
-                REG_OUT_EN         => TRBUF_REG_EN)
-            port map (
-                CLK => CLK,
-                RST => RESET,
-
-                RX_MFB_DATA    => mfb_data_lng_check,
-                RX_MFB_EOF_POS => mfb_eof_pos_lng_check,
-                RX_MFB_SOF     => mfb_sof_lng_check(0),
-                RX_MFB_EOF     => mfb_eof_lng_check(0),
-                RX_MFB_SRC_RDY => mfb_src_rdy_lng_check,
-                RX_MFB_DST_RDY => mfb_dst_rdy_lng_check,
-
-                TX_MFB_DATA    => mfb_data_trbuf,
-                TX_MFB_SOF_POS => mfb_sof_pos_trbuf,
-                TX_MFB_EOF_POS => mfb_eof_pos_trbuf,
-                TX_MFB_SOF     => mfb_sof_trbuf,
-                TX_MFB_EOF     => mfb_eof_trbuf,
-                TX_MFB_SRC_RDY => mfb_src_rdy_trbuf,
-                TX_MFB_DST_RDY => mfb_dst_rdy_trbuf);
-
-    end generate;
-
+    -- The counter of packet length that is provided to the HDR_MANAGER in order to generate
+    -- a correct amount of PCIe headers  for the data transactions.
     mfb_frame_lng_check_i : entity work.MFB_FRAME_LNG_CHECK
         generic map (
             REGIONS     => USER_RX_MFB_REGIONS,

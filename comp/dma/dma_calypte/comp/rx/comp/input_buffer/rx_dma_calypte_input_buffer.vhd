@@ -12,9 +12,12 @@ use IEEE.numeric_std.all;
 use work.type_pack.all;
 use work.math_pack.all;
 
--- This component accepts incoming data on the input and aligns them to the beginning block of the
--- MFB bus. This component also splits a word which contains two packets. The purpose is to align
--- the data se they can be easily buffered by whole words in the following component.
+-- This component accepts incoming data on the input of the RX DMA and adjusts them in two steps:
+--
+-- #. A bus word that contains two packets (only one region is used, thus this only applies when one
+--    packet ends and another begins).
+-- #. A packet that begins in the middle of a bus word is aligned to the beginning of the word
+--    (i.e. to bit 0) in order to simplify buffering further in the design.
 entity RX_DMA_CALYPTE_INPUT_BUFFER is
 
     generic (
@@ -53,6 +56,8 @@ end entity;
 
 architecture FULL of RX_DMA_CALYPTE_INPUT_BUFFER is
 
+    -- The MFB block to which the data should be shifted. Currently set to 0 so all of the data will
+    -- be shifted to the beginning of the MFB bus word.
     constant SHIFT_TO_BLOCK : natural := 0;
 
     --=============================================================================================================

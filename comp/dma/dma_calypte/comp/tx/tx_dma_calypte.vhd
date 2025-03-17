@@ -20,45 +20,36 @@ entity TX_DMA_CALYPTE is
 
         MI_WIDTH : natural := 32;
 
-        -- =========================================================================================
-        -- Output interface to the FPGA user logic
-        -- =========================================================================================
+        -- User Logic MFB cofiguration
         USR_TX_MFB_REGIONS     : natural := 1;
         USR_TX_MFB_REGION_SIZE : natural := 8;
         USR_TX_MFB_BLOCK_SIZE  : natural := 8;
         USR_TX_MFB_ITEM_WIDTH  : natural := 8;
 
-        -- =========================================================================================
-        -- Input PCIe interface (Completer Request)
-        -- =========================================================================================
+        -- PCIe MFB configuration (Completer Request interface)
         PCIE_CQ_MFB_REGIONS     : natural := 2;
         PCIE_CQ_MFB_REGION_SIZE : natural := 1;
         PCIE_CQ_MFB_BLOCK_SIZE  : natural := 8;
         PCIE_CQ_MFB_ITEM_WIDTH  : natural := 32;
 
-        -- =========================================================================================
-        -- Setting of internal components
-        -- =========================================================================================
-        -- Pointer width for data and hdr buffers. The data pointer points to bytes of the packet.
-        -- The header pointer points to the header of a current packet.
-        DATA_POINTER_WIDTH    : natural := 13;
-        -- NOTE: Depracated, the width of the header pointer is calculated from DATA_POINTER_WIDTH
-        DMA_HDR_POINTER_WIDTH : natural := 10;
         -- Set the number of DMA channels, each channel has its separate buffer
         CHANNELS              : natural := 32;
+        -- Pointer width for data and hdr buffers. The data pointer points to bytes of the packet.
+        -- The header pointer points to the header of a current packet.
+        POINTER_WIDTH    : natural := 13;
 
-        -- =========================================================================================
-        -- Others
-        -- =========================================================================================
         -- Set the width of counters of packets for each channel which are there to provide some
         -- entry level statistics.
-        CNTRS_WIDTH    : natural := 64;
-        -- Width of the metadata in bits which are stored in the DMA header.
-        HDR_META_WIDTH : natural := 24;
-
-        ST_SP_DBG_SIGNAL_W : natural := 4;
-        -- Size of the largest packets that can be transmitted on the USR_TX_MFB interface.
-        PKT_SIZE_MAX   : natural := 2**12
+        CNTRS_WIDTH        : natural := 64;
+        -- Width of application metadata transported within the DMA headers.
+        -- In bits.
+        HDR_META_WIDTH     : natural := 24;
+        -- Size of the largest packet in bytes that can be transmitted on the USR_TX_MFB interface.
+        PKT_SIZE_MAX       : natural := 2**12;
+        -- * Bit width of a debug signal form START_STOP_CTRL component.
+        -- * WARNING: A user should not deliberately change this value since this
+        --   is only used for the purpose of development.
+        ST_SP_DBG_SIGNAL_W : natural := 4
         );
     port (
         CLK   : in std_logic;
@@ -66,6 +57,8 @@ entity TX_DMA_CALYPTE is
 
         -- =========================================================================================
         -- User MFB signals
+        --
+        -- Dispatches packets toward the application logic
         -- =========================================================================================
         USR_TX_MFB_META_PKT_SIZE : out std_logic_vector(log2(PKT_SIZE_MAX + 1) -1 downto 0);
         USR_TX_MFB_META_CHAN     : out std_logic_vector(log2(CHANNELS) -1 downto 0);
@@ -82,7 +75,7 @@ entity TX_DMA_CALYPTE is
         -- =========================================================================================
         -- PCIe Completer Request MFB interface
         --
-        -- Accepts PCIe write and read requests
+        -- Receives transactions from the PCIe domain
         -- =========================================================================================
         PCIE_CQ_MFB_DATA    : in  std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_MFB_REGION_SIZE*PCIE_CQ_MFB_BLOCK_SIZE*PCIE_CQ_MFB_ITEM_WIDTH-1 downto 0);
         PCIE_CQ_MFB_META    : in  std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0);
@@ -95,12 +88,14 @@ entity TX_DMA_CALYPTE is
 
         -- =========================================================================================
         -- Debugging signals
+        --
+        -- WARNING: Not suited to be used by the users of this controller
         -- =========================================================================================
         ST_SP_DBG_CHAN : out std_logic_vector(log2(CHANNELS) -1 downto 0);
         ST_SP_DBG_META : out std_logic_vector(ST_SP_DBG_SIGNAL_W -1 downto 0);
 
         -- =========================================================================================
-        -- Control MI bus
+        -- Control MI bus for software access
         -- =========================================================================================
         MI_ADDR : in  std_logic_vector(MI_WIDTH -1 downto 0);
         MI_DWR  : in  std_logic_vector(MI_WIDTH -1 downto 0);
@@ -160,11 +155,11 @@ architecture FULL of TX_DMA_CALYPTE is
     signal stop_req_ack  : std_logic;
 
     signal upd_hdp_chan : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    signal upd_hdp_data : std_logic_vector(DATA_POINTER_WIDTH -1 downto 0);
+    signal upd_hdp_data : std_logic_vector(POINTER_WIDTH -1 downto 0);
     signal upd_hdp_en   : std_logic;
 
     signal upd_hhp_chan : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    signal upd_hhp_data : std_logic_vector(DATA_POINTER_WIDTH-3 -1 downto 0);
+    signal upd_hhp_data : std_logic_vector(POINTER_WIDTH-3 -1 downto 0);
     signal upd_hhp_en   : std_logic;
 
     signal ext_mfb_data    : std_logic_vector(PCIE_CQ_MFB_WIDTH -1 downto 0);
@@ -184,7 +179,7 @@ architecture FULL of TX_DMA_CALYPTE is
 
     signal trbuff_rd_chan         : std_logic_vector(log2(CHANNELS) -1 downto 0);
     signal trbuff_rd_data         : std_logic_vector(PCIE_CQ_MFB_WIDTH -1 downto 0);
-    signal trbuff_rd_addr         : std_logic_vector(DATA_POINTER_WIDTH -1 downto 0);
+    signal trbuff_rd_addr         : std_logic_vector(POINTER_WIDTH -1 downto 0);
     signal trbuff_rd_en           : std_logic;
     signal trbuff_rd_data_vld     : std_logic;
 
@@ -256,11 +251,11 @@ begin
         report "TX_DMA_CALYPTE: unsupported PCIE_CQ_MFB configuration, the allowed are: (1,1,8,32), (2,1,8,32)"
         severity FAILURE;
 
-    assert (PKT_SIZE_MAX <= 2**DATA_POINTER_WIDTH)
-        report "TX_DMA_CALYPTE: too large PKT_SIZE_MAX, the internal buffer must be able to fit at least one packet of the size of the PKT_SIZE_MAX. Either change DATA_POINTER_WIDTH or PKT_SIZE_MAX generic."
+    assert (PKT_SIZE_MAX <= 2**POINTER_WIDTH)
+        report "TX_DMA_CALYPTE: too large PKT_SIZE_MAX, the internal buffer must be able to fit at least one packet of the size of the PKT_SIZE_MAX. Either change POINTER_WIDTH or PKT_SIZE_MAX generic."
         severity FAILURE;
 
-    assert (DATA_POINTER_WIDTH <= 16)
+    assert (POINTER_WIDTH <= 16)
         report "TX_DMA_CALYPTE: Too large data pointer, the length of 16 already allows to store 64KiB of data."
         severity FAILURE;
 
@@ -278,8 +273,8 @@ begin
             DISC_PKT_CNT_WIDTH => CNTRS_WIDTH,
             DISC_BTS_CNT_WIDTH => CNTRS_WIDTH,
 
-            DATA_POINTER_WIDTH    => DATA_POINTER_WIDTH,
-            DMA_HDR_POINTER_WIDTH => DATA_POINTER_WIDTH-3,
+            DATA_POINTER_WIDTH    => POINTER_WIDTH,
+            DMA_HDR_POINTER_WIDTH => POINTER_WIDTH-3,
             PKT_SIZE_MAX          => PKT_SIZE_MAX,
             MI_WIDTH              => MI_WIDTH)
         port map (
@@ -322,12 +317,12 @@ begin
         generic map (
             DEVICE        => DEVICE,
             CHANNELS      => CHANNELS,
-            POINTER_WIDTH => DATA_POINTER_WIDTH,
+            POINTER_WIDTH => POINTER_WIDTH,
 
-            PCIE_MFB_REGIONS     => PCIE_CQ_MFB_REGIONS,
-            PCIE_MFB_REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
-            PCIE_MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
-            PCIE_MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH)
+            MFB_REGIONS     => PCIE_CQ_MFB_REGIONS,
+            MFB_REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH)
         port map (
             CLK   => CLK,
             RESET => RESET,
@@ -355,10 +350,10 @@ begin
             DEVICE   => DEVICE,
             CHANNELS => CHANNELS,
 
-            PCIE_MFB_REGIONS     => PCIE_CQ_MFB_REGIONS,
-            PCIE_MFB_REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
-            PCIE_MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
-            PCIE_MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
+            MFB_REGIONS     => PCIE_CQ_MFB_REGIONS,
+            MFB_REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
 
             PKT_SIZE_MAX     => PKT_SIZE_MAX,
             DBG_SIGNAL_WIDTH => ST_SP_DBG_SIGNAL_W)
@@ -427,7 +422,7 @@ begin
             MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
             MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
 
-            POINTER_WIDTH => DATA_POINTER_WIDTH)
+            POINTER_WIDTH => POINTER_WIDTH)
         port map (
             CLK   => CLK,
             RESET => RESET,
@@ -467,7 +462,7 @@ begin
     dma_hdr_fifo_i : entity work.FIFOX_MULTI
     generic map(
         DATA_WIDTH      => 62 + log2(CHANNELS) + 64,
-        ITEMS           => (2**(DATA_POINTER_WIDTH-3)) * CHANNELS,
+        ITEMS           => (2**(POINTER_WIDTH-3)) * CHANNELS,
         WRITE_PORTS     => PCIE_CQ_MFB_REGIONS,
         READ_PORTS      => 1,
         RAM_TYPE        => "AUTO",
@@ -498,18 +493,13 @@ begin
             HDR_META_WIDTH => HDR_META_WIDTH,
             PKT_SIZE_MAX   => PKT_SIZE_MAX,
 
-            PCIE_MFB_REGIONS        => PCIE_CQ_MFB_REGIONS,
-            PCIE_MFB_REGION_SIZE    => PCIE_CQ_MFB_REGION_SIZE,
-            PCIE_MFB_BLOCK_SIZE     => PCIE_CQ_MFB_BLOCK_SIZE,
-            PCIE_MFB_ITEM_WIDTH     => PCIE_CQ_MFB_ITEM_WIDTH,
-
             MFB_REGIONS     => USR_TX_MFB_REGIONS,
             MFB_REGION_SIZE => USR_TX_MFB_REGION_SIZE,
             MFB_BLOCK_SIZE  => USR_TX_MFB_BLOCK_SIZE,
             MFB_ITEM_WIDTH  => USR_TX_MFB_ITEM_WIDTH,
 
-            DATA_POINTER_WIDTH    => DATA_POINTER_WIDTH,
-            DMA_HDR_POINTER_WIDTH => DATA_POINTER_WIDTH-3)
+            DATA_POINTER_WIDTH    => POINTER_WIDTH,
+            DMA_HDR_POINTER_WIDTH => POINTER_WIDTH-3)
         port map (
             CLK   => CLK,
             RESET => RESET,

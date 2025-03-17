@@ -9,36 +9,35 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 -- Note:
--- Todo: Add FIFO with counter (so we can write data into it while reading them out)
---       Support different latency of Buffer
---       Backward compatibility for one region
 
 use work.math_pack.all;
 use work.type_pack.all;
 use work.dma_hdr_pkg.all;
 
--- This component dispatches the frames from data buffers according to available DMA Headers. Frames
--- are dispatched from all channels in order in which DMA headers came from the PCI Express.
--- After dispatching a frame, the component issues an update of header and data pointers. If a channel
--- is already stopped and DMA header for this channel occurs on the input of this component, this
--- DMA header is dropped and no frame data are dispatched to the output as well as no update of
--- pointers is issued.
+-- This component dispatches the packets from data buffers according to the available DMA Headers
+-- (read from the *HDR_BUFF_* interface). Packets are dispatched from all channels in the same order
+-- in which DMA headers came from the PCI Express. After dispatching a packet, the component issues
+-- an update of header and data pointers using the *UPD_* interface. An update of a packet counter
+-- is issued when packet dispatch is finished.
+--
+-- .. NOTE:: Although the data pointer has been established with a resolution to individual bytes,
+--           the updated value is always a multiple of 32. This constrain has been introduced in
+--           order to minimize an alignment overhead in the software.
+--
 entity TX_DMA_PKT_DISPATCHER is
     generic (
         DEVICE : string := "ULTRASCALE";
 
         CHANNELS            : natural := 8;
+        -- The size of application metadata in the DMA header as well as on the
+        -- :vhdl:portsignal:`USR_MFB_META_HDR_META` output port. The size currently adheres to
+        -- :ref:`Header metadata format <hdr_meta_format>`.
         HDR_META_WIDTH      : natural := 24;
         PKT_SIZE_MAX        : natural := 2**16 -1;
 
-        -- allowed values for PCIE_MFB_REGIONS are 1 or 2
-        PCIE_MFB_REGIONS        : natural := 2; -- 1/2
-        PCIE_MFB_REGION_SIZE    : natural := 1;
-        PCIE_MFB_BLOCK_SIZE     : natural := 8;
-        PCIE_MFB_ITEM_WIDTH     : natural := 32;
-
         MFB_REGIONS         : natural := 1;
-        MFB_REGION_SIZE     : natural := 4; -- 4/8
+        -- Either 4 or 8
+        MFB_REGION_SIZE     : natural := 4;
         MFB_BLOCK_SIZE      : natural := 8;
         MFB_ITEM_WIDTH      : natural := 8;
 
@@ -67,7 +66,7 @@ entity TX_DMA_PKT_DISPATCHER is
         -- =========================================================================================
         -- Input interface from header buffer
         -- =========================================================================================
-        -- This is not an address for reading interface of the buffer, but the addres on which the
+        -- This is not an address for reading interface of the buffer, but the addres to which the
         -- current header has been written.
         HDR_BUFF_ADDR    : in  std_logic_vector(62 -1 downto 0);
         HDR_BUFF_CHAN    : in  std_logic_vector(log2(CHANNELS) -1 downto 0);
@@ -108,13 +107,13 @@ end entity;
 
 architecture FULL of TX_DMA_PKT_DISPATCHER is
     -- =============================================================================================
-    -- Constants
+    -- Internal parameters
     -- =============================================================================================
     constant MFB_LENGTH     : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
     constant META_LENGTH    : natural := HDR_META_WIDTH + log2(CHANNELS) + log2(PKT_SIZE_MAX + 1);
 
     -- =============================================================================================
-    -- FSM declarations
+    -- Dispatch FSM signals
     -- =============================================================================================
     type pkt_dispatch_state_t is (S_IDLE, S_PKT_BEGIN, S_PKT_MIDDLE, S_UPDATE_STATUS);
     signal pkt_dispatch_pst : pkt_dispatch_state_t := S_IDLE;
@@ -283,6 +282,8 @@ begin
     PKT_SENT_CHAN  <= HDR_BUFF_CHAN;
     PKT_SENT_BYTES <= HDR_BUFF_DATA(DMA_FRAME_LENGTH)(PKT_SENT_BYTES'range);
 
+    -- The length of a packet gets rounded up to the nearest multiple of 32 and this value is then
+    -- used for the HDP pointer update.
     fr_len_round_up_msk <= not to_unsigned(31,16);
     fr_len_rounded      <= (unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH)) + 31) and fr_len_round_up_msk;
 

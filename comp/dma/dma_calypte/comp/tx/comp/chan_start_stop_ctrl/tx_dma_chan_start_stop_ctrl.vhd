@@ -1,4 +1,4 @@
--- tx_dma_chan_start_stop_ctrl.vhd: controls the acception of packets according to the running state
+-- tx_dma_chan_start_stop_ctrl.vhd: controls the acception of packets according to the activity state
 -- of the DMA channels
 -- Copyright (C) 2023 CESNET z.s.p.o.
 -- Author(s): Vladislav Valek  <xvalek14@vutbr.cz>
@@ -16,15 +16,21 @@ use work.math_pack.all;
 use work.type_pack.all;
 use work.dma_hdr_pkg.all;
 
--- This component controls the acception of incoming frames according to the running state of a
--- specific DMA channel. When channel is stopped, all incoming frames to that channel are dropped.
--- When channel is running, all incoming frames on that channel are accepted and reach the
--- output *USR_MFB_* bus. When a stop request of a channel comes when a frame is received on this
--- channel, the frame is received till its end and all other frames will be dropped. The system
--- works vice versa when a start request comes and a frame is dropped on a single channel.
+-- This component accepts the incoming packets according to the running state (active/inactive) of a
+-- specific DMA channel. When channel is stopped, all incoming packets on that channel are dropped.
+-- When a channel is running, all incoming packets on that channel are accepted and passed to the
+-- output *USR_MFB_* interface. This component is a primary responder during the start/stop sequence
+-- on a channel. When a stop request is received on a channel during packet reception, the currently
+-- processed frame is received and all following packets are dropped. The system works vice versa
+-- when a start request arrives on a channel where the currently processed packet is dropped and the
+-- following ones are accepted.
 --
--- .. NOTE::
---    A frame can consist out of multiple smaller frames that are delimited by the DMA header.
+-- .. NOTE:: A packet comes split between multiple PCIe transactions followed by a PCIe transaction
+--           containing the DMA header.
+--
+-- .. NOTE:: The complexity of the architecture stems mostly from the pkt_acc_{pst,nst} FSM which
+--           gets more complex as MFB_REGIONS increase. Although the state of packet reception is
+--           channel-specific, it still needs to be established on a common MFB bus.
 --
 entity TX_DMA_CHAN_START_STOP_CTRL is
     generic (
@@ -33,20 +39,16 @@ entity TX_DMA_CHAN_START_STOP_CTRL is
         -- Total number of DMA Channels within this DMA Endpoint
         CHANNELS : natural := 8;
 
-        -- =========================================================================================
-        -- Input PCIe interface parameters
-        -- =========================================================================================
-        PCIE_MFB_REGIONS     : natural := 2;
-        PCIE_MFB_REGION_SIZE : natural := 1;
-        PCIE_MFB_BLOCK_SIZE  : natural := 8;
-        PCIE_MFB_ITEM_WIDTH  : natural := 32;
+        -- Input/output MFB interface parameters
+        MFB_REGIONS     : natural := 2;
+        MFB_REGION_SIZE : natural := 1;
+        MFB_BLOCK_SIZE  : natural := 8;
+        MFB_ITEM_WIDTH  : natural := 32;
 
-        -- =========================================================================================
-        -- Others
-        -- =========================================================================================
-        -- Largest packet (in bytes) which can come out of USR_MFB interface
+        -- Largest packet (in bytes) which can be transported by the TX DMA Calypte controller
         PKT_SIZE_MAX : natural := 2**16 - 1;
 
+        -- WARNING: Only for debug purposes. Determines the width of the debug signal in bits.
         DBG_SIGNAL_WIDTH : natural := 4
     );
     port (
@@ -56,24 +58,24 @@ entity TX_DMA_CHAN_START_STOP_CTRL is
         -- =========================================================================================
         -- Input PCIe MFB interface
         -- =========================================================================================
-        PCIE_MFB_DATA    : in  std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0);
-        PCIE_MFB_META    : in  std_logic_vector(PCIE_MFB_REGIONS*(13 + (PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0);
-        PCIE_MFB_SOF     : in  std_logic_vector(PCIE_MFB_REGIONS -1 downto 0);
-        PCIE_MFB_EOF     : in  std_logic_vector(PCIE_MFB_REGIONS -1 downto 0);
-        PCIE_MFB_SOF_POS : in  std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE)) -1 downto 0);
-        PCIE_MFB_EOF_POS : in  std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE)) -1 downto 0);
+        PCIE_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        PCIE_MFB_META    : in  std_logic_vector(MFB_REGIONS*(13 + (MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0);
+        PCIE_MFB_SOF     : in  std_logic_vector(MFB_REGIONS -1 downto 0);
+        PCIE_MFB_EOF     : in  std_logic_vector(MFB_REGIONS -1 downto 0);
+        PCIE_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
+        PCIE_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
         PCIE_MFB_SRC_RDY : in  std_logic;
         PCIE_MFB_DST_RDY : out std_logic;
 
         -- =========================================================================================
         -- Output MFB interface
         -- =========================================================================================
-        USR_MFB_DATA    : out std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0);
-        USR_MFB_META    : out std_logic_vector(PCIE_MFB_REGIONS*((PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0);
-        USR_MFB_SOF     : out std_logic_vector(PCIE_MFB_REGIONS -1 downto 0);
-        USR_MFB_EOF     : out std_logic_vector(PCIE_MFB_REGIONS -1 downto 0);
-        USR_MFB_SOF_POS : out std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE)) -1 downto 0);
-        USR_MFB_EOF_POS : out std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE)) -1 downto 0);
+        USR_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        USR_MFB_META    : out std_logic_vector(MFB_REGIONS*((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0);
+        USR_MFB_SOF     : out std_logic_vector(MFB_REGIONS -1 downto 0);
+        USR_MFB_EOF     : out std_logic_vector(MFB_REGIONS -1 downto 0);
+        USR_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
+        USR_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
         USR_MFB_SRC_RDY : out std_logic;
         USR_MFB_DST_RDY : in  std_logic;
 
@@ -95,7 +97,7 @@ entity TX_DMA_CHAN_START_STOP_CTRL is
         PKT_DISC_BYTES : out std_logic_vector(log2(PKT_SIZE_MAX+1) -1 downto 0);
 
         -- =========================================================================================
-        -- Debug signals
+        -- Debug signal
         -- =========================================================================================
         ST_SP_DBG_CHAN : out std_logic_vector(log2(CHANNELS) -1 downto 0);
         ST_SP_DBG_META : out std_logic_vector(DBG_SIGNAL_WIDTH -1 downto 0)
@@ -104,7 +106,7 @@ end entity;
 
 architecture FULL of TX_DMA_CHAN_START_STOP_CTRL is
 
-    constant MFB_LENGTH : natural := PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH;
+    constant MFB_LENGTH : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
 
     -- =============================================================================================
     -- Defining ranges for meta signal
@@ -112,7 +114,7 @@ architecture FULL of TX_DMA_CHAN_START_STOP_CTRL is
     constant META_IS_DMA_HDR_W : natural := 1;
     constant META_PCIE_ADDR_W  : natural := 62;
     constant META_CHAN_NUM_W   : natural := log2(CHANNELS);
-    constant META_BE_W         : natural := (PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8;
+    constant META_BE_W         : natural := (MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8;
     constant META_BYTE_CNT_W   : natural := 13;
 
     constant META_IS_DMA_HDR_O : natural := 0;
@@ -145,30 +147,30 @@ architecture FULL of TX_DMA_CHAN_START_STOP_CTRL is
     signal pkt_acc_nst              : all_chan_pkt_acc_state_t := (others => S_IDLE);
 
     -- Drop enable for each channel
-    signal chan_pkt_drop_en         : slv_array_t(CHANNELS -1 downto 0)(PCIE_MFB_REGIONS -1 downto 0);
+    signal chan_pkt_drop_en         : slv_array_t(CHANNELS -1 downto 0)(MFB_REGIONS -1 downto 0);
 
     -- MUXed from all channels
-    signal pkt_drop_en              : std_logic_vector(PCIE_MFB_REGIONS -1 downto 0);
+    signal pkt_drop_en              : std_logic_vector(MFB_REGIONS -1 downto 0);
 
     -- =============================================================================================
     -- Two regions support
     -- =============================================================================================
     -- This signal is telling us, when the State should change
     -- is_dma_hdr per region
-    signal is_dma_hdr_by_chan       : slv_array_t(CHANNELS - 1 downto 0)(PCIE_MFB_REGIONS - 1 downto 0);
+    signal is_dma_hdr_by_chan       : slv_array_t(CHANNELS - 1 downto 0)(MFB_REGIONS - 1 downto 0);
 
     -- Divide meta signal for better usage
-    signal pcie_mfb_meta_arr        : slv_array_t(PCIE_MFB_REGIONS - 1 downto 0)(13 + (PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1-1 downto 0);
+    signal pcie_mfb_meta_arr        : slv_array_t(MFB_REGIONS - 1 downto 0)(13 + (MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1-1 downto 0);
 
     -- SOF for specific channel
-    signal pcie_mfb_sof_by_chan         : slv_array_t(CHANNELS - 1 downto 0)(PCIE_MFB_REGIONS - 1 downto 0);
+    signal pcie_mfb_sof_by_chan         : slv_array_t(CHANNELS - 1 downto 0)(MFB_REGIONS - 1 downto 0);
 
     -- Discard logic and statistics
-    signal pcie_mfb_data_arr        : slv_array_t(PCIE_MFB_REGIONS - 1 downto 0)(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH - 1 downto 0);
-    signal pcie_mfb_disc_chan_arr   : slv_array_t(PCIE_MFB_REGIONS - 1 downto 0)(log2(CHANNELS) -1 downto 0);
-    signal pcie_mfb_disc_bytes_arr  : slv_array_t(PCIE_MFB_REGIONS - 1 downto 0)(log2(PKT_SIZE_MAX+1) -1 downto 0);
-    signal pcie_mfb_disc_inc_arr    : std_logic_vector(PCIE_MFB_REGIONS - 1 downto 0);
-    signal fifox_mult_di            : slv_array_t(PCIE_MFB_REGIONS - 1 downto 0)(log2(CHANNELS) + log2(PKT_SIZE_MAX+1) + 1 - 1 downto 0);
+    signal pcie_mfb_data_arr        : slv_array_t(MFB_REGIONS - 1 downto 0)(MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH - 1 downto 0);
+    signal pcie_mfb_disc_chan_arr   : slv_array_t(MFB_REGIONS - 1 downto 0)(log2(CHANNELS) -1 downto 0);
+    signal pcie_mfb_disc_bytes_arr  : slv_array_t(MFB_REGIONS - 1 downto 0)(log2(PKT_SIZE_MAX+1) -1 downto 0);
+    signal pcie_mfb_disc_inc_arr    : std_logic_vector(MFB_REGIONS - 1 downto 0);
+    signal fifox_mult_di            : slv_array_t(MFB_REGIONS - 1 downto 0)(log2(CHANNELS) + log2(PKT_SIZE_MAX+1) + 1 - 1 downto 0);
     signal fifox_mult_do            : std_logic_vector(log2(CHANNELS) + log2(PKT_SIZE_MAX+1) + 1 - 1 downto 0);
     signal fifox_mult_empty         : std_logic_vector(0 downto 0);
 
@@ -176,7 +178,7 @@ architecture FULL of TX_DMA_CHAN_START_STOP_CTRL is
     signal fifox_mult_full          : std_logic := '0';
 
     -- Meta extraction
-    signal pcie_mfb_meta_ext        : slv_array_t(PCIE_MFB_REGIONS - 1 downto 0)(META_BE_O + META_BE_W -1 downto 0);
+    signal pcie_mfb_meta_ext        : slv_array_t(MFB_REGIONS - 1 downto 0)(META_BE_O + META_BE_W -1 downto 0);
 
     -- =============================================================================================
     -- All things debugging
@@ -197,7 +199,7 @@ architecture FULL of TX_DMA_CHAN_START_STOP_CTRL is
     -- attribute mark_debug of dma_hdr_out_of_order_chan : signal is "true";
     -- attribute mark_debug of chan_pkt_drop_en          : signal is "true";
 
-    signal meta_is_dma_hdr_int : std_logic_vector(PCIE_MFB_REGIONS -1 downto 0);
+    signal meta_is_dma_hdr_int : std_logic_vector(MFB_REGIONS -1 downto 0);
     signal meta_pcie_addr_int  : std_logic_vector(META_PCIE_ADDR);
     signal meta_chan_num_int   : std_logic_vector(META_CHAN_NUM);
 
@@ -220,12 +222,12 @@ architecture FULL of TX_DMA_CHAN_START_STOP_CTRL is
     -- attribute mark_debug of ST_SP_DBG_META : signal is "true";
 
 begin
-    pcie_mfb_meta_arr   <= slv_array_deser(PCIE_MFB_META, PCIE_MFB_REGIONS);
+    pcie_mfb_meta_arr   <= slv_array_deser(PCIE_MFB_META, MFB_REGIONS);
 
     -- Debug signal for one region
     stop_req_while_pending_ored <= or stop_req_while_pending;
 
-    meta_is_dma_hdr_int_g: for reg_idx in (PCIE_MFB_REGIONS-1) downto 0 generate
+    meta_is_dma_hdr_int_g: for reg_idx in (MFB_REGIONS-1) downto 0 generate
         meta_is_dma_hdr_int(reg_idx) <= pcie_mfb_meta_arr(reg_idx)(0);
     end generate;
     meta_pcie_addr_int          <= PCIE_MFB_META(META_PCIE_ADDR);
@@ -309,7 +311,7 @@ begin
         pcie_mfb_sof_by_chan <= (others => (others => '0'));
 
         -- Last assignment
-        for i in 0 to PCIE_MFB_REGIONS - 1 loop
+        for i in 0 to MFB_REGIONS - 1 loop
             if PCIE_MFB_SOF(i) = '1' then
                 pcie_mfb_sof_by_chan(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_CHAN_NUM))))(i) <= '1';
                 is_dma_hdr_by_chan(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_CHAN_NUM))))(i)   <= pcie_mfb_meta_arr(i)(META_IS_DMA_HDR)(0);
@@ -322,7 +324,7 @@ begin
     --
     -- The PKT_PENDING means there are still incoming PCIe transactions for the current packet.
     -- =============================================================================================
-    pkt_region_acc_g: if PCIE_MFB_REGIONS = 1 generate
+    pkt_region_acc_g: if MFB_REGIONS = 1 generate
         acceptor_fsm_g : for j in (CHANNELS -1) downto 0 generate
             pkt_acceptor_state_reg_p : process (CLK) is
             begin
@@ -561,7 +563,7 @@ begin
     end process;
 
     -- One region debug (The "PCIE_MFB_SOF = "1"" is not that compatible)
-    pkt_statistics_g: if PCIE_MFB_REGIONS = 1 generate
+    pkt_statistics_g: if MFB_REGIONS = 1 generate
         PKT_DISC_CHAN  <= PCIE_MFB_META(META_CHAN_NUM);
         -- choose only packet size from the DMA header
         PKT_DISC_BYTES <= PCIE_MFB_DATA(log2(PKT_SIZE_MAX+1) -1 downto 0);
@@ -575,10 +577,10 @@ begin
     else generate
         -- Extract data for statistics
         -- This part should be compatible with one region as well
-        pcie_mfb_data_arr   <= slv_array_deser(PCIE_MFB_DATA, PCIE_MFB_REGIONS);
+        pcie_mfb_data_arr   <= slv_array_deser(PCIE_MFB_DATA, MFB_REGIONS);
         discard_arr_p: process(all)
         begin
-            for i in PCIE_MFB_REGIONS - 1 downto 0 loop
+            for i in MFB_REGIONS - 1 downto 0 loop
                 pcie_mfb_disc_chan_arr(i)   <= pcie_mfb_meta_arr(i)(META_CHAN_NUM);
                 pcie_mfb_disc_bytes_arr(i)  <= pcie_mfb_data_arr(i)(log2(PKT_SIZE_MAX+1) -1 downto 0);
 
@@ -595,7 +597,7 @@ begin
         -- Concatenate statistical data
         var_conc_p: process(all)
         begin
-            for i in PCIE_MFB_REGIONS - 1 downto 0 loop
+            for i in MFB_REGIONS - 1 downto 0 loop
                 fifox_mult_di(i) <= pcie_mfb_disc_chan_arr(i) & pcie_mfb_disc_bytes_arr(i) & pcie_mfb_disc_inc_arr(i);
             end loop;
         end process;
@@ -605,7 +607,7 @@ begin
         generic map(
             DATA_WIDTH      => log2(CHANNELS) + log2(PKT_SIZE_MAX+1) + 1,
             ITEMS           => CHANNELS*2,
-            WRITE_PORTS     => PCIE_MFB_REGIONS,
+            WRITE_PORTS     => MFB_REGIONS,
             READ_PORTS      => 1,
             DEVICE          => DEVICE
         )
@@ -640,11 +642,11 @@ begin
     -- Meeting specific conditions regarding processing of a current packet and channel active
     -- status will cause every packet on the input to be dropped.
     -- =============================================================================================
-    pkt_drop_en_g: for i in PCIE_MFB_REGIONS - 1 downto 0 generate
+    pkt_drop_en_g: for i in MFB_REGIONS - 1 downto 0 generate
         pkt_drop_en(i)  <= chan_pkt_drop_en(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_CHAN_NUM))))(i);
     end generate;
 
-    pcie_mfb_meta_ext_g : for i in PCIE_MFB_REGIONS - 1 downto 0 generate
+    pcie_mfb_meta_ext_g : for i in MFB_REGIONS - 1 downto 0 generate
         pcie_mfb_meta_ext(i)(META_IS_DMA_HDR)                                               <= pcie_mfb_meta_arr(i)(META_IS_DMA_HDR) when pkt_drop_en(i) = '0' else (others => '0');
         pcie_mfb_meta_ext(i)(META_CHAN_NUM_O + META_CHAN_NUM_W -1 downto META_IS_DMA_HDR_W) <= pcie_mfb_meta_arr(i)(META_CHAN_NUM_O + META_CHAN_NUM_W -1 downto META_IS_DMA_HDR_W);
         pcie_mfb_meta_ext(i)(META_BE)                                                       <= pcie_mfb_meta_arr(i)(META_BE_O + META_BE_W -1 downto META_BE_O) when pkt_drop_en(i) = '0' else (others => '0');
@@ -652,11 +654,11 @@ begin
 
     pkt_dropper_i : entity work.MFB_DROPPER
         generic map (
-            REGIONS     => PCIE_MFB_REGIONS,
-            REGION_SIZE => PCIE_MFB_REGION_SIZE,
-            BLOCK_SIZE  => PCIE_MFB_BLOCK_SIZE,
-            ITEM_WIDTH  => PCIE_MFB_ITEM_WIDTH,
-            META_WIDTH  => ((PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1))
+            REGIONS     => MFB_REGIONS,
+            REGION_SIZE => MFB_REGION_SIZE,
+            BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            ITEM_WIDTH  => MFB_ITEM_WIDTH,
+            META_WIDTH  => ((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1))
         port map (
             CLK   => CLK,
             RESET => RESET,
