@@ -1,5 +1,8 @@
 #!/bin/python
-# -*- coding: iso-8859-2 -*-
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2022 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#            Martin Spinler <spinler@cesnet.cz>
 
 import sys
 

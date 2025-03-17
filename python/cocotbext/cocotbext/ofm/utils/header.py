@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+#            Daniel Kondys <kondys@cesnet.cz>
+
 def concat(values):
     ret = 0
     for val, width in reversed(values):

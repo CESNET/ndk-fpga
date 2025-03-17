@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <kondys@cesnet.cz>
+#            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
+
 import sys
 from typing import Any
 

@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <kondys@cesnet.cz>
+#            Martin Spinler <spinler@cesnet.cz>
+
 # sm_get_speed.py: use the MFB Speed Meter to obtain
 # TODO: Improve argument parsing and add more arguments (measurements, average, freq, offset(s), printing (+verbosity), ...)
 

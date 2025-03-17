@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+
 from cocotb_bus.monitors import BusMonitor
 from cocotb.triggers import RisingEdge
 

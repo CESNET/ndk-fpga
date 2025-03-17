@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+
 import re
 import logging
 import queue

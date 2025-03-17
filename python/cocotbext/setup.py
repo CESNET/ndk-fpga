@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2023 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+
 
 from setuptools import setup, find_namespace_packages
 

@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+#            Tomas Hak <hak@cesnet.cz>
+
 from setuptools import setup
 
 VERSION = '0.0.1'

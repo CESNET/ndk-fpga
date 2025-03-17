@@ -1,5 +1,8 @@
-from dataclasses import dataclass
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
 
+from dataclasses import dataclass
 
 class BaseTransaction():
     """Base class for transactions"""

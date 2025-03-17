@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2024 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <kondys@cesnet.cz>
+#            Martin Spinler <spinler@cesnet.cz>
+#            Radek Isa <isa@cesnet.cz>
+
 import cocotb
 from cocotb.queue import Queue
 
