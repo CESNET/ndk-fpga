@@ -338,6 +338,65 @@ class sequence_min_max #(int unsigned ITEM_WIDTH) extends sequence_simple #(ITEM
 
 endclass
 
+class sequence_inverted_gauss #(int unsigned ITEM_WIDTH) extends sequence_simple #(ITEM_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array::sequence_inverted_gauss #(ITEM_WIDTH))
+    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_inverted_gauss)
+
+    int unsigned mean;
+
+    // Constructor
+    function new(string name = "sequence_inverted_gauss");
+        super.new(name);
+    endfunction
+
+    function int math_min(int first, int second);
+        return (first < second) ? first : second;
+    endfunction
+
+    function int math_max(int first, int second);
+        return (first > second) ? first : second;
+    endfunction
+
+    function int inverted_gaussian_dist();
+        int value = $dist_normal($urandom(), mean, mean/3);
+        value = math_min(value, cfg.array_size_max);
+        value = math_max(value, cfg.array_size_min);
+
+        if (value < mean) begin
+            return math_min(value+mean, cfg.array_size_max);
+        end
+        else begin
+            return math_max(value-mean, cfg.array_size_min);
+        end
+    endfunction
+
+    task body;
+        uvm_common::sequence_cfg state;
+        void'(uvm_config_db #(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state));
+
+        `uvm_info(m_sequencer.get_full_name(), "\n\tsequence_inverted_gauss is running", UVM_DEBUG)
+
+        mean = (cfg.array_size_max-cfg.array_size_min)/2;
+
+        repeat (transaction_count) begin
+            int unsigned data_size;
+
+            if (state != null) begin
+                if (!state.next()) begin
+                    break;
+                end
+            end
+
+            data_size = inverted_gaussian_dist();
+
+            `uvm_do_with(req, {
+                data.size == data_size;
+            })
+        end
+    endtask
+
+endclass
+
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY
 class sequence_lib #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_library#(config_sequence, sequence_item#(ITEM_WIDTH));
@@ -353,11 +412,12 @@ class sequence_lib #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_libra
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         super.init_sequence(param_cfg);
-        this.add_sequence(sequence_simple#(ITEM_WIDTH)::get_type());
-        this.add_sequence(sequence_simple_const#(ITEM_WIDTH)::get_type());
-        this.add_sequence(sequence_simple_gauss#(ITEM_WIDTH)::get_type());
-        this.add_sequence(sequence_simple_inc#(ITEM_WIDTH)::get_type());
-        this.add_sequence(sequence_simple_dec#(ITEM_WIDTH)::get_type());
-        this.add_sequence(sequence_min_max   #(ITEM_WIDTH)::get_type());
+        this.add_sequence(sequence_simple         #(ITEM_WIDTH)::get_type());
+        this.add_sequence(sequence_simple_const   #(ITEM_WIDTH)::get_type());
+        this.add_sequence(sequence_simple_gauss   #(ITEM_WIDTH)::get_type());
+        this.add_sequence(sequence_simple_inc     #(ITEM_WIDTH)::get_type());
+        this.add_sequence(sequence_simple_dec     #(ITEM_WIDTH)::get_type());
+        this.add_sequence(sequence_min_max        #(ITEM_WIDTH)::get_type());
+        this.add_sequence(sequence_inverted_gauss #(ITEM_WIDTH)::get_type());
     endfunction
 endclass
