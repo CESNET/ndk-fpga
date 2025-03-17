@@ -43,10 +43,19 @@ def create_setting_from_combination(settings, combination):
             FAIL = True
             continue
         for i in settings[c].keys(): # load modified values
-            if i not in s.keys():
+            # if parameter is __coreparams__ then it is dict
+            if i == "__core_params__":
+                if "__core_params__" not in s.keys():
+                    s[i] = settings[c][i]
+                else:
+                    s[i].update(settings[c][i])
+            # or it is string
+            elif i not in s.keys():
                 print("ERROR: Parameter \"{}\" is present in setting \"{}\" but not in setting \"default\". This might cause unexpected behaviour in the following runs!".format(i, c))
                 FAIL = True
-            s[i] = settings[c][i]
+                s[i] = settings[c][i]
+            else:
+                s[i] = settings[c][i]
     return s
 
 
