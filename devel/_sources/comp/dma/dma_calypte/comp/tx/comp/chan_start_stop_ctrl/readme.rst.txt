@@ -1,4 +1,4 @@
-.. _tx_dma_chan_start_stop_ctrl:
+.. _tx_dma_calypte_chan_start_stop_ctrl:
 
 Channel Start/stop control
 ==========================

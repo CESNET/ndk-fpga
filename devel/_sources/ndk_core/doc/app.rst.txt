@@ -50,6 +50,8 @@ The MVB metadata bus does not use a single ``MVB_DATA`` signal but  multiple dat
 
 The MFB bus transfers the packet data, which may contain a user header before the payload data (e.g., an Ethernet packet). You can determine the presence of the user header and its length from the metadata in the ``DMA_TX_MVB_HDR_META`` signal (see below).
 
+.. _hdr_meta_format:
+
 **The format of the metadata for the DMA header (DMA_TX_MVB_HDR_META):**
 
 ========= ========== ===========================================

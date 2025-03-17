@@ -77,11 +77,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#resource-consumption">Resource consumption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#latency-report">Latency report</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../../../rx/readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">TX DMA Calypte</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#maintainers">Maintainers</a></li>
 </ul>
 </li>
 </ul>
@@ -140,16 +143,21 @@
            <div itemprop="articleBody">
              
   <section id="packet-dispatcher">
-<span id="tx-dma-pkt-dispatcher"></span><h1>Packet Dispatcher<a class="headerlink" href="#packet-dispatcher" title="Link to this heading"></a></h1>
+<span id="tx-dma-calypte-pkt-dispatcher"></span><h1>Packet Dispatcher<a class="headerlink" href="#packet-dispatcher" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-tx_dma_pkt_dispatcher">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">TX_DMA_PKT_DISPATCHER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-tx_dma_pkt_dispatcher" title="Link to this definition"></a></dt>
-<dd><p>This component dispatches the frames from data buffers according to available DMA Headers. Frames
-are dispatched from all channels in order in which DMA headers came from the PCI Express.
-After dispatching a frame, the component issues an update of header and data pointers. If a channel
-is already stopped and DMA header for this channel occurs on the input of this component, this
-DMA header is dropped and no frame data are dispatched to the output as well as no update of
-pointers is issued.</p>
+<dd><p>This component dispatches the packets from data buffers according to the available DMA Headers
+(read from the <em>HDR_BUFF_</em> interface). Packets are dispatched from all channels in the same order
+in which DMA headers came from the PCI Express. After dispatching a packet, the component issues
+an update of header and data pointers using the <em>UPD_</em> interface. An update of a packet counter
+is issued when packet dispatch is finished.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the data pointer has been established with a resolution to individual bytes,
+the updated value is always a multiple of 32. This constrain has been introduced in
+order to minimize an alignment overhead in the software.</p>
+</div>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -172,31 +180,13 @@ pointers is issued.</p>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-hdr_meta_width"><td><p>HDR_META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>24</p></td>
-<td></td>
+<td><p>The size of application metadata in the DMA header as well as on the
+<code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">USR_MFB_META_HDR_META</span></code> output port. The size currently adheres to
+<a class="reference internal" href="../../../../../../../ndk_core/doc/app.html#hdr-meta-format"><span class="std std-ref">Header metadata format</span></a>.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
 <td><p>natural</p></td>
 <td><p>2**16 -1</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-pcie_mfb_regions"><td><p>PCIE_MFB_REGIONS</p></td>
-<td><p>natural</p></td>
-<td><p>2</p></td>
-<td><p>allowed values for PCIE_MFB_REGIONS are 1 or 2</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-pcie_mfb_region_size"><td><p>PCIE_MFB_REGION_SIZE</p></td>
-<td><p>natural</p></td>
-<td><p>1</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-pcie_mfb_block_size"><td><p>PCIE_MFB_BLOCK_SIZE</p></td>
-<td><p>natural</p></td>
-<td><p>8</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-pcie_mfb_item_width"><td><p>PCIE_MFB_ITEM_WIDTH</p></td>
-<td><p>natural</p></td>
-<td><p>32</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-mfb_regions"><td><p>MFB_REGIONS</p></td>
@@ -207,7 +197,7 @@ pointers is issued.</p>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
-<td><p>4/8</p></td>
+<td><p>Either 4 or 8</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_pkt_dispatcher-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
@@ -313,7 +303,7 @@ pointers is issued.</p>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_pkt_dispatcher-hdr_buff_addr"><td><p>HDR_BUFF_ADDR</p></td>
 <td><p>std_logic_vector(62 -1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>This is not an address for reading interface of the buffer, but the addres on which the
+<td><p>This is not an address for reading interface of the buffer, but the addres to which the
 current header has been written.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_pkt_dispatcher-hdr_buff_chan"><td><p>HDR_BUFF_CHAN</p></td>
