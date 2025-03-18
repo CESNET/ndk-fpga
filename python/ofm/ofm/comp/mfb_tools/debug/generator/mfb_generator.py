@@ -4,10 +4,25 @@
 #            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import sys
-from typing import Any
+from dataclasses import dataclass
+from typing import Any, Optional
 
 import nfb
 
+@dataclass
+class GeneratorConfig:
+    enabled: bool
+    frame_length: int
+    channel_increment: int
+    channel_increment_reversed: bool
+    bursting: bool
+    burst_size: int
+    minimum_channel: int
+    maximum_channel: int
+    dst_mac_address: bytes
+    src_mac_address: bytes
+    generating: Optional[bool] = None # Read-only
+    frame_count: Optional[int] = None # Read-only
 
 class MfbGenerator(nfb.BaseComp):
     DT_COMPATIBLE = "cesnet,ofm,mfb_generator"
@@ -30,48 +45,27 @@ class MfbGenerator(nfb.BaseComp):
     # ################
     # Command register
     # ################
-    def start(self) -> None:
-        """Set the generator to active state (start generating frames).
-
-        The only other bit that could be set by writing to this address is the Clear bit, which is
-        not desired. Hence, write32() is used instead of set_bit() as reading the value of this
-        register first does not really make sense.
-        """
-        self._comp.write32(self._REG_CONTROL, 1)
-
-    def stop(self) -> None:
-        """Set the generator to inactive state (stop generating frames).
-
-        The only other bit that could be set by writing to this address is the Clear bit, which is
-        not desired. Hence, write32() is used instead of set_bit() as reading the value of this
-        register first does not really make sense."""
-        self._comp.write32(self._REG_CONTROL, 0)
-
-    def clear(self) -> None:
-        """Clear the generator's frame counters."""
-        self._comp.set_bit(self._REG_CONTROL, 4)
-
     @property
     def enabled(self) -> bool:
-        """Returns True if the generator has been enabled."""
+        """The generator is running."""
         return self._comp.get_bit(self._REG_CONTROL, 0)
+
+    @enabled.setter
+    def enabled(self, en: bool) -> None:
+        self._comp.write32(self._REG_CONTROL, int(en))
 
     @property
     def generating(self) -> bool:
-        """Returns True if packets are being generated.
+        """Packets are being generated.
 
+        Its value should correspond with the `enabled` property.
         Makes sense to check when generating bursts.
         """
         return self._comp.get_bit(self._REG_CONTROL, 1)
 
-    @property
-    def clearing(self) -> bool:
-        """Returns True if frame counters are being cleared/reset.
-
-        Does not make sense to check as it is asserted for only a single clock cycle issuing the
-        clear command (it is not realistic to get other value than 0).
-        """
-        return self._comp.get_bit(self._REG_CONTROL, 1)
+    def clear(self):
+        """Clear packet counters."""
+        self._comp.set_bit(self._REG_CONTROL, 4)
 
     # #####################
     # Frame Length register
@@ -130,7 +124,8 @@ class MfbGenerator(nfb.BaseComp):
     @bursting.setter
     def bursting(self, enable: bool) -> None:
         """Configure the generator to send packets in bursts."""
-        raise NotImplementedError("Reliable bursting has not yet been implemented.")
+        if enable:
+            raise NotImplementedError("Reliable bursting has not yet been implemented.")
         # self._comp.set_bit(self._REG_CHANNEL_INCR, 9, enable)
 
     @property
@@ -289,3 +284,38 @@ class MfbGenerator(nfb.BaseComp):
     def frame_count(self) -> int:
         """Get the number of generated frames."""
         return int.from_bytes(self._comp.read(self._REG_FRAME_CNT_LOW, 8), byteorder=sys.byteorder)
+
+    # #############
+    # Configuration
+    # #############
+    def get_configuration(self) -> GeneratorConfig:
+        """Returns the full configuration of the generator (all properties)."""
+        # TODO: optimize this by reducing the amount of MI Reads
+        conf = GeneratorConfig(
+            enabled                    = self.enabled,
+            generating                 = self.generating,
+            frame_length               = self.frame_length,
+            channel_increment          = self.channel_increment,
+            channel_increment_reversed = self.channel_increment_reversed,
+            bursting                   = self.bursting,
+            burst_size                 = self.burst_size,
+            minimum_channel            = self.minimum_channel,
+            maximum_channel            = self.maximum_channel,
+            dst_mac_address            = self.dst_mac_address,
+            src_mac_address            = self.src_mac_address,
+            frame_count                = self.frame_count,
+        )
+        return conf
+
+    def configure(self, conf: GeneratorConfig) -> None:
+        """Configures the Generator while ignoring read-only items."""
+        self.frame_length               = conf.frame_length
+        self.channel_increment          = conf.channel_increment
+        self.channel_increment_reversed = conf.channel_increment_reversed
+        self.bursting                   = conf.bursting
+        self.burst_size                 = conf.burst_size
+        self.minimum_channel            = conf.minimum_channel
+        self.maximum_channel            = conf.maximum_channel
+        self.dst_mac_address            = conf.dst_mac_address
+        self.src_mac_address            = conf.src_mac_address
+        self.enabled                    = conf.enabled
