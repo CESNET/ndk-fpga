@@ -53,9 +53,9 @@ port (
     -- =========================================================================
     RX_MVB_USERMETA        : in  std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
     -- RX MFB frame size in MFB items
-    RX_MVB_FRAME_LENGTH    : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU)-1 downto 0);
+    RX_MVB_FRAME_LENGTH    : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
     -- Frame extension size in MFB items, but must be divisible by MFB_BLOCK_SIZE
-    RX_MVB_EXT_SIZE        : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU)-1 downto 0);
+    RX_MVB_EXT_SIZE        : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
     -- It only uses the new part (EXT_SIZE) of the frame, the rest is discarded.
     -- This can be useful, for example, when we need to send only metadata instead of the frame.
     RX_MVB_EXT_ONLY        : in  std_logic_vector(MFB_REGIONS-1 downto 0) := (others => '0');
@@ -96,7 +96,7 @@ end entity;
 
 architecture FULL of MFB_FRAME_EXTENDER is
 
-    constant LEN_WIDTH      : natural := log2(PKT_MTU);
+    constant LEN_WIDTH      : natural := log2(PKT_MTU+1+MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE);
     constant GEN_META_WIDTH : natural := USERMETA_WIDTH+LEN_WIDTH+1;
 
     signal rx_mvb_usermeta_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_WIDTH-1 downto 0);
