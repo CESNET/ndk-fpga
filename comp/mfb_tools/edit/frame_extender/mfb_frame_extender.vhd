@@ -169,6 +169,18 @@ begin
         gen_len_ext_off(rr)  <= unsigned(rx_mvb_frame_length_arr(rr));
         gen_len_ext_only(rr) <= unsigned(rx_mvb_ext_size_arr(rr));
 
+        -- psl assert_max_total_len_on_mode :
+        --      assert always ((RX_MVB_SRC_RDY='1' and RX_MVB_DST_RDY='1' and RX_MVB_VLD(rr)='1' and gen_mode(rr)="10") -> ((unsigned('0' & rx_mvb_frame_length_arr(rr)) + unsigned('0' & rx_mvb_ext_size_arr(rr))) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
+        --      report "The sum of RX_MVB_FRAME_LENGTH and RX_MVB_EXT_SIZE is higher than PKT_MTU!";
+
+        -- psl assert_max_total_len_only_mode :
+        --      assert always ((RX_MVB_SRC_RDY='1' and RX_MVB_DST_RDY='1' and RX_MVB_VLD(rr)='1' and gen_mode(rr)="11") -> (unsigned(rx_mvb_ext_size_arr(rr)) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
+        --      report "RX_MVB_EXT_SIZE is higher than PKT_MTU!";
+
+        -- psl assert_max_total_len_off_mode :
+        --      assert always ((RX_MVB_SRC_RDY='1' and RX_MVB_DST_RDY='1' and RX_MVB_VLD(rr)='1' and RX_MVB_EXT_EN(rr)='0') -> (unsigned(rx_mvb_frame_length_arr(rr)) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
+        --      report "RX_MVB_FRAME_LENGTH is higher than PKT_MTU!";
+
         with gen_mode(rr) select
             gen_len(rr) <= std_logic_vector(gen_len_ext_on(rr))   when "10",
                            std_logic_vector(gen_len_ext_only(rr)) when "11",
