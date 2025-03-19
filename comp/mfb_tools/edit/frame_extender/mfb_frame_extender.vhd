@@ -53,9 +53,13 @@ port (
     -- =========================================================================
     RX_MVB_USERMETA        : in  std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
     -- RX MFB frame size in MFB items
-    RX_MVB_FRAME_LENGTH    : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU)-1 downto 0);
+    -- Maximum size is PKT_MTU MFB items
+    RX_MVB_FRAME_LENGTH    : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
     -- Frame extension size in MFB items, but must be divisible by MFB_BLOCK_SIZE
-    RX_MVB_EXT_SIZE        : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU)-1 downto 0);
+    -- Minimum size is 60 MFB items
+    -- If EXT_EN is active and EXT_ONLY is not, then the sum of RX_MVB_FRAME_LENGTH and RX_MVB_EXT_SIZE cannot be higher than PKT_MTU
+    -- If both EXT_EN and EXT_ONLY are active, then RX_MVB_EXT_SIZE cannot be higher than PKT_MTU
+    RX_MVB_EXT_SIZE        : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
     -- It only uses the new part (EXT_SIZE) of the frame, the rest is discarded.
     -- This can be useful, for example, when we need to send only metadata instead of the frame.
     RX_MVB_EXT_ONLY        : in  std_logic_vector(MFB_REGIONS-1 downto 0) := (others => '0');
@@ -96,7 +100,7 @@ end entity;
 
 architecture FULL of MFB_FRAME_EXTENDER is
 
-    constant LEN_WIDTH      : natural := log2(PKT_MTU);
+    constant LEN_WIDTH      : natural := log2(PKT_MTU+1+MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE);
     constant GEN_META_WIDTH : natural := USERMETA_WIDTH+LEN_WIDTH+1;
 
     signal rx_mvb_usermeta_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_WIDTH-1 downto 0);
@@ -168,6 +172,18 @@ begin
         gen_len_ext_on(rr)   <= unsigned(rx_mvb_frame_length_arr(rr)) + unsigned(rx_mvb_ext_size_arr(rr));
         gen_len_ext_off(rr)  <= unsigned(rx_mvb_frame_length_arr(rr));
         gen_len_ext_only(rr) <= unsigned(rx_mvb_ext_size_arr(rr));
+
+        -- psl assert_max_total_len_on_mode :
+        --      assert always ((RX_MVB_SRC_RDY='1' and RX_MVB_DST_RDY='1' and RX_MVB_VLD(rr)='1' and gen_mode(rr)="10") -> ((unsigned('0' & rx_mvb_frame_length_arr(rr)) + unsigned('0' & rx_mvb_ext_size_arr(rr))) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
+        --      report "The sum of RX_MVB_FRAME_LENGTH and RX_MVB_EXT_SIZE is higher than PKT_MTU!";
+
+        -- psl assert_max_total_len_only_mode :
+        --      assert always ((RX_MVB_SRC_RDY='1' and RX_MVB_DST_RDY='1' and RX_MVB_VLD(rr)='1' and gen_mode(rr)="11") -> (unsigned(rx_mvb_ext_size_arr(rr)) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
+        --      report "RX_MVB_EXT_SIZE is higher than PKT_MTU!";
+
+        -- psl assert_max_total_len_off_mode :
+        --      assert always ((RX_MVB_SRC_RDY='1' and RX_MVB_DST_RDY='1' and RX_MVB_VLD(rr)='1' and RX_MVB_EXT_EN(rr)='0') -> (unsigned(rx_mvb_frame_length_arr(rr)) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
+        --      report "RX_MVB_FRAME_LENGTH is higher than PKT_MTU!";
 
         with gen_mode(rr) select
             gen_len(rr) <= std_logic_vector(gen_len_ext_on(rr))   when "10",
