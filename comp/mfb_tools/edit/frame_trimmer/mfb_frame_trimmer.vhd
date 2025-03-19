@@ -187,6 +187,10 @@ begin
         s_rx_sof_after_eof_vld(r)  <= s_rx_sof_after_eof(r) and RX_SOF(r) and RX_EOF(r);
         s_rx_sof_before_eof_vld(r) <= not s_rx_sof_after_eof(r) and RX_SOF(r) and RX_EOF(r);
 
+        -- psl assert_max_trim_len :
+        --      assert always ((RX_SRC_RDY='1' and RX_DST_RDY='1' and RX_SOF(r)='1' and RX_TRIM_EN(r)='1') -> (unsigned(s_rx_new_len(r)) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
+        --      report "RX_TRIM_LEN is greater than PKT_MTU!";
+
         s_rx_new_len_ext_curr(r) <= unsigned(s_rx_new_len(r)) + (r*REGION_SIZE*BLOCK_SIZE) + s_rx_sof_pos_ext(r) - 1;
         s_rx_new_len_ext(r+1)    <= s_rx_new_len_ext_curr(r) when (RX_SOF(r) = '1') else s_rx_new_len_ext(r);
 
