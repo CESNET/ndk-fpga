@@ -156,8 +156,8 @@ def run_test(mode, min_fr_size, max_fr_size, fr_size_step, gls_clk_freq, log_en,
             nfb_bus(dt_path_gls[p], 0x00, 0x1)
 
     # Enable RX DMA for all channels
-        ndp_read = subprocess.Popen("ndp-read", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if mode in ["rx", "rxtx", "dma_rx", "dma_rxtx", "dma_loop"]:
+        ndp_read = subprocess.Popen("ndp-read", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         time.sleep(0.5)
 
     for i in range(len(fr_lengths)):
@@ -310,7 +310,7 @@ if __name__ == '__main__':
         3: "tx",
         4: "rxtx",
         5: "dma_rx",
-        6: "dmx_tx",
+        6: "dma_tx",
         7: "dma_rxtx",
         8: "dma_loop",
     }.get(int(args[0]))
@@ -393,3 +393,4 @@ if __name__ == '__main__':
         print("finished.")
         if single_cycle or flag.exit():
             break
+
