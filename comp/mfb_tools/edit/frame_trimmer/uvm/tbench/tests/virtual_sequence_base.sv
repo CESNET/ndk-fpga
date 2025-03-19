@@ -17,24 +17,30 @@ class virtual_sequence_base #(int unsigned REGIONS, int unsigned REGION_SIZE, in
     endfunction
 
     virtual function void init();
-        uvm_logic_vector_array::config_sequence m_rx_mfb_data_config;
+        uvm_common::sequence_cfg_transactions m_rx_mfb_data_config;
 
         // Create the reset sequence
         m_reset = uvm_reset::sequence_start::type_id::create("m_reset");
 
-        // ---------------- //
-        // RX MFB sequences //
-        // ---------------- //
+        // --------------- //
+        // RX MFB sequence //
+        // --------------- //
 
         // Create the RX MFB data sequence
         m_rx_mfb_data = uvm_logic_vector_array::sequence_lib #(ITEM_WIDTH)::type_id::create("m_rx_mfb_data");
         // Configure the RX MFB data sequence
-        m_rx_mfb_data_config = new();
-        m_rx_mfb_data_config.array_size_min = 64;
-        m_rx_mfb_data_config.array_size_max = 3000;
-        m_rx_mfb_data.init_sequence(m_rx_mfb_data_config);
-        m_rx_mfb_data.min_random_count = 15;
-        m_rx_mfb_data.max_random_count = 25;
+        m_rx_mfb_data.init_sequence();
+        m_rx_mfb_data.cfg = new();
+        m_rx_mfb_data.cfg.array_size_set(64, (2**LEN_WIDTH)-1);
+        m_rx_mfb_data.min_random_count = 100;
+        m_rx_mfb_data.max_random_count = 150;
+
+        // Create the RX MFB data state config
+        m_rx_mfb_data_config = new("m_rx_mfb_data_config");
+        m_rx_mfb_data_config.transactions_min = 1200;
+        m_rx_mfb_data_config.transactions_max = 1500;
+        assert(m_rx_mfb_data_config.randomize());
+        uvm_config_db #(uvm_common::sequence_cfg)::set(p_sequencer.m_rx_mfb_data, "", "state", m_rx_mfb_data_config);
 
         // Create the RX MFB meta sequence
         m_rx_mfb_meta = trim_sequence_library #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH)::type_id::create("m_rx_mfb_meta");
@@ -56,6 +62,8 @@ class virtual_sequence_base #(int unsigned REGIONS, int unsigned REGION_SIZE, in
     endfunction
 
     task body();
+        init();
+
         // Run the reset sequence
         fork
             begin

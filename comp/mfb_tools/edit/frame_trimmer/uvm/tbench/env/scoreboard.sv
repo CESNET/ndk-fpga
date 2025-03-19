@@ -53,8 +53,8 @@ class scoreboard #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned 
     function void build_phase(uvm_phase phase);
         comparer_data = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))::type_id::create("comparer_data", this);
         comparer_meta = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(META_WIDTH))      ::type_id::create("comparer_meta", this);
-        comparer_data.model_tr_timeout_set(200us);
-        comparer_meta.model_tr_timeout_set(200us);
+        comparer_data.model_tr_timeout_set(1000us);
+        comparer_meta.model_tr_timeout_set(1000us);
 
         m_model         = model         #(ITEM_WIDTH, LEN_WIDTH)::type_id::create("m_model", this);
         m_meta_splitter = meta_splitter #(META_WIDTH, LEN_WIDTH)::type_id::create("m_meta_splitter", this);
