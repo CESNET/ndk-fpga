@@ -7,7 +7,7 @@ class coverage_model #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int uns
     `uvm_component_param_utils(uvm_mfb_frame_trimmer::coverage_model #(BLOCK_SIZE, ITEM_WIDTH, LEN_WIDTH))
 
     localparam int unsigned MIN_DATA_LENGTH = 64;
-    localparam int unsigned MAX_DATA_LENGTH = 3000;
+    localparam int unsigned MAX_DATA_LENGTH = (2**LEN_WIDTH)-1;
     localparam int unsigned MIN_TRIM_LENGTH = (BLOCK_SIZE*ITEM_WIDTH)-(ITEM_WIDTH-1);
 
     // ------ //

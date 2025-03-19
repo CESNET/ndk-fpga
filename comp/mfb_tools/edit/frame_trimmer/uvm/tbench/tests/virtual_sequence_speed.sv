@@ -29,6 +29,8 @@ class virtual_sequence_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     endfunction
 
     task body();
+        init();
+
         // Run the reset sequence
         fork
             begin

@@ -28,7 +28,6 @@ class test_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_
         phase.raise_objection(this);
 
         // Run the virtual sequence
-        m_virtual_sequence.init();
         assert(m_virtual_sequence.randomize());
         m_virtual_sequence.start(m_env.m_virtual_sequencer);
 
