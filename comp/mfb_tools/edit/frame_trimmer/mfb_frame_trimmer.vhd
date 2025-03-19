@@ -23,7 +23,7 @@ entity MFB_FRAME_TRIMMER is
         BLOCK_SIZE  : natural := 8;
         ITEM_WIDTH  : natural := 8;
         META_WIDTH  : natural := 8;
-        LEN_WIDTH   : natural := 14;
+        PKT_MTU     : natural := 2**14;
         DEVICE      : string  := "AGILEX"
     );
     port(
@@ -35,7 +35,7 @@ entity MFB_FRAME_TRIMMER is
         -- New frame length after trimming in ITEMS, max value is original frame
         -- length, min value is ((BLOCK_SIZE*ITEM_WIDTH)-(ITEM_WIDTH-1)).
         -- The new length is valid with RX_TRIM_EN.
-        RX_TRIM_LEN    : in  std_logic_vector(REGIONS*LEN_WIDTH-1 downto 0);
+        RX_TRIM_LEN    : in  std_logic_vector(REGIONS*log2(PKT_MTU+1)-1 downto 0);
         RX_DATA        : in  std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
         -- User metadata valid with RX_SOF.
         RX_META        : in  std_logic_vector(REGIONS*META_WIDTH-1 downto 0);
@@ -60,6 +60,7 @@ end entity;
 
 architecture FULL of MFB_FRAME_TRIMMER is
 
+    constant LEN_WIDTH      : natural := log2(PKT_MTU+1+REGIONS*REGION_SIZE*BLOCK_SIZE);
     constant REGION_ITEMS   : natural := REGION_SIZE*BLOCK_SIZE;
     constant SOF_POS_WIDTH  : natural := log2(REGION_SIZE);
     constant EOF_POS_WIDTH  : natural := log2(REGION_ITEMS);
