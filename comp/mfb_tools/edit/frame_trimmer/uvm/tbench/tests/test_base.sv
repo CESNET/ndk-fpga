@@ -3,11 +3,11 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class test_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH) extends uvm_test;
-    typedef uvm_component_registry #(test::test_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH), "test::test_base") type_id;
+class test_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) extends uvm_test;
+    typedef uvm_component_registry #(test::test_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU), "test::test_base") type_id;
 
     // Verification environment
-    uvm_mfb_frame_trimmer::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH) m_env;
+    uvm_mfb_frame_trimmer::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) m_env;
 
     // Constructor
     function new(string name = "test_base", uvm_component parent = null);
@@ -17,12 +17,12 @@ class test_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
-        m_env = uvm_mfb_frame_trimmer::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH)::type_id::create("m_env", this);
+        m_env = uvm_mfb_frame_trimmer::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_env", this);
     endfunction
 
     task run_phase(uvm_phase phase);
         time end_time;
-        virtual_sequence_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH) m_virtual_sequence = virtual_sequence_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH)::type_id::create("m_virtual_sequence", this);
+        virtual_sequence_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) m_virtual_sequence = virtual_sequence_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_virtual_sequence", this);
 
         // Raise objection
         phase.raise_objection(this);

@@ -16,7 +16,7 @@ package test;
     parameter BLOCK_SIZE  = 8;
     parameter ITEM_WIDTH  = 8;
     parameter META_WIDTH  = 8;
-    parameter LEN_WIDTH   = 14;
+    parameter PKT_MTU     = 2**14;
 
     parameter DEVICE = "AGILEX";
 
