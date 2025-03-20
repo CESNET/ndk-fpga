@@ -217,12 +217,7 @@ module testbench;
 
     // PCIe Hard IP connection
     generate
-        // Physical endpoints
-        for (genvar pcie_connection = 0; pcie_connection < PCIE_CONS; pcie_connection++) begin
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_hip_clk[pcie_connection] = PCIE_USER_CLK;
-        end
-
-        // Logical endpoints (bifurcation)
+        // PCIE endpoints
         for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
             // UP HDR
             wire logic [3  -1 : 0] up_hdr_init;
@@ -245,6 +240,7 @@ module testbench;
             wire logic [3*4-1 : 0] down_data_update_cnt;
             wire logic [3  -1 : 0] down_data_init_ack;
 
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_clk[pcie_e] = PCIE_USER_CLK;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_link_up_comb[pcie_e]  = '1;
 
             for (genvar pcie_r = 0; pcie_r < CQ_MFB_REGIONS; pcie_r++) begin
