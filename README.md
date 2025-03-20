@@ -28,6 +28,7 @@ Before you get started, there are a few requirements that you need to have.
     - PRO DESIGN FALCON Stratix 10 (only EXPERIMENTAL support)
     - Terasic Mercury A2700 Accelerator Card
     - iWave G35P Accelerator card
+    - Napatech NT200A02
 - Other supported FPGA cards in the NDK framework but not available as open-source:
     - Netcope NFB-200G2QL card
 - To control an FPGA card with an application based on the NDK framework, you also need:

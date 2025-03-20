@@ -1,0 +1,411 @@
+-- fpga.vhd: Napatech NT200A02 board top level entity and architecture
+-- Copyright (C) 2025 DynaNIC Semiconductors s.r.o.
+-- Author(s): Jan Privara <privara@dyna-nic.com>
+--
+-- SPDX-License-Identifier: BSD-3-Clause
+
+library ieee;
+library unisim;
+library xpm;
+
+use xpm.vcomponents.all;
+
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+use work.combo_const.all;
+use work.combo_user_const.all;
+
+use work.math_pack.all;
+use work.type_pack.all;
+use work.dma_bus_pack.all;
+
+use unisim.vcomponents.all;
+
+entity FPGA is
+port (
+    -- 50 MHz external clocks
+    SYSCLK              : in    std_logic;
+
+    -- QSPI flash in-system configuration
+    SPI_CFG_CCLK        : inout std_logic;
+    SPI_CFG_FCS_B       : inout std_logic;
+    SPI_CFG_D           : inout std_logic_vector(3 downto 0);
+
+    -- PCIe
+    PCIE_SYSCLK_P       : in    std_logic;
+    PCIE_SYSCLK_N       : in    std_logic;
+
+    PCIE_SYSRST         : in    std_logic;
+
+    PCIE_RX_P           : in    std_logic_vector(PCIE_LANES -1 downto 0);
+    PCIE_RX_N           : in    std_logic_vector(PCIE_LANES -1 downto 0);
+    PCIE_TX_P           : out   std_logic_vector(PCIE_LANES -1 downto 0);
+    PCIE_TX_N           : out   std_logic_vector(PCIE_LANES -1 downto 0);
+
+    -- QSFP management interface
+    QSFP_INT_B         : in    std_logic_vector(1 downto 0);
+    QSFP_LPMODE        : out   std_logic_vector(1 downto 0);
+    QSFP_MODPRS_B      : in    std_logic_vector(1 downto 0);
+    QSFP_RESET_B       : out   std_logic_vector(1 downto 0);
+    QSFP_SCL           : inout std_logic_vector(1 downto 0);
+    QSFP_SDA           : inout std_logic_vector(1 downto 0);
+
+    -- QSFP data
+    QSFP0_REFCLK_P      : in    std_logic;
+    QSFP0_REFCLK_N      : in    std_logic;
+    QSFP0_RX_P          : in    std_logic_vector(3 downto 0);
+    QSFP0_RX_N          : in    std_logic_vector(3 downto 0);
+    QSFP0_TX_P          : out   std_logic_vector(3 downto 0);
+    QSFP0_TX_N          : out   std_logic_vector(3 downto 0);
+
+    QSFP1_REFCLK_P      : in    std_logic;
+    QSFP1_REFCLK_N      : in    std_logic;
+    QSFP1_RX_P          : in    std_logic_vector(3 downto 0);
+    QSFP1_RX_N          : in    std_logic_vector(3 downto 0);
+    QSFP1_TX_P          : out   std_logic_vector(3 downto 0);
+    QSFP1_TX_N          : out   std_logic_vector(3 downto 0);
+
+    -- QSFP LEDs
+    QSFP0_LED           : out   std_logic_vector(3 downto 0);
+    QSFP1_LED           : out   std_logic_vector(3 downto 0);
+
+    -- Debug LEDs
+    TS_LED_GREEN        : out   std_logic;
+    TS_LED_RED          : out   std_logic;
+    DEBUG_LED           : out   std_logic_vector(3 downto 0) := (others => '0')
+);
+end entity;
+
+architecture FULL of FPGA is
+
+    constant PCIE_CLKS           : integer := 1;
+    constant PCIE_CONS           : integer := 1;
+    constant MISC_IN_WIDTH       : integer := 4;
+    constant MISC_OUT_WIDTH      : integer := 4;
+    constant ETH_LANES           : integer := 4;
+    constant DMA_ENDPOINTS       : integer := PCIE_ENDPOINTS;
+    constant ETH_LANE_MAP        : integer_vector(2*ETH_LANES-1 downto 0) := (2, 0, 1, 3, 2, 0, 1, 3);
+    constant ETH_LANE_RXPOLARITY : std_logic_vector(2*ETH_LANES-1 downto 0) := "01100111";
+    constant ETH_LANE_TXPOLARITY : std_logic_vector(2*ETH_LANES-1 downto 0) := "00101100";
+    constant DEVICE              : string  := "ULTRASCALE";
+
+    signal sysclk_ibuf      : std_logic;
+    signal sysclk_bufg      : std_logic;
+    signal sysrst_cnt       : unsigned(4 downto 0) := (others => '0');
+    signal sysrst           : std_logic := '1';
+
+    signal pcie_ref_clk_p   : std_logic_vector(PCIE_CLKS-1 downto 0);
+    signal pcie_ref_clk_n   : std_logic_vector(PCIE_CLKS-1 downto 0);
+
+    signal pcie_sysrst_n    : std_logic;
+
+    signal eth_refclk_p     : std_logic_vector(2-1 downto 0);
+    signal eth_refclk_n     : std_logic_vector(2-1 downto 0);
+    signal eth_rx_p         : std_logic_vector(2*ETH_LANES-1 downto 0);
+    signal eth_rx_n         : std_logic_vector(2*ETH_LANES-1 downto 0);
+    signal eth_tx_p         : std_logic_vector(2*ETH_LANES-1 downto 0);
+    signal eth_tx_n         : std_logic_vector(2*ETH_LANES-1 downto 0);
+
+    signal boot_mi_clk      : std_logic;
+    signal boot_mi_reset    : std_logic;
+    signal boot_mi_addr     : std_logic_vector(32-1 downto 0);
+    signal boot_mi_dwr      : std_logic_vector(32-1 downto 0);
+    signal boot_mi_wr       : std_logic;
+    signal boot_mi_rd       : std_logic;
+    signal boot_mi_be       : std_logic_vector((32/8)-1 downto 0);
+    signal boot_mi_ardy     : std_logic;
+    signal boot_mi_drd      : std_logic_vector(32-1 downto 0);
+    signal boot_mi_drdy     : std_logic;
+    -- ICAPE3 Controller
+    signal boot_reset       : std_logic;
+    signal boot_clk         : std_logic;
+    signal icap_avail       : std_logic;
+    signal icap_csib        : std_logic;
+    signal icap_rdwrb       : std_logic;
+    signal icap_di          : std_logic_vector(32-1 downto 0);
+    signal icap_do          : std_logic_vector(32-1 downto 0);
+
+    -- AXI QSPI Flash Controller
+    signal axi_spi_clk      : std_logic;
+    signal axi_mi_addr_s    : std_logic_vector(8-1 downto 0);
+    signal axi_mi_dwr_s     : std_logic_vector(32-1 downto 0);
+    signal axi_mi_wr_s      : std_logic;
+    signal axi_mi_rd_s      : std_logic;
+    signal axi_mi_be_s      : std_logic_vector((32/8)-1 downto 0);
+    signal axi_mi_ardy_s    : std_logic;
+    signal axi_mi_drd_s     : std_logic_vector(32-1 downto 0);
+    signal axi_mi_drdy_s    : std_logic;
+
+    signal misc_in          : std_logic_vector(MISC_IN_WIDTH-1 downto 0) := (others => '0');
+    signal misc_out         : std_logic_vector(MISC_OUT_WIDTH-1 downto 0);
+
+    signal status_led_r     : std_logic_vector(2-1 downto 0);
+    signal status_led_g     : std_logic_vector(2-1 downto 0);
+    signal eth_led_g        : std_logic_vector((2*4)-1 downto 0);
+
+begin
+
+    sysclk_ibuf_i : IBUF
+    port map (
+        I  => SYSCLK,
+        O  => sysclk_ibuf
+    );
+
+    sysclk_bufg_i : BUFG
+    port map (
+        I => sysclk_ibuf,
+        O => sysclk_bufg
+    );
+
+    pcie_sysrst_n <= not PCIE_SYSRST;
+
+    -- reset after power up
+    process(sysclk_bufg)
+    begin
+        if rising_edge(sysclk_bufg) then
+            if (sysrst_cnt(sysrst_cnt'high) = '0') then
+                sysrst_cnt <= sysrst_cnt + 1;
+            end if;
+            sysrst <= not sysrst_cnt(sysrst_cnt'high);
+        end if;
+    end process;
+
+    -- QSFP MAPPING ------------------------------------------------------------
+    eth_refclk_p <= QSFP1_REFCLK_P & QSFP0_REFCLK_P;
+    eth_refclk_n <= QSFP1_REFCLK_N & QSFP0_REFCLK_N;
+
+    eth_rx_p <= QSFP1_RX_P & QSFP0_RX_P;
+    eth_rx_n <= QSFP1_RX_N & QSFP0_RX_N;
+
+    net_arch_empty_g: if (NET_MOD_ARCH /= "EMPTY") generate
+        QSFP1_TX_P <= eth_tx_p(2*ETH_LANES-1 downto 1*ETH_LANES);
+        QSFP1_TX_N <= eth_tx_n(2*ETH_LANES-1 downto 1*ETH_LANES);
+        QSFP0_TX_P <= eth_tx_p(1*ETH_LANES-1 downto 0*ETH_LANES);
+        QSFP0_TX_N <= eth_tx_n(1*ETH_LANES-1 downto 0*ETH_LANES);
+    end generate;
+
+    -- =========================================================================
+    -- BOOT AND FLASH
+    -- =========================================================================
+
+    axi_spi_clk     <= misc_out(0); -- usr_x1 = 100MHz
+    boot_clk        <= misc_out(2); -- usr_x2 = 200MHz
+    boot_reset      <= misc_out(3);
+
+    boot_ctrl_i : entity work.BOOT_CTRL
+    generic map(
+        ICAP_WBSTAR0 => X"00000000",
+        ICAP_WBSTAR1 => X"00000000",
+        DEVICE       => "ULTRASCALE",
+        BOOT_TYPE    => 1
+    )
+    port map(
+        MI_CLK        => boot_mi_clk,
+        MI_RESET      => boot_mi_reset,
+        MI_DWR        => boot_mi_dwr,
+        MI_ADDR       => boot_mi_addr,
+        MI_BE         => boot_mi_be,
+        MI_RD         => boot_mi_rd,
+        MI_WR         => boot_mi_wr,
+        MI_ARDY       => boot_mi_ardy,
+        MI_DRD        => boot_mi_drd,
+        MI_DRDY       => boot_mi_drdy,
+
+        BOOT_CLK      => boot_clk,
+        BOOT_RESET    => boot_reset,
+
+        BOOT_REQUEST  => open,
+        BOOT_IMAGE    => open,
+
+        ICAP_AVAIL    => icap_avail,
+        ICAP_CSIB     => icap_csib,
+        ICAP_RDWRB    => icap_rdwrb,
+        ICAP_DI       => icap_di,
+        ICAP_DO       => icap_do,
+
+        BMC_MI_ADDR   => open,
+        BMC_MI_DWR    => open,
+        BMC_MI_WR     => open,
+        BMC_MI_RD     => open,
+        BMC_MI_BE     => open,
+        BMC_MI_ARDY   => '0',
+        BMC_MI_DRD    => (others => '0'),
+        BMC_MI_DRDY   => '0',
+
+        AXI_MI_ADDR   => axi_mi_addr_s,
+        AXI_MI_DWR    => axi_mi_dwr_s,
+        AXI_MI_WR     => axi_mi_wr_s,
+        AXI_MI_RD     => axi_mi_rd_s,
+        AXI_MI_BE     => axi_mi_be_s,
+        AXI_MI_ARDY   => axi_mi_ardy_s,
+        AXI_MI_DRD    => axi_mi_drd_s,
+        AXI_MI_DRDY   => axi_mi_drdy_s
+    );
+
+    -- ICAPE3 CTRL
+    icape3_i : ICAPE3
+    generic map (
+       DEVICE_ID         => X"76543210", -- only for SIM
+       ICAP_AUTO_SWITCH  => "DISABLE",
+       SIM_CFG_FILE_NAME => "NONE"
+    )
+    port map (
+       AVAIL   => icap_avail,
+       O       => icap_do,
+       PRDONE  => open,
+       PRERROR => open,
+       CLK     => boot_clk,
+       CSIB    => icap_csib,
+       I       => icap_di,
+       RDWRB   => icap_rdwrb
+    );
+
+    axi_qspi_flash_i: entity work.axi_quad_flash_controller
+    port map(
+        -- clock and reset
+        SPI_CLK      => axi_spi_clk,
+        CLK          => boot_clk,
+        RST          => boot_reset,
+
+        -- MI32 protocol
+        AXI_MI_ADDR => axi_mi_addr_s,
+        AXI_MI_DWR  => axi_mi_dwr_s,
+        AXI_MI_WR   => axi_mi_wr_s,
+        AXI_MI_RD   => axi_mi_rd_s,
+        AXI_MI_BE   => axi_mi_be_s,
+        AXI_MI_ARDY => axi_mi_ardy_s,
+        AXI_MI_DRD  => axi_mi_drd_s,
+        AXI_MI_DRDY => axi_mi_drdy_s,
+
+        -- QSPI signals
+        QSPI_CLK    => SPI_CFG_CCLK,
+        QSPI_IO     => SPI_CFG_D,
+        QSPI_SS     => SPI_CFG_FCS_B
+    );
+
+    -- =========================================================================
+    -- FPGA COMMON
+    -- =========================================================================
+
+    cm_i : entity work.FPGA_COMMON
+    generic map (
+        SYSCLK_PERIOD           => 20.0,
+        PLL_MULT_F              => 24.0,
+        PLL_MASTER_DIV          => 1,
+        PLL_OUT0_DIV_F          => 3.0,
+        PLL_OUT1_DIV            => 4,
+        PLL_OUT2_DIV            => 6,
+        PLL_OUT3_DIV            => 12,
+
+        USE_PCIE_CLK            => False,
+
+        PCIE_LANES              => PCIE_LANES,
+        PCIE_CLKS               => PCIE_CLKS,
+        PCIE_CONS               => PCIE_CONS,
+        PCIE_ENDPOINTS          => PCIE_ENDPOINTS,
+        PCIE_ENDPOINT_TYPE      => PCIE_MOD_ARCH,
+        PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE,
+
+        DMA_ENDPOINTS           => DMA_ENDPOINTS,
+        DMA_MODULES             => DMA_MODULES,
+        DMA_RX_CHANNELS         => DMA_RX_CHANNELS/DMA_MODULES,
+        DMA_TX_CHANNELS         => DMA_TX_CHANNELS/DMA_MODULES,
+
+        ETH_CORE_ARCH           => NET_MOD_ARCH,
+        ETH_PORTS               => ETH_PORTS,
+        ETH_PORT_SPEED          => ETH_PORT_SPEED,
+        ETH_PORT_CHAN           => ETH_PORT_CHAN,
+        ETH_LANES               => ETH_LANES,
+        ETH_LANE_MAP            => ETH_LANE_MAP(ETH_PORTS*ETH_LANES-1 downto 0),
+        ETH_LANE_RXPOLARITY     => ETH_LANE_RXPOLARITY(ETH_PORTS*ETH_LANES-1 downto 0),
+        ETH_LANE_TXPOLARITY     => ETH_LANE_TXPOLARITY(ETH_PORTS*ETH_LANES-1 downto 0),
+        ETH_PORT_LEDS           => 4,
+        QSFP_PORTS              => ETH_PORTS,
+        QSFP_I2C_PORTS          => ETH_PORTS,
+        QSFP_I2C_TRISTATE       => true,
+
+        MEM_PORTS               => MEM_PORTS, -- must be 0
+
+        STATUS_LEDS             => 2,
+
+        MISC_IN_WIDTH           => MISC_IN_WIDTH,
+        MISC_OUT_WIDTH          => MISC_OUT_WIDTH,
+
+        BOARD                   => CARD_NAME,
+        DEVICE                  => DEVICE
+    )
+    port map(
+        SYSCLK                  => sysclk_bufg,
+        SYSRST                  => sysrst,
+
+        PCIE_SYSCLK_P           => pcie_ref_clk_p,
+        PCIE_SYSCLK_N           => pcie_ref_clk_n,
+        PCIE_SYSRST_N(0)        => pcie_sysrst_n,
+        PCIE_RX_P               => PCIE_RX_P,
+        PCIE_RX_N               => PCIE_RX_N,
+        PCIE_TX_P               => PCIE_TX_P,
+        PCIE_TX_N               => PCIE_TX_N,
+
+        ETH_REFCLK_P            => eth_refclk_p(ETH_PORTS-1 downto 0),
+        ETH_REFCLK_N            => eth_refclk_n(ETH_PORTS-1 downto 0),
+
+        ETH_RX_P                => eth_rx_p(ETH_PORTS*ETH_LANES-1 downto 0),
+        ETH_RX_N                => eth_rx_n(ETH_PORTS*ETH_LANES-1 downto 0),
+        ETH_TX_P                => eth_tx_p(ETH_PORTS*ETH_LANES-1 downto 0),
+        ETH_TX_N                => eth_tx_n(ETH_PORTS*ETH_LANES-1 downto 0),
+
+        ETH_LED_R               => open, -- no red LEDs present
+        ETH_LED_G               => eth_led_g,
+
+        QSFP_I2C_SCL            => QSFP_SCL,
+        QSFP_I2C_SDA            => QSFP_SDA,
+        QSFP_I2C_SDA_I          =>(others => '0'),
+        QSFP_I2C_SCL_I          =>(others => '0'),
+        QSFP_I2C_SCL_O          => open,
+        QSFP_I2C_SCL_OE         => open,
+        QSFP_I2C_SDA_O          => open,
+        QSFP_I2C_SDA_OE         => open,
+        QSFP_I2C_DIR            => open,
+
+        QSFP_MODSEL_N           => open,
+        QSFP_LPMODE             => QSFP_LPMODE,
+        QSFP_RESET_N            => QSFP_RESET_B,
+        QSFP_MODPRS_N           => QSFP_MODPRS_B,
+        QSFP_INT_N              => QSFP_INT_B,
+
+        MEM_CLK                 => (others => '0'),
+        MEM_RST                 => (others => '0'),
+
+        STATUS_LED_G            => status_led_g,
+        STATUS_LED_R            => status_led_r,
+
+        PCIE_CLK                => open,
+        PCIE_RESET              => open,
+
+        BOOT_MI_CLK             => boot_mi_clk,
+        BOOT_MI_RESET           => boot_mi_reset,
+        BOOT_MI_DWR             => boot_mi_dwr,
+        BOOT_MI_ADDR            => boot_mi_addr,
+        BOOT_MI_RD              => boot_mi_rd,
+        BOOT_MI_WR              => boot_mi_wr,
+        BOOT_MI_BE              => boot_mi_be,
+        BOOT_MI_DRD             => boot_mi_drd,
+        BOOT_MI_ARDY            => boot_mi_ardy,
+        BOOT_MI_DRDY            => boot_mi_drdy,
+
+        MISC_IN                 => misc_in,
+        MISC_OUT                => misc_out
+    );
+
+    pcie_ref_clk_p <= (others => PCIE_SYSCLK_P);
+    pcie_ref_clk_n <= (others => PCIE_SYSCLK_N);
+
+    -- QSPI LEDs (there are 4 green LEDs next to each QSFP)
+    QSFP1_LED <= eth_led_g(2*4-1 downto 1*4);
+    QSFP0_LED <= eth_led_g(1*4-1 downto 0*4);
+
+    TS_LED_GREEN <= status_led_g(0); -- pcie up
+    TS_LED_RED   <= status_led_r(0); -- heartbeat
+
+end architecture;

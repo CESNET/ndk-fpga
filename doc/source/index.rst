@@ -115,6 +115,7 @@ support a subset of these cards. A complete list of supported FPGA cards can be 
     ndk_cards/prodesign/pd-falcon/readme
     ndk_cards/terasic/a2700/readme
     ndk_cards/iwave/g35p/readme
+    ndk_cards/napatech/nt200a02/readme
 
 --------
 
