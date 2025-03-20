@@ -392,5 +392,5 @@ Notation: NUMBER_OF_CHANNELS x SPEED
 - `Intel F-tile Ethernet Hard IP User Guide <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug20313.pdf>`_
 - `Intel E-tile Ethernet Hard IP User Guide <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug20160.pdf>`_
 - `Intel E-Tile Transceiver PHY User Guide <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/ug/ug_etile_xcvr_phy.pdf>`_
-- `Xilinx Ultrascale+ CMAC Ethernet Hard IP User Guide <https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/cmac_usplus/v3_1/pg203-cmac-usplus.pdf>`_
-- `Xilinx LBUS documentation <https://docs.xilinx.com/r/en-US/pg165-cmac/User-Side-LBUS-Interface>`_
+- `Xilinx Ultrascale+ CMAC Ethernet Hard IP User Guide <https://docs.amd.com/r/en-US/pg203-cmac-usplus>`_
+- `Xilinx LBUS documentation <https://docs.amd.com/r/en-US/pg203-cmac-usplus/User-Side-LBUS-Interface>`_
