@@ -4,10 +4,11 @@ stagesFirmware(
     dir: 'apps/minimal/build/agi-fh400g',
     target: '400g1',
     tool: 'quartus',
-    project: 'agi-fh400g-minimal-400g1',
+    project: 'agi-fh400g-minimal-rev1-pcie2xgen5x8x8-400g1',
+    params: 'BOARD_REV=1 PCIE_CONF=2xgen5x8x8',
     pollscm: 'H H(0-11) * * 6',
     rpms: false,
     rename: false,
-    artifacts: 'agi-fh400g-minimal-400g1',
+    artifacts: 'agi-fh400g-minimal-rev1-pcie2xgen5x8x8-400g1',
     lastBuilds: 2,
 )

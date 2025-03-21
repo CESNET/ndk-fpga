@@ -3,10 +3,10 @@ library 'liberouter'
 stagesFirmware(
     dir: 'apps/minimal/build/fb2cghh',
     target: '100g2',
-    project: 'fb2cghh-minimal-100g2',
+    project: 'fb2cghh-minimal-pcie1xgen3x16-100g2',
     pollscm: 'H H(0-11) * * 6',
     rpms: false,
     rename: false,
-    artifacts: 'fb2cghh-minimal-100g2',
+    artifacts: 'fb2cghh-minimal-pcie1xgen3x16-100g2',
     lastBuilds: 2,
 )

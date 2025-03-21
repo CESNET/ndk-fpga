@@ -3,10 +3,10 @@ library 'liberouter'
 stagesFirmware(
     dir: 'apps/minimal/build/nfb-200g2ql',
     target: '100g2',
-    project: 'nfb-200g2ql-minimal-100g2',
+    project: 'nfb-200g2ql-minimal-pcie1xgen3x16-100g2',
     pollscm: 'H H(0-11) * * 6',
     rpms: false,
     rename: false,
-    artifacts: 'nfb-200g2ql-minimal-100g2',
+    artifacts: 'nfb-200g2ql-minimal-pcie1xgen3x16-100g2',
     lastBuilds: 2,
 )
