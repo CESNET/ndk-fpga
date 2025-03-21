@@ -28,7 +28,8 @@ class controler extends uvm_sequence;
         port  = 0;
 
         if (uvm_config_db#(nfb_driver::dev_tree)::get(null, "", "DevTree", devtree) == 0) begin
-            `uvm_fatal("controler", $sformatf("\n\t%s\n\tCannot get device tree", `__FILE__));
+            devtree = null;
+            //`uvm_fatal(this.get_full_name() , $sformatf("\n\t%s\n\tCannot get device tree", `__FILE__));
         end
     endfunction
 
