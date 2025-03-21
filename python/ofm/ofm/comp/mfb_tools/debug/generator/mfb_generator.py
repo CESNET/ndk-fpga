@@ -218,7 +218,8 @@ class MfbGenerator(nfb.BaseComp):
             raise ValueError(f"MAC address must be 6 bytes long (got {len(smac)})!")
         self._comp.write(self._REG_SRC_MAC_LOW, smac)
 
-    def convert_bytes2mac(self, mac: bytes, sep: str = "") -> Any:
+    @staticmethod
+    def convert_bytes2mac(mac: bytes, sep: str = "") -> Any:
         """Conver a 6-byte little-endian MAC address into big-endian with an optional formatting.
 
         Args:
@@ -242,7 +243,8 @@ class MfbGenerator(nfb.BaseComp):
             return sep.join(f'{byte:02x}' for byte in mac_bige)
         return mac_bige
 
-    def convert_mac2bytes(self, mac: Any, sep: str = "") -> bytes:
+    @staticmethod
+    def convert_mac2bytes(mac: Any, sep: str = "") -> bytes:
         """Convert a MAC address into a 6-byte little-endian.
 
         Args:
