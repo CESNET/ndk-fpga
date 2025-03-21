@@ -11,7 +11,11 @@
 COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/prodesign/pd-falcon
 APP_CONF = app_conf.tcl
-OUTPUT_NAME = pd-falcon
+
+PCIE_CONF ?= 1xgen3x16
+export PCIE_CONF
+
+OUTPUT_NAME = pd-falcon-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 100g2
 

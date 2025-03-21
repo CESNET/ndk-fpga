@@ -8,8 +8,10 @@ COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/terasic/a2700
 APP_CONF = app_conf.tcl
 
+PCIE_CONF ?= 1xgen5x8x8
+export PCIE_CONF
 
-OUTPUT_NAME = a2700-400g-minimal
+OUTPUT_NAME = a2700-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 400g1 200g2 100g2 100g4 50g8 40g2 25g8 10g8
 

@@ -12,7 +12,11 @@
 COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/iwave/g35p
 APP_CONF = app_conf.tcl
-OUTPUT_NAME = g35p-minimal
+
+PCIE_CONF ?= 1xgen3x16
+export PCIE_CONF
+
+OUTPUT_NAME = g35p-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 100g2
 
@@ -21,7 +25,7 @@ all: 100g2
 100g2: ETH_PORTS=2
 100g2: ETH_PORT_SPEED=100
 100g2: ETH_PORT_CHAN=1
-100g2: OUTPUT_NAME:=g35p-minimal-100g2
+100g2: OUTPUT_NAME:=$(OUTPUT_NAME)-100g2
 100g2: build
 
 include $(CARD_BASE)/src/card.mk

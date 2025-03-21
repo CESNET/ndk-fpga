@@ -10,15 +10,12 @@ COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/reflexces/agi-fh400g
 APP_CONF = app_conf.tcl
 
-ifndef BOARD_REV
-BOARD_REV = 1
-endif
+BOARD_REV ?= 1
+export BOARD_REV
+PCIE_CONF ?= 2xgen5x8x8
+export PCIE_CONF
 
-ifeq ($(BOARD_REV),0)
-OUTPUT_NAME = agi-fh400g-minimal
-else
-OUTPUT_NAME = agi-fh400g-minimal-rev$(BOARD_REV)
-endif
+OUTPUT_NAME = agi-fh400g-rev$(BOARD_REV)-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 1x400g-8 2x200g-4 4x100g-2 8x50g-1 2x40g-4 8x25g-1 8x10g-1 mr_2x100g-4 mr_8x25g-1_8x10g-1
 

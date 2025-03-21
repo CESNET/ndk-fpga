@@ -12,7 +12,11 @@
 COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/intel/dk-dev-1sdx-p
 APP_CONF = app_conf.tcl
-OUTPUT_NAME = dk-dev-1sdx-p-minimal
+
+PCIE_CONF ?= 1xgen4x16
+export PCIE_CONF
+
+OUTPUT_NAME = dk-dev-1sdx-p-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 100g2 25g8 10g8
 

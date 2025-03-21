@@ -11,7 +11,11 @@
 COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/extra/nfb-200g2ql
 APP_CONF = app_conf.tcl
-OUTPUT_NAME = nfb-200g2ql-minimal
+
+PCIE_CONF ?= 1xgen3x16
+export PCIE_CONF
+
+OUTPUT_NAME = nfb-200g2ql-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 100g2 40g2
 

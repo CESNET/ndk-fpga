@@ -12,7 +12,11 @@
 COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/silicom/fb2cghh
 APP_CONF = app_conf.tcl
-OUTPUT_NAME = fb2cghh-minimal
+
+PCIE_CONF ?= 1xgen3x16
+export PCIE_CONF
+
+OUTPUT_NAME = fb2cghh-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 100g2 40g2 25g8 10g8
 
@@ -21,7 +25,7 @@ all: 100g2 40g2 25g8 10g8
 100g2: ETH_PORTS=2
 100g2: ETH_PORT_SPEED=100
 100g2: ETH_PORT_CHAN=1
-100g2: OUTPUT_NAME:=fb2cghh-minimal-100g2
+100g2: OUTPUT_NAME:=$(OUTPUT_NAME)-100g2
 100g2: build
 
 40g2: ETH_PORTS=2

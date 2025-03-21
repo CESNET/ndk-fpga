@@ -11,7 +11,11 @@
 COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/amd/alveo-u55c
 APP_CONF = app_conf.tcl
-OUTPUT_NAME = alveo-u55c-minimal
+
+PCIE_CONF ?= 1xgen3x16
+export PCIE_CONF
+
+OUTPUT_NAME = alveo-u55c-minimal-pcie$(PCIE_CONF)
 
 ETH_PORT_SPEED=100
 ETH_PORT_CHAN=1
@@ -21,11 +25,11 @@ ETH_PORT_CHAN=1
 all: 100g2
 
 100g2: ETH_PORTS=2
-100g2: OUTPUT_NAME:=alveo-u55c-minimal-100g2
+100g2: OUTPUT_NAME:=$(OUTPUT_NAME)-100g2
 100g2: build
 
 100g0: ETH_PORTS=0
-100g0: OUTPUT_NAME:=alveo-u55c-minimal-noeth
+100g0: OUTPUT_NAME:=$(OUTPUT_NAME)-noeth
 100g0: build
 
 include $(CARD_BASE)/src/card.mk

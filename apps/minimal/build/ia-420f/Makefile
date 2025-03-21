@@ -11,7 +11,11 @@
 COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/bittware/ia-420f
 APP_CONF = app_conf.tcl
-OUTPUT_NAME = ia-420f-minimal
+
+PCIE_CONF ?= 1xgen4x16
+export PCIE_CONF
+
+OUTPUT_NAME = ia-420f-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 100g2 25g8 10g8
 
