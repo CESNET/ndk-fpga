@@ -76,3 +76,16 @@ proc dts_create_labeled_node {DTS alias name body} {
 proc dts_create_node {DTS name body} {
     uplevel 1 [list dts_create_labeled_node $DTS "" $name $body]
 }
+
+# Create default mi node
+proc dts_create_default_mi_node {DTS INDEX body} {
+    upvar 1 $DTS dts
+
+    append mi_body [subst {
+        dts_add_cells DTS
+        dts_appendprop_string DTS "compatible" "netcope,bus,mi"
+        dts_appendprop_string DTS "resource" "PCI$INDEX,BAR0"
+        dts_appendprop_int DTS "width" "0x20"
+    }] $body
+    uplevel 1 [list dts_create_labeled_node $DTS "mi${INDEX}" "mi_bus${INDEX}" "$mi_body"]
+}
