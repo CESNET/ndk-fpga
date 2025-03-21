@@ -3,12 +3,12 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class scoreboard #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned LEN_WIDTH) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_mfb_frame_trimmer::scoreboard #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH))
+class scoreboard #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends uvm_scoreboard;
+    `uvm_component_param_utils(uvm_mfb_frame_trimmer::scoreboard #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
 
     // RX analysis exports
-    uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))       analysis_export_rx_mfb_data;
-    uvm_analysis_export #(uvm_logic_vector::sequence_item #(META_WIDTH+1+LEN_WIDTH)) analysis_export_rx_mfb_meta;
+    uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))               analysis_export_rx_mfb_data;
+    uvm_analysis_export #(uvm_logic_vector::sequence_item #(META_WIDTH+1+$clog2(PKT_MTU+1))) analysis_export_rx_mfb_meta;
 
     // TX analysis exports
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)) analysis_export_tx_mfb_data;
@@ -19,12 +19,12 @@ class scoreboard #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned 
     uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(META_WIDTH))       comparer_meta;
 
     // Model
-    model #(ITEM_WIDTH, LEN_WIDTH) m_model;
+    model #(ITEM_WIDTH, PKT_MTU) m_model;
     // Meta splitter
-    meta_splitter #(META_WIDTH, LEN_WIDTH) m_meta_splitter;
+    meta_splitter #(META_WIDTH, PKT_MTU) m_meta_splitter;
 
     // High-level coverage model
-    coverage_model #(BLOCK_SIZE, ITEM_WIDTH, LEN_WIDTH) m_coverage_model;
+    coverage_model #(BLOCK_SIZE, ITEM_WIDTH, PKT_MTU) m_coverage_model;
 
     // Contructor
     function new(string name = "scoreboard", uvm_component parent = null);
@@ -53,13 +53,13 @@ class scoreboard #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned 
     function void build_phase(uvm_phase phase);
         comparer_data = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))::type_id::create("comparer_data", this);
         comparer_meta = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(META_WIDTH))      ::type_id::create("comparer_meta", this);
-        comparer_data.model_tr_timeout_set(1000us);
-        comparer_meta.model_tr_timeout_set(1000us);
+        comparer_data.model_tr_timeout_set(2000us);
+        comparer_meta.model_tr_timeout_set(2000us);
 
-        m_model         = model         #(ITEM_WIDTH, LEN_WIDTH)::type_id::create("m_model", this);
-        m_meta_splitter = meta_splitter #(META_WIDTH, LEN_WIDTH)::type_id::create("m_meta_splitter", this);
+        m_model         = model         #(ITEM_WIDTH, PKT_MTU)::type_id::create("m_model", this);
+        m_meta_splitter = meta_splitter #(META_WIDTH, PKT_MTU)::type_id::create("m_meta_splitter", this);
 
-        m_coverage_model = coverage_model #(BLOCK_SIZE, ITEM_WIDTH, LEN_WIDTH)::type_id::create("m_coverage_model", this);
+        m_coverage_model = coverage_model #(BLOCK_SIZE, ITEM_WIDTH, PKT_MTU)::type_id::create("m_coverage_model", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);

@@ -3,15 +3,15 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class model #(int unsigned ITEM_WIDTH, int unsigned LEN_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_mfb_frame_trimmer::model #(ITEM_WIDTH, LEN_WIDTH))
+class model #(int unsigned ITEM_WIDTH, int unsigned PKT_MTU) extends uvm_component;
+    `uvm_component_param_utils(uvm_mfb_frame_trimmer::model #(ITEM_WIDTH, PKT_MTU))
 
     // ------ //
     // Inputs //
     // ------ //
 
-    uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)) in_data;
-    uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(1+LEN_WIDTH))      in_trim;
+    uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))    in_data;
+    uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(1+$clog2(PKT_MTU+1))) in_trim;
 
     // ------- //
     // Outputs //
@@ -28,12 +28,12 @@ class model #(int unsigned ITEM_WIDTH, int unsigned LEN_WIDTH) extends uvm_compo
     endfunction
 
     task run_phase(uvm_phase phase);
-        uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)  in_data_item;
-        uvm_logic_vector::sequence_item       #(1+LEN_WIDTH) in_trim_item;
-        uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)  out_data_item;
+        uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)          in_data_item;
+        uvm_logic_vector::sequence_item       #(1+$clog2(PKT_MTU+1)) in_trim_item;
+        uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)          out_data_item;
 
-        logic trim_en;
-        logic [LEN_WIDTH-1 : 0] trim_len;
+        bit          trim_en;
+        int unsigned trim_len;
 
         forever begin
             in_data.get(in_data_item);
@@ -41,8 +41,8 @@ class model #(int unsigned ITEM_WIDTH, int unsigned LEN_WIDTH) extends uvm_compo
 
             out_data_item = uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)::type_id::create("out_data_item");
 
-            trim_len = in_trim_item.data[LEN_WIDTH-1 -: LEN_WIDTH];
-            trim_en  = in_trim_item.data[1+LEN_WIDTH-1 -: 1];
+            trim_len = in_trim_item.data[$clog2(PKT_MTU+1)  -1 -: $clog2(PKT_MTU+1)];
+            trim_en  = in_trim_item.data[1+$clog2(PKT_MTU+1)-1 -: 1];
 
             if (trim_en === 1'b1) begin
                 assert(trim_len <= in_data_item.size())

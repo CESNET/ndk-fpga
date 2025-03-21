@@ -3,7 +3,7 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH, DEVICE)
+module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU, DEVICE)
 (
     input logic CLK,
     input logic RST,
@@ -11,9 +11,9 @@ module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH
     mfb_if.dut_tx mfb_tx
 );
 
-    logic [REGIONS*LEN_WIDTH -1 : 0] mfb_rx_trim_len;
-    logic [REGIONS           -1 : 0] mfb_rx_trim_en;
-    logic [REGIONS*META_WIDTH-1 : 0] mfb_rx_meta;
+    logic [REGIONS*$clog2(PKT_MTU+1)-1 : 0] mfb_rx_trim_len;
+    logic [REGIONS                  -1 : 0] mfb_rx_trim_en;
+    logic [REGIONS*META_WIDTH       -1 : 0] mfb_rx_meta;
 
     MFB_FRAME_TRIMMER  #(
         .REGIONS     (REGIONS),
@@ -21,7 +21,7 @@ module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH
         .BLOCK_SIZE  (BLOCK_SIZE),
         .ITEM_WIDTH  (ITEM_WIDTH),
         .META_WIDTH  (META_WIDTH),
-        .LEN_WIDTH   (LEN_WIDTH),
+        .PKT_MTU     (PKT_MTU),
         .DEVICE      (DEVICE)
     ) VHDL_DUT_U (
         .CLK   (CLK),
@@ -53,13 +53,13 @@ module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH
 
     generate;
         for (genvar i = 0; i < REGIONS; i++) begin
-            logic [META_WIDTH+1+LEN_WIDTH-1 : 0] mfb_rx_meta_slice;
+            logic [META_WIDTH+1+$clog2(PKT_MTU+1)-1 : 0] mfb_rx_meta_slice;
 
-            assign mfb_rx_meta_slice = mfb_rx.META[(META_WIDTH+1+LEN_WIDTH)*(i+1)-1 -: META_WIDTH+1+LEN_WIDTH];
+            assign mfb_rx_meta_slice = mfb_rx.META[(META_WIDTH+1+$clog2(PKT_MTU+1))*(i+1)-1 -: META_WIDTH+1+$clog2(PKT_MTU+1)];
 
-            assign mfb_rx_trim_len[LEN_WIDTH*(i+1)-1 -: LEN_WIDTH]   = mfb_rx_meta_slice[LEN_WIDTH             -1 -: LEN_WIDTH];
-            assign mfb_rx_trim_en [i]                                = mfb_rx_meta_slice[1+LEN_WIDTH           -1 -: 1];
-            assign mfb_rx_meta    [META_WIDTH*(i+1)-1 -: META_WIDTH] = mfb_rx_meta_slice[META_WIDTH+1+LEN_WIDTH-1 -: META_WIDTH];
+            assign mfb_rx_trim_len[$clog2(PKT_MTU+1)*(i+1)-1 -: $clog2(PKT_MTU+1)] = mfb_rx_meta_slice[$clog2(PKT_MTU+1)             -1 -: $clog2(PKT_MTU+1)];
+            assign mfb_rx_trim_en [i]                                              = mfb_rx_meta_slice[1+$clog2(PKT_MTU+1)           -1 -: 1];
+            assign mfb_rx_meta    [META_WIDTH*(i+1)-1 -: META_WIDTH]               = mfb_rx_meta_slice[META_WIDTH+1+$clog2(PKT_MTU+1)-1 -: META_WIDTH];
         end
     endgenerate
 

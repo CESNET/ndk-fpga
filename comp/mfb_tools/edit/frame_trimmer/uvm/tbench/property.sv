@@ -3,7 +3,7 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-module mfb_frame_trimmer_property #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, LEN_WIDTH) (
+module mfb_frame_trimmer_property #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) (
         input  RESET,
         mfb_if mfb_rx,
         mfb_if mfb_tx
@@ -18,7 +18,7 @@ module mfb_frame_trimmer_property #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH
         .REGION_SIZE (REGION_SIZE),
         .BLOCK_SIZE  (BLOCK_SIZE),
         .ITEM_WIDTH  (ITEM_WIDTH),
-        .META_WIDTH  (META_WIDTH+1+LEN_WIDTH)
+        .META_WIDTH  (META_WIDTH+1+$clog2(PKT_MTU+1))
     )
     mfb_rx_prop (
         .RESET (RESET),

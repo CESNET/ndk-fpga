@@ -11,14 +11,14 @@ SETTINGS = {
         "BLOCK_SIZE"      : "8",
         "ITEM_WIDTH"      : "8",
         "META_WIDTH"      : "8",
-        "LEN_WIDTH"       : "14",
+        "PKT_MTU"         : "2**14",
         "DEVICE"          : "\\\"AGILEX\\\"",
         "__core_params__" : {"UVM_TEST": "test::test_base"}
     },
     # MFB presets
     "small" : {
-        "REGIONS"   : "1",
-        "LEN_WIDTH" : "12",
+        "REGIONS" : "1",
+        "PKT_MTU" : "2**12",
     },
     # DEVICE
     "device_stratix10" : {

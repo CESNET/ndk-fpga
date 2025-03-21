@@ -3,19 +3,21 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class coverage_model #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned LEN_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_mfb_frame_trimmer::coverage_model #(BLOCK_SIZE, ITEM_WIDTH, LEN_WIDTH))
+class coverage_model #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned PKT_MTU) extends uvm_component;
+    `uvm_component_param_utils(uvm_mfb_frame_trimmer::coverage_model #(BLOCK_SIZE, ITEM_WIDTH, PKT_MTU))
 
+    localparam int unsigned MAX_DATA_LENGTH = PKT_MTU;
     localparam int unsigned MIN_DATA_LENGTH = 64;
-    localparam int unsigned MAX_DATA_LENGTH = (2**LEN_WIDTH)-1;
+
+    localparam int unsigned MAX_TRIM_LENGTH = MAX_DATA_LENGTH;
     localparam int unsigned MIN_TRIM_LENGTH = (BLOCK_SIZE*ITEM_WIDTH)-(ITEM_WIDTH-1);
 
     // ------ //
     // Inputs //
     // ------ //
 
-    uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)) in_data;
-    uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(1+LEN_WIDTH))      in_trim;
+    uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))    in_data;
+    uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(1+$clog2(PKT_MTU+1))) in_trim;
 
     // ----------- //
     // Covergroups //
@@ -37,7 +39,7 @@ class coverage_model #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int uns
         }
     endgroup
 
-    covergroup trim_covergroup(string name = "trim_covergroup") with function sample(logic trim_en, logic [LEN_WIDTH-1 : 0] trim_len, bit is_trim_nop);
+    covergroup trim_covergroup(string name = "trim_covergroup") with function sample(bit trim_en, int unsigned trim_len, bit is_trim_nop);
         option.name = name;
         option.per_instance = 1;
 
@@ -56,8 +58,8 @@ class coverage_model #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int uns
         trim_length : coverpoint trim_len iff (trim_en === 1'b1)
         {
             bins min       = { MIN_TRIM_LENGTH };
-            bins max       = { MAX_DATA_LENGTH };
-            bins other[10] = { [MIN_TRIM_LENGTH+1 : MAX_DATA_LENGTH-1] };
+            bins max       = { MAX_TRIM_LENGTH };
+            bins other[10] = { [MIN_TRIM_LENGTH+1 : MAX_TRIM_LENGTH-1] };
         }
 
         // TRIM length = original frame length
@@ -74,18 +76,18 @@ class coverage_model #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int uns
         in_data = new("in_data", this);
         in_trim = new("in_trim", this);
 
-        data_covergroup = new("data_covergroup");
-        trim_covergroup = new("trim_covergroup");
+        data_covergroup = new({ get_full_name(), ".", "data_covergroup" });
+        trim_covergroup = new({ get_full_name(), ".", "trim_covergroup" });
     endfunction
 
     task run_phase(uvm_phase phase);
-        uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)  in_data_item;
-        uvm_logic_vector::sequence_item       #(1+LEN_WIDTH) in_trim_item;
+        uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)          in_data_item;
+        uvm_logic_vector::sequence_item       #(1+$clog2(PKT_MTU+1)) in_trim_item;
 
-        int unsigned            data_size;
-        logic                   trim_en;
-        logic [LEN_WIDTH-1 : 0] trim_len;
-        bit                     is_trim_nop;
+        int unsigned data_size;
+        bit          trim_en;
+        int unsigned trim_len;
+        bit          is_trim_nop;
 
         forever begin
             in_data.get(in_data_item);
@@ -93,8 +95,8 @@ class coverage_model #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int uns
 
             data_size = in_data_item.size();
 
-            trim_len    = in_trim_item.data[LEN_WIDTH-1 -: LEN_WIDTH];
-            trim_en     = in_trim_item.data[1+LEN_WIDTH-1 -: 1];
+            trim_len    = in_trim_item.data[$clog2(PKT_MTU+1)  -1 -: $clog2(PKT_MTU+1)];
+            trim_en     = in_trim_item.data[1+$clog2(PKT_MTU+1)-1 -: 1];
             is_trim_nop = (trim_len === data_size);
 
             data_covergroup.sample(data_size);
