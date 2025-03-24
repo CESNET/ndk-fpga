@@ -24,6 +24,8 @@ NDK firmware support
     - See the ``<NDK-FPGA_root_directory>/cards/bittware/ia-440i/config/card_conf.tcl`` file for supported PCIe configurations.
 - Makefile targets for building the NDK firmware (valid for NDK-APP-Minimal, may vary for other apps):
     - Use ``make 400g1`` command for firmware with 1x400GE (default).
+- Support for booting the NDK firmware using the nfb-boot tool:
+    - YES, starting with the nfb-framework version 6.26.0.
 
 .. note::
 
@@ -148,4 +150,4 @@ If everything is OK (card has been found and is available via USB), you can use 
 
 .. warning::
 
-   So far, there are features of the nfb framework that are not yet fully supported for this card (e. g. ``nfb-eth -T`` or ``nfb-boot``).
+   So far, there are features of the nfb framework that are not yet fully supported for this card (e. g. ``nfb-eth -T``).
