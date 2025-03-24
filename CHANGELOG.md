@@ -6,6 +6,64 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
+## [0.10.0] - 2025-03-XX
+
+### Added
+- cards: Introduced support for Napatech NT200A02 card.
+- cards: Introduced boot controller for the Bittware IA-440i card.
+- cards: Introduced DDR4 memory support for the Bittware IA-440i card.
+- build: Introduced loading device tree files to verifications.
+- core: Introduced parameterizable IOPLL for Altera FPGAs.
+- core: Added propagation the PCIE_GEN parameter to the PCIE_CORE module.
+- core: Integrated the frequency meter to the fpga_common.
+- comp: Introduced MFB MVB Prepender component.
+- comp: Introduced the frequency_meter component include Python module.
+- comp: Introduced the Python module for MFB Generator component.
+- comp: Added function for ORing together all items of an array into one vector in type_pack.
+- comp: Added function to resize items of an array in type_pack.
+- docs: Introduced NDK performance report.
+- uvm: Added interface properties to check correct behavioral in pcie-adapter-ver.
+- uvm: Added verification for MVB_MERGE_STREAMS module.
+- uvm: Added verification for MFB_FRAME_TRIMMER module.
+- uvm: Added sequence_min_max to uvm_logic_vector sequence library.
+- uvm: Added the sequence_inverted_gauss sequence.
+- uvm: Added support for build device tree in verifications.
+- ver: Created mvb speed meter for old verification.
+
+### Changed
+- cocotb: Update cocotb verifications for MVB_HASH_TABLE_SIMPLE and MVB_FIFOX.
+- build: Added print running time to end of simulation in multiver script.
+- cards: Set PCIe Gen5 x8x8 mode as default for IA-440i card.
+- cards: Made AGI-FH400G-REV0 card work again with older Quartus.
+- core: Added SDM_CTRL architecture compatible with older Quartus.
+- core: Revised R-Tile PCIe IP and add Gen4 x16 mode.
+- dma: Registered DMA Calypte reset for better timing.
+- dma: Refactored DMA Calypte include docs.
+- app: Set DMA channels to 32 on IA-440i card in Minimal app.
+- app: Used PCIE_CONF in FW build name.
+- app: Used 16 channels for DMA Calypte on R-Tile FPGAs.
+- uvm: Improved comparing data in scoreboard.
+
+### Removed
+- cards: Removed DK-DEV-AGI027RES card support.
+
+### Fixed
+- build: Fixed post-place physical optimization directive setting in Vivado.
+- cards: Fixed DMA_ENDPOINTS calculation on R-Tile cards.
+- core: Fixed multi-region support in DMA Calypte wrapper.
+- comp: Fixed setting the 100GBASE-SR4 mode in the Ethernet MGMT.
+- comp: Fixed optional PMA_TX_FAULT input in the Ethernet MGMT.
+- comp: Fixed fix latency histogram in MEM_TESTER module.
+- comp: Fixed test results checks in MEM_TESTER module.
+- comp: Removed ambiguous behaviour in MVB_DEMUX module due to DST/DST RDY loop.
+- comp: Fixed open ndp_read in dma tests and fix typo in dma_tx test in GLS module script.
+- comp: Used MTU_PKT instead of LEN_WIDTH in entity and prevent bit overflow in MFB_FRAME_TRIMMER. (BREAKING CHANGE!)
+- comp: Increased the length of signals to prevent a bit overflow in MFB_FRAME_EXTENDER. (BREAKING CHANGE!)
+- dma: Fixed send stop request after pointers have same values in DMA_CALYPTE.
+- uvm: Removed copy sw pointer from HW pointer when driver is shutting down channel in DMA_CALYPTE.
+- uvm: Fixed start generating data after first ready is set, reset ocurres.
+- uvm: Fixed generating valid signal with specific ready latency on AVST.
+
 ## [0.9.0] - 2025-01-13
 
 ### Added
