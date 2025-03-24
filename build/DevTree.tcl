@@ -40,6 +40,8 @@ proc DevTreeBuildString { } {
         set BUILD_TOOL_COMMAND "vivado -version 2>/dev/null | grep Vivado | head -n1"
     } elseif {$TOOL == "quartus"} {
         set BUILD_TOOL_COMMAND "quartus_sh --tcl_eval puts {Quartus \\\$quartus(version)}"
+    } elseif {$TOOL == "SIM"} {
+        set BUILD_TOOL_COMMAND "true"
     }
 
    # Get common build information

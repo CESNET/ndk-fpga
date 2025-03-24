@@ -15,34 +15,65 @@ class mi_sequence extends controler;
 
     protected uvm_mem mem;
     protected string  dev_tree;
-    protected string  inf_name;
 
     function new (string name = "controler");
         int pid;
         super.new(name);
-
-        inf_name = "nic";
     endfunction
 
-    function void component_set(uvm_mem comp, string dev_tree);
+    //parameter dev tree is deprecated and can be deleted anytime
+    function void component_set(uvm_mem comp, string dev_tree = "");
         this.mem      = comp;
-        this.dev_tree = dev_tree;
+
+        // preocess deprecated parameter dev_tree
+        if (devtree == null) begin
+            const string dt_name = $sformatf("dev_tree_deprecated_%0d", $urandom_range(0, 50000));
+            int dtb_ptr;
+            if(this.tree_compile(dt_name, dev_tree) == 0) begin
+                `uvm_fatal(this.get_full_name(), "\n\ŧCannot create and compile device tree");
+            end
+            devtree = new({dt_name, ".dtb"});
+        end
     endfunction
 
-    virtual function string tree_components();
-        return dev_tree;
+    // this function is deprecated and can be deleted anytime
+    function bit tree_compile(string name, string dev_tree);
+        const string author = "anonymous";
+        const string revision = "-1";
+        const string card_name = "NFB-VERIFICATION";
+        int dts;
+        int dtb_ptr;
+
+        dts = $fopen({name, ".dts"}, "w");
+        if(dts == 0) return 0;
+        $fwrite(dts, "/dts-v1/;\n\n");
+        $fwrite(dts, "/ {\n\n");
+        $fwrite(dts, "  firmware {\n");
+        $fwrite(dts, "    build-tool = \"ModelSim\";\n");
+        $fwrite(dts, "    build-author = \"%s\";\n", author);
+        $fwrite(dts, "    build-revision = \"%s\";\n", revision);
+        $fwrite(dts, "    build-time = <0x0>;\n");
+        $fwrite(dts, "    card-name = \"%s\";\n\n", card_name);
+        $fwrite(dts, "    mi0: mi_bus {\n");
+        $fwrite(dts, "      compatible = \"netcope,bus,mi\";\n");
+        $fwrite(dts, "      resource = \"PCI0,BAR0\";\n");
+        $fwrite(dts, "      width = <0x20>;\n");
+        $fwrite(dts, "      #address-cells = <1>;\n");
+        $fwrite(dts, "      #size-cells = <1>;\n\n");
+        $fwrite(dts, dev_tree);
+        $fwrite(dts, "\n    };\n  };\n};\n");
+        $fclose(dts);
+
+        if($system({"dtc -I dts -O dtb -o ", name, ".dtb ", name, ".dts"}) != 0) return 0;
+        return 1;
     endfunction
 
     virtual task run_program();
     endtask
 
-    //virtual task run_backhand();
-    //    this.serve();
-    //endtask
-
     task body();
         //Create interface
-        this.open(inf_name);
+        this.open();
         fork
             this.serve();
         join_none

@@ -19,31 +19,30 @@ class controler extends uvm_sequence;
 
     protected chandle       mq_id;
     protected int  unsigned port;
-    protected string        dev_name;
-    protected byte unsigned dtb[];
+    nfb_driver::dev_tree    devtree;
     protected bit           stop;
 
     function new (string name = "controler");
         super.new(name);
         mq_id = null;
         port  = 0;
+
+        if (uvm_config_db#(nfb_driver::dev_tree)::get(null, "", "DevTree", devtree) == 0) begin
+            devtree = null;
+            //`uvm_fatal(this.get_full_name() , $sformatf("\n\t%s\n\tCannot get device tree", `__FILE__));
+        end
     endfunction
 
-    function void open(string dev_name);
+    function void open();
         const string ip_addr = "0.0.0.0:";
-        string dev_tree_name;
         stop    = 0;
         mq_id   = nfb_sv_create(ip_addr, port);
         $fflush();
         if (mq_id == null) begin
-            `uvm_fatal("nfb_driver", {"\n\tCannot create grpc server ",  ip_addr, "\n\t\texample of address: \"0.0.0.0:\""})
+            `uvm_fatal(m_sequencer.get_full_name(), {"\n\tCannot create grpc server ",  ip_addr, "\n\t\texample of address: \"0.0.0.0:\""})
         end
 
-        dev_tree_name = $sformatf("%s_%0d", dev_name, port);
-        if (this.tree_compile(dev_tree_name) == 0) begin
-            `uvm_fatal("nfb_driver", {"\n\tCannot create device tree : ", dev_tree_name})
-        end
-        nfb_sv_set_fdt(mq_id, dtb);
+        nfb_sv_set_fdt(mq_id, devtree.data);
     endfunction
 
     function void close();
@@ -55,7 +54,7 @@ class controler extends uvm_sequence;
         chandle      cmd_ptr;
 
         if (mq_id == null) begin
-            `uvm_fatal("nfb_driver", "\n\tBefore you call server function you have to create grpc server");
+            `uvm_fatal(m_sequencer.get_full_name(), "\n\tBefore you call server function you have to create grpc server");
         end
 
         do begin
@@ -69,7 +68,7 @@ class controler extends uvm_sequence;
             cmd = stop ? 0 : cmd;
             case (cmd)
                 0 : ; //program logout
-                1 : nfb_sv_process(cmd_ptr, dtb);
+                1 : nfb_sv_process(cmd_ptr, devtree.data);
                 2 : begin
                     data = new[size];
                     nfb_sv_process(cmd_ptr, data);
@@ -89,43 +88,6 @@ class controler extends uvm_sequence;
         nfb_sv_close(mq_id);
         mq_id = null;
     endtask
-
-    function bit tree_compile(string name, string author = "anonymous", string revision = "0", string card_name = "NFB-VERIFICATION");
-        int dts;
-        int dtb_ptr;
-
-        dts = $fopen({name, ".dts"}, "w");
-        if(dts == 0) return 0;
-        $fwrite(dts, "/dts-v1/;\n\n");
-        $fwrite(dts, "/ {\n\n");
-        $fwrite(dts, "  firmware {\n");
-        $fwrite(dts, "    build-tool = \"ModelSim\";\n");
-        $fwrite(dts, "    build-author = \"%s\";\n", author);
-        $fwrite(dts, "    build-revision = \"%s\";\n", revision);
-        $fwrite(dts, "    build-time = <0x0>;\n");
-        $fwrite(dts, "    card-name = \"%s\";\n\n", card_name);
-        $fwrite(dts, "    mi0: mi_bus {\n");
-        $fwrite(dts, "      compatible = \"netcope,bus,mi\";\n");
-        $fwrite(dts, "      resource = \"PCI0,BAR0\";\n");
-        $fwrite(dts, "      width = <0x20>;\n");
-        $fwrite(dts, "      #address-cells = <1>;\n");
-        $fwrite(dts, "      #size-cells = <1>;\n\n");
-        $fwrite(dts, tree_components());
-        $fwrite(dts, "\n    };\n  };\n};\n");
-        $fclose(dts);
-
-        if($system({"dtc -I dts -O dtb -o ", name, ".dtb ", name, ".dts"}) != 0) return 0;
-
-        dtb_ptr = $fopen({name, ".dtb"}, "r");
-        if (dtb_ptr == 0) return 0;
-        $fread(dtb, dtb_ptr);
-        $fclose(dtb_ptr);
-        return 1;
-    endfunction
-
-    virtual function string tree_components();
-        return "";
-    endfunction
 
     virtual task write(logic [64-1:0] addr, byte unsigned data[]);
     endtask

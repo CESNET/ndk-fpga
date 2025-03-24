@@ -67,6 +67,22 @@ proc PrintLabel {LABEL} {
     puts "$lines\n$space $LABEL\n$lines"
 }
 
+# this process get prameters into array params
+# This coudl be remove if primary HARP is used.
+proc nb_parse_parameters {params} {
+    upvar 1 $params PARAMS
+
+    global env
+
+    if {[info exists env(CORE_PARAMS)]} {
+        foreach P $env(CORE_PARAMS) {
+            lassign [split $P "="] PARAM_NAME PARAM_VALUE
+            lappend PARAM_LIST $PARAM_NAME $PARAM_VALUE
+        }
+        array set PARAMS $PARAM_LIST
+    }
+}
+
 # Filter duplicate entries in list and preserve the order
 proc uniqueList {LIST} {
     set new {}
