@@ -104,8 +104,8 @@ architecture FULL of MFB_FRAME_EXTENDER is
     constant GEN_META_WIDTH : natural := USERMETA_WIDTH+LEN_WIDTH+1;
 
     signal rx_mvb_usermeta_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_WIDTH-1 downto 0);
-    signal rx_mvb_frame_length_arr  : slv_array_t(MFB_REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
-    signal rx_mvb_ext_size_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
+    signal rx_mvb_frame_length_arr  : slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+    signal rx_mvb_ext_size_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
 
     signal gen_mode                 : slv_array_t(MFB_REGIONS-1 downto 0)(2-1 downto 0);
     signal gen_len_ext_on           : u_array_t(MFB_REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
@@ -169,9 +169,9 @@ begin
     gen_meta_g : for rr in 0 to MFB_REGIONS-1 generate
         gen_mode(rr) <= RX_MVB_EXT_EN(rr) & RX_MVB_EXT_ONLY(rr);
 
-        gen_len_ext_on(rr)   <= unsigned(rx_mvb_frame_length_arr(rr)) + unsigned(rx_mvb_ext_size_arr(rr));
-        gen_len_ext_off(rr)  <= unsigned(rx_mvb_frame_length_arr(rr));
-        gen_len_ext_only(rr) <= unsigned(rx_mvb_ext_size_arr(rr));
+        gen_len_ext_on(rr)   <= resize(unsigned(rx_mvb_frame_length_arr(rr)), LEN_WIDTH) + resize(unsigned(rx_mvb_ext_size_arr(rr)), LEN_WIDTH);
+        gen_len_ext_off(rr)  <= resize(unsigned(rx_mvb_frame_length_arr(rr)), LEN_WIDTH);
+        gen_len_ext_only(rr) <= resize(unsigned(rx_mvb_ext_size_arr(rr)), LEN_WIDTH);
 
         -- psl assert_max_total_len_on_mode :
         --      assert always ((RX_MVB_SRC_RDY='1' and RX_MVB_DST_RDY='1' and RX_MVB_VLD(rr)='1' and gen_mode(rr)="10") -> ((unsigned('0' & rx_mvb_frame_length_arr(rr)) + unsigned('0' & rx_mvb_ext_size_arr(rr))) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
