@@ -65,6 +65,7 @@
 <li class="toctree-l2"><a class="reference internal" href="tsu.html">Time Stamp Unit</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
@@ -97,7 +98,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -109,6 +109,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -357,38 +358,43 @@
 <td><p>16</p></td>
 <td><p>Number of PCIe lanes in each PCIe connector</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie-card_id_width"><td><p>CARD_ID_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-pcie_gen"><td><p>PCIE_GEN</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>PCIe generation number</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-card_id_width"><td><p>CARD_ID_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Width of CARD/FPGA ID number</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie-ptc_disable"><td><p>PTC_DISABLE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-ptc_disable"><td><p>PTC_DISABLE</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Disable PTC module and allows direct connection of the DMA module to
 the PCIe IP RQ and RC interfaces.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie-dma_bar_enable"><td><p>DMA_BAR_ENABLE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie-dma_bar_enable"><td><p>DMA_BAR_ENABLE</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enable CQ/CC interface for DMA-BAR, condition DMA_PORTS=PCIE_ENDPOINTS</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie-xvc_enable"><td><p>XVC_ENABLE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-xvc_enable"><td><p>XVC_ENABLE</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enable of XCV IP, for Xilinx only</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie-misc_top2pcie_width"><td><p>MISC_TOP2PCIE_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie-misc_top2pcie_width"><td><p>MISC_TOP2PCIE_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between Top-Level FPGA design and PCIE core logic</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie-misc_pcie2top_width"><td><p>MISC_PCIE2TOP_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-misc_pcie2top_width"><td><p>MISC_PCIE2TOP_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between PCIE core logic and Top-Level FPGA design</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device</p></td>

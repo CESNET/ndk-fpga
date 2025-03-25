@@ -1,4 +1,4 @@
-.. _tx_dma_sw_manager:
+.. _tx_dma_calypte_sw_manager:
 
 Software Manager
 ================

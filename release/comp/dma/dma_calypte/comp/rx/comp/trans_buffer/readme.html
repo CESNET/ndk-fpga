@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_build/readme.html">Build System</a></li>
@@ -76,11 +77,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#resource-consumption">Resource consumption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#latency-report">Latency report</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tx/readme.html">TX DMA Calypte</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#maintainers">Maintainers</a></li>
 </ul>
 </li>
 </ul>
@@ -98,7 +102,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -110,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -144,8 +148,12 @@
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-rx_dma_calypte_trans_buffer">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">RX_DMA_CALYPTE_TRANS_BUFFER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-rx_dma_calypte_trans_buffer" title="Link to this definition"></a></dt>
-<dd><p>This component contols the successfull buffering of input data on the block specified by the
-<cite>BUFFERED_DATA_SIZE</cite> generic parameter. Whole buffer content is then set on the output MFB bus.</p>
+<dd><p>This component buffers input bus words to a bigger word of the size specified by the
+<code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">BUFFERED_DATA_SIZE</span></code> parameter. This buffered word is then set  on the output
+MFB bus. The buffering takes place even if the <code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">TX_MFB_DST_RDY</span></code> input is low in
+order to have a buffered word ready on the output.This buffer disables automatically when the
+<code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">BUFFERED_DATA_SIZE</span></code> equals the size of the <code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">RX_MFB_DATA</span></code> bus
+in bytes.</p>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -158,17 +166,24 @@
 <tr class="row-even" id="vhdl-gengeneric-rx_dma_calypte_trans_buffer-buffered_data_size"><td><p>BUFFERED_DATA_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>128</p></td>
-<td><p>The amount of data which needs to be buffered in bytes</p></td>
+<td><p>The amount of data which needs to be buffered (in bytes).
+Currently, only 128 is supported</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-rx_dma_calypte_trans_buffer-reg_out_en"><td><p>REG_OUT_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
-<td><p>Adds a skid buffer on the output</p></td>
+<td><p>Adds a skid buffer on the output, i.e. the output register FIFO that buffers data even when
+the receiver’s TX_MFB_DST_RDY is low.</p></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
 <td><p>MFB bus parameters</p></td>
 <td><p>=====</p></td>
-<td><p>The amount of regions is always set to 1</p></td>
+<td><p>The amount of regions is always set to 1, the supported combinations are</p>
+<ul class="simple">
+<li><p>(1, 32, 8)</p></li>
+<li><p>(1, 64, 8)</p></li>
+</ul>
+</td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-rx_dma_calypte_trans_buffer-rx_region_size"><td><p>RX_REGION_SIZE</p></td>
 <td><p>integer</p></td>
@@ -182,7 +197,7 @@
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-rx_dma_calypte_trans_buffer-rx_item_width"><td><p>RX_ITEM_WIDTH</p></td>
 <td><p>integer</p></td>
-<td><p>8)</p></td>
+<td><p>8</p></td>
 <td></td>
 </tr>
 </tbody>
@@ -254,7 +269,7 @@
 <tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_trans_buffer-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(max(1, log2(RX_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>The SOF_POS is propably useless because each output packet is aligned to the beginning of a word, only
+<td><p>The SOF_POS is probably useless because each output packet is aligned to the beginning of a word, only
 one block is used</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_trans_buffer-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>

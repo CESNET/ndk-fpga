@@ -67,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="tsu.html">Time Stamp Unit</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
@@ -99,7 +100,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -270,7 +271,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">MVB_CHANNEL</span></code> - the DMA channel number</p></li>
 </ul>
 <p>The MFB bus transfers the packet data, which may contain a user header before the payload data (e.g., an Ethernet packet). You can determine the presence of the user header and its length from the metadata in the <code class="docutils literal notranslate"><span class="pre">DMA_TX_MVB_HDR_META</span></code> signal (see below).</p>
-<p><strong>The format of the metadata for the DMA header (DMA_TX_MVB_HDR_META):</strong></p>
+<p id="hdr-meta-format"><strong>The format of the metadata for the DMA header (DMA_TX_MVB_HDR_META):</strong></p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Bit range</p></th>

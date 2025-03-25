@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_build/readme.html">Build System</a></li>
@@ -76,11 +77,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#resource-consumption">Resource consumption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#latency-report">Latency report</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../../../rx/readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">TX DMA Calypte</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#maintainers">Maintainers</a></li>
 </ul>
 </li>
 </ul>
@@ -98,7 +102,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -110,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -140,19 +144,28 @@
            <div itemprop="articleBody">
              
   <section id="channel-start-stop-control">
-<span id="tx-dma-chan-start-stop-ctrl"></span><h1>Channel Start/stop control<a class="headerlink" href="#channel-start-stop-control" title="Link to this heading"></a></h1>
+<span id="tx-dma-calypte-chan-start-stop-ctrl"></span><h1>Channel Start/stop control<a class="headerlink" href="#channel-start-stop-control" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-tx_dma_chan_start_stop_ctrl">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">TX_DMA_CHAN_START_STOP_CTRL</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-tx_dma_chan_start_stop_ctrl" title="Link to this definition"></a></dt>
-<dd><p>This component controls the acception of incoming frames according to the running state of a
-specific DMA channel. When channel is stopped, all incoming frames to that channel are dropped.
-When channel is running, all incoming frames on that channel are accepted and reach the
-output <em>USR_MFB_</em> bus. When a stop request of a channel comes when a frame is received on this
-channel, the frame is received till its end and all other frames will be dropped. The system
-works vice versa when a start request comes and a frame is dropped on a single channel.</p>
+<dd><p>This component accepts the incoming packets according to the running state (active/inactive) of a
+specific DMA channel. When channel is stopped, all incoming packets on that channel are dropped.
+When a channel is running, all incoming packets on that channel are accepted and passed to the
+output <em>USR_MFB_</em> interface. This component is a primary responder during the start/stop sequence
+on a channel. When a stop request is received on a channel during packet reception, the currently
+processed frame is received and all following packets are dropped. The system works vice versa
+when a start request arrives on a channel where the currently processed packet is dropped and the
+following ones are accepted.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>A frame can consist out of multiple smaller frames that are delimited by the DMA header.</p>
+<p>A packet comes split between multiple PCIe transactions followed by a PCIe transaction
+containing the DMA header.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The complexity of the architecture stems mostly from the pkt_acc_{pst,nst} FSM which
+gets more complex as MFB_REGIONS increase. Although the state of packet reception is
+channel-specific, it still needs to be established on a common MFB bus.</p>
 </div>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
@@ -173,45 +186,35 @@ works vice versa when a start request comes and a frame is dropped on a single c
 <td><p>8</p></td>
 <td><p>Total number of DMA Channels within this DMA Endpoint</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>Input PCIe interface parameters</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-pcie_mfb_regions"><td><p>PCIE_MFB_REGIONS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-mfb_regions"><td><p>MFB_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
-<td></td>
+<td><p>Input/output MFB interface parameters</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-pcie_mfb_region_size"><td><p>PCIE_MFB_REGION_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-pcie_mfb_block_size"><td><p>PCIE_MFB_BLOCK_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-pcie_mfb_item_width"><td><p>PCIE_MFB_ITEM_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
-<td><p>Others</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
-</tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
 <td><p>natural</p></td>
 <td><p>2**16 - 1</p></td>
-<td><p>Largest packet (in bytes) which can come out of USR_MFB interface</p></td>
+<td><p>Largest packet (in bytes) which can be transported by the TX DMA Calypte controller</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_chan_start_stop_ctrl-dbg_signal_width"><td><p>DBG_SIGNAL_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
-<td></td>
+<td><p>WARNING: Only for debug purposes. Determines the width of the debug signal in bits.</p></td>
 </tr>
 </tbody>
 </table>
@@ -240,32 +243,32 @@ works vice versa when a start request comes and a frame is dropped on a single c
 <td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-pcie_mfb_data"><td><p>PCIE_MFB_DATA</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-pcie_mfb_meta"><td><p>PCIE_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*(13 + (PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*(13 + (MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-pcie_mfb_sof"><td><p>PCIE_MFB_SOF</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-pcie_mfb_eof"><td><p>PCIE_MFB_EOF</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-pcie_mfb_sof_pos"><td><p>PCIE_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-pcie_mfb_eof_pos"><td><p>PCIE_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -285,32 +288,32 @@ works vice versa when a start request comes and a frame is dropped on a single c
 <td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-usr_mfb_meta"><td><p>USR_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*((PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-usr_mfb_sof"><td><p>USR_MFB_SOF</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-usr_mfb_eof"><td><p>USR_MFB_EOF</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-usr_mfb_sof_pos"><td><p>USR_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_chan_start_stop_ctrl-usr_mfb_eof_pos"><td><p>USR_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
@@ -380,7 +383,7 @@ works vice versa when a start request comes and a frame is dropped on a single c
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>Debug signals</p></td>
+<td><p>Debug signal</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Intel Agilex I-Series FPGA DK &mdash; NDK-FPGA  documentation</title>
+  <title>Napatech NT200A02 &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -19,8 +19,7 @@
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Silicom fb4CGg3@VU9P" href="../../silicom/fb4cgg3/readme.html" />
-    <link rel="prev" title="Intel Stratix 10 DX FPGA DK" href="../dk-dev-1sdx-p/readme.html" /> 
+    <link rel="prev" title="iWave G35P" href="../../iwave/g35p/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
@@ -78,12 +78,7 @@
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Intel Agilex I-Series FPGA DK</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#boot-instructions">Boot instructions</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -95,6 +90,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Napatech NT200A02</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jtag-programming">JTAG programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nfb-boot-information">nfb-boot information</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -111,9 +112,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Intel Agilex I-Series FPGA DK</li>
+      <li class="breadcrumb-item active">Napatech NT200A02</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../_sources/ndk_cards/intel/dk-dev-agi027res/readme.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../_sources/ndk_cards/napatech/nt200a02/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -121,27 +122,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="intel-agilex-i-series-fpga-dk">
-<span id="card-agi-dk"></span><h1>Intel Agilex I-Series FPGA DK<a class="headerlink" href="#intel-agilex-i-series-fpga-dk" title="Link to this heading"></a></h1>
+  <section id="napatech-nt200a02">
+<span id="card-napatech-nt200a02"></span><h1>Napatech NT200A02<a class="headerlink" href="#napatech-nt200a02" title="Link to this heading"></a></h1>
 <ul class="simple">
 <li><dl class="simple">
 <dt>Card information:</dt><dd><ul>
-<li><p>Vendor: Intel</p></li>
-<li><p>Name: Agilex I-Series FPGA Development Kit (DK-DEV-AGI027RES)</p></li>
-<li><p>Ethernet ports: 2x QSFP-DD (NDK firmware uses only QSFP-DD 1)</p></li>
-<li><p>PCIe conectors: Edge connector + optional MCIO connectors</p></li>
-<li><p><a class="reference external" href="https://www.intel.com/content/www/us/en/products/details/fpga/development-kits/agilex/i-series.html">FPGA Card Website</a></p></li>
-<li><p><a class="reference external" href="https://www.intel.com/content/www/us/en/docs/programmable/683288/current/overview.html">FPGA Card User Guide</a></p></li>
-<li><p><a class="reference external" href="https://www.intel.com/content/dam/altera-www/global/en_US/support/boards-kits/agilex/agilex-agi027-devkit-schematic-reva1-apr2021.pdf">FPGA Card Schematic</a></p></li>
+<li><p>Vendor: Napatech</p></li>
+<li><p>Name: NT200A02</p></li>
+<li><p>Ethernet ports: 2x QSFP28</p></li>
+<li><p>PCIe conectors: Edge connector</p></li>
+<li><p><a class="reference external" href="https://www.napatech.com/products/nt200a02-smartnic-capture">FPGA Card Website</a></p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
 <dt>FPGA specification:</dt><dd><ul>
-<li><p>FPGA part number: <code class="docutils literal notranslate"><span class="pre">AGIB027R29A1E2VR0</span></code></p></li>
-<li><p>Ethernet Hard IP: F-Tile (up to 400G Ethernet)</p></li>
-<li><p>PCIe Hard IP: R-Tile (up to PCIe Gen5 x16)</p></li>
+<li><p>FPGA part number: <code class="docutils literal notranslate"><span class="pre">xcvu5p-flva2104-2L-e</span></code></p></li>
+<li><p>Ethernet Hard IP: CMAC (100G Ethernet)</p></li>
+<li><p>PCIe Hard IP: USP</p></li>
 </ul>
 </dd>
 </dl>
@@ -149,60 +148,75 @@
 </ul>
 <section id="ndk-firmware-support">
 <h2>NDK firmware support<a class="headerlink" href="#ndk-firmware-support" title="Link to this heading"></a></h2>
-<ul class="simple">
+<ul>
 <li><dl class="simple">
-<dt>Ethernet cores that are supported in the NDK firmware:</dt><dd><ul>
-<li><p><a class="reference internal" href="../../../ndk_core/doc/eth.html#ndk-intel-net-mod"><span class="std std-ref">F-Tile in the Network Module</span></a></p></li>
+<dt>Ethernet cores that are supported in the NDK firmware:</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="../../../ndk_core/doc/eth.html#ndk-net-mod"><span class="std std-ref">CMAC in the Network Module</span></a></p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>PCIe cores that are supported in the NDK firmware:</dt><dd><ul>
-<li><p><a class="reference internal" href="../../../ndk_core/doc/pcie.html#ndk-intel-pcie-mod"><span class="std std-ref">R-Tile in the PCIe Module</span></a></p></li>
-<li><p>See the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/card/intel/dk-dev-agi027res/config/card_conf.tcl</span></code> file for supported PCIe configurations.</p></li>
+<dt>PCIe cores that are supported in the NDK firmware:</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="../../../ndk_core/doc/pcie.html#ndk-pcie-mod"><span class="std std-ref">USP in the PCIe Module</span></a></p></li>
+<li><p>See the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/card/napatech/nt200a02/config/card_conf.tcl</span></code> file for supported PCIe configurations.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Makefile targets for building the NDK firmware (valid for Minimal app, may vary for other apps):</dt><dd><ul>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">400g1</span></code> command for firmware with 1x400GbE (default).</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">200g2</span></code> command for firmware with 2x200GbE.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g4</span></code> command for firmware with 4x100GbE.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">50g8</span></code> command for firmware with 8x50GbE.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">40g2</span></code> command for firmware with 2x40GbE.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">25g8</span></code> command for firmware with 8x25GbE.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">10g8</span></code> command for firmware with 8x10GbE.</p></li>
+<dt>Makefile targets for building the NDK firmware (valid for Minimal app, may vary for other apps):</dt><dd><ul class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">100g2</span></code> command for firmware with 2x100GbE (default).</p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><dl class="simple">
+<li><dl>
 <dt>Support for booting the NDK firmware using the nfb-boot tool:</dt><dd><ul>
-<li><p>NO, see booting instructions bellow.</p></li>
+<li><dl>
+<dt>YES, starting with the nfb-framework version 6.26.4.</dt><dd><ul>
+<li><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is neccessary to reboot the OS after changing or rebooting the FW using nfb-boot, otherwise the FLASH memory will not be detected by the driver. See “nfb-boot information” below for details.</p>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>OR use JTAG (see “JTAG programming” below).</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
+</section>
+<section id="jtag-programming">
+<h2>JTAG programming<a class="headerlink" href="#jtag-programming" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Buld the firmware using <code class="docutils literal notranslate"><span class="pre">make</span></code> as described above (“Generate bitstream” using Vivado GUI flow)</p></li>
+<li><p>Connect USB cable to the JTAG interface of the card</p></li>
+<li><p>Open Hardware manager in Vivado</p></li>
+<li><p>Program the device</p></li>
+</ol>
+<p>For more information, refer to the <a class="reference external" href="https://docs.xilinx.com/r/2022.2-English/ug908-vivado-programming-debugging/Opening-the-Hardware-Manager?tocId=x0two8P7pmYkinePAp~Scg">Programming and debugging manual</a>
+of the Vivado</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro installed, including a valid license.</p>
+<p>To build the NDK firmware for this card, you must have the Xilinx Vivado installed, including a valid license.</p>
 </div>
 </section>
-<section id="boot-instructions">
-<h2>Boot instructions<a class="headerlink" href="#boot-instructions" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>After the NDK firmware build is complete, you will have a bitstream file called <code class="docutils literal notranslate"><span class="pre">my_bitstream.sof</span></code>.</p></li>
-<li><p>Use the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/cards/intel/dk-dev-agi027res/scripts/generate_pof.sh</span> <span class="pre">my_bitstream.sof</span></code> command to convert the bitstream file to .pof format for flash memory.</p></li>
-<li><p>On the host PC where the card is connected, write the .pof bitstream to the flash memory with the command <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/cards/intel/dk-dev-1sdx-p/scripts/write_pof.sh</span> <span class="pre">my_bitstream.pof</span></code>.</p></li>
-<li><p>You must power off and on the PC to power cycle it completely. Only then is the new NDK firmware loaded into the FPGA.</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This procedure requires the Intel Quartus to be installed and the PC must also be connected to the card using an USB cable (JTAG).</p>
-</div>
+<section id="nfb-boot-information">
+<h2>nfb-boot information<a class="headerlink" href="#nfb-boot-information" title="Link to this heading"></a></h2>
+<p>Currently, the <cite>nfb-boot</cite> functionality is limited to one firmware change per OS boot (PCIe reset). More precisely, the FLASH memory becomes unavailable to the driver upon the first FPGA reset initiated by the <cite>nfb-boot</cite> tool (internally performed by the ICAP primitive).</p>
+<p>It is possible to repeatedly access/write the firmware slot using <cite>nfb-boot -w0</cite> until <cite>nfb-boot -F0</cite> is executed. Then, it is still possible to repeatedly reboot the FW stored in the slot (<cite>nfb-boot -F0</cite>), but the OS must be rebooted in order to write the FW slot again.</p>
+<p>This limitation stems from the “PCI-RESET driven image switching” mechanism implemented by the BMC. The FLASH memory QSPI interface is duplicated to two QSPI interfaces on the FPGA:</p>
+<ol class="arabic simple">
+<li><p>The “native” QSPI interface used during the power-on FPGA configuration.</p></li>
+<li><p>The ISP (In-System update Programming) interface, which is routed to general-purpose FPGA pins.</p></li>
+</ol>
+<p>The BMC controls a switch, which activates one of these two interfaces.
+On card power-on (or cold reset), the native interface is activated so that the FPGA can load the FW from the FLASH memory. After that, the ISP interface is selected. The FLASH memory is now accessible to the FPGA through the ISP interface and this is the interface utilized by the <cite>nfb-boot</cite> tool. However, when the BMC detects a JTAG programming cable or when the FPGA is reset using the ICAP primitive, the FLASH interface is again switched to the native one (the FLASH memory can be written with Vivado HW Manager). That is why it is no longer possible to read or write the FLASH using the <cite>nfb-boot</cite>, but rebooting the FW (<cite>nfb-boot -F0</cite>) still works as it uses the native interface. The next OS reboot triggers a PCIe reset, which allows the BMC to “recover” and the ISP interface is activated again.</p>
 </section>
 </section>
 
@@ -210,8 +224,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../dk-dev-1sdx-p/readme.html" class="btn btn-neutral float-left" title="Intel Stratix 10 DX FPGA DK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../../silicom/fb4cgg3/readme.html" class="btn btn-neutral float-right" title="Silicom fb4CGg3@VU9P" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../../iwave/g35p/readme.html" class="btn btn-neutral float-left" title="iWave G35P" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

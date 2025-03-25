@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_build/readme.html">Build System</a></li>
@@ -76,11 +77,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#resource-consumption">Resource consumption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#latency-report">Latency report</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tx/readme.html">TX DMA Calypte</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#maintainers">Maintainers</a></li>
 </ul>
 </li>
 </ul>
@@ -98,7 +102,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -110,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -144,9 +148,13 @@
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-rx_dma_calypte_input_buffer">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">RX_DMA_CALYPTE_INPUT_BUFFER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-rx_dma_calypte_input_buffer" title="Link to this definition"></a></dt>
-<dd><p>This component accepts incoming data on the input and aligns them to the beginning block of the
-MFB bus. This component also splits a word which contains two packets. The purpose is to align
-the data se they can be easily buffered by whole words in the following component.</p>
+<dd><p>This component accepts incoming data on the input of the RX DMA and adjusts them in two steps:</p>
+<ol class="arabic simple">
+<li><p>A bus word that contains two packets (only one region is used, thus this only applies when one
+packet ends and another begins).</p></li>
+<li><p>A packet that begins in the middle of a bus word is aligned to the beginning of the word
+(i.e. to bit 0) in order to simplify buffering further in the design.</p></li>
+</ol>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>

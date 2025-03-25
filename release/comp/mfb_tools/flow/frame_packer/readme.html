@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
@@ -67,6 +68,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../debug/generator/readme.html">MFB Generator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../edit/frame_appender/readme.html">MFB MVB Appender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../edit/frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../edit/frame_prepender/readme.html">MFB MVB Prepender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../edit/frame_trimmer/readme.html">MFB FRAME TRIMMER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cutter_simple/readme.html">MFB Cutter Simple</a></li>
@@ -76,6 +78,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Frame Packer</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#known-bugs">Known bugs</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
@@ -120,7 +123,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -132,6 +134,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -457,6 +460,16 @@ The length and the channel ID are sent to the <code class="docutils literal notr
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <p>For more detailed description refer to <a class="reference external" href="https://www.vut.cz/www_base/zav_prace_soubor_verejne.php?file_id=267988">David Beneš’s master thesis</a>  (2023/2024)</p>
+</section>
+<section id="known-bugs">
+<h2>Known bugs<a class="headerlink" href="#known-bugs" title="Link to this heading"></a></h2>
+<p>There is a possible bug when sending the combination of small and large packets. In 400G
+version this could result in sending a packet larger than USR_PKT_SIZE_MAX.</p>
+<p>Another bug considers incomplete resetting logic of a signal that blocks the activation of the Timeout counter in the FP_TIMEOUT_EXT component.
+This bug occures in a verification when, at the end of the run, a Superpacket is sent due to a Timeout on a channel, and then one more packet
+(smaller than the size of the MFB word) arrives on this channel. It gets stuck in the Assembly/Temporary register forever as the Timeout counter
+gets unblocked only when the register “overflows” (i.e., a packet continues over this word). The solution should be to fix the reset logic for
+the <cite>timeout_block</cite> signal.</p>
 </section>
 </section>
 

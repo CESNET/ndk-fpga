@@ -19,7 +19,7 @@
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="MFB FRAME TRIMMER" href="../frame_trimmer/readme.html" />
+    <link rel="next" title="MFB MVB Prepender" href="../frame_prepender/readme.html" />
     <link rel="prev" title="MFB MVB Appender" href="../frame_appender/readme.html" /> 
 </head>
 
@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
@@ -67,6 +68,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../debug/generator/readme.html">MFB Generator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_appender/readme.html">MFB MVB Appender</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MFB FRAME EXTENDER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../frame_prepender/readme.html">MFB MVB Prepender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_trimmer/readme.html">MFB FRAME TRIMMER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/crossbarx_stream2/readme.html">CROSSBARX STREAM2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/cutter_simple/readme.html">MFB Cutter Simple</a></li>
@@ -116,7 +118,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -128,6 +129,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -259,14 +261,18 @@ where it is valid with SOF.</p>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_frame_extender-rx_mvb_frame_length"><td><p>RX_MVB_FRAME_LENGTH</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*log2(PKT_MTU)-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>RX MFB frame size in MFB items</p></td>
+<td><p>RX MFB frame size in MFB items
+Maximum size is PKT_MTU MFB items</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_frame_extender-rx_mvb_ext_size"><td><p>RX_MVB_EXT_SIZE</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*log2(PKT_MTU)-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Frame extension size in MFB items, but must be divisible by MFB_BLOCK_SIZE</p></td>
+<td><p>Frame extension size in MFB items, but must be divisible by MFB_BLOCK_SIZE
+Minimum size is 60 MFB items
+If EXT_EN is active and EXT_ONLY is not, then the sum of RX_MVB_FRAME_LENGTH and RX_MVB_EXT_SIZE cannot be higher than PKT_MTU
+If both EXT_EN and EXT_ONLY are active, then RX_MVB_EXT_SIZE cannot be higher than PKT_MTU</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_frame_extender-rx_mvb_ext_only"><td><p>RX_MVB_EXT_ONLY</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
@@ -406,7 +412,7 @@ are the same as on the TX_MVB_USERMETA signal.</p></td>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../frame_appender/readme.html" class="btn btn-neutral float-left" title="MFB MVB Appender" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../frame_trimmer/readme.html" class="btn btn-neutral float-right" title="MFB FRAME TRIMMER" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../frame_prepender/readme.html" class="btn btn-neutral float-right" title="MFB MVB Prepender" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

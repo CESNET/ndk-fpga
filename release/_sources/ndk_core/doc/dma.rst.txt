@@ -7,11 +7,12 @@ The DMA module
 The DMA module is a wrapper containing the DMA controller (DMA IP), auxiliary, and debug logic. The connection of the DMA module is shown in the block diagram below. The DMA module is parametric and handles different numbers of DMA streams. The number of DMA streams corresponds to the number of instantiated DMA controllers. The currently supported DMA controllers in NDK are:
 
 - **DMA Medusa IP** -- Closed-source DMA controller optimized for high throughput (up to 400 Gbps) and support for multiple PCIe endpoints. See the :ref:`DMA Medusa IP documentation <dma_medusa>` for a detailed description.
-- **DMA Calypte IP** -- Open-source DMA controller optimized for low latency communication and supports only one PCIe endpoint. DMA Calypte IP is still under development and not yet ready for use! See the :ref:`DMA Calypte IP documentation <dma_calypte>` for a detailed description.
+- **DMA Calypte IP** -- Open-source DMA controller optimized for low latency communication and supports only one PCIe endpoint. See the :ref:`DMA Calypte IP documentation <dma_calypte>` for a detailed description.
 
 .. note::
 
-    The DMA Medusa IP is not part of the open-source NDK. `You can get the NDK, including the DMA Medusa IP and professional support, through our partner BrnoLogic. <https://support.brnologic.com/>`_
+    The DMA Medusa IP is not part of the open-source NDK-FPGA.
+    For more information about IP availability, `see the section Partners in README.md file <https://github.com/CESNET/ndk-fpga/blob/devel/README.md#partners>`_.
 
 Each DMA stream consists of two buses: the :ref:`MFB bus <mfb_bus>` is used to transfer data packets, the :ref:`MVB bus <mvb_bus>` is used to transfer DMA instructions to each packet. How a user application should properly use these buses is described in :ref:`The Application chapter <ndk_app>`.
 

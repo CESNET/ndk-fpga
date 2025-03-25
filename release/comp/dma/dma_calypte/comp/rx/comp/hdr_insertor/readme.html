@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_build/readme.html">Build System</a></li>
@@ -76,11 +77,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#resource-consumption">Resource consumption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#latency-report">Latency report</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../tx/readme.html">TX DMA Calypte</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#maintainers">Maintainers</a></li>
 </ul>
 </li>
 </ul>
@@ -98,7 +102,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -110,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -309,30 +313,19 @@ beginning of the word.</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr_size"><td><p>HDRM_DMA_PCIE_HDR_SIZE</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td><p>log. 0 means header is 3 DW long
-log. 1 means header is 4 DW long</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr"><td><p>HDRM_DMA_PCIE_HDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr"><td><p>HDRM_DMA_PCIE_HDR</p></td>
 <td><p>std_logic_vector(127 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr_src_rdy"><td><p>HDRM_DMA_PCIE_HDR_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr_src_rdy"><td><p>HDRM_DMA_PCIE_HDR_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr_dst_rdy"><td><p>HDRM_DMA_PCIE_HDR_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr_dst_rdy"><td><p>HDRM_DMA_PCIE_HDR_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_data_pcie_hdr_size"><td><p>HDRM_DATA_PCIE_HDR_SIZE</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_data_pcie_hdr"><td><p>HDRM_DATA_PCIE_HDR</p></td>

@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_build/readme.html">Build System</a></li>
@@ -76,11 +77,14 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../../../readme.html">DMA Calypte</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#resource-consumption">Resource consumption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#latency-report">Latency report</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../../../../readme.html#local-subcomponents">Local Subcomponents</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="../../../rx/readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="../../readme.html">TX DMA Calypte</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../readme.html#maintainers">Maintainers</a></li>
 </ul>
 </li>
 </ul>
@@ -98,7 +102,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -110,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -144,9 +148,18 @@
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-tx_dma_metadata_extractor">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">TX_DMA_METADATA_EXTRACTOR</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-tx_dma_metadata_extractor" title="Link to this definition"></a></dt>
-<dd><p>This component processes the incoming PCIe transactions. This does not care about whole DMA
-frames delimited by the DMA header but processes all frames in general. The metadata on the
-output are chosen according their usefullness later in the design.</p>
+<dd><p>This component pre-processes the incoming PCIe transactions by extracting metadata from the PCIe
+header. These metadata include:</p>
+<ul class="simple">
+<li><p>Status if the current transaction contains a DMA header</p></li>
+<li><p>PCIe address</p></li>
+<li><p>Index of a channel that should process the transaction</p></li>
+<li><p>A byte enable signal assessing the validity of individual bytes within a one bus-word of
+<code class="xref vhdl vhdl-portsignal docutils literal notranslate"><span class="pre">USR_MFB_DATA</span></code>.</p></li>
+<li><p>The amount of bytes being transfered within the transaction.</p></li>
+<li><p>The First and Last Byte Enable field from the PCIe header of the
+transaction (used for creating the bus-word-wide byte enable signal)</p></li>
+</ul>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -164,29 +177,31 @@ output are chosen according their usefullness later in the design.</p>
 <tr class="row-odd" id="vhdl-gengeneric-tx_dma_metadata_extractor-channels"><td><p>CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
-<td><p>For generating outputs and calculating the DMA buffers address space</p></td>
+<td><p>The amount of instantiated channels to correctly specify the fields within the PCIe
+address.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-tx_dma_metadata_extractor-pointer_width"><td><p>POINTER_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>16</p></td>
-<td><p>Pointer with respect to bytes</p></td>
+<td><p>Width of a pointer to the data buffer to correctly specify the fields within the PCIe
+address</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_metadata_extractor-pcie_mfb_regions"><td><p>PCIE_MFB_REGIONS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_metadata_extractor-mfb_regions"><td><p>MFB_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
-<td></td>
+<td><p>Configuration of the input and output MFB interface</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_metadata_extractor-pcie_mfb_region_size"><td><p>PCIE_MFB_REGION_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_metadata_extractor-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-tx_dma_metadata_extractor-pcie_mfb_block_size"><td><p>PCIE_MFB_BLOCK_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_metadata_extractor-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-tx_dma_metadata_extractor-pcie_mfb_item_width"><td><p>PCIE_MFB_ITEM_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_metadata_extractor-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td></td>
@@ -218,32 +233,32 @@ output are chosen according their usefullness later in the design.</p>
 <td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-pcie_mfb_data"><td><p>PCIE_MFB_DATA</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-pcie_mfb_meta"><td><p>PCIE_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>More information about the content of this port can be found in <em>pcie_meta_pack</em></p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-pcie_mfb_sof"><td><p>PCIE_MFB_SOF</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-pcie_mfb_eof"><td><p>PCIE_MFB_EOF</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-pcie_mfb_sof_pos"><td><p>PCIE_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-pcie_mfb_eof_pos"><td><p>PCIE_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -263,32 +278,32 @@ output are chosen according their usefullness later in the design.</p>
 <td><p>Metadata are all valid with SOF except for USR_MFB_META_BYTE_EN.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_data"><td><p>USR_MFB_DATA</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_meta"><td><p>USR_MFB_META</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*(13 + (PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH)/8 + log2(CHANNELS) + 62 +1) -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*(13 + (MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8 + log2(CHANNELS) + 62 +1) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_sof"><td><p>USR_MFB_SOF</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_eof"><td><p>USR_MFB_EOF</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_sof_pos"><td><p>USR_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_metadata_extractor-usr_mfb_eof_pos"><td><p>USR_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1, log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>

@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
@@ -76,11 +77,18 @@
 <li class="toctree-l2"><a class="reference internal" href="../../pcie/convertors/readme.html">PCIE CONVERSION UNITS</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">DMA Calypte</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#supported-pcie-configurations">Supported PCIe Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resource-consumption">Resource consumption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#latency-report">Latency report</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#test-case-1-amd-fpga">Test case 1 (AMD FPGA)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test-case-2-intel-fpga">Test case 2 (Intel FPGA)</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#local-subcomponents">Local Subcomponents</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="comp/rx/readme.html">RX DMA Calypte</a></li>
 <li class="toctree-l4"><a class="reference internal" href="comp/tx/readme.html">TX DMA Calypte</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#maintainers">Maintainers</a></li>
 </ul>
 </li>
 </ul>
@@ -98,7 +106,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-agi027res/readme.html">Intel Agilex I-Series FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
@@ -110,6 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
 </ul>
 
         </div>
@@ -139,13 +147,24 @@
              
   <section id="dma-calypte">
 <span id="id1"></span><h1>DMA Calypte<a class="headerlink" href="#dma-calypte" title="Link to this heading"></a></h1>
-<p>This core provides simple DMA functionality for both RX and TX directions.
-The design was primary focused on the lowest latency possible for the
-transaction from the input of the DMA core to reach its output. The block scheme
-as well as its connection to the NDK design is provided in the following figure:</p>
-<figure class="align-center">
-<a class="reference internal image-reference" href="../../../_images/tx_calypte_block-dma_whole_block.svg"><img alt="../../../_images/tx_calypte_block-dma_whole_block.svg" src="../../../_images/tx_calypte_block-dma_whole_block.svg" style="width: 1000px;" />
+<p>This module allows simple DMA access to the host memory over the PCI Express interface for both,
+<em>Host-to-FPGA (H2F)</em> and <em>FPGA-to-Host (F2H)</em> directions.  The design was primarily focused on the
+lowest latency possible.  The module contains two controllers for each direction: the F2H (formerly
+named RX) and the H2F (formerly named TX) controller. These allow for the full-duplex transmission
+of packet data from/to the host memory. The controllers connect to the surrounding infrastructure
+using the <a class="reference internal" href="../../mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB bus</span></a>. The packet transmission is part of the Data Flow which is
+distinguished from the Control Flow. The Control Flow is established using the <a class="reference internal" href="../../mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus</span></a>
+that accesses internal Control and Status (C/S) registers. Each of the controllers contains multiple
+virtual channels that share the same MFB bus but have separate address spaces in the host memory.
+This allows for concurrent access from the host system. The block scheme of the DMA module is
+provided in the following figure:</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../../../_images/tx_calypte_block-dma_whole_alt.svg"><img alt="../../../_images/tx_calypte_block-dma_whole_alt.svg" src="../../../_images/tx_calypte_block-dma_whole_alt.svg" style="width: 580.5px; height: 432.0px;" />
 </a>
+<figcaption>
+<p><span class="caption-text">The block sheme of the DMA Calypte module and its integration into the NDK
+framework.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
 </figure>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-dma_calypte">
@@ -167,14 +186,24 @@ as well as its connection to the NDK design is provided in the following figure:
 <tr class="row-odd" id="vhdl-gengeneric-dma_calypte-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
-<td><p>Name of target device, the supported are:
-“ULTRASCALE”</p></td>
+<td><p>Name of target device, the supported are:</p>
+<ul class="simple">
+<li><p>“ULTRASCALE”</p></li>
+<li><p>“STRATIX10”</p></li>
+<li><p>“AGILEX”</p></li>
+</ul>
+</td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-dma_calypte-usr_mfb_regions"><td><p>USR_MFB_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
-<td><p>USER MFB data bus configuration
-Defines the total width of User data stream.</p></td>
+<td><p>USER MFB interface configuration that is used for user data stream. The alowed
+configurations are:</p>
+<ul class="simple">
+<li><p>(1,4,8,8)</p></li>
+<li><p>(1,8,8,8)</p></li>
+</ul>
+</td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-dma_calypte-usr_mfb_region_size"><td><p>USR_MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
@@ -191,37 +220,58 @@ Defines the total width of User data stream.</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>PCIe-side bus settings</p></td>
-<td><p>=====</p></td>
-<td><p>=====</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-hdr_meta_width"><td><p>HDR_META_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>24</p></td>
+<td><p>Width of User Header Metadata information</p>
+<ul class="simple">
+<li><p>on RX: added to the DMA header</p></li>
+<li><p>on TX: extracted from a DMA header</p></li>
+</ul>
+</td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-pcie_rq_mfb_regions"><td><p>PCIE_RQ_MFB_REGIONS</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Requester Request (RQ) MFB interface settings. The allowed configurations are:</p></td>
+<td><p>=====</p></td>
+<td><ul class="simple">
+<li><p>(1,1,8,32)</p></li>
+<li><p>(2,1,8,32)</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-pcie_rq_mfb_regions"><td><p>PCIE_RQ_MFB_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
-<td><p>Requester Request MFB interface configration, allowed configurations are:
-(1,1,8,32)</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-pcie_rq_mfb_region_size"><td><p>PCIE_RQ_MFB_REGION_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-pcie_rq_mfb_region_size"><td><p>PCIE_RQ_MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-pcie_rq_mfb_block_size"><td><p>PCIE_RQ_MFB_BLOCK_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-pcie_rq_mfb_block_size"><td><p>PCIE_RQ_MFB_BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-pcie_rq_mfb_item_width"><td><p>PCIE_RQ_MFB_ITEM_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-pcie_rq_mfb_item_width"><td><p>PCIE_RQ_MFB_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td></td>
 </tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Completer Request (CQ) MFB interface settings. The allowed configurations are:</p></td>
+<td><p>=====</p></td>
+<td><ul class="simple">
+<li><p>(1,1,8,32)</p></li>
+<li><p>(2,1,8,32)</p></li>
+</ul>
+</td>
+</tr>
 <tr class="row-odd" id="vhdl-gengeneric-dma_calypte-pcie_cq_mfb_regions"><td><p>PCIE_CQ_MFB_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
-<td><p>Completer Request MFB interface configration, allowed configurations are:
-(1,1,8,32)</p></td>
+<td></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-dma_calypte-pcie_cq_mfb_region_size"><td><p>PCIE_CQ_MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
@@ -238,103 +288,95 @@ Defines the total width of User data stream.</p></td>
 <td><p>32</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-hdr_meta_width"><td><p>HDR_META_WIDTH</p></td>
-<td><p>natural</p></td>
-<td><p>24</p></td>
-<td><p>Width of User Header Metadata information
-on RX: added to header sent to header Buffer in RAM
-on TX: extracted from descriptor and propagated to output</p></td>
-</tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>RX DMA settings</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX DMA controller settings</p></td>
 <td><p>=====</p></td>
-<td><p>Settings for RX direction of DMA Module</p></td>
+<td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-rx_channels"><td><p>RX_CHANNELS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-rx_channels"><td><p>RX_CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
-<td><p>Total number of RX DMA Channels (multiples of 2 at best)
-Minimum: 4</p></td>
+<td><p>Total number of RX DMA Channels (powers of 2, starting at 2)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-rx_ptr_width"><td><p>RX_PTR_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-rx_ptr_width"><td><p>RX_PTR_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>16</p></td>
-<td><p>Width of Software and Hardware Descriptor Pointer
-Defines width of signals used for these values in DMA Module
-Affects logic complexity
-Maximum value: 32 (restricted by size of SDP and HDP MI register)</p></td>
+<td><ul class="simple">
+<li><p>Width of Software and Hardware Header/DataPointer.</p></li>
+<li><p>Affects logic complexity (MI C/S registers especially)</p></li>
+<li><p>Maximum value: 16</p></li>
+</ul>
+</td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-usr_rx_pkt_size_max"><td><p>USR_RX_PKT_SIZE_MAX</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-usr_rx_pkt_size_max"><td><p>USR_RX_PKT_SIZE_MAX</p></td>
 <td><p>natural</p></td>
 <td><p>2**12</p></td>
-<td><p>Maximum size of a User packet (in bytes)
-Defines width of Packet length signals.
-the maximum is 2**16 - 1</p></td>
+<td><p>Maximum size of a User packet in bytes (in interval between 60 and  2**12, inclusively)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-trbuf_reg_en"><td><p>TRBUF_REG_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-trbuf_reg_en"><td><p>TRBUF_REG_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enables an additional register of the transaction buffer that improves
-throughput</p></td>
+throughput (see <a class="reference internal" href="comp/rx/comp/trans_buffer/readme.html#rx-dma-calypte-trans-buffer"><span class="std std-ref">Transaction Buffer</span></a>)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-perf_cntr_en"><td><p>PERF_CNTR_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-perf_cntr_en"><td><p>PERF_CNTR_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enables performance counters alowing metrics generation.</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>TX DMA settings</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX DMA controller settings</p></td>
 <td><p>=====</p></td>
-<td><p>Settings for TX direction of DMA Module</p></td>
+<td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_channels"><td><p>TX_CHANNELS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_channels"><td><p>TX_CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
-<td><p>Total number of TX DMA Channels
-Minimum value: TX_SEL_CHANNELS*DMA_ENDPOINTS</p></td>
+<td><p>Total number of TX DMA Channels (powers of 2, starting at 2)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_ptr_width"><td><p>TX_PTR_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_ptr_width"><td><p>TX_PTR_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>14</p></td>
-<td><p>Width of Software and Hardware Descriptor Pointer
-Defines width of signals used for these values in DMA Module
-Affects logic complexity
-Maximum value: 32 (restricted by size of SDP and HDP MI register)</p></td>
+<td><p>13</p></td>
+<td><ul class="simple">
+<li><p>Width of the Hardware Descriptor Pointer</p></li>
+<li><p>Significantly affects the complexity of the controller (the C/S registers as well as
+buffers to store packets within each channel).</p></li>
+<li><p>Maximum value: 13 (restricted as a compromise between the size of a controller and
+maximum intact size of a packet that the software can dispatch)</p></li>
+</ul>
+</td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-usr_tx_pkt_size_max"><td><p>USR_TX_PKT_SIZE_MAX</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-usr_tx_pkt_size_max"><td><p>USR_TX_PKT_SIZE_MAX</p></td>
 <td><p>natural</p></td>
 <td><p>2**12</p></td>
-<td><p>Maximum size of a User packet (in bytes)
-Defines width of Packet length signals.
-the maximum is 2**16 - 1</p></td>
+<td><p>Maximum size of a User packet in bytes (in an interval between 60 and 2**12, inclusively)</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>Optional settings</p></td>
 <td><p>=====</p></td>
-<td><p>Settings for testing and debugging, settings usually left unchanged
-at entity-area constants.</p></td>
+<td><p>Settings for testing and debugging, usually left at default values..</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-dsp_cnt_width"><td><p>DSP_CNT_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-dsp_cnt_width"><td><p>DSP_CNT_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>64</p></td>
-<td><p>Width of DSP packet and byte statistics counters</p></td>
+<td><p>Width of statistical counters within each channel</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-rx_gen_en"><td><p>RX_GEN_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-rx_gen_en"><td><p>RX_GEN_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
-<td><p>Enable generation of RX/TX side of DMA Module</p></td>
+<td><p>Allows to disable one of the controllers in the DMA module</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-tx_gen_en"><td><p>TX_GEN_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-tx_gen_en"><td><p>TX_GEN_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>TRUE</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-st_sp_dbg_signal_w"><td><p>ST_SP_DBG_SIGNAL_W</p></td>
 <td><p>natural</p></td>
-<td><p>2</p></td>
-<td></td>
+<td><p>4</p></td>
+<td><p>Width of the debug signal, do not use unless you know what you are doing</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-dma_calypte-mi_width"><td><p>MI_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-dma_calypte-mi_width"><td><p>MI_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>Width of MI bus</p></td>
@@ -465,65 +507,75 @@ at entity-area constants.</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-dma_calypte-st_sp_dbg_chan"><td><p>ST_SP_DBG_CHAN</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Debug signals</p></td>
+<td><p>=====</p></td>
+<td><p>Should not be used by the user of the component</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dma_calypte-st_sp_dbg_chan"><td><p>ST_SP_DBG_CHAN</p></td>
 <td><p>std_logic_vector(log2(TX_CHANNELS) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-dma_calypte-st_sp_dbg_meta"><td><p>ST_SP_DBG_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-dma_calypte-st_sp_dbg_meta"><td><p>ST_SP_DBG_META</p></td>
 <td><p>std_logic_vector(ST_SP_DBG_SIGNAL_W -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
-<td><p>PCIe-side interfaces</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RQ PCIe interface</p></td>
 <td><p>=====</p></td>
-<td><p>=====</p></td>
+<td><p>Upstream MFB interface (for sending data to the PCIe Endpoint)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_data"><td><p>PCIE_RQ_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_data"><td><p>PCIE_RQ_MFB_DATA</p></td>
 <td><p>std_logic_vector(PCIE_RQ_MFB_REGIONS*PCIE_RQ_MFB_REGION_SIZE*PCIE_RQ_MFB_BLOCK_SIZE*PCIE_RQ_MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>Upstream MFB interface (for sending data to PCIe Endpoints)</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_meta"><td><p>PCIE_RQ_MFB_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_meta"><td><p>PCIE_RQ_MFB_META</p></td>
 <td><p>std_logic_vector(PCIE_RQ_MFB_REGIONS*PCIE_RQ_META_WIDTH -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_sof"><td><p>PCIE_RQ_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_sof"><td><p>PCIE_RQ_MFB_SOF</p></td>
 <td><p>std_logic_vector(PCIE_RQ_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_eof"><td><p>PCIE_RQ_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_eof"><td><p>PCIE_RQ_MFB_EOF</p></td>
 <td><p>std_logic_vector(PCIE_RQ_MFB_REGIONS -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_sof_pos"><td><p>PCIE_RQ_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_sof_pos"><td><p>PCIE_RQ_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(PCIE_RQ_MFB_REGIONS*max(1, log2(PCIE_RQ_MFB_REGION_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_eof_pos"><td><p>PCIE_RQ_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_eof_pos"><td><p>PCIE_RQ_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(PCIE_RQ_MFB_REGIONS*max(1, log2(PCIE_RQ_MFB_REGION_SIZE*PCIE_RQ_MFB_BLOCK_SIZE)) -1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_src_rdy"><td><p>PCIE_RQ_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_src_rdy"><td><p>PCIE_RQ_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_dst_rdy"><td><p>PCIE_RQ_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_rq_mfb_dst_rdy"><td><p>PCIE_RQ_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>CQ PCIe interface</p></td>
+<td><p>=====</p></td>
+<td><p>Downstream MFB interface (for receiving data from the PCIe Endpoint)</p></td>
+</tr>
 <tr class="row-even" id="vhdl-portsignal-dma_calypte-pcie_cq_mfb_data"><td><p>PCIE_CQ_MFB_DATA</p></td>
 <td><p>std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_MFB_REGION_SIZE*PCIE_CQ_MFB_BLOCK_SIZE*PCIE_CQ_MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Downstream MFB interface (for sending data from PCIe Endpoints)</p></td>
+<td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-dma_calypte-pcie_cq_mfb_meta"><td><p>PCIE_CQ_MFB_META</p></td>
 <td><p>std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0)</p></td>
@@ -610,25 +662,152 @@ at entity-area constants.</p></td>
 </dd></dl>
 
 <section id="supported-pcie-configurations">
-<h2>Supported PCIe Configurations<a class="headerlink" href="#supported-pcie-configurations" title="Link to this heading"></a></h2>
-<p>The design can be configured for various bus widths and PCIe IP core
-configurations.</p>
+<span id="dma-calyp-supp-pcie-configs"></span><h2>Supported PCIe Configurations<a class="headerlink" href="#supported-pcie-configurations" title="Link to this heading"></a></h2>
+<p>The design can be configured for two major PCIe IP configurations.
+This corresponds to setting the input/output MFB bus
+interfaces when configuring the DMA_CALYPTE entity.</p>
 <ol class="arabic">
-<li><p>Device: AMD Kintex UltraScale+</p>
+<li><p>Device: AMD UltraScale+ Architecture, Intel Avalon P-Tile</p>
 <p>PCI Express configuration: <strong>Gen3 x8</strong></p>
 <p>Internal bus width: 256 bits</p>
 <p>Frequency: 250 MHz</p>
 <p>Input MFB configuration: 1,4,8,8</p>
 <p>Output MFB configuration: 1,1,8,32</p>
 </li>
-<li><p>Device: AMD Kintex UltraScale+, Intel Agilex F</p>
-<p>PCI Express configuration: <strong>Gen3 x16 (AMD), Gen4 x16 (Intel)</strong></p>
+<li><p>Device: AMD UltraScale+ architecture, Intel Avalon P-Tile/R-Tile</p>
+<p>PCI Express configuration: <strong>Gen3 x16 (AMD), Gen4 x16 (Intel)</strong>, <strong>Gen5 x8 (Intel)</strong></p>
 <p>Internal bus width: 512 bits</p>
 <p>Frequency: 250 MHz (AMD), 400 MHz (Intel)</p>
 <p>Input MFB configuration: 1,8,8,8</p>
 <p>Output MFB configuration: 2,1,8,32</p>
 </li>
 </ol>
+</section>
+<section id="resource-consumption">
+<h2>Resource consumption<a class="headerlink" href="#resource-consumption" title="Link to this heading"></a></h2>
+<p>The following tables show the resource utilization on the AMD Virtex UltraScale+
+chip (<code class="docutils literal notranslate"><span class="pre">xcvu7p-flvb2104-2-i</span></code>) for <em>Gen3 x8</em> and <em>Gen3 x16</em> PCIe configurations.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" rowspan="2"></th>
+<th class="head" colspan="2"><p>PCIe Gen3 x8</p></th>
+<th class="head" colspan="2"><p>PCIe Gen3 x16</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>16 channels</p></th>
+<th class="head"><p>64 channels</p></th>
+<th class="head"><p>16 channels</p></th>
+<th class="head"><p>64 channels</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>LUT as Logic</p></td>
+<td><p>7650 (0.97%)</p></td>
+<td><p>10441 (1.32%)</p></td>
+<td><p>16257 (2.06%)</p></td>
+<td><p>18571 (2.36%)</p></td>
+</tr>
+<tr class="row-even"><td><p>LUT as Memory</p></td>
+<td><p>1466 (0.37%)</p></td>
+<td><p>2310 (0.59%)</p></td>
+<td><p>1592 (0.40%)</p></td>
+<td><p>2446 (0.62%)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Registers</p></td>
+<td><p>10156 (0.64%)</p></td>
+<td><p>11614 (0.74%)</p></td>
+<td><p>16290 (1.03%)</p></td>
+<td><p>17929 (1.14%)</p></td>
+</tr>
+<tr class="row-even"><td><p>CARRY logic</p></td>
+<td><p>141 (0.14%)</p></td>
+<td><p>238 (0.24%)</p></td>
+<td><p>145 (0.15%)</p></td>
+<td><p>243 (0.25%)</p></td>
+</tr>
+<tr class="row-odd"><td><p>RAMB36 Tiles</p></td>
+<td><p>32 (2.22%)</p></td>
+<td><p>128 (8.89%)</p></td>
+<td><p>0 (0.00%)</p></td>
+<td><p>128 (8.89%)</p></td>
+</tr>
+<tr class="row-even"><td><p>RAMB18 Tiles</p></td>
+<td><p>8 (0.28%)</p></td>
+<td><p>8 (0.28%)</p></td>
+<td><p>72 (2.50%)</p></td>
+<td><p>8 (0.28%)</p></td>
+</tr>
+<tr class="row-odd"><td><p>URAMs</p></td>
+<td><p>8 (1.25%)</p></td>
+<td><p>32 (5.00%)</p></td>
+<td><p>8 (1.25%)</p></td>
+<td><p>32 (5.00%)</p></td>
+</tr>
+<tr class="row-even"><td><p>DSPs</p></td>
+<td><p>4 (0.09%)</p></td>
+<td><p>4 (0.09%)</p></td>
+<td><p>4 (0.09%)</p></td>
+<td><p>4 (0.09%)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="latency-report">
+<h2>Latency report<a class="headerlink" href="#latency-report" title="Link to this heading"></a></h2>
+<p>Since this module has been designed for low latency, this is our primary concern. Even though its
+RTL design reaches the minimum latency, the PCI Express protocol remains the biggest contributor to
+the overall latency. From our observations, the latency is also influenced by the vendor
+of the CPU where Intel devices perform slightly better than AMD devices. Some PCIe IPs for FPGAs
+provide a special low-latency mode such as the PCIE4 block used in <em>AMD UltraScale+</em> architecture, which
+is enabled on all AMD cards whose measurements we provide. The latency is always measured as a
+<em>Round-Trip-Time (RTT)</em> latency either on the path: <em>Host -&gt; H2F Controller -&gt; FPGA -&gt; F2H Controller
+-&gt; Host (HFH)</em>, or <em>FPGA -&gt; F2H Controller -&gt; Host -&gt; H2F Controller -&gt; FPGA (FHF)</em>, which will be
+denoted for specific results. Every time the data are looped back, either in the Host for the FHF path
+or in the FPGA for the HFH path, the loopback is established with the shortest path possible (E.g., for the
+HFH to directly connect <em>USR_TX_MFB</em> to the <em>USR_RX_MFB</em> interface).</p>
+<section id="test-case-1-amd-fpga">
+<h3>Test case 1 (AMD FPGA)<a class="headerlink" href="#test-case-1-amd-fpga" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Card: AMD Alveo X3522PV</p>
+<p>CPU: Intel(R) Xeon(R) E-2226G CPU &#64; 3.40GHz</p>
+<p>RAM: 64 GB (4 x 16GB)</p>
+<p>PCIe configuration: Gen3x8</p>
+</li>
+<li><p>FHF latency (1000 repetitions)</p>
+<blockquote>
+<div><figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/fhf_latency_alveo_x3522pv.jpg"><img alt="../../../_images/fhf_latency_alveo_x3522pv.jpg" src="../../../_images/fhf_latency_alveo_x3522pv.jpg" style="width: 768.0px; height: 438.59999999999997px;" />
+</a>
+</figure>
+</div></blockquote>
+</li>
+<li><p>HFH latency (64 byte packets, 1000000 repetitions)</p>
+<p>~811 ns (median)</p>
+<p>~1.3 us (0.99-quantile)</p>
+</li>
+</ul>
+</section>
+<section id="test-case-2-intel-fpga">
+<h3>Test case 2 (Intel FPGA)<a class="headerlink" href="#test-case-2-intel-fpga" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Card: Silicom FPGA SmartNIC N6010</p>
+<p>CPU: Intel(R) Xeon(R) Gold 6348 CPU &#64; 2.60GHz</p>
+<p>RAM: 64 GB (4 x 16GB)</p>
+<p>PCIe configuration: Gen3x8</p>
+</li>
+<li><p>FHF latency (1000 repetitions)</p>
+<blockquote>
+<div><figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/latency_n6010_tramin.png"><img alt="../../../_images/latency_n6010_tramin.png" src="../../../_images/latency_n6010_tramin.png" style="height: 450px;" />
+</a>
+</figure>
+</div></blockquote>
+</li>
+<li><p>HFH latency (64 byte packets, 1000000 repetitions)</p>
+<p>~1100 ns (median)</p>
+<p>~1.7 us (0.99-quantile)</p>
+</li>
+</ul>
+</section>
 </section>
 <section id="local-subcomponents">
 <h2>Local Subcomponents<a class="headerlink" href="#local-subcomponents" title="Link to this heading"></a></h2>
@@ -638,6 +817,12 @@ configurations.</p>
 <li class="toctree-l1"><a class="reference internal" href="comp/tx/readme.html">TX DMA Calypte</a></li>
 </ul>
 </div>
+</section>
+<section id="maintainers">
+<h2>Maintainers<a class="headerlink" href="#maintainers" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Vladislav Valek &lt;<a class="reference external" href="mailto:valekv&#37;&#52;&#48;cesnet&#46;cz">valekv<span>&#64;</span>cesnet<span>&#46;</span>cz</a>&gt;</p></li>
+</ul>
 </section>
 </section>
 

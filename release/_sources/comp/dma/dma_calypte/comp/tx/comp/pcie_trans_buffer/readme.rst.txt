@@ -1,4 +1,4 @@
-.. _tx_dma_trans_buffer:
+.. _tx_dma_calypte_trans_buffer:
 
 Transaction buffer
 ==================
