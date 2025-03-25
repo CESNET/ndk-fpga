@@ -74,7 +74,7 @@ architecture FULL of MFB_FRAME_TRIMMER is
 
     signal s_rx_sof_pos              : slv_array_t(REGIONS-1 downto 0)(SOF_POS_WIDTH-1 downto 0);
     signal s_rx_eof_pos              : slv_array_t(REGIONS-1 downto 0)(EOF_POS_WIDTH-1 downto 0);
-    signal s_rx_new_len              : slv_array_t(REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
+    signal s_rx_new_len              : slv_array_t(REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
 
     signal s_rx_sof_pos_ext          : u_array_t(REGIONS-1 downto 0)(EOF_POS_WIDTH-1 downto 0);
     signal s_rx_eof_pos_blk          : slv_array_t(REGIONS-1 downto 0)(SOF_POS_WIDTH-1 downto 0);
@@ -191,7 +191,7 @@ begin
         --      assert always ((RX_SRC_RDY='1' and RX_DST_RDY='1' and RX_SOF(r)='1' and RX_TRIM_EN(r)='1') -> (unsigned(s_rx_new_len(r)) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
         --      report "RX_TRIM_LEN is greater than PKT_MTU!";
 
-        s_rx_new_len_ext_curr(r) <= unsigned(s_rx_new_len(r)) + (r*REGION_SIZE*BLOCK_SIZE) + s_rx_sof_pos_ext(r) - 1;
+        s_rx_new_len_ext_curr(r) <= resize(unsigned(s_rx_new_len(r)), LEN_WIDTH) + (r*REGION_SIZE*BLOCK_SIZE) + s_rx_sof_pos_ext(r) - 1;
         s_rx_new_len_ext(r+1)    <= s_rx_new_len_ext_curr(r) when (RX_SOF(r) = '1') else s_rx_new_len_ext(r);
 
         -- last valid of trim valid
