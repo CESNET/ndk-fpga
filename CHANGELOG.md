@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
-## [0.10.0] - 2025-03-XX
+## [0.10.0] - 2025-03-25
 
 ### Added
 - cards: Introduced support for Napatech NT200A02 card.
@@ -19,12 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - comp: Introduced MFB MVB Prepender component.
 - comp: Introduced the frequency_meter component include Python module.
 - comp: Introduced the Python module for MFB Generator component.
+- comp: Introduced the Python module for Gen Loop Switch (GLS) component.
 - comp: Added function for ORing together all items of an array into one vector in type_pack.
 - comp: Added function to resize items of an array in type_pack.
 - docs: Introduced NDK performance report.
 - uvm: Added interface properties to check correct behavioral in pcie-adapter-ver.
-- uvm: Added verification for MVB_MERGE_STREAMS module.
-- uvm: Added verification for MFB_FRAME_TRIMMER module.
+- uvm: Added verification for MVB_MERGE_STREAMS, MFB_FRAME_TRIMMER, MFB_FRAME_EXTENDER, MVB_SHAKEDOWN components.
 - uvm: Added sequence_min_max to uvm_logic_vector sequence library.
 - uvm: Added the sequence_inverted_gauss sequence.
 - uvm: Added support for build device tree in verifications.
@@ -53,10 +53,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - core: Fixed multi-region support in DMA Calypte wrapper.
 - comp: Fixed setting the 100GBASE-SR4 mode in the Ethernet MGMT.
 - comp: Fixed optional PMA_TX_FAULT input in the Ethernet MGMT.
-- comp: Fixed fix latency histogram in MEM_TESTER module.
-- comp: Fixed test results checks in MEM_TESTER module.
-- comp: Removed ambiguous behaviour in MVB_DEMUX module due to DST/DST RDY loop.
-- comp: Fixed open ndp_read in dma tests and fix typo in dma_tx test in GLS module script.
+- comp: Fixed fix latency histogram in MEM_TESTER component.
+- comp: Fixed test results checks in MEM_TESTER component.
+- comp: Removed ambiguous behaviour in MVB_DEMUX component due to DST/DST RDY loop.
+- comp: Fixed open ndp_read in dma tests and fix typo in dma_tx test in GLS script.
 - comp: Used MTU_PKT instead of LEN_WIDTH in entity and prevent bit overflow in MFB_FRAME_TRIMMER. (BREAKING CHANGE!)
 - comp: Increased the length of signals to prevent a bit overflow in MFB_FRAME_EXTENDER. (BREAKING CHANGE!)
 - dma: Fixed send stop request after pointers have same values in DMA_CALYPTE.
