@@ -20,6 +20,7 @@ set DMA_CHAN_MOD_BASE   "$CORE_APP_COMP_BASE/dma_chan_mod"
 set MEM_TESTER_BASE     "$OFM_PATH/comp/debug/mem_tester"
 set MEM_LOGGER_BASE     "$OFM_PATH/comp/debug/data_logger/mem_logger"
 set HBM_TESTER_BASE     "$OFM_PATH/comp/mem_tools/debug/hbm_tester"
+set ASYNC_RESET_BASE    "$OFM_PATH/comp/base/async/reset"
 
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
@@ -39,6 +40,7 @@ if {$ARCHGRP_ARR(APP_CORE_ENABLE)} {
     lappend COMPONENTS [ list "MEM_TESTER"     $MEM_TESTER_BASE     "FULL" ]
     lappend COMPONENTS [ list "MEM_LOGGER"     $MEM_LOGGER_BASE     "FULL" ]
     lappend COMPONENTS [ list "HBM_TESTER"     $HBM_TESTER_BASE     "FULL" ]
+    lappend COMPONENTS [ list "ASYNC_RESET"    $ASYNC_RESET_BASE    "FULL" ]
 
     # Files
     lappend MOD "$ENTITY_BASE/mem_tester_wrap.vhd"

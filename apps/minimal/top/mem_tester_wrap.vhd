@@ -204,6 +204,8 @@ architecture FULL of MEM_TESTER_WRAP is
     signal ddr_log_mi_ardy               : std_logic_vector(DDR_PORTS-1 downto 0) := (others => '0');
     signal ddr_log_mi_drdy               : std_logic_vector(DDR_PORTS-1 downto 0) := (others => '0');
 
+    signal ddr_reset_repl                : slv_array_t     (DDR_PORTS-1 downto 0)(3-1 downto 0);
+
 begin
 
     mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
@@ -241,7 +243,19 @@ begin
     -- DDR MEMORY TESTERS
     -- =========================================================================
 
-    ddr_testers_g : for i in DDR_PORTS-1 downto 0 generate
+    ddr_g : for i in DDR_PORTS-1 downto 0 generate
+        rst_sync_i : entity work.ASYNC_RESET
+        generic map (
+            TWO_REG  => false,
+            OUT_REG  => true,
+            REPLICAS => 3 -- MEM_TESTER + MEM_LOGGER + MI_ASYNC
+        )
+        port map (
+            CLK        => DDR_RESET(i),
+            ASYNC_RST  => DDR_RESET(i),
+            OUT_RST    => ddr_reset_repl(i)
+        );
+
         ddr_tester_i : entity work.MEM_TESTER
         generic map (
             AMM_DATA_WIDTH              => DDR_DATA_WIDTH,
@@ -266,7 +280,7 @@ begin
         )
         port map(
             AMM_CLK                     => DDR_CLK                  (i),
-            AMM_RST                     => DDR_RESET                (i),
+            AMM_RST                     => ddr_reset_repl           (i)(0),
 
             AMM_READY                   => DDR_AVMM_READY           (i),
             AMM_READ                    => DDR_AVMM_READ            (i),
@@ -319,7 +333,7 @@ begin
             MI_M_DRDY => split_mi_drdy(DDR_PORTS + i),
 
             CLK_S     => DDR_CLK          (i),
-            RESET_S   => DDR_RESET        (i),
+            RESET_S   => ddr_reset_repl   (i)(2),
             MI_S_DWR  => ddr_log_mi_dwr   (i),
             MI_S_ADDR => ddr_log_mi_addr  (i),
             MI_S_RD   => ddr_log_mi_rd    (i),
@@ -343,7 +357,7 @@ begin
         )
         port map (
             CLK                     => DDR_CLK                  (i),
-            RST                     => DDR_RESET                (i),
+            RST                     => ddr_reset_repl           (i)(1),
 
             MEM_READY               => DDR_AVMM_READY           (i),
             MEM_READ                => DDR_AVMM_READ            (i),
