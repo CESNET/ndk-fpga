@@ -119,12 +119,12 @@ class GlsStream:
         if max_ch is not None:
             self.gen.maximum_channel = max_ch
 
-        self.gen.enable = True
+        self.gen.enabled = True
 
     def gen_stop(self) -> None:
         """Stop generating frames and return MUXes to their default state (both to 0)."""
-        self.gen.enable = False
-        while self.gen.enable:
+        self.gen.enabled = False
+        while self.gen.enabled:
             continue
         self.input = 0
 
