@@ -191,7 +191,7 @@ begin
                            std_logic_vector(gen_len_ext_off(rr))  when "00",
                            std_logic_vector(gen_len_ext_off(rr))  when others;
 
-        gen_offset(rr) <= rx_mvb_ext_size_arr(rr) when (gen_mode(rr) = "10") else (others => '0');
+        gen_offset(rr) <= std_logic_vector(resize(unsigned(rx_mvb_ext_size_arr(rr)), LEN_WIDTH)) when (gen_mode(rr) = "10") else (others => '0');
         gen_insert(rr) <= not (RX_MVB_EXT_EN(rr) and RX_MVB_EXT_ONLY(rr));
 
         gen_meta(rr)(0)                                               <= gen_insert(rr);
