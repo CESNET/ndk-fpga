@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
+## [0.10.1] - 2025-03-26
+
+### Fixed
+- comp: Fixed width of some rx_mvb_* signals in MFB_FRAME_EXTENDER.
+- comp: Fixed width of s_rx_new_len signal in MFB_FRAME_TRIMMER.
+- app: Fixed DDR reset timing issues in MEM_TESTER_WRAP module.
+- uvm: Fixed CLK_ETH in E-Tile and CMAC verification testbenches.
+
 ## [0.10.0] - 2025-03-25
 
 ### Added
