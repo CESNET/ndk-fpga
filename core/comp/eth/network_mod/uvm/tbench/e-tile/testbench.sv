@@ -70,9 +70,6 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
     always #(CLK_USR_PERIOD/2) CLK_USR = ~CLK_USR;
-    for (genvar eth_it = 0; eth_it < ETH_PORTS; eth_it++) begin
-        always #(CLK_ETH_PERIOD[eth_it]/2) CLK_ETH[eth_it] = ~CLK_ETH[eth_it];
-    end
     always #(CLK_MI_PERIOD/2)     CLK_MI     = ~CLK_MI    ;
     always #(CLK_MI_PHY_PERIOD/2) CLK_MI_PHY = ~CLK_MI_PHY;
     always #(CLK_MI_PMD_PERIOD/2) CLK_MI_PMD = ~CLK_MI_PMD;
