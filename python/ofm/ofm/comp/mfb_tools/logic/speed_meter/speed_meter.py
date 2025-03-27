@@ -36,8 +36,8 @@ class SpeedMeter(nfb.BaseComp):
             self._name = "Speed Meter"
             if "index" in kwargs:
                 self._name += " " + str(kwargs.get("index"))
-        except Exception:
-            print("Error while opening Speed Meter component!")
+        except Exception as e:
+            print(f"Error while opening Speed Meter component: {e}")
 
     def test_complete(self):
         """Check if speed measurement is complete"""
