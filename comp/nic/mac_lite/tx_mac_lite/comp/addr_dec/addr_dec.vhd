@@ -38,6 +38,9 @@ entity TX_MAC_LITE_ADDR_DEC is
         STAT_TOTAL_SENT_FRAMES          : in  std_logic_vector(63 downto 0);
         STAT_TOTAL_SENT_OCTECTS         : in  std_logic_vector(63 downto 0);
         STAT_TOTAL_DISCARDED_FRAMES     : in  std_logic_vector(63 downto 0);
+        STAT_TOTAL_LINK_ERR_FRAMES      : in  std_logic_vector(63 downto 0);
+        STAT_TOTAL_LEN_ERR_FRAMES       : in  std_logic_vector(63 downto 0);
+        STAT_TOTAL_OCTECTS              : in  std_logic_vector(63 downto 0);
         -- CONTROL OUTPUT INTERFACE (CLK)
         CTRL_STROBE_CNT                 : out std_logic;
         CTRL_RESET_CNT                  : out std_logic;
@@ -60,6 +63,12 @@ architecture FULL of TX_MAC_LITE_ADDR_DEC is
     constant ADDR_REG_OBUF_EN           : std_logic_vector(7 downto 0) := X"20";
     constant ADDR_REG_CTRL              : std_logic_vector(7 downto 0) := X"2C";
     constant ADDR_REG_STATUS            : std_logic_vector(7 downto 0) := X"30";
+    constant ADDR_CNT_TOTAL_OCTECTS_L   : std_logic_vector(7 downto 0) := X"40";
+    constant ADDR_CNT_TOTAL_OCTECTS_H   : std_logic_vector(7 downto 0) := X"44";
+    constant ADDR_CNT_LINK_ERR_FRAMES_L : std_logic_vector(7 downto 0) := X"48";
+    constant ADDR_CNT_LINK_ERR_FRAMES_H : std_logic_vector(7 downto 0) := X"4C";
+    constant ADDR_CNT_LEN_ERR_FRAMES_L  : std_logic_vector(7 downto 0) := X"50";
+    constant ADDR_CNT_LEN_ERR_FRAMES_H  : std_logic_vector(7 downto 0) := X"54";
 
     -- OBUF commands
     constant OBUFCMD_STROBE_COUNTERS    : std_logic_vector(7 downto 0) := X"01";
@@ -196,6 +205,18 @@ begin
                 mi_s_drd <= STAT_TOTAL_DISCARDED_FRAMES(31 downto 0);
             when ADDR_CNT_DISCARDS_FRAMES_H =>
                 mi_s_drd <= STAT_TOTAL_DISCARDED_FRAMES(63 downto 32);
+            when ADDR_CNT_TOTAL_OCTECTS_L =>
+                mi_s_drd <= STAT_TOTAL_OCTECTS(31 downto 0);
+            when ADDR_CNT_TOTAL_OCTECTS_H =>
+                mi_s_drd <= STAT_TOTAL_OCTECTS(63 downto 32);
+            when ADDR_CNT_LINK_ERR_FRAMES_L =>
+                mi_s_drd <= STAT_TOTAL_LINK_ERR_FRAMES(31 downto 0);
+            when ADDR_CNT_LINK_ERR_FRAMES_H =>
+                mi_s_drd <= STAT_TOTAL_LINK_ERR_FRAMES(63 downto 32);
+            when ADDR_CNT_LEN_ERR_FRAMES_L =>
+                mi_s_drd <= STAT_TOTAL_LEN_ERR_FRAMES(31 downto 0);
+            when ADDR_CNT_LEN_ERR_FRAMES_H =>
+                mi_s_drd <= STAT_TOTAL_LEN_ERR_FRAMES(63 downto 32);
             when ADDR_REG_OBUF_EN =>
                 mi_s_drd <= obuf_en_reg_32;
             when ADDR_REG_STATUS =>

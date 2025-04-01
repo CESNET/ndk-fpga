@@ -294,11 +294,16 @@ architecture FULL of TX_MAC_LITE is
     signal stat_tx_frame_inc_reg       : std_logic_vector(MD_REGIONS-1 downto 0);
     signal stat_tx_frame_length_reg    : std_logic_vector(MD_REGIONS*LEN_WIDTH-1 downto 0);
     signal stat_discard_frame_inc_reg  : std_logic_vector(MD_REGIONS-1 downto 0);
+    signal stat_link_err_frame_inc_reg : std_logic_vector(MD_REGIONS-1 downto 0);
+    signal stat_len_err_frame_inc_reg  : std_logic_vector(MD_REGIONS-1 downto 0);
 
     signal stat_total_frames           : std_logic_vector(64-1 downto 0);
+    signal stat_total_octects          : std_logic_vector(64-1 downto 0);
     signal stat_total_sent_frames      : std_logic_vector(64-1 downto 0);
     signal stat_total_sent_octects     : std_logic_vector(64-1 downto 0);
     signal stat_total_discarded_frames : std_logic_vector(64-1 downto 0);
+    signal stat_total_link_err_frames  : std_logic_vector(64-1 downto 0);
+    signal stat_total_len_err_frames   : std_logic_vector(64-1 downto 0);
 
     signal ctrl_strobe_cnt             : std_logic;
     signal ctrl_reset_cnt              : std_logic;
@@ -831,10 +836,12 @@ begin
     process (RX_CLK)
     begin
         if rising_edge(RX_CLK) then
-            stat_rx_frame_inc_reg      <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy;
-            stat_tx_frame_inc_reg      <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and not fl_mfb_discard;
-            stat_tx_frame_length_reg   <= fl_mfb_frame_len;
-            stat_discard_frame_inc_reg <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and fl_mfb_discard;
+            stat_rx_frame_inc_reg       <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy;
+            stat_tx_frame_inc_reg       <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and not fl_mfb_discard;
+            stat_tx_frame_length_reg    <= fl_mfb_frame_len;
+            stat_discard_frame_inc_reg  <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and fl_mfb_discard;
+            stat_link_err_frame_inc_reg <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and ctrl_ld_discard;
+            stat_len_err_frame_inc_reg  <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and fl_mfb_undersize;
         end if;
     end process;
 
@@ -856,14 +863,20 @@ begin
         VECTOR_INC_TOTAL_FRAMES     => stat_rx_frame_inc_reg,
         VECTOR_INC_SENT_FRAMES      => stat_tx_frame_inc_reg,
         VECTOR_INC_DISCARDED        => stat_discard_frame_inc_reg,
+        VECTOR_INC_LINK_ERROR       => stat_link_err_frame_inc_reg,
+        VECTOR_INC_LEN_ERROR        => stat_len_err_frame_inc_reg,
 
         FRAME_LENGTH                => stat_tx_frame_length_reg,
         FRAME_LENGTH_VLD            => stat_tx_frame_inc_reg,
+        FRAME_LENGTH_TOTAL_VLD      => stat_rx_frame_inc_reg,
 
         STAT_TOTAL_FRAMES           => stat_total_frames,
+        STAT_TOTAL_OCTECTS          => stat_total_octects,
         STAT_TOTAL_SENT_FRAMES      => stat_total_sent_frames,
         STAT_TOTAL_SENT_OCTECTS     => stat_total_sent_octects,
-        STAT_TOTAL_DISCARDED_FRAMES => stat_total_discarded_frames
+        STAT_TOTAL_DISCARDED_FRAMES => stat_total_discarded_frames,
+        STAT_TOTAL_LINK_ERR_FRAMES  => stat_total_link_err_frames,
+        STAT_TOTAL_LEN_ERR_FRAMES   => stat_total_len_err_frames
     );
 
     -- =========================================================================
@@ -891,9 +904,12 @@ begin
         MI_DRDY                     => MI_DRDY,
 
         STAT_TOTAL_FRAMES           => stat_total_frames,
+        STAT_TOTAL_OCTECTS          => stat_total_octects,
         STAT_TOTAL_SENT_FRAMES      => stat_total_sent_frames,
         STAT_TOTAL_SENT_OCTECTS     => stat_total_sent_octects,
         STAT_TOTAL_DISCARDED_FRAMES => stat_total_discarded_frames,
+        STAT_TOTAL_LINK_ERR_FRAMES  => stat_total_link_err_frames,
+        STAT_TOTAL_LEN_ERR_FRAMES   => stat_total_len_err_frames,
 
         CTRL_STROBE_CNT             => ctrl_strobe_cnt,
         CTRL_RESET_CNT              => ctrl_reset_cnt,

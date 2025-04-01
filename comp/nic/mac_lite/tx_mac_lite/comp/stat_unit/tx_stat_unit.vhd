@@ -43,17 +43,23 @@ entity TX_MAC_LITE_STAT_UNIT is
         VECTOR_INC_TOTAL_FRAMES     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         VECTOR_INC_SENT_FRAMES      : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         VECTOR_INC_DISCARDED        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        VECTOR_INC_LINK_ERROR       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        VECTOR_INC_LEN_ERROR        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         -- FRAME LENGTH
         FRAME_LENGTH                : in  std_logic_vector(MFB_REGIONS*LENGTH_WIDTH-1 downto 0);
         FRAME_LENGTH_VLD            : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        FRAME_LENGTH_TOTAL_VLD      : in  std_logic_vector(MFB_REGIONS-1 downto 0);
 
         -- =====================================================================
         --  STATS OUTPUT
         -- =====================================================================
         STAT_TOTAL_FRAMES           : out std_logic_vector(63 downto 0);
+        STAT_TOTAL_OCTECTS          : out std_logic_vector(63 downto 0);
         STAT_TOTAL_SENT_FRAMES      : out std_logic_vector(63 downto 0);
         STAT_TOTAL_SENT_OCTECTS     : out std_logic_vector(63 downto 0);
-        STAT_TOTAL_DISCARDED_FRAMES : out std_logic_vector(63 downto 0)
+        STAT_TOTAL_DISCARDED_FRAMES : out std_logic_vector(63 downto 0);
+        STAT_TOTAL_LINK_ERR_FRAMES  : out std_logic_vector(63 downto 0);
+        STAT_TOTAL_LEN_ERR_FRAMES   : out std_logic_vector(63 downto 0)
     );
 end entity;
 
@@ -66,14 +72,20 @@ architecture FULL of TX_MAC_LITE_STAT_UNIT is
     signal frame_len_full       : std_logic_vector(MFB_REGIONS*LENGTH_WIDTH-1 downto 0);
 
     signal inc_total_frames     : std_logic_vector(REGION_CNT_W-1 downto 0);
+    signal inc_total_bytes      : std_logic_vector(LENGTH_WIDTH-1 downto 0);
     signal inc_sent_frames      : std_logic_vector(REGION_CNT_W-1 downto 0);
     signal inc_sent_bytes       : std_logic_vector(LENGTH_WIDTH-1 downto 0);
     signal inc_discarded_frames : std_logic_vector(REGION_CNT_W-1 downto 0);
+    signal inc_link_err_frames  : std_logic_vector(REGION_CNT_W-1 downto 0);
+    signal inc_len_err_frames   : std_logic_vector(REGION_CNT_W-1 downto 0);
 
     signal cnt_total_frames     : std_logic_vector(64-1 downto 0);
+    signal cnt_total_bytes      : std_logic_vector(64-1 downto 0);
     signal cnt_sent_frames      : std_logic_vector(64-1 downto 0);
     signal cnt_sent_bytes       : std_logic_vector(64-1 downto 0);
     signal cnt_discarded_frames : std_logic_vector(64-1 downto 0);
+    signal cnt_link_err_frames  : std_logic_vector(64-1 downto 0);
+    signal cnt_len_err_frames   : std_logic_vector(64-1 downto 0);
 
 begin
 
@@ -140,6 +152,44 @@ begin
         DOUT_VLD => open
     );
 
+    sum_one_link_err_frame_i : entity work.SUM_ONE
+    generic map(
+        INPUT_WIDTH  => MFB_REGIONS,
+        OUTPUT_WIDTH => REGION_CNT_W,
+        OUTPUT_REG   => True
+    )
+    port map(
+        -- CLOCK AND RESET
+        CLK      => CLK,
+        RESET    => RESET,
+        -- INPUT
+        DIN      => VECTOR_INC_LINK_ERROR,
+        DIN_MASK => (others => '1'),
+        DIN_VLD  => '1',
+        -- OUTPUT
+        DOUT     => inc_link_err_frames,
+        DOUT_VLD => open
+    );
+
+    sum_one_len_err_frame_i : entity work.SUM_ONE
+    generic map(
+        INPUT_WIDTH  => MFB_REGIONS,
+        OUTPUT_WIDTH => REGION_CNT_W,
+        OUTPUT_REG   => True
+    )
+    port map(
+        -- CLOCK AND RESET
+        CLK      => CLK,
+        RESET    => RESET,
+        -- INPUT
+        DIN      => VECTOR_INC_LEN_ERROR,
+        DIN_MASK => (others => '1'),
+        DIN_VLD  => '1',
+        -- OUTPUT
+        DOUT     => inc_len_err_frames,
+        DOUT_VLD => open
+    );
+
     -- Sum of inc sent bytes ---------------------------------------------------
 
     frame_len_arr <= slv_array_deser(FRAME_LENGTH,MFB_REGIONS,LENGTH_WIDTH);
@@ -156,7 +206,7 @@ begin
 
     frame_len_full <= slv_array_ser(frame_len_full_arr,MFB_REGIONS,LENGTH_WIDTH);
 
-    sum_inc_total_bytes_i : entity work.PIPE_TREE_ADDER
+    sum_inc_sent_bytes_i : entity work.PIPE_TREE_ADDER
     generic map (
         ITEMS      => MFB_REGIONS,
         DATA_WIDTH => LENGTH_WIDTH,
@@ -168,6 +218,22 @@ begin
         IN_DATA  => frame_len_full,
         IN_VLD   => FRAME_LENGTH_VLD,
         OUT_DATA => inc_sent_bytes
+    );
+
+    -- Sum of inc total bytes ---------------------------------------------------
+
+    sum_inc_total_bytes_i : entity work.PIPE_TREE_ADDER
+    generic map (
+        ITEMS      => MFB_REGIONS,
+        DATA_WIDTH => LENGTH_WIDTH,
+        LATENCY    => 1
+    )
+    port map (
+        CLK      => CLK,
+        RESET    => '0',
+        IN_DATA  => frame_len_full,
+        IN_VLD   => FRAME_LENGTH_TOTAL_VLD,
+        OUT_DATA => inc_total_bytes
     );
 
     -- =========================================================================
@@ -225,6 +291,40 @@ begin
         RESULT    => cnt_discarded_frames
     );
 
+    cnt_link_err_frames_i : entity work.DSP_COUNTER
+    generic map (
+        INPUT_WIDTH  => REGION_CNT_W,
+        OUTPUT_WIDTH => 64,
+        INPUT_REGS   => true,
+        DEVICE       => DEVICE,
+        DSP_ENABLE   => USE_DSP_CNT
+    )
+    port map (
+        CLK       => CLK,
+        CLK_EN    => '1',
+        RESET     => CTRL_RESET_CNT,
+        INCREMENT => inc_link_err_frames,
+        MAX_VAL   => (others => '1'),
+        RESULT    => cnt_link_err_frames
+    );
+
+    cnt_len_err_frames_i : entity work.DSP_COUNTER
+    generic map (
+        INPUT_WIDTH  => REGION_CNT_W,
+        OUTPUT_WIDTH => 64,
+        INPUT_REGS   => true,
+        DEVICE       => DEVICE,
+        DSP_ENABLE   => USE_DSP_CNT
+    )
+    port map (
+        CLK       => CLK,
+        CLK_EN    => '1',
+        RESET     => CTRL_RESET_CNT,
+        INCREMENT => inc_len_err_frames,
+        MAX_VAL   => (others => '1'),
+        RESULT    => cnt_len_err_frames
+    );
+
     cnt_sent_bytes_i : entity work.DSP_COUNTER
     generic map (
         INPUT_WIDTH  => LENGTH_WIDTH,
@@ -242,6 +342,23 @@ begin
         RESULT    => cnt_sent_bytes
     );
 
+    cnt_total_bytes_i : entity work.DSP_COUNTER
+    generic map (
+        INPUT_WIDTH  => LENGTH_WIDTH,
+        OUTPUT_WIDTH => 64,
+        INPUT_REGS   => true,
+        DEVICE       => DEVICE,
+        DSP_ENABLE   => USE_DSP_CNT
+    )
+    port map (
+        CLK       => CLK,
+        CLK_EN    => '1',
+        RESET     => CTRL_RESET_CNT,
+        INCREMENT => inc_total_bytes,
+        MAX_VAL   => (others => '1'),
+        RESULT    => cnt_total_bytes
+    );
+
     -- =========================================================================
     --  LAST STAGE
     -- =========================================================================
@@ -251,9 +368,12 @@ begin
         if (rising_edge(CLK)) then
             if (CTRL_STROBE_CNT = '1') then
                 STAT_TOTAL_FRAMES           <= cnt_total_frames;
+                STAT_TOTAL_OCTECTS          <= cnt_total_bytes;
                 STAT_TOTAL_SENT_FRAMES      <= cnt_sent_frames;
                 STAT_TOTAL_SENT_OCTECTS     <= cnt_sent_bytes;
                 STAT_TOTAL_DISCARDED_FRAMES <= cnt_discarded_frames;
+                STAT_TOTAL_LINK_ERR_FRAMES  <= cnt_link_err_frames;
+                STAT_TOTAL_LEN_ERR_FRAMES   <= cnt_len_err_frames;
             end if;
         end if;
     end process;
