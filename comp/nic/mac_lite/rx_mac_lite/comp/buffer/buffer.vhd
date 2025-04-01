@@ -42,6 +42,7 @@ entity RX_MAC_LITE_BUFFER is
         RX_EOF          : in  std_logic_vector(REGIONS-1 downto 0);
         RX_ERROR        : in  std_logic_vector(REGIONS-1 downto 0) := (others => '0');
         RX_METADATA     : in  slv_array_t(REGIONS-1 downto 0)(META_WIDTH-1 downto 0);
+        RX_ERR_MASK     : in  std_logic_vector(5-1 downto 0) := (others => '0');
         RX_SRC_RDY      : in  std_logic;
 
         -- STATISTICS OUTPUT
@@ -50,6 +51,7 @@ entity RX_MAC_LITE_BUFFER is
         STAT_BUFFER_OVF : out std_logic_vector(REGIONS-1 downto 0);
         STAT_DISCARD    : out std_logic_vector(REGIONS-1 downto 0);
         STAT_METADATA   : out slv_array_t(REGIONS-1 downto 0)(META_WIDTH-1 downto 0);
+        STAT_ERR_MASK   : out std_logic_vector(5-1 downto 0);
         STAT_VALID      : out std_logic_vector(REGIONS-1 downto 0);
 
         -- =====================================================================
@@ -113,6 +115,7 @@ architecture FULL of RX_MAC_LITE_BUFFER is
     signal s_rx_eof_reg         : std_logic_vector(REGIONS-1 downto 0);
     signal s_rx_error_reg       : std_logic_vector(REGIONS-1 downto 0);
     signal s_rx_metadata_reg    : slv_array_t(REGIONS-1 downto 0)(META_WIDTH-1 downto 0);
+    signal s_rx_err_mask_reg    : std_logic_vector(5-1 downto 0);
     signal s_rx_src_rdy_reg     : std_logic;
     signal s_whole_frame_reg    : std_logic_vector(REGIONS-1 downto 0);
 
@@ -270,6 +273,7 @@ begin
             s_rx_eof_pos_reg     <= slv_array_ser(s_rx_eof_pos_mod);
             s_rx_error_reg       <= RX_ERROR;
             s_rx_metadata_reg    <= RX_METADATA;
+            s_rx_err_mask_reg    <= RX_ERR_MASK;
             s_rx_force_drop_reg  <= s_rx_force_drop;
             s_whole_frame_reg    <= s_whole_frame;
         end if;
@@ -313,6 +317,7 @@ begin
             STAT_BUFFER_OVF <= (s_rx_src_rdy_orig_reg and s_rx_eof_orig_reg) and s_rx_force_drop_reg;
             STAT_DISCARD    <= (s_rx_src_rdy_orig_reg and s_rx_eof_orig_reg) and (s_rx_error_reg or s_rx_force_drop_reg);
             STAT_METADATA   <= s_rx_metadata_reg;
+            STAT_ERR_MASK   <= s_rx_err_mask_reg;
             STAT_VALID      <= s_rx_src_rdy_orig_reg and s_rx_eof_orig_reg;
             if (RX_RESET = '1') then
                 STAT_VALID <= (others => '0');

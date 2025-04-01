@@ -309,6 +309,12 @@ architecture FULL of RX_MAC_LITE is
     signal s_bfin_data                : std_logic_vector(BF_DATA_W-1 downto 0);
     signal s_bfin_metadata_ser        : std_logic_vector(BF_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
     signal s_bfin_metadata            : slv_array_t(BF_REGIONS-1 downto 0)(ETH_RX_HDR_WIDTH-1 downto 0);
+    signal s_bfin_err_mask            : std_logic_vector(5-1 downto 0);
+    signal s_bfin_adapter_err_masked  : std_logic_vector(BF_REGIONS-1 downto 0);
+    signal s_bfin_crc_err_masked      : std_logic_vector(BF_REGIONS-1 downto 0);
+    signal s_bfin_len_min_err_masked  : std_logic_vector(BF_REGIONS-1 downto 0);
+    signal s_bfin_len_max_err_masked  : std_logic_vector(BF_REGIONS-1 downto 0);
+    signal s_bfin_mac_err_masked      : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_bfin_sof_pos             : std_logic_vector(BF_REGIONS*max(1,log2(BF_REGION_SIZE))-1 downto 0);
     signal s_bfin_eof_pos             : std_logic_vector(BF_REGIONS*max(1,log2(BF_REGION_SIZE*BF_BLOCK_SIZE))-1 downto 0);
     signal s_bfin_sof                 : std_logic_vector(BF_REGIONS-1 downto 0);
@@ -332,39 +338,53 @@ architecture FULL of RX_MAC_LITE is
     signal s_stin_valid               : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_discarded           : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_buffer_ovf          : std_logic_vector(BF_REGIONS-1 downto 0);
-    signal s_stin_adapter_err         : std_logic_vector(BF_REGIONS-1 downto 0);
+    signal s_stin_mii_err_masked      : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_crc_err             : std_logic_vector(BF_REGIONS-1 downto 0);
+    signal s_stin_crc_err_masked      : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_len_min_err         : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_len_max_err         : std_logic_vector(BF_REGIONS-1 downto 0);
+    signal s_stin_len_err_masked      : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_mac_err             : std_logic_vector(BF_REGIONS-1 downto 0);
+    signal s_stin_mac_err_masked      : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_mac_bcast           : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_mac_mcast           : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_frame_len           : slv_array_t(BF_REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
     signal s_stin_metadata            : slv_array_t(BF_REGIONS-1 downto 0)(ETH_RX_HDR_WIDTH-1 downto 0);
+    signal s_stin_err_mask            : std_logic_vector(5-1 downto 0);
     signal s_buffer_status            : std_logic_vector(2-1 downto 0);
 
-    signal s_stat_frames_received     : std_logic_vector(63 downto 0);
-    signal s_stat_frames_transmitted  : std_logic_vector(63 downto 0);
-    signal s_stat_frames_discarded    : std_logic_vector(63 downto 0);
-    signal s_stat_buffer_ovf          : std_logic_vector(63 downto 0);
-    signal s_stat_rx_bytes            : std_logic_vector(63 downto 0);
-    signal s_stat_tx_bytes            : std_logic_vector(63 downto 0);
-    signal s_stat_crc_err             : std_logic_vector(63 downto 0);
-    signal s_stat_mac_err             : std_logic_vector(63 downto 0);
-    signal s_stat_over_mtu            : std_logic_vector(63 downto 0);
-    signal s_stat_below_min           : std_logic_vector(63 downto 0);
-    signal s_stat_bcast_frames        : std_logic_vector(63 downto 0);
-    signal s_stat_mcast_frames        : std_logic_vector(63 downto 0);
-    signal s_stat_fragment_frames     : std_logic_vector(63 downto 0);
-    signal s_stat_jabber_frames       : std_logic_vector(63 downto 0);
-    signal s_stat_frames_undersize    : std_logic_vector(63 downto 0);
-    signal s_stat_frames_64           : std_logic_vector(63 downto 0);
-    signal s_stat_frames_65_127       : std_logic_vector(63 downto 0);
-    signal s_stat_frames_128_255      : std_logic_vector(63 downto 0);
-    signal s_stat_frames_256_511      : std_logic_vector(63 downto 0);
-    signal s_stat_frames_512_1023     : std_logic_vector(63 downto 0);
-    signal s_stat_frames_1024_1518    : std_logic_vector(63 downto 0);
-    signal s_stat_frames_over_1518    : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_total      : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_passed     : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_dropped    : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_drop_off   : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_drop_ovf   : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_drop_flt   : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_drop_err   : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_err_len    : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_err_mii    : std_logic_vector(63 downto 0);
+    signal s_stat_out_base_err_crc    : std_logic_vector(63 downto 0);
+    signal s_stat_out_rx_bytes        : std_logic_vector(63 downto 0);
+    signal s_stat_out_tx_bytes        : std_logic_vector(63 downto 0);
+    signal s_stat_out_rfc_crc_err     : std_logic_vector(63 downto 0);
+    signal s_stat_out_rfc_mac_err     : std_logic_vector(63 downto 0);
+    signal s_stat_out_rfc_over_mtu    : std_logic_vector(63 downto 0);
+    signal s_stat_out_rfc_below_min   : std_logic_vector(63 downto 0);
+    signal s_stat_out_rfc_mac_bcast   : std_logic_vector(63 downto 0);
+    signal s_stat_out_rfc_mac_mcast   : std_logic_vector(63 downto 0);
+    signal s_stat_out_rfc_fragment    : std_logic_vector(63 downto 0);
+    signal s_stat_out_rfc_jabber      : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_undersize  : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_64         : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_65_127     : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_128_255    : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_256_511    : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_512_1023   : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_1024_1518  : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_over_1518  : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_1519_2047  : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_2048_4095  : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_4096_8191  : std_logic_vector(63 downto 0);
+    signal s_stat_out_hist_over_8191  : std_logic_vector(63 downto 0);
 
     signal s_sm_cnt_ticks             : std_logic_vector(SM_CNT_TICKS_WIDTH-1 downto 0);
     signal s_sm_cnt_ticks_max         : std_logic;
@@ -743,28 +763,21 @@ begin
     end generate;
 
     -- =========================================================================
-    --  ERROR MASKING
+    --  CREATE METADATA
     -- =========================================================================
 
-    s_sync_adapter_err_masked <= s_sync_adapter_err and s_ctl_error_mask(0);
-    s_sync_crc_err_masked     <= s_sync_crc_err     and s_ctl_error_mask(1);
-    s_sync_len_min_err_masked <= s_sync_len_min_err and s_ctl_error_mask(2);
-    s_sync_len_max_err_masked <= s_sync_len_max_err and s_ctl_error_mask(3);
-    s_sync_mac_err_masked     <= s_sync_mac_err     and s_ctl_error_mask(4);
-
-    s_sync_error <= s_sync_adapter_err_masked or s_sync_crc_err_masked or
-        s_sync_len_min_err_masked or s_sync_len_max_err_masked or
-        s_sync_mac_err_masked;
+    s_sync_error <= s_sync_adapter_err or s_sync_crc_err or
+        s_sync_len_min_err or s_sync_len_max_err or s_sync_mac_err;
 
     sync_metadata_g : for r in 0 to RX_REGIONS-1 generate
         s_sync_metadata(r)(ETH_RX_HDR_LENGTH)         <= std_logic_vector(resize(unsigned(s_sync_frame_len(r)),ETH_RX_HDR_LENGTH_W));
         s_sync_metadata(r)(ETH_RX_HDR_PORT)           <= std_logic_vector(to_unsigned(NETWORK_PORT_ID,ETH_RX_HDR_PORT_W));
         s_sync_metadata(r)(ETH_RX_HDR_ERROR_O)        <= s_sync_error(r);
-        s_sync_metadata(r)(ETH_RX_HDR_ERRORFRAME_O)   <= s_sync_adapter_err_masked(r);
-        s_sync_metadata(r)(ETH_RX_HDR_ERRORMINTU_O)   <= s_sync_len_min_err_masked(r);
-        s_sync_metadata(r)(ETH_RX_HDR_ERRORMAXTU_O)   <= s_sync_len_max_err_masked(r);
-        s_sync_metadata(r)(ETH_RX_HDR_ERRORCRC_O)     <= s_sync_crc_err_masked(r);
-        s_sync_metadata(r)(ETH_RX_HDR_ERRORMAC_O)     <= s_sync_mac_err_masked(r);
+        s_sync_metadata(r)(ETH_RX_HDR_ERRORFRAME_O)   <= s_sync_adapter_err(r);
+        s_sync_metadata(r)(ETH_RX_HDR_ERRORMINTU_O)   <= s_sync_len_min_err(r);
+        s_sync_metadata(r)(ETH_RX_HDR_ERRORMAXTU_O)   <= s_sync_len_max_err(r);
+        s_sync_metadata(r)(ETH_RX_HDR_ERRORCRC_O)     <= s_sync_crc_err(r);
+        s_sync_metadata(r)(ETH_RX_HDR_ERRORMAC_O)     <= s_sync_mac_err(r);
         s_sync_metadata(r)(ETH_RX_HDR_BROADCAST_O)    <= s_sync_mac_bcast(r);
         s_sync_metadata(r)(ETH_RX_HDR_MULTICAST_O)    <= s_sync_mac_mcast(r);
         s_sync_metadata(r)(ETH_RX_HDR_HITMACVLD_O)    <= s_sync_mac_hit_vld(r);
@@ -851,10 +864,20 @@ begin
     );
 
     s_bfin_metadata <= slv_array_deser(s_bfin_metadata_ser,BF_REGIONS);
+    s_bfin_err_mask <= s_ctl_error_mask;
 
-    bfin_error_g : for i in 0 to BF_REGIONS-1 generate
-        s_bfin_error(i) <= s_bfin_metadata(i)(ETH_RX_HDR_ERROR_O);
+    -- ERROR MASKING
+    err_mask_g: for rr in 0 to BF_REGIONS-1 generate
+        s_bfin_adapter_err_masked(rr) <= s_bfin_metadata(rr)(ETH_RX_HDR_ERRORFRAME_O) and s_bfin_err_mask(0);
+        s_bfin_crc_err_masked(rr)     <= s_bfin_metadata(rr)(ETH_RX_HDR_ERRORCRC_O)   and s_bfin_err_mask(1);
+        s_bfin_len_min_err_masked(rr) <= s_bfin_metadata(rr)(ETH_RX_HDR_ERRORMINTU_O) and s_bfin_err_mask(2);
+        s_bfin_len_max_err_masked(rr) <= s_bfin_metadata(rr)(ETH_RX_HDR_ERRORMAXTU_O) and s_bfin_err_mask(3);
+        s_bfin_mac_err_masked(rr)     <= s_bfin_metadata(rr)(ETH_RX_HDR_ERRORMAC_O)   and s_bfin_err_mask(4);
     end generate;
+
+    s_bfin_error <= s_bfin_adapter_err_masked or s_bfin_crc_err_masked or
+                    s_bfin_len_min_err_masked or s_bfin_len_max_err_masked or
+                    s_bfin_mac_err_masked;
 
     buffer_i : entity work.RX_MAC_LITE_BUFFER
     generic map(
@@ -880,12 +903,14 @@ begin
         RX_EOF          => s_bfin_eof,
         RX_ERROR        => s_bfin_error,
         RX_METADATA     => s_bfin_metadata,
+        RX_ERR_MASK     => s_bfin_err_mask,
         RX_SRC_RDY      => s_bfin_src_rdy,
 
         BUFFER_STATUS   => s_buffer_status,
         STAT_BUFFER_OVF => s_stin_buffer_ovf,
         STAT_DISCARD    => s_stin_discarded,
         STAT_METADATA   => s_stin_metadata,
+        STAT_ERR_MASK   => s_stin_err_mask,
         STAT_VALID      => s_stin_valid,
 
         TX_CLK          => TX_CLK,
@@ -988,14 +1013,18 @@ begin
     -- =========================================================================
 
     stin_metadata_unpack_g : for i in 0 to BF_REGIONS-1 generate
-        s_stin_adapter_err(i) <= s_stin_metadata(i)(ETH_RX_HDR_ERRORFRAME_O);
-        s_stin_crc_err(i)     <= s_stin_metadata(i)(ETH_RX_HDR_ERRORCRC_O);
-        s_stin_mac_err(i)     <= s_stin_metadata(i)(ETH_RX_HDR_ERRORMAC_O);
-        s_stin_mac_bcast(i)   <= s_stin_metadata(i)(ETH_RX_HDR_BROADCAST_O);
-        s_stin_mac_mcast(i)   <= s_stin_metadata(i)(ETH_RX_HDR_MULTICAST_O);
-        s_stin_frame_len(i)   <= std_logic_vector(resize(unsigned(s_stin_metadata(i)(ETH_RX_HDR_LENGTH)),LEN_WIDTH));
-        s_stin_len_min_err(i) <= s_stin_metadata(i)(ETH_RX_HDR_ERRORMINTU_O);
-        s_stin_len_max_err(i) <= s_stin_metadata(i)(ETH_RX_HDR_ERRORMAXTU_O);
+        s_stin_mii_err_masked(i) <= s_stin_metadata(i)(ETH_RX_HDR_ERRORFRAME_O) and s_stin_err_mask(0);
+        s_stin_crc_err(i)        <= s_stin_metadata(i)(ETH_RX_HDR_ERRORCRC_O);
+        s_stin_crc_err_masked(i) <= s_stin_metadata(i)(ETH_RX_HDR_ERRORCRC_O) and s_stin_err_mask(1);
+        s_stin_mac_err(i)        <= s_stin_metadata(i)(ETH_RX_HDR_ERRORMAC_O);
+        s_stin_mac_err_masked(i) <= s_stin_metadata(i)(ETH_RX_HDR_ERRORMAC_O) and s_stin_err_mask(4);
+        s_stin_len_err_masked(i) <= (s_stin_metadata(i)(ETH_RX_HDR_ERRORMINTU_O) and s_stin_err_mask(2)) or
+                                    (s_stin_metadata(i)(ETH_RX_HDR_ERRORMAXTU_O) and s_stin_err_mask(3));
+        s_stin_mac_bcast(i)      <= s_stin_metadata(i)(ETH_RX_HDR_BROADCAST_O);
+        s_stin_mac_mcast(i)      <= s_stin_metadata(i)(ETH_RX_HDR_MULTICAST_O);
+        s_stin_frame_len(i)      <= std_logic_vector(resize(unsigned(s_stin_metadata(i)(ETH_RX_HDR_LENGTH)),LEN_WIDTH));
+        s_stin_len_min_err(i)    <= s_stin_metadata(i)(ETH_RX_HDR_ERRORMINTU_O);
+        s_stin_len_max_err(i)    <= s_stin_metadata(i)(ETH_RX_HDR_ERRORMAXTU_O);
     end generate;
 
     stat_unit_i : entity work.RX_MAC_LITE_STAT_UNIT
@@ -1010,12 +1039,7 @@ begin
         CNT_IN_DSP         => True,
         DEVICE             => DEVICE,
         -- Counters setup
-        CRC_EN             => CRC_CHECK_EN,
-        MAC_EN             => MAC_CHECK_EN,
-        MTU_EN             => true,
         SIZE_EN            => true,
-        BCAST_MCAST_EN     => MAC_CHECK_EN,
-        FRAGMENT_JABBER_EN => true,
         LEN_HISTOGRAM_EN   => true
     )
     port map(
@@ -1030,9 +1054,12 @@ begin
         IN_FRAME_RECEIVED      => s_stin_valid,
         IN_FRAME_DISCARDED     => s_stin_discarded,
         IN_BUFFER_OVF          => s_stin_buffer_ovf,
-        IN_FRAME_ERROR         => s_stin_adapter_err,
+        IN_FRAME_ERROR_MASKED  => s_stin_mii_err_masked,
         IN_CRC_ERROR           => s_stin_crc_err,
+        IN_CRC_ERROR_MASKED    => s_stin_crc_err_masked,
         IN_MAC_ERROR           => s_stin_mac_err,
+        IN_MAC_ERROR_MASKED    => s_stin_mac_err_masked,
+        IN_LEN_ERROR_MASKED    => s_stin_len_err_masked,
         IN_MAC_BCAST           => s_stin_mac_bcast,
         IN_MAC_MCAST           => s_stin_mac_mcast,
         IN_FRAME_LEN           => s_stin_frame_len,
@@ -1041,28 +1068,38 @@ begin
         IN_STAT_FLAGS_VLD      => s_stin_valid,
         -- OUTPUT OF STATISTICS COUNTERS
         OUT_STAT_VLD           => open,
-        OUT_FRAMES_RECEIVED    => s_stat_frames_received,
-        OUT_FRAMES_TRANSMITTED => s_stat_frames_transmitted,
-        OUT_FRAMES_DISCARDED   => s_stat_frames_discarded,
-        OUT_BUFFER_OVF         => s_stat_buffer_ovf,
-        OUT_RX_BYTES           => s_stat_rx_bytes,
-        OUT_TX_BYTES           => s_stat_tx_bytes,
-        OUT_CRC_ERR            => s_stat_crc_err,
-        OUT_MAC_ERR            => s_stat_mac_err,
-        OUT_OVER_MTU           => s_stat_over_mtu,
-        OUT_BELOW_MIN          => s_stat_below_min,
-        OUT_BCAST_FRAMES       => s_stat_bcast_frames,
-        OUT_MCAST_FRAMES       => s_stat_mcast_frames,
-        OUT_FRAGMENT_FRAMES    => s_stat_fragment_frames,
-        OUT_JABBER_FRAMES      => s_stat_jabber_frames,
-        OUT_FRAMES_UNDERSIZE   => s_stat_frames_undersize,
-        OUT_FRAMES_64          => s_stat_frames_64,
-        OUT_FRAMES_65_127      => s_stat_frames_65_127,
-        OUT_FRAMES_128_255     => s_stat_frames_128_255,
-        OUT_FRAMES_256_511     => s_stat_frames_256_511,
-        OUT_FRAMES_512_1023    => s_stat_frames_512_1023,
-        OUT_FRAMES_1024_1518   => s_stat_frames_1024_1518,
-        OUT_FRAMES_OVER_1518   => s_stat_frames_over_1518
+        OUT_BASE_TOTAL         => s_stat_out_base_total,
+        OUT_BASE_PASSED        => s_stat_out_base_passed,
+        OUT_BASE_DROPPED       => s_stat_out_base_dropped,
+        OUT_BASE_DROP_OFF      => s_stat_out_base_drop_off,
+        OUT_BASE_DROP_OVF      => s_stat_out_base_drop_ovf,
+        OUT_BASE_DROP_FLT      => s_stat_out_base_drop_flt,
+        OUT_BASE_DROP_ERR      => s_stat_out_base_drop_err,
+        OUT_BASE_ERR_LEN       => s_stat_out_base_err_len,
+        OUT_BASE_ERR_MII       => s_stat_out_base_err_mii,
+        OUT_BASE_ERR_CRC       => s_stat_out_base_err_crc,
+        OUT_RX_BYTES           => s_stat_out_rx_bytes,
+        OUT_TX_BYTES           => s_stat_out_tx_bytes,
+        OUT_RFC_CRC_ERR        => s_stat_out_rfc_crc_err,
+        OUT_RFC_MAC_ERR        => s_stat_out_rfc_mac_err,
+        OUT_RFC_OVER_MTU       => s_stat_out_rfc_over_mtu,
+        OUT_RFC_BELOW_MIN      => s_stat_out_rfc_below_min,
+        OUT_RFC_MAC_BCAST      => s_stat_out_rfc_mac_bcast,
+        OUT_RFC_MAC_MCAST      => s_stat_out_rfc_mac_mcast,
+        OUT_RFC_FRAGMENT       => s_stat_out_rfc_fragment,
+        OUT_RFC_JABBER         => s_stat_out_rfc_jabber,
+        OUT_HIST_UNDERSIZE     => s_stat_out_hist_undersize,
+        OUT_HIST_64            => s_stat_out_hist_64,
+        OUT_HIST_65_127        => s_stat_out_hist_65_127,
+        OUT_HIST_128_255       => s_stat_out_hist_128_255,
+        OUT_HIST_256_511       => s_stat_out_hist_256_511,
+        OUT_HIST_512_1023      => s_stat_out_hist_512_1023,
+        OUT_HIST_1024_1518     => s_stat_out_hist_1024_1518,
+        OUT_HIST_OVER_1518     => s_stat_out_hist_over_1518,
+        OUT_HIST_1519_2047     => s_stat_out_hist_1519_2047,
+        OUT_HIST_2048_4095     => s_stat_out_hist_2048_4095,
+        OUT_HIST_4096_8191     => s_stat_out_hist_4096_8191,
+        OUT_HIST_OVER_8191     => s_stat_out_hist_over_8191
     );
 
     -- =========================================================================
@@ -1116,27 +1153,38 @@ begin
         CTL_FRAME_LEN_MIN       => s_ctl_frame_len_min,
         CTL_MAC_CHECK_MODE      => s_ctl_mac_check_mode,
         -- INPUT OF STATISTICS
-        STAT_FRAMES_RECEIVED    => s_stat_frames_received,
-        STAT_FRAMES_TRANSMITTED => s_stat_frames_transmitted,
-        STAT_FRAMES_DISCARDED   => s_stat_frames_discarded,
-        STAT_BUFFER_OVF         => s_stat_buffer_ovf,
-        STAT_RX_BYTES           => s_stat_rx_bytes,
-        STAT_TX_BYTES           => s_stat_tx_bytes,
-        STAT_CRC_ERR            => s_stat_crc_err,
-        STAT_OVER_MTU           => s_stat_over_mtu,
-        STAT_BELOW_MIN          => s_stat_below_min,
-        STAT_BCAST_FRAMES       => s_stat_bcast_frames,
-        STAT_MCAST_FRAMES       => s_stat_mcast_frames,
-        STAT_FRAGMENT_FRAMES    => s_stat_fragment_frames,
-        STAT_JABBER_FRAMES      => s_stat_jabber_frames,
-        STAT_FRAMES_UNDERSIZE   => s_stat_frames_undersize,
-        STAT_FRAMES_64          => s_stat_frames_64,
-        STAT_FRAMES_65_127      => s_stat_frames_65_127,
-        STAT_FRAMES_128_255     => s_stat_frames_128_255,
-        STAT_FRAMES_256_511     => s_stat_frames_256_511,
-        STAT_FRAMES_512_1023    => s_stat_frames_512_1023,
-        STAT_FRAMES_1024_1518   => s_stat_frames_1024_1518,
-        STAT_FRAMES_OVER_1518   => s_stat_frames_over_1518
+        STAT_BASE_TOTAL         => s_stat_out_base_total,
+        STAT_BASE_PASSED        => s_stat_out_base_passed,
+        STAT_BASE_DROPPED       => s_stat_out_base_dropped,
+        STAT_BASE_DROP_OFF      => s_stat_out_base_drop_off,
+        STAT_BASE_DROP_OVF      => s_stat_out_base_drop_ovf,
+        STAT_BASE_DROP_FLT      => s_stat_out_base_drop_flt,
+        STAT_BASE_DROP_ERR      => s_stat_out_base_drop_err,
+        STAT_BASE_ERR_LEN       => s_stat_out_base_err_len,
+        STAT_BASE_ERR_MII       => s_stat_out_base_err_mii,
+        STAT_BASE_ERR_CRC       => s_stat_out_base_err_crc,
+        STAT_RX_BYTES           => s_stat_out_rx_bytes,
+        STAT_TX_BYTES           => s_stat_out_tx_bytes,
+        STAT_RFC_CRC_ERR        => s_stat_out_rfc_crc_err,
+        STAT_RFC_MAC_ERR        => s_stat_out_rfc_mac_err,
+        STAT_RFC_OVER_MTU       => s_stat_out_rfc_over_mtu,
+        STAT_RFC_BELOW_MIN      => s_stat_out_rfc_below_min,
+        STAT_RFC_MAC_BCAST      => s_stat_out_rfc_mac_bcast,
+        STAT_RFC_MAC_MCAST      => s_stat_out_rfc_mac_mcast,
+        STAT_RFC_FRAGMENT       => s_stat_out_rfc_fragment,
+        STAT_RFC_JABBER         => s_stat_out_rfc_jabber,
+        STAT_HIST_UNDERSIZE     => s_stat_out_hist_undersize,
+        STAT_HIST_64            => s_stat_out_hist_64,
+        STAT_HIST_65_127        => s_stat_out_hist_65_127,
+        STAT_HIST_128_255       => s_stat_out_hist_128_255,
+        STAT_HIST_256_511       => s_stat_out_hist_256_511,
+        STAT_HIST_512_1023      => s_stat_out_hist_512_1023,
+        STAT_HIST_1024_1518     => s_stat_out_hist_1024_1518,
+        STAT_HIST_OVER_1518     => s_stat_out_hist_over_1518,
+        STAT_HIST_1519_2047     => s_stat_out_hist_1519_2047,
+        STAT_HIST_2048_4095     => s_stat_out_hist_2048_4095,
+        STAT_HIST_4096_8191     => s_stat_out_hist_4096_8191,
+        STAT_HIST_OVER_8191     => s_stat_out_hist_over_8191
     );
 
 end architecture;
