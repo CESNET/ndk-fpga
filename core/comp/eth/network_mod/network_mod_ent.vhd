@@ -80,6 +80,7 @@ generic(
     -- The measured data is presented to the user via a couple of dedicated registers.
     -- WARNING: works only for a single-channel (and single-Region) designs with E-Tile (Intel)!
     TS_DEMO_EN        : boolean := false;
+    -- TX_DMA_CHANNELS per Eth Stream!
     TX_DMA_CHANNELS   : natural := 16;
     -- Enable low latency optimalization
     LL_MODE           : boolean := false;

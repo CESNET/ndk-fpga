@@ -239,7 +239,7 @@ port (
 
     -- This interface is to transmit Channel IDs and Timestamps of packets
     -- from the APP Core to the demo/testing logic in the Network Mod Core (E-Tile).
-    ETH_TX_MVB_CHANNEL      : out std_logic_vector(ETH_STREAMS* MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
+    ETH_TX_MVB_CHANNEL      : out std_logic_vector(ETH_STREAMS* MFB_REGIONS*log2(DMA_TX_CHANNELS/(ETH_STREAMS/DMA_STREAMS))-1 downto 0);
     ETH_TX_MVB_TIMESTAMP    : out std_logic_vector(ETH_STREAMS* MFB_REGIONS*48-1 downto 0);
     ETH_TX_MVB_VLD          : out std_logic_vector(ETH_STREAMS* MFB_REGIONS-1 downto 0) := (others => '0');
 
