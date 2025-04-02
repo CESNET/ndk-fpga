@@ -401,7 +401,7 @@ module testbench;
         .MI_DRD                (config_if.DRD),  //  : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
         .MI_DRDY               (config_if.DRDY)  //  : out std_logic
     );
-    assign m_tsu.SRC_RDY = 1'b1;
+    assign m_tsu.DST_RDY = 1'b1;
 
     app_core_property #(
         .ETH_STREAMS (test_pkg::ETH_STREAMS),
