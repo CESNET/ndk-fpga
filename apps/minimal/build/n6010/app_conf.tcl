@@ -25,7 +25,7 @@ set MEM_PORTS            4
 # Select debug parameters:
 # ------------------------------------------------------------------------------
 # Enables debug probes and counters in the DMA Module (Medusa)
-set DMA_DEBUG_ENABLE       false
+set DMA_DEBUG_ENABLE       true
 # Enables debug probes and counters in the PCIe Module (PCIe Core arch: USP and P-Tile)
 set PCIE_CORE_DEBUG_ENABLE false
 # Enables debug probes in the PCIe Module (PCIe Ctrl)
