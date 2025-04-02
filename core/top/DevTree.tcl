@@ -133,16 +133,22 @@ proc dts_build_netcope {} {
 
     # Populate application, if exists
     global APP_CORE_ENABLE
+    global ETH_STREAMS_MODE
+    if {$ETH_STREAMS_MODE == 1} {
+        set ETH_STREAMS [expr $ETH_PORTS*$ETH_PORT_CHAN(0)]
+    } else {
+        set ETH_STREAMS $ETH_PORTS
+    }
     if {$APP_CORE_ENABLE} {
         if { [llength [info procs dts_application]] > 0 } {
             global MEM_PORTS HBM_PORTS
 
             if {[llength [info args dts_application]] == 3} {
                 # INFO: backward compatible variant without generics parameter
-                append ret "app:" [dts_application $ADDR_USERAPP $ETH_PORTS $MEM_PORTS]
+                append ret "app:" [dts_application $ADDR_USERAPP $ETH_STREAMS $MEM_PORTS]
             } else {
                 array set GENERICS "
-                    ETH_STREAMS $ETH_PORTS
+                    ETH_STREAMS $ETH_STREAMS
                     DDR_PORTS $MEM_PORTS
                     HBM_PORTS $HBM_PORTS
                 "
