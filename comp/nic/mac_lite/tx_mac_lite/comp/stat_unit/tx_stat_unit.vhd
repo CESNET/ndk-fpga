@@ -45,6 +45,7 @@ entity TX_MAC_LITE_STAT_UNIT is
         VECTOR_INC_DISCARDED        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         VECTOR_INC_LINK_ERROR       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         VECTOR_INC_LEN_ERROR        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        VECTOR_INC_DISABLED         : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         -- FRAME LENGTH
         FRAME_LENGTH                : in  std_logic_vector(MFB_REGIONS*LENGTH_WIDTH-1 downto 0);
         FRAME_LENGTH_VLD            : in  std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -59,7 +60,8 @@ entity TX_MAC_LITE_STAT_UNIT is
         STAT_TOTAL_SENT_OCTECTS     : out std_logic_vector(63 downto 0);
         STAT_TOTAL_DISCARDED_FRAMES : out std_logic_vector(63 downto 0);
         STAT_TOTAL_LINK_ERR_FRAMES  : out std_logic_vector(63 downto 0);
-        STAT_TOTAL_LEN_ERR_FRAMES   : out std_logic_vector(63 downto 0)
+        STAT_TOTAL_LEN_ERR_FRAMES   : out std_logic_vector(63 downto 0);
+        STAT_TOTAL_DISABLED_FRAMES  : out std_logic_vector(63 downto 0)
     );
 end entity;
 
@@ -78,6 +80,7 @@ architecture FULL of TX_MAC_LITE_STAT_UNIT is
     signal inc_discarded_frames : std_logic_vector(REGION_CNT_W-1 downto 0);
     signal inc_link_err_frames  : std_logic_vector(REGION_CNT_W-1 downto 0);
     signal inc_len_err_frames   : std_logic_vector(REGION_CNT_W-1 downto 0);
+    signal inc_disabled_frames  : std_logic_vector(REGION_CNT_W-1 downto 0);
 
     signal cnt_total_frames     : std_logic_vector(64-1 downto 0);
     signal cnt_total_bytes      : std_logic_vector(64-1 downto 0);
@@ -86,6 +89,7 @@ architecture FULL of TX_MAC_LITE_STAT_UNIT is
     signal cnt_discarded_frames : std_logic_vector(64-1 downto 0);
     signal cnt_link_err_frames  : std_logic_vector(64-1 downto 0);
     signal cnt_len_err_frames   : std_logic_vector(64-1 downto 0);
+    signal cnt_disabled_frames  : std_logic_vector(64-1 downto 0);
 
 begin
 
@@ -187,6 +191,25 @@ begin
         DIN_VLD  => '1',
         -- OUTPUT
         DOUT     => inc_len_err_frames,
+        DOUT_VLD => open
+    );
+
+    sum_one_disabled_frame_i : entity work.SUM_ONE
+    generic map(
+        INPUT_WIDTH  => MFB_REGIONS,
+        OUTPUT_WIDTH => REGION_CNT_W,
+        OUTPUT_REG   => True
+    )
+    port map(
+        -- CLOCK AND RESET
+        CLK      => CLK,
+        RESET    => RESET,
+        -- INPUT
+        DIN      => VECTOR_INC_DISABLED,
+        DIN_MASK => (others => '1'),
+        DIN_VLD  => '1',
+        -- OUTPUT
+        DOUT     => inc_disabled_frames,
         DOUT_VLD => open
     );
 
@@ -325,6 +348,23 @@ begin
         RESULT    => cnt_len_err_frames
     );
 
+    cnt_disabled_frames_i : entity work.DSP_COUNTER
+    generic map (
+        INPUT_WIDTH  => REGION_CNT_W,
+        OUTPUT_WIDTH => 64,
+        INPUT_REGS   => true,
+        DEVICE       => DEVICE,
+        DSP_ENABLE   => USE_DSP_CNT
+    )
+    port map (
+        CLK       => CLK,
+        CLK_EN    => '1',
+        RESET     => CTRL_RESET_CNT,
+        INCREMENT => inc_disabled_frames,
+        MAX_VAL   => (others => '1'),
+        RESULT    => cnt_disabled_frames
+    );
+
     cnt_sent_bytes_i : entity work.DSP_COUNTER
     generic map (
         INPUT_WIDTH  => LENGTH_WIDTH,
@@ -374,6 +414,7 @@ begin
                 STAT_TOTAL_DISCARDED_FRAMES <= cnt_discarded_frames;
                 STAT_TOTAL_LINK_ERR_FRAMES  <= cnt_link_err_frames;
                 STAT_TOTAL_LEN_ERR_FRAMES   <= cnt_len_err_frames;
+                STAT_TOTAL_DISABLED_FRAMES  <= cnt_disabled_frames;
             end if;
         end if;
     end process;
