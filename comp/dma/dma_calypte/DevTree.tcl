@@ -36,10 +36,10 @@ proc dts_dma_calypte_tx_buffer {DTS type id base size pcie} {
 # Adds a node to the Device Tree for performance counters within DMA Calypte
 # 1. DTS - reference to DeviceTree string
 # 2. Base - base address of the registers in the MI address space
-proc dts_dma_perf_cntrs {DTS base} {
+proc dts_dma_perf_cntrs {DTS base {compatible "dma_calypte_rx_perf_cntrs"} {idx 0}} {
     upvar 1 $DTS dts
 
-    dts_create_node dts "dma_calypte_rx_perf_cntrs0" {
-        dts_appendprop_comp_node dts $base 0x30 "cesnet,dma_calypte_rx_perf_cntrs"
+    dts_create_node dts "$compatible$idx" {
+        dts_appendprop_comp_node dts $base 0x30 "cesnet,$compatible"
     }
 }

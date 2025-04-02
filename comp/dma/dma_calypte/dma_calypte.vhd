@@ -351,7 +351,8 @@ begin
                 CNTRS_WIDTH        => DSP_CNT_WIDTH,
                 HDR_META_WIDTH     => HDR_META_WIDTH,
                 ST_SP_DBG_SIGNAL_W => ST_SP_DBG_SIGNAL_W,
-                PKT_SIZE_MAX       => USR_TX_PKT_SIZE_MAX)
+                PKT_SIZE_MAX       => USR_TX_PKT_SIZE_MAX,
+                PERF_CNTR_EN       => PERF_CNTR_EN)
             port map (
                 CLK   => CLK,
                 RESET => RESET,

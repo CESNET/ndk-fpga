@@ -63,6 +63,10 @@ proc dts_dmamod_open {base type rxn txn pcie rx_frame_size_max tx_frame_size_max
         }
     }
 
+    if {$type == 4 && $DMA_DEBUG_ENABLE} {
+        dts_dma_perf_cntrs ret [expr $base + $offset + 0x3000] "dma_calypte_tx_perf_cntrs"
+    }
+
     append ret "};"
     return $ret
 }
