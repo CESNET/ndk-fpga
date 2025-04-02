@@ -1573,6 +1573,7 @@ begin
         ETH_PORT_RX_MTU   => ETH_PORT_RX_MTU,
         ETH_PORT_TX_MTU   => ETH_PORT_TX_MTU,
         ETH_MAC_BYPASS    => ETH_MAC_BYPASS ,
+        ETH_CHAN_MAP      => ETH_CHAN_MAP,
         LANES             => ETH_LANES      ,
         QSFP_PORTS        => QSFP_PORTS     ,
         QSFP_I2C_PORTS    => QSFP_I2C_PORTS ,

@@ -40,6 +40,8 @@ generic(
     ETH_PORT_RX_MTU   : integer_vector(ETH_PORTS-1 downto 0) := (others => 16383);
     -- Maximum allowed size of TX frame in bytes per Ethernet port.
     ETH_PORT_TX_MTU   : integer_vector(ETH_PORTS-1 downto 0) := (others => 16383);
+    -- Optional remapping of physical QSFP(DD) lanes to Eth channel numbers
+    ETH_CHAN_MAP      : integer_vector(7 downto 0) := (7, 6, 5, 4, 3, 2, 1, 0);
     -- Optional option to disable MAC Lite modules. Dangerously!
     ETH_MAC_BYPASS    : boolean := False;
     -- Number of serial lanes.

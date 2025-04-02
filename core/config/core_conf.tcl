@@ -157,3 +157,13 @@ set TS_DEMO_EN             false
 
 # Enable Low-latency optimalizations
 set LL_MODE                false
+
+set ETH_CHAN_MAP(0) 0
+set ETH_CHAN_MAP(1) 1
+set ETH_CHAN_MAP(2) 2
+set ETH_CHAN_MAP(3) 3
+set ETH_CHAN_MAP(4) 4
+set ETH_CHAN_MAP(5) 5
+set ETH_CHAN_MAP(6) 6
+set ETH_CHAN_MAP(7) 7
+
