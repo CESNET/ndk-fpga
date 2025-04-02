@@ -819,7 +819,7 @@ There is packet header the meta signal in MFB bus.</p></td>
 <td><p>ETH TX MFB streams: destination ready of each MFB bus</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-application_core-eth_tx_mvb_channel"><td><p>ETH_TX_MVB_CHANNEL</p></td>
-<td><p>std_logic_vector(ETH_STREAMS* MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0)</p></td>
+<td><p>std_logic_vector(ETH_STREAMS* MFB_REGIONS*log2(DMA_TX_CHANNELS/(ETH_STREAMS/DMA_STREAMS))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>This interface is to transmit Channel IDs and Timestamps of packets
 from the APP Core to the demo/testing logic in the Network Mod Core (E-Tile).</p></td>
