@@ -242,11 +242,6 @@ architecture FULL of RX_DMA_CALYPTE is
     signal pcie_mfb_stall_incr        : std_logic;
     signal pcie_mfb_beats_incr        : std_logic;
 
-    signal data_buff_full_chan         : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    signal data_buff_full_cntr_incr    : std_logic;
-    signal dma_hdr_buff_full_chan      : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    signal dma_hdr_buff_full_cntr_incr : std_logic;
-
     --==============================================================================================
     -- Debug signals for the RX DMA
     --==============================================================================================
@@ -363,18 +358,18 @@ begin
                 MI_ADDR_WIDTH   => MI_WIDTH,
 
                 CNTER_CNT       => PERF_CNTR_NUM,
-                VALUE_CNT       => 2,
+                VALUE_CNT       => 0,
 
                 CTRLO_WIDTH     => 0,
-                CTRLI_WIDTH     => 0,
+                CTRLI_WIDTH     => 4,
 
                 CNTER_WIDTH     => PERF_CNTR_WIDTH,
                 VALUE_WIDTH     => (others => log2(CHANNELS)),
 
                 MIN_EN          => (others => FALSE),
                 MAX_EN          => (others => FALSE),
-                SUM_EN          => (others => TRUE),
-                HIST_EN         => (others => TRUE),
+                SUM_EN          => (others => FALSE),
+                HIST_EN         => (others => FALSE),
 
                 SUM_EXTRA_WIDTH => (others => 16),
                 HIST_BOX_CNT    => (others => CHANNELS),
@@ -388,14 +383,14 @@ begin
                 SW_RST        => open,
 
                 CTRLO         => open,
-                CTRLI         => (others => '0'),
+                CTRLI         => PCIE_UP_MFB_SRC_RDY & PCIE_UP_MFB_DST_RDY & USER_RX_MFB_SRC_RDY & USER_RX_MFB_DST_RDY,
 
                 CNTERS_INCR   => perf_cntr_incr_packed,
                 CNTERS_SUBMIT => perf_cntr_incr_packed,
                 CNTERS_DIFF   => perf_cntr_diff_packed,
 
-                VALUES_VLD    => data_buff_full_cntr_incr & dma_hdr_buff_full_cntr_incr,
-                VALUES        => data_buff_full_chan & dma_hdr_buff_full_chan,
+                VALUES_VLD    => (others => '0'),
+                VALUES        => (others => '0'),
 
                 MI_DWR        => mi_split_dwr(1),
                 MI_ADDR       => mi_split_addr(1),
@@ -497,10 +492,10 @@ begin
             HPM_RD_CHAN => hdrm_hdr_rd_chan,
             HPM_RD_DATA => hdrm_hpm_rd_data,
 
-            DATA_BUFF_FULL_CHAN         => data_buff_full_chan,
-            DATA_BUFF_FULL_CNTR_INCR    => data_buff_full_cntr_incr,
-            DMA_HDR_BUFF_FULL_CHAN      => dma_hdr_buff_full_chan,
-            DMA_HDR_BUFF_FULL_CNTR_INCR => dma_hdr_buff_full_cntr_incr);
+            DATA_BUFF_FULL_CHAN         => open,
+            DATA_BUFF_FULL_CNTR_INCR    => open,
+            DMA_HDR_BUFF_FULL_CHAN      => open,
+            DMA_HDR_BUFF_FULL_CNTR_INCR => open);
 
 
     USER_RX_MFB_DST_RDY <= hdr_log_dst_rdy and data_path_dst_rdy;
