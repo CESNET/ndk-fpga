@@ -57,6 +57,8 @@ entity RX_MAC_LITE_STAT_UNIT is
         IN_FRAME_DISCARDED     : in  std_logic_vector(REGIONS-1 downto 0);
         -- Flag of discarded frame due to buffer overfull for each region
         IN_BUFFER_OVF          : in  std_logic_vector(REGIONS-1 downto 0);
+        -- Flag of frame drop due to RX MAC is off for each region
+        IN_FRAME_DROP_OFF      : in  std_logic_vector(REGIONS-1 downto 0);
         -- Flag of frame error (GMII errors) for each region
         IN_FRAME_ERROR_MASKED  : in  std_logic_vector(REGIONS-1 downto 0);
         -- Flag of frame with bad CRC for each region
@@ -224,7 +226,7 @@ begin
             s_reg_in_base_total    <= IN_FRAME_RECEIVED;
             s_reg_in_base_passed   <= IN_FRAME_RECEIVED and not IN_FRAME_DISCARDED;
             s_reg_in_base_dropped  <= IN_FRAME_DISCARDED;
-            s_reg_in_base_drop_off <= (others => '0'); -- TODO
+            s_reg_in_base_drop_off <= IN_FRAME_DROP_OFF;
             s_reg_in_base_drop_ovf <= IN_BUFFER_OVF;
             s_reg_in_base_drop_flt <= IN_MAC_ERROR_MASKED;
             s_reg_in_base_drop_err <= IN_LEN_ERROR_MASKED or IN_FRAME_ERROR_MASKED or IN_CRC_ERROR_MASKED;

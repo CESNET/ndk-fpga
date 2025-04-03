@@ -239,14 +239,6 @@ architecture FULL of RX_MAC_LITE is
 
     signal s_rx_inc_frame             : std_logic_vector(RX_REGIONS downto 0);
 
-    signal s_ena_data                 : std_logic_vector(RX_DATA_W-1 downto 0);
-    signal s_ena_sof_pos              : std_logic_vector(RX_SOF_POS_W-1 downto 0);
-    signal s_ena_eof_pos              : std_logic_vector(RX_EOF_POS_W-1 downto 0);
-    signal s_ena_sof                  : std_logic_vector(RX_REGIONS-1 downto 0);
-    signal s_ena_eof                  : std_logic_vector(RX_REGIONS-1 downto 0);
-    signal s_ena_adapter_err          : std_logic_vector(RX_REGIONS-1 downto 0);
-    signal s_ena_src_rdy              : std_logic;
-
     signal s_cut_data                 : std_logic_vector(RX_DATA_W-1 downto 0);
     signal s_cut_sof_pos              : std_logic_vector(RX_SOF_POS_W-1 downto 0);
     signal s_cut_eof_pos              : std_logic_vector(RX_EOF_POS_W-1 downto 0);
@@ -309,6 +301,7 @@ architecture FULL of RX_MAC_LITE is
     signal s_bfin_data                : std_logic_vector(BF_DATA_W-1 downto 0);
     signal s_bfin_metadata_ser        : std_logic_vector(BF_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
     signal s_bfin_metadata            : slv_array_t(BF_REGIONS-1 downto 0)(ETH_RX_HDR_WIDTH-1 downto 0);
+    signal s_bfin_metactrl            : std_logic_vector(6-1 downto 0);
     signal s_bfin_err_mask            : std_logic_vector(5-1 downto 0);
     signal s_bfin_adapter_err_masked  : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_bfin_crc_err_masked      : std_logic_vector(BF_REGIONS-1 downto 0);
@@ -348,9 +341,12 @@ architecture FULL of RX_MAC_LITE is
     signal s_stin_mac_err_masked      : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_mac_bcast           : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_mac_mcast           : std_logic_vector(BF_REGIONS-1 downto 0);
+    signal s_stin_drop_off            : std_logic_vector(BF_REGIONS-1 downto 0);
     signal s_stin_frame_len           : slv_array_t(BF_REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
     signal s_stin_metadata            : slv_array_t(BF_REGIONS-1 downto 0)(ETH_RX_HDR_WIDTH-1 downto 0);
+    signal s_stin_metactrl            : std_logic_vector(6-1 downto 0);
     signal s_stin_err_mask            : std_logic_vector(5-1 downto 0);
+    signal s_stin_enable              : std_logic;
     signal s_buffer_status            : std_logic_vector(2-1 downto 0);
 
     signal s_stat_out_base_total      : std_logic_vector(63 downto 0);
@@ -439,43 +435,6 @@ begin
     end process;
 
     -- =========================================================================
-    --  INPUT ENABLER
-    -- =========================================================================
-
-    input_enabler_i : entity work.MFB_ENABLER
-    generic map(
-        REGIONS     => RX_REGIONS,
-        REGION_SIZE => RX_REGION_SIZE,
-        BLOCK_SIZE  => RX_BLOCK_SIZE,
-        ITEM_WIDTH  => RX_ITEM_WIDTH,
-        META_WIDTH  => 1,
-        OUTPUT_REG  => false
-    )
-    port map(
-        CLK            => RX_CLK,
-        RESET          => RX_RESET,
-
-        RX_DATA        => RX_MFB_DATA,
-        RX_META        => RX_MFB_ERROR,
-        RX_SOF_POS     => RX_MFB_SOF_POS,
-        RX_EOF_POS     => RX_MFB_EOF_POS,
-        RX_SOF         => RX_MFB_SOF,
-        RX_EOF         => RX_MFB_EOF,
-        RX_SRC_RDY     => RX_MFB_SRC_RDY,
-
-        TX_DATA        => s_ena_data,
-        TX_META        => s_ena_adapter_err,
-        TX_SOF_POS     => s_ena_sof_pos,
-        TX_EOF_POS     => s_ena_eof_pos,
-        TX_SOF         => s_ena_sof,
-        TX_EOF         => s_ena_eof,
-        TX_SRC_RDY     => s_ena_src_rdy,
-        TX_ENABLE      => s_ctl_enable,
-
-        STAT_DISCARDED => open
-    );
-
-    -- =========================================================================
     --  CRC CUTTER (latency = 2 cycles)
     -- =========================================================================
 
@@ -492,13 +451,13 @@ begin
             CLK            => RX_CLK,
             RESET          => RX_RESET,
 
-            RX_DATA        => s_ena_data,
-            RX_SOF_POS     => s_ena_sof_pos,
-            RX_EOF_POS     => s_ena_eof_pos,
-            RX_SOF         => s_ena_sof,
-            RX_EOF         => s_ena_eof,
-            RX_SRC_RDY     => s_ena_src_rdy,
-            RX_ADAPTER_ERR => s_ena_adapter_err,
+            RX_DATA        => RX_MFB_DATA,
+            RX_SOF_POS     => RX_MFB_SOF_POS,
+            RX_EOF_POS     => RX_MFB_EOF_POS,
+            RX_SOF         => RX_MFB_SOF,
+            RX_EOF         => RX_MFB_EOF,
+            RX_SRC_RDY     => RX_MFB_SRC_RDY,
+            RX_ADAPTER_ERR => RX_MFB_ERROR,
 
             TX_DATA        => s_cut_data,
             TX_SOF_POS     => s_cut_sof_pos,
@@ -510,13 +469,13 @@ begin
             TX_CRC_CUT_ERR => s_cut_crc_cut_err
         );
     else generate
-        s_cut_data        <= s_ena_data;
-        s_cut_sof_pos     <= s_ena_sof_pos;
-        s_cut_eof_pos     <= s_ena_eof_pos;
-        s_cut_sof         <= s_ena_sof;
-        s_cut_eof         <= s_ena_eof;
-        s_cut_src_rdy     <= s_ena_src_rdy;
-        s_cut_adapter_err <= s_ena_adapter_err;
+        s_cut_data        <= RX_MFB_DATA;
+        s_cut_sof_pos     <= RX_MFB_SOF_POS;
+        s_cut_eof_pos     <= RX_MFB_EOF_POS;
+        s_cut_sof         <= RX_MFB_SOF;
+        s_cut_eof         <= RX_MFB_EOF;
+        s_cut_src_rdy     <= RX_MFB_SRC_RDY;
+        s_cut_adapter_err <= RX_MFB_ERROR;
         s_cut_crc_cut_err <= (others => '0');
     end generate;
 
@@ -875,9 +834,11 @@ begin
         s_bfin_mac_err_masked(rr)     <= s_bfin_metadata(rr)(ETH_RX_HDR_ERRORMAC_O)   and s_bfin_err_mask(4);
     end generate;
 
-    s_bfin_error <= s_bfin_adapter_err_masked or s_bfin_crc_err_masked or
+    s_bfin_error <= (s_bfin_adapter_err_masked or s_bfin_crc_err_masked or
                     s_bfin_len_min_err_masked or s_bfin_len_max_err_masked or
-                    s_bfin_mac_err_masked;
+                    s_bfin_mac_err_masked) or (not s_ctl_enable);
+
+    s_bfin_metactrl <= s_ctl_error_mask & s_ctl_enable;
 
     buffer_i : entity work.RX_MAC_LITE_BUFFER
     generic map(
@@ -886,6 +847,7 @@ begin
         BLOCK_SIZE     => BF_BLOCK_SIZE,
         ITEM_WIDTH     => BF_ITEM_WIDTH,
         META_WIDTH     => ETH_RX_HDR_WIDTH,
+        METACTRL_WIDTH => 6, -- error_mask + enable
         META_ALIGN2SOF => false,--(BF_REGIONS>1),
         DFIFO_ITEMS    => DFIFO_ITEMS,
         MFIFO_ITEMS    => MFIFO_ITEMS,
@@ -903,14 +865,14 @@ begin
         RX_EOF          => s_bfin_eof,
         RX_ERROR        => s_bfin_error,
         RX_METADATA     => s_bfin_metadata,
-        RX_ERR_MASK     => s_bfin_err_mask,
+        RX_METACTRL     => s_bfin_metactrl,
         RX_SRC_RDY      => s_bfin_src_rdy,
 
         BUFFER_STATUS   => s_buffer_status,
         STAT_BUFFER_OVF => s_stin_buffer_ovf,
         STAT_DISCARD    => s_stin_discarded,
         STAT_METADATA   => s_stin_metadata,
-        STAT_ERR_MASK   => s_stin_err_mask,
+        STAT_METACTRL   => s_stin_metactrl,
         STAT_VALID      => s_stin_valid,
 
         TX_CLK          => TX_CLK,
@@ -929,6 +891,9 @@ begin
         TX_MVB_SRC_RDY  => s_buf_mvb_src_rdy,
         TX_MVB_DST_RDY  => s_buf_mvb_dst_rdy
     );
+
+    s_stin_err_mask <= s_stin_metactrl(6-1 downto 1);
+    s_stin_enable   <= s_stin_metactrl(0);
 
     -- =========================================================================
     --  MFB RECONFIGURATOR + MVB RECONFIGURATOR
@@ -1025,6 +990,7 @@ begin
         s_stin_frame_len(i)      <= std_logic_vector(resize(unsigned(s_stin_metadata(i)(ETH_RX_HDR_LENGTH)),LEN_WIDTH));
         s_stin_len_min_err(i)    <= s_stin_metadata(i)(ETH_RX_HDR_ERRORMINTU_O);
         s_stin_len_max_err(i)    <= s_stin_metadata(i)(ETH_RX_HDR_ERRORMAXTU_O);
+        s_stin_drop_off(i)       <= s_stin_valid(i) and not s_stin_enable;
     end generate;
 
     stat_unit_i : entity work.RX_MAC_LITE_STAT_UNIT
@@ -1046,7 +1012,7 @@ begin
         CLK                    => RX_CLK,
         RESET                  => RX_RESET,
         -- CONTROL INTERFACE
-        CTRL_STAT_EN           => s_ctl_enable,
+        CTRL_STAT_EN           => '1',
         CTRL_SW_RESET          => s_ctl_stat_sw_reset,
         CTRL_TAKE_SNAPSHOT     => s_ctl_stat_take_snapshot,
         CTRL_READ_SNAPSHOT     => s_ctl_stat_read_snapshot,
@@ -1054,6 +1020,7 @@ begin
         IN_FRAME_RECEIVED      => s_stin_valid,
         IN_FRAME_DISCARDED     => s_stin_discarded,
         IN_BUFFER_OVF          => s_stin_buffer_ovf,
+        IN_FRAME_DROP_OFF      => s_stin_drop_off,
         IN_FRAME_ERROR_MASKED  => s_stin_mii_err_masked,
         IN_CRC_ERROR           => s_stin_crc_err,
         IN_CRC_ERROR_MASKED    => s_stin_crc_err_masked,
