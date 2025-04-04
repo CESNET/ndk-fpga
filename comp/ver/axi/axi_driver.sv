@@ -37,9 +37,10 @@ class Axi4SDriver #(DATA_WIDTH, USER_WIDTH, ITEM_WIDTH = 8) extends Driver;
 		this.vif = v;
 
 		this.vif.cb.TVALID	 <= 0;
+		this.vif.cb.TUSER    <= 0;
 	endfunction
 
-	task sendTransaction(AxiTransaction transaction);
+	task sendTransaction(AxiTransaction #(ITEM_WIDTH, USER_WIDTH) transaction);
 		Transaction tr;
 		$cast(tr, transaction);
 
@@ -57,7 +58,7 @@ class Axi4SDriver #(DATA_WIDTH, USER_WIDTH, ITEM_WIDTH = 8) extends Driver;
 	endtask
 
 	task run();
-		AxiTransaction transaction;
+		AxiTransaction #(ITEM_WIDTH, USER_WIDTH) transaction;
 		Transaction to;
 		time before_get;
 
@@ -113,13 +114,15 @@ class Axi4SDriver #(DATA_WIDTH, USER_WIDTH, ITEM_WIDTH = 8) extends Driver;
 
 	virtual task invalidateWordData();
 		logic[DATA_WIDTH-1:0] data = 'x;
-		logic[WORD_ITEMS-1:0] keep= 'x;
+		logic[USER_WIDTH-1:0] user = 'x;
+		logic[WORD_ITEMS-1:0] keep = 'x;
 
 		vif.cb.TDATA <= data;
+		vif.cb.TUSER <= user;
 		vif.cb.TKEEP <= keep;
 	endtask
 
-	virtual task exposeWordData(AxiTransaction tr, int cycle, inout finished);
+	virtual task exposeWordData(AxiTransaction #(ITEM_WIDTH, USER_WIDTH) tr, int cycle, inout finished);
 		logic[DATA_WIDTH-1:0] data = 'x;
 		logic[WORD_ITEMS-1:0] keep = '0;
 		int j;
@@ -133,10 +136,11 @@ class Axi4SDriver #(DATA_WIDTH, USER_WIDTH, ITEM_WIDTH = 8) extends Driver;
 			finished = 1;
 
 		vif.cb.TDATA <= data;
+		vif.cb.TUSER <= tr.user;
 		vif.cb.TKEEP <= keep;
 	endtask
 
-	virtual task sendWord(AxiTransaction tr, int cycle, inout finished);
+	virtual task sendWord(AxiTransaction #(ITEM_WIDTH, USER_WIDTH) tr, int cycle, inout finished);
 		wordRandomWait();
 		exposeWordData(tr, cycle, finished);
 		validateWord(finished);
@@ -146,7 +150,7 @@ class Axi4SDriver #(DATA_WIDTH, USER_WIDTH, ITEM_WIDTH = 8) extends Driver;
 		invalidateWordData();
 	endtask
 
-	virtual task sendFrame(AxiTransaction tr);
+	virtual task sendFrame(AxiTransaction #(ITEM_WIDTH, USER_WIDTH) tr);
 		int cycle = 0;
 		int finished = 0;
 
@@ -157,4 +161,3 @@ class Axi4SDriver #(DATA_WIDTH, USER_WIDTH, ITEM_WIDTH = 8) extends Driver;
 	endtask
 
 endclass
-

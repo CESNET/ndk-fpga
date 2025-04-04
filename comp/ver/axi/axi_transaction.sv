@@ -14,12 +14,13 @@
  *
  */
 
-class AxiTransaction #(ITEM_WIDTH = 8) extends Transaction;
+class AxiTransaction #(ITEM_WIDTH = 8, USER_WIDTH = 1) extends Transaction;
 
     int frameSizeMin = 1;
     int frameSizeMax = 512;
 
     rand bit [ITEM_WIDTH-1 : 0] data[];
+    rand bit [USER_WIDTH-1 : 0] user;
     logic [3:0] fbe;
     logic [3:0] lbe;
 
@@ -41,10 +42,13 @@ class AxiTransaction #(ITEM_WIDTH = 8) extends Transaction;
             $write("%x ",data[j]);
         end
         $write("\n");
+        $write("Metadata value: %x \n",user);
+        $write("\n");
+
     endfunction
 
     virtual function Transaction copy(Transaction to = null);
-        AxiTransaction #(ITEM_WIDTH) tr;
+        AxiTransaction #(ITEM_WIDTH, USER_WIDTH) tr;
 
         if (to == null)
             tr = new();
@@ -54,13 +58,14 @@ class AxiTransaction #(ITEM_WIDTH = 8) extends Transaction;
         tr.fbe  = fbe;
         tr.lbe  = lbe;
         tr.data = data;
+        tr.user = user;
         tr.frameSizeMax = frameSizeMax;
         tr.frameSizeMin = frameSizeMin;
         return tr;
     endfunction
 
     virtual function bit compare(input Transaction to, output string diff, input int kind = -1);
-        AxiTransaction #(ITEM_WIDTH) tr;
+        AxiTransaction #(ITEM_WIDTH, USER_WIDTH) tr;
         $cast(tr, to);
         if (lbe != tr.lbe || fbe != tr.fbe) begin
             return 0;
@@ -76,9 +81,11 @@ class AxiTransaction #(ITEM_WIDTH = 8) extends Transaction;
                         break;
                     end
             return 0;
+        end else if (user != tr.user) begin
+            diff = $sformatf("User data does not match!");
+            return 0;
         end else
             return 1;
     endfunction
 
 endclass
-
