@@ -445,6 +445,7 @@ begin
             REGION_SIZE => RX_REGION_SIZE,
             BLOCK_SIZE  => RX_BLOCK_SIZE,
             ITEM_WIDTH  => RX_ITEM_WIDTH,
+            META_WIDTH  => 1,
             OUTPUT_REG  => true
         )
         port map(
@@ -457,7 +458,7 @@ begin
             RX_SOF         => RX_MFB_SOF,
             RX_EOF         => RX_MFB_EOF,
             RX_SRC_RDY     => RX_MFB_SRC_RDY,
-            RX_ADAPTER_ERR => RX_MFB_ERROR,
+            RX_METADATA    => RX_MFB_ERROR,
 
             TX_DATA        => s_cut_data,
             TX_SOF_POS     => s_cut_sof_pos,
@@ -465,7 +466,7 @@ begin
             TX_SOF         => s_cut_sof,
             TX_EOF         => s_cut_eof,
             TX_SRC_RDY     => s_cut_src_rdy,
-            TX_ADAPTER_ERR => s_cut_adapter_err,
+            TX_METADATA    => s_cut_adapter_err,
             TX_CRC_CUT_ERR => s_cut_crc_cut_err
         );
     else generate
