@@ -5,6 +5,8 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+set TIMING_MET 0
+
 if {![info exists $env(OFM_PATH)]} {
     set OFM_PATH $env(OFM_PATH)
 }
@@ -356,11 +358,28 @@ proc SynthesizeDesignRun {synth_flags} {
 proc ImplementDesign {synth_flags} {
     # Define auxiliary variables
     upvar 1 $synth_flags SYNTH_FLAGS
+    global TIMING_MET
 
     ImplementDesignSetup SYNTH_FLAGS
     # Skip actual implementation if one of the variables is set to 1/true
     if {$SYNTH_FLAGS(PROJ_ONLY) || $SYNTH_FLAGS(SYNTH_ONLY)} {return}
-    ImplementDesignRun SYNTH_FLAGS
+    ImplementDesignRun SYNTH_FLAGS "impl_1"
+
+    # Create Intelligent Design Run when the timing not met
+    if {[info exist SYNTH_FLAGS(IDR)] && !$TIMING_MET} {
+
+        set VIVADO_VER [version -short]
+        set YEAR [string range $VIVADO_VER 0 3]
+        set IDR_SUPPORTED [expr {$YEAR > 2020}]
+
+        if {$IDR_SUPPORTED} {
+            create_run -flow {Vivado IDR Flow 2022} -parent_run synth_1 idr_1
+            set_property REFERENCE_RUN impl_1 [get_runs idr_1]
+            ImplementDesignRun SYNTH_FLAGS idr_1
+        }
+    }
+
+
 }
 
 proc ImplementDesignSetup {synth_flags} {
@@ -456,15 +475,19 @@ proc ImplementDesignSetup {synth_flags} {
     }
 }
 
-proc ImplementDesignRun {synth_flags} {
+proc ImplementDesignRun {synth_flags RUN_NAME} {
     # Define auxiliary variables
     upvar 1 $synth_flags SYNTH_FLAGS
+    global TIMING_MET
 
     PrintLabel "Implement"
 
-    launch_runs impl_1
-    wait_on_run impl_1
-    open_run impl_1
+    launch_runs $RUN_NAME
+    wait_on_run $RUN_NAME
+    open_run $RUN_NAME
+
+    set TIMING_MET [expr {[get_property SLACK [get_timing_paths]] >= 0}]
+    # set TIMING_MET [expr {[get_property STATS.WNS [get_runs $RUN_NAME]] < 0}]
 
     PrintLabel "Report Timing"
     set_delay_model -interconnect actual
