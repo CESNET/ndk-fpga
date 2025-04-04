@@ -15,26 +15,31 @@ module DUT (
 );
 
     AXI2MFB #(
-        .USE_IN_PIPE     (USE_IN_PIPE),
-        .USE_OUT_PIPE    (USE_OUT_PIPE),
-        .REGIONS         (REGIONS),
-        .REGION_SIZE     (REGION_SIZE),
-        .BLOCK_SIZE      (BLOCK_SIZE),
-        .ITEM_WIDTH      (ITEM_WIDTH),
-        .AXI_DATA_WIDTH  (AXI_DATA_WIDTH),
-        .PIPE_TYPE       (PIPE_TYPE),
-        .DEVICE          (DEVICE)
+        .USE_IN_PIPE       (USE_IN_PIPE),
+        .USE_OUT_PIPE      (USE_OUT_PIPE),
+        .REGIONS           (REGIONS),
+        .REGION_SIZE       (REGION_SIZE),
+        .BLOCK_SIZE        (BLOCK_SIZE),
+        .ITEM_WIDTH        (ITEM_WIDTH),
+        .AXI_DATA_WIDTH    (AXI_DATA_WIDTH),
+        .AXI_USER_WIDTH    (AXI_USER_WIDTH),
+        .META_WIDTH        (META_WIDTH),
+        .MFB_META_WITH_SOF (!META_ALIGNMENT),
+        .PIPE_TYPE         (PIPE_TYPE),
+        .DEVICE            (DEVICE)
     ) VHDL_DUT_U (
         .CLK            (CLK),
         .RST            (RESET),
 
         .RX_AXI_TDATA   (RX.TDATA),
+        .RX_AXI_TUSER   (RX.TUSER),
         .RX_AXI_TKEEP   (RX.TKEEP),
         .RX_AXI_TLAST   (RX.TLAST),
         .RX_AXI_TVALID  (RX.TVALID),
         .RX_AXI_TREADY  (RX.TREADY),
 
         .TX_MFB_DATA    (TX.DATA),
+        .TX_MFB_META    (TX.META),
         .TX_MFB_SOF_POS (TX.SOF_POS),
         .TX_MFB_EOF_POS (TX.EOF_POS),
         .TX_MFB_SOF     (TX.SOF),

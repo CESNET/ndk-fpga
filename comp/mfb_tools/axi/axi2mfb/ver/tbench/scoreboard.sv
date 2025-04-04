@@ -18,12 +18,15 @@ class ScoreboardDriverCbs extends DriverCbs;
     endfunction
 
     virtual task pre_tx(ref Transaction transaction, string inst);
-        AxiTransaction #(ITEM_WIDTH) t_axi;
-        MfbTransaction #(ITEM_WIDTH) t_mfb;
+        AxiTransaction #(ITEM_WIDTH, AXI_USER_WIDTH) t_axi;
+        MfbTransaction #(ITEM_WIDTH, META_WIDTH) t_mfb;
         t_mfb = new;
 
         $cast(t_axi, transaction);
         t_mfb.data = t_axi.data;
+        t_mfb.meta = t_axi.user;
+        // Enable Meta Signal Comparison
+        t_mfb.check_meta = 1'b1;
 
         sc_table.add(t_mfb);
     endtask
