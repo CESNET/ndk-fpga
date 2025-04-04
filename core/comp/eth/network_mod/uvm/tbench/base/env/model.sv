@@ -51,6 +51,8 @@ endclass
 class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_PORT_SPEED[ETH_PORTS-1:0], int unsigned ETH_PORT_CHAN[ETH_PORTS-1:0], REGIONS, ITEM_WIDTH, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH) extends uvm_component;
     `uvm_component_param_utils(uvm_network_mod_env::model #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, REGIONS, ITEM_WIDTH, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH));
 
+    localparam int unsigned RX_MAC_COUNT = 16;
+
     uvm_tlm_analysis_fifo#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) eth_rx_data[ETH_PORTS];
     uvm_tlm_analysis_fifo#(uvm_logic_vector::sequence_item#(6))                eth_rx_hdr [ETH_PORTS];
     uvm_analysis_port    #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) eth_tx_data[ETH_PORTS];
@@ -66,6 +68,8 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
 
     protected int unsigned eth_recv[ETH_PORTS];
     protected int unsigned eth_drop[ETH_PORTS];
+
+    reg_model_port #(ETH_PORT_CHAN[0]) m_rx_mac_regmodel[ETH_PORTS];
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -116,6 +120,10 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
                 uvm_probe::pool::get_global_pool().get({"probe_event_component_", $sformatf("testbench.DUT_U.DUT_BASE_U.VHDL_DUT_U.eth_core_g[%0d].network_mod_logic_i.rx_g[%0d].rx_mac_g.rx_mac_i.buffer_i", it, jt), ".probe_drop"}).add_callback(drop_sync[it][jt]);
             end
         end
+    endfunction
+
+    function void set_rx_mac_regmodel(int unsigned port_index, reg_model_port #(ETH_PORT_CHAN[0]) regmodel);
+        m_rx_mac_regmodel[port_index] = regmodel;
     endfunction
 
     task automatic run_eth(int unsigned index);
@@ -173,16 +181,19 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
             broadcast = dst_mac === '1;
             multicast = (dst_mac[48-8] === 1) && !broadcast;
 
-            //mac_hit_vld = 0;
-            //mac_hit     = 'X;
-            mac_hit_vld = 0;
-            mac_hit     = 0;
+            mac_hit_vld = check_mac_address(index, dst_mac, mac_hit);
 
             timestamp_vld = 1'b0;
             timestamp     = 'x;
 
             drop_sync[index][channel].get(drop);
             drop |= error_frame | error_min_tu | error_max_tu | error_crc | error_mac;
+
+            case (get_mac_check_mode(index))
+                2'h1: drop |= ~mac_hit_vld;               // ONLY_VALID
+                2'h2: drop |= ~(mac_hit_vld | broadcast); // VALID_AND_BCAST
+                2'h3: drop |= ~(mac_hit_vld | multicast); // VALID_AND_MCAST
+            endcase
 
             msg = $sformatf("\n\thdr input time %s", hdr.time2string());
             msg = {msg, $sformatf("\n\tlength        [%0d]" , length)};
@@ -280,6 +291,37 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
     virtual function logic is_frame_valid(logic [6-1 : 0] error_data);
         //0=> malformed packet, 1=> CRC error,  2=> data.size() < 64, 3 => data_size > rx_max_frame_size, 4 => if eth_type <= 1500 then data.size() != eth_type;
         return !(|error_data);
+    endfunction
+
+    function bit check_mac_address(int unsigned port_index, longint unsigned mac_address, output int unsigned mac_address_index);
+        longint unsigned mac_addresses[$];
+        int              find_result[$];
+
+        get_mac_check_addresses(port_index, mac_addresses);
+        find_result = mac_addresses.find_first_index with (item == mac_address);
+
+        if (find_result.size() > 0) begin
+            mac_address_index = find_result.pop_front();
+            return 1;
+        end
+        return 0;
+    endfunction
+
+    function void get_mac_check_addresses(int unsigned port_index, output longint unsigned mac_addresses[$]);
+        for (int unsigned i = 0; i < RX_MAC_COUNT; i++) begin
+            bit            valid;
+            bit [48-1 : 0] address;
+
+            { valid, address } = m_rx_mac_regmodel[port_index].channel[0].rx_mac.mac[i].get();
+
+            if (valid == 1'b1) begin
+                mac_addresses.push_back(address);
+            end
+        end
+    endfunction
+
+    function bit [2-1 : 0] get_mac_check_mode(int unsigned port_index);
+        return m_rx_mac_regmodel[port_index].channel[0].rx_mac.mac_check.get();
     endfunction
 
 endclass

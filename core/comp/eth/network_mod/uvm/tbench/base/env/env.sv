@@ -220,6 +220,10 @@ class env #(
             m_sequencer.port[it].usr_tx_hdr  = m_usr_tx_hdr[it].m_sequencer;
         end
         m_sequencer.tsu = m_tsu.m_sequencer;
+
+        for (int unsigned i = 0; i < ETH_PORTS; i++) begin
+            m_scoreboard.set_model_rx_mac_regmodel(i, m_sequencer.port[i].regmodel);
+        end
     endfunction
 endclass
 
