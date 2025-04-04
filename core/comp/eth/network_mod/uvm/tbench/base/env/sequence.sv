@@ -9,7 +9,7 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
     `uvm_declare_p_sequencer(uvm_network_mod_env::sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH));
 
 
-    localparam RX_MAC_COUNT = 4;
+    localparam int unsigned RX_MAC_COUNT = 16;
 
     uvm_sequence#(uvm_reset::sequence_item) eth_rst;
     uvm_sequence#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))  usr_rx_data;
