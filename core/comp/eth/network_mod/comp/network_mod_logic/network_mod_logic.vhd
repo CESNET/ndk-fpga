@@ -127,7 +127,8 @@ port(
     RX_CORE_MFB_EOF_POS  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*max(1,log2(CORE_REGION_SIZE*BLOCK_SIZE))-1 downto 0);
     RX_CORE_MFB_SOF      : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
     RX_CORE_MFB_EOF      : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
-    RX_CORE_MFB_ERROR    : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
+    RX_CORE_MFB_MII_ERR  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0) := (others => (others => '0'));
+    RX_CORE_MFB_CRC_ERR  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0) := (others => (others => '0'));
     RX_CORE_MFB_SRC_RDY  : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
     -- to the CORE
@@ -474,7 +475,8 @@ begin
                 RX_MFB_EOF      => rx_core_mfb_eof_tmp,
                 RX_MFB_SOF_POS  => RX_CORE_MFB_SOF_POS(ch),
                 RX_MFB_EOF_POS  => RX_CORE_MFB_EOF_POS(ch),
-                RX_MFB_ERROR    => RX_CORE_MFB_ERROR  (ch),
+                RX_MFB_MII_ERR  => RX_CORE_MFB_MII_ERR(ch),
+                RX_MFB_CRC_ERR  => RX_CORE_MFB_CRC_ERR(ch),
                 RX_MFB_SRC_RDY  => RX_CORE_MFB_SRC_RDY(ch),
 
                 ADAPTER_LINK_UP => RX_LINK_UP(ch),

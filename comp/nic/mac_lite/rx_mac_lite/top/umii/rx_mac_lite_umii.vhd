@@ -211,7 +211,7 @@ begin
         RX_MFB_EOF_POS  => adp_mfb_eof_pos,
         RX_MFB_SOF      => adp_mfb_sof,
         RX_MFB_EOF      => adp_mfb_eof,
-        RX_MFB_ERROR    => adp_mfb_error,
+        RX_MFB_MII_ERR  => adp_mfb_error,
         RX_MFB_SRC_RDY  => adp_mfb_src_rdy,
 
         ADAPTER_LINK_UP => adp_link_up,

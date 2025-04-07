@@ -777,7 +777,7 @@ architecture FULL of NETWORK_MOD_CORE is
             IN_MAC_STATUS    => ftile_rx_mac_status(i),
             IN_MAC_VALID     => ftile_rx_mac_valid(i),
             OUT_MFB_DATA     => TX_MFB_DATA(i),
-            OUT_MFB_ERROR    => TX_MFB_ERROR(i),
+            OUT_MFB_ERROR    => TX_MFB_CRC_ERR(i),
             OUT_MFB_SOF      => TX_MFB_SOF(i),
             OUT_MFB_EOF      => TX_MFB_EOF(i),
             OUT_MFB_SOF_POS  => TX_MFB_SOF_POS(i),
@@ -785,6 +785,9 @@ architecture FULL of NETWORK_MOD_CORE is
             OUT_MFB_SRC_RDY  => TX_MFB_SRC_RDY(i),
             OUT_LINK_UP      => open
         );
+
+        TX_MFB_MII_ERR(i) <= (others => '0');
+
         tx_ftile_adapter_i : entity work.TX_MAC_LITE_ADAPTER_MAC_SEG
         generic map(
             REGIONS     => REGIONS,

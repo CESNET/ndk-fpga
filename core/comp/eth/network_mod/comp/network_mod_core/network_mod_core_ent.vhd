@@ -130,7 +130,8 @@ port(
     -- =====================================================================
     TX_MFB_CLK      : out std_logic_vector(ETH_PORT_CHAN-1 downto 0) := (others => '0');
     TX_MFB_DATA     : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    TX_MFB_ERROR    : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    TX_MFB_MII_ERR  : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0) := (others => (others => '0'));
+    TX_MFB_CRC_ERR  : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0) := (others => (others => '0'));
     TX_MFB_SOF_POS  : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
     TX_MFB_EOF_POS  : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
     TX_MFB_SOF      : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);

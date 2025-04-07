@@ -1486,8 +1486,10 @@ begin
         OUT_MFB_EOF_POS => TX_MFB_EOF_POS(0),
         OUT_MFB_SOF     => TX_MFB_SOF(0),
         OUT_MFB_EOF     => TX_MFB_EOF(0),
-        OUT_MFB_ERROR   => TX_MFB_ERROR(0),
+        OUT_MFB_ERROR   => TX_MFB_CRC_ERR(0),
         OUT_MFB_SRC_RDY => TX_MFB_SRC_RDY(0)
     );
+
+    TX_MFB_MII_ERR <= (others => (others => '0'));
 
 end architecture;

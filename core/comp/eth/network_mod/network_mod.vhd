@@ -125,7 +125,8 @@ architecture FULL of NETWORK_MOD is
     signal rx_mfb_eof_pos_i : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(MFB_EOFP_WIDTH_CORE-1 downto 0);
     signal rx_mfb_sof_i     : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
     signal rx_mfb_eof_i     : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
-    signal rx_mfb_error_i   : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
+    signal rx_mfb_mii_err_i : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
+    signal rx_mfb_crc_err_i : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
     signal rx_mfb_src_rdy_i : slv_array_t   (ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
 
     -- Output of MFB Merger tree (and of the whole Network modul) as an array
@@ -426,7 +427,8 @@ begin
             RX_CORE_MFB_EOF_POS => rx_mfb_eof_pos_i(p),
             RX_CORE_MFB_SOF     => rx_mfb_sof_i    (p),
             RX_CORE_MFB_EOF     => rx_mfb_eof_i    (p),
-            RX_CORE_MFB_ERROR   => rx_mfb_error_i  (p),
+            RX_CORE_MFB_MII_ERR => rx_mfb_mii_err_i(p),
+            RX_CORE_MFB_CRC_ERR => rx_mfb_crc_err_i(p),
             RX_CORE_MFB_SRC_RDY => rx_mfb_src_rdy_i(p),
 
             TX_CORE_MFB_DATA    => tx_mfb_data_i   (p),
@@ -514,7 +516,8 @@ begin
             TX_MFB_EOF_POS  => rx_mfb_eof_pos_i(p),
             TX_MFB_SOF      => rx_mfb_sof_i    (p),
             TX_MFB_EOF      => rx_mfb_eof_i    (p),
-            TX_MFB_ERROR    => rx_mfb_error_i  (p),
+            TX_MFB_MII_ERR  => rx_mfb_mii_err_i(p),
+            TX_MFB_CRC_ERR  => rx_mfb_crc_err_i(p),
             TX_MFB_SRC_RDY  => rx_mfb_src_rdy_i(p),
 
             -- Control/status

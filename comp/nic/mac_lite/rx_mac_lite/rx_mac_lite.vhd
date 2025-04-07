@@ -108,8 +108,10 @@ entity RX_MAC_LITE is
         RX_MFB_SOF      : in  std_logic_vector(RX_REGIONS-1 downto 0);
         -- RX MFB: EOF position for each MFB region in MFB items
         RX_MFB_EOF      : in  std_logic_vector(RX_REGIONS-1 downto 0);
-        -- RX MFB: Error flag for each MFB region, valid with EOF
-        RX_MFB_ERROR    : in  std_logic_vector(RX_REGIONS-1 downto 0);
+        -- RX MFB: MII Error flag for each MFB region, valid with EOF
+        RX_MFB_MII_ERR  : in  std_logic_vector(RX_REGIONS-1 downto 0) := (others => '0');
+        -- RX MFB: CRC Error flag for each MFB region, valid with EOF
+        RX_MFB_CRC_ERR  : in  std_logic_vector(RX_REGIONS-1 downto 0) := (others => '0');
         -- RX MFB: source ready of each MFB bus, don't support gaps inside frame!
         RX_MFB_SRC_RDY  : in  std_logic;
 
@@ -232,22 +234,24 @@ architecture FULL of RX_MAC_LITE is
     constant MFIFO_ITEMS              : natural := (DFIFO_ITEMS*BF_DATA_W)/512;
     constant LEN_WIDTH                : natural := 16;
     constant MAC_STATUS_WIDTH         : natural := log2(MAC_COUNT)+4;
-    constant FLC_SYNC_WIDTH           : natural := 1+RX_EOF_POS_W+RX_SOF_POS_W+RX_DATA_W+(LEN_WIDTH+5)*RX_REGIONS;
+    constant FLC_SYNC_WIDTH           : natural := 1+RX_EOF_POS_W+RX_SOF_POS_W+RX_DATA_W+(LEN_WIDTH+6)*RX_REGIONS;
     constant INBANDCRC                : boolean := CRC_IS_RECEIVED and not CRC_REMOVE_EN;
     constant SM_CNT_TICKS_WIDTH       : natural := 24;
     constant SM_CNT_BYTES_WIDTH       : natural := 32;
 
     signal s_rx_inc_frame             : std_logic_vector(RX_REGIONS downto 0);
+    signal s_rx_mfb_error             : std_logic_vector(RX_REGIONS*2-1 downto 0);
 
     signal s_cut_data                 : std_logic_vector(RX_DATA_W-1 downto 0);
     signal s_cut_sof_pos              : std_logic_vector(RX_SOF_POS_W-1 downto 0);
     signal s_cut_eof_pos              : std_logic_vector(RX_EOF_POS_W-1 downto 0);
     signal s_cut_sof                  : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_cut_eof                  : std_logic_vector(RX_REGIONS-1 downto 0);
-    signal s_cut_adapter_err          : std_logic_vector(RX_REGIONS-1 downto 0);
+    signal s_cut_adapter_err          : std_logic_vector(RX_REGIONS*2-1 downto 0);
+    signal s_cut_adapter_err_arr      : slv_array_t(RX_REGIONS-1 downto 0)(2-1 downto 0);
     signal s_cut_src_rdy              : std_logic;
     signal s_cut_crc_cut_err          : std_logic_vector(RX_REGIONS-1 downto 0);
-    signal s_cut_metadata             : std_logic_vector(RX_REGIONS*2-1 downto 0);
+    signal s_cut_metadata             : std_logic_vector(RX_REGIONS*3-1 downto 0);
 
     signal s_flc_data                 : std_logic_vector(RX_DATA_W-1 downto 0);
     signal s_flc_sof_pos              : std_logic_vector(RX_SOF_POS_W-1 downto 0);
@@ -255,12 +259,13 @@ architecture FULL of RX_MAC_LITE is
     signal s_flc_sof                  : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_flc_eof                  : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_flc_src_rdy              : std_logic;
-    signal s_flc_adapter_err          : std_logic_vector(RX_REGIONS-1 downto 0);
+    signal s_flc_crc_err              : std_logic_vector(RX_REGIONS-1 downto 0);
+    signal s_flc_mii_err              : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_flc_len_max_err          : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_flc_len_min_err          : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_flc_frame_len            : std_logic_vector(RX_REGIONS*LEN_WIDTH-1 downto 0);
     signal s_flc_crc_cut_err          : std_logic_vector(RX_REGIONS-1 downto 0);
-    signal s_flc_metadata             : std_logic_vector(RX_REGIONS*2-1 downto 0);
+    signal s_flc_metadata             : std_logic_vector(RX_REGIONS*3-1 downto 0);
     signal s_flc_len_min_err_fixed    : std_logic_vector(RX_REGIONS-1 downto 0);
 
     signal s_flc_sync_in              : std_logic_vector(FLC_SYNC_WIDTH-1 downto 0);
@@ -276,12 +281,13 @@ architecture FULL of RX_MAC_LITE is
     signal s_sync_eof                 : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_sync_src_rdy             : std_logic;
     signal s_sync_dst_rdy_dbg         : std_logic;
-    signal s_sync_adapter_err         : std_logic_vector(RX_REGIONS-1 downto 0);
+    signal s_sync_mii_err             : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_sync_len_max_err         : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_sync_len_min_err         : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_sync_frame_len_ser       : std_logic_vector(RX_REGIONS*LEN_WIDTH-1 downto 0);
     signal s_sync_frame_len           : slv_array_t(RX_REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
     signal s_sync_crc_err             : std_logic_vector(RX_REGIONS-1 downto 0);
+    signal s_sync_crc_check_err       : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_sync_mac_status          : std_logic_vector(RX_REGIONS*MAC_STATUS_WIDTH-1 downto 0);
     signal s_sync_mac_err             : std_logic_vector(RX_REGIONS-1 downto 0);
     signal s_sync_mac_bcast           : std_logic_vector(RX_REGIONS-1 downto 0);
@@ -434,6 +440,11 @@ begin
         end if;
     end process;
 
+    rx_mfb_error_g : for r in 0 to RX_REGIONS-1 generate
+        s_rx_mfb_error(r*2+0) <= RX_MFB_CRC_ERR(r);
+        s_rx_mfb_error(r*2+1) <= RX_MFB_MII_ERR(r);
+    end generate;
+
     -- =========================================================================
     --  CRC CUTTER (latency = 2 cycles)
     -- =========================================================================
@@ -445,7 +456,7 @@ begin
             REGION_SIZE => RX_REGION_SIZE,
             BLOCK_SIZE  => RX_BLOCK_SIZE,
             ITEM_WIDTH  => RX_ITEM_WIDTH,
-            META_WIDTH  => 1,
+            META_WIDTH  => 2,
             OUTPUT_REG  => true
         )
         port map(
@@ -458,7 +469,7 @@ begin
             RX_SOF         => RX_MFB_SOF,
             RX_EOF         => RX_MFB_EOF,
             RX_SRC_RDY     => RX_MFB_SRC_RDY,
-            RX_METADATA    => RX_MFB_ERROR,
+            RX_METADATA    => s_rx_mfb_error,
 
             TX_DATA        => s_cut_data,
             TX_SOF_POS     => s_cut_sof_pos,
@@ -476,13 +487,16 @@ begin
         s_cut_sof         <= RX_MFB_SOF;
         s_cut_eof         <= RX_MFB_EOF;
         s_cut_src_rdy     <= RX_MFB_SRC_RDY;
-        s_cut_adapter_err <= RX_MFB_ERROR;
+        s_cut_adapter_err <= s_rx_mfb_error;
         s_cut_crc_cut_err <= (others => '0');
     end generate;
 
+    s_cut_adapter_err_arr <= slv_array_deser(s_cut_adapter_err, RX_REGIONS, 2);
+
     cut_metadata_pack_g : for r in 0 to RX_REGIONS-1 generate
-        s_cut_metadata(r*2+0) <= s_cut_adapter_err(r);
-        s_cut_metadata(r*2+1) <= s_cut_crc_cut_err(r);
+        s_cut_metadata(r*3+0) <= s_cut_adapter_err_arr(r)(0);
+        s_cut_metadata(r*3+1) <= s_cut_adapter_err_arr(r)(1);
+        s_cut_metadata(r*3+2) <= s_cut_crc_cut_err(r);
     end generate;
 
     -- =========================================================================
@@ -500,7 +514,7 @@ begin
         REGION_SIZE => RX_REGION_SIZE,
         BLOCK_SIZE  => RX_BLOCK_SIZE,
         ITEM_WIDTH  => RX_ITEM_WIDTH,
-        META_WIDTH  => 2,
+        META_WIDTH  => 3,
         LNG_WIDTH   => LEN_WIDTH
     )
     port map(
@@ -534,15 +548,16 @@ begin
     );
 
     flc_metadata_unpack_g : for r in 0 to RX_REGIONS-1 generate
-        s_flc_adapter_err(r) <= s_flc_metadata(r*2+0);
-        s_flc_crc_cut_err(r) <= s_flc_metadata(r*2+1);
+        s_flc_crc_err(r)    <= s_flc_metadata(r*3+0) or s_flc_metadata(r*3+2);
+        s_flc_mii_err(r)    <= s_flc_metadata(r*3+1);
+        s_flc_crc_cut_err(r) <= s_flc_metadata(r*3+2);
     end generate;
 
     s_flc_len_min_err_fixed <= s_flc_len_min_err or s_flc_crc_cut_err;
 
     s_flc_sync_in <= s_flc_src_rdy & s_flc_eof & s_flc_sof & s_flc_eof_pos &
         s_flc_sof_pos & s_flc_data & s_flc_frame_len & s_flc_len_min_err_fixed &
-        s_flc_len_max_err & s_flc_adapter_err;
+        s_flc_len_max_err & s_flc_mii_err & s_flc_crc_err;
 
     -- If RESET has 5 or more cycles, then it is enough SH_REG without reset.
     flc_sync_shreg_i : entity work.SH_REG_BASE_STATIC
@@ -558,16 +573,17 @@ begin
         DOUT       => s_flc_sync_out
     );
 
-    s_sync_src_rdy       <= s_flc_sync_out(3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W+RX_REGIONS+RX_REGIONS);
-    s_sync_eof           <= s_flc_sync_out(3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W+RX_REGIONS+RX_REGIONS-1 downto 3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W+RX_REGIONS);
-    s_sync_sof           <= s_flc_sync_out(3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W+RX_REGIONS-1 downto 3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W);
-    s_sync_eof_pos       <= s_flc_sync_out(3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W-1 downto 3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W);
-    s_sync_sof_pos       <= s_flc_sync_out(3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W-1 downto 3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W);
-    s_sync_data          <= s_flc_sync_out(3*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W-1 downto 3*RX_REGIONS+RX_REGIONS*LEN_WIDTH);
-    s_sync_frame_len_ser <= s_flc_sync_out(3*RX_REGIONS+RX_REGIONS*LEN_WIDTH-1 downto 3*RX_REGIONS);
-    s_sync_len_min_err   <= s_flc_sync_out(3*RX_REGIONS-1 downto 2*RX_REGIONS);
-    s_sync_len_max_err   <= s_flc_sync_out(2*RX_REGIONS-1 downto RX_REGIONS);
-    s_sync_adapter_err   <= s_flc_sync_out(RX_REGIONS-1 downto 0);
+    s_sync_src_rdy       <= s_flc_sync_out(4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W+RX_REGIONS+RX_REGIONS);
+    s_sync_eof           <= s_flc_sync_out(4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W+RX_REGIONS+RX_REGIONS-1 downto 4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W+RX_REGIONS);
+    s_sync_sof           <= s_flc_sync_out(4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W+RX_REGIONS-1 downto 4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W);
+    s_sync_eof_pos       <= s_flc_sync_out(4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W+RX_EOF_POS_W-1 downto 4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W);
+    s_sync_sof_pos       <= s_flc_sync_out(4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W+RX_SOF_POS_W-1 downto 4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W);
+    s_sync_data          <= s_flc_sync_out(4*RX_REGIONS+RX_REGIONS*LEN_WIDTH+RX_DATA_W-1 downto 4*RX_REGIONS+RX_REGIONS*LEN_WIDTH);
+    s_sync_frame_len_ser <= s_flc_sync_out(4*RX_REGIONS+RX_REGIONS*LEN_WIDTH-1 downto 4*RX_REGIONS);
+    s_sync_len_min_err   <= s_flc_sync_out(4*RX_REGIONS-1 downto 3*RX_REGIONS);
+    s_sync_len_max_err   <= s_flc_sync_out(3*RX_REGIONS-1 downto 2*RX_REGIONS);
+    s_sync_mii_err       <= s_flc_sync_out(2*RX_REGIONS-1 downto RX_REGIONS);
+    s_sync_crc_err       <= s_flc_sync_out(RX_REGIONS-1 downto 0);
 
     s_sync_frame_len <= slv_array_downto_deser(s_sync_frame_len_ser,RX_REGIONS,LEN_WIDTH);
 
@@ -598,12 +614,12 @@ begin
             RX_EOF          => s_cut_eof,
             RX_SRC_RDY      => s_cut_src_rdy,
             -- OUTPUT MVB CRC ERROR INTERFACE
-            CRC_ERR         => s_sync_crc_err,
+            CRC_ERR         => s_sync_crc_check_err,
             CRC_ERR_VLD     => open,
             CRC_ERR_SRC_RDY => open
         );
     else generate
-        s_sync_crc_err <= (others => '0');
+        s_sync_crc_check_err <= (others => '0');
     end generate;
 
     -- -------------------------------------------------------------------------
@@ -726,17 +742,17 @@ begin
     --  CREATE METADATA
     -- =========================================================================
 
-    s_sync_error <= s_sync_adapter_err or s_sync_crc_err or
+    s_sync_error <= s_sync_mii_err or s_sync_crc_err or s_sync_crc_check_err or
         s_sync_len_min_err or s_sync_len_max_err or s_sync_mac_err;
 
     sync_metadata_g : for r in 0 to RX_REGIONS-1 generate
         s_sync_metadata(r)(ETH_RX_HDR_LENGTH)         <= std_logic_vector(resize(unsigned(s_sync_frame_len(r)),ETH_RX_HDR_LENGTH_W));
         s_sync_metadata(r)(ETH_RX_HDR_PORT)           <= std_logic_vector(to_unsigned(NETWORK_PORT_ID,ETH_RX_HDR_PORT_W));
         s_sync_metadata(r)(ETH_RX_HDR_ERROR_O)        <= s_sync_error(r);
-        s_sync_metadata(r)(ETH_RX_HDR_ERRORFRAME_O)   <= s_sync_adapter_err(r);
+        s_sync_metadata(r)(ETH_RX_HDR_ERRORFRAME_O)   <= s_sync_mii_err(r);
         s_sync_metadata(r)(ETH_RX_HDR_ERRORMINTU_O)   <= s_sync_len_min_err(r);
         s_sync_metadata(r)(ETH_RX_HDR_ERRORMAXTU_O)   <= s_sync_len_max_err(r);
-        s_sync_metadata(r)(ETH_RX_HDR_ERRORCRC_O)     <= s_sync_crc_err(r);
+        s_sync_metadata(r)(ETH_RX_HDR_ERRORCRC_O)     <= s_sync_crc_err(r) or s_sync_crc_check_err(r);
         s_sync_metadata(r)(ETH_RX_HDR_ERRORMAC_O)     <= s_sync_mac_err(r);
         s_sync_metadata(r)(ETH_RX_HDR_BROADCAST_O)    <= s_sync_mac_bcast(r);
         s_sync_metadata(r)(ETH_RX_HDR_MULTICAST_O)    <= s_sync_mac_mcast(r);

@@ -1421,11 +1421,12 @@ begin
             OUT_MFB_SOF_POS  => TX_MFB_SOF_POS(IT),
             OUT_MFB_EOF      => TX_MFB_EOF    (IT),
             OUT_MFB_EOF_POS  => TX_MFB_EOF_POS(IT),
-            OUT_MFB_ERROR    => TX_MFB_ERROR  (IT),
+            OUT_MFB_ERROR    => TX_MFB_CRC_ERR(IT),
             OUT_MFB_SRC_RDY  => TX_MFB_SRC_RDY(IT),
             OUT_LINK_UP      => open -- this is done here
         );
 
+        TX_MFB_MII_ERR(IT) <= (others => '0');
 
         repeater_i: entity work.avst_loop
         generic map (
