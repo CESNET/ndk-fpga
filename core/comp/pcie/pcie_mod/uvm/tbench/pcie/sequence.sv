@@ -156,7 +156,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                 rc_hdr.ep            = 0;
                 rc_hdr.at            = 0;
                 rc_hdr.completer_id  = 0;
-                rc_hdr.requester_id  = 0;
+                rc_hdr.requester_id  = info.rq_hdr[rq_num].hdr.requester_id;
                 rc_hdr.tag           = info.rq_hdr[rq_num].hdr.tag;
                 rc_hdr.bcm           = 0;
                 rc_hdr.lower_address = info.rq_hdr[rq_num].lower_address;
