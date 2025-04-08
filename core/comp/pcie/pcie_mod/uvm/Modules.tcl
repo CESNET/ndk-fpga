@@ -25,6 +25,7 @@ lappend MOD "$OFM_PATH/comp/base/pkg/pcie_meta_pack.sv"
 
 lappend MOD "$ENTITY_BASE/tbench/pcie/pkg.sv"
 lappend MOD "$ENTITY_BASE/tbench/pcie_extend/pkg.sv"
+lappend MOD "$ENTITY_BASE/tbench/pcie_dma_cq/pkg.sv"
 lappend MOD "$ENTITY_BASE/tbench/dma/pkg.sv"
 
 lappend MOD "$OFM_PATH/comp/pcie/mtc/uvm/tbench/info/pkg.sv"
