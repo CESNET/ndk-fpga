@@ -49,7 +49,6 @@ class env #(
     parameter EXP_ROM_BASE_ADDR = 32'h0A000000;
 
 
-    localparam IS_INTEL_DEV = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
     uvm_pcie_top::sequencer#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W,
                              CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
                              ITEM_WIDTH, RQ_MFB_META_W, CC_MFB_META_W, DMA_PORTS, PCIE_ENDPOINTS) m_sequencer;
