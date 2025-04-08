@@ -32,6 +32,8 @@ class env #(
         super.new(name, parent);
         fifo_data = new();
         fifo_meta = new();
+
+        direction = DIR_RQ;
     endfunction
 
 

@@ -20,6 +20,8 @@ class env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_MET
 
     function new(string name = "env", uvm_component parent = null);
         super.new(name, parent);
+
+        direction = DIR_RQ;
     endfunction
 
     function void build_phase(uvm_phase phase);

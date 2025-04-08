@@ -58,6 +58,8 @@ class env #(
         super.new(name, parent);
         fifo_cq = new();
         fifo_rc = new();
+
+        direction = DIR_RQ;
     endfunction
 
     function void build_phase(uvm_phase phase);

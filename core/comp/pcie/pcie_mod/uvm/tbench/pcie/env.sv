@@ -19,11 +19,12 @@ class env extends uvm_env;
     protected monitor m_monitor;
 
     protected stats m_stats;
+    protected uvm_pcie::config_item m_config;
+    protected enum {DIR_RQ, DIR_CQ} direction;
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
     endfunction
-
 
     function void build_phase(uvm_phase phase);
         m_sequencer = sequencer::type_id::create("m_sequencer" , this);
@@ -45,11 +46,13 @@ class env extends uvm_env;
         rc_analysis_port.connect(m_stats.rc_analysis_export);
 
         m_driver.seq_item_port.connect(m_sequencer.seq_item_export);
-        cc_analysis_port.connect(m_sequencer.fifo_cc.analysis_export);
-        rq_analysis_port.connect(m_sequencer.fifo_rq.analysis_export);
+
+        if (direction == DIR_RQ) begin
+            cc_analysis_port.connect(m_sequencer.fifo_cc.analysis_export);
+            rq_analysis_port.connect(m_sequencer.fifo_rq.analysis_export);
+        end else if (direction == DIR_CQ) begin
+            rc_analysis_port.connect(m_sequencer.fifo_cc.analysis_export);
+            cq_analysis_port.connect(m_sequencer.fifo_rq.analysis_export);
+        end
     endfunction
-
-
 endclass
-
-
