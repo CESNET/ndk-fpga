@@ -64,6 +64,9 @@ class scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABL
         end
     endfunction
 
+    virtual function void model_config(uvm_pcie::bar_config bar);
+        m_model.config_set(bar);
+    endfunction
 
     function int unsigned success();
         int unsigned ret = 1;

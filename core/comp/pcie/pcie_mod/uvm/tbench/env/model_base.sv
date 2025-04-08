@@ -29,6 +29,7 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) ex
 
     protected model_mtc #(32, 32)                        mtc[PCIE_ENDPOINTS];
     protected model_ptc#(REGIONS, DMA_PORTS, ITEM_WIDTH) ptc[PCIE_ENDPOINTS];
+    protected uvm_pcie::bar_config bar_cfg;
 
     function new(string name = "model_base", uvm_component parent = null);
         super.new(name, parent);
@@ -53,6 +54,14 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) ex
             mi_rsp[pcie] = new({"mi_rsp", pcie_str}, this);
             mi_req[pcie] = new({"mi_req", pcie_str}, this);
         end
+        bar_cfg = null;
+    endfunction
+
+    virtual function void config_set(uvm_pcie::bar_config cfg);
+        for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
+            mtc[it].bar_register(cfg);
+        end
+        bar_cfg = cfg;
     endfunction
 
     function int unsigned success();

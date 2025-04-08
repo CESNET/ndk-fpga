@@ -13,12 +13,18 @@ class monitor extends uvm_monitor;
     uvm_analysis_port #(uvm_pcie::request_header)   rq_analysis_port;
     uvm_analysis_port #(uvm_pcie::completer_header) rc_analysis_port;
 
+    protected bar_config bar_cfg;
+
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
         cq_analysis_port = new("cq_analysis_port", this);
         cc_analysis_port = new("cc_analysis_port", this);
         rq_analysis_port = new("rq_analysis_port", this);
         rc_analysis_port = new("rc_analysis_port", this);
+    endfunction
+
+    function void bar_register(bar_config cfg);
+        bar_cfg = cfg;
     endfunction
 
     task run_phase(uvm_phase phase);

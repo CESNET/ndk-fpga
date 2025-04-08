@@ -36,6 +36,11 @@ class env #(
         direction = DIR_RQ;
     endfunction
 
+    virtual function void bar_register(uvm_pcie::bar_config cfg);
+        super.bar_register(cfg);
+        uvm_config_db#(uvm_pcie::bar_config)::set(m_avst_down.m_sequencer.m_meta, "", "bar", cfg);
+    endfunction
+
 
     function void build_phase(uvm_phase phase);
         uvm_pcie::config_item  m_config;

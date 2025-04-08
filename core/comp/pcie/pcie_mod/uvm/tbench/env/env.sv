@@ -40,6 +40,14 @@ class env #(
                                                    ITEM_WIDTH,  DMA_PORTS, PCIE_ENDPOINTS,  PCIE_CONS, DMA_BAR_ENABLE, DEVICE));
 
     localparam REQUEST_DEVICE = 2;
+    parameter BAR0_BASE_ADDR    = 32'h01000000;
+    parameter BAR1_BASE_ADDR    = 32'h02000000;
+    parameter BAR2_BASE_ADDR    = 32'h03000000;
+    parameter BAR3_BASE_ADDR    = 32'h04000000;
+    parameter BAR4_BASE_ADDR    = 32'h05000000;
+    parameter BAR5_BASE_ADDR    = 32'h06000000;
+    parameter EXP_ROM_BASE_ADDR = 32'h0A000000;
+
 
     localparam IS_INTEL_DEV = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
     uvm_pcie_top::sequencer#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W,
@@ -156,9 +164,24 @@ class env #(
 
     // Connect agent's ports with ports from scoreboard.
     function void connect_phase(uvm_phase phase);
+        uvm_pcie::bar_config bar_cfg = new();
+
+        bar_cfg.register(0, BAR0_BASE_ADDR[32-1:2]);
+        bar_cfg.register(1, BAR1_BASE_ADDR[32-1:2]);
+        bar_cfg.register(2, BAR2_BASE_ADDR[32-1:2]);
+        bar_cfg.register(3, BAR3_BASE_ADDR[32-1:2]);
+        bar_cfg.register(4, BAR4_BASE_ADDR[32-1:2]);
+        bar_cfg.register(5, BAR5_BASE_ADDR[32-1:2]);
+        bar_cfg.register(6, EXP_ROM_BASE_ADDR[32-1:2]);
+
+
         for (int unsigned cons = 0; cons < PCIE_CONS; cons++) begin
             for (int unsigned pcie_logic = 0; pcie_logic < PCIE_ENDPOINTS/PCIE_CONS; pcie_logic++) begin
                 const int unsigned pcie = cons*PCIE_ENDPOINTS/PCIE_CONS + pcie_logic;
+
+                // SET BAR
+                m_pcie_env[pcie].bar_register(bar_cfg);
+
                 //PCIE CONNECT
                 m_pcie_env[pcie].rc_analysis_port.connect(m_scoreboard.pcie_rc[pcie]);
                 m_pcie_env[pcie].cq_analysis_port.connect(m_scoreboard.pcie_cq[pcie]);
@@ -196,6 +219,9 @@ class env #(
                 end
             end
         end
+
+        //
+        m_scoreboard. model_config(bar_cfg);
 
         // Connect Reset agent to Sequencer
         m_sequencer.m_dma_reset     = m_dma_reset.m_sequencer;

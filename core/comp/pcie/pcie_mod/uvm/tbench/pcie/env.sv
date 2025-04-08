@@ -34,6 +34,11 @@ class env extends uvm_env;
         reset_sync  = new();
     endfunction
 
+    virtual function void bar_register(bar_config cfg);
+        m_sequencer.bar_register(cfg);
+        m_monitor.bar_register(cfg);
+    endfunction
+
     function void connect_phase(uvm_phase phase);
         cq_analysis_port = m_monitor.cq_analysis_port;
         cc_analysis_port = m_monitor.cc_analysis_port;

@@ -15,12 +15,19 @@ class pcie_info;
 
     logic [8-1:0] cq_tags[logic [16-1:0]][logic [8-1:0]];
     rq_info       rq_hdr[$];
+    bar_config    bar;
+    protected string name;
 
-    function new();
+    function new(string name = "");
+        this.name = name;
         cq_tags.delete();
         rq_hdr.delete();
+        bar = null;
     endfunction
 
+    function void bar_register(bar_config cfg);
+        bar = cfg;
+    endfunction
 
     function void requester_add(logic [16-1:0] requester_id);
         //Remove all tags from this requester ID
@@ -63,8 +70,12 @@ class sequencer extends uvm_sequencer #(uvm_pcie::header);
         reset_sync = new();
         fifo_cc = new("fifo_cc", this);
         fifo_rq = new("fifo_rq", this);
-        info    = new();
+        info    = new(this.get_full_name());
     endfunction: new
+
+    function void bar_register(bar_config cfg);
+        info.bar_register(cfg);
+    endfunction
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);

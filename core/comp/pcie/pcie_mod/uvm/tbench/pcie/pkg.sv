@@ -15,6 +15,7 @@ package uvm_pcie;
     `include "config.sv"
 
     `include "fce.sv"
+    `include "bar_config.sv"
     `include "header.sv"
     `include "driver.sv"
     `include "sequencer.sv"

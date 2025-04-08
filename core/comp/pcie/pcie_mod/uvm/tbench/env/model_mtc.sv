@@ -21,6 +21,7 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
     //Store request
     protected uvm_pcie::request_header request_rd[$];
+    protected uvm_pcie::bar_config     bar_cfg;
 
     function new (string name, uvm_component parent = null);
         super.new(name, parent);
@@ -33,6 +34,11 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
         pcie_cq_cnt = 0;
         pcie_cc_cnt = 0;
     endfunction
+
+    virtual function void bar_register(uvm_pcie::bar_config cfg);
+        bar_cfg = cfg;
+    endfunction
+
 
     function int unsigned used();
         int unsigned ret = 0;
@@ -98,21 +104,15 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
             `uvm_info(this.get_full_name(), $sformatf("\nMI Request %0d%s\n", pcie_cq_cnt, info.convert2string()), UVM_MEDIUM);
 
             if ($cast(info_item, info) ) begin
+                logic  [64-1:2] mi_base_addr;
                 tlp_addr_mask = '0;
                 for (int unsigned it = 0; it < info_item.bar_aperture; it++) begin
                     tlp_addr_mask[it] = 1'b1;
                 end
 
-                case (info_item.bar)
-                    3'b000  : mi_addr = 'h01000000;
-                    3'b001  : mi_addr = 'h02000000;
-                    3'b010  : mi_addr = 'h03000000;
-                    3'b011  : mi_addr = 'h04000000;
-                    3'b100  : mi_addr = 'h05000000;
-                    3'b101  : mi_addr = 'h06000000;
-                    3'b110  : mi_addr = 'h0A000000;
-                    default : mi_addr = 'h0;
-                endcase
+                mi_base_addr = 0;
+                bar_cfg.bar2addr(info_item.bar, mi_base_addr);
+                mi_addr = {mi_base_addr, 2'b00};
             end else begin
                 `uvm_fatal(this.get_full_name(), "\nUnsupported header");
                 tlp_addr_mask = 26'h3ffffff;
