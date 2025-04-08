@@ -89,12 +89,11 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
             logic [1-1:0] r0;
             logic [3-1:0] tc;
             logic [1-1:0] r1;
-            logic [1-1:0] attr0;
+            logic [3-1:0] attr;
             logic [1-1:0] r2;
             logic [1-1:0] th;
             logic [1-1:0] td;
             logic [1-1:0] ep;
-            logic [2-1:0] attr1;
             logic [2-1:0] at;
             logic [10-1:0] length;
             uvm_pcie::header pcie_tr;
@@ -110,15 +109,14 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
             r0        = 0;
             tc        = pcie_tr.traffic_class;
             r1        = 0;
-            attr0     = pcie_tr.id_based_ordering;
+            attr      = {pcie_tr.id_based_ordering, pcie_tr.relaxed_ordering, pcie_tr.no_snoop};
             r2        = 0;
             th        = pcie_tr.th;
             td        = pcie_tr.td;
             ep        = pcie_tr.ep;
-            attr1     = {pcie_tr.relaxed_ordering, pcie_tr.no_snoop};
             at        = pcie_tr.at;
             length    = pcie_tr.length;
-            hdr[32*4-1 -: 32] = {fmt, pcie_type, r0, tc, r1, attr0, r2, th, td, ep, attr1, at, length};
+            hdr[32*4-1 -: 32] = {fmt, pcie_type, r0, tc, r1, attr[2], r2, th, td, ep, attr[2-1:0], at, length};
 
             //RC
             if (pcie_tr.hdr_type == uvm_pcie::header::COMPLETER_HDR) begin
