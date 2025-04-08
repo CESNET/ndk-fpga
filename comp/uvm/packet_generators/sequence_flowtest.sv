@@ -262,6 +262,7 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
     task body;
         uvm_pcap::reader reader;
         byte unsigned    data[];
+        uvm_common::sequence_cfg state;
 
         // Output configuration options
         string output_filepath = "output.pcap";
@@ -298,8 +299,16 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
 
         void'(reader.open(output_filepath)); // Try open an output pcap
 
+        void'(uvm_config_db #(uvm_common::sequence_cfg)::get(p_sequencer, "", "state", state));
+
         req = uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)::type_id::create("req", p_sequencer);
         while(reader.read(data) == uvm_pcap::RET_OK) begin
+            if (state != null) begin
+                if (!state.next()) begin
+                    break;
+                end
+            end
+
             start_item(req);
             req.data = { >>{ data } };
             finish_item(req);
