@@ -47,6 +47,8 @@ class pcie_info;
     function void cq_tag_remove(logic [16-1:0] requester_id, logic [8-1:0] tag);
         if (cq_tags.exists(requester_id)) begin
             cq_tags[requester_id].delete(tag);
+        end else begin
+           `uvm_warning(name, $sformatf("\n\tUnknown reguester id %h tag %0d", requester_id, tag));
         end
     endfunction
 endclass
