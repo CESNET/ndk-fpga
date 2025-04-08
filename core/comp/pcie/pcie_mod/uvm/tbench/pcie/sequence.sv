@@ -74,7 +74,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
 
         it = 0;
         //TODO: improve stopping sequence removing emtpy cicle when there there is empty rq_hdr fifo and request only set.
-        while (it < (transactions*4) /*&& (state == null || state.next())*/) begin
+        while (it < transactions /*&& (state == null || state.next())*/) begin
             //assert(std::randomize(rq))
             //generate CQ nebo RC
             std::randomize(cq) with { cq dist {1'b1 :/ 5,  1'b0 :/ info.rq_hdr.size()}; };
@@ -98,6 +98,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                         cq_hdr.lbe inside {4'b1111, 4'b1110, 4'b1100, 4'b1000};
                     }
                     cq_hdr.fmt[0] == 1'b0 -> cq_hdr.address[64-1:32] == 0;
+                    cq_hdr.fmt[0] dist {1'b0 :/ 70, 1'b1 :/ 30};
                     //TODO: change to original
                     //cq_hdr.fmt[2:1]  dist {2'b00 :/ 45, 2'b01 :/ 45, [2'b00:2'b11]  :/ 10}; // 2'b00 => read,  2'b01 => write
                     cq_hdr.fmt[2:1]  dist {2'b00 :/ 45, 2'b01 :/ 45}; // 2'b00 => read,  2'b01 => write
@@ -109,7 +110,6 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                     cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= 32 && cq_hdr.length > 0); //read
                     cq_hdr.fmt[2:1] == 2'b01 -> (cq_hdr.length <= MAX_PAYLOAD_SIZE && cq_hdr.length > 0); //write
 
-
                     cq_hdr.requester_id == dev_id_act;
                     cq_hdr.tag inside   {[0:2**8-1]};  // 8 bit tag
                     !(cq_hdr.tag inside {info.cq_tags[cq_hdr.requester_id]}); //tag is not in array
@@ -120,7 +120,6 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                 cq_hdr.td  = 0;
                 cq_hdr.ep  = 0;
                 finish_item(cq_hdr);
-                cq++;
             end
 
             if (cq == 0 && info.rq_hdr.size() != 0) begin
