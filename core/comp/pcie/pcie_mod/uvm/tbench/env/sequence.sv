@@ -40,6 +40,7 @@ class sequence_base #(
     //CQ
     uvm_sequence #(uvm_mfb::sequence_item #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W)) m_mfb_cq[PCIE_ENDPOINTS][DMA_PORTS];
     //CC
+    uvm_pcie_dma_cq::sequence_resp                                                                                             m_dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
 
     //MI
     uvm_pcie_top::mi_cc_sequence #(32, 32) mi_seq[PCIE_ENDPOINTS];
@@ -96,6 +97,10 @@ class sequence_base #(
                 m_mfb_cq_lib.min_random_count = 100;
                 m_mfb_cq_lib.max_random_count = 200;
                 m_mfb_cq[pcie][dma] = m_mfb_cq_lib;
+
+                //CC
+                m_dma_cc[pcie][dma] = uvm_pcie_dma_cq::sequence_resp::type_id::create({"m_dma_seq_", dma_string}, p_sequencer.m_dma_cc[pcie][dma]);
+
              end
 
              //MI interface
@@ -139,6 +144,13 @@ class sequence_base #(
         forever begin
             assert(m_mfb_cq[pcie][dma].randomize()) else `uvm_fatal(p_sequencer.m_dma_cq[pcie][dma].get_full_name(), "\n\tCannot randomize sequence");;
             m_mfb_cq[pcie][dma].start(p_sequencer.m_dma_cq[pcie][dma]);
+        end
+    endtask
+
+    virtual task run_cc(int unsigned pcie, int unsigned dma);
+        forever begin
+            assert(m_dma_cc[pcie][dma].randomize()) else `uvm_fatal(p_sequencer.m_dma_cc[pcie][dma].get_full_name(), "\n\tCannot randomize sequence");;
+            m_dma_cc[pcie][dma].start(p_sequencer.m_dma_cc[pcie][dma]);
         end
     endtask
 
@@ -189,6 +201,7 @@ class sequence_base #(
                         run_rq(index_pcie, index_dma);
                         run_rc(index_pcie, index_dma);
                         run_cq(index_pcie, index_dma);
+                        run_cc(index_pcie, index_dma);
                     join_none
                 end
                 run_pcie(index_pcie);

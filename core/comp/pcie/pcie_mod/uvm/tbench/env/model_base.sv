@@ -5,21 +5,22 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_pcie_top::model#(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH))
+class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) extends uvm_component;
+    `uvm_component_param_utils(uvm_pcie_top::model#(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE))
 
     // Remove this shit
-    localparam DEVICE        = "ULTRASCALE";
     localparam ENDPOINT_TYPE = "DUMMY";
 
     //PCIE
-    uvm_analysis_export  #(uvm_pcie::request_header)   pcie_rq[PCIE_ENDPOINTS];
-    uvm_analysis_export  #(uvm_pcie::completer_header) pcie_rc[PCIE_ENDPOINTS];
-    uvm_analysis_export  #(uvm_pcie::request_header)   pcie_cq[PCIE_ENDPOINTS];
-    uvm_analysis_export  #(uvm_pcie::completer_header) pcie_cc[PCIE_ENDPOINTS];
+    uvm_analysis_export   #(uvm_pcie::request_header)   pcie_rq[PCIE_ENDPOINTS];
+    uvm_analysis_export   #(uvm_pcie::completer_header) pcie_rc[PCIE_ENDPOINTS];
+    uvm_tlm_analysis_fifo #(uvm_pcie::request_header)   pcie_cq[PCIE_ENDPOINTS];
+    uvm_analysis_export   #(uvm_pcie::completer_header) pcie_cc[PCIE_ENDPOINTS];
 
-    uvm_analysis_export  #(uvm_dma::sequence_item_rq) dma_rq[PCIE_ENDPOINTS][DMA_PORTS];
-    uvm_analysis_export  #(uvm_dma::sequence_item_rc) dma_rc[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_analysis_export   #(uvm_dma::sequence_item_rq) dma_rq[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_analysis_export   #(uvm_dma::sequence_item_rc) dma_rc[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_analysis_port     #(uvm_pcie::request_header)  dma_cq[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_tlm_analysis_fifo #(uvm_pcie::completer_header)dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
 
     ////
     //MI
@@ -45,6 +46,8 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH) extends uvm_compon
 
                 dma_rq[pcie][dma] = new({"dma_rq", dma_str}, this);
                 dma_rc[pcie][dma] = new({"dma_rc", dma_str}, this);
+                dma_cq[pcie][dma] = new({"dma_cq", dma_str}, this);
+                dma_cc[pcie][dma] = new({"dma_cc", dma_str}, this);
             end
 
             mi_rsp[pcie] = new({"mi_rsp", pcie_str}, this);
@@ -64,8 +67,9 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH) extends uvm_compon
     function int unsigned used();
         int unsigned ret = 0;
         for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
-            ret |= mtc[it].used();
-            ret |= ptc[it].used();
+            ret |= (pcie_cq[it].used() != 0);
+            ret |= (mtc[it].used() != 0);
+            ret |= (ptc[it].used() != 0);
         end
         return ret;
     endfunction
@@ -98,12 +102,59 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH) extends uvm_compon
 
             //MTC
             mtc[pcie].pcie_cc.connect(pcie_cc[pcie]);
-            pcie_cq[pcie].connect(mtc[pcie].pcie_cq.analysis_export);
             mi_rsp[pcie].connect(mtc[pcie].mi_rsp.analysis_export);
             mtc[pcie].mi_req.connect(mi_req[pcie]);
         end
     endfunction
 
+    task run_pcie_cq(uvm_phase phase, int unsigned port);
+        uvm_pcie::request_header request;
+        forever begin
+            pcie_cq[port].get(request);
+
+            if (bar_cfg != null && request.fmt[0] == 1'b0) begin
+                int unsigned bar = 0;
+                uvm_pcie_extend::request_header info_item;
+
+
+                assert ($cast(info_item, request)) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannocat cat request");
+                end
+                bar = info_item.bar;
+                if (DMA_BAR_ENABLE == 1 && bar == 2) begin
+                    dma_cq[port][0].write(request);
+                end else begin
+                    mtc[port].pcie_cq.analysis_export.write(request);
+                end
+            end else begin
+                mtc[port].pcie_cq.analysis_export.write(request);
+            end
+        end
+    endtask
+
+    task run_dma_cc(uvm_phase phase, int unsigned pcie_port, int unsigned dma_port);
+        uvm_pcie::completer_header request;
+        forever begin
+            dma_cc[pcie_port][dma_port].get(request);
+            pcie_cc[pcie_port].write(request);
+        end
+    endtask
+
+    task run_phase(uvm_phase phase);
+        assert(DMA_BAR_ENABLE == 0 || DMA_PORTS == 1) else begin `uvm_fatal(this.get_full_name(), "\n\t Unsupported combination when DMA_BAR_ENABLE is set then DMA_PORTS have to be one"); end
+        for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
+            fork
+                automatic int unsigned pcie_index = it;
+                run_pcie_cq(phase, pcie_index);
+                for (int unsigned jt = 0; jt < DMA_PORTS; jt++) begin
+                    fork
+                        automatic int unsigned dma_index = jt;
+                        run_dma_cc(phase, pcie_index, dma_index);
+                    join_none
+                end
+            join_none
+        end
+    endtask
 endclass
 
 
