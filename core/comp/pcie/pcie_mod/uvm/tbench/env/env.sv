@@ -195,7 +195,7 @@ class env #(
                 m_sequencer.m_pcie[pcie]   = m_pcie_env[pcie].m_sequencer;
                 m_pcie_sysrst_n.m_agent[cons].sync_connect(m_pcie_env[pcie].reset_sync);
 
-                for (int dma = 0; dma < DMA_PORTS; dma++) begin
+                for (int unsigned  dma = 0; dma < DMA_PORTS; dma++) begin
                     m_dma_env[pcie][dma].rc_analysis_port.connect(m_scoreboard.dma_rc[pcie][dma]);
                     m_dma_env[pcie][dma].rq_analysis_port.connect(m_scoreboard.dma_rq[pcie][dma]);
 
