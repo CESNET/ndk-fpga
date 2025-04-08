@@ -33,6 +33,8 @@ function uvm_pcie::completer_header get_comp_hdr(uvm_logic_vector_array::sequenc
     logic [1-1:0] ecrc;
 
     ret = uvm_pcie::completer_header::type_id::create("ret", comp);
+    ret.time_array_add(data.start);
+
     {ecrc, attr, tc, completer_id_en, completer_id, tag, requester_id, r3,
     poisoned_completion, completion_status, dword_count, r2, locked_read,
     byte_count, r1, at, r0, address}
@@ -85,6 +87,8 @@ function uvm_pcie::request_header get_rq_hdr(uvm_logic_vector_array::sequence_it
     = {data.data[3], data.data[2], data.data[1], data.data[0]};
 
     ret = uvm_pcie::request_header::type_id::create("rq", comp);
+    ret.time_array_add(data.start);
+
     ret.at       = at;
     ret.address  = address;
     ret.length   = length;

@@ -38,6 +38,7 @@ class monitor extends uvm_monitor;
             rq_mvb.get(tr_meta);
 
             tr_rq = uvm_dma::sequence_item_rq::type_id::create("rq_item.item", this);
+            tr_rq.time_array_add(tr_meta.start);
 
             tr_rq.hdr.relaxed     = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_W-1 : sv_dma_bus_pack::DMA_REQUEST_RELAXED_O];
             tr_rq.hdr.pasidvld    = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_PASIDVLD_O];
@@ -53,6 +54,7 @@ class monitor extends uvm_monitor;
 
             if (tr_rq.hdr.type_ide == 1'b1) begin
                 rq_mfb.get(tr_data);
+                tr_rq.time_array_add(tr_data.start);
 
                 tr_rq.data = new[tr_data.data.size()](tr_data.data);
 
@@ -86,6 +88,9 @@ class monitor extends uvm_monitor;
 
             {unit_id, tag, completed, length} = meta.data;
             dma_rc = uvm_dma::sequence_item_rc::type_id::create("dma_rc", this);
+            dma_rc.time_array_add(meta.start);
+            dma_rc.time_array_add(data.start);
+
             dma_rc.length    = length;
             dma_rc.completed = completed;
             dma_rc.tag       = tag;

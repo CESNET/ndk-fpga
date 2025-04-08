@@ -43,7 +43,7 @@ class monitor extends uvm_pcie::monitor;
 
              {r1, attr, tc, bar, target_function, tag, requester_id, r0, req_type, length, address, at} = { data.data[3], data.data[2], data.data[1], data.data[0]};
              pcie_cq = uvm_pcie_extend::request_header::type_id::create("pcie_cq", this);
-
+             pcie_cq.time_array_add(data.start);
 
              case(req_type)
                 4'b0000 : {pcie_cq.fmt, pcie_cq.pcie_type} = {2'b00, address[64-1:32] != 32'b0 ? 1'b1 : 1'b0, 5'b00000};

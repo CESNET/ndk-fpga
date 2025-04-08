@@ -195,6 +195,9 @@ class monitor#(META_WIDTH_UP, META_WIDTH_DOWN) extends uvm_pcie::monitor;
                 {completer_id, compl_status, bcm, byte_count, requester_id, tag, r0, lower_address} = hdr[32*3-1 -: 64];
 
                 pcie_tr = uvm_pcie::completer_header::type_id::create("pcie_tr", this);
+                pcie_tr.time_array_add(meta.start);
+                pcie_tr.time_array_add(data.start);
+
                 pcie_tr.fmt               = fmt;
                 pcie_tr.pcie_type         = pcie_type;
                 pcie_tr.traffic_class     = tc;
