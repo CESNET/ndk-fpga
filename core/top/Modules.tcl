@@ -67,7 +67,7 @@ if { $ARCHGRP_ARR(APPLICATION_CORE_ENTITY_ONLY) } {
   lappend COMPONENTS [list "MI_SPLITTER"     $MI_SPLITTER_BASE     "FULL"                       ]
   lappend COMPONENTS [list "MI_TEST_SPACE"   $MI_TEST_SPACE_BASE   "FULL"                       ]
   lappend COMPONENTS [list "FREQ_COUNTER"    $FREQ_COUNTER_BASE    "FULL"                       ]
-  lappend COMPONENTS [list "NETWORK_MOD"     $NETWORK_MOD_BASE     $ARCHGRP_ARR(NET_MOD_ARCH)   ]
+  lappend COMPONENTS [list "NETWORK_MOD"     $NETWORK_MOD_BASE     $ARCHGRP                     ]
   lappend COMPONENTS [list "ETH_LED_CTRL"    $ETH_LED_CTRL_BASE    "FULL"                       ]
   lappend COMPONENTS [list "DMA"             $DMA_BASE             $DMA_ARCH                    ]
   lappend COMPONENTS [list "DMA_GENERATOR"   $DMA_GENERATOR_BASE   "FULL"                       ]

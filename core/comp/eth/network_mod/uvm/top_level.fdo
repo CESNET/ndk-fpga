@@ -22,15 +22,17 @@ if {[info exists env(CORE_PARAMS)]} {
     array set PARAMS $PARAM_LIST
 }
 
+array set NETWORK_ARCH_ARR {}
 if {[info exists PARAMS(NETWORK_ARCH)]} {
-    set NETWORK_ARCH $PARAMS(NETWORK_ARCH)
+    set NETWORK_ARCH_ARR(NET_MOD_ARCH) $PARAMS(NETWORK_ARCH)
 } else {
-    set NETWORK_ARCH "E_TILE"
+    set NETWORK_ARCH_ARR(NET_MOD_ARCH) "E_TILE"
 }
+set NETWORK_ARCH_ARR_L [array get NETWORK_ARCH_ARR]
 
 # Set components
-lappend COMPONENTS [ list "DUT"     $DUT_BASE     $NETWORK_ARCH ]
-lappend COMPONENTS [ list "DUT_UVM" $DUT_UVM_BASE $NETWORK_ARCH ]
+lappend COMPONENTS [ list "DUT"     $DUT_BASE     $NETWORK_ARCH_ARR_L ]
+lappend COMPONENTS [ list "DUT_UVM" $DUT_UVM_BASE $NETWORK_ARCH_ARR(NET_MOD_ARCH) ]
 
 # Disable Code Coverage
 set SIM_FLAGS(CODE_COVERAGE) false
@@ -49,5 +51,3 @@ puts "Numeric_std Warnings - Disabled"
 set NumericStdNoWarnings 1
 
 nb_sim_run
-
-
