@@ -26,6 +26,7 @@ SETTINGS = {
         "AXI_RCUSER_WIDTH"     : "161"               ,
         "AXI_STRADDLING"       : "0"                 ,
 
+        "DMA_BAR_ENABLE"       : 0,
         "DMA_PORTS"            : 1,
         "PCIE_ENDPOINT_MODE"   : 0,
         "PCIE_ENDPOINTS"       : 1,
@@ -195,8 +196,15 @@ SETTINGS = {
         "__core_params__"          : {"PCIE_TYPE" : "USP"}     ,
     },
 
+    "dma_ports_1" : {
+        "DMA_PORTS"            : 1,
+    },
     "dma_ports_2" : {
         "DMA_PORTS"            : 2,
+    },
+
+    "bar_enable" : {
+        "DMA_BAR_ENABLE"       : 1,
     },
 
     "_combinations_" : {
@@ -207,5 +215,10 @@ SETTINGS = {
         "R_TILE_512_BIF_2CONS" : ("intel_r_tile_512_bif_2cons",    ),
         "USP_512"              : ("xilinx_usp_512",                ),
         "USP_512_DMA_2"        : ("xilinx_usp_512", "dma_ports_2", ),
+
+        "P_TILE_512_CQ"  : ("intel_p_tile_512" , "dma_ports_1", "bar_enable"),
+        "R_TILE_1024_CQ" : ("intel_r_tile_1024", "dma_ports_1", "bar_enable"),
+        "USP_512_CQ"     : ("xilinx_usp_512"   , "dma_ports_1", "bar_enable"),
+
     },
 }
