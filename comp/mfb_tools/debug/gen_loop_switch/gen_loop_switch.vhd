@@ -22,26 +22,51 @@ use work.math_pack.all;
 -- It allows for loopback between ETH_RX->ETH_TX and DMA_TX->DMA_RX as well as
 -- connection of MFB generators on DMA_RX and ETH_TX.
 -- These generators have their own part of MI32 address space.
+-- Speed Meters (SM) are located on each MFB interface and occupy another part
+-- of the MI32 address space. Contrary to the MFB generators, Speed Meters'
+-- registers are implemented here (its MI wrapper is not used). In case the
+-- Speed Meters' MI wrapper was used, address space would need to be adjusted as
+-- each wrapper contains seven MI registers instead of the current four.
+--
 --
 -- **Connection diagram:**
 --
 -- .. code-block::
 --
---                         +--------+  +---\
---                         | RX Gen +--+ 1  \             +---\
---   ETH_RX                +--------+  |MUX_C+------------+ 0  \   +------+ DMA_RX
---   >--------------------------+------+ 0  /             |MUX_A+--+ FIFO +------>
---                              |      +---/          +---+ 1  /   +------+
---                              |                     |   +---/
---                              |                     |
---                              |                     |
---                              |                     |
---                      /---+   |                     |
---          +------+   /  1 +---+          /---+      |
---   <------+ FIFO +--+MUX_B|             /  0 +------+--------------------------<
---   ETH_TX +------+   \  0 +------------+MUX_D|  +-----------------+       DMA_TX
---                      \---+             \  1 +--+ TX Gen / Player |
---                                         \---+  +-----------------+
+--                                           Left2Right GLS Stream
+--                                   ----------------------------------->>
+--
+--                                      +--------+  +---\
+--                                      | RX Gen +--+ 1  \             +---\
+--     ETH_RX  +------+                 +--------+  |MUX_C+------------+ 0  \   +------+  +------+  DMA_RX
+--     >-------+ SM 2 +----------------------+------+ 0  /             |MUX_A+--+ FIFO +--+ SM 0 +------->
+--             +------+                      |      +---/          +---+ 1  /   +------+  +------+
+--                                           |                     |   +---/
+--                                           |                     |
+--      LEFT                                 |                     |                                RIGHT
+--                                           |                     |
+--                                   /---+   |                     |
+--             +------+  +------+   /  1 +---+          /---+      |                      +------+
+--     <-------+ SM 1 +--+ FIFO +--+MUX_B|             /  0 +------+----------------------+ SM 3 +-------<
+--     ETH_TX  +------+  +------+   \  0 +------------+MUX_D|  +-----------------+        +------+  DMA_TX
+--                                   \---+             \  1 +--+ TX Gen / Player |
+--                                                      \---+  +-----------------+
+--
+--                                           Right2Left GLS Stream
+--                                   <<-----------------------------------
+--
+-- .. note::
+--
+--     There is a Python module as well as a tool for user-friendly access to its features.
+--     Just install the ofm package and use `ofm-gls -h` in the command line or import it like so:
+--     `from ofm.comp.mfb_tools.debug.gen_loop_switch import GenLoopSwitch`.
+--
+-- .. note::
+--
+--     The sides of the GLS were renamed to make it more universal. The DMA side is on the RIGHT,
+--     ETH side is on the LEFT. This is used mainly in the GLS Python module: GenLoopSwitch.
+--     Instance of the GenLoopSwitch class contains two streams: l2r (left2right, prev. RX) and
+--     r2l (right2left, prev. TX).
 --
 -- **MI address offsets:**
 --
