@@ -204,6 +204,8 @@ class env #(
             m_usr_tx_hdr[it].analysis_port.connect(m_scoreboard.usr_tx_hdr[it]);
         end
 
+        m_tsu.analysis_port.connect(m_scoreboard.tsu);
+
         m_sequencer.usr_rst = m_usr_rst.m_sequencer;
         m_sequencer.mi_rst = m_mi_rst.m_sequencer;
         m_sequencer.mi_phy_rst = m_mi_phy_rst.m_sequencer;
@@ -217,6 +219,7 @@ class env #(
             m_sequencer.port[it].usr_tx_data = m_usr_tx_data[it].m_sequencer;
             m_sequencer.port[it].usr_tx_hdr  = m_usr_tx_hdr[it].m_sequencer;
         end
+        m_sequencer.tsu = m_tsu.m_sequencer;
     endfunction
 endclass
 

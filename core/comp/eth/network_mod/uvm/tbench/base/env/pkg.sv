@@ -18,11 +18,13 @@ package uvm_network_mod_env;
     `include "sequencer.sv"
     `include "model.sv"
     `include "scoreboard_cmp.sv"
+    `include "timestamp_checker.sv"
     `include "scoreboard.sv"
     `include "env.sv"
 
     `include "reg_sequence.sv"
     `include "sequence_eth.sv"
+    `include "sequence_timestamp.sv"
     `include "sequence.sv"
 endpackage
 `endif

@@ -38,6 +38,9 @@ class sequencer#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGI
     sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) port[ETH_PORTS];
     // MI PHY
 
+    // TSU
+    uvm_logic_vector::sequencer #(64) tsu;
+
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
     endfunction

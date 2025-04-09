@@ -59,8 +59,6 @@ class comparer_tx_hdr #(int unsigned ITEM_WIDTH) extends uvm_common::comparer_ba
         ret &= dut_multicast === model_multicast      ;
         ret &= dut_mac_hit_vld === model_mac_hit_vld ;
         ret &= (model_mac_hit_vld === 1'b0 || dut_mac_hit === model_mac_hit);
-        ret &= dut_timestamp_vld === model_timestamp_vld;
-        ret &= (model_timestamp_vld === 1'b0 || dut_timestamp === model_timestamp);
 
         return ret;
     endfunction
