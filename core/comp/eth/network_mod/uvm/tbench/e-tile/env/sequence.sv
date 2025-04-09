@@ -361,6 +361,13 @@ class virt_sequence_simple #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM
             tsu_rst.start(p_sequencer.tsu_rst);
         join_none
 
+        fork
+            forever begin
+                assert(tsu.randomize());
+                tsu.start(p_sequencer.tsu);
+            end
+        join_none
+
         for (int unsigned it = 0; it <  ETH_PORTS; it++) begin
             fork
                 automatic int unsigned index = it;
@@ -448,6 +455,13 @@ class virt_sequence_stop #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_W
             do begin
                 tsu_rst.start(p_sequencer.tsu_rst, this);
             end while (!seq_sync_end.stopped());
+        join_none
+
+        fork
+            forever begin
+                assert(tsu.randomize());
+                tsu.start(p_sequencer.tsu);
+            end
         join_none
 
         for (int unsigned it = 0; it <  ETH_PORTS; it++) begin

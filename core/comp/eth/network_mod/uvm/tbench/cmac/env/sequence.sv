@@ -397,6 +397,13 @@ class virt_sequence_simple #(
             tsu_rst.start(p_sequencer.tsu_rst);
         join_none
 
+        fork
+            forever begin
+                assert(tsu.randomize());
+                tsu.start(p_sequencer.tsu);
+            end
+        join_none
+
         // Run sequences
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             fork
@@ -502,6 +509,13 @@ class virt_sequence_stop #(
             do begin
                 tsu_rst.start(p_sequencer.tsu_rst, this);
             end while (!seq_sync_end.stopped());
+        join_none
+
+        fork
+            forever begin
+                assert(tsu.randomize());
+                tsu.start(p_sequencer.tsu);
+            end
         join_none
 
         // Run the sequences
