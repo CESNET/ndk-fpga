@@ -242,6 +242,14 @@ architecture FULL of RX_MAC_LITE is
     signal s_rx_inc_frame             : std_logic_vector(RX_REGIONS downto 0);
     signal s_rx_mfb_error             : std_logic_vector(RX_REGIONS*2-1 downto 0);
 
+    signal s_in_data                  : std_logic_vector(RX_DATA_W-1 downto 0);
+    signal s_in_sof_pos               : std_logic_vector(RX_SOF_POS_W-1 downto 0);
+    signal s_in_eof_pos               : std_logic_vector(RX_EOF_POS_W-1 downto 0);
+    signal s_in_sof                   : std_logic_vector(RX_REGIONS-1 downto 0);
+    signal s_in_eof                   : std_logic_vector(RX_REGIONS-1 downto 0);
+    signal s_in_error                 : std_logic_vector(RX_REGIONS*2-1 downto 0);
+    signal s_in_src_rdy               : std_logic;
+
     signal s_cut_data                 : std_logic_vector(RX_DATA_W-1 downto 0);
     signal s_cut_sof_pos              : std_logic_vector(RX_SOF_POS_W-1 downto 0);
     signal s_cut_eof_pos              : std_logic_vector(RX_EOF_POS_W-1 downto 0);
@@ -412,13 +420,34 @@ begin
 
     LINK_UP <= ADAPTER_LINK_UP;
 
+    rx_mfb_error_g : for r in 0 to RX_REGIONS-1 generate
+        s_rx_mfb_error(r*2+0) <= RX_MFB_CRC_ERR(r);
+        s_rx_mfb_error(r*2+1) <= RX_MFB_MII_ERR(r);
+    end generate;
+
+    -- input register for better timing
+    process (RX_CLK)
+    begin
+        if (rising_edge(RX_CLK)) then
+            s_in_data        <= RX_MFB_DATA;
+            s_in_sof_pos     <= RX_MFB_SOF_POS;
+            s_in_eof_pos     <= RX_MFB_EOF_POS;
+            s_in_sof         <= RX_MFB_SOF;
+            s_in_eof         <= RX_MFB_EOF;
+            s_in_error       <= s_rx_mfb_error;
+            s_in_src_rdy     <= RX_MFB_SRC_RDY;
+            if (RX_RESET = '1') then
+                s_in_src_rdy <= '0';
+            end if;
+        end if;
+    end process;
+
     process(all)
     begin
         for r in 0 to RX_REGIONS-1 loop
-            s_rx_inc_frame(r+1) <= (RX_MFB_SOF(r) and not RX_MFB_EOF(r) and not s_rx_inc_frame(r)) or
-                               (RX_MFB_SOF(r) and RX_MFB_EOF(r) and s_rx_inc_frame(r)) or
-                               (not RX_MFB_SOF(r) and not RX_MFB_EOF(r) and s_rx_inc_frame(r));
-
+            s_rx_inc_frame(r+1) <= (s_in_sof(r) and not s_in_eof(r) and not s_rx_inc_frame(r)) or
+                               (s_in_sof(r) and s_in_eof(r) and s_rx_inc_frame(r)) or
+                               (not s_in_sof(r) and not s_in_eof(r) and s_rx_inc_frame(r));
         end loop;
     end process;
 
@@ -427,7 +456,7 @@ begin
         if (rising_edge(RX_CLK)) then
             if (RX_RESET = '1') then
                 s_rx_inc_frame(0) <= '0';
-            elsif (RX_MFB_SRC_RDY = '1') then
+            elsif (s_in_src_rdy = '1') then
                 s_rx_inc_frame(0) <= s_rx_inc_frame(RX_REGIONS);
             end if;
         end if;
@@ -436,14 +465,9 @@ begin
     process (RX_CLK)
     begin
         if (rising_edge(RX_CLK)) then
-            INCOMING_FRAME <= s_rx_inc_frame(0) or RX_MFB_SRC_RDY;
+            INCOMING_FRAME <= s_rx_inc_frame(0) or s_in_src_rdy;
         end if;
     end process;
-
-    rx_mfb_error_g : for r in 0 to RX_REGIONS-1 generate
-        s_rx_mfb_error(r*2+0) <= RX_MFB_CRC_ERR(r);
-        s_rx_mfb_error(r*2+1) <= RX_MFB_MII_ERR(r);
-    end generate;
 
     -- =========================================================================
     --  CRC CUTTER (latency = 2 cycles)
@@ -463,13 +487,13 @@ begin
             CLK            => RX_CLK,
             RESET          => RX_RESET,
 
-            RX_DATA        => RX_MFB_DATA,
-            RX_SOF_POS     => RX_MFB_SOF_POS,
-            RX_EOF_POS     => RX_MFB_EOF_POS,
-            RX_SOF         => RX_MFB_SOF,
-            RX_EOF         => RX_MFB_EOF,
-            RX_SRC_RDY     => RX_MFB_SRC_RDY,
-            RX_METADATA    => s_rx_mfb_error,
+            RX_DATA        => s_in_data,
+            RX_SOF_POS     => s_in_sof_pos,
+            RX_EOF_POS     => s_in_eof_pos,
+            RX_SOF         => s_in_sof,
+            RX_EOF         => s_in_eof,
+            RX_SRC_RDY     => s_in_src_rdy,
+            RX_METADATA    => s_in_error,
 
             TX_DATA        => s_cut_data,
             TX_SOF_POS     => s_cut_sof_pos,
@@ -481,13 +505,13 @@ begin
             TX_CRC_CUT_ERR => s_cut_crc_cut_err
         );
     else generate
-        s_cut_data        <= RX_MFB_DATA;
-        s_cut_sof_pos     <= RX_MFB_SOF_POS;
-        s_cut_eof_pos     <= RX_MFB_EOF_POS;
-        s_cut_sof         <= RX_MFB_SOF;
-        s_cut_eof         <= RX_MFB_EOF;
-        s_cut_src_rdy     <= RX_MFB_SRC_RDY;
-        s_cut_adapter_err <= s_rx_mfb_error;
+        s_cut_data        <= s_in_data;
+        s_cut_sof_pos     <= s_in_sof_pos;
+        s_cut_eof_pos     <= s_in_eof_pos;
+        s_cut_sof         <= s_in_sof;
+        s_cut_eof         <= s_in_eof;
+        s_cut_src_rdy     <= s_in_src_rdy;
+        s_cut_adapter_err <= s_in_error;
         s_cut_crc_cut_err <= (others => '0');
     end generate;
 
