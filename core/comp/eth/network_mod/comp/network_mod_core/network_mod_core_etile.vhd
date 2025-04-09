@@ -523,6 +523,15 @@ architecture ETILE of NETWORK_MOD_CORE is
     signal rx_avst_empty     : std_logic_vector(ETH_PORT_CHAN*AVST_EMPTY_WIDTH   -1 downto 0);
     signal rx_avst_error     : std_logic_vector(ETH_PORT_CHAN*RX_AVST_ERROR_WIDTH-1 downto 0);
 
+    signal tx_adap_mfb_clk     : std_logic_vector(ETH_PORT_CHAN-1 downto 0) := (others => '0');
+    signal tx_adap_mfb_data    : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+    signal tx_adap_mfb_crc_err : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal tx_adap_mfb_sof_pos : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
+    signal tx_adap_mfb_eof_pos : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+    signal tx_adap_mfb_sof     : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal tx_adap_mfb_eof     : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal tx_adap_mfb_src_rdy : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+
     -- Status signals
     signal rx_hi_ber         : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
     signal rx_pcs_ready      : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
@@ -1416,16 +1425,25 @@ begin
             IN_RX_BLOCK_LOCK => '0', -- rx_block_lock(0)
             IN_RX_AM_LOCK    => '0', -- rx_am_lock   (0)
 
-            OUT_MFB_DATA     => TX_MFB_DATA   (IT),
-            OUT_MFB_SOF      => TX_MFB_SOF    (IT),
-            OUT_MFB_SOF_POS  => TX_MFB_SOF_POS(IT),
-            OUT_MFB_EOF      => TX_MFB_EOF    (IT),
-            OUT_MFB_EOF_POS  => TX_MFB_EOF_POS(IT),
-            OUT_MFB_ERROR    => TX_MFB_CRC_ERR(IT),
-            OUT_MFB_SRC_RDY  => TX_MFB_SRC_RDY(IT),
+            OUT_MFB_DATA     => tx_adap_mfb_data   (IT),
+            OUT_MFB_SOF      => tx_adap_mfb_sof    (IT),
+            OUT_MFB_SOF_POS  => tx_adap_mfb_sof_pos(IT),
+            OUT_MFB_EOF      => tx_adap_mfb_eof    (IT),
+            OUT_MFB_EOF_POS  => tx_adap_mfb_eof_pos(IT),
+            OUT_MFB_ERROR    => tx_adap_mfb_crc_err(IT),
+            OUT_MFB_SRC_RDY  => tx_adap_mfb_src_rdy(IT),
             OUT_LINK_UP      => open -- this is done here
         );
 
+        -- JC: This assignment/renaming is necessary here to synchronize
+        -- the delta delay (for simulators) between the clock and data signals!
+        TX_MFB_DATA   (IT) <= tx_adap_mfb_data(IT);
+        TX_MFB_SOF    (IT) <= tx_adap_mfb_sof(IT);
+        TX_MFB_SOF_POS(IT) <= tx_adap_mfb_sof_pos(IT);
+        TX_MFB_EOF    (IT) <= tx_adap_mfb_eof(IT);
+        TX_MFB_EOF_POS(IT) <= tx_adap_mfb_eof_pos(IT);
+        TX_MFB_CRC_ERR(IT) <= tx_adap_mfb_crc_err(IT);
+        TX_MFB_SRC_RDY(IT) <= tx_adap_mfb_src_rdy(IT);
         TX_MFB_MII_ERR(IT) <= (others => '0');
 
         repeater_i: entity work.avst_loop

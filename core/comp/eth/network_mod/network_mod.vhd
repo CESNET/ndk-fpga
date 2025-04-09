@@ -129,6 +129,15 @@ architecture FULL of NETWORK_MOD is
     signal rx_mfb_crc_err_i : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
     signal rx_mfb_src_rdy_i : slv_array_t   (ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
 
+    signal core_tx_mfb_data    : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(MFB_WIDTH_CORE-1 downto 0);
+    signal core_tx_mfb_sof_pos : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(MFB_SOFP_WIDTH_CORE-1 downto 0);
+    signal core_tx_mfb_eof_pos : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(MFB_EOFP_WIDTH_CORE-1 downto 0);
+    signal core_tx_mfb_sof     : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
+    signal core_tx_mfb_eof     : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
+    signal core_tx_mfb_mii_err : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
+    signal core_tx_mfb_crc_err : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0)(REGIONS_CORE-1 downto 0);
+    signal core_tx_mfb_src_rdy : slv_array_t   (ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
+
     -- Output of MFB Merger tree (and of the whole Network modul) as an array
     -- MFB signals
     signal tx_usr_mfb_data_arr    : slv_array_2d_t(ETH_PORTS-1 downto 0)(ETH_PORT_STREAMS-1 downto 0)(MFB_WIDTH-1 downto 0);
@@ -511,14 +520,14 @@ begin
 
             -- TX interface (packets received from Ethernet, transmit to RX MAC lite)
             TX_MFB_CLK      => rx_mfb_clk      (p),
-            TX_MFB_DATA     => rx_mfb_data_i   (p),
-            TX_MFB_SOF_POS  => rx_mfb_sof_pos_i(p),
-            TX_MFB_EOF_POS  => rx_mfb_eof_pos_i(p),
-            TX_MFB_SOF      => rx_mfb_sof_i    (p),
-            TX_MFB_EOF      => rx_mfb_eof_i    (p),
-            TX_MFB_MII_ERR  => rx_mfb_mii_err_i(p),
-            TX_MFB_CRC_ERR  => rx_mfb_crc_err_i(p),
-            TX_MFB_SRC_RDY  => rx_mfb_src_rdy_i(p),
+            TX_MFB_DATA     => core_tx_mfb_data   (p),
+            TX_MFB_SOF_POS  => core_tx_mfb_sof_pos(p),
+            TX_MFB_EOF_POS  => core_tx_mfb_eof_pos(p),
+            TX_MFB_SOF      => core_tx_mfb_sof    (p),
+            TX_MFB_EOF      => core_tx_mfb_eof    (p),
+            TX_MFB_MII_ERR  => core_tx_mfb_mii_err(p),
+            TX_MFB_CRC_ERR  => core_tx_mfb_crc_err(p),
+            TX_MFB_SRC_RDY  => core_tx_mfb_src_rdy(p),
 
             -- Control/status
             -- REPEATER_CTRL         => REPEATER_CTRL(p*2+1 downto p*2),
@@ -552,6 +561,17 @@ begin
             logic_tx_clk(p) <= (others => CLK_ETH(p));
             logic_rx_clk(p) <= (others => CLK_ETH(p));
         end generate;
+
+        -- JC: This assignment/renaming is necessary here to synchronize
+        -- the delta delay (for simulators) between the clock and data signals!
+        rx_mfb_data_i    <= core_tx_mfb_data;
+        rx_mfb_sof_pos_i <= core_tx_mfb_sof_pos;
+        rx_mfb_eof_pos_i <= core_tx_mfb_eof_pos;
+        rx_mfb_sof_i     <= core_tx_mfb_sof;
+        rx_mfb_eof_i     <= core_tx_mfb_eof;
+        rx_mfb_mii_err_i <= core_tx_mfb_mii_err;
+        rx_mfb_crc_err_i <= core_tx_mfb_crc_err;
+        rx_mfb_src_rdy_i <= core_tx_mfb_src_rdy;
 
         -- =====================================================================
         -- TIMESTAMP synchronization
