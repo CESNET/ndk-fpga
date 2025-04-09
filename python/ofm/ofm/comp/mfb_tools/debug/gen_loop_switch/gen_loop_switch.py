@@ -179,8 +179,8 @@ class GenLoopSwitch(nfb.BaseComp):
     Usage:
     To loop data on the right side, set `gls.l2r.mux_loopback = 1` or `gls.l2r.input = 3`.
     To generate data to the right side using a MFB Generator, the simplest way is to use the
-    generator_start method like so: `gls.l2r.generator_start(en_path=True)`.
-    To get the full configuration of the (l2r) MFB Generator: gls.l2r.gen.get_configuration()
+    gen_start method like so: `gls.l2r.gen_start(en_path=True)`.
+    To get the full configuration of the (l2r) MFB Generator: `gls.l2r.gen.get_configuration()`.
     """
 
     DT_COMPATIBLE = "cesnet,ofm,gen_loop_switch"
