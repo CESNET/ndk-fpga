@@ -80,6 +80,7 @@ class response_item #(int unsigned DATA_WIDTH) extends uvm_common::sequence_item
 
     logic [DATA_WIDTH-1 : 0] readdata;
     time timestamp;
+    bit is_last_in_burst;
 
     // Constructor
     function new(string name = "response_item");

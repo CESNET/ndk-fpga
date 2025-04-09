@@ -116,6 +116,7 @@ class memory_model #(longint unsigned ADDRESS_WIDTH, longint unsigned DATA_WIDTH
             item = response_item #(DATA_WIDTH)::type_id::create("item");
             item.readdata = read_from_memory(current_request.address); // Get data from memory
             item.timestamp = $time;
+            item.is_last_in_burst = (current_request.burstcount == 1);
             response_out.write(item);
 
             // Update the state properties
