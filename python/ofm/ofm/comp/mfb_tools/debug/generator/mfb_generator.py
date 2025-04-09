@@ -4,8 +4,8 @@
 #            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import sys
-from dataclasses import dataclass
-from typing import Any, Optional
+from dataclasses import dataclass, fields
+from typing import Any, Optional, List
 
 import nfb
 
@@ -282,7 +282,7 @@ class MfbGenerator(nfb.BaseComp):
     # ####################
     @property
     def frame_count(self) -> int:
-        """Get the number of generated frames."""
+        """Get the number of generated frames (may overflow frequently due to low cnt width)."""
         return int.from_bytes(self._comp.read(self._REG_FRAME_CNT_LOW, 8), byteorder=sys.byteorder)
 
     # #############
@@ -319,3 +319,17 @@ class MfbGenerator(nfb.BaseComp):
         self.dst_mac_address            = conf.dst_mac_address
         self.src_mac_address            = conf.src_mac_address
         self.enabled                    = conf.enabled
+
+    def get_fconfiguration(self) -> List:
+        """Returns formatted configuration of the generator as a list of [item, value] lists."""
+        conf = self.get_configuration()
+        conf.dst_mac_address = MfbGenerator.convert_bytes2mac(conf.dst_mac_address, ':')
+        conf.src_mac_address = MfbGenerator.convert_bytes2mac(conf.src_mac_address, ':')
+        lst = []
+        for field in fields(conf):
+            value = getattr(conf, field.name)
+            # Convert booleans to strings for tabulation
+            if isinstance(value, bool):
+                value = str(value)
+            lst.append([field.name, value])
+        return lst
