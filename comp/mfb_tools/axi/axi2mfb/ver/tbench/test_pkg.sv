@@ -9,16 +9,20 @@ package test_pkg;
 
     import math_pkg::*;
 
-    parameter REGIONS     = 1;
-    parameter REGION_SIZE = 4;
-    parameter BLOCK_SIZE  = 8;
-    parameter ITEM_WIDTH  = 8;
-    parameter META_WIDTH  = 0;
-    parameter USE_IN_PIPE  = 0;
-    parameter USE_OUT_PIPE = 0;
-    parameter AXI_DATA_WIDTH = REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;;
-    parameter PIPE_TYPE = "SHREG";
-    parameter DEVICE    = "7SERIES";
+    parameter REGIONS        = 4;
+    parameter REGION_SIZE    = 4;
+    parameter BLOCK_SIZE     = 8;
+    parameter ITEM_WIDTH     = 8;
+    parameter USE_IN_PIPE    = 0;
+    parameter USE_OUT_PIPE   = 1;
+    // META_ALIGNMENT=0 => META signal is aligned with SOF,
+    // META_ALIGNMENT=1 => META signal is aligned with EOF.
+    parameter META_ALIGNMENT = 0;
+    parameter AXI_DATA_WIDTH = REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
+    parameter AXI_USER_WIDTH = 32;
+    parameter META_WIDTH     = AXI_USER_WIDTH;
+    parameter PIPE_TYPE      = "SHREG";
+    parameter DEVICE         = "7SERIES";
 
     `include "scoreboard.sv"
 

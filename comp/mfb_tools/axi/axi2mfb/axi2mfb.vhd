@@ -10,6 +10,7 @@ use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.math_pack.all;
+use work.type_pack.all;
 
 -- -------------------------------------------------------------------------
 --                             Description
@@ -50,6 +51,16 @@ entity AXI2MFB is
         -- AXI stream data width
         AXI_DATA_WIDTH          : natural := 256;
 
+        -- AXI stream metadata width
+        AXI_USER_WIDTH          : natural := 0;
+
+        -- The division per regions must be performed afterward
+        META_WIDTH              : natural := AXI_USER_WIDTH;
+
+        -- MFB_META_WITH_SOF = true  => META signal is aligned with SOF
+        -- MFB_META_WITH_SOF = false => META signal is aligned with EOF (if EOF is not set, the user is forwarded to region 0)
+        MFB_META_WITH_SOF       : boolean := true;
+
         -- =============================
         -- Others (PIPE config)
         -- =============================
@@ -70,6 +81,7 @@ entity AXI2MFB is
         -- =========================================================================
 
         RX_AXI_TDATA     : in  std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+        RX_AXI_TUSER     : in  std_logic_vector(AXI_USER_WIDTH - 1 downto 0) := (others => '0');
         RX_AXI_TKEEP     : in  std_logic_vector((AXI_DATA_WIDTH/8)-1 downto 0);
         RX_AXI_TLAST     : in  std_logic;
         RX_AXI_TVALID    : in  std_logic;
@@ -80,6 +92,8 @@ entity AXI2MFB is
         -- =========================================================================
 
         TX_MFB_DATA     : out std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+        -- Valid with SOF
+        TX_MFB_META     : out std_logic_vector(REGIONS*META_WIDTH - 1 downto 0);
         TX_MFB_SOF_POS  : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
         TX_MFB_EOF_POS  : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
         TX_MFB_SOF      : out std_logic_vector(REGIONS-1 downto 0);
@@ -111,6 +125,7 @@ architecture behavioral of AXI2MFB is
     -- s0 => s1
     signal axi_tlast_s1 : std_logic;
     signal axi_tdata_s1 : std_logic_vector(RX_AXI_TDATA'RANGE);
+    signal axi_tuser_s1 : std_logic_vector(RX_AXI_TUSER'RANGE);
     signal axi_tkeep_s1 : std_logic_vector(RX_AXI_TKEEP'RANGE);
     signal src_rdy_s1   : std_logic;
     signal dst_rdy_s1   : std_logic;
@@ -119,6 +134,10 @@ architecture behavioral of AXI2MFB is
     signal mfb_eof_pos_s1 : std_logic_vector(TX_MFB_EOF_POS'RANGE);
     signal mfb_sof_s1     : std_logic_vector(TX_MFB_SOF'RANGE);
     signal mfb_eof_s1     : std_logic_vector(TX_MFB_EOF'RANGE);
+
+    -- Meta signal array
+    signal mfb_meta_s1      : std_logic_vector(REGIONS*META_WIDTH - 1 downto 0);
+    signal mfb_meta_arr_s1  : slv_array_t(REGIONS - 1 downto 0)(META_WIDTH - 1 downto 0):= (others => (others => '0'));
 
 
 begin
@@ -137,12 +156,16 @@ begin
     -- 4. MFB and AXI stream data width needs to be equal
     assert (MFB_DATA_WIDTH = AXI_DATA_WIDTH)   report "AXI2MFB: MFB and AXIs data width is not matching"   severity FAILURE;
 
+    -- 5. MFB and AXI meta signal must have same width
+    assert (META_WIDTH = AXI_USER_WIDTH)   report "AXI2MFB: MFB and AXIs meta width is not matching"   severity FAILURE;
+
     -----------------------------------------------------------------------------
     -- input stage (s0 => s1)
     -----------------------------------------------------------------------------
     input_pipe_i :  entity  work.AXI_PIPE
         generic map(
             AXI_DATA_WIDTH  => AXI_DATA_WIDTH,
+            AXI_USER_WIDTH  => AXI_USER_WIDTH,
             FAKE_PIPE       => not USE_IN_PIPE,
             USE_DST_RDY     => true,
             PIPE_TYPE       => PIPE_TYPE,
@@ -153,12 +176,14 @@ begin
             RESET         => RST,
 
             RX_AXI_TDATA   => RX_AXI_TDATA,
+            RX_AXI_TUSER   => RX_AXI_TUSER,
             RX_AXI_TKEEP   => RX_AXI_TKEEP,
             RX_AXI_TLAST   => RX_AXI_TLAST,
             RX_AXI_TVALID  => RX_AXI_TVALID,
             RX_AXI_TREADY  => RX_AXI_TREADY,
 
             TX_AXI_TDATA   => axi_tdata_s1,
+            TX_AXI_TUSER   => axi_tuser_s1,
             TX_AXI_TKEEP   => axi_tkeep_s1,
             TX_AXI_TLAST   => axi_tlast_s1,
             TX_AXI_TVALID  => src_rdy_s1,
@@ -190,6 +215,28 @@ begin
     -- TX_MFB_SOF is asserted after last packet has ended (start_frame flag)
     mfb_sof_s1 <= (0 => frame_start_q, others => '0');
 
+    valid_with_what_g : if (MFB_META_WITH_SOF) generate
+        -- SOF can appear only in region 0
+        mfb_meta_arr_s1(0)   <= axi_tuser_s1;
+    else generate
+        -- Find eof region
+        find_eof_p: process(all)
+            variable eof_region_int : integer range 0 to max(1, log2(REGIONS+1));
+        begin
+            eof_region_int  := 0;
+            mfb_meta_arr_s1 <= (others => (others => '0'));
+            find_eof_l: for r in 0 to REGIONS - 1 loop
+                if mfb_eof_s1(r) = '1' then
+                    eof_region_int  := r;
+                    exit;
+                end if;
+            end loop;
+            -- place user signal in region where eof is specified
+            -- if eof is not available, user signal is placed in first region
+            mfb_meta_arr_s1(eof_region_int)   <= axi_tuser_s1;
+        end process;
+    end generate;
+
     -- default assignemnt for virtual region
     tkeep_split(REGIONS) <= (others => '0');
 
@@ -220,13 +267,14 @@ begin
     -----------------------------------------------------------------------------
     -- output stage (s1 => s2)
     -----------------------------------------------------------------------------
+    mfb_meta_s1 <= slv_array_ser(mfb_meta_arr_s1);
     output_pipe_i :  entity  work.MFB_PIPE
         generic map(
             REGIONS       => REGIONS,
             REGION_SIZE   => REGION_SIZE,
             BLOCK_SIZE    => BLOCK_SIZE,
             ITEM_WIDTH    => ITEM_WIDTH,
-            META_WIDTH    => 0,
+            META_WIDTH    => META_WIDTH,
 
             FAKE_PIPE     => not USE_OUT_PIPE,
             USE_DST_RDY   => true,
@@ -238,7 +286,7 @@ begin
             RESET         => RST,
 
             RX_DATA       => axi_tdata_s1,
-            RX_META       => (others => '0'),
+            RX_META       => mfb_meta_s1,
             RX_SOF_POS    => (others => '0'), -- SOF POS is fixed to 0
             RX_EOF_POS    => mfb_eof_pos_s1,
             RX_SOF        => mfb_sof_s1,
@@ -247,7 +295,7 @@ begin
             RX_DST_RDY    => dst_rdy_s1,
 
             TX_DATA       => TX_MFB_DATA,
-            TX_META       => open,
+            TX_META       => TX_MFB_META,
             TX_SOF_POS    => TX_MFB_SOF_POS,
             TX_EOF_POS    => TX_MFB_EOF_POS,
             TX_SOF        => TX_MFB_SOF,

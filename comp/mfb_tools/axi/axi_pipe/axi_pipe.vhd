@@ -26,6 +26,9 @@ entity AXI_PIPE is
         -- AXI stream data width
         AXI_DATA_WIDTH          : natural := 256;
 
+        -- AXI stream user width
+        AXI_USER_WIDTH          : natural := 0;
+
         -- =============================
         -- Others
         -- =============================
@@ -48,7 +51,8 @@ entity AXI_PIPE is
         -- AXI input interface
         -- =============================
 
-        RX_AXI_TDATA     : in  std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+        RX_AXI_TDATA     : in  std_logic_vector(AXI_DATA_WIDTH - 1 downto 0);
+        RX_AXI_TUSER     : in  std_logic_vector(AXI_USER_WIDTH - 1 downto 0) := (others => '0');
         RX_AXI_TKEEP     : in  std_logic_vector((AXI_DATA_WIDTH/8)-1 downto 0);
         RX_AXI_TLAST     : in  std_logic;
         RX_AXI_TVALID    : in  std_logic;
@@ -59,6 +63,7 @@ entity AXI_PIPE is
         -- =============================
 
         TX_AXI_TDATA     : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+        TX_AXI_TUSER     : out std_logic_vector(AXI_USER_WIDTH - 1 downto 0);
         TX_AXI_TKEEP     : out std_logic_vector((AXI_DATA_WIDTH/8)-1 downto 0);
         TX_AXI_TLAST     : out std_logic;
         TX_AXI_TVALID    : out std_logic;
@@ -73,10 +78,12 @@ architecture arch of AXI_PIPE is
     constant TLAST_WIDTH        : integer := 1;
     constant TKEEP_WIDTH        : integer := AXI_DATA_WIDTH / 8;
     constant TDATA_WIDTH        : integer := AXI_DATA_WIDTH;
-    constant PIPE_WIDTH         : integer := TLAST_WIDTH + TKEEP_WIDTH + TDATA_WIDTH;
+    constant TUSER_WIDTH        : integer := AXI_USER_WIDTH;
+    constant PIPE_WIDTH         : integer := TLAST_WIDTH + TKEEP_WIDTH + TDATA_WIDTH + TUSER_WIDTH;
 
-    subtype  PIPE_TDATA         is natural range TLAST_WIDTH+TKEEP_WIDTH+TDATA_WIDTH-1 downto TLAST_WIDTH+TKEEP_WIDTH;
-    subtype  PIPE_TKEEP         is natural range TLAST_WIDTH+TKEEP_WIDTH-1 downto TLAST_WIDTH;
+    subtype  PIPE_TDATA         is natural range TLAST_WIDTH + TKEEP_WIDTH + TUSER_WIDTH + TDATA_WIDTH-1 downto TLAST_WIDTH + TKEEP_WIDTH + TUSER_WIDTH;
+    subtype  PIPE_TUSER         is natural range TLAST_WIDTH + TKEEP_WIDTH + TUSER_WIDTH - 1             downto TLAST_WIDTH + TKEEP_WIDTH;
+    subtype  PIPE_TKEEP         is natural range TLAST_WIDTH + TKEEP_WIDTH - 1                           downto TLAST_WIDTH;
     constant PIPE_TLAST         : natural := 0;
 
     signal pipe_in_data         : std_logic_vector(PIPE_WIDTH-1 downto 0);
@@ -87,6 +94,7 @@ begin
     pipe_in_data(PIPE_TLAST) <= RX_AXI_TLAST;
     pipe_in_data(PIPE_TKEEP) <= RX_AXI_TKEEP;
     pipe_in_data(PIPE_TDATA) <= RX_AXI_TDATA;
+    pipe_in_data(PIPE_TUSER) <= RX_AXI_TUSER;
 
     true_pipe_gen : if USE_DST_RDY generate
         pipe_i :  entity  work.PIPE
@@ -114,8 +122,6 @@ begin
         );
     end generate;
 
-
-
     -- Register only implementation
     simple_pipe_gen : if not USE_DST_RDY generate
         RX_AXI_TREADY <= '1';
@@ -123,16 +129,17 @@ begin
             TX_AXI_TVALID <= RX_AXI_TVALID;
             pipe_out_data <= pipe_in_data;
         end generate;
+
         full_gen : if not FAKE_PIPE generate
             pipe_core : process(CLK)
             begin
-                if CLK'event and CLK='1' then
-                if RESET='1' then
-                    TX_AXI_TVALID <= '0';
-                else
-                    TX_AXI_TVALID <= RX_AXI_TVALID;
-                end if;
-                pipe_out_data <= pipe_in_data;
+                if rising_edge(CLK) then
+                    if RESET='1' then
+                        TX_AXI_TVALID <= '0';
+                    else
+                        TX_AXI_TVALID <= RX_AXI_TVALID;
+                    end if;
+                    pipe_out_data <= pipe_in_data;
                 end if;
             end process;
         end generate;
@@ -141,4 +148,5 @@ begin
     TX_AXI_TLAST <= pipe_out_data(PIPE_TLAST);
     TX_AXI_TKEEP <= pipe_out_data(PIPE_TKEEP);
     TX_AXI_TDATA <= pipe_out_data(PIPE_TDATA);
+    TX_AXI_TUSER <= pipe_out_data(PIPE_TUSER);
 end architecture;
