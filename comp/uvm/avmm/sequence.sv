@@ -389,6 +389,39 @@ class sequence_master_bursting #(int unsigned ADDRESS_WIDTH, int unsigned DATA_W
 
 endclass
 
+class sequence_master_random_access #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends sequence_master_static_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
+    `uvm_object_param_utils(uvm_avmm::sequence_master_random_access #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+
+    // Constructor
+    function new(string name = "sequence_master_random_access");
+        super.new(name);
+    endfunction
+
+    // Generate transactions
+    task body;
+        int unsigned current_transaction_count = 0;
+        response_item #(DATA_WIDTH) response;
+
+        req = sequence_item_response #(DATA_WIDTH)::type_id::create("req");
+        while (current_transaction_count < transaction_count) begin
+            // Randomize a flow latency
+            assert(std::randomize(latency) with { latency inside { [latency_min : latency_max] }; });
+
+            response_in.get(response);
+            latency_wait(response.timestamp);
+            send_response(response);
+            current_transaction_count++;
+
+            while (response.is_last_in_burst == 0) begin
+                response_in.get(response);
+                send_response(response);
+                current_transaction_count++;
+            end
+        end
+    endtask
+
+endclass
+
 class sequence_library_master #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_common::sequence_library #(config_sequence, sequence_item_response #(DATA_WIDTH), sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
     `uvm_object_param_utils(uvm_avmm::sequence_library_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
     `uvm_sequence_library_utils(uvm_avmm::sequence_library_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
@@ -407,6 +440,7 @@ class sequence_library_master #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WI
         this.add_sequence(sequence_master_dynamic_latency        #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::get_type());
         this.add_sequence(sequence_master_dynamic_minmax_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::get_type());
         this.add_sequence(sequence_master_bursting               #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::get_type());
+        this.add_sequence(sequence_master_random_access          #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::get_type());
     endfunction
 
 endclass
