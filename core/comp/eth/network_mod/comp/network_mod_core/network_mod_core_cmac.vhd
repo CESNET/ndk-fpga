@@ -564,6 +564,14 @@ architecture CMAC of NETWORK_MOD_CORE is
     signal cmac_tx_lbus_sop        : std_logic_vector(4-1 downto 0);
     signal cmac_tx_lbus_rdy        : std_logic;
 
+    signal adap_tx_mfb_data        : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+    signal adap_tx_mfb_crc_err     : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal adap_tx_mfb_sof_pos     : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
+    signal adap_tx_mfb_eof_pos     : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+    signal adap_tx_mfb_sof         : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal adap_tx_mfb_eof         : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal adap_tx_mfb_src_rdy     : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+
 begin
 
     assert (ETH_PORT_CHAN = 1)
@@ -1481,15 +1489,24 @@ begin
         IN_LBUS_EOP     => cmac_rx_lbus_eop,
         IN_LBUS_ERR     => cmac_rx_lbus_err,
 
-        OUT_MFB_DATA    => TX_MFB_DATA(0),
-        OUT_MFB_SOF_POS => TX_MFB_SOF_POS(0),
-        OUT_MFB_EOF_POS => TX_MFB_EOF_POS(0),
-        OUT_MFB_SOF     => TX_MFB_SOF(0),
-        OUT_MFB_EOF     => TX_MFB_EOF(0),
-        OUT_MFB_ERROR   => TX_MFB_CRC_ERR(0),
-        OUT_MFB_SRC_RDY => TX_MFB_SRC_RDY(0)
+        OUT_MFB_DATA    => adap_tx_mfb_data(0),
+        OUT_MFB_SOF_POS => adap_tx_mfb_sof_pos(0),
+        OUT_MFB_EOF_POS => adap_tx_mfb_eof_pos(0),
+        OUT_MFB_SOF     => adap_tx_mfb_sof(0),
+        OUT_MFB_EOF     => adap_tx_mfb_eof(0),
+        OUT_MFB_ERROR   => adap_tx_mfb_crc_err(0),
+        OUT_MFB_SRC_RDY => adap_tx_mfb_src_rdy(0)
     );
 
+    -- JC: This dump assignment/renaming is necessary here to synchronize
+    -- the delta delay (for simulators) between the clock and data signals!
+    TX_MFB_DATA    <= adap_tx_mfb_data;
+    TX_MFB_SOF_POS <= adap_tx_mfb_sof_pos;
+    TX_MFB_EOF_POS <= adap_tx_mfb_eof_pos;
+    TX_MFB_SOF     <= adap_tx_mfb_sof;
+    TX_MFB_EOF     <= adap_tx_mfb_eof;
+    TX_MFB_CRC_ERR <= adap_tx_mfb_crc_err;
+    TX_MFB_SRC_RDY <= adap_tx_mfb_src_rdy;
     TX_MFB_MII_ERR <= (others => (others => '0'));
 
 end architecture;
