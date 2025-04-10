@@ -14,43 +14,43 @@ use work.type_pack.all;
 
 entity STREAMING_DEBUG_MASTER is
   generic (
-    --! \brief Number of connected probes.
+    -- Number of connected probes.
     CONNECTED_PROBES   : integer := 4;
     -- Number of MFB regions.
     REGIONS            : natural := 1;
-    --! \brief Master debuging enable switch.
-    --! \description True means full architecture implementation, false means empty architecture implementation.
+    -- Master debuging enable switch.
+    -- True means full architecture implementation, false means empty architecture implementation.
     DEBUG_ENABLED      : boolean := false;
-    --! \brief Selective enabling of monitoring of connected probes when master enable is true.
-    --! \details Character 'E' or 'e' means enabled, each other character means disabled.
-    --! String is red from left to right, one character for each interface numbered from 0.
+    -- Selective enabling of monitoring of connected probes when master enable is true.
+    -- Character 'E' or 'e' means enabled, each other character means disabled.
+    -- String is red from left to right, one character for each interface numbered from 0.
     PROBE_ENABLED      : string := "EEEE";
-    --! \brief Should counter of data words be available?
+    -- Should counter of data words be available?
     COUNTER_WORD       : string := "EEEE";
-    --! \brief Should counter of waiting cycles (not source nor destination ready) be available?
+    -- Should counter of waiting cycles (not source nor destination ready) be available?
     COUNTER_WAIT       : string := "EEEE";
-    --! \brief Should counter of cycles when source is ready and destination is not be available?
+    -- Should counter of cycles when source is ready and destination is not be available?
     COUNTER_DST_HOLD   : string := "EEEE";
-    --! \brief Should counter of cycles when destination is ready and source is not be available?
+    -- Should counter of cycles when destination is ready and source is not be available?
     COUNTER_SRC_HOLD   : string := "EEEE";
-    --! \brief Should counter of started transactions be available?
+    -- Should counter of started transactions be available?
     COUNTER_SOP        : string := "EEEE";
-    --! \brief Should counter of ended transactions be available?
+    -- Should counter of ended transactions be available?
     COUNTER_EOP        : string := "EEEE";
-    --! \brief Should bus controll functionality be available?
+    -- Should bus controll functionality be available?
     BUS_CONTROL        : string := "EEEE";
-    --! \brief Text identificators for connected probes.
-    --! \details Each probe name has precisely 4 characters.
+    -- Text identificators for connected probes.
+    -- Each probe name has precisely 4 characters.
     PROBE_NAMES        : string := "Int1Int2Int3Int4";
-    --! \brief Use internal register on all DEBUG interface signals.
+    -- Use internal register on all DEBUG interface signals.
     DEBUG_REG          : boolean := false
   );
   port (
-    --! \name CLOCK and RESET
+    -- CLOCK and RESET
     CLK         : in std_logic;
     RESET       : in std_logic;
 
-    --! \name Input controll MI32 interface
+    -- Input controll MI32 interface
     MI_DWR             : in  std_logic_vector(31 downto 0);
     MI_ADDR            : in  std_logic_vector(31 downto 0);
     MI_RD              : in  std_logic;
@@ -60,7 +60,7 @@ entity STREAMING_DEBUG_MASTER is
     MI_ARDY            : out std_logic := '0';
     MI_DRDY            : out std_logic := '0';
 
-    --! \name Multi-interface for connected streaming interfaces
+    -- Multi-interface for connected streaming interfaces
     DEBUG_BLOCK        : out std_logic_vector(CONNECTED_PROBES-1 downto 0) := (others => '0');
     DEBUG_DROP         : out std_logic_vector(CONNECTED_PROBES-1 downto 0) := (others => '0');
     DEBUG_SRC_RDY      : in  std_logic_vector(CONNECTED_PROBES-1 downto 0) := (others => '0');
