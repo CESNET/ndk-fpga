@@ -204,6 +204,14 @@ architecture FULL of NETWORK_MOD_CORE is
     signal ftile_rx_mac_error     : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(RX_MAC_ERROR_WIDTH    -1 downto 0);
     signal ftile_rx_mac_status    : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(RX_MAC_STATUS_WIDTH   -1 downto 0);
 
+    signal adap_tx_mfb_data       : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+    signal adap_tx_mfb_crc_err    : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal adap_tx_mfb_sof_pos    : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
+    signal adap_tx_mfb_eof_pos    : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+    signal adap_tx_mfb_sof        : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal adap_tx_mfb_eof        : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal adap_tx_mfb_src_rdy    : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+
     begin
 
         mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
@@ -776,16 +784,25 @@ architecture FULL of NETWORK_MOD_CORE is
             IN_MAC_ERROR     => ftile_rx_mac_error(i),
             IN_MAC_STATUS    => ftile_rx_mac_status(i),
             IN_MAC_VALID     => ftile_rx_mac_valid(i),
-            OUT_MFB_DATA     => TX_MFB_DATA(i),
-            OUT_MFB_ERROR    => TX_MFB_CRC_ERR(i),
-            OUT_MFB_SOF      => TX_MFB_SOF(i),
-            OUT_MFB_EOF      => TX_MFB_EOF(i),
-            OUT_MFB_SOF_POS  => TX_MFB_SOF_POS(i),
-            OUT_MFB_EOF_POS  => TX_MFB_EOF_POS(i),
-            OUT_MFB_SRC_RDY  => TX_MFB_SRC_RDY(i),
+            OUT_MFB_DATA     => adap_tx_mfb_data(i),
+            OUT_MFB_ERROR    => adap_tx_mfb_crc_err(i),
+            OUT_MFB_SOF      => adap_tx_mfb_sof(i),
+            OUT_MFB_EOF      => adap_tx_mfb_eof(i),
+            OUT_MFB_SOF_POS  => adap_tx_mfb_sof_pos(i),
+            OUT_MFB_EOF_POS  => adap_tx_mfb_eof_pos(i),
+            OUT_MFB_SRC_RDY  => adap_tx_mfb_src_rdy(i),
             OUT_LINK_UP      => open
         );
 
+        -- JC: This dump assignment/renaming is necessary here to synchronize
+        -- the delta delay (for simulators) between the clock and data signals!
+        TX_MFB_DATA(i)    <= adap_tx_mfb_data(i);
+        TX_MFB_SOF_POS(i) <= adap_tx_mfb_sof_pos(i);
+        TX_MFB_EOF_POS(i) <= adap_tx_mfb_eof_pos(i);
+        TX_MFB_SOF(i)     <= adap_tx_mfb_sof(i);
+        TX_MFB_EOF(i)     <= adap_tx_mfb_eof(i);
+        TX_MFB_CRC_ERR(i) <= adap_tx_mfb_crc_err(i);
+        TX_MFB_SRC_RDY(i) <= adap_tx_mfb_src_rdy(i);
         TX_MFB_MII_ERR(i) <= (others => '0');
 
         tx_ftile_adapter_i : entity work.TX_MAC_LITE_ADAPTER_MAC_SEG
