@@ -1,0 +1,16 @@
+# general_r0-1.qsf
+# Copyright (C) 2020 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+#  Global assignments for board revisions 0 and 1
+# ==============================================================================
+
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
+
+set_global_assignment -name PWRMGT_SLAVE_DEVICE_TYPE ED8401
+set_global_assignment -name PWRMGT_DIRECT_FORMAT_COEFFICIENT_M 1
+set_global_assignment -name PWRMGT_DIRECT_FORMAT_COEFFICIENT_R 64
+set_global_assignment -name PWRMGT_LINEAR_FORMAT_N "-13"
