@@ -272,45 +272,48 @@ begin
 
     mvb_fifoxm_read(0) <= append_ends_here_reg1 and mfb_src_rdy_reg1 and TX_MFB_DST_RDY and not mvb_fifoxm_empty(0);
 
-    mfb_fifox_i : entity work.MFB_FIFOX
-    generic map(
-        REGIONS             => MFB_REGIONS    ,
-        REGION_SIZE         => MFB_REGION_SIZE,
-        BLOCK_SIZE          => MFB_BLOCK_SIZE ,
-        ITEM_WIDTH          => MFB_ITEM_WIDTH ,
-        META_WIDTH          => MFB_META_WIDTH ,
-        FIFO_DEPTH          => MFB_FIFO_DEPTH ,
-        RAM_TYPE            => "AUTO"         ,
-        DEVICE              => DEVICE         ,
-        ALMOST_FULL_OFFSET  => 0              ,
-        ALMOST_EMPTY_OFFSET => 0
-    )
-    port map(
-        CLK => CLK,
-        RST => RESET,
+    -- Using MFB Reconfigurator simplifies the appending logic, however, it also reduces throughput.
+    -- Hence, this is expected to be only a temporary solution.
+    -- This FIFO is left here for a future full-throughput solution (Hint: use also Frame Masker?).
+    -- mfb_fifox_i : entity work.MFB_FIFOX
+    -- generic map(
+    --     REGIONS             => MFB_REGIONS    ,
+    --     REGION_SIZE         => MFB_REGION_SIZE,
+    --     BLOCK_SIZE          => MFB_BLOCK_SIZE ,
+    --     ITEM_WIDTH          => MFB_ITEM_WIDTH ,
+    --     META_WIDTH          => MFB_META_WIDTH ,
+    --     FIFO_DEPTH          => MFB_FIFO_DEPTH ,
+    --     RAM_TYPE            => "AUTO"         ,
+    --     DEVICE              => DEVICE         ,
+    --     ALMOST_FULL_OFFSET  => 0              ,
+    --     ALMOST_EMPTY_OFFSET => 0
+    -- )
+    -- port map(
+    --     CLK => CLK,
+    --     RST => RESET,
 
-        RX_DATA     => RX_MFB_DATA      ,
-        RX_META     => RX_MFB_META      ,
-        RX_SOF_POS  => RX_MFB_SOF_POS   ,
-        RX_EOF_POS  => RX_MFB_EOF_POS   ,
-        RX_SOF      => RX_MFB_SOF       ,
-        RX_EOF      => RX_MFB_EOF       ,
-        RX_SRC_RDY  => RX_MFB_SRC_RDY   ,
-        RX_DST_RDY  => RX_MFB_DST_RDY   ,
+    --     RX_DATA     => RX_MFB_DATA      ,
+    --     RX_META     => RX_MFB_META      ,
+    --     RX_SOF_POS  => RX_MFB_SOF_POS   ,
+    --     RX_EOF_POS  => RX_MFB_EOF_POS   ,
+    --     RX_SOF      => RX_MFB_SOF       ,
+    --     RX_EOF      => RX_MFB_EOF       ,
+    --     RX_SRC_RDY  => RX_MFB_SRC_RDY   ,
+    --     RX_DST_RDY  => RX_MFB_DST_RDY   ,
 
-        TX_DATA     => mfb_fifox_data   ,
-        TX_META     => mfb_fifox_meta   ,
-        TX_SOF_POS  => mfb_fifox_sof_pos,
-        TX_EOF_POS  => mfb_fifox_eof_pos,
-        TX_SOF      => mfb_fifox_sof    ,
-        TX_EOF      => mfb_fifox_eof    ,
-        TX_SRC_RDY  => mfb_fifox_src_rdy,
-        TX_DST_RDY  => mfb_fifox_dst_rdy,
+    --     TX_DATA     => mfb_fifox_data   ,
+    --     TX_META     => mfb_fifox_meta   ,
+    --     TX_SOF_POS  => mfb_fifox_sof_pos,
+    --     TX_EOF_POS  => mfb_fifox_eof_pos,
+    --     TX_SOF      => mfb_fifox_sof    ,
+    --     TX_EOF      => mfb_fifox_eof    ,
+    --     TX_SRC_RDY  => mfb_fifox_src_rdy,
+    --     TX_DST_RDY  => mfb_fifox_dst_rdy,
 
-        FIFO_STATUS => open             ,
-        FIFO_AFULL  => open             ,
-        FIFO_AEMPTY => open
-    );
+    --     FIFO_STATUS => open             ,
+    --     FIFO_AFULL  => open             ,
+    --     FIFO_AEMPTY => open
+    -- );
 
     -- =======================================================================
     -- Logic to serch for new EOF(POS) and using it to create a vector
@@ -329,7 +332,7 @@ begin
         TX_ITEM_WIDTH         => MFB_ITEM_WIDTH                ,
         META_WIDTH            => MFB_META_WIDTH                ,
         META_MODE             => 0                             ,
-        FIFO_SIZE             => 2                             ,
+        FIFO_SIZE             => MFB_FIFO_DEPTH                ,
         FRAMES_OVER_TX_BLOCK  => 0                             ,
         FRAMES_OVER_TX_REGION => 0                             ,
         DEVICE                => DEVICE
@@ -338,14 +341,14 @@ begin
         CLK                 => CLK                  ,
         RESET               => RESET                ,
 
-        RX_DATA             => mfb_fifox_data       ,
-        RX_META             => mfb_fifox_meta       ,
-        RX_SOF_POS          => mfb_fifox_sof_pos    ,
-        RX_EOF_POS          => mfb_fifox_eof_pos    ,
-        RX_SOF              => mfb_fifox_sof        ,
-        RX_EOF              => mfb_fifox_eof        ,
-        RX_SRC_RDY          => mfb_fifox_src_rdy    ,
-        RX_DST_RDY          => mfb_fifox_dst_rdy    ,
+        RX_DATA             => RX_MFB_DATA          ,
+        RX_META             => RX_MFB_META          ,
+        RX_SOF_POS          => RX_MFB_SOF_POS       ,
+        RX_EOF_POS          => RX_MFB_EOF_POS       ,
+        RX_SOF              => RX_MFB_SOF           ,
+        RX_EOF              => RX_MFB_EOF           ,
+        RX_SRC_RDY          => RX_MFB_SRC_RDY       ,
+        RX_DST_RDY          => RX_MFB_DST_RDY       ,
 
         TX_DATA             => mfb_reconf_tx_data   ,
         TX_META             => mfb_reconf_tx_meta   ,
