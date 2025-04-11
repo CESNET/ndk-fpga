@@ -84,9 +84,9 @@ nvc-sim: nvc
 nvc: $(MOD)
 	$(eval TOP_LEVEL_ENT_LC:=$(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]'))
 	nvc --work=nvcwork -H 1G -M 4G --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
-	nvc --work=nvcwork -H 1G -M 4G -e $(TOP_LEVEL_ENT_LC)
+	nvc --work=nvcwork -H 1G -M 4G -e --no-collapse $(TOP_LEVEL_ENT_LC)
 	MODULE=$(COCOTB_MODULE) TOPLEVEL=$(TOP_LEVEL_ENT_LC) TOPLEVEL_LANG=vhdl $(NETCOPE_ENV) COCOTB_RESOLVE_X=ZEROS \
-	nvc --work=nvcwork -H 1G -M 4G -r $(TOP_LEVEL_ENT_LC) --ieee-warnings=off $(NVC_LOAD)
+	nvc --work=nvcwork -H 1G -M 4G -rw $(TOP_LEVEL_ENT_LC) --dump-arrays -g --ieee-warnings=off $(NVC_LOAD)
 
 else
 .PHONY: $(GEN_MK_NAME)
