@@ -29,6 +29,12 @@ class AvstPcieMonitor(BusMonitor):
 
         self._recv_signals = ms | os_filt
 
+        self.__frame_cnt = 0
+
+    @property
+    def frame_cnt(self):
+        return self.__frame_cnt
+
     async def _monitor_recv(self):
         re = RisingEdge(self.clock)
 
@@ -61,3 +67,4 @@ class AvstPcieMonitor(BusMonitor):
                             self._recv((self._header, self._transaction))
                             self._transaction = bytearray(0)
                             self._header = bytearray(0)
+                            self.__frame_cnt += 1
