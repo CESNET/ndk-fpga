@@ -9,6 +9,7 @@ The components are typically located in the ``comp/debug/`` directory in the OFM
    :maxdepth: 1
    :caption: Content:
 
+   comp/debug/streaming_debug/readme
    comp/debug/mem_tester/readme
    comp/debug/histogramer/readme
    comp/debug/latency_meter/readme
