@@ -34,11 +34,10 @@ async def get_dev(dut, init=True, **kwargs):
     return dev, dev.nfb
 
 
-@cocotb.test(timeout_time=200, timeout_unit='us')
+@cocotb.test(timeout_time=200, timeout_unit='us', skip=False)
 async def test_mi_access_unaligned(dut):
     dev, nfb = await get_dev(dut)
     c = nfb.comp_open("cesnet,ofm,mi_test_space")
-
     await e(c.read)(0, 1)
 
     #for i in range(46, 64): # FIXME: Test fails (for US+)
@@ -50,7 +49,7 @@ async def test_mi_access_unaligned(dut):
             assert data == rdata, f"{list(data)}, {list(rdata)}"
 
 
-@cocotb.test(timeout_time=50, timeout_unit='us')
+@cocotb.test(timeout_time=50, timeout_unit='us', skip=False)
 async def test_enable_rxmac_and_check_status(dut):
     dev, nfb = await get_dev(dut)
 
@@ -78,6 +77,7 @@ async def test_frequency_meter(dut):
 @cocotb.test(timeout_time=200, timeout_unit='us')
 async def test_ndp_recvmsg(dut):
     dev, nfb = await get_dev(dut)
+
     for eth in nfb.eth:
         await e(eth.rxmac.enable)()
 
@@ -88,14 +88,16 @@ async def test_ndp_recvmsg(dut):
     #pkt = bytes(raw(Ether()/IP(dst="127.0.0.1")/TCP()/"GET /index.html HTTP/1.0 \n\n"))
     pkt = bytes([i for i in range(72)])
 
-    await dev._eth_rx_driver[0].write_packet(list(pkt))
+    dev._eth_rx_driver[0].append(pkt)
     await Timer(105, units='us')
 
     recv = await e(nfb.ndp.rx[0].recv)()
+
     # FIXME: try again for slower cards
     #if [pkt] != recv:
     #    await Timer(85, units='us')
     #    recv = await e(nfb.ndp.rx[0].recv)()
+
     assert [pkt] == recv
 
 
@@ -153,9 +155,10 @@ async def _test_ndp_sendmsg_burst(dut, dev=None, nfb=None):
     assert stats['passed'] == len(pkts), f"{stats['passed']}"
 
 
-@cocotb.test(timeout_time=400, timeout_unit='us')
+@cocotb.test(timeout_time=400, timeout_unit='us', skip=False)
 async def test_ndp_send_msgs(dut):
     dev, nfb = await get_dev(dut)
+
     # FIXME: tests doesn't shuts DMA
     await _test_ndp_sendmsg(dut, dev, nfb)
     await _test_ndp_sendmsg(dut, dev, nfb)
