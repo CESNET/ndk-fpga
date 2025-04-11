@@ -378,7 +378,7 @@ begin
         MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE ,
         MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH ,
         PKT_MTU         => PKT_MTU_IN     ,
-        MVB_FIFO_DEPTH  => 4              , -- frame lengths come at the end of a frame (=> shallow FIFO)
+        MVB_FIFO_DEPTH  => 512            ,
         MFB_FIFO_DEPTH  => MFB_FIFO_DEPTH ,
         USERMETA_WIDTH  => 0,
         DEVICE          => DEVICE
