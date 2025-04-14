@@ -8,6 +8,8 @@ PKG_COCOTBEXT=$ROOT_PATH/python/cocotbext/
 python -m venv venv-prepender
 source venv-prepender/bin/activate
 
+source $ROOT_PATH/env.sh
+
 python -m pip install setuptools
 python -m pip install $PKG_COCOTBEXT
 
