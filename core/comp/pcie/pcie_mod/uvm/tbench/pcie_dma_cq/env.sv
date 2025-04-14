@@ -5,16 +5,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class env #(
-    CQ_MFB_REGIONS,
-    CQ_MFB_REGION_SIZE,
-    CQ_MFB_BLOCK_SIZE,
+    int unsigned CQ_MFB_REGIONS,
+    int unsigned CQ_MFB_REGION_SIZE,
+    int unsigned CQ_MFB_BLOCK_SIZE,
 
-    CC_MFB_REGIONS,
-    CC_MFB_REGION_SIZE,
-    CC_MFB_BLOCK_SIZE,
+    int unsigned CC_MFB_REGIONS,
+    int unsigned CC_MFB_REGION_SIZE,
+    int unsigned CC_MFB_BLOCK_SIZE,
 
-    ITEM_WIDTH,
-    DEVICE
+    int unsigned ITEM_WIDTH,
+    string       DEVICE
 ) extends uvm_pcie::env;
     `uvm_component_param_utils(uvm_pcie_dma_cq::env#(
             CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,

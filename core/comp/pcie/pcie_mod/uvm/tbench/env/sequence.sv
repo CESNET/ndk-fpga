@@ -5,25 +5,28 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class sequence_base #(
-    RC_MFB_REGIONS,
-    RC_MFB_REGION_SIZE,
-    RC_MFB_BLOCK_SIZE,
-    RC_MFB_META_W,
+    int unsigned RC_MFB_REGIONS,
+    int unsigned RC_MFB_REGION_SIZE,
+    int unsigned RC_MFB_BLOCK_SIZE,
+    int unsigned RC_MFB_META_W,
 
-    CQ_MFB_REGIONS,
-    CQ_MFB_REGION_SIZE,
-    CQ_MFB_BLOCK_SIZE,
-    CQ_MFB_META_W,
+    int unsigned CQ_MFB_REGIONS,
+    int unsigned CQ_MFB_REGION_SIZE,
+    int unsigned CQ_MFB_BLOCK_SIZE,
+    int unsigned CQ_MFB_META_W,
 
-    RQ_MFB_META_W,
+    int unsigned RQ_MFB_META_W,
 
-    CC_MFB_REGIONS,
-    CC_MFB_REGION_SIZE,
-    CC_MFB_BLOCK_SIZE,
-    CC_MFB_META_W,
+    int unsigned CC_MFB_REGIONS,
+    int unsigned CC_MFB_REGION_SIZE,
+    int unsigned CC_MFB_BLOCK_SIZE,
+    int unsigned CC_MFB_META_W,
 
-    ITEM_WIDTH,
-    DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS) extends uvm_sequence;
+    int unsigned ITEM_WIDTH,
+    int unsigned DMA_PORTS,
+    int unsigned PCIE_CONS,
+    int unsigned PCIE_ENDPOINTS
+) extends uvm_sequence;
     `uvm_object_param_utils(uvm_pcie_top::sequence_base#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W, CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE,  CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
                                                          RQ_MFB_META_W,  CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_META_W, ITEM_WIDTH, DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS))
 

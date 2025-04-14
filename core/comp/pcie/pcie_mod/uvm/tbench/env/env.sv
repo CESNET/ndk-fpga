@@ -5,32 +5,32 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class env #(
-     RQ_MFB_REGIONS,
-     RQ_MFB_REGION_SIZE,
-     RQ_MFB_BLOCK_SIZE,
-     RQ_MFB_META_W,
+     int unsigned RQ_MFB_REGIONS,
+     int unsigned RQ_MFB_REGION_SIZE,
+     int unsigned RQ_MFB_BLOCK_SIZE,
+     int unsigned RQ_MFB_META_W,
 
-     RC_MFB_REGIONS,
-     RC_MFB_REGION_SIZE,
-     RC_MFB_BLOCK_SIZE,
-     RC_MFB_META_W,
+     int unsigned RC_MFB_REGIONS,
+     int unsigned RC_MFB_REGION_SIZE,
+     int unsigned RC_MFB_BLOCK_SIZE,
+     int unsigned RC_MFB_META_W,
 
-     CQ_MFB_REGIONS,
-     CQ_MFB_REGION_SIZE,
-     CQ_MFB_BLOCK_SIZE,
-     CQ_MFB_META_W,
+     int unsigned CQ_MFB_REGIONS,
+     int unsigned CQ_MFB_REGION_SIZE,
+     int unsigned CQ_MFB_BLOCK_SIZE,
+     int unsigned CQ_MFB_META_W,
 
-     CC_MFB_REGIONS,
-     CC_MFB_REGION_SIZE,
-     CC_MFB_BLOCK_SIZE,
-     CC_MFB_META_W,
+     int unsigned CC_MFB_REGIONS,
+     int unsigned CC_MFB_REGION_SIZE,
+     int unsigned CC_MFB_BLOCK_SIZE,
+     int unsigned CC_MFB_META_W,
 
-     ITEM_WIDTH,
-     DMA_PORTS,
-     PCIE_ENDPOINTS,
-     PCIE_CONS,
-     DMA_BAR_ENABLE,
-     DEVICE
+     int unsigned ITEM_WIDTH,
+     int unsigned DMA_PORTS,
+     int unsigned PCIE_ENDPOINTS,
+     int unsigned PCIE_CONS,
+     int unsigned DMA_BAR_ENABLE,
+     string       DEVICE
 ) extends uvm_env;
 
     `uvm_component_param_utils(uvm_pcie_top::env #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, RQ_MFB_META_W,

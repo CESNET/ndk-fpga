@@ -5,27 +5,27 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class env #(
-     CQ_REGIONS,
-     CQ_REGION_SIZE,
-     CQ_BLOCK_SIZE,
-     CQ_USER_WIDTH,
+     int unsigned CQ_REGIONS,
+     int unsigned CQ_REGION_SIZE,
+     int unsigned CQ_BLOCK_SIZE,
+     int unsigned CQ_USER_WIDTH,
 
-     CC_REGIONS,
-     CC_REGION_SIZE,
-     CC_BLOCK_SIZE,
-     CC_USER_WIDTH,
+     int unsigned CC_REGIONS,
+     int unsigned CC_REGION_SIZE,
+     int unsigned CC_BLOCK_SIZE,
+     int unsigned CC_USER_WIDTH,
 
-     RQ_REGIONS,
-     RQ_REGION_SIZE,
-     RQ_BLOCK_SIZE,
-     RQ_USER_WIDTH,
+     int unsigned RQ_REGIONS,
+     int unsigned RQ_REGION_SIZE,
+     int unsigned RQ_BLOCK_SIZE,
+     int unsigned RQ_USER_WIDTH,
 
-     RC_REGIONS,
-     RC_REGION_SIZE,
-     RC_BLOCK_SIZE,
-     RC_USER_WIDTH,
+     int unsigned RC_REGIONS,
+     int unsigned RC_REGION_SIZE,
+     int unsigned RC_BLOCK_SIZE,
+     int unsigned RC_USER_WIDTH,
 
-     STRADDLING
+     logic       STRADDLING
 ) extends uvm_pcie::env;
     `uvm_component_param_utils(uvm_pcie_xilinx::env#(
             CQ_REGIONS, CQ_REGION_SIZE, CQ_BLOCK_SIZE, CQ_USER_WIDTH, CC_REGIONS, CC_REGION_SIZE, CC_BLOCK_SIZE, CC_USER_WIDTH,
