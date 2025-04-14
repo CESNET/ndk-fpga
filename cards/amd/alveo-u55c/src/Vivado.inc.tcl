@@ -41,6 +41,7 @@ lappend HIERARCHY(COMPONENTS) [list "TOPLEVEL" $CARD_BASE/src $ARCHGRP_ALL]
 
 # XDC constraints for specific parts of the design
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/general.xdc"
+lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/pblock.xdc"
 
 if {$PCIE_ENDPOINT_MODE == 0 || $PCIE_ENDPOINT_MODE == 1} {
     lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/pcie.xdc"
