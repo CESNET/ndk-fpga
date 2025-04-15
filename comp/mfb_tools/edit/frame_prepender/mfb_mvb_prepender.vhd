@@ -167,12 +167,12 @@ architecture FULL of MFB_MVB_PREPENDER is
     signal frlen_tx_eof                 : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal frlen_tx_src_rdy             : std_logic;
     signal frlen_tx_dst_rdy             : std_logic;
-    signal frlen_tx_frlen               : std_logic_vector(MFB_REGIONS*log2(PKT_MTU_IN)-1 downto 0);
+    signal frlen_tx_frlen               : std_logic_vector(MFB_REGIONS*log2(PKT_MTU_IN+1)-1 downto 0);
 
-    signal MVB_ITEM_SIZE_items_arr      : u_array_t       (MFB_REGIONS-1 downto 0)(log2(PKT_MTU_IN)-1 downto 0);
+    signal MVB_ITEM_SIZE_items_arr      : u_array_t       (MFB_REGIONS-1 downto 0)(log2(PKT_MTU_IN+1)-1 downto 0);
     signal extd_rx_mvb_meta             : std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
-    signal extd_rx_mvb_frlen            : std_logic_vector(MFB_REGIONS*log2(PKT_MTU_IN)-1 downto 0);
-    signal extd_rx_mvb_ext_size         : std_logic_vector(MFB_REGIONS*log2(PKT_MTU_IN)-1 downto 0);
+    signal extd_rx_mvb_frlen            : std_logic_vector(MFB_REGIONS*log2(PKT_MTU_IN+1)-1 downto 0);
+    signal extd_rx_mvb_ext_size         : std_logic_vector(MFB_REGIONS*log2(PKT_MTU_IN+1)-1 downto 0);
     signal extd_rx_mvb_vld              : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal extd_rx_mvb_src_rdy          : std_logic;
     signal extd_rx_mvb_dst_rdy          : std_logic;
@@ -317,14 +317,14 @@ begin
     -- Frame extender expects the length of each frame
     mfb_frame_length_i : entity work.MFB_FRAME_LNG
     generic map(
-        REGIONS        => MFB_REGIONS     ,
-        REGION_SIZE    => MFB_REGION_SIZE ,
-        BLOCK_SIZE     => MFB_BLOCK_SIZE  ,
-        ITEM_WIDTH     => MFB_ITEM_WIDTH  ,
-        META_WIDTH     => MFB_META_WIDTH  ,
-        LNG_WIDTH      => log2(PKT_MTU_IN),
-        REG_BITMAP     => "111"           ,
-        SATURATION     => False           ,
+        REGIONS        => MFB_REGIONS       ,
+        REGION_SIZE    => MFB_REGION_SIZE   ,
+        BLOCK_SIZE     => MFB_BLOCK_SIZE    ,
+        ITEM_WIDTH     => MFB_ITEM_WIDTH    ,
+        META_WIDTH     => MFB_META_WIDTH    ,
+        LNG_WIDTH      => log2(PKT_MTU_IN+1),
+        REG_BITMAP     => "111"             ,
+        SATURATION     => False             ,
         IMPLEMENTATION => "parallel"
     )
     port map(
@@ -355,7 +355,7 @@ begin
     frlen_tx_dst_rdy <= extd_rx_mvb_dst_rdy and extd_rx_mfb_dst_rdy;
 
     -- Frame Extender's RX_MVB_EXT_SIZE generic must be in Items
-    MVB_ITEM_SIZE_items_arr <= (others => to_unsigned(MVB_ITEM_SIZE*MFB_BLOCK_SIZE, log2(PKT_MTU_IN)));
+    MVB_ITEM_SIZE_items_arr <= (others => to_unsigned(MVB_ITEM_SIZE*MFB_BLOCK_SIZE, log2(PKT_MTU_IN+1)));
 
     extd_rx_mvb_meta     <= (others => '0'); -- MFB metadata could be added here (must update src_ and dst_rdy)
     extd_rx_mvb_frlen    <= frlen_tx_frlen;
@@ -378,7 +378,7 @@ begin
         MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE ,
         MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH ,
         PKT_MTU         => PKT_MTU_IN     ,
-        MVB_FIFO_DEPTH  => 4              , -- frame lengths come at the end of a frame (=> shallow FIFO)
+        MVB_FIFO_DEPTH  => 512            ,
         MFB_FIFO_DEPTH  => MFB_FIFO_DEPTH ,
         USERMETA_WIDTH  => 0,
         DEVICE          => DEVICE
