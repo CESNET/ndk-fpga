@@ -167,24 +167,48 @@ DMA Module and Ethernet side in both RX and TX stream.
 By default the connection is ETH_RX-&gt;DMA_RX and DMA_TX-&gt;ETH_TX.
 It allows for loopback between ETH_RX-&gt;ETH_TX and DMA_TX-&gt;DMA_RX as well as
 connection of MFB generators on DMA_RX and ETH_TX.
-These generators have their own part of MI32 address space.</p>
+These generators have their own part of MI32 address space.
+Speed Meters (SM) are located on each MFB interface and occupy another part
+of the MI32 address space. Contrary to the MFB generators, Speed Meters’
+registers are implemented here (its MI wrapper is not used). In case the
+Speed Meters’ MI wrapper was used, address space would need to be adjusted as
+each wrapper contains seven MI registers instead of the current four.</p>
 <p><strong>Connection diagram:</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                      <span class="o">+--------+</span>  <span class="o">+---</span>\
-                      <span class="o">|</span> <span class="n">RX</span> <span class="n">Gen</span> <span class="o">+--+</span> <span class="mi">1</span>  \             <span class="o">+---</span>\
-<span class="n">ETH_RX</span>                <span class="o">+--------+</span>  <span class="o">|</span><span class="n">MUX_C</span><span class="o">+------------+</span> <span class="mi">0</span>  \   <span class="o">+------+</span> <span class="n">DMA_RX</span>
-<span class="o">&gt;--------------------------+------+</span> <span class="mi">0</span>  <span class="o">/</span>             <span class="o">|</span><span class="n">MUX_A</span><span class="o">+--+</span> <span class="n">FIFO</span> <span class="o">+------&gt;</span>
-                           <span class="o">|</span>      <span class="o">+---/</span>          <span class="o">+---+</span> <span class="mi">1</span>  <span class="o">/</span>   <span class="o">+------+</span>
-                           <span class="o">|</span>                     <span class="o">|</span>   <span class="o">+---/</span>
-                           <span class="o">|</span>                     <span class="o">|</span>
-                           <span class="o">|</span>                     <span class="o">|</span>
-                           <span class="o">|</span>                     <span class="o">|</span>
-                   <span class="o">/---+</span>   <span class="o">|</span>                     <span class="o">|</span>
-       <span class="o">+------+</span>   <span class="o">/</span>  <span class="mi">1</span> <span class="o">+---+</span>          <span class="o">/---+</span>      <span class="o">|</span>
-<span class="o">&lt;------+</span> <span class="n">FIFO</span> <span class="o">+--+</span><span class="n">MUX_B</span><span class="o">|</span>             <span class="o">/</span>  <span class="mi">0</span> <span class="o">+------+--------------------------&lt;</span>
-<span class="n">ETH_TX</span> <span class="o">+------+</span>   \  <span class="mi">0</span> <span class="o">+------------+</span><span class="n">MUX_D</span><span class="o">|</span>  <span class="o">+-----------------+</span>       <span class="n">DMA_TX</span>
-                   \<span class="o">---+</span>             \  <span class="mi">1</span> <span class="o">+--+</span> <span class="n">TX</span> <span class="n">Gen</span> <span class="o">/</span> <span class="n">Player</span> <span class="o">|</span>
-                                      \<span class="o">---+</span>  <span class="o">+-----------------+</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                                      <span class="n">Left2Right</span> <span class="n">GLS</span> <span class="n">Stream</span>
+                              <span class="o">-----------------------------------&gt;&gt;</span>
+
+                                 <span class="o">+--------+</span>  <span class="o">+---</span>\
+                                 <span class="o">|</span> <span class="n">RX</span> <span class="n">Gen</span> <span class="o">+--+</span> <span class="mi">1</span>  \             <span class="o">+---</span>\
+<span class="n">ETH_RX</span>  <span class="o">+------+</span>                 <span class="o">+--------+</span>  <span class="o">|</span><span class="n">MUX_C</span><span class="o">+------------+</span> <span class="mi">0</span>  \   <span class="o">+------+</span>  <span class="o">+------+</span>  <span class="n">DMA_RX</span>
+<span class="o">&gt;-------+</span> <span class="n">SM</span> <span class="mi">2</span> <span class="o">+----------------------+------+</span> <span class="mi">0</span>  <span class="o">/</span>             <span class="o">|</span><span class="n">MUX_A</span><span class="o">+--+</span> <span class="n">FIFO</span> <span class="o">+--+</span> <span class="n">SM</span> <span class="mi">0</span> <span class="o">+-------&gt;</span>
+        <span class="o">+------+</span>                      <span class="o">|</span>      <span class="o">+---/</span>          <span class="o">+---+</span> <span class="mi">1</span>  <span class="o">/</span>   <span class="o">+------+</span>  <span class="o">+------+</span>
+                                      <span class="o">|</span>                     <span class="o">|</span>   <span class="o">+---/</span>
+                                      <span class="o">|</span>                     <span class="o">|</span>
+ <span class="n">LEFT</span>                                 <span class="o">|</span>                     <span class="o">|</span>                                <span class="n">RIGHT</span>
+                                      <span class="o">|</span>                     <span class="o">|</span>
+                              <span class="o">/---+</span>   <span class="o">|</span>                     <span class="o">|</span>
+        <span class="o">+------+</span>  <span class="o">+------+</span>   <span class="o">/</span>  <span class="mi">1</span> <span class="o">+---+</span>          <span class="o">/---+</span>      <span class="o">|</span>                      <span class="o">+------+</span>
+<span class="o">&lt;-------+</span> <span class="n">SM</span> <span class="mi">1</span> <span class="o">+--+</span> <span class="n">FIFO</span> <span class="o">+--+</span><span class="n">MUX_B</span><span class="o">|</span>             <span class="o">/</span>  <span class="mi">0</span> <span class="o">+------+----------------------+</span> <span class="n">SM</span> <span class="mi">3</span> <span class="o">+-------&lt;</span>
+<span class="n">ETH_TX</span>  <span class="o">+------+</span>  <span class="o">+------+</span>   \  <span class="mi">0</span> <span class="o">+------------+</span><span class="n">MUX_D</span><span class="o">|</span>  <span class="o">+-----------------+</span>        <span class="o">+------+</span>  <span class="n">DMA_TX</span>
+                              \<span class="o">---+</span>             \  <span class="mi">1</span> <span class="o">+--+</span> <span class="n">TX</span> <span class="n">Gen</span> <span class="o">/</span> <span class="n">Player</span> <span class="o">|</span>
+                                                 \<span class="o">---+</span>  <span class="o">+-----------------+</span>
+
+                                      <span class="n">Right2Left</span> <span class="n">GLS</span> <span class="n">Stream</span>
+                              <span class="o">&lt;&lt;-----------------------------------</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is a Python module as well as a tool for user-friendly access to its features.
+Just install the ofm package and use <cite>ofm-gls -h</cite> in the command line or import it like so:
+<cite>from ofm.comp.mfb_tools.debug.gen_loop_switch import GenLoopSwitch</cite>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The sides of the GLS were renamed to make it more universal. The DMA side is on the RIGHT,
+ETH side is on the LEFT. This is used mainly in the GLS Python module: GenLoopSwitch.
+Instance of the GenLoopSwitch class contains two streams: l2r (left2right, prev. RX) and
+r2l (right2left, prev. TX).</p>
 </div>
 <p><strong>MI address offsets:</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x000</span>      <span class="o">--</span> <span class="n">RX</span> <span class="n">loopback</span> <span class="n">MUX_A</span>  <span class="p">(</span><span class="mi">0</span> <span class="o">-&gt;</span> <span class="n">RX</span> <span class="n">stream</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">TX</span> <span class="n">stream</span> <span class="n">loopback</span><span class="p">)</span>
