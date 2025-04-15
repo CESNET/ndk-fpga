@@ -42,7 +42,7 @@ def convert_units(value: float, in_units: str = "", out_units: Optional[str] = N
 
     if out_units is None:
         if value == 0.0:
-            out_units = list(decadic_conversions.keys())[0]
+            out_units = list(decadic_conversions.keys())[4]
             return value, out_units
 
         for out_units in decadic_conversions:
