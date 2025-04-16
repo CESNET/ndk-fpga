@@ -124,17 +124,46 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
     endfunction
 
     function void configure();
-        foreach (cfg.ipv4_addresses[i]) begin
+        // Get the unique configured addresses
+        bit [32 -1 : 0] cfg_ipv4_addresses[$] = cfg.ipv4_addresses.unique();
+        bit [128-1 : 0] cfg_ipv6_addresses[$] = cfg.ipv6_addresses.unique();
+        bit [48 -1 : 0] cfg_mac_addresses [$] = cfg.mac_addresses .unique();
+
+        // Generate address counts to add
+        int unsigned cfg_ipv4_addresses_count_to_add = $urandom_range(cfg_ipv4_addresses.size(), 0);
+        int unsigned cfg_ipv6_addresses_count_to_add = $urandom_range(cfg_ipv6_addresses.size(), 0);
+        int unsigned cfg_mac_addresses_count_to_add  = $urandom_range(cfg_mac_addresses .size(), 0);
+
+        // Shuffle the addresses
+        cfg_ipv4_addresses.shuffle();
+        cfg_ipv6_addresses.shuffle();
+        cfg_mac_addresses .shuffle();
+
+        // Add IPv4 addresses
+        for (int unsigned i = 0; i < cfg_ipv4_addresses_count_to_add; i++) begin
             ipv4 = new[ipv4.size()+1](ipv4);
             ipv4[ipv4.size()-1].address = cfg.ipv4_addresses[i];
             ipv4[ipv4.size()-1].mask = 32;
         end
 
-        foreach (cfg.ipv6_addresses[i]) begin
+        // Add IPv6 addresses
+        for (int unsigned i = 0; i < cfg_ipv6_addresses_count_to_add; i++) begin
             ipv6 = new[ipv6.size()+1](ipv6);
             ipv6[ipv6.size()-1].address = cfg.ipv6_addresses[i];
             ipv6[ipv6.size()-1].mask = 128;
         end
+
+        // Add MAC addresses
+        for (int unsigned i = 0; i < cfg_mac_addresses_count_to_add; i++) begin
+            mac = new[mac.size()+1](mac);
+            mac[mac.size()-1].address = cfg.mac_addresses[i];
+            mac[mac.size()-1].mask = 48;
+        end
+
+        // Remove duplicates
+        ipv4 = ipv4.unique() with (item.address);
+        ipv6 = ipv6.unique() with (item.address);
+        mac  = mac .unique() with (item.address);
     endfunction
 
     function string get_ipv4_addresses();
