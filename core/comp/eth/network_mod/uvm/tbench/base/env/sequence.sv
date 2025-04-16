@@ -22,6 +22,8 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
 
     protected uvm_logic_vector_array::config_sequence usr_rx_seq_cfg;
 
+    uvm_network_mod_env::sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequence_mac_check_configuration;
+
     rand int unsigned transactions_approx;
     constraint c_transactions {
         //transactions_approx inside {[30_000:40_000]};
@@ -84,6 +86,9 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
         lib_usr_tx_hdr.init_sequence();
         lib_usr_tx_hdr.max_random_count = 20;
         lib_usr_tx_hdr.min_random_count = 10;
+
+        // MAC Check configuration
+        m_sequence_mac_check_configuration = uvm_network_mod_env::sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_sequence_mac_check_configuration");
 
         usr_rx_data  = lib_usr_rx_data;
         usr_rx_meta  = lib_usr_rx_meta;

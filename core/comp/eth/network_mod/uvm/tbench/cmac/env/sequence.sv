@@ -91,6 +91,11 @@ class virt_sequence_port #(
         #(400ns);
 
         for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
+            begin
+                assert(m_sequence_mac_check_configuration.randomize());
+                m_sequence_mac_check_configuration.start(p_sequencer);
+            end
+
             fork
                 p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);
                 p_sequencer.regmodel.channel[it].tx_mac.enable.write(status, 1'h1);
