@@ -298,8 +298,8 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         uvm_common::sequence_cfg state;
 
         // Output configuration options
-        string output_filepath = "output.pcap";
-        string report_filepath = "report.txt";
+        string output_filepath = { p_sequencer.get_full_name(), ".", "output.pcap" };
+        string report_filepath = { p_sequencer.get_full_name(), ".", "report.txt" };
         bit skip_unknown = 0;
         bit no_collision_check = 1;
 
@@ -309,9 +309,7 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         generate_tools_configuration();
 
         reader = new();
-        if (!uvm_config_db #(string)::get(p_sequencer, "", "output_filepath", output_filepath)) begin
-            output_filepath = { p_sequencer.get_full_name(), ".pcap" };
-        end
+        void'(uvm_config_db #(string)::get(p_sequencer, "", "output_filepath", output_filepath));
 
         `uvm_info(get_full_name(), $sformatf("\n\tsequence_flowtest is running\n\t\tpcap_name%s", output_filepath), UVM_DEBUG);
 
