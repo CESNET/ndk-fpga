@@ -33,24 +33,28 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
     endfunction
 
     task pre_body();
-        uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)                           lib_eth_rx_data;
-        //uvm_logic_vector::sequence_simple#(6)                                       lib_eth_rx_meta;
-        uvm_avst::sequence_lib_tx#(ETH_PORT_CHAN, 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1)  lib_eth_tx;
+        uvm_packet_generators::sequence_flowtest #(ITEM_WIDTH)                                                 lib_eth_rx_data;
+        uvm_avst::sequence_lib_tx                #(ETH_PORT_CHAN, 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1) lib_eth_tx;
 
         super.pre_body();
 
         // ETH SEQURENCE RX
         seq_sync_eth_rx = uvm_common::sequences_cfg_sync#(2)::type_id::create("seq_sync_eth_rx", m_sequencer);
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_rx_data, "", "state", seq_sync_eth_rx.cfg[0]);
-        lib_eth_rx_data = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("eth_rx_data", p_sequencer.eth_rx_data);
-        lib_eth_rx_data.max_random_count = 20;
-        lib_eth_rx_data.min_random_count = 10;
-        lib_eth_rx_data.init_sequence();
+        lib_eth_rx_data = uvm_packet_generators::sequence_flowtest #(ITEM_WIDTH)::type_id::create("lib_eth_rx_data", p_sequencer.eth_rx_data);
+        lib_eth_rx_data.generated_config = 1;
+        lib_eth_rx_data.generated_profile = 1;
+        lib_eth_rx_data.config_filepath = { "./", p_sequencer.get_full_name(), ".", "config.yaml" };
+        lib_eth_rx_data.profile_filepath  = { "./", p_sequencer.get_full_name(), ".", "profile.csv" };
+
+        if (initialized == 0) begin
+            assert(m_sequence_mac_check_configuration.randomize());
+        end
+        // Add MAC Check addresses to the configuration of the flowtest sequence
+        lib_eth_rx_data.cfg.mac_addresses = m_sequence_mac_check_configuration.addresses;
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_rx_meta, "", "state", seq_sync_eth_rx.cfg[1]);
-        //lib_eth_rx_meta = //uvm_logic_vector::sequence_simple#(6)::type_id::create("eth_rx_meta", p_sequencer.eth_rx_meta);
         eth_rx_meta = uvm_network_mod_env::sequence_logic_vector#(6)::type_id::create("eth_rx_meta", p_sequencer.eth_rx_meta);
-        //lib_eth_rx_meta.config_set();
 
         // ETH SEQURENCE TX
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_tx, "", "state", seq_sync_end);
@@ -60,7 +64,6 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
         lib_eth_tx.min_random_count = 10;
 
         eth_rx_data  = lib_eth_rx_data;
-        //eth_rx_meta  = lib_eth_rx_meta;
         eth_tx       = lib_eth_tx;
     endtask
 
@@ -85,10 +88,7 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
 
         if (initialized == 0) begin
             for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
-                begin
-                    assert(m_sequence_mac_check_configuration.randomize());
-                    m_sequence_mac_check_configuration.start(p_sequencer);
-                end
+                m_sequence_mac_check_configuration.start(p_sequencer);
 
                 fork
                     p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);

@@ -47,18 +47,25 @@ class virt_sequence_port #(
     endfunction
 
     task pre_body();
-        uvm_logic_vector_array::sequence_lib #(8) lib_eth_tx_packet;
-        uvm_lbus::sequence_library_rx             seq_eth_rx;
+        uvm_packet_generators::sequence_flowtest #(8) lib_eth_tx_packet;
+        uvm_lbus::sequence_library_rx                 seq_eth_rx;
 
         super.pre_body();
 
         // TX eth packet sequence
         seq_sync_eth_tx = uvm_common::sequences_cfg_sync#(2)::type_id::create("seq_sync_eth_tx", m_sequencer);
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_tx_packet, "", "state", seq_sync_eth_tx.cfg[0]);
-        lib_eth_tx_packet = uvm_logic_vector_array::sequence_lib #(8)::type_id::create("eth_tx_packet", p_sequencer.eth_tx_packet);
-        lib_eth_tx_packet.max_random_count = 20;
-        lib_eth_tx_packet.min_random_count = 10;
-        lib_eth_tx_packet.init_sequence();
+        lib_eth_tx_packet = uvm_packet_generators::sequence_flowtest #(8)::type_id::create("lib_eth_tx_packet", p_sequencer.eth_tx_packet);
+        lib_eth_tx_packet.generated_config = 1;
+        lib_eth_tx_packet.generated_profile = 1;
+        lib_eth_tx_packet.config_filepath = { "./", p_sequencer.get_full_name(), ".", "config.yaml" };
+        lib_eth_tx_packet.profile_filepath  = { "./", p_sequencer.get_full_name(), ".", "profile.csv" };
+
+        if (initialized == 0) begin
+            assert(m_sequence_mac_check_configuration.randomize());
+        end
+        // Add MAC Check addresses to the configuration of the flowtest sequence
+        lib_eth_tx_packet.cfg.mac_addresses = m_sequence_mac_check_configuration.addresses;
 
         // TX eth error sequence
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_tx_error, "", "state", seq_sync_eth_tx.cfg[1]);
@@ -94,10 +101,7 @@ class virt_sequence_port #(
 
         if (initialized == 0) begin
             for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
-                begin
-                    assert(m_sequence_mac_check_configuration.randomize());
-                    m_sequence_mac_check_configuration.start(p_sequencer);
-                end
+                m_sequence_mac_check_configuration.start(p_sequencer);
 
                 fork
                     p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);
