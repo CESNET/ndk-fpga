@@ -8,6 +8,8 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
     `uvm_object_param_utils(uvm_network_mod_e_tile_env::virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH))
     `uvm_declare_p_sequencer(uvm_network_mod_e_tile_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
+    bit initialized = 0;
+
     uvm_sequence #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)) eth_rx_data;
     uvm_sequence #(uvm_logic_vector::sequence_item #(6))                eth_rx_meta;
     uvm_sequence #(uvm_avst::sequence_item #(ETH_PORT_CHAN, 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1)) eth_tx;
@@ -81,21 +83,25 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
 
         #(400ns);
 
-        for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
-            begin
-                assert(m_sequence_mac_check_configuration.randomize());
-                m_sequence_mac_check_configuration.start(p_sequencer);
+        if (initialized == 0) begin
+            for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
+                begin
+                    assert(m_sequence_mac_check_configuration.randomize());
+                    m_sequence_mac_check_configuration.start(p_sequencer);
+                end
+
+                fork
+                    p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);
+                    p_sequencer.regmodel.channel[it].tx_mac.enable.write(status, 1'h1);
+                join;
+
+                fork
+                    p_sequencer.regmodel.channel[it].rx_mac.enable.read(status, data);
+                    p_sequencer.regmodel.channel[it].tx_mac.enable.read(status, data);
+                join;
             end
 
-            fork
-                p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);
-                p_sequencer.regmodel.channel[it].tx_mac.enable.write(status, 1'h1);
-            join;
-
-            fork
-                p_sequencer.regmodel.channel[it].rx_mac.enable.read(status, data);
-                p_sequencer.regmodel.channel[it].tx_mac.enable.read(status, data);
-            join;
+            initialized = 1;
         end
 
         fork
