@@ -283,7 +283,8 @@ architecture FULL of TX_MAC_LITE is
     signal cg_mfb_src_rdy              : std_logic;
     signal cg_mfb_dst_rdy              : std_logic;
 
-    signal tx_inc_frame                : std_logic_vector(TX_REGIONS+1-1 downto 0);
+    signal tx_inc_frame                : std_logic_vector(TX_REGIONS-1 downto 0);
+    signal pkt_in_block                : std_logic_vector(TX_REGIONS-1 downto 0);
 
     signal stat_rx_frame_inc_reg       : std_logic_vector(MD_REGIONS-1 downto 0);
     signal stat_tx_frame_inc_reg       : std_logic_vector(MD_REGIONS-1 downto 0);
@@ -771,27 +772,7 @@ begin
     -- -------------------------------------------------------------------------
     --  INCOMPLETE FRAME LOGIC - DEBUG ONLY
     -- -------------------------------------------------------------------------
-
-    tx_inc_frame_g : for r in 0 to TX_REGIONS-1 generate
-        tx_inc_frame(r+1) <= (TX_MFB_SOF(r) and not TX_MFB_EOF(r) and not tx_inc_frame(r)) or
-                          (TX_MFB_SOF(r) and TX_MFB_EOF(r) and tx_inc_frame(r)) or
-                          (not TX_MFB_SOF(r) and not TX_MFB_EOF(r) and tx_inc_frame(r));
-    end generate;
-
-    process (TX_CLK)
-    begin
-        if (rising_edge(TX_CLK)) then
-            if (TX_RESET = '1') then
-                tx_inc_frame(0) <= '0';
-            elsif (TX_MFB_SRC_RDY = '1' and TX_MFB_DST_RDY = '1') then
-                tx_inc_frame(0) <= tx_inc_frame(TX_REGIONS);
-            end if;
-        end if;
-    end process;
-
-    -- psl assert_gap_inside :
-    --      assert always (tx_inc_frame(0) = '0' or TX_MFB_SRC_RDY = '1') abort(TX_RESET) @rising_edge(TX_CLK)
-    --      report "TX_MAC_LITE: Gap inside frame on TX MFB stream!";
+    -- check if SRC_RDY doesnt fall when packet is transmiting  psl assert_gap_inside
 
     -- =========================================================================
     --  STATISTICS MODULE
