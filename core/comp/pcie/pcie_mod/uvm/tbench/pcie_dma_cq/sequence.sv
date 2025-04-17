@@ -21,7 +21,7 @@ class req_fifo#(type T_ITEM);
 endclass
 
 class sequence_data extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(32));
-    `uvm_object_param_utils(uvm_pcie_intel::sequence_data)
+    `uvm_object_param_utils(uvm_pcie_dma_cq::sequence_data)
 
     req_fifo#(uvm_pcie::header) fifo;
 
@@ -58,8 +58,8 @@ class sequence_data extends uvm_sequence #(uvm_logic_vector_array::sequence_item
     endtask
 endclass
 
-class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::sequence_item#(META_WIDTH_DOWN));
-    `uvm_object_param_utils(uvm_pcie_intel::sequence_meta#(META_WIDTH_DOWN))
+class sequence_meta extends uvm_sequence #(uvm_logic_vector::sequence_item#(sv_pcie_meta_pack::PCIE_CC_META_WIDTH));
+    `uvm_object_param_utils(uvm_pcie_dma_cq::sequence_meta)
 
 
     localparam int unsigned HDR_WIDTH       = 128;
@@ -75,15 +75,10 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
     endfunction
 
     task body();
-        uvm_pcie::bar_config bar_cfg;
 
         assert(uvm_config_db #(req_fifo#(uvm_pcie::header))::get(m_sequencer, "", "seq_fifo", fifo)) else begin
             `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo data");
         end;
-
-        if (uvm_config_db#(uvm_pcie::bar_config)::get(m_sequencer, "", "bar", bar_cfg) == 0) begin
-            bar_cfg = null;
-        end
 
         forever begin
             logic [HDR_WIDTH-1:0]        hdr;
@@ -94,11 +89,12 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
             logic [1-1:0] r0;
             logic [3-1:0] tc;
             logic [1-1:0] r1;
-            logic [3-1:0] attr;
+            logic [1-1:0] attr0;
             logic [1-1:0] r2;
             logic [1-1:0] th;
             logic [1-1:0] td;
             logic [1-1:0] ep;
+            logic [2-1:0] attr1;
             logic [2-1:0] at;
             logic [10-1:0] length;
             uvm_pcie::header pcie_tr;
@@ -106,7 +102,7 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
             wait(fifo.size() != 0);
             pcie_tr = fifo.pop_front();
 
-            req = uvm_logic_vector::sequence_item#(META_WIDTH_DOWN)::type_id::create("req", m_sequencer);
+            req = uvm_logic_vector::sequence_item#(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)::type_id::create("req", m_sequencer);
             start_item(req);
 
             fmt       = pcie_tr.fmt;
@@ -114,14 +110,15 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
             r0        = 0;
             tc        = pcie_tr.traffic_class;
             r1        = 0;
-            attr      = {pcie_tr.id_based_ordering, pcie_tr.relaxed_ordering, pcie_tr.no_snoop};
+            attr0     = pcie_tr.id_based_ordering;
             r2        = 0;
             th        = pcie_tr.th;
             td        = pcie_tr.td;
             ep        = pcie_tr.ep;
+            attr1     = {pcie_tr.relaxed_ordering, pcie_tr.no_snoop};
             at        = pcie_tr.at;
             length    = pcie_tr.length;
-            hdr[32*4-1 -: 32] = {fmt, pcie_type, r0, tc, r1, attr[2], r2, th, td, ep, attr[2-1:0], at, length};
+            hdr[32*4-1 -: 32] = {fmt, pcie_type, r0, tc, r1, attr0, r2, th, td, ep, attr1, at, length};
 
             //RC
             if (pcie_tr.hdr_type == uvm_pcie::header::COMPLETER_HDR) begin
@@ -163,12 +160,14 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
                 lbe          = pcie_cq.lbe;
                 fbe          = pcie_cq.fbe;
                 ph           = pcie_cq.ph;
-                if (bar_cfg != null && pcie_cq.fmt[0] == 1'b0) begin
-                    bar_cfg.addr2bar(bar, pcie_cq.address[64-1:2]);
-                end else begin
-                    address  = pcie_cq.address[64-1:2];
-                    bar      =  0;
-                end
+                address      = pcie_cq.address;
+                bar          =  2;
+                //if (bar_cfg != null) begin
+                //    bar_cfg.addr2bar(bar,address);
+                //end else begin
+                //    address  = pcie_cq.address;
+                //    bar      =  0;
+                //end
 
                 if (fmt[0] == 1'b0) begin
                     hdr[32-1 : 0] = 'x;
@@ -179,7 +178,7 @@ class sequence_meta#(META_WIDTH_DOWN) extends uvm_sequence #(uvm_logic_vector::s
             end
 
             prefix = '0;
-            req.data = {bar, prefix, hdr};
+            req.data = {prefix, hdr[32-1:0], hdr[64-1:32], hdr[96-1:64], hdr[128-1:96]};
             finish_item(req);
         end
     endtask

@@ -5,25 +5,28 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class sequence_base #(
-    RC_MFB_REGIONS,
-    RC_MFB_REGION_SIZE,
-    RC_MFB_BLOCK_SIZE,
-    RC_MFB_META_W,
+    int unsigned RC_MFB_REGIONS,
+    int unsigned RC_MFB_REGION_SIZE,
+    int unsigned RC_MFB_BLOCK_SIZE,
+    int unsigned RC_MFB_META_W,
 
-    CQ_MFB_REGIONS,
-    CQ_MFB_REGION_SIZE,
-    CQ_MFB_BLOCK_SIZE,
-    CQ_MFB_META_W,
+    int unsigned CQ_MFB_REGIONS,
+    int unsigned CQ_MFB_REGION_SIZE,
+    int unsigned CQ_MFB_BLOCK_SIZE,
+    int unsigned CQ_MFB_META_W,
 
-    RQ_MFB_META_W,
+    int unsigned RQ_MFB_META_W,
 
-    CC_MFB_REGIONS,
-    CC_MFB_REGION_SIZE,
-    CC_MFB_BLOCK_SIZE,
-    CC_MFB_META_W,
+    int unsigned CC_MFB_REGIONS,
+    int unsigned CC_MFB_REGION_SIZE,
+    int unsigned CC_MFB_BLOCK_SIZE,
+    int unsigned CC_MFB_META_W,
 
-    ITEM_WIDTH,
-    DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS) extends uvm_sequence;
+    int unsigned ITEM_WIDTH,
+    int unsigned DMA_PORTS,
+    int unsigned PCIE_CONS,
+    int unsigned PCIE_ENDPOINTS
+) extends uvm_sequence;
     `uvm_object_param_utils(uvm_pcie_top::sequence_base#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W, CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE,  CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
                                                          RQ_MFB_META_W,  CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_META_W, ITEM_WIDTH, DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS))
 
@@ -32,6 +35,8 @@ class sequence_base #(
                                                        ITEM_WIDTH, RQ_MFB_META_W, CC_MFB_META_W, DMA_PORTS, PCIE_ENDPOINTS))
 
     protected int unsigned stop;
+    protected logic [DMA_PORTS-1:0] rx_stop[PCIE_ENDPOINTS];
+
     //RQ
     uvm_pcie_top::sequence_dma_rq#(DMA_PORTS) dma_rq[PCIE_ENDPOINTS][DMA_PORTS];
     //RC
@@ -40,6 +45,7 @@ class sequence_base #(
     //CQ
     uvm_sequence #(uvm_mfb::sequence_item #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W)) m_mfb_cq[PCIE_ENDPOINTS][DMA_PORTS];
     //CC
+    uvm_pcie_dma_cq::sequence_resp                                                                                             m_dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
 
     //MI
     uvm_pcie_top::mi_cc_sequence #(32, 32) mi_seq[PCIE_ENDPOINTS];
@@ -57,6 +63,9 @@ class sequence_base #(
 
     function new(string name = "sequence_simple_rx_base");
         super.new(name);
+        for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
+            rx_stop[it] = 0;
+        end
     endfunction
 
     virtual function void init(
@@ -96,6 +105,10 @@ class sequence_base #(
                 m_mfb_cq_lib.min_random_count = 100;
                 m_mfb_cq_lib.max_random_count = 200;
                 m_mfb_cq[pcie][dma] = m_mfb_cq_lib;
+
+                //CC
+                m_dma_cc[pcie][dma] = uvm_pcie_dma_cq::sequence_resp::type_id::create({"m_dma_seq_", dma_string}, p_sequencer.m_dma_cc[pcie][dma]);
+
              end
 
              //MI interface
@@ -117,6 +130,7 @@ class sequence_base #(
             assert (dma_rq[pcie][dma].randomize() with {dma_rq[pcie][dma].unit_id ==  dma_unitid_const;});
             dma_rq[pcie][dma].start(p_sequencer.m_dma_rq[pcie][dma]);
         end
+        rx_stop[pcie][dma] = 1;
     endtask
 
     //RUN RC
@@ -142,6 +156,13 @@ class sequence_base #(
         end
     endtask
 
+    virtual task run_cc(int unsigned pcie, int unsigned dma);
+        forever begin
+            assert(m_dma_cc[pcie][dma].randomize()) else `uvm_fatal(p_sequencer.m_dma_cc[pcie][dma].get_full_name(), "\n\tCannot randomize sequence");;
+            m_dma_cc[pcie][dma].start(p_sequencer.m_dma_cc[pcie][dma]);
+        end
+    endtask
+
     //RUN MI
     virtual task run_mi(int unsigned pcie);
         //while (stop == 0) begin
@@ -154,14 +175,12 @@ class sequence_base #(
     //RUN PCIE
     virtual task run_pcie(int unsigned pcie);
 
-        while (p_sequencer.m_pcie[pcie].info.rq_hdr.size() != 0 || stop == 0) begin
+        while (p_sequencer.m_pcie[pcie].info.rq_hdr.size() != 0 || (& rx_stop[pcie]) == 0) begin
             assert(pcie_seq[pcie].randomize()) else `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize pcie sequence");
             pcie_seq[pcie].response_only = (stop == 1);
             pcie_seq[pcie].start(p_sequencer.m_pcie[pcie]);
         end
     endtask
-
-
 
     task run_reset(uvm_reset::sequence_start m_reset, uvm_reset::sequencer m_reset_sqr);
         assert(m_reset.randomize());
@@ -189,6 +208,7 @@ class sequence_base #(
                         run_rq(index_pcie, index_dma);
                         run_rc(index_pcie, index_dma);
                         run_cq(index_pcie, index_dma);
+                        run_cc(index_pcie, index_dma);
                     join_none
                 end
                 run_pcie(index_pcie);

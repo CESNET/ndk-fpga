@@ -110,13 +110,19 @@ class sequence_cq extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(
     endfunction
 
     task body();
+        uvm_pcie::bar_config bar_cfg;
 
         assert(uvm_config_db #(req_fifo#(uvm_pcie::request_header)  )::get(m_sequencer, "", "seq_fifo_cq", fifo)) else begin
             `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get fifo cq")
         end;
 
+        if (uvm_config_db#(uvm_pcie::bar_config)::get(m_sequencer, "", "bar", bar_cfg) == 0) begin
+            bar_cfg = null;
+        end
+
         forever begin
             uvm_pcie::request_header pcie_cq;
+            int unsigned bar_tmp;
             logic [2-1:0]  at;
             logic [64-1:2] address;
             logic [11-1:0] length;
@@ -151,8 +157,13 @@ class sequence_cq extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(
             length            =  pcie_cq.length != 0 ? pcie_cq.length : 1024;
             requester_id      =  pcie_cq.requester_id;
             tag               =  pcie_cq.tag;
-            address           =  pcie_cq.address[64-1:2];
-            bar[2:0]          =  0;
+            if (bar_cfg != null && pcie_cq.fmt[0] == 1'b0) begin
+                bar_cfg.addr2bar(bar_tmp, pcie_cq.address[64-1:2]);
+            end else begin
+                address  = pcie_cq.address[64-1:2];
+                bar_tmp  =  0;
+            end
+            bar[2:0]          =  bar_tmp;
             bar[9-1:3]        =  26;
             target_function   =  0;
             //bar[2:0]          =  tr_out.item.bar;

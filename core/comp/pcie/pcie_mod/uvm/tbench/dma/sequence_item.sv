@@ -44,7 +44,8 @@ class sequence_item_rq  extends uvm_common::sequence_item;
     function string convert2string();
         string msg = "";
 
-        msg = {hdr.convert2string(), $sformatf("\n\tdata : %p\n", data)};
+        msg = this.time2string();
+        msg = {msg, hdr.convert2string(), $sformatf("\n\tdata : %p\n", data)};
         return msg;
     endfunction
 endclass

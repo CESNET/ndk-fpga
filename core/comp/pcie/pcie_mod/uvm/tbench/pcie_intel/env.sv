@@ -5,15 +5,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class env #(
-    CQ_MFB_REGIONS,
-    CQ_MFB_REGION_SIZE,
-    CQ_MFB_BLOCK_SIZE,
-    AVST_DOWN_META_W,
+    int unsigned CQ_MFB_REGIONS,
+    int unsigned CQ_MFB_REGION_SIZE,
+    int unsigned CQ_MFB_BLOCK_SIZE,
+    int unsigned AVST_DOWN_META_W,
 
-    CC_MFB_REGIONS,
-    CC_MFB_REGION_SIZE,
-    CC_MFB_BLOCK_SIZE,
-    AVST_UP_META_W
+    int unsigned CC_MFB_REGIONS,
+    int unsigned CC_MFB_REGION_SIZE,
+    int unsigned CC_MFB_BLOCK_SIZE,
+    int unsigned AVST_UP_META_W
 ) extends uvm_pcie::env;
     `uvm_component_param_utils(uvm_pcie_intel::env#(
             CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_META_W,
@@ -32,6 +32,13 @@ class env #(
         super.new(name, parent);
         fifo_data = new();
         fifo_meta = new();
+
+        direction = DIR_RQ;
+    endfunction
+
+    virtual function void bar_register(uvm_pcie::bar_config cfg);
+        super.bar_register(cfg);
+        uvm_config_db#(uvm_pcie::bar_config)::set(m_avst_down.m_sequencer.m_meta, "", "bar", cfg);
     endfunction
 
 

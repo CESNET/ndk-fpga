@@ -169,8 +169,8 @@ module testbench;
                 uvm_config_db#(virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, RC_MFB_META_W))::set(null, "", {"vif_rc_mfb_",dma_string}, v_rc_mfb[pcie_e][dma]);
                 uvm_config_db#(virtual mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH))::set(null, "", {"vif_rc_mvb_",dma_string}, v_rc_mvb[pcie_e][dma]);
 
-                uvm_config_db#(virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W))::set(null, "", {"vif_cq_mfb_",dma_string}, v_cq_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, CC_MFB_META_W))::set(null, "", {"vif_cc_mfb_",dma_string}, v_cc_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W))::set(null, "", {"vif_dma_",dma_string, "_cq"}, v_cq_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, CC_MFB_META_W))::set(null, "", {"vif_dma_",dma_string, "_cc"}, v_cc_mfb[pcie_e][dma]);
             end
         end
 
@@ -240,7 +240,9 @@ module testbench;
             wire logic [3*4-1 : 0] down_data_update_cnt;
             wire logic [3  -1 : 0] down_data_init_ack;
 
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_clk[pcie_e] = PCIE_USER_CLK;
+            initial begin
+                force DUT_U.VHDL_DUT_U.pcie_core_i.pcie_clk[pcie_e] = PCIE_USER_CLK;
+            end
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_link_up_comb[pcie_e]  = '1;
 
             for (genvar pcie_r = 0; pcie_r < CQ_MFB_REGIONS; pcie_r++) begin

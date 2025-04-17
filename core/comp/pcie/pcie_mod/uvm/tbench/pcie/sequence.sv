@@ -10,15 +10,30 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
     localparam MAX_REQUEST_SIZE = 128;
     localparam MAX_PAYLOAD_SIZE = 64;
 
+    localparam BAR0_BASE_ADDR    = 32'h01000000;
+    localparam BAR1_BASE_ADDR    = 32'h02000000;
+    localparam BAR2_BASE_ADDR    = 32'h03000000;
+    localparam BAR3_BASE_ADDR    = 32'h04000000;
+    localparam BAR4_BASE_ADDR    = 32'h05000000;
+    localparam BAR5_BASE_ADDR    = 32'h06000000;
+    localparam EXP_ROM_BASE_ADDR = 32'h0A000000;
+
+
     rand logic [16-1:0] dev_id[];
 
     int unsigned response_only;
     rand int unsigned transactions;
+    rand int unsigned bar_probability[];
     protected pcie_info   info;
 
     constraint const_base {
         transactions   inside {[200:1000]};
         dev_id.size()  inside {[1:10]};
+        bar_probability.size() == 7+1; // BAR number + 1
+        bar_probability.sum() > 0;
+        foreach(bar_probability[it]) {
+            bar_probability[it] <= 50;
+        }
     }
 
     function new(string name = "sequence_base");
@@ -74,7 +89,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
 
         it = 0;
         //TODO: improve stopping sequence removing emtpy cicle when there there is empty rq_hdr fifo and request only set.
-        while (it < (transactions*4) /*&& (state == null || state.next())*/) begin
+        while (it < transactions /*&& (state == null || state.next())*/) begin
             //assert(std::randomize(rq))
             //generate CQ nebo RC
             std::randomize(cq) with { cq dist {1'b1 :/ 5,  1'b0 :/ info.rq_hdr.size()}; };
@@ -97,7 +112,18 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                         cq_hdr.fbe inside {4'b0001, 4'b0011, 4'b0111, 4'b1111};
                         cq_hdr.lbe inside {4'b1111, 4'b1110, 4'b1100, 4'b1000};
                     }
+
+                    cq_hdr.fmt[0] == 1'b1 -> cq_hdr.address[32-1:2] dist {[0             :BAR0_BASE_ADDR] :/ bar_probability[0],
+                                                                          [BAR0_BASE_ADDR:BAR1_BASE_ADDR-1] :/ bar_probability[1],
+                                                                          [BAR1_BASE_ADDR:BAR2_BASE_ADDR-1] :/ bar_probability[2],
+                                                                          [BAR2_BASE_ADDR:BAR3_BASE_ADDR-1] :/ bar_probability[3],
+                                                                          [BAR3_BASE_ADDR:BAR4_BASE_ADDR-1] :/ bar_probability[4],
+                                                                          [BAR4_BASE_ADDR:BAR5_BASE_ADDR-1] :/ bar_probability[5],
+                                                                          [BAR5_BASE_ADDR:EXP_ROM_BASE_ADDR-1] :/ bar_probability[6],
+                                                                          [EXP_ROM_BASE_ADDR:32'hffffffff]  :/ bar_probability[7]
+                                                                      };
                     cq_hdr.fmt[0] == 1'b0 -> cq_hdr.address[64-1:32] == 0;
+                    cq_hdr.fmt[0] dist {1'b0 :/ 70, 1'b1 :/ 30};
                     //TODO: change to original
                     //cq_hdr.fmt[2:1]  dist {2'b00 :/ 45, 2'b01 :/ 45, [2'b00:2'b11]  :/ 10}; // 2'b00 => read,  2'b01 => write
                     cq_hdr.fmt[2:1]  dist {2'b00 :/ 45, 2'b01 :/ 45}; // 2'b00 => read,  2'b01 => write
@@ -109,7 +135,6 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                     cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= 32 && cq_hdr.length > 0); //read
                     cq_hdr.fmt[2:1] == 2'b01 -> (cq_hdr.length <= MAX_PAYLOAD_SIZE && cq_hdr.length > 0); //write
 
-
                     cq_hdr.requester_id == dev_id_act;
                     cq_hdr.tag inside   {[0:2**8-1]};  // 8 bit tag
                     !(cq_hdr.tag inside {info.cq_tags[cq_hdr.requester_id]}); //tag is not in array
@@ -120,7 +145,6 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                 cq_hdr.td  = 0;
                 cq_hdr.ep  = 0;
                 finish_item(cq_hdr);
-                cq++;
             end
 
             if (cq == 0 && info.rq_hdr.size() != 0) begin
@@ -156,7 +180,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                 rc_hdr.ep            = 0;
                 rc_hdr.at            = 0;
                 rc_hdr.completer_id  = 0;
-                rc_hdr.requester_id  = 0;
+                rc_hdr.requester_id  = info.rq_hdr[rq_num].hdr.requester_id;
                 rc_hdr.tag           = info.rq_hdr[rq_num].hdr.tag;
                 rc_hdr.bcm           = 0;
                 rc_hdr.lower_address = info.rq_hdr[rq_num].lower_address;

@@ -6,22 +6,23 @@
 
 
 class sequencer#(
-    RC_MFB_REGIONS,
-    RC_MFB_REGION_SIZE,
-    RC_MFB_BLOCK_SIZE,
-    RC_MFB_META_W,
+    int unsigned RC_MFB_REGIONS,
+    int unsigned RC_MFB_REGION_SIZE,
+    int unsigned RC_MFB_BLOCK_SIZE,
+    int unsigned RC_MFB_META_W,
 
-    CQ_MFB_REGIONS,
-    CQ_MFB_REGION_SIZE,
-    CQ_MFB_BLOCK_SIZE,
-    CQ_MFB_META_W,
+    int unsigned CQ_MFB_REGIONS,
+    int unsigned CQ_MFB_REGION_SIZE,
+    int unsigned CQ_MFB_BLOCK_SIZE,
+    int unsigned CQ_MFB_META_W,
 
-    ITEM_WIDTH,
+    int unsigned ITEM_WIDTH,
 
-    RQ_MFB_META_W,
-    CC_MFB_META_W,
-    DMA_PORTS,
-    PCIE_ENDPOINTS) extends uvm_sequencer;
+    int unsigned RQ_MFB_META_W,
+    int unsigned CC_MFB_META_W,
+    int unsigned DMA_PORTS,
+    int unsigned PCIE_ENDPOINTS
+) extends uvm_sequencer;
     `uvm_component_param_utils(uvm_pcie_top::sequencer#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W,
                                                         CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
                                                         ITEM_WIDTH, RQ_MFB_META_W, CC_MFB_META_W, DMA_PORTS, PCIE_ENDPOINTS))
@@ -36,8 +37,8 @@ class sequencer#(
     //DMA CQ
     uvm_mfb::sequencer #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W) m_dma_cq[PCIE_ENDPOINTS][DMA_PORTS];
     //DMA CC
-    uvm_logic_vector::sequencer#(CC_MFB_META_W)           m_dma_cc_meta[PCIE_ENDPOINTS][DMA_PORTS];
-    uvm_logic_vector_array::sequencer#(ITEM_WIDTH) m_dma_cc_data[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_pcie::sequencer m_dma_cc[PCIE_ENDPOINTS][DMA_PORTS]; //its very simular to pcie but only support pcie response transactions.
+
     //MI Interface (CQ+CC)
     uvm_mi::sequencer_master#(32, 32)                     m_mi_sqr[PCIE_ENDPOINTS];
 
@@ -52,7 +53,6 @@ class sequencer#(
     function new(string name = "virt_sequencer", uvm_component parent);
         super.new(name, parent);
     endfunction
-
 endclass
 
 

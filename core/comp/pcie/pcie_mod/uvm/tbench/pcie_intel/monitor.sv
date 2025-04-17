@@ -39,12 +39,11 @@ class monitor#(META_WIDTH_UP, META_WIDTH_DOWN) extends uvm_pcie::monitor;
             logic [1-1:0] r0;
             logic [3-1:0] tc;
             logic [1-1:0] r1;
-            logic [1-1:0] attr0;
+            logic [3-1:0] attr;
             logic [1-1:0] r2;
             logic [1-1:0] th;
             logic [1-1:0] td;
             logic [1-1:0] ep;
-            logic [2-1:0] attr1;
             logic [2-1:0] at;
             logic [10-1:0] length;
 
@@ -53,7 +52,7 @@ class monitor#(META_WIDTH_UP, META_WIDTH_DOWN) extends uvm_pcie::monitor;
             avalon_up_data.get(data);
 
             {error, prefix, hdr} = meta.data;
-            {fmt, pcie_type, r0, tc, r1, attr0, r2, th, td, ep, attr1, at, length} = hdr[32*4-1 -: 32];
+            {fmt, pcie_type, r0, tc, r1, attr[2], r2, th, td, ep, attr[2-1:0], at, length} = hdr[32*4-1 -: 32];
             //CC
             if ({fmt, pcie_type} == 8'b01001010) begin
                 uvm_pcie::completer_header pcie_tr;
@@ -69,12 +68,15 @@ class monitor#(META_WIDTH_UP, META_WIDTH_DOWN) extends uvm_pcie::monitor;
                 {completer_id, compl_status, bcm, byte_count, requester_id, tag, r0, lower_address} = hdr[32*3-1 -: 64];
 
                 pcie_tr = uvm_pcie::completer_header::type_id::create("pcie_tr", this);
+                pcie_tr.time_array_add(meta.start);
+                pcie_tr.time_array_add(data.start);
+
                 pcie_tr.fmt               = fmt;
                 pcie_tr.pcie_type         = pcie_type;
                 pcie_tr.traffic_class     = tc;
-                pcie_tr.id_based_ordering = attr1[0];
-                pcie_tr.relaxed_ordering  = attr1[1];
-                pcie_tr.no_snoop          = attr0[0];
+                pcie_tr.id_based_ordering = attr[2];
+                pcie_tr.relaxed_ordering  = attr[1];
+                pcie_tr.no_snoop          = attr[0];
                 pcie_tr.th                = th;
                 pcie_tr.td                = td;
                 pcie_tr.ep                = ep;
@@ -115,12 +117,15 @@ class monitor#(META_WIDTH_UP, META_WIDTH_DOWN) extends uvm_pcie::monitor;
                 end
 
                 pcie_tr = uvm_pcie::request_header::type_id::create("pcie_tr", this);
+                pcie_tr.time_array_add(meta.start);
+                pcie_tr.time_array_add(data.start);
+
                 pcie_tr.fmt               = fmt;
                 pcie_tr.pcie_type         = pcie_type;
                 pcie_tr.traffic_class     = tc;
-                pcie_tr.id_based_ordering = attr1[0];
-                pcie_tr.relaxed_ordering  = attr1[1];
-                pcie_tr.no_snoop          = attr0[0];
+                pcie_tr.id_based_ordering = attr[2];
+                pcie_tr.relaxed_ordering  = attr[1];
+                pcie_tr.no_snoop          = attr[0];
                 pcie_tr.th                = th;
                 pcie_tr.td                = td;
                 pcie_tr.ep                = ep;
@@ -161,12 +166,11 @@ class monitor#(META_WIDTH_UP, META_WIDTH_DOWN) extends uvm_pcie::monitor;
             logic [1-1:0] r0;
             logic [3-1:0] tc;
             logic [1-1:0] r1;
-            logic [1-1:0] attr0;
+            logic [3-1:0] attr;
             logic [1-1:0] r2;
             logic [1-1:0] th;
             logic [1-1:0] td;
             logic [1-1:0] ep;
-            logic [2-1:0] attr1;
             logic [2-1:0] at;
             logic [10-1:0] length;
 
@@ -175,7 +179,7 @@ class monitor#(META_WIDTH_UP, META_WIDTH_DOWN) extends uvm_pcie::monitor;
             avalon_down_data.get(data);
 
             {bar, prefix, hdr} = meta.data;
-            {fmt, pcie_type, r0, tc, r1, attr0, r2, th, td, ep, attr1, at, length} = hdr[32*4-1 -: 32];
+            {fmt, pcie_type, r0, tc, r1, attr[2], r2, th, td, ep, attr[2-1:0], at, length} = hdr[32*4-1 -: 32];
             //RC
             if ({fmt, pcie_type} == 8'b01001010) begin
                 uvm_pcie::completer_header pcie_tr;
@@ -191,12 +195,15 @@ class monitor#(META_WIDTH_UP, META_WIDTH_DOWN) extends uvm_pcie::monitor;
                 {completer_id, compl_status, bcm, byte_count, requester_id, tag, r0, lower_address} = hdr[32*3-1 -: 64];
 
                 pcie_tr = uvm_pcie::completer_header::type_id::create("pcie_tr", this);
+                pcie_tr.time_array_add(meta.start);
+                pcie_tr.time_array_add(data.start);
+
                 pcie_tr.fmt               = fmt;
                 pcie_tr.pcie_type         = pcie_type;
                 pcie_tr.traffic_class     = tc;
-                pcie_tr.id_based_ordering = attr1[0];
-                pcie_tr.relaxed_ordering  = attr1[1];
-                pcie_tr.no_snoop          = attr0[0];
+                pcie_tr.id_based_ordering = attr[2];
+                pcie_tr.relaxed_ordering  = attr[1];
+                pcie_tr.no_snoop          = attr[0];
                 pcie_tr.th                = th;
                 pcie_tr.td                = td;
                 pcie_tr.ep                = ep;
@@ -237,12 +244,15 @@ class monitor#(META_WIDTH_UP, META_WIDTH_DOWN) extends uvm_pcie::monitor;
                 end
 
                 pcie_tr = uvm_pcie_extend::request_header::type_id::create("pcie_tr", this);
+                pcie_tr.time_array_add(meta.start);
+                pcie_tr.time_array_add(data.start);
+
                 pcie_tr.fmt               = fmt;
                 pcie_tr.pcie_type         = pcie_type;
                 pcie_tr.traffic_class     = tc;
-                pcie_tr.id_based_ordering = attr1[0];
-                pcie_tr.relaxed_ordering  = attr1[1];
-                pcie_tr.no_snoop          = attr0[0];
+                pcie_tr.id_based_ordering = attr[2];
+                pcie_tr.relaxed_ordering  = attr[1];
+                pcie_tr.no_snoop          = attr[0];
                 pcie_tr.th                = th;
                 pcie_tr.td                = td;
                 pcie_tr.ep                = ep;

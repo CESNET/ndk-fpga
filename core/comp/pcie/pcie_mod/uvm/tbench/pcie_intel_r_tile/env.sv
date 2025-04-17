@@ -4,7 +4,17 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_META_W, CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, AVST_UP_META_W) extends uvm_pcie_intel::env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_META_W, CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, AVST_UP_META_W);
+class env #(
+    int unsigned CQ_MFB_REGIONS,
+    int unsigned CQ_MFB_REGION_SIZE,
+    int unsigned CQ_MFB_BLOCK_SIZE,
+    int unsigned AVST_DOWN_META_W,
+
+    int unsigned CC_MFB_REGIONS,
+    int unsigned CC_MFB_REGION_SIZE,
+    int unsigned CC_MFB_BLOCK_SIZE,
+    int unsigned AVST_UP_META_W
+) extends uvm_pcie_intel::env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_META_W, CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, AVST_UP_META_W);
     `uvm_component_param_utils(uvm_pcie_intel_r_tile::env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_META_W, CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, AVST_UP_META_W));
 
     uvm_avst_crdt::agent_rx_hdr  m_avst_crdt_up_hdr [3];
@@ -20,6 +30,8 @@ class env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_MET
 
     function new(string name = "env", uvm_component parent = null);
         super.new(name, parent);
+
+        direction = DIR_RQ;
     endfunction
 
     function void build_phase(uvm_phase phase);
@@ -154,11 +166,6 @@ class env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_MET
         sequence_returning_hdr  m_crdt_up_hdr_sequence_returning [3];
         sequence_returning_data m_crdt_up_data_sequence_returning[3];
 
-        // AVST sequences
-        uvm_pcie_intel::sequence_data                     seq_data;
-        uvm_pcie_intel::sequence_meta #(AVST_DOWN_META_W) seq_meta;
-        uvm_avst::sequence_lib_tx #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_UP_META_W) seq_up_rdy;
-
         for (int unsigned i = 0; i < 3; i++) begin
             m_crdt_up_hdr_sequence_init [i] = uvm_avst_crdt::sequence_rx_initializing_hdr::type_id::create($sformatf("m_crdt_up_hdr_sequence_init_%0d", i));
             m_crdt_up_data_sequence_init[i] = uvm_avst_crdt::sequence_rx_initializing_data::type_id::create($sformatf("m_crdt_up_data_sequence_init_%0d", i));
@@ -169,23 +176,6 @@ class env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_MET
             m_crdt_up_hdr_sequence_returning [i] = sequence_returning_hdr::type_id::create($sformatf("m_crdt_up_hdr_sequence_returning_%0d", i));
             m_crdt_up_data_sequence_returning[i] = sequence_returning_data::type_id::create($sformatf("m_crdt_up_data_sequence_returning_%0d", i));
         end
-
-        seq_data = uvm_pcie_intel::sequence_data::type_id::create("seq_data");
-        assert(seq_data.randomize())
-        else begin
-            `uvm_fatal(this.get_full_name(), "\n\tCannot randomize data sequence")
-        end
-
-        seq_meta = uvm_pcie_intel::sequence_meta #(AVST_DOWN_META_W)::type_id::create("seq_meta");
-        assert(seq_meta.randomize())
-        else begin
-            `uvm_fatal(this.get_full_name(), "\n\tCannot randomize meta sequence")
-        end
-
-        seq_up_rdy = uvm_avst::sequence_lib_tx #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_UP_META_W)::type_id::create("seq_up_rdy");
-        seq_up_rdy.init_sequence();
-        seq_up_rdy.min_random_count = 100;
-        seq_up_rdy.max_random_count = 200;
 
         // Credit initialization
         for (int unsigned i = 0; i < 3; i++) begin
@@ -231,15 +221,7 @@ class env #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AVST_DOWN_MET
         end
 
         // AVST data/meta transactions
-        fork
-            seq_data.start(m_avst_down.m_sequencer.m_data);
-            seq_meta.start(m_avst_down.m_sequencer.m_meta);
-
-            forever begin
-                assert(seq_up_rdy.randomize());
-                seq_up_rdy.start(m_avst_up.m_sequencer);
-            end
-        join;
+        super.run_phase(phase);
     endtask
 
 endclass
