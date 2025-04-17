@@ -103,11 +103,14 @@ proc CompileMod {FNAME OPT} {
 
     set VCOM_PARAM ""
     set VLOG_PARAM ""
-    if {$SIM_FLAGS(DEBUG)} {
-        lappend VCOM_PARAM "-lint"
-    } elseif { !$SIM_FLAGS(CODE_COVERAGE) } {
-        lappend VCOM_PARAM "-nodebug=ports"
-        lappend VLOG_PARAM "-nodebug"
+
+    if { ![info exists SIM_FLAGS(TOOL)] || $SIM_FLAGS(TOOL) == "SIM"} {
+        if {$SIM_FLAGS(DEBUG)} {
+            lappend VCOM_PARAM "-lint"
+        } elseif { !$SIM_FLAGS(CODE_COVERAGE) } {
+            lappend VCOM_PARAM "-nodebug=ports"
+            lappend VLOG_PARAM "-nodebug"
+        }
     }
 
     # Source compiling
@@ -308,10 +311,18 @@ proc nb_sim_sanitize_vars {user_sim_flags sim_flags hierarchy VARS} {
 
     global NB_PLATFORM_TAGS env
 
-    if {[info exists env(PLATFORM_TAGS)]} {
-        set NB_PLATFORM_TAGS "$env(PLATFORM_TAGS)"
-    } else {
-        set NB_PLATFORM_TAGS "altera xilinx"
+    if { ![info exists SIM_FLAGS(TOOL)] || $SIM_FLAGS(TOOL) == "SIM"} {
+        if {[info exists env(PLATFORM_TAGS)]} {
+            set NB_PLATFORM_TAGS "$env(PLATFORM_TAGS)"
+        } else {
+            set NB_PLATFORM_TAGS "altera xilinx"
+        }
+    } elseif {$SIM_FLAGS(TOOL) == "COVERCHECK"} {
+        if {[info exists env(PLATFORM_TAGS)]} {
+             netlist fpga -vendor Xilinx -library VIVADO
+        } else {
+             netlist fpga -vendor Intel
+        }
     }
 
     set HIERARCHY(PACKAGES) $PACKAGES
@@ -464,6 +475,9 @@ proc nb_sim_expand_generics {{vsim_flags VSIM_FLAGS} {sim_flags SIM_FLAGS}} {
     }
 }
 
+###########################
+# QUESTAIM/MODELSIM
+###########################
 proc nb_sim_main {{user_sim_flags SIM_FLAGS} {sim_generics SIM_GENERICS}} {
     # Let VSIM_FLAGS variable to be accessible in top level stack frame for running vsim by hand
     upvar 1 VSIM_FLAGS VSIM_FLAGS
@@ -499,4 +513,57 @@ proc nb_sim_main {{user_sim_flags SIM_FLAGS} {sim_generics SIM_GENERICS}} {
     }
 }
 
-nb_sim_main
+
+###########################
+# COVERCHECK TOOL
+###########################
+proc nb_covercheck_exclude {{TOP_MODULE} {UCBD}} {
+
+    covercheck compile -tb_top $TOP_MODULE -d $TOP_MODULE -adaptive -include_asserts
+    # assert as assumptions. This is only valid for automatic exclusion generating
+    netlist assumes -add [find properties "testbench.DUT_U.DMA_MODULE.*" -assert]
+
+    # Load coverage database
+    covercheck load ucdb "${UCBD}.ucdb"
+    # generate exclusion
+    covercheck verify -j 8 -timeout 30m
+
+    # generate Do file with exclusion
+    covercheck generate exclude "${UCBD}_exclude.do"
+    # generate ucdb database with excluded coverage
+    covercheck generate ucdb "${UCBD}_exclude.ucdb" -exclude
+    #exit
+}
+
+proc nb_qverify_compile {{user_sim_flags SIM_FLAGS} {sim_generics SIM_GENERICS}} {
+    # Let VSIM_FLAGS variable to be accessible in top level stack frame for running vsim by hand
+    upvar 1 VSIM_FLAGS VSIM_FLAGS
+
+    # Collect variables in user .fdo script and upvar them
+    lappend VARS CODE_COVERAGE SIM_MODULE VLOG_SV_FLAGS
+    lappend VARS PACKAGES COMPONENTS TB_FILE MOD
+    upvar 1 $user_sim_flags USER_SIM_FLAGS
+    foreach i $VARS {
+        upvar 1 $i $i
+    }
+
+    # SIM_FLAGS variable will be visible in NDKBuild namespace
+    namespace eval NDKBuild {variable SIM_FLAGS}
+    namespace upvar NDKBuild SIM_FLAGS SIM_FLAGS
+
+    nb_sim_sanitize_vars USER_SIM_FLAGS SIM_FLAGS HIERARCHY $VARS
+    nb_sim_parse_parameters SIM_FLAGS
+
+    nb_vsim_prepare
+    nb_vsim_compile_project SIM_FLAGS HIERARCHY
+
+    nb_sim_expand_generics VSIM_FLAGS SIM_FLAGS
+}
+
+
+if {![info exists SIM_FLAGS(TOOL)] || $SIM_FLAGS(TOOL) == "SIM"} {
+    nb_sim_main
+} elseif {$SIM_FLAGS(TOOL) == "COVERCHECK"} {
+    nb_qverify_compile
+}
+
