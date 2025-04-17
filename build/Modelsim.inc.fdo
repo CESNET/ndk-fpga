@@ -123,7 +123,13 @@ proc CompileMod {FNAME OPT} {
     }
 
     if {$SIM_FLAGS(BATCH_COMPILE)} {
-        nb_batch_add $CMD $FNAME
+        #TODO: Thing about better way haw to add psl files
+        if { $FEXT in [list .psl] } {
+            nb_batch_add $CMD "-pslfile"
+            nb_batch_add $CMD $FNAME
+        } else {
+           nb_batch_add $CMD $FNAME
+        }
     } else {
         eval {*}$CMD $FNAME
     }
