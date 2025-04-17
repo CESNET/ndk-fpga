@@ -14,6 +14,7 @@ module testbench;
     // ---------------- //
 
     logic CLK = 0;
+    logic RST_INIT = 1'b1;
 
     always #(CLK_PERIOD) CLK = ~CLK;
 
@@ -33,6 +34,9 @@ module testbench;
 
     typedef test::test_base  #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH) test_base;
     typedef test::test_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH) test_speed;
+
+
+    initial begin #(4*CLK_PERIOD) RST_INIT <= 1'b0; end
 
     // Start of tests
     initial begin
@@ -78,7 +82,7 @@ module testbench;
     DUT_U
     (
         .CLK    (CLK),
-        .RST    (reset.RESET),
+        .RST    (reset.RESET | RST_INIT),
         .mfb_rx (mfb_rx),
         .mvb_rx (mvb_rx),
         .mfb_tx (mfb_tx),
@@ -98,7 +102,7 @@ module testbench;
         .RX_MVB_ITEM_WIDTH (RX_MVB_ITEM_WIDTH)
     )
     PROPERTY_CHECK (
-        .RESET  (reset.RESET),
+        .RESET  (reset.RESET | RST_INIT),
         .mfb_rx (mfb_rx),
         .mvb_rx (mvb_rx),
         .mfb_tx (mfb_tx),
