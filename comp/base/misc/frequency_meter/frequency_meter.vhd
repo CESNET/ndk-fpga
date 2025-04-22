@@ -63,7 +63,7 @@ use work.type_pack.all;
 -- |                |  - status(9) - at least one of the Measured Clocks were reset during the measurement  |
 -- +----------------+---------------------------------------------------------------------------------------+
 -- |           0x08 | Interval length register (Read and Write)                                             |
--- |                |  - default: 2**(INTERVAL_LEN_WIDTH/2)                                             |
+-- |                |  - default: 2**(INTERVAL_LEN_WIDTH/2)                                                 |
 -- +----------------+---------------------------------------------------------------------------------------+
 -- |           0x0C | The Reference Clock frequency in Hz (Read-only)                                       |
 -- +----------------+---------------------------------------------------------------------------------------+
