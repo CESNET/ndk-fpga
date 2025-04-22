@@ -9,6 +9,10 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
     `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer #(ITEM_WIDTH));
 
     // Packet size configuration options
+    int unsigned packet_size_min = 60;   // Packets below are padded
+    int unsigned packet_size_max = 1500; // Packets above are ignored
+
+    // Packet size configuration options
     int unsigned forward_packet_number_min = 10;
     int unsigned forward_packet_number_max = 100;
 
@@ -333,10 +337,18 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
 
         req = uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)::type_id::create("req", p_sequencer);
         while(reader.read(data) == uvm_pcap::RET_OK) begin
+            if (data.size() > packet_size_max) begin
+                continue;
+            end
+
             if (state != null) begin
                 if (!state.next()) begin
                     break;
                 end
+            end
+
+            if (data.size() < packet_size_min) begin
+                data = new[packet_size_min](data);
             end
 
             start_item(req);
