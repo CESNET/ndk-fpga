@@ -1,0 +1,576 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Streaming Debug &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="DDR4 Memory Tester" href="../mem_tester/readme.html" />
+    <link rel="prev" title="Debug Tools" href="../../../debug.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../debug.html">Debug Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Streaming Debug</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#debug-master">Debug Master</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#counters">Counters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#debug-probes">Debug Probes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bus-control">Bus control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#entities">Entities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mem_tester/readme.html">DDR4 Memory Tester</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../histogramer/readme.html">Histogramer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../latency_meter/readme.html">Latency meter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data_logger/readme.html">Data logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jtag_op_client/readme.html">JTAG-over-protocol Client</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../debug.html">Debug Tools</a></li>
+      <li class="breadcrumb-item active">Streaming Debug</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/comp/debug/streaming_debug/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="streaming-debug">
+<span id="id1"></span><h1>Streaming Debug<a class="headerlink" href="#streaming-debug" title="Link to this heading"></a></h1>
+<p>This component is useful for debugging streaming buses (typically <a class="reference internal" href="../../mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB</span></a> and <a class="reference internal" href="../../mvb_tools/readme.html#mvb-bus"><span class="std std-ref">MVB</span></a> in the NDK).
+It can count the number of processed words and packets and indicate a bottleneck where the throughput is being decreased.</p>
+<p>The whole Streaming Debug system consists of two parts: STREAMING_DEBUG_MASTER and STREAMING_DEBUG_PROBE.
+Furthermore, the Probe has three versions:</p>
+<ul class="simple">
+<li><p>classic (entity STREAMING_DEBUG_PROBE)</p></li>
+<li><p>inverted <a class="footnote-reference brackets" href="#f1" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> (entity STREAMING_DEBUG_PROBE_N)</p></li>
+<li><p>MFB (entity STREAMING_DEBUG_PROBE_MFB); often also used for MVB</p></li>
+</ul>
+<p>The Debug Probes are usually placed between two neighboring components in a stream pipeline.
+For example, imagine a pipeline consisting of components A –&gt; B –&gt; C, as in the following figure.</p>
+<figure class="align-center" id="id5">
+<span id="figure1"></span><a class="reference internal image-reference" href="../../../_images/streaming_pipeline_example.drawio.svg"><img alt="../../../_images/streaming_pipeline_example.drawio.svg" src="../../../_images/streaming_pipeline_example.drawio.svg" style="width: 50%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">An example of a stream pipeline where component A sends data to comp B (and B to C) and where B uses backpressure (DST_RDY) to pause data from A (and C to B).</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>In this case, Probes can be placed between the components as well as on the beginning and end of the pipeline.
+All Probes should be connected to the same Debug Master (for simplicity and saving FPGA resources).
+This is displayed in the following diagram.</p>
+<figure class="align-center" id="id6">
+<span id="figure2"></span><a class="reference internal image-reference" href="../../../_images/streaming_debug_example.drawio.svg"><img alt="../../../_images/streaming_debug_example.drawio.svg" src="../../../_images/streaming_debug_example.drawio.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">A pipeline with integrated Debug Probes and Master.
+Control signals such as Data Valid (SRC_RDY), Start-Of-Packet (SOP), End-Of-Packet (EOP), and backpressure (DST_RDY) all flow through the Probe.
+This is the intended manner in which the probes should be integrated into a design to use all of its features.
+Also, the “Bus Control” (see section <a class="reference internal" href="#bus-control"><span class="std std-ref">Bus control</span></a>) signals are connected from the Master to the Probe.</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>However, we often do not need to use features to stop (block) or discard (drop) the flowing traffic.
+In that case, the “Bus Control” signals and some other connections can be omitted.
+The typical connection of the Debug Probes is shown in the following diagram.</p>
+<figure class="align-center" id="id7">
+<span id="figure3"></span><a class="reference internal image-reference" href="../../../_images/streaming_debug_example_2.drawio.svg"><img alt="../../../_images/streaming_debug_example_2.drawio.svg" src="../../../_images/streaming_debug_example_2.drawio.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Common connection of the Probes in the NDK designs - Bus Control is not used (see section <a class="reference internal" href="#bus-control"><span class="std std-ref">Bus control</span></a>).</span><a class="headerlink" href="#id7" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="debug-master">
+<h2>Debug Master<a class="headerlink" href="#debug-master" title="Link to this heading"></a></h2>
+<p>The Debug Master component is connected to the MI bus and one or more Probes.
+It accepts commands through the MI bus to control the Probes or read statistical data.
+The module contains counters that increment according to signals received from each Probe (one counter - of each type - per Probe).</p>
+<section id="counters">
+<h3>Counters<a class="headerlink" href="#counters" title="Link to this heading"></a></h3>
+<p>Six types of counters are available in the Debug Master for each Debug Probe.
+Each can be disabled/enabled by generic parameters: “E” or “e” to “enable”; anything else will translate as “disable”.</p>
+<ul class="simple">
+<li><p><cite>COUNTER_WORD</cite>: number of valid data words - clock cycles when both SRC_RDY and DST_RDY were asserted.</p></li>
+<li><p><cite>COUNTER_WAIT</cite>: number of clock cycles when neither SRC_RDY nor DST_RDY were asserted.</p></li>
+<li><p><cite>COUNTER_DST_HOLD</cite>: number of clock cycles when SRC_RDY was asserted and DST_RDY deasserted (the next component in the pipeline could not process new data).</p></li>
+<li><p><cite>COUNTER_SRC_HOLD</cite>: number of clock cycles when SRC_RDY was deasserted and DST_RDY asserted (the previous component in the pipeline did not output valid data).</p></li>
+<li><p><cite>COUNTER_SOP</cite>: number of transaction starts (valid SOPs/SOFs).</p></li>
+<li><p><cite>COUNTER_EOP</cite>: number of transaction ends (valid SOPs/SOFs).</p></li>
+</ul>
+</section>
+</section>
+<section id="debug-probes">
+<h2>Debug Probes<a class="headerlink" href="#debug-probes" title="Link to this heading"></a></h2>
+<p>Each Probe has three interfaces:</p>
+<ul class="simple">
+<li><p><cite>RX</cite> - connect signals on the interface of the previous component in the pipeline.
+In the A –&gt; B –&gt; C example at the top, this would be the output (TX) interface of component <strong>A</strong> for Probe placed between comps <strong>A</strong> and <strong>B</strong>.</p></li>
+<li><p><cite>TX</cite> - connect signals on the interface of the next component in the pipeline.
+In the A –&gt; B –&gt; C example at the top, this would be the input (RX) interface of component <strong>B</strong> for Probe placed between comps <strong>A</strong> and <strong>B</strong>.</p></li>
+<li><p><cite>DEBUG</cite> - connect to the Master’s <cite>DEBUG</cite> interface.</p></li>
+</ul>
+<p>See Probe connections in the <a class="reference internal" href="#figure2"><span class="std std-ref">second diagram</span></a> (or the <a class="reference internal" href="#figure3"><span class="std std-ref">third</span></a>).</p>
+<p><strong>The Debug interface</strong></p>
+<p>When Bus Control is enabled, the <cite>BLOCK</cite> and <cite>DROP</cite> signals can modify the traffic flow (see the following section).
+Other signals on this interface are the monitored signals from the Probe that increment the Master’s counters.</p>
+<p>Each Probe is identified by:</p>
+<ul class="simple">
+<li><p>four-letter user-defined string (generic parameter of the component),</p></li>
+<li><p>an automatically assigned ID (port number on which it is connected to the Master)</p></li>
+</ul>
+</section>
+<section id="bus-control">
+<span id="id3"></span><h2>Bus control<a class="headerlink" href="#bus-control" title="Link to this heading"></a></h2>
+<p>When this “advanced” feature is enabled, the user can halt or discard the traffic flowing through a selected Probe.
+To utilize this feature, the Probe must be inserted into the pipeline as shown in the <a class="reference internal" href="#figure2"><span class="std std-ref">second diagram</span></a>.
+And for each Probe, it has to be enabled using the <cite>BUS_CONTROL</cite> generic parameter.
+Appropriate MI commands to Debug Master are translated to the <cite>DEBUG_BLOCK</cite> and <cite>DEBUG_DROP</cite> interface signals.
+This sets the requested Probe to:</p>
+<ul class="simple">
+<li><p>Halt the traffic (when the <cite>DEBUG_BLOCK</cite> signal asserts).
+The Probe then pauses the incoming traffic by deasserting <cite>RX_DST_RDY</cite> and invalidating the output by deasserting <cite>TX_SRC_RDY</cite>.</p></li>
+<li><p>Discard the traffic (when the <cite>DEBUG_DROP</cite> signal asserts; has priority over the <cite>DEBUG_BLOCK</cite> signal).
+The Probe accepts all incoming traffic by asserting <cite>RX_DST_RDY</cite> and invalidate the output by deasserting <cite>TX_SRC_RDY</cite>.</p></li>
+</ul>
+</section>
+<section id="usage">
+<span id="id4"></span><h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<p>Use the <cite>nfb-busdebugctl</cite> tool for easy control of the whole Streaming Debug system.
+For more info, see the tool’s documentation.</p>
+</section>
+<section id="entities">
+<h2>Entities<a class="headerlink" href="#entities" title="Link to this heading"></a></h2>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-streaming_debug_master">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">STREAMING_DEBUG_MASTER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-streaming_debug_master" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-streaming_debug_master-connected_probes"><td><p>CONNECTED_PROBES</p></td>
+<td><p>integer</p></td>
+<td><p>4</p></td>
+<td><p>Number of connected probes.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-streaming_debug_master-regions"><td><p>REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Number of MFB regions.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-streaming_debug_master-debug_enabled"><td><p>DEBUG_ENABLED</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Master debuging enable switch.
+True means full architecture implementation, false means empty architecture implementation.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-streaming_debug_master-probe_enabled"><td><p>PROBE_ENABLED</p></td>
+<td><p>string</p></td>
+<td><p>“EEEE”</p></td>
+<td><p>Selective enabling of monitoring of connected probes when master enable is true.
+Character ‘E’ or ‘e’ means enabled, each other character means disabled.
+String is red from left to right, one character for each interface numbered from 0.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-streaming_debug_master-counter_word"><td><p>COUNTER_WORD</p></td>
+<td><p>string</p></td>
+<td><p>“EEEE”</p></td>
+<td><p>Should counter of data words be available?</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-streaming_debug_master-counter_wait"><td><p>COUNTER_WAIT</p></td>
+<td><p>string</p></td>
+<td><p>“EEEE”</p></td>
+<td><p>Should counter of waiting cycles (not source nor destination ready) be available?</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-streaming_debug_master-counter_dst_hold"><td><p>COUNTER_DST_HOLD</p></td>
+<td><p>string</p></td>
+<td><p>“EEEE”</p></td>
+<td><p>Should counter of cycles when source is ready and destination is not be available?</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-streaming_debug_master-counter_src_hold"><td><p>COUNTER_SRC_HOLD</p></td>
+<td><p>string</p></td>
+<td><p>“EEEE”</p></td>
+<td><p>Should counter of cycles when destination is ready and source is not be available?</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-streaming_debug_master-counter_sop"><td><p>COUNTER_SOP</p></td>
+<td><p>string</p></td>
+<td><p>“EEEE”</p></td>
+<td><p>Should counter of started transactions be available?</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-streaming_debug_master-counter_eop"><td><p>COUNTER_EOP</p></td>
+<td><p>string</p></td>
+<td><p>“EEEE”</p></td>
+<td><p>Should counter of ended transactions be available?</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-streaming_debug_master-bus_control"><td><p>BUS_CONTROL</p></td>
+<td><p>string</p></td>
+<td><p>“EEEE”</p></td>
+<td><p>Should bus controll functionality be available?</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-streaming_debug_master-probe_names"><td><p>PROBE_NAMES</p></td>
+<td><p>string</p></td>
+<td><p>“Int1Int2Int3Int4”</p></td>
+<td><p>Text identificators for connected probes.
+Each probe name has precisely 4 characters.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-streaming_debug_master-debug_reg"><td><p>DEBUG_REG</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Use internal register on all DEBUG interface signals.</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_master-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>CLOCK and RESET</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_master-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_master-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Input controll MI32 interface</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_master-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_master-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_master-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_master-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(3 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_master-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_master-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_master-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_master-debug_block"><td><p>DEBUG_BLOCK</p></td>
+<td><p>std_logic_vector(CONNECTED_PROBES-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Multi-interface for connected streaming interfaces</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_master-debug_drop"><td><p>DEBUG_DROP</p></td>
+<td><p>std_logic_vector(CONNECTED_PROBES-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_master-debug_src_rdy"><td><p>DEBUG_SRC_RDY</p></td>
+<td><p>std_logic_vector(CONNECTED_PROBES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_master-debug_dst_rdy"><td><p>DEBUG_DST_RDY</p></td>
+<td><p>std_logic_vector(CONNECTED_PROBES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_master-debug_sop"><td><p>DEBUG_SOP</p></td>
+<td><p>std_logic_vector(CONNECTED_PROBES*REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_master-debug_eop"><td><p>DEBUG_EOP</p></td>
+<td><p>std_logic_vector(CONNECTED_PROBES*REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-streaming_debug_probe_mfb">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">STREAMING_DEBUG_PROBE_MFB</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-streaming_debug_probe_mfb" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-streaming_debug_probe_mfb-regions"><td><p>REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Number of MFB regions.</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Input interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_probe_mfb-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_probe_mfb-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_probe_mfb-rx_sof"><td><p>RX_SOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_probe_mfb-rx_eof"><td><p>RX_EOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Output interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_probe_mfb-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_probe_mfb-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_probe_mfb-tx_sof"><td><p>TX_SOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_probe_mfb-tx_eof"><td><p>TX_EOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Debuging interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_probe_mfb-debug_block"><td><p>DEBUG_BLOCK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>blocks data words on pipe’s input interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_probe_mfb-debug_drop"><td><p>DEBUG_DROP</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>drops data words on pipe’s input interface (higher priority than BLOCK)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_probe_mfb-debug_src_rdy"><td><p>DEBUG_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>source ready on pipe’s input interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_probe_mfb-debug_dst_rdy"><td><p>DEBUG_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>destination ready on pipe’s input interface</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-streaming_debug_probe_mfb-debug_sof"><td><p>DEBUG_SOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>start of transaction on pipe’s input interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-streaming_debug_probe_mfb-debug_eof"><td><p>DEBUG_EOF</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>end of transaction on pipe’s input interface</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="f1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>The monitored signals are expected to be negated.</p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../../debug.html" class="btn btn-neutral float-left" title="Debug Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../mem_tester/readme.html" class="btn btn-neutral float-right" title="DDR4 Memory Tester" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
