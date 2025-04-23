@@ -16,7 +16,7 @@ set PCIE_MOD_ARCH "USP"
 # Achitecture of SDM/SYSMON module
 set SDM_SYSMON_ARCH "USP_IDCOMP"
 # Boot controller type
-set BOOT_TYPE 0
+set BOOT_TYPE 1
 # Achitecture of Network module
 if { $ETH_PORT_SPEED(0) == 100 } {
     set NET_MOD_ARCH "CMAC"
