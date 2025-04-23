@@ -269,12 +269,17 @@ CMAC   core: 100.</p>
 <td><p>(others =&gt; 16383)</p></td>
 <td><p>Maximum allowed size of TX frame in bytes per Ethernet port.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_mac_bypass"><td><p>ETH_MAC_BYPASS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_chan_map"><td><p>ETH_CHAN_MAP</p></td>
+<td><p>integer_vector(7 downto 0)</p></td>
+<td><p>(7, 6, 5, 4, 3, 2, 1, 0)</p></td>
+<td><p>Optional remapping of physical QSFP(DD) lanes to Eth channel numbers</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_mac_bypass"><td><p>ETH_MAC_BYPASS</p></td>
 <td><p>boolean</p></td>
 <td><p>False</p></td>
 <td><p>Optional option to disable MAC Lite modules. Dangerously!</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-lanes"><td><p>LANES</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-lanes"><td><p>LANES</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>Number of serial lanes.
@@ -284,27 +289,27 @@ Options: F_TILE      core: 8;</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-qsfp_ports"><td><p>QSFP_PORTS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-qsfp_ports"><td><p>QSFP_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-qsfp_i2c_ports"><td><p>QSFP_I2C_PORTS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-qsfp_i2c_ports"><td><p>QSFP_I2C_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>max 2</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-qsfp_i2c_tristate"><td><p>QSFP_I2C_TRISTATE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-qsfp_i2c_tristate"><td><p>QSFP_I2C_TRISTATE</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>MFB configuration:</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-regions"><td><p>REGIONS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-regions"><td><p>REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><dl class="simple">
@@ -314,52 +319,52 @@ E_TILE core: 1,8,8,8.</p>
 </dl>
 </td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-region_size"><td><p>REGION_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-region_size"><td><p>REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-block_size"><td><p>BLOCK_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-block_size"><td><p>BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-item_width"><td><p>ITEM_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-item_width"><td><p>ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>MI configuration:</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-mi_data_width_phy"><td><p>MI_DATA_WIDTH_PHY</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-mi_data_width_phy"><td><p>MI_DATA_WIDTH_PHY</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-mi_addr_width_phy"><td><p>MI_ADDR_WIDTH_PHY</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-mi_addr_width_phy"><td><p>MI_ADDR_WIDTH_PHY</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>Other configuration:</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-ts_demo_en"><td><p>TS_DEMO_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-ts_demo_en"><td><p>TS_DEMO_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enable timestamp-limiting demo/testing.
@@ -369,47 +374,47 @@ time between packets from the same DMA channel is measured.
 The measured data is presented to the user via a couple of dedicated registers.
 WARNING: works only for a single-channel (and single-Region) designs with E-Tile (Intel)!</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-tx_dma_channels"><td><p>TX_DMA_CHANNELS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-tx_dma_channels"><td><p>TX_DMA_CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>16</p></td>
 <td><p>TX_DMA_CHANNELS per Eth Stream!</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-ll_mode"><td><p>LL_MODE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-ll_mode"><td><p>LL_MODE</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Enable low latency optimalization</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-lane_rx_polarity"><td><p>LANE_RX_POLARITY</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-lane_rx_polarity"><td><p>LANE_RX_POLARITY</p></td>
 <td><p>std_logic_vector(ETH_PORTS*LANES-1 downto 0)</p></td>
 <td><p>(others =&gt; ‘0’)</p></td>
 <td><p>Ethernet lanes polarity</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-lane_tx_polarity"><td><p>LANE_TX_POLARITY</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-lane_tx_polarity"><td><p>LANE_TX_POLARITY</p></td>
 <td><p>std_logic_vector(ETH_PORTS*LANES-1 downto 0)</p></td>
 <td><p>(others =&gt; ‘0’)</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-reset_width"><td><p>RESET_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-reset_width"><td><p>RESET_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Number of user resets.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-misc_top2net_width"><td><p>MISC_TOP2NET_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-misc_top2net_width"><td><p>MISC_TOP2NET_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between Top-Level FPGA design and NET_MOD core logic</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-misc_net2top_width"><td><p>MISC_NET2TOP_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-misc_net2top_width"><td><p>MISC_NET2TOP_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between NET_MOD core logic and Top-Level FPGA design</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>Select correct FPGA device.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-board"><td><p>BOARD</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-board"><td><p>BOARD</p></td>
 <td><p>string</p></td>
 <td><p>“DK-DEV-1SDX-P”</p></td>
 <td><p>400G1, DK-DEV-AGI027RES, DK-DEV-1SDX-P</p></td>
