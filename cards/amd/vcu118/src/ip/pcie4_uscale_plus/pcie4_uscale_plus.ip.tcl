@@ -47,13 +47,20 @@ set config_list [list \
     CONFIG.pf0_rbar_cap_bar0 {0xffffffffffff} \
     CONFIG.pf0_dsn_enabled {true} \
     CONFIG.pf0_msi_enabled {false} \
-    CONFIG.pf0_msix_enabled {true} \
+    CONFIG.pf0_msix_enabled {false} \
     CONFIG.PF0_MSIX_CAP_PBA_BIR {BAR_1:0} \
     CONFIG.PF0_MSIX_CAP_TABLE_BIR {BAR_1:0} \
-    CONFIG.MSI_X_OPTIONS {MSI-X_External} \
+    CONFIG.MSI_X_OPTIONS {None} \
     CONFIG.mode_selection {Advanced} \
     CONFIG.type1_membase_memlimit_enable {Disabled} \
     CONFIG.type1_prefetchable_membase_memlimit {Disabled} \
+    CONFIG.cfg_ctl_if {true} \
+    CONFIG.cfg_fc_if {true} \
+    CONFIG.cfg_mgmt_if {false} \
+    CONFIG.cfg_pm_if {false} \
+    CONFIG.cfg_tx_msg_if {false} \
+    CONFIG.rcv_msg_if {false} \
+    CONFIG.tx_fc_if {false} \
 ]
 
 if {$PARAMS(PCIE_ENDPOINT_MODE) == 2} {
