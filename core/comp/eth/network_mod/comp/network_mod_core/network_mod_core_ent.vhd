@@ -73,6 +73,8 @@ generic(
     MISC_TOP2NET_WIDTH : natural := 1;
     -- Width of MISC signal between NET_MOD core logic and Top-Level FPGA design
     MISC_NET2TOP_WIDTH : natural := 1;
+    -- QSFP(DD) physical lanes to Ethernet channels mapping  (10 & 25G modes)
+    CHANNEL_MAP        : integer_vector(7 downto 0) := (7, 6, 5, 4, 3, 2, 1, 0);
     -- Select correct FPGA device.
     -- "AGILEX", "STRATIX10", "ULTRASCALE", ...
     DEVICE            : string  := "STRATIX10"

@@ -202,6 +202,9 @@ architecture FULL of RX_MAC_LITE_CTRL_UNIT is
     constant CMD_SW_BASE_REG         : std_logic_vector(2 downto 0) := "011"; -- 0x03
     constant CMD_SM_CNT_CLEAR        : std_logic_vector(2 downto 0) := "100"; -- 0x04
 
+    -- reset of control logic
+    signal ctrl_reset                    : std_logic;
+
     -- MI32 slave interface signals
     signal s_mi_dwr                      : std_logic_vector(31 downto 0);
     signal s_mi_addr                     : std_logic_vector(31 downto 0);
@@ -295,6 +298,20 @@ architecture FULL of RX_MAC_LITE_CTRL_UNIT is
     signal s_sel_register_out            : std_logic;
 
 begin
+
+    -- Generate separate reset signal for logic that shouldn't be affected by the network
+    -- side resets
+    ctrl_reset_sync_i : entity work.ASYNC_RESET
+    generic map (
+        TWO_REG  => false,
+        OUT_REG  => true,
+        REPLICAS => 1
+    )
+    port map (
+        CLK        => CLK,
+        ASYNC_RST  => MI_RESET,
+        OUT_RST(0) => ctrl_reset
+    );
 
     -- =========================================================================
     --  MI32 ASYNC
@@ -440,7 +457,7 @@ begin
     reg_enable_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (ctrl_reset = '1') then
                 s_reg_enable <= '0';
             elsif (s_reg_enable_we = '1') then
                 s_reg_enable <= s_mi_dwr(0);
@@ -452,7 +469,7 @@ begin
     reg_error_mask_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (ctrl_reset = '1') then
                 s_reg_error_mask <= (others => '1');
             elsif (s_reg_error_mask_we = '1') then
                 s_reg_error_mask <= s_mi_dwr(4 downto 0);
@@ -487,7 +504,7 @@ begin
     reg_min_frame_len_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (ctrl_reset = '1') then
                 s_reg_min_frame_len <= std_logic_vector(to_unsigned(64,LEN_WIDTH));
             elsif (s_reg_min_frame_len_we = '1') then
                 s_reg_min_frame_len <= s_mi_dwr(LEN_WIDTH-1 downto 0);
@@ -507,7 +524,7 @@ begin
     reg_max_frame_len_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (ctrl_reset = '1') then
                 s_reg_max_frame_len <= std_logic_vector(to_unsigned(1526,LEN_WIDTH));
             elsif (s_reg_max_frame_len_we = '1') then
                 s_reg_max_frame_len <= s_mi_dwr(LEN_WIDTH-1 downto 0);
@@ -527,7 +544,7 @@ begin
     reg_mac_check_mode_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (ctrl_reset = '1') then
                 s_reg_mac_check_mode <= (others => '0');
             elsif (s_reg_mac_check_mode_we = '1') then
                 s_reg_mac_check_mode <= s_mi_dwr(1 downto 0);
@@ -752,7 +769,7 @@ begin
     reg_sel_register_out_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (ctrl_reset = '1') then
                 -- Select base register field by default
                 s_reg_sel_register_out <= '0';
             elsif (s_cmd_switch_rfc_reg = '1') then

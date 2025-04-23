@@ -460,6 +460,7 @@ begin
         generic map (
             ETH_PORT_SPEED    => ETH_PORT_SPEED(p),
             ETH_PORT_CHAN     => ETH_PORT_CHAN (p),
+            CHANNEL_MAP       => ETH_CHAN_MAP     ,
             EHIP_TYPE         => EHIP_TYPE        ,
             LANES             => LANES            ,
             REGIONS           => REGIONS_CORE     ,
