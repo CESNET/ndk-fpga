@@ -41,8 +41,8 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
     int unsigned mac_mask_max = 48;
 
     // Generator options
-    logic generated_config = 1;
-    logic generated_profile = 1;
+    bit generated_config = 1;
+    bit generated_profile = 1;
 
     string config_filepath = "./config.yaml";
     string profile_filepath = "./profile.csv";
