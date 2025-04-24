@@ -51,7 +51,7 @@ entity MTC is
         -- Expansion ROM base address for PCIE->MI32 transalation
         EXP_ROM_BASE_ADDR : std_logic_vector(31 downto 0) := X"0A000000";
         -- Enable Pipe component on CC interface
-        CC_PIPE           : boolean := true;
+        CC_PIPE           : boolean := false;
         -- Enable Pipe component on CQ interface
         CQ_PIPE           : boolean := true;
         -- Enable Pipe component on MI32 interface
@@ -769,10 +769,7 @@ begin
                     if (last_dword = '1') then
                         mi_fsm_nst <= st_idle;
                     elsif (wr_index_max = '1') then
-                        cq_ready <= '1';
-                        if (cq_valid = '0') then
-                            mi_fsm_nst <= st_wait_for_data;
-                        end if;
+                        mi_fsm_nst <= st_wait_for_data;
                     end if;
                 end if;
 
@@ -1116,38 +1113,60 @@ begin
 
     mfb_meta_arr(0)(PCIE_CC_META_HEADER) <= cc_hdr;
 
-    cc_mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
-        REGIONS     => MFB_REGIONS,
-        REGION_SIZE => MFB_REGION_SIZE,
-        BLOCK_SIZE  => MFB_BLOCK_SIZE,
-        ITEM_WIDTH  => MFB_ITEM_WIDTH,
-        META_WIDTH  => PCIE_CC_META_WIDTH,
-        FAKE_PIPE   => not CC_PIPE,
-        USE_DST_RDY => true,
-        DEVICE      => DEVICE
-    )
-    port map(
-        CLK        => CLK,
-        RESET      => RESET,
+    cc_pipe_g: if CC_PIPE generate
+        cc_mfb_pipe_i : entity work.MFB_PIPE
+        generic map(
+            REGIONS     => MFB_REGIONS,
+            REGION_SIZE => MFB_REGION_SIZE,
+            BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            ITEM_WIDTH  => MFB_ITEM_WIDTH,
+            META_WIDTH  => PCIE_CC_META_WIDTH,
+            FAKE_PIPE   => false,
+            USE_DST_RDY => true,
+            DEVICE      => DEVICE
+        )
+        port map(
+            CLK        => CLK,
+            RESET      => RESET,
 
-        RX_DATA    => cc_data,
-        RX_META    => slv_array_ser(mfb_meta_arr),
-        RX_SOF_POS => (others => '0'),
-        RX_EOF_POS => slv_array_ser(mfb_eof_pos_arr),
-        RX_SOF     => mfb_sof,
-        RX_EOF     => mfb_eof,
-        RX_SRC_RDY => cc_valid,
-        RX_DST_RDY => cc_ready,
+            RX_DATA    => cc_data,
+            RX_META    => slv_array_ser(mfb_meta_arr),
+            RX_SOF_POS => (others => '0'),
+            RX_EOF_POS => slv_array_ser(mfb_eof_pos_arr),
+            RX_SOF     => mfb_sof,
+            RX_EOF     => mfb_eof,
+            RX_SRC_RDY => cc_valid,
+            RX_DST_RDY => cc_ready,
 
-        TX_DATA    => CC_MFB_DATA,
-        TX_META    => CC_MFB_META,
-        TX_SOF_POS => CC_MFB_SOF_POS,
-        TX_EOF_POS => CC_MFB_EOF_POS,
-        TX_SOF     => CC_MFB_SOF,
-        TX_EOF     => CC_MFB_EOF,
-        TX_SRC_RDY => CC_MFB_SRC_RDY,
-        TX_DST_RDY => CC_MFB_DST_RDY
-    );
+            TX_DATA    => CC_MFB_DATA,
+            TX_META    => CC_MFB_META,
+            TX_SOF_POS => CC_MFB_SOF_POS,
+            TX_EOF_POS => CC_MFB_EOF_POS,
+            TX_SOF     => CC_MFB_SOF,
+            TX_EOF     => CC_MFB_EOF,
+            TX_SRC_RDY => CC_MFB_SRC_RDY,
+            TX_DST_RDY => CC_MFB_DST_RDY
+        );
+    else generate
+        process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (cc_ready = '1') then
+                    CC_MFB_DATA    <= cc_data;
+                    CC_MFB_META    <= slv_array_ser(mfb_meta_arr);
+                    CC_MFB_SOF_POS <= (others => '0');
+                    CC_MFB_EOF_POS <= slv_array_ser(mfb_eof_pos_arr);
+                    CC_MFB_SOF     <= mfb_sof;
+                    CC_MFB_EOF     <= mfb_eof;
+                    CC_MFB_SRC_RDY <= cc_valid;
+                end if;
+                if (RESET = '1') then
+                    CC_MFB_SRC_RDY <= '0';
+                end if;
+            end if;
+        end process;
+
+        cc_ready <= CC_MFB_DST_RDY;
+    end generate;
 
 end architecture;
