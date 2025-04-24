@@ -12,7 +12,7 @@ source $PARAMS(IP_TEMPLATE_BASE)/pcie/rtile_pcie_conf_lib.tcl
 
 set PCI_VENDOR_ID 0x18EC
 set PCI_DEVICE_ID 0xC000
-set USR_CLKFREQ 400MHz
+set USR_CLKFREQ 500MHz
 
 load_system $PARAMS(IP_BUILD_DIR)/[get_ip_filename $PARAMS(IP_COMP_NAME)]
 set_project_property DEVICE $PARAMS(IP_DEVICE)
