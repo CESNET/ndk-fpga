@@ -933,173 +933,178 @@ ULTRASCALE</p></td>
 <td><p>in</p></td>
 <td><p>RX MFB: EOF position for each MFB region in MFB items</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-rx_mfb_error"><td><p>RX_MFB_ERROR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-rx_mfb_mii_err"><td><p>RX_MFB_MII_ERR</p></td>
 <td><p>std_logic_vector(RX_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>RX MFB: Error flag for each MFB region, valid with EOF</p></td>
+<td><p>RX MFB: MII Error flag for each MFB region, valid with EOF</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-rx_mfb_crc_err"><td><p>RX_MFB_CRC_ERR</p></td>
+<td><p>std_logic_vector(RX_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>RX MFB: CRC Error flag for each MFB region, valid with EOF</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>RX MFB: source ready of each MFB bus, don’t support gaps inside frame!</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>RX STATUS INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-adapter_link_up"><td><p>ADAPTER_LINK_UP</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-adapter_link_up"><td><p>ADAPTER_LINK_UP</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Link Up flag input, active when link is up</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>INPUT TIMESTAMP INTERFACE (FROM TSU)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
 <td><p>std_logic_vector(64-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Timestamp in nanosecond (new) format, more info in TSU.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tsu_ts_dv"><td><p>TSU_TS_DV</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tsu_ts_dv"><td><p>TSU_TS_DV</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Valid flag of timestamp.</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>TX INTERFACES</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(TX_REGIONS*TX_REGION_SIZE*TX_BLOCK_SIZE*TX_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: data word with frames (packets)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(TX_REGIONS*max(1,log2(TX_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: Start Of Frame (SOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(TX_REGIONS*max(1,log2(TX_REGION_SIZE*TX_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: End Of Frame (EOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: SOF position for each MFB region in MFB blocks</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: EOF position for each MFB region in MFB items</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: source ready of each MFB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>TX MFB: destination ready of each MFB bus</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>TX MVB METADATA INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>Metadata MVB bus is valid for each transmitted frame (EOF) from this
 module. Description of DATA bits are in eth_hdr_pack package.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
 <td><p>std_logic_vector(TX_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MVB: data word with MVB items. Description of DATA bits are in eth_hdr_pack package.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
 <td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MVB: valid of each MVB item. There is one item for each packet on the TX MFB.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>TX MVB: source ready of each MVB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>TX MVB: destination ready of each MVB bus</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>OUTPUT LINK STATUS INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-link_up"><td><p>LINK_UP</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-link_up"><td><p>LINK_UP</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Active when link is up</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-incoming_frame"><td><p>INCOMING_FRAME</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-incoming_frame"><td><p>INCOMING_FRAME</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Active while receiving a frame</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>MI32 INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_clk"><td><p>MI_CLK</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_clk"><td><p>MI_CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Clock for MI bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_reset"><td><p>MI_RESET</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_reset"><td><p>MI_RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Reset synchronized with MI_CLK</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(32-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: data from master to slave (write data)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(32-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: slave address</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: byte enable</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: read request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(4-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: write request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(32-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: ready of slave module</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: data from slave to master (read data)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: valid of MI_DRD data signal</p></td>
