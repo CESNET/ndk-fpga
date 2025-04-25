@@ -132,7 +132,8 @@ begin
     );
 
     TX_MFB_DATA       <= slv_array_deser(tx_adapt_data, 1);
-    TX_MFB_ERROR      <= slv_array_deser(tx_adapt_error, 1);
+    TX_MFB_MII_ERR    <= slv_array_deser(tx_adapt_error, 1);
+    TX_MFB_CRC_ERR    <= (others => (others => '0'));
     TX_MFB_SOF_POS    <= slv_array_deser(tx_adapt_sof_pos, 1);
     TX_MFB_EOF_POS    <= slv_array_deser(tx_adapt_eof_pos, 1);
     TX_MFB_SOF        <= slv_array_deser(tx_adapt_sof, 1);

@@ -17,6 +17,7 @@ entity RX_MAC_LITE_CRC_CUTTER is
         REGION_SIZE : natural := 8; -- any possitive value
         BLOCK_SIZE  : natural := 8; -- must be >= 4 and power of two
         ITEM_WIDTH  : natural := 8; -- must be 8
+        META_WIDTH  : natural := 2;
         OUTPUT_REG  : boolean := True
     );
     port(
@@ -34,7 +35,7 @@ entity RX_MAC_LITE_CRC_CUTTER is
         RX_SOF         : in  std_logic_vector(REGIONS-1 downto 0);
         RX_EOF         : in  std_logic_vector(REGIONS-1 downto 0);
         RX_SRC_RDY     : in  std_logic;
-        RX_ADAPTER_ERR : in  std_logic_vector(REGIONS-1 downto 0);
+        RX_METADATA    : in  std_logic_vector(REGIONS*META_WIDTH-1 downto 0);
         -- =======================================================================
         -- OUTPUT MFB LIKE INTERFACE
         -- =======================================================================
@@ -44,7 +45,7 @@ entity RX_MAC_LITE_CRC_CUTTER is
         TX_SOF         : out std_logic_vector(REGIONS-1 downto 0);
         TX_EOF         : out std_logic_vector(REGIONS-1 downto 0);
         TX_SRC_RDY     : out std_logic;
-        TX_ADAPTER_ERR : out std_logic_vector(REGIONS-1 downto 0);
+        TX_METADATA    : out std_logic_vector(REGIONS*META_WIDTH-1 downto 0);
         TX_CRC_CUT_ERR : out std_logic_vector(REGIONS-1 downto 0)
     );
 end entity;
@@ -55,7 +56,7 @@ architecture FULL of RX_MAC_LITE_CRC_CUTTER is
     constant SOF_POS_SIZE     : natural := max(1,log2(REGION_SIZE));
     constant EOF_POS_SIZE     : natural := max(1,log2(REGION_SIZE*BLOCK_SIZE));
 
-    signal s_err_mca          : std_logic_vector(REGIONS downto 0);
+    signal s_meta_mca         : slv_array_t(REGIONS downto 0)(META_WIDTH-1 downto 0);
     signal s_sof_mca          : std_logic_vector(REGIONS downto 0);
     signal s_eof_mca          : std_logic_vector(REGIONS downto 0);
     signal s_sof_pos_mca      : slv_array_t(REGIONS downto 0)(SOF_POS_SIZE-1 downto 0);
@@ -68,7 +69,8 @@ architecture FULL of RX_MAC_LITE_CRC_CUTTER is
     signal s_reg1_eof_pos_arr : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
     signal s_reg1_sof         : std_logic_vector(REGIONS-1 downto 0);
     signal s_reg1_eof         : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg1_adapter_err : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg1_meta        : std_logic_vector(REGIONS*META_WIDTH-1 downto 0);
+    signal s_reg1_meta_arr    : slv_array_t(REGIONS-1 downto 0)(META_WIDTH-1 downto 0);
     signal s_reg1_src_rdy     : std_logic;
 
     signal s_sof_eof_one_blk  : std_logic_vector(REGIONS downto 0);
@@ -82,7 +84,7 @@ architecture FULL of RX_MAC_LITE_CRC_CUTTER is
     signal s_new_eof          : std_logic_vector(REGIONS-1 downto 0);
     signal s_new_eof_pos_arr  : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
     signal s_new_eof_pos      : std_logic_vector(REGIONS*EOF_POS_SIZE-1 downto 0);
-    signal s_new_err          : std_logic_vector(REGIONS-1 downto 0);
+    signal s_new_meta         : slv_array_t(REGIONS downto 0)(META_WIDTH-1 downto 0);
 
     signal s_inc_frame        : std_logic_vector(REGIONS downto 0);
     signal s_valid_region     : std_logic_vector(REGIONS-1 downto 0);
@@ -93,7 +95,7 @@ architecture FULL of RX_MAC_LITE_CRC_CUTTER is
     signal s_reg2_eof_pos     : std_logic_vector(REGIONS*EOF_POS_SIZE-1 downto 0);
     signal s_reg2_sof         : std_logic_vector(REGIONS-1 downto 0);
     signal s_reg2_eof         : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg2_adapter_err : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg2_meta        : slv_array_t(REGIONS downto 0)(META_WIDTH-1 downto 0);
     signal s_reg2_crc_cut_err : std_logic_vector(REGIONS-1 downto 0);
     signal s_reg2_src_rdy     : std_logic;
 
@@ -112,11 +114,11 @@ begin
     -- =========================================================================
 
     -- create first part of multi-cycle arrays
-    s_err_mca(REGIONS)     <= RX_ADAPTER_ERR(0);
     s_sof_mca(REGIONS)     <= RX_SOF(0) and RX_SRC_RDY;
     s_eof_mca(REGIONS)     <= RX_EOF(0) and RX_SRC_RDY;
     s_eof_pos_mca(REGIONS) <= RX_EOF_POS(EOF_POS_SIZE-1 downto 0);
     s_sof_pos_mca(REGIONS) <= RX_SOF_POS(SOF_POS_SIZE-1 downto 0);
+    s_meta_mca(REGIONS)    <= RX_METADATA(META_WIDTH-1 downto 0);
 
     -- =========================================================================
     --  1. REGISTER STAGE
@@ -130,7 +132,7 @@ begin
             s_reg1_eof_pos     <= RX_EOF_POS;
             s_reg1_sof         <= RX_SOF;
             s_reg1_eof         <= RX_EOF;
-            s_reg1_adapter_err <= RX_ADAPTER_ERR;
+            s_reg1_meta        <= RX_METADATA;
         end if;
     end process;
 
@@ -151,14 +153,15 @@ begin
 
     s_reg1_sof_pos_arr <= slv_array_deser(s_reg1_sof_pos,REGIONS,SOF_POS_SIZE);
     s_reg1_eof_pos_arr <= slv_array_deser(s_reg1_eof_pos,REGIONS,EOF_POS_SIZE);
+    s_reg1_meta_arr    <= slv_array_deser(s_reg1_meta,REGIONS,META_WIDTH);
 
     -- create second part of multi-cycle arrays
     eof_mca_g : for r in 0 to REGIONS-1 generate
-        s_err_mca(r)     <= s_reg1_adapter_err(r);
         s_sof_mca(r)     <= s_reg1_sof(r) and s_reg1_src_rdy;
         s_eof_mca(r)     <= s_reg1_eof(r) and s_reg1_src_rdy;
         s_sof_pos_mca(r) <= s_reg1_sof_pos_arr(r);
         s_eof_pos_mca(r) <= s_reg1_eof_pos_arr(r);
+        s_meta_mca(r)    <= s_reg1_meta_arr(r);
     end generate;
 
     -- detect very small frames (size <= 1 block)
@@ -203,13 +206,13 @@ begin
             end if;
         end process;
 
-        -- generate new Adapter ERROR for cut CRC
-        new_err_p : process (s_move_eof_allowed,s_err_mca)
+        -- generate new meta for cut CRC
+        new_meta_p : process (s_move_eof_allowed,s_meta_mca)
         begin
             if (s_move_eof_allowed(r+1) = '1') then -- move EOF allowed
-                s_new_err(r) <= s_err_mca(r+1);
+                s_new_meta(r) <= s_meta_mca(r+1);
             else
-                s_new_err(r) <= s_err_mca(r);
+                s_new_meta(r) <= s_meta_mca(r);
             end if;
         end process;
 
@@ -267,7 +270,7 @@ begin
                 s_reg2_eof_pos     <= s_new_eof_pos;
                 s_reg2_sof         <= s_reg1_sof;
                 s_reg2_eof         <= s_new_eof;
-                s_reg2_adapter_err <= s_new_err;
+                s_reg2_meta        <= s_new_meta;
                 s_reg2_crc_cut_err <= s_crc_cut_error;
             end if;
         end process;
@@ -290,7 +293,7 @@ begin
         s_reg2_eof_pos     <= s_new_eof_pos;
         s_reg2_sof         <= s_reg1_sof;
         s_reg2_eof         <= s_new_eof;
-        s_reg2_adapter_err <= s_new_err;
+        s_reg2_meta        <= s_new_meta;
         s_reg2_crc_cut_err <= s_crc_cut_error;
         s_reg2_src_rdy     <= s_valid_word;
     end generate;
@@ -301,7 +304,7 @@ begin
     TX_EOF_POS     <= s_reg2_eof_pos;
     TX_SOF         <= s_reg2_sof;
     TX_EOF         <= s_reg2_eof;
-    TX_ADAPTER_ERR <= s_reg2_adapter_err;
+    TX_METADATA    <= slv_array_ser(s_reg2_meta,REGIONS,META_WIDTH);
     TX_CRC_CUT_ERR <= s_reg2_crc_cut_err;
     TX_SRC_RDY     <= s_reg2_src_rdy;
 

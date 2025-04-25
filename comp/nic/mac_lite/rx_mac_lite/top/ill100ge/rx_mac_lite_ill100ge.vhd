@@ -43,7 +43,7 @@ entity RX_MAC_LITE_ILL100GE is
         -- Enable of MAC checking.
         MAC_CHECK_EN    : boolean := true;
         -- Number of maximum MAC address in CAM memory, maximum value is 16.
-        MAC_COUNT       : natural := 4;
+        MAC_COUNT       : natural := 16;
         -- Enable of timestamping frames.
         TIMESTAMP_EN    : boolean := true;
         -- Select correct FPGA device.
@@ -147,7 +147,7 @@ architecture FULL of RX_MAC_LITE_ILL100GE is
 begin
 
     -- avst simple module support only readyLatency=0
-    avst_simple_i : entity work.RX_MAC_LITE_ADAPTER_AVST_SIMPLE
+    avst_simple_i : entity work.ETH_AVST_ADAPTER
     generic map(
         DATA_WIDTH => REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH
     )
@@ -201,7 +201,7 @@ begin
         RX_MFB_EOF_POS  => adp_mfb_eof_pos,
         RX_MFB_SOF      => adp_mfb_sof,
         RX_MFB_EOF      => adp_mfb_eof,
-        RX_MFB_ERROR    => adp_mfb_error,
+        RX_MFB_CRC_ERR  => adp_mfb_error,
         RX_MFB_SRC_RDY  => adp_mfb_src_rdy,
 
         ADAPTER_LINK_UP => adp_link_up,

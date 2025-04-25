@@ -28,12 +28,7 @@ entity RX_MAC_LITE_STAT_UNIT is
         CNT_IN_DSP         : boolean := true;
         DEVICE             : string  := "STRATIX10";
         -- Counters setup
-        CRC_EN             : boolean := true;
-        MAC_EN             : boolean := true;
-        MTU_EN             : boolean := true;
         SIZE_EN            : boolean := true;
-        BCAST_MCAST_EN     : boolean := true;
-        FRAGMENT_JABBER_EN : boolean := true;
         LEN_HISTOGRAM_EN   : boolean := true
     );
     port(
@@ -62,12 +57,18 @@ entity RX_MAC_LITE_STAT_UNIT is
         IN_FRAME_DISCARDED     : in  std_logic_vector(REGIONS-1 downto 0);
         -- Flag of discarded frame due to buffer overfull for each region
         IN_BUFFER_OVF          : in  std_logic_vector(REGIONS-1 downto 0);
+        -- Flag of frame drop due to RX MAC is off for each region
+        IN_FRAME_DROP_OFF      : in  std_logic_vector(REGIONS-1 downto 0);
         -- Flag of frame error (GMII errors) for each region
-        IN_FRAME_ERROR         : in  std_logic_vector(REGIONS-1 downto 0);
+        IN_FRAME_ERROR_MASKED  : in  std_logic_vector(REGIONS-1 downto 0);
         -- Flag of frame with bad CRC for each region
         IN_CRC_ERROR           : in  std_logic_vector(REGIONS-1 downto 0);
+        IN_CRC_ERROR_MASKED    : in  std_logic_vector(REGIONS-1 downto 0);
         -- Flag of frame with bad MAC for each region
         IN_MAC_ERROR           : in  std_logic_vector(REGIONS-1 downto 0);
+        IN_MAC_ERROR_MASKED    : in  std_logic_vector(REGIONS-1 downto 0);
+        -- Flag of length is below MinTU or over MaxTU for each region
+        IN_LEN_ERROR_MASKED    : in  std_logic_vector(REGIONS-1 downto 0);
         -- Flag of Broadcast frame for each region
         IN_MAC_BCAST           : in  std_logic_vector(REGIONS-1 downto 0);
         -- Flag of Multicast frame for each region
@@ -85,44 +86,57 @@ entity RX_MAC_LITE_STAT_UNIT is
         -- =====================================================================
         -- Output statistic are valid
         OUT_STAT_VLD           : out std_logic;
-        -- Total number of received frames
-        OUT_FRAMES_RECEIVED    : out std_logic_vector(63 downto 0);
-        -- Total number of transmitted frames
-        OUT_FRAMES_TRANSMITTED : out std_logic_vector(63 downto 0);
+        -- Total number of total (RX) frames
+        OUT_BASE_TOTAL         : out std_logic_vector(63 downto 0);
+        -- Total number of passed (TX) frames
+        OUT_BASE_PASSED        : out std_logic_vector(63 downto 0);
         -- Total number of discarded frames
-        OUT_FRAMES_DISCARDED   : out std_logic_vector(63 downto 0);
+        OUT_BASE_DROPPED       : out std_logic_vector(63 downto 0);
+        -- Discarded frames due to RX MAC is disabled
+        OUT_BASE_DROP_OFF      : out std_logic_vector(63 downto 0);
         -- Discarded frames due to buffer overflow
-        OUT_BUFFER_OVF         : out std_logic_vector(63 downto 0);
+        OUT_BASE_DROP_OVF      : out std_logic_vector(63 downto 0);
+        -- Discarded frames due to MAC filter
+        OUT_BASE_DROP_FLT      : out std_logic_vector(63 downto 0);
+        -- Discarded frames due to error
+        OUT_BASE_DROP_ERR      : out std_logic_vector(63 downto 0);
+        OUT_BASE_ERR_LEN       : out std_logic_vector(63 downto 0);
+        OUT_BASE_ERR_MII       : out std_logic_vector(63 downto 0);
+        OUT_BASE_ERR_CRC       : out std_logic_vector(63 downto 0);
         -- Total number of received bytes (including CRC)
         OUT_RX_BYTES           : out std_logic_vector(63 downto 0);
         -- Total number of transmitted bytes
         OUT_TX_BYTES           : out std_logic_vector(63 downto 0);
         -- Total number of received frames with bad CRC
-        OUT_CRC_ERR            : out std_logic_vector(63 downto 0);
+        OUT_RFC_CRC_ERR        : out std_logic_vector(63 downto 0);
         -- Total number of received frames with bad MAC
-        OUT_MAC_ERR            : out std_logic_vector(63 downto 0);
+        OUT_RFC_MAC_ERR        : out std_logic_vector(63 downto 0);
         -- Total number of received frames over MTU
-        OUT_OVER_MTU           : out std_logic_vector(63 downto 0);
+        OUT_RFC_OVER_MTU       : out std_logic_vector(63 downto 0);
         -- Total number of received frames below minimal length
-        OUT_BELOW_MIN          : out std_logic_vector(63 downto 0);
+        OUT_RFC_BELOW_MIN      : out std_logic_vector(63 downto 0);
         -- Total number of received broadcast frames
-        OUT_BCAST_FRAMES       : out std_logic_vector(63 downto 0);
+        OUT_RFC_MAC_BCAST      : out std_logic_vector(63 downto 0);
         -- Total number of received multicast frames that were not
         -- identified as broadcast
-        OUT_MCAST_FRAMES       : out std_logic_vector(63 downto 0);
+        OUT_RFC_MAC_MCAST      : out std_logic_vector(63 downto 0);
         -- Total number of received "fragment" frames
-        OUT_FRAGMENT_FRAMES    : out std_logic_vector(63 downto 0);
+        OUT_RFC_FRAGMENT       : out std_logic_vector(63 downto 0);
         -- Total number of received "jabber" frames (frames above 1518 bytes including CRC)
-        OUT_JABBER_FRAMES      : out std_logic_vector(63 downto 0);
+        OUT_RFC_JABBER         : out std_logic_vector(63 downto 0);
         -- Length histograms of received frames (including CRC)
-        OUT_FRAMES_UNDERSIZE   : out std_logic_vector(63 downto 0);
-        OUT_FRAMES_64          : out std_logic_vector(63 downto 0);
-        OUT_FRAMES_65_127      : out std_logic_vector(63 downto 0);
-        OUT_FRAMES_128_255     : out std_logic_vector(63 downto 0);
-        OUT_FRAMES_256_511     : out std_logic_vector(63 downto 0);
-        OUT_FRAMES_512_1023    : out std_logic_vector(63 downto 0);
-        OUT_FRAMES_1024_1518   : out std_logic_vector(63 downto 0);
-        OUT_FRAMES_OVER_1518   : out std_logic_vector(63 downto 0)
+        OUT_HIST_UNDERSIZE     : out std_logic_vector(63 downto 0);
+        OUT_HIST_64            : out std_logic_vector(63 downto 0);
+        OUT_HIST_65_127        : out std_logic_vector(63 downto 0);
+        OUT_HIST_128_255       : out std_logic_vector(63 downto 0);
+        OUT_HIST_256_511       : out std_logic_vector(63 downto 0);
+        OUT_HIST_512_1023      : out std_logic_vector(63 downto 0);
+        OUT_HIST_1024_1518     : out std_logic_vector(63 downto 0);
+        OUT_HIST_OVER_1518     : out std_logic_vector(63 downto 0);
+        OUT_HIST_1519_2047     : out std_logic_vector(63 downto 0);
+        OUT_HIST_2048_4095     : out std_logic_vector(63 downto 0);
+        OUT_HIST_4096_8191     : out std_logic_vector(63 downto 0);
+        OUT_HIST_OVER_8191     : out std_logic_vector(63 downto 0)
     );
 end entity;
 
@@ -134,24 +148,38 @@ architecture FULL of RX_MAC_LITE_STAT_UNIT is
     constant DEVICE_WITH_DSP_CNT : boolean := (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") or (DEVICE = "STRATIX10");
     constant USE_DSP_CNT         : boolean := CNT_IN_DSP and DEVICE_WITH_DSP_CNT;
     constant SUM_ONE_OUTPUT_REG  : boolean := True;
+    constant FRAME_STATS_W       : natural := 18;
+    constant HIST_W              : natural := 12;
 
-    type uns_array_t is array (natural range <>) of unsigned;
+    signal s_fixed_frame_len           : u_array_t(REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
+    signal s_frame_below_64            : std_logic_vector(REGIONS-1 downto 0);
+    signal s_frame_over_1518           : std_logic_vector(REGIONS-1 downto 0);
 
-    signal s_reg_in_frame_received     : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_frame_transmitted  : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_frame_discarded    : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_buffer_ovf         : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_frame_error        : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_crc_error          : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_mac_error          : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_mac_bcast          : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_mac_mcast          : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_frame_len          : slv_array_t(REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
-    signal s_reg_in_len_below_min      : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_len_over_mtu       : std_logic_vector(REGIONS-1 downto 0);
-    signal s_reg_in_stat_flags_vld     : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_total         : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_passed        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_dropped       : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_drop_off      : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_drop_ovf      : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_drop_flt      : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_drop_err      : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_err_len       : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_err_mii       : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_base_err_crc       : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_rfc_crc_err        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_rfc_below_min      : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_rfc_over_mtu       : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_rfc_mac_err        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_rfc_mac_mcast      : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_rfc_mac_bcast      : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_rfc_fragment       : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_rfc_jabber         : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_stat_vld           : std_logic_vector(REGIONS-1 downto 0);
+    signal s_reg_in_frame_len          : u_array_t(REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
 
-    signal s_fixed_frame_len           : uns_array_t(REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
+    signal s_frame_stats_vld           : slv_array_t(FRAME_STATS_W-1 downto 0)(REGIONS-1 downto 0);
+    signal s_frame_stats_inc           : slv_array_t(FRAME_STATS_W-1 downto 0)(log2(REGIONS+1)-1 downto 0);
+    signal s_frame_stats_cnt           : slv_array_t(FRAME_STATS_W-1 downto 0)(63 downto 0);
+
     signal s_resized_rx_frame_len      : slv_array_t(REGIONS-1 downto 0)(LEN_WIDTH+1-1 downto 0);
     signal s_resized_rx_frame_len_vld  : std_logic_vector(REGIONS-1 downto 0);
     signal s_resized_tx_frame_len      : slv_array_t(REGIONS-1 downto 0)(LEN_WIDTH+1-1 downto 0);
@@ -161,74 +189,14 @@ architecture FULL of RX_MAC_LITE_STAT_UNIT is
     signal s_stat_en                   : std_logic;
     signal s_snapshot_en               : std_logic;
 
-    signal s_frame_received_inc        : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_frame_transmitted_inc     : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_frame_discarded_inc       : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_buffer_ovf_inc            : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-
-    signal s_cnt_frame_received        : std_logic_vector(63 downto 0);
-    signal s_cnt_frame_transmitted     : std_logic_vector(63 downto 0);
-    signal s_cnt_frame_discarded       : std_logic_vector(63 downto 0);
-    signal s_cnt_buff_ovf_traff        : std_logic_vector(63 downto 0);
-
-    signal s_crc_error_inc             : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_mac_error_inc             : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_len_below_min_inc         : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_len_over_mtu_inc          : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-
-    signal s_cnt_crc_errors            : std_logic_vector(63 downto 0);
-    signal s_cnt_mac_errors            : std_logic_vector(63 downto 0);
-    signal s_cnt_frames_below_min      : std_logic_vector(63 downto 0);
-    signal s_cnt_frames_over_mtu       : std_logic_vector(63 downto 0);
-
     signal s_cnt_sum_rx_frame_size_inc : std_logic_vector(LEN_WIDTH downto 0);
-
     signal s_cnt_sum_tx_frame_size_inc : std_logic_vector(LEN_WIDTH downto 0);
     signal s_cnt_sum_rx_frame_size     : std_logic_vector(63 downto 0);
     signal s_cnt_sum_tx_frame_size     : std_logic_vector(63 downto 0);
 
-    signal s_bcast_inc                 : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_mcast_inc                 : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-
-    signal s_cnt_mcast_frames          : std_logic_vector(63 downto 0);
-    signal s_cnt_bcast_frames          : std_logic_vector(63 downto 0);
-
-    signal s_frame_over_1518           : std_logic_vector(REGIONS-1 downto 0);
-    signal s_fragment_frames           : std_logic_vector(REGIONS-1 downto 0);
-    signal s_jabber_frames             : std_logic_vector(REGIONS-1 downto 0);
-
-    signal s_fragment_frames_inc       : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_jabber_frames_inc         : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-
-    signal s_cnt_fragment_frames       : std_logic_vector(63 downto 0);
-    signal s_cnt_jabber_frames         : std_logic_vector(63 downto 0);
-
-    signal s_frames_64                 : std_logic_vector(REGIONS-1 downto 0);
-    signal s_frames_65_127             : std_logic_vector(REGIONS-1 downto 0);
-    signal s_frames_128_255            : std_logic_vector(REGIONS-1 downto 0);
-    signal s_frames_256_511            : std_logic_vector(REGIONS-1 downto 0);
-    signal s_frames_512_1023           : std_logic_vector(REGIONS-1 downto 0);
-    signal s_frames_1024_1518          : std_logic_vector(REGIONS-1 downto 0);
-    signal s_frames_over_1518          : std_logic_vector(REGIONS-1 downto 0);
-    signal s_frames_undersize          : std_logic_vector(REGIONS-1 downto 0);
-
-    signal s_frames_64_inc             : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_frames_65_127_inc         : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_frames_128_255_inc        : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_frames_256_511_inc        : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_frames_512_1023_inc       : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_frames_1024_1518_inc      : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_frames_over_1518_inc      : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-    signal s_frames_undersize_inc      : std_logic_vector(log2(REGIONS+1)-1 downto 0);
-
-    signal s_cnt_frames_64             : std_logic_vector(63 downto 0);
-    signal s_cnt_frames_65_127         : std_logic_vector(63 downto 0);
-    signal s_cnt_frames_128_255        : std_logic_vector(63 downto 0);
-    signal s_cnt_frames_256_511        : std_logic_vector(63 downto 0);
-    signal s_cnt_frames_512_1023       : std_logic_vector(63 downto 0);
-    signal s_cnt_frames_1024_1518      : std_logic_vector(63 downto 0);
-    signal s_cnt_frames_over_1518      : std_logic_vector(63 downto 0);
-    signal s_cnt_frames_undersize      : std_logic_vector(63 downto 0);
+    signal s_size_hist_vld             : slv_array_t(HIST_W-1 downto 0)(REGIONS-1 downto 0);
+    signal s_size_hist_inc             : slv_array_t(HIST_W-1 downto 0)(log2(REGIONS+1)-1 downto 0);
+    signal s_size_hist_cnt             : slv_array_t(HIST_W-1 downto 0)(63 downto 0);
 
     attribute maxfan of s_snapshot_en  : signal is 16;
 
@@ -238,21 +206,42 @@ begin
     -- Input flags register
     -- =========================================================================
 
-    in_flags_reg_p : process (CLK)
+    frame_flags_g : for r in 0 to REGIONS-1 generate
+        -- Prepare frame length (RFC defines frame length with CRC!)
+        remove_crc_g : if not INBANDFCS generate
+            s_fixed_frame_len(r) <= unsigned(IN_FRAME_LEN(r)) + 4;
+        end generate;
+
+        no_remove_crc_g : if INBANDFCS generate
+            s_fixed_frame_len(r) <= unsigned(IN_FRAME_LEN(r));
+        end generate;
+
+        s_frame_below_64(r)  <= '1' when (s_fixed_frame_len(r) < 64) else '0';
+        s_frame_over_1518(r) <= '1' when (s_fixed_frame_len(r) > 1518) else '0';
+    end generate;
+
+    process (CLK)
     begin
         if (rising_edge(CLK)) then
-            s_reg_in_frame_received    <= IN_FRAME_RECEIVED;
-            s_reg_in_frame_transmitted <= IN_FRAME_RECEIVED and not IN_FRAME_DISCARDED;
-            s_reg_in_frame_discarded   <= IN_FRAME_DISCARDED;
-            s_reg_in_buffer_ovf        <= IN_BUFFER_OVF;
-            s_reg_in_frame_error       <= IN_FRAME_ERROR;
-            s_reg_in_crc_error         <= IN_CRC_ERROR;
-            s_reg_in_mac_error         <= IN_MAC_ERROR;
-            s_reg_in_mac_bcast         <= IN_MAC_BCAST;
-            s_reg_in_mac_mcast         <= IN_MAC_MCAST and not IN_MAC_BCAST;
-            s_reg_in_frame_len         <= IN_FRAME_LEN;
-            s_reg_in_len_below_min     <= IN_LEN_BELOW_MIN;
-            s_reg_in_len_over_mtu      <= IN_LEN_OVER_MTU;
+            s_reg_in_base_total    <= IN_FRAME_RECEIVED;
+            s_reg_in_base_passed   <= IN_FRAME_RECEIVED and not IN_FRAME_DISCARDED;
+            s_reg_in_base_dropped  <= IN_FRAME_DISCARDED;
+            s_reg_in_base_drop_off <= IN_FRAME_DROP_OFF;
+            s_reg_in_base_drop_ovf <= IN_BUFFER_OVF;
+            s_reg_in_base_drop_flt <= IN_MAC_ERROR_MASKED;
+            s_reg_in_base_drop_err <= IN_LEN_ERROR_MASKED or IN_FRAME_ERROR_MASKED or IN_CRC_ERROR_MASKED;
+            s_reg_in_base_err_len  <= IN_LEN_ERROR_MASKED;
+            s_reg_in_base_err_mii  <= IN_FRAME_ERROR_MASKED;
+            s_reg_in_base_err_crc  <= IN_CRC_ERROR_MASKED;
+            s_reg_in_rfc_crc_err   <= IN_CRC_ERROR;
+            s_reg_in_rfc_below_min <= IN_LEN_BELOW_MIN;
+            s_reg_in_rfc_over_mtu  <= IN_LEN_OVER_MTU;
+            s_reg_in_rfc_mac_err   <= IN_MAC_ERROR;
+            s_reg_in_rfc_mac_mcast <= IN_MAC_BCAST;
+            s_reg_in_rfc_mac_bcast <= IN_MAC_MCAST and not IN_MAC_BCAST;
+            s_reg_in_rfc_fragment  <= IN_CRC_ERROR and s_frame_below_64;
+            s_reg_in_rfc_jabber    <= IN_CRC_ERROR and s_frame_over_1518;
+            s_reg_in_frame_len     <= s_fixed_frame_len;
         end if;
     end process;
 
@@ -260,23 +249,12 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                s_reg_in_stat_flags_vld <= (others => '0');
+                s_reg_in_stat_vld <= (others => '0');
             else
-                s_reg_in_stat_flags_vld <= IN_STAT_FLAGS_VLD;
+                s_reg_in_stat_vld <= IN_STAT_FLAGS_VLD;
             end if;
         end if;
     end process;
-
-    frame_len_g : for r in 0 to REGIONS-1 generate
-        -- Prepare frame length (RFC defines frame length with CRC!)
-        remove_crc_g : if not INBANDFCS generate
-            s_fixed_frame_len(r) <= unsigned(s_reg_in_frame_len(r)) + 4;
-        end generate;
-
-        no_remove_crc_g : if INBANDFCS generate
-            s_fixed_frame_len(r) <= unsigned(s_reg_in_frame_len(r));
-        end generate;
-    end generate;
 
     -- =========================================================================
     -- Control signals
@@ -307,343 +285,87 @@ begin
     OUT_STAT_VLD <= s_snapshot_en;
 
     -- =========================================================================
-    -- Counters: Received & Received & Discarded
+    -- Frame Counters
     -- =========================================================================
 
-    -- Received frames ---------------------------------------------------------
-    frame_received_inc_i : entity work.SUM_ONE
-    generic map (
-        INPUT_WIDTH  => REGIONS,
-        OUTPUT_WIDTH => log2(REGIONS+1),
-        OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-    )
-    port map (
-        CLK      => CLK,
-        RESET    => s_reset,
-        -- Input ports
-        DIN      => s_reg_in_frame_received,
-        DIN_MASK => s_reg_in_stat_flags_vld,
-        DIN_VLD  => '1',
-        -- Output ports
-        DOUT     => s_frame_received_inc,
-        DOUT_VLD => open
-    );
+    s_frame_stats_vld(0)  <= s_reg_in_base_total;
+    s_frame_stats_vld(1)  <= s_reg_in_base_passed;
+    s_frame_stats_vld(2)  <= s_reg_in_base_dropped;
+    s_frame_stats_vld(3)  <= s_reg_in_base_drop_off;
+    s_frame_stats_vld(4)  <= s_reg_in_base_drop_ovf;
+    s_frame_stats_vld(5)  <= s_reg_in_base_drop_flt;
+    s_frame_stats_vld(6)  <= s_reg_in_base_drop_err;
+    s_frame_stats_vld(7)  <= s_reg_in_base_err_len;
+    s_frame_stats_vld(8)  <= s_reg_in_base_err_mii;
+    s_frame_stats_vld(9)  <= s_reg_in_base_err_crc;
+    s_frame_stats_vld(10) <= s_reg_in_rfc_crc_err;
+    s_frame_stats_vld(11) <= s_reg_in_rfc_mac_err;
+    s_frame_stats_vld(12) <= s_reg_in_rfc_mac_mcast;
+    s_frame_stats_vld(13) <= s_reg_in_rfc_mac_bcast;
+    s_frame_stats_vld(14) <= s_reg_in_rfc_below_min;
+    s_frame_stats_vld(15) <= s_reg_in_rfc_over_mtu;
+    s_frame_stats_vld(16) <= s_reg_in_rfc_fragment;
+    s_frame_stats_vld(17) <= s_reg_in_rfc_jabber;
 
-    cnt_frame_received_i : entity work.DSP_COUNTER
-    generic map (
-        INPUT_WIDTH  => log2(REGIONS+1),
-        OUTPUT_WIDTH => 64,
-        INPUT_REGS   => true,
-        DEVICE       => DEVICE,
-        DSP_ENABLE   => USE_DSP_CNT
-    )
-    port map (
-        CLK        => CLK,
-        CLK_EN     => s_stat_en,
-        RESET      => s_reset,
-        INCREMENT  => s_frame_received_inc,
-        MAX_VAL    => (others => '1'),
-        RESULT     => s_cnt_frame_received
-    );
+    frame_stats_g : for ii in 0 to FRAME_STATS_W-1 generate
+        inc_i : entity work.SUM_ONE
+        generic map (
+            INPUT_WIDTH  => REGIONS,
+            OUTPUT_WIDTH => log2(REGIONS+1),
+            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
+        )
+        port map (
+            CLK      => CLK,
+            RESET    => s_reset,
 
-    -- Transmitted frames ------------------------------------------------------
-    frame_transmitted_inc_i : entity work.SUM_ONE
-    generic map (
-        INPUT_WIDTH  => REGIONS,
-        OUTPUT_WIDTH => log2(REGIONS+1),
-        OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-    )
-    port map (
-        CLK      => CLK,
-        RESET    => s_reset,
-        -- Input ports
-        DIN      => s_reg_in_frame_transmitted,
-        DIN_MASK => s_reg_in_stat_flags_vld,
-        DIN_VLD  => '1',
-        -- Output ports
-        DOUT     => s_frame_transmitted_inc,
-        DOUT_VLD => open
-    );
+            DIN      => s_frame_stats_vld(ii),
+            DIN_MASK => s_reg_in_stat_vld,
+            DIN_VLD  => '1',
 
-    cnt_frame_transmitted_i : entity work.DSP_COUNTER
-    generic map (
-        INPUT_WIDTH  => log2(REGIONS+1),
-        OUTPUT_WIDTH => 64,
-        INPUT_REGS   => true,
-        DEVICE       => DEVICE,
-        DSP_ENABLE   => USE_DSP_CNT
-    )
-    port map (
-        CLK        => CLK,
-        CLK_EN     => s_stat_en,
-        RESET      => s_reset,
-        INCREMENT  => s_frame_transmitted_inc,
-        MAX_VAL    => (others => '1'),
-        RESULT     => s_cnt_frame_transmitted
-    );
+            DOUT     => s_frame_stats_inc(ii),
+            DOUT_VLD => open
+        );
 
-    -- Discarded frames --------------------------------------------------------
-    frame_discarded_inc_i : entity work.SUM_ONE
-    generic map (
-        INPUT_WIDTH  => REGIONS,
-        OUTPUT_WIDTH => log2(REGIONS+1),
-        OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-    )
-    port map (
-        CLK      => CLK,
-        RESET    => s_reset,
-        -- Input ports
-        DIN      => s_reg_in_frame_discarded,
-        DIN_MASK => s_reg_in_stat_flags_vld,
-        DIN_VLD  => '1',
-        -- Output ports
-        DOUT     => s_frame_discarded_inc,
-        DOUT_VLD => open
-    );
+        cnt_i : entity work.DSP_COUNTER
+        generic map (
+            INPUT_WIDTH  => log2(REGIONS+1),
+            OUTPUT_WIDTH => 64,
+            INPUT_REGS   => true,
+            DEVICE       => DEVICE,
+            DSP_ENABLE   => USE_DSP_CNT
+        )
+        port map (
+            CLK        => CLK,
+            CLK_EN     => s_stat_en,
+            RESET      => s_reset,
+            INCREMENT  => s_frame_stats_inc(ii),
+            MAX_VAL    => (others => '1'),
+            RESULT     => s_frame_stats_cnt(ii)
+        );
+    end generate;
 
-    cnt_frame_discarded_i : entity work.DSP_COUNTER
-    generic map (
-        INPUT_WIDTH  => log2(REGIONS+1),
-        OUTPUT_WIDTH => 64,
-        INPUT_REGS   => true,
-        DEVICE       => DEVICE,
-        DSP_ENABLE   => USE_DSP_CNT
-    )
-    port map (
-        CLK        => CLK,
-        CLK_EN     => s_stat_en,
-        RESET      => s_reset,
-        INCREMENT  => s_frame_discarded_inc,
-        MAX_VAL    => (others => '1'),
-        RESULT     => s_cnt_frame_discarded
-    );
-
-    -- Buffer overflow ---------------------------------------------------------
-    buffer_ovf_inc_i : entity work.SUM_ONE
-    generic map (
-        INPUT_WIDTH  => REGIONS,
-        OUTPUT_WIDTH => log2(REGIONS+1),
-        OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-    )
-    port map (
-        CLK      => CLK,
-        RESET    => s_reset,
-        -- Input ports
-        DIN      => s_reg_in_buffer_ovf,
-        DIN_MASK => s_reg_in_stat_flags_vld,
-        DIN_VLD  => '1',
-        -- Output ports
-        DOUT     => s_buffer_ovf_inc,
-        DOUT_VLD => open
-    );
-
-    cnt_buff_ovf_traff_i : entity work.DSP_COUNTER
-    generic map (
-        INPUT_WIDTH  => log2(REGIONS+1),
-        OUTPUT_WIDTH => 64,
-        INPUT_REGS   => true,
-        DEVICE       => DEVICE,
-        DSP_ENABLE   => USE_DSP_CNT
-    )
-    port map (
-        CLK        => CLK,
-        CLK_EN     => s_stat_en,
-        RESET      => s_reset,
-        INCREMENT  => s_buffer_ovf_inc,
-        MAX_VAL    => (others => '1'),
-        RESULT     => s_cnt_buff_ovf_traff
-    );
-
-    -- Register ----------------------------------------------------------------
-    trafic_reg_p : process (CLK)
+    process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (s_snapshot_en = '0') then
-                OUT_FRAMES_RECEIVED    <= s_cnt_frame_received;
-                OUT_FRAMES_TRANSMITTED <= s_cnt_frame_transmitted;
-                OUT_FRAMES_DISCARDED   <= s_cnt_frame_discarded;
-                OUT_BUFFER_OVF         <= s_cnt_buff_ovf_traff;
-            end if;
-        end if;
-    end process;
-
-    -- =========================================================================
-    -- Counters: CRC & MTU & MAC
-    -- =========================================================================
-
-    -- CRC errors --------------------------------------------------------------
-    crc_g : if CRC_EN generate
-        crc_error_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_reg_in_crc_error,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_crc_error_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_crc_errors_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_crc_error_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_crc_errors
-        );
-    end generate;
-
-    no_crc_g : if not CRC_EN generate
-        s_cnt_crc_errors <= (others => '0');
-    end generate;
-
-    -- MAC errors --------------------------------------------------------------
-    mac_g : if MAC_EN generate
-        mac_error_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_reg_in_mac_error,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_mac_error_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_mac_errors_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_mac_error_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_mac_errors
-        );
-    end generate;
-
-    no_mac_g : if not MAC_EN generate
-        s_cnt_mac_errors <= (others => '0');
-    end generate;
-
-    -- MTU errors --------------------------------------------------------------
-    mtu_g : if MTU_EN generate
-        -- MIN
-        len_below_min_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_reg_in_len_below_min,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_len_below_min_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_frames_below_min_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_len_below_min_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_below_min
-        );
-
-        -- MAX
-        len_over_mtu_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_reg_in_len_over_mtu,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_len_over_mtu_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_frames_over_mtu_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_len_over_mtu_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_over_mtu
-        );
-    end generate;
-
-    no_mtu_g : if not MTU_EN generate
-        s_cnt_frames_below_min <= (others => '0');
-        s_cnt_frames_over_mtu  <= (others => '0');
-    end generate;
-
-    -- Register ----------------------------------------------------------------
-    errors_reg_p : process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            if (s_snapshot_en = '0') then
-                OUT_CRC_ERR   <= s_cnt_crc_errors;
-                OUT_MAC_ERR   <= s_cnt_mac_errors;
-                OUT_BELOW_MIN <= s_cnt_frames_below_min;
-                OUT_OVER_MTU  <= s_cnt_frames_over_mtu;
+                OUT_BASE_TOTAL    <= s_frame_stats_cnt(0);
+                OUT_BASE_PASSED   <= s_frame_stats_cnt(1);
+                OUT_BASE_DROPPED  <= s_frame_stats_cnt(2);
+                OUT_BASE_DROP_OFF <= s_frame_stats_cnt(3);
+                OUT_BASE_DROP_OVF <= s_frame_stats_cnt(4);
+                OUT_BASE_DROP_FLT <= s_frame_stats_cnt(5);
+                OUT_BASE_DROP_ERR <= s_frame_stats_cnt(6);
+                OUT_BASE_ERR_LEN  <= s_frame_stats_cnt(7);
+                OUT_BASE_ERR_MII  <= s_frame_stats_cnt(8);
+                OUT_BASE_ERR_CRC  <= s_frame_stats_cnt(9);
+                OUT_RFC_CRC_ERR   <= s_frame_stats_cnt(10);
+                OUT_RFC_MAC_ERR   <= s_frame_stats_cnt(11);
+                OUT_RFC_MAC_MCAST <= s_frame_stats_cnt(12);
+                OUT_RFC_MAC_BCAST <= s_frame_stats_cnt(13);
+                OUT_RFC_BELOW_MIN <= s_frame_stats_cnt(14);
+                OUT_RFC_OVER_MTU  <= s_frame_stats_cnt(15);
+                OUT_RFC_FRAGMENT  <= s_frame_stats_cnt(16);
+                OUT_RFC_JABBER    <= s_frame_stats_cnt(17);
             end if;
         end if;
     end process;
@@ -655,9 +377,9 @@ begin
     size_g : if SIZE_EN generate
         -- sum received frame size ---------------------------------------------
         resized_rx_frame_len_g : for r in 0 to REGIONS-1 generate
-            s_resized_rx_frame_len(r) <= std_logic_vector(resize(s_fixed_frame_len(r),LEN_WIDTH+1));
+            s_resized_rx_frame_len(r) <= std_logic_vector(resize(s_reg_in_frame_len(r),LEN_WIDTH+1));
         end generate;
-        s_resized_rx_frame_len_vld <= s_reg_in_frame_received and s_reg_in_stat_flags_vld;
+        s_resized_rx_frame_len_vld <= s_reg_in_base_total and s_reg_in_stat_vld;
 
         cnt_sum_rx_frame_size_inc_i : entity work.PIPE_TREE_ADDER
         generic map (
@@ -692,9 +414,9 @@ begin
 
         -- sum transmitted frame size ------------------------------------------
         resized_tx_frame_len_g : for r in 0 to REGIONS-1 generate
-            s_resized_tx_frame_len(r) <= std_logic_vector(resize(s_fixed_frame_len(r),LEN_WIDTH+1));
+            s_resized_tx_frame_len(r) <= std_logic_vector(resize(s_reg_in_frame_len(r),LEN_WIDTH+1));
         end generate;
-        s_resized_tx_frame_len_vld <= s_reg_in_frame_transmitted and s_reg_in_stat_flags_vld;
+        s_resized_tx_frame_len_vld <= s_reg_in_base_passed and s_reg_in_stat_vld;
 
         cnt_sum_tx_frame_size_inc_i : entity work.PIPE_TREE_ADDER
         generic map (
@@ -746,532 +468,96 @@ begin
     end generate;
 
     -- =========================================================================
-    -- Counters: Multicast and broadcast
-    -- =========================================================================
-
-    cast_g : if BCAST_MCAST_EN generate
-        -- MAC BCAST -----------------------------------------------------------
-        bcast_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_reg_in_mac_bcast,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_bcast_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_bcast_frames_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_bcast_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_bcast_frames
-        );
-
-        -- MAC MCAST -----------------------------------------------------------
-        mcast_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_reg_in_mac_mcast,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_mcast_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_mcast_frames_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_mcast_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_mcast_frames
-        );
-
-        -- Register ------------------------------------------------------------
-        cast_reg_p : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (s_snapshot_en = '0') then
-                OUT_MCAST_FRAMES <= s_cnt_mcast_frames;
-                OUT_BCAST_FRAMES <= s_cnt_bcast_frames;
-                end if;
-            end if;
-        end process;
-
-    end generate;
-
-    no_cast_g : if not BCAST_MCAST_EN generate
-        OUT_MCAST_FRAMES <= (others=>'0');
-        OUT_BCAST_FRAMES <= (others=>'0');
-    end generate;
-
-    -- =========================================================================
-    -- Counters: Fragment and Jabber
-    -- =========================================================================
-
-    fragment_jabber_g : if FRAGMENT_JABBER_EN generate
-        frame_over_1518_g : for r in 0 to REGIONS-1 generate
-            s_frame_over_1518(r) <= '1' when (s_fixed_frame_len(r) > 1518) else '0';
-        end generate;
-
-        s_fragment_frames <= s_reg_in_crc_error and s_reg_in_len_below_min;
-        s_jabber_frames   <= s_reg_in_crc_error and s_frame_over_1518;
-
-        -- Fragment ------------------------------------------------------------
-        fragment_frames_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_fragment_frames,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_fragment_frames_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_fragment_frames_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_fragment_frames_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_fragment_frames
-        );
-
-        -- Jabber --------------------------------------------------------------
-        jabber_frames_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_jabber_frames,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_jabber_frames_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_jabber_frames_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_jabber_frames_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_jabber_frames
-        );
-
-        -- Register ------------------------------------------------------------
-        fragment_jabber_reg_p : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (s_snapshot_en = '0') then
-                OUT_FRAGMENT_FRAMES <= s_cnt_fragment_frames;
-                OUT_JABBER_FRAMES   <= s_cnt_jabber_frames;
-                end if;
-            end if;
-        end process;
-    end generate;
-
-    no_fragment_jabber_g : if not FRAGMENT_JABBER_EN generate
-        OUT_FRAGMENT_FRAMES <= (others=>'0');
-        OUT_JABBER_FRAMES   <= (others=>'0');
-    end generate;
-
-    -- =========================================================================
     -- Counters: Frames length histograms
     -- =========================================================================
 
     len_hist_g : if LEN_HISTOGRAM_EN generate
         frame_sizes_g : for r in 0 to REGIONS-1 generate
-            s_frames_64(r)        <= '1' when (s_fixed_frame_len(r) = 64) else '0';
-            s_frames_65_127(r)    <= '1' when (s_fixed_frame_len(r) >= 65 and s_fixed_frame_len(r) <= 127) else '0';
-            s_frames_128_255(r)   <= '1' when (s_fixed_frame_len(r) >= 128 and s_fixed_frame_len(r) <= 255) else '0';
-            s_frames_256_511(r)   <= '1' when (s_fixed_frame_len(r) >= 256 and s_fixed_frame_len(r) <= 511) else '0';
-            s_frames_512_1023(r)  <= '1' when (s_fixed_frame_len(r) >= 512 and s_fixed_frame_len(r) <= 1023) else '0';
-            s_frames_1024_1518(r) <= '1' when (s_fixed_frame_len(r) >= 1024 and s_fixed_frame_len(r) <= 1518) else '0';
-            s_frames_over_1518(r) <= '1' when (s_fixed_frame_len(r) > 1518) else '0';
-            s_frames_undersize(r) <= '1' when (s_fixed_frame_len(r) < 64) else '0';
+            s_size_hist_vld(0)(r)  <= '1' when (s_reg_in_frame_len(r) < 64) else '0';
+            s_size_hist_vld(1)(r)  <= '1' when (s_reg_in_frame_len(r) = 64) else '0';
+            s_size_hist_vld(2)(r)  <= '1' when (s_reg_in_frame_len(r) >= 65 and s_reg_in_frame_len(r) <= 127) else '0';
+            s_size_hist_vld(3)(r)  <= '1' when (s_reg_in_frame_len(r) >= 128 and s_reg_in_frame_len(r) <= 255) else '0';
+            s_size_hist_vld(4)(r)  <= '1' when (s_reg_in_frame_len(r) >= 256 and s_reg_in_frame_len(r) <= 511) else '0';
+            s_size_hist_vld(5)(r)  <= '1' when (s_reg_in_frame_len(r) >= 512 and s_reg_in_frame_len(r) <= 1023) else '0';
+            s_size_hist_vld(6)(r)  <= '1' when (s_reg_in_frame_len(r) >= 1024 and s_reg_in_frame_len(r) <= 1518) else '0';
+            s_size_hist_vld(7)(r)  <= '1' when (s_reg_in_frame_len(r) > 1518) else '0';
+            s_size_hist_vld(8)(r)  <= '1' when (s_reg_in_frame_len(r) >= 1519 and s_reg_in_frame_len(r) <= 2047) else '0';
+            s_size_hist_vld(9)(r)  <= '1' when (s_reg_in_frame_len(r) >= 2048 and s_reg_in_frame_len(r) <= 4095) else '0';
+            s_size_hist_vld(10)(r) <= '1' when (s_reg_in_frame_len(r) >= 4096 and s_reg_in_frame_len(r) <= 8191) else '0';
+            s_size_hist_vld(11)(r) <= '1' when (s_reg_in_frame_len(r) > 8191) else '0';
         end generate;
 
-        -- frames 64 -----------------------------------------------------------
-        frames_64_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_frames_64,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_frames_64_inc,
-            DOUT_VLD => open
-        );
+        hist_g : for ii in 0 to HIST_W-1 generate
+            inc_i : entity work.SUM_ONE
+            generic map (
+                INPUT_WIDTH  => REGIONS,
+                OUTPUT_WIDTH => log2(REGIONS+1),
+                OUTPUT_REG   => SUM_ONE_OUTPUT_REG
+            )
+            port map (
+                CLK      => CLK,
+                RESET    => s_reset,
 
-        cnt_frames_64_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_frames_64_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_64
-        );
+                DIN      => s_size_hist_vld(ii),
+                DIN_MASK => s_reg_in_stat_vld,
+                DIN_VLD  => '1',
 
-        -- frames 65 127 -------------------------------------------------------
-        frames_65_127_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_frames_65_127,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_frames_65_127_inc,
-            DOUT_VLD => open
-        );
+                DOUT     => s_size_hist_inc(ii),
+                DOUT_VLD => open
+            );
 
-        cnt_frames_65_127_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_frames_65_127_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_65_127
-        );
+            cnt_i : entity work.DSP_COUNTER
+            generic map (
+                INPUT_WIDTH  => log2(REGIONS+1),
+                OUTPUT_WIDTH => 64,
+                INPUT_REGS   => true,
+                DEVICE       => DEVICE,
+                DSP_ENABLE   => USE_DSP_CNT
+            )
+            port map (
+                CLK        => CLK,
+                CLK_EN     => s_stat_en,
+                RESET      => s_reset,
+                INCREMENT  => s_size_hist_inc(ii),
+                MAX_VAL    => (others => '1'),
+                RESULT     => s_size_hist_cnt(ii)
+            );
+        end generate;
 
-        -- frames 128 255 ------------------------------------------------------
-        frames_128_255_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_frames_128_255,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_frames_128_255_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_frames_128_255_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_frames_128_255_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_128_255
-        );
-
-        -- frames 256 511 ------------------------------------------------------
-        frames_256_511_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_frames_256_511,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_frames_256_511_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_frames_256_511_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_frames_256_511_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_256_511
-        );
-
-        -- frames 512 1023 -----------------------------------------------------
-        frames_512_1023_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_frames_512_1023,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_frames_512_1023_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_frames_512_1023_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_frames_512_1023_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_512_1023
-        );
-
-        -- frames 1024 1518 ----------------------------------------------------
-        frames_1024_1518_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_frames_1024_1518,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_frames_1024_1518_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_frames_1024_1518_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_frames_1024_1518_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_1024_1518
-        );
-
-        -- frames over 1518 ----------------------------------------------------
-        frames_over_1518_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_frames_over_1518,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_frames_over_1518_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_frames_over_1518_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_frames_over_1518_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_over_1518
-        );
-
-        -- frames under 64 -----------------------------------------------------
-        frames_undersize_inc_i : entity work.SUM_ONE
-        generic map (
-            INPUT_WIDTH  => REGIONS,
-            OUTPUT_WIDTH => log2(REGIONS+1),
-            OUTPUT_REG   => SUM_ONE_OUTPUT_REG
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => s_reset,
-            -- Input ports
-            DIN      => s_frames_undersize,
-            DIN_MASK => s_reg_in_stat_flags_vld,
-            DIN_VLD  => '1',
-            -- Output ports
-            DOUT     => s_frames_undersize_inc,
-            DOUT_VLD => open
-        );
-
-        cnt_frames_undersize_i : entity work.DSP_COUNTER
-        generic map (
-            INPUT_WIDTH  => log2(REGIONS+1),
-            OUTPUT_WIDTH => 64,
-            INPUT_REGS   => true,
-            DEVICE       => DEVICE,
-            DSP_ENABLE   => USE_DSP_CNT
-        )
-        port map (
-            CLK        => CLK,
-            CLK_EN     => s_stat_en,
-            RESET      => s_reset,
-            INCREMENT  => s_frames_undersize_inc,
-            MAX_VAL    => (others => '1'),
-            RESULT     => s_cnt_frames_undersize
-        );
-
-        -- Register ------------------------------------------------------------
-        len_hist_reg_p : process (CLK)
+        process (CLK)
         begin
             if (rising_edge(CLK)) then
                 if (s_snapshot_en = '0') then
-                    OUT_FRAMES_64        <= s_cnt_frames_64;
-                    OUT_FRAMES_65_127    <= s_cnt_frames_65_127;
-                    OUT_FRAMES_128_255   <= s_cnt_frames_128_255;
-                    OUT_FRAMES_256_511   <= s_cnt_frames_256_511;
-                    OUT_FRAMES_512_1023  <= s_cnt_frames_512_1023;
-                    OUT_FRAMES_1024_1518 <= s_cnt_frames_1024_1518;
-                    OUT_FRAMES_OVER_1518 <= s_cnt_frames_over_1518;
-                    OUT_FRAMES_UNDERSIZE <= s_cnt_frames_undersize;
+                    OUT_HIST_UNDERSIZE <= s_size_hist_cnt(0);
+                    OUT_HIST_64        <= s_size_hist_cnt(1);
+                    OUT_HIST_65_127    <= s_size_hist_cnt(2);
+                    OUT_HIST_128_255   <= s_size_hist_cnt(3);
+                    OUT_HIST_256_511   <= s_size_hist_cnt(4);
+                    OUT_HIST_512_1023  <= s_size_hist_cnt(5);
+                    OUT_HIST_1024_1518 <= s_size_hist_cnt(6);
+                    OUT_HIST_OVER_1518 <= s_size_hist_cnt(7);
+                    OUT_HIST_1519_2047 <= s_size_hist_cnt(8);
+                    OUT_HIST_2048_4095 <= s_size_hist_cnt(9);
+                    OUT_HIST_4096_8191 <= s_size_hist_cnt(10);
+                    OUT_HIST_OVER_8191 <= s_size_hist_cnt(11);
                 end if;
             end if;
         end process;
     end generate;
 
     no_len_hist_g : if not LEN_HISTOGRAM_EN generate
-        OUT_FRAMES_64        <= (others=>'0');
-        OUT_FRAMES_65_127    <= (others=>'0');
-        OUT_FRAMES_128_255   <= (others=>'0');
-        OUT_FRAMES_256_511   <= (others=>'0');
-        OUT_FRAMES_512_1023  <= (others=>'0');
-        OUT_FRAMES_1024_1518 <= (others=>'0');
-        OUT_FRAMES_OVER_1518 <= (others=>'0');
-        OUT_FRAMES_UNDERSIZE <= (others=>'0');
+        OUT_HIST_UNDERSIZE <= (others=>'0');
+        OUT_HIST_64        <= (others=>'0');
+        OUT_HIST_65_127    <= (others=>'0');
+        OUT_HIST_128_255   <= (others=>'0');
+        OUT_HIST_256_511   <= (others=>'0');
+        OUT_HIST_512_1023  <= (others=>'0');
+        OUT_HIST_1024_1518 <= (others=>'0');
+        OUT_HIST_OVER_1518 <= (others=>'0');
+        OUT_HIST_1519_2047 <= (others=>'0');
+        OUT_HIST_2048_4095 <= (others=>'0');
+        OUT_HIST_4096_8191 <= (others=>'0');
+        OUT_HIST_OVER_8191 <= (others=>'0');
     end generate;
 
 end architecture;

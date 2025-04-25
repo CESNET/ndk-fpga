@@ -38,11 +38,16 @@ entity TX_MAC_LITE_ADDR_DEC is
         STAT_TOTAL_SENT_FRAMES          : in  std_logic_vector(63 downto 0);
         STAT_TOTAL_SENT_OCTECTS         : in  std_logic_vector(63 downto 0);
         STAT_TOTAL_DISCARDED_FRAMES     : in  std_logic_vector(63 downto 0);
+        STAT_TOTAL_LINK_ERR_FRAMES      : in  std_logic_vector(63 downto 0);
+        STAT_TOTAL_LEN_ERR_FRAMES       : in  std_logic_vector(63 downto 0);
+        STAT_TOTAL_DISABLED_FRAMES      : in  std_logic_vector(63 downto 0);
+        STAT_TOTAL_OCTECTS              : in  std_logic_vector(63 downto 0);
         -- CONTROL OUTPUT INTERFACE (CLK)
         CTRL_STROBE_CNT                 : out std_logic;
         CTRL_RESET_CNT                  : out std_logic;
         CTRL_OBUF_EN                    : out std_logic;
-        CTRL_LD_DISCARD_DIS             : out std_logic
+        CTRL_LD_DISCARD_DIS             : out std_logic;
+        CTRL_OFF_DISCARD_DIS            : out std_logic
     );
 end entity;
 
@@ -60,6 +65,14 @@ architecture FULL of TX_MAC_LITE_ADDR_DEC is
     constant ADDR_REG_OBUF_EN           : std_logic_vector(7 downto 0) := X"20";
     constant ADDR_REG_CTRL              : std_logic_vector(7 downto 0) := X"2C";
     constant ADDR_REG_STATUS            : std_logic_vector(7 downto 0) := X"30";
+    constant ADDR_CNT_TOTAL_OCTECTS_L   : std_logic_vector(7 downto 0) := X"40";
+    constant ADDR_CNT_TOTAL_OCTECTS_H   : std_logic_vector(7 downto 0) := X"44";
+    constant ADDR_CNT_LINK_ERR_FRAMES_L : std_logic_vector(7 downto 0) := X"48";
+    constant ADDR_CNT_LINK_ERR_FRAMES_H : std_logic_vector(7 downto 0) := X"4C";
+    constant ADDR_CNT_LEN_ERR_FRAMES_L  : std_logic_vector(7 downto 0) := X"50";
+    constant ADDR_CNT_LEN_ERR_FRAMES_H  : std_logic_vector(7 downto 0) := X"54";
+    constant ADDR_CNT_DISABLED_FRAMES_L : std_logic_vector(7 downto 0) := X"58";
+    constant ADDR_CNT_DISABLED_FRAMES_H : std_logic_vector(7 downto 0) := X"5C";
 
     -- OBUF commands
     constant OBUFCMD_STROBE_COUNTERS    : std_logic_vector(7 downto 0) := X"01";
@@ -98,6 +111,7 @@ architecture FULL of TX_MAC_LITE_ADDR_DEC is
     signal cmd_reset_cnt_reg  : std_logic;
     signal obuf_en_reg        : std_logic;
     signal ld_discard_dis_reg : std_logic;
+    signal off_discard_dis_reg: std_logic;
     signal obuf_en_reg_32     : std_logic_vector(31 downto 0);
     signal status_disable_crc : std_logic;
     signal status_reg         : std_logic_vector(6 downto 0) := "1010000";
@@ -196,6 +210,22 @@ begin
                 mi_s_drd <= STAT_TOTAL_DISCARDED_FRAMES(31 downto 0);
             when ADDR_CNT_DISCARDS_FRAMES_H =>
                 mi_s_drd <= STAT_TOTAL_DISCARDED_FRAMES(63 downto 32);
+            when ADDR_CNT_TOTAL_OCTECTS_L =>
+                mi_s_drd <= STAT_TOTAL_OCTECTS(31 downto 0);
+            when ADDR_CNT_TOTAL_OCTECTS_H =>
+                mi_s_drd <= STAT_TOTAL_OCTECTS(63 downto 32);
+            when ADDR_CNT_LINK_ERR_FRAMES_L =>
+                mi_s_drd <= STAT_TOTAL_LINK_ERR_FRAMES(31 downto 0);
+            when ADDR_CNT_LINK_ERR_FRAMES_H =>
+                mi_s_drd <= STAT_TOTAL_LINK_ERR_FRAMES(63 downto 32);
+            when ADDR_CNT_LEN_ERR_FRAMES_L =>
+                mi_s_drd <= STAT_TOTAL_LEN_ERR_FRAMES(31 downto 0);
+            when ADDR_CNT_LEN_ERR_FRAMES_H =>
+                mi_s_drd <= STAT_TOTAL_LEN_ERR_FRAMES(63 downto 32);
+            when ADDR_CNT_DISABLED_FRAMES_L =>
+                mi_s_drd <= STAT_TOTAL_DISABLED_FRAMES(31 downto 0);
+            when ADDR_CNT_DISABLED_FRAMES_H =>
+                mi_s_drd <= STAT_TOTAL_DISABLED_FRAMES(63 downto 32);
             when ADDR_REG_OBUF_EN =>
                 mi_s_drd <= obuf_en_reg_32;
             when ADDR_REG_STATUS =>
@@ -263,11 +293,13 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                obuf_en_reg        <= '0';
-                ld_discard_dis_reg <= '0'; -- link down discard is enabled by default
+                obuf_en_reg         <= '0';
+                ld_discard_dis_reg  <= '0'; -- link down discard is enabled by default
+                off_discard_dis_reg <= '0'; -- when OBUF/TXMAC is disabled, frames are dropped by default
             elsif (obuf_en_reg_we = '1') then
-                obuf_en_reg        <= mi_s_dwr(0);
-                ld_discard_dis_reg <= mi_s_dwr(8);
+                obuf_en_reg         <= mi_s_dwr(0);
+                ld_discard_dis_reg  <= mi_s_dwr(8);
+                off_discard_dis_reg <= mi_s_dwr(16);
             end if;
         end if;
     end process;
@@ -276,9 +308,10 @@ begin
     --  OUTPUTS ASSIGMENTS
     -- =========================================================================
 
-    CTRL_STROBE_CNT     <= cmd_strobe_cnt_reg;
-    CTRL_RESET_CNT      <= cmd_reset_cnt_reg;
-    CTRL_OBUF_EN        <= obuf_en_reg;
-    CTRL_LD_DISCARD_DIS <= ld_discard_dis_reg;
+    CTRL_STROBE_CNT      <= cmd_strobe_cnt_reg;
+    CTRL_RESET_CNT       <= cmd_reset_cnt_reg;
+    CTRL_OBUF_EN         <= obuf_en_reg;
+    CTRL_LD_DISCARD_DIS  <= ld_discard_dis_reg;
+    CTRL_OFF_DISCARD_DIS <= off_discard_dis_reg;
 
 end architecture;

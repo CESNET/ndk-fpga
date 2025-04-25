@@ -7,7 +7,7 @@
 # Set paths
 
 set PKG_BASE          "$OFM_PATH/comp/base/pkg"
-set AVST_ADAPTER_BASE "$OFM_PATH/comp/nic/mac_lite/rx_mac_lite/comp/adapters/avst_simple"
+set AVST_ADAPTER_BASE "$OFM_PATH/comp/nic/mac_lite/rx_mac_lite/comp/adapters/eth_avst"
 set RX_MAC_LITE_BASE  "$OFM_PATH/comp/nic/mac_lite/rx_mac_lite"
 
 set PACKAGES "$PACKAGES $PKG_BASE/math_pack.vhd"

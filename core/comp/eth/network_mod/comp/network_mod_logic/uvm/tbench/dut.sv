@@ -131,7 +131,7 @@ module DUT (
         .RX_CORE_MFB_EOF_POS     (rx_mfb_eof_pos),
         .RX_CORE_MFB_SOF         (rx_mfb_sof),
         .RX_CORE_MFB_EOF         (rx_mfb_eof),
-        .RX_CORE_MFB_ERROR       (rx_mfb_error),
+        .RX_CORE_MFB_CRC_ERR     (rx_mfb_error),
         .RX_CORE_MFB_SRC_RDY     (rx_mfb_src_rdy),
         // User side
         .TX_USER_MFB_DATA        (user_mfb_tx.DATA),

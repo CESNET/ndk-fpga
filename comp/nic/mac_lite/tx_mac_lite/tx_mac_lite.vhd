@@ -294,15 +294,25 @@ architecture FULL of TX_MAC_LITE is
     signal stat_tx_frame_inc_reg       : std_logic_vector(MD_REGIONS-1 downto 0);
     signal stat_tx_frame_length_reg    : std_logic_vector(MD_REGIONS*LEN_WIDTH-1 downto 0);
     signal stat_discard_frame_inc_reg  : std_logic_vector(MD_REGIONS-1 downto 0);
+    signal stat_link_err_frame_inc_reg : std_logic_vector(MD_REGIONS-1 downto 0);
+    signal stat_len_err_frame_inc_reg  : std_logic_vector(MD_REGIONS-1 downto 0);
+    signal stat_disabled_frame_inc_reg : std_logic_vector(MD_REGIONS-1 downto 0);
 
     signal stat_total_frames           : std_logic_vector(64-1 downto 0);
+    signal stat_total_octects          : std_logic_vector(64-1 downto 0);
     signal stat_total_sent_frames      : std_logic_vector(64-1 downto 0);
     signal stat_total_sent_octects     : std_logic_vector(64-1 downto 0);
     signal stat_total_discarded_frames : std_logic_vector(64-1 downto 0);
+    signal stat_total_link_err_frames  : std_logic_vector(64-1 downto 0);
+    signal stat_total_len_err_frames   : std_logic_vector(64-1 downto 0);
+    signal stat_total_disabled_frames  : std_logic_vector(64-1 downto 0);
 
     signal ctrl_strobe_cnt             : std_logic;
     signal ctrl_reset_cnt              : std_logic;
     signal ctrl_obuf_en                : std_logic;
+    signal ctrl_off_discard_dis        : std_logic;
+    signal ctrl_off_discard            : std_logic;
+    signal ctrl_off_stop               : std_logic;
 
 begin
 
@@ -320,6 +330,10 @@ begin
 
     -- when ETH link is down, discard all packets by default
     ctrl_ld_discard <= eth_link_down_sync and not ctrl_ld_discard_dis;
+
+    -- when OBUF/TXMAC is disabled, frames are dropped by default
+    ctrl_off_discard <= not ctrl_obuf_en and not ctrl_off_discard_dis;
+    ctrl_off_stop    <= not ctrl_obuf_en and ctrl_off_discard_dis;
 
     -- =========================================================================
     --  MFB RECONFIGURATOR
@@ -370,8 +384,8 @@ begin
     --  FRAME LENGTH CALCULATOR AND DISCARD FLAG GENERATOR
     -- =========================================================================
 
-    rc_mfb_src_rdy_len <= rc_mfb_src_rdy and ctrl_obuf_en;
-    rc_mfb_dst_rdy     <= rc_mfb_dst_rdy_len and ctrl_obuf_en;
+    rc_mfb_src_rdy_len <= rc_mfb_src_rdy and not ctrl_off_stop;
+    rc_mfb_dst_rdy     <= rc_mfb_dst_rdy_len and not ctrl_off_stop;
 
     mfb_frame_len_i : entity work.MFB_FRAME_LNG
     generic map(
@@ -414,7 +428,7 @@ begin
 
     fl_mfb_discard_g : for r in 0 to MD_REGIONS-1 generate
         fl_mfb_undersize(r)   <= '1' when (unsigned(fl_mfb_frame_len_arr(r)) < FRAME_LEN_MIN) else '0';
-        fl_mfb_discard(r)     <= fl_mfb_undersize(r) or ctrl_ld_discard;
+        fl_mfb_discard(r)     <= fl_mfb_undersize(r) or ctrl_ld_discard or ctrl_off_discard;
         fl_mfb_discard_vld(r) <= fl_mfb_discard(r) and fl_mfb_eof(r) and fl_mfb_src_rdy;
     end generate;
 
@@ -831,10 +845,13 @@ begin
     process (RX_CLK)
     begin
         if rising_edge(RX_CLK) then
-            stat_rx_frame_inc_reg      <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy;
-            stat_tx_frame_inc_reg      <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and not fl_mfb_discard;
-            stat_tx_frame_length_reg   <= fl_mfb_frame_len;
-            stat_discard_frame_inc_reg <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and fl_mfb_discard;
+            stat_rx_frame_inc_reg       <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy;
+            stat_tx_frame_inc_reg       <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and not fl_mfb_discard;
+            stat_tx_frame_length_reg    <= fl_mfb_frame_len;
+            stat_discard_frame_inc_reg  <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and fl_mfb_discard;
+            stat_link_err_frame_inc_reg <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and ctrl_ld_discard;
+            stat_len_err_frame_inc_reg  <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and fl_mfb_undersize;
+            stat_disabled_frame_inc_reg <= fl_mfb_eof and fl_mfb_src_rdy and fl_mfb_dst_rdy and ctrl_off_discard;
         end if;
     end process;
 
@@ -856,14 +873,22 @@ begin
         VECTOR_INC_TOTAL_FRAMES     => stat_rx_frame_inc_reg,
         VECTOR_INC_SENT_FRAMES      => stat_tx_frame_inc_reg,
         VECTOR_INC_DISCARDED        => stat_discard_frame_inc_reg,
+        VECTOR_INC_LINK_ERROR       => stat_link_err_frame_inc_reg,
+        VECTOR_INC_LEN_ERROR        => stat_len_err_frame_inc_reg,
+        VECTOR_INC_DISABLED         => stat_disabled_frame_inc_reg,
 
         FRAME_LENGTH                => stat_tx_frame_length_reg,
         FRAME_LENGTH_VLD            => stat_tx_frame_inc_reg,
+        FRAME_LENGTH_TOTAL_VLD      => stat_rx_frame_inc_reg,
 
         STAT_TOTAL_FRAMES           => stat_total_frames,
+        STAT_TOTAL_OCTECTS          => stat_total_octects,
         STAT_TOTAL_SENT_FRAMES      => stat_total_sent_frames,
         STAT_TOTAL_SENT_OCTECTS     => stat_total_sent_octects,
-        STAT_TOTAL_DISCARDED_FRAMES => stat_total_discarded_frames
+        STAT_TOTAL_DISCARDED_FRAMES => stat_total_discarded_frames,
+        STAT_TOTAL_LINK_ERR_FRAMES  => stat_total_link_err_frames,
+        STAT_TOTAL_LEN_ERR_FRAMES   => stat_total_len_err_frames,
+        STAT_TOTAL_DISABLED_FRAMES  => stat_total_disabled_frames
     );
 
     -- =========================================================================
@@ -891,14 +916,19 @@ begin
         MI_DRDY                     => MI_DRDY,
 
         STAT_TOTAL_FRAMES           => stat_total_frames,
+        STAT_TOTAL_OCTECTS          => stat_total_octects,
         STAT_TOTAL_SENT_FRAMES      => stat_total_sent_frames,
         STAT_TOTAL_SENT_OCTECTS     => stat_total_sent_octects,
         STAT_TOTAL_DISCARDED_FRAMES => stat_total_discarded_frames,
+        STAT_TOTAL_LINK_ERR_FRAMES  => stat_total_link_err_frames,
+        STAT_TOTAL_LEN_ERR_FRAMES   => stat_total_len_err_frames,
+        STAT_TOTAL_DISABLED_FRAMES  => stat_total_disabled_frames,
 
         CTRL_STROBE_CNT             => ctrl_strobe_cnt,
         CTRL_RESET_CNT              => ctrl_reset_cnt,
         CTRL_OBUF_EN                => ctrl_obuf_en,
-        CTRL_LD_DISCARD_DIS         => ctrl_ld_discard_dis
+        CTRL_LD_DISCARD_DIS         => ctrl_ld_discard_dis,
+        CTRL_OFF_DISCARD_DIS        => ctrl_off_discard_dis
     );
 
 end architecture;

@@ -11,7 +11,7 @@ proc dts_tx_mac_lite {no speed base mtu} {
 	append ret "type = \"tx_mac_lite\";"
 	append ret "speed = \"$speed\";"
 	# how to determine version ?
-	append ret "version = <0x00000002>;"
+	append ret "version = <0x00000003>;"
 	append ret "reg = <$base $size>;"
 	append ret "mtu = <$mtu>;"
 	append ret "};"

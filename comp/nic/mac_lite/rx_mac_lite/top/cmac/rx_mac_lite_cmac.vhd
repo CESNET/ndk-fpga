@@ -176,7 +176,7 @@ begin
         RX_MFB_EOF_POS  => cmac_mfb_eof_pos,
         RX_MFB_SOF      => cmac_mfb_sof,
         RX_MFB_EOF      => cmac_mfb_eof,
-        RX_MFB_ERROR    => cmac_mfb_err,
+        RX_MFB_CRC_ERR  => cmac_mfb_err,
         RX_MFB_SRC_RDY  => cmac_mfb_src_rdy,
 
         ADAPTER_LINK_UP => CMAC_LINK_UP,

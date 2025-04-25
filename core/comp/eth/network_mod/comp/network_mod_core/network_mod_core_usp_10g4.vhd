@@ -222,7 +222,8 @@ begin
 
 
     TX_MFB_DATA    <= tx_int_mfb_data;
-    TX_MFB_ERROR   <= tx_int_mfb_error;
+    TX_MFB_MII_ERR <= tx_int_mfb_error;
+    TX_MFB_CRC_ERR <= (others => (others => '0'));
     TX_MFB_SOF     <= tx_int_mfb_sof;
     TX_MFB_EOF     <= tx_int_mfb_eof;
     TX_MFB_SOF_POS <= tx_int_mfb_sof_pos;

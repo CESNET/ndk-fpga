@@ -87,41 +87,38 @@ entity RX_MAC_LITE_CTRL_UNIT is
         -- =====================================================================
         -- INPUT OF STATISTICS
         -- =====================================================================
-        -- Total number of received frames
-        STAT_FRAMES_RECEIVED    : in  std_logic_vector(63 downto 0);
-        -- Total number of transmitted frames
-        STAT_FRAMES_TRANSMITTED : in  std_logic_vector(63 downto 0);
-        -- Total number of discarded frames
-        STAT_FRAMES_DISCARDED   : in  std_logic_vector(63 downto 0);
-        -- Discarded frames due to buffer overflow
-        STAT_BUFFER_OVF         : in  std_logic_vector(63 downto 0);
-        -- Total number of received bytes (include CRC bytes)
-        STAT_RX_BYTES           : in  std_logic_vector(63 downto 0);
-        -- Total number of transmitted
-        STAT_TX_BYTES           : in  std_logic_vector(63 downto 0);
-        -- Total number of frames with bad CRC
-        STAT_CRC_ERR            : in  std_logic_vector(63 downto 0);
-        -- Total number of frames over MTU
-        STAT_OVER_MTU           : in  std_logic_vector(63 downto 0);
-        -- Total number of frames below minimal length
-        STAT_BELOW_MIN          : in  std_logic_vector(63 downto 0);
-        -- Total amount of received broadcast frames
-        STAT_BCAST_FRAMES       : in  std_logic_vector(63 downto 0);
-        -- Total amount of received multicast frames
-        STAT_MCAST_FRAMES       : in  std_logic_vector(63 downto 0);
-        -- Total amount of received "fragment" frames
-        STAT_FRAGMENT_FRAMES    : in  std_logic_vector(63 downto 0);
-        -- Total amount of received "jabber" frames (frames above 1518 bytes including FCS)
-        STAT_JABBER_FRAMES      : in  std_logic_vector(63 downto 0);
-        -- Frame length histograms
-        STAT_FRAMES_UNDERSIZE   : in  std_logic_vector(63 downto 0);
-        STAT_FRAMES_64          : in  std_logic_vector(63 downto 0);
-        STAT_FRAMES_65_127      : in  std_logic_vector(63 downto 0);
-        STAT_FRAMES_128_255     : in  std_logic_vector(63 downto 0);
-        STAT_FRAMES_256_511     : in  std_logic_vector(63 downto 0);
-        STAT_FRAMES_512_1023    : in  std_logic_vector(63 downto 0);
-        STAT_FRAMES_1024_1518   : in  std_logic_vector(63 downto 0);
-        STAT_FRAMES_OVER_1518   : in  std_logic_vector(63 downto 0)
+        STAT_BASE_TOTAL        : in  std_logic_vector(63 downto 0);
+        STAT_BASE_PASSED       : in  std_logic_vector(63 downto 0);
+        STAT_BASE_DROPPED      : in  std_logic_vector(63 downto 0);
+        STAT_BASE_DROP_OFF     : in  std_logic_vector(63 downto 0);
+        STAT_BASE_DROP_OVF     : in  std_logic_vector(63 downto 0);
+        STAT_BASE_DROP_FLT     : in  std_logic_vector(63 downto 0);
+        STAT_BASE_DROP_ERR     : in  std_logic_vector(63 downto 0);
+        STAT_BASE_ERR_LEN      : in  std_logic_vector(63 downto 0);
+        STAT_BASE_ERR_MII      : in  std_logic_vector(63 downto 0);
+        STAT_BASE_ERR_CRC      : in  std_logic_vector(63 downto 0);
+        STAT_RX_BYTES          : in  std_logic_vector(63 downto 0);
+        STAT_TX_BYTES          : in  std_logic_vector(63 downto 0);
+        STAT_RFC_CRC_ERR       : in  std_logic_vector(63 downto 0);
+        STAT_RFC_MAC_ERR       : in  std_logic_vector(63 downto 0);
+        STAT_RFC_OVER_MTU      : in  std_logic_vector(63 downto 0);
+        STAT_RFC_BELOW_MIN     : in  std_logic_vector(63 downto 0);
+        STAT_RFC_MAC_BCAST     : in  std_logic_vector(63 downto 0);
+        STAT_RFC_MAC_MCAST     : in  std_logic_vector(63 downto 0);
+        STAT_RFC_FRAGMENT      : in  std_logic_vector(63 downto 0);
+        STAT_RFC_JABBER        : in  std_logic_vector(63 downto 0);
+        STAT_HIST_UNDERSIZE    : in  std_logic_vector(63 downto 0);
+        STAT_HIST_64           : in  std_logic_vector(63 downto 0);
+        STAT_HIST_65_127       : in  std_logic_vector(63 downto 0);
+        STAT_HIST_128_255      : in  std_logic_vector(63 downto 0);
+        STAT_HIST_256_511      : in  std_logic_vector(63 downto 0);
+        STAT_HIST_512_1023     : in  std_logic_vector(63 downto 0);
+        STAT_HIST_1024_1518    : in  std_logic_vector(63 downto 0);
+        STAT_HIST_OVER_1518    : in  std_logic_vector(63 downto 0);
+        STAT_HIST_1519_2047    : in  std_logic_vector(63 downto 0);
+        STAT_HIST_2048_4095    : in  std_logic_vector(63 downto 0);
+        STAT_HIST_4096_8191    : in  std_logic_vector(63 downto 0);
+        STAT_HIST_OVER_8191    : in  std_logic_vector(63 downto 0)
     );
 end entity;
 
@@ -192,6 +189,32 @@ architecture FULL of RX_MAC_LITE_CTRL_UNIT is
     constant FRAMES_1024_1518_H_ADDR : std_logic_vector(7 downto 2) := "011011";
     constant FRAMES_OVER_1518_H_ADDR : std_logic_vector(7 downto 2) := "011101";
     constant FRAMES_UNDERSIZE_H_ADDR : std_logic_vector(7 downto 2) := "011111";
+
+    -- =====================================================================
+    -- Extended counter addresses
+    -- =====================================================================
+
+    constant FRAMES_1519_2047_L_ADDR : std_logic_vector(7 downto 2) := "100000"; -- 0x180
+    constant FRAMES_1519_2047_H_ADDR : std_logic_vector(7 downto 2) := "100001"; -- 0x184
+    constant FRAMES_2048_4095_L_ADDR : std_logic_vector(7 downto 2) := "100010"; -- 0x188
+    constant FRAMES_2048_4095_H_ADDR : std_logic_vector(7 downto 2) := "100011"; -- 0x18C
+    constant FRAMES_4096_8191_L_ADDR : std_logic_vector(7 downto 2) := "100100"; -- 0x190
+    constant FRAMES_4096_8191_H_ADDR : std_logic_vector(7 downto 2) := "100101"; -- 0x194
+    constant FRAMES_OVER_8191_L_ADDR : std_logic_vector(7 downto 2) := "100110"; -- 0x198
+    constant FRAMES_OVER_8191_H_ADDR : std_logic_vector(7 downto 2) := "100111"; -- 0x19C
+
+    constant FRAMES_MAC_FLTR_L_ADDR  : std_logic_vector(7 downto 2) := "101000"; -- 0x1A0
+    constant FRAMES_MAC_FLTR_H_ADDR  : std_logic_vector(7 downto 2) := "101001"; -- 0x1A4
+    constant FRAMES_ERROR_L_ADDR     : std_logic_vector(7 downto 2) := "101010"; -- 0x1A8
+    constant FRAMES_ERROR_H_ADDR     : std_logic_vector(7 downto 2) := "101011"; -- 0x1AC
+    constant FRAMES_DISABLED_L_ADDR  : std_logic_vector(7 downto 2) := "101100"; -- 0x1B0
+    constant FRAMES_DISABLED_H_ADDR  : std_logic_vector(7 downto 2) := "101101"; -- 0x1B4
+    constant FRAMES_ERR_MII_L_ADDR   : std_logic_vector(7 downto 2) := "101110"; -- 0x1B8
+    constant FRAMES_ERR_MII_H_ADDR   : std_logic_vector(7 downto 2) := "101111"; -- 0x1BC
+    constant FRAMES_ERR_CRC_L_ADDR   : std_logic_vector(7 downto 2) := "110000"; -- 0x1C0
+    constant FRAMES_ERR_CRC_H_ADDR   : std_logic_vector(7 downto 2) := "110001"; -- 0x1C4
+    constant FRAMES_ERR_LEN_L_ADDR   : std_logic_vector(7 downto 2) := "110010"; -- 0x1C8
+    constant FRAMES_ERR_LEN_H_ADDR   : std_logic_vector(7 downto 2) := "110011"; -- 0x1CC
 
     -- =====================================================================
     -- Command constants
@@ -698,16 +721,16 @@ begin
     begin
         if (rising_edge(CLK)) then
             case (s_mi_addr(7 downto 2)) is
-                when TRFC_L_ADDR  => s_mx_base_stat_out <= STAT_FRAMES_RECEIVED(31 downto 0);
-                when CFC_L_ADDR   => s_mx_base_stat_out <= STAT_FRAMES_TRANSMITTED(31 downto 0);
-                when DFC_L_ADDR   => s_mx_base_stat_out <= STAT_FRAMES_DISCARDED(31 downto 0);
-                when BODFC_L_ADDR => s_mx_base_stat_out <= STAT_BUFFER_OVF(31 downto 0);
+                when TRFC_L_ADDR  => s_mx_base_stat_out <= STAT_BASE_TOTAL(31 downto 0);
+                when CFC_L_ADDR   => s_mx_base_stat_out <= STAT_BASE_PASSED(31 downto 0);
+                when DFC_L_ADDR   => s_mx_base_stat_out <= STAT_BASE_DROPPED(31 downto 0);
+                when BODFC_L_ADDR => s_mx_base_stat_out <= STAT_BASE_DROP_OVF(31 downto 0);
                 when OROC_L_ADDR  => s_mx_base_stat_out <= STAT_TX_BYTES(31 downto 0);
 
-                when TRFC_H_ADDR  => s_mx_base_stat_out <= STAT_FRAMES_RECEIVED(63 downto 32);
-                when CFC_H_ADDR   => s_mx_base_stat_out <= STAT_FRAMES_TRANSMITTED(63 downto 32);
-                when DFC_H_ADDR   => s_mx_base_stat_out <= STAT_FRAMES_DISCARDED(63 downto 32);
-                when BODFC_H_ADDR => s_mx_base_stat_out <= STAT_BUFFER_OVF(63 downto 32);
+                when TRFC_H_ADDR  => s_mx_base_stat_out <= STAT_BASE_TOTAL(63 downto 32);
+                when CFC_H_ADDR   => s_mx_base_stat_out <= STAT_BASE_PASSED(63 downto 32);
+                when DFC_H_ADDR   => s_mx_base_stat_out <= STAT_BASE_DROPPED(63 downto 32);
+                when BODFC_H_ADDR => s_mx_base_stat_out <= STAT_BASE_DROP_OVF(63 downto 32);
                 when OROC_H_ADDR  => s_mx_base_stat_out <= STAT_TX_BYTES(63 downto 32);
 
                 when others       => s_mx_base_stat_out <= s_mx_ctrl_regs_out;
@@ -720,41 +743,63 @@ begin
     begin
         if (rising_edge(CLK)) then
             case (s_mi_addr(7 downto 2)) is
-                when CRC_ERR_L_ADDR          => s_mx_rfc2819_out <= STAT_CRC_ERR(31 downto 0);
-                when OVER_MTU_L_ADDR         => s_mx_rfc2819_out <= STAT_OVER_MTU(31 downto 0);
-                when BELOW_MIN_L_ADDR        => s_mx_rfc2819_out <= STAT_BELOW_MIN(31 downto 0);
-                when BCAST_FRAMES_L_ADDR     => s_mx_rfc2819_out <= STAT_BCAST_FRAMES(31 downto 0);
-                when MCAST_FRAMES_L_ADDR     => s_mx_rfc2819_out <= STAT_MCAST_FRAMES(31 downto 0);
-                when FRAGMENT_FRAMES_L_ADDR  => s_mx_rfc2819_out <= STAT_FRAGMENT_FRAMES(31 downto 0);
-                when JABBER_FRAMES_L_ADDR    => s_mx_rfc2819_out <= STAT_JABBER_FRAMES(31 downto 0);
+                when CRC_ERR_L_ADDR          => s_mx_rfc2819_out <= STAT_RFC_CRC_ERR(31 downto 0);
+                when OVER_MTU_L_ADDR         => s_mx_rfc2819_out <= STAT_RFC_OVER_MTU(31 downto 0);
+                when BELOW_MIN_L_ADDR        => s_mx_rfc2819_out <= STAT_RFC_BELOW_MIN(31 downto 0);
+                when BCAST_FRAMES_L_ADDR     => s_mx_rfc2819_out <= STAT_RFC_MAC_BCAST(31 downto 0);
+                when MCAST_FRAMES_L_ADDR     => s_mx_rfc2819_out <= STAT_RFC_MAC_MCAST(31 downto 0);
+                when FRAGMENT_FRAMES_L_ADDR  => s_mx_rfc2819_out <= STAT_RFC_FRAGMENT(31 downto 0);
+                when JABBER_FRAMES_L_ADDR    => s_mx_rfc2819_out <= STAT_RFC_JABBER(31 downto 0);
                 when TRANS_OCTETS_L_ADDR     => s_mx_rfc2819_out <= STAT_RX_BYTES(31 downto 0);
 
-                when CRC_ERR_H_ADDR          => s_mx_rfc2819_out <= STAT_CRC_ERR(63 downto 32);
-                when OVER_MTU_H_ADDR         => s_mx_rfc2819_out <= STAT_OVER_MTU(63 downto 32);
-                when BELOW_MIN_H_ADDR        => s_mx_rfc2819_out <= STAT_BELOW_MIN(63 downto 32);
-                when BCAST_FRAMES_H_ADDR     => s_mx_rfc2819_out <= STAT_BCAST_FRAMES(63 downto 32);
-                when MCAST_FRAMES_H_ADDR     => s_mx_rfc2819_out <= STAT_MCAST_FRAMES(63 downto 32);
-                when FRAGMENT_FRAMES_H_ADDR  => s_mx_rfc2819_out <= STAT_FRAGMENT_FRAMES(63 downto 32);
-                when JABBER_FRAMES_H_ADDR    => s_mx_rfc2819_out <= STAT_JABBER_FRAMES(63 downto 32);
+                when CRC_ERR_H_ADDR          => s_mx_rfc2819_out <= STAT_RFC_CRC_ERR(63 downto 32);
+                when OVER_MTU_H_ADDR         => s_mx_rfc2819_out <= STAT_RFC_OVER_MTU(63 downto 32);
+                when BELOW_MIN_H_ADDR        => s_mx_rfc2819_out <= STAT_RFC_BELOW_MIN(63 downto 32);
+                when BCAST_FRAMES_H_ADDR     => s_mx_rfc2819_out <= STAT_RFC_MAC_BCAST(63 downto 32);
+                when MCAST_FRAMES_H_ADDR     => s_mx_rfc2819_out <= STAT_RFC_MAC_MCAST(63 downto 32);
+                when FRAGMENT_FRAMES_H_ADDR  => s_mx_rfc2819_out <= STAT_RFC_FRAGMENT(63 downto 32);
+                when JABBER_FRAMES_H_ADDR    => s_mx_rfc2819_out <= STAT_RFC_JABBER(63 downto 32);
                 when TRANS_OCTETS_H_ADDR     => s_mx_rfc2819_out <= STAT_RX_BYTES(63 downto 32);
 
-                when FRAMES_64_L_ADDR        => s_mx_rfc2819_out <= STAT_FRAMES_64(31 downto 0);
-                when FRAMES_65_127_L_ADDR    => s_mx_rfc2819_out <= STAT_FRAMES_65_127(31 downto 0);
-                when FRAMES_128_255_L_ADDR   => s_mx_rfc2819_out <= STAT_FRAMES_128_255(31 downto 0);
-                when FRAMES_256_511_L_ADDR   => s_mx_rfc2819_out <= STAT_FRAMES_256_511(31 downto 0);
-                when FRAMES_512_1023_L_ADDR  => s_mx_rfc2819_out <= STAT_FRAMES_512_1023(31 downto 0);
-                when FRAMES_1024_1518_L_ADDR => s_mx_rfc2819_out <= STAT_FRAMES_1024_1518(31 downto 0);
-                when FRAMES_OVER_1518_L_ADDR => s_mx_rfc2819_out <= STAT_FRAMES_OVER_1518(31 downto 0);
-                when FRAMES_UNDERSIZE_L_ADDR => s_mx_rfc2819_out <= STAT_FRAMES_UNDERSIZE(31 downto 0);
+                when FRAMES_64_L_ADDR        => s_mx_rfc2819_out <= STAT_HIST_64(31 downto 0);
+                when FRAMES_65_127_L_ADDR    => s_mx_rfc2819_out <= STAT_HIST_65_127(31 downto 0);
+                when FRAMES_128_255_L_ADDR   => s_mx_rfc2819_out <= STAT_HIST_128_255(31 downto 0);
+                when FRAMES_256_511_L_ADDR   => s_mx_rfc2819_out <= STAT_HIST_256_511(31 downto 0);
+                when FRAMES_512_1023_L_ADDR  => s_mx_rfc2819_out <= STAT_HIST_512_1023(31 downto 0);
+                when FRAMES_1024_1518_L_ADDR => s_mx_rfc2819_out <= STAT_HIST_1024_1518(31 downto 0);
+                when FRAMES_OVER_1518_L_ADDR => s_mx_rfc2819_out <= STAT_HIST_OVER_1518(31 downto 0);
+                when FRAMES_UNDERSIZE_L_ADDR => s_mx_rfc2819_out <= STAT_HIST_UNDERSIZE(31 downto 0);
 
-                when FRAMES_64_H_ADDR        => s_mx_rfc2819_out <= STAT_FRAMES_64(63 downto 32);
-                when FRAMES_65_127_H_ADDR    => s_mx_rfc2819_out <= STAT_FRAMES_65_127(63 downto 32);
-                when FRAMES_128_255_H_ADDR   => s_mx_rfc2819_out <= STAT_FRAMES_128_255(63 downto 32);
-                when FRAMES_256_511_H_ADDR   => s_mx_rfc2819_out <= STAT_FRAMES_256_511(63 downto 32);
-                when FRAMES_512_1023_H_ADDR  => s_mx_rfc2819_out <= STAT_FRAMES_512_1023(63 downto 32);
-                when FRAMES_1024_1518_H_ADDR => s_mx_rfc2819_out <= STAT_FRAMES_1024_1518(63 downto 32);
-                when FRAMES_OVER_1518_H_ADDR => s_mx_rfc2819_out <= STAT_FRAMES_OVER_1518(63 downto 32);
-                when FRAMES_UNDERSIZE_H_ADDR => s_mx_rfc2819_out <= STAT_FRAMES_UNDERSIZE(63 downto 32);
+                when FRAMES_64_H_ADDR        => s_mx_rfc2819_out <= STAT_HIST_64(63 downto 32);
+                when FRAMES_65_127_H_ADDR    => s_mx_rfc2819_out <= STAT_HIST_65_127(63 downto 32);
+                when FRAMES_128_255_H_ADDR   => s_mx_rfc2819_out <= STAT_HIST_128_255(63 downto 32);
+                when FRAMES_256_511_H_ADDR   => s_mx_rfc2819_out <= STAT_HIST_256_511(63 downto 32);
+                when FRAMES_512_1023_H_ADDR  => s_mx_rfc2819_out <= STAT_HIST_512_1023(63 downto 32);
+                when FRAMES_1024_1518_H_ADDR => s_mx_rfc2819_out <= STAT_HIST_1024_1518(63 downto 32);
+                when FRAMES_OVER_1518_H_ADDR => s_mx_rfc2819_out <= STAT_HIST_OVER_1518(63 downto 32);
+                when FRAMES_UNDERSIZE_H_ADDR => s_mx_rfc2819_out <= STAT_HIST_UNDERSIZE(63 downto 32);
+
+                when FRAMES_1519_2047_L_ADDR => s_mx_rfc2819_out <= STAT_HIST_1519_2047(31 downto 0);
+                when FRAMES_1519_2047_H_ADDR => s_mx_rfc2819_out <= STAT_HIST_1519_2047(63 downto 32);
+                when FRAMES_2048_4095_L_ADDR => s_mx_rfc2819_out <= STAT_HIST_2048_4095(31 downto 0);
+                when FRAMES_2048_4095_H_ADDR => s_mx_rfc2819_out <= STAT_HIST_2048_4095(63 downto 32);
+                when FRAMES_4096_8191_L_ADDR => s_mx_rfc2819_out <= STAT_HIST_4096_8191(31 downto 0);
+                when FRAMES_4096_8191_H_ADDR => s_mx_rfc2819_out <= STAT_HIST_4096_8191(63 downto 32);
+                when FRAMES_OVER_8191_L_ADDR => s_mx_rfc2819_out <= STAT_HIST_OVER_8191(31 downto 0);
+                when FRAMES_OVER_8191_H_ADDR => s_mx_rfc2819_out <= STAT_HIST_OVER_8191(63 downto 32);
+
+                when FRAMES_MAC_FLTR_L_ADDR  => s_mx_rfc2819_out <= STAT_BASE_DROP_FLT(31 downto 0);
+                when FRAMES_MAC_FLTR_H_ADDR  => s_mx_rfc2819_out <= STAT_BASE_DROP_FLT(63 downto 32);
+                when FRAMES_ERROR_L_ADDR     => s_mx_rfc2819_out <= STAT_BASE_DROP_ERR(31 downto 0);
+                when FRAMES_ERROR_H_ADDR     => s_mx_rfc2819_out <= STAT_BASE_DROP_ERR(63 downto 32);
+                when FRAMES_DISABLED_L_ADDR  => s_mx_rfc2819_out <= STAT_BASE_DROP_OFF(31 downto 0);
+                when FRAMES_DISABLED_H_ADDR  => s_mx_rfc2819_out <= STAT_BASE_DROP_OFF(63 downto 32);
+                when FRAMES_ERR_MII_L_ADDR   => s_mx_rfc2819_out <= STAT_BASE_ERR_MII(31 downto 0);
+                when FRAMES_ERR_MII_H_ADDR   => s_mx_rfc2819_out <= STAT_BASE_ERR_MII(63 downto 32);
+                when FRAMES_ERR_CRC_L_ADDR   => s_mx_rfc2819_out <= STAT_BASE_ERR_CRC(31 downto 0);
+                when FRAMES_ERR_CRC_H_ADDR   => s_mx_rfc2819_out <= STAT_BASE_ERR_CRC(63 downto 32);
+                when FRAMES_ERR_LEN_L_ADDR   => s_mx_rfc2819_out <= STAT_BASE_ERR_LEN(31 downto 0);
+                when FRAMES_ERR_LEN_H_ADDR   => s_mx_rfc2819_out <= STAT_BASE_ERR_LEN(63 downto 32);
 
                 when others                  => s_mx_rfc2819_out <= s_mx_ctrl_regs_out;
             end case;
