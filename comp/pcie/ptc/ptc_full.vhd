@@ -315,7 +315,7 @@ begin
             FIFO_ITEMS     => UP_ASFIFO_ITEMS,
             OUTPUT_REG     => true           ,
             RAM_TYPE       => "BRAM"         ,
-            FWFT_MODE      => true
+            FWFT_MODE      => false
         )
         port map(
             RX_CLK       => CLK_DMA  ,
@@ -389,7 +389,7 @@ begin
             FIFO_ITEMS       => UP_ASFIFO_ITEMS   ,
             OUTPUT_REG       => true              ,
             RAM_TYPE         => "BRAM"            ,
-            FWFT_MODE        => true
+            FWFT_MODE        => false
         )
         port map(
             RX_CLK       => CLK_DMA  ,
