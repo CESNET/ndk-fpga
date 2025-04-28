@@ -123,6 +123,10 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         cfg = new();
     endfunction
 
+    function void post_randomize();
+        configure();
+    endfunction
+
     function void configure();
         // Get the unique configured addresses
         bit [32 -1 : 0] cfg_ipv4_addresses[$] = cfg.ipv4_addresses.unique();
@@ -302,7 +306,6 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         string generator_parameters;
         string generator_execute_command;
 
-        configure();
         generate_tools_configuration();
 
         reader = new();
