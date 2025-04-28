@@ -18,5 +18,3 @@ set COMPONENTS [list \
 
 # Source files for implemented component
 set MOD "$MOD $ENTITY_BASE/crossbar.vhd"
-
-lappend SRCS(CONSTR_QUARTUS) [list $ENTITY_BASE/crossbar.sdc SDC_ENTITY_FILE crossbar]
