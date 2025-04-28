@@ -174,67 +174,81 @@ class read_rx_counters#(RX_MAC_COUNT) extends uvm_sequence;
 endclass
 
 class read_tx_counters extends uvm_sequence;
-    `uvm_object_param_utils(uvm_network_mod_env::read_tx_counters)
+    `uvm_object_utils(uvm_network_mod_env::read_tx_counters)
 
     uvm_tx_mac_lite::regmodel regmodel;
-    logic [64-1:0] tfc;
-    logic [64-1:0] soc;
-    logic [64-1:0] dfc;
-    logic [64-1:0] sfc;
 
-    function new(string name = "mi_sequence");
+    typedef enum bit [8-1 : 0]
+    {
+        SAMPLE = 'h1,
+        RESET  = 'h2
+    } command_e;
+
+    longint unsigned tfc;
+    longint unsigned toc;
+    longint unsigned sfc;
+    longint unsigned soc;
+    longint unsigned dfc;
+    longint unsigned liec;
+    longint unsigned lnec;
+
+    function new(string name = "read_tx_counters");
         super.new(name);
     endfunction
 
+    virtual task send_command(command_e command);
+        uvm_status_e status;
+        regmodel.command.write(status, command);
+    endtask
+
+    virtual task read_counter(uvm_reg reg_counter_l, uvm_reg reg_counter_h, output longint unsigned output_value);
+        uvm_status_e   status;
+        uvm_reg_data_t data;
+        reg_counter_l.read(status, data);
+        output_value[32-1 : 0] = data;
+        reg_counter_h.read(status, data);
+        output_value[64-1 : 32] = data;
+    endtask
+
     virtual task reset();
-        uvm_status_e  status_cmd;
-        regmodel.command.write(status_cmd, 'h2);
+        send_command(RESET);
     endtask
 
     virtual task body();
-        uvm_status_e   status_cmd;
-        regmodel.command.write(status_cmd, 'h1);
+        send_command(SAMPLE);
+
+        #(30ns);
 
         fork
-            begin
-                uvm_status_e   status;
-                uvm_reg_data_t data;
-                regmodel.tfcl.read(status, data);
-                tfc[32-1:0] = data;
-                regmodel.tfch.read(status, data);
-                tfc[64-1:32] = data;
-            end
-            begin
-                uvm_status_e   status;
-                uvm_reg_data_t data;
-                regmodel.socl.read(status, data);
-                soc[32-1:0] = data;
-                regmodel.soch.read(status, data);
-                soc[64-1:32] = data;
-            end
-
-            begin
-                uvm_status_e   status;
-                uvm_reg_data_t data;
-                regmodel.dfcl.read(status, data);
-                dfc[32-1:0] = data;
-                regmodel.dfch.read(status, data);
-                dfc[64-1:32] = data;
-            end
-
-            begin
-                uvm_status_e   status;
-                uvm_reg_data_t data;
-                regmodel.sfcl.read(status, data);
-                sfc[32-1:0] = data;
-                regmodel.sfch.read(status, data);
-                sfc[64-1:32] = data;
-            end
+            read_counter(regmodel.tfcl , regmodel.tfch , tfc);
+            read_counter(regmodel.tocl , regmodel.toch , toc);
+            read_counter(regmodel.sfcl , regmodel.sfch , sfc);
+            read_counter(regmodel.socl , regmodel.soch , soc);
+            read_counter(regmodel.dfcl , regmodel.dfch , dfc);
+            read_counter(regmodel.liecl, regmodel.liech, liec);
+            read_counter(regmodel.lnecl, regmodel.lnech, lnec);
         join
     endtask
 
-    function void set_regmodel(uvm_tx_mac_lite::regmodel model);
+    virtual function bit zero();
+        return (
+            tfc  == 0 &&
+            toc  == 0 &&
+            sfc  == 0 &&
+            soc  == 0 &&
+            dfc  == 0 &&
+            liec == 0 &&
+            lnec == 0
+        );
+    endfunction
+
+    virtual function void set_regmodel(uvm_tx_mac_lite::regmodel model);
         regmodel = model;
     endfunction
-endclass
 
+    virtual function string convert2string();
+        string format = "tfc %0d toc %0d sfc %0d soc %0d dfc %0d liec %0d lnec %0d";
+        return $sformatf(format, tfc, toc, sfc, soc, dfc, liec, lnec);
+    endfunction
+
+endclass
