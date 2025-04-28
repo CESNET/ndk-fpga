@@ -92,12 +92,12 @@ class virt_sequence_port #(
 
         for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
             fork
-                p_sequencer.regmodel.channel[it].rx_mac.base.enable.write(status, 1'h1);
+                p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);
                 p_sequencer.regmodel.channel[it].tx_mac.enable.write(status, 1'h1);
             join;
 
             fork
-                p_sequencer.regmodel.channel[it].rx_mac.base.enable.read(status, data);
+                p_sequencer.regmodel.channel[it].rx_mac.enable.read(status, data);
                 p_sequencer.regmodel.channel[it].tx_mac.enable.read(status, data);
             join;
         end
@@ -160,18 +160,8 @@ class virt_sequence_port #(
                 tx_stats.start(null);
             join
 
-            `uvm_info(this.get_full_name(),
-                $sformatf("RX channel %s base [%0d]\n\tSTATS trfc %0d cfc %0d dfc %0d bodfc %0d oroc %0d\n", m_sequencer.get_full_name(), it, rx_stats.trfc, rx_stats.cfc, rx_stats.dfc, rx_stats.bodfc, rx_stats.oroc),
-                UVM_LOW);
-            `uvm_info(this.get_full_name(),
-                $sformatf("RX channel %s rfc  [%0d]\n\tcrc_err %0d\n\tover_mtu_addr %0d\n\t below_min_addr %0d\n\tbcast_frames_addr %0d\n\tmcast_frames_addr %0d\n\tfragment_frames_addr %0d\n\tjabber_frames_addr %0d\n\ttrans_octets_addr %0d\n\tframes_64_addr %0d\n\tframes_65_127_addr %0d\n\tframes_128_255_addr %0d\n\tframes_256_511_addr %0d\n\tframes_512_1023_addr %0d\n\tframes_1024_1518_addr %0d\n\tframes_over_1518_addr %0d\n\tframes_below_64_addr %0d\n\n",
-                    m_sequencer.get_full_name(), it, rx_stats.crc_err, rx_stats.over_mtu_addr, rx_stats.below_min_addr, rx_stats.bcast_frames_addr, rx_stats.mcast_frames_addr, rx_stats.fragment_frames_addr, rx_stats.jabber_frames_addr, rx_stats.trans_octets_addr,
-                    rx_stats.frames_64_addr, rx_stats.frames_65_127_addr, rx_stats.frames_128_255_addr, rx_stats.frames_256_511_addr, rx_stats.frames_512_1023_addr, rx_stats.frames_1024_1518_addr, rx_stats.frames_over_1518_addr, rx_stats.frames_below_64_addr),
-                UVM_LOW);
-
-            `uvm_info(this.get_full_name(),
-                $sformatf("TX channel %s  [%0d]\n\tSTATS tfc  %0d soc %0d dfc %0d sfc %0d\n",            m_sequencer.get_full_name(), it, tx_stats.tfc, tx_stats.soc, tx_stats.dfc, tx_stats.sfc),
-                UVM_LOW);
+            `uvm_info(m_sequencer.get_full_name(), $sformatf("RX channel[%0d] STATS\n\t%s\n", it, rx_stats.convert2string()), UVM_LOW);
+            `uvm_info(m_sequencer.get_full_name(), $sformatf("TX channel[%0d] STATS\n\t%s\n", it, tx_stats.convert2string()), UVM_LOW);
 
             fork
                 rx_stats.reset();
@@ -183,20 +173,10 @@ class virt_sequence_port #(
                 tx_stats.start(null);
             join
 
-            `uvm_info(this.get_full_name(),
-                $sformatf("RX channel %s [%0d]\n\tAFTER RESET STATS trfc %0d cfc %0d dfc %0d bodfc %0d oroc %0d\n", m_sequencer.get_full_name(), it, rx_stats.trfc, rx_stats.cfc, rx_stats.dfc, rx_stats.bodfc, rx_stats.oroc),
-                UVM_LOW);
-            `uvm_info(this.get_full_name(),
-                $sformatf("RX channel %s rfc  [%0d]\n\tcrc_err %0d\n\tover_mtu_addr %0d\n\t below_min_addr %0d\n\tbcast_frames_addr %0d\n\tmcast_frames_addr %0d\n\tfragment_frames_addr %0d\n\tjabber_frames_addr %0d\n\ttrans_octets_addr %0d\n\tframes_64_addr %0d\n\tframes_65_127_addr %0d\n\tframes_128_255_addr %0d\n\tframes_256_511_addr %0d\n\tframes_512_1023_addr %0d\n\tframes_1024_1518_addr %0d\n\tframes_over_1518_addr %0d\n\tframes_below_64_addr %0d\n\n",
-                          m_sequencer.get_full_name(), it, rx_stats.crc_err, rx_stats.over_mtu_addr, rx_stats.below_min_addr, rx_stats.bcast_frames_addr, rx_stats.mcast_frames_addr, rx_stats.fragment_frames_addr, rx_stats.jabber_frames_addr, rx_stats.trans_octets_addr,
-                          rx_stats.frames_64_addr, rx_stats.frames_65_127_addr, rx_stats.frames_128_255_addr, rx_stats.frames_256_511_addr, rx_stats.frames_512_1023_addr, rx_stats.frames_1024_1518_addr, rx_stats.frames_over_1518_addr, rx_stats.frames_below_64_addr),
-                UVM_LOW);
-            `uvm_info(this.get_full_name(),
-                $sformatf("TX channel %s [%0d]\n\tAFTER RESET STATS tfc  %0d soc %0d dfc %0d sfc %0d\n",            m_sequencer.get_full_name(), it, tx_stats.tfc, tx_stats.soc, tx_stats.dfc, tx_stats.sfc),
-                UVM_LOW);
+            `uvm_info(m_sequencer.get_full_name(), $sformatf("RX channel[%0d] STATS AFTER RESET\n\t%s\n", it, rx_stats.convert2string()), UVM_LOW);
+            `uvm_info(m_sequencer.get_full_name(), $sformatf("TX channel[%0d] STATS AFTER RESET\n\t%s\n", it, tx_stats.convert2string()), UVM_LOW);
 
-            if (rx_stats.trfc != 0 || rx_stats.cfc != 0 || rx_stats.dfc != 0 || rx_stats.bodfc != 0 ||  /*rx_stats.oroc != 0 ||*/
-                tx_stats.tfc != 0  || tx_stats.soc != 0 || tx_stats.dfc != 0 || tx_stats.sfc != 0) begin
+            if (!rx_stats.zero() || !tx_stats.zero()) begin
                 `uvm_fatal(m_sequencer.get_full_name(), "Some statistic is not set to zero after reset!\n");
             end
         end
