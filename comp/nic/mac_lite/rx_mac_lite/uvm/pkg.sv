@@ -13,8 +13,6 @@ package uvm_rx_mac_lite;
     import uvm_pkg::*;
 
     `include "registers.sv"
-    `include "base.sv"
-    `include "rfc.sv"
     `include "regmodel.sv"
 endpackage
 `endif
