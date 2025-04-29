@@ -47,12 +47,6 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
         lib_eth_rx_data.config_filepath = { "./", p_sequencer.get_full_name(), ".", "config.yaml" };
         lib_eth_rx_data.profile_filepath  = { "./", p_sequencer.get_full_name(), ".", "profile.csv" };
 
-        if (initialized == 0) begin
-            assert(m_sequence_mac_check_configuration.randomize());
-        end
-        // Add MAC Check addresses to the configuration of the flowtest sequence
-        lib_eth_rx_data.cfg.mac_addresses = m_sequence_mac_check_configuration.addresses;
-
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_rx_meta, "", "state", seq_sync_eth_rx.cfg[1]);
         eth_rx_meta = uvm_network_mod_env::sequence_logic_vector#(6)::type_id::create("eth_rx_meta", p_sequencer.eth_rx_meta);
 
@@ -88,6 +82,7 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
 
         if (initialized == 0) begin
             for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
+                assert(m_sequence_mac_check_configuration.randomize());
                 m_sequence_mac_check_configuration.start(p_sequencer);
 
                 fork
@@ -102,6 +97,13 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
             end
 
             initialized = 1;
+        end
+
+        // Add MAC Check addresses to the configuration of the flowtest sequence
+        begin
+            uvm_packet_generators::sequence_flowtest #(ITEM_WIDTH) dummy;
+            assert($cast(dummy, eth_rx_data));
+            add_mac_check_addresses(dummy.cfg);
         end
 
         fork

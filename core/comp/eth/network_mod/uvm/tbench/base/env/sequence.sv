@@ -44,6 +44,19 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
         this.usr_rx_seq_cfg = usr_rx_seq_cfg;
     endfunction
 
+    function void add_mac_check_addresses(uvm_packet_generators::config_sequence cfg);
+        for (int unsigned i = 0; i < RX_MAC_COUNT; i++) begin
+            bit            valid;
+            bit [48-1 : 0] address;
+
+            { valid, address } = p_sequencer.regmodel.channel[0].rx_mac.mac[i].get();
+
+            if (valid == 1'b1) begin
+                cfg.add_mac_address(address);
+            end
+        end
+    endfunction
+
     virtual task pre_body();
         int unsigned rst = 0;
         uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)                           lib_usr_rx_data;
