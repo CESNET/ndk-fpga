@@ -22,7 +22,8 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
 
     protected uvm_logic_vector_array::config_sequence usr_rx_seq_cfg;
 
-    uvm_network_mod_env::sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequence_mac_check_configuration;
+    uvm_network_mod_env::sequence_mac_check_configuration    #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequence_mac_check_configuration;
+    uvm_network_mod_env::sequence_frame_length_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequence_frame_length_configuration;
 
     rand int unsigned transactions_approx;
     constraint c_transactions {
@@ -102,6 +103,8 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
 
         // MAC Check configuration
         m_sequence_mac_check_configuration = uvm_network_mod_env::sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_sequence_mac_check_configuration");
+        // Frame lengths configuration
+        m_sequence_frame_length_configuration = uvm_network_mod_env::sequence_frame_length_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_sequence_frame_length_configuration");
 
         usr_rx_data  = lib_usr_rx_data;
         usr_rx_meta  = lib_usr_rx_meta;
