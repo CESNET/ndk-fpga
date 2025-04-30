@@ -106,10 +106,6 @@ architecture FULL of DP_BRAM_V7 is
    signal portB_we            : T_MEM_WE;
    --! Memory Enable bus
    signal portB_en            : T_MEM_EN;
-
-   signal debug_item_vldA : std_logic := '1';
-   signal debug_item_vldB : std_logic := '1';
-
 begin
 
    -- -------------------------------------------
@@ -148,7 +144,7 @@ begin
    PORTA_OUT_NO_REG_GEN:if(ENABLE_OUT_REG = false) generate
 
       --! Deal with data output
-      DOA      <= portA_data_out(conv_integer(UNSIGNED(reg_row_address_a))) when debug_item_vldA='1' else (others => 'U');
+      DOA      <= portA_data_out(conv_integer(UNSIGNED(reg_row_address_a)));
       DOA_DV   <= reg_data_a_vld;
 
       --! Enable pipeline by default
@@ -165,11 +161,7 @@ begin
                DOA_DV <= '0';
             else
                if(PIPE_ENA = '1')then
-                  if debug_item_vldA='1' then
-                     DOA <= portA_data_out(conv_integer(UNSIGNED(reg_row_address_a)));
-                  else
-                     DOA <= (others => 'U');
-                  end if;
+                  DOA <= portA_data_out(conv_integer(UNSIGNED(reg_row_address_a)));
                   DOA_DV <= reg_data_a_vld;
                end if;
             end if;
@@ -261,7 +253,7 @@ begin
    PORTB_OUT_NO_REG_GEN:if(ENABLE_OUT_REG = false) generate
 
       --! Deal with data output
-      DOB      <= portB_data_out(conv_integer(UNSIGNED(reg_row_address_b))) when debug_item_vldB='1' else (others => 'U');
+      DOB      <= portB_data_out(conv_integer(UNSIGNED(reg_row_address_b)));
       DOB_DV   <= reg_data_b_vld;
 
       --! Enable pipeline by default
@@ -278,11 +270,7 @@ begin
                DOB_DV <= '0';
             else
                if(PIPE_ENB = '1')then
-                  if debug_item_vldB='1' then
-                     DOB <= portB_data_out(conv_integer(UNSIGNED(reg_row_address_b)));
-                  else
-                     DOB <= (others => 'U');
-                  end if;
+                  DOB <= portB_data_out(conv_integer(UNSIGNED(reg_row_address_b)));
                   DOB_DV <= reg_data_b_vld;
                end if;
             end if;
@@ -471,36 +459,4 @@ begin
          end generate;
       end generate;
    end generate;
-
-
--- pragma translate_off
--- pragma synthesis_off
-   -- Debuging -----------------------------------------------------------------
-   dbg_init_control : process(CLKA,CLKB)
-      variable debug_item_written  : std_logic_vector(2**ADDRESS_WIDTH-1 downto 0);
-   begin
-      if CLKA'event and CLKA='1' then
-         if RSTA='1' then
-            debug_item_written := (others => '0');
-         elsif  PIPE_ENA='1' and WEA='1' then
-            debug_item_written(conv_integer(ADDRA)) := '1';
-         end if;
-         debug_item_vldA <= debug_item_written(conv_integer(ADDRA));
-      end if;
-      if CLKB'event and CLKB='1' then
-         if RSTB='1' then
-            debug_item_written := (others => '0');
-         elsif  PIPE_ENB='1' and WEB='1' then
-            debug_item_written(conv_integer(ADDRB)) := '1';
-         end if;
-         debug_item_vldB <= debug_item_written(conv_integer(ADDRB));
-      end if;
-   end process;
-   assert_gen : if DEBUG_ASSERT_UNINITIALIZED generate
-      assert debug_item_vldA='1' or reg_data_a_vld='0' or RSTA/='0' or not CLKA'event or CLKA='0' report "Reading uninitialized item from DP_BMEM_V7 on port A!" severity error;
-      assert debug_item_vldB='1' or reg_data_b_vld='0' or RSTB/='0' or not CLKB'event or CLKB='0' report "Reading uninitialized item from DP_BMEM_V7 on port B!" severity error;
-   end generate;
--- pragma synthesis_on
--- pragma translate_on
-
 end architecture FULL;

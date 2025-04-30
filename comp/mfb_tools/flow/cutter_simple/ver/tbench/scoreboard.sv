@@ -76,7 +76,6 @@ class ScoreboardMonitorCbs extends MonitorCbs;
          sc_table.display();
          $stop;
       end;
-      $write("%d. Transaction received.\n", rx_cnt);
    endtask
 endclass
 
@@ -90,6 +89,10 @@ class Scoreboard;
       monitorCbs = new(scoreTable);
       driverCbs  = new(scoreTable);
    endfunction
+
+    function int unsigned done();
+        return (scoreTable.empty() != 0);
+    endfunction
 
    task display();
       scoreTable.display();

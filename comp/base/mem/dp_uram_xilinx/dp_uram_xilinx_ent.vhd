@@ -31,8 +31,8 @@ entity DP_URAM_XILINX is
          INTERNAL_OUT_REG   : boolean := true;
          --! Enable output register.
          EXTERNAL_OUT_REG : boolean := false;
-         --! ENable reporting of uninitialized memory
-         DEBUG_ASSERT_UNINITIALIZED : boolean := false
+         --! Enable check write before read. For more info check *.psl file
+         PSL_WR_BEFFORE_RD : boolean := true
    );
    port(
    --UltraRAM common clock

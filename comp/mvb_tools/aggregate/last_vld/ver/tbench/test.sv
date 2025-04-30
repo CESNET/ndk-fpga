@@ -92,7 +92,9 @@ program TEST (
         enableTestEnvironment();
         resetDesign();
         test1();
-        $write("Verification finished successfully!\n");
+        if (scoreboard.done()) begin
+            $write("Verification finished successfully!\n");
+        end
         $stop();
     end
 

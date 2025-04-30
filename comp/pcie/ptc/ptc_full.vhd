@@ -206,7 +206,6 @@ architecture full of PCIE_TRANSACTION_CTRL is
     signal down_mvb_tfifo_in_dst_rdy : std_logic;
     signal down_mvb_tfifo_afull      : std_logic;
     signal down_mvb_tfifo_afull_reg  : std_logic;
-    signal down_mvb_tfifo_in_err_reg : std_logic;
 
     -- PCIe2DMA hdr transform output / DOWN Splitter MVB input
     signal down_mvb_split_in_data       : std_logic_vector(MVB_DOWN_ITEMS*DMA_DOWNHDR_WIDTH-1 downto 0);
@@ -274,10 +273,6 @@ architecture full of PCIE_TRANSACTION_CTRL is
 
     ---------------------------------------------------------------------------
     -- debug signals
-    signal down_storage_fifo_err_reg    : std_logic;
-    signal down_mvb_asynch_fifo_err_reg : std_logic_vector(DMA_PORTS-1 downto 0);
-    signal down_mfb_asynch_fifo_err_reg : std_logic_vector(DMA_PORTS-1 downto 0);
-
     signal dbg_rc_cnt               : unsigned(63 downto 0);
     signal dbg_rq_cnt               : unsigned(63 downto 0);
     signal dbg_di_mvb_cnt           : unsigned(63 downto 0);
@@ -1007,22 +1002,9 @@ begin
             TX_MFB_DST_RDY  => down_mfb_splfi_in_dst_rdy
         );
 
-        process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (down_mfb_stfifo_in_dst_rdy = '0' and down_mfb_stfifo_in_src_rdy = '1') then
-                    down_storage_fifo_err_reg <= '1';
-                end if;
-                if (RESET = '1') then
-                    down_storage_fifo_err_reg <= '0';
-                end if;
-            end if;
-        end process;
-
-        assert (down_storage_fifo_err_reg /= '1')
-           report "PTC: No dst_rdy part error! Writing in full DOWN MFB storage FIFO!"
-           severity failure;
-
+        -- psl assert_down_mfb_fifo_owerflow :
+        --      assert always (not (down_mfb_stfifo_in_dst_rdy = '0' and down_mfb_stfifo_in_src_rdy = '1')) abort (RESET) @rising_edge(CLK)
+        --      report "PTC: No dst_rdy part error! Writing in full DOWN MFB storage FIFO!";
     else generate
 
         mvb_pipe_i : entity work.MVB_PIPE
@@ -1165,21 +1147,10 @@ begin
         end if;
     end process;
 
-    process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            if (down_mvb_tfifo_in_dst_rdy = '0' and down_mvb_tfifo_in_src_rdy = '1') then
-                down_mvb_tfifo_in_err_reg <= '1';
-            end if;
-            if (RESET = '1') then
-                down_mvb_tfifo_in_err_reg <= '0';
-            end if;
-        end if;
-    end process;
+    -- psl assert_down_mvb_fifo_owerflow :
+    --      assert always (not (down_mvb_tfifo_in_dst_rdy = '0' and down_mvb_tfifo_in_src_rdy = '1')) abort (RESET) @rising_edge(CLK)
+    --      report "PTC: No dst_rdy error! Writing in full DOWN MVB TFIFO!";
 
-    assert (down_mvb_tfifo_in_err_reg /= '1')
-       report "PTC: No dst_rdy error! Writing in full DOWN MVB TFIFO!"
-       severity failure;
 
     ---------------------------------------------------------------------------
 

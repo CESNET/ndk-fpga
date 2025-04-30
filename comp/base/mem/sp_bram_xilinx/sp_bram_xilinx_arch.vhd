@@ -36,33 +36,7 @@ architecture FULL of SP_BRAM_XILINX is
 
    --! Validity signal for readed data.
    signal reg_data_vld  : std_logic;
-
-   --! Auxiliary signal for debugging uninitaliazed data
-   signal debug_item_vld : std_logic := '1';
-
 begin
-
--- pragma translate_off
--- pragma synthesis_off
-   --! Support for DEBUG_ASSERT_UNINITIALIZED in simulations.
-   assert_gen: if DEBUG_ASSERT_UNINITIALIZED generate
-      dbg_init_control: process(CLK)
-         variable debug_item_written: std_logic_vector(2**ADDRESS_WIDTH-1 downto 0);
-      begin
-         if CLK'event and CLK = '1' then
-            if RST = '1' then
-               debug_item_written := (others => '0');
-            elsif PIPE_EN = '1' and WE = '1' then
-               debug_item_written(conv_integer(ADDR)) := '1';
-            end if;
-            debug_item_vld <= debug_item_written(conv_integer(ADDR));
-         end if;
-      end process;
-      assert debug_item_vld = '1' or reg_data_vld = '0' or RST /= '0' or not CLK'event or CLK = '0' report "Reading uninitialized item from SP_BRAM_XILINX!" severity error;
-   end generate;
--- pragma synthesis_on
--- pragma translate_on
-
    --! Code for non ULTRASCALE devices.
    --! Based on BRAM_TDP_MACRO, for more details see UG768 (Xilinx 7 Series FPGA
    --! and Zynq-7000 All Programmable SoC Libraries Guide for HDL Designs).
@@ -132,7 +106,7 @@ begin
       do_noreg_gen: if (ENABLE_OUT_REG = false) generate
          pipe_en_in <= '1'; --! Enable pipeline by default
          DO_DV <= reg_data_vld; --! Deal with data output
-         DO <= port_data_out(conv_integer(unsigned(reg_row_address))) when (debug_item_vld = '1') else (others => 'U');
+         DO <= port_data_out(conv_integer(unsigned(reg_row_address)));
       end generate;
 
       --! Output register
@@ -145,11 +119,7 @@ begin
                   DO_DV <= '0';
                else
                   if (PIPE_EN = '1') then
-                     if (debug_item_vld = '1') then
-                        DO <= port_data_out(conv_integer(unsigned(reg_row_address)));
-                     else
-                        DO <= (others => 'U');
-                     end if;
+                     DO <= port_data_out(conv_integer(unsigned(reg_row_address)));
                      DO_DV <= reg_data_vld;
                   end if;
                end if;

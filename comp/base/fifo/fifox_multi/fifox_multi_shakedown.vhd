@@ -68,6 +68,22 @@ architecture SHAKEDOWN of FIFOX_MULTI is
     signal sh_next : std_logic_vector(READ_PORTS-1 downto 0);
 
     -- -------------------------------------------------------------------------
+    function rd_check(rd : std_logic_vector; empty : std_logic_vector) return boolean is
+        variable read_stop : boolean;
+    begin
+        read_stop := false;
+        for IT in rd'low to rd'high loop
+            if (rd(IT) = '1' and empty(IT) = '0' and read_stop = true) then
+                return false;
+            end if;
+
+            if (rd(IT) = '0' and empty(IT) = '0') then
+                read_stop := true;
+            end if;
+        end loop;
+
+        return true;
+    end function;
 
 begin
 
@@ -75,33 +91,14 @@ begin
     -- Assert checking
     -- -------------------------------------------------------------------------
 
-    assert_pr : process (CLK)
-        variable rd_i  : natural;
-        variable rd_en : boolean;
-    begin
-        if (rising_edge(CLK)) then
-            if (RESET/='1') then
-                rd_en := true;
-                for i in 0 to READ_PORTS-1 loop
-                    if (SAFE_READ_MODE=false and RD(i)='1' and EMPTY(i)='1') then
-                        assert (false)
-                            report "ERROR: FIFOX Multi: Non-safe Read Mode condition violated! Reading from port " & to_string(i) & " is forbidden when it is EMPTY!"
-                            severity failure;
-                    end if;
+    -- psl assert_safe_read :
+    --      assert always (SAFE_READ_MODE=true or (RD and EMPTY) = (READ_PORTS-1 downto 0 => '0')) abort (RESET) @rising_edge(CLK)
+    --      report "ERROR: FIFOX Multi: Non-safe Read Mode condition violated! Reading from port is forbidden when is EMPTY!";
 
-                    if (RD(i)/='1' and EMPTY(i)/='1') then
-                        rd_i  := i;
-                        rd_en := false;
-                    end if;
-                    if (rd_en=false and RD(i)='1' and EMPTY(i)/='1') then
-                        assert (false)
-                            report "ERROR: FIFOX Multi: Aligned read condition viloated! Reading from non-empty port " & to_string(i) & " is forbidden when not reading from port " & to_string(rd_i) & "!"
-                            severity failure;
-                    end if;
-                end loop;
-            end if;
-        end if;
-    end process;
+    -- psl assert_read_condition :
+    --      assert always (rd_check(RD, EMPTY)) abort (RESET) @rising_edge(CLK)
+    --      report "ERROR: FIFOX Multi: Aligned read condition viloated! Reading from non-empty port which and dont read from lower nonempty port is forbidden!";
+
 
     -- -------------------------------------------------------------------------
 

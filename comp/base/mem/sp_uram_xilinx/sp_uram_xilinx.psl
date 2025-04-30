@@ -1,0 +1,23 @@
+
+
+vunit dp_bram_v7_assert (SP_URAM_XILINX(FULL)) {
+
+    signal debug_item_vld : std_logic := '1'; -- Dont fire assertion on start of simulation;
+    signal debug_item_written  : std_logic_vector(2**ADDRESS_WIDTH-1 downto 0) := (others => '0');
+
+      dbg_assertA : process(CLK)
+      begin
+         if CLK'event and CLK = '1' then
+            if RST = '1' then
+               debug_item_written <= (others => '0');
+            elsif PIPE_EN = '1' and WE = '1' then
+               debug_item_written(to_integer(unsigned(ADDR))) <= '1';
+            end if;
+            debug_item_vld <= debug_item_written(to_integer(unsigned(ADDR)));
+         end if;
+      end process;
+     assert_portA: assert always {PSL_WR_BEFFORE_RD -> (debug_item_vld = '1' or reg_data_vld(READ_LATENCY-1) = '0')} abort(RST) @rising_edge(CLK)
+     report "Reading uninitialized data on DP_URAM_XILINX port A";
+
+}
+

@@ -129,8 +129,11 @@ begin
     end if;
   end process;
 
-  -- pragma synthesis_off
-  assert not CLK'event or CLK /= '1' or shreg_addr /= "11" or shreg_add = '0' report "SLR Crossing overflow!"  severity failure;
-  assert not CLK'event or CLK /= '1' or shreg_addr /= "00" or shreg_rem = '0' or RESET /= '0' report "SLR Crossing underflow!" severity failure;
-  -- pragma synthesis_on
+  -- psl assert_slr_crossing_overflow :
+  --      assert always (shreg_addr /= "11" or shreg_add = '0') abort (RESET) @rising_edge(CLK)
+  --      report "SLR Crossing overflow!";
+
+  -- psl assert_slr_crossing_underflow :
+  --      assert always (shreg_addr /= "00" or shreg_rem = '0') abort (RESET) @rising_edge(CLK)
+  --      report "SLR Crossing underflow!";
 end architecture;

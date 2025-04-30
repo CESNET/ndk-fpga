@@ -1,0 +1,22 @@
+
+
+vunit dp_bram_v7_assert (SP_BRAM_XILINX(FULL)) {
+
+    signal debug_item_vld : std_logic := '1'; -- Dont fire assertion on start of simulation;
+    signal debug_item_written  : std_logic_vector(2**ADDRESS_WIDTH-1 downto 0) := (others => '0');
+
+
+    dbg_init_control: process(CLK)
+    begin
+       if CLK'event and CLK = '1' then
+          if RST = '1' then
+             debug_item_written <= (others => '0');
+          elsif PIPE_EN = '1' and WE = '1' then
+             debug_item_written(conv_integer(ADDR)) := '1';
+          end if;
+          debug_item_vld <= debug_item_written(conv_integer(ADDR));
+       end if;
+    end process;
+    assert_portA: assert always {PSL_WR_BEFFORE_RD -> (debug_item_vld='1' or reg_data_vld='0')} abort(RST) @rising_edge(CLK) report "Reading uninitialized item from DP_BMEM_V7 on port!";
+}
+

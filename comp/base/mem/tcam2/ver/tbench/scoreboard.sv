@@ -221,6 +221,11 @@ class Scoreboard #(int DATA_WIDTH, int ITEMS, bit FRAGMENTED_MEM, int ITEMS_ALIG
         matchDriverCbs  = new(tcam, scoreTable);
     endfunction
 
+
+    function int unsigned done();
+        return (scoreTable.empty() != 0);
+    endfunction
+
     task display();
         scoreTable.display();
     endtask

@@ -35,8 +35,8 @@ entity SDP_URAM_XILINX is
          EXTERNAL_OUT_REG : boolean := false;
          --! Enable internal register
          INTERNAL_OUT_REG : boolean := false;
-         --! Enable reporting of uninitialized memory
-         DEBUG_ASSERT_UNINITIALIZED : boolean := false
+          --! Enable check write before read. For more info check *.psl file
+         PSL_WR_BEFFORE_RD : boolean := true
           );
    port(
          --! Port A clock.

@@ -7,9 +7,8 @@
 # $Id$
 #
 
-proc blk_BRAM { } {
+proc blk_BRAM { BRAM_PATH } {
 
-    global BRAM_PATH
     add_wave "-noupdate -hex -label PIPE_ENA" /$BRAM_PATH/PIPE_ENA
     add_wave "-noupdate -hex -label REA" /$BRAM_PATH/REA
     add_wave "-noupdate -hex -label WEA" /$BRAM_PATH/WEA

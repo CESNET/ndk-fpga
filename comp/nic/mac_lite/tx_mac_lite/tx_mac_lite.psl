@@ -1,0 +1,29 @@
+
+
+vunit vunit_tx_mac_lite (TX_MAC_LITE(FULL)) {
+
+    signal psl_tx_frame_end      : std_logic_vector(TX_REGIONS-1 downto 0);
+    signal psl_tx_frame_in_block : std_logic_vector(TX_REGIONS-1 downto 0);
+
+
+    psl_tx_frame_g : for it in 0 to TX_REGIONS-1 generate
+    begin
+        -- there is bug in questasim leads to sigsegv. This is hotfix
+
+        -- check if packet SOF_POS < EOF_POS
+        psl_tx_frame_in_block(it) <= '1' when unsigned(TX_MFB_SOF_POS((it+1)*log2(TX_REGION_SIZE)-1 downto it*log2(TX_REGION_SIZE)))*TX_BLOCK_SIZE < unsigned(TX_MFB_EOF_POS((it+1)*log2(TX_REGION_SIZE*TX_BLOCK_SIZE)-1 downto it*log2(TX_REGION_SIZE*TX_BLOCK_SIZE))) else '0';
+        -- check if packet is lasty terminated in next region.
+        psl_tx_frame_end(it) <= or(TX_MFB_EOF(TX_REGIONS-1 downto it+1) & '0');
+    end generate;
+
+    sequence  seq_sof_start(const index) is {TX_MFB_SRC_RDY = '1':TX_MFB_DST_RDY = '1':TX_MFB_SOF(index)};
+    sequence  seq_eof_start(const index) is {(TX_MFB_EOF(index) = '1' and psl_tx_frame_in_block(index) = '1')
+                                              or psl_tx_frame_end(index) = '1'};
+    sequence  seq_eof_end                is {TX_MFB_SRC_RDY[*]:TX_MFB_DST_RDY = '1':or(TX_MFB_EOF)};
+    assert_gap_inside : assert forall it in {0 to TX_REGIONS-1}:
+         always (seq_sof_start(it) |-> {{seq_eof_start(it)} | {true;seq_eof_end}}) abort(TX_RESET) @rising_edge(TX_CLK)
+         report "TX_MAC_LITE: Gap inside frame on TX MFB stream!";
+
+}
+
+

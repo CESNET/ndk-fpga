@@ -37,4 +37,21 @@ module testbench;
         .MI_SLAVE       (MI_TX)
     );
 
+
+    MI_PROPERTY #(
+        .DIRECTION(1) //  0 => ASSERT(TX), 1 => ASSUME(RX)
+    )
+    MI_PROPERTY_RX (
+        .inf(MI_RX)
+    )
+
+    generate
+        gen_dma_endpoints : for (genvar it = 0; it < PORTS; it++) begin
+            MI_PROPERTY #(
+                .DIRECTION(0) //  0 => ASSERT(TX), 1 => ASSUME(RX)
+            )
+            MI_PROPERTY_TX (
+                .inf(MI_TX[it])
+            );
+    end endgenerate
 endmodule

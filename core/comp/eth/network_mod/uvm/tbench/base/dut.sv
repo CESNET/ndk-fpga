@@ -66,6 +66,7 @@ module DUT_BASE #(
 
     mvb_if.dut_rx tsu
 );
+    logic RST_INIT;
     wire logic [RESET_WIDTH-1 : 0] reset_user;
     wire logic [ETH_PORTS  -1 : 0] reset_eth;
 
@@ -93,13 +94,18 @@ module DUT_BASE #(
     wire logic [ETH_PORTS-1:0]                                usr_tx_hdr_src_rdy;
     wire logic [ETH_PORTS-1:0]                                usr_tx_hdr_dst_rdy;
 
+    initial begin
+        RST_INIT <= 1'b1;
+        #(10ns) RST_INIT <= 1'b0;
+    end
+
     for (genvar rst_it = 0; rst_it < RESET_WIDTH; rst_it++) begin
-        assign reset_user[rst_it] = rst_usr.RESET;
+        assign reset_user[rst_it] = rst_usr.RESET | RST_INIT;
     end
 
     for (genvar eth_it = 0; eth_it < ETH_PORTS; eth_it++) begin
         //RESET
-        assign reset_eth[eth_it] = rst_eth[eth_it].RESET;
+        assign reset_eth[eth_it] = rst_eth[eth_it].RESET | RST_INIT;
 
         //RX
         assign usr_rx_data[(eth_it+1)*REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH -1 -: REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH] = usr_rx[eth_it].DATA;
@@ -215,7 +221,7 @@ module DUT_BASE #(
         .TX_MVB_DST_RDY (usr_tx_hdr_dst_rdy),
 
         .MI_CLK         (CLK_MI),
-        .MI_RESET       (rst_mi.RESET),
+        .MI_RESET       (rst_mi.RESET | RST_INIT),
         .MI_DWR         (mi.DWR),
         .MI_ADDR        (mi.ADDR),
         .MI_RD          (mi.RD),
@@ -226,7 +232,7 @@ module DUT_BASE #(
         .MI_DRDY        (mi.DRDY),
 
         .MI_CLK_PHY     (CLK_MI_PHY),
-        .MI_RESET_PHY   (rst_mi_phy.RESET),
+        .MI_RESET_PHY   (rst_mi_phy.RESET | RST_INIT),
         .MI_DWR_PHY     (mi_phy.DWR),
         .MI_ADDR_PHY    (mi_phy.ADDR),
         .MI_RD_PHY      (mi_phy.RD),
@@ -237,7 +243,7 @@ module DUT_BASE #(
         .MI_DRDY_PHY    (mi_phy.DRDY),
 
         .MI_CLK_PMD     (CLK_MI_PMD),
-        .MI_RESET_PMD   (rst_mi_pmd.RESET),
+        .MI_RESET_PMD   (rst_mi_pmd.RESET | RST_INIT),
         .MI_DWR_PMD     (mi_pmd.DWR),
         .MI_ADDR_PMD    (mi_pmd.ADDR),
         .MI_RD_PMD      (mi_pmd.RD),

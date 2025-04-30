@@ -193,9 +193,9 @@ begin
     st_asfifo_di <= fl_mfb_frame_len & fl_mfb_undersize & fl_mfb_eof;
     st_asfifo_wr <= (or fl_mfb_eof) and fl_mfb_src_rdy and fl_mfb_dst_rdy;
 
-    assert (not (st_asfifo_wr and st_asfifo_full))
-        report "TX_MAC_LITE_BUFFER: Write to full ST_ASFIFO!"
-        severity error;
+    -- psl assert_asfifo_overflow :
+    --      assert always (not (st_asfifo_wr and st_asfifo_full)) @rising_edge(RX_CLK)
+    --      report "TX_MAC_LITE_BUFFER: Write to full ST_ASFIFO!";
 
     st_asfifo_i : entity work.ASFIFOX
     generic map(

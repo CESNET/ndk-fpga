@@ -58,7 +58,7 @@ interface iFrameLinkRx #(DWIDTH=32, DREMWIDTH=2) (input logic CLK, RESET);
      @(posedge CLK) (RESET)|->(SRC_RDY_N);
   endproperty
 
-  assert property (RESETSRC)
+  assume property (RESETSRC)
      else $error("RX_SRC_RDY_N is active during reset.");
 
   // -- SOF together with SOP -------------------------------------------------
@@ -68,7 +68,7 @@ interface iFrameLinkRx #(DWIDTH=32, DREMWIDTH=2) (input logic CLK, RESET);
      @(posedge CLK) !(SOF_N) && !(SRC_RDY_N)|->!(SOP_N);
   endproperty
 
-  assert property (SOFSOP)
+  assume property (SOFSOP)
      else $error("RX_SOF_N is not active the same time as RX_SOP_N.");
 
 
@@ -79,7 +79,7 @@ interface iFrameLinkRx #(DWIDTH=32, DREMWIDTH=2) (input logic CLK, RESET);
      @(posedge CLK) !(EOF_N) && !(SRC_RDY_N)|->!(EOP_N);
   endproperty
 
-  assert property (EOFEOP)
+  assume property (EOFEOP)
      else $error("RX_EOF_N is not active the same time as RX_EOP_N.");
 
 
@@ -99,7 +99,7 @@ interface iFrameLinkRx #(DWIDTH=32, DREMWIDTH=2) (input logic CLK, RESET);
 	   !(SOP_N && !(SRC_RDY_N || DST_RDY_N)) throughout sop_seq;
   endproperty
 
-  assert property (NoDataAfterEOP)
+  assume property (NoDataAfterEOP)
      else $error("FrameLink transaction continued after RX_EOP_N.");
 
 
@@ -118,7 +118,7 @@ interface iFrameLinkRx #(DWIDTH=32, DREMWIDTH=2) (input logic CLK, RESET);
            (!((!SOP_N) && !(SRC_RDY_N || DST_RDY_N))) throughout eop_seq;
   endproperty
 
-  assert property (EOPMatchSOP)
+  assume property (EOPMatchSOP)
      else $error("RX_SOP_N was not followed by matching RX_EOP_N.");
 
 
@@ -137,7 +137,7 @@ interface iFrameLinkRx #(DWIDTH=32, DREMWIDTH=2) (input logic CLK, RESET);
            (!((!SOF_N) && !(SRC_RDY_N || DST_RDY_N))) throughout eof_seq;
   endproperty
 
-  assert property (EOFMatchSOF)
+  assume property (EOFMatchSOF)
      else $error("RX_SOF_N was not followed by matching RX_EOF_N.");
 
 endinterface : iFrameLinkRx
@@ -189,12 +189,12 @@ interface iFrameLinkTx #(DWIDTH=32, DREMWIDTH=2) (input logic CLK, RESET);
     // -- While RESET DST_RDY_N inactive ----------------------------------------
   // DST_RDY_N may be active only if RESET is inactive.
 
-  property RESETDST;
-     @(posedge CLK) (RESET)|->(DST_RDY_N);
-  endproperty
+  //property RESETDST;
+  //   @(posedge CLK) (RESET)|->(DST_RDY_N);
+  //endproperty
 
-  assert property (RESETDST)
-     else $error("TX_DST_RDY_N is active during reset.");
+  //assume property (RESETDST)
+  //   else $error("TX_DST_RDY_N is active during reset.");
 
 
   // -- SOF together with SOP -------------------------------------------------

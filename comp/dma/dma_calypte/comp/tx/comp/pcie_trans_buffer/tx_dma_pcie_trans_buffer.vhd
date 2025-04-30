@@ -222,24 +222,12 @@ begin
     -- =============================================================================================
     -- Assertions for verification
     -- =============================================================================================
-    assert_dma_hdr_check_p: process (all) is
-        constant NULL_VECT : std_logic_vector(META_BE_W -1 downto 0) := (others => '0');
-        variable pcie_mfb_meta_arr_v : slv_array_t(MFB_REGIONS -1 downto 0)(META_BE_O + META_BE_W -1 downto 0);
-    begin
-        pcie_mfb_meta_arr_v := slv_array_deser(PCIE_MFB_META, MFB_REGIONS);
 
-        if rising_edge(CLK) then
-            for i in 0 to (MFB_REGIONS -1) loop
-                if (RESET = '0') then
-                    if (PCIE_MFB_SRC_RDY = '1' or pcie_mfb_meta_arr_v(i)(META_BE) /= NULL_VECT) then
-                        assert (pcie_mfb_meta_arr_v(i)(META_IS_DMA_HDR) = "0")
-                            report "TX_DMA_PCIE_TRANS_BUFFER: captured DMA header on region " & to_string(i) & "! Danger of data overwrite!"
-                            severity FAILURE;
-                    end if;
-                end if;
-            end loop;
-        end if;
-    end process;
+    -- psl assert_captured_dma_header :
+    --      assert forall it in {0 to (MFB_REGIONS -1)} :
+    --      always ((not (PCIE_MFB_SRC_RDY = '1' or slv_array_deser(PCIE_MFB_META, MFB_REGIONS)(it)(META_BE) /= (META_BE_W -1 downto 0 => '0'))) or
+    --              (slv_array_deser(PCIE_MFB_META, MFB_REGIONS)(it)(META_IS_DMA_HDR) = "0")) abort(RESET) @rising_edge(CLK)
+    --      report "TX_DMA_PCIE_TRANS_BUFFER: captured DMA header on region  to_string(it) Danger of data overwrite!";
 
     -- =============================================================================================
     -- Address storage

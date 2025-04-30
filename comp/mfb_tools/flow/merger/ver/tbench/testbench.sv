@@ -20,8 +20,8 @@ module testbench;
     logic CLK = 0;
     logic RESET;
 
-    iMvbRx #(MVB_ITEMS,MVB_ITEM_WIDTH)                                              RX_MVB[MERGER_INPUTS-1:0] (CLK, RESET);
-    iMfbRx #(MFB_REGIONS,MFB_REG_SIZE,MFB_BLOCK_SIZE,MFB_ITEM_WIDTH,MFB_META_WIDTH) RX_MFB[MERGER_INPUTS-1:0] (CLK, RESET);
+    iMvbRx #(MVB_ITEMS,MVB_ITEM_WIDTH)                                              RX_MVB[MERGER_INPUTS] (CLK, RESET);
+    iMfbRx #(MFB_REGIONS,MFB_REG_SIZE,MFB_BLOCK_SIZE,MFB_ITEM_WIDTH,MFB_META_WIDTH) RX_MFB[MERGER_INPUTS] (CLK, RESET);
     iMvbTx #(MVB_ITEMS,MVB_ITEM_WIDTH)                                              TX_MVB(CLK, RESET);
     iMfbTx #(MFB_REGIONS,MFB_REG_SIZE,MFB_BLOCK_SIZE,MFB_ITEM_WIDTH,MFB_META_WIDTH) TX_MFB(CLK, RESET);
 
@@ -42,9 +42,7 @@ module testbench;
        .RX_MVB (RX_MVB),
        .RX_MFB (RX_MFB),
        .TX_MVB (TX_MVB),
-       .TX_MFB (TX_MFB),
-       .MO_MVB (TX_MVB),
-       .MO_MFB (TX_MFB)
+       .TX_MFB (TX_MFB)
     );
 
 endmodule

@@ -15,3 +15,4 @@ set PACKAGES  "$PACKAGES $ENTITY_BASE/dp_bram_xilinx_func.vhd"
 
 set MOD  "$MOD $ENTITY_BASE/dp_bram_xilinx_ent.vhd"
 set MOD  "$MOD $ENTITY_BASE/dp_bram_xilinx_arch.vhd"
+set MOD  "$MOD $ENTITY_BASE/dp_bram_xilinx.psl"

@@ -36,37 +36,7 @@ architecture FULL of SDP_BRAM_XILINX is
 
    --! Validity signal for readed data.
    signal reg_data_b_vld  : std_logic;
-
-   --! Auxiliary signal for debugging uninitaliazed data
-   signal debug_item_vldB : std_logic := '1';
-
 begin
-
--- pragma translate_off
--- pragma synthesis_off
-   --! Support for DEBUG_ASSERT_UNINITIALIZED in simulations.
-   assert_gen: if DEBUG_ASSERT_UNINITIALIZED generate
-      dbg_init_control: process(CLKA, CLKB)
-         variable debug_item_written: std_logic_vector(2**ADDRESS_WIDTH-1 downto 0);
-      begin
-         if CLKA'event and CLKA = '1' then
-            if PIPE_ENA = '1' and WEA = '1' then
-               debug_item_written(conv_integer(ADDRA)) := '1';
-            end if;
-         end if;
-
-         if CLKB'event and CLKB = '1' then
-            if RSTB = '1' then
-               debug_item_written := (others => '0');
-            end if;
-            debug_item_vldB <= debug_item_written(conv_integer(ADDRB));
-         end if;
-      end process;
-      assert debug_item_vldB = '1' or reg_data_b_vld = '0' or RSTB /= '0' or not CLKB'event or CLKB = '0' report "Reading uninitialized item from SDP_BRAM_XILINX on port B!" severity error;
-   end generate;
--- pragma synthesis_on
--- pragma translate_on
-
    --! Code for non ULTRASCALE devices.
    --! Based on BRAM_TDP_MACRO, for more details see UG768 (Xilinx 7 Series FPGA
    --! and Zynq-7000 All Programmable SoC Libraries Guide for HDL Designs).
@@ -160,7 +130,7 @@ begin
       dob_noreg_gen: if (ENABLE_OUT_REG = false) generate
          pipe_enb_in <= '1'; --! Enable pipeline by default
          DOB_DV <= reg_data_b_vld; --! Deal with data output
-         DOB <= portB_data_out(conv_integer(unsigned(reg_row_address_b))) when (debug_item_vldB = '1') else (others => 'U');
+         DOB <= portB_data_out(conv_integer(unsigned(reg_row_address_b)));
       end generate;
 
       --! Output register for port B
@@ -173,11 +143,7 @@ begin
                   DOB_DV <= '0';
                else
                   if (PIPE_ENB = '1') then
-                     if (debug_item_vldB = '1') then
-                        DOB <= portB_data_out(conv_integer(unsigned(reg_row_address_b)));
-                     else
-                        DOB <= (others => 'U');
-                     end if;
+                     DOB <= portB_data_out(conv_integer(unsigned(reg_row_address_b)));
                      DOB_DV <= reg_data_b_vld;
                   end if;
                end if;

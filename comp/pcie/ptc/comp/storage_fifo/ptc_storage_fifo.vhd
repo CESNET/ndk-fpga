@@ -165,12 +165,6 @@ architecture full of PTC_STORAGE_FIFO is
    signal main_mfb_fifo_in_eof_pos : std_logic_vector(MFB_REGIONS*EOF_POS_WIDTH-1 downto 0);
    signal main_mfb_fifo_in_src_rdy : std_logic;
    signal main_mfb_fifo_in_dst_rdy : std_logic;
-
-   ---------------------------------------------------------------------------
-
-   signal rx_mfb_ext_err_reg       : std_logic; -- for simulation debug purposes
-   signal mvb_main_fifo_err_reg    : std_logic; -- for simulation debug purposes
-
 begin
 
    -- -------------------------------------------------------------------------
@@ -212,21 +206,9 @@ begin
 
    RX_MFB_DST_RDY_ext <= not in_mfb_fifoxm_full;
 
-   process (CLK)
-   begin
-      if (rising_edge(CLK)) then
-         if (in_mfb_fifoxm_full = '1') then
-            rx_mfb_ext_err_reg <= '1';
-         end if;
-         if (RESET = '1') then
-            rx_mfb_ext_err_reg <= '0';
-         end if;
-      end if;
-   end process;
-
-   assert (rx_mfb_ext_err_reg /= '1')
-      report "PTC: Storage input shakedown FIFO dst_rdy fall error!"
-      severity failure;
+   -- psl assert_fifo_owerflow :
+   --      assert always (not (in_mfb_fifoxm_full = '1')) abort (RESET) @rising_edge(CLK)
+   --      report "PTC: Storage input shakedown FIFO dst_rdy fall error!";
 
    -- -------------------------------------------------------------------------
 
@@ -429,21 +411,9 @@ begin
       AEMPTY      => open
    );
 
-   process (CLK)
-   begin
-      if (rising_edge(CLK)) then
-         if (RX_MVB_DST_RDY = '0') then
-            mvb_main_fifo_err_reg <= '1';
-         end if;
-         if (RESET = '1') then
-            mvb_main_fifo_err_reg <= '0';
-         end if;
-      end if;
-   end process;
-
-   assert (mvb_main_fifo_err_reg /= '1')
-      report "PTC: Storage main MVB FIFO dst_rdy fall error!"
-      severity failure;
+   -- psl assert_fifo_dst_rdy :
+   --      assert always (not (RX_MVB_DST_RDY = '0')) abort (RESET) @rising_edge(CLK)
+   --      report "PTC: Storage main MVB FIFO dst_rdy fall error!";
 
    -- safe MVB items checking
    safe_mvb_items_check_pr : process (safe_mvb_items_reg,TX_MVB_DST_RDY,mvb_fifo_empty)

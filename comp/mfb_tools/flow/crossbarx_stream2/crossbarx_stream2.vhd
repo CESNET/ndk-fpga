@@ -149,7 +149,6 @@ architecture FULL of MFB_CROSSBARX_STREAM2 is
     signal dis_fifo_mvb_vld           : slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal dis_fifo_mvb_src_rdy       : std_logic_vector(IN_STREAMS-1 downto 0);
     signal dis_fifo_mvb_dst_rdy       : std_logic_vector(IN_STREAMS-1 downto 0);
-    signal dis_fifo_wr_err_reg        : std_logic_vector(IN_STREAMS-1 downto 0);
 
     signal gen_tr_mvb_len             : slv_array_2d_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
     signal gen_tr_mvb_planmeta        : slv_array_2d_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0)(PLAN_META_W-1 downto 0);
@@ -526,21 +525,9 @@ begin
             TX_DST_RDY => dis_fifo_mvb_dst_rdy(s)
         );
 
-        process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (dis_mvb_src_rdy(s) = '1' and dis_mvb_dst_rdy(s) = '0') then
-                    dis_fifo_wr_err_reg(s) <= '1';
-                end if;
-                if (RESET = '1') then
-                    dis_fifo_wr_err_reg(s) <= '0';
-                end if;
-            end if;
-        end process;
-
-        assert (dis_fifo_wr_err_reg(s) /= '1')
-           report "CXS2: dst_rdy error! Writing in full dis_fifo_i!"
-           severity failure;
+        -- psl assert_wr_err :
+        --      assert always (not (dis_mvb_src_rdy(s) = '1' and dis_mvb_dst_rdy(s) = '0')) abort (RESET) @rising_edge(CLK)
+        --      report "CXS2: dst_rdy error! Writing in full dis_fifo_i!";
 
         dis_fifo_mvb_pkt_id(s)  <= slv_array_deser(dis_fifo_mvb_data(s), MFB_REGIONS);
         dis_fifo_mvb_dst_rdy(s) <= not crox_done_src_rdy(s);

@@ -198,8 +198,8 @@ program TEST (
         // Max burst size the burst mode is tested on
         const int max_bst_size = 10;
 
-        resetDesign();
         createEnvironment();
+        resetDesign();
 
         // Test with different packet lengths and different burst sizes.
         if (USE_PACP_ARCH != 1'b1) begin
@@ -214,7 +214,6 @@ program TEST (
         for (int length = 64; length < 4*MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE; length=length+3) begin
             test(length, 0, 64);
         end
-
         $write("Verification finished successfully!\n");
         $stop();
     end

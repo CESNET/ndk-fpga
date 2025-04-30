@@ -90,26 +90,8 @@ signal out_mem : std_logic_vector(C_DWIDTH-1 downto 0);
 
 -- Internal Signals
 
-signal reg_data_vld : std_logic_vector(READ_LATENCY-1 downto 0);
-signal debug_item_vld : std_logic := '1';
-
+    signal reg_data_vld : std_logic_vector(READ_LATENCY-1 downto 0);
 begin
-   -- Generate uninitialized memory reports
-   assert_gen : if DEBUG_ASSERT_UNINITIALIZED = true generate
-      dbg_assertA : process(CLK)
-      variable debug_item_written : std_logic_vector(2**ADDRESS_WIDTH-1 downto 0);
-      begin
-         if CLK'event and CLK = '1' then
-            if RST = '1' then
-               debug_item_written := (others => '0');
-            elsif PIPE_EN = '1' and WE = '1' then
-               debug_item_written(to_integer(unsigned(ADDR))) := '1';
-            end if;
-            debug_item_vld <= debug_item_written(to_integer(unsigned(ADDR)));
-         end if;
-      end process;
-      assert debug_item_vld = '1' or reg_data_vld(READ_LATENCY-1) = '0' or RST /= '0' or not CLK'event or CLK = '0' report "Reading uninitialized data on DP_URAM_XILINX port A" severity error;
-   end generate;
 
 -- Macro instantiation
 macro_gen : if (DEVICE = "ULTRASCALE") generate
@@ -251,12 +233,7 @@ end generate;
       process(CLK)
       begin
          if(CLK'event and CLK = '1') then
-            if(PIPE_EN = '1') then
-               if debug_item_vld = '1' then
-                  DO <= out_mem;
-               else
-                  DO <= (others => 'U');
-               end if;
+               DO <= out_mem;
             end if;
          end if;
       end process;
@@ -277,7 +254,7 @@ end generate;
      -- Assign signals when output register is disabled
    disable_out_reg : if(EXTERNAL_OUT_REG = false) generate
       DO_DV <= reg_data_vld(READ_LATENCY-1);
-      DO <= out_mem when debug_item_vld = '1' else (others => 'U');
+      DO <= out_mem;
    end generate;
 
 

@@ -206,12 +206,13 @@ begin
       end if;
    end process;
 
+   -- psl assert_sub_optional_gap :
+   --      assert always (sync_next/='1' or sync_vld/='1' or sync_tx_gap_size=sync_rx_gap_size-HDR_BYTES or (sync_tx_gap_size=sync_rx_gap_size+WORD_BYTES-HDR_BYTES and sync_rx_gap_size<HDR_BYTES))
+   --      report "HINS_VER: Sub-optimal gap size detected! (RX=integer'IMAGE(conv_integer(sync_rx_gap_size)), TX=integer'IMAGE(conv_integer(sync_tx_gap_size)))";
 
-   assert (sync_next/='1' or sync_vld/='1' or sync_tx_gap_size=sync_rx_gap_size-HDR_BYTES or (sync_tx_gap_size=sync_rx_gap_size+WORD_BYTES-HDR_BYTES and sync_rx_gap_size<HDR_BYTES))
-       report "HINS_VER: Sub-optimal gap size detected! (RX="&integer'IMAGE(conv_integer(sync_rx_gap_size))&", TX="&integer'IMAGE(conv_integer(sync_tx_gap_size))&")"
-       severity error;
-   assert ((TX_SRC_RDY='1' or sync_vld/='1') or not CLK'event or not CLK='1' or not rx_src_rdy_reg='1')
-       report "HINS_VER: Wait state from HINS detected!)"
-       severity error;
+   -- psl assert_wait :
+   --      assert always ((TX_SRC_RDY='1' or sync_vld/='1') or not CLK'event or not CLK='1' or not rx_src_rdy_reg='1')
+   --      report "HINS_VER: Wait state from HINS detected!)";
+
 end architecture;
 

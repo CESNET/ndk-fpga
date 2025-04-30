@@ -511,9 +511,9 @@ begin
             TX_TRANS_DST_RDY => trsr_trans_comp_dst_rdy(s)
         );
 
-        assert (((or trcg_trans_vld)='1' and trcg_trans_src_rdy='1' and trcg_trans_dst_rdy='1' and trsr_trans_dst_rdy(s)='0')=false)
-            report "WARNING: CROSSBARX: Internal Transaction FIFO is FULL causing a decrease in throughput! Consider increasing value of generic TRANS_FIFO_ITEMS (currently "&to_string(TRANS_FIFO_ITEMS)&")."
-            severity warning;
+        -- psl assert_trcg :
+        --      assert always (((or trcg_trans_vld)='1' and trcg_trans_src_rdy='1' and trcg_trans_dst_rdy='1' and trsr_trans_dst_rdy(s)='0')=false) @rising_edge(CLK)
+        --      report "WARNING: CROSSBARX: Internal Transaction FIFO is FULL causing a decrease in throughput! Consider increasing value of generic TRANS_FIFO_ITEMS (currently to_string(TRANS_FIFO_ITEMS)).";
 
         -- ------------------------------------------------------------------------
 
@@ -724,10 +724,9 @@ begin
             end generate;
 
             -- overflow checking
-            assert (ugen_f_wr(s)(i)/='1' or ugen_f_full(s)(i)/='1')
-                report "ERROR: CrossbarX: uInstruction Generator FIFOX_" & to_string(s) & "_" & to_string(i) &
-                       " overflow detected! Consider increasing UGEN_F_AFULL_OFFSET."
-                severity failure;
+            -- psl assert_ugen_f_overflow :
+            --      assert always (ugen_f_wr(s)(i)/='1' or ugen_f_full(s)(i)/='1') @rising_edge(CLK)
+            --      report "ERROR: CrossbarX: uInstruction Generator FIFOX_to_string(s) _ to_string(i) overflow detected! Consider increasing UGEN_F_AFULL_OFFSET.";
 
             (tmp_ugen_f_uinstr_a_col ,
              tmp_ugen_f_uinstr_a_item,

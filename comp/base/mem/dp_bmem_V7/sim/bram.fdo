@@ -8,7 +8,7 @@
 
 # For whole design testing
 set FIRMWARE_BASE    "../../../../.."
-set BRAM_BASE       "$OFM_PATH/comp/base/mem/dp_bmem_V7"
+set BRAM_BASE       "$FIRMWARE_BASE/comp/base/mem/dp_bmem_V7"
 
 set TB_FILE          "$BRAM_BASE/sim/testbench.vhd"
 set SIG_FILE         "$BRAM_BASE/sim/bram_sig.fdo"

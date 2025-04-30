@@ -174,12 +174,7 @@ begin
                 -- send RD request
                 elsif (cmd(1) = '1') then
                     next_st <= RD;
-                -- Error state - WR and RD = '1'
-                elsif (and cmd) then
-                    next_st <= IDLE;
-                    assert false
-                        report "Read and Write requests at the same time !!"
-                        severity failure;
+                -- elsif (and cmd) then <- Absolulty dead code due to previs conditions
                 else
                     next_st <= IDLE;
                 end if;
@@ -211,6 +206,10 @@ begin
                 next_st <= IDLE;
         end case;
     end process;
+
+    -- psl assert_wr_rd :
+    --      assert always (not(and cmd)) abort (RESET) @rising_edge(CLK)
+    --      report "Read and Write requests at the same time !!";
 
     -- Control ------------------------------------------------------------
     output_logic_p : process (all)

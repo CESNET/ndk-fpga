@@ -79,9 +79,6 @@ architecture FULL of MFB_CROSSBARX_STREAM2_TR_FIFO is
     signal txbuf_done_cnt      : u_array_t(STREAMS-1 downto 0)(DONE_CNT_W-1 downto 0);
     signal txbuf_done_dec      : u_array_t(STREAMS-1 downto 0)(log2(MFB_REGIONS+1)-1 downto 0);
 
-    signal txbuf_done_cnt_ovf     : std_logic_vector(STREAMS-1 downto 0);
-    signal txbuf_done_cnt_ovf_reg : std_logic_vector(STREAMS-1 downto 0);
-
 begin
 
     rx_tr_mvb_pack_g: for i in 0 to MFB_REGIONS-1 generate
@@ -165,23 +162,10 @@ begin
             end if;
         end process;
 
-        txbuf_done_cnt_ovf(s) <= (and txbuf_done_cnt(s));
 
-        process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (txbuf_done_cnt_ovf(s) = '1') then
-                    txbuf_done_cnt_ovf_reg(s) <= '1';
-                end if;
-                if (RESET = '1') then
-                    txbuf_done_cnt_ovf_reg(s) <= '0';
-                end if;
-            end if;
-        end process;
-
-        assert (txbuf_done_cnt_ovf_reg(s) /= '1')
-            report "CXS2-TRFIFO: Counter txbuf_done_cnt overflowed!"
-            severity failure;
+        -- psl assert_txbuf_done_cnt :
+        --      assert always (not (and txbuf_done_cnt(s))) abort (RESET) @rising_edge(CLK)
+        --      report "CXS2-TRFIFO: Counter txbuf_done_cnt overflowed!";
     end generate;
 
 end architecture;

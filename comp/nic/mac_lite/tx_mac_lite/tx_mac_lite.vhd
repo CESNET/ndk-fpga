@@ -246,9 +246,6 @@ architecture FULL of TX_MAC_LITE is
     signal cd_fifo_rd                  : std_logic;
     signal cd_fifo_empty               : std_logic;
 
-    signal cd_fifo_overflow_dbg_reg    : std_logic;
-    signal cd_fifo_underflow_dbg_reg   : std_logic;
-
     signal crc32_vld_masked            : std_logic_vector(MD_REGIONS-1 downto 0);
     signal crc32_src_rdy_masked        : std_logic;
 
@@ -286,9 +283,8 @@ architecture FULL of TX_MAC_LITE is
     signal cg_mfb_src_rdy              : std_logic;
     signal cg_mfb_dst_rdy              : std_logic;
 
-    signal tx_inc_frame                : std_logic_vector(TX_REGIONS+1-1 downto 0);
-    signal tx_gap_inside_frame_dbg     : std_logic;
-    signal tx_gap_inside_frame_dbg_reg : std_logic;
+    signal tx_inc_frame                : std_logic_vector(TX_REGIONS-1 downto 0);
+    signal pkt_in_block                : std_logic_vector(TX_REGIONS-1 downto 0);
 
     signal stat_rx_frame_inc_reg       : std_logic_vector(MD_REGIONS-1 downto 0);
     signal stat_tx_frame_inc_reg       : std_logic_vector(MD_REGIONS-1 downto 0);
@@ -499,16 +495,9 @@ begin
         cd_fifo_wr <= (or fl_mfb_eof) and crc_mfb_src_rdy;
         cd_fifo_di <= fl_mfb_eof and not fl_mfb_discard;
 
-        process (RX_CLK)
-        begin
-            if (rising_edge(RX_CLK)) then
-                cd_fifo_overflow_dbg_reg <= cd_fifo_wr and cd_fifo_full;
-            end if;
-        end process;
-
-        assert (cd_fifo_overflow_dbg_reg /= '1')
-            report "TX_MAC_LITE: crc_discard_fifo_i overflow!"
-            severity failure;
+        -- psl assert_fifo_overflow :
+        --      assert always ((cd_fifo_wr and cd_fifo_full) /= '1') @rising_edge(RX_CLK)
+        --      report "TX_MAC_LITE: crc_discard_fifo_i overflow!";
 
         crc_discard_fifo_i : entity work.FIFOX
         generic map(
@@ -534,16 +523,9 @@ begin
             AEMPTY => open
         );
 
-        process (RX_CLK)
-        begin
-            if (rising_edge(RX_CLK)) then
-                cd_fifo_underflow_dbg_reg <= cd_fifo_rd and cd_fifo_empty;
-            end if;
-        end process;
-
-        assert (cd_fifo_underflow_dbg_reg /= '1')
-            report "TX_MAC_LITE: crc_discard_fifo_i underflow!"
-            severity failure;
+        -- psl assert_fifo_underflow :
+        --      assert always ((cd_fifo_rd and cd_fifo_empty) /= '1') @rising_edge(RX_CLK)
+        --      report "TX_MAC_LITE: crc_discard_fifo_i underflow!";
 
         cd_fifo_rd <= crc32_src_rdy;
 
@@ -804,39 +786,7 @@ begin
     -- -------------------------------------------------------------------------
     --  INCOMPLETE FRAME LOGIC - DEBUG ONLY
     -- -------------------------------------------------------------------------
-
-    tx_inc_frame_g : for r in 0 to TX_REGIONS-1 generate
-        tx_inc_frame(r+1) <= (TX_MFB_SOF(r) and not TX_MFB_EOF(r) and not tx_inc_frame(r)) or
-                          (TX_MFB_SOF(r) and TX_MFB_EOF(r) and tx_inc_frame(r)) or
-                          (not TX_MFB_SOF(r) and not TX_MFB_EOF(r) and tx_inc_frame(r));
-    end generate;
-
-    process (TX_CLK)
-    begin
-        if (rising_edge(TX_CLK)) then
-            if (TX_RESET = '1') then
-                tx_inc_frame(0) <= '0';
-            elsif (TX_MFB_SRC_RDY = '1' and TX_MFB_DST_RDY = '1') then
-                tx_inc_frame(0) <= tx_inc_frame(TX_REGIONS);
-            end if;
-        end if;
-    end process;
-
-    tx_gap_inside_frame_dbg <= tx_inc_frame(0) and not TX_MFB_SRC_RDY;
-
-    process (TX_CLK)
-    begin
-        if (rising_edge(TX_CLK)) then
-            tx_gap_inside_frame_dbg_reg <= tx_gap_inside_frame_dbg;
-        end if;
-    end process;
-
-    assert (tx_gap_inside_frame_dbg_reg /= '1')
-        report "TX_MAC_LITE: Gap inside frame on TX MFB stream!"
-        severity warning;
-        --change severity to warning, because questa sim have problem with this assert and
-        --evaluate it wrongly
-        --severity failure;
+    -- check if SRC_RDY doesnt fall when packet is transmiting  psl assert_gap_inside
 
     -- =========================================================================
     --  STATISTICS MODULE

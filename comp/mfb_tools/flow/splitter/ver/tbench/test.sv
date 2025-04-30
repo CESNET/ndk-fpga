@@ -139,6 +139,7 @@ program TEST (
    task test1();
       $write("\n\n############ TEST CASE 1 ############\n\n");
       enableTestEnvironment();
+      resetDesign();
       generator.setEnabled(TRANSACTION_COUNT);
       wait(!generator.enabled);
       disableTestEnvironment();
@@ -146,10 +147,11 @@ program TEST (
    endtask
 
    initial begin
-      resetDesign();
       createEnvironment(FRAME_SIZE_MAX, FRAME_SIZE_MIN);
       test1();
-      $write("Verification finished successfully!\n");
+      if (scoreboard.done()) begin
+        $write("Verification finished successfully!\n");
+      end
       $stop();
    end
 

@@ -334,7 +334,8 @@ begin
             WRITE_MODE       => "READ_FIRST",
             ADDITIONAL_REG   => 0,
             EXTERNAL_OUT_REG => false,
-            INTERNAL_OUT_REG => false
+            INTERNAL_OUT_REG => false,
+            PSL_WR_BEFFORE_RD => false
          )
          port map(
             CLK     => CLK,

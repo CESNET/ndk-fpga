@@ -68,10 +68,14 @@ class Scoreboard;
       driverCbs  = new(scoreTable);
     endfunction
 
+    function int unsigned done();
+        return (scoreTable.removed != 0);
+    endfunction
+
     task display();
       //scoreTable.display();
       $write("-----------------------------------------------------------------\n");
-      $write("Verification done! Discarded frames: %d\n", scoreTable.tr_table.size);
+      $write("Verification done! Accepted frames %0d  Discarded frames: %d\n", scoreTable.removed, scoreTable.tr_table.size);
       $write("Compare this value with counter in waveform.\n");
       $write("-----------------------------------------------------------------\n");
     endtask

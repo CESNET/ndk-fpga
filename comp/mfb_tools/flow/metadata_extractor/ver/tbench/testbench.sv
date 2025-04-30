@@ -17,9 +17,9 @@ module testbench;
 
     logic CLK = 0;
     logic RESET;
-    iMfbRx #(test_pkg::MFB_REGIONS,test_pkg::MFB_REGION_SIZE,test_pkg::MFB_BLOCK_SIZE,test_pkg::MFB_ITEM_WIDTH,test_pkg::MFB_META_WIDTH) RX(CLK);
-    iMfbTx #(test_pkg::MFB_REGIONS,test_pkg::MFB_REGION_SIZE,test_pkg::MFB_BLOCK_SIZE,test_pkg::MFB_ITEM_WIDTH,test_pkg::MFB_META_WIDTH) TX_MFB(CLK);
-    iMvbTx #(test_pkg::MVB_ITEMS,test_pkg::MFB_META_WIDTH) TX_MVB(CLK);
+    iMfbRx #(test_pkg::MFB_REGIONS,test_pkg::MFB_REGION_SIZE,test_pkg::MFB_BLOCK_SIZE,test_pkg::MFB_ITEM_WIDTH,test_pkg::MFB_META_WIDTH) RX(CLK, RESET);
+    iMfbTx #(test_pkg::MFB_REGIONS,test_pkg::MFB_REGION_SIZE,test_pkg::MFB_BLOCK_SIZE,test_pkg::MFB_ITEM_WIDTH,test_pkg::MFB_META_WIDTH) TX_MFB(CLK, RESET);
+    iMvbTx #(test_pkg::MVB_ITEMS,test_pkg::MFB_META_WIDTH) TX_MVB(CLK, RESET);
 
     always #(test_pkg::CLK_PERIOD/2) CLK = ~CLK;
 

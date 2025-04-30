@@ -35,4 +35,19 @@ module testbench;
         .MI_SLAVE   (MI_SLAVE)
     );
 
+    MI_PROPERTY #(
+        .DIRECTION(1) //  0 => ASSERT(TX), 1 => ASSUME(RX)
+    )
+    MI_PROPERTY_RX (
+        .inf(MI_MASTER)
+    )
+
+    MI_PROPERTY #(
+        .DIRECTION(0)//  0 => ASSERT(TX), 1 => ASSUME(RX)
+    )
+    MI_PROPERTY_TX (
+        .inf(MI_SLAVE)
+    )
+
+
 endmodule

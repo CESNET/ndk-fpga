@@ -84,9 +84,6 @@ architecture FULL of TX_MAC_LITE_CRC_INSERT is
     signal shake_vld               : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal shake_vld_n             : std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    signal crc_out_of_sync_dbg     : std_logic;
-    signal crc_out_of_sync_dbg_reg : std_logic;
-
     signal reg0_mfb_eof_pos_arr    : slv_array_t(MFB_REGIONS-1 downto 0)(MFB_EOF_POS_W-1 downto 0);
     signal crc32_data_arr          : slv_array_t(MFB_REGIONS-1 downto 0)(CRC_W-1 downto 0);
     signal crc32_data_shifted_arr  : slv_array_t(MFB_REGIONS-1 downto 0)(CRC_W-1 downto 0);
@@ -188,37 +185,10 @@ begin
 
     shake_vld <= not shake_vld_n;
 
-    crc_out_of_sync_dbg_p : process (all)
-        variable v_crc_index : integer range 0 to MFB_REGIONS;
-        variable v_eof_index : integer range 0 to MFB_REGIONS;
-    begin
-        v_crc_index := 0;
-        v_eof_index := 0;
-        for i in 0 to MFB_REGIONS-1 loop
-            if (shake_vld(i) = '1') then
-                v_crc_index := v_crc_index + 1;
-            end if;
-            if (reg0_mfb_eof(i) = '1') then
-                v_eof_index := v_eof_index + 1;
-            end if;
-        end loop;
-        if (v_eof_index > v_crc_index) then
-            crc_out_of_sync_dbg <= ci_mfb_src_rdy and ci_mfb_dst_rdy;
-        else
-            crc_out_of_sync_dbg <= '0';
-        end if;
-    end process;
+    -- psl assert_sync_crc :
+    --      assert always ((countones(reg0_mfb_eof) > countones(shake_vld)) or (not (ci_mfb_src_rdy = '1' and ci_mfb_dst_rdy = '1'))) abort (RESET) @rising_edge(CLK)
+    --      report "TX_MAC_LITE_CRC_INSERT: CRC32 out of sync!";
 
-    process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            crc_out_of_sync_dbg_reg <= crc_out_of_sync_dbg;
-        end if;
-    end process;
-
-    assert (not crc_out_of_sync_dbg_reg)
-        report "TX_MAC_LITE_CRC_INSERT: CRC32 out of sync!"
-        severity error;
 
     crc_accept_p : process (all)
         variable v_crc_accept : std_logic_vector(MFB_REGIONS-1 downto 0);

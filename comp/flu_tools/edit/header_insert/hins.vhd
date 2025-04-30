@@ -241,13 +241,13 @@ begin
   HDR_NEXT   <= sig_hdr_next;
 
   -- some functional asserts for verification and debug only
--- pragma synthesis_off
-  assert (vld_reg/='0' or sop_reg/='1')
-    report "FLU_HINS: sop_reg active when vld_reg is not!"
-    severity error;
-  assert (vld_reg/='0' or eop_reg/='1')
-    report "FLU_HINS: eop_reg active when vld_reg is not!"
-    severity error;
--- pragma synthesis_on
+  -- psl assert_vld_sop :
+  --      assert always (vld_reg/='0' or sop_reg/='1')
+  --      report "FLU_HINS: sop_reg active when vld_reg is not!";
+
+  -- psl assert_vld_eop :
+  --      assert always (vld_reg/='0' or eop_reg/='1')
+  --      report "FLU_HINS: eop_reg active when vld_reg is not!";
+
 end architecture;
 

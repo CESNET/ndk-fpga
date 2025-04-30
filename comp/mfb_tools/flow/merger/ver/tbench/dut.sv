@@ -18,8 +18,8 @@ import test_pkg::*;
 module DUT (
     input logic CLK,
     input logic RESET,
-    iMvbRx.dut RX_MVB[MERGER_INPUTS-1:0],
-    iMfbRx.dut RX_MFB[MERGER_INPUTS-1:0],
+    iMvbRx.dut RX_MVB[MERGER_INPUTS],
+    iMfbRx.dut RX_MFB[MERGER_INPUTS],
     iMvbTx.dut TX_MVB,
     iMfbTx.dut TX_MFB
 );

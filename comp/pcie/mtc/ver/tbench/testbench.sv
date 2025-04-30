@@ -34,4 +34,11 @@ module testbench;
 		.MI            (MI)
 	);
 
+    MI_PROPERTY #(
+        .DIRECTION(1) //  0 => ASSERT(TX), 1 => ASSUME(RX)
+    )
+    MI_PROPERTY_U (
+        .inf(MI)
+    )
+
 endmodule

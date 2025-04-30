@@ -34,7 +34,7 @@ class MvbMonitor #(ITEMS = 4, ITEM_WIDTH = 8) extends Monitor;
                 @(vif.monitor_cb);
                 busy = vif.monitor_cb.SRC_RDY;
                 if(!enabled) return;
-            end while(!(vif.monitor_cb.SRC_RDY && vif.monitor_cb.DST_RDY)); // wait for valid data
+            end while(!(vif.monitor_cb.SRC_RDY === 1'b1 && vif.monitor_cb.DST_RDY === 1'b1)); // wait for valid data
             if(!vif.monitor_cb.VLD) begin
                 $write("@%0t - %s: Error in MVB protocol! Valid word without a single valid item.\n", $time, inst);
                 @(vif.monitor_cb);

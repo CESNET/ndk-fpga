@@ -35,8 +35,8 @@ entity DP_BRAM_V7 is
       ENABLE_OUT_REG : boolean := false;
       --! Select target device "VIRTEX5", "VIRTEX6", "7SERIES", "SPARTAN6"
       DEVICE         : string := "7SERIES";
-      --! Asserts will report reading of uinitialized items from memory in verification
-      DEBUG_ASSERT_UNINITIALIZED : boolean := false
+      --! Enable check write before read. For more info check *.psl file
+      PSL_WR_BEFFORE_RD : boolean := true
    );
    port (
       --! \name Interface A

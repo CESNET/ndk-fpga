@@ -127,7 +127,6 @@ architecture FULL of RX_MAC_LITE_BUFFER is
     signal s_dbuf_rdy           : std_logic;
     signal s_dbuf_full          : std_logic;
     signal s_dbuf_discard       : std_logic_vector(REGIONS-1 downto 0);
-    signal s_dbuf_ovf_err_reg   : std_logic;
     signal s_dbuf_afull_reg     : std_logic;
     signal s_dbuf_status        : std_logic_vector(log2(DFIFO_ITEMS) downto 0);
 
@@ -135,7 +134,6 @@ architecture FULL of RX_MAC_LITE_BUFFER is
     signal s_mbuf_vld           : std_logic_vector(REGIONS-1 downto 0);
     signal s_mbuf_src_rdy       : std_logic;
     signal s_mbuf_dst_rdy       : std_logic;
-    signal s_mbuf_ovf_err_reg   : std_logic;
     signal s_mbuf_status        : std_logic_vector(log2(MFIFO_ITEMS) downto 0);
     signal s_mbuf_afull         : std_logic;
     signal s_mbuf_afull_reg     : std_logic;
@@ -366,23 +364,10 @@ begin
         TX_DST_RDY       => TX_MFB_DST_RDY
     );
 
-    process (RX_CLK, TX_RESET)
-    begin
-        if (TX_RESET = '1') then
-            s_dbuf_ovf_err_reg <= '0';
-        elsif (rising_edge(RX_CLK)) then
-            if (s_dbuf_rdy = '0' and s_rx_src_rdy_reg = '1') then
-                s_dbuf_ovf_err_reg <= '1';
-            end if;
-            if (RX_RESET = '1') then
-                s_dbuf_ovf_err_reg <= '0';
-            end if;
-        end if;
-    end process;
+    -- psl assert_write_dbuf :
+    --      assert always (s_dbuf_rdy = '1' or s_rx_src_rdy_reg = '0') abort (TX_RESET) @rising_edge(RX_CLK)
+    --      report "RX_MAC_LITE_BUFFER: Ilegal wite to full dbuf_i FIFO!";
 
-    assert (s_dbuf_ovf_err_reg /= '1')
-       report "RX_MAC_LITE_BUFFER: Ilegal wite to full dbuf_i FIFO!"
-       severity failure;
 
     process (RX_CLK)
     begin
@@ -429,21 +414,10 @@ begin
         TX_DST_RDY => s_mbuf_mvb_dst_rdy
     );
 
-    process (RX_CLK)
-    begin
-        if (rising_edge(RX_CLK)) then
-            if (s_mbuf_dst_rdy = '0' and s_mbuf_src_rdy = '1') then
-                s_mbuf_ovf_err_reg <= '1';
-            end if;
-            if (RX_RESET = '1') then
-                s_mbuf_ovf_err_reg <= '0';
-            end if;
-        end if;
-    end process;
 
-    assert (s_mbuf_ovf_err_reg /= '1')
-       report "RX_MAC_LITE_BUFFER: Ilegal wite to full mbuf_i FIFO!"
-       severity failure;
+    -- psl assert_mbuf :
+    --      assert always (s_mbuf_dst_rdy = '1' or s_mbuf_src_rdy = '0') abort (RX_RESET) @rising_edge(RX_CLK)
+    --      report "RX_MAC_LITE_BUFFER: Ilegal wite to full mbuf_i FIFO!";
 
     process (RX_CLK)
     begin

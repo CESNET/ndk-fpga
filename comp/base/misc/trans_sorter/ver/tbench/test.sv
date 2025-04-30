@@ -78,8 +78,6 @@ program TEST (
         txTransResponder.setEnabled();
         //  Enabling of Confirmator.
         scoreboard.setEnabled();
-        //  Setting up number of transactions that will be generated.
-        rxTransGenerator.setEnabled(TRANSACTION_COUNT);
     endtask
 
     // This task manage that there is not any active verification component
@@ -126,7 +124,8 @@ program TEST (
         //  Set up of the verification environment constraints.
         txTransResponder.wordDelayEnable_wt = 2;
         txTransResponder.wordDelayDisable_wt = 8;
-        enableTestEnvironment();
+        //  Setting up number of transactions that will be generated.
+        rxTransGenerator.setEnabled(TRANSACTION_COUNT);
 
         #(20*CLK_PERIOD);
         //  Waiting for generator to end generating.
@@ -134,7 +133,6 @@ program TEST (
         //  Waiting predetermined time.
         #(TIME_TO_WAIT_AFTER_GENERATOR_FINISHED*CLK_PERIOD);
 
-        disableTestEnvironment();
         //  Displaying scoreboard.
         scoreboard.display();
         $write("-- End of TEST CASE 1 --------------------------------------\n\n");
@@ -146,7 +144,8 @@ program TEST (
         //  Set up of the verification environment constraints.
         txTransResponder.wordDelayEnable_wt = 8;
         txTransResponder.wordDelayDisable_wt = 2;
-        enableTestEnvironment();
+        //  Setting up number of transactions that will be generated.
+        rxTransGenerator.setEnabled(TRANSACTION_COUNT);
 
         #(20*CLK_PERIOD);
 
@@ -155,22 +154,20 @@ program TEST (
         //  Waiting predetermined time.
         #(TIME_TO_WAIT_AFTER_GENERATOR_FINISHED*CLK_PERIOD);
 
-        disableTestEnvironment();
-        //  Displaying scoreboard.
         scoreboard.display();
         $write("-- End of TEST CASE 2 --------------------------------------\n\n");
         $write("------------------------------------------------------------\n");
     endtask
 
     initial begin
-        resetDesign();
         createEnvironment();
+        enableTestEnvironment();
+        resetDesign();
         test1();
-
-        resetDesign();
-        createEnvironment();
         test2();
 
+        disableTestEnvironment();
+        //  Displaying scoreboard.
         $write("------------------------------------------------------------\n");
         $write("-- Verification finished successfully!\n");
         $write("------------------------------------------------------------\n");

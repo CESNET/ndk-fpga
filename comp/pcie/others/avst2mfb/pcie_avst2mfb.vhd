@@ -65,17 +65,12 @@ architecture behav of PCIE_AVST2MFB is
     signal fifo_wr            : std_logic;
     signal fifo_full          : std_logic;
     signal fifo_afull         : std_logic;
-    signal fifo_owf_err_reg   : std_logic;
     signal fifo_data_out      : std_logic_vector(FIFO_DATA_WIDTH - 1 downto 0);
     signal fifo_empty         : std_logic;
     signal avst_empty_arr     : slv_array_t(REGIONS - 1 downto 0)(log2(REGION_SIZE*BLOCK_SIZE) - 1 downto 0);
     signal mfb_eof_pos_arr    : slv_array_t(REGIONS - 1 downto 0)(log2(REGION_SIZE*BLOCK_SIZE) - 1 downto 0);
     signal mfb_eof_pos        : std_logic_vector(EOF_POS_WIDTH - 1 downto 0);
     signal mfb_src_rdy        : std_logic;
-
-    attribute preserve_for_debug : boolean;
-    attribute preserve_for_debug of fifo_owf_err_reg : signal is true;
-
 begin
 
     fifo_enable_g : if (FIFO_ENABLE = true) generate
@@ -134,21 +129,9 @@ begin
             AEMPTY => open
         );
 
-        process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (fifo_wr = '1' and fifo_full = '1') then
-                    fifo_owf_err_reg <= '1';
-                end if;
-                if (RST = '1') then
-                    fifo_owf_err_reg <= '0';
-                end if;
-            end if;
-        end process;
-
-        assert (fifo_owf_err_reg /= '1')
-            report "PCIE_AVST2MFB: fifox_i overflow!"
-            severity failure;
+        -- psl assert_owf_fifo_owerflow :
+        --      assert always (not (fifo_wr = '1' and fifo_full = '1')) abort(RST) @rising_edge(CLK)
+        --      report "PCIE_AVST2MFB: fifox_i overflow!";
 
         avst_sop   <= fifo_data_out(FIFO_DATA_WIDTH-1 downto DATA_WIDTH+META_SIGNAL_WIDTH+EOF_POS_WIDTH+REGIONS);
         avst_eop   <= fifo_data_out(DATA_WIDTH+META_SIGNAL_WIDTH+EOF_POS_WIDTH+REGIONS-1 downto DATA_WIDTH+META_SIGNAL_WIDTH+EOF_POS_WIDTH);
