@@ -172,8 +172,8 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
             {dst_mac, src_mac, eth_type} = {>>{data.data[0: (48+48+16)/ITEM_WIDTH-1]}};
 
             error_frame  = !is_frame_valid(hdr.data);
-            error_min_tu = length < 60;
-            error_max_tu = length > 1526;
+            error_min_tu = length < get_frame_length_minimum(index);
+            error_max_tu = length > get_frame_length_maximum(index);
             error_crc    = 0;
             error_mac    = 0;
             error = error_frame | error_min_tu | error_max_tu | error_crc | error_mac;
@@ -322,6 +322,14 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
 
     function bit [2-1 : 0] get_mac_check_mode(int unsigned port_index);
         return m_rx_mac_regmodel[port_index].channel[0].rx_mac.mac_check.get();
+    endfunction
+
+    function int unsigned get_frame_length_minimum(int unsigned port_index);
+        return m_rx_mac_regmodel[port_index].channel[0].rx_mac.min.get() - 4; // Substract the CRC
+    endfunction
+
+    function int unsigned get_frame_length_maximum(int unsigned port_index);
+        return m_rx_mac_regmodel[port_index].channel[0].rx_mac.max.get() - 4; // Substract the CRC
     endfunction
 
 endclass
