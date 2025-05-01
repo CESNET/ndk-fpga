@@ -5,15 +5,20 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class config_sequence extends uvm_logic_vector_array::config_sequence;
-    logic [31 : 0]  ipv4_addresses [$];
-    logic [127 : 0] ipv6_addresses [$];
+    bit [31 : 0]  ipv4_addresses [$];
+    bit [127 : 0] ipv6_addresses [$];
+    bit [47 : 0]  mac_addresses  [$];
 
-    function void add_ipv4_address(logic [31 : 0] ipv4_address);
+    function void add_ipv4_address(bit [31 : 0] ipv4_address);
         ipv4_addresses.push_back(ipv4_address);
     endfunction
 
-    function void add_ipv6_address(logic [127 : 0] ipv6_address);
+    function void add_ipv6_address(bit [127 : 0] ipv6_address);
         ipv6_addresses.push_back(ipv6_address);
+    endfunction
+
+    function void add_mac_address(bit [47 : 0] mac_address);
+        mac_addresses.push_back(mac_address);
     endfunction
 
 endclass

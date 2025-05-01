@@ -15,7 +15,8 @@ lappend COMPONENTS \
     [ list "SV_LOGIC_VECTOR_ARRAY_MFB"           "$SV_UVM_BASE/logic_vector_array_mfb"           "FULL"] \
     [ list "SV_LOGIC_VECTOR_MVB"                 "$SV_UVM_BASE/logic_vector_mvb"                 "FULL"] \
     [ list "SV_LOGIC_VECTOR_ARRAY_AVST"          "$SV_UVM_BASE/logic_vector_array_avst"          "FULL"] \
-    [ list "SV_LOGIC_VECTOR_ARRAY_INTEL_MAC_SEG" "$SV_UVM_BASE/logic_vector_array_intel_mac_seg" "FULL"]
+    [ list "SV_LOGIC_VECTOR_ARRAY_INTEL_MAC_SEG" "$SV_UVM_BASE/logic_vector_array_intel_mac_seg" "FULL"] \
+    [ list "SV_PACKET_GENERATORS_BASE"           "$SV_UVM_BASE/packet_generators"                "FULL"]
 
 lappend COMPONENTS [ list "RX_MAC_LITE_SV" "$OFM_PATH/comp/nic/mac_lite/rx_mac_lite/uvm" "FULL"]
 lappend COMPONENTS [ list "TX_MAC_LITE_SV" "$OFM_PATH/comp/nic/mac_lite/tx_mac_lite/uvm" "FULL"]

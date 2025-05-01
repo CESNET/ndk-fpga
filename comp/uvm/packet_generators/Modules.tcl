@@ -9,6 +9,7 @@ set SV_UVM_BASE "$OFM_PATH/comp/uvm"
 
 lappend COMPONENTS \
         [ list "SV_COMMON_BASE"                 "$SV_UVM_BASE/common"             "FULL"] \
-        [ list "SV_LOGIC_VECTOR_ARRAY_UVM_BASE" "$SV_UVM_BASE/logic_vector_array" "FULL"]
+        [ list "SV_LOGIC_VECTOR_ARRAY_UVM_BASE" "$SV_UVM_BASE/logic_vector_array" "FULL"] \
+        [ list "SV_PCAP_BASE"                   "$SV_UVM_BASE/pcap"               "FULL"]
 
 lappend MOD "$ENTITY_BASE/pkg.sv"

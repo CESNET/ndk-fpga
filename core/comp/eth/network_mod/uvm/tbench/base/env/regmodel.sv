@@ -8,7 +8,7 @@
 class reg_model_channel extends uvm_reg_block;
     `uvm_object_param_utils(uvm_network_mod_env::reg_model_channel)
 
-    localparam RX_MAC_COUNT = 4;
+    localparam int unsigned RX_MAC_COUNT = 16;
 
     rand uvm_rx_mac_lite::regmodel#(RX_MAC_COUNT) rx_mac;
     rand uvm_tx_mac_lite::regmodel                tx_mac;

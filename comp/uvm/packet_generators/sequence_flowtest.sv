@@ -9,6 +9,10 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
     `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer #(ITEM_WIDTH));
 
     // Packet size configuration options
+    int unsigned packet_size_min = 60;   // Packets below are padded
+    int unsigned packet_size_max = 1500; // Packets above are ignored
+
+    // Packet size configuration options
     int unsigned forward_packet_number_min = 10;
     int unsigned forward_packet_number_max = 100;
 
@@ -37,8 +41,8 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
     int unsigned mac_mask_max = 48;
 
     // Generator options
-    logic generated_config = 1;
-    logic generated_profile = 1;
+    bit generated_config = 1;
+    bit generated_profile = 1;
 
     string config_filepath = "./config.yaml";
     string profile_filepath = "./profile.csv";
@@ -123,18 +127,51 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         cfg = new();
     endfunction
 
+    function void post_randomize();
+        configure();
+    endfunction
+
     function void configure();
-        foreach (cfg.ipv4_addresses[i]) begin
+        // Get the unique configured addresses
+        bit [32 -1 : 0] cfg_ipv4_addresses[$] = cfg.ipv4_addresses.unique();
+        bit [128-1 : 0] cfg_ipv6_addresses[$] = cfg.ipv6_addresses.unique();
+        bit [48 -1 : 0] cfg_mac_addresses [$] = cfg.mac_addresses .unique();
+
+        // Generate address counts to add
+        int unsigned cfg_ipv4_addresses_count_to_add = $urandom_range(cfg_ipv4_addresses.size(), 0);
+        int unsigned cfg_ipv6_addresses_count_to_add = $urandom_range(cfg_ipv6_addresses.size(), 0);
+        int unsigned cfg_mac_addresses_count_to_add  = $urandom_range(cfg_mac_addresses .size(), 0);
+
+        // Shuffle the addresses
+        cfg_ipv4_addresses.shuffle();
+        cfg_ipv6_addresses.shuffle();
+        cfg_mac_addresses .shuffle();
+
+        // Add IPv4 addresses
+        for (int unsigned i = 0; i < cfg_ipv4_addresses_count_to_add; i++) begin
             ipv4 = new[ipv4.size()+1](ipv4);
             ipv4[ipv4.size()-1].address = cfg.ipv4_addresses[i];
             ipv4[ipv4.size()-1].mask = 32;
         end
 
-        foreach (cfg.ipv6_addresses[i]) begin
+        // Add IPv6 addresses
+        for (int unsigned i = 0; i < cfg_ipv6_addresses_count_to_add; i++) begin
             ipv6 = new[ipv6.size()+1](ipv6);
             ipv6[ipv6.size()-1].address = cfg.ipv6_addresses[i];
             ipv6[ipv6.size()-1].mask = 128;
         end
+
+        // Add MAC addresses
+        for (int unsigned i = 0; i < cfg_mac_addresses_count_to_add; i++) begin
+            mac = new[mac.size()+1](mac);
+            mac[mac.size()-1].address = cfg.mac_addresses[i];
+            mac[mac.size()-1].mask = 48;
+        end
+
+        // Remove duplicates
+        ipv4 = ipv4.unique() with (item.address);
+        ipv6 = ipv6.unique() with (item.address);
+        mac  = mac .unique() with (item.address);
     endfunction
 
     function string get_ipv4_addresses();
@@ -262,23 +299,21 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
     task body;
         uvm_pcap::reader reader;
         byte unsigned    data[];
+        uvm_common::sequence_cfg state;
 
         // Output configuration options
-        string output_filepath = "output.pcap";
-        string report_filepath = "report.txt";
+        string output_filepath = { p_sequencer.get_full_name(), ".", "output.pcap" };
+        string report_filepath = { p_sequencer.get_full_name(), ".", "report.txt" };
         bit skip_unknown = 0;
         bit no_collision_check = 1;
 
         string generator_parameters;
         string generator_execute_command;
 
-        configure();
         generate_tools_configuration();
 
         reader = new();
-        if (!uvm_config_db #(string)::get(p_sequencer, "", "output_filepath", output_filepath)) begin
-            output_filepath = { p_sequencer.get_full_name(), ".pcap" };
-        end
+        void'(uvm_config_db #(string)::get(p_sequencer, "", "output_filepath", output_filepath));
 
         `uvm_info(get_full_name(), $sformatf("\n\tsequence_flowtest is running\n\t\tpcap_name%s", output_filepath), UVM_DEBUG);
 
@@ -298,8 +333,24 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
 
         void'(reader.open(output_filepath)); // Try open an output pcap
 
+        void'(uvm_config_db #(uvm_common::sequence_cfg)::get(p_sequencer, "", "state", state));
+
         req = uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)::type_id::create("req", p_sequencer);
         while(reader.read(data) == uvm_pcap::RET_OK) begin
+            if (data.size() > packet_size_max) begin
+                continue;
+            end
+
+            if (state != null) begin
+                if (!state.next()) begin
+                    break;
+                end
+            end
+
+            if (data.size() < packet_size_min) begin
+                data = new[packet_size_min](data);
+            end
+
             start_item(req);
             req.data = { >>{ data } };
             finish_item(req);

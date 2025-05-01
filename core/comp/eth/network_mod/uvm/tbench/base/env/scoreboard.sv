@@ -132,6 +132,10 @@ class scoreboard #(ETH_CORE_ARCH, ETH_PORTS, int unsigned ETH_PORT_SPEED[ETH_POR
         end
     endfunction
 
+    function void set_model_rx_mac_regmodel(int unsigned port_index, reg_model_port #(ETH_PORT_CHAN[0]) regmodel);
+        m_model.set_rx_mac_regmodel(port_index, regmodel);
+    endfunction
+
     function void report_phase(uvm_phase phase);
         string msg = "";
 

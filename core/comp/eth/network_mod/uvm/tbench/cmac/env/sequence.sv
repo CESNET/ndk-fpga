@@ -22,6 +22,8 @@ class virt_sequence_port #(
     `uvm_object_param_utils(uvm_network_mod_cmac_env::virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH))
     `uvm_declare_p_sequencer(uvm_network_mod_cmac_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
+    bit initialized = 0;
+
     uvm_sequence #(uvm_logic_vector_array::sequence_item #(8)) eth_tx_packet;
     uvm_sequence #(uvm_logic_vector::sequence_item       #(1)) eth_tx_error;
     uvm_sequence #(uvm_lbus::sequence_item)                    eth_rx;
@@ -45,18 +47,19 @@ class virt_sequence_port #(
     endfunction
 
     task pre_body();
-        uvm_logic_vector_array::sequence_lib #(8) lib_eth_tx_packet;
-        uvm_lbus::sequence_library_rx             seq_eth_rx;
+        uvm_packet_generators::sequence_flowtest #(8) lib_eth_tx_packet;
+        uvm_lbus::sequence_library_rx                 seq_eth_rx;
 
         super.pre_body();
 
         // TX eth packet sequence
         seq_sync_eth_tx = uvm_common::sequences_cfg_sync#(2)::type_id::create("seq_sync_eth_tx", m_sequencer);
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_tx_packet, "", "state", seq_sync_eth_tx.cfg[0]);
-        lib_eth_tx_packet = uvm_logic_vector_array::sequence_lib #(8)::type_id::create("eth_tx_packet", p_sequencer.eth_tx_packet);
-        lib_eth_tx_packet.max_random_count = 20;
-        lib_eth_tx_packet.min_random_count = 10;
-        lib_eth_tx_packet.init_sequence();
+        lib_eth_tx_packet = uvm_packet_generators::sequence_flowtest #(8)::type_id::create("lib_eth_tx_packet", p_sequencer.eth_tx_packet);
+        lib_eth_tx_packet.generated_config = 1;
+        lib_eth_tx_packet.generated_profile = 1;
+        lib_eth_tx_packet.config_filepath = { "./", p_sequencer.get_full_name(), ".", "config.yaml" };
+        lib_eth_tx_packet.profile_filepath  = { "./", p_sequencer.get_full_name(), ".", "profile.csv" };
 
         // TX eth error sequence
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_tx_error, "", "state", seq_sync_eth_tx.cfg[1]);
@@ -90,16 +93,30 @@ class virt_sequence_port #(
 
         #(400ns);
 
-        for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
-            fork
-                p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);
-                p_sequencer.regmodel.channel[it].tx_mac.enable.write(status, 1'h1);
-            join;
+        if (initialized == 0) begin
+            for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
+                assert(m_sequence_mac_check_configuration.randomize());
+                m_sequence_mac_check_configuration.start(p_sequencer);
 
-            fork
-                p_sequencer.regmodel.channel[it].rx_mac.enable.read(status, data);
-                p_sequencer.regmodel.channel[it].tx_mac.enable.read(status, data);
-            join;
+                fork
+                    p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);
+                    p_sequencer.regmodel.channel[it].tx_mac.enable.write(status, 1'h1);
+                join;
+
+                fork
+                    p_sequencer.regmodel.channel[it].rx_mac.enable.read(status, data);
+                    p_sequencer.regmodel.channel[it].tx_mac.enable.read(status, data);
+                join;
+            end
+
+            initialized = 1;
+        end
+
+        // Add MAC Check addresses to the configuration of the flowtest sequence
+        begin
+            uvm_packet_generators::sequence_flowtest #(8) dummy;
+            assert($cast(dummy, eth_tx_packet));
+            add_mac_check_addresses(dummy.cfg);
         end
 
         fork
