@@ -43,8 +43,8 @@ class sequence_main#(
     protected logic [ETH_STREAMS-1:0] event_eth_rx_end;
     protected logic [DMA_STREAMS-1:0] event_dma_rx_end;
     rand time time_start;
-    logic [128-1:0] conf_ipv6[];
-    logic [32-1:0]  conf_ipv4[];
+    bit [128-1:0] conf_ipv6[];
+    bit [32-1:0]  conf_ipv4[];
     int unsigned min_random_count;
     int unsigned max_random_count;
     int unsigned pkt_size_min;
