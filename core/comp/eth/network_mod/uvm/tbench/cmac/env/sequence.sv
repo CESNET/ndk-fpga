@@ -98,6 +98,9 @@ class virt_sequence_port #(
                 assert(m_sequence_mac_check_configuration.randomize());
                 m_sequence_mac_check_configuration.start(p_sequencer);
 
+                assert(m_sequence_frame_length_configuration.randomize());
+                m_sequence_frame_length_configuration.start(p_sequencer);
+
                 fork
                     p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);
                     p_sequencer.regmodel.channel[it].tx_mac.enable.write(status, 1'h1);

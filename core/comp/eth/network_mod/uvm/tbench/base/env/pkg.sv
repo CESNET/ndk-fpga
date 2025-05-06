@@ -26,6 +26,7 @@ package uvm_network_mod_env;
     `include "sequence_eth.sv"
     `include "sequence_timestamp.sv"
     `include "sequence_mac_check_configuration.sv"
+    `include "sequence_frame_length_configuration.sv"
     `include "sequence.sv"
 endpackage
 `endif

@@ -85,6 +85,9 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
                 assert(m_sequence_mac_check_configuration.randomize());
                 m_sequence_mac_check_configuration.start(p_sequencer);
 
+                assert(m_sequence_frame_length_configuration.randomize());
+                m_sequence_frame_length_configuration.start(p_sequencer);
+
                 fork
                     p_sequencer.regmodel.channel[it].rx_mac.enable.write(status, 1'h1);
                     p_sequencer.regmodel.channel[it].tx_mac.enable.write(status, 1'h1);

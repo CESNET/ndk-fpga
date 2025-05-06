@@ -184,7 +184,7 @@ class reg_mtu extends uvm_reg;
 
         //Configure
         //rsvd.configure(  this, 8, 24, "RW", 0, 8'h00, 1, 1, 0);
-        length.configure(this, 32, 0, "RW", 0, def_value, 1, 0, 0);
+        length.configure(this, 16, 0, "RW", 0, def_value, 1, 0, 0);
     endfunction
 endclass
 
