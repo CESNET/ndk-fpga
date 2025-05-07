@@ -190,9 +190,9 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
             drop |= error_frame | error_min_tu | error_max_tu | error_crc | error_mac;
 
             case (get_mac_check_mode(index))
-                2'h1: drop |= ~mac_hit_vld;               // ONLY_VALID
-                2'h2: drop |= ~(mac_hit_vld | broadcast); // VALID_AND_BCAST
-                2'h3: drop |= ~(mac_hit_vld | multicast); // VALID_AND_MCAST
+                2'h1: drop |= ~mac_hit_vld;                           // ONLY_VALID
+                2'h2: drop |= ~(mac_hit_vld | broadcast);             // VALID_AND_BCAST
+                2'h3: drop |= ~(mac_hit_vld | broadcast | multicast); // VALID_AND_BCAST_AND_MCAST
             endcase
 
             msg = $sformatf("\n\thdr input time %s", hdr.time2string());
