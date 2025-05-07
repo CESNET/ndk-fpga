@@ -40,6 +40,8 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
     int unsigned mac_mask_min = 24;
     int unsigned mac_mask_max = 48;
 
+    bit mac_broadcast = 1;
+
     // Generator options
     bit generated_config = 1;
     bit generated_profile = 1;
@@ -116,6 +118,9 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         foreach (mac[i]) {
             mac[i].mask inside { [mac_mask_min : mac_mask_max] };
         }
+    }
+    constraint c_mac_broadcast {
+        mac_broadcast -> (mac.sum with (item.address == '1) == 1);
     }
 
     rand int unsigned seed;
