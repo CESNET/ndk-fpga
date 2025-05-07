@@ -237,8 +237,8 @@ begin
             s_reg_in_rfc_below_min <= IN_LEN_BELOW_MIN;
             s_reg_in_rfc_over_mtu  <= IN_LEN_OVER_MTU;
             s_reg_in_rfc_mac_err   <= IN_MAC_ERROR;
-            s_reg_in_rfc_mac_mcast <= IN_MAC_BCAST;
-            s_reg_in_rfc_mac_bcast <= IN_MAC_MCAST and not IN_MAC_BCAST;
+            s_reg_in_rfc_mac_mcast <= IN_MAC_MCAST;
+            s_reg_in_rfc_mac_bcast <= IN_MAC_BCAST;
             s_reg_in_rfc_fragment  <= IN_CRC_ERROR and s_frame_below_64;
             s_reg_in_rfc_jabber    <= IN_CRC_ERROR and s_frame_over_1518;
             s_reg_in_frame_len     <= s_fixed_frame_len;
