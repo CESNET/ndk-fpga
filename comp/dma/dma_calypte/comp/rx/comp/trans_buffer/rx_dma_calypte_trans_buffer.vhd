@@ -129,6 +129,7 @@ begin
                     packing_fsm_pst <= S_IDLE;
                     segment_ptr_pst <= (others => '0');
 
+                    recalc_eof_pos_pst      <= (others => '0');
                     buff_tx_mfb_src_rdy_pst <= '0';
                 else
 
