@@ -239,6 +239,11 @@ class MfbDriver #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8, 
                 end
             end
         end
+
+        // Send last word if there is
+        if (eof != 0) begin
+            moveWord();
+        end
     endtask
 
 endclass
