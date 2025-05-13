@@ -19,7 +19,10 @@ use work.type_pack.all;
 -- between MFB frames. Each generated MFB frame can be of different size within
 -- the allowed range. Through MVB instructions (items), user metadata can be
 -- inserted into the generated packets. The metadata are then available on the
--- MFB signal TX_META and are valid with SOF.
+-- MFB signal TX_META and are valid with SOF. When the SHARED_REGIONS is enabled,
+-- the minimum length of generated packets is 57B, as is the NDK standard.
+-- When it is disabled, packets as small as 1B can be processed, however,
+-- they are not aligned on the bus as efficiently -> lowers the throughput.
 --
 entity MFB_USER_PACKET_GEN is
    generic(
@@ -35,11 +38,16 @@ entity MFB_USER_PACKET_GEN is
       -- USER PACKET GENERATOR CONFIGURATION:
       -- =======================================================================
       -- This parameter determines maximum length of generated packet.
-      LEN_WIDTH   : natural := 14;
+      LEN_WIDTH      : natural := 14;
       -- Set the depth of FIFOX Multi
-      FIFO_DEPTH  : natural := 16;
+      FIFO_DEPTH     : natural := 16;
+      -- Enables generation of shared regions (end of old packet and start of
+      -- new one in one region). Disabling shared regions allows generation of
+      -- packets from 1B in length. Otherwise, the minimum packet length is 57B.
+      -- Disabling this generic may reduce throughput.
+      SHARED_REGIONS : boolean := True;
       -- Set correct device type, is used for choose best FIFOX settings.
-      DEVICE      : string  := "AGILEX"
+      DEVICE         : string  := "AGILEX"
    );
    port(
       -- =======================================================================
@@ -235,7 +243,11 @@ begin
       -- region is full when previous packet ending on last block
       s_region_full(r) <= and s_eof_offset_prev(r)(EOF_POS_WIDTH-1 downto BLOCK_WIDTH);
       -- set SOF in this region
-      s_set_sof(r) <= (s_muxed_pkt_gen(r) and not s_need_set_eof(r)) or (s_muxed_pkt_gen(r) and s_need_set_eof(r) and s_eof_prev_ok(r) and not s_region_full(r));
+      shared_regions_g : if SHARED_REGIONS generate
+         s_set_sof(r) <= (s_muxed_pkt_gen(r) and not s_need_set_eof(r)) or (s_muxed_pkt_gen(r) and s_need_set_eof(r) and s_eof_prev_ok(r) and not s_region_full(r));
+      else generate
+         s_set_sof(r) <= (s_muxed_pkt_gen(r) and not s_need_set_eof(r));
+      end generate;
       -- SOF_POS for shared region (region with two packet)
       s_sof_pos_shared_region(r) <= std_logic_vector(unsigned(s_eof_offset_prev(r)(EOF_POS_WIDTH-1 downto BLOCK_WIDTH)) + 1);
       -- set correct SOF_POS in this region
