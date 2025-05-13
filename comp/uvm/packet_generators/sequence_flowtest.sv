@@ -177,6 +177,25 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         ipv4 = ipv4.unique() with (item.address);
         ipv6 = ipv6.unique() with (item.address);
         mac  = mac .unique() with (item.address);
+
+        // Tool doesnt support less address that 2
+        while (ipv4.size() < 2) begin
+            ipv4 = new[ipv4.size()+1](ipv4);
+            std::randomize(ipv4[ipv4.size()-1].address);
+            std::randomize(ipv4[ipv4.size()-1].mask) with { ipv4[ipv4.size()-1].mask <= 32;};
+        end
+
+        while (ipv6.size() < 2) begin
+            ipv6 = new[ipv6.size()+1](ipv6);
+            std::randomize(ipv6[ipv6.size()-1].address);
+            std::randomize(ipv6[ipv6.size()-1].mask) with { ipv6[ipv6.size()-1].mask <= 128;};
+        end
+
+        while (mac.size() < 2) begin
+            mac = new[mac.size()+1](mac);
+            std::randomize(mac[mac.size()-1].address);
+            std::randomize(mac[mac.size()-1].mask) with { mac[mac.size()-1].mask <= 128;};
+        end
     endfunction
 
     function string get_ipv4_addresses();
