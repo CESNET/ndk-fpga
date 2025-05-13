@@ -244,7 +244,15 @@ the number of MFB Blocks in a word (MFB_REGIONS*MFB_REGION_SIZE).</p></td>
 <td><p>512</p></td>
 <td><p>Number of Items (MVB words) in the Input MVB FIFOX.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_prepender-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_mvb_prepender-shared_regions"><td><p>SHARED_REGIONS</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>Enables generation of shared regions (end of old frame and start of new
+one in one region) on TX MFB. Disabling shared regions allows work with
+frames from 1B in size. Otherwise, the minimum frame size is 57B.
+Disabling this generic may reduce throughput.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_mvb_prepender-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td><p>FPGA device name: ULTRASCALE, STRATIX10, AGILEX, …</p></td>

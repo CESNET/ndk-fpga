@@ -219,7 +219,15 @@ where it is valid with SOF.</p>
 <td><p>32</p></td>
 <td><p>Width of User Metadata information</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_frame_extender-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_frame_extender-shared_regions"><td><p>SHARED_REGIONS</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>Enables generation of shared regions (end of old frame and start of new
+one in one region) on TX MFB. Disabling shared regions allows work with
+frames from 1B in size. Otherwise, the minimum frame size is 57B.
+Disabling this generic may reduce throughput.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_frame_extender-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td><p>Target device: AGILEX, STRATIX10, ULTRASCALE,…</p></td>
