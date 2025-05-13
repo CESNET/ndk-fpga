@@ -115,7 +115,7 @@ begin
             RX_EOF_POS     => RX_EOF_POS,
             RX_SOF         => RX_SOF,
             RX_EOF         => RX_EOF,
-            RX_ADAPTER_ERR => (others => '0'),
+            RX_METADATA    => (others => '0'),
             RX_SRC_RDY     => RX_SRC_RDY,
 
             TX_DATA        => cut_data,
@@ -124,7 +124,7 @@ begin
             TX_SOF         => cut_sof,
             TX_EOF         => cut_eof,
             TX_SRC_RDY     => cut_src_rdy,
-            TX_ADAPTER_ERR => open,
+            TX_METADATA    => open,
             TX_CRC_CUT_ERR => open
         );
     end generate;
