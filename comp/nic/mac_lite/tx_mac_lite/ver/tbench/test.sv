@@ -13,11 +13,11 @@ import crc32_ethernet_pkg::*;
 program TEST (
     input  logic RX_CLK,
     input  logic RX_CLK_X2,
-    output logic RX_RESET,
+    output logic RX_RESET=1,
     input  logic TX_CLK,
-    output logic TX_RESET,
+    output logic TX_RESET=1,
     input  logic MI_CLK,
-    output logic MI_RESET,
+    output logic MI_RESET=1,
     iMfbRx.tb RX,
     iMfbTx.tb TX,
     iMfbTx.monitor MONITOR,
@@ -96,6 +96,8 @@ program TEST (
         Mi32Driver      mi32Driver      ;
         mi32Transaction = new();
         mi32Driver      = new("Mi32 Driver", null, MI32);
+
+        #(10*MI_CLK_PERIOD);
 
         // Disable OBUF
         mi32Transaction.rw      = 1;
@@ -223,8 +225,9 @@ program TEST (
 
     task test1();
         $write("\n\n############ TEST CASE 1 ############\n\n");
-        initObuf();
         enableTestEnvironment();
+        resetDesign();
+        initObuf();
         generator.setEnabled(TRANSACTION_COUNT);
         wait(!generator.enabled);
         disableTestEnvironment();
@@ -234,7 +237,6 @@ program TEST (
     endtask
 
     initial begin
-        resetDesign();
         createGeneratorEnvironment(FRAME_SIZE_MAX, FRAME_SIZE_MIN);
         createEnvironment();
         test1();
