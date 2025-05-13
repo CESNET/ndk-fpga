@@ -214,7 +214,9 @@ class MfbDriver #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8, 
                 tr.sof_pos = p / BLOCK_SIZE;
             end
             i = 0;
-            while(i < tr.data.size)// transaction written onto bus
+
+            // transaction written onto bus
+            while(i < tr.data.size) begin
                 if((tr.data.size-i) > BLOCK_SIZE) begin
                     for(j = 0; j < BLOCK_SIZE; j++, i++)
                         data[offset+j] = tr.data[i];
@@ -235,7 +237,12 @@ class MfbDriver #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8, 
                     moveBlock();
                     break;
                 end
+            end
+        end
 
+        // Send last word if there is
+        if (eof != 0) begin
+            moveWord();
         end
     endtask
 
