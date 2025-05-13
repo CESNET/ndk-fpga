@@ -73,6 +73,12 @@ generic(
     -- Number of Items (MVB words) in the Input MVB FIFOX.
     MVB_FIFO_DEPTH        : natural := 512;
 
+    -- Enables generation of shared regions (end of old frame and start of new
+    -- one in one region) on TX MFB. Disabling shared regions allows work with
+    -- frames from 1B in size. Otherwise, the minimum frame size is 57B.
+    -- Disabling this generic may reduce throughput.
+    SHARED_REGIONS        : boolean := True;
+
     -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
     DEVICE                : string := "AGILEX"
 );
@@ -381,6 +387,7 @@ begin
         MVB_FIFO_DEPTH  => 512            ,
         MFB_FIFO_DEPTH  => MFB_FIFO_DEPTH ,
         USERMETA_WIDTH  => 0,
+        SHARED_REGIONS  => SHARED_REGIONS,
         DEVICE          => DEVICE
     )
     port map(

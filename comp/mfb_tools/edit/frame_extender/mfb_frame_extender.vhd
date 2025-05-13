@@ -38,6 +38,11 @@ generic (
     MFB_FIFO_DEPTH  : natural := 32;
     -- Width of User Metadata information
     USERMETA_WIDTH  : natural := 32;
+    -- Enables generation of shared regions (end of old frame and start of new
+    -- one in one region) on TX MFB. Disabling shared regions allows work with
+    -- frames from 1B in size. Otherwise, the minimum frame size is 57B.
+    -- Disabling this generic may reduce throughput.
+    SHARED_REGIONS  : boolean := True;
     -- Target device: AGILEX, STRATIX10, ULTRASCALE,...
     DEVICE          : string  := "AGILEX"
 );
@@ -223,14 +228,15 @@ begin
 
     pkt_gen_i : entity work.MFB_USER_PACKET_GEN
     generic map(
-        REGIONS     => MFB_REGIONS,
-        REGION_SIZE => MFB_REGION_SIZE,
-        BLOCK_SIZE  => MFB_BLOCK_SIZE,
-        ITEM_WIDTH  => MFB_ITEM_WIDTH,
-        META_WIDTH  => GEN_META_WIDTH,
-        FIFO_DEPTH  => MVB_FIFO_DEPTH,
-        LEN_WIDTH   => LEN_WIDTH,
-        DEVICE      => DEVICE
+        REGIONS        => MFB_REGIONS,
+        REGION_SIZE    => MFB_REGION_SIZE,
+        BLOCK_SIZE     => MFB_BLOCK_SIZE,
+        ITEM_WIDTH     => MFB_ITEM_WIDTH,
+        META_WIDTH     => GEN_META_WIDTH,
+        FIFO_DEPTH     => MVB_FIFO_DEPTH,
+        LEN_WIDTH      => LEN_WIDTH,
+        SHARED_REGIONS => SHARED_REGIONS,
+        DEVICE         => DEVICE
     )
     port map(
         CLK         => CLK,
