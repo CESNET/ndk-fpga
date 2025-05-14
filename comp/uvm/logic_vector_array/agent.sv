@@ -14,7 +14,7 @@
 class agent #(int unsigned ITEM_WIDTH) extends uvm_agent;
 
     // registration of component tools
-    `uvm_component_utils(uvm_logic_vector_array::agent #(ITEM_WIDTH))
+    `uvm_component_param_utils(uvm_logic_vector_array::agent #(ITEM_WIDTH))
 
     // -----------------------
     // Variables.
