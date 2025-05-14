@@ -695,8 +695,7 @@ begin
 
     -- psl assert_length :
     --      assert forall i in {0 to MFB_REGIONS-1}:
-    --      always (pacp_rx_pkt_vld(0)(i) = '1' and
-    --                     (to_integer(unsigned(pacp_rx_pkt_len_mod3(0)(i))) + GAP_SIZE_MIN + MFB_BLOCK_SIZE-1) >= MFB_REGION_SIZE*MFB_BLOCK_SIZE) @rising_edge(RX_CLK)
+    --      always (pacp_rx_pkt_vld(0)(i) = '0') or (pacp_rx_pkt_vld(0)(i) = '1' and (to_integer(unsigned(pacp_rx_pkt_len_mod3(0)(i))) + GAP_SIZE_MIN + MFB_BLOCK_SIZE-1) >= MFB_REGION_SIZE*MFB_BLOCK_SIZE) abort (RX_RESET) @rising_edge(RX_CLK)
     --      report "Packet's length + minimal gap size (+ packet alignment) is too small: to_string(pkt_len_with_gap), must be at least to_string(MFB_REGION_SIZE*MFB_BLOCK_SIZE)";
 
 

@@ -46,7 +46,7 @@ module DUT (
         .RX_MFB_EOF_POS  (RX_MFB.EOF_POS),
         .RX_MFB_SOF      (RX_MFB.SOF),
         .RX_MFB_EOF      (RX_MFB.EOF),
-        .RX_MFB_ERROR    (RX_MFB.META),
+        .RX_MFB_CRC_ERR  (RX_MFB.META),
         .RX_MFB_SRC_RDY  (RX_MFB.SRC_RDY),
 
         .ADAPTER_LINK_UP (1'b1),

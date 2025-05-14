@@ -126,6 +126,8 @@ program TEST (
         mi32_tr.rw = 1;
         mi32_tr.be = '1;
 
+        #(10*MI_CLK_PERIOD);
+
         // set MAC address to CAM memory
         for (int i = 0; i < MAC_COUNT; i++) begin
             // Send low 32 bits
@@ -537,9 +539,9 @@ program TEST (
 
     task test1();
         $write("\n\n############ TEST CASE 1 ############\n\n");
-        //resetDesign();
-        initConfig();
         enableTestEnvironment();
+        resetDesign();
+        initConfig();
         generator.setEnabled(TRANSACTION_COUNT);
         wait(!generator.enabled);
         disableTestEnvironment();
@@ -549,7 +551,6 @@ program TEST (
 
     task test2();
         $write("\n\n############ TEST CASE 2 ############\n\n");
-        //resetDesign();
         mfb_responder.wordDelayEnable_wt = 1;
         mfb_responder.wordDelayDisable_wt = 1;
         mfb_responder.wordDelayLow = 1;
@@ -558,8 +559,8 @@ program TEST (
         mvb_responder.wordDelayDisable_wt = 1;
         mvb_responder.wordDelayLow = 1;
         mvb_responder.wordDelayHigh = 9;
-        initConfig();
         enableTestEnvironment();
+        initConfig();
         generator.setEnabled(TRANSACTION_COUNT);
         wait(!generator.enabled);
         disableTestEnvironment();
@@ -568,7 +569,6 @@ program TEST (
     endtask
 
     initial begin
-        resetDesign();
         createGeneratorEnvironment(FRAME_SIZE_MAX, FRAME_SIZE_MIN, MAC_COUNT);
         createEnvironment();
         test1();

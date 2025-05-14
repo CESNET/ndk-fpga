@@ -10,11 +10,11 @@ module testbench;
 
     logic ASYNC_RESET;
     logic RX_CLK = 0;
-    logic RX_RESET;
+    logic RX_RESET = 1;
     logic TX_CLK = 0;
-    logic TX_RESET;
+    logic TX_RESET = 1;
     logic MI_CLK = 0;
-    logic MI_RESET;
+    logic MI_RESET = 1;
 
     iMfbRx #(RX_REGIONS,RX_REGION_SIZE,RX_BLOCK_SIZE,RX_ITEM_WIDTH) RX_MFB (RX_CLK, RX_RESET);
     iMfbTx #(TX_REGIONS,TX_REGION_SIZE,TX_BLOCK_SIZE,TX_ITEM_WIDTH) TX_MFB (TX_CLK, TX_RESET);

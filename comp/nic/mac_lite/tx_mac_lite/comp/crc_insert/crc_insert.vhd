@@ -186,7 +186,7 @@ begin
     shake_vld <= not shake_vld_n;
 
     -- psl assert_sync_crc :
-    --      assert always ((countones(reg0_mfb_eof) > countones(shake_vld)) or (not (ci_mfb_src_rdy = '1' and ci_mfb_dst_rdy = '1'))) abort (RESET) @rising_edge(CLK)
+    --      assert always ((countones(reg0_mfb_eof) <= countones(shake_vld)) or (not (ci_mfb_src_rdy = '1' and ci_mfb_dst_rdy = '1'))) abort (RESET) @rising_edge(CLK)
     --      report "TX_MAC_LITE_CRC_INSERT: CRC32 out of sync!";
 
 
