@@ -12,10 +12,10 @@ class sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITE
     localparam int unsigned RX_MAC_COUNT = 16;
 
     typedef enum bit[2-1 : 0] {
-        ALL_PASS        = 2'h0,
-        ONLY_VALID      = 2'h1,
-        VALID_AND_BCAST = 2'h2,
-        VALID_AND_MCAST = 2'h3
+        ALL_PASS                  = 2'h0,
+        ONLY_VALID                = 2'h1,
+        VALID_AND_BCAST           = 2'h2,
+        VALID_AND_BCAST_AND_MCAST = 2'h3
     } mode_e;
 
     rand mode_e         mode;

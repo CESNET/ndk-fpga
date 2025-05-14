@@ -174,6 +174,8 @@ architecture FULL of NETWORK_MOD is
     signal tx_mfb_src_rdy_i : slv_array_t   (ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
     signal tx_mfb_dst_rdy_i : slv_array_t   (ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
 
+    signal core_rx_mfb_dst_rdy : slv_array_t   (ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
+
     -- Control/Status signals
     signal sig_activity_rx : slv_array_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
     signal sig_activity_tx : slv_array_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
@@ -510,7 +512,7 @@ begin
             RX_MFB_SOF      => tx_mfb_sof_i    (p),
             RX_MFB_EOF      => tx_mfb_eof_i    (p),
             RX_MFB_SRC_RDY  => tx_mfb_src_rdy_i(p),
-            RX_MFB_DST_RDY  => tx_mfb_dst_rdy_i(p),
+            RX_MFB_DST_RDY  => core_rx_mfb_dst_rdy(p),
 
             RX_MVB_CHANNEL   => mvb_ch (p),
             RX_MVB_TIMESTAMP => mvb_ts (p),
@@ -573,6 +575,10 @@ begin
         rx_mfb_mii_err_i <= core_tx_mfb_mii_err;
         rx_mfb_crc_err_i <= core_tx_mfb_crc_err;
         rx_mfb_src_rdy_i <= core_tx_mfb_src_rdy;
+
+        -- JC: This assignment/renaming is necessary here to synchronize
+        -- the delta delay (for simulators) between the clock and data signals!
+        tx_mfb_dst_rdy_i <= core_rx_mfb_dst_rdy;
 
         -- =====================================================================
         -- TIMESTAMP synchronization

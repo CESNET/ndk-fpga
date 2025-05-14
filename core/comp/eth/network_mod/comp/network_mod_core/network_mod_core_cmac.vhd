@@ -564,6 +564,8 @@ architecture CMAC of NETWORK_MOD_CORE is
     signal cmac_tx_lbus_sop        : std_logic_vector(4-1 downto 0);
     signal cmac_tx_lbus_rdy        : std_logic;
 
+    signal mfb2lbus_rx_mfb_dst_rdy : std_logic;
+
     signal adap_tx_mfb_data        : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
     signal adap_tx_mfb_crc_err     : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
     signal adap_tx_mfb_sof_pos     : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
@@ -1449,6 +1451,10 @@ begin
     --  ADAPTERS
     -- =========================================================================
 
+    -- JC: This dump assignment/renaming is necessary here to synchronize
+    -- the delta delay (for simulators) between the clock and data signals!
+    RX_MFB_DST_RDY(0) <= mfb2lbus_rx_mfb_dst_rdy;
+
     mfb2lbus_i : entity work.TX_MAC_LITE_ADAPTER_LBUS
     generic map(
         DEVICE => DEVICE
@@ -1463,7 +1469,7 @@ begin
         IN_MFB_SOF     => RX_MFB_SOF(0),
         IN_MFB_EOF     => RX_MFB_EOF(0),
         IN_MFB_SRC_RDY => RX_MFB_SRC_RDY(0),
-        IN_MFB_DST_RDY => RX_MFB_DST_RDY(0),
+        IN_MFB_DST_RDY => mfb2lbus_rx_mfb_dst_rdy,
 
         OUT_LBUS_DATA  => cmac_tx_lbus_data,
         OUT_LBUS_MTY   => cmac_tx_lbus_mty,

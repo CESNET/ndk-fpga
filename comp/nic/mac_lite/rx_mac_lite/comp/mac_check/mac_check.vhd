@@ -224,7 +224,7 @@ begin
 
     mac_cast_err_g : for r in 0 to REGIONS-1 generate
         -- Possible multicast error occurence
-        s_multicast_err(r) <= not s_ext_mac_arr(r)(0);
+        s_multicast_err(r) <= (not s_ext_mac_arr(r)(0)) or not s_broadcast_err(r);
         -- Possible broadcast error occurence
         s_broadcast_err(r) <= nand s_ext_mac_arr(r);
     end generate;

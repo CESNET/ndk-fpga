@@ -523,6 +523,8 @@ architecture ETILE of NETWORK_MOD_CORE is
     signal rx_avst_empty     : std_logic_vector(ETH_PORT_CHAN*AVST_EMPTY_WIDTH   -1 downto 0);
     signal rx_avst_error     : std_logic_vector(ETH_PORT_CHAN*RX_AVST_ERROR_WIDTH-1 downto 0);
 
+    signal mfb2avst_rx_mfb_dst_rdy : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+
     signal tx_adap_mfb_clk     : std_logic_vector(ETH_PORT_CHAN-1 downto 0) := (others => '0');
     signal tx_adap_mfb_data    : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
     signal tx_adap_mfb_crc_err : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
@@ -1377,6 +1379,10 @@ begin
             mfb2avst_rx_mfb_eof <= RX_MFB_EOF(IT);
         end process;
 
+        -- JC: This assignment/renaming is necessary here to synchronize
+        -- the delta delay (for simulators) between the clock and data signals!
+        RX_MFB_DST_RDY(IT) <= mfb2avst_rx_mfb_dst_rdy(IT);
+
         -- TX adaption
         mfb2avst_i : entity work.TX_MAC_LITE_ADAPTER_AVST_100G
         generic map(
@@ -1394,7 +1400,7 @@ begin
             RX_MFB_EOF     => mfb2avst_rx_mfb_eof,
             RX_MFB_EOF_POS => RX_MFB_EOF_POS(IT),
             RX_MFB_SRC_RDY => RX_MFB_SRC_RDY(IT),
-            RX_MFB_DST_RDY => RX_MFB_DST_RDY(IT),
+            RX_MFB_DST_RDY => mfb2avst_rx_mfb_dst_rdy(IT),
 
             TX_AVST_DATA   => tx_ad_avst_data,
             TX_AVST_SOP    => tx_ad_avst_sop,

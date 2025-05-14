@@ -212,6 +212,8 @@ architecture FULL of NETWORK_MOD_CORE is
     signal adap_tx_mfb_eof        : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
     signal adap_tx_mfb_src_rdy    : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
+    signal adap_rx_mfb_dst_rdy    : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+
     begin
 
         mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
@@ -820,7 +822,7 @@ architecture FULL of NETWORK_MOD_CORE is
             IN_MFB_EOF_POS    => RX_MFB_EOF_POS(i),
             IN_MFB_ERROR      => (others => '0'),
             IN_MFB_SRC_RDY    => RX_MFB_SRC_RDY(i),
-            IN_MFB_DST_RDY    => RX_MFB_DST_RDY(i),
+            IN_MFB_DST_RDY    => adap_rx_mfb_dst_rdy(i),
             OUT_MAC_DATA      => ftile_tx_adapt_data(i),
             OUT_MAC_INFRAME   => ftile_tx_adapt_inframe(i),
             OUT_MAC_EOP_EMPTY => ftile_tx_adapt_eop_empty(i),
@@ -828,5 +830,10 @@ architecture FULL of NETWORK_MOD_CORE is
             OUT_MAC_VALID     => ftile_tx_adapt_valid(i),
             OUT_MAC_READY     => ftile_tx_mac_ready(i)
         );
+
+        -- JC: This dump assignment/renaming is necessary here to synchronize
+        -- the delta delay (for simulators) between the clock and data signals!
+        RX_MFB_DST_RDY(i) <= adap_rx_mfb_dst_rdy(i);
+
     end generate;
 end architecture;
