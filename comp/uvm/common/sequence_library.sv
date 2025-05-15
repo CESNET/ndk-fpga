@@ -10,7 +10,6 @@
 
 class sequence_library #(type CONFIG_TYPE, type REQ=uvm_common::sequence_item, type RSP=REQ) extends uvm_sequence_library#(REQ, RSP);
     `uvm_object_param_utils(uvm_common::sequence_library#(CONFIG_TYPE, REQ, RSP))
-    //`uvm_sequence_library_utils(uvm_byte_array::sequence_lib)
 
     CONFIG_TYPE cfg;
 

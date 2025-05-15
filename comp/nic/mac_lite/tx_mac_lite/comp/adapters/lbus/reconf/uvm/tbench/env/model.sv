@@ -8,8 +8,8 @@
 class model extends uvm_component;
     `uvm_component_param_utils(uvm_mfb_to_lbus_adapter::model)
 
-    uvm_tlm_analysis_fifo #(uvm_byte_array::sequence_item)   input_data;
-    uvm_analysis_port #(uvm_byte_array::sequence_item)       out_data;
+    uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(8)) input_data;
+    uvm_analysis_port #(uvm_logic_vector_array::sequence_item #(8))     out_data;
 
     function new(string name = "model", uvm_component parent = null);
         super.new(name, parent);
@@ -22,7 +22,7 @@ class model extends uvm_component;
 
     task run_phase(uvm_phase phase);
 
-        uvm_byte_array::sequence_item tr_input_packet;
+        uvm_logic_vector_array::sequence_item #(8) tr_input_packet;
 
         forever begin
 

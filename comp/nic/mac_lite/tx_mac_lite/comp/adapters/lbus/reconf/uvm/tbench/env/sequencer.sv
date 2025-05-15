@@ -8,8 +8,8 @@
 class virt_sequencer extends uvm_sequencer;
     `uvm_component_param_utils(uvm_mfb_to_lbus_adapter::virt_sequencer)
 
-    uvm_reset::sequencer        m_reset;
-    uvm_byte_array::sequencer   m_byte_array_scr;
+    uvm_reset::sequencer                   m_reset;
+    uvm_logic_vector_array::sequencer #(8) m_logic_vector_array_scr;
 
     function new(string name = "virt_sequencer", uvm_component parent);
         super.new(name, parent);

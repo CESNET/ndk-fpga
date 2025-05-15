@@ -8,9 +8,9 @@
 set SV_UVM_BASE                     "$OFM_PATH/comp/uvm"
 
 lappend COMPONENTS \
-      [ list "SV_RESET"                    "$SV_UVM_BASE/reset"            "FULL"] \
-      [ list "SV_MFB_UVM_BASE"             "$SV_UVM_BASE/mfb"              "FULL"] \
-      [ list "SV_BYTE_ARRAY_MFB_UVM_BASE"  "$SV_UVM_BASE/byte_array_mfb"   "FULL"] \
+      [ list "SV_RESET"                           "$SV_UVM_BASE/reset"                  "FULL"] \
+      [ list "SV_MFB_UVM_BASE"                    "$SV_UVM_BASE/mfb"                    "FULL"] \
+      [ list "SV_LOGIC_VECTOR_ARRAY_MFB_UVM_BASE" "$SV_UVM_BASE/logic_vector_array_mfb" "FULL"] \
 
 lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv" \
       "$ENTITY_BASE/tbench/tests/pkg.sv" \
