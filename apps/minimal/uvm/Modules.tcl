@@ -10,7 +10,6 @@ lappend PACKAGES "$ENTITY_BASE/test_pkg.sv"
 #lappend COMPONENTS [ list "COMMON"     "$OFM_PATH/comp/uvm/common"                    "FULL" ]
 #lappend COMPONENTS [ list "RESET"      "$OFM_PATH/comp/uvm/reset"                     "FULL" ]
 #lappend COMPONENTS [ list "MVB"        "$OFM_PATH/comp/uvm/logic_vector_mvb"          "FULL" ]
-#lappend COMPONENTS [ list "MFB"        "$OFM_PATH/comp/uvm/byte_array_mfb"            "FULL" ]
 #lappend COMPONENTS [ list "MI"         "$OFM_PATH/comp/uvm/mi"                        "FULL" ]
 
 #MODELS
