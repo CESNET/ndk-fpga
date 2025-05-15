@@ -52,7 +52,7 @@ class Model;
             end
         end
 
-        if (frame.data[0][0] == 1)
+        if (frame.data[0][0] == 1 && is_mac_bcast == 0)
             is_mac_mcast = 1;
 
         // Check available MACs
