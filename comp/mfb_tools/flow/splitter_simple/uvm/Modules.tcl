@@ -12,7 +12,6 @@ set COMPONENTS [list \
       [ list "SV_MFB_UVM_BASE"             "$SV_UVM_BASE/mfb"              "FULL"] \
       [ list "SV_LOGIC_VECTOR_UVM_BASE"    "$SV_UVM_BASE/logic_vector"     "FULL"] \
       [ list "SV_LV_ARRAY_MFB_UVM_BASE"    "$SV_UVM_BASE/logic_vector_array_mfb"  "FULL"] \
-      [ list "SV_BYTE_ARRAY_MFB_UVM_BASE"  "$SV_UVM_BASE/byte_array_mfb"   "FULL"] \
 ]
 
 set MOD "$MOD $ENTITY_BASE/tbench/env/pkg.sv"
