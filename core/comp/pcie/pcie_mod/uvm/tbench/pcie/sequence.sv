@@ -203,6 +203,14 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                 end
             end
 
+
+            // If there is notnigh to send, then prevent to infinite loop by add some waiting time.
+            if (info.rq_hdr.size() == 0 && cq == 0) begin
+                int unsigned wait_time;
+                std::randomize(wait_time) with {wait_time inside {[10:333]};};
+                #(wait_time*1ns);
+            end
+
             it++;
         end
     endtask

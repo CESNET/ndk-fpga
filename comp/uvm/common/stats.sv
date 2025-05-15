@@ -28,12 +28,16 @@ class stats;
         min = this.min;
         max = this.max;
 
-        avg_local = sum/values;
-        avg = avg_local;
-
+        // When values are not bigger than one, then the average doesn't make any sense.
         if (values > 1) begin
+            avg_local = sum/values;
+            avg = avg_local;
+
             std_dev = (1.0/(values-1)*(sum2 - values*(avg_local**2)))**0.5;
         end else begin
+            // when values are one then the average is value
+            // or when values are zero then the averagie make no sense
+            avg = sum;
             std_dev = 0;
         end
     endfunction
