@@ -165,6 +165,8 @@ class virt_sequence_port #(
         seq_sync_usr_rx.send_stop();
         seq_sync_eth_tx.send_stop();
 
+        #(300ns);
+
         // Read statistics
         for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
             uvm_network_mod_env::read_rx_counters#(RX_MAC_COUNT) rx_stats;
@@ -187,6 +189,8 @@ class virt_sequence_port #(
                 rx_stats.reset();
                 tx_stats.reset();
             join
+
+            #(40ns);
 
             fork
                 rx_stats.start(null);
