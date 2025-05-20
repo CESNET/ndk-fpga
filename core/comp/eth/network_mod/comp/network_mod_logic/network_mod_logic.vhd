@@ -64,7 +64,7 @@ generic(
     --  - Generate IPG
     --  - Do not use resize on TX
     USE_FULL_MAC      : boolean := false;
-    RESET_USER_WIDTH  : natural := 8;
+    RESET_USER_WIDTH  : natural := ETH_PORT_CHAN;
     --                             ETH_PORT_CHAN x (TX MAC lite + RX MAC lite)
     RESET_CORE_WIDTH  : natural := ETH_PORT_CHAN * (1           + 1          );
     -- Resize Buffer feature of RX_MAC_LITE.
@@ -389,7 +389,7 @@ begin
 
                 RX_CLK         => CLK_USER             ,
                 RX_CLK_X2      => CLK_USER             , -- CX inside is not used, else use CLK_X2
-                RX_RESET       => RESET_USER(0)        ,
+                RX_RESET       => RESET_USER       (ch),
                 RX_MFB_DATA    => split_mfb_data   (ch),
                 RX_MFB_SOF_POS => split_mfb_sof_pos(ch),
                 RX_MFB_EOF_POS => split_mfb_eof_pos(ch),
@@ -468,7 +468,7 @@ begin
                 RX_CLK          => RX_CLK_CORE(ch)   ,
                 RX_RESET        => RESET_CORE(ch*2+1), -- todo
                 TX_CLK          => CLK_USER     ,
-                TX_RESET        => RESET_USER(0),
+                TX_RESET        => RESET_USER(ch),
 
                 RX_MFB_DATA     => RX_CORE_MFB_DATA   (ch),
                 RX_MFB_SOF      => rx_core_mfb_sof_tmp,

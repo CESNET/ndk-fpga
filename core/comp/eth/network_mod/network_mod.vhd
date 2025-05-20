@@ -116,6 +116,7 @@ architecture FULL of NETWORK_MOD is
     signal repl_rst_arr   : slv_array_t(ETH_PORTS-1 downto 0)(RESET_REPLICAS-1 downto 0);
     signal logic_rst_arr  : slv_array_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS*2-1 downto 0);
     signal clk_eth_stable : slv_array_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
+    signal usr_rst_arr    : slv_array_t(ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
 
     -- Interior signals, Network Module Core -> Network Module Logic
     signal logic_rx_clk     : slv_array_t   (ETH_PORTS-1 downto 0)(ETH_CHANNELS-1 downto 0);
@@ -229,6 +230,18 @@ begin
     --  Resets replication
     -- =========================================================================
     ports_reset_g : for p in ETH_PORTS-1 downto 0 generate
+        user_reset_i : entity work.ASYNC_RESET
+        generic map (
+            TWO_REG  => false,
+            OUT_REG  => true ,
+            REPLICAS => ETH_CHANNELS
+        )
+        port map (
+            CLK         => CLK_USER,
+            ASYNC_RST   => RESET_USER(0),
+            OUT_RST     => usr_rst_arr(p)
+        );
+
         network_mod_reset_i : entity work.ASYNC_RESET
         generic map (
             TWO_REG  => false,
@@ -391,7 +404,7 @@ begin
             -- Other
             LL_MODE          => LL_MODE         ,
             USE_FULL_MAC     => IS_USP_10G4_25G4,
-            RESET_USER_WIDTH => RESET_WIDTH     ,
+            RESET_USER_WIDTH => ETH_CHANNELS    ,
             RESET_CORE_WIDTH => logic_rst_arr(p)'length,
             RESIZE_BUFFER    => RESIZE_BUFFER   ,
             DEVICE           => DEVICE          ,
@@ -401,7 +414,7 @@ begin
             CLK_USER            => CLK_USER,
             TX_CLK_CORE         => logic_tx_clk(p),
             RX_CLK_CORE         => logic_rx_clk(p),
-            RESET_USER          => RESET_USER,
+            RESET_USER          => usr_rst_arr(p),
             RESET_CORE          => logic_rst_arr(p),
 
             -- Control/status interface
