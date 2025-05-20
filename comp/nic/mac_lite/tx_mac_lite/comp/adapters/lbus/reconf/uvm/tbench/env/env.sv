@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class mfb_to_lbus_seqv_lib #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, META_WIDTH) extends uvm_byte_array_mfb::sequence_lib_rx#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, META_WIDTH);
+class mfb_to_lbus_seqv_lib #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_lib_rx#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 8, META_WIDTH);
   `uvm_object_param_utils(    uvm_mfb_to_lbus_adapter::mfb_to_lbus_seqv_lib#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, META_WIDTH))
   `uvm_sequence_library_utils(uvm_mfb_to_lbus_adapter::mfb_to_lbus_seqv_lib#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, META_WIDTH))
 
@@ -14,15 +14,15 @@ class mfb_to_lbus_seqv_lib #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, META_WID
     init_sequence_library();
   endfunction
 
-    virtual function void init_sequence(uvm_byte_array_mfb::config_sequence param_cfg = null);
+    virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
         //super.init_sequence(param_cfg);
         if (param_cfg == null) begin
             this.cfg = new();
         end else begin
             this.cfg = param_cfg;
         end
-        this.add_sequence(uvm_byte_array_mfb::seqv_no_inframe_gap_rx #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, META_WIDTH)::get_type());
-        this.add_sequence(uvm_byte_array_mfb::sequence_full_speed_rx #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, META_WIDTH)::get_type());
+        this.add_sequence(uvm_logic_vector_array_mfb::seqv_no_inframe_gap_rx #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 8, META_WIDTH)::get_type());
+        this.add_sequence(uvm_logic_vector_array_mfb::sequence_full_speed_rx #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 8, META_WIDTH)::get_type());
     endfunction
 
 endclass
@@ -33,8 +33,8 @@ endclass
 class env #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE) extends uvm_env;
     `uvm_component_param_utils(uvm_mfb_to_lbus_adapter::env #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE));
 
-    uvm_byte_array_mfb::env_rx #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 0) m_env_rx;
-    uvm_byte_array_mfb::env_tx #(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, 0) m_env_tx;
+    uvm_logic_vector_array_mfb::env_rx #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 8, 0) m_env_rx;
+    uvm_logic_vector_array_mfb::env_tx #(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, 8, 0) m_env_tx;
 
     uvm_mfb_to_lbus_adapter::virt_sequencer vscr;
     uvm_reset::agent m_reset;
@@ -49,12 +49,12 @@ class env #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, TX_REGIONS, TX_REGION_SIZ
     // Create base components of the environment.
     function void build_phase(uvm_phase phase);
 
-        uvm_reset::config_item            m_config_reset;
-        uvm_byte_array_mfb::config_item   m_config_rx;
-        uvm_byte_array_mfb::config_item   m_config_tx;
+        uvm_reset::config_item                  m_config_reset;
+        uvm_logic_vector_array_mfb::config_item m_config_rx;
+        uvm_logic_vector_array_mfb::config_item m_config_tx;
 
         //change implementation
-        uvm_byte_array_mfb::sequence_lib_rx#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 0)::type_id::set_inst_override(uvm_mfb_to_lbus_adapter::mfb_to_lbus_seqv_lib#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 0)::get_type(),
+        uvm_logic_vector_array_mfb::sequence_lib_rx#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 8, 0)::type_id::set_inst_override(uvm_mfb_to_lbus_adapter::mfb_to_lbus_seqv_lib#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 0)::get_type(),
              {this.get_full_name(), ".m_env_rx.mfb_seq"});
 
 
@@ -69,18 +69,18 @@ class env #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, TX_REGIONS, TX_REGION_SIZ
         m_config_rx                  = new;
         m_config_rx.active           = UVM_ACTIVE;
         m_config_rx.interface_name   = "vif_rx";
-        m_config_rx.meta_behav       = uvm_byte_array_mfb::config_item::META_SOF;
+        m_config_rx.meta_behav       = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
-        uvm_config_db #(uvm_byte_array_mfb::config_item)::set(this, "m_env_rx", "m_config", m_config_rx);
-        m_env_rx = uvm_byte_array_mfb::env_rx#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE,0)::type_id::create("m_env_rx", this);
+        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rx", "m_config", m_config_rx);
+        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, 8, 0)::type_id::create("m_env_rx", this);
 
         m_config_tx                  = new;
         m_config_tx.active           = UVM_ACTIVE;
         m_config_tx.interface_name   = "vif_tx";
-        m_config_tx.meta_behav       = uvm_byte_array_mfb::config_item::META_SOF;
+        m_config_tx.meta_behav       = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
-        uvm_config_db #(uvm_byte_array_mfb::config_item)::set(this, "m_env_tx", "m_config", m_config_tx);
-        m_env_tx = uvm_byte_array_mfb::env_tx#(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, 0)::type_id::create("m_env_tx", this);
+        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_tx", "m_config", m_config_tx);
+        m_env_tx = uvm_logic_vector_array_mfb::env_tx#(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, 8, 0)::type_id::create("m_env_tx", this);
 
         sc     = scoreboard::type_id::create("sc", this);
         vscr   = uvm_mfb_to_lbus_adapter::virt_sequencer::type_id::create("vscr",this);
@@ -90,15 +90,15 @@ class env #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, TX_REGIONS, TX_REGION_SIZ
     // Connect agent's ports with ports from the scoreboard.
     function void connect_phase(uvm_phase phase);
 
-        m_env_rx.m_byte_array_agent.analysis_port.connect(sc.input_data);
+        m_env_rx.m_logic_vector_array_agent.analysis_port.connect(sc.input_data);
 
-        m_env_tx.m_byte_array_agent.analysis_port.connect(sc.out_data);
+        m_env_tx.m_logic_vector_array_agent.analysis_port.connect(sc.out_data);
 
         m_reset.sync_connect(m_env_rx.reset_sync);
         m_reset.sync_connect(m_env_tx.reset_sync);
 
         vscr.m_reset = m_reset.m_sequencer;
-        vscr.m_byte_array_scr = m_env_rx.m_sequencer.m_data;
+        vscr.m_logic_vector_array_scr = m_env_rx.m_sequencer.m_data;
 
 
     endfunction

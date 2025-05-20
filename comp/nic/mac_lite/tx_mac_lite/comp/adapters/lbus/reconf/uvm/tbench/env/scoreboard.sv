@@ -11,11 +11,11 @@ class scoreboard extends uvm_scoreboard;
     int unsigned compared;
     int unsigned error;
 
-    uvm_analysis_export #(uvm_byte_array::sequence_item)    input_data;
-    uvm_analysis_export #(uvm_byte_array::sequence_item)    out_data;
+    uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(8)) input_data;
+    uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(8)) out_data;
 
-    uvm_tlm_analysis_fifo #(uvm_byte_array::sequence_item)  dut_data;
-    uvm_tlm_analysis_fifo #(uvm_byte_array::sequence_item)  model_data;
+    uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(8))  dut_data;
+    uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(8))  model_data;
 
     model m_model;
 
@@ -50,8 +50,8 @@ class scoreboard extends uvm_scoreboard;
 
     task run_phase(uvm_phase phase);
 
-        uvm_byte_array::sequence_item tr_dut;
-        uvm_byte_array::sequence_item tr_model;
+        uvm_logic_vector_array::sequence_item #(8) tr_dut;
+        uvm_logic_vector_array::sequence_item #(8) tr_model;
 
         forever begin
 
