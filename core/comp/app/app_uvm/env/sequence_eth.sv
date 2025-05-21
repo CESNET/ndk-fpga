@@ -443,6 +443,7 @@ class sequence_search_eth  #(
     rand int unsigned mpls_next_prot[4];
     rand int unsigned ipv4_next_prot[6];
     rand int unsigned ipv6_next_prot[7];
+    rand int unsigned udp_next_prot[3];
     rand int unsigned proto_next_prot[2]; //empty/payload
     rand int unsigned algorithm; // 0 -> rand; 1 -> dfs
 
@@ -504,6 +505,14 @@ class sequence_search_eth  #(
         ipv6_next_prot.sum() > 0;
     };
 
+    constraint c_udp{
+        foreach(udp_next_prot[it]) {
+            udp_next_prot[it] >= 0;
+            udp_next_prot[it]  < 10;
+        }
+        udp_next_prot.sum() > 0;
+    };
+
     constraint c_proto{
         foreach(proto_next_prot[it]) {
             proto_next_prot[it] >= 0;
@@ -554,7 +563,7 @@ class sequence_search_eth  #(
         $fwrite(file, "\"PPP\" : { \"weight\" : %s},\n",  proto_dist_gen(ppp_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
         $fwrite(file, "\"MPLS\" : { \"weight\" : %s},\n", proto_dist_gen(mpls_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
         $fwrite(file, "\"TCP\" : { \"weight\" : %s},\n",  proto_dist_gen(proto_next_prot, {"Empty", "Payload"}));
-        $fwrite(file, "\"UDP\" : { \"weight\" : %s},\n",  proto_dist_gen(proto_next_prot, {"Empty", "Payload"}));
+        $fwrite(file, "\"UDP\" : { \"weight\" : %s},\n",  proto_dist_gen(udp_next_prot, {"Empty", "Payload", "VXLAN"}));
 
         $fwrite(file, "\"IPv4\" : { \"values\" : {");
         $fwrite(file, {"\n\t\"src\" : ", "[\n", rule_ipv4, "],", "\n\t\"dst\" : ", "[\n", rule_ipv4, "]"});

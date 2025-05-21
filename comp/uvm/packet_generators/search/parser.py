@@ -67,6 +67,22 @@ class TRILL(base_node):
         return proto
 
 
+class VXLAN(base_node):
+    def __init__(self):
+        super().__init__("VXLAN")
+
+    def protocol_add(self, config):
+        return scapy.all.VXLAN()
+
+    def protocol_next(self, config):
+        proto = {"ETH": 1}
+
+        if config.vxlan != 0:
+            config.vxlan -= 1
+
+        return proto
+
+
 #################################
 # L4 protocols
 #################################
@@ -79,10 +95,14 @@ class UDP(base_node):
         return scapy.all.UDP()
 
     def protocol_next(self, config):
-        proto = {"Empty": 1, "Payload": 1}
+        proto = {"Empty": 1, "Payload": 1, "VXLAN": 1}
         cfg_obj = config.object_get([self.name, "weight"])
         if cfg_obj is not None:
             proto.update(cfg_obj)
+
+        if config.vxlan == 0:
+            proto["VXLAN"] = 0
+
         return proto
 
 
@@ -319,7 +339,7 @@ class Parser:
         self.protocols = {
             "ETH": ETH(), "VLAN": VLAN(), "TRILL": TRILL(), "PPP": PPP(), "MPLS": MPLS(), "IPv6": IPv6(), "IPv6Ext": IPv6Ext(),
             "IPv4": IPv4(), "TCP": TCP(), "UDP": UDP(), "ICMPv6": ICMPv6(), "ICMPv4": ICMPv4(), "SCTP": SCTP(),
-            "Payload": Payload(), "Empty": Empty()
+            "Payload": Payload(), "Empty": Empty(), "VXLAN": VXLAN()
         }
         self.pcap_file = scapy.utils.PcapWriter(pcap_file, append=False, sync=True)
         self.cfg = None

@@ -26,6 +26,7 @@ class packet_config:
         self.vlan    = 4
         self.mpls    = 4
         self.ipv6ext = 4
+        self.vxlan   = 1
 
         self.constraints = constraints
 
@@ -48,6 +49,7 @@ class packet_config:
         ret.vlan    = self.vlan
         ret.mpls    = self.mpls
         ret.ipv6ext = self.ipv6ext
+        ret.vxlan   = self.vxlan
         return ret
 
     def object_get(self, path):
