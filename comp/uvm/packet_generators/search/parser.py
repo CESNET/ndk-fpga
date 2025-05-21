@@ -37,8 +37,9 @@ class base_node:
 
 
 #################################
-# PAYLOAD protocols
+# L7 protocols
 #################################
+
 class Empty(base_node):
     def __init__(self):
         super().__init__("Empty")
@@ -67,23 +68,8 @@ class TRILL(base_node):
 
 
 #################################
-# L7 protocols
+# L4 protocols
 #################################
-class ICMPv4(base_node):
-    def __init__(self):
-        super().__init__("ICMPv4")
-
-    def protocol_add(self, config):
-        return scapy.all.ICMP()
-
-
-class ICMPv6(base_node):
-    def __init__(self):
-        super().__init__("ICMPv6")
-
-    def protocol_add(self, config):
-        return scapy.all.ICMPv6Unknown()
-
 
 class UDP(base_node):
     def __init__(self):
@@ -131,8 +117,9 @@ class SCTP(base_node):
 
 
 #################################
-# IP protocols
+# L3 protocols
 #################################
+
 class IPv4(base_node):
     def __init__(self):
         super().__init__("IPv4")
@@ -174,7 +161,7 @@ class IPv6Ext(base_node):
         return random.choice(possible_protocols)
 
     def protocol_next(self, config):
-        proto = {"Payload": 1, "Empty": 1, "ICMPv4": 1, "ICMPv6": 1, "UDP": 1, "TCP": 1, "SCTP": 1, "IPv6Ext": 1}
+        proto = {"Payload": 1, "Empty": 1, "ICMPv6": 1, "UDP": 1, "TCP": 1, "SCTP": 1, "IPv6Ext": 1}
         proto_weight = config.object_get([self.name, "weight"])
         if proto_weight is not None:
             proto.update(proto_weight)
@@ -212,16 +199,32 @@ class IPv6(base_node):
         return scapy.all.IPv6(version=6, src=src, dst=dst)
 
     def protocol_next(self, config):
-        proto = {"Payload": 1, "Empty": 1, "ICMPv4": 1, "ICMPv6": 1, "UDP": 1, "TCP": 1, "SCTP": 1, "IPv6Ext": 1}
+        proto = {"Payload": 1, "Empty": 1, "ICMPv6": 1, "UDP": 1, "TCP": 1, "SCTP": 1, "IPv6Ext": 1}
         proto_weight = config.object_get([self.name, "weight"])
         if proto_weight is not None:
             proto.update(proto_weight)
         return proto
 
-#################################
-# ETHERNET protocols
-#################################
 
+class ICMPv4(base_node):
+    def __init__(self):
+        super().__init__("ICMPv4")
+
+    def protocol_add(self, config):
+        return scapy.all.ICMP()
+
+
+class ICMPv6(base_node):
+    def __init__(self):
+        super().__init__("ICMPv6")
+
+    def protocol_add(self, config):
+        return scapy.all.ICMPv6Unknown()
+
+
+#################################
+# L2 protocols
+#################################
 
 class MPLS(base_node):
     def __init__(self):
@@ -306,6 +309,10 @@ class ETH(base_node):
 
         return proto
 
+
+#################################
+# Parser
+#################################
 
 class Parser:
     def __init__(self, pcap_file, cfg, seed):

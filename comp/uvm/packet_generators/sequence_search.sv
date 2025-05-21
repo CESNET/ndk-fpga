@@ -12,7 +12,6 @@
 // Reusable high level sequence. Contains transaction, which has only data part.
 class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
     `uvm_object_param_utils(uvm_packet_generators::sequence_search#(ITEM_WIDTH))
-    `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer#(ITEM_WIDTH));
 
     int unsigned pkt_size_min = 60;
     int unsigned pkt_size_max = 0;
@@ -24,12 +23,12 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
 
     //randomization packet
     //ETH next protocol  (IPV4, IPV6, VLAN, MPLS, Empty, PPP)
-    rand int unsigned eth_next_prot[6];
-    rand int unsigned vlan_next_prot[6];
+    rand int unsigned eth_next_prot[7];
+    rand int unsigned vlan_next_prot[7];
     rand int unsigned ppp_next_prot[4];
     rand int unsigned mpls_next_prot[4];
-    rand int unsigned ipv4_next_prot[5];
-    rand int unsigned ipv6_next_prot[6];
+    rand int unsigned ipv4_next_prot[6];
+    rand int unsigned ipv6_next_prot[7];
     rand int unsigned proto_next_prot[2]; //empty/payload
     rand int unsigned algorithm; // 0 -> rand; 1 -> dfs
 
@@ -105,14 +104,12 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
     function new(string name = "sequence_search");
         super.new(name);
         cfg = new();
-
-        //pkt_gen_file =  $system({"`dirname ", FILE_PATH, "../pkt_gen/pkt_gen.py"});
     endfunction
 
     function string proto_dist_gen(int unsigned weight[], string proto[]);
         string ret = "";
         if (weight.size() != proto.size()) begin
-            `uvm_fatal(p_sequencer.get_full_name(), $sformatf(" \n\uvm_packet_generators::sequence_search#(%0d) weight(%0d) and proto(%0d) size is not same", ITEM_WIDTH, weight.size(), proto.size()));
+            `uvm_fatal(m_sequencer.get_full_name(), $sformatf(" \n\uvm_packet_generators::sequence_search#(%0d) weight(%0d) and proto(%0d) size is not same", ITEM_WIDTH, weight.size(), proto.size()));
         end
         for(int unsigned it = 0; it < weight.size(); it++) begin
             if (it != 0) begin
@@ -136,8 +133,8 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
         $fwrite(file, "{\n");
         //ETH
         $fwrite(file, "\"packet\" : { \"err_probability\" : %0d},\n", packet_err_prob);
-        $fwrite(file, "\"ETH\"  : { \"weight\" : %s},\n", proto_dist_gen(eth_next_prot, {"IPv4", "IPv6", "VLAN", "MPLS", "Empty", "PPP"}));
-        $fwrite(file, "\"VLAN\" : { \"weight\" : %s},\n", proto_dist_gen(vlan_next_prot, {"IPv4", "IPv6", "VLAN", "MPLS", "Empty", "PPP"}));
+        $fwrite(file, "\"ETH\"  : { \"weight\" : %s},\n", proto_dist_gen(eth_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
+        $fwrite(file, "\"VLAN\" : { \"weight\" : %s},\n", proto_dist_gen(vlan_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
         $fwrite(file, "\"PPP\" : { \"weight\" : %s},\n",  proto_dist_gen(ppp_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
         $fwrite(file, "\"MPLS\" : { \"weight\" : %s},\n", proto_dist_gen(mpls_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
         $fwrite(file, "\"TCP\" : { \"weight\" : %s},\n",  proto_dist_gen(proto_next_prot, {"Empty", "Payload"}));
@@ -145,13 +142,13 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
 
         $fwrite(file, "\"IPv4\" : { \"values\" : {");
         $fwrite(file, {"\n\t\"src\" : ", "[\n", rule_ipv4, "],", "\n\t\"dst\" : ", "[\n", rule_ipv4, "]"});
-        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv4_next_prot, {"Payload", "Empty", "ICMPv4", "UDP", "TCP"}));
+        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv4_next_prot, {"Payload", "Empty", "ICMPv4", "UDP", "TCP", "SCTP"}));
 
         $fwrite(file, "\"IPv6\" : { \"values\" : {");
         $fwrite(file, {"\n\t\"src\" : ", "[\n", rule_ipv6, "],", "\n\t\"dst\" : ", "[\n", rule_ipv6, "]"});
-        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv4", "UDP", "TCP", "IPv6Ext"}));
+        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv6", "UDP", "TCP", "SCTP", "IPv6Ext"}));
 
-        $fwrite(file, "\"IPv6Ext\" : { \"weight\" : %s}\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv4", "UDP", "TCP", "IPv6Ext"}));
+        $fwrite(file, "\"IPv6Ext\" : { \"weight\" : %s}\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv6", "UDP", "TCP", "SCTP", "IPv6Ext"}));
 
         $fwrite(file, "\n\t}\n");
         $fclose(file);
@@ -205,8 +202,8 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
         string pkt_gen_params;
 
         reader = new();
-        if (!uvm_config_db #(string)::get(p_sequencer, "", "pcap_file", pcap_file)) begin
-            pcap_file = {p_sequencer.get_full_name(), ".pcap"};
+        if (!uvm_config_db #(string)::get(m_sequencer, "", "pcap_file", pcap_file)) begin
+            pcap_file = {m_sequencer.get_full_name(), ".pcap"};
         end
 
 
@@ -215,11 +212,11 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
         this.configure(config_json);
         pkt_gen_params = $sformatf("-a %s -f \"%s\" -p %0d -c %s -s %0d", algorithm == 0 ? "rand" : "dfs",  pcap_file, transaction_count, config_json, pkt_gen_seed);
         if($system({PKT_GEN_PATH, " ", pkt_gen_params, " >> pkt_gen_out"}) != 0) begin
-            `uvm_fatal(p_sequencer.get_full_name(), $sformatf("\n\t Cannot run command %s", {PKT_GEN_PATH, " ", pkt_gen_params}))
+            `uvm_fatal(m_sequencer.get_full_name(), $sformatf("\n\t Cannot run command %s", {PKT_GEN_PATH, " ", pkt_gen_params}))
         end
 
         void'(reader.open(pcap_file));
-        req = uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)::type_id::create("req", p_sequencer);
+        req = uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)::type_id::create("req", m_sequencer);
         while(reader.read(data) == uvm_pcap::RET_OK)
         begin
             pkt_num++;
@@ -238,6 +235,3 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
     endtask
 
 endclass
-
-
-
