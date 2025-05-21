@@ -136,6 +136,25 @@ class SCTP(base_node):
         return proto
 
 
+class GRE(base_node):
+    def __init__(self):
+        super().__init__("GRE")
+
+    def protocol_add(self, config):
+        return scapy.all.GRE(routing_present = 0)
+
+    def protocol_next(self, config):
+        proto = {"ETH": 1, "IPv4": 1, "IPv6": 1}
+        proto_weight = config.object_get([self.name, "weight"])
+        if proto_weight is not None:
+            proto.update(proto_weight)
+
+        if config.gre != 0:
+            config.gre -= 1
+
+        return proto
+
+
 #################################
 # L3 protocols
 #################################
@@ -165,10 +184,14 @@ class IPv4(base_node):
         return scapy.all.IP(version=4, src=src, dst=dst)
 
     def protocol_next(self, config):
-        proto = {"Payload": 1, "Empty": 1, "ICMPv4": 1, "UDP": 1, "TCP": 1, "SCTP": 1}
+        proto = {"Payload": 1, "Empty": 1, "ICMPv4": 1, "UDP": 1, "TCP": 1, "SCTP": 1, "GRE": 1}
         proto_weight = config.object_get([self.name, "weight"])
         if proto_weight is not None:
             proto.update(proto_weight)
+
+        if config.gre == 0:
+            proto["GRE"] = 0
+
         return proto
 
 
@@ -181,7 +204,7 @@ class IPv6Ext(base_node):
         return random.choice(possible_protocols)
 
     def protocol_next(self, config):
-        proto = {"Payload": 1, "Empty": 1, "ICMPv6": 1, "UDP": 1, "TCP": 1, "SCTP": 1, "IPv6Ext": 1}
+        proto = {"Payload": 1, "Empty": 1, "ICMPv6": 1, "UDP": 1, "TCP": 1, "SCTP": 1, "IPv6Ext": 1, "GRE": 1}
         proto_weight = config.object_get([self.name, "weight"])
         if proto_weight is not None:
             proto.update(proto_weight)
@@ -190,6 +213,9 @@ class IPv6Ext(base_node):
             config.ipv6ext -= 1
         if (config.ipv6ext == 0):
             proto["IPv6Ext"] = 0
+
+        if config.gre == 0:
+            proto["GRE"] = 0
 
         return proto
 
@@ -219,10 +245,14 @@ class IPv6(base_node):
         return scapy.all.IPv6(version=6, src=src, dst=dst)
 
     def protocol_next(self, config):
-        proto = {"Payload": 1, "Empty": 1, "ICMPv6": 1, "UDP": 1, "TCP": 1, "SCTP": 1, "IPv6Ext": 1}
+        proto = {"Payload": 1, "Empty": 1, "ICMPv6": 1, "UDP": 1, "TCP": 1, "SCTP": 1, "IPv6Ext": 1, "GRE": 1}
         proto_weight = config.object_get([self.name, "weight"])
         if proto_weight is not None:
             proto.update(proto_weight)
+
+        if config.gre == 0:
+            proto["GRE"] = 0
+
         return proto
 
 
@@ -339,7 +369,7 @@ class Parser:
         self.protocols = {
             "ETH": ETH(), "VLAN": VLAN(), "TRILL": TRILL(), "PPP": PPP(), "MPLS": MPLS(), "IPv6": IPv6(), "IPv6Ext": IPv6Ext(),
             "IPv4": IPv4(), "TCP": TCP(), "UDP": UDP(), "ICMPv6": ICMPv6(), "ICMPv4": ICMPv4(), "SCTP": SCTP(),
-            "Payload": Payload(), "Empty": Empty(), "VXLAN": VXLAN()
+            "Payload": Payload(), "Empty": Empty(), "VXLAN": VXLAN(), "GRE": GRE()
         }
         self.pcap_file = scapy.utils.PcapWriter(pcap_file, append=False, sync=True)
         self.cfg = None
