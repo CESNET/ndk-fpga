@@ -85,7 +85,7 @@ class driver #(
     driver_sync #(MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) m_data_export;
     uvm_reset::sync_terminate                                            m_reset_terminate;
 
-    local uvm_tx_dma_calypte_regs::regmodel_channel m_regmodel_channel;
+    local uvm_tx_dma_calypte_regs::regmodel_channel #(DATA_POINTER_WIDTH) m_regmodel_channel;
     local driver_data                               m_driv_data;
     int unsigned                                    m_channel;
 
@@ -188,7 +188,7 @@ class driver #(
         return ret;
     endfunction
 
-    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_channel m_regmodel);
+    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_channel #(DATA_POINTER_WIDTH) m_regmodel);
         status_cbs cbs;
 
         this.m_driv_data = new();

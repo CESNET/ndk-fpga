@@ -12,15 +12,16 @@ class sequencer #(
     int unsigned USR_MFB_ITEM_WIDTH,
     int unsigned CHANNELS,
     int unsigned HDR_META_WIDTH,
-    int unsigned PKT_SIZE_MAX
+    int unsigned PKT_SIZE_MAX,
+    int unsigned DATA_POINTER_WIDTH
 ) extends uvm_sequencer;
 
-    `uvm_component_param_utils(uvm_tx_dma_calypte::sequencer #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX))
+    `uvm_component_param_utils(uvm_tx_dma_calypte::sequencer #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH))
 
     localparam USER_META_WIDTH = HDR_META_WIDTH + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
     uvm_reset::sequencer                                                                                                m_reset_sqcr;
-    uvm_tx_dma_calypte_cq::sequencer                                                                                    m_packet_sqcr [CHANNELS];
+    uvm_tx_dma_calypte_cq::sequencer #(DATA_POINTER_WIDTH)                                                              m_packet_sqcr [CHANNELS];
     uvm_mfb::sequencer #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, USER_META_WIDTH) m_usr_mfb_sqcr;
 
     function new(string name = "virt_sequencer", uvm_component parent);

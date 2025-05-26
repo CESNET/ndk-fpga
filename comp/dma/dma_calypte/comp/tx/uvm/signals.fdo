@@ -429,6 +429,14 @@ proc trans_buffer {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_
     add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_EN
     add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_DATA_VLD
 
+    add wave -noupdate -group "$grp_name" -divider "Calculated parameters"
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MFB_LENGTH
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MFB_DWORDS
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MFB_BYTES
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/BUFFER_DEPTH
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MAX_BRAM_DEPTH
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/CHANS_PER_ARRAY
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MEM_ARRAYS
 
     add wave -noupdate -group "$grp_name" -divider "Input registers"
     add_wave "-noupdate -group \"$grp_name\"" $PATH/pcie_mfb_data_inp_reg

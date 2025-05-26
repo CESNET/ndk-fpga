@@ -47,9 +47,8 @@ module DUT (
         .PCIE_CQ_MFB_BLOCK_SIZE   (PCIE_CQ_MFB_BLOCK_SIZE),
         .PCIE_CQ_MFB_ITEM_WIDTH   (PCIE_CQ_MFB_ITEM_WIDTH),
 
-        .DMA_HDR_POINTER_WIDTH    (DMA_HDR_POINTER_WIDTH),
-        .DATA_POINTER_WIDTH       (DATA_POINTER_WIDTH),
         .CHANNELS                 (CHANNELS),
+        .POINTER_WIDTH            (DATA_POINTER_WIDTH),
         .CNTRS_WIDTH              (CNTRS_WIDTH),
         .HDR_META_WIDTH           (HDR_META_WIDTH),
         .PKT_SIZE_MAX             (PKT_SIZE_MAX)

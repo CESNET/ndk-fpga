@@ -49,13 +49,13 @@ class env #(
 
     localparam USR_MFB_META_WIDTH = HDR_META_WIDTH + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
-    sequencer #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX) m_sequencer;
+    sequencer #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH) m_sequencer;
     uvm_reset::agent                                                                                                  m_reset_agent;
     uvm_tx_dma_calypte_cq::env #(DEVICE, PCIE_CQ_MFB_REGIONS, PCIE_CQ_MFB_REGION_SIZE, PCIE_CQ_MFB_BLOCK_SIZE, PCIE_CQ_MFB_ITEM_WIDTH,
                                  CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX)                                          m_cq_mfb_env;
     uvm_logic_vector_array_mfb::env_tx #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, USR_MFB_META_WIDTH) m_tx_mfb_env;
     uvm_logic_vector_mvb::env_tx #(PCIE_CQ_MFB_REGIONS, 1)                                                            m_int_meta_mfb_env;
-    uvm_mi::regmodel #(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS), MI_WIDTH, MI_WIDTH)                         m_regmodel_top;
+    uvm_mi::regmodel #(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH), MI_WIDTH, MI_WIDTH)     m_regmodel_top;
 
     coverage #(PCIE_CQ_MFB_REGIONS, PCIE_CQ_MFB_REGION_SIZE, PCIE_CQ_MFB_BLOCK_SIZE, PCIE_CQ_MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) m_coverage;
 
@@ -93,11 +93,11 @@ class env #(
         m_mi_config.agent.active         = UVM_ACTIVE;
         m_mi_config.agent.interface_name = "config_mi_vif";
         uvm_config_db #(uvm_mi::regmodel_config)::set(this, "m_regmodel_top", "m_config", m_mi_config);
-        m_regmodel_top = uvm_mi::regmodel #(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS), MI_WIDTH, MI_WIDTH)::type_id::create("m_regmodel_top", this);
+        m_regmodel_top = uvm_mi::regmodel #(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH), MI_WIDTH, MI_WIDTH)::type_id::create("m_regmodel_top", this);
 
         m_scoreboard  = scoreboard #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE)::type_id::create("m_scoreboard", this);
 
-        m_sequencer = sequencer #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX)::type_id::create("m_sequencer", this);
+        m_sequencer = sequencer #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH)::type_id::create("m_sequencer", this);
 
         m_tx_mfb_env_cfg                = new;
         m_tx_mfb_env_cfg.active         = UVM_ACTIVE;

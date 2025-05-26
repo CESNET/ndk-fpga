@@ -81,7 +81,7 @@ class scoreboard #(
 
     model #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE) m_model;
 
-    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS)                                     m_regmodel_top;
+    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH)                 m_regmodel_top;
     data_comparer #(USR_MFB_ITEM_WIDTH)                                                         m_data_cmp;
     uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(USR_MFB_META_WIDTH))       m_meta_cmp;
 
@@ -114,7 +114,7 @@ class scoreboard #(
         return ret;
     endfunction
 
-    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_top#(CHANNELS) m_regmodel);
+    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH) m_regmodel);
         this.m_regmodel_top = m_regmodel;
         m_model.regmodel_set(m_regmodel);
     endfunction

@@ -18,14 +18,14 @@ class env #(
 
     `uvm_component_param_utils(uvm_tx_dma_calypte_cq::env #(DEVICE, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX));
 
-    sequencer                                                                    m_sequencer [CHANNELS];
+    sequencer #(DATA_POINTER_WIDTH)                                              m_sequencer [CHANNELS];
     driver #(DEVICE, MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX) m_driver    [CHANNELS];
 
     uvm_reset::sync_cbs                                                                                                                       m_reset_sync;
     uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) m_rx_mfb_env;
 
     local driver_sync #(MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) m_data_export;
-    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS)                    m_regmodel_top;
+    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH) m_regmodel_top;
     local config_item                                                          m_config;
 
     // Constructor of environment.
@@ -33,7 +33,7 @@ class env #(
         super.new(name, parent);
     endfunction
 
-    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS) regmodel);
+    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH) regmodel);
         this.m_regmodel_top = regmodel;
 
         for (int unsigned it = 0; it < CHANNELS; it++) begin
@@ -66,7 +66,7 @@ class env #(
             string i_string = $sformatf("%0d", chan);
 
             if (m_config.active == UVM_ACTIVE) begin
-                m_sequencer[chan]        = sequencer::type_id::create({"m_sequencer_", i_string}, this);
+                m_sequencer[chan]        = sequencer #(DATA_POINTER_WIDTH)::type_id::create({"m_sequencer_", i_string}, this);
                 m_driver[chan]           = driver #(DEVICE, MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX)::type_id::create({"m_driver_", i_string}, this);
                 m_driver[chan].m_channel = chan;
             end else begin

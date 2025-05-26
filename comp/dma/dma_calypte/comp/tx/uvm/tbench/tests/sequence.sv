@@ -12,7 +12,8 @@ class virt_seq #(
     int unsigned USR_MFB_ITEM_WIDTH,
     int unsigned CHANNELS,
     int unsigned HDR_META_WIDTH,
-    int unsigned PKT_SIZE_MAX
+    int unsigned PKT_SIZE_MAX,
+    int unsigned DATA_POINTER_WIDTH
 ) extends uvm_sequence;
 
     `uvm_object_param_utils(test::virt_seq #(
@@ -22,7 +23,8 @@ class virt_seq #(
         USR_MFB_ITEM_WIDTH,
         CHANNELS,
         HDR_META_WIDTH,
-        PKT_SIZE_MAX
+        PKT_SIZE_MAX,
+        DATA_POINTER_WIDTH
     ))
 
     `uvm_declare_p_sequencer(uvm_tx_dma_calypte::sequencer #(
@@ -32,13 +34,14 @@ class virt_seq #(
         USR_MFB_ITEM_WIDTH,
         CHANNELS,
         HDR_META_WIDTH,
-        PKT_SIZE_MAX
+        PKT_SIZE_MAX,
+        DATA_POINTER_WIDTH
     ))
 
     localparam USR_MFB_META_WIDTH = HDR_META_WIDTH + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
     uvm_reset::sequence_start                                                                                                                  m_reset_seq;
-    uvm_tx_dma_calypte::sequence_simple                                                                                                        m_channel_seq [CHANNELS];
+    uvm_tx_dma_calypte::sequence_simple #(DATA_POINTER_WIDTH)                                                                                  m_channel_seq [CHANNELS];
     uvm_sequence #(uvm_mfb::sequence_item #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, USR_MFB_META_WIDTH)) m_usr_mfb_seq;
 
     local logic [CHANNELS-1:0] m_done;
@@ -53,7 +56,8 @@ class virt_seq #(
         m_reset_seq = uvm_reset::sequence_start::type_id::create("m_reset_seq");
 
         for (int unsigned it = 0; it < CHANNELS; it++) begin
-            m_channel_seq[it] = uvm_tx_dma_calypte::sequence_simple::type_id::create($sformatf("m_channel_seq_%0d", it));
+            m_channel_seq[it] = uvm_tx_dma_calypte::sequence_simple #(DATA_POINTER_WIDTH)::type_id::create($sformatf("m_channel_seq_%0d", it));
+            m_channel_seq[it].m_packet_size_min = 1;
             m_channel_seq[it].m_packet_size_max = PKT_SIZE_MAX;
         end
 

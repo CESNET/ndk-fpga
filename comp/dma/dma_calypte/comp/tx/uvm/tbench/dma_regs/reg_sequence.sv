@@ -6,10 +6,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class start_channel_seq extends uvm_sequence;
-    `uvm_object_utils(uvm_tx_dma_calypte_regs::start_channel_seq)
+class start_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
+    `uvm_object_utils(uvm_tx_dma_calypte_regs::start_channel_seq #(POINTER_WIDTH))
 
-    regmodel_channel m_regmodel_channel;
+    regmodel_channel #(POINTER_WIDTH) m_regmodel_channel;
 
     function new (string name = "start_channel_seq");
         super.new(name);
@@ -41,10 +41,10 @@ class start_channel_seq extends uvm_sequence;
     endtask
 endclass
 
-class stop_channel_seq extends uvm_sequence;
-    `uvm_object_utils(uvm_tx_dma_calypte_regs::stop_channel_seq)
+class stop_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
+    `uvm_object_utils(uvm_tx_dma_calypte_regs::stop_channel_seq #(POINTER_WIDTH))
 
-    regmodel_channel m_regmodel_channel;
+    regmodel_channel #(POINTER_WIDTH) m_regmodel_channel;
 
     function new (string name = "start_channel_seq");
         super.new(name);

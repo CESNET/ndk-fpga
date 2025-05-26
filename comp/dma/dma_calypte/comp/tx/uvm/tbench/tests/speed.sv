@@ -12,7 +12,8 @@ class virt_seq_full_speed #(
     int unsigned USR_MFB_ITEM_WIDTH,
     int unsigned CHANNELS,
     int unsigned HDR_META_WIDTH,
-    int unsigned PKT_SIZE_MAX
+    int unsigned PKT_SIZE_MAX,
+    int unsigned DATA_POINTER_WIDTH
 ) extends virt_seq #(
     USR_MFB_REGIONS,
     USR_MFB_REGION_SIZE,
@@ -20,7 +21,8 @@ class virt_seq_full_speed #(
     USR_MFB_ITEM_WIDTH,
     CHANNELS,
     HDR_META_WIDTH,
-    PKT_SIZE_MAX
+    PKT_SIZE_MAX,
+    DATA_POINTER_WIDTH
 );
 
     `uvm_object_param_utils(test::virt_seq_full_speed #(
@@ -30,7 +32,8 @@ class virt_seq_full_speed #(
         USR_MFB_ITEM_WIDTH,
         CHANNELS,
         HDR_META_WIDTH,
-        PKT_SIZE_MAX)
+        PKT_SIZE_MAX,
+        DATA_POINTER_WIDTH)
     )
 
     function new (string name = "virt_seq_full_speed");
@@ -87,9 +90,9 @@ class speed extends base;
         uvm_reg_data_t discard_byte_cnt [CHANNELS];
         uvm_status_e   status_r;
         time end_time;
-        virt_seq_full_speed #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX) m_virt_seq;
+        virt_seq_full_speed #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH) m_virt_seq;
 
-        m_virt_seq = virt_seq_full_speed #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX)::type_id::create("m_virt_seq");
+        m_virt_seq = virt_seq_full_speed #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH)::type_id::create("m_virt_seq");
 
         phase.raise_objection(this);
 

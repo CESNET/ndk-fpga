@@ -40,7 +40,7 @@ class model #(
     uvm_analysis_port     #(uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH))                    m_usr_data_analysis_port;
     uvm_analysis_port     #(uvm_logic_vector      ::sequence_item #(USR_MFB_META_WIDTH))                    m_usr_meta_analysis_port;
 
-    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS) m_regmodel_top;
+    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH) m_regmodel_top;
 
     protected int unsigned m_discard_wait;
     discard #(CHANNELS) m_discard_comp;
@@ -87,7 +87,7 @@ class model #(
         end
     endfunction
 
-    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS) regmodel);
+    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH) regmodel);
         this.m_regmodel_top = regmodel;
     endfunction
 
