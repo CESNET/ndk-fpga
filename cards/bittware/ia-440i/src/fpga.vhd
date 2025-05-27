@@ -343,7 +343,7 @@ begin
 
         QSFP_PORTS              => QSFP_PORTS,
         QSFP_I2C_PORTS          => 1,
-        -- QSFP_I2C_TRISTATE       => ??,
+        QSFP_I2C_CTRL_EN        => false,
 
         STATUS_LEDS             => STATUS_LEDS,
         MISC_IN_WIDTH           => MISC_IN_WIDTH,

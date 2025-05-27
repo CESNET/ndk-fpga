@@ -12,5 +12,11 @@ proc dts_card_specific {base} {
     append ret "reg = <$base 0x44>;"
     append ret "version = <0x00000003>;"
     append ret "};"
+
+    append ret "i2c_bmc: i2c_controller {"
+    append ret "compatible = \"bittware,bmc\";"
+    append ret "reg = <[expr $base + 256] 0x44>;"
+    append ret "version = <0x00000003>;"
+    append ret "};"
     return $ret
 }
