@@ -748,45 +748,47 @@ begin
     -- QSFP control
     -- =====================================================================
 
-    qsfp_ctrl_i : entity work.QSFP_CTRL
-    generic map (
-       QSFP_PORTS     => QSFP_PORTS,
-       QSFP_I2C_PORTS => QSFP_I2C_PORTS,
-       FPC202_INIT_EN => FPC202_INIT_EN,
-       I2C_TRISTATE   => QSFP_I2C_TRISTATE
-    )
-    port map (
-       RST            => MI_RESET_PMD,
-       --
-       TX_READY       => (others => '1'),
-       -- QSFP control/status
-       QSFP_MODSEL_N  => QSFP_MODSEL_N,
-       QSFP_LPMODE    => QSFP_LPMODE,
-       QSFP_RESET_N   => QSFP_RESET_N,
-       QSFP_MODPRS_N  => QSFP_MODPRS_N,
-       QSFP_INT_N     => QSFP_INT_N,
-       QSFP_I2C_SCL   => QSFP_I2C_SCL,
-       QSFP_I2C_SDA   => QSFP_I2C_SDA,
-       QSFP_I2C_DIR   => QSFP_I2C_DIR,
-       QSFP_I2C_SDA_I => QSFP_I2C_SDA_I,
-       QSFP_I2C_SCL_I => QSFP_I2C_SCL_I,
-       QSFP_I2C_SCL_O  => QSFP_I2C_SCL_O,
-       QSFP_I2C_SCL_OE => QSFP_I2C_SCL_OE,
-       QSFP_I2C_SDA_O  => QSFP_I2C_SDA_O,
-       QSFP_I2C_SDA_OE => QSFP_I2C_SDA_OE,
-       -- Select which QSFP port is targetting during MI read/writes
-       MI_QSFP_SEL    => MI_ADDR_PMD(8+max(log2(QSFP_PORTS),1)-1 downto 8),
-       -- MI interface
-       MI_CLK_PHY     => MI_CLK_PMD  ,
-       MI_RESET_PHY   => MI_RESET_PMD,
-       MI_DWR_PHY     => MI_DWR_PMD  ,
-       MI_ADDR_PHY    => MI_ADDR_PMD ,
-       MI_RD_PHY      => MI_RD_PMD   ,
-       MI_WR_PHY      => MI_WR_PMD   ,
-       MI_BE_PHY      => MI_BE_PMD   ,
-       MI_DRD_PHY     => MI_DRD_PMD  ,
-       MI_ARDY_PHY    => MI_ARDY_PMD ,
-       MI_DRDY_PHY    => MI_DRDY_PMD
-    );
+    qsfp_ctrl_g: if QSFP_I2C_CTRL_EN generate
+        qsfp_ctrl_i : entity work.QSFP_CTRL
+        generic map (
+           QSFP_PORTS     => QSFP_PORTS,
+           QSFP_I2C_PORTS => QSFP_I2C_PORTS,
+           FPC202_INIT_EN => FPC202_INIT_EN,
+           I2C_TRISTATE   => QSFP_I2C_TRISTATE
+        )
+        port map (
+           RST            => MI_RESET_PMD,
+           --
+           TX_READY       => (others => '1'),
+           -- QSFP control/status
+           QSFP_MODSEL_N  => QSFP_MODSEL_N,
+           QSFP_LPMODE    => QSFP_LPMODE,
+           QSFP_RESET_N   => QSFP_RESET_N,
+           QSFP_MODPRS_N  => QSFP_MODPRS_N,
+           QSFP_INT_N     => QSFP_INT_N,
+           QSFP_I2C_SCL   => QSFP_I2C_SCL,
+           QSFP_I2C_SDA   => QSFP_I2C_SDA,
+           QSFP_I2C_DIR   => QSFP_I2C_DIR,
+           QSFP_I2C_SDA_I => QSFP_I2C_SDA_I,
+           QSFP_I2C_SCL_I => QSFP_I2C_SCL_I,
+           QSFP_I2C_SCL_O  => QSFP_I2C_SCL_O,
+           QSFP_I2C_SCL_OE => QSFP_I2C_SCL_OE,
+           QSFP_I2C_SDA_O  => QSFP_I2C_SDA_O,
+           QSFP_I2C_SDA_OE => QSFP_I2C_SDA_OE,
+           -- Select which QSFP port is targetting during MI read/writes
+           MI_QSFP_SEL    => MI_ADDR_PMD(8+max(log2(QSFP_PORTS),1)-1 downto 8),
+           -- MI interface
+           MI_CLK_PHY     => MI_CLK_PMD  ,
+           MI_RESET_PHY   => MI_RESET_PMD,
+           MI_DWR_PHY     => MI_DWR_PMD  ,
+           MI_ADDR_PHY    => MI_ADDR_PMD ,
+           MI_RD_PHY      => MI_RD_PMD   ,
+           MI_WR_PHY      => MI_WR_PMD   ,
+           MI_BE_PHY      => MI_BE_PMD   ,
+           MI_DRD_PHY     => MI_DRD_PMD  ,
+           MI_ARDY_PHY    => MI_ARDY_PMD ,
+           MI_DRDY_PHY    => MI_DRDY_PMD
+        );
+    end generate;
 
 end architecture;
