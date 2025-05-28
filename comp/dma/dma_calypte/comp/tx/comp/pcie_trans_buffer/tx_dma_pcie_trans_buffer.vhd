@@ -138,6 +138,10 @@ architecture FULL of TX_DMA_PCIE_TRANS_BUFFER is
     signal addr_cntr_pst            : unsigned(META_PCIE_ADDR_W -1 downto 0);
     signal addr_cntr_nst            : unsigned(META_PCIE_ADDR_W -1 downto 0);
 
+    -- Stores the index of the packet that get currently stored
+    signal chan_num_reg             : std_logic_vector(META_CHAN_NUM_W -1 downto 0);
+    signal chan_num_next            : std_logic_vector(META_CHAN_NUM_W -1 downto 0);
+
     -- control of the amount of shift on the writing barrel shifters
     signal wr_shift_sel             : slv_array_t(MFB_REGIONS - 1 downto 0)(log2(MFB_LENGTH/32) -1 downto 0);
 
@@ -237,8 +241,10 @@ begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
                 addr_cntr_pst <= (others => '0');
+                chan_num_reg  <= (others => '0');
             else
                 addr_cntr_pst <= addr_cntr_nst;
+                chan_num_reg  <= chan_num_next;
             end if;
         end if;
     end process;
@@ -246,6 +252,7 @@ begin
     addr_cntr_nst_logic_p : process (all) is
     begin
         addr_cntr_nst <= addr_cntr_pst;
+        chan_num_next <= chan_num_reg;
 
         -- Increment the address for a next word by 8 (the number of DWs in the
         -- word) to be written to the BRAMs.  When the new packet arrives, its
@@ -266,6 +273,7 @@ begin
                     -- particularly in the first region, then increment by 16 because the frame
                     -- continues in the next word.
                     addr_cntr_nst   <= unsigned(pcie_mfb_meta_arr(i)(META_PCIE_ADDR)) + (MFB_REGIONS - i)*MFB_BLOCK_SIZE;
+                    chan_num_next   <= pcie_mfb_meta_arr(i)(META_CHAN_NUM);
                 end if;
             end loop;
         end if;
@@ -420,7 +428,7 @@ begin
                 -- Pass address to variable
                 pcie_mfb_meta_addr_v := pcie_mfb_meta_arr(0)(META_PCIE_ADDR);
                 buff_addr_v          := pcie_mfb_meta_addr_v(log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto log2(MFB_DWORDS));
-                chan_addr_v          := pcie_mfb_meta_addr_v(log2(CHANS_PER_ARRAY) + 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS));
+                chan_addr_v          := pcie_mfb_meta_arr(0)(log2(CHANS_PER_ARRAY) + META_CHAN_NUM_O -1 downto META_CHAN_NUM_O);
 
                 wr_addr_bram_by_shift(0) <= (others => (chan_addr_v & buff_addr_v));
 
@@ -432,7 +440,7 @@ begin
                 end loop;
             else
                 buff_addr_v := std_logic_vector(addr_cntr_pst(log2(BUFFER_DEPTH) + log2(MFB_DWORDS) -1 downto log2(MFB_DWORDS)));
-                chan_addr_v := std_logic_vector(addr_cntr_pst(log2(CHANS_PER_ARRAY) + 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS)));
+                chan_addr_v := chan_num_reg;
 
                 wr_addr_bram_by_shift(0) <= (others => (chan_addr_v & buff_addr_v));
 
@@ -460,7 +468,7 @@ begin
                     -- Pass address to variable
                     pcie_mfb_meta_addr_v := pcie_mfb_meta_arr(1)(META_PCIE_ADDR);
                     buff_addr_v          := pcie_mfb_meta_addr_v(log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto log2(MFB_DWORDS));
-                    chan_addr_v          := pcie_mfb_meta_addr_v(log2(CHANS_PER_ARRAY) + 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS));
+                    chan_addr_v          := pcie_mfb_meta_arr(1)(log2(CHANS_PER_ARRAY) + META_CHAN_NUM_O -1 downto META_CHAN_NUM_O);
 
                     wr_addr_bram_by_shift(1) <= (others => (chan_addr_v & buff_addr_v));
 
