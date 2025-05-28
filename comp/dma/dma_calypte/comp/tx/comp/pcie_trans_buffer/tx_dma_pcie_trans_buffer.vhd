@@ -150,8 +150,8 @@ architecture FULL of TX_DMA_PCIE_TRANS_BUFFER is
     signal wr_addr_bram_by_shift    : slv_array_2d_t(MFB_REGIONS - 1 downto 0)((PCIE_MFB_DATA'length/32) -1 downto 0)(log2(BUFFER_DEPTH*CHANS_PER_ARRAY) -1 downto 0);
     signal wr_data_bram_bshifter    : slv_array_t(MFB_REGIONS - 1 downto 0)(MFB_LENGTH -1 downto 0);
 
-    signal chan_num_pst             : std_logic_vector(log2(MEM_ARRAYS) -1 downto 0);
-    signal chan_num_nst             : std_logic_vector(log2(MEM_ARRAYS) -1 downto 0);
+    signal mem_arr_idx_reg          : std_logic_vector(log2(MEM_ARRAYS) -1 downto 0);
+    signal mem_arr_idx_next         : std_logic_vector(log2(MEM_ARRAYS) -1 downto 0);
 
     signal rd_en_bram_demux         : std_logic_vector(MEM_ARRAYS -1 downto 0);
     signal rd_data_bram_mux         : std_logic_vector(MFB_LENGTH -1 downto 0);
@@ -492,13 +492,13 @@ begin
     -- TODO: It should be taken into consideration that this storing process should be removed
     -- because the channel number is already extracted in METADATA_EXTRACTOR and the index of a
     -- channel is held through the duration of a whole packet.
-    chan_num_hold_reg_p : process (CLK) is
+    mem_arr_idx_hold_reg_p : process (CLK) is
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                chan_num_pst <= (others => '0');
+                mem_arr_idx_reg <= (others => '0');
             else
-                chan_num_pst <= chan_num_nst;
+                mem_arr_idx_reg <= mem_arr_idx_next;
             end if;
         end if;
     end process;
@@ -506,18 +506,18 @@ begin
     -- This FSM stores a part of a channel number to determine the memory array
     -- to which the data ought to be send. It stores channel number for the last
     -- valid SOF in the word.
-    chan_num_hold_nst_logic_p : process (all) is
-        variable chan_num_v : std_logic_vector(log2(CHANNELS) -1 downto 0);
+    mem_arr_idx_hold_nst_logic_p : process (all) is
+        variable mem_arr_idx_v : std_logic_vector(log2(CHANNELS) -1 downto 0);
     begin
-        chan_num_nst <= chan_num_pst;
+        mem_arr_idx_next <= mem_arr_idx_reg;
 
         -- Higher takes
         if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
             for i in 0 to (MFB_REGIONS - 1) loop
                 if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
 
-                    chan_num_v   := pcie_mfb_meta_arr(i)(META_CHAN_NUM);
-                    chan_num_nst <= chan_num_v(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY));
+                    mem_arr_idx_v    := pcie_mfb_meta_arr(i)(META_CHAN_NUM);
+                    mem_arr_idx_next <= mem_arr_idx_v(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY));
 
                 end if;
             end loop;
@@ -542,7 +542,7 @@ begin
                 if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
                     wr_be_bram_demux(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_MEM_ARR_IDX))))(i) <= wr_be_bram_bshifter(i);
                 else
-                    wr_be_bram_demux(to_integer(unsigned(chan_num_pst)))(i)                           <= wr_be_bram_bshifter(i);
+                    wr_be_bram_demux(to_integer(unsigned(mem_arr_idx_reg)))(i)                        <= wr_be_bram_bshifter(i);
                 end if;
             end if;
         end loop;
