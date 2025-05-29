@@ -492,61 +492,75 @@ begin
     -- TODO: It should be taken into consideration that this storing process should be removed
     -- because the channel number is already extracted in METADATA_EXTRACTOR and the index of a
     -- channel is held through the duration of a whole packet.
-    mem_arr_idx_hold_reg_p : process (CLK) is
-    begin
-        if (rising_edge(CLK)) then
-            if (RESET = '1') then
-                mem_arr_idx_reg <= (others => '0');
-            else
-                mem_arr_idx_reg <= mem_arr_idx_next;
+    mem_arr_indx_hold_g: if (MEM_ARRAYS > 1) generate
+        mem_arr_idx_hold_reg_p : process (CLK) is
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    mem_arr_idx_reg <= (others => '0');
+                else
+                    mem_arr_idx_reg <= mem_arr_idx_next;
+                end if;
             end if;
-        end if;
-    end process;
+        end process;
 
-    -- This FSM stores a part of a channel number to determine the memory array
-    -- to which the data ought to be send. It stores channel number for the last
-    -- valid SOF in the word.
-    mem_arr_idx_hold_nst_logic_p : process (all) is
-        variable mem_arr_idx_v : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    begin
-        mem_arr_idx_next <= mem_arr_idx_reg;
+        -- This FSM stores a part of a channel number to determine the memory array
+        -- to which the data ought to be send. It stores channel number for the last
+        -- valid SOF in the word.
+        mem_arr_idx_hold_nst_logic_p : process (all) is
+            variable mem_arr_idx_v : std_logic_vector(log2(CHANNELS) -1 downto 0);
+        begin
+            mem_arr_idx_next <= mem_arr_idx_reg;
 
-        -- Higher takes
-        if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
+            -- Higher takes
+            if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
+                for i in 0 to (MFB_REGIONS - 1) loop
+                    if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
+
+                        mem_arr_idx_v    := pcie_mfb_meta_arr(i)(META_CHAN_NUM);
+                        mem_arr_idx_next <= mem_arr_idx_v(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY));
+
+                    end if;
+                end loop;
+            end if;
+        end process;
+
+        -- =============================================================================================
+        -- Demultiplexers - Byte enable
+        -- =============================================================================================
+        -- Possibilites:
+        --     SOF(0) SOF(1)
+        -- 1)    0      0   - Port A handles whole MFB word = Last valid channel is used
+        -- 2)    0      1   - Port A handles first region, Second region is dispatched by port B (illegal for incoming data)
+        -- 3)    1      0   - Port A handles whole MFB word = Current channel is used
+        -- 4)    1      1   - Port A handles first region, Second region is dispatched by port B
+        wr_bram_data_demux_p : process (all) is
+        begin
+            wr_be_bram_demux <= (others => (others => (others => '0')));
+
             for i in 0 to (MFB_REGIONS - 1) loop
-                if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
-
-                    mem_arr_idx_v    := pcie_mfb_meta_arr(i)(META_CHAN_NUM);
-                    mem_arr_idx_next <= mem_arr_idx_v(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY));
-
+                if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
+                    if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
+                        wr_be_bram_demux(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_MEM_ARR_IDX))))(i) <= wr_be_bram_bshifter(i);
+                    else
+                        wr_be_bram_demux(to_integer(unsigned(mem_arr_idx_reg)))(i)                        <= wr_be_bram_bshifter(i);
+                    end if;
                 end if;
             end loop;
-        end if;
-    end process;
+        end process;
+    else generate
 
-    -- =============================================================================================
-    -- Demultiplexers - Byte enable
-    -- =============================================================================================
-    -- Possibilites:
-    --     SOF(0) SOF(1)
-    -- 1)    0      0   - Port A handles whole MFB word = Last valid channel is used
-    -- 2)    0      1   - Port A handles first region, Second region is dispatched by port B (illegal for incoming data)
-    -- 3)    1      0   - Port A handles whole MFB word = Current channel is used
-    -- 4)    1      1   - Port A handles first region, Second region is dispatched by port B
-    wr_bram_data_demux_p : process (all) is
-    begin
-        wr_be_bram_demux <= (others => (others => (others => '0')));
+        wr_bram_data_demux_p : process (all) is
+        begin
+            wr_be_bram_demux <= (others => (others => (others => '0')));
 
-        for i in 0 to (MFB_REGIONS - 1) loop
-            if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
-                if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
-                    wr_be_bram_demux(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_MEM_ARR_IDX))))(i) <= wr_be_bram_bshifter(i);
-                else
-                    wr_be_bram_demux(to_integer(unsigned(mem_arr_idx_reg)))(i)                        <= wr_be_bram_bshifter(i);
+            for i in 0 to (MFB_REGIONS - 1) loop
+                if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
+                    wr_be_bram_demux(0)(i) <= wr_be_bram_bshifter(i);
                 end if;
-            end if;
-        end loop;
-    end process;
+            end loop;
+        end process;
+    end generate;
 
     -- =============================================================================================
     -- Registers between BARREL_SHIFTERs and BRAMs
