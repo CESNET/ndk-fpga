@@ -11,7 +11,7 @@
 # 11. qsfp_cages      - number of QSFP cages
 # 12. QSFP_I2C_ADDR   - array of integer, I2C address for all QSFP cages
 # 13. card_name       - name of the card
-proc dts_network_mod { base_mac base_pcs base_pmd ports ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU eth_ip_name qsfp_cages QSFP_I2C_ADDR card_name} {
+proc dts_network_mod { base_mac base_pcs base_pmd ports ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU eth_ip_name qsfp_cages QSFP_I2C_ADDR card_name {i2c_custom_ctrls {}}} {
 
     # use upvar to pass an array
     upvar $ETH_PORT_SPEED port_speed
@@ -40,9 +40,14 @@ proc dts_network_mod { base_mac base_pcs base_pmd ports ETH_PORT_SPEED ETH_PORT_
     set ret ""
 
     for {set p 0} {$p < $qsfp_cages} {incr p} {
-        append ret "i2c$p:" [dts_i2c $p [expr $base_pmd + $PMD_PORT_OFF * $p + 0x10]]
+        set i2c_node [lindex $i2c_custom_ctrls $p]
+        # generate I2C controller node by default
+        if {$i2c_node eq {}} {
+            set i2c_node "i2c$p"
+            append ret "$i2c_node:" [dts_i2c $p [expr $base_pmd + $PMD_PORT_OFF * $p + 0x10]]
+        }
         append ret "pmdctrl$p:" [dts_pmd_ctrl $p [expr $base_pmd + $PMD_PORT_OFF * $p + 0x1c]]
-        append ret "pmd$p:" [dts_eth_transciever $p "QSFP" "pmdctrl$p" "i2c$p" $pmd_i2c_addr($p)]
+        append ret "pmd$p:" [dts_eth_transciever $p "QSFP" "pmdctrl$p" $i2c_node $pmd_i2c_addr($p)]
     }
 
     set ports_per_qsfp [expr $ports / $qsfp_cages]

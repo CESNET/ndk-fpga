@@ -79,6 +79,7 @@ generic (
     QSFP_PORTS              : natural := 2;
     QSFP_I2C_PORTS          : natural := 1;
     QSFP_I2C_TRISTATE       : boolean := true;
+    QSFP_I2C_CTRL_EN        : boolean := true;
 
     HBM_PORTS               : natural := 1;
     HBM_ADDR_WIDTH          : natural := 32;

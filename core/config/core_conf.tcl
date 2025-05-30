@@ -75,6 +75,9 @@ set QSFP_I2C_ADDR(1)   "0xA0"
 set QSFP_I2C_ADDR(2)   "0xA0"
 set QSFP_I2C_ADDR(3)   "0xA0"
 
+# List of custom I2C controllers for QSFP: label of node in Devicetree
+set QSFP_I2C_CUSTOM_CTRLS [list]
+
 # ------------------------------------------------------------------------------
 # Application core parameters:
 # ------------------------------------------------------------------------------
