@@ -120,7 +120,7 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
         for pcie_clk in self._core.pcie_i.pcie_core_i.pcie_hip_clk:
             await cocotb.start(Clock(pcie_clk, 4, 'ns').start())
 
-        for eth_core in self._core.network_mod_i.eth_core_g:
+        for eth_core in self._core.network_mod_i.eth_core_g if hasattr(self._core.network_mod_i, 'eth_core_g') else []:
             if hasattr(eth_core.network_mod_core_i, 'cmac_clk_322m'):
                 await cocotb.start(Clock(eth_core.network_mod_core_i.cmac_clk_322m, 3106, 'ps').start())
             if hasattr(eth_core.network_mod_core_i, 'etile_clk_out'):
@@ -172,7 +172,7 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
 
         self._eth_rx_driver = []
         self._eth_tx_monitor = []
-        for i, eth_core in enumerate(self._core.network_mod_i.eth_core_g):
+        for i, eth_core in enumerate(self._core.network_mod_i.eth_core_g if hasattr(self._core.network_mod_i, 'eth_core_g') else []):
             if hasattr(eth_core.network_mod_core_i, 'cmac_tx_lbus_rdy'):
                 eth_core.network_mod_core_i.cmac_tx_lbus_rdy.value = 1
                 eth_core.network_mod_core_i.cmac_rx_local_fault.value = 0
