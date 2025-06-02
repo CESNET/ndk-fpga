@@ -233,7 +233,9 @@ end generate;
       process(CLK)
       begin
          if(CLK'event and CLK = '1') then
-             DO <= out_mem;
+            if(PIPE_EN = '1') then
+                DO <= out_mem;
+            end if;
          end if;
       end process;
 
