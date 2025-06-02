@@ -35,24 +35,19 @@ def convert_units(value: float, in_units: str = "", out_units: Optional[str] = N
         value: converted value.
         out_units: in which units the converted value is.
     """
-    assert in_units in decadic_conversions.keys()
-    assert out_units in decadic_conversions.keys() or out_units is None
+    units = list(decadic_conversions.keys())
+    assert in_units in units
+    assert out_units in units or out_units is None
 
-    value = value * decadic_conversions[in_units]  # converting value to base units
+    value *= decadic_conversions[in_units]  # converting value to base units
+    abs_value = abs(value)
 
     if out_units is None:
-        if value == 0.0:
-            out_units = list(decadic_conversions.keys())[4]
-            return value, out_units
-
-        for out_units in decadic_conversions:
-            value_temp = value / decadic_conversions[out_units]
-
-            if value_temp < 1000 and value_temp >= 1:
-                value = value_temp
+        out_units = "" if abs_value == 0.0 else units[0]
+        for ou in units[1:]:
+            if abs_value < decadic_conversions[ou]:
                 break
+            out_units = ou
 
-    else:
-        value = value / decadic_conversions[out_units]
-
+    value /= decadic_conversions[out_units]
     return value, out_units
