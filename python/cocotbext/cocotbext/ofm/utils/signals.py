@@ -1,14 +1,16 @@
 # signals.py: Cocotbext signal utilities
-# Copyright (C) 2024 CESNET z. s. p. o.
+# Copyright (C) 2025 CESNET z. s. p. o.
 # Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 from cocotb.binary import BinaryValue
-from typing import Optional
+from typing import Optional, Any
+from cocotb.triggers import RisingEdge, FallingEdge
+from cocotb.clock import Clock
 
 
-async def await_signal_sync(clk_re, signal, value: int = 1) -> None:
+async def await_signal_sync(clk_re: RisingEdge, signal, value: int = 1) -> None:
     """
     Synchronously waits until the value of the passed signal becomes passed value.
 
@@ -136,3 +138,20 @@ def align_read_request(bus_width: int, addr: int, byte_count: int, *, byte_enabl
 
     byte_count += start_offset + end_offset
     return start_offset, end_offset, addr, byte_count, byte_enable
+
+
+async def wait_number_of_cycles(clk: RisingEdge | FallingEdge | Clock, cycles: int) -> None:
+    if isinstance(Clock):
+        clk_re = RisingEdge(clk)
+    elif isinstance(RisingEdge) or isinstance(FallingEdge):
+        clk_re = clk
+    else:
+        raise TypeError("Invalid type passed to clk arg.")
+
+    for _ in range(cycles):
+        await clk_re
+
+
+async def set_signal_delayed(clk: RisingEdge | FallingEdge | Clock, signal, cycles: int, value: Any) -> None:
+    await wait_number_of_cycles(clk, cycles)
+    signal.value = value

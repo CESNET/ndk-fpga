@@ -26,6 +26,11 @@ from cocotbext.ofm.lbus.drivers import LBusDriver
 from cocotbext.ofm.avst_eth.monitors import AvstEthMonitor
 from cocotbext.ofm.avst_eth.drivers import AvstEthDriver
 
+from cocotbext.ofm.mac_segmented.drivers import MAC_Segmented_RX_Driver
+from cocotbext.ofm.mac_segmented.monitors import MAC_Segmented_TX_Monitor
+
+from cocotbext.ofm.avst_pcie.creditor import AvstCreditorRX, AvstCreditorTX, AvstCreditRequester, AvstCreditReceiver
+
 
 class Axi4StreamMasterV(Axi4StreamMaster):
     _signals = {"TVALID": "VALID"}
@@ -64,11 +69,11 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
         elif self._card_name == "NFB-200G2QL":
             await cocotb.start(Clock(self._dut.SYSCLK_P, 8, 'ns').start())
             await cocotb.start(Clock(self._dut.SYSCLK_N, 8, 'ns').start(start_high=False))
+
         elif "AGI-FH400G" in self._card_name:
-            # FIXME: Check freq
             await cocotb.start(Clock(self._dut.AG_SYSCLK0_P, 8, 'ns').start())
-            await cocotb.start(Clock(self._dut.AG_SYSCLK1_P, 8, 'ns').start())
-            raise NotImplementedError("This card doesn't run")
+            await cocotb.start(Clock(self._dut.AG_SYSCLK1_P, 10, 'ns').start())
+
         elif self._card_name == "N6010":
             await cocotb.start(Clock(self._dut.SYS_CLK_100M, 10, 'ns').start())
             self._core.clk_gen_i.LOCKED.value = 1
@@ -111,7 +116,8 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
             # No card: fpga_common
             await cocotb.start(Clock(self._dut.SYSCLK, 10, 'ns').start())
 
-        if self._card_name in ["IA-420F", "N6010", "DK-DEV-1SDX-P"]:
+        # Workaround for all Intel PLL/CLOCKGEN
+        if any([(name in self._card_name) for name in ["IA-420F", "N6010", "DK-DEV-1SDX-P", "AGI-FH400G"]]):
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_0, 2.5, 'ns').start())
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_1, get_sim_steps(10/3 / 2, 'ns', round_mode='round')*2).start())
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_2, 5, 'ns').start())
@@ -125,6 +131,8 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
                 await cocotb.start(Clock(eth_core.network_mod_core_i.cmac_clk_322m, 3106, 'ps').start())
             if hasattr(eth_core.network_mod_core_i, 'etile_clk_out'):
                 await cocotb.start(Clock(eth_core.network_mod_core_i.etile_clk_out, 2482, 'ps').start())
+            if hasattr(eth_core.network_mod_core_i, 'ftile_clk_out'):
+                await cocotb.start(Clock(eth_core.network_mod_core_i.ftile_clk_out, 2482, 'ps').start())
 
     def _init_pcie(self):
         handle = simulator.get_root_handle("combo_user_const")
@@ -165,6 +173,16 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
                 cc_mon = AvstPcieMonitor(pcie_i, "pcie_avst_up", clk, 0, aux_signals=True, array_idx=i)
                 rq_mon = AvstPcieMonitor(pcie_i, "pcie_avst_up", clk, aux_signals=True, array_idx=i)
 
+                if hasattr(pcie_i, "pcie_dcrdt_up_init"): # R-TILE
+                    hcrdt_rx = AvstCreditorRX(pcie_i, "pcie_hcrdt_dw", clk, array_idx=i)
+                    dcrdt_rx = AvstCreditorRX(pcie_i, "pcie_dcrdt_dw", clk, array_idx=i)
+                    cq_rc_drv = AvstCreditRequester(cq_rc_drv, hcrdt_rx, dcrdt_rx)
+
+                    hcrdt_tx = AvstCreditorTX(pcie_i, "pcie_hcrdt_up", clk, array_idx=i, credits=[0, 32, 32])
+                    dcrdt_tx = AvstCreditorTX(pcie_i, "pcie_dcrdt_up", clk, array_idx=i, credits=[0, 1024, 1024])
+                    cc_mon = AvstCreditReceiver(cc_mon, hcrdt_tx, dcrdt_tx)
+                    rq_mon = AvstCreditReceiver(rq_mon, hcrdt_tx, dcrdt_tx)
+
                 req = AvstRequester(self.ram, cc_rq_drv, cq_rc_drv, rq_mon)
                 mi = AvstCompleter(cq_rc_drv, cc_rq_drv, cc_mon)
                 self.mi.append(mi)
@@ -188,6 +206,14 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
 
                 tx_monitor = AvstEthMonitor(eth_core.network_mod_core_i, "tx_avst", eth_core.network_mod_core_i.etile_clk_out)
                 rx_driver = AvstEthDriver(eth_core.network_mod_core_i, "rx_avst", eth_core.network_mod_core_i.etile_clk_out)
+                self._eth_tx_monitor.append(tx_monitor)
+                self._eth_rx_driver.append(rx_driver)
+
+            if hasattr(eth_core.network_mod_core_i, 'ftile_tx_mac_ready'):
+                eth_core.network_mod_core_i.ftile_tx_mac_ready.value = 1
+
+                tx_monitor = MAC_Segmented_TX_Monitor(eth_core.network_mod_core_i, "ftile_tx_adapt", eth_core.network_mod_core_i.ftile_clk_out, array_idx=i)
+                rx_driver = MAC_Segmented_RX_Driver(eth_core.network_mod_core_i, "ftile_rx_mac", eth_core.network_mod_core_i.ftile_clk_out, array_idx=i)
                 self._eth_tx_monitor.append(tx_monitor)
                 self._eth_rx_driver.append(rx_driver)
 

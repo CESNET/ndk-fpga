@@ -1,0 +1,16 @@
+[project]
+name = "cocotb-ndk-minimal-test-toplevel"
+version = "0.1.0"
+dependencies = [
+	"cocotbext-ofm[nfb] @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
+]
+
+[project.optional-dependencies]
+grpc = [
+	"scapy",
+	"cocotbext-ofm[nfb_grpcio] @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
