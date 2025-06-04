@@ -20,6 +20,9 @@ set DMA_TX_CHANNELS      16
 # In non-blocking mode, packets are dropped whenever they cannot be sent.
 set DMA_RX_BLOCKING_MODE true
 
+set MEM_PORTS 0
+set TSU_ENABLE false
+
 # ------------------------------------------------------------------------------
 # Other parameters:
 # ------------------------------------------------------------------------------
