@@ -5,5 +5,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 # Including synthesis procedures
-source $OFM_PATH/build/Vivado.inc.tcl
+source $OFM_PATH/build/Vivado_non_prj.inc.tcl
 source $CORE_BASE/common.inc.tcl
