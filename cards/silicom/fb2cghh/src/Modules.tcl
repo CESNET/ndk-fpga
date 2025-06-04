@@ -35,14 +35,16 @@ set ARCHGRP_ARR(USE_IP_SUBDIRS)   true
 #                         script_path     script_name          ip_comp_name     type  modify
 lappend IP_COMPONENTS [list  "mem"    "axi_quad_spi_0"     "axi_quad_spi_0"       0      1]
 
-if {$ARCHGRP_ARR(NET_MOD_ARCH) eq "40GE"} {
-    lappend IP_COMPONENTS [list "eth"  "gty_40ge"          "gty_40ge"                     0      1]
-} elseif { $ARCHGRP_ARR(NET_MOD_ARCH) eq "25G4" } {
-    lappend IP_COMPONENTS [list "eth"  "pcs_pma_4x25g"     "twenty_five_gig_eth_pcspma"   0      1]
-} elseif { $ARCHGRP_ARR(NET_MOD_ARCH) eq "10G4" } {
-    lappend IP_COMPONENTS [list "eth"  "pcs_pma_4x10g"     "ten_gig_eth_pcspma"           0      1]
-} else {
-    lappend IP_COMPONENTS [list "eth"  "cmac_eth_1x100g"   "cmac_eth_1x100g"              0      1]
+if {$ARCHGRP_ARR(NET_MOD_ARCH) != "EMPTY"} {
+    if {$ARCHGRP_ARR(NET_MOD_ARCH) eq "40GE"} {
+        lappend IP_COMPONENTS [list "eth"  "gty_40ge"          "gty_40ge"                     0      1]
+    } elseif { $ARCHGRP_ARR(NET_MOD_ARCH) eq "25G4" } {
+        lappend IP_COMPONENTS [list "eth"  "pcs_pma_4x25g"     "twenty_five_gig_eth_pcspma"   0      1]
+    } elseif { $ARCHGRP_ARR(NET_MOD_ARCH) eq "10G4" } {
+        lappend IP_COMPONENTS [list "eth"  "pcs_pma_4x10g"     "ten_gig_eth_pcspma"           0      1]
+    } else {
+        lappend IP_COMPONENTS [list "eth"  "cmac_eth_1x100g"   "cmac_eth_1x100g"              0      1]
+    }
 }
 
 if {$ARCHGRP_ARR(MEM_PORTS) > 0} {
