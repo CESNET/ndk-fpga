@@ -158,19 +158,7 @@ architecture FULL of DMA_TEST_CORE is
     signal tx_mfb_dst_rdy_dbg : std_logic;
 
     -- =============================================================================================
-    -- MFB Generator ----> MUX
-    -- =============================================================================================
-    signal rx_mfb_data_gen    : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH -1 downto 0);
-    signal rx_mfb_meta_gen    : std_logic_vector(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX +1) -1 downto 0);
-    signal rx_mfb_sof_gen     : std_logic_vector(MFB_REGIONS -1 downto 0);
-    signal rx_mfb_eof_gen     : std_logic_vector(MFB_REGIONS -1 downto 0);
-    signal rx_mfb_sof_pos_gen : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
-    signal rx_mfb_eof_pos_gen : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
-    signal rx_mfb_src_rdy_gen : std_logic;
-    signal rx_mfb_dst_rdy_gen : std_logic;
-
-    -- =============================================================================================
-    -- MFB Loopback ----> MUX
+    -- MFB Loopback ----> Latency meter
     -- =============================================================================================
     signal rx_mfb_data_lbk    : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH -1 downto 0);
     signal rx_mfb_meta_lbk    : std_logic_vector(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX +1) + HDR_META_WIDTH -1 downto 0);
@@ -182,49 +170,21 @@ architecture FULL of DMA_TEST_CORE is
     signal rx_mfb_dst_rdy_lbk : std_logic;
 
     -- =============================================================================================
-    -- MFB generator control
+    -- Latency meter ---> TX Debug Core
     -- =============================================================================================
-    signal mfb_gen_ctrl_en          : std_logic;
-    signal mfb_gen_ctrl_chan_inc    : std_logic_vector(32-1 downto 0);
-    signal mfb_gen_ctrl_chan_val    : std_logic_vector(32-1 downto 0);
-    signal mfb_gen_ctrl_length      : std_logic_vector(log2(USR_RX_PKT_SIZE_MAX+1) -1 downto 0);
-    signal mfb_gen_ctrl_pkt_cnt_clr : std_logic;
-    signal mfb_gen_ctrl_pkt_cnt     : std_logic_vector(64 -1 downto 0);
+    signal tx_mfb_meta_pkt_size_lm : std_logic_vector(log2(USR_TX_PKT_SIZE_MAX+1) -1 downto 0);
+    signal tx_mfb_meta_hdr_meta_lm : std_logic_vector(HDR_META_WIDTH -1 downto 0);
+    signal tx_mfb_meta_chan_lm     : std_logic_vector(log2(TX_CHANNELS) -1 downto 0);
 
-    -- =============================================================================================
-    -- RX MFB Generator/RX stream multiplexer ---> RX Debug Core
-    -- =============================================================================================
-    signal rx_mfb_meta_pkt_size_gen_mux : std_logic_vector(log2(USR_RX_PKT_SIZE_MAX+1) -1 downto 0);
-    signal rx_mfb_meta_hdr_meta_gen_mux : std_logic_vector(HDR_META_WIDTH -1 downto 0);
-    signal rx_mfb_meta_chan_gen_mux     : std_logic_vector(log2(RX_CHANNELS) -1 downto 0);
-
-    signal rx_mfb_data_gen_mux    : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH -1 downto 0);
-    signal rx_mfb_meta_gen_mux    : std_logic_vector(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX +1) + HDR_META_WIDTH -1 downto 0);
-    signal rx_mfb_sof_gen_mux     : std_logic_vector(MFB_REGIONS -1 downto 0);
-    signal rx_mfb_eof_gen_mux     : std_logic_vector(MFB_REGIONS -1 downto 0);
-    signal rx_mfb_sof_pos_gen_mux : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
-    signal rx_mfb_eof_pos_gen_mux : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
-    signal rx_mfb_src_rdy_gen_mux : std_logic;
-    signal rx_mfb_dst_rdy_gen_mux : std_logic;
+    signal tx_mfb_data_lm    : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH -1 downto 0);
+    signal tx_mfb_sof_lm     : std_logic_vector(MFB_REGIONS -1 downto 0);
+    signal tx_mfb_eof_lm     : std_logic_vector(MFB_REGIONS -1 downto 0);
+    signal tx_mfb_sof_pos_lm : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
+    signal tx_mfb_eof_pos_lm : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
+    signal tx_mfb_src_rdy_lm : std_logic;
+    signal tx_mfb_dst_rdy_lm : std_logic;
 
     -- =============================================================================================
-    -- Lanecy meters
-    -- =============================================================================================
-    constant TIMESTAMP_WIDTH  : positive := 11;
-    constant LAT_PARAL_EVENTS : positive := 64;
-
-    signal lat_meas_val_vld    : std_logic;
-    signal lat_meas_val        : std_logic_vector(TIMESTAMP_WIDTH -1 downto 0);
-    signal lat_meas_fifo_full  : std_logic;
-    signal lat_meas_fifo_items : std_logic_vector(log2(LAT_PARAL_EVENTS) downto 0);
-
-    type meas_fsm_state_t is (S_IDLE, S_COUNT_TESTING_PACKETS, S_TEST_FINISHED);
-    signal meas_fsm_pst : meas_fsm_state_t := S_IDLE;
-    signal meas_fsm_nst : meas_fsm_state_t := S_IDLE;
-    signal pkt_cnt_pst : unsigned(15 downto 0);
-    signal pkt_cnt_nst : unsigned(15 downto 0);
-    signal test_finished : std_logic;
-
     -- =============================================================================================
     -- Reset FSM
     -- =============================================================================================
@@ -238,10 +198,8 @@ architecture FULL of DMA_TEST_CORE is
     -- =============================================================================================
     -- Miscelaneous
     -- =============================================================================================
-    signal tst_gen_mux_sel   : std_logic;
     signal data_logger_rst   : std_logic;
     signal data_logger_ctrlo : std_logic_vector((1+1+log2(USR_RX_PKT_SIZE_MAX+1)+32+32+1) -1 downto 0);
-    signal rx_mfb_meta_dbg   : std_logic_vector(log2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + log2(RX_CHANNELS) -1 downto 0);
 
     -- =============================================================================================
     -- Debug probes
@@ -249,7 +207,6 @@ architecture FULL of DMA_TEST_CORE is
     -- attribute mark_debug : string;
 
     -- attribute mark_debug of data_logger_rst : signal is "true";
-    -- attribute mark_debug of tst_gen_mux_sel : signal is "true";
     -- attribute mark_debug of meas_fsm_pst    : signal is "true";
     -- attribute mark_debug of pkt_cnt_pst     : signal is "true";
     -- attribute mark_debug of test_finished   : signal is "true";
