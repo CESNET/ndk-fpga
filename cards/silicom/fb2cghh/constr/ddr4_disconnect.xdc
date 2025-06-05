@@ -1,0 +1,41 @@
+# ddr4_disconnect.xdc
+# Copyright (C) 2025 CESNET z.s.p.o.
+# Author(s): Vladislav Valek <valekv@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_A[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_BA[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_CKE[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_CS_N}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_LDM[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_UDM[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_DQ[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_LDQS_N[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_LDQS_P[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_UDQS_N[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_UDQS_P[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_ODT*}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_BG[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_RESET_N}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_ACT_N}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_CK_N[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4A_CK_P[*]}]
+
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_A[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_BA[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_CKE[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_CS_N}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_LDM[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_UDM[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_DQ[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_LDQS_N[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_LDQS_P[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_UDQS_N[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_UDQS_P[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_ODT*}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_BG[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_RESET_N}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_ACT_N}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_CK_N[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {DDR4B_CK_P[*]}]

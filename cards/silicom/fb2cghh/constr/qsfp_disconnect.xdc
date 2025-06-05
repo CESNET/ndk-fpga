@@ -26,6 +26,5 @@ set_property IO_BUFFER_TYPE NONE [get_ports {QSFP1_TX_N[3]}]
 
 set_property IO_BUFFER_TYPE NONE [get_ports {QSFP*_RESET_N}]
 set_property IO_BUFFER_TYPE NONE [get_ports {QSFP*_LPMODE}]
-set_property IO_BUFFER_TYPE NONE [get_ports {QSFP*_MODPRS_N}]
 set_property IO_BUFFER_TYPE NONE [get_ports {QSFP*_SCL}]
 set_property IO_BUFFER_TYPE NONE [get_ports {QSFP*_SDA}]

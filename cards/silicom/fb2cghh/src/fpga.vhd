@@ -511,48 +511,48 @@ begin
         );
 
     else generate
-        ddr_init_calib_complete                     <= (others => '0');
-        DDR4A_A                                     <= (others => '0');
-        DDR4A_BA                                    <= (others => '0');
-        DDR4A_CKE(0 downto 0)                       <= (others => '0');
-        DDR4A_CS_N(0 downto 0)                      <= (others => '1');
-        DDR4A_LDM(((DDR_BYTES/2)+1)-1 downto 0)     <= (others => '0');
-        DDR4A_DQ((DDR_BYTES*8)-1 downto 0)          <= (others => '0');
-        DDR4A_UDM((DDR_BYTES/2)-1 downto 0)         <= (others => '0');
-        DDR4A_ODT(0 downto 0)                       <= (others => '1');
-        DDR4A_BG                                    <= (others => '0');
-        DDR4A_RESET_N                               <= '0';
-        DDR4A_ACT_N                                 <= '0';
+        -- ddr_init_calib_complete                     <= (others => '0');
+        -- DDR4A_A                                     <= (others => '0');
+        -- DDR4A_BA                                    <= (others => '0');
+        -- DDR4A_CKE(0 downto 0)                       <= (others => '0');
+        -- DDR4A_CS_N(0 downto 0)                      <= (others => '1');
+        -- DDR4A_LDM(((DDR_BYTES/2)+1)-1 downto 0)     <= (others => '0');
+        -- DDR4A_DQ((DDR_BYTES*8)-1 downto 0)          <= (others => '0');
+        -- DDR4A_UDM((DDR_BYTES/2)-1 downto 0)         <= (others => '0');
+        -- DDR4A_ODT(0 downto 0)                       <= (others => '1');
+        -- DDR4A_BG                                    <= (others => '0');
+        -- DDR4A_RESET_N                               <= '0';
+        -- DDR4A_ACT_N                                 <= '0';
 
-        -- Insert differential buffers
-        CK_BUF: OBUFDS
-        port map (
-            I   => '1',
-            O   => DDR4A_CK_P(0),
-            OB  => DDR4A_CK_N(0)
-        );
+        -- -- Insert differential buffers
+        -- CK_BUF: OBUFDS
+        -- port map (
+        --     I   => '1',
+        --     O   => DDR4A_CK_P(0),
+        --     OB  => DDR4A_CK_N(0)
+        -- );
 
-        ldqs_buf_g: for p in 0 to ((DDR_BYTES/2)+1)-1 generate
-            LDQS_BUF: IOBUFDS
-            port map (
-                O   => open,
-                I   => '0',
-                T   => '0',
-                IO  => DDR4A_LDQS_P(p),
-                IOB => DDR4A_LDQS_N(p)
-            );
-        end generate;
+        -- ldqs_buf_g: for p in 0 to ((DDR_BYTES/2)+1)-1 generate
+        --     LDQS_BUF: IOBUFDS
+        --     port map (
+        --         O   => open,
+        --         I   => '0',
+        --         T   => '0',
+        --         IO  => DDR4A_LDQS_P(p),
+        --         IOB => DDR4A_LDQS_N(p)
+        --     );
+        -- end generate;
 
-        udqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
-            UDQS_BUF: IOBUFDS
-            port map (
-                O   => open,
-                I   => '0',
-                T   => '0',
-                IO  => DDR4A_UDQS_P(p),
-                IOB => DDR4A_UDQS_N(p)
-            );
-        end generate;
+        -- udqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
+        --     UDQS_BUF: IOBUFDS
+        --     port map (
+        --         O   => open,
+        --         I   => '0',
+        --         T   => '0',
+        --         IO  => DDR4A_UDQS_P(p),
+        --         IOB => DDR4A_UDQS_N(p)
+        --     );
+        -- end generate;
 
     end generate;
 
@@ -661,48 +661,48 @@ begin
         );
 
     else generate
-        ddr_init_calib_complete                     <= (others => '0');
-        DDR4B_A                                     <= (others => '0');
-        DDR4B_BA                                    <= (others => '0');
-        DDR4B_CKE(0 downto 0)                       <= (others => '0');
-        DDR4B_CS_N(0 downto 0)                      <= (others => '1');
-        DDR4B_LDM(((DDR_BYTES/2)+1)-1 downto 0)     <= (others => '0');
-        DDR4B_DQ((DDR_BYTES*8)-1 downto 0)          <= (others => '0');
-        DDR4B_UDM((DDR_BYTES/2)-1 downto 0)         <= (others => '0');
-        DDR4B_ODT(0 downto 0)                       <= (others => '1');
-        DDR4B_BG                                    <= (others => '0');
-        DDR4B_RESET_N                               <= '0';
-        DDR4B_ACT_N                                 <= '0';
+        -- ddr_init_calib_complete                     <= (others => '0');
+        -- DDR4B_A                                     <= (others => '0');
+        -- DDR4B_BA                                    <= (others => '0');
+        -- DDR4B_CKE(0 downto 0)                       <= (others => '0');
+        -- DDR4B_CS_N(0 downto 0)                      <= (others => '1');
+        -- DDR4B_LDM(((DDR_BYTES/2)+1)-1 downto 0)     <= (others => '0');
+        -- DDR4B_DQ((DDR_BYTES*8)-1 downto 0)          <= (others => '0');
+        -- DDR4B_UDM((DDR_BYTES/2)-1 downto 0)         <= (others => '0');
+        -- DDR4B_ODT(0 downto 0)                       <= (others => '1');
+        -- DDR4B_BG                                    <= (others => '0');
+        -- DDR4B_RESET_N                               <= '0';
+        -- DDR4B_ACT_N                                 <= '0';
 
-        -- Insert differential buffers
-        CK_BUF: OBUFDS
-        port map (
-            I   => '1',
-            O   => DDR4B_CK_P(0),
-            OB  => DDR4B_CK_N(0)
-        );
+        -- -- Insert differential buffers
+        -- CK_BUF: OBUFDS
+        -- port map (
+        --     I   => '1',
+        --     O   => DDR4B_CK_P(0),
+        --     OB  => DDR4B_CK_N(0)
+        -- );
 
-        ldqs_buf_g: for p in 0 to ((DDR_BYTES/2)+1)-1 generate
-            LDQS_BUF: IOBUFDS
-            port map (
-                O   => open,
-                I   => '0',
-                T   => '0',
-                IO  => DDR4B_LDQS_P(p),
-                IOB => DDR4B_LDQS_N(p)
-            );
-        end generate;
+        -- ldqs_buf_g: for p in 0 to ((DDR_BYTES/2)+1)-1 generate
+        --     LDQS_BUF: IOBUFDS
+        --     port map (
+        --         O   => open,
+        --         I   => '0',
+        --         T   => '0',
+        --         IO  => DDR4B_LDQS_P(p),
+        --         IOB => DDR4B_LDQS_N(p)
+        --     );
+        -- end generate;
 
-        udqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
-            UDQS_BUF: IOBUFDS
-            port map (
-                O   => open,
-                I   => '0',
-                T   => '0',
-                IO  => DDR4B_UDQS_P(p),
-                IOB => DDR4B_UDQS_N(p)
-            );
-        end generate;
+        -- udqs_buf_g: for p in 0 to (DDR_BYTES/2)-1 generate
+        --     UDQS_BUF: IOBUFDS
+        --     port map (
+        --         O   => open,
+        --         I   => '0',
+        --         T   => '0',
+        --         IO  => DDR4B_UDQS_P(p),
+        --         IOB => DDR4B_UDQS_N(p)
+        --     );
+        -- end generate;
 
     end generate;
 
@@ -802,10 +802,10 @@ begin
         QSFP0_RESET_N <= qsfp_reset_n(0);
         QSFP0_SCL     <= qsfp_scl(0);
         QSFP0_SDA     <= qsfp_sda(0);
-    end generate;
 
-    qsfp_modprs_n <= QSFP1_MODPRS_N & QSFP0_MODPRS_N;
-    qsfp_int_n    <= QSFP1_INT_N & QSFP0_INT_N;
+        qsfp_modprs_n <= QSFP1_MODPRS_N & QSFP0_MODPRS_N;
+        qsfp_int_n    <= QSFP1_INT_N & QSFP0_INT_N;
+    end generate;
 
     axi_spi_clk     <= misc_out(0); -- usr_x1 = 100MHz
     boot_clk        <= misc_out(2); -- usr_x2 = 200MHz
