@@ -884,5 +884,5 @@ begin
 
     LM_MI_DRD  <= (others => x"DEAD_BEDD");
     LM_MI_ARDY <= LM_MI_RD or LM_MI_WR;
-    MI_MI_DRDY <= LM_MI_RD;
+    LM_MI_DRDY <= LM_MI_RD;
 end architecture;
