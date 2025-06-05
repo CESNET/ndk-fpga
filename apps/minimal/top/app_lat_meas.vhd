@@ -9,11 +9,14 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 architecture EMPTY of APPLICATION_CORE is
+
+    constant DPP_MI_OFFSET     : unsigned(32-1 downto 0) := X"00000080";
+
     function lm_mi_addr_base_f return slv_array_t is
         variable mi_addr_base_var : slv_array_t(DMA_STREAMS-1 downto 0)(MI_ADDR_WIDTH-1 downto 0);
     begin
         for i in 0 to DMA_STREAMS-1 loop
-            mi_addr_base_var(i) := std_logic_vector(resize(i*x"30", MI_ADDR_WIDTH));
+            mi_addr_base_var(i) := std_logic_vector(resize(i*DPP_MI_OFFSET, MI_ADDR_WIDTH));
         end loop;
         return mi_addr_base_var;
     end function;
