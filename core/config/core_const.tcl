@@ -74,6 +74,10 @@ if { $DMA_TYPE == 4 } {
         error "The maximum allowed length of a packet is too large and cannot fit to data buffer:\
                 DMA_TX_FRAME_SIZE_MAX: $DMA_TX_FRAME_SIZE and DMA_TX_DATA_PTR_W: $DMA_TX_DATA_PTR_W"
     }
+    if { $APP_CORE_ENABLE && $APP_CORE_ARCH == "LAT_MEAS"} {
+        error "The LAT_MEAS application architecture was not designed for DMA Calypte"
+    }
+
 } elseif { $DMA_TYPE == 3 } {
     if { $DMA_RX_DATA_PTR_W != 16 || $DMA_RX_HDR_PTR_W != 16 || $DMA_TX_DATA_PTR_W != 16} {
         error "This pointer configuration has never been tested on DMA Medusa: RX_DATA_PTR_W: $DMA_RX_DATA_PTR_W,\
@@ -84,6 +88,10 @@ if { $DMA_TYPE == 4 } {
         error "Incompatible DMA_TYPE: $DMA_TYPE with chosen PCIE_ENDPOINT_MODE: $PCIE_ENDPOINT_MODE\
                 and PCIE_LANES: $PCIE_LANES! Try to use PCIE_CONF=1xGen4x16 or PCIE_CONF=1xGen3x16."
     }
+}
+
+if {$APP_CORE_ARCH != "FULL" && $APP_CORE_ARCH != "LAT_MEAS"} {
+    error "Wrong type of architecture: $APP_CORE_ARCH (the correct ones are FULL and LAT_MEAS)"
 }
 
 VhdlPkgProjectText $PROJECT_NAME

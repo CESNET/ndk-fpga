@@ -62,6 +62,16 @@ proc dts_app_minimal_core {index base reg_size} {
     return $ret
 }
 
+proc dts_app_lat_meas {DTS base dma_streams} {
+    upvar 1 $DTS dts
+
+    dts_create_node dts "application" {
+        for {set i 0} {$i < $dma_streams} {incr i} {
+            dts_dma_latency_meter dts [expr $base+ $i*0x30]
+        }
+    }
+}
+
 proc dts_build_project {} {
     return [dts_build_netcope]
 }

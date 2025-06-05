@@ -9,7 +9,14 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 architecture EMPTY of APPLICATION_CORE is
-
+    function lm_mi_addr_base_f return slv_array_t is
+        variable mi_addr_base_var : slv_array_t(DMA_STREAMS-1 downto 0)(MI_ADDR_WIDTH-1 downto 0);
+    begin
+        for i in 0 to DMA_STREAMS-1 loop
+            mi_addr_base_var(i) := std_logic_vector(resize(i*x"30", MI_ADDR_WIDTH));
+        end loop;
+        return mi_addr_base_var;
+    end function;
 begin
 
     MI_CLK     <= CLK_USER;
@@ -62,13 +69,40 @@ begin
     EMIF_RST_REQ        <= (others => '0');
     EMIF_AUTO_PRECHARGE <= (others => '0');
 
-    MI_ARDY <= MI_RD or MI_WR;
-    MI_DRD  <= (others => '0');
-    MI_DRDY <= MI_RD;
+    lm_mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
+        generic map (
+            ADDR_WIDTH   => MI_ADDR_WIDTH,
+            DATA_WIDTH   => MI_DATA_WIDTH,
+            META_WIDTH   => 0,
 
-    LM_MI_DWR  <= (others => (others => '0'));
-    LM_MI_ADDR <= (others => (others => '0'));
-    LM_MI_BE   <= (others => (others => '0'));
-    LM_MI_RD   <= (others => '0');
-    LM_MI_WR   <= (others => '0');
+            PORTS        => DMA_STREAMS,
+            PIPE_OUT     => (others => true),
+            PIPE_TYPE    => "REG",
+            PIPE_OUTREG  => false,
+            ADDR_BASES   => DMA_STREAMS,
+            ADDR_BASE    => lm_mi_addr_base_f,
+            DEVICE       => DEVICE)
+        port map (
+            CLK     => MI_CLK,
+            RESET   => MI_RESET(0),
+
+            RX_DWR  => MI_DWR,
+            RX_MWR  => (others => '0'),
+            RX_ADDR => MI_ADDR,
+            RX_BE   => MI_BE,
+            RX_RD   => MI_RD,
+            RX_WR   => MI_WR,
+            RX_ARDY => MI_ARDY,
+            RX_DRD  => MI_DRD,
+            RX_DRDY => MI_DRDY,
+
+            TX_DWR  => LM_MI_DWR,
+            TX_MWR  => open,
+            TX_ADDR => LM_MI_ADDR,
+            TX_BE   => LM_MI_BE,
+            TX_RD   => LM_MI_RD,
+            TX_WR   => LM_MI_WR,
+            TX_ARDY => LM_MI_ARDY,
+            TX_DRD  => LM_MI_DRD,
+            TX_DRDY => LM_MI_DRDY);
 end architecture;

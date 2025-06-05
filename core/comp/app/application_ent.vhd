@@ -418,6 +418,15 @@ port (
     -- EMIF auto precharge request
     EMIF_AUTO_PRECHARGE    : out std_logic_vector(MEM_PORTS-1 downto 0);
 
+    LM_MI_DWR                  : out slv_array_t(DMA_STREAMS -1 downto 0)(MI_DATA_WIDTH-1 downto 0);
+    LM_MI_ADDR                 : out slv_array_t(DMA_STREAMS -1 downto 0)(MI_ADDR_WIDTH-1 downto 0);
+    LM_MI_BE                   : out slv_array_t(DMA_STREAMS -1 downto 0)(MI_DATA_WIDTH/8-1 downto 0);
+    LM_MI_RD                   : out std_logic_vector(DMA_STREAMS -1 downto 0);
+    LM_MI_WR                   : out std_logic_vector(DMA_STREAMS -1 downto 0);
+    LM_MI_ARDY                 : in  std_logic_vector(DMA_STREAMS -1 downto 0);
+    LM_MI_DRD                  : in  slv_array_t(DMA_STREAMS -1 downto 0)(MI_DATA_WIDTH-1 downto 0);
+    LM_MI_DRDY                 : in  std_logic_vector(DMA_STREAMS -1 downto 0);
+
     -- =========================================================================
     -- MI INTERFACE (clocked at MI_CLK)
     -- =========================================================================

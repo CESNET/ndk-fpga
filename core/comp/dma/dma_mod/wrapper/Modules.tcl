@@ -19,6 +19,7 @@ set MFB_PIPE_BASE               "$OFM_PATH/comp/mfb_tools/flow/pipe"
 set DMA_MEDUSA_BASE             "$OFM_PATH/extra/dma-medusa"
 set DMA_CALYPTE_BASE            "$OFM_PATH/comp/dma/dma_calypte"
 set DMA_TEST_CORE_BASE          "$OFM_PATH/comp/dma/dma_calypte/comp/test_core"
+set DMA_LAT_METER_BASE          "$OFM_PATH/comp/dma/dma_calypte/comp/test_core/comp/dma_latency_meter"
 
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
@@ -34,6 +35,7 @@ if { $ARCHGRP == "MEDUSA" } {
 
     lappend COMPONENTS [ list "MI_SPLITTER_PLUS_GEN" $MI_SPLITTER_PLUS_GEN_BASE "FULL" ]
     lappend COMPONENTS [ list "DMA_MEDUSA"           $DMA_MEDUSA_BASE           "FULL" ]
+    lappend COMPONENTS [ list "DMA_LATENCY_METER"    $DMA_LAT_METER_BASE        "FULL" ]
 
     # Source files for implemented component
     lappend MOD "$ENTITY_BASE/dma_medusa_wrapper_arch.vhd"

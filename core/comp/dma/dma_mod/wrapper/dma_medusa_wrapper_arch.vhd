@@ -65,6 +65,43 @@ architecture MEDUSA of DMA_WRAPPER is
 
     -- =====================================================================
 
+    -- =============================================================================================
+    -- Latency meter ----> RX DMA
+    -- =============================================================================================
+    signal rx_usr_mvb_len_lm       :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MVB_ITEMS*log2(USR_RX_PKT_SIZE_MAX+1) -1 downto 0);
+    signal rx_usr_mvb_hdr_meta_lm  :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MVB_ITEMS*HDR_META_WIDTH           -1 downto 0);
+    signal rx_usr_mvb_channel_lm   :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MVB_ITEMS*log2(RX_CHANNELS)        -1 downto 0);
+    signal rx_usr_mvb_discard_lm   :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MVB_ITEMS*1                        -1 downto 0);
+    signal rx_usr_mvb_vld_lm       :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MVB_ITEMS                          -1 downto 0);
+    signal rx_usr_mvb_src_rdy_lm   :  std_logic_vector(DMA_STREAMS -1 downto 0);
+    signal rx_usr_mvb_dst_rdy_lm   :  std_logic_vector(DMA_STREAMS -1 downto 0) := (others => '1');
+
+    signal rx_usr_mfb_data_lm      :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS*USR_MFB_REGION_SIZE*USR_MFB_BLOCK_SIZE*USR_MFB_ITEM_WIDTH -1 downto 0);
+    signal rx_usr_mfb_sof_lm       :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS                                                           -1 downto 0);
+    signal rx_usr_mfb_eof_lm       :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS                                                           -1 downto 0);
+    signal rx_usr_mfb_sof_pos_lm   :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS*max(1,log2(USR_MFB_REGION_SIZE))                          -1 downto 0);
+    signal rx_usr_mfb_eof_pos_lm   :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS*max(1,log2(USR_MFB_REGION_SIZE*USR_MFB_BLOCK_SIZE))       -1 downto 0);
+    signal rx_usr_mfb_src_rdy_lm   :  std_logic_vector(DMA_STREAMS -1 downto 0);
+    signal rx_usr_mfb_dst_rdy_lm   :  std_logic_vector(DMA_STREAMS -1 downto 0) := (others => '1');
+
+    -- =============================================================================================
+    -- TX DMA ----> Latency meter
+    -- =============================================================================================
+    signal tx_usr_mvb_len_eng       :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MVB_ITEMS*log2(USR_TX_PKT_SIZE_MAX+1) -1 downto 0) := (others => (others => '0'));
+    signal tx_usr_mvb_hdr_meta_eng  :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MVB_ITEMS*HDR_META_WIDTH           -1 downto 0) := (others => (others => '0'));
+    signal tx_usr_mvb_channel_eng   :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MVB_ITEMS*log2(TX_CHANNELS)        -1 downto 0) := (others => (others => '0'));
+    signal tx_usr_mvb_vld_eng       :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MVB_ITEMS                          -1 downto 0) := (others => (others => '0'));
+    signal tx_usr_mvb_src_rdy_eng   :  std_logic_vector(DMA_STREAMS -1 downto 0)                                                := (others => '0');
+    signal tx_usr_mvb_dst_rdy_eng   :  std_logic_vector(DMA_STREAMS -1 downto 0);
+
+    signal tx_usr_mfb_data_eng      :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS*USR_MFB_REGION_SIZE*USR_MFB_BLOCK_SIZE*USR_MFB_ITEM_WIDTH -1 downto 0) := (others => (others => '0'));
+    signal tx_usr_mfb_sof_eng       :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS                                                           -1 downto 0) := (others => (others => '0'));
+    signal tx_usr_mfb_eof_eng       :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS                                                           -1 downto 0) := (others => (others => '0'));
+    signal tx_usr_mfb_sof_pos_eng   :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS*max(1,log2(USR_MFB_REGION_SIZE))                          -1 downto 0) := (others => (others => '0'));
+    signal tx_usr_mfb_eof_pos_eng   :  slv_array_t(DMA_STREAMS -1 downto 0)(USR_MFB_REGIONS*max(1,log2(USR_MFB_REGION_SIZE*USR_MFB_BLOCK_SIZE))       -1 downto 0) := (others => (others => '0'));
+    signal tx_usr_mfb_src_rdy_eng   :  std_logic_vector(DMA_STREAMS -1 downto 0)                                                                                   := (others => '0');
+    signal tx_usr_mfb_dst_rdy_eng   :  std_logic_vector(DMA_STREAMS -1 downto 0);
+
     -- =====================================================================
     --  UP MVB Endpoint tagging
     -- =====================================================================
@@ -230,6 +267,103 @@ begin
     dma_medusa_g : for i in 0 to DMA_STREAMS-1 generate
         subtype DPE is natural range (i+1)*DMA_EP_PER_DMA-1 downto i*DMA_EP_PER_DMA;
     begin
+        dma_latency_meter_i : entity work.DMA_LATENCY_METER
+            generic map (
+                DEVICE              => DEVICE,
+
+                USE_MVB_META        => true,
+                MVB_ITEMS           => USR_MVB_ITEMS,
+                MFB_REGIONS         => USR_MFB_REGIONS,
+                MFB_REGION_SIZE     => USR_MFB_REGION_SIZE,
+                MFB_BLOCK_SIZE      => USR_MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH      => USR_MFB_ITEM_WIDTH,
+
+                HDR_META_WIDTH      => HDR_META_WIDTH,
+                RX_CHANNELS         => RX_CHANNELS,
+                TX_CHANNELS         => TX_CHANNELS,
+                USR_RX_PKT_SIZE_MAX => USR_RX_PKT_SIZE_MAX,
+                USR_TX_PKT_SIZE_MAX => USR_TX_PKT_SIZE_MAX,
+
+                MI_SAME_CLK         => false,
+                MI_WIDTH            => MI_WIDTH)
+            port map (
+                CLK                      => USR_CLK,
+                RESET                    => USR_RESET,
+
+                RX_MVB_META_PKT_SIZE_OUT => rx_usr_mvb_len_lm(i),
+                RX_MVB_META_HDR_META_OUT => rx_usr_mvb_hdr_meta_lm(i),
+                RX_MVB_META_CHAN_OUT     => rx_usr_mvb_channel_lm(i),
+                RX_MVB_META_DISCARD_OUT  => rx_usr_mvb_discard_lm(i),
+                RX_MVB_VLD_OUT           => rx_usr_mvb_vld_lm(i),
+                RX_MVB_SRC_RDY_OUT       => rx_usr_mvb_src_rdy_lm(i),
+                RX_MVB_DST_RDY_OUT       => rx_usr_mvb_dst_rdy_lm(i),
+
+                RX_MFB_DATA_OUT          => rx_usr_mfb_data_lm(i),
+                RX_MFB_SOF_OUT           => rx_usr_mfb_sof_lm(i),
+                RX_MFB_EOF_OUT           => rx_usr_mfb_eof_lm(i),
+                RX_MFB_SOF_POS_OUT       => rx_usr_mfb_sof_pos_lm(i),
+                RX_MFB_EOF_POS_OUT       => rx_usr_mfb_eof_pos_lm(i),
+                RX_MFB_SRC_RDY_OUT       => rx_usr_mfb_src_rdy_lm(i),
+                RX_MFB_DST_RDY_OUT       => rx_usr_mfb_dst_rdy_lm(i),
+
+                TX_MVB_META_PKT_SIZE_IN  => tx_usr_mvb_len_eng(i),
+                TX_MVB_META_HDR_META_IN  => tx_usr_mvb_hdr_meta_eng(i),
+                TX_MVB_META_CHAN_IN      => tx_usr_mvb_channel_eng(i),
+                TX_MVB_VLD_IN            => tx_usr_mvb_vld_eng(i),
+                TX_MVB_SRC_RDY_IN        => tx_usr_mvb_src_rdy_eng(i),
+                TX_MVB_DST_RDY_IN        => tx_usr_mvb_dst_rdy_eng(i),
+
+                TX_MFB_DATA_IN           => tx_usr_mfb_data_eng(i),
+                TX_MFB_SOF_IN            => tx_usr_mfb_sof_eng(i),
+                TX_MFB_EOF_IN            => tx_usr_mfb_eof_eng(i),
+                TX_MFB_SOF_POS_IN        => tx_usr_mfb_sof_pos_eng(i),
+                TX_MFB_EOF_POS_IN        => tx_usr_mfb_eof_pos_eng(i),
+                TX_MFB_SRC_RDY_IN        => tx_usr_mfb_src_rdy_eng(i),
+                TX_MFB_DST_RDY_IN        => tx_usr_mfb_dst_rdy_eng(i),
+
+                RX_MVB_META_PKT_SIZE_IN  => RX_USR_MVB_LEN(i),
+                RX_MVB_META_HDR_META_IN  => RX_USR_MVB_HDR_META(i),
+                RX_MVB_META_CHAN_IN      => RX_USR_MVB_CHANNEL(i),
+                RX_MVB_META_DISCARD_IN   => RX_USR_MVB_DISCARD(i),
+                RX_MVB_VLD_IN            => RX_USR_MVB_VLD(i),
+                RX_MVB_SRC_RDY_IN        => RX_USR_MVB_SRC_RDY(i),
+                RX_MVB_DST_RDY_IN        => RX_USR_MVB_DST_RDY(i),
+
+                RX_MFB_DATA_IN           => RX_USR_MFB_DATA(i),
+                RX_MFB_SOF_IN            => RX_USR_MFB_SOF(i),
+                RX_MFB_EOF_IN            => RX_USR_MFB_EOF(i),
+                RX_MFB_SOF_POS_IN        => RX_USR_MFB_SOF_POS(i),
+                RX_MFB_EOF_POS_IN        => RX_USR_MFB_EOF_POS(i),
+                RX_MFB_SRC_RDY_IN        => RX_USR_MFB_SRC_RDY(i),
+                RX_MFB_DST_RDY_IN        => RX_USR_MFB_DST_RDY(i),
+
+                TX_MVB_META_PKT_SIZE_OUT => TX_USR_MVB_LEN(i),
+                TX_MVB_META_HDR_META_OUT => TX_USR_MVB_HDR_META(i),
+                TX_MVB_META_CHAN_OUT     => TX_USR_MVB_CHANNEL(i),
+                TX_MVB_VLD_OUT           => TX_USR_MVB_VLD(i),
+                TX_MVB_SRC_RDY_OUT       => TX_USR_MVB_SRC_RDY(i),
+                TX_MVB_DST_RDY_OUT       => TX_USR_MVB_DST_RDY(i),
+
+                TX_MFB_DATA_OUT          => TX_USR_MFB_DATA(i),
+                TX_MFB_SOF_OUT           => TX_USR_MFB_SOF(i),
+                TX_MFB_EOF_OUT           => TX_USR_MFB_EOF(i),
+                TX_MFB_SOF_POS_OUT       => TX_USR_MFB_SOF_POS(i),
+                TX_MFB_EOF_POS_OUT       => TX_USR_MFB_EOF_POS(i),
+                TX_MFB_SRC_RDY_OUT       => TX_USR_MFB_SRC_RDY(i),
+                TX_MFB_DST_RDY_OUT       => TX_USR_MFB_DST_RDY(i),
+
+                MI_CLK                   => MI_CLK,
+                MI_RESET                 => MI_RESET,
+
+                MI_ADDR                  => LM_MI_ADDR(i),
+                MI_DWR                   => LM_MI_DWR(i),
+                MI_BE                    => LM_MI_BE(i),
+                MI_RD                    => LM_MI_RD(i),
+                MI_WR                    => LM_MI_WR(i),
+                MI_DRD                   => LM_MI_DRD(i),
+                MI_ARDY                  => LM_MI_ARDY(i),
+                MI_DRDY                  => LM_MI_DRDY(i));
+
         dma_medusa_i : entity work.DMA_MEDUSA
         generic map(
             DEVICE               => DEVICE                          ,
@@ -292,36 +426,36 @@ begin
             USR_CLK              => USR_CLK                ,
             USR_RESET            => USR_RESET              ,
 
-            RX_USR_MVB_LEN       => RX_USR_MVB_LEN(i)     ,
-            RX_USR_MVB_HDR_META  => RX_USR_MVB_HDR_META(i),
-            RX_USR_MVB_CHANNEL   => RX_USR_MVB_CHANNEL(i) ,
-            RX_USR_MVB_DISCARD   => RX_USR_MVB_DISCARD(i) ,
-            RX_USR_MVB_VLD       => RX_USR_MVB_VLD(i)     ,
-            RX_USR_MVB_SRC_RDY   => RX_USR_MVB_SRC_RDY(i) ,
-            RX_USR_MVB_DST_RDY   => RX_USR_MVB_DST_RDY(i) ,
+            RX_USR_MVB_LEN       => rx_usr_mvb_len_lm(i)     ,
+            RX_USR_MVB_HDR_META  => rx_usr_mvb_hdr_meta_lm(i),
+            RX_USR_MVB_CHANNEL   => rx_usr_mvb_channel_lm(i) ,
+            RX_USR_MVB_DISCARD   => rx_usr_mvb_discard_lm(i) ,
+            RX_USR_MVB_VLD       => rx_usr_mvb_vld_lm(i)     ,
+            RX_USR_MVB_SRC_RDY   => rx_usr_mvb_src_rdy_lm(i) ,
+            RX_USR_MVB_DST_RDY   => rx_usr_mvb_dst_rdy_lm(i) ,
 
-            RX_USR_MFB_DATA      => RX_USR_MFB_DATA(i)    ,
-            RX_USR_MFB_SOF       => RX_USR_MFB_SOF(i)     ,
-            RX_USR_MFB_EOF       => RX_USR_MFB_EOF(i)     ,
-            RX_USR_MFB_SOF_POS   => RX_USR_MFB_SOF_POS(i) ,
-            RX_USR_MFB_EOF_POS   => RX_USR_MFB_EOF_POS(i) ,
-            RX_USR_MFB_SRC_RDY   => RX_USR_MFB_SRC_RDY(i) ,
-            RX_USR_MFB_DST_RDY   => RX_USR_MFB_DST_RDY(i) ,
+            RX_USR_MFB_DATA      => rx_usr_mfb_data_lm(i)    ,
+            RX_USR_MFB_SOF       => rx_usr_mfb_sof_lm(i)     ,
+            RX_USR_MFB_EOF       => rx_usr_mfb_eof_lm(i)     ,
+            RX_USR_MFB_SOF_POS   => rx_usr_mfb_sof_pos_lm(i) ,
+            RX_USR_MFB_EOF_POS   => rx_usr_mfb_eof_pos_lm(i) ,
+            RX_USR_MFB_SRC_RDY   => rx_usr_mfb_src_rdy_lm(i) ,
+            RX_USR_MFB_DST_RDY   => rx_usr_mfb_dst_rdy_lm(i) ,
 
-            TX_USR_MVB_LEN       => TX_USR_MVB_LEN(i)     ,
-            TX_USR_MVB_HDR_META  => TX_USR_MVB_HDR_META(i),
-            TX_USR_MVB_CHANNEL   => TX_USR_MVB_CHANNEL(i) ,
-            TX_USR_MVB_VLD       => TX_USR_MVB_VLD(i)     ,
-            TX_USR_MVB_SRC_RDY   => TX_USR_MVB_SRC_RDY(i) ,
-            TX_USR_MVB_DST_RDY   => TX_USR_MVB_DST_RDY(i) ,
+            TX_USR_MVB_LEN       => tx_usr_mvb_len_eng(i)     ,
+            TX_USR_MVB_HDR_META  => tx_usr_mvb_hdr_meta_eng(i),
+            TX_USR_MVB_CHANNEL   => tx_usr_mvb_channel_eng(i) ,
+            TX_USR_MVB_VLD       => tx_usr_mvb_vld_eng(i)     ,
+            TX_USR_MVB_SRC_RDY   => tx_usr_mvb_src_rdy_eng(i) ,
+            TX_USR_MVB_DST_RDY   => tx_usr_mvb_dst_rdy_eng(i) ,
 
-            TX_USR_MFB_DATA      => TX_USR_MFB_DATA(i)    ,
-            TX_USR_MFB_SOF       => TX_USR_MFB_SOF(i)     ,
-            TX_USR_MFB_EOF       => TX_USR_MFB_EOF(i)     ,
-            TX_USR_MFB_SOF_POS   => TX_USR_MFB_SOF_POS(i) ,
-            TX_USR_MFB_EOF_POS   => TX_USR_MFB_EOF_POS(i) ,
-            TX_USR_MFB_SRC_RDY   => TX_USR_MFB_SRC_RDY(i) ,
-            TX_USR_MFB_DST_RDY   => TX_USR_MFB_DST_RDY(i) ,
+            TX_USR_MFB_DATA      => tx_usr_mfb_data_eng(i)    ,
+            TX_USR_MFB_SOF       => tx_usr_mfb_sof_eng(i)     ,
+            TX_USR_MFB_EOF       => tx_usr_mfb_eof_eng(i)     ,
+            TX_USR_MFB_SOF_POS   => tx_usr_mfb_sof_pos_eng(i) ,
+            TX_USR_MFB_EOF_POS   => tx_usr_mfb_eof_pos_eng(i) ,
+            TX_USR_MFB_SRC_RDY   => tx_usr_mfb_src_rdy_eng(i) ,
+            TX_USR_MFB_DST_RDY   => tx_usr_mfb_dst_rdy_eng(i) ,
 
             TX_USR_CHOKE_CHANS   => TX_USR_CHOKE_CHANS(i) ,
 

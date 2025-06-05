@@ -219,6 +219,15 @@ port(
     PCIE_CC_MFB_SRC_RDY       : out std_logic_vector(DMA_ENDPOINTS -1 downto 0) := (others => '0');
     PCIE_CC_MFB_DST_RDY       : in  std_logic_vector(DMA_ENDPOINTS -1 downto 0);
 
+    LM_MI_ADDR              : in  slv_array_t(DMA_STREAMS -1 downto 0)(32 -1 downto 0);
+    LM_MI_DWR               : in  slv_array_t(DMA_STREAMS -1 downto 0)(32 -1 downto 0);
+    LM_MI_BE                : in  slv_array_t(DMA_STREAMS -1 downto 0)(32/8 -1 downto 0);
+    LM_MI_RD                : in  std_logic_vector(DMA_STREAMS -1 downto 0);
+    LM_MI_WR                : in  std_logic_vector(DMA_STREAMS -1 downto 0);
+    LM_MI_DRD               : out slv_array_t(DMA_STREAMS -1 downto 0)(32 -1 downto 0);
+    LM_MI_ARDY              : out std_logic_vector(DMA_STREAMS -1 downto 0);
+    LM_MI_DRDY              : out std_logic_vector(DMA_STREAMS -1 downto 0);
+
     MI_ADDR              : in  slv_array_t(PCIE_ENDPOINTS -1 downto 0)(32   -1 downto 0);
     MI_DWR               : in  slv_array_t(PCIE_ENDPOINTS -1 downto 0)(32   -1 downto 0);
     MI_BE                : in  slv_array_t(PCIE_ENDPOINTS -1 downto 0)(32/8 -1 downto 0);

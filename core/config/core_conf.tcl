@@ -82,6 +82,7 @@ set QSFP_I2C_CUSTOM_CTRLS [list]
 # Application core parameters:
 # ------------------------------------------------------------------------------
 set APP_CORE_ENABLE $env(APP_CORE_ENABLE)
+set APP_CORE_ARCH $env(APP_CORE_ARCH)
 
 # ------------------------------------------------------------------------------
 # PCIe parameters (not all combinations work):

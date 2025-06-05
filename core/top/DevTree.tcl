@@ -132,15 +132,14 @@ proc dts_build_netcope {} {
     }
 
     # Populate application, if exists
-    global APP_CORE_ENABLE
-    global ETH_STREAMS_MODE
+    global APP_CORE_ENABLE ETH_STREAMS_MODE DMA_MODULES APP_CORE_ARCH
     if {$ETH_STREAMS_MODE == 1} {
         set ETH_STREAMS [expr $ETH_PORTS*$ETH_PORT_CHAN(0)]
     } else {
         set ETH_STREAMS $ETH_PORTS
     }
     if {$APP_CORE_ENABLE} {
-        if { [llength [info procs dts_application]] > 0 } {
+        if { [llength [info procs dts_application]] > 0 && $APP_CORE_ARCH == "FULL"} {
             global MEM_PORTS HBM_PORTS
 
             if {[llength [info args dts_application]] == 3} {
@@ -154,11 +153,12 @@ proc dts_build_netcope {} {
                 "
                 append ret "app:" [dts_application $ADDR_USERAPP [array get GENERICS]]
             }
+        } elseif {$APP_CORE_ARCH == "LAT_MEAS"} {
+            dts_app_lat_meas ret $ADDR_USERAPP $DMA_MODULES
         }
     }
 
     # Gen Loop Switch debug modules for each DMA stream/module
-    global DMA_MODULES
     for {set i 0} {$i < $DMA_MODULES} {incr i} {
         set    gls_offset [expr $i * 0x200]
         append ret [dts_gen_loop_switch [expr $ADDR_GEN_LOOP + $gls_offset] "dbg_gls$i"]

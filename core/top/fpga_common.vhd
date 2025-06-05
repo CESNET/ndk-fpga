@@ -540,6 +540,15 @@ architecture FULL of FPGA_COMMON is
     signal dma_mi_ardy                   : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal dma_mi_drdy                   : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
 
+    signal lm_mi_dwr                     : slv_array_t(DMA_STREAMS-1 downto 0)(31 downto 0);
+    signal lm_mi_addr                    : slv_array_t(DMA_STREAMS-1 downto 0)(31 downto 0);
+    signal lm_mi_be                      : slv_array_t(DMA_STREAMS-1 downto 0)(3 downto 0);
+    signal lm_mi_rd                      : std_logic_vector(DMA_STREAMS-1 downto 0);
+    signal lm_mi_wr                      : std_logic_vector(DMA_STREAMS-1 downto 0);
+    signal lm_mi_drd                     : slv_array_t(DMA_STREAMS-1 downto 0)(31 downto 0);
+    signal lm_mi_ardy                    : std_logic_vector(DMA_STREAMS-1 downto 0);
+    signal lm_mi_drdy                    : std_logic_vector(DMA_STREAMS-1 downto 0);
+
     signal dma_rq_mvb_data               : slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_RQ_MVB_ITEMS*DMA_RQ_MVB_ITEM_WIDTH-1 downto 0);
     signal dma_rq_mvb_vld                : slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_RQ_MVB_ITEMS-1 downto 0);
     signal dma_rq_mvb_src_rdy            : std_logic_vector(DMA_ENDPOINTS-1 downto 0);
@@ -1293,6 +1302,15 @@ begin
         PCIE_CC_MFB_SRC_RDY => dma_cc_mfb_src_rdy,
         PCIE_CC_MFB_DST_RDY => dma_cc_mfb_dst_rdy,
 
+        LM_MI_ADDR          => lm_mi_addr,
+        LM_MI_DWR           => lm_mi_dwr,
+        LM_MI_BE            => lm_mi_be,
+        LM_MI_RD            => lm_mi_rd,
+        LM_MI_WR            => lm_mi_wr,
+        LM_MI_DRD           => lm_mi_drd,
+        LM_MI_ARDY          => lm_mi_ardy,
+        LM_MI_DRDY          => lm_mi_drdy,
+
         MI_ADDR             => dma_mi_addr,
         MI_DWR              => dma_mi_dwr,
         MI_BE               => dma_mi_be,
@@ -1555,6 +1573,15 @@ begin
         MI_DRD             => mi_adc_drd(MI_ADC_PORT_USERAPP),
         MI_ARDY            => mi_adc_ardy(MI_ADC_PORT_USERAPP),
         MI_DRDY            => mi_adc_drdy(MI_ADC_PORT_USERAPP),
+
+        LM_MI_ADDR         => lm_mi_addr,
+        LM_MI_DWR          => lm_mi_dwr,
+        LM_MI_BE           => lm_mi_be,
+        LM_MI_RD           => lm_mi_rd,
+        LM_MI_WR           => lm_mi_wr,
+        LM_MI_DRD          => lm_mi_drd,
+        LM_MI_ARDY         => lm_mi_ardy,
+        LM_MI_DRDY         => lm_mi_drdy,
 
         MISC_TOP2APP           => MISC_TOP2APP,
         MISC_APP2TOP           => MISC_APP2TOP

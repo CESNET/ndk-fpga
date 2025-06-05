@@ -28,24 +28,31 @@ lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/eth_hdr_pack.vhd"
 
 if {$ARCHGRP_ARR(APP_CORE_ENABLE)} {
-    # Components
-    lappend COMPONENTS [ list "MI_ASYNC"       $MI_ASYNC_BASE       "FULL" ]
-    lappend COMPONENTS [ list "MI_SPLITTER"    $MI_SPLITTER_BASE    "FULL" ]
-    lappend COMPONENTS [ list "MFB_META_INS"   $MFB_META_INS_BASE   "FULL" ]
-    lappend COMPONENTS [ list "MFB_PIPE"       $MFB_PIPE_BASE       "FULL" ]
-    lappend COMPONENTS [ list "MVB_PIPE"       $MVB_PIPE_BASE       "FULL" ]
-    lappend COMPONENTS [ list "STREAMS_MERGER" $STREAMS_MERGER_BASE "FULL" ]
-    lappend COMPONENTS [ list "DMA_CHAN_MOD"   $DMA_CHAN_MOD_BASE   "FULL" ]
-    lappend COMPONENTS [ list "MVB_CHDIST"     $MVB_CHDIST_BASE     "FULL" ]
-    lappend COMPONENTS [ list "MEM_TESTER"     $MEM_TESTER_BASE     "FULL" ]
-    lappend COMPONENTS [ list "MEM_LOGGER"     $MEM_LOGGER_BASE     "FULL" ]
-    lappend COMPONENTS [ list "HBM_TESTER"     $HBM_TESTER_BASE     "FULL" ]
-    lappend COMPONENTS [ list "ASYNC_RESET"    $ASYNC_RESET_BASE    "FULL" ]
+    if {$ARCHGRP_ARR(APP_CORE_ARCH) == "FULL"} {
+        # Components
+        lappend COMPONENTS [ list "MI_ASYNC"       $MI_ASYNC_BASE       "FULL" ]
+        lappend COMPONENTS [ list "MI_SPLITTER"    $MI_SPLITTER_BASE    "FULL" ]
+        lappend COMPONENTS [ list "MFB_META_INS"   $MFB_META_INS_BASE   "FULL" ]
+        lappend COMPONENTS [ list "MFB_PIPE"       $MFB_PIPE_BASE       "FULL" ]
+        lappend COMPONENTS [ list "MVB_PIPE"       $MVB_PIPE_BASE       "FULL" ]
+        lappend COMPONENTS [ list "STREAMS_MERGER" $STREAMS_MERGER_BASE "FULL" ]
+        lappend COMPONENTS [ list "DMA_CHAN_MOD"   $DMA_CHAN_MOD_BASE   "FULL" ]
+        lappend COMPONENTS [ list "MVB_CHDIST"     $MVB_CHDIST_BASE     "FULL" ]
+        lappend COMPONENTS [ list "MEM_TESTER"     $MEM_TESTER_BASE     "FULL" ]
+        lappend COMPONENTS [ list "MEM_LOGGER"     $MEM_LOGGER_BASE     "FULL" ]
+        lappend COMPONENTS [ list "HBM_TESTER"     $HBM_TESTER_BASE     "FULL" ]
+        lappend COMPONENTS [ list "ASYNC_RESET"    $ASYNC_RESET_BASE    "FULL" ]
 
-    # Files
-    lappend MOD "$ENTITY_BASE/mem_tester_wrap.vhd"
-    lappend MOD "$ENTITY_BASE/app_subcore.vhd"
-    lappend MOD "$ENTITY_BASE/application_core.vhd"
+        # Files
+        lappend MOD "$ENTITY_BASE/mem_tester_wrap.vhd"
+        lappend MOD "$ENTITY_BASE/app_subcore.vhd"
+        lappend MOD "$ENTITY_BASE/application_core.vhd"
+    } elseif {$ARCHGRP_ARR(APP_CORE_ARCH) == "LAT_MEAS"} {
+        lappend COMPONENTS [ list "MI_SPLITTER"    $MI_SPLITTER_BASE    "FULL" ]
+        lappend MOD "$ENTITY_BASE/app_lat_meas.vhd"
+    } else {
+        lappend MOD "$CORE_APP_COMP_BASE/app_core_empty_arch.vhd"
+    }
 } else {
     lappend MOD "$CORE_APP_COMP_BASE/app_core_empty_arch.vhd"
 }

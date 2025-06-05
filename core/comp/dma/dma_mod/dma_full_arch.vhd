@@ -283,6 +283,15 @@ begin
             PCIE_CC_MFB_SRC_RDY => PCIE_CC_MFB_SRC_RDY,
             PCIE_CC_MFB_DST_RDY => PCIE_CC_MFB_DST_RDY,
 
+            LM_MI_ADDR => LM_MI_ADDR,
+            LM_MI_DWR  => LM_MI_DWR,
+            LM_MI_BE   => LM_MI_BE,
+            LM_MI_RD   => LM_MI_RD,
+            LM_MI_WR   => LM_MI_WR,
+            LM_MI_DRD  => LM_MI_DRD,
+            LM_MI_ARDY => LM_MI_ARDY,
+            LM_MI_DRDY => LM_MI_DRDY,
+
             MI_ADDR => MI_ADDR,
             MI_DWR  => MI_DWR,
             MI_BE   => MI_BE,

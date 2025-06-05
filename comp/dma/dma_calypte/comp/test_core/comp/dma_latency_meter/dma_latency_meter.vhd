@@ -150,16 +150,33 @@ architecture FULL of DMA_LATENCY_METER is
     signal mi_drdy_sync : std_logic;
 
     -- =============================================================================================
-    -- MFB Generator ----> MUX
+    -- MFB Generator ----> MUX or METADATA_EXTRACTOR
     -- =============================================================================================
-    signal rx_mfb_data_gen    : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH -1 downto 0);
-    signal rx_mfb_meta_gen    : std_logic_vector(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX +1) -1 downto 0);
-    signal rx_mfb_sof_gen     : std_logic_vector(MFB_REGIONS -1 downto 0);
-    signal rx_mfb_eof_gen     : std_logic_vector(MFB_REGIONS -1 downto 0);
-    signal rx_mfb_sof_pos_gen : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
-    signal rx_mfb_eof_pos_gen : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
-    signal rx_mfb_src_rdy_gen : std_logic;
-    signal rx_mfb_dst_rdy_gen : std_logic;
+    signal mfb_data_gen    : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH -1 downto 0);
+    signal mfb_meta_gen    : std_logic_vector(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX +1) -1 downto 0);
+    signal mfb_sof_gen     : std_logic_vector(MFB_REGIONS -1 downto 0);
+    signal mfb_eof_gen     : std_logic_vector(MFB_REGIONS -1 downto 0);
+    signal mfb_sof_pos_gen : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
+    signal mfb_eof_pos_gen : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
+    signal mfb_src_rdy_gen : std_logic;
+    signal mfb_dst_rdy_gen : std_logic;
+
+    -- =============================================================================================
+    -- METADATA_EXTRACTOR ---> MUX
+    -- =============================================================================================
+    signal rx_mvb_data_ext    : std_logic_vector(MVB_ITEMS*(log2(USR_RX_PKT_SIZE_MAX+1) + log2(RX_CHANNELS)) -1 downto 0);
+    signal rx_mvb_vld_ext     : std_logic_vector(MVB_ITEMS -1 downto 0);
+    signal rx_mvb_src_rdy_ext : std_logic;
+    signal rx_mvb_dst_rdy_ext : std_logic;
+
+    signal rx_mfb_data_ext    : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH -1 downto 0);
+    signal rx_mfb_meta_ext    : std_logic_vector(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX +1) -1 downto 0);
+    signal rx_mfb_sof_ext     : std_logic_vector(MFB_REGIONS -1 downto 0);
+    signal rx_mfb_eof_ext     : std_logic_vector(MFB_REGIONS -1 downto 0);
+    signal rx_mfb_sof_pos_ext : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
+    signal rx_mfb_eof_pos_ext : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
+    signal rx_mfb_src_rdy_ext : std_logic;
+    signal rx_mfb_dst_rdy_ext : std_logic;
 
     -- =============================================================================================
     -- MFB generator control
@@ -170,22 +187,6 @@ architecture FULL of DMA_LATENCY_METER is
     signal mfb_gen_ctrl_length      : std_logic_vector(log2(USR_RX_PKT_SIZE_MAX+1) -1 downto 0);
     signal mfb_gen_ctrl_pkt_cnt_clr : std_logic;
     signal mfb_gen_ctrl_pkt_cnt     : std_logic_vector(64 -1 downto 0);
-
-    -- =============================================================================================
-    -- RX MFB Generator/RX stream multiplexer ---> RX Debug Core
-    -- =============================================================================================
-    signal rx_mfb_meta_pkt_size_gen_mux : std_logic_vector(log2(USR_RX_PKT_SIZE_MAX+1) -1 downto 0);
-    signal rx_mfb_meta_hdr_meta_gen_mux : std_logic_vector(HDR_META_WIDTH -1 downto 0);
-    signal rx_mfb_meta_chan_gen_mux     : std_logic_vector(log2(RX_CHANNELS) -1 downto 0);
-
-    signal rx_mfb_data_gen_mux    : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH -1 downto 0);
-    signal rx_mfb_meta_gen_mux    : std_logic_vector(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX +1) + HDR_META_WIDTH -1 downto 0);
-    signal rx_mfb_sof_gen_mux     : std_logic_vector(MFB_REGIONS -1 downto 0);
-    signal rx_mfb_eof_gen_mux     : std_logic_vector(MFB_REGIONS -1 downto 0);
-    signal rx_mfb_sof_pos_gen_mux : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)) -1 downto 0);
-    signal rx_mfb_eof_pos_gen_mux : std_logic_vector(MFB_REGIONS*max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
-    signal rx_mfb_src_rdy_gen_mux : std_logic;
-    signal rx_mfb_dst_rdy_gen_mux : std_logic;
 
     -- =============================================================================================
     -- Lanecy meters
@@ -510,37 +511,37 @@ begin
                 RX_MFB_SRC_RDY => mfb_src_rdy_gen,
                 RX_MFB_DST_RDY => mfb_dst_rdy_gen,
 
-                TX_MVB_DATA    => rx_mvb_data_gen,
-                TX_MVB_VLD     => rx_mvb_vld_gen,
-                TX_MVB_SRC_RDY => rx_mvb_src_rdy_gen,
-                TX_MVB_DST_RDY => rx_mvb_dst_rdy_gen,
+                TX_MVB_DATA    => rx_mvb_data_ext,
+                TX_MVB_VLD     => rx_mvb_vld_ext,
+                TX_MVB_SRC_RDY => rx_mvb_src_rdy_ext,
+                TX_MVB_DST_RDY => rx_mvb_dst_rdy_ext,
 
-                TX_MFB_DATA    => rx_mfb_data_gen,
+                TX_MFB_DATA    => rx_mfb_data_ext,
                 TX_MFB_META    => open,
-                TX_MFB_SOF     => rx_mfb_sof_gen,
-                TX_MFB_EOF     => rx_mfb_eof_gen,
-                TX_MFB_SOF_POS => rx_mfb_sof_pos_gen,
-                TX_MFB_EOF_POS => rx_mfb_eof_pos_gen,
-                TX_MFB_SRC_RDY => rx_mfb_src_rdy_gen,
-                TX_MFB_DST_RDY => rx_mfb_dst_rdy_gen);
+                TX_MFB_SOF     => rx_mfb_sof_ext,
+                TX_MFB_EOF     => rx_mfb_eof_ext,
+                TX_MFB_SOF_POS => rx_mfb_sof_pos_ext,
+                TX_MFB_EOF_POS => rx_mfb_eof_pos_ext,
+                TX_MFB_SRC_RDY => rx_mfb_src_rdy_ext,
+                TX_MFB_DST_RDY => rx_mfb_dst_rdy_ext);
 
-        RX_MVB_META_PKT_SIZE_OUT <= RX_MVB_META_PKT_SIZE_IN when tst_gen_mux_sel = '0' else rx_mvb_data_gen(log2(USR_RX_PKT_SIZE_MAX+1) -1 downto 0);
+        RX_MVB_META_PKT_SIZE_OUT <= RX_MVB_META_PKT_SIZE_IN when tst_gen_mux_sel = '0' else rx_mvb_data_ext(log2(USR_RX_PKT_SIZE_MAX+1) -1 downto 0);
         RX_MVB_META_HDR_META_OUT <= RX_MVB_META_HDR_META_IN when tst_gen_mux_sel = '0' else (others => '0');
-        RX_MVB_META_CHAN_OUT     <= RX_MVB_META_CHAN_IN     when tst_gen_mux_sel = '0' else rx_mvb_meta_gen(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX+1) -1 downto log2(USR_RX_PKT_SIZE_MAX+1));
+        RX_MVB_META_CHAN_OUT     <= RX_MVB_META_CHAN_IN     when tst_gen_mux_sel = '0' else rx_mvb_data_ext(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX+1) -1 downto log2(USR_RX_PKT_SIZE_MAX+1));
         RX_MVB_META_DISCARD_OUT  <= RX_MVB_META_DISCARD_IN  when tst_gen_mux_sel = '0' else (others => '0');
-        RX_MVB_VLD_OUT           <= RX_MVB_VLD_IN           when tst_gen_mux_sel = '0' else rx_mvb_vld_gen;
-        RX_MVB_SRC_RDY_OUT       <= RX_MVB_SRC_RDY_IN       when tst_gen_mux_sel = '0' else rx_mvb_src_rdy_gen;
+        RX_MVB_VLD_OUT           <= RX_MVB_VLD_IN           when tst_gen_mux_sel = '0' else rx_mvb_vld_ext;
+        RX_MVB_SRC_RDY_OUT       <= RX_MVB_SRC_RDY_IN       when tst_gen_mux_sel = '0' else rx_mvb_src_rdy_ext;
         RX_MVB_DST_RDY_IN        <= RX_MVB_DST_RDY_OUT      when tst_gen_mux_sel = '0' else '1';
-        rx_mvb_dst_rdy_gen       <= RX_MVB_DST_RDY_OUT      when tst_gen_mux_sel = '1' else '1';
+        rx_mvb_dst_rdy_ext       <= RX_MVB_DST_RDY_OUT      when tst_gen_mux_sel = '1' else '1';
 
-        RX_MFB_DATA_OUT    <= RX_MFB_DATA_IN     when tst_gen_mux_sel = '0' else rx_mfb_data_gen;
-        RX_MFB_SOF_OUT     <= RX_MFB_SOF_IN      when tst_gen_mux_sel = '0' else rx_mfb_sof_gen;
-        RX_MFB_EOF_OUT     <= RX_MFB_EOF_IN      when tst_gen_mux_sel = '0' else rx_mfb_eof_gen;
-        RX_MFB_SOF_POS_OUT <= RX_MFB_SOF_POS_IN  when tst_gen_mux_sel = '0' else rx_mfb_sof_pos_gen;
-        RX_MFB_EOF_POS_OUT <= RX_MFB_EOF_POS_IN  when tst_gen_mux_sel = '0' else rx_mfb_eof_pos_gen;
-        RX_MFB_SRC_RDY_OUT <= RX_MFB_SRC_RDY_IN  when tst_gen_mux_sel = '0' else rx_mfb_src_rdy_gen;
+        RX_MFB_DATA_OUT    <= RX_MFB_DATA_IN     when tst_gen_mux_sel = '0' else rx_mfb_data_ext;
+        RX_MFB_SOF_OUT     <= RX_MFB_SOF_IN      when tst_gen_mux_sel = '0' else rx_mfb_sof_ext;
+        RX_MFB_EOF_OUT     <= RX_MFB_EOF_IN      when tst_gen_mux_sel = '0' else rx_mfb_eof_ext;
+        RX_MFB_SOF_POS_OUT <= RX_MFB_SOF_POS_IN  when tst_gen_mux_sel = '0' else rx_mfb_sof_pos_ext;
+        RX_MFB_EOF_POS_OUT <= RX_MFB_EOF_POS_IN  when tst_gen_mux_sel = '0' else rx_mfb_eof_pos_ext;
+        RX_MFB_SRC_RDY_OUT <= RX_MFB_SRC_RDY_IN  when tst_gen_mux_sel = '0' else rx_mfb_src_rdy_ext;
         RX_MFB_DST_RDY_IN  <= RX_MFB_DST_RDY_OUT when tst_gen_mux_sel = '0' else '1';
-        rx_mfb_dst_rdy_gen <= RX_MFB_DST_RDY_OUT when tst_gen_mux_sel = '1' else '1';
+        rx_mfb_dst_rdy_ext <= RX_MFB_DST_RDY_OUT when tst_gen_mux_sel = '1' else '1';
     else generate
         RX_MVB_META_PKT_SIZE_OUT <= RX_MVB_META_PKT_SIZE_IN when tst_gen_mux_sel = '0' else mfb_meta_gen(log2(USR_RX_PKT_SIZE_MAX+1) -1 downto 0);
         RX_MVB_META_HDR_META_OUT <= RX_MVB_META_HDR_META_IN when tst_gen_mux_sel = '0' else (others => '0');

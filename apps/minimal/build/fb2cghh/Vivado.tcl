@@ -23,10 +23,11 @@ set APP_ARCHGRP(APP_CORE_ENABLE) $APP_CORE_ENABLE
 
 # Convert associative array to list
 set APP_ARCHGRP_L [array get APP_ARCHGRP]
+set ARCHGRP_ALL [concat $APP_ARCHGRP_L $ARCHGRP_ALL]
 
 # ----- Add application core to main component list ---------------------------
 lappend HIERARCHY(COMPONENTS) \
-    [list "APPLICATION_CORE" "$OFM_PATH/apps/minimal/top" $APP_ARCHGRP_L]
+    [list "APPLICATION_CORE" "$OFM_PATH/apps/minimal/top" $ARCHGRP_ALL]
 
 # Call main function which handle targets
 nb_main
