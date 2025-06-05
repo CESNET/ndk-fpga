@@ -27,9 +27,7 @@ proc dts_calypte_test_core {DTS base_addr {dbg_en False}} {
                 }
             }
 
-            dts_create_node dts "dma_calypte_latency_meter0" {
-                dts_appendprop_comp_node dts $LATENCY_METER_BASE_ADDR 0x30 "cesnet,dma_calypte_latency_meter"
-            }
+            dts_dma_latency_meter dts $LATENCY_METER_BASE_ADDR
         }
 
         dts_create_node dts "dma_calypte_reset_fsm0" {

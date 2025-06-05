@@ -360,17 +360,17 @@ begin
                 ST_SP_DBG_CHAN       => ST_SP_DBG_CHAN,
                 ST_SP_DBG_META       => ST_SP_DBG_META,
 
-                RX_MFB_META_PKT_SIZE => TX_MFB_META_PKT_SIZE_IN,
-                RX_MFB_META_CHAN     => TX_MFB_META_CHAN_IN,
-                RX_MFB_META_HDR_META => TX_MFB_META_HDR_META_IN,
+                RX_MFB_META_PKT_SIZE => tx_mfb_meta_pkt_size_lm,
+                RX_MFB_META_CHAN     => tx_mfb_meta_chan_lm,
+                RX_MFB_META_HDR_META => tx_mfb_meta_hdr_meta_lm,
 
-                RX_MFB_DATA          => TX_MFB_DATA_IN,
-                RX_MFB_SOF_POS       => TX_MFB_SOF_POS_IN,
-                RX_MFB_EOF_POS       => TX_MFB_EOF_POS_IN,
-                RX_MFB_SOF           => TX_MFB_SOF_IN,
-                RX_MFB_EOF           => TX_MFB_EOF_IN,
-                RX_MFB_SRC_RDY       => TX_MFB_SRC_RDY_IN,
-                RX_MFB_DST_RDY       => TX_MFB_DST_RDY_IN,
+                RX_MFB_DATA          => tx_mfb_data_lm,
+                RX_MFB_SOF_POS       => tx_mfb_sof_pos_lm,
+                RX_MFB_EOF_POS       => tx_mfb_eof_pos_lm,
+                RX_MFB_SOF           => tx_mfb_sof_lm,
+                RX_MFB_EOF           => tx_mfb_eof_lm,
+                RX_MFB_SRC_RDY       => tx_mfb_src_rdy_lm,
+                RX_MFB_DST_RDY       => tx_mfb_dst_rdy_lm,
 
                 TX_MFB_DATA          => tx_mfb_data_dbg,
                 TX_MFB_META          => tx_mfb_meta_dbg,
@@ -398,14 +398,14 @@ begin
         mi_ardy_split(1) <= mi_rd_split(1) or mi_wr_split(1);
         mi_drdy_split(1) <= mi_rd_split(1);
 
-        tx_mfb_data_dbg    <= TX_MFB_DATA_IN;
-        tx_mfb_meta_dbg    <= TX_MFB_META_PKT_SIZE_IN & TX_MFB_META_HDR_META_IN & TX_MFB_META_CHAN_IN;
-        tx_mfb_sof_dbg     <= TX_MFB_SOF_IN;
-        tx_mfb_eof_dbg     <= TX_MFB_EOF_IN;
-        tx_mfb_sof_pos_dbg <= TX_MFB_SOF_POS_IN;
-        tx_mfb_eof_pos_dbg <= TX_MFB_EOF_POS_IN;
-        tx_mfb_src_rdy_dbg <= TX_MFB_SRC_RDY_IN;
-        TX_MFB_DST_RDY_IN  <= tx_mfb_dst_rdy_dbg;
+        tx_mfb_data_dbg    <= tx_mfb_data_lm;
+        tx_mfb_meta_dbg    <= tx_mfb_meta_pkt_size_lm & tx_mfb_meta_hdr_meta_lm & tx_mfb_meta_chan_lm;
+        tx_mfb_sof_dbg     <= tx_mfb_sof_lm;
+        tx_mfb_eof_dbg     <= tx_mfb_eof_lm;
+        tx_mfb_sof_pos_dbg <= tx_mfb_sof_pos_lm;
+        tx_mfb_eof_pos_dbg <= tx_mfb_eof_pos_lm;
+        tx_mfb_src_rdy_dbg <= tx_mfb_src_rdy_lm;
+        tx_mfb_dst_rdy_lm  <= tx_mfb_dst_rdy_dbg;
     end generate;
 
     mfb_loopback_i : entity work.MFB_LOOPBACK
@@ -473,232 +473,130 @@ begin
     -- =============================================================================================
     -- Latency measurement
     -- =============================================================================================
-    (tst_gen_mux_sel,
-     mfb_gen_ctrl_pkt_cnt_clr,
-     mfb_gen_ctrl_en,
-     mfb_gen_ctrl_length,
-     mfb_gen_ctrl_chan_val,
-     mfb_gen_ctrl_chan_inc)
-        <= data_logger_ctrlo;
-
     latency_meter_g: if (LATENCY_METER_EN) generate
-        data_logger_i: entity work.DATA_LOGGER
+        latency_meter_i: entity work.DMA_LATENCY_METER
             generic map (
-                MI_DATA_WIDTH   => MI_WIDTH,
-                MI_ADDR_WIDTH   => MI_WIDTH,
+                DEVICE              => DEVICE,
+                USE_MVB_META        => FALSE,
+                MVB_ITEMS           => MFB_REGIONS,
+                MFB_REGIONS         => MFB_REGIONS,
+                MFB_REGION_SIZE     => MFB_REGION_SIZE,
+                MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
 
-                CNTER_CNT       => 0,
-                VALUE_CNT       => 1,
-
-                -- MUX for MFB Generator + all signals to control the generator
-                CTRLO_WIDTH     => data_logger_ctrlo'length,
-                -- Counter
-                CTRLI_WIDTH     => 1+64+log2(LAT_PARAL_EVENTS)+1+1,
-
-                CNTER_WIDTH     => 64,
-                VALUE_WIDTH     => (others => TIMESTAMP_WIDTH),
-
-                MIN_EN          => (others => true),
-                MAX_EN          => (others => true),
-                SUM_EN          => (others => false),
-                HIST_EN         => (others => true),
-
-                SUM_EXTRA_WIDTH => (others => 16),
-                HIST_BOX_CNT    => (others => 128),
-                HIST_BOX_WIDTH  => (others => 32),
-                CTRLO_DEFAULT   => (others => '0'))
+                HDR_META_WIDTH      => HDR_META_WIDTH,
+                RX_CHANNELS         => RX_CHANNELS,
+                TX_CHANNELS         => TX_CHANNELS,
+                USR_RX_PKT_SIZE_MAX => USR_RX_PKT_SIZE_MAX,
+                USR_TX_PKT_SIZE_MAX => USR_TX_PKT_SIZE_MAX,
+                MI_SAME_CLK         => TRUE,
+                MI_WIDTH            => MI_WIDTH)
             port map (
-                CLK           => CLK,
-                RST           => RESET,
+                CLK                      => CLK,
+                RESET                    => RESET,
 
-                RST_DONE      => open,
-                SW_RST        => data_logger_rst,
+                RX_MVB_META_PKT_SIZE_OUT => RX_MFB_META_PKT_SIZE_OUT,
+                RX_MVB_META_HDR_META_OUT => RX_MFB_META_HDR_META_OUT,
+                RX_MVB_META_CHAN_OUT     => RX_MFB_META_CHAN_OUT,
+                RX_MVB_META_DISCARD_OUT  => open,
+                RX_MVB_VLD_OUT           => open,
+                RX_MVB_SRC_RDY_OUT       => open,
+                RX_MVB_DST_RDY_OUT       => '1',
 
-                CTRLO         => data_logger_ctrlo,
-                CTRLI         => (
-                    test_finished &
-                    mfb_gen_ctrl_pkt_cnt &
-                    lat_meas_fifo_items &
-                    lat_meas_fifo_full),
+                RX_MFB_DATA_OUT          => RX_MFB_DATA_OUT,
+                RX_MFB_SOF_OUT           => RX_MFB_SOF_OUT,
+                RX_MFB_EOF_OUT           => RX_MFB_EOF_OUT,
+                RX_MFB_SOF_POS_OUT       => RX_MFB_SOF_POS_OUT,
+                RX_MFB_EOF_POS_OUT       => RX_MFB_EOF_POS_OUT,
+                RX_MFB_SRC_RDY_OUT       => RX_MFB_SRC_RDY_OUT,
+                RX_MFB_DST_RDY_OUT       => RX_MFB_DST_RDY_OUT,
 
-                CNTERS_INCR   => (others => '0'),
-                CNTERS_SUBMIT => (others => '0'),
-                CNTERS_DIFF   => (others => (others => '0')),
+                TX_MVB_META_PKT_SIZE_IN  => TX_MFB_META_PKT_SIZE_IN,
+                TX_MVB_META_HDR_META_IN  => TX_MFB_META_HDR_META_IN,
+                TX_MVB_META_CHAN_IN      => TX_MFB_META_CHAN_IN,
+                TX_MVB_VLD_IN            => (others => '1'),
+                TX_MVB_SRC_RDY_IN        => '1',
+                TX_MVB_DST_RDY_IN        => open,
 
-                VALUES_VLD    => (others => lat_meas_val_vld),
-                VALUES        => lat_meas_val,
+                TX_MFB_DATA_IN           => TX_MFB_DATA_IN,
+                TX_MFB_SOF_IN            => TX_MFB_SOF_IN,
+                TX_MFB_EOF_IN            => TX_MFB_EOF_IN,
+                TX_MFB_SOF_POS_IN        => TX_MFB_SOF_POS_IN,
+                TX_MFB_EOF_POS_IN        => TX_MFB_EOF_POS_IN,
+                TX_MFB_SRC_RDY_IN        => TX_MFB_SRC_RDY_IN,
+                TX_MFB_DST_RDY_IN        => TX_MFB_DST_RDY_IN,
 
-                MI_DWR        => mi_dwr_split(2),
-                MI_ADDR       => mi_addr_split(2),
-                MI_BE         => mi_be_split(2),
-                MI_RD         => mi_rd_split(2),
-                MI_WR         => mi_wr_split(2),
-                MI_ARDY       => mi_ardy_split(2),
-                MI_DRD        => mi_drd_split(2),
-                MI_DRDY       => mi_drdy_split(2));
+                RX_MVB_META_PKT_SIZE_IN  => rx_mfb_meta_lbk(log2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + log2(RX_CHANNELS) -1 downto HDR_META_WIDTH + log2(RX_CHANNELS)),
+                RX_MVB_META_HDR_META_IN  => rx_mfb_meta_lbk(HDR_META_WIDTH + log2(RX_CHANNELS) -1 downto log2(RX_CHANNELS)),
+                RX_MVB_META_CHAN_IN      => rx_mfb_meta_lbk(log2(RX_CHANNELS) -1 downto 0),
+                RX_MVB_META_DISCARD_IN   => (others => '0'),
+                RX_MVB_VLD_IN            => (others => '1'),
+                RX_MVB_SRC_RDY_IN        => '1',
+                RX_MVB_DST_RDY_IN        => open,
 
-        latency_meter_i : entity work.LATENCY_METER
-            generic map (
-                DATA_WIDTH         => TIMESTAMP_WIDTH,
-                MAX_PARALEL_EVENTS => LAT_PARAL_EVENTS,
-                DEVICE             => DEVICE)
-            port map (
-                CLK         => CLK,
-                RST         => RESET or data_logger_rst,
+                RX_MFB_DATA_IN           => rx_mfb_data_lbk,
+                RX_MFB_SOF_IN            => rx_mfb_sof_lbk,
+                RX_MFB_EOF_IN            => rx_mfb_eof_lbk,
+                RX_MFB_SOF_POS_IN        => rx_mfb_sof_pos_lbk,
+                RX_MFB_EOF_POS_IN        => rx_mfb_eof_pos_lbk,
+                RX_MFB_SRC_RDY_IN        => rx_mfb_src_rdy_lbk,
+                RX_MFB_DST_RDY_IN        => rx_mfb_dst_rdy_lbk,
 
-                START_EVENT => RX_MFB_SOF_OUT(0) and RX_MFB_SRC_RDY_OUT and RX_MFB_DST_RDY_OUT,
-                END_EVENT   => TX_MFB_SOF_IN(0)  and TX_MFB_SRC_RDY_IN  and TX_MFB_DST_RDY_IN,
+                TX_MVB_META_PKT_SIZE_OUT => tx_mfb_meta_pkt_size_lm,
+                TX_MVB_META_HDR_META_OUT => tx_mfb_meta_hdr_meta_lm,
+                TX_MVB_META_CHAN_OUT     => tx_mfb_meta_chan_lm,
+                TX_MVB_VLD_OUT           => open,
+                TX_MVB_SRC_RDY_OUT       => open,
+                TX_MVB_DST_RDY_OUT       => '1',
 
-                LATENCY_VLD => lat_meas_val_vld,
-                LATENCY     => lat_meas_val,
+                TX_MFB_DATA_OUT          => tx_mfb_data_lm,
+                TX_MFB_SOF_OUT           => tx_mfb_sof_lm,
+                TX_MFB_EOF_OUT           => tx_mfb_eof_lm,
+                TX_MFB_SOF_POS_OUT       => tx_mfb_sof_pos_lm,
+                TX_MFB_EOF_POS_OUT       => tx_mfb_eof_pos_lm,
+                TX_MFB_SRC_RDY_OUT       => tx_mfb_src_rdy_lm,
+                TX_MFB_DST_RDY_OUT       => tx_mfb_dst_rdy_lm,
 
-                FIFO_FULL   => lat_meas_fifo_full,
-                FIFO_ITEMS  => lat_meas_fifo_items);
+                MI_CLK                   => '0',
+                MI_RESET                 => '0',
 
-        meas_director_fsm_reg_p : process (CLK) is
-        begin
-            if (rising_edge(CLK)) then
-                if (RESET = '1' or data_logger_rst = '1') then
-                    meas_fsm_pst <= S_IDLE;
-                    pkt_cnt_pst  <= (others => '0');
-                else
-                    meas_fsm_pst <= meas_fsm_nst;
-                    pkt_cnt_pst  <= pkt_cnt_nst;
-                end if;
-            end if;
-        end process;
-
-        meas_director_fsm_nst_logic_p : process (all) is
-            variable bst_init_count : unsigned(15 downto 0);
-            variable bst_mode_en    : std_logic;
-        begin
-            meas_fsm_nst <= meas_fsm_pst;
-            pkt_cnt_nst  <= pkt_cnt_pst;
-
-            test_finished <= '0';
-
-            bst_init_count := unsigned(mfb_gen_ctrl_chan_inc(31 downto 16));
-            bst_mode_en    := mfb_gen_ctrl_chan_inc(9);
-
-            case meas_fsm_pst is
-                when S_IDLE =>
-
-                    -- Enable testing check only when burst mode in the generator is enabled
-                    if (mfb_gen_ctrl_en = '1'
-                        and bst_mode_en = '1'
-                        and RX_MFB_SRC_RDY_OUT = '1'
-                        and RX_MFB_DST_RDY_OUT = '1') then
-
-                        meas_fsm_nst <= S_COUNT_TESTING_PACKETS;
-                        pkt_cnt_nst  <= bst_init_count - 1;
-                    end if;
-
-                when S_COUNT_TESTING_PACKETS =>
-
-                    if (
-                        RX_MFB_SRC_RDY_OUT = '1'
-                        and RX_MFB_DST_RDY_OUT = '1'
-                        and pkt_cnt_pst > 0) then
-
-                        pkt_cnt_nst <= pkt_cnt_pst -1;
-                    end if;
-
-                    if (pkt_cnt_pst = 0 and unsigned(lat_meas_fifo_items) = 0) then
-                        meas_fsm_nst <= S_TEST_FINISHED;
-                    end if;
-
-                when S_TEST_FINISHED =>
-
-                    test_finished <= '1';
-
-                    if (mfb_gen_ctrl_en = '0') then
-                        meas_fsm_nst <= S_IDLE;
-                    end if;
-
-            end case;
-        end process;
-
-        mfb_generator_i: entity work.MFB_GENERATOR
-            generic map (
-                REGIONS        => MFB_REGIONS,
-                REGION_SIZE    => MFB_REGION_SIZE,
-                BLOCK_SIZE     => MFB_BLOCK_SIZE,
-                ITEM_WIDTH     => MFB_ITEM_WIDTH,
-
-                LENGTH_WIDTH   => log2(USR_RX_PKT_SIZE_MAX+1),
-                CHANNELS_WIDTH => log2(RX_CHANNELS),
-
-                PKT_CNT_WIDTH  => 64,
-                USE_PACP_ARCH  => false,
-                DEVICE         => DEVICE)
-            port map (
-                CLK              => CLK,
-                RST              => RESET or data_logger_rst,
-
-                CTRL_EN          => mfb_gen_ctrl_en,
-                CTRL_CHAN_INC    => mfb_gen_ctrl_chan_inc,
-                CTRL_CHAN_VAL    => mfb_gen_ctrl_chan_val,
-                CTRL_LENGTH      => mfb_gen_ctrl_length,
-                CTRL_MAC_DST     => (others => '0'),
-                CTRL_MAC_SRC     => (others => '0'),
-                CTRL_PKT_CNT_CLR => mfb_gen_ctrl_pkt_cnt_clr,
-                CTRL_PKT_CNT     => mfb_gen_ctrl_pkt_cnt,
-
-                TX_MFB_DATA      => rx_mfb_data_gen,
-                TX_MFB_META      => rx_mfb_meta_gen,
-                TX_MFB_SOF       => rx_mfb_sof_gen,
-                TX_MFB_EOF       => rx_mfb_eof_gen,
-                TX_MFB_SOF_POS   => rx_mfb_sof_pos_gen,
-                TX_MFB_EOF_POS   => rx_mfb_eof_pos_gen,
-                TX_MFB_SRC_RDY   => rx_mfb_src_rdy_gen,
-                TX_MFB_DST_RDY   => rx_mfb_dst_rdy_gen);
-
-        rx_mfb_meta_pkt_size_gen_mux <= rx_mfb_meta_lbk(log2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + log2(RX_CHANNELS) -1 downto HDR_META_WIDTH + log2(RX_CHANNELS))
-                                    when tst_gen_mux_sel = '0' else rx_mfb_meta_gen(log2(USR_RX_PKT_SIZE_MAX+1) -1 downto 0);
-        rx_mfb_meta_hdr_meta_gen_mux <= rx_mfb_meta_lbk(HDR_META_WIDTH + log2(RX_CHANNELS) -1 downto log2(RX_CHANNELS))
-                                    when tst_gen_mux_sel = '0' else (others => '0');
-        rx_mfb_meta_chan_gen_mux     <= rx_mfb_meta_lbk(log2(RX_CHANNELS) -1 downto 0)
-                                    when tst_gen_mux_sel = '0' else rx_mfb_meta_gen(log2(RX_CHANNELS) + log2(USR_RX_PKT_SIZE_MAX+1) -1 downto log2(USR_RX_PKT_SIZE_MAX+1));
-
-        rx_mfb_data_gen_mux    <= rx_mfb_data_lbk    when tst_gen_mux_sel = '0' else rx_mfb_data_gen;
-        rx_mfb_sof_gen_mux     <= rx_mfb_sof_lbk     when tst_gen_mux_sel = '0' else rx_mfb_sof_gen;
-        rx_mfb_eof_gen_mux     <= rx_mfb_eof_lbk     when tst_gen_mux_sel = '0' else rx_mfb_eof_gen;
-        rx_mfb_sof_pos_gen_mux <= rx_mfb_sof_pos_lbk when tst_gen_mux_sel = '0' else rx_mfb_sof_pos_gen;
-        rx_mfb_eof_pos_gen_mux <= rx_mfb_eof_pos_lbk when tst_gen_mux_sel = '0' else rx_mfb_eof_pos_gen;
-        rx_mfb_src_rdy_gen_mux <= rx_mfb_src_rdy_lbk when tst_gen_mux_sel = '0' else rx_mfb_src_rdy_gen;
-
-        rx_mfb_dst_rdy_lbk <= rx_mfb_dst_rdy_gen_mux when tst_gen_mux_sel = '0' else '1';
-        rx_mfb_dst_rdy_gen <= rx_mfb_dst_rdy_gen_mux when tst_gen_mux_sel = '1' else '1';
-
+                MI_ADDR                  => mi_addr_split(2),
+                MI_DWR                   => mi_dwr_split(2),
+                MI_BE                    => mi_be_split(2),
+                MI_RD                    => mi_rd_split(2),
+                MI_WR                    => mi_wr_split(2),
+                MI_DRD                   => mi_drd_split(2),
+                MI_ARDY                  => mi_ardy_split(2),
+                MI_DRDY                  => mi_drdy_split(2));
     else generate
         mi_drd_split(2)  <= X"DEAD_BEAD";
         mi_ardy_split(2) <= mi_rd_split(2) or mi_wr_split(2);
         mi_drdy_split(2) <= mi_rd_split(2);
 
-        rx_mfb_meta_pkt_size_gen_mux <= rx_mfb_meta_lbk(log2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + log2(RX_CHANNELS) -1 downto HDR_META_WIDTH + log2(RX_CHANNELS));
-        rx_mfb_meta_hdr_meta_gen_mux <= rx_mfb_meta_lbk(HDR_META_WIDTH + log2(RX_CHANNELS) -1 downto log2(RX_CHANNELS));
-        rx_mfb_meta_chan_gen_mux     <= rx_mfb_meta_lbk(log2(RX_CHANNELS) -1 downto 0);
+        tx_mfb_meta_pkt_size_lm <= TX_MFB_META_PKT_SIZE_IN;
+        tx_mfb_meta_hdr_meta_lm <= TX_MFB_META_HDR_META_IN;
+        tx_mfb_meta_chan_lm     <= TX_MFB_META_CHAN_IN;
 
-        rx_mfb_data_gen_mux    <= rx_mfb_data_lbk;
-        rx_mfb_sof_gen_mux     <= rx_mfb_sof_lbk;
-        rx_mfb_eof_gen_mux     <= rx_mfb_eof_lbk;
-        rx_mfb_sof_pos_gen_mux <= rx_mfb_sof_pos_lbk;
-        rx_mfb_eof_pos_gen_mux <= rx_mfb_eof_pos_lbk;
-        rx_mfb_src_rdy_gen_mux <= rx_mfb_src_rdy_lbk;
-        rx_mfb_dst_rdy_lbk     <= rx_mfb_dst_rdy_gen_mux;
+        tx_mfb_data_lm    <= TX_MFB_DATA_IN;
+        tx_mfb_sof_lm     <= TX_MFB_SOF_IN;
+        tx_mfb_eof_lm     <= TX_MFB_EOF_IN;
+        tx_mfb_sof_pos_lm <= TX_MFB_SOF_POS_IN;
+        tx_mfb_eof_pos_lm <= TX_MFB_EOF_POS_IN;
+        tx_mfb_src_rdy_lm <= TX_MFB_SRC_RDY_IN;
+        TX_MFB_DST_RDY_IN <= tx_mfb_dst_rdy_lm;
+
+        RX_MFB_META_PKT_SIZE_OUT <= rx_mfb_meta_lbk(log2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + log2(RX_CHANNELS) -1 downto HDR_META_WIDTH + log2(RX_CHANNELS));
+        RX_MFB_META_HDR_META_OUT <= rx_mfb_meta_lbk(HDR_META_WIDTH + log2(RX_CHANNELS) -1 downto log2(RX_CHANNELS));
+        RX_MFB_META_CHAN_OUT     <= rx_mfb_meta_lbk(log2(RX_CHANNELS) -1 downto 0);
+
+        RX_MFB_DATA_OUT    <= rx_mfb_data_lbk;
+        RX_MFB_SOF_OUT     <= rx_mfb_sof_lbk;
+        RX_MFB_EOF_OUT     <= rx_mfb_eof_lbk;
+        RX_MFB_SOF_POS_OUT <= rx_mfb_sof_pos_lbk;
+        RX_MFB_EOF_POS_OUT <= rx_mfb_eof_pos_lbk;
+        RX_MFB_SRC_RDY_OUT <= rx_mfb_src_rdy_lbk;
+        rx_mfb_dst_rdy_lbk <= RX_MFB_DST_RDY_OUT;
     end generate;
-
-    RX_MFB_META_PKT_SIZE_OUT <= rx_mfb_meta_pkt_size_gen_mux;
-    RX_MFB_META_HDR_META_OUT <= rx_mfb_meta_hdr_meta_gen_mux;
-    RX_MFB_META_CHAN_OUT     <= rx_mfb_meta_chan_gen_mux;
-
-    RX_MFB_DATA_OUT        <= rx_mfb_data_gen_mux;
-    RX_MFB_SOF_OUT         <= rx_mfb_sof_gen_mux;
-    RX_MFB_EOF_OUT         <= rx_mfb_eof_gen_mux;
-    RX_MFB_SOF_POS_OUT     <= rx_mfb_sof_pos_gen_mux;
-    RX_MFB_EOF_POS_OUT     <= rx_mfb_eof_pos_gen_mux;
-    RX_MFB_SRC_RDY_OUT     <= rx_mfb_src_rdy_gen_mux;
-    rx_mfb_dst_rdy_gen_mux <= RX_MFB_DST_RDY_OUT;
 
     -- =============================================================================================
     -- Resetting FSM
