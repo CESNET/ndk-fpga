@@ -26,7 +26,7 @@ class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, 
 
     rand int unsigned hl_transactions;
     int unsigned hl_transactions_min = 10;
-    int unsigned hl_transactions_max = 100;
+    int unsigned hl_transactions_max = 200;
 
     constraint c_hl_transations {
         hl_transactions inside {[hl_transactions_min:hl_transactions_max]};
