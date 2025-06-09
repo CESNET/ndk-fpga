@@ -82,9 +82,7 @@ virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel
         while (p_sequencer.reset_sync.has_been_reset()) begin
             //SETUP RESET
             if (hl_tr != null) begin
-                hl_sqr.m_packet.item_done();
-                hl_sqr.m_error.item_done();
-                hl_tr = null;
+                done();
             end
 
             send_empty_frame();
@@ -101,6 +99,13 @@ virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel
                 hl_sqr.m_error.get_next_item(hl_tr_err);
             end
         end
+    endtask
+
+    task done();
+        //clear data
+        hl_tr = null;
+        hl_sqr.m_packet.item_done();
+        hl_sqr.m_error.item_done();
     endtask
 
     virtual task response_process();
@@ -197,11 +202,8 @@ class sequence_simple_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_bas
                     gen.eop_empty[it] = 8 - end_size;
                     {>>{gen.fcs_error[it], gen.error[it], gen.status_data[it]}} = hl_tr_err.data;
                     //clear data
-                    hl_tr = null;
-                    hl_sqr.m_packet.item_done();
-                    hl_sqr.m_error.item_done();
-                    assert(rdy_length.randomize());
-                    space_size = rdy_length.m_value;
+                    done();
+                    space_size = space_size_same;
                 end
                 hl_tr_index += 8;
             end
@@ -251,11 +253,7 @@ class sequence_sop_pos_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_ba
                     gen.eop_empty[it] = 8 - end_size;
                     {>>{gen.fcs_error[it], gen.error[it], gen.status_data[it]}} = hl_tr_err.data;
                     //clear data
-                    hl_tr = null;
-                    hl_sqr.m_packet.item_done();
-                    hl_sqr.m_error.item_done();
-                    assert(rdy_length.randomize());
-                    space_size = rdy_length.m_value;
+                    done();
                 end
                 hl_tr_index += 8;
             end
@@ -301,11 +299,7 @@ class sequence_max_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #
                     gen.inframe[it]   = 0;
                     gen.eop_empty[it] = 8 - end_size;
                     {>>{gen.fcs_error[it], gen.error[it], gen.status_data[it]}} = hl_tr_err.data;
-                    //clear data
-                    hl_tr = null;
-                    hl_sqr.m_packet.item_done();
-                    hl_sqr.m_error.item_done();
-                    space_size = 0;
+                    done();
                 end
                 hl_tr_index += 8;
             end
