@@ -10,7 +10,7 @@
 
 //////////////////////////////////////////////////
 // BASE CLASS CONTAINING COMMON FUNCTIONS
-class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel_mac_seg::sequence_simple_rx #(SEGMENTS);
+virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel_mac_seg::sequence_simple_rx #(SEGMENTS);
    `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx_base#(SEGMENTS))
    `uvm_declare_p_sequencer(uvm_intel_mac_seg::sequencer#(SEGMENTS));
    localparam LOGIC_WIDTH = 6;
@@ -47,8 +47,7 @@ class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel_mac_seg
         super.new(name);
     endfunction
 
-    virtual task create_sequence_item();
-    endtask
+    pure virtual task create_sequence_item();
 
     task send_empty_frame();
         start_item(req);
