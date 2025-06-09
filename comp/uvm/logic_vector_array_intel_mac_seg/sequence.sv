@@ -85,8 +85,8 @@ virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel
                 done();
             end
 
-            send_empty_frame();
             response_process();
+            send_empty_frame();
         end
     endtask
 
@@ -116,11 +116,12 @@ virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel
     task send_frame();
         // Handle delayed ready
         while (hl_sqr.ready.pop_front() != 1) begin
+            response_process();
+
             start_item(req);
             req.randomize();
             req.valid = 0;
             finish_item(req);
-            response_process();
         end
         // Handle reset
         reset_handle();
