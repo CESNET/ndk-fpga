@@ -19,10 +19,9 @@ class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel_mac_seg
     sequencer             hl_sqr;
     uvm_intel_mac_seg::sequence_item #(SEGMENTS) gen;
     //DAta
-    uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)                 hl_tr = null;
-    uvm_logic_vector::sequence_item#(LOGIC_WIDTH) hl_tr_err = null;
-    int unsigned                              hl_tr_index;
-    int unsigned                              space_size = 0;
+    uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)  hl_tr = null;
+    uvm_logic_vector::sequence_item#(LOGIC_WIDTH)       hl_tr_err = null;
+    int unsigned                                        hl_tr_index;
 
     //////////////////////////////////
     // RANDOMIZATION
@@ -81,15 +80,11 @@ class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel_mac_seg
 
     task try_get();
         if (hl_tr == null && hl_transactions != 0) begin
-            if (space_size == 0) begin
-                hl_sqr.m_packet.try_next_item(hl_tr);
-                hl_tr_index = 0;
-                if (hl_tr != null) begin
-                    hl_transactions--;
-                    hl_sqr.m_error.get_next_item(hl_tr_err);
-                end
-            end else begin
-                space_size--;
+            hl_sqr.m_packet.try_next_item(hl_tr);
+            hl_tr_index = 0;
+            if (hl_tr != null) begin
+                hl_transactions--;
+                hl_sqr.m_error.get_next_item(hl_tr_err);
             end
         end
     endtask
@@ -138,7 +133,6 @@ class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel_mac_seg
 
         hl_tr = null;
         hl_tr_err = null;
-        space_size = 0;
 
         req = uvm_intel_mac_seg::sequence_item #(SEGMENTS)::type_id::create("req");
         gen = uvm_intel_mac_seg::sequence_item #(SEGMENTS)::type_id::create("reg");
