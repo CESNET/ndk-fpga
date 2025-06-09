@@ -161,6 +161,183 @@ class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, 
     endtask
 endclass
 
+class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_simple_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+    uvm_common::rand_length   rand_space_size; //burst set to 0
+
+    //cfg.space_size
+    //cfg.rdy_probability_max
+
+    //local int unsigned space_size;
+    local int unsigned space_size_dist; //distace betwen minimal and maximal space size
+    rand int unsigned space_size_min;
+    rand int unsigned space_size_max;
+
+    local int unsigned rdy_probability_dist; //distace betwen minimal and maximal rdy_probability
+    rand int unsigned rdy_probability;
+
+    constraint c_space_size {
+        space_size_min <= space_size_max;
+        space_size_min dist
+                {
+                    cfg.space_size_min :/ 20,
+                    [cfg.space_size_min                    :cfg.space_size_min+space_size_dist/4*1] :/ 30,
+                    [cfg.space_size_min+space_size_dist/8*1:cfg.space_size_min+space_size_dist/8*2] :/ 14,
+                    [cfg.space_size_min+space_size_dist/8*2:cfg.space_size_min+space_size_dist/8*3] :/ 6,
+                    [cfg.space_size_min+space_size_dist/8*3:cfg.space_size_min+space_size_dist/8*4] :/ 3,
+                    [cfg.space_size_min+space_size_dist/8*4:cfg.space_size_min+space_size_dist/8*5] :/ 1,
+                    [cfg.space_size_min+space_size_dist/8*5:cfg.space_size_min+space_size_dist/8*6] :/ 2,
+                    [cfg.space_size_min+space_size_dist/8*6:cfg.space_size_min+space_size_dist/8*7] :/ 3,
+                    [cfg.space_size_min+space_size_dist/8*7:cfg.space_size_max] :/ 5,
+                    cfg.space_size_max :/ 7
+                };
+
+        space_size_max dist
+                {
+                     cfg.space_size_min :/ 20,
+                    [cfg.space_size_min                    :cfg.space_size_min+space_size_dist/4*1] :/ 30,
+                    [cfg.space_size_min+space_size_dist/8*1:cfg.space_size_min+space_size_dist/8*2] :/ 14,
+                    [cfg.space_size_min+space_size_dist/8*2:cfg.space_size_min+space_size_dist/8*3] :/ 6,
+                    [cfg.space_size_min+space_size_dist/8*3:cfg.space_size_min+space_size_dist/8*4] :/ 3,
+                    [cfg.space_size_min+space_size_dist/8*4:cfg.space_size_min+space_size_dist/8*5] :/ 1,
+                    [cfg.space_size_min+space_size_dist/8*5:cfg.space_size_min+space_size_dist/8*6] :/ 2,
+                    [cfg.space_size_min+space_size_dist/8*6:cfg.space_size_min+space_size_dist/8*7] :/ 3,
+                    [cfg.space_size_min+space_size_dist/8*7:cfg.space_size_max] :/ 5,
+                     cfg.space_size_max :/ 7
+                };
+    }
+
+
+    constraint c_probability {
+        rdy_probability != 0;
+        rdy_probability dist
+                {
+                    [cfg.rdy_probability_min                         :cfg.rdy_probability_min+rdy_probability_dist/4*1] :/ 5,
+                    [cfg.rdy_probability_min+rdy_probability_dist/8*1:cfg.rdy_probability_min+rdy_probability_dist/8*2] :/ 2,
+                    [cfg.rdy_probability_min+rdy_probability_dist/8*2:cfg.rdy_probability_min+rdy_probability_dist/8*3] :/ 1,
+                    [cfg.rdy_probability_min+rdy_probability_dist/8*3:cfg.rdy_probability_min+rdy_probability_dist/8*4] :/ 1,
+                    [cfg.rdy_probability_min+rdy_probability_dist/8*4:cfg.rdy_probability_min+rdy_probability_dist/8*5] :/ 2,
+                    [cfg.rdy_probability_min+rdy_probability_dist/8*5:cfg.rdy_probability_min+rdy_probability_dist/8*6] :/ 5,
+                    [cfg.rdy_probability_min+rdy_probability_dist/8*6:cfg.rdy_probability_min+rdy_probability_dist/8*7] :/ 15,
+                    [cfg.rdy_probability_min+rdy_probability_dist/8*7:cfg.rdy_probability_max] :/ 25,
+                     cfg.rdy_probability_max :/ 10
+                };
+    }
+
+    function new (string name = "sequence_simple_rx");
+        uvm_common::rand_length_rand  bound_burst;
+        uvm_common::rand_length_rand  bound_space_size;
+
+        super.new(name);
+
+        bound_space_size = new();
+        bound_space_size.bound_set(100, 700);
+        rand_space_size = bound_space_size; //uvm_common::rand_length_rand::new(rand_bound_space);
+    endfunction
+
+    virtual function string get_type_name();
+        return "sequence_simple_rx";
+    endfunction
+
+    /////////
+    // CREATE uvm_intel_mac_seg::Sequence_item
+    virtual task create_sequence_item();
+        int unsigned rdy;
+        gen.randomize();
+
+        // TODO: This code need revision.
+        // It have to generate  mutch more combination. For example if it is allowed
+        // space in packet valid = 101, sof = 100, eof 001.  And sof in last invalid region.
+        gen.valid = '0;
+
+        // TODO: Do something with RDY probability
+        rdy = $urandom_range(0, 100 - (rdy_probability < 99 ? rdy_probability : 99));
+        if (rdy == 0) begin
+            // When there is no change to download HL_level transaction then (this is stop sequence)
+            // decrement number of generated hl_level_transaction to prevent deadlock.
+            if (rdy_probability == 0 && hl_transactions != 0) begin
+                hl_transactions--;
+            end
+            return;
+        end
+
+        //TODO: And sof in last invalid region.
+        gen.sop   = '0;
+        gen.eop   = '0;
+
+        for (int unsigned it = 0; it < REGIONS; it++) begin
+             if (state_packet == state_packet_space_new) begin
+                 space_size   = $urandom_range(space_size_min, space_size_max);
+                 state_packet = state_packet_space;
+             end
+
+             if (state_packet == state_packet_space) begin
+                 if (space_size != 0) begin
+                     space_size--;
+                 end else begin
+                     state_packet = state_packet_none;
+                 end
+             end
+
+
+             if (state_packet == state_packet_none) begin
+                 try_get();
+             end
+
+             if (state_packet == state_packet_new) begin
+                 bit st_new;
+                 bit st_eof;
+                 // Check if packet can size in and if straddling is set then put data
+                 // on first or when previous packet end in previous region
+
+                 st_new = 1;
+                 // if straddling is enabled then previous packet have to end in previous region
+                 // to start new packet in on first region.
+                 if (it != 0 && cfg.straddling == 0)
+                    st_new = gen.eop[it-1];
+
+                 // Check if packet can be put in actual region.
+                 if (gen.sop[it] == 0 && st_new == 1 && gen.eop[it] == 0) begin
+                    gen.sop[it]     = 1'b1;
+                    if (hl_sqr.meta_behav == config_item::META_SOF && META_WIDTH != 0) begin
+                        gen.meta[it] = meta.data;
+                    end
+                    state_packet = state_packet_data;
+                 end
+             end
+
+
+             if (state_packet == state_packet_data) begin
+                 int unsigned loop_end   = REGION_SIZE*BLOCK_SIZE < (data.data.size() - data_index) ? REGION_SIZE*BLOCK_SIZE : (data.data.size() - data_index);
+                 gen.valid[it] = 1;
+
+                 for (int unsigned jt = 0; jt < loop_end; jt++) begin
+                      gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
+                      data_index++;
+                 end
+
+                 if (data.data.size() <= data_index) begin
+                     if (hl_sqr.meta_behav == config_item::META_EOF && META_WIDTH != 0) begin
+                         gen.meta[it] = meta.data;
+                     end
+                     gen.eop[it]     = 1'b1;
+                     gen.empty[it] = REGION_SIZE*BLOCK_SIZE - loop_end;
+                     item_done();
+                     state_packet = state_packet_space_new;
+                 end
+             end
+        end
+    endtask
+
+    task body;
+        space_size_dist = cfg.space_size_max - cfg.space_size_min;
+        rdy_probability_dist = cfg.rdy_probability_max - cfg.rdy_probability_min;
+        super.body();
+    endtask
+
+endclass
+
+
 class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
     uvm_common::rand_length   rand_burst_size; //burst set to 1
@@ -538,6 +715,7 @@ class sequence_lib_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsi
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
+        this.add_sequence(uvm_logic_vector_array_avst::sequence_simple_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
         this.add_sequence(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
         this.add_sequence(uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
         this.add_sequence(uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
