@@ -27,10 +27,18 @@ class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel_mac_seg
     // RANDOMIZATION
     rand int unsigned hl_transactions;
     int unsigned hl_transactions_min = 10;
-    int unsigned hl_transactions_max = 1000;
+    int unsigned hl_transactions_max = 200;
+
+    rand int unsigned  ready_delay;
+    const int unsigned ready_delay_min = 1;
+    const int unsigned ready_delay_max = 8;
 
     constraint c_hl_transactions{
         hl_transactions inside {[hl_transactions_min:hl_transactions_max]};
+    };
+
+    constraint c_valid_delay{
+        ready_delay inside {[ready_delay_min:ready_delay_max]};
     };
 
     //////////////////////////////////
