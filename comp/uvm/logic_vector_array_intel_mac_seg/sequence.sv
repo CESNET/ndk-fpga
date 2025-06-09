@@ -56,17 +56,24 @@ virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel
         finish_item(req);
     endtask
 
-    function void delay_rand();
-        int unsigned delay;
-        delay = $urandom_range(1, 8);
-        if (delay < hl_sqr.ready.size()) begin
-            for (int unsigned it = hl_sqr.ready.size(); it < delay; it++) begin
+    function void prepare_valid_delay_fifo();
+        if (ready_delay < hl_sqr.ready.size()) begin
+            for (int unsigned it = hl_sqr.ready.size(); it < ready_delay; it++) begin
                 hl_sqr.ready.push_back(1);
             end
         end else begin
-            while (hl_sqr.ready[$] != 0 && hl_sqr.ready.size() > delay) begin
+            logic rdy_val;
+
+            rdy_val = hl_sqr.ready[$];
+            while (hl_sqr.ready.size() > ready_delay) begin
                 void'(hl_sqr.ready.pop_front());
+                rdy_val &= hl_sqr.ready[$];
             end
+
+            // if there is value 0 somewhere in removed fifo then
+            // put on new top value 0. This prevent not fall down
+            // valid when ready signal is fall down
+            hl_sqr.ready[$] = rdy_val;
         end
     endfunction
 
@@ -113,11 +120,6 @@ virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel
         // Handle reset
         reset_handle();
 
-        // randomization of delay
-        if ($urandom_range(0, 10000) == 0) begin
-            delay_rand();
-        end
-
         // CREATE intel_mac_seg::Sequence_item
         create_sequence_item();
 
@@ -138,19 +140,22 @@ virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel
             `uvm_fatal(p_sequencer.get_full_name(), "\n\tsequence sequence_simple_rx cannot get hl_sqr");
         end
 
+
         hl_tr = null;
         hl_tr_err = null;
 
         req = uvm_intel_mac_seg::sequence_item #(SEGMENTS)::type_id::create("req");
         gen = uvm_intel_mac_seg::sequence_item #(SEGMENTS)::type_id::create("reg");
 
-        delay_rand();
+        prepare_valid_delay_fifo();
+
 
         //send empty frame to get first response
         send_empty_frame();
         while (hl_transactions > 0 || hl_tr != null) begin
             send_frame();
         end
+
         //Get last response
         response_process();
     endtask
