@@ -358,10 +358,6 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     function new (string name = "sequence_burst_pcie_rx");
         uvm_common::rand_length_rand  bound_burst;
         uvm_common::rand_length_rand  bound_space_size;
-        uvm_common::rand_length_rand  bound_rdy;
-        uvm_common::length_bounds rand_bound[3];
-        uvm_common::length_bounds rand_bound_burst[3];
-        uvm_common::length_bounds rand_bound_space[4];
 
         super.new(name);
 
