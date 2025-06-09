@@ -287,28 +287,40 @@ class sequence_space_same_rx #(int unsigned SEGMENTS) extends sequence_simple_rx
     endtask
 endclass
 
+
 class sequence_sop_pos_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #(SEGMENTS);
     `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_sop_pos_rx #(SEGMENTS))
 
-    uvm_common::rand_length   rdy_length;
-    rand int unsigned sop_position;
-    constraint c_sop_position {sop_position inside {[0:SEGMENTS-1]};};
+    rand logic [SEGMENTS-1:0] sop_position;
+
+    constraint c_sop_position {
+        $countones(sop_position) dist {
+            0 :/ 3,
+            1 :/ 25,
+            [1:SEGMENTS/3] :/ 32,
+            [SEGMENTS/3:SEGMENTS*2/3] :/ 30,
+            [SEGMENTS*2/3:SEGMENTS-1] :/ 10
+        };
+    };
 
     function new (string name = "req");
         super.new(name);
-        this.hl_transactions_max = 100;
-        rdy_length = uvm_common::rand_length_rand::new();
-        this.hl_transactions_max = 100;
     endfunction
 
     /////////
     // CREATE intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
         gen.randomize();
-        gen.valid = ($urandom_range(0,10) != 0);
+        gen.valid = ($urandom_range(0,10) == 0);
         gen.inframe = '{ SEGMENTS{{0}} };
+        // if this is stop sequence then decrement transactions and return
+        if (sop_position == 0) begin
+            hl_transactions--;
+            return;
+        end
+
         for (int unsigned it = 0; it < SEGMENTS; it++) begin
-            if (sop_position == it) begin
+            if (hl_tr == null &&  sop_position[it] == 1) begin
                 try_get();
             end
 
