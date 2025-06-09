@@ -365,7 +365,9 @@ class sequence_max_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #
         gen.valid = ($urandom_range(0,10) != 0);
         gen.inframe = '{ SEGMENTS{{0}} };
         for (int unsigned it = 0; it < SEGMENTS; it++) begin
-            try_get();
+            if (hl_tr == null) begin
+                try_get();
+            end
 
             if (hl_tr == null) begin
                 gen.inframe[it] = 0;
