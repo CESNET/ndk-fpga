@@ -356,11 +356,6 @@ class sequence_max_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #
 
     function new (string name = "req");
         super.new(name);
-        this.hl_transactions_max = 100;
-    endfunction
-
-    function void pre_randomize();
-        super.pre_randomize();
     endfunction
 
     /////////
