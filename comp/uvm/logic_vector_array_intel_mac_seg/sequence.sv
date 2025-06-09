@@ -169,21 +169,97 @@ endclass
 
 class sequence_simple_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #(SEGMENTS);
     `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx#(SEGMENTS))
-    uvm_common::rand_length   rdy_length;
+
+    local int unsigned space_size;
+    rand int unsigned  space_size_min;
+    rand int unsigned  space_size_max;
+
+    constraint c_space_size {
+        space_size_min <= space_size_max;
+        space_size_min dist { [0*SEGMENTS:1*SEGMENTS] :/ 60,  [1*SEGMENTS:3*SEGMENTS] :/ 10,  [3*SEGMENTS:5*SEGMENTS] :/ 5,
+                              [5*SEGMENTS:90*SEGMENTS] :/ 3,  [90*SEGMENTS:95*SEGMENTS] :/ 7, [95*SEGMENTS:100*SEGMENTS] :/ 15};
+        space_size_max dist { [0*SEGMENTS:1*SEGMENTS] :/ 60,  [1*SEGMENTS:3*SEGMENTS] :/ 10,  [3*SEGMENTS:5*SEGMENTS] :/ 5,
+                              [5*SEGMENTS:90*SEGMENTS] :/ 3,  [90*SEGMENTS:95*SEGMENTS] :/ 7, [95*SEGMENTS:100*SEGMENTS] :/ 15};
+    }
 
     function new (string name = "req");
         super.new(name);
-        rdy_length = uvm_common::rand_length_rand::new();
+        space_size = 0;
     endfunction
 
     /////////
     // CREATE intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
         gen.randomize();
-        gen.valid = ($urandom_range(0,10) != 0);
+        gen.valid = ($urandom_range(0,10) == 0);
         gen.inframe = '{ SEGMENTS{{0}} };
         for (int unsigned it = 0; it < SEGMENTS; it++) begin
-            try_get();
+            if (hl_tr == null) begin
+                if (space_size == 0) begin
+                    try_get();
+                end else begin
+                    space_size--;
+                end
+            end
+
+            if (hl_tr == null) begin
+                gen.inframe[it] = 0;
+            end else begin
+                gen.valid = 1;
+                if ((hl_tr_index + 8) < hl_tr.data.size()) begin
+                    for (int unsigned jt = 0; jt < 8; jt++) begin
+                        gen.data[it][(jt+1)*8-1 -: 8] = hl_tr.data[hl_tr_index + jt];
+                    end
+                    //gen.data[it] = {<<byte{hl_tr.data[hl_tr_index +: 8]}};
+                    gen.inframe[it] = 1;
+                end else begin
+                    int unsigned end_size = hl_tr.data.size() - hl_tr_index;
+                    for (int unsigned jt = 0; jt < end_size; jt++) begin
+                        gen.data[it][(jt+1)*8-1 -: 8] = hl_tr.data[hl_tr_index + jt];
+                    end
+                    //set output
+                    gen.inframe[it]   = 0;
+                    gen.eop_empty[it] = 8 - end_size;
+                    {>>{gen.fcs_error[it], gen.error[it], gen.status_data[it]}} = hl_tr_err.data;
+                    //clear data
+                    done();
+                    assert(std::randomize(space_size) with { space_size inside {[space_size_min:space_size_max]};}  );
+                end
+                hl_tr_index += 8;
+            end
+        end
+    endtask
+endclass
+
+class sequence_space_same_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #(SEGMENTS);
+    `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_space_same_rx#(SEGMENTS))
+
+    rand int unsigned space_size_same;
+    local int unsigned space_size;
+
+    constraint c_space_size {
+        space_size_same dist { [0*SEGMENTS:1*SEGMENTS] :/ 60,  [1*SEGMENTS:3*SEGMENTS] :/ 10,  [3*SEGMENTS:5*SEGMENTS] :/ 5,
+                              [5*SEGMENTS:90*SEGMENTS] :/ 3,  [90*SEGMENTS:95*SEGMENTS] :/ 7, [95*SEGMENTS:100*SEGMENTS] :/ 15};
+    }
+
+    function new (string name = "req");
+        super.new(name);
+    endfunction
+
+    /////////
+    // CREATE intel_mac_seg::Sequence_item
+    virtual task create_sequence_item();
+        gen.randomize();
+        gen.valid = ($urandom_range(0,10) == 0);
+        gen.inframe = '{ SEGMENTS{{0}} };
+        for (int unsigned it = 0; it < SEGMENTS; it++) begin
+            if (hl_tr == null) begin
+                if (space_size == 0) begin
+                    try_get();
+                end else begin
+                    space_size--;
+                end
+            end
 
             if (hl_tr == null) begin
                 gen.inframe[it] = 0;
@@ -323,6 +399,7 @@ class sequence_lib_rx #(int unsigned SEGMENTS) extends uvm_sequence_library#(uvm
     virtual function void init_sequence();
         this.add_sequence(uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx#(SEGMENTS)::get_type());
         this.add_sequence(uvm_logic_vector_array_intel_mac_seg::sequence_sop_pos_rx #(SEGMENTS)::get_type());
+        this.add_sequence(uvm_logic_vector_array_intel_mac_seg::sequence_space_same_rx #(SEGMENTS)::get_type());
         this.add_sequence(uvm_logic_vector_array_intel_mac_seg::sequence_max_rx#(SEGMENTS)::get_type());
     endfunction
 endclass
