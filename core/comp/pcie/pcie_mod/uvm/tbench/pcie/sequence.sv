@@ -32,7 +32,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
 
 
     constraint const_base {
-        transactions   inside {[200:1000]};
+        transactions   inside {[50:100]};
         dev_id.size()  inside {[1:10]};
         bar_probability.size() == 7+1; // BAR number + 1
         bar_probability.sum() > 0;
