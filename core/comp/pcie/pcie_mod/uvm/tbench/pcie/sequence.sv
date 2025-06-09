@@ -26,6 +26,11 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
     rand int unsigned bar_probability[];
     protected pcie_info   info;
 
+    const int unsigned payload_max = MAX_PAYLOAD_SIZE < 1024 ? MAX_PAYLOAD_SIZE : 0;
+    rand logic [10-1:0] length_max;
+    rand logic [10-1:0] length_min;
+
+
     constraint const_base {
         transactions   inside {[200:1000]};
         dev_id.size()  inside {[1:10]};
@@ -34,6 +39,19 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
         foreach(bar_probability[it]) {
             bar_probability[it] <= 50;
         }
+    }
+
+    //In Dwords
+    constraint c_length {
+        length_min <= length_max;
+        length_min dist {
+            [1:5] :/40,
+            [6:20] :/ 25,
+            [20:MAX_PAYLOAD_SIZE/4] :/ 13,
+            [MAX_PAYLOAD_SIZE/4*1:MAX_PAYLOAD_SIZE/4*3] :/ 5,
+            [MAX_PAYLOAD_SIZE/4*3:MAX_PAYLOAD_SIZE-1  ] :/2,
+            payload_max :/ 10
+        };
     }
 
     function new(string name = "sequence_base");
@@ -131,9 +149,10 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                     //cq_hdr.pcie_type dist {5'b00000 :/ 95, [5'b00000:5'b11111] :/ 5};
                     cq_hdr.pcie_type == 0;
                     //TODO: remove this // if read then length is lower that 32 DWORDS
-                    cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= MAX_REQUEST_SIZE && cq_hdr.length > 0); //read
-                    cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= 32 && cq_hdr.length > 0); //read
-                    cq_hdr.fmt[2:1] == 2'b01 -> (cq_hdr.length <= MAX_PAYLOAD_SIZE && cq_hdr.length > 0); //write
+                    cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= MAX_REQUEST_SIZE); //read
+                    cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= 32); //read
+                    cq_hdr.fmt[2:1] == 2'b01 -> (cq_hdr.length <= MAX_PAYLOAD_SIZE); //write
+                    MAX_PAYLOAD_SIZE != 1024 -> cq_hdr.length != 0;
 
                     cq_hdr.requester_id == dev_id_act;
                     cq_hdr.tag inside   {[0:2**8-1]};  // 8 bit tag
@@ -152,7 +171,6 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                 int unsigned rq_num;
                 int unsigned byte_count;
                 int unsigned rc_length;
-                const int unsigned max_payload = MAX_PAYLOAD_SIZE < 1024 ? MAX_PAYLOAD_SIZE : 0;
 
 
                 //cc_hdr = hdr.pop_front();
@@ -163,7 +181,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                 start_item(rc_hdr);
                 assert(rc_hdr.randomize() with {
                     rc_hdr.data.size() <= 15000;
-                    info.rq_hdr[rq_num].rest_length >= MAX_PAYLOAD_SIZE -> rc_hdr.length dist {max_payload :/60,  [6*MAX_PAYLOAD_SIZE/8:MAX_PAYLOAD_SIZE-1] :/ 30,  [MAX_PAYLOAD_SIZE/8:6*MAX_PAYLOAD_SIZE/8-1] :/ 10,  [1:MAX_PAYLOAD_SIZE/8-1] :/ 10};
+                    info.rq_hdr[rq_num].rest_length >= MAX_PAYLOAD_SIZE -> rc_hdr.length dist {payload_max :/60,  [6*MAX_PAYLOAD_SIZE/8:MAX_PAYLOAD_SIZE-1] :/ 30,  [MAX_PAYLOAD_SIZE/8:6*MAX_PAYLOAD_SIZE/8-1] :/ 10,  [1:MAX_PAYLOAD_SIZE/8-1] :/ 10};
                     info.rq_hdr[rq_num].rest_length <  MAX_PAYLOAD_SIZE -> rc_hdr.length dist {info.rq_hdr[rq_num].rest_length  :/70,  [1:info.rq_hdr[rq_num].rest_length] :/ 30};
 
                     (rc_hdr.length == 0) -> (rc_hdr.data.size() == 1024);
