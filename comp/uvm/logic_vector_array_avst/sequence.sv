@@ -235,7 +235,7 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
     endfunction
 
     virtual function string get_type_name();
-        return "sequence_simple_rx";
+        return $sformatf("uvm_logic_vector_array_avst::sequence_simple_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     endfunction
 
     /////////
@@ -370,6 +370,10 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
         rand_space_size = bound_space_size; //uvm_common::rand_length_rand::new(rand_bound_space);
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    endfunction
+
     /////////
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
@@ -492,6 +496,10 @@ class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SI
         super.new(name);
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    endfunction
+
     /////////
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
@@ -577,6 +585,10 @@ class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
         super.new(name);
         rdy_rdy    = uvm_common::rand_rdy_rand::new();
         rdy_length = uvm_common::rand_length_rand::new();
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     endfunction
 
     /////////
@@ -669,12 +681,16 @@ class sequence_stop_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, in
                               [(hl_transactions_max - hl_transactions_step):hl_transactions_max] :/10};
     }
 
-    function new (string name = "sequence_stop_rx");
+    function new (string name = "sequence_stop_pcie_rx");
         super.new(name);
         hl_transactions_min = 10;
         hl_transactions_max = 300;
 
         hl_transactions_step = (hl_transactions_max - hl_transactions_min)/10;
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     endfunction
 
     /////////
