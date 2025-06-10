@@ -140,6 +140,13 @@ proc SetupDesign {synth_flags} {
 
     set_param messaging.defaultLimit 3000
 
+    # setup IP repos for blocks designs
+    if { [info exists SYNTH_FLAGS(IP_REPO_PATHS)] } {
+        puts "Using IP REPO path: $SYNTH_FLAGS(IP_REPO_PATHS)"
+        set_property  ip_repo_paths  $SYNTH_FLAGS(IP_REPO_PATHS) [current_project]
+        update_ip_catalog
+    }
+
     # Apply user settings
     foreach i $SYNTH_FLAGS(SETUP_FLAGS) {
         if { $i == "USE_XPM_LIBRARIES" } {
