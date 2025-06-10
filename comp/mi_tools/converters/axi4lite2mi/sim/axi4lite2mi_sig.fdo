@@ -1,0 +1,18 @@
+# axi4lite2mi_sig.fdo: Include file with signals
+# Copyright (C) DynaNIC Semiconductors, Ltd.
+# Author: Vlastimil Kosar <kosar@dyna-nic.com>, 2025
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+global TB_PATH AXI4LITE2MI_PATH
+
+# Paths
+set TB_PATH            "/testbench"
+set AXI4LITE2MI_PATH   "/testbench/uut"
+
+# include signals
+source      "signals.fdo"
+
+add wave -noupdate -label RESET -color magenta $TB_PATH/reset
+add wave -noupdate -label CLK -color magenta $TB_PATH/clk
+blk_AXI4LITE2MI

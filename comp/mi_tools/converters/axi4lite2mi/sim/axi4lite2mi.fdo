@@ -1,0 +1,32 @@
+# axi4lite2mi.fdo: Simulation script
+# Copyright (C) DynaNIC Semiconductors, Ltd.
+# Author: Vlastimil Kosar <kosar@dyna-nic.com>, 2025
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# For whole design testing
+set FIRMWARE_BASE      "../../../../.."
+set AXI4LITE2MI_BASE   ".."
+
+set TB_FILE          "$AXI4LITE2MI_BASE/sim/testbench.vhd"
+set SIG_FILE         "$AXI4LITE2MI_BASE/sim/axi4lite2mi_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "AXI4LITE2MI" "$AXI4LITE2MI_BASE"   "FULL"] \
+               ]
+
+set SIM_FLAGS(DEBUG) true
+set SIM_FLAGS(VOPT_ARGS) "+acc"
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set StdArithNoWarnings 1
+set NumericStdNoWarnings 1
+
+# Run the simulation
+nb_sim_run 5000ns
+wave zoomrange 0 205ns

@@ -1,0 +1,52 @@
+# signals.fdo: Include file with signals
+# Copyright (C) DynaNIC Semiconductors, Ltd.
+# Author: Vlastimil Kosar <kosar@dyna-nic.com>, 2025
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc blk_AXI4LITE2MI { } {
+
+    global AXI4LITE2MI_PATH
+
+    add_wave "-noupdate -hex -label AXI_AWADDR"        /$AXI4LITE2MI_PATH/AXI_AWADDR
+    add_wave "-noupdate -hex -label AXI_AWVALID"       /$AXI4LITE2MI_PATH/AXI_AWVALID
+    add_wave "-noupdate -hex -label AXI_AWREADY"       /$AXI4LITE2MI_PATH/AXI_AWREADY
+    add_wave "-noupdate -hex -label AXI_WDATA"         /$AXI4LITE2MI_PATH/AXI_WDATA
+    add_wave "-noupdate -hex -label AXI_WSTRB"         /$AXI4LITE2MI_PATH/AXI_WSTRB
+    add_wave "-noupdate -hex -label AXI_WVALID"        /$AXI4LITE2MI_PATH/AXI_WVALID
+    add_wave "-noupdate -hex -label AXI_WREADY"        /$AXI4LITE2MI_PATH/AXI_WREADY
+    add_wave "-noupdate -hex -label AXI_BRESP"         /$AXI4LITE2MI_PATH/AXI_BRESP
+    add_wave "-noupdate -hex -label AXI_BVALID"        /$AXI4LITE2MI_PATH/AXI_BVALID
+    add_wave "-noupdate -hex -label AXI_BREADY"        /$AXI4LITE2MI_PATH/AXI_BREADY
+    add_wave "-noupdate -hex -label AXI_ARADDR"        /$AXI4LITE2MI_PATH/AXI_ARADDR
+    add_wave "-noupdate -hex -label AXI_ARVALID"       /$AXI4LITE2MI_PATH/AXI_ARVALID
+    add_wave "-noupdate -hex -label AXI_ARREADY"       /$AXI4LITE2MI_PATH/AXI_ARREADY
+    add_wave "-noupdate -hex -label AXI_RDATA"         /$AXI4LITE2MI_PATH/AXI_RDATA
+    add_wave "-noupdate -hex -label AXI_RRESP"         /$AXI4LITE2MI_PATH/AXI_RRESP
+    add_wave "-noupdate -hex -label AXI_RVALID"        /$AXI4LITE2MI_PATH/AXI_RVALID
+    add_wave "-noupdate -hex -label AXI_RREADY"        /$AXI4LITE2MI_PATH/AXI_RREADY
+
+    add_wave "-noupdate -hex -label MI_DWR"  /$AXI4LITE2MI_PATH/MI_DWR
+    add_wave "-noupdate -hex -label MI_ADDR" /$AXI4LITE2MI_PATH/MI_ADDR
+    add_wave "-noupdate -hex -label MI_BE"   /$AXI4LITE2MI_PATH/MI_BE
+    add_wave "-noupdate -hex -label MI_DRD"  /$AXI4LITE2MI_PATH/MI_DRD
+    add_wave "-noupdate -hex -label MI_RD"   /$AXI4LITE2MI_PATH/MI_RD
+    add_wave "-noupdate -hex -label MI_WR"   /$AXI4LITE2MI_PATH/MI_WR
+    add_wave "-noupdate -hex -label MI_ARDY" /$AXI4LITE2MI_PATH/MI_ARDY
+    add_wave "-noupdate -hex -label MI_DRDY" /$AXI4LITE2MI_PATH/MI_DRDY
+
+    add_wave "-noupdate -hex -label current_state" /$AXI4LITE2MI_PATH/current_state
+    add_wave "-noupdate -hex -label next_state"    /$AXI4LITE2MI_PATH/next_state
+    add_wave "-noupdate -hex -label reg_raddr"     /$AXI4LITE2MI_PATH/reg_raddr
+    add_wave "-noupdate -hex -label reg_raddr_we"  /$AXI4LITE2MI_PATH/reg_raddr_we
+    add_wave "-noupdate -hex -label reg_rdata"     /$AXI4LITE2MI_PATH/reg_rdata
+    add_wave "-noupdate -hex -label reg_rdata_we"  /$AXI4LITE2MI_PATH/reg_rdata_we
+    add_wave "-noupdate -hex -label reg_waddr"     /$AXI4LITE2MI_PATH/reg_waddr
+    add_wave "-noupdate -hex -label reg_waddr_we"  /$AXI4LITE2MI_PATH/reg_waddr_we
+    add_wave "-noupdate -hex -label reg_wdata"     /$AXI4LITE2MI_PATH/reg_wdata
+    add_wave "-noupdate -hex -label reg_wdata_we"  /$AXI4LITE2MI_PATH/reg_wdata_we
+    add_wave "-noupdate -hex -label reg_strb"      /$AXI4LITE2MI_PATH/reg_strb
+    add_wave "-noupdate -hex -label reg_strb_we"   /$AXI4LITE2MI_PATH/reg_strb_we
+    add_wave "-noupdate -hex -label rd_wr"         /$AXI4LITE2MI_PATH/rd_wr
+
+}
