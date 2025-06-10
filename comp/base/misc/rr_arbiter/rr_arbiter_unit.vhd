@@ -35,7 +35,7 @@ entity RR_ARBITER_UNIT is
         GARANT                : in std_logic;
 
         -- acknowledgement vector
-        ACK                   : out std_logic;
+        ACK                   : out std_logic_vector(PORTS-1 downto 0);
         -- write the ack. vector_vector(PORTS-1 downto 0);
         ACK_W                 : out std_logic
 
