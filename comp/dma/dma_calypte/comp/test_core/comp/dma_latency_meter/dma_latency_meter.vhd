@@ -191,8 +191,8 @@ architecture FULL of DMA_LATENCY_METER is
     -- =============================================================================================
     -- Lanecy meters
     -- =============================================================================================
-    constant TIMESTAMP_WIDTH  : positive := 11;
-    constant LAT_PARAL_EVENTS : positive := 64;
+    constant TIMESTAMP_WIDTH  : positive := 18;
+    constant LAT_PARAL_EVENTS : positive := 4;
 
     signal lat_meas_val_vld    : std_logic;
     signal lat_meas_val        : std_logic_vector(TIMESTAMP_WIDTH -1 downto 0);
@@ -333,7 +333,7 @@ begin
             HIST_EN => (others => TRUE),
 
             SUM_EXTRA_WIDTH => (others => 16),
-            HIST_BOX_CNT    => (others => 128),
+            HIST_BOX_CNT    => (others => 2**14),
             HIST_BOX_WIDTH  => (others => 32),
             CTRLO_DEFAULT   => (others => '0'))
         port map (
