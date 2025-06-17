@@ -46,6 +46,35 @@ proc nb_preference_filter {PLATFORM_TAGS SUPPORTED_TAGS} {
     return $preferred
 }
 
+# Generate list of numbers like range in Python
+# examples:
+# - nb_range 4      : returns "0 1 2 3"
+# - nb_range 2 5    : returns "2 3 4"
+# - nb_range 3 8 2  : returns "3 5 7"
+proc nb_range {num args} {
+    switch [llength $args] {
+        0 {
+            set from 0
+            set to $num
+            set step 1
+        }
+        1 {
+            set from $num
+            set to $args
+            set step 1
+        }
+        2 {
+            set from $num
+            lassign $args to step
+        }
+    }
+    set result [list ]
+    for {set i $from} {$i < $to} {set i [expr {$i + $step}]} {
+        lappend result $i
+    }
+    return $result
+}
+
 # ---------------------- Common procedures ----------------------------
 # String Generation
 proc GenStr {NUM CH} {
