@@ -16,50 +16,36 @@ set PROJECT_NAME ""
 # ------------------------------------------------------------------------------
 # Number of Ethernet ports, must match number of items in list ETH_PORTS_SPEED!
 set ETH_PORTS          4
-# Speed for each one of the ETH_PORTS
-# ETH_PORT_SPEED is an array where each index represents given ETH_PORT and
-# each index has associated a required port speed.
-# NOTE: at this moment, all ports must have same speed!
-set ETH_PORT_SPEED(0)  100
-set ETH_PORT_SPEED(1)  100
-set ETH_PORT_SPEED(2)  100
-set ETH_PORT_SPEED(3)  100
-# Type of used IP core for each one of the ETH_PORTS
-# FTILE_TYPE is an array where each index represents a given ETH_PORT and
-# is associated with a required type of used IP core for this port.
-# NOTE: at this moment, all ports must have the same type of used IP core!
-# Options are: 0 which is used for F-tile IP core
-#              1 which is used for F-tile Multirate IP core
-set EHIP_PORT_TYPE(0)  0
-set EHIP_PORT_TYPE(1)  0
-set EHIP_PORT_TYPE(2)  0
-set EHIP_PORT_TYPE(3)  0
-# Number of channels for each one of the ETH_PORTS
-# ETH_PORT_CHAN is an array where each index represents given ETH_PORT and
-# each index has associated a required number of channels this port has.
-# NOTE: at this moment, all ports must have same number of channels!
-set ETH_PORT_CHAN(0)   1
-set ETH_PORT_CHAN(1)   1
-set ETH_PORT_CHAN(2)   1
-set ETH_PORT_CHAN(3)   1
-# Number of lanes for each one of the ETH_PORTS
-# Typical values: 4 (QSFP), 8 (QSFP-DD)
-set ETH_PORT_LANES(0)  4
-set ETH_PORT_LANES(1)  4
-set ETH_PORT_LANES(2)  4
-set ETH_PORT_LANES(3)  4
-# Maximum allowed size of RX frame in bytes for each one of the ETH_PORTS
-# NOTE: ETH_PORT_RX_MTU = 16383 is maximum supported value!
-set ETH_PORT_RX_MTU(0) 16383
-set ETH_PORT_RX_MTU(1) 16383
-set ETH_PORT_RX_MTU(2) 16383
-set ETH_PORT_RX_MTU(3) 16383
-# Maximum allowed size of TX frame in bytes for each one of the ETH_PORTS
-# NOTE: ETH_PORT_TX_MTU = 16383 is maximum supported value!
-set ETH_PORT_TX_MTU(0) 16383
-set ETH_PORT_TX_MTU(1) 16383
-set ETH_PORT_TX_MTU(2) 16383
-set ETH_PORT_TX_MTU(3) 16383
+
+foreach i [nb_range $ETH_PORTS] {
+    # Speed for each one of the ETH_PORTS
+    # ETH_PORT_SPEED is an array where each index represents given ETH_PORT and
+    # each index has associated a required port speed.
+    # NOTE: at this moment, all ports must have same speed!
+    set ETH_PORT_SPEED($i)  100
+    # Type of used IP core for each one of the ETH_PORTS
+    # FTILE_TYPE is an array where each index represents a given ETH_PORT and
+    # is associated with a required type of used IP core for this port.
+    # NOTE: at this moment, all ports must have the same type of used IP core!
+    # Options are: 0 which is used for F-tile IP core
+    #              1 which is used for F-tile Multirate IP core
+    set EHIP_PORT_TYPE($i)  0
+    # Number of channels for each one of the ETH_PORTS
+    # ETH_PORT_CHAN is an array where each index represents given ETH_PORT and
+    # each index has associated a required number of channels this port has.
+    # NOTE: at this moment, all ports must have same number of channels!
+    set ETH_PORT_CHAN($i)   1
+    # Number of lanes for each one of the ETH_PORTS
+    # Typical values: 4 (QSFP), 8 (QSFP-DD)
+    set ETH_PORT_LANES($i)  4
+    # Maximum allowed size of RX frame in bytes for each one of the ETH_PORTS
+    # NOTE: ETH_PORT_RX_MTU = 16383 is maximum supported value!
+    set ETH_PORT_RX_MTU($i) 16383
+    # Maximum allowed size of TX frame in bytes for each one of the ETH_PORTS
+    # NOTE: ETH_PORT_TX_MTU = 16383 is maximum supported value!
+    set ETH_PORT_TX_MTU($i) 16383
+}
+
 # Ethernet streams mode. Options are:
 #    0 = All ETH channels from one ETH port (QSFP) are merged to a single ETH
 #        stream (MFB+MVB bus). This is the default mode.
@@ -67,13 +53,13 @@ set ETH_PORT_TX_MTU(3) 16383
 set ETH_STREAMS_MODE   0
 # Optional option to disable Ethernet MAC Lite modules. Dangerously!
 set ETH_MAC_BYPASS     false
+
 # Total number of QSFP cages
 set QSFP_CAGES         4
 # I2C address of each QSFP cage
-set QSFP_I2C_ADDR(0)   "0xA0"
-set QSFP_I2C_ADDR(1)   "0xA0"
-set QSFP_I2C_ADDR(2)   "0xA0"
-set QSFP_I2C_ADDR(3)   "0xA0"
+foreach i [nb_range $QSFP_CAGES] {
+    set QSFP_I2C_ADDR($i)   "0xA0"
+}
 
 # List of custom I2C controllers for QSFP: label of node in Devicetree
 set QSFP_I2C_CUSTOM_CTRLS [list]
@@ -161,12 +147,6 @@ set TS_DEMO_EN             false
 # Enable Low-latency optimalizations
 set LL_MODE                false
 
-set ETH_CHAN_MAP(0) 0
-set ETH_CHAN_MAP(1) 1
-set ETH_CHAN_MAP(2) 2
-set ETH_CHAN_MAP(3) 3
-set ETH_CHAN_MAP(4) 4
-set ETH_CHAN_MAP(5) 5
-set ETH_CHAN_MAP(6) 6
-set ETH_CHAN_MAP(7) 7
-
+foreach i [nb_range 8] {
+    set ETH_CHAN_MAP($i) $i
+}
