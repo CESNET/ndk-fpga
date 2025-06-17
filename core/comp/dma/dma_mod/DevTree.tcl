@@ -7,8 +7,9 @@
 # 7.  tx_frame_size_max - maximum allowed size of DMA TX frame
 # 8.  rx_frame_size_min - minimum allowed size of DMA RX frame
 # 9.  tx_frame_size_min - minimum allowed size of DMA TX frame
-# 10. offset - address offset for TX controllers
-proc dts_dmamod_open {base type rxn txn pcie rx_frame_size_max tx_frame_size_max rx_frame_size_min tx_frame_size_min {offset 0x00200000}} {
+# 10. dma_debug_enable
+# 11. offset - address offset for TX controllers (e.g. for virtualization)
+proc dts_dmamod_open {base type rxn txn pcie rx_frame_size_max tx_frame_size_max rx_frame_size_min tx_frame_size_min dma_debug_enable {offset 0x00200000}} {
     set    ret ""
     append ret "dma_module@$base {"
 
@@ -28,12 +29,11 @@ proc dts_dmamod_open {base type rxn txn pcie rx_frame_size_max tx_frame_size_max
     }
 
     # RX DMA Channels
-    global DMA_DEBUG_ENABLE
     for {set i 0} {$i < $rxn} {incr i} {
         if {$type == 3} {
             set    var_base [expr $base + $i * 0x80]
             append ret [dts_dma_medusa_ctrl "ndp" $type "rx" $i $var_base $pcie "dma_params_rx$pcie"]
-            if {$DMA_DEBUG_ENABLE} {
+            if {$dma_debug_enable} {
                 append ret [dts_event_counter [expr $base + 0x00010000 + $i * 0x80 + 0x00] "event_counter0_$i" 1]
                 append ret [dts_event_counter [expr $base + 0x00010000 + $i * 0x80 + 0x10] "event_counter1_$i" 1]
                 append ret [dts_event_counter [expr $base + 0x00010000 + $i * 0x80 + 0x20] "event_counter2_$i" 1]
@@ -48,7 +48,7 @@ proc dts_dmamod_open {base type rxn txn pcie rx_frame_size_max tx_frame_size_max
         }
     }
 
-    if {$type == 4 && $DMA_DEBUG_ENABLE} {
+    if {$type == 4 && $dma_debug_enable} {
         dts_dma_perf_cntrs ret [expr $base + 0x3000]
     }
 
@@ -61,6 +61,10 @@ proc dts_dmamod_open {base type rxn txn pcie rx_frame_size_max tx_frame_size_max
             set    var_base [expr $base + $i * 0x80 + $offset]
             dts_dma_calypte_ctrl ret "tx" $i $var_base $pcie
         }
+    }
+
+    if {$type == 4} {
+        dts_calypte_test_core ret [expr $base + "0x300000"] $dma_debug_enable
     }
 
     append ret "};"
