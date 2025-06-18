@@ -26,15 +26,15 @@ proc dts_build_netcope {} {
 
     global CARD_NAME DT_PROJECT_TEXT PROJECT_VARIANT PROJECT_VERSION
 
-    append ret "card-name = \"$CARD_NAME\";"
-    if { [info exists DT_PROJECT_TEXT] } {
-        append ret "project-name = \"$DT_PROJECT_TEXT\";"
+    dts_appendprop_string ret "card-name" "$CARD_NAME"
+    if {[info exists DT_PROJECT_TEXT]} {
+        dts_appendprop_string ret "project-name" "$DT_PROJECT_TEXT"
     }
-    if { [info exists PROJECT_VARIANT] } {
-        append ret "project-variant = \"$PROJECT_VARIANT\";"
+    if {[info exists PROJECT_VARIANT]} {
+        dts_appendprop_string ret "project-variant" "$PROJECT_VARIANT"
     }
-    if { [info exists PROJECT_VERSION] } {
-        append ret "project-version = \"$PROJECT_VERSION\";"
+    if {[info exists PROJECT_VERSION]} {
+        dts_appendprop_string ret "project-version" "$PROJECT_VERSION"
     }
 
     # Create MI bus node
