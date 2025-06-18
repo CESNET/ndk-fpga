@@ -51,8 +51,8 @@ class ram #(ADDR_WIDTH, MPS, MRRS) extends sv_common_pkg::Driver;
                     data_display("WRITE", data, address, tr.tag);
                 end
 
-                if (data.size() > MPS) begin
-                    $error("%s ERROR: MPS is %6d but WRITE data size is %6d\n", inst, MPS, data.size());
+                if (tr.data.size()*4 > MPS) begin
+                    $error("%s ERROR: MPS is %6d but WRITE data size is %6d\n", inst, MPS, tr.data.size()*4);
                     $finish();
                 end
 
