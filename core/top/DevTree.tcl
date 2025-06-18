@@ -52,7 +52,7 @@ proc dts_ndk_core_boot_module {DTS} {
     # BOOT component
     set boot_active_serial 0
     if {$BOOT_TYPE == 1 || $BOOT_TYPE == 2 || $BOOT_TYPE == 3} {
-        append ret "boot:" [dts_boot_controller $ADDR_BOOT_CTRL $BOOT_TYPE]
+        append ret "boot:" [dts_boot_controller $NdkCore::ADDR_BOOT_CTRL $BOOT_TYPE]
     }
     if {$BOOT_TYPE == 4} {
         # ASx4 BOOT via Intel SDM client
@@ -60,19 +60,19 @@ proc dts_ndk_core_boot_module {DTS} {
     }
     if {$BOOT_TYPE == 5} {
         # OFS PMCI BOOT component
-        append ret "boot:" [dts_ofs_pmci $ADDR_BOOT_CTRL]
+        append ret "boot:" [dts_ofs_pmci $NdkCore::ADDR_BOOT_CTRL]
     }
 
     global SDM_SYSMON_ARCH
     # Intel FPGA SDM controller
     if {$SDM_SYSMON_ARCH == "INTEL_SDM"} {
-        append ret [dts_sdm_controller $ADDR_SDM_SYSMON $boot_active_serial]
+        append ret [dts_sdm_controller $NdkCore::ADDR_SDM_SYSMON $boot_active_serial]
     # Deprecated ID component to access Xilinx SYSMON
     } elseif {$SDM_SYSMON_ARCH == "USP_IDCOMP"} {
-        append ret "idcomp:" [dts_idcomp $ADDR_SDM_SYSMON]
+        append ret "idcomp:" [dts_idcomp $NdkCore::ADDR_SDM_SYSMON]
     # Deprecated Intel Stratix 10 ADC Sensor Component
     } elseif {$SDM_SYSMON_ARCH == "S10_ADC"} {
-        append ret [dts_stratix_adc_sensors $ADDR_SDM_SYSMON]
+        append ret [dts_stratix_adc_sensors $NdkCore::ADDR_SDM_SYSMON]
     }
 }
 
@@ -83,12 +83,12 @@ proc dts_ndp_core_main_mi {DTS} {
     dts_ndk_core_boot_module ret
 
     # MI test space
-    append ret [dts_mi_test_space "mi_test_space" $ADDR_TEST_SPACE]
+    append ret [dts_mi_test_space "mi_test_space" $NdkCore::ADDR_TEST_SPACE]
 
     # Frequency meter component
     global MEASURE_FREQUENCIES
     if {$MEASURE_FREQUENCIES} {
-        append ret [dts_frequency_counter $ADDR_FREQ_METER]
+        append ret [dts_frequency_counter $NdkCore::ADDR_FREQ_METER]
     }
 
     # Card specific components
@@ -96,7 +96,7 @@ proc dts_ndp_core_main_mi {DTS} {
         set cs_args [info args dts_card_specific]
         lappend cs_params
         if {[llength cs_args] > 0} {
-            lappend cs_params $ADDR_BOOT_CTRL
+            lappend cs_params $NdkCore::ADDR_BOOT_CTRL
         }
         append ret [dts_card_specific {*}$cs_params]
     }
@@ -104,20 +104,19 @@ proc dts_ndp_core_main_mi {DTS} {
     # TSU component
     global TSU_ENABLE
     if {$TSU_ENABLE} {
-        append ret "tsu:" [dts_tsugen $ADDR_TSU]
+        append ret "tsu:" [dts_tsugen $NdkCore::ADDR_TSU]
     }
-
 
     # Network module
     global NET_MOD_ARCH ETH_PORTS ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU NET_MOD_ARCH QSFP_CAGES QSFP_I2C_ADDR QSFP_I2C_CUSTOM_CTRLS CARD_NAME
     if {$NET_MOD_ARCH != "EMPTY"} {
-        append ret [dts_network_mod $ADDR_ETH_MAC $ADDR_ETH_PCS $ADDR_ETH_PMD $ETH_PORTS ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU $NET_MOD_ARCH $QSFP_CAGES QSFP_I2C_ADDR $CARD_NAME $QSFP_I2C_CUSTOM_CTRLS]
+        append ret [dts_network_mod $NdkCore::ADDR_ETH_MAC $NdkCore::ADDR_ETH_PCS $NdkCore::ADDR_ETH_PMD $ETH_PORTS ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU $NET_MOD_ARCH $QSFP_CAGES QSFP_I2C_ADDR $CARD_NAME $QSFP_I2C_CUSTOM_CTRLS]
     }
 
     global CLOCK_GEN_ARCH VIRTUAL_DEBUG_ENABLE
     # Intel JTAG-over-protocol controller
     if {$CLOCK_GEN_ARCH == "INTEL" && $VIRTUAL_DEBUG_ENABLE} {
-        append ret [dts_jtag_op_controller $ADDR_JTAG_IP]
+        append ret [dts_jtag_op_controller $NdkCore::ADDR_JTAG_IP]
     }
 
     # Populate application, if exists
@@ -134,14 +133,14 @@ proc dts_ndp_core_main_mi {DTS} {
 
             if {[llength [info args dts_application]] == 3} {
                 # INFO: backward compatible variant without generics parameter
-                append ret "app:" [dts_application $ADDR_USERAPP $ETH_STREAMS $MEM_PORTS]
+                append ret "app:" [dts_application $NdkCore::ADDR_USERAPP $ETH_STREAMS $MEM_PORTS]
             } else {
                 array set GENERICS "
                     ETH_STREAMS $ETH_STREAMS
                     DDR_PORTS $MEM_PORTS
                     HBM_PORTS $HBM_PORTS
                 "
-                append ret "app:" [dts_application $ADDR_USERAPP [array get GENERICS]]
+                append ret "app:" [dts_application $NdkCore::ADDR_USERAPP [array get GENERICS]]
             }
         }
     }
@@ -150,16 +149,16 @@ proc dts_ndp_core_main_mi {DTS} {
     global DMA_MODULES
     for {set i 0} {$i < $DMA_MODULES} {incr i} {
         set    gls_offset [expr $i * 0x200]
-        append ret [dts_gen_loop_switch [expr $ADDR_GEN_LOOP + $gls_offset] "dbg_gls$i"]
+        append ret [dts_gen_loop_switch [expr $NdkCore::ADDR_GEN_LOOP + $gls_offset] "dbg_gls$i"]
     }
 
     # PCIe Debug
     global PCIE_CORE_DEBUG_ENABLE PCIE_CTRL_DEBUG_ENABLE PCIE_ENDPOINT_MODE PCIE_MOD_ARCH
     if {$PCIE_CORE_DEBUG_ENABLE} {
-        append ret [dts_pcie_core_dbg $ADDR_PCIE_DBG $PCIE_ENDPOINTS $PCIE_ENDPOINT_MODE $PCIE_MOD_ARCH]
+        append ret [dts_pcie_core_dbg $NdkCore::ADDR_PCIE_DBG $PCIE_ENDPOINTS $PCIE_ENDPOINT_MODE $PCIE_MOD_ARCH]
     }
     if {$PCIE_CTRL_DEBUG_ENABLE} {
-        set pcie_ctrl_base [expr $ADDR_PCIE_DBG + "0x100000"]
+        set pcie_ctrl_base [expr $NdkCore::ADDR_PCIE_DBG + "0x100000"]
         append ret [dts_pcie_ctrl_dbg $pcie_ctrl_base $PCIE_ENDPOINTS $PCIE_ENDPOINT_MODE $PCIE_MOD_ARCH]
     }
 }
@@ -227,7 +226,7 @@ proc dts_build_netcope {} {
             # DMA module
             global DMA_RX_CHANNELS DMA_RX_FRAME_SIZE_MAX DMA_TX_FRAME_SIZE_MAX DMA_RX_FRAME_SIZE_MIN DMA_TX_FRAME_SIZE_MIN DMA_DEBUG_ENABLE
             if {$DMA_TYPE != 0} {
-                append ret [dts_dmamod_open $ADDR_DMA_MOD $DMA_TYPE [expr $DMA_RX_CHANNELS / $PCIE_ENDPOINTS] [expr $DMA_TX_CHANNELS / $PCIE_ENDPOINTS] $pcie $DMA_RX_FRAME_SIZE_MAX $DMA_TX_FRAME_SIZE_MAX $DMA_RX_FRAME_SIZE_MIN $DMA_TX_FRAME_SIZE_MIN $DMA_DEBUG_ENABLE]
+                append ret [dts_dmamod_open $NdkCore::ADDR_DMA_MOD $DMA_TYPE [expr $DMA_RX_CHANNELS / $PCIE_ENDPOINTS] [expr $DMA_TX_CHANNELS / $PCIE_ENDPOINTS] $pcie $DMA_RX_FRAME_SIZE_MAX $DMA_TX_FRAME_SIZE_MAX $DMA_RX_FRAME_SIZE_MIN $DMA_TX_FRAME_SIZE_MIN $DMA_DEBUG_ENABLE]
             }
         }
 
