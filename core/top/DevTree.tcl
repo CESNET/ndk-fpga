@@ -1,4 +1,4 @@
-proc dts_build_netcope {} {
+namespace eval NdkCore {
     # =========================================================================
     # MI ADDRESS SPACE
     # Changes must also be made manually in VHDL package:
@@ -17,12 +17,10 @@ proc dts_build_netcope {} {
     set ADDR_PCIE_DBG   "0x01400000"
     set ADDR_ETH_PCS    "0x00800000"
     set ADDR_USERAPP    "0x02000000"
+}
 
-    # =========================================================================
-    # Top level Device tree file
-    # =========================================================================
-    set    ret ""
-    set    mi_idx 0
+proc dts_ndk_core_info {DTS} {
+    upvar 1 $DTS ret
 
     global CARD_NAME DT_PROJECT_TEXT PROJECT_VARIANT PROJECT_VERSION
 
@@ -36,15 +34,10 @@ proc dts_build_netcope {} {
     if {[info exists PROJECT_VERSION]} {
         dts_appendprop_string ret "project-version" "$PROJECT_VERSION"
     }
+}
 
-    # Create MI bus node
-    append ret "mi$mi_idx: mi_bus$mi_idx {"
-    append ret "#address-cells = <1>;"
-    append ret "#size-cells = <1>;"
-
-    append ret "compatible = \"netcope,bus,mi\";"
-    append ret "resource = \"PCI0,BAR0\";"
-    append ret "width = <0x20>;"
+proc dts_ndk_core_boot_module {DTS} {
+    upvar 1 $DTS ret
 
     global BOOT_TYPE
     # BOOT_TYPE overview:
@@ -70,6 +63,26 @@ proc dts_build_netcope {} {
         append ret "boot:" [dts_ofs_pmci $ADDR_BOOT_CTRL]
     }
 
+    global SDM_SYSMON_ARCH
+    # Intel FPGA SDM controller
+    if {$SDM_SYSMON_ARCH == "INTEL_SDM"} {
+        append ret [dts_sdm_controller $ADDR_SDM_SYSMON $boot_active_serial]
+    # Deprecated ID component to access Xilinx SYSMON
+    } elseif {$SDM_SYSMON_ARCH == "USP_IDCOMP"} {
+        append ret "idcomp:" [dts_idcomp $ADDR_SDM_SYSMON]
+    # Deprecated Intel Stratix 10 ADC Sensor Component
+    } elseif {$SDM_SYSMON_ARCH == "S10_ADC"} {
+        append ret [dts_stratix_adc_sensors $ADDR_SDM_SYSMON]
+    }
+}
+
+proc dts_ndp_core_main_mi {DTS} {
+    upvar 1 $DTS ret
+
+    # Boot module
+    dts_ndk_core_boot_module ret
+
+    # MI test space
     append ret [dts_mi_test_space "mi_test_space" $ADDR_TEST_SPACE]
 
     # Frequency meter component
@@ -94,30 +107,11 @@ proc dts_build_netcope {} {
         append ret "tsu:" [dts_tsugen $ADDR_TSU]
     }
 
-    # DMA module
-    global DMA_TYPE DMA_RX_CHANNELS DMA_TX_CHANNELS PCIE_ENDPOINTS DMA_RX_FRAME_SIZE_MAX DMA_TX_FRAME_SIZE_MAX DMA_RX_FRAME_SIZE_MIN DMA_TX_FRAME_SIZE_MIN DMA_DEBUG_ENABLE
-    if {$DMA_TYPE != 0} {
-        append ret [dts_dmamod_open $ADDR_DMA_MOD $DMA_TYPE [expr $DMA_RX_CHANNELS / $PCIE_ENDPOINTS] [expr $DMA_TX_CHANNELS / $PCIE_ENDPOINTS] $mi_idx $DMA_RX_FRAME_SIZE_MAX $DMA_TX_FRAME_SIZE_MAX $DMA_RX_FRAME_SIZE_MIN $DMA_TX_FRAME_SIZE_MIN $DMA_DEBUG_ENABLE]
-    }
 
     # Network module
-    global NET_MOD_ARCH ETH_PORTS ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU NET_MOD_ARCH QSFP_CAGES QSFP_I2C_ADDR QSFP_I2C_CUSTOM_CTRLS
+    global NET_MOD_ARCH ETH_PORTS ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU NET_MOD_ARCH QSFP_CAGES QSFP_I2C_ADDR QSFP_I2C_CUSTOM_CTRLS CARD_NAME
     if {$NET_MOD_ARCH != "EMPTY"} {
         append ret [dts_network_mod $ADDR_ETH_MAC $ADDR_ETH_PCS $ADDR_ETH_PMD $ETH_PORTS ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU $NET_MOD_ARCH $QSFP_CAGES QSFP_I2C_ADDR $CARD_NAME $QSFP_I2C_CUSTOM_CTRLS]
-    }
-
-    global SDM_SYSMON_ARCH
-    # Intel FPGA SDM controller
-    if {$SDM_SYSMON_ARCH == "INTEL_SDM"} {
-        append ret [dts_sdm_controller $ADDR_SDM_SYSMON $boot_active_serial]
-    }
-    # Deprecated ID component to access Xilinx SYSMON
-    if {$SDM_SYSMON_ARCH == "USP_IDCOMP"} {
-        append ret "idcomp:" [dts_idcomp $ADDR_SDM_SYSMON]
-    }
-    # Deprecated Intel Stratix 10 ADC Sensor Component
-    if {$SDM_SYSMON_ARCH == "S10_ADC"} {
-        append ret [dts_stratix_adc_sensors $ADDR_SDM_SYSMON]
     }
 
     global CLOCK_GEN_ARCH VIRTUAL_DEBUG_ENABLE
@@ -168,23 +162,10 @@ proc dts_build_netcope {} {
         set pcie_ctrl_base [expr $ADDR_PCIE_DBG + "0x100000"]
         append ret [dts_pcie_ctrl_dbg $pcie_ctrl_base $PCIE_ENDPOINTS $PCIE_ENDPOINT_MODE $PCIE_MOD_ARCH]
     }
+}
 
-    append ret "};"
-
-    set mi_idx [incr mi_idx]
-
-    # Creating separate space for MI bus when DMA Calypte are used, the core uses additional BAR for its function
-    if {$DMA_TYPE == 4 && $DMA_TX_CHANNELS > 0} {
-        append ret "mi$mi_idx: mi_bus$mi_idx {"
-        append ret "#address-cells = <1>;"
-        append ret "#size-cells = <1>;"
-
-        append ret "compatible = \"netcope,bus,mi\";"
-        append ret "resource = \"PCI0,BAR2\";"
-        append ret "width = <0x20>;"
-        append ret "map-as-wc;"
-
-        set mi_idx [incr mi_idx]
+proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_ENDPOINTS DMA_TX_CHANNELS} {
+    upvar 1 $DTS ret
 
         # -------------------------------------------------
         # These two widths are changeable
@@ -224,23 +205,39 @@ proc dts_build_netcope {} {
             set    var_buff_base [expr $TX_HDR_BUFF_BASE + $i * $TX_BUFF_SIZE_HEX]
             dts_dma_calypte_tx_buffer ret "hdr" $i $var_buff_base $TX_BUFF_SIZE_HEX "0"
         }
-        append ret "};"
-    }
+}
 
-    for {set i $mi_idx} {$i < $PCIE_ENDPOINTS} {incr i} {
-        # Create MI bus node
-        append ret "mi$i: mi_bus$i {"
-        append ret "#address-cells = <1>;"
-        append ret "#size-cells = <1>;"
+proc dts_build_netcope {} {
+    # =========================================================================
+    # Top level Device tree file
+    # =========================================================================
 
-        append ret "compatible = \"netcope,bus,mi\";"
-        append ret "resource = \"PCI$i,BAR0\";"
-        append ret "width = <0x20>;"
+    set ret ""
 
-        if {$DMA_TYPE != 0} {
-            append ret [dts_dmamod_open $ADDR_DMA_MOD $DMA_TYPE [expr $DMA_RX_CHANNELS / $PCIE_ENDPOINTS] [expr $DMA_TX_CHANNELS / $PCIE_ENDPOINTS] $i $DMA_RX_FRAME_SIZE_MAX $DMA_TX_FRAME_SIZE_MAX $DMA_RX_FRAME_SIZE_MIN $DMA_TX_FRAME_SIZE_MIN]
+    dts_ndk_core_info ret
+
+    # Create MI bus nodes for each PCIe endpoint
+    global PCIE_ENDPOINTS DMA_TYPE DMA_TX_CHANNELS
+    foreach pcie [nb_range $PCIE_ENDPOINTS] {
+        dts_create_default_mi_bar_node ret $pcie 0 {
+            if {$pcie == 0} {
+                dts_ndp_core_main_mi ret
+            }
+
+            # DMA module
+            global DMA_RX_CHANNELS DMA_RX_FRAME_SIZE_MAX DMA_TX_FRAME_SIZE_MAX DMA_RX_FRAME_SIZE_MIN DMA_TX_FRAME_SIZE_MIN DMA_DEBUG_ENABLE
+            if {$DMA_TYPE != 0} {
+                append ret [dts_dmamod_open $ADDR_DMA_MOD $DMA_TYPE [expr $DMA_RX_CHANNELS / $PCIE_ENDPOINTS] [expr $DMA_TX_CHANNELS / $PCIE_ENDPOINTS] $pcie $DMA_RX_FRAME_SIZE_MAX $DMA_TX_FRAME_SIZE_MAX $DMA_RX_FRAME_SIZE_MIN $DMA_TX_FRAME_SIZE_MIN $DMA_DEBUG_ENABLE]
+            }
         }
-        append ret "};"
+
+        dts_create_default_mi_bar_node ret $pcie 2 {
+            append ret "map-as-wc;"
+            # Creating separate space for MI bus when DMA Calypte are used, the core uses additional BAR for its function
+            if {$DMA_TYPE == 4} {
+                dts_ndk_core_dma_calypte_tx_buffers ret $PCIE_ENDPOINTS $DMA_TX_CHANNELS
+            }
+        }
     }
 
     return $ret
