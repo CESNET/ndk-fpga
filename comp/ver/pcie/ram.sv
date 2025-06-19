@@ -39,7 +39,7 @@ class ram #(ADDR_WIDTH, MPS, MRRS) extends sv_common_pkg::Driver;
             if ((({tr.addr, 2'b00} & (PAGE_SIZE-1)) + tr.data.size()*4) > PAGE_SIZE) begin
                 tr.display();
                 $error("PCIE: transaction continuos throught page boundary\n\tstart address : %h\n\tend address   : %h\n",
-                                                                     {tr.addr, 2'b00}, {tr.addr, 2'b00} + data.size()*4);
+                                                                     {tr.addr, 2'b00}, {tr.addr, 2'b00} + tr.data.size()*4);
                 $stop();
             end
 
