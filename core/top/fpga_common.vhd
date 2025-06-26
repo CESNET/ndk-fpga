@@ -633,7 +633,7 @@ architecture FULL of FPGA_COMMON is
     signal eth_tx_mfb_src_rdy            : std_logic_vector(ETH_STREAMS-1 downto 0);
     signal eth_tx_mfb_dst_rdy            : std_logic_vector(ETH_STREAMS-1 downto 0) := (others => '1');
 
-    signal eth_tx_mvb_channel            : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*log2(DMA_TX_CHANNELS/(ETH_STREAMS/DMA_STREAMS))-1 downto 0);
+    signal eth_tx_mvb_channel            : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*maximum(1,log2(DMA_TX_CHANNELS/(ETH_STREAMS/DMA_STREAMS)))-1 downto 0);
     signal eth_tx_mvb_timestamp_vld      : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*48-1 downto 0);
     signal eth_tx_mvb_vld                : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS-1 downto 0);
 
