@@ -8,5 +8,10 @@ from .Axi4SRequester import Axi4SRequester
 from .AvstCompleter import AvstCompleter
 from .AvstRequester import AvstRequester
 
+# Generic device
+from .PcieHeaders import (RQHeader, CQHeader, RCHeader, CCHeader, RQUser, CQUser,
+                          RCUser)
 
-__all__ = ["Axi4SCompleter", "Axi4SRequester", "AvstCompleter", "AvstRequester"]
+__all__ = ["Axi4SCompleter", "Axi4SRequester", "AvstCompleter", "AvstRequester",
+           "RQHeader", "CQHeader", "RCHeader", "CCHeader", "RQUser", "CQUser",
+           "RCUser"]

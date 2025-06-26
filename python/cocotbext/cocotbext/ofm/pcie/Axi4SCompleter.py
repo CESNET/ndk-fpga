@@ -7,42 +7,11 @@ import cocotb.queue
 from cocotb.triggers import Event, RisingEdge
 
 from ..utils import concat, SerializableHeader
+from .PcieHeaders import CQHeader, CCHeader, CQUser
 
 
-class RequestHeaderEmpty(SerializableHeader):
+class CQHeaderEmpty(SerializableHeader):
     items = list(zip([], []))
-
-
-class RequestHeader(SerializableHeader):
-    items = list(zip(
-        ['addr', 'length', 'type', 'res1', 'req_id', 'tag', 'func', 'bar', 'barap', 'res2'],
-        [64, 11, 4, 1, 16, 8, 8, 3, 6, 7],
-    ))
-
-
-class RequestUser(SerializableHeader):
-    items = list(zip(
-        ['firstBe', 'lastBe', 'byte_en', 'sop', 'discontinue', 'tph_present', 'tph_type', 'tph_st_tag', 'parity'],
-        [4, 4, 32, 1, 1, 1, 2, 8, 32],
-    ))
-
-
-class RequestUser512(SerializableHeader):
-    items = list(zip(
-        ['firstBe', 'firstBe1', 'lastBe', 'lastBe1', 'res1', 'sop', 'res2'],
-        [4, 4, 4, 4, 64, 1, 0],
-    ))
-
-
-class CompletionHeader(SerializableHeader):
-    items = list(zip(
-        [
-            'lower_address', 'r1', 'at', 'r2', 'byte_count', 'lrc', 'r3',
-            'dword_count', 'completion_status', 'poisoned', 'r4', 'rid',
-            'tag', 'cid', 'cid_en', 'tc', 'attr', 'ecrc'
-        ],
-        [7, 1, 2, 6, 13, 1, 2, 11, 3, 1, 1, 16, 8, 16, 1, 3, 3, 1],
-    ))
 
 
 class Axi4SCompleter:
@@ -87,9 +56,9 @@ class Axi4SCompleter:
         # FIXME: Monitor sends values as bytes
         tlast = bool(tr['TLAST'][0])
         if self._cc_inframe is None:
-            h = len(CompletionHeader()) // 8
+            h = len(CCHeader()) // 8
             hdrbytes, data = data[:h], data[h:]
-            self._cc_inframe = CompletionHeader.deserialize(int.from_bytes(hdrbytes, byteorder='little'))
+            self._cc_inframe = CCHeader.deserialize(int.from_bytes(hdrbytes, byteorder='little'))
 
         hdr = self._cc_inframe
 
@@ -112,18 +81,18 @@ class Axi4SCompleter:
                 self._tag_queue.put_nowait(hdr.tag)
 
     async def _cq_req(self, addr, byte_count, req_type=0, data=[], tag=None, sync=True):
-        header_empty = RequestHeaderEmpty()
-        header = RequestHeader()
-        user = RequestUser() if self._axi_width != (512 // 8) else RequestUser512()
+        header_empty = CQHeaderEmpty()
+        header = CQHeader()
+        user = CQUser()
 
-        user.firstBe = [0xF, 0xE, 0xC, 0x8][addr % 4]
-        user.lastBe = [0xF, 0x1, 0x3, 0x7][(addr + byte_count) % 4]
-        user.sop = 1
+        user.firstBe0 = [0xF, 0xE, 0xC, 0x8][addr % 4]
+        user.lastBe0 = [0xF, 0x1, 0x3, 0x7][(addr + byte_count) % 4]
+        user.sop0 = 1
 
         dwords = (addr % 4 + byte_count + 3) // 4
         if dwords <= 1:
-            user.firstBe &= user.lastBe
-            user.lastBe = 0
+            user.firstBe0 &= user.lastBe0
+            user.lastBe0 = 0
 
         if req_type == 1:
             assert len(data) == byte_count
@@ -131,10 +100,10 @@ class Axi4SCompleter:
 
         if tag is not None:
             header.tag = tag
-        header.barap = 26
-        header.addr = addr & ~3
-        header.length = dwords
-        header.type = req_type
+        header.bar_apper = 26
+        header.addr = addr >> 2
+        header.dword_count = dwords
+        header.req_type = req_type
 
         while len(data) or len(header):
             cnt = min(self._axi_width - len(header) // 8, len(data))
@@ -144,7 +113,7 @@ class Axi4SCompleter:
             await self._cq.write({"TDATA": tdata, "TUSER": tuser, "TKEEP": tkeep}, sync=sync)
 
             header = header_empty
-            user.sop = 0
+            user.sop0 = 0
             data = data[cnt:]
 
     async def read(self, addr: int, byte_count: int) -> bytes:
