@@ -53,6 +53,7 @@ architecture FULL of BMC_DRIVER is
         st_write,               -- writing 1 byte to SPI slave device
         st_write_delay,         -- delay between bytes
         st_wait,                -- state between write and read process
+        st_preread,             -- nSS = 0
         st_read,                -- reading 1 byte data from SPI
         st_read_delay,          -- delay between bytes
         st_eos                  -- end of sequence
@@ -387,10 +388,18 @@ begin
                 end if;
 
                 if interrupt_detected = '1' then
-                    next_state      <= st_read;
+                    next_state      <= st_preread;
                 elsif wait_cnt_q = to_integer(unsigned(wait_duration_q)) then
-                    next_state      <= st_read;
+                    next_state      <= st_preread;
                     timeout_event_d <= '1';
+                end if;
+
+            when st_preread         =>
+                spi_clk_en      <= '1';
+
+                spi_nss_d   <= '0';
+                if spi_clk_event = '1' then
+                    next_state <= st_read;
                 end if;
 
             when st_read            =>
@@ -423,7 +432,7 @@ begin
                     delay_cnt_d <= delay_cnt_q + 1;
 
                     if delay_cnt_q = to_integer(unsigned(delay_duration_q(7 downto 1))) then
-                        next_state      <= st_read;
+                        next_state      <= st_preread;
 
                         miso_word_cnt_d <= miso_word_cnt_q + 1;
                         if miso_word_cnt_q = 2 - 1 then
