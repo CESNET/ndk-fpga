@@ -360,18 +360,6 @@ architecture FULL of FPGA_COMMON is
 
     constant HDR_META_WIDTH     : integer := 12;
 
-    -- This function returns appropriate REGION_SIZE parameter value according to set DMA type, and
-    -- PCIe configuration
-    function mfb_reg_size_calc_f
-        return natural is
-    begin
-        if (DEVICE = "ULTRASCALE" and DMA_TYPE = 4 and PCIE_ENDPOINTS = 1 and PCIE_ENDPOINT_MODE = 2) then
-            return 4;
-        end if;
-
-        return 8;
-    end function;
-
     function pcie_mfb_regions_calc_f (PCIE_DIR : string) return natural is
         variable pcie_mfb_regions : natural;
     begin
