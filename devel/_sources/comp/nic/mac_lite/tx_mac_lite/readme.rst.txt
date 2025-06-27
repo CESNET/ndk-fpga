@@ -25,7 +25,7 @@ The whole module can be controlled by SW using MI registers (see chapter Registe
 - **ADDR DEC** - controls the whole module through MI registers
 - **Stats Unit** - contains statistical counters accessible through MI registers
 - **Length Check** - calculates and checks the minimal length of the Ethernet frame
-- **CRC Gen** - calculate the CRC of the Ethernet frame before sent (optional, it is not available in OFM repository, extra license required)
+- **CRC Gen** - calculate the CRC of the Ethernet frame before sent (optional, it is not available in NDK-FPGA repository, extra license required)
 - **CRC Insert** - insert the CRC to the Ethernet frame before sent (optional)
 - **MFB PD ASFIFO** - store and forward buffer is used to store the Ethernet frame, use when it is not necessary to generate a CRC and/or inter packet gaps (IPG), for example, in cases where the CRC is inserted by Ethernet Hard IP
 - **Spacer** - store and forward buffer is used to store the Ethernet frame and generate space for inserting the CRC and IPG according to the Ethernet standard
@@ -40,7 +40,7 @@ Currently, several variants of the adapter are implemented:
 - **UMII Adapter** - connects Ethernet PCS/PMA layer with MII interface for various speeds (XGMII, XLGMII, CDGMII,...)
 - **CMAC Adapter** - connects CMAC Hard IP, which is used in Xilinx UltraScale+ FPGA for 100 Gbps Ethernet (Uses MFB not LBUS!)
 - **AVST Adapter** - connects E-Tile Hard IP, which is used in Intel Stratix 10 and Agilex FPGA for up to 100 Gbps Ethernet
-- **MAC Segmented Adapter (WIP)** - connects F-Tile Hard IP, which is used in Intel Agilex FPGA for up to 400 Gbps Ethernet
+- **MAC Segmented Adapter** - connects F-Tile Hard IP, which is used in Intel Agilex FPGA for up to 400 Gbps Ethernet
 
 Register Map
 ^^^^^^^^^^^^
@@ -57,100 +57,26 @@ There are four statistical counters in the address space. You have to sample the
 ======  ==================================================================
 Offset  Name of register
 ======  ==================================================================
-0x00    Total Frames Counter - low part (TFCL)
-0x04    Sent Octects Counter - low part (SOCL)
-0x08    Discarted Frames Counter - low part (DFCL)
-0x0C    Sent Frames Counter - low part (SFCL)
-0x10    Total Frames Counter - high part (TFCH)
-0x14    Sent Octects Counter - high part (SOCH)
-0x18    Discarded Frames Counter - high part (DFCH)
-0x1C    Sent Frames Counter - high part (SFCH)
+0x00    Counter - Frames total - low 32b
+0x04    Counter - Bytes passed (sent to network) - low 32b
+0x08    Counter - Frames dropped - low 32b
+0x0C    Counter - Frames passed (sent to network) - low 32b
+0x10    Counter - Frames total - high 32b
+0x14    Counter - Bytes passed (sent to network) - high 32b
+0x18    Counter - Frames dropped - high 32b
+0x1C    Counter - Frames passed (sent to network) - high 32b
 0x20    Enable register
-0x24    Reserved bits
-0x28    Reserved bits
 0x2C    Command register
 0x30    Status register
+0x40    Counter - Bytes total - low 32b
+0x44    Counter - Bytes high - low 32b
+0x48    Counter - Frames dropped due to link error (link down) - low 32b
+0x4C    Counter - Frames dropped due to link error (link down) - high 32b
+0x50    Counter - Frames dropped due to error in length (below 60B) - low 32b
+0x54    Counter - Frames dropped due to error in length (below 60B) - high 32b
+0x58    Counter - Frames dropped due to MAC disabled - low 32b
+0x5C    Counter - Frames dropped due to MAC disabled - high 32b
 ======  ==================================================================
-
-**Total Frames Counter - low part (TFCL)**
-
-This is the low part of counter that holds number of all processed frames. (TFC = SFC + DFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value - low part
-====  ===  =============  ======  ==============
-
-**Total Frames Counter - high part (TFCL)**
-
-This is the high part of counter that holds number of all processed frames. (TFC = SFC + DFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value - high part
-====  ===  =============  ======  ==============
-
-**Sent Frames Counter - low part (SFCL)**
-
-This is the low part of counter that holds number of frames that were successfully sent. (SFC = TFC - DFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value - low part
-====  ===  =============  ======  ==============
-
-**Sent Frames Counter - high part (SFCL)**
-
-This is the high part of counter that holds number of frames that were successfully sent. (SFC = TFC - DFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value - high part
-====  ===  =============  ======  ==============
-
-**Sent Octects Counter - low part (SOCL)**
-
-This is the low part of counter that holds number of data octets (bytes) in frames that were successfully sent.
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value - low part
-====  ===  =============  ======  ==============
-
-**Sent Octects Counter - high part (SOCL)**
-
-This is the high part of counter that holds number of data octets (bytes) in frames that were successfully sent.
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value - high part
-====  ===  =============  ======  ==============
-
-**Discarded Frames Counter - low part (SFCL)**
-
-This is the low part of counter that holds number of discarted frames due to being to short (<60B without CRC). (DFC = TFC - SFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value - low part
-====  ===  =============  ======  ==============
-
-**Discarded Frames Counter - high part (SFCL)**
-
-This is the high part of counter that holds number of discarted frames due to being to short (<60B without CRC). (DFC = TFC - SFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value - high part
-====  ===  =============  ======  ==============
 
 **Enable register**
 
