@@ -1,0 +1,31 @@
+# bmc.qsf
+# Copyright (C) 2025 DynaNIC Semiconductors, Ltd.
+# Author(s): David Beneš <benes@dyna-nic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# QSPI interface to Flash through BMC:
+set_location_assignment PIN_D29 -to QSPI_CSN_1V2
+set_location_assignment PIN_B31 -to QSPI_CLK
+set_location_assignment PIN_D33 -to QSPI_D0
+set_location_assignment PIN_E32 -to QSPI_D1
+set_location_assignment PIN_B33 -to QSPI_D2
+set_location_assignment PIN_A32 -to QSPI_D3
+
+# SPI bus from FPGA to BMC (Ingress):
+set_location_assignment PIN_E26 -to SPI_INGRESS_SCLK
+set_location_assignment PIN_E30 -to SPI_INGRESS_MISO
+set_location_assignment PIN_A30 -to SPI_INGRESS_MOSI
+set_location_assignment PIN_B27 -to SPI_INGRESS_CSN
+
+# SPI bus from BMC to FPGA (Egress):
+set_location_assignment PIN_A24 -to SPI_EGRESS_CSN
+set_location_assignment PIN_B25 -to SPI_EGRESS_MISO
+set_location_assignment PIN_D25 -to SPI_EGRESS_SCLK
+set_location_assignment PIN_E24 -to SPI_EGRESS_MOSI
+
+# Misc signals between FPGA and BMC:
+set_location_assignment PIN_A26 -to MAX_FPGA_HB_1V2
+set_location_assignment PIN_D27 -to FPGA_MAX_HB
+set_location_assignment PIN_G30 -to FPGA_MAX_THRM_SHTD_N_1V2
+set_location_assignment PIN_H31 -to FPGA_MAX_FPGA_SEU_1V2
