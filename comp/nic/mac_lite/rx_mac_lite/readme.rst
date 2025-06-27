@@ -39,7 +39,7 @@ Currently, several variants of the adapter are implemented:
 - **UMII Adapter** - connects Ethernet PCS/PMA layer with MII interface for various speeds (XGMII, XLGMII, CDGMII,...)
 - **CMAC Adapter** - connects CMAC Hard IP, which is used in Xilinx UltraScale+ FPGA for 100 Gbps Ethernet (Uses MFB not LBUS!)
 - **AVST Adapter** - connects E-Tile Hard IP, which is used in Intel Stratix 10 and Agilex FPGA for up to 100 Gbps Ethernet
-- **MAC Segmented Adapter (WIP)** - connects F-Tile Hard IP, which is used in Intel Agilex FPGA for up to 400 Gbps Ethernet
+- **MAC Segmented Adapter** - connects F-Tile Hard IP, which is used in Intel Agilex FPGA for up to 400 Gbps Ethernet
 
 Register Map
 ^^^^^^^^^^^^
@@ -49,119 +49,89 @@ You can set MAC check mode, RX MAC LITE error mask, minimal and maximal frame le
 After you are done you can enable RX MAC LITE.
 You can also write all valid MAC addresses into MAC memory, but the MAC memory can be accessed by software only when the RX MAC LITE is disabled!
 
-You can read number of received, correct, discarded and discarded due to buffer overflow frames or number of correctly received bytes.
-You have to sample the counters first and then you can read their content. RX MAC LITE has four frame counters:
-Total Received Frames Counter (TRFC), Correct Frames Counter (CFC), Discarded Frames Counter (DFC) and Counter of Frames Discarded due to Buffer Overflow (BODFC) and the byte counter:
-Octets Received OK Counter (OROC).
-
 .. note::
 
-    If the RX MAC LITE unit is enabled, these counters will have a floating content.
+    Statistics counters have a dynamic content.
     For this reason, it is necessary to strobe their actual values at the one moment into the counter registers.
     Software tool is then able to read those registers.
 
 ======  ==================================================================
 Offset  Name of register
 ======  ==================================================================
-0x00    Total Received Frames Counter - low part (TRFCL)
-0x04    Correct Frames Counter - low part (CFCL)
-0x08    Discarded Frames Counter - low part (DFCL)
-0x0C    Counter of frames discarded due to buffer overflow - low part (BODFCL)
-0x10    Total Received Frames Counter - high part (TRFCH)
-0x14    Correct Frames Counter - high part (CFCH)
-0x18    Discarded Frames Counter - high part (DFCH)
-0x1C    Counter of frames discarded due to buffer overflow - high part (BODFCH)
-0x20    Enable register
-0x24    Error mask register
-0x28    Status register
-0x2C    Command register
-0x30    Minimum frame length allowed
-0x34    Frame MTU
-0x38    MAC address check mode
-0x3C    Octets Received OK Counter - low part (OROCL)
-0x40    Octets Received OK Counter - high part (OROCH)
-0x80    Memory of available MAC addresses
+0x000   Counter - Frames total (RFC2819 - etherStatsPkts) - low 32b
+0x004   Counter - Frames passed (sent to user logic) - low 32b
+0x008   Counter - Frames dropped - low 32b
+0x00C   Counter - Frames dropped due to buffer overflow - low 32b
+0x010   Counter - Frames total (RFC2819 - etherStatsPkts) - high 32b
+0x014   Counter - Frames passed (sent to user logic) - high 32b
+0x018   Counter - Frames dropped - high 32b
+0x01C   Counter - Frames dropped due to buffer overflow - high 32b
+0x020   Enable register
+0x024   Error mask register
+0x028   Status register
+0x02C   Command register
+0x030   Minimum frame length allowed (MinTU)
+0x034   Maximum frame length allowed (MaxTU/MTU)
+0x038   MAC address check mode
+0x03C   Counter - Bytes passed (sent to user logic) - low 32b
+0x040   Counter - Bytes passed (sent to user logic) - high 32b
+0x044   Speed Meter - ticks counter
+0x048   Speed Meter - bytes counter
+0x04C   Speed Meter - packets counter
+0x080   Memory of available MAC addresses (0x080 - 0x0FF)
+0x100   Counter - RFC2819 - etherStatsCRCAlignErrors - low 32b
+0x104   Counter - Frame with size over configured maximum (MaxTU/MTU) - low 32b
+0x108   Counter - Frame with size over configured minimum (MinTU) - low 32b
+0x10C   Counter - RFC2819 - etherStatsBroadcastPkts - low 32b
+0x110   Counter - RFC2819 - etherStatsMulticastPkts - low 32b
+0x114   Counter - RFC2819 - etherStatsFragments - low 32b
+0x118   Counter - RFC2819 - etherStatsJabbers - low 32b
+0x11C   Counter - RFC2819 - etherStatsOctets (bytes total) - low 32b
+0x120   Counter - RFC2819 - etherStatsPkts64Octets (histogram - 64B) - low 32b
+0x124   Counter - RFC2819 - etherStatsPkts65to127Octets (histogram - 65-127B) - low 32b
+0x128   Counter - RFC2819 - etherStatsPkts128to255Octets (histogram - 128-255B) - low 32b
+0x12C   Counter - RFC2819 - etherStatsPkts256to511Octets (histogram - 256-511B) - low 32b
+0x130   Counter - RFC2819 - etherStatsPkts512to1023Octets (histogram - 512-1023B) - low 32b
+0x134   Counter - RFC2819 - etherStatsPkts1024to1518Octets (histogram - 1024-1518B) - low 32b
+0x138   Counter - RFC2819 - etherStatsCRCAlignErrors - high 32b
+0x13C   Counter - Frame with size over configured maximum (MaxTU/MTU) - high 32b
+0x140   Counter - Frame with size over configured minimum (MinTU) - high 32b
+0x144   Counter - RFC2819 - etherStatsBroadcastPkts - high 32b
+0x148   Counter - RFC2819 - etherStatsMulticastPkts - high 32b
+0x14C   Counter - RFC2819 - etherStatsFragments - high 32b
+0x150   Counter - RFC2819 - etherStatsJabbers - high 32b
+0x154   Counter - RFC2819 - etherStatsOctets (bytes total) - high 32b
+0x158   Counter - RFC2819 - etherStatsPkts64Octets (histogram - 64B) - high 32b
+0x15C   Counter - RFC2819 - etherStatsPkts65to127Octets (histogram - 65-127B) - high 32b
+0x160   Counter - RFC2819 - etherStatsPkts128to255Octets (histogram - 128-255B) - high 32b
+0x164   Counter - RFC2819 - etherStatsPkts256to511Octets (histogram - 256-511B) - high 32b
+0x168   Counter - RFC2819 - etherStatsPkts512to1023Octets (histogram - 512-1023B) - high 32b
+0x16C   Counter - RFC2819 - etherStatsPkts1024to1518Octets (histogram - 1024-1518B) - high 32b
+0x170   Counter - RFC2819 - etherStatsOversizePkts (over 1518B) - low 32b
+0x174   Counter - RFC2819 - etherStatsOversizePkts (over 1518B) - high 32b
+0x178   Counter - RFC2819 - etherStatsUndersizePkts (below 64B) - low 32b
+0x17C   Counter - RFC2819 - etherStatsUndersizePkts (below 64B) - high 32b
+0x180   Counter - Frame size histogram (1519-2047B) - low 32b
+0x184   Counter - Frame size histogram (1519-2047B) - high 32b
+0x188   Counter - Frame size histogram (2048-4095B) - low 32b
+0x18C   Counter - Frame size histogram (2048-4095B) - high 32b
+0x190   Counter - Frame size histogram (4096-8191B) - low 32b
+0x194   Counter - Frame size histogram (4096-8191B) - high 32b
+0x198   Counter - Frame size histogram (over 8192B) - low 32b
+0x19C   Counter - Frame size histogram (over 8192B) - high 32b
+0x1A0   Counter - Frames dropped due to MAC filtered - low 32b
+0x1A4   Counter - Frames dropped due to MAC filtered - high 32b
+0x1A8   Counter - Frames dropped due to error - low 32b
+0x1AC   Counter - Frames dropped due to error - high 32b
+0x1B0   Counter - Frames dropped due to MAC disabled - low 32b
+0x1B4   Counter - Frames dropped due to MAC disabled - high 32b
+0x1B8   Counter - Frames dropped due to error in MII - low 32b
+0x1BC   Counter - Frames dropped due to error in MII - high 32b
+0x1C0   Counter - Frames dropped due to error in CRC - low 32b
+0x1C4   Counter - Frames dropped due to error in CRC - high 32b
+0x1C8   Counter - Frames dropped due to error in length - low 32b
+0x1CC   Counter - Frames dropped due to error in length - high 32b
 ======  ==================================================================
-
-**Total Received Frames Counter - low part (TRFCL)**
-
-This is the low part of counter that holds number of all arrived frames including those being received at the moment. (TRFC = CFC + DFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
-
-**Correct Frames Counter - low part (CFCL)**
-
-This is the low part of counter that holds number of frames that passed sampling and all controls (was found to be correct) and are forwarded to the RX MAC LITE's output. (CFC = TRFC - DFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
-
-**Discarded Frames Counter - low part (DFCL)**
-
-This is the low part of counter that holds number of frames that did NOT pass sampling or any control (was found to be NOT correct) and are NOT forwarded to the RX MAC LITE's output. (DFC = TRFC - CFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
-
-**Counter of frames discarded due to buffer overflow - low part (BODFCL)**
-
-This is the low part of counter that holds number of frames that were discarded due to buffer overflow.
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
-
-**Total Received Frames Counter - high part (TRFCH)**
-
-This is the high part of counter that holds number of all arrived frames including those being received at the moment. (TRFC = CFC + DFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
-
-**Correct Frames Counter - high part (CFCH)**
-
-This is the high part of counter that holds number of frames that passed sampling and all controls (was found to be correct) and are forwarded to the RX MAC LITE's output. (CFC = TRFC - DFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
-
-**Discarded Frames Counter - high part (DFCH)**
-
-This is the high part of counter that holds number of frames that did NOT pass sampling or any control (was found to be NOT correct) and are NOT forwarded to the RX MAC LITE's output. (DFC = TRFC - CFC)
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
-
-**Counter of frames discarded due to buffer overflow - high part (BODFCH)**
-
-This is the high part of counter that holds number of frames that were discarded due to buffer overflow.
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
 
 **Enable register**
 
@@ -170,7 +140,7 @@ The value stored in this register determines whether the RX MAC LITE unit is ena
 ====  ===  =============  ======  ==============
 From  To   Name           Access  Description
 ====  ===  =============  ======  ==============
-0     0    Enable         RW      Assert this bit to change the RX MAC LITE status to 'enabled'. Clear this bit to change the RX MAC LITE status to 'disabled'. As soon as the RX MAC LITE status is set to 'enabled' the RX MAC LITE unit starts working.
+0     0    Enable         RW      Assert this bit to change the RX MAC LITE status to 'enabled'. Clear this bit to change the RX MAC LITE status to 'disabled'. As soon as the RX MAC LITE status is set to 'enabled' the RX MAC LITE unit starts passed frames to user logic.
 1     31   Reserved       R       Reserved bits.
 ====  ===  =============  ======  ==============
 
@@ -181,7 +151,7 @@ This register specifies which controls will be done over incoming frames. The va
 ====  ===  =============  ======  ==============
 From  To   Name           Access  Description
 ====  ===  =============  ======  ==============
-0     0    ADAPTER_ERROR  RW      This bit signals whether the error notified by adapter will cause the frame discarding. Assert this bit to allow frame discarding. Clear this bit to mask this error.
+0     0    MII_ERROR      RW      This bit signals whether the MII error will cause the frame discarding. Assert this bit to allow frame discarding. Clear this bit to mask this error.
 1     1    CRC_ERROR      RW      This bit signals whether the CRC check error will cause the frame discarding. Assert this bit to allow frame discarding. Clear this bit to mask this error.
 2     2    MINTU_CHECK    RW      This bit enables the minimum frame length check. If the incoming frame length is less than the RX MAC LITE minimum frame length register, the frame will be discarded.
 3     3    MTU_CHECK      RW      This bit enables the MTU frame length check. If the incoming frame length is greater than the RX MAC LITE frame MTU register, the frame will be discarded.
@@ -222,7 +192,7 @@ Command definition:
 
 **Minimum frame length allowed**
 
-This register specifies the minimal frame length allowed (MINTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of <data> part of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64.
+This register specifies the minimal frame length allowed (MINTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of <data> 32b of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64.
 
 ====  ===  =============  ======  ==============
 From  To   Name           Access  Description
@@ -233,7 +203,7 @@ From  To   Name           Access  Description
 
 **Maximum frame length allowed**
 
-This register specifies the maximal frame length allowed (MTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of <data> part of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64. Default value is 1526.
+This register specifies the maximal frame length allowed (MTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of <data> 32b of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64. Default value is 1526.
 
 ====  ===  =============  ======  ==============
 From  To   Name           Access  Description
@@ -259,26 +229,6 @@ MAC address checking mode definition:
 - 0x01 - MODE 1: Only frames with valid MAC addresses can pass (see MAC memory).
 - 0x02 - MODE 2: MODE 1 + All brodcast frames can pass.
 - 0x03 - MODE 3: MODE 2 + All multicast frames can pass.
-
-**Octets Received OK Counter - low part (OROCL)**
-
-This is the low part of counter that holds number of data octets in frames that were successfully received. This does not include octets in frames received with MAC, CRC, MINTU, MTU, CRC or CGMII errors according the settings of Error mask register. This counter is incremented when a new packet is successfully received and the length of the currently received packet is added. The counted length of the packets always includes the length of CRC and vice versa.
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
-
-**Octets Received OK Counter - high part (OROCH)**
-
-This is the high part of counter that holds number of data octets in frames that were successfully received. This does not include octets in frames received with MAC, CRC, MINTU, MTU, CRC or CGMII errors according the settings of Error mask register. This counter is incremented when a new packet is successfully received and the length of the currently received packet is added. The counted length of the packets always includes the length of CRC and vice versa.
-
-====  ===  =============  ======  ==============
-From  To   Name           Access  Description
-====  ===  =============  ======  ==============
-0     31   Counter value  R       Current counter value
-====  ===  =============  ======  ==============
 
 **Memory of available MAC addresses**
 
