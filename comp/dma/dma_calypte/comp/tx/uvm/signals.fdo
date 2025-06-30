@@ -215,6 +215,7 @@ proc internals {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_BE_
     add_wave "-noupdate -group \"INTERNALS\" -hex" $PATH/trbuff_rd_data
     add_wave "-noupdate -group \"INTERNALS\" -hex" $PATH/trbuff_rd_addr
     add_wave "-noupdate -group \"INTERNALS\"" $PATH/trbuff_rd_en
+    add_wave "-noupdate -group \"INTERNALS\"" $PATH/trbuff_rd_data_vld
 
     add wave -group "INTERNALS" -noupdate -divider "Fifox_multi"
     add_wave "-noupdate -group \"INTERNALS\"" $PATH/st_sp_ctrl_mfb_meta_arr
@@ -423,11 +424,17 @@ proc trans_buffer {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_
 
     add wave -noupdate -group "$grp_name" -divider "BRAM_OUTPUT"
 
-    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/RD_CHAN
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_DATA
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_ADDR
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_EN
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_DATA_VLD
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/RD_CHAN_A
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_DATA_A
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_ADDR_A
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_EN_A
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_DATA_VLD_A
+
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/RD_CHAN_B
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_DATA_B
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_ADDR_B
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_EN_B
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/RD_DATA_VLD_B
 
     add wave -noupdate -group "$grp_name" -divider "Calculated parameters"
     add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MFB_LENGTH
@@ -471,7 +478,7 @@ proc trans_buffer {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_
     add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/rd_en_pch
 
     add wave -noupdate -group "$grp_name" -divider "Read interface"
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/rd_data_valid_arr
+    add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/rd_data_valid_arr
     add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/rd_en_bram_demux
     add_wave "-noupdate -group \"$grp_name\"" $PATH/rd_data_bram_mux
     add_wave "-noupdate -group \"$grp_name\"" $PATH/rd_data_bram

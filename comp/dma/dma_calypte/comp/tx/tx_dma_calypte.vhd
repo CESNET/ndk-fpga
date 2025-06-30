@@ -428,7 +428,9 @@ begin
         MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
         MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
 
-        POINTER_WIDTH => POINTER_WIDTH
+        POINTER_WIDTH          => POINTER_WIDTH,
+        SPLIT_READ_PORTS       => FALSE,
+        READ_BARREL_SHIFTER_EN => (FALSE, TRUE)
     )
     port map (
         CLK   => CLK,
@@ -439,11 +441,17 @@ begin
         PCIE_MFB_SOF     => st_sp_ctrl_mfb_sof_masked,
         PCIE_MFB_SRC_RDY => (or mfb_meta_vld_regions) and st_sp_ctrl_mfb_src_rdy,
 
-        RD_CHAN     => trbuff_rd_chan,
-        RD_DATA     => trbuff_rd_data,
-        RD_ADDR     => trbuff_rd_addr,
-        RD_EN       => trbuff_rd_en,
-        RD_DATA_VLD => trbuff_rd_data_vld
+        RD_CHAN_A     => trbuff_rd_chan,
+        RD_DATA_A     => trbuff_rd_data,
+        RD_ADDR_A     => trbuff_rd_addr,
+        RD_EN_A       => trbuff_rd_en,
+        RD_DATA_VLD_A => trbuff_rd_data_vld,
+
+        RD_CHAN_B     => (others => '0'),
+        RD_DATA_B     => open,
+        RD_ADDR_B     => (others => '0'),
+        RD_EN_B       => '0',
+        RD_DATA_VLD_B => open
     );
 
     -- Deserialize metadata for better handling
