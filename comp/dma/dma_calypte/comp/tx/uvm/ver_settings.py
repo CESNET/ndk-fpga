@@ -24,7 +24,6 @@ SETTINGS = {
         "PKT_SIZE_MAX"            : "2**12",
 
         "DATA_POINTER_WIDTH"      : "13",
-        "DMA_HDR_POINTER_WIDTH"   : "10",
 
         "PCIE_LEN_MAX"            : "256",
 

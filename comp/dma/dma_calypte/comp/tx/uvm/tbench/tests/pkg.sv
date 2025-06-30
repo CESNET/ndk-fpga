@@ -32,7 +32,6 @@ package test;
     parameter HDR_META_WIDTH          = 24;
 
     parameter DATA_POINTER_WIDTH      = 13;
-    parameter DMA_HDR_POINTER_WIDTH   = 10;
 
     // Max size bytes of DMA frame
     parameter PKT_SIZE_MAX            = 2**12;
