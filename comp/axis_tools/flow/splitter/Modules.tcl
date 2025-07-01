@@ -14,4 +14,4 @@ lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 #lappend COMPONENTS [ list "ASFIFOX" "$OFM_PATH/comp/base/fifo/asfifox" "FULL" ]
 
 # Files
-lappend MOD "$ENTITY_BASE/axis_merger.vhd"
+lappend MOD "$ENTITY_BASE/axis_splitter.vhd"

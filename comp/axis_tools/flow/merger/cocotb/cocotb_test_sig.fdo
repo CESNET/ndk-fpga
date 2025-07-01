@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /axis_merger/*
+
+config wave -signalnamewidth 1
