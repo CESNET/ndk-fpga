@@ -8,7 +8,7 @@ source $NDK_FPGA_PATH/env.sh
 
 ndk_fpga_venv_prepare "venv-mi_pipe"
 
-pip install -e .
+pip install .
 
 echo ""
 echo "Now activate environment with:"
