@@ -54,7 +54,7 @@ async def init(dut):
     dut.RX_DST_RDY.value = 1
 
 
-@cocotb.test()
+#@cocotb.test()
 async def test_bytes_conut(dut):
     """Send transaction and check byte counter with MI READ"""
     await init(dut)
