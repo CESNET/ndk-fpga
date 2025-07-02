@@ -33,12 +33,20 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
     rand int unsigned gre_next_prot[3];
     rand int unsigned proto_next_prot[2]; //empty/payload
     rand int unsigned algorithm; // 0 -> rand; 1 -> dfs
+    rand int unsigned dfs_mindepth;
+    rand int unsigned dfs_maxdepth;
 
     rand int unsigned packet_err_prob; //empty/payload
 
     constraint c_alg{
         algorithm dist {0 :/ 10, 1 :/ 1};
     }
+
+    constraint c_dfs {
+        dfs_maxdepth dist { [1 : 2] :/ 2, [3 : 6] :/ 5, [7 : 10] :/ 10 };
+        dfs_maxdepth - dfs_mindepth dist { [0 : 2] :/ 5, [3 : 6] :/ 10, [7 : 10] :/ 1 };
+        dfs_mindepth <= dfs_maxdepth;
+    };
 
     constraint c_err {
         packet_err_prob dist {[0:10] :/ 70, [11:70] :/ 20, [71:99] :/ 10};
@@ -229,7 +237,7 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
         `uvm_info(get_full_name(), $sformatf("\n\tsequence_search is running\n\t\tpcap_name%s", pcap_file), UVM_DEBUG);
 
         this.configure(config_json);
-        pkt_gen_params = $sformatf("-a %s -f \"%s\" -p %0d -c %s -s %0d", algorithm == 0 ? "rand" : "dfs",  pcap_file, transaction_count, config_json, pkt_gen_seed);
+        pkt_gen_params = $sformatf("-a %s -f \"%s\" -p %0d --mindepth %0d --maxdepth %0d -c %s -s %0d", algorithm == 0 ? "rand" : "dfs",  pcap_file, transaction_count, dfs_mindepth, dfs_maxdepth, config_json, pkt_gen_seed);
         if($system({PKT_GEN_PATH, " ", pkt_gen_params, " >> pkt_gen_out"}) != 0) begin
             `uvm_fatal(m_sequencer.get_full_name(), $sformatf("\n\t Cannot run command %s", {PKT_GEN_PATH, " ", pkt_gen_params}))
         end

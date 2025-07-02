@@ -15,6 +15,7 @@ from parser_dfs import Parser_dfs
 import argparse
 import time
 import enum
+import sys
 
 
 class parse_alg(enum.Enum):
@@ -44,6 +45,12 @@ def main():
         "-p", "--packets", type=int,
         help="number of generated packets", default=20)
     arg_parser.add_argument(
+        "--mindepth", type=int,
+        help="min depth for DFS", default=0)
+    arg_parser.add_argument(
+        "--maxdepth", type=int,
+        help="max depth for DFS", default=sys.maxsize)
+    arg_parser.add_argument(
         "-a", "--algorithm", type=parse_alg,
         help=("parse algorithms possible values [" + ' '.join(parse_alg.values()) + "]"), default="rand")
     arg_parser.add_argument(
@@ -63,7 +70,7 @@ def main():
     if (args.algorithm == parse_alg.rand):
         gen = Parser_rand(args.file_output, args.conf, args.seed, args.packets)
     if (args.algorithm == parse_alg.dfs):
-        gen = Parser_dfs(args.file_output, args.conf, args.seed)
+        gen = Parser_dfs(args.file_output, args.conf, args.seed, args.packets, args.mindepth, args.maxdepth)
 
     #run generator
     gen.gen()
