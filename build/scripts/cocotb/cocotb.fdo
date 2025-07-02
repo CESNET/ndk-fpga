@@ -5,6 +5,12 @@
 set NC_FLAGS [list SIMULATION]
 set OFM_PATH $env(OFM_PATH)
 
+if {[info exists env(GENERICS)]} {
+    set GENERICS $env(GENERICS)
+} else {
+    set GENERICS ""
+}
+
 # Workaround
 if {[info exists env(FIRMWARE_BASE)]} {
     set FIRMWARE_BASE $env(FIRMWARE_BASE)
@@ -60,11 +66,11 @@ proc rst {args} {
     set do_run $data(-do_run)
     set run_args $data(-run)
 
-    upvar SIM_FLAGS SIM_FLAGS VSIM_FLAGS VSIM_FLAGS USE_COCOTB USE_COCOTB
+    upvar SIM_FLAGS SIM_FLAGS VSIM_FLAGS VSIM_FLAGS USE_COCOTB USE_COCOTB GENERICS GENERICS
     exec make -f $SIM_FLAGS(MAKEFILE_NAME)
 
     quit -sim
-    vsim {*}$VSIM_FLAGS
+    vsim {*}$VSIM_FLAGS {*}$GENERICS
 
     global NumericStdNoWarnings StdArithNoWarnings
     set NumericStdNoWarnings 1
