@@ -256,9 +256,9 @@ module testbench;
                 assign avst_up[pcie_e].META[pcie_r*AVST_UP_META_W + HDR_WIDTH + PREFIX_WIDTH + 1-1 -: 1]            = avst_up_error [pcie_e] [(pcie_r+1)*1              -1 -: 1];
             end
 
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_DATA = avst_down[pcie_e].DATA;
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_SOP = avst_down[pcie_e].SOP;
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_EOP = avst_down[pcie_e].EOP;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_DATA      = avst_down[pcie_e].DATA;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_SOP       = avst_down[pcie_e].SOP;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_EOP       = avst_down[pcie_e].EOP;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_EMPTY     = avst_down[pcie_e].EMPTY;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_HDR       = avst_down_hdr[pcie_e];
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_PREFIX    = avst_down_prefix[pcie_e];
