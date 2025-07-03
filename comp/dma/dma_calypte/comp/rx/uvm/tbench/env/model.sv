@@ -84,6 +84,8 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uv
     localparam USER_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
     localparam IS_INTEL_DEV    = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
 
+    localparam BLOCK_SIZE = 128;
+
     //UVM PROBE - model input
     disc_probe_cbs uvm_probe_discard;
 
@@ -249,7 +251,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uv
         for (it = 0; it < (packet.size()+3)/4; it++) begin
             pcie_packet[it] = {<<8{packet[it*4 +: 4]}};
         end
-        parts = (packet.size() + 127)/128;
+        parts = (packet.size() + BLOCK_SIZE-1)/BLOCK_SIZE;
         //SEND PARTS OF PACKETS EXCEPT LAST PART
         for (it = 0; it < (parts-1); it++) begin
             packet_meta   = uvm_logic_vector::sequence_item#(META_WIDTH)::type_id::create("packet_meta");
@@ -261,13 +263,13 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uv
             packet_output.part         = it+1;
             packet_output.start_time   = start_time;
 
-            addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*128);
+            addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE);
             m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
-            get_pcie_header(128, addr, pcie_hdr_tmp, pcie_meta_tmp);
+            get_pcie_header(BLOCK_SIZE, addr, pcie_hdr_tmp, pcie_meta_tmp);
             if (IS_INTEL_DEV) begin
-                packet_output.data = pcie_packet[it*(128/4) +: 128/4];
+                packet_output.data = pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4];
             end else begin
-                packet_output.data = {pcie_hdr_tmp, pcie_packet[it*(128/4) +: 128/4]};
+                packet_output.data = {pcie_hdr_tmp, pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4]};
             end
             packet_output.hdr  = pcie_hdr_tmp;
             packet_output.meta = pcie_meta_tmp;
@@ -286,14 +288,14 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uv
         packet_output.part         = parts;
         packet_output.start_time   = start_time;
 
-        get_data(pcie_packet, it*(128/4), (packet.size()+3)/4, packet_end);
-        addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*128);
+        get_data(pcie_packet, it*(BLOCK_SIZE/4), (packet.size()+3)/4, packet_end);
+        addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE);
         m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
-        get_pcie_header(128, addr, pcie_hdr_tmp, pcie_meta_tmp);
+        get_pcie_header(BLOCK_SIZE, addr, pcie_hdr_tmp, pcie_meta_tmp);
         if (IS_INTEL_DEV) begin
-            packet_output.data = pcie_packet[it*(128/4) +: 128/4];
+            packet_output.data = pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4];
         end else begin
-            packet_output.data = {pcie_hdr_tmp, pcie_packet[it*(128/4) +: 128/4]};
+            packet_output.data = {pcie_hdr_tmp, pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4]};
         end
         packet_output.hdr  = pcie_hdr_tmp;
         packet_output.meta = pcie_meta_tmp;
