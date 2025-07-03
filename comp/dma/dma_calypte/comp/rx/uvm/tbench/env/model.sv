@@ -83,6 +83,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
 
     localparam USER_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
+
     localparam BLOCK_SIZE = 128;
 
     //UVM PROBE - model input
@@ -246,6 +247,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         for (it = 0; it < (packet.size()+3)/4; it++) begin
             pcie_packet[it] = {<<8{packet[it*4 +: 4]}};
         end
+
         parts = (packet.size() + BLOCK_SIZE-1)/BLOCK_SIZE;
         //SEND PARTS OF PACKETS EXCEPT LAST PART
         for (it = 0; it < (parts-1); it++) begin

@@ -9,6 +9,8 @@ class scoreboard #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) exten
 
     localparam LOGIC_WIDTH  = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
     localparam IS_INTEL_DEV    = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
+    localparam MPS = 256;
+    localparam PAGE_SIZE  = 4096;
 
     //INPUT TO DUT
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) analysis_export_rx_packet;
@@ -195,6 +197,12 @@ class scoreboard #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) exten
         ret &= (length         ==? tr_model.length) === 1'b1;
         ret &= (data           ==? tr_model.data) === 1'b1;
         ret &= (ph             ==? tr_model.ph) === 1'b1;
+
+        //Check pcie requiretments
+        if (data.size() > MPS || (((addr & (PAGE_SIZE-1)) + data.size()) > PAGE_SIZE)) begin
+            `uvm_error(this.get_full_name(), $sformatf("\n\tPacket doesn't meet pcie requirements.\n\t\tPacket size %0d\n\t\tMaximum payload(%0d) exceeded %0d\n\t\tPage(%0d) boundary exceeded %0d addr 0x%h",
+                                    data.size(), MPS, data.size() > MPS, PAGE_SIZE, (((addr & (PAGE_SIZE-1)) + data.size()) > PAGE_SIZE), addr));
+        end
 
         return ret;
     endfunction
