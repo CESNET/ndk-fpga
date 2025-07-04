@@ -15,6 +15,7 @@ package frame_masker;
 
     `include "sequencer.sv"
     `include "probe_cbs.sv"
+    `include "discarder.sv"
     `include "model.sv"
     `include "scoreboard.sv"
     `include "env.sv"
