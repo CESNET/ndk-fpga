@@ -4,22 +4,22 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class model_packet extends uvm_logic_vector_array::sequence_item#(32);
+
+class model_packet extends uvm_pcie::request_header;
     `uvm_object_utils(uvm_dma_ll::model_packet);
-    time start_time;
+
     bit  data_packet;
     int unsigned packet_num;
     int unsigned channel;
     int unsigned part;
     int unsigned part_num;
-    logic [32-1 :0]  hdr[4];
-    logic [168-1 :0] meta;
 
     function new(string name = "model_packet");
         super.new(name);
         data_packet  = 0;
     endfunction
 endclass
+
 
 class model_data;
     int unsigned data_ptr;
@@ -78,11 +78,10 @@ class disc_probe_cbs extends uvm_probe::cbs_simple #(1);
     endfunction
 endclass
 
-class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uvm_component;
-    `uvm_component_param_utils(uvm_dma_ll::model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE))
+class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
+    `uvm_component_param_utils(uvm_dma_ll::model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX))
 
     localparam USER_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
-    localparam IS_INTEL_DEV    = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
 
     localparam BLOCK_SIZE = 128;
 
@@ -92,8 +91,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uv
     uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) analysis_imp_rx;
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item#(USER_META_WIDTH))  analysis_imp_rx_meta;
     model_accept#(CHANNELS)                                                     analysis_dma;
-    uvm_analysis_port     #(uvm_logic_vector_array::sequence_item#(32))         analysis_port_tx;
-    uvm_analysis_port     #(uvm_logic_vector::sequence_item#(META_WIDTH))       analysis_port_tx_meta;
+    uvm_analysis_port     #(model_packet)                                       analysis_port_tx;
 
     typedef struct{
         logic [$clog2(PKT_SIZE_MAX+1)-1:0] packet_size;
@@ -128,7 +126,6 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uv
         analysis_imp_rx       = new("analysis_imp_rx", this);
         analysis_imp_rx_meta  = new("analysis_imp_rx_meta", this);
         analysis_port_tx      = new("analysis_port_tx", this);
-        analysis_port_tx_meta = new("analysis_port_tx_meta", this);
 
         for (int unsigned it = 0; it < CHANNELS; it++) begin
             m_data[it]       = new();
@@ -162,57 +159,56 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uv
         end
     endfunction
 
-    function void get_pcie_header(int unsigned packet_size, logic [64-1:0] addr, output logic[32-1 : 0] header[], output logic[168-1 : 0] meta);
-        logic [2-1:0]  at       = 0;
-        logic [1-1:0]  ecrc     = 0;
-        logic [3-1:0]  attr     = 0;
-        logic [3-1:0]  tc       = 0;
-        logic [1-1:0]  rq_id_enabled = 0;
-        logic [16-1:0] cm_id    = 0; //compleater ID
-        logic [8-1:0]  tag      = 0;
-        logic [16-1:0] rq_id    = 0;
-        logic [1-1:0]  poisoned = 0;
-        logic [4-1:0]  rq_type  = 4'h1;
+
+    function model_packet get_pcie_transaction(logic [64-1:0] addr, int unsigned packet_size, logic [32-1:0] data []);
+        model_packet rq;
+
+        rq = model_packet::type_id::create(this.get_full_name);
+
+        rq.at       = 0;
+        rq.traffic_class = 0;
+        rq.id_based_ordering = 0;
+        rq.relaxed_ordering  = 0;
+        rq.tag      = 0;
+        rq.requester_id = 0;
+        rq.ep = 0;
         // {TD, TH}
-        logic [1-1:0] td  = 0;
-        logic [1-1:0] th  = 0;
-        logic [1-1:0] ln  = 0;
-        // Tag8
-        logic [1-1:0] tag_8  = 0;
-        // Tag9
-        logic [1-1:0] tag_9  = 0;
-        // FBE
-        logic [4-1 : 0] fbe = '1;
-        // LBE
-        logic [4-1 : 0] lbe = 2**(4-(packet_size % 4)) - 1;
-        logic [64-1 : 0] intel_addr = '0;
-        logic [8-1:0]    intel_rq_type;
-        logic [11-1:0]   dword_count = (packet_size + 3)/4; //size in dwords
-        logic [128-1:0]  out_hdr;
+        rq.td  = 0;
+        rq.th  = 0;
+        rq.ph  = 0;
+        rq.no_snoop = 0;
+        rq.address = addr[64-1:2];
 
-        meta = '0;
-
-        if (IS_INTEL_DEV) begin // Intel P/R-Tile
-            // Address resolve
-            if (|addr[64-1 : 32]) begin
-                intel_addr = {addr[32-1 : 2], 2'b0, addr[64-1 : 32]};
-                intel_rq_type = 8'b01100000; // Memory Write - 4DW header
-            end else begin
-                intel_addr = {32'h0000, addr[32-1 : 2], 2'b0};
-                intel_rq_type = 8'b01000000; // Memory Write - 3DW header
-            end
-
-            out_hdr = {intel_addr, cm_id, tag, lbe, fbe, intel_rq_type, tag_9, tc, tag_8, attr[2], ln, th, td, poisoned, attr[1 : 0], at, dword_count[10-1 : 0]};
-
-            meta[128-1 : 0]  = out_hdr; // TLP HEADER
-            meta[160-1 : 128] = '0; // TLP PREFIX
-        end else begin // Xilinx FPGA
-            out_hdr = {ecrc, attr, tc, rq_id_enabled, cm_id, tag, rq_id, poisoned, rq_type, dword_count, addr[64-1:2], at};
-
-            meta[164-1 : 160] = fbe;
-            meta[168-1 : 164] = lbe;
+        if (addr[64-1:32] == 0) begin
+            rq.fmt = 3'b010;
+        end else begin
+            rq.fmt = 3'b011;
         end
-        header = {<<32{out_hdr}};
+        rq.pcie_type = 0; //memory write request
+
+        assert(addr[2-1:0] == 0) else `uvm_fatal(this.get_full_name(), $sformatf("\n\tThis model doesnt support counting fbe. lower 2 bits of addres heve to zero"));
+        // FBE
+        rq.fbe = '1;
+        // LBE
+        case (packet_size % 4)
+            0:
+                rq.lbe = 4'b1111;
+            1:
+                rq.lbe = 4'b0001;
+            2:
+                rq.lbe = 4'b0011;
+            3:
+                rq.lbe = 4'b0111;
+        endcase
+        rq.length = (packet_size + 3)/4;
+        rq.data   = data;
+
+        if (rq.length == 1) begin
+            rq.fbe &= rq.lbe;
+            rq.lbe = 0;
+        end
+
+        return rq;
     endfunction
 
     function void get_dma_header(logic [16-1:0] frame_pointer, logic[16-1:0] frame_length, logic [24-1:0] meta, output logic[32-1 : 0] header[2]);
@@ -223,21 +219,20 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uv
     endfunction
 
 
-    function void get_data(logic[32-1 : 0] packet[], int unsigned f_start, int unsigned f_end, output logic[32-1 : 0] out[]);
-        out = new[f_end - f_start];
+    function void get_data_last(logic[32-1 : 0] packet[], int unsigned f_start, int unsigned f_end, output logic[32-1 : 0] out[BLOCK_SIZE/4]);
         for (int unsigned it = 0; it < f_end - f_start; it++) begin
             out[it] = packet[f_start + it];
+        end
+
+        for (int unsigned it = f_end - f_start; it < BLOCK_SIZE/4; it++) begin
+            out[it] = 'x;
         end
     endfunction
 
     task packet_send(logic [ITEM_WIDTH-1:0] packet[], time start_time, int unsigned channel, logic [24-1:0] meta);
-        uvm_logic_vector::sequence_item#(META_WIDTH) packet_meta;
-
         model_packet               packet_output;
-        logic[32-1 : 0]            pcie_hdr_tmp[4];
-        logic[168-1 : 0]           pcie_meta_tmp;
         int unsigned               it;
-        logic[32-1 : 0]            packet_end[];
+        logic[32-1 : 0]            packet_end[BLOCK_SIZE/4];
         logic[32-1 : 0]            pcie_packet[];
         logic[32-1 : 0]            packet_hdr[2];
         int unsigned               packet_pointer_start;
@@ -254,79 +249,46 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) extends uv
         parts = (packet.size() + BLOCK_SIZE-1)/BLOCK_SIZE;
         //SEND PARTS OF PACKETS EXCEPT LAST PART
         for (it = 0; it < (parts-1); it++) begin
-            packet_meta   = uvm_logic_vector::sequence_item#(META_WIDTH)::type_id::create("packet_meta");
-            packet_output = model_packet::type_id::create("packet_output");
+            addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE);
+            m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
+
+            packet_output = get_pcie_transaction(addr, BLOCK_SIZE, pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4]);
             packet_output.packet_num   = pkt_cntr_total_chan[channel];
             packet_output.data_packet  = 1;
             packet_output.channel      = channel;
             packet_output.part_num     = parts;
             packet_output.part         = it+1;
-            packet_output.start_time   = start_time;
-
-            addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE);
-            m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
-            get_pcie_header(BLOCK_SIZE, addr, pcie_hdr_tmp, pcie_meta_tmp);
-            if (IS_INTEL_DEV) begin
-                packet_output.data = pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4];
-            end else begin
-                packet_output.data = {pcie_hdr_tmp, pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4]};
-            end
-            packet_output.hdr  = pcie_hdr_tmp;
-            packet_output.meta = pcie_meta_tmp;
-            packet_meta.data = pcie_meta_tmp;
+            packet_output.start[this.get_full_name()]  = start_time;
             analysis_port_tx.write(packet_output);
-            analysis_port_tx_meta.write(packet_meta);
         end
 
         //SEND LAST PART OF PACKET
-        packet_meta   = uvm_logic_vector::sequence_item#(META_WIDTH)::type_id::create("packet_meta");
-        packet_output = model_packet::type_id::create("packet_output");
+        addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE);
+        m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
+
+        get_data_last(pcie_packet, it*(BLOCK_SIZE/4), (packet.size()+3)/4, packet_end);
+        packet_output = get_pcie_transaction(addr, BLOCK_SIZE, packet_end);
         packet_output.packet_num   = pkt_cntr_total_chan[channel];
         packet_output.data_packet  = 1;
         packet_output.channel      = channel;
         packet_output.part_num     = parts;
         packet_output.part         = parts;
-        packet_output.start_time   = start_time;
-
-        get_data(pcie_packet, it*(BLOCK_SIZE/4), (packet.size()+3)/4, packet_end);
-        addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE);
-        m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
-        get_pcie_header(BLOCK_SIZE, addr, pcie_hdr_tmp, pcie_meta_tmp);
-        if (IS_INTEL_DEV) begin
-            packet_output.data = pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4];
-        end else begin
-            packet_output.data = {pcie_hdr_tmp, pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4]};
-        end
-        packet_output.hdr  = pcie_hdr_tmp;
-        packet_output.meta = pcie_meta_tmp;
-        packet_meta.data = pcie_meta_tmp;
+        packet_output.start[this.get_full_name()]  = start_time;
         analysis_port_tx.write(packet_output);
-        analysis_port_tx_meta.write(packet_meta);
 
         //SEND DMA HEADER
-        packet_meta   = uvm_logic_vector::sequence_item#(META_WIDTH)::type_id::create("packet_meta");
-        packet_output = model_packet::type_id::create("packet_output");
+        addr = m_regmodel.channel[channel].hdr_base.get() + (m_data[channel].hdr_ptr*8);
+        m_data[channel].hdr_ptr = (m_data[channel].hdr_ptr + 1) & m_regmodel.channel[channel].hdr_mask.get();
+
+        get_dma_header(packet_pointer_start, packet.size(), meta, packet_hdr);
+        packet_output = get_pcie_transaction(addr, 8, packet_hdr);
         packet_output.packet_num   = pkt_cntr_total_chan[channel];
         packet_output.data_packet  = 0;
         packet_output.channel      = channel;
         packet_output.part_num     = 1;
         packet_output.part         = 1;
-        packet_output.start_time   = start_time;
-
-        get_dma_header(packet_pointer_start, packet.size(), meta, packet_hdr);
-        addr = m_regmodel.channel[channel].hdr_base.get() + (m_data[channel].hdr_ptr*8);
-        m_data[channel].hdr_ptr = (m_data[channel].hdr_ptr + 1) & m_regmodel.channel[channel].hdr_mask.get();
-        get_pcie_header(8, addr, pcie_hdr_tmp, pcie_meta_tmp);
-        if (IS_INTEL_DEV) begin
-            packet_output.data = packet_hdr;
-        end else begin
-            packet_output.data = {pcie_hdr_tmp, packet_hdr};
-        end
-        packet_output.hdr  = pcie_hdr_tmp;
-        packet_output.meta = pcie_meta_tmp;
-        packet_meta.data = pcie_meta_tmp;
+        packet_output.start[this.get_full_name()]  = start_time;
         analysis_port_tx.write(packet_output);
-        analysis_port_tx_meta.write(packet_meta);
     endtask
 
     task get_input();
