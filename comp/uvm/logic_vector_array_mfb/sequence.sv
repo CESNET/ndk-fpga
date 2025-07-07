@@ -25,7 +25,7 @@ class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, 
 
     rand int unsigned hl_transactions;
     int unsigned hl_transactions_min = 10;
-    int unsigned hl_transactions_max = 100;
+    int unsigned hl_transactions_max = 300;
 
     constraint c_hl_transations {
         hl_transactions inside {[hl_transactions_min:hl_transactions_max]};
@@ -144,23 +144,69 @@ endclass
 
 class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_simple_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-    uvm_common::rand_length   rdy_length;
-    uvm_common::rand_rdy      rdy_rdy;
+
+    rand int unsigned space_size_min;
+    rand int unsigned space_size_max;
+
+    constraint c_space_size {
+        space_size_min <= space_size_max;
+        space_size_min dist {
+             cfg.space_size_min :/ 5,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*0 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1] :/ 20,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2] :/ 7,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3] :/ 5,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4] :/ 3,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5] :/ 2,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6] :/ 1,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7] :/ 1,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*8] :/ 3,
+             cfg.space_size_max :/ 5
+        };
+
+        space_size_max dist {
+             cfg.space_size_min :/ 5,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*0 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1] :/ 20,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2] :/ 7,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3] :/ 5,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4] :/ 3,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5] :/ 2,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6] :/ 1,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7] :/ 1,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*8] :/ 3,
+             cfg.space_size_max :/ 5
+        };
+
+    }
+
+    rand int unsigned rdy_probability;
+
+    constraint c_rdy_probability {
+        rdy_probability != 0;
+        rdy_probability dist {
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*0 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1] :/ 3,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5] :/ 3,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6] :/ 5,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7] :/ 10,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*8] :/ 20,
+             cfg.rdy_probability_max :/ 30
+        };
+    }
 
     function new (string name = "sequence_simple_rx");
         super.new(name);
-        rdy_length = uvm_common::rand_length_rand::new();
-        rdy_rdy    = uvm_common::rand_rdy_rand::new();
     endfunction
 
     /////////
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
+        int unsigned rdy;
         gen.randomize();
 
-        //randomization of rdy
-        void'(rdy_rdy.randomize());
-        if (rdy_rdy.m_value == 0) begin
+        assert(std::randomize(rdy) with { rdy dist {0 :/ (100 -rdy_probability), 1 :/ rdy_probability}; } );
+        if (rdy == 0) begin
             gen.src_rdy = 0;
             return;
         end
@@ -173,8 +219,7 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
             int unsigned index = 0;
             while (index < REGION_SIZE) begin
                 if (state_packet == state_packet_space_new) begin
-                    void'(rdy_length.randomize());
-                    space_size = rdy_length.m_value;
+                    space_size = $urandom_range(space_size_min, space_size_max);
                     state_packet = state_packet_space;
                 end
 
@@ -232,25 +277,52 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
     endtask
 
     task body;
-        rdy_length.bound_set(cfg.space_size_min, cfg.space_size_max);
-        rdy_rdy.bound_set(cfg.rdy_probability_min, cfg.rdy_probability_max);
-
+        if (rdy_probability > 100) begin
+            rdy_probability = 100;
+        end
         super.body();
     endtask
 endclass
 
 class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_burst_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-    uvm_common::rand_length   rand_burst_size; //burst set to 1
-    uvm_common::rand_length   rand_space_size; //burst set to 0
 
     rand int unsigned rdy_probability_min;
     rand int unsigned rdy_probability_max;
 
-    constraint c_probability {
-        rdy_probability_min dist {[0:29] :/ 10, [30:49] :/ 20, [50:79] :/ 50, [80:99] :/ 20};
-        rdy_probability_max dist {[0:29] :/ 5 , [30:49] :/ 15, [50:79] :/ 30, [80:99] :/ 50};
+    constraint c_rdy_probability {
+        rdy_probability_min != 0;
+        rdy_probability_max != 0;
+
         rdy_probability_min <= rdy_probability_max;
+        rdy_probability_min dist {
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*0 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1] :/ 3,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5] :/ 3,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6] :/ 5,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7] :/ 10,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*8] :/ 20,
+             cfg.rdy_probability_max :/ 30
+        };
+
+        rdy_probability_max dist {
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*0 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1] :/ 3,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5] :/ 3,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6] :/ 5,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7] :/ 10,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*8] :/ 20,
+             cfg.rdy_probability_max :/ 30
+        };
+    }
+
+    rand int unsigned burst_size;
+    constraint c_burst_size {
+        burst_size inside { [10:100] };
     }
 
 
@@ -259,22 +331,7 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
     int unsigned size = 0;
 
     function new (string name = "sequence_burst_rx");
-        uvm_common::rand_length_rand  bound_burst;
-        uvm_common::rand_length_rand  bound_space_size;
-        uvm_common::rand_length_rand  bound_rdy;
-        uvm_common::length_bounds rand_bound[3];
-        uvm_common::length_bounds rand_bound_burst[3];
-        uvm_common::length_bounds rand_bound_space[4];
-
         super.new(name);
-
-        bound_burst = new();
-        bound_burst.bound_set(300, 1000);
-        rand_burst_size = bound_burst; //uvm_common::rand_length_rand::new(rand_bound_burst);
-
-        bound_space_size = new();
-        bound_space_size.bound_set(100, 700);
-        rand_space_size = bound_space_size; //uvm_common::rand_length_rand::new(rand_bound_space);
     endfunction
 
     /////////
@@ -286,23 +343,19 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
         gen.sof     = '0;
         gen.eof     = '0;
 
-
         if (size == 0) begin
             case (burst_state)
                 SPACE : begin
-                    assert(rand_burst_size.randomize());
-                    size = rand_burst_size.m_value;
+                    size = $urandom_range(rdy_probability_min, rdy_probability_max)*burst_size;
                     burst_state = PACKET;
                 end
 
                 PACKET : begin
-                    if (cfg.rdy_probability_min < 100) begin
-                        assert(rand_space_size.randomize());
-                        size = rand_space_size.m_value;
+                    if (rdy_probability_min < 100) begin
+                        size = $urandom_range(100 - rdy_probability_max, 100 - rdy_probability_min)*burst_size;
                         burst_state = SPACE;
                     end else begin
-                        assert(rand_burst_size.randomize());
-                        size = rand_burst_size.m_value;
+                        size = $urandom_range(rdy_probability_min, rdy_probability_max)*burst_size;
                         burst_state = PACKET;
                     end
                 end
@@ -319,7 +372,7 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
                 int unsigned index = 0;
                 while (index < REGION_SIZE && burst_state == PACKET) begin
                     if (state_packet == state_packet_space_new) begin
-                        space_size   = cfg.space_size_min + $urandom_range(0, REGION_SIZE);
+                        space_size   = cfg.space_size_min;
                         state_packet = state_packet_space;
                     end
 
@@ -378,17 +431,9 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
         end
     endtask
 
-    task body;
-        const int unsigned coeficient = REGION_SIZE; //This is just some magic number. which modified length of burst.
-        int unsigned probability_min;
-        int unsigned probability_max;
-
-        probability_min = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_min)/100;
-        probability_max = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_max)/100;
-
-        rand_burst_size.bound_set(probability_min*coeficient, probability_max*coeficient);
-        rand_space_size.bound_set((100 - probability_max) *coeficient,  (100 - probability_min) *coeficient);
-
+    task body();
+        burst_state = SPACE;
+        size = 0;
         super.body();
     endtask
 endclass
@@ -397,16 +442,60 @@ endclass
 class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_position_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
 
-    uvm_common::rand_length      rdy_length;
-    uvm_common::rand_rdy         rdy_rdy;
     rand logic [REGION_SIZE-1:0] sof_pos;
-
     constraint sof_pos_c {sof_pos > 0;};
+
+    rand int unsigned space_size_min;
+    rand int unsigned space_size_max;
+    constraint c_space_size {
+        space_size_min <= space_size_max;
+        space_size_min dist {
+             cfg.space_size_min :/ 5,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*0 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1] :/ 20,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2] :/ 7,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3] :/ 5,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4] :/ 3,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5] :/ 2,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6] :/ 1,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7] :/ 1,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*8] :/ 3,
+             cfg.space_size_max :/ 5
+        };
+
+        space_size_max dist {
+             cfg.space_size_min :/ 5,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*0 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1] :/ 20,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2] :/ 7,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3] :/ 5,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4] :/ 3,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5] :/ 2,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6] :/ 1,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7] :/ 1,
+            [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*8] :/ 3,
+             cfg.space_size_max :/ 5
+        };
+    }
+
+    rand int unsigned rdy_probability;
+    constraint c_rdy_probability {
+        rdy_probability != 0;
+        rdy_probability dist {
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*0 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1] :/ 3,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4] :/ 1,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5] :/ 3,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6] :/ 5,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7] :/ 10,
+            [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*8] :/ 20,
+             cfg.rdy_probability_max :/ 30
+        };
+    }
+
+
 
     function new (string name = "sequence_simple_rx");
         super.new(name);
-        rdy_length = uvm_common::rand_length_rand::new();
-        rdy_rdy    = uvm_common::rand_rdy_rand::new();
     endfunction
 
     /////////
@@ -415,8 +504,7 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
         gen.randomize();
 
         //randomization of rdy
-        void'(rdy_rdy.randomize());
-        if (rdy_rdy.m_value == 0) begin
+        if ($urandom_range(0,100) > rdy_probability) begin
             gen.src_rdy = 0;
             return;
         end
@@ -429,8 +517,7 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
             int unsigned index = 0;
             while (index < REGION_SIZE) begin
                 if (state_packet == state_packet_space_new) begin
-                    void'(rdy_length.randomize());
-                    space_size   = rdy_length.m_value;
+                    space_size   = $urandom_range(space_size_min, space_size_max);
                     state_packet = state_packet_space;
                 end
 
@@ -487,13 +574,6 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
                 index++;
             end
         end
-    endtask
-
-    task body;
-        rdy_length.bound_set(cfg.space_size_min, cfg.space_size_max);
-        rdy_rdy.bound_set(cfg.rdy_probability_min, cfg.rdy_probability_max);
-
-        super.body();
     endtask
 endclass
 
@@ -573,26 +653,15 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
             end
         end
     endtask
-
 endclass
 
 class sequence_stop_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_stop_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
 
-    int unsigned hl_transactions_step;
-
-    constraint c_hl_transations_stop {
-        hl_transactions dist {[hl_transactions_min:(hl_transactions_min + hl_transactions_step)] :/ 60,
-                              [(hl_transactions_min+hl_transactions_step)  :(hl_transactions_max - hl_transactions_step)] :/ 30,
-                              [(hl_transactions_max - hl_transactions_step):hl_transactions_max] :/10};
-    }
-
     function new (string name = "sequence_stop_rx");
         super.new(name);
-        hl_transactions_min = 10;
-        hl_transactions_max = 300;
-
-        hl_transactions_step = (hl_transactions_max - hl_transactions_min)/10;
+        hl_transactions_min = 30;
+        hl_transactions_max = 500;
     endfunction
 
     /////////
