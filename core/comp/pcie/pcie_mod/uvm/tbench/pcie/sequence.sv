@@ -111,6 +111,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
             //assert(std::randomize(rq))
             //generate CQ nebo RC
             std::randomize(cq) with { cq dist {1'b1 :/ 5,  1'b0 :/ info.rq_hdr.size()}; };
+
             if (cq == 1 && response_only == 0) begin
                 logic [16-1:0] dev_id_act;
                 uvm_pcie::request_header cq_hdr;
@@ -223,7 +224,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
 
 
             // If there is notnigh to send, then prevent to infinite loop by add some waiting time.
-            if (info.rq_hdr.size() == 0 && cq == 0) begin
+            if (info.rq_hdr.size() == 0 && (cq == 0 || response_only != 0)) begin
                 int unsigned wait_time;
                 std::randomize(wait_time) with {wait_time inside {[10:333]};};
                 #(wait_time*1ns);
