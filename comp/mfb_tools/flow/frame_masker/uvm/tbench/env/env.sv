@@ -20,6 +20,8 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_ME
 
     protected uvm_logic_vector_array_mfb::config_item m_config_rx; // why is it protected and why is it declared here instead of the Build Phase ?
 
+    coverage_model #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_coverage_model;
+
     // Constructor of the environment.
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -61,6 +63,8 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_ME
         sc   = scoreboard                   #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("sc", this);
         vscr = frame_masker::virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("vscr",this);
 
+        m_coverage_model = coverage_model #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_coverage_model", this);
+
     endfunction
 
     // Connect agent's ports with ports from the scoreboard.
@@ -82,6 +86,9 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_ME
         vscr.m_mvb_data_sqr = m_env_rx_mvb.m_sequencer;
         vscr.m_mfb_data_sqr = m_env_rx.m_sequencer.m_data;
         vscr.m_mfb_meta_sqr = m_env_rx.m_sequencer.m_meta;
+
+        sc.m_discarder.analysis_port.connect(m_coverage_model.input_discard);
+        m_env_rx.m_mfb_agent.analysis_port.connect(m_coverage_model.input_frame);
 
     endfunction
 

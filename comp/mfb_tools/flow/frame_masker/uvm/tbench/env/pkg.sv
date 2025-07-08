@@ -17,6 +17,7 @@ package frame_masker;
     `include "probe_cbs.sv"
     `include "discarder.sv"
     `include "model.sv"
+    `include "coverage_model.sv"
     `include "scoreboard.sv"
     `include "env.sv"
 
