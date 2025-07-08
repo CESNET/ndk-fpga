@@ -199,6 +199,10 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
         super.new(name);
     endfunction
 
+    virtual function string get_type_name ();
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_simple_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    endfunction
+
     /////////
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
@@ -332,6 +336,10 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
 
     function new (string name = "sequence_burst_rx");
         super.new(name);
+    endfunction
+
+    virtual function string get_type_name ();
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_burst_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     endfunction
 
     /////////
@@ -498,6 +506,10 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
         super.new(name);
     endfunction
 
+    virtual function string get_type_name ();
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_position_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    endfunction
+
     /////////
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
@@ -585,6 +597,10 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
         super.new(name);
     endfunction
 
+    virtual function string get_type_name ();
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_full_speed_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    endfunction
+
     /////////
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
@@ -662,6 +678,10 @@ class sequence_stop_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int uns
         super.new(name);
         hl_transactions_min = 30;
         hl_transactions_max = 500;
+    endfunction
+
+    virtual function string get_type_name ();
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_stop_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     endfunction
 
     /////////
