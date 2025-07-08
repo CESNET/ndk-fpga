@@ -34,7 +34,9 @@ package test;
     parameter RESET_CLKS         = 10;
 
     `include "sequence.sv"
+    `include "sequence_all_pass.sv"
     `include "test.sv"
     `include "speed.sv"
+    `include "test_all_pass.sv"
 endpackage
 `endif
