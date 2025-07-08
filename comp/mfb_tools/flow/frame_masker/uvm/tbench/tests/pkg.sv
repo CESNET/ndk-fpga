@@ -35,8 +35,10 @@ package test;
 
     `include "sequence.sv"
     `include "sequence_all_pass.sv"
+    `include "sequence_one_frame.sv"
     `include "test.sv"
     `include "speed.sv"
     `include "test_all_pass.sv"
+    `include "test_all_pass_and_one_frame.sv"
 endpackage
 `endif

@@ -12,9 +12,10 @@ import test::*;
 module testbench;
 
     //TESTS
-    typedef test::ex_test       ex_test;
-    typedef test::speed         speed;
-    typedef test::test_all_pass test_all_pass;
+    typedef test::ex_test                     ex_test;
+    typedef test::speed                       speed;
+    typedef test::test_all_pass               test_all_pass;
+    typedef test::test_all_pass_and_one_frame test_all_pass_and_one_frame;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
