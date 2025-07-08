@@ -12,7 +12,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_ME
 
     uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_env_rx;
     uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_env_tx;
-    uvm_logic_vector_mvb::env_rx       #(MFB_REGIONS, 1)                                                               m_env_rx_mvb;
+    uvm_logic_vector_mvb::env_rx       #(1, MFB_REGIONS)                                                               m_env_rx_mvb;
 
     frame_masker::virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) vscr;
 
@@ -56,7 +56,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_ME
         m_config_mvb_rx.active         = UVM_ACTIVE;
         m_config_mvb_rx.interface_name = "vif_mvb_rx";
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_rx_mvb", "m_config", m_config_mvb_rx);
-        m_env_rx_mvb = uvm_logic_vector_mvb::env_rx #(MFB_REGIONS, 1)::type_id::create("m_env_rx_mvb", this);
+        m_env_rx_mvb = uvm_logic_vector_mvb::env_rx #(1, MFB_REGIONS)::type_id::create("m_env_rx_mvb", this);
 
         sc   = scoreboard                   #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("sc", this);
         vscr = frame_masker::virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("vscr",this);

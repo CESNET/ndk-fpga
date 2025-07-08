@@ -25,9 +25,9 @@ module testbench;
     reset_if                                                                               reset (CLK);
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_rx(CLK);
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_tx(CLK);
-    mvb_if #(MFB_REGIONS, 1)                                                               mvb_rx(CLK);
+    mvb_if #(1, MFB_REGIONS)                                                               mvb_rx(CLK);
 
-    bind MFB_FRAME_MASKER : DUT_U.VHDL_DUT_U probe_inf#(REGIONS*2) probe_mask2discard(TX_DST_RDY & src_rdy_reg, {TX_SOF_UNMASKED, TX_MASK}, CLK);
+    bind MFB_FRAME_MASKER : DUT_U.VHDL_DUT_U probe_inf#(REGIONS*2) probe_mask2discard(TX_DST_RDY & TX_SRC_RDY_UNMASKED, {TX_SOF_UNMASKED, TX_MASK}, CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
@@ -42,7 +42,7 @@ module testbench;
         uvm_config_db #(virtual reset_if)                                                                              ::set(null, "", "vif_reset",  reset );
         uvm_config_db #(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))::set(null, "", "vif_rx",     mfb_rx);
         uvm_config_db #(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))::set(null, "", "vif_tx",     mfb_tx);
-        uvm_config_db #(virtual mvb_if #(MFB_REGIONS, 1))                                                              ::set(null, "", "vif_mvb_rx", mvb_rx);
+        uvm_config_db #(virtual mvb_if #(1, MFB_REGIONS))                                                              ::set(null, "", "vif_mvb_rx", mvb_rx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

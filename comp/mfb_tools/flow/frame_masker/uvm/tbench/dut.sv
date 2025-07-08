@@ -14,10 +14,8 @@ module DUT (
     mvb_if.dut_rx mvb_rx,
     mfb_if.dut_tx mfb_tx
 );
-
-    assign mvb_rx.VLD     = 1; // TODO
-    assign mvb_rx.SRC_RDY = 1; // TODO
-    assign mvb_rx.DST_RDY = mfb_tx.DST_RDY;
+    logic tx_src_rdy;
+    logic tx_dst_rdy;
 
     MFB_FRAME_MASKER #(
         .REGIONS     (MFB_REGIONS    ),
@@ -45,8 +43,8 @@ module DUT (
         .TX_EOF_POS      (mfb_tx.EOF_POS),
         .TX_SOF_MASKED   (mfb_tx.SOF    ),
         .TX_EOF_MASKED   (mfb_tx.EOF    ),
-        .TX_SRC_RDY      (mfb_tx.SRC_RDY),
-        .TX_DST_RDY      (mfb_tx.DST_RDY),
+        .TX_SRC_RDY      (tx_src_rdy    ),
+        .TX_DST_RDY      (tx_dst_rdy    ),
 
         // .TX_SOF_UNMASKED (mfb_tx.SOF    ),
         // .TX_EOF_UNMASKED (mfb_tx.EOF    ),
@@ -59,5 +57,9 @@ module DUT (
         .TX_MASK         (mvb_rx.DATA   )
     );
 
+    assign mfb_tx.SRC_RDY = tx_src_rdy & mvb_rx.SRC_RDY & mvb_rx.VLD;
+    assign tx_dst_rdy = mfb_tx.DST_RDY & mvb_rx.SRC_RDY & mvb_rx.VLD;
+
+    assign mvb_rx.DST_RDY = mfb_tx.DST_RDY;
 
 endmodule

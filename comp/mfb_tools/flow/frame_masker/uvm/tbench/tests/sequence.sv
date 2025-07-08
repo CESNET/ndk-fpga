@@ -14,7 +14,7 @@ class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WID
     endfunction
 
     uvm_reset::sequence_start                              m_reset;
-    uvm_logic_vector::sequence_endless   #(1)              m_mvb_data_seq;
+    uvm_logic_vector::sequence_endless   #(MFB_REGIONS)    m_mvb_data_seq;
     uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH) m_mfb_data_sq_lib;
     uvm_logic_vector::sequence_endless   #(MFB_META_WIDTH) m_mfb_meta_sq;
 
@@ -28,7 +28,7 @@ class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WID
         m_reset           = uvm_reset::sequence_start                             ::type_id::create("m_reset_seq"      );
         m_mfb_data_sq_lib = uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)::type_id::create("m_mfb_data_sq_lib");
         m_mfb_meta_sq     = uvm_logic_vector::sequence_endless   #(MFB_META_WIDTH)::type_id::create("m_mfb_meta_sq"    );
-        m_mvb_data_seq    = uvm_logic_vector::sequence_endless   #(1)             ::type_id::create("m_mvb_data_seq"   );
+        m_mvb_data_seq    = uvm_logic_vector::sequence_endless   #(MFB_REGIONS)   ::type_id::create("m_mvb_data_seq", p_sequencer);
 
         m_mfb_rdy_lib = uvm_mfb::sequence_lib_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_mfb_rdy_lib");
 

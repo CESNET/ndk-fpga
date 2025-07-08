@@ -29,6 +29,17 @@ class ex_test extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
+
+        // ------------------- //
+        // Database overriding //
+        // ------------------- //
+
+        uvm_logic_vector_mvb::sequence_lib_rx #(1, MFB_REGIONS)::type_id::set_inst_override(
+            uvm_logic_vector_mvb::sequence_lib_speed_rx #(1, MFB_REGIONS)::get_type(),
+            "m_env.m_env_rx_mvb.mvb_seq",
+            this
+        );
+
         // Initializing the reference to the environment
         m_env = frame_masker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env", this);
     endfunction
