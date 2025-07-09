@@ -11,10 +11,6 @@ from cocotb.triggers import RisingEdge
 from .transaction import MvbTransaction, MvbTrClassic
 
 
-class MVBProtocolError(Exception):
-    pass
-
-
 class MVBMonitor(BusMonitor):
     """
     Master monitor intended for monitoring the MVB bus.
