@@ -1,0 +1,52 @@
+# cocotb_test_sig.fdo: Include file with signals
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Tomas Hak <hak@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc mi {name} {
+    add_wave -group "MI" -noupdate -hex /${name}/MI_*
+}
+
+proc axis {name direction} {
+    add_wave -group "${direction}_AXI" -noupdate /${name}/${direction}_AXI_*
+}
+
+view wave
+delete wave *
+
+set name "AXIS_SWITCH"
+
+add wave -divider "SYNC"
+add_wave -noupdate -color yellow -label CLK   /${name}/CLK
+add_wave -noupdate -color yellow -label RESET /${name}/RESET
+
+add wave -divider "CONFIGURATION"
+mi ${name}
+
+add wave -divider "TRAFFIC"
+axis ${name} RX
+axis ${name} TX
+
+add wave -divider "INTERNAL"
+add_wave -group "SIGNALS" -noupdate -hex /${name}/s_*
+
+#add_wave -group "PARSER_0" -noupdate -hex /${name}/rx_pipelines_g(0)/rx_pipeline_i/axis_parser_i/*
+#add_wave -group "PARSER_1" -noupdate -hex /${name}/rx_pipelines_g(1)/rx_pipeline_i/axis_parser_i/*
+#add_wave -group "DISPATCHER_0" -noupdate -hex /${name}/rx_pipelines_g(0)/rx_pipeline_i/axis_dispatcher_i/*
+#add_wave -group "DISPATCHER_0_MAT_0" -noupdate -hex /${name}/rx_pipelines_g(0)/rx_pipeline_i/axis_dispatcher_i/match_action_tables_g(0)/match_action_table_i/*
+#add_wave -group "DISPATCHER_0_MAT_1" -noupdate -hex /${name}/rx_pipelines_g(0)/rx_pipeline_i/axis_dispatcher_i/match_action_tables_g(1)/match_action_table_i/*
+#add_wave -group "DISPATCHER_1" -noupdate -hex /${name}/rx_pipelines_g(1)/rx_pipeline_i/axis_dispatcher_i/*
+#add_wave -group "DISPATCHER_1_MAT" -noupdate -hex /${name}/rx_pipelines_g(1)/rx_pipeline_i/axis_dispatcher_i/match_action_tables_g(0)/match_action_table_i/*
+#add_wave -group "DISPATCHER_REG_FIFO" -noupdate -hex /${name}/rx_pipelines_g(0)/rx_pipeline_i/axis_dispatcher_i/s_action_buffer_i/*
+#add_wave -group "VOQ_MANAGER_0" -noupdate -hex /${name}/rx_pipelines_g(0)/rx_pipeline_i/axis_voq_manager_i/*
+#add_wave -group "VOQ_MANAGER_1" -noupdate -hex /${name}/rx_pipelines_g(1)/rx_pipeline_i/axis_voq_manager_i/*
+
+#add_wave -group "ISLIP" -noupdate -hex /${name}/switch_fabric_i/islip_i/*
+#add_wave -group "ISLIP_I1" -noupdate -hex /${name}/switch_fabric_i/islip_i/islip_iterations_g(1)/islip_iteration_i/*
+#add_wave -group "ISLIP_I2" -noupdate -hex /${name}/switch_fabric_i/islip_i/islip_iterations_g(2)/islip_iteration_i/*
+
+#add_wave -group "VIQ_MANAGER_0" -noupdate -hex /${name}/tx_pipelines_g(0)/op_manager_i/*
+#add_wave -group "VIQ_MANAGER_1" -noupdate -hex /${name}/tx_pipelines_g(1)/op_manager_i/*
+#add_wave -group "VIQ_MANAGER_QUEUE_0" -noupdate -hex /${name}/tx_pipelines_g(0)/op_manager_i/viq_manager_i/virtual_output_queues_g(0)/voq_i/*
+#add_wave -group "VIQ_MANAGER_QUEUE_1" -noupdate -hex /${name}/tx_pipelines_g(0)/op_manager_i/viq_manager_i/virtual_output_queues_g(1)/voq_i/*
