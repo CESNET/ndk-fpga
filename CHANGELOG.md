@@ -6,6 +6,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
+## [0.11.0] - 2025-07-10
+
+### Added
+- cocotb: Added R/F-Tile support to top-level-sim.
+- cards: Added custom QSFP I2C controller to Devicetree on IA-440I.
+- cards: Added second BMC node for QSFP I2C access on IA-440I.
+- cards: Introduced preliminary support for Silicom fb2CDg1@AGM39D-2 (ThunderFjord) card.
+- core: Added support for custom QSFP_I2C controllers.
+- core: Added option to remap QSFP lanes to Ethernet channels in Network module.
+- comp: Added new stats counters to RX/TX_MAC_LITE component.
+- comp: Introduced AXIS_SWITCH, AXIS_MERGER, AXIS_SPLITTER components.
+- comp: Added tuser signal to AXI2MFB, AXI_PIPE components.
+- comp: Added option to disable shared regions in MFB_MVB_PREPENDER, MFB_FRAME_EXTENDER, MFB_USER_PACKET_GEN.
+- comp: Added the ofm-gls commandline Python tool for Gen Loop Switch (GLS) component.
+- docs: Introduced documentation of top-level-sim and verification enviroment based on cocotb.
+- uvm: Added option to generate broadcast MAC addresses to the flowtest sequence.
+
+### Changed
+- cocotb: Improved AXI-Stream monitor/driver.
+- cards: Overclocked PCIe module to 500MHz for IA-440i card.
+- core: Improved DeviceTree generation.
+- core: Improved timing in PTC, MTC and Network module.
+- comp: Changed dynamic VHDL assertion to PSL assertions.
+- comp: Updated the Python module for MFB Generator and Gen Loop Switch (GLS) component.
+- comp: Improved MFB MVB Prepender, Shakedown, Packet Planner, MVB Fork components.
+- comp: Added and used more error inputs to RX_MAC_LITE.
+- comp: Allowed statistics counting when RX_MAC_LITE is disabled.
+- comp: Allowed frame dropping when TX_MAC_LITE is disabled.
+- docs: Improved NDK-FPGA documentation.
+- uvm: Changed data type of the conf_ipv6 and conf_ipv4 in APP-UVM.
+- uvm: Improved PCIE_MOD and NET_MOD verifications.
+- uvm: Improved packet generators.
+- ver: Improved old verification framework.
+
+### Removed
+- comp: Removed unused constraints in CrossbarX module.
+- uvm: Removed byte_array_* environment and agent.
+- ver: Removed MTC, PTC old verifications.
+
+### Fixed
+- cards: Set PCIe and DMA pblocks on Alveo U55C.
+- cards: Split general constraints into sets of common and specific constraints on AGI-FH400G.
+- cards: Fixed power management settings for AGI-FH400G board revision 2.
+- cards: Fixed fb2cghh BMC driver.
+- core: Fixed CLK delta delay problem in NetMod.
+- core: Fixed number of Eth streams for Mode 1 in DeviceTree.
+- core: Adjusted width of signals/ports for TS Demo.
+- app: Fixed TSU connection in Minimal APP UVM testbench.
+- dma: Fixed generation of unaligned transactions by MTU.
+- uvm: Fixed the division error in stats count when numbers of values is zero.
+- uvm: Changed register macro to register macro with parameter in uvm_logic_vector_array.
+- uvm: Changed parent class sequence sequence_lib_pcie_rx.
+- uvm: Fixed assign start time to uvm_logic_vector_array::sequence_item from avst::sequence_item.
+- uvm: Added address when address number is less that two in sequence_flowtest.
+- ver: Fixed error report of PCIe trans over PAGE.
+- ver: Check MPS with dword instead bytes.
+
 ## [0.10.2] - 2025-03-26
 
 ### Fixed
