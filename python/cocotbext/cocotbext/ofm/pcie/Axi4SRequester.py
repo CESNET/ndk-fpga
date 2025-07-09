@@ -8,7 +8,7 @@ from functools import reduce
 import cocotb
 from cocotb.queue import Queue
 
-from ..utils import concat, SerializableHeader
+from ..utils import concat, numberOfSetBits, bitmask, byte_serialize, byte_deserialize, SerializableHeader
 
 
 def byte_serialize(data, length):
@@ -65,16 +65,6 @@ class RcUser(SerializableHeader):
     ))
 
 
-def bm(bits):
-    return (2**bits) - 1
-
-
-def numberOfSetBits(i):
-    i = i - ((i >> 1) & 0x55555555)
-    i = (i & 0x33333333) + ((i >> 2) & 0x33333333)
-    return (((i + (i >> 4) & 0xF0F0F0F) * 0x1010101) & 0xFFFFFFFF) >> 24
-
-
 class Frame(object):
     def __init__(self, meta):
         self.meta = meta
@@ -82,7 +72,7 @@ class Frame(object):
         self.dwords = 0
 
     def append(self, data, dwords):
-        self.data |= (data & bm(dwords * 32)) << (self.dwords * 32)
+        self.data |= (data & bitmask(dwords * 32)) << (self.dwords * 32)
         self.dwords += dwords
         return self
 
@@ -183,12 +173,12 @@ class Axi4SRequester:
                 + [(byte_deserialize(data), len(data) * 8)]
             )
             while dword_count > 0:
-                tkeep = bm(self._rq_width // 32)
+                tkeep = bitmask(self._rq_width // 32)
                 if dword_count < self._rq_width // 32:
                     user.eop = 1
                     user.eop_pos0 = dword_count
-                    tkeep = bm(dword_count)
-                await self._rc.write({"TDATA": tdata & bm(self._rq_width), "TUSER": user.serialize(), "TKEEP": tkeep}, sync=False)
+                    tkeep = bitmask(dword_count)
+                await self._rc.write({"TDATA": tdata & bitmask(self._rq_width), "TUSER": user.serialize(), "TKEEP": tkeep}, sync=False)
 
                 user.sop = 0
                 tdata >>= self._rq_width
