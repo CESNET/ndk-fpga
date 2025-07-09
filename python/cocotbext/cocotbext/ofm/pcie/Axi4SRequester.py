@@ -2,23 +2,11 @@
 # Copyright (C) 2023 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 
-import operator
-from functools import reduce
 
 import cocotb
 from cocotb.queue import Queue
 
 from ..utils import concat, numberOfSetBits, bitmask, byte_serialize, byte_deserialize, SerializableHeader
-
-
-def byte_serialize(data, length):
-    return [(data >> (8 * i)) & 0xFF for i in range(length)]
-
-
-def byte_deserialize(data):
-    return reduce(
-        operator.or_, [(data[i] & 0xFF) << (8 * i) for i in range(len(data))], 0
-    )
 
 
 class RequestHeader(SerializableHeader):
