@@ -143,14 +143,14 @@ class AvstRequester(AvstBase):
             header.fmt = int("010", base=2) # Completition with data: "010", Completition withOUT data: "000"
             header.tlp_type = int("01010", base=2) # Completion for LOCKED Memory Read: "01011" (with/without data)
             header.dwords = rq_hdr.dwords
-            # 15.bit_count() # only in Python 3.10 and newer can be used below
+
             # TODO: Check IO and CFG transfers
             header.byte_cnt = (
                 header.dwords * 4
                 - (4 - numberOfSetBits(rq_fbe))
                 - ((4 - numberOfSetBits(rq_fbe)) if header.dwords > 1 else 0)
             )
+
             header.compl_stat = 1
-            # WTF is this?
             header.low_addr = 0  # Info: increment for each consequent completion
             await self._send_frame(self._cdriver.write_rc, data, header, header_empty)
