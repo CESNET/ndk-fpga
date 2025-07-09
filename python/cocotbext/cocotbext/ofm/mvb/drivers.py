@@ -15,7 +15,7 @@ from .transaction import MvbTrClassic
 
 
 class MVBDriver(BusDriver):
-    """Driver intender for the MVB bus used for sending transactions to the bus.
+    """Driver intended for the MVB bus used for sending transactions to the bus.
 
     Atributes:
        _item_cnt(int): number of ready items in the current word.
