@@ -247,28 +247,28 @@ _________________
       - Obligatory
       - Func. cover
       - Verified
-      - test::ex_test
+      - ex_test
     * - 2
       - Read all packets without skipping any of them. This is the most realistic use-case of the component.
       - Obligatory.
       - Func. cover
-      - Unverified, the speed test needs adjustments to set the Mask to avoid skipping packets.
-      - test::speed
+      - Verified
+      - test_all_pass
     * - 3
       - Read all packets (no skips) and no more than one in each clock cycle.
       - Optional
       - Func. cover
-      - Unverified
-      - N/A
+      - Verified
+      - test_all_pass_and_single_frame
     * - 4
       - Verify that the UNMASKED interface behaves correctly. This interface is expected to be used intensly.
       - Obligatory
-      - Func. cover (?)
-      - Partially Verified - the SOF_UNMASKED is tapped by a probe and used in the Model to skip packets.
-      - test::ex_test
+      - Assertion coverage
+      - Verified
+      - MFB Property
     * - 5
       - Verify that the ORIGINAL interface behaves correctly.
       - Optional
-      - Func. cover (?)
-      - Unverified
-      - N/A
+      - Assertion coverage
+      - Verified
+      - MFB Property
