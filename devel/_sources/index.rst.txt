@@ -115,6 +115,7 @@ support a subset of these cards. A complete list of supported FPGA cards can be 
     ndk_cards/silicom/fb4cgg3/readme
     ndk_cards/silicom/fb2cghh/readme
     ndk_cards/silicom/n6010/readme
+    ndk_cards/silicom/fb2cdg1/readme
     ndk_cards/bittware/ia-420f/readme
     ndk_cards/bittware/ia-440i/readme
     ndk_cards/amd/alveo-u200/readme
