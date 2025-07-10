@@ -2,6 +2,7 @@
 -- Copyright (C) 2023 CESNET z. s. p. o.
 -- Author(s): Daniel Kondys <xkondy00@vutbr.cz>
 --            Vladislav Valek <valekv@cesnet.cz>
+--            Jakub Cabal <cabal@cesnet.cz>
 --
 -- SPDX-License-Identifier: BSD-3-Clause
 --
@@ -33,6 +34,7 @@ use work.math_pack.all;
 -- - 0x1C - Src MAC High (higher part of source MAC address)
 -- - 0x20 - Cntr Low  (lower  part of counter for generated frames)
 -- - 0x24 - Cntr High (higher part of counter for generated frames)
+-- - 0x28 - SRC IP address mask register
 --
 -- **Register format**
 --
@@ -132,6 +134,7 @@ architecture BEHAV of MFB_GENERATOR_MI32 is
     signal dmac_high_reg_sel   : std_logic;
     signal smac_low_reg_sel    : std_logic;
     signal smac_high_reg_sel   : std_logic;
+    signal src_ip_mask_reg_sel : std_logic;
     -- register signals
     signal en_reg              : std_logic;
     signal clr_reg             : std_logic;
@@ -146,6 +149,7 @@ architecture BEHAV of MFB_GENERATOR_MI32 is
     signal smac_comb_reg       : std_logic_vector(MAC_ADDR_WIDTH-1 downto 0); -- combines smac_low_reg and smac_high_reg signals for the mfb_generator input
     signal smac_low_reg        : std_logic_vector(31 downto 0); -- low bits of source mac address
     signal smac_high_reg       : std_logic_vector(MAC_ADDR_WIDTH-33 downto 0); -- high bits of source mac address
+    signal src_ip_mask_reg     : std_logic_vector(31 downto 0);
 
 begin
 
@@ -175,6 +179,7 @@ begin
         CTRL_MAC_SRC     => smac_comb_reg,
         CTRL_PKT_CNT_CLR => clr_reg,
         CTRL_PKT_CNT     => cnt_reg,
+        CTRL_SRC_IP_MASK => src_ip_mask_reg,
         -- tx interface
         TX_MFB_DATA      => TX_MFB_DATA,
         TX_MFB_META      => TX_MFB_META,
@@ -187,14 +192,15 @@ begin
     );
 
     -- signals for register selection
-    ctrl_reg_sel      <= '1' when (MI_ADDR(6-1 downto 0) = "000000") else '0';
-    len_reg_sel       <= '1' when (MI_ADDR(6-1 downto 0) = "000100") else '0';
-    chan_inc_reg_sel  <= '1' when (MI_ADDR(6-1 downto 0) = "001000") else '0';
-    chan_val_reg_sel  <= '1' when (MI_ADDR(6-1 downto 0) = "001100") else '0';
-    dmac_low_reg_sel  <= '1' when (MI_ADDR(6-1 downto 0) = "010000") else '0';
-    dmac_high_reg_sel <= '1' when (MI_ADDR(6-1 downto 0) = "010100") else '0';
-    smac_low_reg_sel  <= '1' when (MI_ADDR(6-1 downto 0) = "011000") else '0';
-    smac_high_reg_sel <= '1' when (MI_ADDR(6-1 downto 0) = "011100") else '0';
+    ctrl_reg_sel        <= '1' when (MI_ADDR(6-1 downto 0) = "000000") else '0';
+    len_reg_sel         <= '1' when (MI_ADDR(6-1 downto 0) = "000100") else '0';
+    chan_inc_reg_sel    <= '1' when (MI_ADDR(6-1 downto 0) = "001000") else '0';
+    chan_val_reg_sel    <= '1' when (MI_ADDR(6-1 downto 0) = "001100") else '0';
+    dmac_low_reg_sel    <= '1' when (MI_ADDR(6-1 downto 0) = "010000") else '0';
+    dmac_high_reg_sel   <= '1' when (MI_ADDR(6-1 downto 0) = "010100") else '0';
+    smac_low_reg_sel    <= '1' when (MI_ADDR(6-1 downto 0) = "011000") else '0';
+    smac_high_reg_sel   <= '1' when (MI_ADDR(6-1 downto 0) = "011100") else '0';
+    src_ip_mask_reg_sel <= '1' when (MI_ADDR(6-1 downto 0) = "101000") else '0';
 
     -- ==================================================================
     -- transfering data to/from registers according to the select signals
@@ -308,6 +314,17 @@ begin
 
     smac_comb_reg <= smac_high_reg & smac_low_reg;
 
+    process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (RST = '1') then
+                src_ip_mask_reg <= (others => '1');
+            elsif ((src_ip_mask_reg_sel = '1') and (MI_WR = '1')) then
+                src_ip_mask_reg <= MI_DWR;
+            end if;
+        end if;
+    end process;
+
     cnt_comb_reg_resize <= std_logic_vector(resize(unsigned(cnt_reg), 64));
 
     -- process for reading data from the register with the current address
@@ -328,6 +345,7 @@ begin
                 when "011100"  => MI_DRD(15 downto 0)             <= smac_high_reg;
                 when "100000"  => MI_DRD                          <= cnt_comb_reg_resize(31 downto 0);
                 when "100100"  => MI_DRD                          <= cnt_comb_reg_resize(63 downto 32);
+                when "101000"  => MI_DRD                          <= src_ip_mask_reg;
                 when others    => MI_DRD                          <= (others => '0');
             end case;
         end if;
