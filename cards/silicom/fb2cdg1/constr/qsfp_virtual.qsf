@@ -1,0 +1,24 @@
+# qsfp_misc.qsf
+# Copyright (C) 2025 DynaNIC Semiconductors, Ltd.
+# Author(s): David Beneš <benes@dyna-nic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+#set_location_assignment PIN_JD74 -to QSFP_REFCLK0_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP0_REFCLK_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP0_REFCLK_N
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP1_REFCLK_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP1_REFCLK_N
+
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP0_RX_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP0_RX_N
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP0_TX_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP0_TX_N
+
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP1_RX_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP1_RX_N
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP1_TX_P
+set_instance_assignment -name VIRTUAL_PIN ON -to QSFP1_TX_N
+
+set_instance_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON -to BK1
+set_instance_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON -to EC4
