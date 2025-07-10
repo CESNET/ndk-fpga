@@ -1,0 +1,762 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cocotbext-ndk &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting Started with Verifications Using cocotb/cocotbext-ndk" href="basic_cocotb_test.html" />
+    <link rel="prev" title="MFB specification" href="comp/mfb_tools/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">cocotbext-ndk</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#motivation">Motivation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#modules">Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-base">cocotbext.ofm.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-utils">cocotbext.ofm.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-ver">cocotbext.ofm.ver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-avst-eth">cocotbext.ofm.avst_eth</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-avst-pcie">cocotbext.ofm.avst_pcie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-axi4stream">cocotbext.ofm.axi4stream</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-lbus">cocotbext.ofm.lbus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-lii">cocotbext.ofm.lii</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-mac-segmented">cocotbext.ofm.mac_segmented</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-mfb">cocotbext.ofm.mfb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-mi">cocotbext.ofm.mi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-mvb">cocotbext.ofm.mvb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-ofm-pcie">cocotbext.ofm.pcie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-nfb">cocotbext.nfb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-nfb-ext-gprc">cocotbext.nfb.ext.gprc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocotbext-nfb-ext-python">cocotbext.nfb.ext.python</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">cocotbext-ndk</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cocotbext.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cocotbext-ndk">
+<span id="id1"></span><h1>cocotbext-ndk<a class="headerlink" href="#cocotbext-ndk" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> is a Python package extending the <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> framework. It is not intended as its replacement.
+The NDK uses it to verify VHDL components, potentially in combination with associated software (Python module).</p>
+<p>The base directory of <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> is located in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/cocotbext</span></code>.</p>
+<section id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> was created to improve and extend <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> in areas where we found it lacking while implementing verifications of modules
+included in ndk-fpga. It’s meant to improve and simplify the implementation of simulations and verifications for high-speed networking devices
+and is much better adapted for this purpose compared to base <code class="docutils literal notranslate"><span class="pre">cocotb</span></code>. Some modules can also be found useful in the verification of other types
+of devices.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> notably adds:</p>
+<ul class="simple">
+<li><p>drivers and monitors for various buses</p></li>
+<li><p>requesters and completers for PCIe</p></li>
+<li><p>rate limiters</p></li>
+<li><p>probes</p></li>
+<li><p>generators</p></li>
+<li><p>transaction objects</p></li>
+<li><p>interfaces for <code class="docutils literal notranslate"><span class="pre">libnfb</span></code></p></li>
+<li><p>a collection of useful utilities</p></li>
+</ul>
+</section>
+<section id="modules">
+<h2>Modules<a class="headerlink" href="#modules" title="Link to this heading"></a></h2>
+<p>The following section describes a few notable modules in <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code>.</p>
+<section id="cocotbext-ofm-base">
+<h3>cocotbext.ofm.base<a class="headerlink" href="#cocotbext-ofm-base" title="Link to this heading"></a></h3>
+<p>This module includes base classes that are meant to be extended for specific purposes. You may find these very useful while creating
+a verification of hardware with interfaces that are not supported by <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code>.</p>
+<p class="rubric">drivers.BusDriver</p>
+<p>Extended BusDriver found in <code class="docutils literal notranslate"><span class="pre">cocotb_bus.drivers.BusDriver</span></code>.</p>
+<p>It adds common functionality like:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RisingEdge</span></code> clock event (<code class="docutils literal notranslate"><span class="pre">self._clk_re</span></code>)</p></li>
+<li><p>Configuration (<code class="docutils literal notranslate"><span class="pre">self._cfg</span></code>) can be used, for example, to configure a specific idle generator</p></li>
+<li><p>Idle generator (default is <code class="docutils literal notranslate"><span class="pre">IdleGenerator</span></code>, which doesn’t generate any idles)</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Can be used as a drop-in replacement for <code class="docutils literal notranslate"><span class="pre">cocotb_bus.BusDriver</span></code> with more creature comforts.</p>
+</div>
+<p class="rubric">generators.IdleGenerator</p>
+<p>Idle generator ensures the interlacing of idle and data transactions in drivers.</p>
+<p>Idle generators can adopt various behaviors such as “no idles” (full throughput on bus),
+“random idles”, “rate limiter”, etc.</p>
+<p>This base <code class="docutils literal notranslate"><span class="pre">IdleGenerator</span></code> generates no idles.</p>
+<p>A driver uses the idle generator by calling a pair of <code class="docutils literal notranslate"><span class="pre">.get</span></code> and <code class="docutils literal notranslate"><span class="pre">.put</span></code> methods.
+The <code class="docutils literal notranslate"><span class="pre">get</span></code> method returns a number of idle items which should be inserted on the bus.
+The <code class="docutils literal notranslate"><span class="pre">put</span></code> method awaits the number of idle items that were inserted onto the bus (may have been more or less than what the <cite>get()</cite> method returned).</p>
+<p>Some idle generators need to know more about the bus parameters and should be parametrized
+with a proper configure call.</p>
+<p class="rubric">generators.EthernetRateLimiter</p>
+<p>Limits throughput to achieve a specified maximum rate on Ethernet by generating <code class="docutils literal notranslate"><span class="pre">IdleTransaction</span></code>.
+Considers SFD, CRC, and IPG in its calculation of the current throughput.
+Typically applicable for a byte-oriented data bus like the MFB, AXI-stream, etc.</p>
+<p>Ensure the driver puts a transaction with the “end” argument.</p>
+<p class="rubric">generators.ItemRateLimiter</p>
+<p>Limits throughput to achieve a specified rate by generating <code class="docutils literal notranslate"><span class="pre">IdleTransaction</span></code>.
+Typically applicable for a value-oriented data bus like the MVB.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">IdleGenerator</span></code>, <code class="docutils literal notranslate"><span class="pre">EthernetRateLimiter</span></code> and <code class="docutils literal notranslate"><span class="pre">ItemRateLimiter</span></code> are useful for generating empty, non-valid transactions during
+verifications to make the traffic more realistic.</p>
+</div>
+<p class="rubric">probe.Probe</p>
+<p>Generic probe class used for probing specific parameters of a simulated component.</p>
+<p>This class by itself does nothing. It is a generic class made to be derived from for specific use cases.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Useful for logging values of interest. Check out <code class="docutils literal notranslate"><span class="pre">cocotbext.ofm.utils.throughput_probe.ThroughputProbe</span></code> for specific implementation.</p>
+</div>
+<p class="rubric">probe.ProbeInterface</p>
+<p>Generic class for translating attributes of monitors to probe attributes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Creates a link between <code class="docutils literal notranslate"><span class="pre">Probe</span></code> and a connected object. See <code class="docutils literal notranslate"><span class="pre">cocotbext.ofm.utils.throughput_probe.ThroughputProbeInterface</span></code> for specific implementation.</p>
+</div>
+<p class="rubric">proxymonitor.ProxyMonitor</p>
+<p>Abstract proxy monitor, which is used for redirecting traffic from <code class="docutils literal notranslate"><span class="pre">BusMonitor</span></code> from <code class="docutils literal notranslate"><span class="pre">cocotb_bus.monitors</span></code> and running it through a filter. It automatically
+connects to the <code class="docutils literal notranslate"><span class="pre">_recv</span></code> function of the passed <code class="docutils literal notranslate"><span class="pre">BusMonitor</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Useful for filtering out unwanted transactions or modifying transactions before passing them down to a test without
+modifying the monitor itself, which allows you to have a generic monitor and use proxy monitors for special needs.
+Check out <code class="docutils literal notranslate"><span class="pre">cocotbext.ofm.mi.proxymonitor.MIProxyMonitor</span></code> for specific implementation.</p>
+</div>
+<p class="rubric">transaction.BaseTransaction</p>
+<p>Base class for transactions. All other transaction types inherit from this class.</p>
+<p class="rubric">transaction.IdleTransaction</p>
+<p>Transaction represents general bus idling.</p>
+<p>There is no exact size of <code class="docutils literal notranslate"><span class="pre">IdleTransaction</span></code>; it should represent the
+smallest unit of data that the bus can transfer. For example,
+one byte on the MFB bus, one item on the MVB bus, one word (clock cycle) on
+common buses.</p>
+<p class="rubric">transaction.Transaction</p>
+<p>Transactions with real data to be written onto the bus.</p>
+<p>It is possible to also find this class under the alias <strong>DataTransaction</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The main advantage is that you see which signals the transaction includes and expects to be set in the declaration of the class
+and their type. Check out <code class="docutils literal notranslate"><span class="pre">cocotbext.ofm.mi.transaction</span></code> for specific implementations.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-utils">
+<h3>cocotbext.ofm.utils<a class="headerlink" href="#cocotbext-ofm-utils" title="Link to this heading"></a></h3>
+<p>This module includes many tools that you may find useful while implementing verifications.</p>
+<p class="rubric">device.get_dtb</p>
+<p>Creates a Device Tree represented as a binary blob.</p>
+<p class="rubric">servicer.Servicer</p>
+<p>Allows to perform read and write operations on a component accessed via a Device Tree.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A Device Tree in conjunction with <code class="docutils literal notranslate"><span class="pre">Servicer</span></code> allows you to simulate the behavior of (if applicable) an associated Python module that controls the component.</p>
+<p>Check out <code class="docutils literal notranslate"><span class="pre">ndk-fpga/comp/mvb_tools/storage/mvb_hash_table_simple/cocotb/cocotb_test.py</span></code> for example use in a test.</p>
+<p>Check out <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/ofm/ofm/comp/mvb_tools/storage/mvb_hash_table_simple/mvb_hash_table_simple.py</span></code> for an example of an associated Python module.</p>
+</div>
+<p class="rubric">header.SerializableHeader</p>
+<p>Class for storing a packet header. It is possible to represent the header either as a dictionary (to work with individual fields) or an integer (for transmission/reception).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The class is handy for working with packet headers - easy packing into an integer and unpacking into a dictionary.
+Check out <code class="docutils literal notranslate"><span class="pre">cocotbext.ofm.pcie.AvstCompleter</span></code> to see specific use cases.</p>
+</div>
+<p class="rubric">header.concat</p>
+<p>Converts a list of values into an integer.</p>
+<p class="rubric">header.deconcat</p>
+<p>Converts an integer into a list of values.</p>
+<p class="rubric">header.byte_serialize</p>
+<p>Breaks down a large integer into a list of 8-bit integer values.</p>
+<p class="rubric">header.byte_deserialize</p>
+<p>Combines a list of integers (using their lower 8 bits) into a single large integer.</p>
+<p class="rubric">math.ceildiv</p>
+<p>Calculates into how many transmissions a transaction must be divided.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In other words, how many words do I need to send a transaction of this length? Very commonly used in drivers and tests.</p>
+</div>
+<p class="rubric">math.numberOfSetBits</p>
+<p>Counts the number of bits that are set to a logical 1 in an integer (after conversion to binary).</p>
+<p class="rubric">math.bitmask</p>
+<p>Returns a bitmask as an integer of a specified length.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Usually used to generate value of signals indicating validity of the data. If used for this purpose, all of the data would
+be indicated as valid.</p>
+</div>
+<p class="rubric">ram.RAM</p>
+<p>Simulated RAM component implemented in Python.</p>
+<p class="rubric">signals.await_signal_sync</p>
+<p>Synchronously waits until the value of the signal is equal to the required value.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In drivers, monitors, and tests, waiting for the activation of a certain signal, such as a valid signal or a ready signal, is a very
+common occurrence. If the awaited signal is already set, the function returns with no delay; otherwise, it waits
+until the next rising edge of the clock signal and checks the value again.</p>
+</div>
+<p class="rubric">signals.get_signal_value_in_bytes</p>
+<p>Gets the value of OUT signals in bytes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Simply retrieves the value of a signal, configures its endianness, and returns it as bytes. Nothing groundbreaking, it just hides
+three lines into one. Useful if you require bytes in little-endian rather than the default big-endian.</p>
+</div>
+<p class="rubric">signals.filter_bytes_by_bitmask</p>
+<p>Filters the input bytes by a given bitmask.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On some interfaces, not all transferred data bytes are valid, or in other terminology, shouldn’t be kept. Which ones are and
+aren’t valid is usually indicated by another signal that is a bitmask of the data signal. This function takes data and the bitmask as
+arguments, removes bytes that are not valid completely, and merges the ones that are valid into one <code class="docutils literal notranslate"><span class="pre">bytes</span></code> object, which it then returns.</p>
+</div>
+<p class="rubric">signals.align_request</p>
+<p>Aligns the address and byte enable of a continuous request based on the bus width.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some interfaces do not accept requests where the address isn’t aligned based on the width of the bus. This function takes the width
+of the bus, the address, and the length of the data that is sent with the request, optionally byte_enable, and determines how many bytes should
+be added to the front and back of the transaction, the aligned address, and the new byte enable. The function is a little complicated but
+it certainly can save you time when you need to align a request.</p>
+</div>
+<p class="rubric">signals.align_write_request</p>
+<p>Aligns data, address, and byte enable of a continuous write request based on the bus width.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Same function as <code class="docutils literal notranslate"><span class="pre">signals.align_request</span></code>, but instead of the length of the data, it accepts the data itself, which it also
+returns aligned. Useful for aligning write requests as the name suggests.</p>
+</div>
+<p class="rubric">signals.align_read_request</p>
+<p>Aligns the address and byte enable of a continuous read request based on the bus width.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Same function as <code class="docutils literal notranslate"><span class="pre">signals.align_request</span></code>, but in addition, it also returns how many bytes should actually be read
+and their byte enable to compensate for the non-aligned address.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For an example use of the align functions, please refer to the <code class="docutils literal notranslate"><span class="pre">cocotbext.ofm.mi.driver</span></code> module.</p>
+</div>
+<p class="rubric">signals.wait_number_of_cycles</p>
+<p>Waits for the specified number of clock cycles.</p>
+<p class="rubric">signals.set_signal_delayed</p>
+<p>Sets a signal after waiting a certain amount of clock cycles.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The two functions <code class="docutils literal notranslate"><span class="pre">signals.wait_number_of_cycles</span></code> and <code class="docutils literal notranslate"><span class="pre">signals.set_signal_delayed</span></code> are usually used in cases where
+a signal should be set after a random number of cycles in a range. The number of cycles in those cases is generated by
+the <code class="docutils literal notranslate"><span class="pre">random.randint</span></code> function.</p>
+</div>
+<p class="rubric">throughput_probe.ThroughputProbe</p>
+<p>Probe for measuring and logging throughput and efficiency.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Great for measuring the throughput and efficiency of a component under different loads, which can be simulated by e.g., using rate limiters.</p>
+</div>
+<p class="rubric">throughput_probe.ThroughputProbeInterface</p>
+<p>Base class for interfacing between a throughput probe and a <code class="docutils literal notranslate"><span class="pre">BusMonitor</span></code> object. By itself, it does nothing;
+it should be used as a template (to see which attributes a throughput probe requires in the <code class="docutils literal notranslate"><span class="pre">interface_dict</span></code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Allows you to easily create an interface to be able to use <code class="docutils literal notranslate"><span class="pre">ThroughputProbe</span></code> with bus not supported by <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code>.</p>
+</div>
+<p class="rubric">throughput_probe.ThroughputProbeMvbInterface</p>
+<p>Throughput probe interface for <code class="docutils literal notranslate"><span class="pre">MVBMonitor</span></code>.</p>
+<p class="rubric">throughput_probe.ThroughputProbeMfbInterface</p>
+<p>Throughput probe interface for <code class="docutils literal notranslate"><span class="pre">MFBMonitor</span></code>.</p>
+<p class="rubric"><code class="docutils literal notranslate"><span class="pre">EXPERIMENTAL</span></code> binary.BinaryConvertions</p>
+<p>Collection of operations with binary numbers represented by a list of ones and zeros.</p>
+<p>They are intended for <code class="docutils literal notranslate"><span class="pre">Binary</span></code>, but they can be useful if you can’t or don’t want to use
+<code class="docutils literal notranslate"><span class="pre">Binary</span></code> for whatever reason.</p>
+<p class="rubric"><code class="docutils literal notranslate"><span class="pre">EXPERIMENTAL</span></code> binary.Binary</p>
+<p>Class for easier storing of and working with binary numbers.</p>
+<p class="rubric"><code class="docutils literal notranslate"><span class="pre">EXPERIMENTAL</span></code> binary.BinaryVector</p>
+<p>Vector of binary numbers.
+In reality, it’s just <code class="docutils literal notranslate"><span class="pre">Binary</span></code> divided into smaller sections of fixed length that can be indexed (aka ‘items’ of an array).</p>
+<p class="rubric"><code class="docutils literal notranslate"><span class="pre">EXPERIMENTAL</span></code> binary.BinarySignals</p>
+<p>Interface for converting values read from <code class="docutils literal notranslate"><span class="pre">cocotb.bus</span></code> to <code class="docutils literal notranslate"><span class="pre">Binary</span></code> and <code class="docutils literal notranslate"><span class="pre">BinaryVector</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">Binary</span></code>, <code class="docutils literal notranslate"><span class="pre">BinaryVector</span></code> and <code class="docutils literal notranslate"><span class="pre">BinarySignals</span></code> were created to make working with segmented buses simpler
+and more readable. They are <strong>highly experimental</strong> and should be used with caution.</p>
+<p>You can see them in action in drivers and monitors in the <code class="docutils literal notranslate"><span class="pre">cocotbext.ofm.mac_segmented</span></code> module.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-ver">
+<h3>cocotbext.ofm.ver<a class="headerlink" href="#cocotbext-ofm-ver" title="Link to this heading"></a></h3>
+<p>Includes tools made to simplify the creation of verifications.</p>
+<p class="rubric">generators.random_byte</p>
+<p>Random byte generator.</p>
+<p class="rubric">generators.random_bytes</p>
+<p>Generates N random bytes from the passed generator.</p>
+<p class="rubric">generators.random_packets</p>
+<p>Generates N random packets with random length of bytes in a min/max range.</p>
+<p class="rubric">generators.random_integers</p>
+<p>Generates N random integers between the min/max range.</p>
+<p class="rubric">generators.random_transactions</p>
+<p>Generates N random transactions based on the transaction type and the driver that is going to be used to send
+the transaction. The driver object is used for getting the bit width of the signals that are set by the
+transaction. The length of the transaction is random and between the specified minimum and maximum word count.
+The value of every word is random by default. This can be changed by the <code class="docutils literal notranslate"><span class="pre">patterns</span></code> parameter, which accepts
+a dictionary that has items of the following format: <code class="docutils literal notranslate"><span class="pre">n:</span> <span class="pre">(f,</span> <span class="pre">a)</span></code>, where <code class="docutils literal notranslate"><span class="pre">n</span></code> is the name of the signal, <code class="docutils literal notranslate"><span class="pre">f</span></code> is a
+function that is used to set the value of each word and <code class="docutils literal notranslate"><span class="pre">a</span></code> is a <code class="docutils literal notranslate"><span class="pre">tuple</span></code> of arguments that is given to the
+function as args.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Generators come in handy for easy generation of a large number of variable-length packets or transactions, which then
+can be passed to a driver and modeled as an expected output of a monitor.</p>
+</div>
+<p class="rubric">multibit_driver.MultiBitDriver</p>
+<p>Extension of <code class="docutils literal notranslate"><span class="pre">BitDriver</span></code> from <code class="docutils literal notranslate"><span class="pre">cocotb_bus.drivers</span></code> capable of driving multiple bits instead of just one with
+configurable driving patterns.
+Useful for testing unstable ready and valid signals.</p>
+<p class="rubric">multibit_driver.Patterns</p>
+<p>Includes methods used with the <code class="docutils literal notranslate"><span class="pre">MultiBitDriver</span></code> as the <code class="docutils literal notranslate"><span class="pre">pattern</span></code> argument.
+To be compatible with the driver, the methods should accept at least
+two parameters: the width of the signal that is set and the
+driver’s state, which is either 0 as <cite>off</cite> or 1 as <cite>on</cite>. Other
+parameters can be passed via the <code class="docutils literal notranslate"><span class="pre">pattern_args</span></code> tuple, which is passed
+as args. A string of ones and zeros representing a binary number shall
+be returned.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">MultiBitDriver</span></code> is useful in these cases:</p>
+<ul class="simple">
+<li><p>you have a component with a multi-bit ready signal and you want it to randomly activate and deactivate</p></li>
+</ul>
+<p>(which you usually want to properly verify that the behavior of the component is correct)</p>
+<ul class="simple">
+<li><p>you want a little more control over the driven signal than the standard <code class="docutils literal notranslate"><span class="pre">BitDriver</span></code> provides, thanks to the configurable pattern</p></li>
+</ul>
+<p>function.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-avst-eth">
+<h3>cocotbext.ofm.avst_eth<a class="headerlink" href="#cocotbext-ofm-avst-eth" title="Link to this heading"></a></h3>
+<p>Drivers and monitors for Avalon Streaming for Ethernet (Ethernet E-TILE interface).</p>
+<p class="rubric">avst_eth.drivers.AvstEthDriver</p>
+<p>Accepts whole packets as bytes and writes them to the master side of the bus.</p>
+<p class="rubric">avst_eth.drivers.AvstEthMonitor</p>
+<p>Reads whole packets from the slave side of the bus and returns them as bytes.</p>
+</section>
+<section id="cocotbext-ofm-avst-pcie">
+<h3>cocotbext.ofm.avst_pcie<a class="headerlink" href="#cocotbext-ofm-avst-pcie" title="Link to this heading"></a></h3>
+<p>Drivers, monitors, and credit interface controllers for Avalon Streaming for PCIe P-TILE and R-TILE interfaces.</p>
+<p class="rubric">drivers.AvstPcieDriverMaster</p>
+<p>Accepts whole request or completion packets as a dictionary and writes them to the master side of the bus.
+Completions are prioritized.</p>
+<p class="rubric">drivers.AvstPcieDriverSlave</p>
+<p>Sets the ready signal of the slave side of the bus to logical 1.</p>
+<p class="rubric">monitors.AvstPcieMonitor</p>
+<p>Reads whole packets from the slave side of the bus and returns them as a tuple consisting of two bytearrays - the header bytearray
+and the data bytearray.</p>
+<p class="rubric">creditor.AvstCreditorStatesTX</p>
+<p>States of the finite state machine of <code class="docutils literal notranslate"><span class="pre">AvstCreditorTX</span></code>.</p>
+<p class="rubric">creditor.AvstCreditorStatesRX</p>
+<p>States of the finite state machine of <code class="docutils literal notranslate"><span class="pre">AvstCreditorRX</span></code>.</p>
+<p class="rubric">creditor.AvstTransactionTypes</p>
+<p>Transaction types of Avalon Streaming for PCIe with their number codes.</p>
+<p class="rubric">creditor.PcieTransactionTypes</p>
+<p>Types of PCIe transactions with their codes supported by <code class="docutils literal notranslate"><span class="pre">AvstCreditRequester</span></code> and <code class="docutils literal notranslate"><span class="pre">AvstCreditReceiver</span></code>.</p>
+<p class="rubric">creditor.AvstCreditorTX</p>
+<p>Driver controlling the TX side of the R-TILE credit interface.</p>
+<p class="rubric">creditor.AvstCreditorRX</p>
+<p>Driver controlling the RX side of the R-TILE credit interface.</p>
+<p class="rubric">creditor.AvstCreditRequester</p>
+<p>Catches transactions sent by <code class="docutils literal notranslate"><span class="pre">AvstRequester</span></code> and <code class="docutils literal notranslate"><span class="pre">AvstCompleter</span></code> and checks if there
+are enough credits of the specific type to forward them to the <code class="docutils literal notranslate"><span class="pre">AvstPcieDriverMaster</span></code>.
+If not, they are stopped until there are enough credits. It also updates the number
+of credits consumed by a transaction after letting it through.</p>
+<p class="rubric">creditor.AvstCreditReceiver</p>
+<p>Returns credits to the <code class="docutils literal notranslate"><span class="pre">AvstCreditorTX</span></code> when a transaction comes through. Also checks if there are enough
+credits to send the transaction. If not, an exception is raised.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use the credit interface components only for R-TILE.</p>
+<p>For implementation of conditional switching between P-TILE and R-TILE, check out <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-axi4stream">
+<h3>cocotbext.ofm.axi4stream<a class="headerlink" href="#cocotbext-ofm-axi4stream" title="Link to this heading"></a></h3>
+<p>Drivers, monitors, and transactions for AXI4-Stream.</p>
+<p class="rubric">drivers.Axi4StreamMaster</p>
+<p>Writes either a whole packet or a single word to the master side of the bus. It is recommended to write whole packets, which
+can be achieved by passing the packet as an Axi4StreamTransaction object. If a dictionary is passed, it is sent as a single
+word for backward compatibility.</p>
+<p class="rubric">drivers.Axi4StreamSlave</p>
+<p>Sets the <code class="docutils literal notranslate"><span class="pre">TREADY</span></code> signal of the slave side of the bus to logical 1.</p>
+<p class="rubric">monitors.Axi4Stream</p>
+<p>Reads either a single word or a whole packet from the slave side of the bus and returns it. By default, a single word as a dictionary
+is returned for backwards compatibility; however, this is deprecated. It is recommended to set the argument <code class="docutils literal notranslate"><span class="pre">trans_type</span></code> to <code class="docutils literal notranslate"><span class="pre">Axi4StreamTransaction</span></code>
+during initialization so a whole packet is returned as an <code class="docutils literal notranslate"><span class="pre">Axi4StreamTransaction</span></code> object.</p>
+<p class="rubric">transaction.Axi4StreamTransaction</p>
+<p>Basic transaction for AXI4-Stream that includes <code class="docutils literal notranslate"><span class="pre">TDATA</span></code>, <code class="docutils literal notranslate"><span class="pre">TUSER</span></code>, and <code class="docutils literal notranslate"><span class="pre">TKEEP</span></code>.</p>
+<p class="rubric">transaction.Axi4StreamTransactionWithSelect</p>
+<p>Variant of <code class="docutils literal notranslate"><span class="pre">Axi4StreamTransaction</span></code> that includes selector <code class="docutils literal notranslate"><span class="pre">SEL</span></code> for use with AXIS Splitter component.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-lbus">
+<h3>cocotbext.ofm.lbus<a class="headerlink" href="#cocotbext-ofm-lbus" title="Link to this heading"></a></h3>
+<p>Drivers and monitors for LBus.</p>
+<p class="rubric">drivers.LBusDriver</p>
+<p>Accepts a whole packet as bytes and writes it to the master side of the bus.</p>
+<p class="rubric">monitors.LBusMonitor</p>
+<p>Reads a whole packet from the slave side of the bus and returns it as a list of integer values of the read bytes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-lii">
+<h3>cocotbext.ofm.lii<a class="headerlink" href="#cocotbext-ofm-lii" title="Link to this heading"></a></h3>
+<p>Drivers and monitors for low-latency Ethernet.</p>
+<p class="rubric">drivers.LIIDriver</p>
+<p>Accepts a whole packet as bytes and writes it to the master side of the bus.</p>
+<p class="rubric">monitors.LIIMonitor</p>
+<p>Reads a whole packet from the bus and returns it as bytes.</p>
+<p class="rubric">monitors.LIIProtocolError</p>
+<p>Exception generated by <code class="docutils literal notranslate"><span class="pre">LIIMonitor</span></code> (e.g. when duplicate start or end of frame is detected).</p>
+</section>
+<section id="cocotbext-ofm-mac-segmented">
+<h3>cocotbext.ofm.mac_segmented<a class="headerlink" href="#cocotbext-ofm-mac-segmented" title="Link to this heading"></a></h3>
+<p>Drivers and monitors for Mac Segmented Client Interface (Ethernet F-TILE interface).</p>
+<p class="rubric">drivers.MAC_Segmented_RX_Driver</p>
+<p>Accepts a whole packet as bytes and writes it to the RX side of the bus.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example use, see <code class="docutils literal notranslate"><span class="pre">comp/nic/mac_lite/rx_mac_lite/comp/adapters/mac_seg/cocotb/cocotb_test.py</span></code>.</p>
+</div>
+<p class="rubric">monitors.MAC_Segmented_TX_Monitor</p>
+<p>Reads a whole packet from the TX side of the bus and returns it as bytes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example use, see <code class="docutils literal notranslate"><span class="pre">comp/nic/mac_lite/tx_mac_lite/comp/adapters/mac_seg/cocotb/cocotb_test.py</span></code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-mfb">
+<h3>cocotbext.ofm.mfb<a class="headerlink" href="#cocotbext-ofm-mfb" title="Link to this heading"></a></h3>
+<p>Drivers and monitors for MFB (Multi Frame Bus).</p>
+<p class="rubric">drivers.MFBDriver</p>
+<p>Accepts a whole packet as bytes and writes it to the master side of the bus.</p>
+<p class="rubric">monitors.MFBMonitor</p>
+<p>Reads a whole packet from the slave side of the bus and returns it as bytes.</p>
+<p class="rubric">monitors.MFBProtocolError</p>
+<p>Exception generated by <code class="docutils literal notranslate"><span class="pre">MFBMonitor</span></code>.</p>
+<p class="rubric">utils.get_mfb_params</p>
+<p>Gets bus parameters for <code class="docutils literal notranslate"><span class="pre">MFBDriver</span></code> from a dictionary with parameters <code class="docutils literal notranslate"><span class="pre">param_dic</span></code>. If <code class="docutils literal notranslate"><span class="pre">param_dic</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+parameters are calculated automatically based on the connected signals.</p>
+<p class="rubric">utils.signal_unpack</p>
+<p>Splits the value of a signal into items and returns them as a list.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/comp/mfb_tools/storage/fifox/cocotb/cocotb_test.py</span></code>.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-mi">
+<h3>cocotbext.ofm.mi<a class="headerlink" href="#cocotbext-ofm-mi" title="Link to this heading"></a></h3>
+<p>Drivers, monitors, proxymonitors, and transactions for MI (Memory Interface).</p>
+<p class="rubric">drivers.MIRequestDriver</p>
+<p>Request driver intended for the MI bus that allows sending data to and receiving from the bus.</p>
+<p class="rubric">drivers.MIResponseDriver</p>
+<p>Response driver intended for the MI bus that allows sending data - responses to read requests - to the read signals of the bus.</p>
+<p class="rubric">drivers.MIRequestDriverAgent</p>
+<p><code class="docutils literal notranslate"><span class="pre">MIRequestDriver</span></code> with a <code class="docutils literal notranslate"><span class="pre">_send_thread</span></code> function. Intended for use in flow tests.</p>
+<p class="rubric">drivers.MIResponseDriverAgent</p>
+<p><code class="docutils literal notranslate"><span class="pre">MIResponseDriver</span></code> with a <code class="docutils literal notranslate"><span class="pre">_send_thread</span></code> function. Intended for use in flow tests.</p>
+<p class="rubric">monitors.MIMonitor</p>
+<p>Monitor intended for monitoring both sides of the MI bus.</p>
+<p class="rubric">proxymonitor.MIProxyMonitor</p>
+<p>Proxy Monitor intended for the <code class="docutils literal notranslate"><span class="pre">MIMonitor</span></code>. Based on configuration lets through only request transactions (sent by master) or
+only response transactions (sent by slave).</p>
+<p>For example, two MI monitors are connected to an MI Pipe; one is connected to the request (master)
+side and the other to the response (slave) side. When a transaction appears on
+the pipe, it is detected by both monitors, and both generate an MI transaction
+and send it to the scoreboard. However, only one of the two transactions is
+the wanted one. If the transaction on the bus was a request transaction, the
+transaction from the request monitor should be accepted, and vice versa.
+The purpose of this monitor is to filter out the unwanted transactions.</p>
+<p class="rubric">transaction.MiTransactionType</p>
+<p>Enum of types of MI transactions.</p>
+<p class="rubric">transaction.MiBaseTransaction</p>
+<p>Base class for MI transactions with configurable data items.</p>
+<p class="rubric">transaction.MiRequestTransaction</p>
+<p>Transaction for <code class="docutils literal notranslate"><span class="pre">MIRequestDriver</span></code>.</p>
+<p class="rubric">transaction.MiResponseTransaction</p>
+<p>Transaction for <code class="docutils literal notranslate"><span class="pre">MIResponseDriver</span></code>.</p>
+<p class="rubric">transaction.MiTransaction</p>
+<p>Full MI transaction for monitor and test.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/comp/mi_tools/pipe/cocotb/cocotb_test.py</span></code> and <code class="docutils literal notranslate"><span class="pre">/ndk-fpga/comp/mi_tools/test_space/cocotb/cocotb_test.py</span></code>.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-mvb">
+<h3>cocotbext.ofm.mvb<a class="headerlink" href="#cocotbext-ofm-mvb" title="Link to this heading"></a></h3>
+<p>Drivers, monitors, and transactions for MVB (Multi Value Bus).</p>
+<p class="rubric">drivers.MVBDriver</p>
+<p>Driver intended for the MVB bus used for sending transactions to the bus.</p>
+<p class="rubric">monitors.MVBMonitor</p>
+<p>Master monitor intended for monitoring the MVB bus.</p>
+<p class="rubric">transaction.MvbTransaction</p>
+<p>Base class for MVB Transactions with configurable data items.</p>
+<p class="rubric">transaction.MvbTrClassic</p>
+<p>Transaction for the MVB bus consisting of data only.</p>
+<p class="rubric">transaction.MvbTrClassicWithMeta</p>
+<p>Transaction for the MVB bus consisting of data and metadata.</p>
+<p class="rubric">transaction.MvbTrAddressWithMeta</p>
+<p>Transaction for the MVB bus consisting of an address (could be also a key, hash, etc.) and metadata.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py</span></code>.</p>
+</div>
+</section>
+<section id="cocotbext-ofm-pcie">
+<h3>cocotbext.ofm.pcie<a class="headerlink" href="#cocotbext-ofm-pcie" title="Link to this heading"></a></h3>
+<p>Requesters, completers, and their headers for Avalon Streaming for PCIe and AXI4-Stream.</p>
+<p class="rubric">AvstRequester.AvstBase</p>
+<p>Base class for <code class="docutils literal notranslate"><span class="pre">AvstCompleter</span></code> and <code class="docutils literal notranslate"><span class="pre">AvstRequester</span></code>.</p>
+<p class="rubric">AvstRequester.AvstRequester</p>
+<p>Handles inbound PCIe request transactions and their completions for the PCIe Avalon Streaming bus.
+Requests are accepted from a monitor, processed here by the <code class="docutils literal notranslate"><span class="pre">AvstRequester</span></code>, and stored in the RAM.
+If the request requires a response (e.g., it is a read request), it also generates one (see the <code class="docutils literal notranslate"><span class="pre">handle_response</span></code> method)
+and sends it to the bus using a driver.</p>
+<p class="rubric">AvstRequester.CompletionHeaderEmpty</p>
+<p>Empty header of a PCIe completion packet used by <code class="docutils literal notranslate"><span class="pre">AvstRequester</span></code>.</p>
+<p class="rubric">AvstRequester.RequestHeader</p>
+<p>Header of a PCIe request packet used by <code class="docutils literal notranslate"><span class="pre">AvstRequester</span></code>.</p>
+<p class="rubric">AvstRequester.CompletionHeader</p>
+<p>Header of a PCIe completion packet used by <code class="docutils literal notranslate"><span class="pre">AvstRequester</span></code>.</p>
+<p class="rubric">AvstCompleter.AvstCompleter</p>
+<p>Handles outbound request transactions and their completions for the PCIe Avalon Streaming bus. Request transactions are created by the <code class="docutils literal notranslate"><span class="pre">read</span></code>
+and <code class="docutils literal notranslate"><span class="pre">write</span></code> methods (and their variants), and sent via a driver to the bus. Completions (for read requests) are then accepted by a monitor
+and processed here by the <code class="docutils literal notranslate"><span class="pre">AvstCompleter</span></code> (see the <code class="docutils literal notranslate"><span class="pre">_handle_cc_transaction</span></code> method).</p>
+<p class="rubric">AvstCompleter.RequestHeaderEmpty</p>
+<p>Empty header of a PCIe request packet used by <code class="docutils literal notranslate"><span class="pre">AvstCompleter</span></code>.</p>
+<p class="rubric">AvstCompleter.RequestHeader</p>
+<p>Header of a PCIe request packet used by <code class="docutils literal notranslate"><span class="pre">AvstCompleter</span></code>.</p>
+<p class="rubric">AvstCompleter.CompletionHeader</p>
+<p>Header of a PCIe completion packet used by <code class="docutils literal notranslate"><span class="pre">AvstCompleter</span></code>.</p>
+<p class="rubric">Axi4SRequester.Axi4SRequester</p>
+<p>Handles inbound request transactions and their completions for the PCIe AXI4-Stream bus. Requests are accepted from a monitor,
+processed here by <code class="docutils literal notranslate"><span class="pre">Axi4SRequester</span></code> and are stored in RAM. If the request requires a reponse (e.g., it is a read request), it
+also generates one (see the <code class="docutils literal notranslate"><span class="pre">handle_response</span></code> method) and sends it to the bus using a driver.</p>
+<p class="rubric">Axi4SRequester.RequestHeader</p>
+<p>Header of a PCIe request packet used by <code class="docutils literal notranslate"><span class="pre">Axi4SRequester</span></code>.</p>
+<p class="rubric">Axi4SRequester.CompletionHeader</p>
+<p>Header of a PCIe completion packet used by <code class="docutils literal notranslate"><span class="pre">Axi4SRequester</span></code>.</p>
+<p class="rubric">Axi4SRequester.RqUser</p>
+<p>Additional information for PCIe request packet sent via the <code class="docutils literal notranslate"><span class="pre">TUSER</span></code> signal of AXI4-Stream.</p>
+<p class="rubric">Axi4SRequester.RcUser</p>
+<p>Additional information for PCIe completion packet sent via the <code class="docutils literal notranslate"><span class="pre">TUSER</span></code> signal of AXI4-Stream.</p>
+<p class="rubric">Axi4SRequester.Frame</p>
+<p>Stores data, metadata, and the number of dwords of a packet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example use of requesters and completers, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+</div>
+<p class="rubric">Axi4SCompleter.Axi4SCompleter</p>
+<p>Handles outbound request transactions and their completions for the PCIe AXI4-Stream bus. Request transactions are created by the <code class="docutils literal notranslate"><span class="pre">read</span></code>
+and <code class="docutils literal notranslate"><span class="pre">write</span></code> methods (and their variants), and sent via a driver to the bus. Completions (for read requests) are then accepted by a monitor
+and processed here by the <code class="docutils literal notranslate"><span class="pre">Axi4SCompleter</span></code> (see the <code class="docutils literal notranslate"><span class="pre">_handle_cc_transaction</span></code> method).</p>
+<p class="rubric">Axi4SCompleter.RequestHeaderEmpty</p>
+<p>Empty header of a PCIe AXI4-Stream request packet used by <code class="docutils literal notranslate"><span class="pre">Axi4SCompleter</span></code>.</p>
+<p class="rubric">Axi4SCompleter.RequestHeader</p>
+<p>Header of a PCIe request packet used by <code class="docutils literal notranslate"><span class="pre">Axi4SCompleter</span></code>.</p>
+<p class="rubric">Axi4SCompleter.RequestUser</p>
+<p>Additional information for PCIe request packet sent via the <code class="docutils literal notranslate"><span class="pre">TUSER</span></code> signal of AXI4-Stream.</p>
+<p class="rubric">Axi4SCompleter.RequestUser512</p>
+<p>Additional information for PCIe request packet sent via the <code class="docutils literal notranslate"><span class="pre">TUSER</span></code> signal of AXI4-Stream with 512 bit <code class="docutils literal notranslate"><span class="pre">res1</span></code>.</p>
+<p class="rubric">Axi4SCompleter.CompletionHeader</p>
+<p>Header of a PCIe completion packet used by <code class="docutils literal notranslate"><span class="pre">Axi4SCompleter</span></code>.</p>
+</section>
+<section id="cocotbext-nfb">
+<h3>cocotbext.nfb<a class="headerlink" href="#cocotbext-nfb" title="Link to this heading"></a></h3>
+<p class="rubric">device.NfbDevice</p>
+<p>Abstract class representing an NFB device from the <code class="docutils literal notranslate"><span class="pre">libnfb</span></code> library.</p>
+<p class="rubric">queue.QueueManager</p>
+<p>Helper class for creating queues representing <code class="docutils literal notranslate"><span class="pre">libnfb</span></code> queues.</p>
+<p class="rubric">queue.QueueNdp</p>
+<p>For alternative, simplified NDP queue management in firmware.</p>
+<p class="rubric">queue.QueueNdpRx</p>
+<p>Implementation of <code class="docutils literal notranslate"><span class="pre">QueueNdp</span></code> for RX transactions.</p>
+<p class="rubric">queue.QueueNdpTx</p>
+<p>Implementation of <code class="docutils literal notranslate"><span class="pre">QueueNdp</span></code> for TX transactions.</p>
+</section>
+<section id="cocotbext-nfb-ext-gprc">
+<h3>cocotbext.nfb.ext.gprc<a class="headerlink" href="#cocotbext-nfb-ext-gprc" title="Link to this heading"></a></h3>
+<p class="rubric">dma.DmaRequest</p>
+<p>Encapsulates DMA transactions via gRPC used by <code class="docutils literal notranslate"><span class="pre">DmaServicer</span></code>.</p>
+<p class="rubric">dma.DmaServicer</p>
+<p>Processes <code class="docutils literal notranslate"><span class="pre">DmaRequest</span></code> requests originating from the simulated design and transmitted via gRPC.
+It represents a <cite>reversed</cite> gRPC usage: the DMA servicer runs on the client side (the program generating MI bus requests)
+and processes these requests as a server, even though it’s connected as a client to the simulated design acting as the server.</p>
+<p class="rubric">dma.RAM</p>
+<p>RAM used by <code class="docutils literal notranslate"><span class="pre">DmaServicer</span></code>.</p>
+<p class="rubric">nfb.CompRequest</p>
+<p>Request transaction for <code class="docutils literal notranslate"><span class="pre">NfbServicer</span></code>.</p>
+<p class="rubric">nfb.NfbServicer</p>
+<p>Processes requests on the simulator server, translating gRPC transactions into transactions for the PCIe driver.</p>
+<p class="rubric">server.NfbDmaThreadedGrpcServer</p>
+<p>This wrapper class encapsulates the aforementioned components, effectively turning a simulation object into a functional server.</p>
+</section>
+<section id="cocotbext-nfb-ext-python">
+<h3>cocotbext.nfb.ext.python<a class="headerlink" href="#cocotbext-nfb-ext-python" title="Link to this heading"></a></h3>
+<p class="rubric">servicer.Servicer</p>
+<p>This provides a concrete implementation for the <code class="docutils literal notranslate"><span class="pre">libnfb</span></code> extension’s abstract interface, enabling its use directly from Python.</p>
+<p class="rubric">servicer.Servicer.NdpQueue</p>
+<p>Queues for packet transmission via the NDP interface, specific to the <code class="docutils literal notranslate"><span class="pre">libnfb</span></code> extension.</p>
+<p class="rubric">servicer.Servicer.NdpQueueRx</p>
+<p>Implementation of <code class="docutils literal notranslate"><span class="pre">NdpQueue</span></code> for RX transactions.</p>
+<p class="rubric">servicer.Servicer.NdpQueueTx</p>
+<p>Implementation of <code class="docutils literal notranslate"><span class="pre">NdpQueue</span></code> for TX transactions.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="comp/mfb_tools/readme.html" class="btn btn-neutral float-left" title="MFB specification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="basic_cocotb_test.html" class="btn btn-neutral float-right" title="Getting Started with Verifications Using cocotb/cocotbext-ndk" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
