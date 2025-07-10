@@ -2,7 +2,7 @@
 name = "cocotb-hash-table-simple-test"
 version = "0.1.0"
 dependencies = [
-    "cocotbext-ofm[nfb] @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
+    "cocotbext-ofm @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
     "setuptools",
 ]
 

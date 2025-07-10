@@ -3,6 +3,9 @@
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 
+import operator
+from functools import reduce
+
 def concat(values):
     ret = 0
     for val, width in reversed(values):
@@ -18,6 +21,16 @@ def deconcat(values=[0, 0]):
         ret.append(vector & (2**width - 1))
         vector >>= width
     return ret
+
+
+def byte_serialize(data, length):
+    return [(data >> (8 * i)) & 0xFF for i in range(length)]
+
+
+def byte_deserialize(data):
+    return reduce(
+        operator.or_, [(data[i] & 0xFF) << (8 * i) for i in range(len(data))], 0
+    )
 
 
 class SerializableHeader(object):

@@ -45,6 +45,7 @@ Other example applications will be added in the future, stay tuned!
     :caption: Applications
 
     app-minimal
+    top_level_simulation
 
 --------
 
@@ -88,6 +89,14 @@ it also provides converters:
     comp/mi_tools/readme
     comp/mvb_tools/readme
     comp/mfb_tools/readme
+
+.. toctree::
+    :caption: Cocotb/CocotbExt
+    :maxdepth: 1
+
+    cocotbext
+    basic_cocotb_test
+
 
 --------
 

@@ -7,7 +7,7 @@
 import cocotb
 from cocotb.queue import Queue
 
-from ..utils import concat, deconcat, SerializableHeader
+from ..utils import concat, deconcat, numberOfSetBits, SerializableHeader
 
 
 class CompletionHeaderEmpty(SerializableHeader):
@@ -34,12 +34,6 @@ class CompletionHeader(SerializableHeader):
         ],
         [32, 7, 1, 8, 16, 12, 1, 3, 16, 10, 2, 2, 4, 1, 1, 3, 1, 5, 3],
     ))
-
-
-def numberOfSetBits(i):
-    i = i - ((i >> 1) & 0x55555555)
-    i = (i & 0x33333333) + ((i >> 2) & 0x33333333)
-    return (((i + (i >> 4) & 0xF0F0F0F) * 0x1010101) & 0xFFFFFFFF) >> 24
 
 
 class AvstBase:
@@ -143,14 +137,14 @@ class AvstRequester(AvstBase):
             header.fmt = int("010", base=2) # Completition with data: "010", Completition withOUT data: "000"
             header.tlp_type = int("01010", base=2) # Completion for LOCKED Memory Read: "01011" (with/without data)
             header.dwords = rq_hdr.dwords
-            # 15.bit_count() # only in Python 3.10 and newer can be used below
+
             # TODO: Check IO and CFG transfers
             header.byte_cnt = (
                 header.dwords * 4
                 - (4 - numberOfSetBits(rq_fbe))
                 - ((4 - numberOfSetBits(rq_fbe)) if header.dwords > 1 else 0)
             )
+
             header.compl_stat = 1
-            # WTF is this?
             header.low_addr = 0  # Info: increment for each consequent completion
             await self._send_frame(self._cdriver.write_rc, data, header, header_empty)
