@@ -1,124 +1,90 @@
-"""
-file: cocotb_test.py
-author(s): Oliver Gurka <oliver.gurka@cesnet.cz>
-description: Simple cocotb tests for multiport BRAM implemented using XOR
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
-Copyright (C) 2024 CESNET z. s. p. o.
-SPDX-License-Identifier: BSD-3-Clause
-"""
 
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotbext.ofm.mp_bram.controller import MP_BRAM_Controller
+from cocotbext.ofm.utils.ram import VWWRAM
+from cocotbext.ofm.ver.generators import random_packets
+from cocotb.result import TestFailure, TestSuccess
+from random import randint
 
 
-async def reset(dut):
-    # Reset the design
-    dut.RESET.value = 1
-    await ClockCycles(dut.CLK, 5)
-    dut.RESET.value = 0
-    await RisingEdge(dut.CLK)
+class testbench():
+    def __init__(self, dut, debug=False):
+        self.dut = dut
+        self.stream_in = MP_BRAM_Controller(dut, "", dut.CLK)
+
+        self.ref_ram = VWWRAM(capacity=2**len(self.stream_in.bus.WR_ADDR[0]),
+                              word_width=len(self.stream_in.bus.WR_DATA[0]),
+                              block_width=dut.BLOCK_WIDTH.value if dut.BLOCK_ENABLE.value else None)
+
+        if debug:
+            self.stream_in.log.setLevel(cocotb.logging.DEBUG)
+
+    async def reset(self):
+        self.dut.RESET.value = 1
+        await ClockCycles(self.dut.CLK, 2)
+        self.dut.RESET.value = 0
+        await RisingEdge(self.dut.CLK)
 
 
-async def read(dut, port, addr):
-    re = RisingEdge(dut.CLK)
+async def write_read_test(dut, pkt_count=1000, item_width_min=1, item_width_max=16, parallel_write=False, parallel_read=False):
+    # Start clock generator
+    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    tb = testbench(dut)
+    await tb.reset()
+    await tb.stream_in.clear_memory()
 
-    dut.RD_ADDR[port].value = addr
-    dut.RD_EN[port].value = 1
-    await re
-    dut.RD_EN[port].value = 0
+    addr_width = len(tb.stream_in.bus.WR_ADDR[0])
 
-    while dut.RD_DATA_VLD[port].value != 1:
-        await re
+    cocotb.log.info("-------------------------------------Write and immediate read---------------------------------")
 
-    return dut.RD_DATA[port].value
+    for transaction in random_packets(item_width_min, item_width_max, pkt_count):
+        cocotb.log.info(f"generated transaction: {transaction.hex()}")
 
+        address = randint(0, (2**addr_width-1)-(len(transaction)*8))
 
-def start_clock(dut):
-    # Set up the clock
-    clock = Clock(dut.CLK, 10, units="ns")
-    cocotb.start_soon(clock.start())
+        await tb.stream_in.write(address, transaction, parallel=parallel_write)
 
+        tb.ref_ram.write(address, transaction) # writting transaction to reference RAM
 
-async def setup(dut):
-    start_clock(dut)
-    for i in range(dut.READ_PORTS.value):
-        dut.RD_EN[i].value = 0
-    for i in range(dut.WRITE_PORTS.value):
-        dut.WR_EN[i].value = 0
-    await reset(dut)
+        output = await tb.stream_in.read(address, len(transaction), parallel=parallel_read)
+        cocotb.log.info(f"received transaction:  {output.hex()}")
+
+        if output != transaction:
+            raise TestFailure(f"Expected {transaction.hex()}, got {output.hex()}")
+
+    cocotb.log.info("--------------------Comparing end state of reference RAM and simulated RAM--------------------")
+
+    for i in range(2**addr_width):
+        ref_word = tb.ref_ram.read_word(i)
+        sim_word = await tb.stream_in.read_word(i, 0)
+
+        if ref_word != sim_word:
+            raise TestFailure(f"On address {i} reference RAM has {ref_word}, but simulated RAM has {sim_word}.")
+
+    raise TestSuccess()
 
 
 @cocotb.test()
 async def test_simple(dut):
-    await setup(dut)
-    re = RisingEdge(dut.CLK)
-    # Write some data
-    dut.WR_EN[0].value = 1
-    dut.WR_ADDR[0].value = 0
-    dut.WR_DATA[0].value = 0xAA
-    await re
-
-    dut.WR_ADDR[0].value = 1
-    dut.WR_DATA[0].value = 0xBB
-    await RisingEdge(dut.CLK)
-
-    dut.WR_EN.value = 0
-    await RisingEdge(dut.CLK)
-
-    assert (await read(dut, 0, 0)) == 0xAA
-    assert (await read(dut, 1, 1)) == 0xBB
+    await write_read_test(dut)
 
 
 @cocotb.test()
 async def test_parallel_write(dut):
-    await setup(dut)
-    re = RisingEdge(dut.CLK)
+    await write_read_test(dut, parallel_write=True)
 
-    # Write some data
-    dut.WR_EN[0].value = 1
-    dut.WR_ADDR[0].value = 42
-    dut.WR_DATA[0].value = 0xAA
 
-    dut.WR_EN[1].value = 1
-    dut.WR_ADDR[1].value = 43
-    dut.WR_DATA[1].value = 0xFF
-    await re
-    dut.WR_EN.value = 0
-
-    if not dut.ONE_CLK_WRITE.value:
-        await re
-
-    assert (await read(dut, 0, 42)) == 0xAA
-    assert (await read(dut, 1, 43)) == 0xFF
+@cocotb.test()
+async def test_parallel_read(dut):
+    await write_read_test(dut, parallel_read=True)
 
 
 @cocotb.test()
 async def test_parallel_write_read(dut):
-    await setup(dut)
-    re = RisingEdge(dut.CLK)
-
-    # Write some data
-    dut.WR_EN[0].value = 1
-    dut.WR_ADDR[0].value = 52
-    dut.WR_DATA[0].value = 0xAA
-
-    dut.WR_EN[1].value = 1
-    dut.WR_ADDR[1].value = 53
-    dut.WR_DATA[1].value = 0xFF
-    await re
-    dut.WR_EN.value = 0
-
-    if not dut.ONE_CLK_WRITE.value:
-        await re
-
-    dut.RD_ADDR[0] = 52
-    dut.RD_ADDR[1] = 53
-    dut.RD_EN = 3
-    await re
-
-    while dut.RD_DATA_VLD[0].value != 1:
-        await re
-
-    assert (dut.RD_DATA[0].value == 0xAA)
-    assert (dut.RD_DATA[1].value == 0xFF)
+    await write_read_test(dut, parallel_write=True, parallel_read=True)
