@@ -644,35 +644,35 @@ If it is set to <code class="docutils literal notranslate"><span class="pre">Tru
 <td><p>Obligatory</p></td>
 <td><p>Func. cover</p></td>
 <td><p>Verified</p></td>
-<td><p>test::ex_test</p></td>
+<td><p>ex_test</p></td>
 </tr>
 <tr class="row-odd"><td><p>2</p></td>
 <td><p>Read all packets without skipping any of them. This is the most realistic use-case of the component.</p></td>
 <td><p>Obligatory.</p></td>
 <td><p>Func. cover</p></td>
-<td><p>Unverified, the speed test needs adjustments to set the Mask to avoid skipping packets.</p></td>
-<td><p>test::speed</p></td>
+<td><p>Verified</p></td>
+<td><p>test_all_pass</p></td>
 </tr>
 <tr class="row-even"><td><p>3</p></td>
 <td><p>Read all packets (no skips) and no more than one in each clock cycle.</p></td>
 <td><p>Optional</p></td>
 <td><p>Func. cover</p></td>
-<td><p>Unverified</p></td>
-<td><p>N/A</p></td>
+<td><p>Verified</p></td>
+<td><p>test_all_pass_and_single_frame</p></td>
 </tr>
 <tr class="row-odd"><td><p>4</p></td>
 <td><p>Verify that the UNMASKED interface behaves correctly. This interface is expected to be used intensly.</p></td>
 <td><p>Obligatory</p></td>
-<td><p>Func. cover (?)</p></td>
-<td><p>Partially Verified - the SOF_UNMASKED is tapped by a probe and used in the Model to skip packets.</p></td>
-<td><p>test::ex_test</p></td>
+<td><p>Assertion coverage</p></td>
+<td><p>Verified</p></td>
+<td><p>MFB Property</p></td>
 </tr>
 <tr class="row-even"><td><p>5</p></td>
 <td><p>Verify that the ORIGINAL interface behaves correctly.</p></td>
 <td><p>Optional</p></td>
-<td><p>Func. cover (?)</p></td>
-<td><p>Unverified</p></td>
-<td><p>N/A</p></td>
+<td><p>Assertion coverage</p></td>
+<td><p>Verified</p></td>
+<td><p>MFB Property</p></td>
 </tr>
 </tbody>
 </table>
