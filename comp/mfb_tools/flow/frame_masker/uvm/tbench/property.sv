@@ -8,9 +8,32 @@
 module frame_masker_property #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) (
         input RESET,
         mfb_if tx_mfb_vif,
+        mfb_if tx_mfb_unmasked_vif,
+        mfb_if tx_mfb_original_vif,
         mfb_if rx_mfb_vif,
         mvb_if mvb_vif
 );
+
+    mfb_property #(
+        .REGIONS     (MFB_REGIONS    ),
+        .REGION_SIZE (MFB_REGION_SIZE),
+        .BLOCK_SIZE  (MFB_BLOCK_SIZE ),
+        .ITEM_WIDTH  (MFB_ITEM_WIDTH ),
+        .META_WIDTH  (MFB_META_WIDTH )
+    )
+    rx_mfb_prop (
+        .RESET (RESET     ),
+        .vif   (rx_mfb_vif)
+    );
+
+    mvb_property #(
+        .ITEMS      (1          ),
+        .ITEM_WIDTH (MFB_REGIONS)
+    )
+    mvb_prop (
+        .RESET (RESET),
+        .vif   (mvb_vif)
+    );
 
     mfb_property #(
         .REGIONS     (MFB_REGIONS    ),
@@ -31,9 +54,21 @@ module frame_masker_property #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB
         .ITEM_WIDTH  (MFB_ITEM_WIDTH ),
         .META_WIDTH  (MFB_META_WIDTH )
     )
-    rx_mfb_prop (
-        .RESET (RESET     ),
-        .vif   (rx_mfb_vif)
+    tx_mfb_unmasked_prop (
+        .RESET (RESET),
+        .vif   (tx_mfb_unmasked_vif)
+    );
+
+    mfb_property #(
+        .REGIONS     (MFB_REGIONS    ),
+        .REGION_SIZE (MFB_REGION_SIZE),
+        .BLOCK_SIZE  (MFB_BLOCK_SIZE ),
+        .ITEM_WIDTH  (MFB_ITEM_WIDTH ),
+        .META_WIDTH  (MFB_META_WIDTH )
+    )
+    tx_mfb_original_prop (
+        .RESET (RESET),
+        .vif   (tx_mfb_original_vif)
     );
 
 endmodule

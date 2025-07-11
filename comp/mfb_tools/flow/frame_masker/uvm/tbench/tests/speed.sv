@@ -61,8 +61,22 @@ class speed extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(mfb_rx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
-        {this.get_full_name(), ".m_env.m_env_rx.*"});
+
+        // ------------------- //
+        // Database overriding //
+        // ------------------- //
+
+        uvm_logic_vector_mvb::sequence_lib_rx #(1, MFB_REGIONS)::type_id::set_inst_override(
+            uvm_logic_vector_mvb::sequence_lib_speed_rx #(1, MFB_REGIONS)::get_type(),
+            "m_env.m_env_rx_mvb.mvb_seq",
+            this
+        );
+
+        uvm_logic_vector_array_mfb::sequence_lib_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(
+            mfb_rx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
+            "m_env.m_env_rx.mfb_seq",
+            this
+        );
 
         // Initializing the reference to the environment
         m_env = frame_masker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env", this);

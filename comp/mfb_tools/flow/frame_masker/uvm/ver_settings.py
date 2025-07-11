@@ -35,18 +35,27 @@ SETTINGS = {
         "FRAME_SIZE_MAX"     : "100",
         "MFB_META_WIDTH"     : "5",
     },
+    "uvm_speed_test" : {
+        "__core_params__" : {"UVM_TEST": "test::speed"}
+    },
+    "uvm_all_pass_test" : {
+        "__core_params__" : {"UVM_TEST": "test::test_all_pass"}
+    },
+    "uvm_all_pass_and_one_frame_test" : {
+        "__core_params__" : {"UVM_TEST": "test::test_all_pass_and_one_frame"}
+    },
     "_combinations_" : (
-    (                                             ), # Works the same as '("default",),' as the "default" is applied in every combination
-    ("pcie"      ,                                ),
-    ("one_region",                                ),
-    ("one_region", "pipe_enabled",                ),
-    ("pcie"      , "pipe_enabled",                ),
-    (              "pipe_enabled",                ),
-    (                              "big_frames"  ,),
-    ("pcie"      ,                 "big_frames"  ,),
-    ("one_region",                 "big_frames"  ,),
-    ("one_region",                 "small_frames",),
-    ("pcie"      ,                 "small_frames",),
-    (                              "small_frames",),
+    (                                                                                ), # Works the same as '("default",),' as the "default" is applied in every combination
+    ("pcie"      ,                                 "uvm_speed_test",                 ),
+    ("one_region",                                 "uvm_all_pass_test",              ),
+    ("one_region", "pipe_enabled",                 "uvm_all_pass_and_one_frame_test",),
+    ("pcie"      , "pipe_enabled",                                                   ),
+    (              "pipe_enabled",                 "uvm_speed_test",                 ),
+    (                              "big_frames",   "uvm_all_pass_test",              ),
+    ("pcie"      ,                 "big_frames",   "uvm_all_pass_and_one_frame_test",),
+    ("one_region",                 "big_frames",                                     ),
+    ("one_region",                 "small_frames", "uvm_speed_test",                 ),
+    ("pcie"      ,                 "small_frames", "uvm_all_pass_test",              ),
+    (                              "small_frames", "uvm_all_pass_and_one_frame_test",),
     ),
 }

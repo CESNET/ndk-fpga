@@ -12,8 +12,10 @@ import test::*;
 module testbench;
 
     //TESTS
-    typedef test::ex_test ex_test;
-    typedef test::speed   speed;
+    typedef test::ex_test                     ex_test;
+    typedef test::speed                       speed;
+    typedef test::test_all_pass               test_all_pass;
+    typedef test::test_all_pass_and_one_frame test_all_pass_and_one_frame;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
@@ -22,12 +24,14 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
-    reset_if                                                                               reset (CLK);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_rx(CLK);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_tx(CLK);
-    mvb_if #(MFB_REGIONS, 1)                                                               mvb_rx(CLK);
+    reset_if                                                                               reset          (CLK);
+    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_rx         (CLK);
+    mvb_if #(1, MFB_REGIONS)                                                               mvb_rx         (CLK);
+    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_tx         (CLK);
+    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_unmasked_tx(CLK);
+    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_original_tx(CLK);
 
-    bind MFB_FRAME_MASKER : DUT_U.VHDL_DUT_U probe_inf#(REGIONS*2) probe_mask2discard(TX_DST_RDY & src_rdy_reg, {TX_SOF_UNMASKED, TX_MASK}, CLK);
+    bind MFB_FRAME_MASKER : DUT_U.VHDL_DUT_U probe_inf#(REGIONS*2) probe_mask2discard(TX_DST_RDY & TX_SRC_RDY_UNMASKED, {TX_SOF_UNMASKED, TX_MASK}, CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
@@ -42,7 +46,7 @@ module testbench;
         uvm_config_db #(virtual reset_if)                                                                              ::set(null, "", "vif_reset",  reset );
         uvm_config_db #(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))::set(null, "", "vif_rx",     mfb_rx);
         uvm_config_db #(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))::set(null, "", "vif_tx",     mfb_tx);
-        uvm_config_db #(virtual mvb_if #(MFB_REGIONS, 1))                                                              ::set(null, "", "vif_mvb_rx", mvb_rx);
+        uvm_config_db #(virtual mvb_if #(1, MFB_REGIONS))                                                              ::set(null, "", "vif_mvb_rx", mvb_rx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -58,11 +62,13 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // DUT
     DUT DUT_U (
-        .CLK    (CLK        ),
-        .RST    (reset.RESET),
-        .mfb_rx (mfb_rx     ),
-        .mvb_rx (mvb_rx     ),
-        .mfb_tx (mfb_tx     )
+        .CLK             (CLK            ),
+        .RST             (reset.RESET    ),
+        .mfb_rx          (mfb_rx         ),
+        .mvb_rx          (mvb_rx         ),
+        .mfb_tx          (mfb_tx         ),
+        .mfb_unmasked_tx (mfb_unmasked_tx),
+        .mfb_original_tx (mfb_original_tx)
     );
 
     // Properties
@@ -74,10 +80,12 @@ module testbench;
         .MFB_META_WIDTH  (MFB_META_WIDTH )
     )
     PROPERTY_CHECK (
-        .RESET      (reset.RESET),
-        .tx_mfb_vif (mfb_tx     ),
-        .rx_mfb_vif (mfb_rx     ),
-        .mvb_vif    (mvb_rx     )
+        .RESET               (reset.RESET    ),
+        .tx_mfb_vif          (mfb_tx         ),
+        .tx_mfb_unmasked_vif (mfb_unmasked_tx),
+        .tx_mfb_original_vif (mfb_original_tx),
+        .rx_mfb_vif          (mfb_rx         ),
+        .mvb_vif             (mvb_rx         )
     );
 
 endmodule

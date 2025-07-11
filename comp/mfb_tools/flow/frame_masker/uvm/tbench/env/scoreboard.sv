@@ -12,6 +12,7 @@ class scoreboard #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_scor
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(MFB_META_WIDTH))       meta_dut;
 
     protected model #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_model;
+    discarder #(MFB_REGIONS) m_discarder;
 
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)) m_data_subscriber;
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(MFB_META_WIDTH))       m_meta_subscriber;
@@ -50,6 +51,7 @@ class scoreboard #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_scor
 
     function void build_phase(uvm_phase phase);
         m_model = model #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_model", this);
+        m_discarder = discarder #(MFB_REGIONS)::type_id::create("m_discarder", this);
 
         data_cmp = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))::type_id::create("data_cmp", this);
         meta_cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(MFB_META_WIDTH))      ::type_id::create("meta_cmp", this);
@@ -57,6 +59,9 @@ class scoreboard #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_scor
     endfunction
 
     function void connect_phase(uvm_phase phase);
+
+        m_discarder.analysis_port.connect(m_model.input_data_discard.analysis_export);
+        m_discarder.analysis_port.connect(m_model.input_meta_discard.analysis_export);
 
         // connects the input data (from the Subscriber - connection in Env) to the input of the Model
         m_data_subscriber.connect(m_model.input_data.analysis_export);
