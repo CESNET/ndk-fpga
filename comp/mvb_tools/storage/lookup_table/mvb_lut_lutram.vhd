@@ -52,7 +52,7 @@ end entity;
 architecture FULL of MVB_LOOKUP_TABLE_LUTRAM is
 
     constant LUT_BYTES_W      : natural := LUT_WIDTH/8;
-    constant SW_WORDS_PER_LUT : natural := LUT_WIDTH/SW_WIDTH;
+    constant SW_WORDS_PER_LUT : natural := (LUT_WIDTH+SW_WIDTH-1)/SW_WIDTH;
     constant SW_BYTES_W       : natural := SW_WIDTH/8;
 
     signal lram_wr_addr         : std_logic_vector(log2(LUT_DEPTH)-1 downto 0);
