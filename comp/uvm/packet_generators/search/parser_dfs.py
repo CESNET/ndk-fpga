@@ -10,6 +10,7 @@
 #    Radek Iša <isa@cesnet.cz>
 
 import scapy
+import random
 
 from config import packet_config
 from parser import Parser
@@ -19,6 +20,7 @@ class dfs_item:
     def __init__(self, protocol, cfg):
         self.protocol     = protocol
         self.index        = 0
+        self.depth        = 0
         self.cfg          = cfg.copy()
         proto_next = protocol.protocol_next(self.cfg)
         self.protocols_next = []
@@ -26,8 +28,8 @@ class dfs_item:
             if (proto_next[it] != 0):
                 self.protocols_next.append(it)
 
-    def last(self):
-        return len(self.protocols_next) == 0
+    def last(self, max_depth):
+        return (len(self.protocols_next) == 0) or (max_depth <= self.depth)
 
     def next(self):
         if self.protocols_next is None or self.index >= len(self.protocols_next):
@@ -39,44 +41,53 @@ class dfs_item:
 
 
 class Parser_dfs(Parser):
-    def __init__(self, pcap_file, cfg, seed):
+    def __init__(self, pcap_file, cfg, seed, max_packets, min_depth, max_depth):
         super().__init__(pcap_file, cfg, seed)
+        self.max_packets = max_packets
+        self.min_depth   = min_depth
+        self.max_depth   = max_depth
 
     def gen(self):
+        packets_to_generate = []
         next_items = []
 
         cfg_act  = packet_config(self.cfg)
         item = dfs_item(self.protocols["ETH"], cfg_act)
         next_items.append(item)
 
-        packets = 0
         while len(next_items) > 0:
             # get last item
             item = next_items[-1]
             # get next generated protocol
             proto_next = item.next()
 
-            if not item.last():
+            if not item.last(self.max_depth):
                 if proto_next is not None:
                     item_next = dfs_item(self.protocols[proto_next], item.cfg)
+                    item_next.depth = item.depth + 1
                     next_items.append(item_next)
                 else:
                     #remove last index there is no next protocol
                     del next_items[-1]
-            else:
+            elif len(next_items)-1 >= self.min_depth:
                 #generate packet
-                packets += 1
                 packet = scapy.packet.Packet()
 
                 for it in next_items:
                     pkt_proto = it.protocol.protocol_add(it.cfg)
                     if pkt_proto is not None:
-                        packet     = packet / pkt_proto
+                        packet = packet / pkt_proto
 
                 #write packet
-                self.write(packet)
+                packets_to_generate.append(packet)
                 #remove last index
                 del next_items[-1]
+            else:
+                del next_items[-1]
 
-        print("PACKETS %d" % (packets))
-        pass
+        # Pick some packets
+        packets_to_generate = random.sample(packets_to_generate, min(self.max_packets, len(packets_to_generate)))
+        for p in packets_to_generate:
+            self.write(p)
+
+        print("PACKETS %d" % len(packets_to_generate))

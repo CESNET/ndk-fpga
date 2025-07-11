@@ -437,20 +437,30 @@ class sequence_search_eth  #(
 
     //randomization packet
     //ETH next protocol  (IPV4, IPV6, VLAN, MPLS, Empty, PPP)
-    rand int unsigned eth_next_prot[6];
-    rand int unsigned vlan_next_prot[6];
+    rand int unsigned eth_next_prot[7];
+    rand int unsigned vlan_next_prot[7];
     rand int unsigned ppp_next_prot[4];
     rand int unsigned mpls_next_prot[4];
-    rand int unsigned ipv4_next_prot[5];
-    rand int unsigned ipv6_next_prot[6];
+    rand int unsigned ipv4_next_prot[7];
+    rand int unsigned ipv6_next_prot[8];
+    rand int unsigned udp_next_prot[3];
+    rand int unsigned gre_next_prot[3];
     rand int unsigned proto_next_prot[2]; //empty/payload
     rand int unsigned algorithm; // 0 -> rand; 1 -> dfs
+    rand int unsigned dfs_mindepth;
+    rand int unsigned dfs_maxdepth;
 
     rand int unsigned packet_err_prob; //empty/payload
 
     constraint c_alg{
         algorithm dist {0 :/ 10, 1 :/ 1};
     }
+
+    constraint c_dfs {
+        dfs_maxdepth dist { [1 : 2] :/ 2, [3 : 6] :/ 5, [7 : 10] :/ 10 };
+        dfs_maxdepth - dfs_mindepth dist { [0 : 2] :/ 5, [3 : 6] :/ 10, [7 : 10] :/ 1 };
+        dfs_mindepth <= dfs_maxdepth;
+    };
 
     constraint c_err {
         packet_err_prob dist {[0:10] :/ 70, [11:70] :/ 20, [71:99] :/ 10};
@@ -504,6 +514,22 @@ class sequence_search_eth  #(
         ipv6_next_prot.sum() > 0;
     };
 
+    constraint c_udp{
+        foreach(udp_next_prot[it]) {
+            udp_next_prot[it] >= 0;
+            udp_next_prot[it]  < 10;
+        }
+        udp_next_prot.sum() > 0;
+    };
+
+    constraint c_gre{
+        foreach(gre_next_prot[it]) {
+            gre_next_prot[it] >= 0;
+            gre_next_prot[it]  < 10;
+        }
+        gre_next_prot.sum() > 0;
+    };
+
     constraint c_proto{
         foreach(proto_next_prot[it]) {
             proto_next_prot[it] >= 0;
@@ -549,22 +575,23 @@ class sequence_search_eth  #(
         $fwrite(file, "{\n");
         //ETH
         $fwrite(file, "\"packet\" : { \"err_probability\" : %0d},\n", packet_err_prob);
-        $fwrite(file, "\"ETH\"  : { \"weight\" : %s},\n", proto_dist_gen(eth_next_prot, {"IPv4", "IPv6", "VLAN", "MPLS", "Empty", "PPP"}));
-        $fwrite(file, "\"VLAN\" : { \"weight\" : %s},\n", proto_dist_gen(vlan_next_prot, {"IPv4", "IPv6", "VLAN", "MPLS", "Empty", "PPP"}));
+        $fwrite(file, "\"ETH\"  : { \"weight\" : %s},\n", proto_dist_gen(eth_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
+        $fwrite(file, "\"VLAN\" : { \"weight\" : %s},\n", proto_dist_gen(vlan_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
         $fwrite(file, "\"PPP\" : { \"weight\" : %s},\n",  proto_dist_gen(ppp_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
         $fwrite(file, "\"MPLS\" : { \"weight\" : %s},\n", proto_dist_gen(mpls_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
         $fwrite(file, "\"TCP\" : { \"weight\" : %s},\n",  proto_dist_gen(proto_next_prot, {"Empty", "Payload"}));
-        $fwrite(file, "\"UDP\" : { \"weight\" : %s},\n",  proto_dist_gen(proto_next_prot, {"Empty", "Payload"}));
+        $fwrite(file, "\"UDP\" : { \"weight\" : %s},\n",  proto_dist_gen(udp_next_prot, {"Empty", "Payload", "VXLAN"}));
+        $fwrite(file, "\"GRE\" : { \"weight\" : %s},\n",  proto_dist_gen(gre_next_prot, {"ETH", "IPv4", "IPv6"}));
 
         $fwrite(file, "\"IPv4\" : { \"values\" : {");
         $fwrite(file, {"\n\t\"src\" : ", "[\n", rule_ipv4, "],", "\n\t\"dst\" : ", "[\n", rule_ipv4, "]"});
-        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv4_next_prot, {"Payload", "Empty", "ICMPv4", "UDP", "TCP"}));
+        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv4_next_prot, {"Payload", "Empty", "ICMPv4", "UDP", "TCP", "SCTP", "GRE"}));
 
         $fwrite(file, "\"IPv6\" : { \"values\" : {");
         $fwrite(file, {"\n\t\"src\" : ", "[\n", rule_ipv6, "],", "\n\t\"dst\" : ", "[\n", rule_ipv6, "]"});
-        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv4", "UDP", "TCP", "IPv6Ext"}));
+        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv6", "UDP", "TCP", "SCTP", "IPv6Ext", "GRE"}));
 
-        $fwrite(file, "\"IPv6Ext\" : { \"weight\" : %s}\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv4", "UDP", "TCP", "IPv6Ext"}));
+        $fwrite(file, "\"IPv6Ext\" : { \"weight\" : %s}\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv6", "UDP", "TCP", "SCTP", "IPv6Ext", "GRE"}));
 
         $fwrite(file, "\n\t}\n");
         $fclose(file);
@@ -627,7 +654,7 @@ class sequence_search_eth  #(
         `uvm_info(get_full_name(), $sformatf("\n\tsequence_search is running\n\t\tpcap_name%s", pcap_file), UVM_DEBUG);
 
         this.configure(config_json);
-        pkt_gen_params = $sformatf("-a %s -f \"%s\" -p %0d -c %s -s %0d", algorithm == 0 ? "rand" : "dfs",  pcap_file, transaction_count, config_json, pkt_gen_seed);
+        pkt_gen_params = $sformatf("-a %s -f \"%s\" -p %0d --mindepth %0d --maxdepth %0d -c %s -s %0d", algorithm == 0 ? "rand" : "dfs",  pcap_file, transaction_count, dfs_mindepth, dfs_maxdepth, config_json, pkt_gen_seed);
         if($system({uvm_packet_generators::PKT_GEN_PATH, " ", pkt_gen_params, " >> pkt_gen_out"}) != 0) begin
             `uvm_fatal(m_sequencer.get_full_name(), $sformatf("\n\t Cannot run command %s", {uvm_packet_generators::PKT_GEN_PATH, " ", pkt_gen_params}))
         end

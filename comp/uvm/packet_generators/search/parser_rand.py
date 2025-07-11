@@ -34,8 +34,11 @@ class Parser_rand(Parser):
                 proto_next = proto_act.protocol_next(cfg)
                 if len(proto_next) > 0:
                     (proto_next_indexs, proto_next_weights) = self.proto_weight_get(proto_next)
-                    protocol_next_name = random.choices(proto_next_indexs, proto_next_weights)[0]
-                    proto_act = self.protocols.get(protocol_next_name)
+                    if sum(proto_next_weights) > 0:
+                        protocol_next_name = random.choices(proto_next_indexs, proto_next_weights)[0]
+                        proto_act = self.protocols.get(protocol_next_name)
+                    else:
+                        proto_act = None
                 else:
                     proto_act = None
 
