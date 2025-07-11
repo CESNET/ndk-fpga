@@ -47,9 +47,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
@@ -57,6 +57,7 @@
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
@@ -92,6 +93,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
@@ -99,6 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
@@ -167,6 +174,94 @@ It is recommended to use the provided python tool to calculate the final value o
 <p>Other yet-to-be-implemented features include storing the counters’ values from multiple measurements and
 a histogram of these values.</p>
 <p><strong>MI Address Space</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address offset</p></th>
+<th class="head"><p>MI Register description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0x00</p></td>
+<td><dl class="simple">
+<dt>Command register (Write-only):</dt><dd><ul class="simple">
+<li><p>cmd(0) - start (1) / stop (0) measuring the frequency (see Status(1))</p></li>
+<li><p>cmd(1) - reset the measurement logic (except the interval length!)</p></li>
+<li><p>cmd(2) - fetch measured data when ready (see Status(2))</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd"><td><p>0x04</p></td>
+<td><dl class="simple">
+<dt>Status register (Read-only):</dt><dd><ul class="simple">
+<li><p>status(0) - ready to measure (is able to accept the command to start measuring)</p></li>
+<li><p>status(1) - measuring in process (write in Command reg)</p></li>
+<li><p>status(2) - measurement done (measuring interval ended)</p></li>
+<li><p>status(3) - counters’ data are ready to be fetched</p></li>
+<li><p>status(4) - fetched data are ready to be read</p></li>
+<li><p>status(5) - an error occurred during the measurement (Counters’ data are invalid)</p></li>
+<li><p>status(6) - the Reference Frequency Counter overflowed</p></li>
+<li><p>status(7) - at least one Measured Frequency Counter overflowed</p></li>
+<li><p>status(8) - the Reference Clock was reset during the measurement</p></li>
+<li><p>status(9) - at least one of the Measured Clocks were reset during the measurement</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-even"><td><p>0x08</p></td>
+<td><dl class="simple">
+<dt>Interval length register (Read and Write)</dt><dd><ul class="simple">
+<li><p>default: 2**(INTERVAL_LEN_WIDTH/2)</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd"><td><p>0x0C</p></td>
+<td><p>The Reference Clock frequency in Hz (Read-only)</p></td>
+</tr>
+<tr class="row-even"><td><p>0x10</p></td>
+<td><dl class="simple">
+<dt>Measured Frequencies register (Read-only):</dt><dd><ul class="simple">
+<li><p>the number of measured frequencies</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd"><td><p>0x14</p></td>
+<td><dl class="simple">
+<dt>Reference Frequency Counter data register (Read-only):</dt><dd><ul class="simple">
+<li><p>issue multiple Read requests when the Counter is wider than the MI bus</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-even"><td><p>0x18</p></td>
+<td><dl class="simple">
+<dt>Measured Frequency Counter data register(s) (Read-only):</dt><dd><ul class="simple">
+<li><p>issue one Read request to this register for each Counters’ data</p></li>
+<li><p>starts from index 0 and increments after each read to this address, resets at max</p></li>
+<li><p>current index can be read from the Read Pointer register</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd"><td><p>0x1C</p></td>
+<td><dl class="simple">
+<dt>Read Pointer register (Read-only):</dt><dd><ul class="simple">
+<li><p>index of the next Measured Frequency Counter data register that will be read</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>

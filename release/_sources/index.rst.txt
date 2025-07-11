@@ -14,9 +14,9 @@ Overview
     ndk_core/doc/how_to_start
     ndk_core/doc/terminology
     ndk_core/doc/readme
+    ndk_core/doc/testing
     ndk_core/doc/performance
     ndk_core/doc/configuration
-    ndk_core/doc/testing
     ndk_build/readme
     ndk_core/doc/devtree
     ndk_core/doc/faq
@@ -45,6 +45,7 @@ Other example applications will be added in the future, stay tuned!
     :caption: Applications
 
     app-minimal
+    top_level_simulation
 
 --------
 
@@ -89,6 +90,14 @@ it also provides converters:
     comp/mvb_tools/readme
     comp/mfb_tools/readme
 
+.. toctree::
+    :caption: Cocotb/CocotbExt
+    :maxdepth: 1
+
+    cocotbext
+    basic_cocotb_test
+
+
 --------
 
 The NDK-FPGA supports a wide range of FPGA cards, providing access to features such as DDR and HBM
@@ -106,6 +115,7 @@ support a subset of these cards. A complete list of supported FPGA cards can be 
     ndk_cards/silicom/fb4cgg3/readme
     ndk_cards/silicom/fb2cghh/readme
     ndk_cards/silicom/n6010/readme
+    ndk_cards/silicom/fb2cdg1/readme
     ndk_cards/bittware/ia-420f/readme
     ndk_cards/bittware/ia-440i/readme
     ndk_cards/amd/alveo-u200/readme

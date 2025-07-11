@@ -47,9 +47,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
@@ -57,6 +57,7 @@
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
@@ -120,6 +121,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
@@ -127,6 +133,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
@@ -183,7 +190,7 @@ The configured speed only determines the proportion between these two states.
 At the end of the Section, the flow is restored (to full throughput), and the process is repeated in the next Section.
 The component detects that the limit is reached with a delay of a few clock cycles (depending on the limiting type), so the actual amount of transmitted data won’t be exactly the configured limit.
 This is solved by adding constants to the current amount of transferred data to ensure the limit is not surpassed.
-Unfortunately, this approach is not ideal, and some configuration restrictions must be met for the component to function correctly (see the <a class="reference internal" href="../../../uvm/byte_array_mii/readme.html#usage"><span class="std std-ref">Usage section</span></a>).</p>
+Unfortunately, this approach is not ideal, and some configuration restrictions must be met for the component to function correctly (see the <a class="reference internal" href="../../../mi_tools/indirect_access/readme.html#usage"><span class="std std-ref">Usage section</span></a>).</p>
 <figure class="align-center" id="timespace">
 <a class="reference internal image-reference" href="../../../../_images/timespace.svg"><img alt="../../../../_images/timespace.svg" src="../../../../_images/timespace.svg" style="width: 100%;" />
 </a>

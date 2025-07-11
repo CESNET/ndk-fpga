@@ -41,7 +41,7 @@ Yes, the NDK firmware supports packets up to 16383 B by default, which is the ma
 Is there also an open-source DMA controller available?
 ******************************************************
 
-Not currently, but a low-latency DMA controller (DMA Calypte) is currently under development, which will be available as an open-source component of the NDK.
+Yes, there is an open source low-latency DMA controller (DMA Calypte IP). However, it is not the default and must be selected when compiling the firmware using the ``make DMA_TYPE=4`` command.
 
 What clock frequencies are available for the user application?
 **************************************************************

@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Top-Level Simulation using cocotb/cocotbext-ndk &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Basic Tools" href="base.html" />
+    <link rel="prev" title="Minimal NDK application" href="app-minimal.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Top-Level Simulation using cocotb/cocotbext-ndk</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-run">How to run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#architecture">Architecture</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cocotbext.html">cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Top-Level Simulation using cocotb/cocotbext-ndk</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/top_level_simulation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="top-level-simulation-using-cocotb-cocotbext-ndk">
+<h1>Top-Level Simulation using cocotb/cocotbext-ndk<a class="headerlink" href="#top-level-simulation-using-cocotb-cocotbext-ndk" title="Link to this heading"></a></h1>
+<p>NDK-FPGA also includes a top-level simulation for running tests on the whole firmware of FPGA cards. It is implemented using
+<strong>Python</strong> and the <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> framework. Some parts of <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> were also modified and extended by us to better fit our use cases, creating
+the <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> package. If you want to discover more about <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code>, refer to <a class="reference internal" href="cocotbext.html#cocotbext-ndk"><span class="std std-ref">its chapter</span></a>.</p>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p><strong>Python version 3.11</strong> and higher, <strong>Intel Quartus Prime Pro</strong> or <strong>AMD Vivado</strong>, and <strong>Questa Sim</strong> are required.</p>
+<p>Cloning <cite>ndk-fpga</cite> from GitHub with all its dependencies is also required. You can achieve this using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/CESNET/ndk-fpga.git
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Some submodules are internal to CESNET and may not be accessible for cloning by unauthorized users.</p>
+</div>
+</section>
+<section id="how-to-run">
+<h2>How to run<a class="headerlink" href="#how-to-run" title="Link to this heading"></a></h2>
+<p>Locate the <cite>ndk-fpga</cite> repository. Then use the following command to change into the simulation’s location:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ndk-fpga/apps/minimal/tests/cocotb
+</pre></div>
+</div>
+<p>Use the <strong>prepare.sh</strong> script which automatically creates a <strong>Python virtual environment</strong> with all the dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./prepare.sh
+</pre></div>
+</div>
+<p>After the script is finished, enter the newly created virtual environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>venv-cocotb/bin/activate
+</pre></div>
+</div>
+<p>Then run the simulation using the included <strong>Makefile</strong>. You can also specify the card that shall be simulated.
+Selection of the simulated card is performed with the environment variable <strong>CARD</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CARD</span><span class="o">=</span>...
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Source files used to run the simulation of all cards can be found in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/apps/minimal/build</span></code>. To find out which
+cards are supported, refer to <strong>NFBDevice</strong> in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+</div>
+</section>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
+<p>Now let’s do a deep dive into what the top-level simulation is used for and how it actually functions.</p>
+<p>A top-level simulation is used for a simple software verification of the entire <cite>FPGA</cite> firmware of network cards. This allows for
+debugging their functionality before actual deployment. It tests several basic operations on the network card: writing to and reading
+from the <strong>MI interface</strong>, activating the <strong>RX MAC</strong> and checking its status, measuring the frequency of clock signals, and sending and
+receiving packets through the entire design. It’s designed to be as universal and easily modifiable as possible to support additional
+network cards.</p>
+<p>The specifics of individual network cards are configured using the <strong>NFBDevice class</strong> (found in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>).
+This includes, among other things, starting the necessary clocks and initializing the <strong>Ethernet</strong> and <strong>PCIe</strong> interface drivers and monitors.
+These are then used by the tests to send input data to and read output data from the network card. Each card has pre-defined frequencies for clock
+signals and the simulation selects the appropriate ones according to the simulated CARD. The card’s design conditionally selects drivers and
+monitors based on individual signals it contains. These approaches give the <strong>NFBDevice</strong> module considerable
+versatility, reduce redundancy, and allow to easily extend the list of supported cards in the future.</p>
+<p>Several <strong>PCIe</strong> and <strong>Ethernet</strong> interfaces are supported. For <strong>PCIe</strong>, both <strong>Axi4 Stream</strong> and
+<strong>Avalon Streaming for PCI Express</strong> can be used. In the case of
+the <strong>Avalon Streaming</strong> bus, two variants for two Hard IPs are supported: the older <strong>P-Tile</strong> and the newer <strong>R-Tile</strong> (adds a credit interface). In the area of <strong>Ethernet interfaces</strong>, modules enabling the use of <strong>LBus</strong> (CMAC hard IP), <strong>Avalon Streaming for Ethernet (E-Tile)</strong>, and
+<strong>MAC Segmented (F-Tile)</strong> are implemented. Due to the support for many cards and interfaces, the <strong>AGI-FH400G</strong> card will be used to describe the top-level simulation.</p>
+<hr class="docutils" />
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="_images/top_level_simulace.svg"><img alt="_images/top_level_simulace.svg" src="_images/top_level_simulace.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">AGI-FH400G Card Firmware Simulation Block Diagram.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The block diagram above illustrates the connection of individual drivers and monitors used in the simulation to specific hardware design
+signals. Drivers typically inherit from the <strong>BusDriver</strong> class, either from the <cite>cocotb_bus</cite> package (one of the packages provided by
+<cite>cocotb</cite>) or from the identically named class in the <cite>cocotbext-ndk</cite> package. Monitors inherit from the <strong>BusMonitor</strong>
+class from the <cite>cocotb_bus</cite> package. The diagram illustrates the inheritance hierarchy by displaying each object’s parent class in its
+respective header. Monitors can only read signal values and report them. Drivers can both read from and write to signals. The interaction
+method between an object and a specific signal is shown by arrows between them: an arrow from a driver to the card means the signal’s value
+is modified by the driver and read by the card. Conversely, an arrow from the card to a driver or monitor indicates that the signal is controlled
+by the card and is read by the connected object.</p>
+<p>Typically, <strong>PCIe</strong> and <strong>Ethernet</strong> interface signals are set and read during verification. This specific card uses the <strong>PCIe R-Tile hard IP</strong> with the <strong>Avalon Streaming</strong> interface and associated credit interface; individual signal groups of this interface are
+shown in blue. The <strong>Ethernet F-Tile hard IP</strong> uses the <strong>MAC Segmented</strong> interface, which is marked in red.</p>
+<hr class="docutils" />
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="_images/top_level_simulace-tridy.svg"><img alt="_images/top_level_simulace-tridy.svg" src="_images/top_level_simulace-tridy.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Class Diagram for Controlling the Simulated R-Tile PCIe Avalon-ST Interface</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>However, the simulation architecture is usually much more complex than simply setting and reading signals, with many layers between the
+test and the simulated hardware. A great example, in the case of the <strong>AGI-FH400G</strong>, is the control of the <strong>Avalon Streaming</strong>
+bus. The objects that are an integral part of it and their interactions are shown in the class diagram above. The diagram displays individual
+classes with their attributes and methods. There are four types of relationships between classes, indicated by arrows:</p>
+<ul class="simple">
+<li><p>A solid arrow with a transparent arrowhead and the description <cite>extend</cite> signifies class inheritance.</p></li>
+<li><p>A solid arrow with a filled arrowhead means that the attribute pointed to by the arrow is an instance of the class from which the arrow originates.</p></li>
+<li><p>A dashed arrow indicates the simulation flow, i.e., the order of method calls. The method from which the arrow originates typically calls the method it points to after completing its operation.</p></li>
+<li><p>A dotted line signifies either an interaction between a method and an attribute, or another method. An arrow from a method to an attribute indicates that the method modifies the attribute’s value (e.g., adding an item to a queue). If the arrow goes in the opposite direction, it means the method reads the attribute and performs an action based on its value (e.g., if a new transaction appears in the queue, the method that was waiting for it calls another method to process the transaction). The meaning of this relationship between two methods is that the execution of the method pointed to by the arrow is influenced by the value returned by the method from which the arrow originates (e.g., the <code class="docutils literal notranslate"><span class="pre">_send_thread</span></code> method of the <strong>AvstCreditRequester</strong> class calls the next method only if the <code class="docutils literal notranslate"><span class="pre">get_credits</span></code> method of the <strong>AvstCreditorRX</strong> class returns a sufficiently large number indicating the number of available credits).</p></li>
+</ul>
+<p>Additionally, some methods may have <code class="docutils literal notranslate"><span class="pre">&lt;&lt;enter&gt;&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;&lt;exit&gt;&gt;</span></code> decorators, indicating entry into and exit from the diagram. These are
+either classes that write or read transactions to or from hardware signals as shown in the diagram, or they are functions called by an
+external class not shown in the diagram, usually tests.</p>
+<p>The first entry is the <code class="docutils literal notranslate"><span class="pre">_monitor_recv()</span></code> method of the <strong>AvstPcieMonitor</strong> monitor, with the path shown in red. If the <code class="docutils literal notranslate"><span class="pre">ready</span></code> signal
+of the <code class="docutils literal notranslate"><span class="pre">pcie_avst_down</span></code> signal group is active and the card has data it wants to send via the <strong>Avalon Streaming</strong> interface, it writes
+it to the signals of this group. The <strong>AvstPcieMonitor</strong> monitor is connected to these, which reads the signal values and constructs a
+transaction from them, sending it further using a callback. This callback invokes the method linked to it. In the <strong>R-Tile</strong> variant, which
+has a credit interface used to control the amount of data passing through the bus to prevent overload, the callback is connected to the
+<code class="docutils literal notranslate"><span class="pre">monitor_callback</span></code> method of the class that <strong>AvstCreditReceiver</strong> inherits from the base class <strong>ProxyMonitor</strong>. This immediately passes
+the transaction to the <code class="docutils literal notranslate"><span class="pre">_filter_transaction</span></code> method of the same object. This then uses the <code class="docutils literal notranslate"><span class="pre">get_credits</span></code> method of the <strong>AvstCreditorTX</strong>
+class, accessed via its <code class="docutils literal notranslate"><span class="pre">__header_creditor</span></code> and <code class="docutils literal notranslate"><span class="pre">__data_creditor</span></code> attributes, to check the number of credits available to the card,
+thus limiting the number of transactions that can be sent by the card. If there are not enough credits, an exception is raised, indicating that the
+card did not respect the credit limit. Otherwise, credits are used, and the transaction proceeds to two methods simultaneously:
+<code class="docutils literal notranslate"><span class="pre">_handle_cc_transaction</span></code> of the <strong>AvstCompleter</strong> class and <code class="docutils literal notranslate"><span class="pre">handle_rq_transaction</span></code> of the <strong>AvstRequester</strong> class. Here, the type
+of transaction is evaluated. If it’s a completion, it’s processed by the <code class="docutils literal notranslate"><span class="pre">_handle_cc_transaction</span></code> method, and its tag is stored in
+the <code class="docutils literal notranslate"><span class="pre">_queue_tag</span></code> queue. The <code class="docutils literal notranslate"><span class="pre">handle_rq_transaction</span></code> method discards its copy. If it’s a request, <strong>AvstCompleter</strong> ignores it, and
+<strong>AvstRequester</strong> passes it to its <code class="docutils literal notranslate"><span class="pre">handle_request</span></code> method, which examines whether it’s a write request or a read request. In the case of
+a write, data is written to memory, accessed via the <code class="docutils literal notranslate"><span class="pre">_ram</span></code> attribute. Otherwise, data is read from memory, and the result is appended to
+the <code class="docutils literal notranslate"><span class="pre">_q</span></code> queue. If the <code class="docutils literal notranslate"><span class="pre">handle_response</span></code> method finds data in the <code class="docutils literal notranslate"><span class="pre">_q</span></code> queue, another program flow begins, shown in green. The data
+is passed to the <code class="docutils literal notranslate"><span class="pre">_send_frame</span></code> method of the same class, which constructs a frame from it. This is then moved to the <code class="docutils literal notranslate"><span class="pre">write_rc</span></code> method of the
+<strong>AvstCreditRequester</strong> class, which writes it to its <code class="docutils literal notranslate"><span class="pre">__rc_queue</span></code>. Once the transaction’s turn comes, it’s taken out of the queue
+by the <code class="docutils literal notranslate"><span class="pre">_send_thread</span></code> method, where it waits until, based on the result of the <strong>AvstCreditorRX</strong> object’s <code class="docutils literal notranslate"><span class="pre">get_credits</span></code>, there
+are enough credits for it to be sent. If there are not enough credits, the transaction waits until the card returns enough credits
+to allow the transfer. Then, the transaction is passed to the <code class="docutils literal notranslate"><span class="pre">write_rc</span></code> method of the <strong>AvstPcieDriverMaster</strong> driver, which writes
+it to its <code class="docutils literal notranslate"><span class="pre">_rc_q</span></code> queue, from where it is later read by the <code class="docutils literal notranslate"><span class="pre">send_transaction</span></code> method and written to the <code class="docutils literal notranslate"><span class="pre">pcie_avst_up</span></code> signals
+of the network card.</p>
+<p>The second input to the diagram consists of the methods <code class="docutils literal notranslate"><span class="pre">read</span></code>, <code class="docutils literal notranslate"><span class="pre">write</span></code>, and their variants of the <strong>AvstCompleter</strong> class. This
+path is marked in blue. The passed data is written to the <code class="docutils literal notranslate"><span class="pre">_queue_send</span></code> queue. From there, it is then read by the <code class="docutils literal notranslate"><span class="pre">_cq_loop</span></code> method,
+which passes it to <code class="docutils literal notranslate"><span class="pre">_cq_req</span></code> of the same object, where a frame is constructed from the data. This is sent using the <code class="docutils literal notranslate"><span class="pre">_send_frame</span></code>
+function to another object, <strong>AvstCreditRequester</strong>, which receives it via the <code class="docutils literal notranslate"><span class="pre">write_cq</span></code> method. This method adds the packet to
+<code class="docutils literal notranslate"><span class="pre">cq_queue</span></code>, and it is processed and sent in the same manner described previously.</p>
+<hr class="docutils" />
+<p>All previously mentioned parts of the simulation are then utilized by the tests performed on the network card. To date, there are
+five tests in total:</p>
+<ul class="simple">
+<li><p><strong>test_mi_access_unaligned</strong>: Verifies writing to and reading from card memory using the <strong>MI interface</strong>. Requests are sent using the <code class="docutils literal notranslate"><span class="pre">read</span></code> and <code class="docutils literal notranslate"><span class="pre">write</span></code> methods of the <strong>AvstCompleter</strong> object.</p></li>
+<li><p><strong>test_enable_rxmac_and_check_status</strong>: Activates the <strong>RX MAC</strong> of the <strong>Ethernet interface</strong> and attempts to read the card’s status.</p></li>
+<li><p><strong>test_frequency_meter</strong>: Measures the frequency of selected (in the FPGA FW) clock signals.</p></li>
+<li><p><strong>test_ndp_recvmsg</strong>: Sends a packet onto the <strong>Ethernet</strong> interface via the <strong>Mac Segmented RX Driver</strong>. The packet is then received on <strong>PCIe</strong> interface by the <strong>Avst PCIe Monitor</strong> and compared with the sent packet for evaluation of the RX datapath.</p></li>
+<li><p><strong>test_ndp_send_msgs</strong>: Sends a packet through <strong>PCIe</strong> via the <strong>Avst Pcie Driver Master</strong>. The packet is then received on the <strong>Ethernet interface</strong> by the <strong>Mac Segmented TX Monitor</strong> and compared with the sent packet. This test internally runs <code class="docutils literal notranslate"><span class="pre">_test_ndp_sendmsg</span></code> twice (which sends and receives one packet each) and <code class="docutils literal notranslate"><span class="pre">_test_ndp_sendmsg_burst</span></code> once (which sends and receives several packets).</p></li>
+</ul>
+<hr class="docutils" />
+<p>The implemented simulation provides all the necessary means for connecting to <strong>software layers</strong>. It offers access to
+<strong>firmware registers</strong> via <code class="docutils literal notranslate"><span class="pre">read</span></code> and <code class="docutils literal notranslate"><span class="pre">write</span></code> methods, and also supports <strong>DMA communication</strong> utilizing direct <cite>RAM</cite>
+access. Simultaneously, the <strong>entire network card firmware is simulated</strong>, which opens up the possibility of integrating
+complex software layers like <strong>DPDK</strong>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="app-minimal.html" class="btn btn-neutral float-left" title="Minimal NDK application" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="base.html" class="btn btn-neutral float-right" title="Basic Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -58,9 +58,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration files and parameters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
@@ -68,6 +68,7 @@
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul>
@@ -87,6 +88,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../comp/mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../comp/mfb_tools/readme.html">MFB specification</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cocotbext.html">cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
@@ -94,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
@@ -147,7 +154,7 @@
 <li><p>Go to the <code class="docutils literal notranslate"><span class="pre">&lt;NDK-FPGA_root_directory&gt;/apps/minimal/build/&lt;your_card&gt;/</span></code> directory.</p></li>
 <li><p>Check or modify the <code class="docutils literal notranslate"><span class="pre">app_conf.tcl</span></code> file, where you can change the firmware configuration.</p></li>
 <li><p>Build the FPGA firmware with Quartus/Vivado by the <code class="docutils literal notranslate"><span class="pre">make</span></code> command in the same folder.</p></li>
-<li><p>If you do not have a DMA IP (it is not part of the open-source NDK), you must use the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">DMA_TYPE=0</span></code> command to disable the DMA and create a loopback instead.</p></li>
+<li><p>If you do not have a DMA Medusa IP (it is not part of the open-source NDK), you must use open-source DMA Calypte IP using the command <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">DMA_TYPE=4</span></code>.</p></li>
 <li><p>Wait until the FPGA firmware build successfully finishes.</p></li>
 <li><p>The FPGA firmware file (bitstream) is in the same directory in the NDK format (.nfw) or the Quartus/Vivado format (.sof/.bit).</p></li>
 </ul>
@@ -155,7 +162,7 @@
 <h3>List of make parameters:<a class="headerlink" href="#list-of-make-parameters" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">PCIE_CONF</span></code> – Allows you to set the PCIe configuration, for example: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">PCIE_CONF=1xGen4x16</span></code>. More information can be found in the <a class="reference internal" href="pcie.html#ndk-pcie-mod"><span class="std std-ref">documentation of the PCIe module</span></a>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE</span></code>  – Allows you to select the DMA controller, for example <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">DMA_TYPE=0</span></code>. More information and allowed values can be found in the <a class="reference internal" href="dma.html#ndk-dma"><span class="std std-ref">documentation of the DMA module</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DMA_TYPE</span></code>  – Allows you to select the DMA controller, for example <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">DMA_TYPE=4</span></code>. More information and allowed values can be found in the <a class="reference internal" href="dma.html#ndk-dma"><span class="std std-ref">documentation of the DMA module</span></a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">BOARD_REV</span></code> – Allows you to set the board revision number, for correct firmware settings. This parameter is not available for all FPGA cards. You can find the allowed values in the NDK documentation for the specific card.</p></li>
 </ul>
 </section>

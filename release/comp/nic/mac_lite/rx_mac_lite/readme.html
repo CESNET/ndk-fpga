@@ -47,9 +47,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
@@ -57,6 +57,7 @@
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
@@ -88,6 +89,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
@@ -95,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
@@ -164,7 +171,7 @@ Currently, several variants of the adapter are implemented:</p>
 <li><p><strong>UMII Adapter</strong> - connects Ethernet PCS/PMA layer with MII interface for various speeds (XGMII, XLGMII, CDGMII,…)</p></li>
 <li><p><strong>CMAC Adapter</strong> - connects CMAC Hard IP, which is used in Xilinx UltraScale+ FPGA for 100 Gbps Ethernet (Uses MFB not LBUS!)</p></li>
 <li><p><strong>AVST Adapter</strong> - connects E-Tile Hard IP, which is used in Intel Stratix 10 and Agilex FPGA for up to 100 Gbps Ethernet</p></li>
-<li><p><strong>MAC Segmented Adapter (WIP)</strong> - connects F-Tile Hard IP, which is used in Intel Agilex FPGA for up to 400 Gbps Ethernet</p></li>
+<li><p><strong>MAC Segmented Adapter</strong> - connects F-Tile Hard IP, which is used in Intel Agilex FPGA for up to 400 Gbps Ethernet</p></li>
 </ul>
 </section>
 <section id="register-map">
@@ -173,13 +180,9 @@ Currently, several variants of the adapter are implemented:</p>
 You can set MAC check mode, RX MAC LITE error mask, minimal and maximal frame length.
 After you are done you can enable RX MAC LITE.
 You can also write all valid MAC addresses into MAC memory, but the MAC memory can be accessed by software only when the RX MAC LITE is disabled!</p>
-<p>You can read number of received, correct, discarded and discarded due to buffer overflow frames or number of correctly received bytes.
-You have to sample the counters first and then you can read their content. RX MAC LITE has four frame counters:
-Total Received Frames Counter (TRFC), Correct Frames Counter (CFC), Discarded Frames Counter (DFC) and Counter of Frames Discarded due to Buffer Overflow (BODFC) and the byte counter:
-Octets Received OK Counter (OROC).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If the RX MAC LITE unit is enabled, these counters will have a floating content.
+<p>Statistics counters have a dynamic content.
 For this reason, it is necessary to strobe their actual values at the one moment into the counter registers.
 Software tool is then able to read those registers.</p>
 </div>
@@ -190,219 +193,224 @@ Software tool is then able to read those registers.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>0x00</p></td>
-<td><p>Total Received Frames Counter - low part (TRFCL)</p></td>
+<tr class="row-even"><td><p>0x000</p></td>
+<td><p>Counter - Frames total (RFC2819 - etherStatsPkts) - low 32b</p></td>
 </tr>
-<tr class="row-odd"><td><p>0x04</p></td>
-<td><p>Correct Frames Counter - low part (CFCL)</p></td>
+<tr class="row-odd"><td><p>0x004</p></td>
+<td><p>Counter - Frames passed (sent to user logic) - low 32b</p></td>
 </tr>
-<tr class="row-even"><td><p>0x08</p></td>
-<td><p>Discarded Frames Counter - low part (DFCL)</p></td>
+<tr class="row-even"><td><p>0x008</p></td>
+<td><p>Counter - Frames dropped - low 32b</p></td>
 </tr>
-<tr class="row-odd"><td><p>0x0C</p></td>
-<td><p>Counter of frames discarded due to buffer overflow - low part (BODFCL)</p></td>
+<tr class="row-odd"><td><p>0x00C</p></td>
+<td><p>Counter - Frames dropped due to buffer overflow - low 32b</p></td>
 </tr>
-<tr class="row-even"><td><p>0x10</p></td>
-<td><p>Total Received Frames Counter - high part (TRFCH)</p></td>
+<tr class="row-even"><td><p>0x010</p></td>
+<td><p>Counter - Frames total (RFC2819 - etherStatsPkts) - high 32b</p></td>
 </tr>
-<tr class="row-odd"><td><p>0x14</p></td>
-<td><p>Correct Frames Counter - high part (CFCH)</p></td>
+<tr class="row-odd"><td><p>0x014</p></td>
+<td><p>Counter - Frames passed (sent to user logic) - high 32b</p></td>
 </tr>
-<tr class="row-even"><td><p>0x18</p></td>
-<td><p>Discarded Frames Counter - high part (DFCH)</p></td>
+<tr class="row-even"><td><p>0x018</p></td>
+<td><p>Counter - Frames dropped - high 32b</p></td>
 </tr>
-<tr class="row-odd"><td><p>0x1C</p></td>
-<td><p>Counter of frames discarded due to buffer overflow - high part (BODFCH)</p></td>
+<tr class="row-odd"><td><p>0x01C</p></td>
+<td><p>Counter - Frames dropped due to buffer overflow - high 32b</p></td>
 </tr>
-<tr class="row-even"><td><p>0x20</p></td>
+<tr class="row-even"><td><p>0x020</p></td>
 <td><p>Enable register</p></td>
 </tr>
-<tr class="row-odd"><td><p>0x24</p></td>
+<tr class="row-odd"><td><p>0x024</p></td>
 <td><p>Error mask register</p></td>
 </tr>
-<tr class="row-even"><td><p>0x28</p></td>
+<tr class="row-even"><td><p>0x028</p></td>
 <td><p>Status register</p></td>
 </tr>
-<tr class="row-odd"><td><p>0x2C</p></td>
+<tr class="row-odd"><td><p>0x02C</p></td>
 <td><p>Command register</p></td>
 </tr>
-<tr class="row-even"><td><p>0x30</p></td>
-<td><p>Minimum frame length allowed</p></td>
+<tr class="row-even"><td><p>0x030</p></td>
+<td><p>Minimum frame length allowed (MinTU)</p></td>
 </tr>
-<tr class="row-odd"><td><p>0x34</p></td>
-<td><p>Frame MTU</p></td>
+<tr class="row-odd"><td><p>0x034</p></td>
+<td><p>Maximum frame length allowed (MaxTU/MTU)</p></td>
 </tr>
-<tr class="row-even"><td><p>0x38</p></td>
+<tr class="row-even"><td><p>0x038</p></td>
 <td><p>MAC address check mode</p></td>
 </tr>
-<tr class="row-odd"><td><p>0x3C</p></td>
-<td><p>Octets Received OK Counter - low part (OROCL)</p></td>
+<tr class="row-odd"><td><p>0x03C</p></td>
+<td><p>Counter - Bytes passed (sent to user logic) - low 32b</p></td>
 </tr>
-<tr class="row-even"><td><p>0x40</p></td>
-<td><p>Octets Received OK Counter - high part (OROCH)</p></td>
+<tr class="row-even"><td><p>0x040</p></td>
+<td><p>Counter - Bytes passed (sent to user logic) - high 32b</p></td>
 </tr>
-<tr class="row-odd"><td><p>0x80</p></td>
-<td><p>Memory of available MAC addresses</p></td>
+<tr class="row-odd"><td><p>0x044</p></td>
+<td><p>Speed Meter - ticks counter</p></td>
 </tr>
-</tbody>
-</table>
-<p><strong>Total Received Frames Counter - low part (TRFCL)</strong></p>
-<p>This is the low part of counter that holds number of all arrived frames including those being received at the moment. (TRFC = CFC + DFC)</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
+<tr class="row-even"><td><p>0x048</p></td>
+<td><p>Speed Meter - bytes counter</p></td>
 </tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
+<tr class="row-odd"><td><p>0x04C</p></td>
+<td><p>Speed Meter - packets counter</p></td>
 </tr>
-</tbody>
-</table>
-<p><strong>Correct Frames Counter - low part (CFCL)</strong></p>
-<p>This is the low part of counter that holds number of frames that passed sampling and all controls (was found to be correct) and are forwarded to the RX MAC LITE’s output. (CFC = TRFC - DFC)</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
+<tr class="row-even"><td><p>0x080</p></td>
+<td><p>Memory of available MAC addresses (0x080 - 0x0FF)</p></td>
 </tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
+<tr class="row-odd"><td><p>0x100</p></td>
+<td><p>Counter - RFC2819 - etherStatsCRCAlignErrors - low 32b</p></td>
 </tr>
-</tbody>
-</table>
-<p><strong>Discarded Frames Counter - low part (DFCL)</strong></p>
-<p>This is the low part of counter that holds number of frames that did NOT pass sampling or any control (was found to be NOT correct) and are NOT forwarded to the RX MAC LITE’s output. (DFC = TRFC - CFC)</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
+<tr class="row-even"><td><p>0x104</p></td>
+<td><p>Counter - Frame with size over configured maximum (MaxTU/MTU) - low 32b</p></td>
 </tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
+<tr class="row-odd"><td><p>0x108</p></td>
+<td><p>Counter - Frame with size over configured minimum (MinTU) - low 32b</p></td>
 </tr>
-</tbody>
-</table>
-<p><strong>Counter of frames discarded due to buffer overflow - low part (BODFCL)</strong></p>
-<p>This is the low part of counter that holds number of frames that were discarded due to buffer overflow.</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
+<tr class="row-even"><td><p>0x10C</p></td>
+<td><p>Counter - RFC2819 - etherStatsBroadcastPkts - low 32b</p></td>
 </tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
+<tr class="row-odd"><td><p>0x110</p></td>
+<td><p>Counter - RFC2819 - etherStatsMulticastPkts - low 32b</p></td>
 </tr>
-</tbody>
-</table>
-<p><strong>Total Received Frames Counter - high part (TRFCH)</strong></p>
-<p>This is the high part of counter that holds number of all arrived frames including those being received at the moment. (TRFC = CFC + DFC)</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
+<tr class="row-even"><td><p>0x114</p></td>
+<td><p>Counter - RFC2819 - etherStatsFragments - low 32b</p></td>
 </tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
+<tr class="row-odd"><td><p>0x118</p></td>
+<td><p>Counter - RFC2819 - etherStatsJabbers - low 32b</p></td>
 </tr>
-</tbody>
-</table>
-<p><strong>Correct Frames Counter - high part (CFCH)</strong></p>
-<p>This is the high part of counter that holds number of frames that passed sampling and all controls (was found to be correct) and are forwarded to the RX MAC LITE’s output. (CFC = TRFC - DFC)</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
+<tr class="row-even"><td><p>0x11C</p></td>
+<td><p>Counter - RFC2819 - etherStatsOctets (bytes total) - low 32b</p></td>
 </tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
+<tr class="row-odd"><td><p>0x120</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts64Octets (histogram - 64B) - low 32b</p></td>
 </tr>
-</tbody>
-</table>
-<p><strong>Discarded Frames Counter - high part (DFCH)</strong></p>
-<p>This is the high part of counter that holds number of frames that did NOT pass sampling or any control (was found to be NOT correct) and are NOT forwarded to the RX MAC LITE’s output. (DFC = TRFC - CFC)</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
+<tr class="row-even"><td><p>0x124</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts65to127Octets (histogram - 65-127B) - low 32b</p></td>
 </tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
+<tr class="row-odd"><td><p>0x128</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts128to255Octets (histogram - 128-255B) - low 32b</p></td>
 </tr>
-</tbody>
-</table>
-<p><strong>Counter of frames discarded due to buffer overflow - high part (BODFCH)</strong></p>
-<p>This is the high part of counter that holds number of frames that were discarded due to buffer overflow.</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
+<tr class="row-even"><td><p>0x12C</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts256to511Octets (histogram - 256-511B) - low 32b</p></td>
 </tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
+<tr class="row-odd"><td><p>0x130</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts512to1023Octets (histogram - 512-1023B) - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x134</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts1024to1518Octets (histogram - 1024-1518B) - low 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x138</p></td>
+<td><p>Counter - RFC2819 - etherStatsCRCAlignErrors - high 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x13C</p></td>
+<td><p>Counter - Frame with size over configured maximum (MaxTU/MTU) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x140</p></td>
+<td><p>Counter - Frame with size over configured minimum (MinTU) - high 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x144</p></td>
+<td><p>Counter - RFC2819 - etherStatsBroadcastPkts - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x148</p></td>
+<td><p>Counter - RFC2819 - etherStatsMulticastPkts - high 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x14C</p></td>
+<td><p>Counter - RFC2819 - etherStatsFragments - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x150</p></td>
+<td><p>Counter - RFC2819 - etherStatsJabbers - high 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x154</p></td>
+<td><p>Counter - RFC2819 - etherStatsOctets (bytes total) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x158</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts64Octets (histogram - 64B) - high 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x15C</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts65to127Octets (histogram - 65-127B) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x160</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts128to255Octets (histogram - 128-255B) - high 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x164</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts256to511Octets (histogram - 256-511B) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x168</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts512to1023Octets (histogram - 512-1023B) - high 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x16C</p></td>
+<td><p>Counter - RFC2819 - etherStatsPkts1024to1518Octets (histogram - 1024-1518B) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x170</p></td>
+<td><p>Counter - RFC2819 - etherStatsOversizePkts (over 1518B) - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x174</p></td>
+<td><p>Counter - RFC2819 - etherStatsOversizePkts (over 1518B) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x178</p></td>
+<td><p>Counter - RFC2819 - etherStatsUndersizePkts (below 64B) - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x17C</p></td>
+<td><p>Counter - RFC2819 - etherStatsUndersizePkts (below 64B) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x180</p></td>
+<td><p>Counter - Frame size histogram (1519-2047B) - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x184</p></td>
+<td><p>Counter - Frame size histogram (1519-2047B) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x188</p></td>
+<td><p>Counter - Frame size histogram (2048-4095B) - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x18C</p></td>
+<td><p>Counter - Frame size histogram (2048-4095B) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x190</p></td>
+<td><p>Counter - Frame size histogram (4096-8191B) - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x194</p></td>
+<td><p>Counter - Frame size histogram (4096-8191B) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x198</p></td>
+<td><p>Counter - Frame size histogram (over 8192B) - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x19C</p></td>
+<td><p>Counter - Frame size histogram (over 8192B) - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x1A0</p></td>
+<td><p>Counter - Frames dropped due to MAC filtered - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x1A4</p></td>
+<td><p>Counter - Frames dropped due to MAC filtered - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x1A8</p></td>
+<td><p>Counter - Frames dropped due to error - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x1AC</p></td>
+<td><p>Counter - Frames dropped due to error - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x1B0</p></td>
+<td><p>Counter - Frames dropped due to MAC disabled - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x1B4</p></td>
+<td><p>Counter - Frames dropped due to MAC disabled - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x1B8</p></td>
+<td><p>Counter - Frames dropped due to error in MII - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x1BC</p></td>
+<td><p>Counter - Frames dropped due to error in MII - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x1C0</p></td>
+<td><p>Counter - Frames dropped due to error in CRC - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x1C4</p></td>
+<td><p>Counter - Frames dropped due to error in CRC - high 32b</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x1C8</p></td>
+<td><p>Counter - Frames dropped due to error in length - low 32b</p></td>
+</tr>
+<tr class="row-even"><td><p>0x1CC</p></td>
+<td><p>Counter - Frames dropped due to error in length - high 32b</p></td>
 </tr>
 </tbody>
 </table>
@@ -422,7 +430,7 @@ Software tool is then able to read those registers.</p>
 <td><p>0</p></td>
 <td><p>Enable</p></td>
 <td><p>RW</p></td>
-<td><p>Assert this bit to change the RX MAC LITE status to ‘enabled’. Clear this bit to change the RX MAC LITE status to ‘disabled’. As soon as the RX MAC LITE status is set to ‘enabled’ the RX MAC LITE unit starts working.</p></td>
+<td><p>Assert this bit to change the RX MAC LITE status to ‘enabled’. Clear this bit to change the RX MAC LITE status to ‘disabled’. As soon as the RX MAC LITE status is set to ‘enabled’ the RX MAC LITE unit starts passed frames to user logic.</p></td>
 </tr>
 <tr class="row-odd"><td><p>1</p></td>
 <td><p>31</p></td>
@@ -446,9 +454,9 @@ Software tool is then able to read those registers.</p>
 <tbody>
 <tr class="row-even"><td><p>0</p></td>
 <td><p>0</p></td>
-<td><p>ADAPTER_ERROR</p></td>
+<td><p>MII_ERROR</p></td>
 <td><p>RW</p></td>
-<td><p>This bit signals whether the error notified by adapter will cause the frame discarding. Assert this bit to allow frame discarding. Clear this bit to mask this error.</p></td>
+<td><p>This bit signals whether the MII error will cause the frame discarding. Assert this bit to allow frame discarding. Clear this bit to mask this error.</p></td>
 </tr>
 <tr class="row-odd"><td><p>1</p></td>
 <td><p>1</p></td>
@@ -581,7 +589,7 @@ Software tool is then able to read those registers.</p>
 <li><p>0x03 - CMD SWITCH ADDRESS SPACE: Switch the output address space (more information here TODO RFC COUNTERS link)</p></li>
 </ul>
 <p><strong>Minimum frame length allowed</strong></p>
-<p>This register specifies the minimal frame length allowed (MINTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of &lt;data&gt; part of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64.</p>
+<p>This register specifies the minimal frame length allowed (MINTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of &lt;data&gt; 32b of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64.</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
@@ -607,7 +615,7 @@ Software tool is then able to read those registers.</p>
 </tbody>
 </table>
 <p><strong>Maximum frame length allowed</strong></p>
-<p>This register specifies the maximal frame length allowed (MTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of &lt;data&gt; part of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64. Default value is 1526.</p>
+<p>This register specifies the maximal frame length allowed (MTU). The frame length includes the length of Ethernet frame including FCS - according to the XGMII specification it is the length of &lt;data&gt; 32b of XGMII data stream without IFG, preamble, SFD or EFD. Default value is 64. Default value is 1526.</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>From</p></th>
@@ -665,46 +673,6 @@ Software tool is then able to read those registers.</p>
 <li><p>0x02 - MODE 2: MODE 1 + All brodcast frames can pass.</p></li>
 <li><p>0x03 - MODE 3: MODE 2 + All multicast frames can pass.</p></li>
 </ul>
-<p><strong>Octets Received OK Counter - low part (OROCL)</strong></p>
-<p>This is the low part of counter that holds number of data octets in frames that were successfully received. This does not include octets in frames received with MAC, CRC, MINTU, MTU, CRC or CGMII errors according the settings of Error mask register. This counter is incremented when a new packet is successfully received and the length of the currently received packet is added. The counted length of the packets always includes the length of CRC and vice versa.</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Octets Received OK Counter - high part (OROCH)</strong></p>
-<p>This is the high part of counter that holds number of data octets in frames that were successfully received. This does not include octets in frames received with MAC, CRC, MINTU, MTU, CRC or CGMII errors according the settings of Error mask register. This counter is incremented when a new packet is successfully received and the length of the currently received packet is added. The counted length of the packets always includes the length of CRC and vice versa.</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>From</p></th>
-<th class="head"><p>To</p></th>
-<th class="head"><p>Name</p></th>
-<th class="head"><p>Access</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>0</p></td>
-<td><p>31</p></td>
-<td><p>Counter value</p></td>
-<td><p>R</p></td>
-<td><p>Current counter value</p></td>
-</tr>
-</tbody>
-</table>
 <p><strong>Memory of available MAC addresses</strong></p>
 <p>This memory contains all available MAC addresses for network interface.</p>
 <table class="docutils align-default">
@@ -933,173 +901,178 @@ ULTRASCALE</p></td>
 <td><p>in</p></td>
 <td><p>RX MFB: EOF position for each MFB region in MFB items</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-rx_mfb_error"><td><p>RX_MFB_ERROR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-rx_mfb_mii_err"><td><p>RX_MFB_MII_ERR</p></td>
 <td><p>std_logic_vector(RX_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>RX MFB: Error flag for each MFB region, valid with EOF</p></td>
+<td><p>RX MFB: MII Error flag for each MFB region, valid with EOF</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-rx_mfb_crc_err"><td><p>RX_MFB_CRC_ERR</p></td>
+<td><p>std_logic_vector(RX_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>RX MFB: CRC Error flag for each MFB region, valid with EOF</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>RX MFB: source ready of each MFB bus, don’t support gaps inside frame!</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>RX STATUS INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-adapter_link_up"><td><p>ADAPTER_LINK_UP</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-adapter_link_up"><td><p>ADAPTER_LINK_UP</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Link Up flag input, active when link is up</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>INPUT TIMESTAMP INTERFACE (FROM TSU)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tsu_ts_ns"><td><p>TSU_TS_NS</p></td>
 <td><p>std_logic_vector(64-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Timestamp in nanosecond (new) format, more info in TSU.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tsu_ts_dv"><td><p>TSU_TS_DV</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tsu_ts_dv"><td><p>TSU_TS_DV</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Valid flag of timestamp.</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>TX INTERFACES</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(TX_REGIONS*TX_REGION_SIZE*TX_BLOCK_SIZE*TX_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: data word with frames (packets)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(TX_REGIONS*max(1,log2(TX_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: Start Of Frame (SOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(TX_REGIONS*max(1,log2(TX_REGION_SIZE*TX_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: End Of Frame (EOF) flag for each MFB region</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: SOF position for each MFB region in MFB blocks</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: EOF position for each MFB region in MFB items</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>TX MFB: source ready of each MFB bus</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>TX MFB: destination ready of each MFB bus</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>TX MVB METADATA INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>Metadata MVB bus is valid for each transmitted frame (EOF) from this
 module. Description of DATA bits are in eth_hdr_pack package.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
 <td><p>std_logic_vector(TX_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MVB: data word with MVB items. Description of DATA bits are in eth_hdr_pack package.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
 <td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>TX MVB: valid of each MVB item. There is one item for each packet on the TX MFB.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>TX MVB: source ready of each MVB bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>TX MVB: destination ready of each MVB bus</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>OUTPUT LINK STATUS INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-link_up"><td><p>LINK_UP</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-link_up"><td><p>LINK_UP</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Active when link is up</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-incoming_frame"><td><p>INCOMING_FRAME</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-incoming_frame"><td><p>INCOMING_FRAME</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>Active while receiving a frame</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>MI32 INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_clk"><td><p>MI_CLK</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_clk"><td><p>MI_CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Clock for MI bus</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_reset"><td><p>MI_RESET</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_reset"><td><p>MI_RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>Reset synchronized with MI_CLK</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_dwr"><td><p>MI_DWR</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_dwr"><td><p>MI_DWR</p></td>
 <td><p>std_logic_vector(32-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: data from master to slave (write data)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_addr"><td><p>MI_ADDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_addr"><td><p>MI_ADDR</p></td>
 <td><p>std_logic_vector(32-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: slave address</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_rd"><td><p>MI_RD</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: byte enable</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_wr"><td><p>MI_WR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: read request</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_be"><td><p>MI_BE</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_be"><td><p>MI_BE</p></td>
 <td><p>std_logic_vector(4-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MI bus: write request</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_drd"><td><p>MI_DRD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_drd"><td><p>MI_DRD</p></td>
 <td><p>std_logic_vector(32-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: ready of slave module</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_ardy"><td><p>MI_ARDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_ardy"><td><p>MI_ARDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: data from slave to master (read data)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_mac_lite-mi_drdy"><td><p>MI_DRDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_mac_lite-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td><p>MI bus: valid of MI_DRD data signal</p></td>

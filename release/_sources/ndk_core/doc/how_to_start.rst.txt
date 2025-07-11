@@ -19,7 +19,7 @@ How to build an FPGA firmware with an NDK-based application
 - Go to the ``<NDK-FPGA_root_directory>/apps/minimal/build/<your_card>/`` directory.
 - Check or modify the ``app_conf.tcl`` file, where you can change the firmware configuration.
 - Build the FPGA firmware with Quartus/Vivado by the ``make`` command in the same folder.
-- If you do not have a DMA IP (it is not part of the open-source NDK), you must use the ``make DMA_TYPE=0`` command to disable the DMA and create a loopback instead.
+- If you do not have a DMA Medusa IP (it is not part of the open-source NDK), you must use open-source DMA Calypte IP using the command ``make DMA_TYPE=4``.
 - Wait until the FPGA firmware build successfully finishes.
 - The FPGA firmware file (bitstream) is in the same directory in the NDK format (.nfw) or the Quartus/Vivado format (.sof/.bit).
 
@@ -27,7 +27,7 @@ List of make parameters:
 ------------------------
 
 - ``PCIE_CONF`` -- Allows you to set the PCIe configuration, for example: ``make PCIE_CONF=1xGen4x16``. More information can be found in the :ref:`documentation of the PCIe module <ndk_pcie_mod>`.
-- ``DMA_TYPE``  -- Allows you to select the DMA controller, for example ``make DMA_TYPE=0``. More information and allowed values can be found in the :ref:`documentation of the DMA module <ndk_dma>`.
+- ``DMA_TYPE``  -- Allows you to select the DMA controller, for example ``make DMA_TYPE=4``. More information and allowed values can be found in the :ref:`documentation of the DMA module <ndk_dma>`.
 - ``BOARD_REV`` -- Allows you to set the board revision number, for correct firmware settings. This parameter is not available for all FPGA cards. You can find the allowed values in the NDK documentation for the specific card.
 
 How to prepare the FPGA card and the host PC

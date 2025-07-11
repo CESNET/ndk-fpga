@@ -45,9 +45,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../doc/configuration.html">Configuration files and parameters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../doc/faq.html">Frequently Asked Questions</a></li>
@@ -55,6 +55,7 @@
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul>
@@ -74,6 +75,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../comp/mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../comp/mfb_tools/readme.html">MFB specification</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
@@ -81,6 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
@@ -269,12 +276,17 @@ CMAC   core: 100.</p>
 <td><p>(others =&gt; 16383)</p></td>
 <td><p>Maximum allowed size of TX frame in bytes per Ethernet port.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_mac_bypass"><td><p>ETH_MAC_BYPASS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-eth_chan_map"><td><p>ETH_CHAN_MAP</p></td>
+<td><p>integer_vector(7 downto 0)</p></td>
+<td><p>(7, 6, 5, 4, 3, 2, 1, 0)</p></td>
+<td><p>Optional remapping of physical QSFP(DD) lanes to Eth channel numbers</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-eth_mac_bypass"><td><p>ETH_MAC_BYPASS</p></td>
 <td><p>boolean</p></td>
 <td><p>False</p></td>
 <td><p>Optional option to disable MAC Lite modules. Dangerously!</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-lanes"><td><p>LANES</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-lanes"><td><p>LANES</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>Number of serial lanes.
@@ -284,17 +296,22 @@ Options: F_TILE      core: 8;</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-qsfp_ports"><td><p>QSFP_PORTS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-qsfp_ports"><td><p>QSFP_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-qsfp_i2c_ports"><td><p>QSFP_I2C_PORTS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-qsfp_i2c_ports"><td><p>QSFP_I2C_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>max 2</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-qsfp_i2c_tristate"><td><p>QSFP_I2C_TRISTATE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-qsfp_i2c_tristate"><td><p>QSFP_I2C_TRISTATE</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-qsfp_i2c_ctrl_en"><td><p>QSFP_I2C_CTRL_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td></td>
@@ -372,7 +389,7 @@ WARNING: works only for a single-channel (and single-Region) designs with E-Tile
 <tr class="row-even" id="vhdl-gengeneric-network_mod-tx_dma_channels"><td><p>TX_DMA_CHANNELS</p></td>
 <td><p>natural</p></td>
 <td><p>16</p></td>
-<td></td>
+<td><p>TX_DMA_CHANNELS per Eth Stream!</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-network_mod-ll_mode"><td><p>LL_MODE</p></td>
 <td><p>boolean</p></td>

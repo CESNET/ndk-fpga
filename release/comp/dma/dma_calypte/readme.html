@@ -47,9 +47,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/performance.html">Performance report</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
@@ -57,6 +57,7 @@
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
@@ -79,8 +80,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#supported-pcie-configurations">Supported PCIe Configurations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#resource-consumption">Resource consumption</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#latency-report">Latency report</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#test-case-1-amd-fpga">Test case 1 (AMD FPGA)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#test-case-2-intel-fpga">Test case 2 (Intel FPGA)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#amd-fpga-gen3x8">AMD FPGA Gen3x8</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#intel-fpga-gen3x8">Intel FPGA Gen3x8</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#amd-fpga-gen3x16">AMD FPGA Gen3x16</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#intel-fpga-gen4x16">Intel FPGA Gen4x16</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#comparison-of-fpga-vendors">Comparison of FPGA vendors</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#local-subcomponents">Local Subcomponents</a><ul>
@@ -102,6 +106,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../mfb_tools/readme.html">MFB specification</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
@@ -109,6 +118,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
@@ -753,6 +763,10 @@ chip (<code class="docutils literal notranslate"><span class="pre">xcvu7p-flvb21
 </section>
 <section id="latency-report">
 <h2>Latency report<a class="headerlink" href="#latency-report" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unless given explicitly, all measured values are in microseconds.</p>
+</div>
 <p>Since this module has been designed for low latency, this is our primary concern. Even though its
 RTL design reaches the minimum latency, the PCI Express protocol remains the biggest contributor to
 the overall latency. From our observations, the latency is also influenced by the vendor
@@ -764,47 +778,523 @@ is enabled on all AMD cards whose measurements we provide. The latency is always
 denoted for specific results. Every time the data are looped back, either in the Host for the FHF path
 or in the FPGA for the HFH path, the loopback is established with the shortest path possible (E.g., for the
 HFH to directly connect <em>USR_TX_MFB</em> to the <em>USR_RX_MFB</em> interface).</p>
-<section id="test-case-1-amd-fpga">
-<h3>Test case 1 (AMD FPGA)<a class="headerlink" href="#test-case-1-amd-fpga" title="Link to this heading"></a></h3>
+<section id="amd-fpga-gen3x8">
+<h3>AMD FPGA Gen3x8<a class="headerlink" href="#amd-fpga-gen3x8" title="Link to this heading"></a></h3>
 <ul>
-<li><p>Card: AMD Alveo X3522PV</p>
-<p>CPU: Intel(R) Xeon(R) E-2226G CPU &#64; 3.40GHz</p>
-<p>RAM: 64 GB (4 x 16GB)</p>
-<p>PCIe configuration: Gen3x8</p>
+<li><p>Card: Silicom fb2CGhh (Chip: <code class="docutils literal notranslate"><span class="pre">xcku15p-ffve1760-2-e</span></code>)</p>
+<p>CPU: Intel Xeon CPU E5-2630 v4 &#64; 2.20GHz</p>
+<p>RAM: 32 GB</p>
+<p>PCIe configuration: Gen3x8 (low latency configuration)</p>
 </li>
-<li><p>FHF latency (1000 repetitions)</p>
+<li><p>FHF latency (16384 repetitions)</p>
+<p>The following table summarizes the measured results. The form of a distribution function has been
+chosen as the most suitable since the measured latency values have a normal distribution across
+the set. The quantiles are labeled with a letter “P” followed by its value, meaning P1 the
+0.01-quantile, P50 the 0.5-quantile (or median), etc.</p>
 <blockquote>
-<div><figure class="align-center">
-<a class="reference internal image-reference" href="../../../_images/fhf_latency_alveo_x3522pv.jpg"><img alt="../../../_images/fhf_latency_alveo_x3522pv.jpg" src="../../../_images/fhf_latency_alveo_x3522pv.jpg" style="width: 768.0px; height: 438.59999999999997px;" />
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Packet size</p></th>
+<th class="head"><p>Min</p></th>
+<th class="head"><p>P1-lat</p></th>
+<th class="head"><p>P50-lat</p></th>
+<th class="head"><p>P80-lat</p></th>
+<th class="head"><p>P99-lat</p></th>
+<th class="head"><p>Max</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>60B</p></td>
+<td><p>0.796</p></td>
+<td><p>0.825</p></td>
+<td><p>0.842</p></td>
+<td><p>0.855</p></td>
+<td><p>0.892</p></td>
+<td><p>24.676</p></td>
+</tr>
+<tr class="row-odd"><td><p>64B</p></td>
+<td><p>0.796</p></td>
+<td><p>0.820</p></td>
+<td><p>0.837</p></td>
+<td><p>0.847</p></td>
+<td><p>0.887</p></td>
+<td><p>17.284</p></td>
+</tr>
+<tr class="row-even"><td><p>128B</p></td>
+<td><p>0.804</p></td>
+<td><p>0.831</p></td>
+<td><p>0.843</p></td>
+<td><p>0.855</p></td>
+<td><p>0.892</p></td>
+<td><p>18.768</p></td>
+</tr>
+<tr class="row-odd"><td><p>256B</p></td>
+<td><p>0.832</p></td>
+<td><p>0.857</p></td>
+<td><p>0.874</p></td>
+<td><p>0.886</p></td>
+<td><p>0.924</p></td>
+<td><p>19.168</p></td>
+</tr>
+<tr class="row-even"><td><p>512B</p></td>
+<td><p>0.900</p></td>
+<td><p>0.928</p></td>
+<td><p>0.939</p></td>
+<td><p>0.952</p></td>
+<td><p>0.990</p></td>
+<td><p>18.440</p></td>
+</tr>
+<tr class="row-odd"><td><p>1024B</p></td>
+<td><p>1.052</p></td>
+<td><p>1.078</p></td>
+<td><p>1.095</p></td>
+<td><p>1.105</p></td>
+<td><p>1.143</p></td>
+<td><p>19.640</p></td>
+</tr>
+<tr class="row-even"><td><p>1500B</p></td>
+<td><p>1.228</p></td>
+<td><p>1.254</p></td>
+<td><p>1.271</p></td>
+<td><p>1.281</p></td>
+<td><p>1.324</p></td>
+<td><p>18.236</p></td>
+</tr>
+</tbody>
+</table>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/latency_fb2cghh_oliver.svg"><img alt="../../../_images/latency_fb2cghh_oliver.svg" src="../../../_images/latency_fb2cghh_oliver.svg" style="width: 794.8000000000001px; height: 528.4px;" />
 </a>
 </figure>
 </div></blockquote>
 </li>
-<li><p>HFH latency (64 byte packets, 1000000 repetitions)</p>
-<p>~811 ns (median)</p>
-<p>~1.3 us (0.99-quantile)</p>
+<li><p>HFH latency (64 B packets, 1000000 repetitions)</p>
+<p>822 ns (median), 1241 ns (0.99-quantile)</p>
+</li>
+<li><p>HFH latency (1500 B packets, 1000000 repetitions)</p>
+<p>1340 ns (median), 1401 ns (0.99-quantile)</p>
 </li>
 </ul>
 </section>
-<section id="test-case-2-intel-fpga">
-<h3>Test case 2 (Intel FPGA)<a class="headerlink" href="#test-case-2-intel-fpga" title="Link to this heading"></a></h3>
+<section id="intel-fpga-gen3x8">
+<h3>Intel FPGA Gen3x8<a class="headerlink" href="#intel-fpga-gen3x8" title="Link to this heading"></a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This 8-lane PCIe configuration is not officially provided by the NDK
+framework. It has been published here to only provide a comparison with the
+equally configured AMD-based FPGA card.</p>
+</div>
 <ul>
-<li><p>Card: Silicom FPGA SmartNIC N6010</p>
-<p>CPU: Intel(R) Xeon(R) Gold 6348 CPU &#64; 2.60GHz</p>
-<p>RAM: 64 GB (4 x 16GB)</p>
+<li><p>Card: Silicom FPGA SmartNIC N6010 (Chip: <code class="docutils literal notranslate"><span class="pre">AGFB014R24A2E2V</span></code>)</p>
+<p>CPU: Intel Xeon CPU E5-2630 v4 &#64; 2.20GHz</p>
+<p>RAM: 32 GB</p>
 <p>PCIe configuration: Gen3x8</p>
 </li>
-<li><p>FHF latency (1000 repetitions)</p>
+<li><p>FHF latency (16384 repetitions)</p>
 <blockquote>
-<div><figure class="align-center">
-<a class="reference internal image-reference" href="../../../_images/latency_n6010_tramin.png"><img alt="../../../_images/latency_n6010_tramin.png" src="../../../_images/latency_n6010_tramin.png" style="height: 450px;" />
+<div><blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Pakcet size</p></th>
+<th class="head"><p>Min</p></th>
+<th class="head"><p>P1-lat</p></th>
+<th class="head"><p>P50-lat</p></th>
+<th class="head"><p>P80-lat</p></th>
+<th class="head"><p>P99-lat</p></th>
+<th class="head"><p>Max</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>60B</p></td>
+<td><p>0.876</p></td>
+<td><p>0.897</p></td>
+<td><p>0.910</p></td>
+<td><p>0.923</p></td>
+<td><p>0.965</p></td>
+<td><p>17.836</p></td>
+</tr>
+<tr class="row-odd"><td><p>64B</p></td>
+<td><p>0.872</p></td>
+<td><p>0.890</p></td>
+<td><p>0.907</p></td>
+<td><p>0.921</p></td>
+<td><p>0.959</p></td>
+<td><p>20.972</p></td>
+</tr>
+<tr class="row-even"><td><p>128B</p></td>
+<td><p>0.888</p></td>
+<td><p>0.906</p></td>
+<td><p>0.922</p></td>
+<td><p>0.935</p></td>
+<td><p>0.973</p></td>
+<td><p>17.908</p></td>
+</tr>
+<tr class="row-odd"><td><p>256B</p></td>
+<td><p>0.920</p></td>
+<td><p>0.938</p></td>
+<td><p>0.954</p></td>
+<td><p>0.966</p></td>
+<td><p>1.006</p></td>
+<td><p>18.028</p></td>
+</tr>
+<tr class="row-even"><td><p>512B</p></td>
+<td><p>0.980</p></td>
+<td><p>1.001</p></td>
+<td><p>1.016</p></td>
+<td><p>1.026</p></td>
+<td><p>1.070</p></td>
+<td><p>19.660</p></td>
+</tr>
+<tr class="row-odd"><td><p>1024B</p></td>
+<td><p>1.128</p></td>
+<td><p>1.155</p></td>
+<td><p>1.169</p></td>
+<td><p>1.182</p></td>
+<td><p>1.219</p></td>
+<td><p>18.452</p></td>
+</tr>
+<tr class="row-even"><td><p>1500B</p></td>
+<td><p>1.300</p></td>
+<td><p>1.329</p></td>
+<td><p>1.342</p></td>
+<td><p>1.357</p></td>
+<td><p>1.401</p></td>
+<td><p>18.236</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/latency_n6010_oliver.svg"><img alt="../../../_images/latency_n6010_oliver.svg" src="../../../_images/latency_n6010_oliver.svg" style="width: 794.8000000000001px; height: 528.4px;" />
 </a>
 </figure>
 </div></blockquote>
 </li>
-<li><p>HFH latency (64 byte packets, 1000000 repetitions)</p>
-<p>~1100 ns (median)</p>
-<p>~1.7 us (0.99-quantile)</p>
+</ul>
+</section>
+<section id="amd-fpga-gen3x16">
+<h3>AMD FPGA Gen3x16<a class="headerlink" href="#amd-fpga-gen3x16" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Card: Silicom fb2CGhh (Chip: <code class="docutils literal notranslate"><span class="pre">xcku15p-ffve1760-2-e</span></code>)</p>
+<p>CPU: Intel Xeon CPU E5-2630 v4 &#64; 2.20GHz</p>
+<p>RAM: 32 GB</p>
+<p>PCIe configuration: Gen3x16</p>
+</li>
+<li><p>FHF latency (16384 repetitions)</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Packet size</p></th>
+<th class="head"><p>Min</p></th>
+<th class="head"><p>P1-lat</p></th>
+<th class="head"><p>P50-lat</p></th>
+<th class="head"><p>P80-lat</p></th>
+<th class="head"><p>P99-lat</p></th>
+<th class="head"><p>Max</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>60B</p></td>
+<td><p>0.800</p></td>
+<td><p>0.819</p></td>
+<td><p>0.839</p></td>
+<td><p>0.856</p></td>
+<td><p>0.894</p></td>
+<td><p>17.828</p></td>
+</tr>
+<tr class="row-odd"><td><p>64B</p></td>
+<td><p>0.792</p></td>
+<td><p>0.814</p></td>
+<td><p>0.830</p></td>
+<td><p>0.846</p></td>
+<td><p>0.886</p></td>
+<td><p>17.752</p></td>
+</tr>
+<tr class="row-even"><td><p>128B</p></td>
+<td><p>0.804</p></td>
+<td><p>0.819</p></td>
+<td><p>0.834</p></td>
+<td><p>0.845</p></td>
+<td><p>0.885</p></td>
+<td><p>18.444</p></td>
+</tr>
+<tr class="row-odd"><td><p>256B</p></td>
+<td><p>0.828</p></td>
+<td><p>0.839</p></td>
+<td><p>0.857</p></td>
+<td><p>0.872</p></td>
+<td><p>0.910</p></td>
+<td><p>18.856</p></td>
+</tr>
+<tr class="row-even"><td><p>512B</p></td>
+<td><p>0.880</p></td>
+<td><p>0.898</p></td>
+<td><p>0.910</p></td>
+<td><p>0.923</p></td>
+<td><p>0.959</p></td>
+<td><p>17.832</p></td>
+</tr>
+<tr class="row-odd"><td><p>1024B</p></td>
+<td><p>0.984</p></td>
+<td><p>1.000</p></td>
+<td><p>1.016</p></td>
+<td><p>1.027</p></td>
+<td><p>1.070</p></td>
+<td><p>18.020</p></td>
+</tr>
+<tr class="row-even"><td><p>1500B</p></td>
+<td><p>1.076</p></td>
+<td><p>1.094</p></td>
+<td><p>1.114</p></td>
+<td><p>1.133</p></td>
+<td><p>1.184</p></td>
+<td><p>20.216</p></td>
+</tr>
+</tbody>
+</table>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/latency_x16_fb2cghh_oliver.svg"><img alt="../../../_images/latency_x16_fb2cghh_oliver.svg" src="../../../_images/latency_x16_fb2cghh_oliver.svg" style="width: 794.8000000000001px; height: 528.4px;" />
+</a>
+</figure>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="intel-fpga-gen4x16">
+<h3>Intel FPGA Gen4x16<a class="headerlink" href="#intel-fpga-gen4x16" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Card: Silicom FPGA SmartNIC N6010 (Chip: <code class="docutils literal notranslate"><span class="pre">AGFB014R24A2E2V</span></code>)</p></li>
+<li><p>CPU: Intel Xeon Gold 6342 CPU &#64; 2.80GHz</p></li>
+<li><p>RAM: 128 GB</p></li>
+<li><p>PCIe configuration: Gen4x16</p></li>
+<li><p>FHF latency (16384 repetitions)</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Packet size</p></th>
+<th class="head"><p>Min</p></th>
+<th class="head"><p>P1-lat</p></th>
+<th class="head"><p>P50-lat</p></th>
+<th class="head"><p>P80-lat</p></th>
+<th class="head"><p>P99-lat</p></th>
+<th class="head"><p>Max</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>60B</p></td>
+<td><p>0.965</p></td>
+<td><p>1.049</p></td>
+<td><p>1.069</p></td>
+<td><p>1.084</p></td>
+<td><p>1.116</p></td>
+<td><p>4.240</p></td>
+</tr>
+<tr class="row-odd"><td><p>64B</p></td>
+<td><p>0.968</p></td>
+<td><p>1.044</p></td>
+<td><p>1.066</p></td>
+<td><p>1.082</p></td>
+<td><p>1.118</p></td>
+<td><p>3.822</p></td>
+</tr>
+<tr class="row-even"><td><p>128B</p></td>
+<td><p>0.968</p></td>
+<td><p>1.052</p></td>
+<td><p>1.073</p></td>
+<td><p>1.087</p></td>
+<td><p>1.112</p></td>
+<td><p>3.645</p></td>
+</tr>
+<tr class="row-odd"><td><p>256B</p></td>
+<td><p>1.030</p></td>
+<td><p>1.068</p></td>
+<td><p>1.087</p></td>
+<td><p>1.101</p></td>
+<td><p>1.128</p></td>
+<td><p>3.420</p></td>
+</tr>
+<tr class="row-even"><td><p>512B</p></td>
+<td><p>1.052</p></td>
+<td><p>1.094</p></td>
+<td><p>1.112</p></td>
+<td><p>1.124</p></td>
+<td><p>1.148</p></td>
+<td><p>3.717</p></td>
+</tr>
+<tr class="row-odd"><td><p>1024B</p></td>
+<td><p>1.115</p></td>
+<td><p>1.145</p></td>
+<td><p>1.162</p></td>
+<td><p>1.176</p></td>
+<td><p>1.224</p></td>
+<td><p>3.675</p></td>
+</tr>
+<tr class="row-even"><td><p>1500B</p></td>
+<td><p>1.177</p></td>
+<td><p>1.223</p></td>
+<td><p>1.264</p></td>
+<td><p>1.356</p></td>
+<td><p>1.408</p></td>
+<td><p>4.765</p></td>
+</tr>
+</tbody>
+</table>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/latency_x16_n6010_mourvedre.svg"><img alt="../../../_images/latency_x16_n6010_mourvedre.svg" src="../../../_images/latency_x16_n6010_mourvedre.svg" style="width: 794.8000000000001px; height: 528.4px;" />
+</a>
+</figure>
+</div></blockquote>
+</li>
+<li><p>HFH latency (64 B packets, 1000000 repetitions)</p>
+<p>866 ns (median), 1340 ns (0.99-quantile)</p>
+</li>
+<li><p>HFH latency (1500 B packets, 1000000 repetitions)</p>
+<p>1292 ns (median), 2241 ns (0.99-quantile)</p>
+</li>
+</ul>
+</section>
+<section id="comparison-of-fpga-vendors">
+<h3>Comparison of FPGA vendors<a class="headerlink" href="#comparison-of-fpga-vendors" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Cards: Silicom FPGA SmartNIC N6010 and Silicom fb2CGhh</p>
+<p>CPU: Intel Xeon CPU E5-2630 v4 &#64; 2.20GHz</p>
+<p>RAM: 32 GB</p>
+<p>PCIe configuration: Gen3x8</p>
+</li>
+<li><p>FHF latency (16384 repetitions)</p>
+<p>The graph beneath the table picks only some of the packet lengths showed in the table.</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Packet size</p></th>
+<th class="head"><p>Min</p></th>
+<th class="head"><p>P1-lat</p></th>
+<th class="head"><p>P50-lat</p></th>
+<th class="head"><p>P80-lat</p></th>
+<th class="head"><p>P99-lat</p></th>
+<th class="head"><p>Max</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>amd_60B</p></td>
+<td><p>0.796</p></td>
+<td><p>0.825</p></td>
+<td><p>0.842</p></td>
+<td><p>0.855</p></td>
+<td><p>0.892</p></td>
+<td><p>24.676</p></td>
+</tr>
+<tr class="row-odd"><td><p>intel_60B</p></td>
+<td><p>0.876</p></td>
+<td><p>0.897</p></td>
+<td><p>0.910</p></td>
+<td><p>0.923</p></td>
+<td><p>0.965</p></td>
+<td><p>17.836</p></td>
+</tr>
+<tr class="row-even"><td><p>amd_64B</p></td>
+<td><p>0.796</p></td>
+<td><p>0.820</p></td>
+<td><p>0.837</p></td>
+<td><p>0.847</p></td>
+<td><p>0.887</p></td>
+<td><p>17.284</p></td>
+</tr>
+<tr class="row-odd"><td><p>intel_64B</p></td>
+<td><p>0.872</p></td>
+<td><p>0.890</p></td>
+<td><p>0.907</p></td>
+<td><p>0.921</p></td>
+<td><p>0.959</p></td>
+<td><p>20.972</p></td>
+</tr>
+<tr class="row-even"><td><p>amd_128B</p></td>
+<td><p>0.804</p></td>
+<td><p>0.831</p></td>
+<td><p>0.843</p></td>
+<td><p>0.855</p></td>
+<td><p>0.892</p></td>
+<td><p>18.768</p></td>
+</tr>
+<tr class="row-odd"><td><p>intel_128B</p></td>
+<td><p>0.888</p></td>
+<td><p>0.906</p></td>
+<td><p>0.922</p></td>
+<td><p>0.935</p></td>
+<td><p>0.973</p></td>
+<td><p>17.908</p></td>
+</tr>
+<tr class="row-even"><td><p>amd_256B</p></td>
+<td><p>0.832</p></td>
+<td><p>0.857</p></td>
+<td><p>0.874</p></td>
+<td><p>0.886</p></td>
+<td><p>0.924</p></td>
+<td><p>19.168</p></td>
+</tr>
+<tr class="row-odd"><td><p>intel_256B</p></td>
+<td><p>0.920</p></td>
+<td><p>0.938</p></td>
+<td><p>0.954</p></td>
+<td><p>0.966</p></td>
+<td><p>1.006</p></td>
+<td><p>18.028</p></td>
+</tr>
+<tr class="row-even"><td><p>amd_512B</p></td>
+<td><p>0.900</p></td>
+<td><p>0.928</p></td>
+<td><p>0.939</p></td>
+<td><p>0.952</p></td>
+<td><p>0.990</p></td>
+<td><p>18.440</p></td>
+</tr>
+<tr class="row-odd"><td><p>intel_512B</p></td>
+<td><p>0.980</p></td>
+<td><p>1.001</p></td>
+<td><p>1.016</p></td>
+<td><p>1.026</p></td>
+<td><p>1.070</p></td>
+<td><p>19.660</p></td>
+</tr>
+<tr class="row-even"><td><p>amd_1024B</p></td>
+<td><p>1.052</p></td>
+<td><p>1.078</p></td>
+<td><p>1.095</p></td>
+<td><p>1.105</p></td>
+<td><p>1.143</p></td>
+<td><p>19.640</p></td>
+</tr>
+<tr class="row-odd"><td><p>intel_1024B</p></td>
+<td><p>1.128</p></td>
+<td><p>1.155</p></td>
+<td><p>1.169</p></td>
+<td><p>1.182</p></td>
+<td><p>1.219</p></td>
+<td><p>18.452</p></td>
+</tr>
+<tr class="row-even"><td><p>amd_1500B</p></td>
+<td><p>1.228</p></td>
+<td><p>1.254</p></td>
+<td><p>1.271</p></td>
+<td><p>1.281</p></td>
+<td><p>1.324</p></td>
+<td><p>18.236</p></td>
+</tr>
+<tr class="row-odd"><td><p>intel_1500B</p></td>
+<td><p>1.300</p></td>
+<td><p>1.329</p></td>
+<td><p>1.342</p></td>
+<td><p>1.357</p></td>
+<td><p>1.401</p></td>
+<td><p>18.236</p></td>
+</tr>
+</tbody>
+</table>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/fb2cghh_n6010_compare.svg"><img alt="../../../_images/fb2cghh_n6010_compare.svg" src="../../../_images/fb2cghh_n6010_compare.svg" style="width: 794.8000000000001px; height: 528.4px;" />
+</a>
+</figure>
+</div></blockquote>
 </li>
 </ul>
 </section>
