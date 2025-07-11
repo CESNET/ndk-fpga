@@ -177,6 +177,8 @@ if args.setting is None and args.test_name is None:
         # system("cp transcript transcript_"+"_".join(c))
         # backup test_pkg
         # system("cp {} {}_".format(args.test_pkg_file,args.test_pkg_file)+"_".join(c))
+    if args.coverage:
+        system('vcover merge coverage_merged.ucdb coverage_*.ucdb > /dev/null')
     ##########
 else:
     ##########
