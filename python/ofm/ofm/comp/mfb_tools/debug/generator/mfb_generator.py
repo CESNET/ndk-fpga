@@ -2,8 +2,10 @@
 # Copyright (C) 2024 CESNET z. s. p. o.
 # Author(s): Daniel Kondys <kondys@cesnet.cz>
 #            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
+#            Jakub Cabal <cabal@cesnet.cz>
 
 import sys
+import logging
 from dataclasses import dataclass, fields
 from typing import Any, Optional, List
 
@@ -21,6 +23,7 @@ class GeneratorConfig:
     maximum_channel: int
     dst_mac_address: bytes
     src_mac_address: bytes
+    src_ip_address_mask: int
     generating: Optional[bool] = None # Read-only
     frame_count: Optional[int] = None # Read-only
 
@@ -38,9 +41,11 @@ class MfbGenerator(nfb.BaseComp):
     _REG_SRC_MAC_HIGH    = 0x1C
     _REG_FRAME_CNT_LOW   = 0x20
     _REG_FRAME_CNT_HIGH  = 0x24
+    _REG_SRC_IP_MASK     = 0x28
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._logger = logging.getLogger("MfbGenerator")
 
     # ################
     # Command register
@@ -285,6 +290,24 @@ class MfbGenerator(nfb.BaseComp):
         """Get the number of generated frames (may overflow frequently due to low cnt width)."""
         return int.from_bytes(self._comp.read(self._REG_FRAME_CNT_LOW, 8), byteorder=sys.byteorder)
 
+    # ################
+    # IP mask register
+    # ################
+    @property
+    def src_ip_address_mask(self) -> int:
+        """Get the mask of the generated SRC IP address."""
+        if self._node.get_property("version").value >= 2:
+            return self._comp.read32(self._REG_SRC_IP_MASK)
+        return 0
+
+    @src_ip_address_mask.setter
+    def src_ip_address_mask(self, mask: int) -> None:
+        """Set the mask to generate SRC IP address."""
+        if self._node.get_property("version").value >= 2:
+            self._comp.write32(self._REG_SRC_IP_MASK, mask)
+        else:
+            self._logger.warning("Unable to set SRC IP address mask in this generator version. Try using a newer FW.")
+
     # #############
     # Configuration
     # #############
@@ -303,6 +326,7 @@ class MfbGenerator(nfb.BaseComp):
             maximum_channel            = self.maximum_channel,
             dst_mac_address            = self.dst_mac_address,
             src_mac_address            = self.src_mac_address,
+            src_ip_address_mask        = self.src_ip_address_mask,
             frame_count                = self.frame_count,
         )
         return conf
@@ -318,6 +342,7 @@ class MfbGenerator(nfb.BaseComp):
         self.maximum_channel            = conf.maximum_channel
         self.dst_mac_address            = conf.dst_mac_address
         self.src_mac_address            = conf.src_mac_address
+        self.src_ip_address_mask        = conf.src_ip_address_mask
         self.enabled                    = conf.enabled
 
     def get_fconfiguration(self) -> List:
@@ -328,6 +353,12 @@ class MfbGenerator(nfb.BaseComp):
         lst = []
         for field in fields(conf):
             value = getattr(conf, field.name)
+            # Convert src_ip_address_mask to hex if it exists
+            if field.name == "src_ip_address_mask":
+                if self._node.get_property("version").value >= 2:
+                    value = hex(value)
+                else:
+                    value = "UNSUPPORTED!"
             # Convert booleans to strings for tabulation
             if isinstance(value, bool):
                 value = str(value)
