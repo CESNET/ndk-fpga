@@ -95,6 +95,16 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
 
     // every midnight check for new commits and run pipeline if they exist
     properties([pipelineTriggers([pollSCM('H H(0-2) * * *')])])
+    properties([
+        parameters([
+            booleanParam(name: 'FORCE_RUN_COVERAGE_REPORT', defaultValue: (params.FORCE_RUN_COVERAGE_REPORT ?: false))
+        ])
+    ])
+
+    def run_coverage_report = (
+        params.FORCE_RUN_COVERAGE_REPORT || // Used for manually triggered jobs
+        ['devel'].contains(env.BRANCH_NAME) // Used for automatically triggered jobs
+    )
 
     def failed = []
     //load new fpga_version and set default simulator
@@ -116,12 +126,16 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
         //def repo_root = pwd()
         //def multi_ver = "$repo_root/build/scripts/multi_ver/multi_ver.py"
         def multi_ver = "$ofm_path/build/scripts/multi_ver/multi_ver.py"
+        def coverage_reporter = "$ofm_path/python/coverage_reporter/coverage_reporter.py"
         // exec vsim
         try { // try-catch is a hack to continue even after the first failed verification
             timeout(time: 4, unit: 'HOURS') {
                 stage("$name") {
                     dir("$path") {
                         def command = "python3 $multi_ver $fdo $pkg $settings -p \"$name\""
+                        if (run_coverage_report) {
+                            command = "$command --coverage"
+                        }
                         sh "${print_info}"
                         sh "${toolsel}${command}"
                     }
@@ -132,6 +146,10 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
             failed.add("$name")
         } finally { // collect interesting files
             archiveArtifacts "$path/transcript*" // verification log
+            if (run_coverage_report) {
+                // Generate a coverage report file
+                sh "python3 ${coverage_reporter} --name \"$name\" --input \"$path/coverage_merged.ucdb\" --output \"$path/coverage_report.json\""
+            }
             if(currentBuild.result == "FAILURE") {
                 archiveArtifacts "$path/vsim.wlf"   // generated waveform, use vsim -view vsim.wlf
             }
@@ -155,6 +173,11 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
             """.stripIndent(),
             attachLog: true,
             compressLog: true
+    }
+
+    if (run_coverage_report) {
+        // Publish the coverage report file
+        publishReport displayType: 'absolute', name: 'Coverage Report', provider: json(pattern: '**/coverage_report.json')
     }
 }
 
