@@ -26,14 +26,32 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
     rand int unsigned bar_probability[];
     protected pcie_info   info;
 
+    const int unsigned payload_max = MAX_PAYLOAD_SIZE < 1024 ? MAX_PAYLOAD_SIZE : 0;
+    rand logic [10-1:0] length_max;
+    rand logic [10-1:0] length_min;
+
+
     constraint const_base {
-        transactions   inside {[200:1000]};
+        transactions   inside {[50:100]};
         dev_id.size()  inside {[1:10]};
         bar_probability.size() == 7+1; // BAR number + 1
         bar_probability.sum() > 0;
         foreach(bar_probability[it]) {
             bar_probability[it] <= 50;
         }
+    }
+
+    //In Dwords
+    constraint c_length {
+        length_min <= length_max;
+        length_min dist {
+            [1:5] :/40,
+            [6:20] :/ 25,
+            [20:MAX_PAYLOAD_SIZE/4] :/ 13,
+            [MAX_PAYLOAD_SIZE/4*1:MAX_PAYLOAD_SIZE/4*3] :/ 5,
+            [MAX_PAYLOAD_SIZE/4*3:MAX_PAYLOAD_SIZE-1  ] :/2,
+            payload_max :/ 10
+        };
     }
 
     function new(string name = "sequence_base");
@@ -93,6 +111,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
             //assert(std::randomize(rq))
             //generate CQ nebo RC
             std::randomize(cq) with { cq dist {1'b1 :/ 5,  1'b0 :/ info.rq_hdr.size()}; };
+
             if (cq == 1 && response_only == 0) begin
                 logic [16-1:0] dev_id_act;
                 uvm_pcie::request_header cq_hdr;
@@ -131,9 +150,10 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                     //cq_hdr.pcie_type dist {5'b00000 :/ 95, [5'b00000:5'b11111] :/ 5};
                     cq_hdr.pcie_type == 0;
                     //TODO: remove this // if read then length is lower that 32 DWORDS
-                    cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= MAX_REQUEST_SIZE && cq_hdr.length > 0); //read
-                    cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= 32 && cq_hdr.length > 0); //read
-                    cq_hdr.fmt[2:1] == 2'b01 -> (cq_hdr.length <= MAX_PAYLOAD_SIZE && cq_hdr.length > 0); //write
+                    cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= MAX_REQUEST_SIZE); //read
+                    cq_hdr.fmt[2:1] == 2'b00 -> (cq_hdr.length <= 32); //read
+                    cq_hdr.fmt[2:1] == 2'b01 -> (cq_hdr.length <= MAX_PAYLOAD_SIZE); //write
+                    MAX_PAYLOAD_SIZE != 1024 -> cq_hdr.length != 0;
 
                     cq_hdr.requester_id == dev_id_act;
                     cq_hdr.tag inside   {[0:2**8-1]};  // 8 bit tag
@@ -152,7 +172,6 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                 int unsigned rq_num;
                 int unsigned byte_count;
                 int unsigned rc_length;
-                const int unsigned max_payload = MAX_PAYLOAD_SIZE < 1024 ? MAX_PAYLOAD_SIZE : 0;
 
 
                 //cc_hdr = hdr.pop_front();
@@ -163,7 +182,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
                 start_item(rc_hdr);
                 assert(rc_hdr.randomize() with {
                     rc_hdr.data.size() <= 15000;
-                    info.rq_hdr[rq_num].rest_length >= MAX_PAYLOAD_SIZE -> rc_hdr.length dist {max_payload :/60,  [6*MAX_PAYLOAD_SIZE/8:MAX_PAYLOAD_SIZE-1] :/ 30,  [MAX_PAYLOAD_SIZE/8:6*MAX_PAYLOAD_SIZE/8-1] :/ 10,  [1:MAX_PAYLOAD_SIZE/8-1] :/ 10};
+                    info.rq_hdr[rq_num].rest_length >= MAX_PAYLOAD_SIZE -> rc_hdr.length dist {payload_max :/60,  [6*MAX_PAYLOAD_SIZE/8:MAX_PAYLOAD_SIZE-1] :/ 30,  [MAX_PAYLOAD_SIZE/8:6*MAX_PAYLOAD_SIZE/8-1] :/ 10,  [1:MAX_PAYLOAD_SIZE/8-1] :/ 10};
                     info.rq_hdr[rq_num].rest_length <  MAX_PAYLOAD_SIZE -> rc_hdr.length dist {info.rq_hdr[rq_num].rest_length  :/70,  [1:info.rq_hdr[rq_num].rest_length] :/ 30};
 
                     (rc_hdr.length == 0) -> (rc_hdr.data.size() == 1024);
@@ -205,7 +224,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
 
 
             // If there is notnigh to send, then prevent to infinite loop by add some waiting time.
-            if (info.rq_hdr.size() == 0 && cq == 0) begin
+            if (info.rq_hdr.size() == 0 && (cq == 0 || response_only != 0)) begin
                 int unsigned wait_time;
                 std::randomize(wait_time) with {wait_time inside {[10:333]};};
                 #(wait_time*1ns);

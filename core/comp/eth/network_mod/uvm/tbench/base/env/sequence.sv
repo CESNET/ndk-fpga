@@ -28,7 +28,13 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
     rand int unsigned transactions_approx;
     constraint c_transactions {
         //transactions_approx inside {[30_000:40_000]};
-        transactions_approx inside {[1000:1500]};
+        transactions_approx dist {
+                [150:400]  :/ 5,
+                [400:1000] :/ 10,
+                [1000:2000] :/ 15,
+                [2000:4000] :/ 25,
+                [4000:10000] :/ 45
+            };
     };
 
     function new(string name = "uvm_network_mod_env::sequence_simple");

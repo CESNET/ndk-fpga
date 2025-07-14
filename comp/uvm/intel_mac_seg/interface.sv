@@ -34,7 +34,7 @@ interface intel_mac_seg_if #(int unsigned SEGMENTS) (input logic CLK);
         input DATA, INFRAME, EOP_EMPTY, FCS_ERROR, ERROR, STATUS_DATA, VALID, READY;
     endclocking
 
-    modport dut_rx(input DATA, INFRAME, EOP_EMPTY, FCS_ERROR, ERROR, STATUS_DATA, VALID);
+    modport dut_rx(input DATA, INFRAME, EOP_EMPTY, FCS_ERROR, ERROR, STATUS_DATA, VALID, output READY);
     modport dut_tx(output DATA, INFRAME, EOP_EMPTY, FCS_ERROR, VALID, input READY);
 
     // ------------------------------------------------------------------------

@@ -19,7 +19,39 @@ class sequence_simple #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
     int unsigned transaction_count_max = 200;
     rand int unsigned transaction_count;
 
+    rand int unsigned data_size_min;
+    rand int unsigned data_size_max;
+
     constraint c1 {transaction_count inside {[transaction_count_min : transaction_count_max]};}
+    constraint c_data_size {
+        data_size_min <= data_size_max;
+        data_size_min dist {
+             cfg.array_size_min :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
+             cfg.array_size_max :/ 5
+        };
+
+        data_size_max dist {
+             cfg.array_size_min :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
+             cfg.array_size_max :/ 5
+        };
+
+    }
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_simple");
@@ -43,7 +75,7 @@ class sequence_simple #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
         while(it < transaction_count && (state == null || state.next()))
         begin
             // Generate random request, which must be in interval from min length to max length
-            `uvm_do_with(req, {data.size inside{[cfg.array_size_min : cfg.array_size_max]}; });
+            `uvm_do_with(req, {data.size inside{[data_size_min : data_size_max]}; });
             it++;
         end
     endtask
@@ -63,7 +95,18 @@ class sequence_simple_const #(int unsigned ITEM_WIDTH) extends uvm_common::seque
     rand int unsigned transaction_count;
 
     constraint c1 {transaction_count inside {[transaction_count_min : transaction_count_max]};}
-    constraint c2 {data_size inside {[cfg.array_size_min : cfg.array_size_max]};}
+    constraint c2 {data_size dist {
+             cfg.array_size_min :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
+             cfg.array_size_max :/ 5
+        };}
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_simple_const");
@@ -112,7 +155,20 @@ class sequence_simple_gauss #(int unsigned ITEM_WIDTH) extends uvm_common::seque
     int unsigned std_deviation_max = 32;
 
     constraint c1 {transaction_count inside {[transaction_count_min : transaction_count_max]};}
-    constraint c2 {mean inside {[cfg.array_size_min : cfg.array_size_max]};}
+    constraint c2 {
+        mean dist {
+             cfg.array_size_min :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
+             cfg.array_size_max :/ 5
+        };
+    }
     constraint c3 {std_deviation inside {[std_deviation_min : std_deviation_max]};}
 
     function int gaussian_dist();
@@ -343,6 +399,39 @@ class sequence_inverted_gauss #(int unsigned ITEM_WIDTH) extends sequence_simple
     `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_inverted_gauss)
 
     int unsigned mean;
+    rand int unsigned data_size_min;
+    rand int unsigned data_size_max;
+
+    constraint c_data_size {
+        data_size_min <= data_size_max;
+        data_size_min dist {
+             cfg.array_size_min :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
+             cfg.array_size_max :/ 5
+        };
+
+        data_size_max dist {
+             cfg.array_size_min :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
+             cfg.array_size_max :/ 5
+        };
+
+    }
+
 
     // Constructor
     function new(string name = "sequence_inverted_gauss");
@@ -359,14 +448,14 @@ class sequence_inverted_gauss #(int unsigned ITEM_WIDTH) extends sequence_simple
 
     function int inverted_gaussian_dist();
         int value = $dist_normal($urandom(), mean, mean/3);
-        value = math_min(value, cfg.array_size_max);
-        value = math_max(value, cfg.array_size_min);
+        value = math_min(value, data_size_max);
+        value = math_max(value, data_size_min);
 
         if (value < mean) begin
-            return math_min(value+mean, cfg.array_size_max);
+            return math_min(value+mean, data_size_max);
         end
         else begin
-            return math_max(value-mean, cfg.array_size_min);
+            return math_max(value-mean, data_size_min);
         end
     endfunction
 
@@ -376,7 +465,7 @@ class sequence_inverted_gauss #(int unsigned ITEM_WIDTH) extends sequence_simple
 
         `uvm_info(m_sequencer.get_full_name(), "\n\tsequence_inverted_gauss is running", UVM_DEBUG)
 
-        mean = (cfg.array_size_max-cfg.array_size_min)/2;
+        mean = (data_size_max-data_size_min)/2;
 
         repeat (transaction_count) begin
             int unsigned data_size;
