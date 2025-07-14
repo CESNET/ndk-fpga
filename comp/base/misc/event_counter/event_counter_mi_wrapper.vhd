@@ -187,9 +187,16 @@ begin
     MI_ARDY <= MI_WR or MI_RD;
     MI_DRDY <= MI_RD;
 
-    -- psl assert_empty_flag :
-    --      assert always (total_events'length+1<=MI_WIDTH)
-    --      report "WARNING: EVENT COUNTER MI WRAPPER: The width of register for counting number of events (to_string(total_events'length)) is higher or equal to the total width of the connected MI interface (to_string(MI_WIDTH))! This might cause overflow of the value read from this register!";
+    -- synthesis translate_off
+    process(CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (total_events'length+1 > MI_WIDTH) then
+                report "WARNING: EVENT COUNTER MI WRAPPER: The width of register for counting number of events " & to_string(total_events'length) & " is higher or equal to the total width of the connected MI interface " & to_string(MI_WIDTH) & "! This might cause overflow of the value read from this register!" severity warning;
+            end if;
+        end if;
+    end process;
+    -- synthesis translate_on
 
     MI_DRD <= std_logic_vector(resize_left(unsigned(total_events),MI_WIDTH))
          when (MI_ADDR and MI_ADDR_MASK)=(MI_EVENTS_ADDR and MI_ADDR_MASK) else

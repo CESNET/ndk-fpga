@@ -511,10 +511,16 @@ begin
             TX_TRANS_DST_RDY => trsr_trans_comp_dst_rdy(s)
         );
 
-        -- psl assert_trcg :
-        --      assert always (((or trcg_trans_vld)='1' and trcg_trans_src_rdy='1' and trcg_trans_dst_rdy='1' and trsr_trans_dst_rdy(s)='0')=false) @rising_edge(CLK)
-        --      report "WARNING: CROSSBARX: Internal Transaction FIFO is FULL causing a decrease in throughput! Consider increasing value of generic TRANS_FIFO_ITEMS (currently to_string(TRANS_FIFO_ITEMS)).";
-
+        -- synthesis translate_off
+        process(CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (not (((or trcg_trans_vld)='1' and trcg_trans_src_rdy='1' and trcg_trans_dst_rdy='1' and trsr_trans_dst_rdy(s)='0')=false)) then
+                    report "WARNING: CROSSBARX: Internal Transaction FIFO is FULL causing a decrease in throughput! Consider increasing value of generic TRANS_FIFO_ITEMS currently (" & to_string(TRANS_FIFO_ITEMS) & ")." severity warning;
+                end if;
+            end if;
+        end process;
+        -- synthesis translate_on
         -- ------------------------------------------------------------------------
 
         -- ------------------------------------------------------------------------
