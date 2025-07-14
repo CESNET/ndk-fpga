@@ -20,6 +20,11 @@ class start_channel extends uvm_sequence;
         data_mask_width > 5;
         hdr_mask_width  < 16;
         hdr_mask_width  > 3;
+
+        // Packet BLOCK_SIZE
+        data_base_addr % 128 == 0;
+        // Packet header size
+        hdr_base_addr  % 8   == 0;
     }
 
     function new (string name = "start_channel");
