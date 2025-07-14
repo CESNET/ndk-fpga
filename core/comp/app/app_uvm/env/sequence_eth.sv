@@ -301,13 +301,16 @@ class sequence_flowtest_eth #(
         string ipv6_addresses = get_ipv6_addresses();
         string mac_addresses  = get_mac_addresses();
 
-        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s", // Creating string of the options
+        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s %s %s", // Creating string of the options
                                        config_filepath,
                                        seed,
                                        (config_generator_config_filepath != "") ? { "--config \"", config_generator_config_filepath, "\"" } : "",
                                        (ipv4_addresses != "") ? { "--ipv4 \"", ipv4_addresses, "\"" } : "",
                                        (ipv6_addresses != "") ? { "--ipv6 \"", ipv6_addresses, "\"" } : "",
-                                       (mac_addresses != "") ? { "--mac \"", mac_addresses, "\"" } : "");
+                                       (mac_addresses != "") ? { "--mac \"", mac_addresses, "\"" } : "",
+                                       $sformatf("--packet-min-size %0d", cfg.array_size_min),
+                                       $sformatf("--packet-max-size %0d", cfg.array_size_max)
+                                       );
         config_generator_execute_command = { uvm_packet_generators::CONFIG_GENERATOR_EXECUTE_PATH, " ", config_generator_parameters }; // Creating string of the config generator call command
 
         // Try generate config file

@@ -196,6 +196,10 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
             std::randomize(mac[mac.size()-1].address);
             std::randomize(mac[mac.size()-1].mask) with { mac[mac.size()-1].mask <= 128;};
         end
+
+        // Set the packet sizes
+        packet_size_min = cfg.array_size_min;
+        packet_size_max = cfg.array_size_max;
     endfunction
 
     function string get_ipv4_addresses();
@@ -277,13 +281,16 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         string ipv6_addresses = get_ipv6_addresses();
         string mac_addresses  = get_mac_addresses();
 
-        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s", // Creating string of the options
+        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s %s %s", // Creating string of the options
                                        config_filepath,
                                        seed,
                                        (config_generator_config_filepath != "") ? { "--config \"", config_generator_config_filepath, "\"" } : "",
                                        (ipv4_addresses != "") ? { "--ipv4 \"", ipv4_addresses, "\"" } : "",
                                        (ipv6_addresses != "") ? { "--ipv6 \"", ipv6_addresses, "\"" } : "",
-                                       (mac_addresses != "") ? { "--mac \"", mac_addresses, "\"" } : "");
+                                       (mac_addresses != "") ? { "--mac \"", mac_addresses, "\"" } : "",
+                                       $sformatf("--packet-min-size %0d", packet_size_min),
+                                       $sformatf("--packet-max-size %0d", packet_size_max)
+                                       );
         config_generator_execute_command = { CONFIG_GENERATOR_EXECUTE_PATH, " ", config_generator_parameters }; // Creating string of the config generator call command
 
         // Try generate config file
