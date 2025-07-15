@@ -137,8 +137,8 @@ architecture BEHAV of MFB_GENERATOR is
 
     signal sof_pos_arr          : slv_array_t(REGIONS-1 downto 0)(max(1, log2(REGION_SIZE))-1 downto 0);
     signal sof_index            : u_array_t(REGIONS-1 downto 0)(max(1, log2(REGIONS*REGION_SIZE))-1 downto 0);
-    signal data_word_plus       : slv_array_t(2*REGIONS*REGION_SIZE-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    signal data_word_plus_reg   : slv_array_t(REGIONS*REGION_SIZE-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+    signal data_word_plus       : slv_array_t(REGIONS*REGION_SIZE+6-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+    signal data_word_plus_reg   : slv_array_t(6-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
     signal data_word            : slv_array_t(REGIONS*REGION_SIZE-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
     signal data_word_ser        : std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
 
@@ -482,21 +482,14 @@ begin
 
     process (all)
     begin
-        for b in 0 to REGIONS*REGION_SIZE-1 loop
-            data_word_plus(b) <= data_word_plus_reg(b);
-        end loop;
-        for c in REGIONS*REGION_SIZE to 2*REGIONS*REGION_SIZE-1 loop
-            data_word_plus(c) <= (others => '0');
-        end loop;
-        for i in 0 to REGIONS-1 loop
-            sof_index(i) <= resize(unsigned(sof_pos_arr(i)),log2(REGIONS*REGION_SIZE)) + i*REGION_SIZE;
-            if (sof(i) = '1') then
-                data_word_plus(to_integer(sof_index(i)))   <= eth_hdr_384b(i)(64-1 downto 0);
-                data_word_plus(to_integer(sof_index(i))+1) <= eth_hdr_384b(i)(128-1 downto 64);
-                data_word_plus(to_integer(sof_index(i))+2) <= eth_hdr_384b(i)(192-1 downto 128);
-                data_word_plus(to_integer(sof_index(i))+3) <= eth_hdr_384b(i)(256-1 downto 192);
-                data_word_plus(to_integer(sof_index(i))+4) <= eth_hdr_384b(i)(320-1 downto 256);
-                data_word_plus(to_integer(sof_index(i))+5) <= eth_hdr_384b(i)(384-1 downto 320);
+        data_word_plus <= (others => (others => '0'));
+        data_word_plus(6-1 downto 0) <= data_word_plus_reg;
+        for ii in 0 to REGIONS-1 loop
+            sof_index(ii) <= resize(unsigned(sof_pos_arr(ii)), log2(REGIONS*REGION_SIZE)) + ii*REGION_SIZE;
+            if (sof(ii) = '1') then
+                for jj in 0 to 5 loop
+                    data_word_plus(to_integer(sof_index(ii))+jj) <= eth_hdr_384b(ii)((jj+1)*64-1 downto jj*64);
+                end loop;
             end if;
         end loop;
     end process;
@@ -505,7 +498,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (dst_rdy = '1') then
-                data_word_plus_reg <= data_word_plus(2*REGIONS*REGION_SIZE-1 downto REGIONS*REGION_SIZE);
+                data_word_plus_reg <= data_word_plus(REGIONS*REGION_SIZE+6-1 downto REGIONS*REGION_SIZE);
             end if;
         end if;
     end process;
