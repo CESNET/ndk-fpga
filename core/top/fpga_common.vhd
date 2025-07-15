@@ -1469,8 +1469,13 @@ begin
         DMA_TX_MVB_DST_RDY  => app_dma_tx_mvb_dst_rdy,
 
         DMA_TX_MFB_DATA     => slv_array_ser(app_dma_tx_mfb_data),
-        DMA_TX_MFB_SOF      => slv_array_ser(app_dma_tx_mfb_sof),
-        DMA_TX_MFB_EOF      => slv_array_ser(app_dma_tx_mfb_eof),
+        -- FIXME: questasim have problem with this construstion. Problem is with optimalizer.
+        -- which probublly change svl(N downto 0)(1-1 downto 0) to std_logic_vector. This lead to
+	-- sigsegv in some corner cases.
+        -- DMA_TX_MFB_SOF      => slv_array_ser(app_dma_tx_mfb_sof),
+        -- DMA_TX_MFB_EOF      => slv_array_ser(app_dma_tx_mfb_eof),
+        DMA_TX_MFB_SOF      => slv_array_ser(app_dma_tx_mfb_sof, DMA_STREAMS, DMA_MFB_REGIONS),
+        DMA_TX_MFB_EOF      => slv_array_ser(app_dma_tx_mfb_eof, DMA_STREAMS, DMA_MFB_REGIONS),
         DMA_TX_MFB_SOF_POS  => slv_array_ser(app_dma_tx_mfb_sof_pos),
         DMA_TX_MFB_EOF_POS  => slv_array_ser(app_dma_tx_mfb_eof_pos),
         DMA_TX_MFB_SRC_RDY  => app_dma_tx_mfb_src_rdy,
