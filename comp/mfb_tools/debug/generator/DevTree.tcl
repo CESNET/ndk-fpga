@@ -6,7 +6,7 @@ proc dts_mfb_generator {base name} {
     append ret "$name {"
     append ret "compatible = \"cesnet,ofm,mfb_generator\";"
     append ret "reg = <$base $size>;"
-    append ret "version = <1>;"
+    append ret "version = <2>;"
     append ret "};"
     return $ret
 }

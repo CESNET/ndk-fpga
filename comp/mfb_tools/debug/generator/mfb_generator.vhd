@@ -2,6 +2,7 @@
 -- Copyright (C) 2023 CESNET z. s. p. o.
 -- Author(s): Daniel Kondys <xkondy00@vutbr.cz>
 --            Vladislav Valek <valekv@cesnet.cz>
+--            Jakub Cabal <cabal@cesnet.cz>
 --
 -- SPDX-License-Identifier: BSD-3-Clause
 
@@ -55,6 +56,7 @@ entity MFB_GENERATOR is
         CTRL_MAC_SRC      : in std_logic_vector(48-1 downto 0);
         CTRL_PKT_CNT_CLR  : in std_logic;
         CTRL_PKT_CNT      : out std_logic_vector(PKT_CNT_WIDTH-1 downto 0);
+        CTRL_SRC_IP_MASK  : in  std_logic_vector(32-1 downto 0);
 
         -- TX interface
         TX_MFB_DATA     : out std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
@@ -71,7 +73,7 @@ entity MFB_GENERATOR is
 architecture BEHAV of MFB_GENERATOR is
 
     constant CHANNELS           : natural := 2**CHANNELS_WIDTH;
-    constant ETHER_TYPE         : std_logic_vector(15 downto 0) := X"B588"; -- local experimental ethertype
+    constant ETHER_TYPE         : std_logic_vector(15 downto 0) := X"0008"; -- IPv4 ethertype
 
     signal pkt_cnt              : u_array_t(REGIONS downto 0)(PKT_CNT_WIDTH-1 downto 0);
     signal pkt_cnt_reg          : unsigned(PKT_CNT_WIDTH-1 downto 0);
@@ -122,8 +124,17 @@ architecture BEHAV of MFB_GENERATOR is
     signal meta                 : slv_array_t(REGIONS-1 downto 0)(CHANNELS_WIDTH+LENGTH_WIDTH-1 downto 0);
     signal data                 : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
 
-    signal free_cnt             : unsigned(16-1 downto 0);
-    signal eth_hdr_128b         : std_logic_vector(128-1 downto 0);
+    signal free_cnt             : unsigned(32-1 downto 0);
+    signal dip                  : slv_array_t(REGIONS-1 downto 0)(32-1 downto 0);
+    signal sip                  : slv_array_t(REGIONS-1 downto 0)(32-1 downto 0);
+    signal dport                : slv_array_t(REGIONS-1 downto 0)(16-1 downto 0);
+    signal sport                : slv_array_t(REGIONS-1 downto 0)(16-1 downto 0);
+    signal l3len                : std_logic_vector(16-1 downto 0);
+    signal l4len                : std_logic_vector(16-1 downto 0);
+    signal ipv4_hdr             : slv_array_t(REGIONS-1 downto 0)((20*8)-1 downto 0);
+    signal udp_hdr              : slv_array_t(REGIONS-1 downto 0)((8*8)-1 downto 0);
+    signal eth_hdr_384b         : slv_array_t(REGIONS-1 downto 0)(384-1 downto 0);
+
     signal sof_pos_arr          : slv_array_t(REGIONS-1 downto 0)(max(1, log2(REGION_SIZE))-1 downto 0);
     signal sof_index            : u_array_t(REGIONS-1 downto 0)(max(1, log2(REGIONS*REGION_SIZE))-1 downto 0);
     signal data_word_plus       : slv_array_t(2*REGIONS*REGION_SIZE-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
@@ -447,12 +458,26 @@ begin
             if (RST = '1') then
                 free_cnt <= (others => '0');
             elsif (dst_rdy = '1') then
-                free_cnt <= free_cnt + 1;
+                free_cnt <= free_cnt + REGIONS;
             end if;
         end if;
     end process;
 
-    eth_hdr_128b <= std_logic_vector(free_cnt) & ETHER_TYPE & CTRL_MAC_SRC & CTRL_MAC_DST;
+    l3len <= std_logic_vector(resize((unsigned(CTRL_LENGTH)-14),16));
+    l4len <= std_logic_vector(resize((unsigned(CTRL_LENGTH)-34),16));
+
+    hdr_g: for i in 0 to REGIONS-1 generate
+        dip(i)   <= X"00000000";
+        sip(i)   <= std_logic_vector(free_cnt + i) and CTRL_SRC_IP_MASK;
+        dport(i) <= X"0000";
+        sport(i) <= X"0000";
+
+        --UDP proto, Time To Live, Identification+Flags+FragmentOffset, l3len, DSCP+ECN, IHL+version
+        ipv4_hdr(i) <= dip(i) & sip(i) & X"0000" & X"11" & X"FF" & X"00000000" & l3len(7 downto 0) & l3len(15 downto 8) & X"00" & X"45";
+        udp_hdr(i) <= X"0000" & l4len(7 downto 0) & l4len(15 downto 8) & dport(i) & sport(i);
+        eth_hdr_384b(i) <= X"000000000000" & udp_hdr(i) & ipv4_hdr(i) & ETHER_TYPE & CTRL_MAC_SRC & CTRL_MAC_DST;
+    end generate;
+
     sof_pos_arr <= slv_array_deser(sof_pos,REGIONS,max(1, log2(REGION_SIZE)));
 
     process (all)
@@ -466,8 +491,12 @@ begin
         for i in 0 to REGIONS-1 loop
             sof_index(i) <= resize(unsigned(sof_pos_arr(i)),log2(REGIONS*REGION_SIZE)) + i*REGION_SIZE;
             if (sof(i) = '1') then
-                data_word_plus(to_integer(sof_index(i))) <= eth_hdr_128b(64-1 downto 0);
-                data_word_plus(to_integer(sof_index(i))+1) <= eth_hdr_128b(128-1 downto 64);
+                data_word_plus(to_integer(sof_index(i)))   <= eth_hdr_384b(i)(64-1 downto 0);
+                data_word_plus(to_integer(sof_index(i))+1) <= eth_hdr_384b(i)(128-1 downto 64);
+                data_word_plus(to_integer(sof_index(i))+2) <= eth_hdr_384b(i)(192-1 downto 128);
+                data_word_plus(to_integer(sof_index(i))+3) <= eth_hdr_384b(i)(256-1 downto 192);
+                data_word_plus(to_integer(sof_index(i))+4) <= eth_hdr_384b(i)(320-1 downto 256);
+                data_word_plus(to_integer(sof_index(i))+5) <= eth_hdr_384b(i)(384-1 downto 320);
             end if;
         end loop;
     end process;
