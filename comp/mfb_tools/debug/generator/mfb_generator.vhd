@@ -56,7 +56,7 @@ entity MFB_GENERATOR is
         CTRL_MAC_SRC      : in std_logic_vector(48-1 downto 0);
         CTRL_PKT_CNT_CLR  : in std_logic;
         CTRL_PKT_CNT      : out std_logic_vector(PKT_CNT_WIDTH-1 downto 0);
-        CTRL_SRC_IP_MASK  : in  std_logic_vector(32-1 downto 0);
+        CTRL_SRC_IP_MASK  : in  std_logic_vector(32-1 downto 0) := (others => '1');
 
         -- TX interface
         TX_MFB_DATA     : out std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
