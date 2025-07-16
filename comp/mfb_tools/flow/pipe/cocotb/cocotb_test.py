@@ -20,9 +20,17 @@ from cocotb_bus.scoreboard import Scoreboard
 class testbench():
     def __init__(self, dut):
         self.dut = dut
-        self.RX_MFB = MFBDriver(dut, "RX", dut.CLK)
+
+        mfb_params = {
+            "regions"     : dut.REGIONS.value,
+            "region_size" : dut.REGION_SIZE.value,
+            "block_size"  : dut.BLOCK_SIZE.value,
+            "item_width"  : dut.ITEM_WIDTH.value
+        }
+
+        self.RX_MFB = MFBDriver(dut, "RX", dut.CLK, mfb_params=mfb_params)
         self.backpressure = BitDriver(dut.TX_DST_RDY, dut.CLK)
-        self.TX_MFB = MFBMonitor(dut, "TX", dut.CLK)
+        self.TX_MFB = MFBMonitor(dut, "TX", dut.CLK, mfb_params=mfb_params)
 
         # Create a scoreboard on the TX_MFB bus
         self.expected_output = []
