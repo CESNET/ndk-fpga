@@ -15,6 +15,7 @@ from cocotbext.ofm.mfb.monitors import MFBMonitor
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
+from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
 
 
 class testbench():
@@ -31,6 +32,11 @@ class testbench():
         self.RX_MFB = MFBDriver(dut, "RX", dut.CLK, mfb_params=mfb_params)
         self.backpressure = BitDriver(dut.TX_DST_RDY, dut.CLK)
         self.TX_MFB = MFBMonitor(dut, "TX", dut.CLK, mfb_params=mfb_params)
+
+        # setting up the probe measuring throughput
+        self.throughput_probe = ThroughputProbe(ThroughputProbeMfbInterface(self.TX_MFB), throughput_units="bits")
+        self.throughput_probe.add_log_interval(0, None)
+        self.throughput_probe.set_log_period(10)
 
         # Create a scoreboard on the TX_MFB bus
         self.expected_output = []
@@ -73,5 +79,9 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     await ClockCycles(dut.CLK, 100)
     # print("RX: %d/%d" % (tb.RX_MFB.frame_cnt, pkt_count))
     # print("TX: %d/%d" % (tb.TX_MFB.frame_cnt, pkt_count))
+
+    # logging values measured by throughput probe
+    tb.throughput_probe.log_max_throughput()
+    tb.throughput_probe.log_average_throughput()
 
     raise tb.scoreboard.result
