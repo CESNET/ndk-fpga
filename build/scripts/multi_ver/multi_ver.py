@@ -34,7 +34,7 @@ def run_modelsim(fdo_file, test_name, manual=False, gui=False, coverage=False, e
 
     command  = f"do {fdo_file};"
     if coverage:
-        command += f"coverage save -codeAll -testname {test_name} {test_name}.ucdb;"
+        command += f"coverage save -codeAll -cvg -assert -testname {test_name} {test_name}.ucdb;"
     if not gui:
         command += "quit -f;"
 
