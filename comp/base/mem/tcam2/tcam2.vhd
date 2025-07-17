@@ -124,7 +124,7 @@ architecture FULL of TCAM2 is
     signal input_wr_addr_reg         : std_logic_vector(WRITE_ADDR'range);
 
     -- Input registers augmented
-    signal input_m_data_reg_aug      : std_logic_vector(COLUMNS*CELL_WIDTH-1 downto 0);
+    signal input_m_data_reg_aug      : std_logic_vector(COLUMNS*CELL_WIDTH-1 downto 0) := (others => '0');
     signal input_wr_data_reg_aug     : std_logic_vector(COLUMNS*CELL_WIDTH-1 downto 0) := (others => '0');
     signal input_wr_mask_reg_aug     : std_logic_vector(COLUMNS*CELL_WIDTH-1 downto 0) := (others => '0');
 
@@ -500,7 +500,7 @@ begin
     end process;
 
     -- match data register padding
-    input_m_data_reg_aug     <= (input_m_data_reg'range => input_m_data_reg, others => '0');
+    input_m_data_reg_aug(input_m_data_reg'range) <= input_m_data_reg;
     -- match data register array
     input_m_data_reg_aug_arr <= slv_array_deser(input_m_data_reg_aug,COLUMNS);
 
