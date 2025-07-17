@@ -5,7 +5,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 # Source files for implemented component
-lappend MOD "$ENTITY_BASE/rq_hdr_gen/rq_hdr_gen.vhd"
-lappend MOD "$ENTITY_BASE/cc_hdr_gen/cc_hdr_gen.vhd"
-lappend MOD "$ENTITY_BASE/cq_hdr_deparser/cq_hdr_deparser.vhd"
-lappend MOD "$ENTITY_BASE/rc_hdr_deparser/rc_hdr_deparser.vhd"
+
+lappend COMPONENTS [list "RQ_HDR_GEN"       $ENTITY_BASE/rq_hdr_gen "FULL"]
+lappend COMPONENTS [list "CC_HDR_GEN"       $ENTITY_BASE/cc_hdr_gen "FULL"]
+lappend COMPONENTS [list "CQ_HDR_DEPARSER"  $ENTITY_BASE/cq_hdr_deparser "FULL"]
+lappend COMPONENTS [list "RC_HDR_DEPARSER"  $ENTITY_BASE/rc_hdr_deparser "FULL"]

@@ -6,12 +6,8 @@
 
 TOP_LEVEL_ENT=PULSE_SHORT
 
-SYNTH=vivado
 export CLK_PERIOD=2.56
-export DEVICE=ULTRASCALE
-
 
 all: comp
-# the way: ndk/common/build/Makefile
 include ../../../../../build/Makefile
 .PHONY: all

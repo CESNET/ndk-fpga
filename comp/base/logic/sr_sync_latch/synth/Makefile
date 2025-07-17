@@ -6,9 +6,7 @@
 
 TOP_LEVEL_ENT=SR_SYNC_LATCH
 
-SYNTH=vivado
 export CLK_PERIOD=2.64
-export DEVICE=ULTRASCALE
 
 all: comp
 include ../../../../../build/Makefile

@@ -11,6 +11,6 @@ SYNTH=quartus
 # export DEVICE=AGILEX
 
 all: comp
-include ../../../../../../ofm/build/Makefile
+include ../../../../../build/Makefile
 .PHONY: all
 
