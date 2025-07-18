@@ -15,7 +15,7 @@ simulation: GEN_MK_ENV=SIM_SCRIPT=$(SIM_SCRIPT) SIM_FLAGS=$(SIM_FLAGS)
 
 # INFO: NETCOPE_TEMP is generated directory
 clean_common:
-	-@$(RM) -r $(NETCOPE_TEMP)
+	-@$(RM) -r nvcwork/ $(NETCOPE_TEMP)
 	-@$(RM) DevTree_paths.txt vhdocl.doc vhdocl.conf
 
 MAKE_REC = $(MAKE) -f $(firstword $(MAKEFILE_LIST)) --no-print-directory $(NETCOPE_ENV)
@@ -83,10 +83,10 @@ nvc-sim: nvc
 
 nvc: $(MOD)
 	$(eval TOP_LEVEL_ENT_LC:=$(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]'))
-	nvc --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
-	nvc -M 4G -e $(TOP_LEVEL_ENT_LC)
+	nvc --work=nvcwork --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
+	nvc --work=nvcwork -M 4G -e $(TOP_LEVEL_ENT_LC)
 	MODULE=$(COCOTB_MODULE) TOPLEVEL=$(TOP_LEVEL_ENT_LC) TOPLEVEL_LANG=vhdl $(NETCOPE_ENV) COCOTB_RESOLVE_X=ZEROS \
-	nvc -M 4G -r $(TOP_LEVEL_ENT_LC) --ieee-warnings=off $(NVC_LOAD)
+	nvc --work=nvcwork -M 4G -r $(TOP_LEVEL_ENT_LC) --ieee-warnings=off $(NVC_LOAD)
 
 else
 .PHONY: $(GEN_MK_NAME)
