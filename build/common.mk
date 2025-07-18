@@ -8,10 +8,15 @@
 RM ?= rm -f
 TCLSH ?= tclsh
 
-.PHONY: simulation vhdocl cocotb
+.PHONY: simulation vhdocl cocotb clean_common
 
 GEN_MK_TARGETS += simulation vhdocl cocotb ghdl-sim nvc nvc-sim
 simulation: GEN_MK_ENV=SIM_SCRIPT=$(SIM_SCRIPT) SIM_FLAGS=$(SIM_FLAGS)
+
+# INFO: NETCOPE_TEMP is generated directory
+clean_common:
+	-@$(RM) -r $(NETCOPE_TEMP)
+	-@$(RM) DevTree_paths.txt vhdocl.doc vhdocl.conf
 
 MAKE_REC = $(MAKE) -f $(firstword $(MAKEFILE_LIST)) --no-print-directory $(NETCOPE_ENV)
 

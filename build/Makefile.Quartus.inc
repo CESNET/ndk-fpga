@@ -89,11 +89,10 @@ clean_build:
                 *.qpf *.qsf *.qws *.pin *.sld \
                 *.rpt *.summary *.done
 	-@$(RM) -r qdb tmp-clearbox
-	-@$(RM) -r DevTree_paths.txt
-	-@$(RM) -r $(NETCOPE_TEMP) $(OUTPUT_NAME).quartus.mk $(OUTPUT_NAME).quartus_sh.mk
+	-@$(RM) -r $(OUTPUT_NAME).quartus.mk $(OUTPUT_NAME).quartus_sh.mk
 
 # User's chance to add own cleaning stuff
-clean: clean_build $(CLEAN_DEPENDS)
+clean: clean_build clean_common $(CLEAN_DEPENDS)
 
 # User's chance to add own 'hard' cleaning stuff (e.g. removing module checkpoints)
 cleanall: clean $(CLEANALL_DEPENDS)
