@@ -12,6 +12,6 @@ export DEVICE=STRATIX10
 
 all: comp
 
-include ../../../../../../ofm/build/Makefile
+include ../../../../../build/Makefile
 
 .PHONY: all

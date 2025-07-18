@@ -8,10 +8,15 @@
 RM ?= rm -f
 TCLSH ?= tclsh
 
-.PHONY: simulation vhdocl cocotb
+.PHONY: simulation vhdocl cocotb clean_common
 
-GEN_MK_TARGETS += simulation vhdocl cocotb ghdl-sim nvc-sim
+GEN_MK_TARGETS += simulation vhdocl cocotb ghdl-sim nvc nvc-sim
 simulation: GEN_MK_ENV=SIM_SCRIPT=$(SIM_SCRIPT) SIM_FLAGS=$(SIM_FLAGS)
+
+# INFO: NETCOPE_TEMP is generated directory
+clean_common:
+	-@$(RM) -r nvcwork/ $(NETCOPE_TEMP)
+	-@$(RM) DevTree_paths.txt vhdocl.doc vhdocl.conf
 
 MAKE_REC = $(MAKE) -f $(firstword $(MAKEFILE_LIST)) --no-print-directory $(NETCOPE_ENV)
 
@@ -72,12 +77,16 @@ ghdl-sim: $(MOD)
 	MODULE=$(COCOTB_MODULE) TOPLEVEL=$(TOP_LEVEL_ENT_LC) TOPLEVEL_LANG=vhdl $(NETCOPE_ENV) COCOTB_RESOLVE_X=ZEROS \
 	ghdl -r -v --workdir=$(GHDL_WORK_DIR) -P$(GHDL_WORK_DIR) $(addprefix -P,$(GHDL_LIBS)) $(TOP_LEVEL_ENT_LC) --vpi=$(shell cocotb-config --lib-name-path vpi ghdl) --asserts=disable --vcd=$(OUTPUT_NAME).vcd
 
-nvc-sim: $(MOD)
+NVC_LOAD ?=
+nvc-sim: NVC_LOAD=--load $(shell cocotb-config --lib-name-path vhpi nvc)
+nvc-sim: nvc
+
+nvc: $(MOD)
 	$(eval TOP_LEVEL_ENT_LC:=$(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]'))
-	nvc --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
-	nvc -M 4G -e  $(TOP_LEVEL_ENT_LC)
+	nvc --work=nvcwork -H 1G -M 4G --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
+	nvc --work=nvcwork -H 1G -M 4G -e $(TOP_LEVEL_ENT_LC)
 	MODULE=$(COCOTB_MODULE) TOPLEVEL=$(TOP_LEVEL_ENT_LC) TOPLEVEL_LANG=vhdl $(NETCOPE_ENV) COCOTB_RESOLVE_X=ZEROS \
-	nvc -M 4G -r $(TOP_LEVEL_ENT_LC) --ieee-warnings=off --load $(shell cocotb-config --lib-name-path vhpi nvc)
+	nvc --work=nvcwork -H 1G -M 4G -r $(TOP_LEVEL_ENT_LC) --ieee-warnings=off $(NVC_LOAD)
 
 else
 .PHONY: $(GEN_MK_NAME)

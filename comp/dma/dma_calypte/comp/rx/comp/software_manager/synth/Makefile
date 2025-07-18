@@ -15,4 +15,4 @@ CLK_PERIOD=4.000
 .PHONY: all
 all: comp
 
-include ../../../../../../../../../build/Makefile
+include ../../../../../../../../build/Makefile

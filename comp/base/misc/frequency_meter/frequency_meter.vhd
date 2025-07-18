@@ -289,7 +289,8 @@ begin
                 interval_len <= resize(unsigned(MI_DWR), INTERVAL_LEN_WIDTH);
             end if;
             if (MI_RESET = '1') then
-                interval_len <= (INTERVAL_LEN_WIDTH/2 => '1', others => '0');
+                interval_len <= (others => '0');
+                interval_len(INTERVAL_LEN_WIDTH/2) <= '1';
             end if;
         end if;
     end process;

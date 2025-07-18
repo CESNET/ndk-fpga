@@ -105,8 +105,10 @@ begin
    s_drd_premuxed(31 downto 0)    <= s_sreg;
    s_drd_premuxed(63 downto 32)   <= s_creg;
    s_drd_premuxed(95 downto 64)   <= s_fifo2mi_flow_ctrl;
-   s_drd_premuxed(127 downto 96)  <= (96+SOF_POS_WIDTH-1 downto 96 => s_fifo_out.sof_pos, others => '0');
-   s_drd_premuxed(159 downto 128) <= (128+EOF_POS_WIDTH-1 downto 128 => s_fifo_out.eof_pos, others => '0');
+   s_drd_premuxed(127 downto 96+SOF_POS_WIDTH)      <= (others => '0');
+   s_drd_premuxed(96+SOF_POS_WIDTH-1 downto 96)     <= s_fifo_out.sof_pos;
+   s_drd_premuxed(159 downto 128+EOF_POS_WIDTH)     <= (others => '0');
+   s_drd_premuxed(128+EOF_POS_WIDTH-1 downto 128)   <= s_fifo_out.eof_pos;
 
    s_drd_premuxed_g : for i in 0 to MI_DATA_ITEMS-1 generate
       s_drd_premuxed((i+5+1)*32-1 downto (i+5)*32) <= s_fifo_out.data((i+1)*32-1 downto i*32);

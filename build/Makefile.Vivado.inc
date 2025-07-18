@@ -90,12 +90,10 @@ clean_build:
                 messages-* *_synth.drc *_par.drc
 	-@$(RM) -r *.dcp *.prm
 	-@$(RM) -r *.data *.runs *.cache *.filter *.hw *.sim .Xil *.ip_user_files
-	-@$(RM) -r vhdocl.doc vhdocl.conf
-	-@$(RM) -r DevTree_paths.txt
-	-@$(RM) -r $(NETCOPE_TEMP) $(OUTPUT_NAME).vivado.mk
+	-@$(RM) -r $(OUTPUT_NAME).vivado.mk
 
 # User's chance to add own cleaning stuff
-clean: clean_build $(CLEAN_DEPENDS)
+clean: clean_build clean_common $(CLEAN_DEPENDS)
 
 # Clean really everything (e.g. module checkpoints)
 cleanall: clean $(CLEANALL_DEPENDS)

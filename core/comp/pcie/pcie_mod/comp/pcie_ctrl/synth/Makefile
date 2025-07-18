@@ -9,4 +9,4 @@ TOP_LEVEL_ENT=PCIE_CTRL
 .PHONY: all
 all: comp
 
-include ../../../../../../../../../conf/Makefile
+include ../../../../../../../build/Makefile

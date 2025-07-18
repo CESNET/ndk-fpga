@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-TOP_LEVEL_ENT=FREQUENCY_COUNTER
+TOP_LEVEL_ENT=FREQUENCY_METER
 SYNTH=quartus
 
 all: comp

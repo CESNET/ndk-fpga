@@ -8,5 +8,5 @@ TOP_LEVEL_ENT=MEM_TESTER
 SYNTH=quartus
 
 all: comp
-include ../../../../../ofm/build/Makefile
+include ../../../../build/Makefile
 .PHONY: all

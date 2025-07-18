@@ -82,11 +82,10 @@ endif
 clean_build:
 	-@$(RM) *.edf *.prj stdout.log* synlog.tcl
 	-@$(RM) -r synth1 rev_1
-	-@$(RM) -r DevTree_paths.txt
-	-@$(RM) -r $(NETCOPE_TEMP) $(OUTPUT_NAME).synplify_pro.mk
+	-@$(RM) -r $(OUTPUT_NAME).synplify_pro.mk
 
 # User's chance to add own cleaning stuff
-clean: clean_build $(CLEAN_DEPENDS)
+clean: clean_build clean_common $(CLEAN_DEPENDS)
 
 # User's chance to add own 'hard' cleaning stuff (e.g. removing module checkpoints)
 cleanall: clean $(CLEANALL_DEPENDS)
