@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import sys
-sys.path.insert(1, "../common")
 from switch import Switch
 
 from random import randbytes, randint
@@ -19,6 +17,7 @@ from cocotbext.axi import AxiStreamFrame, AxiStreamBus, AxiStreamSource, AxiStre
 
 from scapy.all import Ether, Dot1Q, raw
 #import json
+
 
 class testbench:
     """ Test environment. """
@@ -122,8 +121,10 @@ class testbench:
         index = self.tx_predict[dest].index(frame)
         self.tx_predict[dest][index].sim_time_start = frame.sim_time_start
 
-    async def send_frames(self, *, count:int=None, port:int=None, frames:list[Ether]=[], length:int=None,
-                                    cleanup:bool=True, fullspeed:bool=True) -> dict:
+    async def send_frames(
+                self, *, count: int = None, port: int = None, frames: list[Ether] = [], length: int = None,
+                cleanup: bool = True, fullspeed: bool = True
+            ) -> dict:
         """ Generate frames to DUT's RX.
 
             Params
@@ -140,22 +141,22 @@ class testbench:
                 dict      ... information about the generated frame
         """
         # adjust frames count
-        count          = len(frames) if count == None else count
+        count          = len(frames) if count is None else count
         default_port   = port
         default_length = length
         for f in range(count):
             # adjust port number
-            port = randint(0, self.num_ports-1) if default_port == None else default_port
+            port = randint(0, self.num_ports-1) if default_port is None else default_port
             # make adjustments for frame replay
             if frames:
                 f_idx  = f % len(frames)
-                length = len(frames[f_idx]) if default_length == None else default_length
+                length = len(frames[f_idx]) if default_length is None else default_length
                 frame  = frames[f_idx]
                 if length > len(frame):
                     frame /= randbytes(length-len(frame))
             # make adjustments for random frame generation
             if not frames:
-                length = randint(60, 1500) if default_length == None else max(default_length, 14)
+                length = randint(60, 1500) if default_length is None else max(default_length, 14)
                 frame  = Ether(dst=randbytes(6), src=randbytes(6))/randbytes(length-14)
             # log and send frame
             axi_frame = AxiStreamFrame(raw(frame))
@@ -203,6 +204,7 @@ class testbench:
                 for frame in real:
                     cocotb.log.error(f"\t{frame.sim_time_end} : {[hex(val) for val in frame.tdata]}")
 
+
 def report_throughput(silent, start, end, ip_bytes, op_bytes) -> float:
     """ Report throughput measurements.
 
@@ -232,7 +234,8 @@ def report_throughput(silent, start, end, ip_bytes, op_bytes) -> float:
                 cocotb.log.info(f"{port:<{len(port_str[i])}}: {throughput}")
     return round(result/(len(ip_bytes)+len(op_bytes)), 2)
 
-def report_latency(silent, tb:testbench) -> dict:
+
+def report_latency(silent, tb: testbench) -> dict:
     """ Report latency measurements.
 
         Params
@@ -256,15 +259,19 @@ def report_latency(silent, tb:testbench) -> dict:
             latency_sum += latency
             num_frames  += 1
     if not silent:
-        cocotb.log.info( "Latency [ns]:")
+        cocotb.log.info("Latency [ns]:")
         cocotb.log.info(f"Min         : {latency_min}")
         cocotb.log.info(f"Max         : {latency_max}")
         cocotb.log.info(f"Avg         : {round(latency_sum/num_frames, 2)}")
     return {'min': latency_min, 'max': latency_max, 'avg': round(latency_sum/num_frames, 2)}
 
-async def run_test(tb:testbench, test_title:str, measure:bool, silent:bool=False, *,
-                    c:int=None, p:int=None, f:list[Ether]=[], l:int=None,
-                     cl:bool=True, fs:bool=True) -> dict:
+
+async def run_test(
+            tb: testbench, test_title: str, measure: bool, silent: bool = False, *,
+            c: int = None, p: int = None, f: list[Ether] = [], n: int = None,
+            cl: bool = True, fs: bool = True
+        ) -> dict:
+
     """ Perform DUT test.
 
         Params
@@ -273,7 +280,7 @@ async def run_test(tb:testbench, test_title:str, measure:bool, silent:bool=False
             test_title         ... name of test
             measure            ... perform throughput and latency measurements?
             silent             ... do not send output to cocotb.log
-            c, p, f, l, cl, fs ... see testbench.send_frames
+            c, p, f, n, cl, fs ... see testbench.send_frames
 
         Returns
         -------
@@ -287,7 +294,7 @@ async def run_test(tb:testbench, test_title:str, measure:bool, silent:bool=False
         num_bytes_ip = [0 for _ in range(tb.num_ports)]
         num_bytes_op = [0 for _ in range(tb.num_ports)]
         start = cocotb.utils.get_sim_time()
-        async for frame in tb.send_frames(count=c, port=p, frames=f, length=l, cleanup=False, fullspeed=fs):
+        async for frame in tb.send_frames(count=c, port=p, frames=f, length=n, cleanup=False, fullspeed=fs):
             length = frame['length']
             num_bytes_ip[frame['ip']] += length
             num_bytes_op[frame['op']] += length
@@ -300,9 +307,10 @@ async def run_test(tb:testbench, test_title:str, measure:bool, silent:bool=False
             tb.reset_frames()
 
     else:
-        async for frame in tb.send_frames(count=c, port=p, frames=f, length=l, cleanup=cl, fullspeed=fs):
+        async for frame in tb.send_frames(count=c, port=p, frames=f, length=n, cleanup=cl, fullspeed=fs):
             cocotb.start_soon(tb.monitor_rx_port(frame['ip'], frame['op']))
     return measurements
+
 
 @cocotb.test
 async def run_tests(dut):
@@ -317,19 +325,19 @@ async def run_tests(dut):
         Ether(dst="00:5d:00:00:06:00")/Dot1Q(vlan=561),
         Ether(dst="01:15:00:00:04:00")/Dot1Q(vlan=562)
     ]
-    frames_all2one = [ Ether(dst="04:00:00:00:00:00") ]
+    frames_all2one = [Ether(dst="04:00:00:00:00:00")]
 
     await run_test(tb, "VLAN switching - priority"                    , False, c=10   , p=0, f=frames_vlan)
-    await run_test(tb, "Ethernet switching - small frames (64B)"      , True , c=10000, l=64)
-    await run_test(tb, "Ethernet switching - medium frames (256B)"    , True , c=10000, l=256)
-    await run_test(tb, "Ethernet switching - larger frames (512B)"    , True , c=10000, l=512)
-    await run_test(tb, "Ethernet switching - large frames (1500B)"    , True , c=10000, l=1500)
+    await run_test(tb, "Ethernet switching - small frames (64B)"      , True , c=10000, n=64)
+    await run_test(tb, "Ethernet switching - medium frames (256B)"    , True , c=10000, n=256)
+    await run_test(tb, "Ethernet switching - larger frames (512B)"    , True , c=10000, n=512)
+    await run_test(tb, "Ethernet switching - large frames (1500B)"    , True , c=10000, n=1500)
     await run_test(tb, "Ethernet switching - non-full throughput"     , True , c=10000, fs=False)
     await run_test(tb, "Ethernet switching - random frames (60-1500B)", True , c=10000)
-    await run_test(tb, "Ethernet switching - all-to-one"              , True , c=10000, f=frames_all2one, l=64)
+    await run_test(tb, "Ethernet switching - all-to-one"              , True , c=10000, f=frames_all2one, n=64)
 
 #    measurements = []
 #    for length in range(60, 1500, 4):
-#        measurements.append(await run_test(tb, "", True, True, c=10000, l=length))
+#        measurements.append(await run_test(tb, "", True, True, c=10000, n=length))
 #    with open("results.json", "w") as f:
 #        f.write(json.dumps(measurements))

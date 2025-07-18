@@ -3,8 +3,6 @@
 # Author(s): Daniel Kondys <kondys@cesnet.cz>
 #
 
-from typing import Any, Tuple, List, Optional
-
 
 def mask_value(val: int, mask: int) -> int:
     """Return only the value specified by the mask.
@@ -32,6 +30,7 @@ def mask_value(val: int, mask: int) -> int:
     # The shift size must be one less than the bit's position.
     shift_size = first_mask_bit_pos - 1
     return (val & mask) >> shift_size
+
 
 def apply_value(base: int, part: int, mask: int) -> int:
     """Replace a part in the original value indicated by the mask with a new value.

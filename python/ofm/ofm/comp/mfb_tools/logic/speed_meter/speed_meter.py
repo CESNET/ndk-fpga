@@ -66,7 +66,7 @@ class SpeedMeter(nfb.BaseComp):
     def frequency(self) -> int:
         """Retrieve frequency in Hz."""
         if self._lightweight:
-                raise ValueError("Cannot read frequency from FW when in the Lightweight mode!")
+            raise ValueError("Cannot read frequency from FW when in the Lightweight mode!")
         return self._comp.read32(self._REG_FREQ) * 1_000_000
 
     @property
@@ -83,14 +83,14 @@ class SpeedMeter(nfb.BaseComp):
     def sofs(self) -> int:
         """Read the number of accumulated frames started (MFB SOFs)."""
         if self._lightweight:
-                raise ValueError("Cannot read SOFs from FW when in the Lightweight mode!")
+            raise ValueError("Cannot read SOFs from FW when in the Lightweight mode!")
         return self._comp.read32(self._REG_SOFS)
 
     @property
     def eofs(self) -> int:
         """Read the number of accumulated frames ended (MFB EOFs)."""
         if self._lightweight:
-                raise ValueError("Cannot read EOFs from FW when in the Lightweight mode!")
+            raise ValueError("Cannot read EOFs from FW when in the Lightweight mode!")
         return self._comp.read32(self._REG_EOFS)
 
     @property

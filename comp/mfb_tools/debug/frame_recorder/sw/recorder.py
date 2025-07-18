@@ -53,7 +53,6 @@ def read32(addr):
 
     The type of returned vaue has to be long.
     """
-    global memory
     # Implementation of the read statement
     if addr >= RecorderReader.DATA_OFFSET:
         # Read 32bit data word from the memory

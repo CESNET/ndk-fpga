@@ -15,8 +15,8 @@ HDR_ETH = {
     'name'  : Ether._name,
     'width' : 14,
     'fields': {
-        ( 47,  0): 'dst',
-        ( 95, 48): 'src',
+        (47,  0): 'dst',
+        (95, 48): 'src',
         (111, 96): 'type',
     }
 }
@@ -51,18 +51,22 @@ HDR_DB = {
     2: HDR_VLAN_1AD,
 }
 
-def get_protocol_class(protocol:int) -> object|None:
+
+def get_protocol_class(protocol: int) -> object | None:
     return HDR_DB[protocol]['class'] if protocol in HDR_DB else None
 
-def field_is_supported(protocol:int, range_high:int, range_low:int) -> bool:
+
+def field_is_supported(protocol: int, range_high: int, range_low: int) -> bool:
     return protocol in HDR_DB and (range_high, range_low) in HDR_DB[protocol]['fields']
 
-def get_field_id(protocol:int, range_high:int, range_low:int) -> str:
+
+def get_field_id(protocol: int, range_high: int, range_low: int) -> str:
     if field_is_supported(protocol, range_high, range_low):
         return HDR_DB[protocol]['fields'][(range_high, range_low)]
     return ''
 
-def get_field_info_str(protocol:int, range_high:int, range_low:int) -> str:
+
+def get_field_info_str(protocol: int, range_high: int, range_low: int) -> str:
     if field_is_supported(protocol, range_high, range_low):
         return HDR_DB[protocol]['name'] + ' - ' + get_field_id(protocol, range_high, range_low)
     return ''

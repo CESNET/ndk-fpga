@@ -11,6 +11,7 @@ from typing import Any, Optional, List
 
 import nfb
 
+
 @dataclass
 class GeneratorConfig:
     enabled: bool
@@ -26,6 +27,7 @@ class GeneratorConfig:
     src_ip_address_mask: int
     generating: Optional[bool] = None # Read-only
     frame_count: Optional[int] = None # Read-only
+
 
 class MfbGenerator(nfb.BaseComp):
     DT_COMPATIBLE = "cesnet,ofm,mfb_generator"
@@ -315,35 +317,35 @@ class MfbGenerator(nfb.BaseComp):
         """Returns the full configuration of the generator (all properties)."""
         # TODO: optimize this by reducing the amount of MI Reads
         conf = GeneratorConfig(
-            enabled                    = self.enabled,
-            generating                 = self.generating,
-            frame_length               = self.frame_length,
-            channel_increment          = self.channel_increment,
-            channel_increment_reversed = self.channel_increment_reversed,
-            bursting                   = self.bursting,
-            burst_size                 = self.burst_size,
-            minimum_channel            = self.minimum_channel,
-            maximum_channel            = self.maximum_channel,
-            dst_mac_address            = self.dst_mac_address,
-            src_mac_address            = self.src_mac_address,
-            src_ip_address_mask        = self.src_ip_address_mask,
-            frame_count                = self.frame_count,
+            enabled=self.enabled,
+            generating=self.generating,
+            frame_length=self.frame_length,
+            channel_increment=self.channel_increment,
+            channel_increment_reversed=self.channel_increment_reversed,
+            bursting=self.bursting,
+            burst_size=self.burst_size,
+            minimum_channel=self.minimum_channel,
+            maximum_channel=self.maximum_channel,
+            dst_mac_address=self.dst_mac_address,
+            src_mac_address=self.src_mac_address,
+            src_ip_address_mask=self.src_ip_address_mask,
+            frame_count=self.frame_count,
         )
         return conf
 
     def configure(self, conf: GeneratorConfig) -> None:
         """Configures the Generator while ignoring read-only items."""
-        self.frame_length               = conf.frame_length
-        self.channel_increment          = conf.channel_increment
+        self.frame_length = conf.frame_length
+        self.channel_increment = conf.channel_increment
         self.channel_increment_reversed = conf.channel_increment_reversed
-        self.bursting                   = conf.bursting
-        self.burst_size                 = conf.burst_size
-        self.minimum_channel            = conf.minimum_channel
-        self.maximum_channel            = conf.maximum_channel
-        self.dst_mac_address            = conf.dst_mac_address
-        self.src_mac_address            = conf.src_mac_address
-        self.src_ip_address_mask        = conf.src_ip_address_mask
-        self.enabled                    = conf.enabled
+        self.bursting = conf.bursting
+        self.burst_size = conf.burst_size
+        self.minimum_channel = conf.minimum_channel
+        self.maximum_channel = conf.maximum_channel
+        self.dst_mac_address = conf.dst_mac_address
+        self.src_mac_address = conf.src_mac_address
+        self.src_ip_address_mask = conf.src_ip_address_mask
+        self.enabled = conf.enabled
 
     def get_fconfiguration(self) -> List:
         """Returns formatted configuration of the generator as a list of [item, value] lists."""
