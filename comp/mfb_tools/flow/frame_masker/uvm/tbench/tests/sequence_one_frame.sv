@@ -11,11 +11,12 @@ class sequence_one_frame #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZ
     endfunction
 
     virtual task create_sequence_item();
+        int unsigned rdy;
         gen.randomize();
 
         // Randomization of READY
-        void'(rdy_rdy.randomize());
-        if (rdy_rdy.m_value == 0) begin
+        assert(std::randomize(rdy) with { rdy dist {0 :/ (100 -rdy_probability), 1 :/ rdy_probability}; } );
+        if (rdy == 0) begin
             gen.src_rdy = 0;
             return;
         end
@@ -27,8 +28,7 @@ class sequence_one_frame #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZ
         for (int unsigned region = 0; region < REGIONS; region++) begin
             for (int unsigned index = 0; index < REGION_SIZE; index++) begin
                 if (state_packet == state_packet_space_new) begin
-                    void'(rdy_length.randomize());
-                    space_size = rdy_length.m_value;
+                    space_size = $urandom_range(space_size_min, space_size_max);;
                     state_packet = state_packet_space;
                 end
 
