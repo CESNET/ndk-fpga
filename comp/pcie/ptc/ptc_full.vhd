@@ -80,6 +80,10 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
 
     -- UP MVB Transformer output / AXI2PCIE hdr transform input
     signal up_mvb_trans_out_data     : slv_array_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS*DMA_UPHDR_WIDTH-1 downto 0);
+    signal up_mvb_trans_out_data_2d  : slv_array_2d_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
+    signal up_mvb_trans_out_data_2df : slv_array_2d_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
+    signal up_mvb_trans_out_data_sel : slv_array_2d_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS-1 downto 0)(log2(DMA_PORTS)-1 downto 0);
+    signal up_mvb_trans_out_data_fix : slv_array_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS*DMA_UPHDR_WIDTH-1 downto 0);
     signal up_mvb_trans_out_vld      : slv_array_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS                -1 downto 0);
     signal up_mvb_trans_out_payload  : slv_array_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS                -1 downto 0);
     signal up_mvb_trans_out_src_rdy  : std_logic_vector(DMA_PORTS-1 downto 0);
@@ -236,6 +240,9 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
     signal down_mfb_split_in_dst_rdy      : std_logic;
 
     -- DOWN Splitter MVB output / DOWN MVB Transformer input
+    signal down_mvb_trans_in_data_fix : slv_array_t(DMA_PORTS-1 downto 0)(MVB_DOWN_ITEMS*DMA_DOWNHDR_WIDTH-1 downto 0);
+    signal down_mvb_trans_in_data_2df : slv_array_2d_t(DMA_PORTS-1 downto 0)(MVB_DOWN_ITEMS-1 downto 0)(DMA_DOWNHDR_WIDTH-1 downto 0);
+    signal down_mvb_trans_in_data_2d  : slv_array_2d_t(DMA_PORTS-1 downto 0)(MVB_DOWN_ITEMS-1 downto 0)(DMA_DOWNHDR_WIDTH-1 downto 0);
     signal down_mvb_trans_in_data     : slv_array_t(DMA_PORTS-1 downto 0)(MVB_DOWN_ITEMS*DMA_DOWNHDR_WIDTH-1 downto 0);
     signal down_mvb_trans_in_vld      : slv_array_t(DMA_PORTS-1 downto 0)(MVB_DOWN_ITEMS                  -1 downto 0);
     signal down_mvb_trans_in_src_rdy  : std_logic_vector(DMA_PORTS-1 downto 0);
@@ -476,6 +483,24 @@ begin
     end generate;
 
     dma_up_ports_merge_g : if DMA_PORTS > 1 generate
+        dma_ep_set_g: for ii in 0 to DMA_PORTS-1 generate
+            up_mvb_trans_out_data_2d(ii) <= slv_array_deser(up_mvb_trans_out_data(ii), MVB_UP_ITEMS, DMA_UPHDR_WIDTH);
+
+            process (all)
+            begin
+                for rr in 0 to MVB_UP_ITEMS-1 loop
+                    up_mvb_trans_out_data_sel(ii)(rr) <= std_logic_vector(to_unsigned(ii, log2(DMA_PORTS)));
+
+                    -- Set the lower bits of UNITID to the DMA EP number.
+                    -- These bits must not be used by another component!
+                    up_mvb_trans_out_data_2df(ii)(rr)                                                                     <= up_mvb_trans_out_data_2d(ii)(rr);
+                    up_mvb_trans_out_data_2df(ii)(rr)(DMA_REQUEST_UNITID_O+log2(DMA_PORTS)-1 downto DMA_REQUEST_UNITID_O) <= up_mvb_trans_out_data_sel(ii)(rr);
+                end loop;
+            end process;
+
+            up_mvb_trans_out_data_fix(ii) <= slv_array_ser(up_mvb_trans_out_data_2df(ii), MVB_UP_ITEMS, DMA_UPHDR_WIDTH);
+        end generate;
+
         dma_up_merger_i : entity work.MFB_MERGER_GEN
         generic map (
             MERGER_INPUTS   => DMA_PORTS,
@@ -495,7 +520,7 @@ begin
             CLK            => CLK,
             RESET          => RESET,
 
-            RX_MVB_DATA    => up_mvb_trans_out_data,
+            RX_MVB_DATA    => up_mvb_trans_out_data_fix,
             RX_MVB_PAYLOAD => up_mvb_trans_out_payload,
             RX_MVB_VLD     => up_mvb_trans_out_vld,
             RX_MVB_SRC_RDY => up_mvb_trans_out_src_rdy,
@@ -1162,8 +1187,7 @@ begin
 
     down_mvb_split_in_data_arr <= slv_array_deser(down_mvb_split_in_data,MVB_DOWN_ITEMS);
     down_mvb_split_in_switch_g : for i in 0 to MVB_DOWN_ITEMS-1 generate
-        down_mvb_split_in_tag_arr(i)    <= down_mvb_split_in_data_arr(i)(DMA_COMPLETION_TAG);
-        down_mvb_split_in_switch_arr(i) <= down_mvb_split_in_tag_arr(i)(DMA_COMPLETION_TAG_W-1 downto DMA_COMPLETION_TAG_W-log2(DMA_PORTS));
+        down_mvb_split_in_switch_arr(i) <= down_mvb_split_in_data_arr(i)(DMA_COMPLETION_UNITID_O+log2(DMA_PORTS)-1 downto DMA_COMPLETION_UNITID_O);
     end generate;
     down_mvb_split_in_switch <= slv_array_ser(down_mvb_split_in_switch_arr);
 
@@ -1253,7 +1277,7 @@ begin
             RX_MFB_SRC_RDY => down_mfb_split_in_src_rdy,
             RX_MFB_DST_RDY => down_mfb_split_in_dst_rdy,
 
-            TX_MVB_DATA    => down_mvb_trans_in_data,
+            TX_MVB_DATA    => down_mvb_trans_in_data_fix,
             TX_MVB_VLD     => down_mvb_trans_in_vld,
             TX_MVB_SRC_RDY => down_mvb_trans_in_src_rdy,
             TX_MVB_DST_RDY => down_mvb_trans_in_dst_rdy,
@@ -1266,6 +1290,21 @@ begin
             TX_MFB_SRC_RDY => down_mfb_trans_in_src_rdy,
             TX_MFB_DST_RDY => down_mfb_trans_in_dst_rdy
         );
+
+        dma_ep_clr_g: for ii in 0 to DMA_PORTS-1 generate
+            down_mvb_trans_in_data_2df(ii) <= slv_array_deser(down_mvb_trans_in_data_fix(ii), MVB_DOWN_ITEMS, DMA_DOWNHDR_WIDTH);
+
+            process (all)
+            begin
+                for rr in 0 to MVB_DOWN_ITEMS-1 loop
+                    -- resetting the reserved low bits of UNITID
+                    down_mvb_trans_in_data_2d(ii)(rr)                                                                           <= down_mvb_trans_in_data_2df(ii)(rr);
+                    down_mvb_trans_in_data_2d(ii)(rr)(DMA_COMPLETION_UNITID_O+log2(DMA_PORTS)-1 downto DMA_COMPLETION_UNITID_O) <= (others => '0');
+                end loop;
+            end process;
+
+            down_mvb_trans_in_data(ii) <= slv_array_ser(down_mvb_trans_in_data_2d(ii), MVB_DOWN_ITEMS, DMA_DOWNHDR_WIDTH);
+        end generate;
     end generate;
 
     ---------------------------------------------------------------------------

@@ -65,16 +65,6 @@ architecture MEDUSA of DMA_WRAPPER is
 
     -- =====================================================================
 
-    -- =====================================================================
-    --  UP MVB Endpoint tagging
-    -- =====================================================================
-
-    signal dma_rq_mvb_data      : slv_array_t(DMA_ENDPOINTS-1 downto 0)(PCIE_RQ_MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0);
-    signal pcie_rq_mvb_data_arr : slv_array_2d_t(DMA_ENDPOINTS-1 downto 0)(PCIE_RQ_MFB_REGIONS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
-    signal pcie_rq_mvb_data_vec : std_logic_vector(DMA_ENDPOINTS*PCIE_RQ_MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0);
-
-    -- =====================================================================
-
 begin
 
     dma_rst_i : entity work.ASYNC_RESET
@@ -198,32 +188,6 @@ begin
     -- =====================================================================
 
     -- =====================================================================
-    --  UP MVB Endpoint tagging
-    -- =====================================================================
-    -- When there ade multiple DMA Endpoints for each PCIe Endpoint,
-    -- the top bits of UP MVB Tag is determined by SRC DMA Endpoint.
-
-    up_mvb_data_pr : process (all)
-    begin
-        PCIE_RQ_MVB_DATA <= dma_rq_mvb_data;
-
-        if (DMA_PER_PCIE > 1) then
-            for i in 0 to PCIE_ENDPOINTS-1 loop
-                for e in 0 to DMA_PER_PCIE-1 loop
-                    pcie_rq_mvb_data_arr(i*DMA_PER_PCIE+e) <= slv_array_deser(dma_rq_mvb_data(i*DMA_PER_PCIE+e),PCIE_RQ_MFB_REGIONS);
-                    for g in 0 to PCIE_RQ_MFB_REGIONS-1 loop
-                        pcie_rq_mvb_data_arr(i*DMA_PER_PCIE+e)(g)(DMA_REQUEST_TAG'high downto DMA_REQUEST_TAG'high-log2(DMA_PER_PCIE)+1) <= std_logic_vector(to_unsigned(e,log2(DMA_PER_PCIE)));
-                    end loop;
-                end loop;
-            end loop;
-            pcie_rq_mvb_data_vec <= slv_array_2d_ser(pcie_rq_mvb_data_arr);
-            PCIE_RQ_MVB_DATA     <= slv_array_deser(pcie_rq_mvb_data_vec,DMA_ENDPOINTS);
-        end if;
-    end process;
-
-    -- =====================================================================
-
-    -- =====================================================================
     --  DMA Medusa Module
     -- =====================================================================
 
@@ -246,7 +210,7 @@ begin
 
             PCIE_MPS             => PCIE_MPS,
             PCIE_MRRS            => PCIE_MRRS,
-            DMA_TAG_WIDTH        => DMA_TAG_WIDTH-log2(DMA_PER_PCIE),
+            DMA_TAG_WIDTH        => DMA_TAG_WIDTH,
 
             UP_MFB_REGIONS       => PCIE_RQ_MFB_REGIONS,
             UP_MFB_REGION_SIZE   => PCIE_RQ_MFB_REGION_SIZE,
@@ -325,7 +289,7 @@ begin
 
             TX_USR_CHOKE_CHANS   => TX_USR_CHOKE_CHANS(i),
 
-            UP_MVB_DATA          => dma_rq_mvb_data(DPE),
+            UP_MVB_DATA          => PCIE_RQ_MVB_DATA(DPE),
             UP_MVB_VLD           => PCIE_RQ_MVB_VLD(DPE),
             UP_MVB_SRC_RDY       => PCIE_RQ_MVB_SRC_RDY(DPE),
             UP_MVB_DST_RDY       => PCIE_RQ_MVB_DST_RDY(DPE),
