@@ -6,6 +6,7 @@
 import operator
 from functools import reduce
 
+
 def concat(values):
     ret = 0
     for val, width in reversed(values):

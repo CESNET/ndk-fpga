@@ -141,7 +141,7 @@ class GRE(base_node):
         super().__init__("GRE")
 
     def protocol_add(self, config):
-        return scapy.all.GRE(routing_present = 0)
+        return scapy.all.GRE(routing_present=0)
 
     def protocol_next(self, config):
         proto = {"ETH": 1, "IPv4": 1, "IPv6": 1}

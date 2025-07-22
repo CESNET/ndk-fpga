@@ -16,6 +16,7 @@ from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
 
+
 # definition of the class encapsulating components of the test
 class testbench():
     # dut = device tree to the tested component

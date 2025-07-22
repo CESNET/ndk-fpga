@@ -7,12 +7,12 @@ import argparse
 import os
 from os import system
 from importlib.machinery import SourceFileLoader
-from random import randint
 import time
 from multi_ver_utils import reduce_combinations, create_setting_from_combination
 
 
 FAIL = False
+
 
 # Modify package file according to setting
 def apply_setting(pkg_file, setting, sed_str):
@@ -30,8 +30,6 @@ def apply_setting(pkg_file, setting, sed_str):
 
 # Run Modelsim with the current test_pkg file
 def run_modelsim(fdo_file, test_name, manual=False, gui=False, coverage=False, env={}):
-    global FAIL
-
     logfile_name = f"transcript_{test_name}"
 
     command  = f"do {fdo_file};"

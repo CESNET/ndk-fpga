@@ -393,4 +393,3 @@ if __name__ == '__main__':
         print("finished.")
         if single_cycle or flag.exit():
             break
-

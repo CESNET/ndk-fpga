@@ -4,6 +4,7 @@
 
 from dataclasses import dataclass
 
+
 class BaseTransaction():
     """Base class for transactions"""
 

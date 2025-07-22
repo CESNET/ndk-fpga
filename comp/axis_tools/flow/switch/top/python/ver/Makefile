@@ -7,6 +7,7 @@
 TOP_LEVEL_ENT=AXIS_SWITCH
 TOP_LEVEL_PATH=../../
 TARGET=cocotb
+export PYTHONPATH=../common
 
 .PHONY: all
 all: comp

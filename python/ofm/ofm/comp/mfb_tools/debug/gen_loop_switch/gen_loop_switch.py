@@ -12,6 +12,7 @@ from ofm.comp.mfb_tools.debug.generator import MfbGenerator
 from ofm.comp.mfb_tools.logic.speed_meter import SpeedMeter
 from ofm.utils import convert_units
 
+
 @dataclass
 class StreamNodes:
     """A helpful class to encapsulate information about the nodes of a GlsStream."""
@@ -20,6 +21,7 @@ class StreamNodes:
     gen_name: str
     rx_mux_offset: int
     tx_mux_offset: int
+
 
 class GlsStream:
     """Top (left2right) or bottom (right2left) part of the GenLoopSwitch.
@@ -177,6 +179,7 @@ class GlsStream:
         raise NotImplementedError("Unable to use the Frame Player at this time.")
         self.player.enable = False
 
+
 # #########################
 # The GEN LOOP SWITCH class
 # #########################
@@ -219,19 +222,19 @@ class GenLoopSwitch(nfb.BaseComp):
 
         l2r_nodes = StreamNodes(
             # The names are taken from the Device Tree (they must correspond).
-            tx_sm_name = "l2r_tx_speed_meter",
-            rx_sm_name = "l2r_rx_speed_meter",
-            gen_name = "mfb_gen2dma",
-            rx_mux_offset = self._REG_MUX_C,
-            tx_mux_offset = self._REG_MUX_A,
+            tx_sm_name="l2r_tx_speed_meter",
+            rx_sm_name="l2r_rx_speed_meter",
+            gen_name="mfb_gen2dma",
+            rx_mux_offset=self._REG_MUX_C,
+            tx_mux_offset=self._REG_MUX_A,
         )
         r2l_nodes = StreamNodes(
             # The names are taken from the Device Tree (they must correspond).
-            tx_sm_name = "r2l_tx_speed_meter",
-            rx_sm_name = "r2l_rx_speed_meter",
-            gen_name = "mfb_gen2eth",
-            rx_mux_offset = self._REG_MUX_D,
-            tx_mux_offset = self._REG_MUX_B,
+            tx_sm_name="r2l_tx_speed_meter",
+            rx_sm_name="r2l_rx_speed_meter",
+            gen_name="mfb_gen2eth",
+            rx_mux_offset=self._REG_MUX_D,
+            tx_mux_offset=self._REG_MUX_B,
         )
 
         # Checking for the presence of SpeedMeters, may not be available in older versions of FW.
@@ -239,8 +242,8 @@ class GenLoopSwitch(nfb.BaseComp):
         self.speedmeters_exist = True
         if not self._node.exist_subnode(l2r_nodes.tx_sm_name):
             print(f"Warning: SpeedMeters of the {self._node.name} not found in the Device Tree.")
-            print(f"         Unable to use methods to measure speed.")
-            print(f"         Try using a newer FW.")
+            print("         Unable to use methods to measure speed.")
+            print("         Try using a newer FW.")
             self.speedmeters_exist = False
 
         self.l2r = GlsStream(self._dev, self._node, self._comp, l2r_nodes, self.speedmeters_exist)
@@ -351,7 +354,7 @@ def main():
                 sm_row.append(p_speed)
                 sm_row.append(f"{p_unit}pps")
             table_rows.append(sm_row)
-        print(tabulate(table_rows, floatfmt=".2f", colalign=("right","right","right")))
+        print(tabulate(table_rows, floatfmt=".2f", colalign=("right", "right", "right")))
 
     # GLS Stream selection
     streams = []

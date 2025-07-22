@@ -6,12 +6,12 @@ import argparse
 import os
 from os import system
 from importlib.machinery import SourceFileLoader
-from random import randint
 import time
 import os.path as op
 from multi_ver_utils import reduce_combinations, create_setting_from_combination
 
 FAIL = False
+
 
 def junit(testResults: str, allowEmptyResults: bool = False) -> bool:
     if not op.exists(testResults):
@@ -40,6 +40,7 @@ def find_venv() -> str | None:
                 return dir
 
     return None
+
 
 def run_modelsim(settings: dict, venv: str | None = None, gui=False):
     command = ""
@@ -72,6 +73,7 @@ def run_modelsim(settings: dict, venv: str | None = None, gui=False):
 ##########
 # Parsing script arguments
 ##########
+
 
 parser = argparse.ArgumentParser()
 

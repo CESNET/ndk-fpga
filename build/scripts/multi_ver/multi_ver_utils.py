@@ -5,6 +5,7 @@
 
 from random import randint
 
+
 # RANDOMLY reduce number of combination to a certain percentage
 def reduce_combinations(combinations, reduction_perc=100):
     if reduction_perc >= 100:

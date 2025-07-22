@@ -19,6 +19,7 @@ from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProb
 from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.mvb.transaction import MvbTrClassic
 
+
 # definition of the class encapsulating components of the test
 class testbench():
     # dut = device tree of the tested component

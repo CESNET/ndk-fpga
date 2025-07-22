@@ -23,6 +23,7 @@ def concat(values: List[Tuple[int, int]]) -> int:
         vector |= val & (2**width - 1)
     return vector
 
+
 def deconcat(vec: int, widths: List[int]) -> List[int]:
     """Splits the input integer into parts according to the given list of bit widths.
 

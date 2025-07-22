@@ -8,8 +8,9 @@ import asyncio
 from functools import partial
 from math import ceil, log2
 
-from hdr_info import *
+import hdr_info
 from scapy.all import Ether
+
 
 # wrapper ensuring proper calling of a function (a/sync)
 async def asyncio_wrapper(function, *args, **kwargs):
@@ -18,9 +19,15 @@ async def asyncio_wrapper(function, *args, **kwargs):
     else:
         return await asyncio.to_thread(function, *args, **kwargs)
 
+
 # auxiliary lambdas for 'int <-> bytes' conversion
-reg2int = lambda b : int.from_bytes(b, "little")
-int2reg = lambda i, w : int.to_bytes(i, w, "little")
+def reg2int(b):
+    return int.from_bytes(b, "little")
+
+
+def int2reg(i, w):
+    return int.to_bytes(i, w, "little")
+
 
 class SwitchAddrSpace:
     """ Software representation (internal) of switch address space. """
@@ -70,31 +77,33 @@ class SwitchAddrSpace:
             for _ in range(num_mats_per_port):
                 mat = {}
                 for attr in ["num_fields", "num_items"]:
-                    mat[attr] = reg2int(mat_cfgs[self.w*reg_idx:self.w*(reg_idx+1)]) ; reg_idx += 1
+                    mat[attr] = reg2int(mat_cfgs[self.w*reg_idx:self.w*(reg_idx+1)])
+                    reg_idx += 1
                 mat["fields"] = []
                 for _ in range(mat["num_fields"]):
                     field = {}
                     for attr in ["protocol", "range_high", "range_low"]:
-                        field[attr] = reg2int(mat_cfgs[self.w*reg_idx:self.w*(reg_idx+1)]) ; reg_idx += 1
+                        field[attr] = reg2int(mat_cfgs[self.w*reg_idx:self.w*(reg_idx+1)])
+                        reg_idx += 1
                     mat["fields"].append(field)
                 mats.append(mat)
             return mats
         except IndexError:
             raise Exception("Invalid MATs configuration!")
 
-    async def read(self, addr:int, count:int) -> bytes:
-        assert self.read_f != None, "Read function handle not initialized!"
+    async def read(self, addr: int, count: int) -> bytes:
+        assert self.read_f is not None, "Read function handle not initialized!"
         return await self.read_f(addr, count)
 
-    async def read_reg(self, name:str, *, strip:bool=False) -> bytes:
+    async def read_reg(self, name: str, *, strip: bool = False) -> bytes:
         reg = await self.read(*self.regs[name])
         return reg.strip(b'\00') if strip else reg
 
-    async def write(self, addr:int, data:bytes) -> None:
-        assert self.write_f != None, "Write function handle not initialized!"
+    async def write(self, addr: int, data: bytes) -> None:
+        assert self.write_f is not None, "Write function handle not initialized!"
         await self.write_f(addr, data)
 
-    async def write_reg(self, name:str, data:bytes) -> None:
+    async def write_reg(self, name: str, data: bytes) -> None:
         addr, size = self.regs[name]
         await self.write(addr, data+(bytes(size-len(data))))
 
@@ -118,11 +127,14 @@ class SwitchAddrSpace:
 
     async def init(self, *, read_f=None, write_f=None) -> None:
         # initialize R/W function handles
-        assert read_f != None and write_f != None, "Enter valid R/W functions!"
+        assert read_f is not None and write_f is not None, "Enter valid R/W functions!"
         self.read_f             = partial(asyncio_wrapper, read_f)
         self.write_f            = partial(asyncio_wrapper, write_f)
+
         # save immutable meta information internally
-        meta_sel                = lambda x : x.startswith("M_") and x != "M_MAT_CFGS"
+        def meta_sel(x):
+            return x.startswith("M_") and x != "M_MAT_CFGS"
+
         self.meta_info          = dict([(r, reg2int(await self.read_reg(r))) for r in self.regs if meta_sel(r)])
         n_meta                  = self.meta_info["M_NUM_META_REGS"]
         n_data                  = self.meta_info["M_NUM_DATA_REGS"]
@@ -141,7 +153,7 @@ class SwitchAddrSpace:
             self.regs = {k: v for k, v in self.regs.items() if not k.startswith("OUT_")}
             self.cap_read = False
 
-    def _dbg_dump_reg(self, name:str, addr:int, value) -> str:
+    def _dbg_dump_reg(self, name: str, addr: int, value) -> str:
         def _dbg_str(name, addr, value) -> str:
             if type(value) is not int:
                 if type(value) is bytes:
@@ -159,7 +171,7 @@ class SwitchAddrSpace:
                 rest, idx = rest[self.w:], idx+1
         return report
 
-    async def _dbg_dump_reg_async(self, name:str) -> str:
+    async def _dbg_dump_reg_async(self, name: str) -> str:
         return self._dbg_dump_reg(name, self.regs[name][0], await self.read_reg(name))
 
     def dbg_dump_meta(self) -> str:
@@ -172,11 +184,13 @@ class SwitchAddrSpace:
         for mat_idx, mat_info in enumerate(self.mat_cfgs):
             report += f'\tMAT #{mat_idx}:\n'
             for attr, value in mat_info.items():
-                report += self._dbg_dump_reg(attr, reg_addr, value) ; reg_addr += self.w
+                report += self._dbg_dump_reg(attr, reg_addr, value)
+                reg_addr += self.w
             for field_idx, field_info in enumerate(mat_info["fields"]):
                 report += f'\t\tFIELD #{field_idx} ({get_field_info_str(*field_info.values())}):\n'
                 for attr, value in field_info.items():
-                    report += self._dbg_dump_reg(attr, reg_addr, value) ; reg_addr += self.w
+                    report += self._dbg_dump_reg(attr, reg_addr, value)
+                    reg_addr += self.w
         return report
 
     async def dbg_dump_csr(self) -> str:
@@ -214,7 +228,7 @@ class Switch:
     class Rule:
         """ Software abstraction of a rule. """
 
-        def __init__(self, data:bytes=None, mask:bytes=None, action:bytes=None):
+        def __init__(self, data: bytes = None, mask: bytes = None, action: bytes = None):
             self.dict = {'data': data, 'mask': mask, 'action': action}
 
         def __getitem__(self, key):
@@ -237,7 +251,7 @@ class Switch:
         def is_deleted(self) -> bool:
             """ Checks whether FW data are deleted. """
             data, mask = reg2int(self['data']), reg2int(self['mask'])
-            return mask|data != mask
+            return mask | data != mask
 
         def __bool__(self):
             if not self['data'] or not self['mask'] or not self['action']:
@@ -253,16 +267,16 @@ class Switch:
             if not self:
                 self.clear()
 
-        def copy(self, rule:'Rule'=None) -> 'Rule':
+        def copy(self, rule: 'Rule' = None) -> 'Rule':
             """ Copy rule (create new/overwrite). """
-            if rule == None:
+            if rule is None:
                 cp = self.__class__()
                 return cp.copy(self)
             else:
                 self.dict = {k: v for k, v in rule.dict.items()}
                 return self
 
-        def match(self, mv:bytes) -> bool:
+        def match(self, mv: bytes) -> bool:
             """ Match vector against rule. """
             data = reg2int(self['data'])
             mask = reg2int(self['mask'])
@@ -278,10 +292,10 @@ class Switch:
         self.grm  = grm
         self.regs = SwitchAddrSpace()
 
-    def _mat_addr(self, mat:int, addr:int) -> bytes:
+    def _mat_addr(self, mat: int, addr: int) -> bytes:
         """ Build MAT rule address. """
         mat_sel = mat << (self.regs.w*8 - ceil(log2(self.num_mats)))
-        return int2reg(mat_sel|addr, self.regs.w)
+        return int2reg(mat_sel | addr, self.regs.w)
 
     async def init(self, *, read_f=None, write_f=None) -> None:
         """ Initialize the API.
@@ -299,8 +313,11 @@ class Switch:
         self.num_mats_per_port = self.regs.meta_info["M_NUM_MATS_PER_PORT"]
         self.num_mats          = self.num_ports * self.num_mats_per_port
         self.mat_cfgs          = self.regs.mat_cfgs
+
         # provide user-friendly way of MATs indexing -> self.mats[port_idx][mat_idx]
-        subrange  = lambda sr_idx, width : [width*sr_idx+j for j in range(width)]
+        def subrange(sr_idx, width):
+            return [width*sr_idx+j for j in range(width)]
+
         self.mats = [subrange(port, self.num_mats_per_port) for port in range(self.num_ports)]
         # mirror MATs depths in FW
         self.mats_items = [mat_cfg["num_items"] for mat_cfg in self.mat_cfgs]*self.num_ports
@@ -326,13 +343,13 @@ class Switch:
             if action >= self.num_actions:
                 raise ValueError(f"Invalid action: {action}. Should be in range <0, {self.num_actions})")
             for field in rule:
-                if rule[field] == None:
+                if rule[field] is None:
                     raise ValueError(f"Invalid rule: {rule}. Field '{field}' should not be {rule[field]}!")
             return await func(self, rule, *args, **kwargs)
         return wrapper
 
     @_check_addr
-    async def write_addr(self, mat:int, addr:int) -> None:
+    async def write_addr(self, mat: int, addr: int) -> None:
         """ Write address to firmware.
 
             Params
@@ -343,7 +360,7 @@ class Switch:
         await self.regs.write_reg("IN_ADDR", self._mat_addr(mat, addr))
 
     @_check_rule
-    async def write_rule(self, rule:'Switch.Rule') -> None:
+    async def write_rule(self, rule: 'Switch.Rule') -> None:
         """ Write rule to firmware (rule only).
 
             Params
@@ -353,7 +370,7 @@ class Switch:
         for field in rule:
             await self.regs.write_reg("IN_"+field.upper(), rule[field])
 
-    async def write(self, mat:int, addr:int, rule:'Switch.Rule', write_rule:bool=True) -> bool:
+    async def write(self, mat: int, addr: int, rule: 'Switch.Rule', write_rule: bool = True) -> bool:
         """ Write rule to firmware.
 
             Params
@@ -377,7 +394,7 @@ class Switch:
                 self.fw[mat][addr].copy(rule)
         return ret
 
-    async def read(self, mat:int, addr:int, *, grm_read:bool=True, strip:bool=False) -> 'Switch.Rule':
+    async def read(self, mat: int, addr: int, *, grm_read: bool = True, strip: bool = False) -> 'Switch.Rule':
         """ Read rule from firmware.
 
             Params
@@ -403,7 +420,7 @@ class Switch:
         return rule
 
     # TODO: delete_rule based on the rule -> using grm with hashing
-    async def delete(self, mat:int, addr:int, write_rule:bool=True) -> bool:
+    async def delete(self, mat: int, addr: int, write_rule: bool = True) -> bool:
         """ Delete rule in firmware.
 
             Params
@@ -418,7 +435,7 @@ class Switch:
         """
         return await self.write(mat, addr, self.Rule().fw_delete(), write_rule)
 
-    async def clear_mat(self, mat:int, write_rule:bool=True) -> bool:
+    async def clear_mat(self, mat: int, write_rule: bool = True) -> bool:
         """ Clear MAT.
 
             Params
@@ -449,7 +466,7 @@ class Switch:
                 break
         return ret
 
-    async def dbg_dump_mat(self, mat:int, *, grm_read:bool=True) -> str:
+    async def dbg_dump_mat(self, mat: int, *, grm_read: bool = True) -> str:
         """ Report active MAT rules.
 
             Params
@@ -470,7 +487,7 @@ class Switch:
                 report += f"{addr:#0{addr_w}x} : {rule}\n"
         return report
 
-    async def dbg_dump_all(self, *, grm_read:bool=True) -> str:
+    async def dbg_dump_all(self, *, grm_read: bool = True) -> str:
         """ Report active rules from all MATs.
 
             Params
@@ -502,7 +519,7 @@ class Switch:
         """ Wait for completion of write operation. """
         return await self.regs.send_cmd("WRITE", wait_only=True)
 
-    async def config(self, cfg:dict) -> bool:
+    async def config(self, cfg: dict) -> bool:
         """ Configure the switch.
 
             Params
@@ -519,7 +536,7 @@ class Switch:
                     return False
         return True
 
-    def predict(self, frame:Ether, port:int) -> int:
+    def predict(self, frame: Ether, port: int) -> int:
         """ Predict output port for a given frame.
 
             Params
@@ -539,11 +556,11 @@ class Switch:
             # TODO: add support for multiple fields/byte-unaligned fields
             for field in self.mat_cfgs[mat_pidx]['fields']:
                 protocol       = field['protocol']
-                protocol_class = get_protocol_class(protocol)
+                protocol_class = hdr_info.get_protocol_class(protocol)
                 if protocol_class not in frame:
                     continue
                 field_range = (field['range_high'], field['range_low'])
-                field_id    = get_field_id(protocol, *field_range)
+                field_id    = hdr_info.get_field_id(protocol, *field_range)
                 fld, val    = frame[protocol_class].getfield_and_val(field_id)
                 val_decode  = fld.i2m(frame, val)
                 if type(val_decode) is int:
@@ -555,7 +572,7 @@ class Switch:
                 if rule.match(match_vector):
                     action = reg2int(rule['action'])
 
-            if action != None:
+            if action is not None:
                 return action
 
         return 0
