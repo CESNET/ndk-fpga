@@ -199,7 +199,7 @@ begin
     generic map(
         ITEMS       => MVB_ITEMS     ,
         ITEM_WIDTH  => MFB_META_WIDTH,
-        FAKE_PIPE   => (not OUT_MFB_PIPE_EN),
+        FAKE_PIPE   => (not OUT_MVB_PIPE_EN),
         USE_DST_RDY => true  ,
         OPT         => "SRL" ,
         DEVICE      => DEVICE
