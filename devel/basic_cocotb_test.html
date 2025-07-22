@@ -160,118 +160,119 @@ It can be found at <code class="docutils literal notranslate"><span class="pre">
 <span class="linenos"> 19</span><span class="kn">from</span> <span class="nn">cocotbext.ofm.base.generators</span> <span class="kn">import</span> <span class="n">ItemRateLimiter</span>
 <span class="linenos"> 20</span><span class="kn">from</span> <span class="nn">cocotbext.ofm.mvb.transaction</span> <span class="kn">import</span> <span class="n">MvbTrClassic</span>
 <span class="linenos"> 21</span>
-<span class="linenos"> 22</span><span class="c1"># definition of the class encapsulating components of the test</span>
-<span class="linenos"> 23</span><span class="k">class</span> <span class="nc">testbench</span><span class="p">():</span>
-<span class="linenos"> 24</span>    <span class="c1"># dut = device tree of the tested component</span>
-<span class="linenos"> 25</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dut</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="linenos"> 26</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dut</span> <span class="o">=</span> <span class="n">dut</span>
-<span class="linenos"> 27</span>
-<span class="linenos"> 28</span>        <span class="c1"># setting up the input driver and connecting it to signals beginning with &quot;RX&quot;</span>
-<span class="linenos"> 29</span>        <span class="bp">self</span><span class="o">.</span><span class="n">stream_in</span> <span class="o">=</span> <span class="n">MVBDriver</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="s2">&quot;RX&quot;</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">)</span>
-<span class="linenos"> 30</span>
-<span class="linenos"> 31</span>        <span class="c1"># setting up the output monitor and connecting it to signals beginning with &quot;TX&quot;</span>
-<span class="linenos"> 32</span>        <span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span> <span class="o">=</span> <span class="n">MVBMonitor</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="s2">&quot;TX&quot;</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="n">tr_type</span><span class="o">=</span><span class="n">MvbTrClassic</span><span class="p">)</span>
-<span class="linenos"> 33</span>
-<span class="linenos"> 34</span>        <span class="c1"># setting up driver of the DST_RDY so it randomly fluctuates between 0 and 1</span>
-<span class="linenos"> 35</span>        <span class="bp">self</span><span class="o">.</span><span class="n">backpressure</span> <span class="o">=</span> <span class="n">BitDriver</span><span class="p">(</span><span class="n">dut</span><span class="o">.</span><span class="n">TX_DST_RDY</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">)</span>
-<span class="linenos"> 36</span>
-<span class="linenos"> 37</span>        <span class="c1"># setting up the probe measuring throughput</span>
-<span class="linenos"> 38</span>        <span class="bp">self</span><span class="o">.</span><span class="n">throughput_probe</span> <span class="o">=</span> <span class="n">ThroughputProbe</span><span class="p">(</span><span class="n">ThroughputProbeMvbInterface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span><span class="p">),</span> <span class="n">throughput_units</span><span class="o">=</span><span class="s2">&quot;items&quot;</span><span class="p">)</span>
-<span class="linenos"> 39</span>        <span class="bp">self</span><span class="o">.</span><span class="n">throughput_probe</span><span class="o">.</span><span class="n">set_log_period</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="linenos"> 40</span>        <span class="bp">self</span><span class="o">.</span><span class="n">throughput_probe</span><span class="o">.</span><span class="n">add_log_interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="linenos"> 41</span>
-<span class="linenos"> 42</span>        <span class="c1"># counter of sent transactions</span>
-<span class="linenos"> 43</span>        <span class="bp">self</span><span class="o">.</span><span class="n">pkts_sent</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="linenos"> 44</span>
-<span class="linenos"> 45</span>        <span class="c1"># list of the transactions that are expected to be received</span>
-<span class="linenos"> 46</span>        <span class="bp">self</span><span class="o">.</span><span class="n">expected_output</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="linenos"> 47</span>
-<span class="linenos"> 48</span>        <span class="c1"># setting up a scoreboard which compares received transactions with the expected transactions</span>
-<span class="linenos"> 49</span>        <span class="bp">self</span><span class="o">.</span><span class="n">scoreboard</span> <span class="o">=</span> <span class="n">Scoreboard</span><span class="p">(</span><span class="n">dut</span><span class="p">)</span>
-<span class="linenos"> 50</span>
-<span class="linenos"> 51</span>        <span class="c1"># linking a monitor with its expected output</span>
-<span class="linenos"> 52</span>        <span class="bp">self</span><span class="o">.</span><span class="n">scoreboard</span><span class="o">.</span><span class="n">add_interface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_output</span><span class="p">)</span>
-<span class="linenos"> 53</span>
-<span class="linenos"> 54</span>        <span class="c1"># setting up the logging level</span>
-<span class="linenos"> 55</span>        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-<span class="linenos"> 56</span>            <span class="bp">self</span><span class="o">.</span><span class="n">stream_in</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">cocotb</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-<span class="linenos"> 57</span>            <span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">cocotb</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-<span class="linenos"> 58</span>
-<span class="linenos"> 59</span>    <span class="c1"># method for adding transactions to the expected output</span>
-<span class="linenos"> 60</span>    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction</span><span class="p">):</span>
-<span class="linenos"> 61</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Model the DUT based on the input transaction&quot;&quot;&quot;</span>
-<span class="linenos"> 62</span>        <span class="bp">self</span><span class="o">.</span><span class="n">expected_output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transaction</span><span class="p">)</span>
-<span class="linenos"> 63</span>        <span class="bp">self</span><span class="o">.</span><span class="n">pkts_sent</span> <span class="o">+=</span> <span class="mi">1</span>
-<span class="linenos"> 64</span>
-<span class="linenos"> 65</span>    <span class="c1"># method preforming a hardware reset</span>
-<span class="linenos"> 66</span>    <span class="k">async</span> <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="linenos"> 67</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">RESET</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="linenos"> 68</span>        <span class="k">await</span> <span class="n">ClockCycles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-<span class="linenos"> 69</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">RESET</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="linenos"> 70</span>        <span class="k">await</span> <span class="n">RisingEdge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">)</span>
-<span class="linenos"> 71</span>
+<span class="linenos"> 22</span>
+<span class="linenos"> 23</span><span class="c1"># definition of the class encapsulating components of the test</span>
+<span class="linenos"> 24</span><span class="k">class</span> <span class="nc">testbench</span><span class="p">():</span>
+<span class="linenos"> 25</span>    <span class="c1"># dut = device tree of the tested component</span>
+<span class="linenos"> 26</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dut</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="linenos"> 27</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dut</span> <span class="o">=</span> <span class="n">dut</span>
+<span class="linenos"> 28</span>
+<span class="linenos"> 29</span>        <span class="c1"># setting up the input driver and connecting it to signals beginning with &quot;RX&quot;</span>
+<span class="linenos"> 30</span>        <span class="bp">self</span><span class="o">.</span><span class="n">stream_in</span> <span class="o">=</span> <span class="n">MVBDriver</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="s2">&quot;RX&quot;</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">)</span>
+<span class="linenos"> 31</span>
+<span class="linenos"> 32</span>        <span class="c1"># setting up the output monitor and connecting it to signals beginning with &quot;TX&quot;</span>
+<span class="linenos"> 33</span>        <span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span> <span class="o">=</span> <span class="n">MVBMonitor</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="s2">&quot;TX&quot;</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="n">tr_type</span><span class="o">=</span><span class="n">MvbTrClassic</span><span class="p">)</span>
+<span class="linenos"> 34</span>
+<span class="linenos"> 35</span>        <span class="c1"># setting up driver of the DST_RDY so it randomly fluctuates between 0 and 1</span>
+<span class="linenos"> 36</span>        <span class="bp">self</span><span class="o">.</span><span class="n">backpressure</span> <span class="o">=</span> <span class="n">BitDriver</span><span class="p">(</span><span class="n">dut</span><span class="o">.</span><span class="n">TX_DST_RDY</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">)</span>
+<span class="linenos"> 37</span>
+<span class="linenos"> 38</span>        <span class="c1"># setting up the probe measuring throughput</span>
+<span class="linenos"> 39</span>        <span class="bp">self</span><span class="o">.</span><span class="n">throughput_probe</span> <span class="o">=</span> <span class="n">ThroughputProbe</span><span class="p">(</span><span class="n">ThroughputProbeMvbInterface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span><span class="p">),</span> <span class="n">throughput_units</span><span class="o">=</span><span class="s2">&quot;items&quot;</span><span class="p">)</span>
+<span class="linenos"> 40</span>        <span class="bp">self</span><span class="o">.</span><span class="n">throughput_probe</span><span class="o">.</span><span class="n">set_log_period</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="linenos"> 41</span>        <span class="bp">self</span><span class="o">.</span><span class="n">throughput_probe</span><span class="o">.</span><span class="n">add_log_interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="linenos"> 42</span>
+<span class="linenos"> 43</span>        <span class="c1"># counter of sent transactions</span>
+<span class="linenos"> 44</span>        <span class="bp">self</span><span class="o">.</span><span class="n">pkts_sent</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos"> 45</span>
+<span class="linenos"> 46</span>        <span class="c1"># list of the transactions that are expected to be received</span>
+<span class="linenos"> 47</span>        <span class="bp">self</span><span class="o">.</span><span class="n">expected_output</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos"> 48</span>
+<span class="linenos"> 49</span>        <span class="c1"># setting up a scoreboard which compares received transactions with the expected transactions</span>
+<span class="linenos"> 50</span>        <span class="bp">self</span><span class="o">.</span><span class="n">scoreboard</span> <span class="o">=</span> <span class="n">Scoreboard</span><span class="p">(</span><span class="n">dut</span><span class="p">)</span>
+<span class="linenos"> 51</span>
+<span class="linenos"> 52</span>        <span class="c1"># linking a monitor with its expected output</span>
+<span class="linenos"> 53</span>        <span class="bp">self</span><span class="o">.</span><span class="n">scoreboard</span><span class="o">.</span><span class="n">add_interface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_output</span><span class="p">)</span>
+<span class="linenos"> 54</span>
+<span class="linenos"> 55</span>        <span class="c1"># setting up the logging level</span>
+<span class="linenos"> 56</span>        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+<span class="linenos"> 57</span>            <span class="bp">self</span><span class="o">.</span><span class="n">stream_in</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">cocotb</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="linenos"> 58</span>            <span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">cocotb</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="linenos"> 59</span>
+<span class="linenos"> 60</span>    <span class="c1"># method for adding transactions to the expected output</span>
+<span class="linenos"> 61</span>    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction</span><span class="p">):</span>
+<span class="linenos"> 62</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Model the DUT based on the input transaction&quot;&quot;&quot;</span>
+<span class="linenos"> 63</span>        <span class="bp">self</span><span class="o">.</span><span class="n">expected_output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transaction</span><span class="p">)</span>
+<span class="linenos"> 64</span>        <span class="bp">self</span><span class="o">.</span><span class="n">pkts_sent</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="linenos"> 65</span>
+<span class="linenos"> 66</span>    <span class="c1"># method preforming a hardware reset</span>
+<span class="linenos"> 67</span>    <span class="k">async</span> <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos"> 68</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">RESET</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos"> 69</span>        <span class="k">await</span> <span class="n">ClockCycles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="linenos"> 70</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">RESET</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos"> 71</span>        <span class="k">await</span> <span class="n">RisingEdge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">)</span>
 <span class="linenos"> 72</span>
-<span class="linenos"> 73</span><span class="c1"># defining a test - functions with &quot;@cocotb.test()&quot; decorator will be automatically found and run</span>
-<span class="linenos"> 74</span><span class="nd">@cocotb</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
-<span class="linenos"> 75</span><span class="k">async</span> <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="n">pkt_count</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
-<span class="linenos"> 76</span>    <span class="c1"># start a clock generator</span>
-<span class="linenos"> 77</span>    <span class="n">cocotb</span><span class="o">.</span><span class="n">start_soon</span><span class="p">(</span><span class="n">Clock</span><span class="p">(</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">())</span>
-<span class="linenos"> 78</span>
-<span class="linenos"> 79</span>    <span class="c1"># initialization of the test bench</span>
-<span class="linenos"> 80</span>    <span class="n">tb</span> <span class="o">=</span> <span class="n">testbench</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="linenos"> 81</span>
-<span class="linenos"> 82</span>    <span class="c1"># change MVB driver&#39;s IdleGenerator to ItemRateLimiter</span>
-<span class="linenos"> 83</span>    <span class="c1"># note: the RateLimiter&#39;s rate is affected by backpressure (DST_RDY).</span>
-<span class="linenos"> 84</span>    <span class="c1"># Even though it takes into account cycles with DST_RDY=0, the desired rate might not be achievable.</span>
-<span class="linenos"> 85</span>    <span class="n">idle_gen_conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">random_idles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_idles</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">zero_idles_chance</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-<span class="linenos"> 86</span>    <span class="n">tb</span><span class="o">.</span><span class="n">stream_in</span><span class="o">.</span><span class="n">set_idle_generator</span><span class="p">(</span><span class="n">ItemRateLimiter</span><span class="p">(</span><span class="n">rate_percentage</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="o">**</span><span class="n">idle_gen_conf</span><span class="p">))</span>
-<span class="linenos"> 87</span>
-<span class="linenos"> 88</span>    <span class="c1"># running simulated reset</span>
-<span class="linenos"> 89</span>    <span class="k">await</span> <span class="n">tb</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-<span class="linenos"> 90</span>
-<span class="linenos"> 91</span>    <span class="c1"># starting the BitDriver (randomized DST_RDY)</span>
-<span class="linenos"> 92</span>    <span class="n">tb</span><span class="o">.</span><span class="n">backpressure</span><span class="o">.</span><span class="n">start</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">5</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
-<span class="linenos"> 93</span>
-<span class="linenos"> 94</span>    <span class="c1"># dynamically getting the width of the data signal that will be set (useful if the width of the signal may change)</span>
-<span class="linenos"> 95</span>    <span class="n">data_width</span> <span class="o">=</span> <span class="n">tb</span><span class="o">.</span><span class="n">stream_in</span><span class="o">.</span><span class="n">item_widths</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
-<span class="linenos"> 96</span>
-<span class="linenos"> 97</span>    <span class="c1"># generating MVB items as random integers between the minimum and maximum unsigned value of the item</span>
-<span class="linenos"> 98</span>    <span class="k">for</span> <span class="n">transaction</span> <span class="ow">in</span> <span class="n">random_integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="n">data_width</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">pkt_count</span><span class="p">):</span>
-<span class="linenos"> 99</span>
-<span class="linenos">100</span>        <span class="c1"># logging the generated transaction</span>
-<span class="linenos">101</span>        <span class="n">cocotb</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;generated transaction: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">transaction</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="linenos">102</span>
-<span class="linenos">103</span>        <span class="c1"># initializing MVB transaction object</span>
-<span class="linenos">104</span>        <span class="n">mvb_tr</span> <span class="o">=</span> <span class="n">MvbTrClassic</span><span class="p">()</span>
-<span class="linenos">105</span>
-<span class="linenos">106</span>        <span class="c1"># setting data of MVB transaction to the generated integer</span>
-<span class="linenos">107</span>        <span class="n">mvb_tr</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">transaction</span>
-<span class="linenos">108</span>
-<span class="linenos">109</span>        <span class="c1"># appending the transaction to tb.expected_output</span>
-<span class="linenos">110</span>        <span class="n">tb</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">mvb_tr</span><span class="p">)</span>
-<span class="linenos">111</span>
-<span class="linenos">112</span>        <span class="c1"># passing the transaction to the driver which then writes it to the bus</span>
-<span class="linenos">113</span>        <span class="n">tb</span><span class="o">.</span><span class="n">stream_in</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mvb_tr</span><span class="p">)</span>
-<span class="linenos">114</span>
-<span class="linenos">115</span>    <span class="n">last_num</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="linenos">116</span>
-<span class="linenos">117</span>    <span class="c1"># checking if all the expected packets have been received</span>
-<span class="linenos">118</span>    <span class="k">while</span> <span class="p">(</span><span class="n">tb</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">item_cnt</span> <span class="o">&lt;</span> <span class="n">pkt_count</span><span class="p">):</span>
-<span class="linenos">119</span>
-<span class="linenos">120</span>        <span class="c1"># logging number of received packets after every 1000 packets</span>
-<span class="linenos">121</span>        <span class="k">if</span> <span class="p">(</span><span class="n">tb</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">item_cnt</span> <span class="o">//</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">last_num</span><span class="p">:</span>
-<span class="linenos">122</span>            <span class="n">last_num</span> <span class="o">=</span> <span class="n">tb</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">item_cnt</span> <span class="o">//</span> <span class="mi">1000</span>
-<span class="linenos">123</span>            <span class="n">cocotb</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of transactions processed: </span><span class="si">{</span><span class="n">tb</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">item_cnt</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">pkt_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="linenos">124</span>
-<span class="linenos">125</span>        <span class="c1"># if not all packets have been received yet, waiting 100 cycles so the simulation doesn&#39;t stop prematurely</span>
-<span class="linenos">126</span>        <span class="k">await</span> <span class="n">ClockCycles</span><span class="p">(</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="linenos">127</span>
-<span class="linenos">128</span>    <span class="c1"># logging values measured by throughput probe</span>
-<span class="linenos">129</span>    <span class="n">tb</span><span class="o">.</span><span class="n">throughput_probe</span><span class="o">.</span><span class="n">log_max_throughput</span><span class="p">()</span>
-<span class="linenos">130</span>    <span class="n">tb</span><span class="o">.</span><span class="n">throughput_probe</span><span class="o">.</span><span class="n">log_average_throughput</span><span class="p">()</span>
-<span class="linenos">131</span>
-<span class="linenos">132</span>    <span class="c1"># displaying result of the test</span>
-<span class="linenos">133</span>    <span class="k">raise</span> <span class="n">tb</span><span class="o">.</span><span class="n">scoreboard</span><span class="o">.</span><span class="n">result</span>
+<span class="linenos"> 73</span>
+<span class="linenos"> 74</span><span class="c1"># defining a test - functions with &quot;@cocotb.test()&quot; decorator will be automatically found and run</span>
+<span class="linenos"> 75</span><span class="nd">@cocotb</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+<span class="linenos"> 76</span><span class="k">async</span> <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="n">pkt_count</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+<span class="linenos"> 77</span>    <span class="c1"># start a clock generator</span>
+<span class="linenos"> 78</span>    <span class="n">cocotb</span><span class="o">.</span><span class="n">start_soon</span><span class="p">(</span><span class="n">Clock</span><span class="p">(</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">())</span>
+<span class="linenos"> 79</span>
+<span class="linenos"> 80</span>    <span class="c1"># initialization of the test bench</span>
+<span class="linenos"> 81</span>    <span class="n">tb</span> <span class="o">=</span> <span class="n">testbench</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos"> 82</span>
+<span class="linenos"> 83</span>    <span class="c1"># change MVB driver&#39;s IdleGenerator to ItemRateLimiter</span>
+<span class="linenos"> 84</span>    <span class="c1"># note: the RateLimiter&#39;s rate is affected by backpressure (DST_RDY).</span>
+<span class="linenos"> 85</span>    <span class="c1"># Even though it takes into account cycles with DST_RDY=0, the desired rate might not be achievable.</span>
+<span class="linenos"> 86</span>    <span class="n">idle_gen_conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">random_idles</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_idles</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">zero_idles_chance</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="linenos"> 87</span>    <span class="n">tb</span><span class="o">.</span><span class="n">stream_in</span><span class="o">.</span><span class="n">set_idle_generator</span><span class="p">(</span><span class="n">ItemRateLimiter</span><span class="p">(</span><span class="n">rate_percentage</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="o">**</span><span class="n">idle_gen_conf</span><span class="p">))</span>
+<span class="linenos"> 88</span>
+<span class="linenos"> 89</span>    <span class="c1"># running simulated reset</span>
+<span class="linenos"> 90</span>    <span class="k">await</span> <span class="n">tb</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="linenos"> 91</span>
+<span class="linenos"> 92</span>    <span class="c1"># starting the BitDriver (randomized DST_RDY)</span>
+<span class="linenos"> 93</span>    <span class="n">tb</span><span class="o">.</span><span class="n">backpressure</span><span class="o">.</span><span class="n">start</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">5</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+<span class="linenos"> 94</span>
+<span class="linenos"> 95</span>    <span class="c1"># dynamically getting the width of the data signal that will be set (useful if the width of the signal may change)</span>
+<span class="linenos"> 96</span>    <span class="n">data_width</span> <span class="o">=</span> <span class="n">tb</span><span class="o">.</span><span class="n">stream_in</span><span class="o">.</span><span class="n">item_widths</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+<span class="linenos"> 97</span>
+<span class="linenos"> 98</span>    <span class="c1"># generating MVB items as random integers between the minimum and maximum unsigned value of the item</span>
+<span class="linenos"> 99</span>    <span class="k">for</span> <span class="n">transaction</span> <span class="ow">in</span> <span class="n">random_integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="n">data_width</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">pkt_count</span><span class="p">):</span>
+<span class="linenos">100</span>
+<span class="linenos">101</span>        <span class="c1"># logging the generated transaction</span>
+<span class="linenos">102</span>        <span class="n">cocotb</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;generated transaction: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">transaction</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">103</span>
+<span class="linenos">104</span>        <span class="c1"># initializing MVB transaction object</span>
+<span class="linenos">105</span>        <span class="n">mvb_tr</span> <span class="o">=</span> <span class="n">MvbTrClassic</span><span class="p">()</span>
+<span class="linenos">106</span>
+<span class="linenos">107</span>        <span class="c1"># setting data of MVB transaction to the generated integer</span>
+<span class="linenos">108</span>        <span class="n">mvb_tr</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">transaction</span>
+<span class="linenos">109</span>
+<span class="linenos">110</span>        <span class="c1"># appending the transaction to tb.expected_output</span>
+<span class="linenos">111</span>        <span class="n">tb</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">mvb_tr</span><span class="p">)</span>
+<span class="linenos">112</span>
+<span class="linenos">113</span>        <span class="c1"># passing the transaction to the driver which then writes it to the bus</span>
+<span class="linenos">114</span>        <span class="n">tb</span><span class="o">.</span><span class="n">stream_in</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mvb_tr</span><span class="p">)</span>
+<span class="linenos">115</span>
+<span class="linenos">116</span>    <span class="n">last_num</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">117</span>
+<span class="linenos">118</span>    <span class="c1"># checking if all the expected packets have been received</span>
+<span class="linenos">119</span>    <span class="k">while</span> <span class="p">(</span><span class="n">tb</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">item_cnt</span> <span class="o">&lt;</span> <span class="n">pkt_count</span><span class="p">):</span>
+<span class="linenos">120</span>
+<span class="linenos">121</span>        <span class="c1"># logging number of received packets after every 1000 packets</span>
+<span class="linenos">122</span>        <span class="k">if</span> <span class="p">(</span><span class="n">tb</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">item_cnt</span> <span class="o">//</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">last_num</span><span class="p">:</span>
+<span class="linenos">123</span>            <span class="n">last_num</span> <span class="o">=</span> <span class="n">tb</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">item_cnt</span> <span class="o">//</span> <span class="mi">1000</span>
+<span class="linenos">124</span>            <span class="n">cocotb</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of transactions processed: </span><span class="si">{</span><span class="n">tb</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">item_cnt</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">pkt_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">125</span>
+<span class="linenos">126</span>        <span class="c1"># if not all packets have been received yet, waiting 100 cycles so the simulation doesn&#39;t stop prematurely</span>
+<span class="linenos">127</span>        <span class="k">await</span> <span class="n">ClockCycles</span><span class="p">(</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="linenos">128</span>
+<span class="linenos">129</span>    <span class="c1"># logging values measured by throughput probe</span>
+<span class="linenos">130</span>    <span class="n">tb</span><span class="o">.</span><span class="n">throughput_probe</span><span class="o">.</span><span class="n">log_max_throughput</span><span class="p">()</span>
+<span class="linenos">131</span>    <span class="n">tb</span><span class="o">.</span><span class="n">throughput_probe</span><span class="o">.</span><span class="n">log_average_throughput</span><span class="p">()</span>
+<span class="linenos">132</span>
+<span class="linenos">133</span>    <span class="c1"># displaying result of the test</span>
+<span class="linenos">134</span>    <span class="k">raise</span> <span class="n">tb</span><span class="o">.</span><span class="n">scoreboard</span><span class="o">.</span><span class="n">result</span>
 </pre></div>
 </div>
 <p>This test can be used as a template for tests of basic <cite>flow</cite> and <cite>storage</cite> components, and can be easily adapted for
