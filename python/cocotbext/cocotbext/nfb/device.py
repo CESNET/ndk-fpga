@@ -26,7 +26,7 @@ class NfbDevice:
         self.mi = None
         self._dut = dut
 
-        self.ram = ram if ram else RAM(0x02000000)
+        self.ram = ram if ram else RAM(0x08000000)
         self._servicer_cls = servicer
 
         self._init_pcie()

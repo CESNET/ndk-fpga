@@ -60,6 +60,10 @@ class QueueNdp:
         self._hdr_base = bb + bs + (bs // 4) * 1 # if self._dir == 0 else 0
         self._upd_base = bb + bs + (bs // 4) * 2
 
+        if self._upd_base + 4 > len(self._ram._mem):
+            raise Exception("Not enough memory for QueueNdp in RAM object. "
+                            "Try to increase RAM size or decrease number of queues")
+
     def update_desc_upper_address(self, ba):
         desc = self._ctrl.desc0(ba)
         if self._ctrl.last_upper_addr == desc:
