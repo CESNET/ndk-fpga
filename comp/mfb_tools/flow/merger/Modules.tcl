@@ -11,6 +11,7 @@ set MFB_PIPE_BASE     "$OFM_PATH/comp/mfb_tools/flow/pipe"
 set PIPE_REG_BASE     "$OFM_PATH/comp/base/misc/pipe"
 set SHAKEDOWN_BASE    "$OFM_PATH/comp/mvb_tools/flow/shakedown"
 set MVB_MERGE_ST_BASE "$OFM_PATH/comp/mvb_tools/flow/merge_streams"
+set MFB_FIFOX_BASE   "$OFM_PATH/comp/mfb_tools/storage/fifox"
 
 set PKG_BASE "$OFM_PATH/comp/base/pkg"
 
@@ -26,6 +27,7 @@ lappend COMPONENTS [ list "MFB_PIPE"     $MFB_PIPE_BASE    "FULL" ]
 lappend COMPONENTS [ list "PIPE_REG"     $PIPE_REG_BASE    "FULL" ]
 lappend COMPONENTS [ list "SHAKEDOWN"    $SHAKEDOWN_BASE   "FULL" ]
 lappend COMPONENTS [ list "MVB_MERGE_ST" $MVB_MERGE_ST_BASE "FULL" ]
+lappend COMPONENTS [ list "MFB_FIFOX"    $MFB_FIFOX_BASE   "FULL" ]
 
 # Source files for implemented component
 set MOD "$MOD $ENTITY_BASE/mfb_merger_ent.vhd"

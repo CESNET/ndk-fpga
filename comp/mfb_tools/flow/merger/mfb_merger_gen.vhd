@@ -63,6 +63,9 @@ entity MFB_MERGER_GEN is
         -- the next active MVB/MFB stream occurs.
         SW_TIMEOUT_WIDTH : natural := 4;
 
+        -- To enable optional MFB FIFOs at middle stages
+        MID_MFB_FIFOS_EN : boolean := False;
+
         -- Input PIPEs enable for all 2:1 Mergers
         -- Input registers is created when this is set to false.
         IN_PIPE_EN      : boolean := false;
@@ -206,6 +209,7 @@ begin
                 HDR_WIDTH           => MVB_ITEM_WIDTH,
                 RX0_PAYLOAD_ENABLED => get_payload_en(s,2*i  ),
                 RX1_PAYLOAD_ENABLED => get_payload_en(s,2*i+1),
+                IN_MFB_FIFO_EN      => (s /= 0 and MID_MFB_FIFOS_EN),
                 INPUT_FIFO_SIZE     => INPUT_FIFO_SIZE,
                 SW_TIMEOUT_WIDTH    => SW_TIMEOUT_WIDTH,
                 IN_PIPE_EN          => IN_PIPE_EN,

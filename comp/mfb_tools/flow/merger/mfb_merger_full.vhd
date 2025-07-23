@@ -68,6 +68,16 @@ architecture FULL of MFB_MERGER is
     signal rx_mvb_hdr_p_arr : slv_array_2d_t(2-1 downto 0)(MVB_ITEMS-1 downto 0)(1+HDR_WIDTH-1 downto 0);
     signal rx_mvb_hdr_p     : slv_array_t(2-1 downto 0)(MVB_ITEMS*(1+HDR_WIDTH)-1 downto 0);
 
+    -- RX MFB FIFO signals
+    signal rx_fifo_mfb_data    : slv_array_t(2-1 downto 0)(MFB_REGIONS*MFB_DATA_WIDTH-1 downto 0);
+    signal rx_fifo_mfb_meta    : slv_array_t(2-1 downto 0)(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
+    signal rx_fifo_mfb_sof     : slv_array_t(2-1 downto 0)(MFB_REGIONS-1 downto 0);
+    signal rx_fifo_mfb_eof     : slv_array_t(2-1 downto 0)(MFB_REGIONS-1 downto 0);
+    signal rx_fifo_mfb_sof_pos : slv_array_t(2-1 downto 0)(MFB_REGIONS*SOF_POS_WIDTH-1 downto 0);
+    signal rx_fifo_mfb_eof_pos : slv_array_t(2-1 downto 0)(MFB_REGIONS*EOF_POS_WIDTH-1 downto 0);
+    signal rx_fifo_mfb_src_rdy : std_logic_vector(2-1 downto 0);
+    signal rx_fifo_mfb_dst_rdy : std_logic_vector(2-1 downto 0);
+
     -----------------------------------------------
 
     -- RX MVB hdr from input PIPEs with payload added
@@ -295,6 +305,57 @@ begin
 
     -- -------------------------------------------------------------------------
 
+    -- -------------------------------------------------------------------------
+    -- Optional Input FIFOs
+    -- -------------------------------------------------------------------------
+
+    in_mfb_fifo_g : for ii in 0 to 2-1 generate
+        in_mfb_fifo_g2 : if (IN_MFB_FIFO_EN = True) generate
+            mfb_fifo_i : entity work.MFB_FIFOX
+            generic map (
+                REGIONS     => MFB_REGIONS,
+                REGION_SIZE => MFB_REG_SIZE,
+                BLOCK_SIZE  => MFB_BLOCK_SIZE,
+                ITEM_WIDTH  => MFB_ITEM_WIDTH,
+                META_WIDTH  => MFB_META_WIDTH,
+                FIFO_DEPTH  => INPUT_FIFO_SIZE,
+                RAM_TYPE    => "AUTO",
+                DEVICE      => DEVICE
+            )
+            port map (
+                CLK         => CLK,
+                RST         => RESET,
+
+                RX_DATA     => rx_mfb_data(ii),
+                RX_META     => rx_mfb_meta(ii),
+                RX_SOF_POS  => rx_mfb_sof_pos(ii),
+                RX_EOF_POS  => rx_mfb_eof_pos(ii),
+                RX_SOF      => rx_mfb_sof(ii),
+                RX_EOF      => rx_mfb_eof(ii),
+                RX_SRC_RDY  => rx_mfb_src_rdy(ii),
+                RX_DST_RDY  => rx_mfb_dst_rdy(ii),
+
+                TX_DATA     => rx_fifo_mfb_data(ii),
+                TX_META     => rx_fifo_mfb_meta(ii),
+                TX_SOF_POS  => rx_fifo_mfb_sof_pos(ii),
+                TX_EOF_POS  => rx_fifo_mfb_eof_pos(ii),
+                TX_SOF      => rx_fifo_mfb_sof(ii),
+                TX_EOF      => rx_fifo_mfb_eof(ii),
+                TX_SRC_RDY  => rx_fifo_mfb_src_rdy(ii),
+                TX_DST_RDY  => rx_fifo_mfb_dst_rdy(ii)
+            );
+        else generate
+            rx_fifo_mfb_data(ii)    <= rx_mfb_data(ii);
+            rx_fifo_mfb_meta(ii)    <= rx_mfb_meta(ii);
+            rx_fifo_mfb_sof_pos(ii) <= rx_mfb_sof_pos(ii);
+            rx_fifo_mfb_eof_pos(ii) <= rx_mfb_eof_pos(ii);
+            rx_fifo_mfb_sof(ii)     <= rx_mfb_sof(ii);
+            rx_fifo_mfb_eof(ii)     <= rx_mfb_eof(ii);
+            rx_fifo_mfb_src_rdy(ii) <= rx_mfb_src_rdy(ii);
+            rx_mfb_dst_rdy(ii)      <= rx_fifo_mfb_dst_rdy(ii);
+        end generate;
+    end generate;
+
     no_in_pipe_gen : if (IN_PIPE_EN = false) generate
 
         -- -------------------------------------------------------------------------
@@ -308,14 +369,14 @@ begin
             rx_in_pipe_mvb_src_rdy(i) <= rx_mvb_src_rdy(i);
             rx_mvb_dst_rdy        (i) <= rx_in_pipe_mvb_dst_rdy(i);
 
-            rx_in_pipe_mfb_data   (i) <= rx_mfb_data   (i);
-            rx_in_pipe_mfb_meta   (i) <= rx_mfb_meta   (i);
-            rx_in_pipe_mfb_sof    (i) <= rx_mfb_sof    (i);
-            rx_in_pipe_mfb_eof    (i) <= rx_mfb_eof    (i);
-            rx_in_pipe_mfb_sof_pos(i) <= rx_mfb_sof_pos(i);
-            rx_in_pipe_mfb_eof_pos(i) <= rx_mfb_eof_pos(i);
-            rx_in_pipe_mfb_src_rdy(i) <= rx_mfb_src_rdy(i);
-            rx_mfb_dst_rdy        (i) <= rx_in_pipe_mfb_dst_rdy(i);
+            rx_in_pipe_mfb_data   (i) <= rx_fifo_mfb_data   (i);
+            rx_in_pipe_mfb_meta   (i) <= rx_fifo_mfb_meta   (i);
+            rx_in_pipe_mfb_sof    (i) <= rx_fifo_mfb_sof    (i);
+            rx_in_pipe_mfb_eof    (i) <= rx_fifo_mfb_eof    (i);
+            rx_in_pipe_mfb_sof_pos(i) <= rx_fifo_mfb_sof_pos(i);
+            rx_in_pipe_mfb_eof_pos(i) <= rx_fifo_mfb_eof_pos(i);
+            rx_in_pipe_mfb_src_rdy(i) <= rx_fifo_mfb_src_rdy(i);
+            rx_fifo_mfb_dst_rdy   (i) <= rx_in_pipe_mfb_dst_rdy(i);
         end generate;
 
         -- -------------------------------------------------------------------------
@@ -403,14 +464,14 @@ begin
                 CLK           => CLK,
                 RESET         => RESET,
 
-                RX_DATA       => rx_mfb_data   (i),
-                RX_META       => rx_mfb_meta   (i),
-                RX_SOF_POS    => rx_mfb_sof_pos(i),
-                RX_EOF_POS    => rx_mfb_eof_pos(i),
-                RX_SOF        => rx_mfb_sof    (i),
-                RX_EOF        => rx_mfb_eof    (i),
-                RX_SRC_RDY    => rx_mfb_src_rdy(i),
-                RX_DST_RDY    => rx_mfb_dst_rdy(i),
+                RX_DATA       => rx_fifo_mfb_data   (i),
+                RX_META       => rx_fifo_mfb_meta   (i),
+                RX_SOF_POS    => rx_fifo_mfb_sof_pos(i),
+                RX_EOF_POS    => rx_fifo_mfb_eof_pos(i),
+                RX_SOF        => rx_fifo_mfb_sof    (i),
+                RX_EOF        => rx_fifo_mfb_eof    (i),
+                RX_SRC_RDY    => rx_fifo_mfb_src_rdy(i),
+                RX_DST_RDY    => rx_fifo_mfb_dst_rdy(i),
 
                 TX_DATA       => rx_in_pipe_mfb_data   (i),
                 TX_META       => rx_in_pipe_mfb_meta   (i),

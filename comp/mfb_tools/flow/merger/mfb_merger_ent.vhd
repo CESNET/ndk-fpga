@@ -57,8 +57,10 @@ entity MFB_MERGER is
         RX0_PAYLOAD_ENABLED : boolean := true;
         RX1_PAYLOAD_ENABLED : boolean := true;
 
+        -- To enable optional MFB FIFOs at input
+        IN_MFB_FIFO_EN      : boolean := false;
+
         -- Size of input MVB and MFB FIFOs (in words)
-        -- Only used in architecture FULL.
         -- Minimum value is 2!
         INPUT_FIFO_SIZE     : integer := 8;
 
