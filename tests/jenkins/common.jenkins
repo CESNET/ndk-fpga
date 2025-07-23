@@ -177,7 +177,7 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
 
     if (run_coverage_report) {
         // Publish the coverage report file
-        publishReport displayType: 'absolute', name: 'Coverage Report', provider: json(pattern: '**/coverage_report.json')
+        publishReport displayType: 'absolute', name: 'Coverage Report', provider: json(pattern: '**/coverage_report*.json')
     }
 }
 
