@@ -1,0 +1,15 @@
+library 'liberouter'
+
+stagesFirmware(
+    dir: 'apps/minimal/build/agi-fh400g',
+    target: '400g1',
+    tool: 'quartus',
+    quartus: '22.4.0.94',
+    project: 'agi-fh400g-rev0-minimal-pcie1xgen5x16-400g1',
+    params: 'BOARD_REV=0 PCIE_CONF=1xgen5x16',
+    pollscm: 'H H(0-11) * * 6',
+    rpms: false,
+    rename: false,
+    artifacts: 'agi-fh400g-rev0-minimal-pcie1xgen5x16-400g1',
+    lastBuilds: 2,
+)
