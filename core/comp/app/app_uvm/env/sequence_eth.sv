@@ -577,7 +577,7 @@ class sequence_search_eth  #(
         end
         $fwrite(file, "{\n");
         //ETH
-        $fwrite(file, "\"packet\" : { \"err_probability\" : %0d},\n", packet_err_prob);
+        $fwrite(file, "\"packet\" : { \"err_probability\" : %0d, \"size_min\" : %0d, \"size_max\" : %0d},\n", packet_err_prob, cfg.array_size_min, cfg.array_size_max);
         $fwrite(file, "\"ETH\"  : { \"weight\" : %s},\n", proto_dist_gen(eth_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
         $fwrite(file, "\"VLAN\" : { \"weight\" : %s},\n", proto_dist_gen(vlan_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
         $fwrite(file, "\"PPP\" : { \"weight\" : %s},\n",  proto_dist_gen(ppp_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
@@ -690,7 +690,7 @@ class sequence_search_eth  #(
             if (data.size() < cfg.array_size_min) begin
                 data = new[cfg.array_size_min](data);
             end
-            if (cfg.array_size_max > 0 && data.size() > cfg.array_size_max) begin
+            if (data.size() > cfg.array_size_max) begin
                 data = new[cfg.array_size_max](data);
             end
             req.data = {>>{data}};

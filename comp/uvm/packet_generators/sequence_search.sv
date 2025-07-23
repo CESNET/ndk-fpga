@@ -14,7 +14,7 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
     `uvm_object_param_utils(uvm_packet_generators::sequence_search#(ITEM_WIDTH))
 
     int unsigned pkt_size_min = 60;
-    int unsigned pkt_size_max = 0;
+    int unsigned pkt_size_max = 1500;
     string config_json = "./filter.json";
     rand int unsigned transaction_count;
     rand int unsigned pkt_gen_seed;
@@ -158,7 +158,7 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
         end
         $fwrite(file, "{\n");
         //ETH
-        $fwrite(file, "\"packet\" : { \"err_probability\" : %0d},\n", packet_err_prob);
+        $fwrite(file, "\"packet\" : { \"err_probability\" : %0d, \"size_min\" : %0d, \"size_max\" : %0d},\n", packet_err_prob, pkt_size_min, pkt_size_max);
         $fwrite(file, "\"ETH\"  : { \"weight\" : %s},\n", proto_dist_gen(eth_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
         $fwrite(file, "\"VLAN\" : { \"weight\" : %s},\n", proto_dist_gen(vlan_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
         $fwrite(file, "\"PPP\" : { \"weight\" : %s},\n",  proto_dist_gen(ppp_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
@@ -252,7 +252,7 @@ class sequence_search #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
             if (data.size() < pkt_size_min) begin
                 data = new[pkt_size_min](data);
             end
-            if (pkt_size_max > 0 && data.size() > pkt_size_max) begin
+            if (data.size() > pkt_size_max) begin
                 data = new[pkt_size_max](data);
             end
             req.data = {>>{data}};
