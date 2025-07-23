@@ -28,7 +28,7 @@ class Parser_rand(Parser):
             packet = scapy.packet.Packet()
 
             while proto_act is not None:
-                pkt_proto = proto_act.protocol_add(cfg)
+                pkt_proto = proto_act.protocol_add(cfg, packet)
                 if pkt_proto is not None:
                     packet     = packet / pkt_proto
                 proto_next = proto_act.protocol_next(cfg)
