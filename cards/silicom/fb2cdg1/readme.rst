@@ -1,11 +1,11 @@
 .. _card_fb2cdg1:
 
-Silicom fb2CDg1@AGM39D-2
+Silicom fb2CDg1\@AGM39D-2
 ------------------------
 
 - Card information:
     - Vendor: Silicom
-    - Name: fb2CDg1@AGM39D-2 (ThunderFjord)
+    - Name: fb2CDg1\@AGM39D-2 (ThunderFjord)
     - Ethernet ports: 2x QSFPDD56
     - PCIe conectors: Edge connector
     - `FPGA Card Website <https://www.silicom-usa.com/pr/server-adapters/programmable-fpga-server-adapter/fpga-intel-based-2/fpga-intel-agilex-based/fpga-smartnic-fb2cdg1agm39d-2-intel-based/>`_
