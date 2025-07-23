@@ -503,18 +503,19 @@ begin
 
         dma_up_merger_i : entity work.MFB_MERGER_GEN
         generic map (
-            MERGER_INPUTS   => DMA_PORTS,
-            MVB_ITEMS       => MVB_UP_ITEMS,
-            MVB_ITEM_WIDTH  => DMA_UPHDR_WIDTH,
-            MFB_REGIONS     => MFB_UP_REGIONS,
-            MFB_REG_SIZE    => MFB_UP_REG_SIZE,
-            MFB_BLOCK_SIZE  => MFB_UP_BLOCK_SIZE,
-            MFB_ITEM_WIDTH  => MFB_UP_ITEM_WIDTH,
-            INPUT_FIFO_SIZE => 16,
-            RX_PAYLOAD_EN   => (others => true),
-            IN_PIPE_EN      => false,
-            OUT_PIPE_EN     => true,
-            DEVICE          => DEVICE
+            MERGER_INPUTS    => DMA_PORTS,
+            MVB_ITEMS        => MVB_UP_ITEMS,
+            MVB_ITEM_WIDTH   => DMA_UPHDR_WIDTH,
+            MFB_REGIONS      => MFB_UP_REGIONS,
+            MFB_REG_SIZE     => MFB_UP_REG_SIZE,
+            MFB_BLOCK_SIZE   => MFB_UP_BLOCK_SIZE,
+            MFB_ITEM_WIDTH   => MFB_UP_ITEM_WIDTH,
+            INPUT_FIFO_SIZE  => 512,
+            RX_PAYLOAD_EN    => (others => true),
+            MID_MFB_FIFOS_EN => true,
+            IN_PIPE_EN       => false,
+            OUT_PIPE_EN      => true,
+            DEVICE           => DEVICE
         )
         port map (
             CLK            => CLK,
@@ -1255,6 +1256,8 @@ begin
             MFB_BLOCK_SIZE   => MFB_DOWN_BLOCK_SIZE,
             MFB_ITEM_WIDTH   => MFB_DOWN_ITEM_WIDTH,
             OUTPUT_FIFO_SIZE => 16,
+            MID_MFB_FIFOS_EN => true,
+            MFB_FIFO_DEPTH   => 512,
             OUT_PIPE_EN      => true,
             DEVICE           => DEVICE
         )
