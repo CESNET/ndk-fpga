@@ -301,13 +301,16 @@ class sequence_flowtest_eth #(
         string ipv6_addresses = get_ipv6_addresses();
         string mac_addresses  = get_mac_addresses();
 
-        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s", // Creating string of the options
+        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s %s %s", // Creating string of the options
                                        config_filepath,
                                        seed,
                                        (config_generator_config_filepath != "") ? { "--config \"", config_generator_config_filepath, "\"" } : "",
                                        (ipv4_addresses != "") ? { "--ipv4 \"", ipv4_addresses, "\"" } : "",
                                        (ipv6_addresses != "") ? { "--ipv6 \"", ipv6_addresses, "\"" } : "",
-                                       (mac_addresses != "") ? { "--mac \"", mac_addresses, "\"" } : "");
+                                       (mac_addresses != "") ? { "--mac \"", mac_addresses, "\"" } : "",
+                                       $sformatf("--packet-min-size %0d", cfg.array_size_min),
+                                       $sformatf("--packet-max-size %0d", cfg.array_size_max)
+                                       );
         config_generator_execute_command = { uvm_packet_generators::CONFIG_GENERATOR_EXECUTE_PATH, " ", config_generator_parameters }; // Creating string of the config generator call command
 
         // Try generate config file
@@ -574,7 +577,7 @@ class sequence_search_eth  #(
         end
         $fwrite(file, "{\n");
         //ETH
-        $fwrite(file, "\"packet\" : { \"err_probability\" : %0d},\n", packet_err_prob);
+        $fwrite(file, "\"packet\" : { \"err_probability\" : %0d, \"size_min\" : %0d, \"size_max\" : %0d},\n", packet_err_prob, cfg.array_size_min, cfg.array_size_max);
         $fwrite(file, "\"ETH\"  : { \"weight\" : %s},\n", proto_dist_gen(eth_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
         $fwrite(file, "\"VLAN\" : { \"weight\" : %s},\n", proto_dist_gen(vlan_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
         $fwrite(file, "\"PPP\" : { \"weight\" : %s},\n",  proto_dist_gen(ppp_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
@@ -687,7 +690,7 @@ class sequence_search_eth  #(
             if (data.size() < cfg.array_size_min) begin
                 data = new[cfg.array_size_min](data);
             end
-            if (cfg.array_size_max > 0 && data.size() > cfg.array_size_max) begin
+            if (data.size() > cfg.array_size_max) begin
                 data = new[cfg.array_size_max](data);
             end
             req.data = {>>{data}};

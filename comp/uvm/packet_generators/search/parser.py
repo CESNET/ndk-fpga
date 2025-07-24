@@ -29,7 +29,7 @@ class base_node:
     def name_get(self):
         return self.name
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return None
 
     def protocol_next(self, config):
@@ -49,15 +49,26 @@ class Payload(base_node):
     def __init__(self):
         super().__init__("Payload")
 
-    def protocol_add(self, config):
-        return scapy.all.Raw()
+    def protocol_add(self, config, packet):
+        min_size = config.object_get(["packet", "size_min"])
+        max_size = config.object_get(["packet", "size_max"])
+
+        if not min_size:
+            min_size = 60
+        if not max_size:
+            max_size = 1500
+
+        enlarged_size = random.randint(min_size, max_size)
+        if len(packet) < enlarged_size:
+            payload_size = enlarged_size-len(packet)
+            return scapy.all.Raw(random.randbytes(payload_size))
 
 
 class TRILL(base_node):
     def __init__(self):
         super().__init__("TRILL")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return trill.Trill(version=0, res=0)
 
     def protocol_next(self, config):
@@ -71,7 +82,7 @@ class VXLAN(base_node):
     def __init__(self):
         super().__init__("VXLAN")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.all.VXLAN()
 
     def protocol_next(self, config):
@@ -91,7 +102,7 @@ class UDP(base_node):
     def __init__(self):
         super().__init__("UDP")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.all.UDP()
 
     def protocol_next(self, config):
@@ -110,7 +121,7 @@ class TCP(base_node):
     def __init__(self):
         super().__init__("TCP")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.all.TCP()
 
     def protocol_next(self, config):
@@ -125,7 +136,7 @@ class SCTP(base_node):
     def __init__(self):
         super().__init__("SCTP")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.all.SCTP()
 
     def protocol_next(self, config):
@@ -140,7 +151,7 @@ class GRE(base_node):
     def __init__(self):
         super().__init__("GRE")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.all.GRE(routing_present=0)
 
     def protocol_next(self, config):
@@ -163,7 +174,7 @@ class IPv4(base_node):
     def __init__(self):
         super().__init__("IPv4")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         src = None
         dst = None
 
@@ -199,7 +210,7 @@ class IPv6Ext(base_node):
     def __init__(self):
         super().__init__("IPv6Ext")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         possible_protocols = [scapy.all.IPv6ExtHdrDestOpt(), scapy.all.IPv6ExtHdrFragment(id=random.randint(0, 2**32 - 1)), scapy.all.IPv6ExtHdrHopByHop(), scapy.all.IPv6ExtHdrRouting()]
         return random.choice(possible_protocols)
 
@@ -224,7 +235,7 @@ class IPv6(base_node):
     def __init__(self):
         super().__init__("IPv6")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         src = None
         dst = None
 
@@ -260,7 +271,7 @@ class ICMPv4(base_node):
     def __init__(self):
         super().__init__("ICMPv4")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.all.ICMP()
 
 
@@ -268,7 +279,7 @@ class ICMPv6(base_node):
     def __init__(self):
         super().__init__("ICMPv6")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.all.ICMPv6Unknown()
 
 
@@ -280,7 +291,7 @@ class MPLS(base_node):
     def __init__(self):
         super().__init__("MPLS")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.contrib.mpls.MPLS()
 
     def protocol_next(self, config):
@@ -305,7 +316,7 @@ class PPP(base_node):
     def __init__(self):
         super().__init__("PPP")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.all.PPPoE() / scapy.all.PPP()
 
     def protocol_next(self, config):
@@ -321,7 +332,7 @@ class VLAN(base_node):
     def __init__(self):
         super().__init__("VLAN")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         possible_protocols = [scapy.all.Dot1Q(), scapy.all.Dot1AD()]
         return random.choice(possible_protocols)
 
@@ -345,7 +356,7 @@ class ETH(base_node):
     def __init__(self):
         super().__init__("ETH")
 
-    def protocol_add(self, config):
+    def protocol_add(self, config, packet):
         return scapy.all.Ether(src=scapy.volatile.RandMAC(), dst=scapy.volatile.RandMAC())
 
     def protocol_next(self, config):

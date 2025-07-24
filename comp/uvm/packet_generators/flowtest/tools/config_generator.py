@@ -299,6 +299,16 @@ def add_mac_from_arguments(config: dict, mac_string: str) -> None:
     mac_addresses_from_arguments = mac_string.split(';')
     extend_list_attribute(config, 'MANDATORY_MAC_ADDRESS_RANGES', mac_addresses_from_arguments)
 
+### PACKET SIZE PROCESSING ###
+
+
+def set_packet_min_size_from_arguments(config: dict, packet_min_size: int):
+    config['PACKET_MIN_SIZE'] = packet_min_size
+
+
+def set_packet_max_size_from_arguments(config: dict, packet_max_size: int):
+    config['PACKET_MAX_SIZE'] = packet_max_size
+
 ### ARGUMENT PARSING ###
 
 
@@ -311,6 +321,8 @@ def parse_arguments() -> argparse.Namespace:
     argument_parser.add_argument('--ipv4', type=str, help='IPv4 addresses in format \"addr1/mask1;addr2/mask2;addr3/mask3\".', default=None)
     argument_parser.add_argument('--ipv6', type=str, help='IPv6 addresses in format \"addr1/mask1;addr2/mask2;addr3/mask3\".', default=None)
     argument_parser.add_argument('--mac', type=str, help='MAC addresses in format \"addr1/mask1;addr2/mask2;addr3/mask3\".', default=None)
+    argument_parser.add_argument('--packet-min-size', type=int, help='Minimum size of packets.', default=None)
+    argument_parser.add_argument('--packet-max-size', type=int, help='Maximum size of packets.', default=None)
 
     arguments = argument_parser.parse_args()
     return arguments
@@ -335,6 +347,11 @@ def main() -> None:
         add_ipv6_from_arguments(generator_config, arguments.ipv6)
     if arguments.mac is not None:
         add_mac_from_arguments(generator_config, arguments.mac)
+
+    if arguments.packet_min_size is not None:
+        set_packet_min_size_from_arguments(generator_config, arguments.packet_min_size)
+    if arguments.packet_max_size is not None:
+        set_packet_max_size_from_arguments(generator_config, arguments.packet_max_size)
 
     config_generator = ConfigGenerator(generator_config)
     config = config_generator.generate()

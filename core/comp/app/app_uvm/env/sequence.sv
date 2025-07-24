@@ -58,7 +58,7 @@ class sequence_main#(
         min_random_count = 50;
         max_random_count = 150;
         pkt_size_min = 60;
-        pkt_size_max = 1500;
+        pkt_size_max = DMA_PKT_MTU;
 
     endfunction
 

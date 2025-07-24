@@ -74,7 +74,7 @@ class Parser_dfs(Parser):
                 packet = scapy.packet.Packet()
 
                 for it in next_items:
-                    pkt_proto = it.protocol.protocol_add(it.cfg)
+                    pkt_proto = it.protocol.protocol_add(it.cfg, packet)
                     if pkt_proto is not None:
                         packet = packet / pkt_proto
 
