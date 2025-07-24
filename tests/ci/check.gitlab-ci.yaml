@@ -41,3 +41,17 @@ commitlint:
     - npm install --save-dev @commitlint/config-conventional @commitlint/cli
   script:
     - npx commitlint --extends '@commitlint/config-conventional' --from "${BASE_COMMIT_SHA}" --to "${CI_COMMIT_SHA}"
+
+vhdlcodestyle:
+    stage: check
+    needs: []
+    image: python:3.11-slim
+    variables:
+      VSG_CONFIG_PATH: "tests/ci/vsg_config.yaml"
+    before_script:
+        - pip install -U vsg
+    script:
+        # Find all VHDL files in selected folders
+        - PATHS=("apps" "core" "comp/axis_tools" "comp/base"  "comp/dma" "comp/mem_tools" "comp/mfb_tools" "comp/mvb_tools" "comp/mi_tools" "comp/nic" "comp/pcie" "comp/tsu")
+        - readarray -d '' VHDL_FILES < <(find "${PATHS[@]}" -name "*.vhd" -print0)
+        - vsg -of syntastic --all_phases -c "${VSG_CONFIG_PATH}" -f "${VHDL_FILES[@]}"
