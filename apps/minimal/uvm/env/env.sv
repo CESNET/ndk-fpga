@@ -22,6 +22,13 @@ class env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         uvm_app_core::regmodel::type_id::set_inst_override(regmodel#(ETH_STREAMS, ETH_CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS)::get_type(), {this.get_full_name() ,".m_regmodel.*"});
 
+        // In case of merging multiple ETH streams into one DMA stream, the merging order is random, so it is necessary to use an "unordered" comparator
+        if ((DMA_STREAMS != ETH_STREAMS) && (DMA_STREAMS == 1)) begin
+            uvm_app_core::config_item m_scoreboard_config = new();
+            m_scoreboard_config.compare_dma = uvm_app_core::config_item::CMP_UNORDERED;
+            uvm_config_db #(uvm_app_core::config_item)::set(this, "m_scoreboard", "config", m_scoreboard_config);
+        end
+
         uvm_app_core::model#(ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, MFB_ITEM_WIDTH)::type_id::set_inst_override(
         model#(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, REGIONS, MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type(), {this.get_full_name() ,".m_scoreboard.m_model"});
         //mfb_rx::transaction #(ITEM_WIDTH, MFB_META_RX_WIDTH)::type_id::set_inst_override(mfb_transaction::get_type(), {this.get_full_name() ,".m_mfb_rx_agent_ptc.*"})
