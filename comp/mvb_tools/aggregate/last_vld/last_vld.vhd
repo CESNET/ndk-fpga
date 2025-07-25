@@ -151,8 +151,15 @@ begin
     vld <= RX_VLD & rx(0).valid;
     units_gen : for i in 0 to ITEMS generate
       sum : entity work.GEN_MUX_ONEHOT
-        generic map(ITEM_WIDTH, i+1)
-        port map(data((i+1)*ITEM_WIDTH-1 downto 0), vld(i downto 0), tx(i).value);
+      generic map (
+          DATA_WIDTH => ITEM_WIDTH,
+          MUX_WIDTH  => i+1
+      )
+      port map (
+          DATA_IN  => data((i+1)*ITEM_WIDTH-1 downto 0),
+          SEL      => vld(i downto 0),
+          DATA_OUT => tx(i).value
+      );
       tx(i).valid <= or_reduce(vld(i downto 0));
     end generate;
   end generate;
