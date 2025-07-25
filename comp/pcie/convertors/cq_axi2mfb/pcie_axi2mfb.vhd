@@ -16,17 +16,17 @@ use work.type_pack.all;
 -- Supported are 512b and 256b with and without straddling, but
 -- variants with straddling and all 256 variant has not been tested.
 entity PCIE_CQ_AXI2MFB is
-    generic(
+    generic (
         -- =======================================================================
         -- MFB BUS CONFIGURATION:
         --
         -- Supported configurations are: (2,1,8,32), (1,1,8,32)
         -- =======================================================================
 
-        MFB_REGIONS      : natural := 2;
-        MFB_REGION_SIZE  : natural := 1;
-        MFB_BLOCK_SIZE   : natural := 8;
-        MFB_ITEM_WIDTH   : natural := 32;
+        MFB_REGIONS       : natural := 2;
+        MFB_REGION_SIZE   : natural := 1;
+        MFB_BLOCK_SIZE    : natural := 8;
+        MFB_ITEM_WIDTH    : natural := 32;
         -- MFB bus: width of single data region in bits, auxiliary parameter, do not change value!
         MFB_REGION_WIDTH  : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
 
@@ -38,15 +38,15 @@ entity PCIE_CQ_AXI2MFB is
         -- CQ_USER_WIDTH = 85  for Gen3x8 PCIe - without straddling!
         -- =======================================================================
 
-        AXI_CQUSER_WIDTH : natural := 183;
-        AXI_DATA_WIDTH   : natural := MFB_REGIONS*MFB_REGION_WIDTH;
+        AXI_CQUSER_WIDTH  : natural := 183;
+        AXI_DATA_WIDTH    : natural := MFB_REGIONS*MFB_REGION_WIDTH;
         -- Straddling is permited only for CQ_USER_WIDTH = 183
-        STRADDLING       : boolean := false;
+        STRADDLING        : boolean := false;
         -- Select correct FPGA device: "ULTRASCALE", "VIRTEX7"
         DEVICE            : string := "ULTRASCALE"
 
-        );
-    port(
+    );
+    port (
 
         -- =====================================================================
         -- AXI Completer Request Interface (CQ) - Xilinx FPGA Only
@@ -108,14 +108,14 @@ entity PCIE_CQ_AXI2MFB is
         -- Byte enables for the last DWORD
         CQ_LBE            : out std_logic_vector(MFB_REGIONS*4-1 downto 0)
 
-        );
+    );
 end entity;
 
 -- ----------------------------------------------------------------------------
 --                             Architecture
 -- ----------------------------------------------------------------------------
 
-architecture full of PCIE_CQ_AXI2MFB is
+architecture FULL of PCIE_CQ_AXI2MFB is
 
     -- ========================================================================
     -- Constants
@@ -170,10 +170,10 @@ begin
         cq_axi_user_lbe        <= CQ_AXI_USER(8-1 downto 4);
 
         conv_256_pr : process (all)
-            variable eof_pos : unsigned(3-1 downto 0) := (others => '0');
+            variable eof_pos   : unsigned(3-1 downto 0) := (others => '0');
             variable eof       : std_logic_vector(1 downto 0);
         begin
-            eof_pos := (others => '0');
+            eof_pos        := (others => '0');
             CQ_TPH_PRESENT <= (others => '0');
             CQ_TPH_TYPE    <= (others => '0');
             CQ_TPH_ST_TAG  <= (others => '0');
@@ -246,11 +246,11 @@ begin
                 end if;
 
                 if (cq_axi_user_eop(i) = '1') then
-                    if cq_axi_user_eop_ptr(i)(EOP_POS_WIDTH) = '1' then
-                        CQ_MFB_EOF(1) <= '1';
+                    if (cq_axi_user_eop_ptr(i)(EOP_POS_WIDTH) = '1') then
+                        CQ_MFB_EOF(1)                                          <= '1';
                         CQ_MFB_EOF_POS(2*EOP_POS_WIDTH-1 downto EOP_POS_WIDTH) <= cq_axi_user_eop_ptr(i)(EOP_POS_WIDTH-1 downto 0);
                     else
-                        CQ_MFB_EOF(0) <= '1';
+                        CQ_MFB_EOF(0)                            <= '1';
                         CQ_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0) <= cq_axi_user_eop_ptr(i)(EOP_POS_WIDTH-1 downto 0);
                     end if;
                 end if;
@@ -278,8 +278,8 @@ begin
             variable eof_pos : unsigned(3-1 downto 0) := (others => '0');
             variable eof     : std_logic_vector(1 downto 0);
         begin
-            eof_pos := (others => '0');
-            eof     := (others => '0');
+            eof_pos        := (others => '0');
+            eof            := (others => '0');
             CQ_TPH_PRESENT <= (others => '0');
             CQ_TPH_TYPE    <= (others => '0');
             CQ_TPH_ST_TAG  <= (others => '0');
@@ -294,7 +294,7 @@ begin
             if (CQ_AXI_LAST = '1') then
 
                 for i in 0 to ((AXI_DATA_WIDTH/32)/2-1) loop
-                    if (CQ_AXI_KEEP(i) = '1' and not (CQ_AXI_KEEP(i+1) = '0')) or (CQ_AXI_KEEP(i) = '1' and unsigned(CQ_AXI_KEEP) = 1) then
+                    if ((CQ_AXI_KEEP(i) = '1' and not (CQ_AXI_KEEP(i+1) = '0')) or (CQ_AXI_KEEP(i) = '1' and unsigned(CQ_AXI_KEEP) = 1)) then
                         eof(0) := '1';
                     end if;
                     if (CQ_AXI_KEEP(i+1) = '1' and i = ((AXI_DATA_WIDTH/32)/2-1)) then
@@ -306,7 +306,7 @@ begin
                 end loop;
 
                 CQ_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0) <= std_logic_vector((eof_pos-1));
-                eof_pos := (others => '0');
+                eof_pos                                  := (others => '0');
 
                 -- Check keep in second region
                 for i in (AXI_DATA_WIDTH/32)/2 to ((AXI_DATA_WIDTH/32)-1) loop
@@ -315,7 +315,7 @@ begin
                 end loop;
 
                 CQ_MFB_EOF_POS(2*EOP_POS_WIDTH-1 downto EOP_POS_WIDTH) <= std_logic_vector((eof_pos-1));
-                CQ_MFB_EOF <= eof;
+                CQ_MFB_EOF                                             <= eof;
             end if;
         end process;
     end generate;

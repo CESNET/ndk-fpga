@@ -19,29 +19,29 @@ architecture FULL of TESTBENCH is
     constant DATA_2 : std_logic_vector(511 downto 0) := ('0', '1', '1', '1', others => '0');
 
     -- clock period definition
-    constant CLK_period : time := 10 ns;
+    constant CLK_PERIOD : time := 10 ns;
 
     -- clk, reset signals
-    signal RESET : std_logic := '0';
-    signal CLK   : std_logic := '0';
+    signal reset : std_logic := '0';
+    signal clk   : std_logic := '0';
 
     -- input interface signals
-    signal RX_DATA    : std_logic_vector(511 downto 0);
-    signal RX_SOP     : std_logic_vector(3 downto 0) := "1001";
-    signal RX_EOP     : std_logic_vector(3 downto 0) := "1010";
-    signal RX_SOP_POS : std_logic_vector(7 downto 0) := "01101100";
-    signal RX_EOP_POS : std_logic_vector(15 downto 0) := "1111000011000011";
-    signal RX_SRC_RDY : std_logic := '0';
-    signal TX_DST_RDY : std_logic := '0';
+    signal rx_data    : std_logic_vector(511 downto 0);
+    signal rx_sop     : std_logic_vector(3 downto 0) := "1001";
+    signal rx_eop     : std_logic_vector(3 downto 0) := "1010";
+    signal rx_sop_pos : std_logic_vector(7 downto 0) := "01101100";
+    signal rx_eop_pos : std_logic_vector(15 downto 0) := "1111000011000011";
+    signal rx_src_rdy : std_logic := '0';
+    signal tx_dst_rdy : std_logic := '0';
 
     -- output interface signals
-    signal TX_DATA    : std_logic_vector(127 downto 0);
-    signal TX_SOP     : std_logic_vector(0 downto 0);
-    signal TX_EOP     : std_logic_vector(0 downto 0);
-    signal TX_SOP_POS : std_logic_vector(1 downto 0);
-    signal TX_EOP_POS : std_logic_vector(3 downto 0);
-    signal TX_SRC_RDY : std_logic;
-    signal RX_DST_RDY : std_logic;
+    signal tx_data    : std_logic_vector(127 downto 0);
+    signal tx_sop     : std_logic_vector(0 downto 0);
+    signal tx_eop     : std_logic_vector(0 downto 0);
+    signal tx_sop_pos : std_logic_vector(1 downto 0);
+    signal tx_eop_pos : std_logic_vector(3 downto 0);
+    signal tx_src_rdy : std_logic;
+    signal rx_dst_rdy : std_logic;
 
 begin
 
@@ -55,33 +55,33 @@ begin
         ITEM_WIDTH  => 8
     )
     port map (
-        RESET => RESET,
-        CLK   => CLK,
+        RESET => reset,
+        CLK   => clk,
 
-        RX_DATA    => RX_DATA,
-        RX_SOP     => RX_SOP,
-        RX_EOP     => RX_EOP,
-        RX_SOP_POS => RX_SOP_POS,
-        RX_EOP_POS => RX_EOP_POS,
-        RX_SRC_RDY => RX_SRC_RDY,
-        RX_DST_RDY => RX_DST_RDY,
+        RX_DATA    => rx_data,
+        RX_SOP     => rx_sop,
+        RX_EOP     => rx_eop,
+        RX_SOP_POS => rx_sop_pos,
+        RX_EOP_POS => rx_eop_pos,
+        RX_SRC_RDY => rx_src_rdy,
+        RX_DST_RDY => rx_dst_rdy,
 
-        TX_DATA    => TX_DATA,
-        TX_SOP     => TX_SOP,
-        TX_EOP     => TX_EOP,
-        TX_SOP_POS => TX_SOP_POS,
-        TX_EOP_POS => TX_EOP_POS,
-        TX_SRC_RDY => TX_SRC_RDY,
-        TX_DST_RDY => TX_DST_RDY
+        TX_DATA    => tx_data,
+        TX_SOP     => tx_sop,
+        TX_EOP     => tx_eop,
+        TX_SOP_POS => tx_sop_pos,
+        TX_EOP_POS => tx_eop_pos,
+        TX_SRC_RDY => tx_src_rdy,
+        TX_DST_RDY => tx_dst_rdy
     );
 
     -- cllock process
-    CLK_p : process
+    clk_p : process
     begin
-        CLK <= '0';
-        wait for CLK_period/2;
-        CLK <= '1';
-        wait for CLK_period/2;
+        clk <= '0';
+        wait for CLK_PERIOD/2;
+        clk <= '1';
+        wait for CLK_PERIOD/2;
     end process;
 
     -- stimulus process
@@ -89,23 +89,23 @@ begin
     begin
         wait for 100 ns;
 
-        RX_DATA <= DATA_1;
-        wait for CLK_period*4;
+        rx_data <= DATA_1;
+        wait for CLK_PERIOD*4;
 
-        RX_SRC_RDY <= '1';
-        wait for CLK_period;
+        rx_src_rdy <= '1';
+        wait for CLK_PERIOD;
 
-        RX_SRC_RDY <= '0';
-        RESET <= '1' after CLK_period*4, '0' after CLK_period*5;
-        TX_DST_RDY <= '1', '0' after CLK_period*2, '1' after CLK_period*3, '0' after CLK_period*6;
-        wait for CLK_period*10;
+        rx_src_rdy <= '0';
+        reset      <= '1' after CLK_PERIOD*4, '0' after CLK_PERIOD*5;
+        tx_dst_rdy <= '1', '0' after CLK_PERIOD*2, '1' after CLK_PERIOD*3, '0' after CLK_PERIOD*6;
+        wait for CLK_PERIOD*10;
 
-        RX_DATA <= DATA_2;
-        RX_SRC_RDY <= '1';
-        wait for CLK_period*2;
+        rx_data    <= DATA_2;
+        rx_src_rdy <= '1';
+        wait for CLK_PERIOD*2;
 
-        RX_DATA <= DATA_1;
-        TX_DST_RDY <= '1', '0' after CLK_period*5;
+        rx_data    <= DATA_1;
+        tx_dst_rdy <= '1', '0' after CLK_PERIOD*5;
         wait;
     end process;
 

@@ -20,50 +20,50 @@ use work.type_pack.all;
 -- Only a part of a packets checksum can be calculated here - in case the checksum data are also in the previous Region/word or continue to the following Region/word.
 -- The partial checksums are used to make the final (per-packet) checksum in the chsum_regional.vhd component.
 entity CHSUM_REGIONAL is
-generic(
-    -- Number of Items in a Region.
-    ITEMS             : natural := 8*8;
-    -- Width of an Item (in bits), must be 8.
-    ITEM_WIDTH        : natural := 8;
-    -- Width of the output checksum (in bits), must be 16.
-    CHECKSUM_WIDTH    : natural := 16
-);
-port(
-    -- ========================================================================
-    -- Clock and Reset
-    -- ========================================================================
+    generic (
+        -- Number of Items in a Region.
+        ITEMS             : natural := 8*8;
+        -- Width of an Item (in bits), must be 8.
+        ITEM_WIDTH        : natural := 8;
+        -- Width of the output checksum (in bits), must be 16.
+        CHECKSUM_WIDTH    : natural := 16
+    );
+    port (
+        -- ========================================================================
+        -- Clock and Reset
+        -- ========================================================================
 
-    CLK           : in  std_logic;
-    RESET         : in  std_logic;
+        CLK           : in  std_logic;
+        RESET         : in  std_logic;
 
-    -- ========================================================================
-    -- RX INTERFACE
-    --
-    -- Data for the checksum calculation.
-    -- ========================================================================
+        -- ========================================================================
+        -- RX INTERFACE
+        --
+        -- Data for the checksum calculation.
+        -- ========================================================================
 
-    RX_CHSUM_DATA : in  std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0);
-    -- Checksum data start on an odd Item, always valid.
-    RX_CHSUM_ODD  : in  std_logic_vector(ITEMS-1 downto 0);
-    -- Checksum data end on this Item.
-    RX_CHSUM_END  : in  std_logic_vector(ITEMS-1 downto 0);
-    -- Valid for each Item, like the INFRAME signal (Mac Segmented bus).
-    RX_VALID      : in  std_logic_vector(ITEMS-1 downto 0);
-    RX_SRC_RDY    : in  std_logic; -- to remove
-    RX_DST_RDY    : out std_logic;
+        RX_CHSUM_DATA : in  std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0);
+        -- Checksum data start on an odd Item, always valid.
+        RX_CHSUM_ODD  : in  std_logic_vector(ITEMS-1 downto 0);
+        -- Checksum data end on this Item.
+        RX_CHSUM_END  : in  std_logic_vector(ITEMS-1 downto 0);
+        -- Valid for each Item, like the INFRAME signal (Mac Segmented bus).
+        RX_VALID      : in  std_logic_vector(ITEMS-1 downto 0);
+        RX_SRC_RDY    : in  std_logic; -- to remove
+        RX_DST_RDY    : out std_logic;
 
-    -- ========================================================================
-    -- TX INTERFACE
-    --
-    -- Calucated checksum(s) - there can be upto 2 in a Region.
-    -- ========================================================================
+        -- ========================================================================
+        -- TX INTERFACE
+        --
+        -- Calucated checksum(s) - there can be upto 2 in a Region.
+        -- ========================================================================
 
-    TX_CHSUM_REGION : out std_logic_vector(2*CHECKSUM_WIDTH-1 downto 0);
-    TX_CHSUM_END    : out std_logic_vector(2-1 downto 0);
-    TX_CHSUM_VLD    : out std_logic_vector(2-1 downto 0);
-    TX_SRC_RDY      : out std_logic; -- to remove
-    TX_DST_RDY      : in  std_logic
-);
+        TX_CHSUM_REGION : out std_logic_vector(2*CHECKSUM_WIDTH-1 downto 0);
+        TX_CHSUM_END    : out std_logic_vector(2-1 downto 0);
+        TX_CHSUM_VLD    : out std_logic_vector(2-1 downto 0);
+        TX_SRC_RDY      : out std_logic; -- to remove
+        TX_DST_RDY      : in  std_logic
+    );
 end entity;
 
 architecture FULL of CHSUM_REGIONAL is
@@ -144,7 +144,7 @@ begin
     -- Pre-checksum register
     -- ========================================================================
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (TX_DST_RDY = '1') then
@@ -163,14 +163,14 @@ begin
     -- Checksum calculation
     -- ========================================================================
 
-    chsum_32(0)(0) <= resize_left(unsigned(chsum_data_16_reg(0)), ITEM_WIDTH_16_EXT);
+    chsum_32(0)(0)       <= resize_left(unsigned(chsum_data_16_reg(0)), ITEM_WIDTH_16_EXT);
     chsum_data_16_arr(0) <= chsum_data_16_reg;
-    chsum_end_16_arr(0) <= chsum_end_16_reg;
-    chsum_vld_16_arr(0) <= chsum_vld_16_reg;
+    chsum_end_16_arr(0)  <= chsum_end_16_reg;
+    chsum_vld_16_arr(0)  <= chsum_vld_16_reg;
 
     chsum_g : for i in 1 to ITEMS_16-1 generate
 
-        chsum_p : process(CLK)
+        chsum_p : process (CLK)
         begin
             if rising_edge(CLK) then
                 if (TX_DST_RDY = '1') then
@@ -184,13 +184,13 @@ begin
             end if;
         end process;
 
-        chsum_data_propg_p : process(CLK)
+        chsum_data_propg_p : process (CLK)
         begin
             if rising_edge(CLK) then
                 if (TX_DST_RDY = '1') then
                     chsum_data_16_arr(i) <= chsum_data_16_arr(i-1);
-                    chsum_end_16_arr(i) <= chsum_end_16_arr(i-1);
-                    chsum_vld_16_arr(i) <= chsum_vld_16_arr(i-1);
+                    chsum_end_16_arr(i)  <= chsum_end_16_arr(i-1);
+                    chsum_vld_16_arr(i)  <= chsum_vld_16_arr(i-1);
                 end if;
                 if (RESET = '1') then
                     chsum_vld_16_arr(i) <= (others => '0');
@@ -204,7 +204,7 @@ begin
     -- Post-checksum register
     -- ========================================================================
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (TX_DST_RDY = '1') then
@@ -232,10 +232,10 @@ begin
     -- Output selection logic
     -- ========================================================================
 
-    process(all)
+    process (all)
         variable prev_end : std_logic := '0';
     begin
-        prev_end := '0';
+        prev_end    := '0';
         output0_ptr <= ITEMS_16-1;
         output1_ptr <= ITEMS_16-1;
 

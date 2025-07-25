@@ -14,144 +14,144 @@ use work.eth_hdr_pack.all;
 use work.combo_user_const.all;
 
 entity MEM_TESTER_WRAP is
-generic (
-    -- HBM parameters: number of HBM ports
-    HBM_PORTS             : natural := 1;
-    -- HBM parameters: width of AXI address signal
-    HBM_ADDR_WIDTH        : natural := 32;
-    -- HBM parameters: width of AXI data signal
-    HBM_DATA_WIDTH        : natural := 256;
-    -- HBM parameters: width of AXI burst signal
-    HBM_BURST_WIDTH       : natural := 2;
-    -- HBM parameters: width of AXI ID signal
-    HBM_ID_WIDTH          : natural := 6;
-    -- HBM parameters: width of AXI LEN signal
-    HBM_LEN_WIDTH         : natural := 4;
-    -- HBM parameters: width of AXI size signal
-    HBM_SIZE_WIDTH        : natural := 3;
-    -- HBM parameters: width of AXI resp signal
-    HBM_RESP_WIDTH        : natural := 2;
-    -- Frequence of the HBM AXI bus
-    HBM_FREQ_KHZ          : natural := 266660;
-    -- DDR parameters: number of external memory ports (EMIFs)
-    DDR_PORTS             : natural := 1;
-    -- DDR parameters: width of AVMM address signal
-    DDR_ADDR_WIDTH        : natural := 27;
-    -- DDR parameters: width of AVMM burst count signal
-    DDR_BURST_WIDTH       : natural := 7;
-    -- DDR parameters: width of AVMM data signals
-    DDR_DATA_WIDTH        : natural := 512;
-    -- DDR parameters: width of user refresh period
-    DDR_REFR_PERIOD_WIDTH : natural := 32;
-    -- DDR parameters: default refresh periods for each interface
-    DDR_DEF_REFR_PERIOD   : natural := 0;
-    -- Frequence of the DDR AVMM bus
-    DDR_FREQ_KHZ          : natural := 266660;
-    -- MI parameters: width of data signals
-    MI_DATA_WIDTH         : natural := 32;
-    -- MI parameters: width of address signal
-    MI_ADDR_WIDTH         : natural := 32;
-    -- Name of FPGA device
-    DEVICE                : string := "AGILEX"
-);
-port (
-    -- =========================================================================
-    -- Clock and Resets inputs
-    -- =========================================================================
-    CLK      : in  std_logic;
-    RESET    : in  std_logic;
+    generic (
+        -- HBM parameters: number of HBM ports
+        HBM_PORTS             : natural := 1;
+        -- HBM parameters: width of AXI address signal
+        HBM_ADDR_WIDTH        : natural := 32;
+        -- HBM parameters: width of AXI data signal
+        HBM_DATA_WIDTH        : natural := 256;
+        -- HBM parameters: width of AXI burst signal
+        HBM_BURST_WIDTH       : natural := 2;
+        -- HBM parameters: width of AXI ID signal
+        HBM_ID_WIDTH          : natural := 6;
+        -- HBM parameters: width of AXI LEN signal
+        HBM_LEN_WIDTH         : natural := 4;
+        -- HBM parameters: width of AXI size signal
+        HBM_SIZE_WIDTH        : natural := 3;
+        -- HBM parameters: width of AXI resp signal
+        HBM_RESP_WIDTH        : natural := 2;
+        -- Frequence of the HBM AXI bus
+        HBM_FREQ_KHZ          : natural := 266660;
+        -- DDR parameters: number of external memory ports (EMIFs)
+        DDR_PORTS             : natural := 1;
+        -- DDR parameters: width of AVMM address signal
+        DDR_ADDR_WIDTH        : natural := 27;
+        -- DDR parameters: width of AVMM burst count signal
+        DDR_BURST_WIDTH       : natural := 7;
+        -- DDR parameters: width of AVMM data signals
+        DDR_DATA_WIDTH        : natural := 512;
+        -- DDR parameters: width of user refresh period
+        DDR_REFR_PERIOD_WIDTH : natural := 32;
+        -- DDR parameters: default refresh periods for each interface
+        DDR_DEF_REFR_PERIOD   : natural := 0;
+        -- Frequence of the DDR AVMM bus
+        DDR_FREQ_KHZ          : natural := 266660;
+        -- MI parameters: width of data signals
+        MI_DATA_WIDTH         : natural := 32;
+        -- MI parameters: width of address signal
+        MI_ADDR_WIDTH         : natural := 32;
+        -- Name of FPGA device
+        DEVICE                : string := "AGILEX"
+    );
+    port (
+        -- =========================================================================
+        -- Clock and Resets inputs
+        -- =========================================================================
+        CLK      : in  std_logic;
+        RESET    : in  std_logic;
 
-    -- =========================================================================
-    -- HBM AXI INTERFACES (clocked at HBM_CLK)
-    -- =========================================================================
-    HBM_CLK                 : in  std_logic;
-    HBM_RESET               : in  std_logic;
-    HBM_INIT_DONE           : in  std_logic;
+        -- =========================================================================
+        -- HBM AXI INTERFACES (clocked at HBM_CLK)
+        -- =========================================================================
+        HBM_CLK                 : in  std_logic;
+        HBM_RESET               : in  std_logic;
+        HBM_INIT_DONE           : in  std_logic;
 
-    HBM_AXI_ARADDR          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_ARBURST         : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_ARID            : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_ARLEN           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_ARSIZE          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_ARVALID         : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_AXI_ARREADY         : in  std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_ARADDR          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_ARBURST         : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_ARID            : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_ARLEN           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_ARSIZE          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_ARVALID         : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_ARREADY         : in  std_logic_vector(HBM_PORTS-1 downto 0);
 
-    HBM_AXI_RDATA           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0);
-    HBM_AXI_RDATA_PARITY    : in  slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0);
-    HBM_AXI_RID             : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
-    HBM_AXI_RLAST           : in  std_logic_vector(HBM_PORTS-1 downto 0);
-    HBM_AXI_RRESP           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0);
-    HBM_AXI_RVALID          : in  std_logic_vector(HBM_PORTS-1 downto 0);
-    HBM_AXI_RREADY          : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_RDATA           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0);
+        HBM_AXI_RDATA_PARITY    : in  slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0);
+        HBM_AXI_RID             : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
+        HBM_AXI_RLAST           : in  std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_RRESP           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0);
+        HBM_AXI_RVALID          : in  std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_RREADY          : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
 
-    HBM_AXI_AWADDR          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_AWBURST         : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_AWID            : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_AWLEN           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_AWSIZE          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_AWVALID         : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_AXI_AWREADY         : in  std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_AWADDR          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_AWBURST         : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_AWID            : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_AWLEN           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_AWSIZE          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_AWVALID         : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_AWREADY         : in  std_logic_vector(HBM_PORTS-1 downto 0);
 
-    HBM_AXI_WDATA           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_WDATA_PARITY    : out slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_WLAST           : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_AXI_WSTRB           : out slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_WVALID          : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_AXI_WREADY          : in  std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_WDATA           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_WDATA_PARITY    : out slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_WLAST           : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_WSTRB           : out slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_WVALID          : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_WREADY          : in  std_logic_vector(HBM_PORTS-1 downto 0);
 
-    HBM_AXI_BID             : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
-    HBM_AXI_BRESP           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0);
-    HBM_AXI_BVALID          : in  std_logic_vector(HBM_PORTS-1 downto 0);
-    HBM_AXI_BREADY          : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_BID             : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
+        HBM_AXI_BRESP           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0);
+        HBM_AXI_BVALID          : in  std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_BREADY          : out std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
 
-    -- =========================================================================
-    -- DDR AVMM INTERFACES (clocked at DDR_CLK)
-    -- =========================================================================
-    -- Clock for each memory port
-    DDR_CLK                : in  std_logic_vector(DDR_PORTS-1 downto 0);
-    -- Reset synchronized with DDR_CLK for each memory port
-    DDR_RESET              : in  std_logic_vector(DDR_PORTS-1 downto 0);
+        -- =========================================================================
+        -- DDR AVMM INTERFACES (clocked at DDR_CLK)
+        -- =========================================================================
+        -- Clock for each memory port
+        DDR_CLK                : in  std_logic_vector(DDR_PORTS-1 downto 0);
+        -- Reset synchronized with DDR_CLK for each memory port
+        DDR_RESET              : in  std_logic_vector(DDR_PORTS-1 downto 0);
 
-    -- MEM Avalon-MM: ready for request
-    DDR_AVMM_READY         : in  std_logic_vector(DDR_PORTS-1 downto 0);
-    -- MEM Avalon-MM: read request
-    DDR_AVMM_READ          : out std_logic_vector(DDR_PORTS-1 downto 0);
-    -- MEM Avalon-MM: write request
-    DDR_AVMM_WRITE         : out std_logic_vector(DDR_PORTS-1 downto 0);
-    -- MEM Avalon-MM: address of r/w request
-    DDR_AVMM_ADDRESS       : out slv_array_t(DDR_PORTS-1 downto 0)(DDR_ADDR_WIDTH-1 downto 0);
-    -- MEM Avalon-MM: burst count of read/write request
-    DDR_AVMM_BURSTCOUNT    : out slv_array_t(DDR_PORTS-1 downto 0)(DDR_BURST_WIDTH-1 downto 0);
-    -- MEM Avalon-MM: write data, valid only with write request
-    DDR_AVMM_WRITEDATA     : out slv_array_t(DDR_PORTS-1 downto 0)(DDR_DATA_WIDTH-1 downto 0);
-    -- MEM Avalon-MM: read data
-    DDR_AVMM_READDATA      : in  slv_array_t(DDR_PORTS-1 downto 0)(DDR_DATA_WIDTH-1 downto 0);
-    -- MEM Avalon-MM: read data valid flag
-    DDR_AVMM_READDATAVALID : in  std_logic_vector(DDR_PORTS-1 downto 0);
+        -- MEM Avalon-MM: ready for request
+        DDR_AVMM_READY         : in  std_logic_vector(DDR_PORTS-1 downto 0);
+        -- MEM Avalon-MM: read request
+        DDR_AVMM_READ          : out std_logic_vector(DDR_PORTS-1 downto 0);
+        -- MEM Avalon-MM: write request
+        DDR_AVMM_WRITE         : out std_logic_vector(DDR_PORTS-1 downto 0);
+        -- MEM Avalon-MM: address of r/w request
+        DDR_AVMM_ADDRESS       : out slv_array_t(DDR_PORTS-1 downto 0)(DDR_ADDR_WIDTH-1 downto 0);
+        -- MEM Avalon-MM: burst count of read/write request
+        DDR_AVMM_BURSTCOUNT    : out slv_array_t(DDR_PORTS-1 downto 0)(DDR_BURST_WIDTH-1 downto 0);
+        -- MEM Avalon-MM: write data, valid only with write request
+        DDR_AVMM_WRITEDATA     : out slv_array_t(DDR_PORTS-1 downto 0)(DDR_DATA_WIDTH-1 downto 0);
+        -- MEM Avalon-MM: read data
+        DDR_AVMM_READDATA      : in  slv_array_t(DDR_PORTS-1 downto 0)(DDR_DATA_WIDTH-1 downto 0);
+        -- MEM Avalon-MM: read data valid flag
+        DDR_AVMM_READDATAVALID : in  std_logic_vector(DDR_PORTS-1 downto 0);
 
-    DDR_REFR_PERIOD        : out slv_array_t(DDR_PORTS-1 downto 0)(DDR_REFR_PERIOD_WIDTH - 1 downto 0) := (others => std_logic_vector(to_unsigned(DDR_DEF_REFR_PERIOD, DDR_REFR_PERIOD_WIDTH)));
-    DDR_REFR_REQ           : out std_logic_vector(DDR_PORTS - 1 downto 0);
-    DDR_REFR_ACK           : in std_logic_vector(DDR_PORTS - 1 downto 0);
+        DDR_REFR_PERIOD        : out slv_array_t(DDR_PORTS-1 downto 0)(DDR_REFR_PERIOD_WIDTH - 1 downto 0) := (others => std_logic_vector(to_unsigned(DDR_DEF_REFR_PERIOD, DDR_REFR_PERIOD_WIDTH)));
+        DDR_REFR_REQ           : out std_logic_vector(DDR_PORTS - 1 downto 0);
+        DDR_REFR_ACK           : in std_logic_vector(DDR_PORTS - 1 downto 0);
 
-    EMIF_RST_REQ           : out std_logic_vector(DDR_PORTS-1 downto 0);
-    EMIF_RST_DONE          : in  std_logic_vector(DDR_PORTS-1 downto 0);
-    EMIF_ECC_USR_INT       : in  std_logic_vector(DDR_PORTS-1 downto 0);
-    EMIF_CAL_SUCCESS       : in  std_logic_vector(DDR_PORTS-1 downto 0);
-    EMIF_CAL_FAIL          : in  std_logic_vector(DDR_PORTS-1 downto 0);
-    EMIF_AUTO_PRECHARGE    : out std_logic_vector(DDR_PORTS-1 downto 0);
+        EMIF_RST_REQ           : out std_logic_vector(DDR_PORTS-1 downto 0);
+        EMIF_RST_DONE          : in  std_logic_vector(DDR_PORTS-1 downto 0);
+        EMIF_ECC_USR_INT       : in  std_logic_vector(DDR_PORTS-1 downto 0);
+        EMIF_CAL_SUCCESS       : in  std_logic_vector(DDR_PORTS-1 downto 0);
+        EMIF_CAL_FAIL          : in  std_logic_vector(DDR_PORTS-1 downto 0);
+        EMIF_AUTO_PRECHARGE    : out std_logic_vector(DDR_PORTS-1 downto 0);
 
-    -- =========================================================================
-    -- MI INTERFACE (clocked at CLK)
-    -- =========================================================================
-    MI_DWR                  : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_ADDR                 : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
-    MI_BE                   : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0);
-    MI_RD                   : in  std_logic;
-    MI_WR                   : in  std_logic;
-    MI_ARDY                 : out std_logic;
-    MI_DRD                  : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_DRDY                 : out std_logic
-);
+        -- =========================================================================
+        -- MI INTERFACE (clocked at CLK)
+        -- =========================================================================
+        MI_DWR                  : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_ADDR                 : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
+        MI_BE                   : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0);
+        MI_RD                   : in  std_logic;
+        MI_WR                   : in  std_logic;
+        MI_ARDY                 : out std_logic;
+        MI_DRD                  : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_DRDY                 : out std_logic
+    );
 end entity;
 
 architecture FULL of MEM_TESTER_WRAP is
@@ -176,8 +176,8 @@ architecture FULL of MEM_TESTER_WRAP is
     constant MI_PORTS          : natural := 2 ** log2(MI_PORTS_RAW);
 
     function mi_addr_base_f return slv_array_t is
-        constant ADDR_W    : natural := 21; --TODO
-        constant SUBADDR_W : natural := ADDR_W-log2(MI_PORTS);
+        constant ADDR_W      : natural := 21; -- TODO
+        constant SUBADDR_W   : natural := ADDR_W-log2(MI_PORTS);
         variable v_addr_base : slv_array_t(MI_PORTS-1 downto 0)(MI_ADDR_WIDTH-1 downto 0) := (others => (others => '0'));
     begin
         for i in 0 to MI_PORTS-1 loop
@@ -209,14 +209,14 @@ architecture FULL of MEM_TESTER_WRAP is
 begin
 
     mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
-    generic map(
+    generic map (
         ADDR_WIDTH => MI_ADDR_WIDTH,
         DATA_WIDTH => MI_DATA_WIDTH,
         PORTS      => MI_PORTS,
         ADDR_BASE  => mi_addr_base_f,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -278,7 +278,7 @@ begin
 
             DEVICE                      => DEVICE
         )
-        port map(
+        port map (
             AMM_CLK                     => DDR_CLK                  (i),
             AMM_RST                     => ddr_reset_repl           (i)(0),
 
@@ -315,12 +315,12 @@ begin
         );
 
         mi_async_i : entity work.MI_ASYNC
-        generic map(
+        generic map (
             ADDR_WIDTH => MI_ADDR_WIDTH,
             DATA_WIDTH => MI_DATA_WIDTH,
             DEVICE     => DEVICE
         )
-        port map(
+        port map (
             CLK_M     => CLK,
             RESET_M   => RESET,
             MI_M_DWR  => split_mi_dwr (DDR_PORTS + i),
@@ -346,13 +346,13 @@ begin
 
         ddr_logger_i : entity work.MEM_LOGGER
         generic map (
-            MEM_DATA_WIDTH          => DDR_DATA_WIDTH       ,
-            MEM_ADDR_WIDTH          => DDR_ADDR_WIDTH       ,
-            MEM_BURST_COUNT_WIDTH   => DDR_BURST_WIDTH      ,
-            MEM_FREQ_KHZ            => DDR_FREQ_KHZ         ,
-            MI_DATA_WIDTH           => MI_DATA_WIDTH        ,
-            MI_ADDR_WIDTH           => MI_ADDR_WIDTH        ,
-            MEM_ASYNC               => False                ,
+            MEM_DATA_WIDTH          => DDR_DATA_WIDTH,
+            MEM_ADDR_WIDTH          => DDR_ADDR_WIDTH,
+            MEM_BURST_COUNT_WIDTH   => DDR_BURST_WIDTH,
+            MEM_FREQ_KHZ            => DDR_FREQ_KHZ,
+            MI_DATA_WIDTH           => MI_DATA_WIDTH,
+            MI_ADDR_WIDTH           => MI_ADDR_WIDTH,
+            MEM_ASYNC               => False,
             DEVICE                  => DEVICE
         )
         port map (
@@ -405,7 +405,7 @@ begin
             PORT_ADDR_HBIT  => 28,
             DEVICE          => DEVICE
         )
-        port map(
+        port map (
             HBM_CLK             => HBM_CLK,
             HBM_RESET           => HBM_RESET,
 

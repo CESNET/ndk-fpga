@@ -18,72 +18,72 @@ use work.math_pack.all;
 
 -- This component validates Items from the received offset until the Length is reached.
 entity MFB_ITEMS_VLD is
-generic(
-    -- Number of Regions within a data word, must be power of 2.
-    MFB_REGIONS          : natural := 4;
-    -- Region size (in Blocks).
-    MFB_REGION_SIZE      : natural := 8;
-    -- Block size (in Items).
-    MFB_BLOCK_SIZE       : natural := 8;
-    -- Item width (in bits).
-    MFB_ITEM_WIDTH       : natural := 8;
-    -- Metadata width (in bits).
-    MFB_META_WIDTH       : natural := 0;
+    generic (
+        -- Number of Regions within a data word, must be power of 2.
+        MFB_REGIONS          : natural := 4;
+        -- Region size (in Blocks).
+        MFB_REGION_SIZE      : natural := 8;
+        -- Block size (in Items).
+        MFB_BLOCK_SIZE       : natural := 8;
+        -- Item width (in bits).
+        MFB_ITEM_WIDTH       : natural := 8;
+        -- Metadata width (in bits).
+        MFB_META_WIDTH       : natural := 0;
 
-    -- Maximum size of a packet (in Items).
-    PKT_MTU              : natural := 2**14;
+        -- Maximum size of a packet (in Items).
+        PKT_MTU              : natural := 2**14;
 
-    -- Width of each Offset signal in the in the RX_OFFSET vector.
-    OFFSET_WIDTH         : integer := log2(PKT_MTU);
-    -- Width of each Length signal in the in the RX_LENGTH vector.
-    LENGTH_WIDTH         : integer := log2(PKT_MTU)
-);
-port(
-    -- ========================================================================
-    -- Clock and Reset
-    -- ========================================================================
+        -- Width of each Offset signal in the in the RX_OFFSET vector.
+        OFFSET_WIDTH         : integer := log2(PKT_MTU);
+        -- Width of each Length signal in the in the RX_LENGTH vector.
+        LENGTH_WIDTH         : integer := log2(PKT_MTU)
+    );
+    port (
+        -- ========================================================================
+        -- Clock and Reset
+        -- ========================================================================
 
-    CLK              : in  std_logic;
-    RESET            : in  std_logic;
+        CLK              : in  std_logic;
+        RESET            : in  std_logic;
 
-    -- ========================================================================
-    -- RX STREAM
-    --
-    -- #. Input packets (MFB),
-    -- #. Meta information.
-    -- ========================================================================
+        -- ========================================================================
+        -- RX STREAM
+        --
+        -- #. Input packets (MFB),
+        -- #. Meta information.
+        -- ========================================================================
 
-    RX_MFB_DATA      : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    RX_MFB_META      : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
-    RX_MFB_SOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SRC_RDY   : in  std_logic;
-    RX_MFB_DST_RDY   : out std_logic;
+        RX_MFB_DATA      : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        RX_MFB_META      : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
+        RX_MFB_SOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SRC_RDY   : in  std_logic;
+        RX_MFB_DST_RDY   : out std_logic;
 
-    -- A vector of Offsets (each in Items), valid with SOF.
-    RX_OFFSET        : in  std_logic_vector(MFB_REGIONS*OFFSET_WIDTH-1 downto 0);
-    -- A vector of Lengths (each in Items), valid with SOF.
-    RX_LENGTH        : in  std_logic_vector(MFB_REGIONS*LENGTH_WIDTH-1 downto 0);
-    -- Enable data validation, valid with SOF.
-    RX_ENABLE        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        -- A vector of Offsets (each in Items), valid with SOF.
+        RX_OFFSET        : in  std_logic_vector(MFB_REGIONS*OFFSET_WIDTH-1 downto 0);
+        -- A vector of Lengths (each in Items), valid with SOF.
+        RX_LENGTH        : in  std_logic_vector(MFB_REGIONS*LENGTH_WIDTH-1 downto 0);
+        -- Enable data validation, valid with SOF.
+        RX_ENABLE        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    -- ========================================================================
-    -- TX STREAM
-    --
-    -- Validated data.
-    -- ========================================================================
+        -- ========================================================================
+        -- TX STREAM
+        --
+        -- Validated data.
+        -- ========================================================================
 
-    -- Extracted data for the checksum calculation.
-    TX_DATA       : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    TX_META       : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
-    -- Valid per each Item.
-    TX_END        : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE-1 downto 0);
-    TX_VLD        : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE-1 downto 0);
-    TX_SRC_RDY    : out std_logic;
-    TX_DST_RDY    : in  std_logic
-);
+        -- Extracted data for the checksum calculation.
+        TX_DATA       : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        TX_META       : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
+        -- Valid per each Item.
+        TX_END        : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE-1 downto 0);
+        TX_VLD        : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE-1 downto 0);
+        TX_SRC_RDY    : out std_logic;
+        TX_DST_RDY    : in  std_logic
+    );
 end entity;
 
 architecture FULL of MFB_ITEMS_VLD is
@@ -104,7 +104,7 @@ architecture FULL of MFB_ITEMS_VLD is
     constant REGION_ITEMS_W : natural := log2(REGION_ITEMS);
     -- MAX_REGIONS = maximum amount of Regions (possibly across multiple words) a single packet can strech over.
     constant MAX_REGIONS_W  : natural := max(0, OFFSET_WIDTH - REGION_ITEMS_W);
-    constant WORD_ITEMS_W : natural := log2(MFB_REGIONS) + REGION_ITEMS_W;
+    constant WORD_ITEMS_W   : natural := log2(MFB_REGIONS) + REGION_ITEMS_W;
 
     -- Extended
     constant OFFSET_WIDTH_EXT : natural := minimum(max(WORD_ITEMS_W, log2(PKT_MTU)), max(WORD_ITEMS_W, OFFSET_WIDTH+LENGTH_WIDTH)) + 1;
@@ -173,15 +173,15 @@ architecture FULL of MFB_ITEMS_VLD is
 begin
 
     assert (OFFSET_WIDTH <= log2(PKT_MTU))
-        report "MFB_ITEMS_VLD: the value of the OFFSET_WIDTH generic can't be greater than log2(PKT_MTU)!"-- &
-            -- " offset width: " & integer'image(OFFSET_WIDTH) &
-            -- "log2(MTU): " & integer'image(log2(PKT_MTU))
+        report "MFB_ITEMS_VLD: the value of the OFFSET_WIDTH generic can't be greater than log2(PKT_MTU)!" -- &
+        -- " offset width: " & integer'image(OFFSET_WIDTH) &
+        -- "log2(MTU): " & integer'image(log2(PKT_MTU))
         severity failure;
 
     assert (LENGTH_WIDTH <= log2(PKT_MTU))
-        report "MFB_ITEMS_VLD: the value of the LENGTH_WIDTH generic can't be greater than the log2(PKT_MTU)!"-- &
-            -- " length width: " & integer'image(LENGTH_WIDTH) &
-            -- "log2(MTU): " & integer'image(log2(PKT_MTU))
+        report "MFB_ITEMS_VLD: the value of the LENGTH_WIDTH generic can't be greater than the log2(PKT_MTU)!" -- &
+        -- " length width: " & integer'image(LENGTH_WIDTH) &
+        -- "log2(MTU): " & integer'image(log2(PKT_MTU))
         severity failure;
 
     -- TODO: Add more asserts ?
@@ -203,7 +203,7 @@ begin
     word_cnt_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RX_MFB_SRC_RDY = '1') and (rx_dst_rdy_reg0 = '1') then
+            if ((RX_MFB_SRC_RDY = '1') and (rx_dst_rdy_reg0 = '1')) then
                 word_cnt(0) <= word_cnt(MFB_REGIONS) + 1;
             end if;
             if (RESET = '1') then
@@ -221,12 +221,12 @@ begin
     -- -----------------------
     --  Offset precalculation
     -- -----------------------
-    rx_offset_arr      <= slv_arr_to_u_arr(slv_array_deser(RX_OFFSET     , MFB_REGIONS));
+    rx_offset_arr      <= slv_arr_to_u_arr(slv_array_deser(RX_OFFSET, MFB_REGIONS));
     rx_mfb_sof_pos_arr <= slv_arr_to_u_arr(slv_array_deser(RX_MFB_SOF_POS, MFB_REGIONS));
     act_offset_g : for r in 0  to MFB_REGIONS-1 generate
-        rx_sof_pos_word(r) <= to_unsigned(r, log2(MFB_REGIONS)) &   -- add the Regional prefix
-                              rx_mfb_sof_pos_arr(r)             &   -- to the SOF POS
-                              to_unsigned(0, log2(MFB_BLOCK_SIZE)); -- and conver it to Items
+        rx_sof_pos_word(r)     <= to_unsigned(r, log2(MFB_REGIONS)) &   -- add the Regional prefix
+                                  rx_mfb_sof_pos_arr(r)             &   -- to the SOF POS
+                                  to_unsigned(0, log2(MFB_BLOCK_SIZE)); -- and conver it to Items
         -- Global Offset begins from the start of the word rather than the SOF POS.
         -- Start Offset points to the first Item of the Section-to-be-validated
         global_offset_start(r) <= resize_left(rx_offset_arr(r), OFFSET_WIDTH_EXT) + resize_left(rx_sof_pos_word(r), WORD_ITEMS_W);
@@ -238,7 +238,7 @@ begin
     -- Input register
     -- ========================================================================
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (rx_dst_rdy_reg0 = '1') then
@@ -265,38 +265,38 @@ begin
     --  Prepare for validation
     -- ------------------------
     validation_prepare_i : entity work.VALIDATION_PREPARE
-    generic map(
-        MFB_REGIONS     => MFB_REGIONS    ,
+    generic map (
+        MFB_REGIONS     => MFB_REGIONS,
         MFB_REGION_SIZE => MFB_REGION_SIZE,
-        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE ,
-        MAX_WORDS       => PKT_MAX_WORDS  ,
+        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        MAX_WORDS       => PKT_MAX_WORDS,
         OFFSET_WIDTH    => OFFSET_WIDTH_EXT
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        RX_WORD          => rx_word_reg0         ,
-        RX_WORD_PREV     => rx_word_prev_reg0    ,
-        RX_OFFSET_START  => rx_offset_start_reg0 ,
-        RX_OFFSET_END    => rx_offset_end_reg0   ,
-        RX_VALID         => rx_valid_reg0        ,
-        RX_SRC_RDY       => rx_src_rdy_reg0      ,
-        RX_DST_RDY       => rx_dst_rdy_reg0      ,
+        RX_WORD          => rx_word_reg0,
+        RX_WORD_PREV     => rx_word_prev_reg0,
+        RX_OFFSET_START  => rx_offset_start_reg0,
+        RX_OFFSET_END    => rx_offset_end_reg0,
+        RX_VALID         => rx_valid_reg0,
+        RX_SRC_RDY       => rx_src_rdy_reg0,
+        RX_DST_RDY       => rx_dst_rdy_reg0,
 
         TX_OFFSET1_START => vp_offset1_start_reg0,
-        TX_OFFSET1_END   => vp_offset1_end_reg0  ,
-        TX_END1_POINTER  => vp_end1_pointer_reg0 ,
-        TX_END1          => vp_end1_reg0         ,
-        TX_VALID1        => vp_valid1_reg0       ,
+        TX_OFFSET1_END   => vp_offset1_end_reg0,
+        TX_END1_POINTER  => vp_end1_pointer_reg0,
+        TX_END1          => vp_end1_reg0,
+        TX_VALID1        => vp_valid1_reg0,
 
         TX_OFFSET2_START => vp_offset2_start_reg0,
-        TX_OFFSET2_END   => vp_offset2_end_reg0  ,
-        TX_END2_POINTER  => vp_end2_pointer_reg0 ,
-        TX_END2          => vp_end2_reg0         ,
-        TX_VALID2        => vp_valid2_reg0       ,
+        TX_OFFSET2_END   => vp_offset2_end_reg0,
+        TX_END2_POINTER  => vp_end2_pointer_reg0,
+        TX_END2          => vp_end2_reg0,
+        TX_VALID2        => vp_valid2_reg0,
 
-        TX_SRC_RDY       => vp_src_rdy_reg0      ,
+        TX_SRC_RDY       => vp_src_rdy_reg0,
         TX_DST_RDY       => vp_dst_rdy_reg0
     );
 
@@ -305,7 +305,7 @@ begin
     -- ----------------------------------------
     vp_dst_rdy_reg0 <= vd_dst_rdy_reg1;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (vd_dst_rdy_reg1 = '1') then
@@ -340,19 +340,19 @@ begin
     --  Do (perform) the validation
     -- -----------------------------
     validation_do_i : entity work.VALIDATION_DO
-    generic map(
-        MFB_REGIONS     => MFB_REGIONS    ,
+    generic map (
+        MFB_REGIONS     => MFB_REGIONS,
         MFB_REGION_SIZE => MFB_REGION_SIZE,
         MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE
     )
-    port map(
-        OFFSET1_LOW  => vd_offset1_low_reg1 ,
+    port map (
+        OFFSET1_LOW  => vd_offset1_low_reg1,
         OFFSET1_HIGH => vd_offset1_high_reg1,
-        VALID1       => vd_valid1_reg1      ,
+        VALID1       => vd_valid1_reg1,
 
-        OFFSET2_LOW  => vd_offset2_low_reg1 ,
+        OFFSET2_LOW  => vd_offset2_low_reg1,
         OFFSET2_HIGH => vd_offset2_high_reg1,
-        VALID2       => vd_valid2_reg1      ,
+        VALID2       => vd_valid2_reg1,
 
         VALID_VECTOR => vd_valid_vec_reg1
     );
@@ -363,20 +363,20 @@ begin
     end_g : for r in 0 to MFB_REGIONS-1 generate
 
         bin2hot_1_i : entity work.BIN2HOT
-        generic map(
+        generic map (
             DATA_WIDTH => REGION_ITEMS_W
         )
-        port map(
+        port map (
             EN     => vd_end1_reg1        (r),
             INPUT  => vd_end1_pointer_reg1(r),
             OUTPUT => end1_onehot_reg1    (r)
         );
 
         bin2hot_2_i : entity work.BIN2HOT
-        generic map(
+        generic map (
             DATA_WIDTH => REGION_ITEMS_W
         )
-        port map(
+        port map (
             EN     => vd_end2_reg1        (r),
             INPUT  => vd_end2_pointer_reg1(r),
             OUTPUT => end2_onehot_reg1    (r)
@@ -390,7 +390,7 @@ begin
     -- Output register
     -- ========================================================================
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (TX_DST_RDY = '1') then

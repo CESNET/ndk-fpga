@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity FP_MERGER is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
@@ -24,7 +24,7 @@ entity FP_MERGER is
         USR_RX_PKT_SIZE_MAX : natural := 2**10;
         DEVICE              : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- =====================================================================
         -- Clock and Reset
         -- =====================================================================
@@ -62,14 +62,15 @@ architecture FULL of FP_MERGER is
     --                    TYPE DECLARATION                    --
     ------------------------------------------------------------
     type fp_merger_fsm is (
-        st_SKIP,    -- Skip current port
-        st_PASS     -- Pass current port
+        ST_SKIP,    -- Skip current port
+        ST_PASS     -- Pass current port
     );
 
     ------------------------------------------------------------
     --                   SIGNAL DECLARATION                   --
     ------------------------------------------------------------
-    signal state, next_state: fp_merger_fsm := st_SKIP;
+    signal state      : fp_merger_fsm := ST_SKIP;
+    signal next_state : fp_merger_fsm := ST_SKIP;
 
     signal input_select             : unsigned(max(1, log2(MERGER_INPUTS)) - 1 downto 0);
     signal input_skip               : std_logic;
@@ -96,18 +97,18 @@ architecture FULL of FP_MERGER is
 begin
 
     -- Pointer select valid input
-    pointer_reg_p: process(all)
+    pointer_reg_p : process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 input_select   <= (others => '0');
-            elsif input_skip = '1' then
+            elsif (input_skip = '1') then
                 input_select   <= input_valid;
             end if;
         end if;
     end process;
 
-    process(all)
+    process (all)
         variable input_select_oh_v  : std_logic_vector(MERGER_INPUTS - 1 downto 0);
     begin
         input_select_oh_v                           := (others => '0');
@@ -117,21 +118,21 @@ begin
     end process;
 
     after_one_i : entity work.AFTER_ONE
-    generic map(
+    generic map (
         DATA_WIDTH  => MERGER_INPUTS
     )
-    port map(
+    port map (
         DI  => input_select_oh,
         DO  => input_select_ao
     );
 
     -- Select next valid pointer
-    pointer_sel_p: process(all)
+    pointer_sel_p : process (all)
         variable input_valid_v  : unsigned(max(1, log2(MERGER_INPUTS)) - 1 downto 0);
     begin
         input_valid_v := (others => '0');
         for i in 0 to MERGER_INPUTS - 1 loop
-            if (RX_MFB_SRC_RDY(i) = '1') and (input_select_ao(i) = '1') then
+            if ((RX_MFB_SRC_RDY(i) = '1') and (input_select_ao(i) = '1')) then
                 input_valid_v   := to_unsigned(i, input_valid_v'length);
                 exit;
             end if;
@@ -140,18 +141,18 @@ begin
         input_valid <= input_valid_v;
     end process;
 
-    fp_merger_reg_p: process(CLK)
+    fp_merger_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if RST = '1' then
-                state   <= st_SKIP;
+            if (RST = '1') then
+                state   <= ST_SKIP;
             else
                 state   <= next_state;
             end if;
         end if;
     end process;
 
-    fp_merger_log_p: process(all)
+    fp_merger_log_p : process (all)
         variable eof_std_v  : std_logic;
     begin
         next_state  <= state;
@@ -159,22 +160,22 @@ begin
 
         eof_std_v   := or (RX_MFB_EOF(to_integer(input_select)));
 
-        case(state) is
-            when st_SKIP    =>
-                if RX_MFB_SRC_RDY(to_integer(input_select)) = '1' then
-                    next_state  <= st_PASS;
+        case (state) is
+            when ST_SKIP    =>
+                if (RX_MFB_SRC_RDY(to_integer(input_select)) = '1') then
+                    next_state  <= ST_PASS;
                     -- Small Packet
-                    if (eof_std_v = '1') and (pipe_rx_dst_rdy = '1') then
-                        next_state  <= st_SKIP;
+                    if ((eof_std_v = '1') and (pipe_rx_dst_rdy = '1')) then
+                        next_state  <= ST_SKIP;
                         input_skip  <= '1';
                     end if;
                 else
                     input_skip  <= '1';
                 end if;
 
-            when st_PASS    =>
-                if (eof_std_v = '1') and (pipe_rx_dst_rdy = '1') then
-                    next_state  <= st_SKIP;
+            when ST_PASS    =>
+                if ((eof_std_v = '1') and (pipe_rx_dst_rdy = '1')) then
+                    next_state  <= ST_SKIP;
                     input_skip  <= '1';
                 end if;
 
@@ -183,11 +184,11 @@ begin
 
     -- Data MUX
     data_mux_i: entity work.GEN_MUX
-    generic map(
+    generic map (
         DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH,
         MUX_WIDTH   => MERGER_INPUTS
     )
-    port map(
+    port map (
         DATA_IN     => slv_array_ser(RX_MFB_DATA),
         SEL         => std_logic_vector(input_select),
         DATA_OUT    => pipe_rx_data
@@ -195,11 +196,11 @@ begin
 
     -- META MUX
     meta_mux_i: entity work.GEN_MUX
-    generic map(
+    generic map (
         DATA_WIDTH  => MFB_REGIONS*MFB_META_WIDTH,
         MUX_WIDTH   => MERGER_INPUTS
     )
-    port map(
+    port map (
         DATA_IN     => slv_array_ser(RX_MFB_META),
         SEL         => std_logic_vector(input_select),
         DATA_OUT    => pipe_rx_meta
@@ -207,11 +208,11 @@ begin
 
     -- SOF MUX
     sof_mux_i: entity work.GEN_MUX
-    generic map(
+    generic map (
         DATA_WIDTH  => MFB_REGIONS,
         MUX_WIDTH   => MERGER_INPUTS
     )
-    port map(
+    port map (
         DATA_IN     => slv_array_ser(RX_MFB_SOF),
         SEL         => std_logic_vector(input_select),
         DATA_OUT    => pipe_rx_sof
@@ -219,11 +220,11 @@ begin
 
     -- EOF MUX
     eof_mux_i: entity work.GEN_MUX
-    generic map(
+    generic map (
         DATA_WIDTH  => MFB_REGIONS,
         MUX_WIDTH   => MERGER_INPUTS
     )
-    port map(
+    port map (
         DATA_IN     => slv_array_ser(RX_MFB_EOF),
         SEL         => std_logic_vector(input_select),
         DATA_OUT    => pipe_rx_eof
@@ -231,11 +232,11 @@ begin
 
     -- SOF_POS MUX
     sof_pos_mux_i: entity work.GEN_MUX
-    generic map(
+    generic map (
         DATA_WIDTH  => MFB_REGIONS*max(1, log2(MFB_REGION_SIZE)),
         MUX_WIDTH   => MERGER_INPUTS
     )
-    port map(
+    port map (
         DATA_IN     => slv_array_ser(RX_MFB_SOF_POS),
         SEL         => std_logic_vector(input_select),
         DATA_OUT    => pipe_rx_sof_pos
@@ -243,11 +244,11 @@ begin
 
     -- EOF_POS MUX
     eof_pos_mux_i: entity work.GEN_MUX
-    generic map(
+    generic map (
         DATA_WIDTH  => MFB_REGIONS*log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE),
         MUX_WIDTH   => MERGER_INPUTS
     )
-    port map(
+    port map (
         DATA_IN     => slv_array_ser(RX_MFB_EOF_POS),
         SEL         => std_logic_vector(input_select),
         DATA_OUT    => pipe_rx_eof_pos
@@ -257,7 +258,7 @@ begin
     pipe_rx_src_rdy  <= RX_MFB_SRC_RDY(to_integer(input_select));
 
     -- DST_RDY DEMUX
-    dst_rdy_demux_p: process(all)
+    dst_rdy_demux_p : process (all)
         variable dst_rdy_v : std_logic_vector(MERGER_INPUTS -1 downto 0);
     begin
         dst_rdy_v                             := (others => '0');
@@ -273,7 +274,7 @@ begin
     end generate;
     -- Output register
     out_reg_i: entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS        => MFB_REGIONS,
         REGION_SIZE    => MFB_REGION_SIZE,
         BLOCK_SIZE     => MFB_BLOCK_SIZE,
@@ -283,7 +284,7 @@ begin
         PIPE_TYPE      => "SHREG",
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
 
         CLK    => CLK,
         RESET  => RST,

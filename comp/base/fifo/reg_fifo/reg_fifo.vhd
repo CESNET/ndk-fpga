@@ -29,7 +29,8 @@ entity REG_FIFO is
         ITEMS      : natural := 2;
         -- If this is true, the input data are directly connected to the output as well as the
         -- handshaking signals.
-        FAKE_FIFO  : boolean := FALSE);
+        FAKE_FIFO  : boolean := FALSE
+    );
 
     port (
         CLK        : in  std_logic;
@@ -41,7 +42,8 @@ entity REG_FIFO is
 
         TX_DATA    : out std_logic_vector(DATA_WIDTH -1 downto 0);
         TX_SRC_RDY : out std_logic;
-        TX_DST_RDY : in  std_logic);
+        TX_DST_RDY : in  std_logic
+    );
 
 end entity;
 
@@ -83,7 +85,7 @@ begin
 
         TX_DATA            <= sb_data(ITEMS);
         TX_SRC_RDY         <= sb_src_rdy(ITEMS);
-        sb_dst_rdy(ITEMS) <= TX_DST_RDY;
+        sb_dst_rdy(ITEMS)  <= TX_DST_RDY;
 
     end generate;
 end architecture;

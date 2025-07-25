@@ -8,20 +8,20 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use std.env.all;
-use STD.textio.all;
+use std.textio.all;
 
 library work;
 use work.type_pack.all;
 use work.math_pack.all;
 use work.basics_test_pkg.all;
 use std.env.stop;
-use STD.textio.all;
+use std.textio.all;
 
 -- ============================================================================
 --                        Entity declaration
 -- ============================================================================
 entity TESTBENCH is
-end entity TESTBENCH;
+end entity;
 -- ============================================================================
 --                      Architecture declaration
 -- ============================================================================
@@ -49,9 +49,9 @@ architecture BEHAVIORAL of TESTBENCH is
 
     -- signals for verification of a successful run
     signal stop_at_the_end         : std_logic := '0'; -- is '1' at the end of the simulation, allows for the verdict of the simulation run to be written out
-    signal clk_cycle_count         : natural := 0; -- +1 each rising edge, counts up until the LENGHT_OF_SIM is reached
-    signal correct_results         : natural := 0; -- counts the number of iterations when results from the testbench and from the DUT were equal
-    signal incorrect_results       : natural := 0; -- counts the number of iterations when results from the testbench and from the DUT were not equal
+    signal clk_cycle_count         : natural := 0;     -- +1 each rising edge, counts up until the LENGHT_OF_SIM is reached
+    signal correct_results         : natural := 0;     -- counts the number of iterations when results from the testbench and from the DUT were equal
+    signal incorrect_results       : natural := 0;     -- counts the number of iterations when results from the testbench and from the DUT were not equal
 
     shared variable l : line;
 
@@ -62,8 +62,8 @@ begin
         REG_BITMAP => REG_BITMAP
     )
     port map (
-        CLK    => clk      ,
-        RESET  => rst      ,
+        CLK    => clk,
+        RESET  => rst,
         TS_TSU => tsu_ts(0),
         TS_NS  => dut_ns
     );
@@ -139,9 +139,9 @@ begin
         wait until rising_edge(clk);
         if (rst = '0') then
             if (stop_at_the_end = '0') then
-                    randint(seed1,seed2,2,20,seed);
-                    tsu_ts(0) <= (random_vector(64, seed));
-                    -- write(l, "Generated number of seconds (tsu_ts(0)): " & integer'image(to_integer(unsigned(tsu_ts(0))))); writeline(output, l);
+                randint(seed1,seed2,2,20,seed);
+                tsu_ts(0) <= (random_vector(64, seed));
+                -- write(l, "Generated number of seconds (tsu_ts(0)): " & integer'image(to_integer(unsigned(tsu_ts(0))))); writeline(output, l);
                 for c in 0 to CLOCK_CYCLES-1 loop
                     tsu_ts(c+1) <= tsu_ts(c);
                 end loop;
@@ -166,9 +166,9 @@ begin
             -- conversion to [ns]
             tsu_ns_conv := resize(unsigned(tsu_ts(CLOCK_CYCLES-1)(63 downto 32)) * to_unsigned(10**9, log2(10**9)),64);
             tsu_ns      := resize(unsigned(tsu_ts(CLOCK_CYCLES-1)(31 downto  0)),64);
-            model_ns <= tsu_ns_conv + tsu_ns;
+            model_ns    <= tsu_ns_conv + tsu_ns;
             if (stop_at_the_end = '0') then
-                if (VERBOSE=2) then
+                if (VERBOSE = 2) then
                     write(l, "Input [seconds]: "   & to_string(tsu_ts(CLOCK_CYCLES-1)(63 downto 32)) & " ");
                     write(l, "Input [ns]     : "   & to_string(tsu_ts(CLOCK_CYCLES-1)(31 downto  0)) & LF );
                     write(l, "Model output [ns]: " & to_string(model_ns)                             & LF );
@@ -176,7 +176,7 @@ begin
                     writeline(output, l);
                 end if;
                 if (model_ns /= unsigned(dut_ns)) then
-                    if (VERBOSE=1) then
+                    if (VERBOSE = 1) then
                         write(l, "Error! " & LF);
                         write(l, to_string(tsu_ts(CLOCK_CYCLES-1)(63 downto 32)) & " seconds and " & LF);
                         write(l, to_string(tsu_ts(CLOCK_CYCLES-1)(31 downto  0)) & " nanoseconds " & LF);

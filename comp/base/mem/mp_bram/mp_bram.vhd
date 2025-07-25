@@ -101,8 +101,12 @@ architecture FULL of MP_BRAM is
     signal wr_bram_en      : std_logic_vector(WRITE_PORTS - 1 downto 0);
 begin
 
-    assert (not (BLOCK_ENABLE and  ONE_CLK_WRITE)) report "this generic cobination should work but it is not TESTED" severity failure;
-    assert (not (BLOCK_ENABLE and BLOCK_WIDTH = 0)) report "If BLOCK_ENABLE is set then BLOCK_WIDTH have to be differant from zero" severity failure;
+    assert (not (BLOCK_ENABLE and  ONE_CLK_WRITE))
+        report "this generic cobination should work but it is not TESTED"
+        severity failure;
+    assert (not (BLOCK_ENABLE and BLOCK_WIDTH = 0))
+        report "If BLOCK_ENABLE is set then BLOCK_WIDTH have to be differant from zero"
+        severity failure;
 
     ports_g : for it in 0 to WRITE_PORTS - 1 generate
         signal wr_bram_rd_en   : std_logic;
@@ -117,18 +121,18 @@ begin
         -- SHOULD WRITE TO SAME ADDRESS HAVE UNDEFINED BEHAVIORAL
         -- =====================================================================
         write_to_same_addr_g : if (not UNDEF_BEHAW_WHEN_WR_TO_SAME_ADDRESS) generate
-            process(all)
+            process (all)
                 variable wr_to_same_addr_from_lower_port : std_logic;
             begin
                 wr_to_same_addr_from_lower_port := '0';
-                    -- Check if lower port doesnt write to same address
+                -- Check if lower port doesnt write to same address
                 for jt in 0 to it-1 loop
                     if (wr_bram_addr(it) = wr_bram_addr(jt)) then
                         wr_to_same_addr_from_lower_port := '1';
                     end if;
                 end loop;
 
-                 port_wr_en <= wr_bram_en(it) and not wr_to_same_addr_from_lower_port;
+                port_wr_en <= wr_bram_en(it) and not wr_to_same_addr_from_lower_port;
             end process;
         else generate
             port_wr_en <= wr_bram_en(it);
@@ -171,7 +175,7 @@ begin
                     RD_DATA_VLD => open
                 );
             else generate
-                process(CLK)
+                process (CLK)
                 begin
                     if (rising_edge(CLK)) then
                         wr_bram_rd_data(it)(jt)     <= WR_DATA(it);
@@ -180,7 +184,7 @@ begin
             end generate;
         end generate;
 
-        process(CLK)
+        process (CLK)
         begin
             if (rising_edge(CLK)) then
                 if (RESET = '1') then
@@ -194,7 +198,7 @@ begin
         end process;
 
 
-        xor_p : process(all)
+        xor_p : process (all)
             variable tmp : std_logic_vector(DATA_WIDTH-1 downto 0);
         begin
             tmp := wr_bram_rd_data(0)(it);
@@ -209,8 +213,8 @@ begin
         -- READ BRAMS
         -- =====================================================================
         read_g : for jt in 0 to READ_PORTS-1 generate
-                signal port_wr_be : std_logic_vector(max(BLOCKS, 1) -1 downto 0);
-            begin
+            signal port_wr_be : std_logic_vector(max(BLOCKS, 1) -1 downto 0);
+        begin
 
             port_wr_be <= wr_bram_be(it) when (BLOCK_ENABLE) else (others => '1');
             bram_i : entity work.SDP_BRAM
@@ -245,8 +249,8 @@ begin
 
 
     outpu_read_g : for it in 0 to READ_PORTS-1 generate
-        signal output     : std_logic_vector(DATA_WIDTH-1 downto 0);
-        signal output_xor : std_logic_vector(DATA_WIDTH-1 downto 0);
+        signal output            : std_logic_vector(DATA_WIDTH-1 downto 0);
+        signal output_xor        : std_logic_vector(DATA_WIDTH-1 downto 0);
         signal write_bypass_data : std_logic_vector(DATA_WIDTH-1 downto 0);
         signal write_bypass_en   : std_logic;
         signal metadata_bypass   : std_logic_vector(METADATA_WIDTH-1 downto 0);
@@ -254,7 +258,7 @@ begin
     begin
 
         -- Create output by xor operation
-        xor_read : process(all)
+        xor_read : process (all)
             variable tmp : std_logic_vector(DATA_WIDTH-1 downto 0);
         begin
             tmp := rd_bram_rd_data(0)(it);
@@ -265,9 +269,9 @@ begin
         end process;
 
 
-        --bypassing if ONE_CLK_WRITE is set
+        -- bypassing if ONE_CLK_WRITE is set
         bypass_g : if (ONE_CLK_WRITE) generate
-            process(CLK)
+            process (CLK)
                 variable be   : std_logic_vector(BLOCKS-1 downto 0);
                 variable data : std_logic_vector(DATA_WIDTH-1 downto 0);
                 variable en   : std_logic;
@@ -279,14 +283,14 @@ begin
 
                     for jt in 0 to WRITE_PORTS-1 loop
                         if (wr_bram_en(jt) = '1' and wr_bram_addr(jt) = RD_ADDR(it)) then
-                            --Don't worry in that index is original data.
+                            -- Don't worry in that index is original data.
                             data := wr_bram_rd_data(jt)(jt);
                             be   := wr_bram_be(jt);
                             en   := '1';
                         end if;
                     end loop;
 
-                    --if block_width is enabled then pic old data for BE set to zero
+                    -- if block_width is enabled then pic old data for BE set to zero
                     if (BLOCK_ENABLE) then
                         for jt in 0 to BLOCKS-1 loop
                             if (be(jt) = '1') then
@@ -307,7 +311,7 @@ begin
         end generate;
 
         -- Metadata pipeline
-        meta_process : process(CLK)
+        meta_process : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 metadata_bypass <= RD_META_IN(it);
@@ -315,7 +319,7 @@ begin
         end process;
 
         -- vld pipeline
-        vld_process : process(CLK)
+        vld_process : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 if (RESET = '1') then
@@ -329,7 +333,7 @@ begin
 
         -- Create output register if there is set
         output_reg_g : if (OUTPUT_REG) generate
-            process(CLK)
+            process (CLK)
             begin
                 if (rising_edge(CLK)) then
                     if (write_bypass_en = '1') then
@@ -347,8 +351,8 @@ begin
                 end if;
             end process;
         else generate
-            RD_DATA(it) <= output when write_bypass_en = '0' else write_bypass_data;
-            RD_META_OUT(it) <= metadata_bypass;
+            RD_DATA(it)          <= output when write_bypass_en = '0' else write_bypass_data;
+            RD_META_OUT(it)      <= metadata_bypass;
             RD_DATA_VLD(it)      <= vld_bypass;
         end generate;
     end generate;

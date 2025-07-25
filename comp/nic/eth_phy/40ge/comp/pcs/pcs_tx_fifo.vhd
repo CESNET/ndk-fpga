@@ -8,31 +8,31 @@ library ieee;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity pcs_tx_fifo is
+entity PCS_TX_FIFO is
     generic (
         NUM_LANES : natural := 8;
         DEVICE    : string  := "ULTRASCALE" --! "VIRTEX6", "7SERIES", "ULTRASCALE"
-   );
-   port (
-       RESET_D : in std_logic; -- D-clock reset
-       CLK   : in std_logic; -- D clock
-       D     : in std_logic_vector(NUM_LANES*66-1 downto 0);  -- Input data
-       --
-       RESET_Q : in std_logic; -- Q-clock reset
-       TXCLK : in std_logic; -- Q clock
-       RE    : in std_logic; -- Read enable
-       Q     : out std_logic_vector(NUM_LANES*66-1 downto 0) := (others => '0');  -- Output data
-       -- Debug
-       FIFO_EMPTY_O : out std_logic;
-       FIFO_FULL_O  : out std_logic;
-       FIFO_AFULL_O : out std_logic;
-       FIFO_DIN_O   : out std_logic_vector(NUM_LANES*66-1 downto 0);
-       DROP_O       : out std_logic;
-       INDEX_O      : out std_logic_vector(3 downto 0)
     );
-end pcs_tx_fifo;
+    port (
+        RESET_D      : in std_logic;                                                      -- D-clock reset
+        CLK          : in std_logic;                                                      -- D clock
+        D            : in std_logic_vector(NUM_LANES*66-1 downto 0);                      -- Input data
+        --
+        RESET_Q      : in std_logic;                                                      -- Q-clock reset
+        TXCLK        : in std_logic;                                                      -- Q clock
+        RE           : in std_logic;                                                      -- Read enable
+        Q            : out std_logic_vector(NUM_LANES*66-1 downto 0) := (others => '0');  -- Output data
+        -- Debug
+        FIFO_EMPTY_O : out std_logic;
+        FIFO_FULL_O  : out std_logic;
+        FIFO_AFULL_O : out std_logic;
+        FIFO_DIN_O   : out std_logic_vector(NUM_LANES*66-1 downto 0);
+        DROP_O       : out std_logic;
+        INDEX_O      : out std_logic_vector(3 downto 0)
+    );
+end entity;
 
-architecture behavioral of pcs_tx_fifo is
+architecture BEHAVIORAL of PCS_TX_FIFO is
 
     signal discard       : std_logic;
     signal idle          : std_logic_vector(NUM_LANES-1 downto 0);
@@ -56,14 +56,14 @@ architecture behavioral of pcs_tx_fifo is
 begin
 
     -- Detect IDLE control blocks
-    IDLE_DETECT_LOGIC: process(D)
+    idle_detect_logic : process (D)
     begin
         idle_found <= '0';
         idle       <= (others => '0');
         -- Detect IDLE characters on individual lanes
         for i in 0 to NUM_LANES-1 loop
-            if (D(1+i*66 downto i*66) = "01") and (D(9+i*66 downto i*66+2) = X"1E") then
-                idle(i) <= '1';
+            if ((D(1+i*66 downto i*66) = "01") and (D(9+i*66 downto i*66+2) = X"1E")) then
+                idle(i)    <= '1';
                 idle_found <= '1';
             else
                 idle(i) <= '0';
@@ -71,11 +71,11 @@ begin
         end loop;
     end process;
 
-    GEN_DROP_INDEX : process(idle)
+    gen_drop_index : process (idle)
     begin
         drop_index <= 0;
         for i in 0 to NUM_LANES-1 loop
-            if idle(i) = '1' then
+            if (idle(i) = '1') then
                 drop_index <= i;
             end if;
         end loop;
@@ -83,9 +83,9 @@ begin
 
     drop <= discard and idle_found;
 
-    TX_PIPE: process(CLK)
+    tx_pipe : process (CLK)
     begin
-        if CLK'event and CLK = '1' then
+        if rising_edge(CLK) then
             discard  <= fifo_afull;
             sh_din   <= D;
             sh_drop  <= drop;
@@ -93,8 +93,8 @@ begin
         end if;
     end process;
 
-    GEN_MULTILANE_DROP: if (NUM_LANES > 1) generate
-        BLOCK_DROP: entity work.block_shifter
+    gen_multilane_drop: if (NUM_LANES > 1) generate
+        block_drop: entity work.BLOCK_SHIFTER
         generic map (
             NUM_LANES => NUM_LANES
         )
@@ -111,12 +111,12 @@ begin
         );
     end generate;
 
-    GEN_SINGLELANE_DROP: if (NUM_LANES = 1) generate
+    gen_singlelane_drop: if (NUM_LANES = 1) generate
         fifo_din <= sh_din;
         fifo_wen <= (not(sh_drop) or not(idle_found)) and not(fifo_full);
     end generate;
 
-    ASFIFO: entity work.ASFIFO_BRAM_XILINX
+    asfifo: entity work.ASFIFO_BRAM_XILINX
     generic map (
         DEVICE                  => DEVICE,
         DATA_WIDTH              => 66*NUM_LANES,
@@ -144,18 +144,18 @@ begin
 
     fifo_ren <= RE and fifo_re_delay(fifo_re_delay'high);
 
-    OUT_REG: process(TXCLK)
+    out_reg : process (TXCLK)
     begin
-        if TXCLK'event and TXCLK = '1' then
-           if RE = '1' then
-               Q <= fifo_dout;
-           end if;
-           -- Disable FIFO read after startup for 8 clock cycles
-           if (fifo_empty = '1') then
-               fifo_re_delay <= (others => '0');
-           else
-               fifo_re_delay <= fifo_re_delay(6 downto 0) & '1';
-           end if;
+        if rising_edge(TXCLK) then
+            if (RE = '1') then
+                Q <= fifo_dout;
+            end if;
+            -- Disable FIFO read after startup for 8 clock cycles
+            if (fifo_empty = '1') then
+                fifo_re_delay <= (others => '0');
+            else
+                fifo_re_delay <= fifo_re_delay(6 downto 0) & '1';
+            end if;
         end if;
     end process;
 
@@ -166,4 +166,4 @@ begin
     DROP_O       <= sh_drop;
     INDEX_O      <= std_logic_vector(to_unsigned(sh_index,4));
 
-end behavioral;
+end architecture;

@@ -15,7 +15,7 @@ use work.type_pack.all;
 -- Converts ``RX_ITEMS`` item input MVB to ``TX_ITEMS`` amount of single item MVB interfaces.
 -- Items can be read independetly and in order (out of order is not tested, UVM verification needed).
 entity MVB_SHAKEDOWN is
-    generic(
+    generic (
         -- RX MVB item count
         RX_ITEMS            : natural := 4;
         -- TX MVB independent interfaces count (can be merged to one MVB with MERGE component)
@@ -33,7 +33,7 @@ entity MVB_SHAKEDOWN is
         USE_MUX_IMPL        : boolean := False;
         DEVICE              : string  := "AGILEX"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -66,12 +66,12 @@ architecture FULL of MVB_SHAKEDOWN is
     -- Unequal RX/TX ITEMS interface wrapper
     -- ============================
 
-    constant ITEMS       : integer := max(RX_ITEMS,TX_ITEMS);
-    signal eq_RX_DATA    : std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0);
-    signal eq_RX_VLD     : std_logic_vector(ITEMS-1 downto 0);
-    signal eq_TX_DATA    : std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0);
-    signal eq_TX_VLD     : std_logic_vector(ITEMS-1 downto 0);
-    signal eq_TX_NEXT    : std_logic_vector(ITEMS-1 downto 0);
+    constant ITEMS         : integer := max(RX_ITEMS,TX_ITEMS);
+    signal   eq_rx_data    : std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0);
+    signal   eq_rx_vld     : std_logic_vector(ITEMS-1 downto 0);
+    signal   eq_tx_data    : std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0);
+    signal   eq_tx_vld     : std_logic_vector(ITEMS-1 downto 0);
+    signal   eq_tx_next    : std_logic_vector(ITEMS-1 downto 0);
 
     -- ============================
 
@@ -116,12 +116,12 @@ begin
         -- Unequal RX/TX ITEMS interface wrapper
         -- ============================
 
-        eq_RX_DATA <= std_logic_vector(resize(unsigned(RX_DATA),ITEMS*ITEM_WIDTH));
-        eq_RX_VLD  <= std_logic_vector(resize(unsigned(RX_VLD),ITEMS));
+        eq_rx_data <= std_logic_vector(resize(unsigned(RX_DATA),ITEMS*ITEM_WIDTH));
+        eq_rx_vld  <= std_logic_vector(resize(unsigned(RX_VLD),ITEMS));
 
-        TX_DATA    <= std_logic_vector(resize(unsigned(eq_TX_DATA),TX_ITEMS*ITEM_WIDTH));
-        TX_VLD     <= std_logic_vector(resize(unsigned(eq_TX_VLD),TX_ITEMS));
-        eq_TX_NEXT <= std_logic_vector(resize(unsigned(TX_NEXT),ITEMS));
+        TX_DATA    <= std_logic_vector(resize(unsigned(eq_tx_data),TX_ITEMS*ITEM_WIDTH));
+        TX_VLD     <= std_logic_vector(resize(unsigned(eq_tx_vld),TX_ITEMS));
+        eq_tx_next <= std_logic_vector(resize(unsigned(TX_NEXT),ITEMS));
 
         -- ============================
 
@@ -135,7 +135,7 @@ begin
         begin
             if (rising_edge(CLK)) then
                 if (s_rx_dst_rdy = '1') then
-                    s_rx_data_reg <= eq_RX_DATA;
+                    s_rx_data_reg <= eq_rx_data;
                 end if;
             end if;
         end process;
@@ -146,7 +146,7 @@ begin
                 if (RESET = '1') then
                     s_rx_vld_reg <= (others => '0');
                 elsif (s_rx_dst_rdy = '1') then
-                    s_rx_vld_reg <= eq_RX_VLD and RX_SRC_RDY;
+                    s_rx_vld_reg <= eq_rx_vld and RX_SRC_RDY;
                 end if;
             end if;
         end process;
@@ -170,12 +170,12 @@ begin
         -- =========================================================================
 
         shakedown_i : entity work.SHAKEDOWN
-        generic map(
+        generic map (
             INPUTS     => SHAKE_PORTS*ITEMS,
             OUTPUTS    => SHAKE_PORTS*ITEMS,
             DATA_WIDTH => ITEM_WIDTH
         )
-        port map(
+        port map (
             CLK      => CLK,
             RESET    => RESET,
 
@@ -219,14 +219,14 @@ begin
         end process;
 
         s_sh_dout_vld_reg_masked(SHAKE_PORTS*ITEMS-1 downto ITEMS) <= s_sh_dout_vld_reg(SHAKE_PORTS*ITEMS-1 downto ITEMS);
-        s_sh_dout_vld_reg_masked(ITEMS-1 downto 0) <= s_sh_dout_vld_reg(ITEMS-1 downto 0) and (not eq_TX_NEXT);
+        s_sh_dout_vld_reg_masked(ITEMS-1 downto 0)                 <= s_sh_dout_vld_reg(ITEMS-1 downto 0) and (not eq_tx_next);
 
         -- =========================================================================
         --  OUTPUT LOGIC
         -- =========================================================================
 
-        eq_TX_DATA <= s_sh_dout_reg(ITEMS*ITEM_WIDTH-1 downto 0);
-        eq_TX_VLD  <= s_sh_dout_vld_reg(ITEMS-1 downto 0);
+        eq_tx_data <= s_sh_dout_reg(ITEMS*ITEM_WIDTH-1 downto 0);
+        eq_tx_vld  <= s_sh_dout_vld_reg(ITEMS-1 downto 0);
     end generate;
 
     -- Implement effective N to 1 MVB shakedown
@@ -238,7 +238,7 @@ begin
     begin
         RX_DST_RDY <= rx_dst_rdy_int;
 
-        input_reg_p : process(CLK)
+        input_reg_p : process (CLK)
         begin
             if rising_edge(CLK) then
                 if (rx_dst_rdy_int = '1') then
@@ -256,13 +256,13 @@ begin
         process (CLK)
         begin
             if rising_edge(CLK) then
-                if RESET = '1' then
+                if (RESET = '1') then
                     item_sent_reg <= (others => '1');
                 else
                     for rx_it in 0 to RX_ITEMS - 1 loop
-                        if item_sent_reg_set(rx_it) = '1' then
+                        if (item_sent_reg_set(rx_it) = '1') then
                             item_sent_reg(rx_it) <= '1';
-                        elsif item_sent_reg_reset(rx_it) = '1' then
+                        elsif (item_sent_reg_reset(rx_it) = '1') then
                             item_sent_reg(rx_it) <= '0';
                         end if;
                     end loop;
@@ -280,7 +280,7 @@ begin
         no_items_left <= '1' when unsigned(items_left) = to_unsigned(0, log2(RX_ITEMS + 1)) else '0';
         one_item_left <= '1' when unsigned(items_left) = to_unsigned(1, log2(RX_ITEMS + 1)) else '0';
 
-        rx_dst_rdy_int <= '1' when no_items_left = '1' or (one_item_left = '1' and TX_NEXT = "1") else '0';
+        rx_dst_rdy_int    <= '1' when no_items_left = '1' or (one_item_left = '1' and TX_NEXT = "1") else '0';
         item_sent_reg_set <= (others => rx_dst_rdy_int);
 
         TX_VLD(0) <= not no_items_left and rx_src_rdy_int;

@@ -17,87 +17,87 @@ use work.dma_bus_pack.all;
 -- start/stop sequences when requested. When the start/stop of multiple channels is requested, the
 -- routine is performed sequentially in a Round-Robin fashion.
 entity TX_DMA_SW_MANAGER is
-generic(
-    -- Traget device
-    DEVICE             : string  := "STRATIX10";
+    generic (
+        -- Traget device
+        DEVICE             : string  := "STRATIX10";
 
-    -- Total number of DMA Channels within this DMA Endpoint
-    CHANNELS           : natural := 8;
+        -- Total number of DMA Channels within this DMA Endpoint
+        CHANNELS           : natural := 8;
 
-    -- Actual width of packet and byte counters
-    RECV_PKT_CNT_WIDTH : natural := 64;
-    RECV_BTS_CNT_WIDTH : natural := 64;
-    DISC_PKT_CNT_WIDTH : natural := 64;
-    DISC_BTS_CNT_WIDTH : natural := 64;
+        -- Actual width of packet and byte counters
+        RECV_PKT_CNT_WIDTH : natural := 64;
+        RECV_BTS_CNT_WIDTH : natural := 64;
+        DISC_PKT_CNT_WIDTH : natural := 64;
+        DISC_BTS_CNT_WIDTH : natural := 64;
 
-    -- Width of pointers to data buffers specifying the depth of the
-    -- internal buffers in the :ref:`tx_dma_calypte_trans_buffer`.
-    DATA_POINTER_WIDTH    : natural := 14;
-    -- Width of a virtual DMA header pointer since the buffer is established by a single
-    -- FIFO shared among multiple channels. This pointer is to determine the depth of the FIFO.
-    DMA_HDR_POINTER_WIDTH : natural := 9;
+        -- Width of pointers to data buffers specifying the depth of the
+        -- internal buffers in the :ref:`tx_dma_calypte_trans_buffer`.
+        DATA_POINTER_WIDTH    : natural := 14;
+        -- Width of a virtual DMA header pointer since the buffer is established by a single
+        -- FIFO shared among multiple channels. This pointer is to determine the depth of the FIFO.
+        DMA_HDR_POINTER_WIDTH : natural := 9;
 
-    -- * Maximum size of a packet (in bytes)
-    -- * Defines width of Packet length signals.
-    PKT_SIZE_MAX       : natural := 2**12;
+        -- * Maximum size of a packet (in bytes)
+        -- * Defines width of Packet length signals.
+        PKT_SIZE_MAX       : natural := 2**12;
 
-    -- Width of MI bus
-    MI_WIDTH           : natural := 32
-);
-port (
-    CLK                  : in  std_logic;
-    RESET                : in  std_logic;
+        -- Width of MI bus
+        MI_WIDTH           : natural := 32
+    );
+    port (
+        CLK                  : in  std_logic;
+        RESET                : in  std_logic;
 
-    -- =============================================================================================
-    -- MI interface for SW access
-    -- =============================================================================================
-    MI_ADDR              : in  std_logic_vector(MI_WIDTH-1 downto 0);
-    MI_DWR               : in  std_logic_vector(MI_WIDTH-1 downto 0);
-    MI_BE                : in  std_logic_vector(MI_WIDTH/8-1 downto 0);
-    MI_RD                : in  std_logic;
-    MI_WR                : in  std_logic;
-    MI_DRD               : out std_logic_vector(MI_WIDTH-1 downto 0);
-    MI_ARDY              : out std_logic;
-    MI_DRDY              : out std_logic;
+        -- =============================================================================================
+        -- MI interface for SW access
+        -- =============================================================================================
+        MI_ADDR              : in  std_logic_vector(MI_WIDTH-1 downto 0);
+        MI_DWR               : in  std_logic_vector(MI_WIDTH-1 downto 0);
+        MI_BE                : in  std_logic_vector(MI_WIDTH/8-1 downto 0);
+        MI_RD                : in  std_logic;
+        MI_WR                : in  std_logic;
+        MI_DRD               : out std_logic_vector(MI_WIDTH-1 downto 0);
+        MI_ARDY              : out std_logic;
+        MI_DRDY              : out std_logic;
 
-    -- =============================================================================================
-    -- Packet counter increment interface
-    -- =============================================================================================
-    PKT_SENT_CHAN        : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    PKT_SENT_INC         : in  std_logic;
-    PKT_SENT_BYTES       : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
-    PKT_DISCARD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    PKT_DISCARD_INC      : in  std_logic;
-    PKT_DISCARD_BYTES    : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
+        -- =============================================================================================
+        -- Packet counter increment interface
+        -- =============================================================================================
+        PKT_SENT_CHAN        : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        PKT_SENT_INC         : in  std_logic;
+        PKT_SENT_BYTES       : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
+        PKT_DISCARD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        PKT_DISCARD_INC      : in  std_logic;
+        PKT_DISCARD_BYTES    : in  std_logic_vector(log2(PKT_SIZE_MAX+1)-1 downto 0);
 
-    -- =============================================================================================
-    -- Channel status interface
-    --
-    -- To signal initiation of a start/stop routine to other components
-    -- =============================================================================================
-    START_REQ_CHAN       : out std_logic_vector(log2(CHANNELS)-1 downto 0);
-    START_REQ_VLD        : out std_logic;
-    START_REQ_ACK        : in  std_logic;
+        -- =============================================================================================
+        -- Channel status interface
+        --
+        -- To signal initiation of a start/stop routine to other components
+        -- =============================================================================================
+        START_REQ_CHAN       : out std_logic_vector(log2(CHANNELS)-1 downto 0);
+        START_REQ_VLD        : out std_logic;
+        START_REQ_ACK        : in  std_logic;
 
-    STOP_REQ_CHAN        : out std_logic_vector(log2(CHANNELS)-1 downto 0);
-    STOP_REQ_VLD         : out std_logic;
-    STOP_REQ_ACK         : in  std_logic; --logic request one CLK delay between VLD request and ACK reponse
+        STOP_REQ_CHAN        : out std_logic_vector(log2(CHANNELS)-1 downto 0);
+        STOP_REQ_VLD         : out std_logic;
+        STOP_REQ_ACK         : in  std_logic; -- logic request one CLK delay between VLD request and ACK reponse
 
-    -- Mask of active channels
-    ENABLED_CHAN         : out std_logic_vector(CHANNELS-1 downto 0);
+        -- Mask of active channels
+        ENABLED_CHAN         : out std_logic_vector(CHANNELS-1 downto 0);
 
-    -- =============================================================================================
-    -- Pointer update interface
-    --
-    -- To update pointer values in the C/S registers
-    -- =============================================================================================
-    HDP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    HDP_WR_DATA     : in  std_logic_vector(DATA_POINTER_WIDTH-1 downto 0);
-    HDP_WR_EN       : in  std_logic;
-    HHP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
-    HHP_WR_DATA     : in  std_logic_vector(DMA_HDR_POINTER_WIDTH-1 downto 0);
-    HHP_WR_EN       : in  std_logic
-);
+        -- =============================================================================================
+        -- Pointer update interface
+        --
+        -- To update pointer values in the C/S registers
+        -- =============================================================================================
+        HDP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        HDP_WR_DATA     : in  std_logic_vector(DATA_POINTER_WIDTH-1 downto 0);
+        HDP_WR_EN       : in  std_logic;
+        HHP_WR_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
+        HHP_WR_DATA     : in  std_logic_vector(DMA_HDR_POINTER_WIDTH-1 downto 0);
+        HHP_WR_EN       : in  std_logic
+    );
 end entity;
 
 architecture FULL of TX_DMA_SW_MANAGER is
@@ -422,7 +422,7 @@ architecture FULL of TX_DMA_SW_MANAGER is
         R_SENT_BYTES_LOW  => minimum(MI_WIDTH, RECV_BTS_CNT_WIDTH),
         R_SENT_BYTES_HIGH => max(0, RECV_BTS_CNT_WIDTH-MI_WIDTH),
         R_DISC_PKTS_LOW   => minimum(MI_WIDTH,DISC_PKT_CNT_WIDTH),
-        R_DISC_PKTS_HIGH  => max(0,DISC_PKT_CNT_WIDTH-MI_WIDTH)  ,
+        R_DISC_PKTS_HIGH  => max(0,DISC_PKT_CNT_WIDTH-MI_WIDTH),
         R_DISC_BYTES_LOW  => minimum(MI_WIDTH,DISC_BTS_CNT_WIDTH),
         R_DISC_BYTES_HIGH => max(0,DISC_BTS_CNT_WIDTH-MI_WIDTH)
         );
@@ -504,10 +504,10 @@ architecture FULL of TX_DMA_SW_MANAGER is
     constant RD_PORTS_MAX : natural := max(RD_PORTS);
 
     -- Returns True when given address is an address of a register with STROBE enabled
-    function isStrobeAddr(addr : integer) return boolean is
+    function isstrobeaddr (addr : integer) return boolean is
     begin
         for i in 0 to REGS-1 loop
-            if (STROBE_EN(i) and R_ADDRS(i)=addr) then
+            if (STROBE_EN(i) and R_ADDRS(i) = addr) then
                 return true;
             end if;
         end loop;
@@ -518,16 +518,16 @@ architecture FULL of TX_DMA_SW_MANAGER is
     -- =====================================================================
     --  MI PIPE
     -- =====================================================================
-    signal piped_MI_ADDR : std_logic_vector(MI_WIDTH-1 downto 0);
-    signal piped_MI_DWR  : std_logic_vector(MI_WIDTH-1 downto 0);
-    signal piped_MI_BE   : std_logic_vector(MI_WIDTH/8-1 downto 0);
-    signal piped_MI_RD   : std_logic;
-    signal piped_MI_WR   : std_logic;
-    signal piped_MI_DRD  : std_logic_vector(MI_WIDTH-1 downto 0);
-    signal piped_MI_ARDY : std_logic;
-    signal piped_MI_DRDY : std_logic;
+    signal piped_mi_addr : std_logic_vector(MI_WIDTH-1 downto 0);
+    signal piped_mi_dwr  : std_logic_vector(MI_WIDTH-1 downto 0);
+    signal piped_mi_be   : std_logic_vector(MI_WIDTH/8-1 downto 0);
+    signal piped_mi_rd   : std_logic;
+    signal piped_mi_wr   : std_logic;
+    signal piped_mi_drd  : std_logic_vector(MI_WIDTH-1 downto 0);
+    signal piped_mi_ardy : std_logic;
+    signal piped_mi_drdy : std_logic;
 
-    signal piped_MI_DWR_reg : std_logic_vector(MI_WIDTH-1 downto 0);
+    signal piped_mi_dwr_reg : std_logic_vector(MI_WIDTH-1 downto 0);
     -- =====================================================================
 
 
@@ -535,10 +535,10 @@ architecture FULL of TX_DMA_SW_MANAGER is
     --  MI interface logic
     -- =====================================================================
     signal mi_chan      : std_logic_vector(log2(CHANNELS)-1 downto 0);
-    signal mi_chanI     : integer                                       := 0;
+    signal mi_chani     : integer                                       := 0;
     signal mi_chan_reg  : std_logic_vector(log2(CHANNELS)-1 downto 0);
     signal mi_reg_addr  : std_logic_vector(REG_ADDR_WIDTH-1 downto 0);
-    signal mi_reg_addrI : integer                                       := 0;
+    signal mi_reg_addri : integer                                       := 0;
     -- =====================================================================
 
 
@@ -577,8 +577,8 @@ architecture FULL of TX_DMA_SW_MANAGER is
     --  DMA Channel probing register
     -- =====================================================================
     signal active_chan_reg  : std_logic_vector(log2(CHANNELS)-1 downto 0);
-    signal active_chan_regU : unsigned        (log2(CHANNELS)-1 downto 0)   := (others => '0'); -- This register has no reset
-    signal active_chan_regI : integer                                       := 0;
+    signal active_chan_regu : unsigned        (log2(CHANNELS)-1 downto 0)   := (others => '0'); -- This register has no reset
+    signal active_chan_regi : integer                                       := 0;
     -- =====================================================================
 
 
@@ -597,7 +597,7 @@ architecture FULL of TX_DMA_SW_MANAGER is
     -- =====================================================================
     --  Stop request logic
     -- =====================================================================
-    type stop_fsm_type is (IDLE, WAIT_FOR_REQ_ACK, DELAY_FOR_DSP_1, DELAY_FOR_DSP_2, WAIT_FOR_POINTERS, WAIT_FOR_STATUS_UPDATE);
+    type   stop_fsm_type is (IDLE, WAIT_FOR_REQ_ACK, DELAY_FOR_DSP_1, DELAY_FOR_DSP_2, WAIT_FOR_POINTERS, WAIT_FOR_STATUS_UPDATE);
     signal stop_fsm_pst : stop_fsm_type;
     signal stop_fsm_nst : stop_fsm_type;
 
@@ -652,7 +652,7 @@ begin
     -- hhp_to_compare <= reg_dob_opt(R_HHP)(1)(DMA_HDR_POINTER_WIDTH -1 downto 0);
     -- shp_to_compare <= reg_dob_opt(R_SHP)(1)(DMA_HDR_POINTER_WIDTH -1 downto 0);
 
-    assert (MI_WIDTH=32)
+    assert (MI_WIDTH = 32)
         report "ERROR: RX DMA Software Manager: MI_WIDTH ("&to_string(MI_WIDTH)&") must be 32b!"
         severity failure;
 
@@ -662,39 +662,39 @@ begin
     -- Added for better timing.
 
     mi_pipe_i : entity work.MI_PIPE
-        generic map(
-            DATA_WIDTH => MI_WIDTH,
-            ADDR_WIDTH => MI_WIDTH,
-            META_WIDTH => 0,
-            PIPE_TYPE  => "SHREG",
-            USE_OUTREG => TRUE,
-            FAKE_PIPE  => FALSE,
-            DEVICE     => DEVICE
-            )
-        port map (
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH => MI_WIDTH,
+        ADDR_WIDTH => MI_WIDTH,
+        META_WIDTH => 0,
+        PIPE_TYPE  => "SHREG",
+        USE_OUTREG => TRUE,
+        FAKE_PIPE  => FALSE,
+        DEVICE     => DEVICE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            IN_DWR  => MI_DWR,
-            IN_MWR  => (others => '0'),
-            IN_ADDR => MI_ADDR,
-            IN_BE   => MI_BE,
-            IN_RD   => MI_RD,
-            IN_WR   => MI_WR,
-            IN_ARDY => MI_ARDY,
-            IN_DRD  => MI_DRD,
-            IN_DRDY => MI_DRDY,
+        IN_DWR  => MI_DWR,
+        IN_MWR  => (others => '0'),
+        IN_ADDR => MI_ADDR,
+        IN_BE   => MI_BE,
+        IN_RD   => MI_RD,
+        IN_WR   => MI_WR,
+        IN_ARDY => MI_ARDY,
+        IN_DRD  => MI_DRD,
+        IN_DRDY => MI_DRDY,
 
-            OUT_DWR  => piped_MI_DWR,
-            OUT_MWR  => open,
-            OUT_ADDR => piped_MI_ADDR,
-            OUT_BE   => piped_MI_BE,
-            OUT_RD   => piped_MI_RD,
-            OUT_WR   => piped_MI_WR,
-            OUT_ARDY => piped_MI_ARDY,
-            OUT_DRD  => piped_MI_DRD,
-            OUT_DRDY => piped_MI_DRDY
-            );
+        OUT_DWR  => piped_mi_dwr,
+        OUT_MWR  => open,
+        OUT_ADDR => piped_mi_addr,
+        OUT_BE   => piped_mi_be,
+        OUT_RD   => piped_mi_rd,
+        OUT_WR   => piped_mi_wr,
+        OUT_ARDY => piped_mi_ardy,
+        OUT_DRD  => piped_mi_drd,
+        OUT_DRDY => piped_mi_drdy
+    );
     -- =====================================================================
 
 
@@ -703,11 +703,11 @@ begin
     -- =====================================================================
     -- Extract part of MI address which determines destination DMA Channel
     -- the destination DMA channel is specified within bits with the highest order
-    mi_chan      <= piped_MI_ADDR(REG_ADDR_WIDTH+log2(CHANNELS)-1 downto REG_ADDR_WIDTH);
-    mi_chanI     <= to_integer(unsigned(mi_chan));
+    mi_chan      <= piped_mi_addr(REG_ADDR_WIDTH+log2(CHANNELS)-1 downto REG_ADDR_WIDTH);
+    mi_chani     <= to_integer(unsigned(mi_chan));
     -- Extract part of MI address which determines destination register
-    mi_reg_addr  <= piped_MI_ADDR(REG_ADDR_WIDTH-1 downto 0);
-    mi_reg_addrI <= to_integer(unsigned(mi_reg_addr));
+    mi_reg_addr  <= piped_mi_addr(REG_ADDR_WIDTH-1 downto 0);
+    mi_reg_addri <= to_integer(unsigned(mi_reg_addr));
 
     mi_chan_reg_pr : process (CLK)
     begin
@@ -721,32 +721,32 @@ begin
     begin
         if (rising_edge(CLK)) then
 
-            piped_MI_DRD <= (others => '0');
+            piped_mi_drd <= (others => '0');
 
-            if (RESET='1') then
-                piped_MI_DRDY <= '0';
+            if (RESET = '1') then
+                piped_mi_drdy <= '0';
             else
 
                 for i in 0 to REGS-1 loop
-                    if (mi_reg_addrI=R_ADDRS(i)) then
-                        piped_MI_DRD <= (others => '0');
+                    if (mi_reg_addri = R_ADDRS(i)) then
+                        piped_mi_drd <= (others => '0');
                         for e in 0 to MI_WIDTH/8-1 loop
-                            if (piped_MI_BE(e)='1') then
+                            if (piped_mi_be(e) = '1') then
                                 -- preparing data to read in every time
                                 -- piped_MI_BE in specified byte euqals 1
-                                piped_MI_DRD((e+1)*8-1 downto e*8) <= reg_dob_opt(i)(0)((e+1)*8-1 downto e*8);
+                                piped_mi_drd((e+1)*8-1 downto e*8) <= reg_dob_opt(i)(0)((e+1)*8-1 downto e*8);
                             end if;
                         end loop;
                     end if;
                 end loop;
 
-                piped_MI_DRDY <= piped_MI_RD;
+                piped_mi_drdy <= piped_mi_rd;
 
             end if;
         end if;
     end process;
 
-    piped_MI_ARDY <= piped_MI_RD or piped_MI_WR;
+    piped_mi_ardy <= piped_mi_rd or piped_mi_wr;
     -- =====================================================================
 
 
@@ -760,14 +760,14 @@ begin
 
             -- Generate just one NP_LUTRAM for each MI transaction
             reg_i : entity work.NP_LUTRAM
-            generic map(
+            generic map (
                 DATA_WIDTH  => MI_WIDTH,
                 ITEMS       => CHANNELS,
                 WRITE_PORTS => WR_PORTS(i),
                 READ_PORTS  => RD_PORTS(i),
                 DEVICE      => DEVICE
             )
-            port map(
+            port map (
                 WCLK  => CLK,
                 DI    => reg_di   (i)(WR_PORTS(i)-1 downto 0),
                 WE    => reg_we   (i)(WR_PORTS(i)-1 downto 0),
@@ -781,12 +781,12 @@ begin
                 -- Reset registers by writing 0
                 -- Sample registers from counters by writing 1
                 -- Reset and sample old value at the same time by writing 2
-                with unsigned(piped_MI_DWR_reg) select reg_di (i)(0) <=
+                with unsigned(piped_mi_dwr_reg) select reg_di (i)(0) <=
                     (others => '0') when to_unsigned(0, MI_WIDTH),
-                    cntr_do(i)      when others;
+                    cntr_do(i) when others;
 
                 -- reading is performed one clock cycle earlier than the writing
-                reg_we   (i)(0) <= '1' when cntr_rd_reg='1' or cntr_rst_reg='1' else '0';
+                reg_we   (i)(0) <= '1' when cntr_rd_reg = '1' or cntr_rst_reg = '1' else '0';
                 reg_addra(i)(0) <= mi_chan_reg;
                 reg_addrb(i)(0) <= mi_chan;
 
@@ -794,8 +794,8 @@ begin
 
                 wr_en_gen : if (WR_EN(i)) generate
                     -- Connect MI to the 0th write port of the register
-                    reg_di   (i)(0) <= piped_MI_DWR;
-                    reg_we   (i)(0) <= '1' when (piped_MI_WR='1' and mi_reg_addrI=R_ADDRS(i)) else '0';
+                    reg_di   (i)(0) <= piped_mi_dwr;
+                    reg_we   (i)(0) <= '1' when (piped_mi_wr = '1' and mi_reg_addri = R_ADDRS(i)) else '0';
                     reg_addra(i)(0) <= mi_chan;
 
                 end generate;
@@ -836,7 +836,7 @@ begin
     -- Status register -----------------
     -- Write '1' when start is detected
     -- Write '0' when acknowledged stop is detected
-    reg_di   (R_STATUS)(0) <= (0 => '1', others => '0') when (start_acked='1' and RESET = '0') else (others => '0');
+    reg_di   (R_STATUS)(0) <= (0 => '1', others => '0') when (start_acked = '1' and RESET = '0') else (others => '0');
     reg_we   (R_STATUS)(0) <= start_acked or stop_acked or RESET;
     reg_addra(R_STATUS)(0) <= active_chan_reg;
     ------------------------------------
@@ -871,14 +871,14 @@ begin
     --  Counters logic
     -- =====================================================================
     pkt_sent_cnt_i : entity work.CNT_MULTI_MEMX
-    generic map(
+    generic map (
         DEVICE        => DEVICE,
         CHANNELS      => CHANNELS,
         CNT_WIDTH     => RECV_PKT_CNT_WIDTH,
         INC_WIDTH     => 1,
         INC_FIFO_SIZE => 512
     )
-    port map(
+    port map (
         CLK     => CLK,
         RESET   => RESET,
 
@@ -887,7 +887,7 @@ begin
         INC_VLD => PKT_SENT_INC,
         INC_RDY => open, -- If it overflows, it overflows
 
-        RST_CH  => mi_chan ,
+        RST_CH  => mi_chan,
         RST_VLD => cntr_rst,
 
         RD_CH   => mi_chan,
@@ -896,14 +896,14 @@ begin
     );
 
     bts_sent_cnt_i : entity work.CNT_MULTI_MEMX
-    generic map(
+    generic map (
         DEVICE        => DEVICE,
         CHANNELS      => CHANNELS,
         CNT_WIDTH     => RECV_BTS_CNT_WIDTH,
         INC_WIDTH     => log2(PKT_SIZE_MAX+1),
         INC_FIFO_SIZE => 512
     )
-    port map(
+    port map (
         CLK     => CLK,
         RESET   => RESET,
 
@@ -921,23 +921,23 @@ begin
     );
 
     pkt_disc_cnt_i : entity work.CNT_MULTI_MEMX
-    generic map(
-        DEVICE        => DEVICE            ,
-        CHANNELS      => CHANNELS          ,
+    generic map (
+        DEVICE        => DEVICE,
+        CHANNELS      => CHANNELS,
         CNT_WIDTH     => DISC_PKT_CNT_WIDTH,
-        INC_WIDTH     => 1                 ,
+        INC_WIDTH     => 1,
         INC_FIFO_SIZE => 512
     )
-    port map(
-        CLK     => CLK  ,
+    port map (
+        CLK     => CLK,
         RESET   => RESET,
 
-        INC_CH  => PKT_DISCARD_CHAN   ,
-        INC_VAL => (others => '1')    ,
-        INC_VLD => PKT_DISCARD_INC    ,
-        INC_RDY => open               , -- If it overflows, it overflows
+        INC_CH  => PKT_DISCARD_CHAN,
+        INC_VAL => (others => '1'),
+        INC_VLD => PKT_DISCARD_INC,
+        INC_RDY => open, -- If it overflows, it overflows
 
-        RST_CH  => mi_chan ,
+        RST_CH  => mi_chan,
         RST_VLD => cntr_rst,
 
         RD_CH   => mi_chan,
@@ -946,23 +946,23 @@ begin
     );
 
     bts_disc_cnt_i : entity work.CNT_MULTI_MEMX
-    generic map(
-        DEVICE        => DEVICE              ,
-        CHANNELS      => CHANNELS            ,
-        CNT_WIDTH     => DISC_BTS_CNT_WIDTH  ,
+    generic map (
+        DEVICE        => DEVICE,
+        CHANNELS      => CHANNELS,
+        CNT_WIDTH     => DISC_BTS_CNT_WIDTH,
         INC_WIDTH     => log2(PKT_SIZE_MAX+1),
         INC_FIFO_SIZE => 512
     )
-    port map(
-        CLK     => CLK  ,
+    port map (
+        CLK     => CLK,
         RESET   => RESET,
 
-        INC_CH  => PKT_DISCARD_CHAN   ,
-        INC_VAL => PKT_DISCARD_BYTES  ,
-        INC_VLD => PKT_DISCARD_INC    ,
-        INC_RDY => open               , -- If it overflows, it overflows
+        INC_CH  => PKT_DISCARD_CHAN,
+        INC_VAL => PKT_DISCARD_BYTES,
+        INC_VLD => PKT_DISCARD_INC,
+        INC_RDY => open, -- If it overflows, it overflows
 
-        RST_CH  => mi_chan ,
+        RST_CH  => mi_chan,
         RST_VLD => cntr_rst,
 
         RD_CH   => mi_chan,
@@ -971,9 +971,9 @@ begin
     );
 
     -- Reset when writing value 0 or 2 to any of the Strobing registers
-    cntr_rst <= '1' when (piped_MI_WR='1' and isStrobeAddr(mi_reg_addrI) and (unsigned(piped_MI_DWR)=0 or unsigned(piped_MI_DWR)=2)) else '0';
+    cntr_rst <= '1' when (piped_mi_wr = '1' and isstrobeaddr(mi_reg_addri) and (unsigned(piped_mi_dwr) = 0 or unsigned(piped_mi_dwr) = 2)) else '0';
     -- Read when writing value 1 or 2 to any of the Strobing registers
-    cntr_rd  <= '1' when (piped_MI_WR='1' and isStrobeAddr(mi_reg_addrI) and (unsigned(piped_MI_DWR)=1 or unsigned(piped_MI_DWR)=2)) else '0';
+    cntr_rd  <= '1' when (piped_mi_wr = '1' and isstrobeaddr(mi_reg_addri) and (unsigned(piped_mi_dwr) = 1 or unsigned(piped_mi_dwr) = 2)) else '0';
 
     cntr_rstrd_reg_pr : process (CLK)
     begin
@@ -984,7 +984,7 @@ begin
             -- by the registers below
             cntr_rst_reg     <= cntr_rst;
             cntr_rd_reg      <= cntr_rd;
-            piped_MI_DWR_reg <= piped_MI_DWR;
+            piped_mi_dwr_reg <= piped_mi_dwr;
         end if;
     end process;
 
@@ -995,22 +995,22 @@ begin
         cntr_do <= (others => (others => '0'));
 
         cntr_do(R_SENT_PKTS_LOW) <= std_logic_vector(resize_left(unsigned(pkt_sent_counter),MI_WIDTH));
-        if (RECV_PKT_CNT_WIDTH>MI_WIDTH) then
+        if (RECV_PKT_CNT_WIDTH > MI_WIDTH) then
             cntr_do(R_SENT_PKTS_HIGH) <= std_logic_vector(resize_left(enlarge_right(unsigned(pkt_sent_counter),-MI_WIDTH),MI_WIDTH));
         end if;
 
         cntr_do(R_SENT_BYTES_LOW) <= std_logic_vector(resize_left(unsigned(bts_sent_counter),MI_WIDTH));
-        if (RECV_BTS_CNT_WIDTH>MI_WIDTH) then
+        if (RECV_BTS_CNT_WIDTH > MI_WIDTH) then
             cntr_do(R_SENT_BYTES_HIGH) <= std_logic_vector(resize_left(enlarge_right(unsigned(bts_sent_counter),-MI_WIDTH),MI_WIDTH));
         end if;
 
         cntr_do(R_DISC_PKTS_LOW) <= std_logic_vector(resize_left(unsigned(pkt_disc_counter),MI_WIDTH));
-        if (DISC_PKT_CNT_WIDTH>MI_WIDTH) then
+        if (DISC_PKT_CNT_WIDTH > MI_WIDTH) then
             cntr_do(R_DISC_PKTS_HIGH) <= std_logic_vector(resize_left(enlarge_right(unsigned(pkt_disc_counter),-MI_WIDTH),MI_WIDTH));
         end if;
 
         cntr_do(R_DISC_BYTES_LOW) <= std_logic_vector(resize_left(unsigned(bts_disc_counter),MI_WIDTH));
-        if (DISC_BTS_CNT_WIDTH>MI_WIDTH) then
+        if (DISC_BTS_CNT_WIDTH > MI_WIDTH) then
             cntr_do(R_DISC_BYTES_HIGH) <= std_logic_vector(resize_left(enlarge_right(unsigned(bts_disc_counter),-MI_WIDTH),MI_WIDTH));
         end if;
 
@@ -1025,12 +1025,12 @@ begin
     active_chan_reg_pr : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            active_chan_regU <= active_chan_regU+1;
+            active_chan_regu <= active_chan_regu+1;
         end if;
     end process;
 
-    active_chan_reg  <= std_logic_vector(active_chan_regU);
-    active_chan_regI <=       to_integer(active_chan_regU);
+    active_chan_reg  <= std_logic_vector(active_chan_regu);
+    active_chan_regi <=       to_integer(active_chan_regu);
 
     -- reading from registers
     reg_addrb(R_CONTROL)(1) <= active_chan_reg;
@@ -1050,8 +1050,8 @@ begin
             enabled_chan_set <= (others => '0');
 
             -- Set new start pending request (and propagate request to output)
-            if (start_pending_reg_vld='0') then
-                if (reg_dob_opt(R_CONTROL)(1)(0)='1' and reg_dob_opt(R_STATUS)(1)(0)='0') then
+            if (start_pending_reg_vld = '0') then
+                if (reg_dob_opt(R_CONTROL)(1)(0) = '1' and reg_dob_opt(R_STATUS)(1)(0) = '0') then
                     start_pending_reg_chan  <= active_chan_reg;
                     start_pending_reg_vld   <= '1';
                     start_pending_reg_acked <= '0';
@@ -1063,19 +1063,19 @@ begin
             end if;
 
             -- Accept Acknowledge for Start request
-            if (start_pending_reg_vld='1') then
-                if (START_REQ_ACK='1') then
+            if (start_pending_reg_vld = '1') then
+                if (START_REQ_ACK = '1') then
                     start_pending_reg_acked <= '1';
                 end if;
             end if;
 
             -- Clear after acknowledge propagation to Status register
-            if (start_acked='1') then
+            if (start_acked = '1') then
                 start_pending_reg_vld               <= '0';
-                enabled_chan_set(active_chan_regI)  <= '1';
+                enabled_chan_set(active_chan_regi)  <= '1';
             end if;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 start_pending_reg_vld   <= '0';
                 START_REQ_VLD           <= '0';
             end if;
@@ -1083,14 +1083,14 @@ begin
     end process;
 
     -- Detect Start acknowledgement propagation to Status Register
-    start_acked <= '1' when start_pending_reg_vld='1' and start_pending_reg_acked='1' and start_pending_reg_chan=active_chan_reg else '0';
+    start_acked <= '1' when start_pending_reg_vld = '1' and start_pending_reg_acked = '1' and start_pending_reg_chan = active_chan_reg else '0';
     -- =====================================================================
 
 
     -- =====================================================================
     --  Stop request logic
     -- =====================================================================
-    stop_fsm_pst_reg_p : process(CLK)
+    stop_fsm_pst_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
 
@@ -1148,7 +1148,7 @@ begin
             when WAIT_FOR_STATUS_UPDATE =>
 
                 if (stop_chan_ok = '1') then
-                    stop_fsm_nst <= IDLE;
+                    stop_fsm_nst                                                 <= IDLE;
                     stop_acked                                                   <= '1';
                     enabled_chan_rst(to_integer(unsigned(stop_fsm_channel_reg))) <= '1';
                 end if;
@@ -1189,15 +1189,15 @@ begin
 
     -- DSP comparator for HDP
     dsp_comp_hdp_i : entity work.DSP_COMPARATOR
-    generic map(
+    generic map (
         INPUT_DATA_WIDTH => DATA_POINTER_WIDTH,
         INPUT_REGS_EN    => true,
         DEVICE           => DEVICE,
         MODE             => "><="
     )
     port map (
-        CLK      => CLK  ,
-        CLK_EN   => '1'  ,
+        CLK      => CLK,
+        CLK_EN   => '1',
         RESET    => RESET,
 
         INPUT_1  => reg_dob_opt(R_HDP)(1)(DATA_POINTER_WIDTH-1 downto 0),
@@ -1212,15 +1212,15 @@ begin
 
     -- DSP comparator for HHP
     dsp_comp_hhp_i : entity work.DSP_COMPARATOR
-    generic map(
+    generic map (
         INPUT_DATA_WIDTH => DMA_HDR_POINTER_WIDTH,
         INPUT_REGS_EN    => true,
         DEVICE           => DEVICE,
         MODE             => "><="
     )
     port map (
-        CLK      => CLK  ,
-        CLK_EN   => '1'  ,
+        CLK      => CLK,
+        CLK_EN   => '1',
         RESET    => RESET,
 
         INPUT_1  => reg_dob_opt(R_HHP)(1)(DMA_HDR_POINTER_WIDTH-1 downto 0),

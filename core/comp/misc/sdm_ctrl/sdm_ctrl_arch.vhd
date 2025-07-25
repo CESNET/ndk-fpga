@@ -47,7 +47,7 @@ architecture FULL of SDM_CTRL is
 
     constant MC_ERR_CODE_WIDTH : natural := 11;
 
-    type chip_id_state is (
+    type   chip_id_state is (
         IDLE,                  -- held during RESET signal active
         SEND_CMD,              -- write get_chipid command to Mailbox Client
         READ_ISR,              -- poll interrupt status register
@@ -77,7 +77,7 @@ architecture FULL of SDM_CTRL is
     signal res_header_err     : std_logic;
     signal res_header_err_reg : std_logic;
 
-    signal chip_id_reg        : std_logic_vector(64-1 downto 0) := x"DEADDEADDEADDEAD";
+    signal chip_id_reg        : std_logic_vector(64-1 downto 0) := X"DEADDEADDEADDEAD";
 
     signal retry_cnt          : std_logic_vector(2-1 downto 0);
     signal retry_stop         : std_logic;
@@ -89,7 +89,7 @@ begin
     read_chip_id_g: if READ_CHIP_ID = true generate
 
         -- chip_id reading: state register
-        chip_id_state_reg_p: process (CLK)
+        chip_id_state_reg_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 if (RESET = '1') then
@@ -101,7 +101,7 @@ begin
         end process;
 
         -- chip_id reading: second state register
-        chip_id_state_reg_reg_p: process (CLK)
+        chip_id_state_reg_reg_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 if (RESET = '1') then
@@ -113,7 +113,7 @@ begin
         end process;
 
         -- chip_id reading: next state logic
-        chip_id_n_state_logic_p: process (all)
+        chip_id_n_state_logic_p : process (all)
         begin
             n_state <= p_state;
             case p_state is
@@ -221,7 +221,7 @@ begin
         end process;
 
         -- chip_id reading: state signals
-        chip_id_signals_logic_p: process(all)
+        chip_id_signals_logic_p : process (all)
         begin
             mc_offset     <= (others => '0');
             mc_wr         <= '0';
@@ -285,7 +285,7 @@ begin
         end process;
 
         -- chip_id reading: auxiliary data registers
-        chip_id_data_reg_p: process (CLK)
+        chip_id_data_reg_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 mc_drd_reg         <= mc_drd;
@@ -298,7 +298,7 @@ begin
         res_fill         <= mc_drd(DATA_WIDTH-1 downto 2);
         res_fill_vld     <= or res_fill;
         res_fill_reg_vld <= or res_fill_reg;
-        res_fill_reg_p: process (CLK)
+        res_fill_reg_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 if (p_state = READ_RES_FILL_SOP) then
@@ -312,7 +312,7 @@ begin
         res_header_err <= or mc_drd(MC_ERR_CODE_WIDTH-1 downto 0);
 
         -- chip_id reading: chip_id LSW and MSW data register
-        chip_id_reg_p: process (CLK)
+        chip_id_reg_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 CHIP_ID_VLD <= chip_id_done;
@@ -334,7 +334,7 @@ begin
 
         -- chip_id reading: retry counter
         retry_stop <= and retry_cnt;
-        retry_cnt_p: process (CLK)
+        retry_cnt_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 if (RESET = '1') then
@@ -361,13 +361,13 @@ begin
 
     -- MI to Avalon MM interface converter
     mi2avmm_i : entity work.MI2AVMM
-    generic map(
+    generic map (
         DATA_WIDTH => DATA_WIDTH,
         ADDR_WIDTH => ADDR_WIDTH,
         META_WIDTH => 1,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         CLK                => CLK,
         RESET              => RESET,
 

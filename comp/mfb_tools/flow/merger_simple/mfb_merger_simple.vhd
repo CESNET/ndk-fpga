@@ -24,7 +24,7 @@ use work.math_pack.all;
 -- If there are no valid data on the other input, it stays on the current one
 -- and waits for the same number of clock cycles before checking again.
 entity MFB_MERGER_SIMPLE is
-    Generic (
+    generic (
         -- Number of Regions in a data word.
         REGIONS         : natural := 2;
         -- Number of Blocks in a Region.
@@ -40,7 +40,7 @@ entity MFB_MERGER_SIMPLE is
         -- Maximum amount of clock periods with destination ready before it tries to switch to the other input.
         CNT_MAX         : integer := 64
     );
-    Port (
+    port (
         -- =====================================================================
         -- Clock and Reset
         -- =====================================================================
@@ -126,29 +126,29 @@ architecture BEHAVIORAL of MFB_MERGER_SIMPLE is
     signal mux_addr             : std_logic;
     signal mux_addr_change_to_0 : std_logic;
     signal mux_addr_change_to_1 : std_logic;
-    signal sof0_masked          : std_logic; -- signals whether sof0 has been masked or not
-    signal sof1_masked          : std_logic; -- signals whether sof1 has been masked or not
-    signal sof0_masked_reg      : std_logic; -- signal conserves last value of sof0_masked
-    signal sof1_masked_reg      : std_logic; -- signal conserves last value of sof1_masked
+    signal sof0_masked          : std_logic;                            -- signals whether sof0 has been masked or not
+    signal sof1_masked          : std_logic;                            -- signals whether sof1 has been masked or not
+    signal sof0_masked_reg      : std_logic;                            -- signal conserves last value of sof0_masked
+    signal sof1_masked_reg      : std_logic;                            -- signal conserves last value of sof1_masked
     signal masked_sof0_rx_dly   : std_logic_vector(REGIONS-1 downto 0); -- sof0_rx_dly after masking process, may not be masked at all
     signal masked_sof1_rx_dly   : std_logic_vector(REGIONS-1 downto 0); -- sof1_rx_dly after masking process, may not be masked at all
     signal masked_eof0_rx_dly   : std_logic_vector(REGIONS-1 downto 0); -- eof0_rx_dly after masking process, may not be masked at all
     signal masked_eof1_rx_dly   : std_logic_vector(REGIONS-1 downto 0); -- eof1_rx_dly after masking process, may not be masked at all
-    signal sof0_to_be_masked    : std_logic; -- signals whether sof will have to be masked or not
-    signal sof1_to_be_masked    : std_logic; -- signals whether sof will have to be masked or not
-    signal pkt_cnt              : unsigned(log2(CNT_MAX)-1 downto 0); -- after some changes this signal does not count packets but incremets every clock cycle when dst_rdy_tx is asserted
+    signal sof0_to_be_masked    : std_logic;                            -- signals whether sof will have to be masked or not
+    signal sof1_to_be_masked    : std_logic;                            -- signals whether sof will have to be masked or not
+    signal pkt_cnt              : unsigned(log2(CNT_MAX)-1 downto 0);   -- after some changes this signal does not count packets but incremets every clock cycle when dst_rdy_tx is asserted
     signal pkt_cnt_reached      : std_logic;
-    signal src_not_rdy          : std_logic; -- is true when the counter reaches its limit and the other input has src_rdy deasserted
-    signal cnt_rst              : std_logic; -- reset of the counter
-    signal inc_pkt0             : std_logic_vector(REGIONS downto 0); -- incomplete packet in this data word
-    signal inc_pkt1             : std_logic_vector(REGIONS downto 0); -- incomplete packet in this data word
-    signal sw_right_now0        : std_logic; -- signals whether it is possibe to switch from one input to other input right now
-    signal sw_right_now1        : std_logic; -- signals whether it is possibe to switch from one input to other input right now
+    signal src_not_rdy          : std_logic;                            -- is true when the counter reaches its limit and the other input has src_rdy deasserted
+    signal cnt_rst              : std_logic;                            -- reset of the counter
+    signal inc_pkt0             : std_logic_vector(REGIONS downto 0);   -- incomplete packet in this data word
+    signal inc_pkt1             : std_logic_vector(REGIONS downto 0);   -- incomplete packet in this data word
+    signal sw_right_now0        : std_logic;                            -- signals whether it is possibe to switch from one input to other input right now
+    signal sw_right_now1        : std_logic;                            -- signals whether it is possibe to switch from one input to other input right now
 
     -- state signals for FSM
-    type state is (sel0, sel1, mask_sof0, mask_sof1, mask_eof0, mask_eof1);
-    signal present_st           : state := sel0;
-    signal next_st              : state := sel0;
+    type   state is (SEL0, SEL1, MASK_SOF0, MASK_SOF1, MASK_EOF0, MASK_EOF1);
+    signal present_st           : state := SEL0;
+    signal next_st              : state := SEL0;
 
     -- output signals
     signal data_tx              : std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -195,7 +195,7 @@ begin
                 sof_pos0_rx_dly    <= RX_MFB0_SOF_POS;
                 eof_pos0_rx_dly    <= RX_MFB0_EOF_POS;
             end if;
-        end if ;
+        end if;
     end process;
 
     reg_src_rdy1_p : process (CLK)
@@ -203,7 +203,7 @@ begin
         if (rising_edge(CLK)) then
             if (RST = '1') then
                 src_rdy1_rx_dly <= '0';
-            elsif dst_rdy1_rx = '1' then
+            elsif (dst_rdy1_rx = '1') then
                 src_rdy1_rx_dly <= RX_MFB1_SRC_RDY;
             end if;
         end if;
@@ -220,7 +220,7 @@ begin
                 sof_pos1_rx_dly <= RX_MFB1_SOF_POS;
                 eof_pos1_rx_dly <= RX_MFB1_EOF_POS;
             end if;
-        end if ;
+        end if;
     end process;
 
     pkt_cnt_reached <= '0' when pkt_cnt < (CNT_MAX-1) else '1';
@@ -270,7 +270,7 @@ begin
     end process;
 
     sof0_to_be_masked <= inc_pkt0(REGIONS) and (or eof0_rx) and src_rdy0_rx;
-    sw_right_now0 <= (not inc_pkt0(0) and (or eof0_rx_dly) and src_rdy0_rx_dly) or (not inc_pkt0(0) and not src_rdy0_rx_dly);
+    sw_right_now0     <= (not inc_pkt0(0) and (or eof0_rx_dly) and src_rdy0_rx_dly) or (not inc_pkt0(0) and not src_rdy0_rx_dly);
 
     inc_pkt1_g : for i in 0 to REGIONS-1 generate
         inc_pkt1(i+1) <= (sof1_rx(i) and not eof1_rx(i) and not inc_pkt1(i)) or
@@ -290,7 +290,7 @@ begin
     end process;
 
     sof1_to_be_masked <= inc_pkt1(REGIONS) and (or eof1_rx) and src_rdy1_rx;
-    sw_right_now1 <= (not inc_pkt1(0) and (or eof1_rx_dly) and src_rdy1_rx_dly) or (not inc_pkt1(0) and not src_rdy1_rx_dly);
+    sw_right_now1     <= (not inc_pkt1(0) and (or eof1_rx_dly) and src_rdy1_rx_dly) or (not inc_pkt1(0) and not src_rdy1_rx_dly);
 
     -- ============================
     -- masking processes
@@ -298,7 +298,7 @@ begin
     -- the correct (masked or not masked) sof and eof signals, that are here generated, are later tranferred to the output according to address
     masking0_p : process (all)
     begin
-        if (present_st = mask_sof0) then
+        if (present_st = MASK_SOF0) then
             masked_sof0_rx_dly <= sof0_rx_dly;
             masked_eof0_rx_dly <= eof0_rx_dly;
             mask_sof0_l : for i in REGIONS-1 downto 0 loop
@@ -307,7 +307,7 @@ begin
                     exit;
                 end if;
             end loop;
-        elsif (present_st = mask_eof0) then
+        elsif (present_st = MASK_EOF0) then
             masked_sof0_rx_dly <= (others => '0');
             masked_eof0_rx_dly <= (others => '0');
             mask_eof0_l : for i in REGIONS-1 downto 0 loop
@@ -324,7 +324,7 @@ begin
 
     masking1_p : process (all)
     begin
-        if (present_st = mask_sof1) then
+        if (present_st = MASK_SOF1) then
             masked_sof1_rx_dly <= sof1_rx_dly;
             masked_eof1_rx_dly <= eof1_rx_dly;
             mask_sof1_l : for i in REGIONS-1 downto 0 loop
@@ -333,7 +333,7 @@ begin
                     exit;
                 end if;
             end loop;
-        elsif (present_st = mask_eof1) then
+        elsif (present_st = MASK_EOF1) then
             masked_sof1_rx_dly <= (others => '0');
             masked_eof1_rx_dly <= (others => '0');
             mask_eof1_l : for i in REGIONS-1 downto 0 loop
@@ -370,7 +370,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RST = '1') then
-                present_st <= sel0;
+                present_st <= SEL0;
             elsif (dst_rdy_tx = '1') then
                 present_st <= next_st;
             end if;
@@ -386,51 +386,51 @@ begin
     begin
         case present_st is
 
-            when sel0 =>
+            when SEL0 =>
                 if ((mux_addr_change_to_1 = '1') and (sof1_masked = '0') and (sw_right_now0 = '1')) then
-                    next_st <= sel1;
+                    next_st <= SEL1;
                 elsif ((mux_addr_change_to_1 = '1') and (sof0_to_be_masked = '1') and MASKING_EN) then
-                    next_st <= mask_sof0;
+                    next_st <= MASK_SOF0;
                 elsif ((mux_addr_change_to_1 = '1') and (sof1_masked = '1') and (sw_right_now0 = '1') and MASKING_EN) then
-                    next_st <= mask_eof1;
+                    next_st <= MASK_EOF1;
                 else
-                    next_st <= sel0;
+                    next_st <= SEL0;
                 end if;
 
-            when sel1 =>
+            when SEL1 =>
                 if ((mux_addr_change_to_0 = '1') and (sof0_masked = '0') and (sw_right_now1 = '1')) then
-                    next_st <= sel0;
+                    next_st <= SEL0;
                 elsif ((mux_addr_change_to_0 = '1') and (sof1_to_be_masked = '1') and MASKING_EN) then
-                    next_st <= mask_sof1;
-                elsif ((mux_addr_change_to_0  = '1') and (sof0_masked  = '1') and (sw_right_now1 = '1') and MASKING_EN) then
-                    next_st <= mask_eof0;
+                    next_st <= MASK_SOF1;
+                elsif ((mux_addr_change_to_0 = '1') and (sof0_masked = '1') and (sw_right_now1 = '1') and MASKING_EN) then
+                    next_st <= MASK_EOF0;
                 else
-                    next_st <= sel1;
+                    next_st <= SEL1;
                 end if;
 
-            when mask_sof0 =>
+            when MASK_SOF0 =>
 
                 if (sof1_masked = '0') then
-                    next_st <= sel1;
+                    next_st <= SEL1;
                 else
-                    next_st <= mask_eof1;
+                    next_st <= MASK_EOF1;
                 end if;
 
-            when mask_sof1 =>
+            when MASK_SOF1 =>
                 if (sof0_masked = '0') then
-                    next_st <= sel0;
+                    next_st <= SEL0;
                 else
-                    next_st <= mask_eof0;
+                    next_st <= MASK_EOF0;
                 end if;
 
-            when mask_eof0 =>
-                next_st <= sel0;
+            when MASK_EOF0 =>
+                next_st <= SEL0;
 
-            when mask_eof1 =>
-                next_st <= sel1;
+            when MASK_EOF1 =>
+                next_st <= SEL1;
 
             when others =>
-                next_st <= sel0;
+                next_st <= SEL0;
 
         end case;
     end process;
@@ -448,61 +448,61 @@ begin
 
         case present_st is
             -- in this state the data form input 0 are transferred to the output
-            when sel0 =>
+            when SEL0 =>
                 mux_addr    <= '0';
                 src_rdy_tx  <= src_rdy0_rx_dly;
                 dst_rdy0_rx <= dst_rdy_tx or not src_rdy0_rx_dly;
-                dst_rdy1_rx <= not src_rdy1_rx_dly; -- or '0'
+                dst_rdy1_rx <= not src_rdy1_rx_dly;                                                      -- or '0'
                 sof0_masked <= sof0_masked_reg;
                 sof1_masked <= sof1_masked_reg;
                 cnt_rst     <= '0';
                 if ((dst_rdy_tx = '1') and (mux_addr_change_to_1 = '1') and (sw_right_now0 = '1') ) then
                     cnt_rst <= '1';
-                end if ;
+                end if;
             -- in this state the data form input 1 are transferred to the output
-            when sel1 =>
+            when SEL1 =>
                 mux_addr    <= '1';
                 src_rdy_tx  <= src_rdy1_rx_dly;
-                dst_rdy0_rx <= not src_rdy0_rx_dly; -- or '0'
+                dst_rdy0_rx <= not src_rdy0_rx_dly;                                                      -- or '0'
                 dst_rdy1_rx <= dst_rdy_tx or not src_rdy1_rx_dly;
                 sof0_masked <= sof0_masked_reg;
                 sof1_masked <= sof1_masked_reg;
                 cnt_rst     <= '0';
                 if ((dst_rdy_tx = '1') and (mux_addr_change_to_0 = '1') and (sw_right_now1 = '1')) then
                     cnt_rst <= '1';
-                end if ;
+                end if;
             -- in this state the last data word is transferred form input 0 to output with the incomplete packet being masked
-            when mask_sof0 =>
+            when MASK_SOF0 =>
                 mux_addr    <= '0';
                 src_rdy_tx  <= src_rdy0_rx_dly;
                 dst_rdy0_rx <= '0';
-                dst_rdy1_rx <= not src_rdy1_rx_dly; -- or '0'
+                dst_rdy1_rx <= not src_rdy1_rx_dly;                                                      -- or '0'
                 sof0_masked <= '1';
                 sof1_masked <= sof1_masked_reg;
                 cnt_rst     <= '1';
             -- in this state the last data word is transferred form input 1 to output with the incomplete packet being masked
-            when mask_sof1 =>
+            when MASK_SOF1 =>
                 mux_addr    <= '1';
                 src_rdy_tx  <= src_rdy0_rx_dly;
-                dst_rdy0_rx <= not src_rdy0_rx_dly; -- or '0'
+                dst_rdy0_rx <= not src_rdy0_rx_dly;                                                      -- or '0'
                 dst_rdy1_rx <= '0';
                 sof0_masked <= sof0_masked_reg;
                 sof1_masked <= '1';
                 cnt_rst     <= '1';
             -- in this state the input has been switched form 1 to 0 and only the incomplete part of packet that were previously masked is sent
-            when mask_eof0 =>
+            when MASK_EOF0 =>
                 mux_addr    <= '0';
                 src_rdy_tx  <= src_rdy0_rx_dly;
                 dst_rdy0_rx <= dst_rdy_tx or not src_rdy0_rx_dly;
-                dst_rdy1_rx <= not src_rdy1_rx_dly; -- or '0'
+                dst_rdy1_rx <= not src_rdy1_rx_dly;                                                      -- or '0'
                 sof0_masked <= '0';
                 sof1_masked <= sof1_masked_reg;
                 cnt_rst     <= '1';
             -- in this state the input has been switched form 0 to 1 and only the incomplete part of packet that were previously masked is sent
-            when mask_eof1 =>
+            when MASK_EOF1 =>
                 mux_addr    <= '1';
                 src_rdy_tx  <= src_rdy1_rx_dly;
-                dst_rdy0_rx <= not src_rdy0_rx_dly; -- or '0'
+                dst_rdy0_rx <= not src_rdy0_rx_dly;                                                      -- or '0'
                 dst_rdy1_rx <= dst_rdy_tx or not src_rdy1_rx_dly;
                 sof0_masked <= sof0_masked_reg;
                 sof1_masked <= '0';
@@ -531,7 +531,7 @@ begin
                   eof_pos1_rx_dly;
 
 
-    reg_out_data_p : process(CLK)
+    reg_out_data_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (dst_rdy_tx = '1') then

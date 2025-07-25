@@ -38,7 +38,7 @@ entity RX_DMA_CALYPTE_TRANS_BUFFER is
         RX_REGION_SIZE : integer := 1;
         RX_BLOCK_SIZE  : integer := 4*8;
         RX_ITEM_WIDTH  : integer := 8
-        );
+    );
 
     port (
         CLK : in std_logic;
@@ -68,7 +68,7 @@ entity RX_DMA_CALYPTE_TRANS_BUFFER is
         TX_MFB_EOF     : out std_logic;
         TX_MFB_SRC_RDY : out std_logic;
         TX_MFB_DST_RDY : in  std_logic
-        );
+    );
 
 end entity;
 
@@ -79,7 +79,7 @@ architecture FULL of RX_DMA_CALYPTE_TRANS_BUFFER is
     -- Buffer depth in the amount of buffered MFB words, each of size (RX_MFB_DATA'length)
     constant BUFFER_DEPTH : positive := BUFFERED_DATA_SIZE/(RX_REGION_SIZE*RX_BLOCK_SIZE);
 
-    type packing_fsm_state_t is (S_IDLE, S_PACKING, S_WAIT);
+    type   packing_fsm_state_t is (S_IDLE, S_PACKING, S_WAIT);
     signal packing_fsm_pst : packing_fsm_state_t := S_IDLE;
     signal packing_fsm_nst : packing_fsm_state_t := S_IDLE;
 
@@ -285,21 +285,23 @@ begin
         -- Output register FIFO for throughput improvement
         -- =============================================================================================
         reg_fifo_i : entity work.REG_FIFO
-            generic map (
-                DATA_WIDTH => FIFO_TX_DATA_WIDTH,
-                ITEMS      => 1,
-                FAKE_FIFO  => not REG_OUT_EN)
-            port map (
-                CLK => CLK,
-                RST => RST,
+        generic map (
+            DATA_WIDTH => FIFO_TX_DATA_WIDTH,
+            ITEMS      => 1,
+            FAKE_FIFO  => not REG_OUT_EN
+        )
+        port map (
+            CLK => CLK,
+            RST => RST,
 
-                RX_DATA    => slv_array_ser(rx_mfb_data_reg_pst) & rx_mfb_sof_reg_pst(0) & (or rx_mfb_eof_reg_pst) & std_logic_vector(recalc_eof_pos_pst),
-                RX_SRC_RDY => buff_tx_mfb_src_rdy_pst,
-                RX_DST_RDY => fifo_rx_mfb_dst_rdy,
+            RX_DATA    => slv_array_ser(rx_mfb_data_reg_pst) & rx_mfb_sof_reg_pst(0) & (or rx_mfb_eof_reg_pst) & std_logic_vector(recalc_eof_pos_pst),
+            RX_SRC_RDY => buff_tx_mfb_src_rdy_pst,
+            RX_DST_RDY => fifo_rx_mfb_dst_rdy,
 
-                TX_DATA    => fifo_tx_mfb_data,
-                TX_SRC_RDY => TX_MFB_SRC_RDY,
-                TX_DST_RDY => TX_MFB_DST_RDY);
+            TX_DATA    => fifo_tx_mfb_data,
+            TX_SRC_RDY => TX_MFB_SRC_RDY,
+            TX_DST_RDY => TX_MFB_DST_RDY
+        );
 
         TX_MFB_DATA    <= fifo_tx_mfb_data(FIFO_TX_DATA_WIDTH -1 downto 1 + 1 + recalc_eof_pos_nst'length);
         TX_MFB_SOF     <= fifo_tx_mfb_data(1 + 1 + recalc_eof_pos_nst'length -1);

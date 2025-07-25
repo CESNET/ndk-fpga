@@ -12,10 +12,10 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_TIMESTAMP is
-    generic(
+    generic (
         REGIONS : natural := 4 -- any possitive value
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -55,7 +55,7 @@ begin
         begin
             if (rising_edge(CLK)) then
                 TS_DATA((r+1)*65-1 downto r*65) <= TSU_TS_NS & TSU_TS_DV;
-                TS_VLD(r)  <= RX_EOF(r);
+                TS_VLD(r)                       <= RX_EOF(r);
             end if;
         end process;
     end generate;

@@ -15,7 +15,7 @@ use work.type_pack.all;
 --                            Entity declaration
 -- =====================================================================
 entity MVB_TCAM is
-    Generic (
+    generic (
         -- Number of MVB items in word
         MVB_ITEMS          : natural := 4;
 
@@ -72,7 +72,7 @@ entity MVB_TCAM is
         ITEMS_ALIGNED      : natural := tsel(USE_FRAGMENTED_MEM, div_roundup(ITEMS,MEMORY_DATA_WIDTH)*ALIGNED_DATA_WIDTH, ITEMS);
         ADDR_WIDTH         : natural := max(1, log2(ITEMS_ALIGNED))
     );
-    Port (
+    port (
         -- CLOCK AND RESET
         CLK                : in  std_logic;
         RESET              : in  std_logic;

@@ -13,7 +13,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MFB_SPEED_METER_MI is
-    generic(
+    generic (
         -- MFB CONFIGURATION
         -- =================
         REGIONS          : natural := 2;
@@ -42,7 +42,7 @@ entity MFB_SPEED_METER_MI is
         MI_DATA_WIDTH    : natural := 32;
         MI_ADDRESS_WIDTH : natural := 32
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK        : in  std_logic;
         RST        : in  std_logic;
@@ -95,7 +95,7 @@ begin
         CLK             => CLK,
         RST             => RST,
 
-        --MFB interface
+        -- MFB interface
         RX_SOF_POS      => RX_SOF_POS,
         RX_EOF_POS      => RX_EOF_POS,
         RX_SOF          => RX_SOF,

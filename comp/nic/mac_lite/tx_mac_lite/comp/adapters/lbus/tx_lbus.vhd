@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_ADAPTER_LBUS is
-    generic(
+    generic (
         -- REGIONS must be 1
         REGIONS     : natural := 1;
         -- REGION_SIZE must be 8
@@ -22,7 +22,7 @@ entity TX_MAC_LITE_ADAPTER_LBUS is
         -- Select correct FPGA device.
         DEVICE      : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK            : in  std_logic;
         RESET          : in  std_logic;
@@ -90,7 +90,7 @@ begin
     -- -------------------------------------------------------------------------
 
     mfb_to_lbus_reconf_i : entity work.MFB_TO_LBUS_RECONF
-    port map(
+    port map (
         CLK        => CLK,
         RST        => RESET,
 
@@ -129,7 +129,7 @@ begin
     end process;
 
     mfb_aux_i : entity work.MFB_AUXILIARY_SIGNALS
-    generic map(
+    generic map (
         REGIONS        => REGIONS,
         REGION_SIZE    => SEGMENTS,
         BLOCK_SIZE     => 16,
@@ -139,7 +139,7 @@ begin
         BLOCK_AUX_EN   => true,
         ITEM_AUX_EN    => false
     )
-    port map(
+    port map (
         CLK              => CLK,
         RESET            => RESET,
 
@@ -173,7 +173,7 @@ begin
 
     align_mfb_dst_rdy <= lbus_rdy_reg;
 
-    process(CLK)
+    process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then

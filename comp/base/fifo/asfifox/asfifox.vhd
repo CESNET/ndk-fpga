@@ -11,15 +11,15 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 
 -- pragma translate_off
-library XPM;
-use XPM.vcomponents.all;
+library xpm;
+use xpm.vcomponents.all;
 -- pragma translate_on
 
 -- A universal asynchronous (dual clock) FIFO, suitable both for Xilinx and Intel
 -- (Altera) FPGA. Can be parametrically implemented in BRAM or LUTRAM (MLAB on
 -- Intel FPGA = 32 items, distributed memory in Xilinx FPGA = 64 items).
 entity ASFIFOX is
-    generic(
+    generic (
         -- Data word width in bits.
         DATA_WIDTH          : natural := 512;
         -- FIFO depth in number of data words, must be a power of two!
@@ -55,7 +55,7 @@ entity ASFIFOX is
         -- ( ``currently_stored <= ALMOST_EMPTY_OFFSET`` )
         ALMOST_EMPTY_OFFSET : natural := ITEMS/2
     );
-    port(
+    port (
         -- =====================================================================
         --  WRITE INTERFACE
         -- =====================================================================
@@ -106,53 +106,53 @@ entity ASFIFOX is
     );
 end entity;
 
-architecture behavioral of ASFIFOX is
+architecture BEHAVIORAL of ASFIFOX is
 
-    component xpm_memory_sdpram
-    generic (
-        MEMORY_SIZE             : integer := 2048           ;
-        MEMORY_PRIMITIVE        : string  := "auto"         ;
-        CLOCKING_MODE           : string  := "common_clock" ;
-        ECC_MODE                : string  := "no_ecc"       ;
-        MEMORY_INIT_FILE        : string  := "none"         ;
-        MEMORY_INIT_PARAM       : string  := ""             ;
-        USE_MEM_INIT            : integer := 1              ;
-        WAKEUP_TIME             : string  := "disable_sleep";
-        AUTO_SLEEP_TIME         : integer := 0              ;
-        MESSAGE_CONTROL         : integer := 0              ;
-        USE_EMBEDDED_CONSTRAINT : integer := 0              ;
-        MEMORY_OPTIMIZATION     : string  := "true";
-        CASCADE_HEIGHT          : integer := 0               ;
-        SIM_ASSERT_CHK          : integer := 0               ;
-        WRITE_DATA_WIDTH_A      : integer := 32 ;
-        BYTE_WRITE_WIDTH_A      : integer := 32 ;
-        ADDR_WIDTH_A            : integer := 6  ;
-        RST_MODE_A              : string  := "SYNC";
-        READ_DATA_WIDTH_B       : integer := 32          ;
-        ADDR_WIDTH_B            : integer := 6           ;
-        READ_RESET_VALUE_B      : string  := "0"         ;
-        READ_LATENCY_B          : integer := 2           ;
-        WRITE_MODE_B            : string  := "no_change" ;
-        RST_MODE_B              : string  := "SYNC"
-    );
-    port (
-        sleep          : in  std_logic;
-        clka           : in  std_logic;
-        ena            : in  std_logic;
-        wea            : in  std_logic_vector((WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A)-1 downto 0);
-        addra          : in  std_logic_vector(ADDR_WIDTH_A-1 downto 0);
-        dina           : in  std_logic_vector(WRITE_DATA_WIDTH_A-1 downto 0);
-        injectsbiterra : in  std_logic;
-        injectdbiterra : in  std_logic;
-        clkb           : in  std_logic;
-        rstb           : in  std_logic;
-        enb            : in  std_logic;
-        regceb         : in  std_logic;
-        addrb          : in  std_logic_vector(ADDR_WIDTH_B-1 downto 0);
-        doutb          : out std_logic_vector(READ_DATA_WIDTH_B-1 downto 0);
-        sbiterrb       : out std_logic;
-        dbiterrb       : out std_logic
-    );
+    component xpm_memory_sdpram is
+        generic (
+            MEMORY_SIZE             : integer := 2048;
+            MEMORY_PRIMITIVE        : string  := "auto";
+            CLOCKING_MODE           : string  := "common_clock";
+            ECC_MODE                : string  := "no_ecc";
+            MEMORY_INIT_FILE        : string  := "none";
+            MEMORY_INIT_PARAM       : string  := "";
+            USE_MEM_INIT            : integer := 1;
+            WAKEUP_TIME             : string  := "disable_sleep";
+            AUTO_SLEEP_TIME         : integer := 0;
+            MESSAGE_CONTROL         : integer := 0;
+            USE_EMBEDDED_CONSTRAINT : integer := 0;
+            MEMORY_OPTIMIZATION     : string  := "true";
+            CASCADE_HEIGHT          : integer := 0;
+            SIM_ASSERT_CHK          : integer := 0;
+            WRITE_DATA_WIDTH_A      : integer := 32;
+            BYTE_WRITE_WIDTH_A      : integer := 32;
+            ADDR_WIDTH_A            : integer := 6;
+            RST_MODE_A              : string  := "SYNC";
+            READ_DATA_WIDTH_B       : integer := 32;
+            ADDR_WIDTH_B            : integer := 6;
+            READ_RESET_VALUE_B      : string  := "0";
+            READ_LATENCY_B          : integer := 2;
+            WRITE_MODE_B            : string  := "no_change";
+            RST_MODE_B              : string  := "SYNC"
+        );
+        port (
+            SLEEP          : in  std_logic;
+            CLKA           : in  std_logic;
+            ENA            : in  std_logic;
+            WEA            : in  std_logic_vector((WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A)-1 downto 0);
+            ADDRA          : in  std_logic_vector(ADDR_WIDTH_A-1 downto 0);
+            DINA           : in  std_logic_vector(WRITE_DATA_WIDTH_A-1 downto 0);
+            INJECTSBITERRA : in  std_logic;
+            INJECTDBITERRA : in  std_logic;
+            CLKB           : in  std_logic;
+            RSTB           : in  std_logic;
+            ENB            : in  std_logic;
+            REGCEB         : in  std_logic;
+            ADDRB          : in  std_logic_vector(ADDR_WIDTH_B-1 downto 0);
+            DOUTB          : out std_logic_vector(READ_DATA_WIDTH_B-1 downto 0);
+            SBITERRB       : out std_logic;
+            DBITERRB       : out std_logic
+        );
     end component;
 
     constant MEM_ADDR_WIDTH : natural := log2(ITEMS);
@@ -206,30 +206,30 @@ architecture behavioral of ASFIFOX is
     signal rd_status_uns       : unsigned(log2(ITEMS) downto 0);
 
     attribute preserve : boolean;
-    attribute preserve of rd_addr_cnt_mem: signal is true;
+    attribute preserve of rd_addr_cnt_mem : signal is true;
 
 begin
 
     arst <= RD_RST or WR_RST;
 
     wr_arst_i : entity work.ASYNC_RESET
-    generic map(
-       TWO_REG => false
+    generic map (
+        TWO_REG => false
     )
-    port map(
-       CLK        => WR_CLK,
-       ASYNC_RST  => arst,
-       OUT_RST(0) => wr_arst
+    port map (
+        CLK        => WR_CLK,
+        ASYNC_RST  => arst,
+        OUT_RST(0) => wr_arst
     );
 
     rd_arst_i : entity work.ASYNC_RESET
-    generic map(
-       TWO_REG => false
+    generic map (
+        TWO_REG => false
     )
-    port map(
-       CLK        => RD_CLK,
-       ASYNC_RST  => arst,
-       OUT_RST(0) => rd_arst
+    port map (
+        CLK        => RD_CLK,
+        ASYNC_RST  => arst,
+        OUT_RST(0) => rd_arst
     );
 
     fwft_mode_on_g : if FWFT_MODE generate
@@ -249,12 +249,12 @@ begin
 
     sdp_bram_g : if (RAM_TYPE = "BRAM") or (RAM_TYPE = "AUTO") generate
         sdp_bram_i : entity work.SDP_BRAM_BEHAV
-        generic map(
+        generic map (
             DATA_WIDTH => DATA_WIDTH,
             ITEMS      => ITEMS,
             OUTPUT_REG => False
         )
-        port map(
+        port map (
             WR_CLK      => WR_CLK,
             WR_ADDR     => wr_addr_mem,
             WR_EN       => write_allow,
@@ -274,13 +274,13 @@ begin
     sdp_lutram_g : if (RAM_TYPE = "LUT") generate
         device_g : if (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") generate
             -- use Xilinx XPM macro with embedded constraints (UG974)
-            sdp_lutram_xilinx_i : xpm_memory_sdpram
+            sdp_lutram_xilinx_i : component xpm_memory_sdpram
             generic map (
                 ADDR_WIDTH_A            => MEM_ADDR_WIDTH,
                 ADDR_WIDTH_B            => MEM_ADDR_WIDTH,
                 AUTO_SLEEP_TIME         => 0,
                 BYTE_WRITE_WIDTH_A      => DATA_WIDTH,
-              --CASCADE_HEIGHT          => 0, -- not compatible with Vivado 2018 and older
+                -- CASCADE_HEIGHT          => 0, -- not compatible with Vivado 2018 and older
                 CLOCKING_MODE           => "independent_clock",
                 ECC_MODE                => "no_ecc",
                 MEMORY_INIT_FILE        => "none",
@@ -292,9 +292,9 @@ begin
                 READ_DATA_WIDTH_B       => DATA_WIDTH,
                 READ_LATENCY_B          => 1,
                 READ_RESET_VALUE_B      => "0",
-              --RST_MODE_A              => "SYNC", -- not compatible with Vivado 2018 and older
-              --RST_MODE_B              => "SYNC", -- not compatible with Vivado 2018 and older
-              --SIM_ASSERT_CHK          => 1, -- not compatible with Vivado 2018 and older
+                -- RST_MODE_A              => "SYNC", -- not compatible with Vivado 2018 and older
+                -- RST_MODE_B              => "SYNC", -- not compatible with Vivado 2018 and older
+                -- SIM_ASSERT_CHK          => 1, -- not compatible with Vivado 2018 and older
                 USE_EMBEDDED_CONSTRAINT => 1,
                 USE_MEM_INIT            => 0,
                 WAKEUP_TIME             => "disable_sleep",
@@ -413,7 +413,7 @@ begin
     end process;
 
     wr_addr_cnt_next <= wr_addr_cnt + write_allow;
-    wr_addr_mem <= std_logic_vector(wr_addr_cnt(MEM_ADDR_WIDTH-1 downto 0));
+    wr_addr_mem      <= std_logic_vector(wr_addr_cnt(MEM_ADDR_WIDTH-1 downto 0));
 
     -- -------------------------------------------------------------------------
     --  WRITE ADDRESS TO GRAY CODE CONVERSION
@@ -430,11 +430,11 @@ begin
     -- -------------------------------------------------------------------------
 
     wr_addr_gray_synced_i : entity work.ASYNC_OPEN_LOOP_SMD
-    generic map(
+    generic map (
         DATA_WIDTH => ADDR_WIDTH,
         ASYNC_RST  => True
     )
-    port map(
+    port map (
         ACLK     => WR_CLK,
         ARST     => wr_arst,
         ADATAIN  => wr_addr_gray,
@@ -508,11 +508,11 @@ begin
     -- -------------------------------------------------------------------------
 
     rd_addr_gray_synced_i : entity work.ASYNC_OPEN_LOOP_SMD
-    generic map(
+    generic map (
         DATA_WIDTH => ADDR_WIDTH,
         ASYNC_RST  => True
     )
-    port map(
+    port map (
         ACLK     => RD_CLK,
         ARST     => rd_arst,
         ADATAIN  => rd_addr_gray,
@@ -580,11 +580,11 @@ begin
 
     out_reg_valids <= ram_vld_reg2 & ram_vld_reg;
 
-    with out_reg_valids select
-    out_reg_status_uns <= "10" when "11",
-                          "01" when "01",
-                          "01" when "10",
-                          "00" when others;
+    with out_reg_valids select out_reg_status_uns <=
+        "10" when "11",
+        "01" when "01",
+        "01" when "10",
+        "00" when others;
 
     rd_status_uns <= (wr_addr_synced_reg - rd_addr_cnt) + out_reg_status_uns;
     RD_STATUS     <= std_logic_vector(rd_status_uns);

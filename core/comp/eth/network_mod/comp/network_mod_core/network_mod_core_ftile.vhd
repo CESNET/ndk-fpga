@@ -19,14 +19,14 @@ architecture FULL of NETWORK_MOD_CORE is
     --                        COMPONENTS - PLL and f-tile
     -- =========================================================================
     -- 400g1
-	component ftile_pll is
+    component ftile_pll is
         port (
-            out_systempll_synthlock_0 : out std_logic;        -- out_systempll_synthlock
-            out_systempll_clk_0       : out std_logic;        -- clk
-            out_refclk_fgt_0          : out std_logic;        -- clk
-            in_refclk_fgt_0           : in  std_logic := 'X'  -- in_refclk_fgt_0
+            OUT_SYSTEMPLL_SYNTHLOCK_0 : out std_logic;
+            OUT_SYSTEMPLL_CLK_0       : out std_logic;
+            OUT_REFCLK_FGT_0          : out std_logic;
+            IN_REFCLK_FGT_0           : in  std_logic := 'X'
         );
-    end component ftile_pll;
+    end component;
 
     -- =========================================================================
     --                               FUNCTIONS
@@ -183,7 +183,7 @@ architecture FULL of NETWORK_MOD_CORE is
     signal qsfp_tx_n_sig : slv_array_t(ETH_PORT_CHAN-1 downto 0)(LANES_PER_CHANNEL-1 downto 0); -- QSFP XCVR TX Data
 
     signal ftile_clk_out_vec      : std_logic_vector(ETH_PORT_CHAN-1 downto 0); -- in case of multiple IP cores, only one is chosen
-    signal ftile_clk_out          : std_logic; -- drives i_clk_rx and i_clk_tx of one or more other IP cores
+    signal ftile_clk_out          : std_logic;                                  -- drives i_clk_rx and i_clk_tx of one or more other IP cores
 
     signal ftile_pll_clk          : std_logic;
     signal ftile_pll_refclk       : std_logic;
@@ -214,74 +214,74 @@ architecture FULL of NETWORK_MOD_CORE is
 
     signal adap_rx_mfb_dst_rdy    : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
-    begin
+begin
 
-        mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
-        generic map(
-            ADDR_WIDTH  => MI_ADDR_WIDTH_PHY,
-            DATA_WIDTH  => MI_DATA_WIDTH_PHY,
-            META_WIDTH  => 0,
-            PORTS       => MI_ADDR_BASES_PHY,
-            PIPE_OUT    => (others => true),
-            PIPE_TYPE   => "REG",
-            ADDR_BASES  => MI_ADDR_BASES_PHY,
-            ADDR_BASE   => mi_addr_base_init_phy_f,
-            DEVICE      => DEVICE
-        )
-        port map(
-            CLK     => MI_CLK_PHY,
-            RESET   => MI_RESET_PHY,
+    mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
+    generic map (
+        ADDR_WIDTH  => MI_ADDR_WIDTH_PHY,
+        DATA_WIDTH  => MI_DATA_WIDTH_PHY,
+        META_WIDTH  => 0,
+        PORTS       => MI_ADDR_BASES_PHY,
+        PIPE_OUT    => (others => true),
+        PIPE_TYPE   => "REG",
+        ADDR_BASES  => MI_ADDR_BASES_PHY,
+        ADDR_BASE   => mi_addr_base_init_phy_f,
+        DEVICE      => DEVICE
+    )
+    port map (
+        CLK     => MI_CLK_PHY,
+        RESET   => MI_RESET_PHY,
 
-            RX_DWR  => MI_DWR_PHY,
-            RX_MWR  => (others => '0'),
-            RX_ADDR => MI_ADDR_PHY,
-            RX_BE   => MI_BE_PHY,
-            RX_RD   => MI_RD_PHY,
-            RX_WR   => MI_WR_PHY,
-            RX_ARDY => MI_ARDY_PHY,
-            RX_DRD  => MI_DRD_PHY,
-            RX_DRDY => MI_DRDY_PHY,
+        RX_DWR  => MI_DWR_PHY,
+        RX_MWR  => (others => '0'),
+        RX_ADDR => MI_ADDR_PHY,
+        RX_BE   => MI_BE_PHY,
+        RX_RD   => MI_RD_PHY,
+        RX_WR   => MI_WR_PHY,
+        RX_ARDY => MI_ARDY_PHY,
+        RX_DRD  => MI_DRD_PHY,
+        RX_DRDY => MI_DRDY_PHY,
 
-            TX_DWR  => split_mi_dwr_phy,
-            TX_MWR  => open,
-            TX_ADDR => split_mi_addr_phy,
-            TX_BE   => split_mi_be_phy,
-            TX_RD   => split_mi_rd_phy,
-            TX_WR   => split_mi_wr_phy,
-            TX_ARDY => split_mi_ardy_phy,
-            TX_DRD  => split_mi_drd_phy,
-            TX_DRDY => split_mi_drdy_phy
-        );
+        TX_DWR  => split_mi_dwr_phy,
+        TX_MWR  => open,
+        TX_ADDR => split_mi_addr_phy,
+        TX_BE   => split_mi_be_phy,
+        TX_RD   => split_mi_rd_phy,
+        TX_WR   => split_mi_wr_phy,
+        TX_ARDY => split_mi_ardy_phy,
+        TX_DRD  => split_mi_drd_phy,
+        TX_DRDY => split_mi_drdy_phy
+    );
 
-        -- =========================================================================
-        -- F-TILE PLL
-        -- =========================================================================
-        -- same pll for all IP cores default set to 830,156 MHz
-        ftile_pll_ip_i : component ftile_pll
-        port map (
-            out_systempll_synthlock_0 => open,
-            out_systempll_clk_0       => ftile_pll_clk,
-            out_refclk_fgt_0          => ftile_pll_refclk,
-            in_refclk_fgt_0           => QSFP_REFCLK_P
-        );
+    -- =========================================================================
+    -- F-TILE PLL
+    -- =========================================================================
+    -- same pll for all IP cores default set to 830,156 MHz
+    ftile_pll_ip_i : component ftile_pll
+    port map (
+        out_systempll_synthlock_0 => open,
+        out_systempll_clk_0       => ftile_pll_clk,
+        out_refclk_fgt_0          => ftile_pll_refclk,
+        in_refclk_fgt_0           => QSFP_REFCLK_P
+    );
 
-        -- devide input data to x lines serial lines
-        qsfp_rx_p_sig <= slv_array_deser(QSFP_RX_P, ETH_PORT_CHAN);
-        qsfp_rx_n_sig <= slv_array_deser(QSFP_RX_N, ETH_PORT_CHAN);
-        QSFP_TX_P     <= slv_array_ser(qsfp_tx_p_sig);
-        QSFP_TX_N     <= slv_array_ser(qsfp_tx_n_sig);
+    -- devide input data to x lines serial lines
+    qsfp_rx_p_sig <= slv_array_deser(QSFP_RX_P, ETH_PORT_CHAN);
+    qsfp_rx_n_sig <= slv_array_deser(QSFP_RX_N, ETH_PORT_CHAN);
+    QSFP_TX_P     <= slv_array_ser(qsfp_tx_p_sig);
+    QSFP_TX_N     <= slv_array_ser(qsfp_tx_n_sig);
 
-        ftile_clk_out <= ftile_clk_out_vec(0);
-        CLK_ETH       <= ftile_clk_out;
+    ftile_clk_out <= ftile_clk_out_vec(0);
+    CLK_ETH       <= ftile_clk_out;
 
-        -- generic for 400G 8 line line F-Tile IP core 1 time for one card
-        ftile_1x400g8_g : if ((ETH_PORT_SPEED = 400) and (EHIP_TYPE = 0))  generate
+    -- generic for 400G 8 line line F-Tile IP core 1 time for one card
+    ftile_1x400g8_g : if ((ETH_PORT_SPEED = 400) and (EHIP_TYPE = 0))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_1x400g8_i: entity work.FTILE_1x400G8
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            ftile_1x400g8_i: entity work.FTILE_1X400G8
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (0),
                 MI_ADDR                  => split_mi_addr_phy(0),
                 MI_RD                    => split_mi_rd_phy  (0),
@@ -321,16 +321,16 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate ftile_1x400g8_g;
+    end generate;
 
     -- generic for 200G 4 line F-Tile IP core 2 times for one card
     ftile_2x200g4_g : if ((ETH_PORT_SPEED = 200) and (EHIP_TYPE = 0))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            ftile_2x200g4_i: entity work.FTILE_2x200g4
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            ftile_2x200g4_i: entity work.FTILE_2X200G4
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (i),
                 MI_ADDR                  => split_mi_addr_phy(i),
                 MI_RD                    => split_mi_rd_phy  (i),
@@ -350,7 +350,7 @@ architecture FULL of NETWORK_MOD_CORE is
                 RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i),
                 RX_MACSI_MAC_FCS_ERROR   => ftile_rx_mac_fcs_error(i)(RX_MAC_FCS_ERROR_WIDTH-1 downto 0),
                 RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i),
-                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i)(24-1 downto 0)   ,
+                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i)(24-1 downto 0),
                 RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i),
 
                 TX_MACSI_ADAPT_DATA      => ftile_tx_adapt_data     (i),
@@ -370,16 +370,16 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate ftile_2x200g4_g;
+    end generate;
 
     -- generic for 100G 2 line F-Tile IP core 4 times for one card
     ftile_4x100g2_g : if (((ETH_PORT_SPEED = 100) and (EHIP_TYPE = 0)) and (ETH_PORT_CHAN = 4))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_4x100g2_i: entity work.FTILE_4x100g2
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            ftile_4x100g2_i: entity work.FTILE_4X100G2
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (i),
                 MI_ADDR                  => split_mi_addr_phy(i),
                 MI_RD                    => split_mi_rd_phy  (i),
@@ -394,13 +394,13 @@ architecture FULL of NETWORK_MOD_CORE is
                 QSFP_TX_N                => qsfp_tx_n_sig(i)(2-1 downto 0),
                 QSFP_RX_N                => qsfp_rx_n_sig(i)(2-1 downto 0),
 
-                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i)   ,
+                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i),
                 RX_MACSI_MAC_INFRAME     => ftile_rx_mac_inframe  (i)(MAC_INFRAME_WIDTH-1 downto 0),
-                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i)   ,
+                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i),
                 RX_MACSI_MAC_FCS_ERROR   => ftile_rx_mac_fcs_error(i)(RX_MAC_FCS_ERROR_WIDTH-1 downto 0),
-                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i)   ,
-                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i)   ,
-                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i)   ,
+                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i),
+                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i),
+                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i),
 
                 TX_MACSI_ADAPT_DATA      => ftile_tx_adapt_data     (i),
                 TX_MACSI_ADAPT_INFRAME   => ftile_tx_adapt_inframe  (i)(MAC_INFRAME_WIDTH-1 downto 0),
@@ -419,19 +419,19 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate ftile_4x100g2_g;
+    end generate;
 
     -- generic for 100G 4 line F-Tile IP core 2 times for one card
-    FTILE_MULTIRATE_ETH_2x100G4_g : if ((ETH_PORT_SPEED = 100) and (EHIP_TYPE = 1) and (ETH_PORT_CHAN = 2))  generate
+    ftile_multirate_eth_2x100g4_g : if ((ETH_PORT_SPEED = 100) and (EHIP_TYPE = 1) and (ETH_PORT_CHAN = 2))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-        FTILE_MULTIRATE_ETH_2x100G4_i: entity work.FTILE_MULTIRATE_ETH_2x100G4
-            generic map(
+            ftile_multirate_eth_2x100g4_i: entity work.FTILE_MULTIRATE_ETH_2X100G4
+            generic map (
                 IP_CNT => i
             )
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (i),
                 MI_ADDR                  => split_mi_addr_phy(i),
                 MI_RD                    => split_mi_rd_phy  (i),
@@ -446,13 +446,13 @@ architecture FULL of NETWORK_MOD_CORE is
                 QSFP_TX_N                => qsfp_tx_n_sig(i)(4-1 downto 0),
                 QSFP_RX_N                => qsfp_rx_n_sig(i)(4-1 downto 0),
 
-                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i)   ,
+                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i),
                 RX_MACSI_MAC_INFRAME     => ftile_rx_mac_inframe  (i)(MAC_INFRAME_WIDTH-1 downto 0),
-                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i)   ,
+                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i),
                 RX_MACSI_MAC_FCS_ERROR   => ftile_rx_mac_fcs_error(i)(RX_MAC_FCS_ERROR_WIDTH-1 downto 0),
-                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i)   ,
-                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i)   ,
-                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i)   ,
+                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i),
+                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i),
+                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i),
 
                 TX_MACSI_ADAPT_DATA      => ftile_tx_adapt_data     (i),
                 TX_MACSI_ADAPT_INFRAME   => ftile_tx_adapt_inframe  (i)(MAC_INFRAME_WIDTH-1 downto 0),
@@ -471,15 +471,15 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate FTILE_MULTIRATE_ETH_2x100G4_g;
+    end generate;
 
     -- generic for 100G 4 line F-Tile multirate IP core 2 times for one card
     ftile_2x100g4_g : if (((ETH_PORT_SPEED = 100) and (EHIP_TYPE = 0)) and (ETH_PORT_CHAN = 2))  generate
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_2x100g4_i: entity work.FTILE_2x100g4
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            ftile_2x100g4_i: entity work.FTILE_2X100G4
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (i),
                 MI_ADDR                  => split_mi_addr_phy(i),
                 MI_RD                    => split_mi_rd_phy  (i),
@@ -494,13 +494,13 @@ architecture FULL of NETWORK_MOD_CORE is
                 QSFP_TX_N                => qsfp_tx_n_sig(i)(4-1 downto 0),
                 QSFP_RX_N                => qsfp_rx_n_sig(i)(4-1 downto 0),
 
-                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i)   ,
+                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i),
                 RX_MACSI_MAC_INFRAME     => ftile_rx_mac_inframe  (i)(MAC_INFRAME_WIDTH-1 downto 0),
-                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i)   ,
+                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i),
                 RX_MACSI_MAC_FCS_ERROR   => ftile_rx_mac_fcs_error(i)(RX_MAC_FCS_ERROR_WIDTH-1 downto 0),
-                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i)   ,
-                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i)   ,
-                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i)   ,
+                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i),
+                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i),
+                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i),
 
                 TX_MACSI_ADAPT_DATA      => ftile_tx_adapt_data     (i),
                 TX_MACSI_ADAPT_INFRAME   => ftile_tx_adapt_inframe  (i)(MAC_INFRAME_WIDTH-1 downto 0),
@@ -519,15 +519,15 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate ftile_2x100g4_g;
+    end generate;
 
     -- generic for 50G 1 line F-Tile IP core 8 times for one card
     ftile_8x50g1_g : if ((ETH_PORT_SPEED = 50) and (EHIP_TYPE = 0))  generate
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_8x50g1_i: entity work.FTILE_8x50g1
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            ftile_8x50g1_i: entity work.FTILE_8X50G1
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (i),
                 MI_ADDR                  => split_mi_addr_phy(i),
                 MI_RD                    => split_mi_rd_phy  (i),
@@ -567,15 +567,15 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate ftile_8x50g1_g;
+    end generate;
 
     -- generic for 40G 4 line F-Tile IP core 2 times for one card
     ftile_2x40g4_g : if ((ETH_PORT_SPEED = 40) and (EHIP_TYPE = 0))  generate
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_2x40g4_i: entity work.FTILE_2x40g4
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            ftile_2x40g4_i: entity work.FTILE_2X40G4
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (i),
                 MI_ADDR                  => split_mi_addr_phy(i),
                 MI_RD                    => split_mi_rd_phy  (i),
@@ -615,16 +615,16 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate ftile_2x40g4_g;
+    end generate;
 
     -- generic for 25G 1 line F-Tile IP core 8 times for one card
     ftile_8x25g1_g : if ((ETH_PORT_SPEED = 25) and (EHIP_TYPE = 0))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_8x25g1_i: entity work.FTILE_8x25g1
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            ftile_8x25g1_i: entity work.FTILE_8X25G1
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (i),
                 MI_ADDR                  => split_mi_addr_phy(i),
                 MI_RD                    => split_mi_rd_phy  (i),
@@ -639,13 +639,13 @@ architecture FULL of NETWORK_MOD_CORE is
                 QSFP_TX_N                => qsfp_tx_n_sig(i),
                 QSFP_RX_N                => qsfp_rx_n_sig(i),
 
-                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i)   ,
+                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i),
                 RX_MACSI_MAC_INFRAME     => ftile_rx_mac_inframe  (i)(0),
-                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i)   ,
+                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i),
                 RX_MACSI_MAC_FCS_ERROR   => ftile_rx_mac_fcs_error(i)(0),
-                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i)   ,
-                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i)   ,
-                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i)   ,
+                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i),
+                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i),
+                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i),
 
                 TX_MACSI_ADAPT_DATA      => ftile_tx_adapt_data     (i),
                 TX_MACSI_ADAPT_INFRAME   => ftile_tx_adapt_inframe  (i)(0),
@@ -664,19 +664,19 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate ftile_8x25g1_g;
+    end generate;
 
     -- generic for 25G 1 line F-Tile Multirate IP core 8 times for one card
-    FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g : if ((ETH_PORT_SPEED = 25) and (EHIP_TYPE = 1))  generate
+    ftile_multirate_eth_8x25g1_8x10g1_g : if ((ETH_PORT_SPEED = 25) and (EHIP_TYPE = 1))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-        FTILE_MULTIRATE_ETH_8x25G1_8x10G1_i: entity work.FTILE_MULTIRATE_ETH_8x25G1_8x10G1
-            generic map(
+            ftile_multirate_eth_8x25g1_8x10g1_i: entity work.FTILE_MULTIRATE_ETH_8X25G1_8X10G1
+            generic map (
                 IP_CNT => i
             )
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (i),
                 MI_ADDR                  => split_mi_addr_phy(i),
                 MI_RD                    => split_mi_rd_phy  (i),
@@ -691,13 +691,13 @@ architecture FULL of NETWORK_MOD_CORE is
                 QSFP_TX_N                => qsfp_tx_n_sig(i),
                 QSFP_RX_N                => qsfp_rx_n_sig(i),
 
-                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i)   ,
+                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i),
                 RX_MACSI_MAC_INFRAME     => ftile_rx_mac_inframe  (i)(0),
-                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i)   ,
+                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i),
                 RX_MACSI_MAC_FCS_ERROR   => ftile_rx_mac_fcs_error(i)(0),
-                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i)   ,
-                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i)   ,
-                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i)   ,
+                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i),
+                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i),
+                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i),
 
                 TX_MACSI_ADAPT_DATA      => ftile_tx_adapt_data     (i),
                 TX_MACSI_ADAPT_INFRAME   => ftile_tx_adapt_inframe  (i)(0),
@@ -716,16 +716,16 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate FTILE_MULTIRATE_ETH_8x25G1_8x10G1_g;
+    end generate;
 
     -- generic for 10G 1 line F-Tile IP core 8 times for one card
     ftile_8x10g1_g : if ((ETH_PORT_SPEED = 10) and (EHIP_TYPE = 0))  generate
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
-            FTILE_8x10g1_i: entity work.FTILE_8x10g1
-            port map(
-                MI_RESET_PHY             => MI_RESET_PHY        ,
-                MI_CLK_PHY               => MI_CLK_PHY          ,
+            ftile_8x10g1_i: entity work.FTILE_8X10G1
+            port map (
+                MI_RESET_PHY             => MI_RESET_PHY,
+                MI_CLK_PHY               => MI_CLK_PHY,
                 MI_DWR                   => split_mi_dwr_phy (i),
                 MI_ADDR                  => split_mi_addr_phy(i),
                 MI_RD                    => split_mi_rd_phy  (i),
@@ -740,13 +740,13 @@ architecture FULL of NETWORK_MOD_CORE is
                 QSFP_TX_N                => qsfp_tx_n_sig(i),
                 QSFP_RX_N                => qsfp_rx_n_sig(i),
 
-                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i)   ,
+                RX_MACSI_MAC_DATA        => ftile_rx_mac_data     (i),
                 RX_MACSI_MAC_INFRAME     => ftile_rx_mac_inframe  (i)(0),
-                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i)   ,
+                RX_MACSI_MAC_EOP_EMPTY   => ftile_rx_mac_eop_empty(i),
                 RX_MACSI_MAC_FCS_ERROR   => ftile_rx_mac_fcs_error(i)(0),
-                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i)   ,
-                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i)   ,
-                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i)   ,
+                RX_MACSI_MAC_ERROR       => ftile_rx_mac_error    (i),
+                RX_MACSI_MAC_STATUS      => ftile_rx_mac_status   (i),
+                RX_MACSI_MAC_VALID       => ftile_rx_mac_valid    (i),
 
                 TX_MACSI_ADAPT_DATA      => ftile_tx_adapt_data     (i),
                 TX_MACSI_ADAPT_INFRAME   => ftile_tx_adapt_inframe  (i)(0),
@@ -765,18 +765,18 @@ architecture FULL of NETWORK_MOD_CORE is
                 FTILE_PLL_REFCLK         => ftile_pll_refclk
             );
         end generate;
-    end generate ftile_8x10g1_g;
+    end generate;
 
     adapts_g : for i in ETH_PORT_CHAN-1 downto 0 generate
         -- =========================================================================
         -- ADAPTERS
         -- =========================================================================
         rx_ftile_adapter_i : entity work.RX_MAC_LITE_ADAPTER_MAC_SEG
-        generic map(
+        generic map (
             REGIONS     => REGIONS,
             REGION_SIZE => REGION_SIZE
         )
-        port map(
+        port map (
             CLK              => ftile_clk_out,
             RESET            => RESET_ETH,
             IN_MAC_DATA      => ftile_rx_mac_data(i),
@@ -808,11 +808,11 @@ architecture FULL of NETWORK_MOD_CORE is
         TX_MFB_MII_ERR(i) <= (others => '0');
 
         tx_ftile_adapter_i : entity work.TX_MAC_LITE_ADAPTER_MAC_SEG
-        generic map(
+        generic map (
             REGIONS     => REGIONS,
             REGION_SIZE => REGION_SIZE
         )
-        port map(
+        port map (
             CLK               => ftile_clk_out,
             RESET             => RESET_ETH,
             IN_MFB_DATA       => RX_MFB_DATA(i),

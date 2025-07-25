@@ -14,10 +14,10 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity SENSOR_INTERFACE is
-    Generic (
+    generic (
         VERI : boolean := false -- if the entity is being used in a verification or not
     );
-    Port (
+    port (
         -- =======================================================================
         -- CONTROL SIGNALS
         -- =======================================================================
@@ -27,23 +27,23 @@ entity SENSOR_INTERFACE is
         --  MI32 IN
         -- =======================================================================
         -- Data for W
-        DWR  : in std_logic_vector(31 downto 0);
+        DWR   : in std_logic_vector(31 downto 0);
         -- Address for R\W
-        ADDR : in std_logic_vector(31 downto 0);
+        ADDR  : in std_logic_vector(31 downto 0);
         -- Read request
-        RD   : in std_logic;
+        RD    : in std_logic;
         -- Write request
-        WR   : in std_logic;
+        WR    : in std_logic;
         -- Byte enable
-        BE   : in std_logic_vector(3 downto 0);
+        BE    : in std_logic_vector(3 downto 0);
         -- =======================================================================
         --  MI32 OUT
         -- =======================================================================
         -- Data for R
-        DRD  : out std_logic_vector(31 downto 0);
+        DRD   : out std_logic_vector(31 downto 0);
         -- conf_regirmation about receiving ADDR
-        ARDY : out std_logic;
+        ARDY  : out std_logic;
         -- conf_regirmation about DRD
-        DRDY : out std_logic
+        DRDY  : out std_logic
     );
 end entity;

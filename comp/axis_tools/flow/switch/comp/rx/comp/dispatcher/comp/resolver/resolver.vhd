@@ -41,7 +41,7 @@ begin
     end generate;
 
     priority_mux_i : entity work.GEN_MUX_ONEHOT
-    generic map(
+    generic map (
         DATA_WIDTH => DATA_WIDTH,
         MUX_WIDTH  => SEL_WIDTH,
         DEVICE     => DEVICE

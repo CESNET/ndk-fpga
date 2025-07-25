@@ -8,7 +8,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 
 entity SDM_CTRL_MAILBOX_CLIENT_WRAP is
-    port(
+    port (
         CLK                : in  std_logic;
         RESET              : in  std_logic;
 

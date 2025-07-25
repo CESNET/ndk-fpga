@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_UMII is
-    generic(
+    generic (
         -- =====================================================================
         -- MII CONFIGURATION:
         -- =====================================================================
@@ -42,7 +42,7 @@ entity TX_MAC_LITE_UMII is
         -- FPGA device name.
         DEVICE          : string := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         --  MI32 INTERFACE (MI_CLK)
         -- =====================================================================
@@ -97,7 +97,7 @@ architecture FULL of TX_MAC_LITE_UMII is
 
     -- The TX MFB parameters are calculated automatically from MII configuration
     constant TX_REGIONS     : natural := max(MII_DW/512,1);
-    constant TX_BLOCK_SIZE  : natural := tsel(MII_DW=64,4,8);
+    constant TX_BLOCK_SIZE  : natural := tsel(MII_DW = 64,4,8);
     constant TX_ITEM_WIDTH  : natural := 8;
     constant TX_REGION_SIZE : natural := (MII_DW/TX_REGIONS)/(TX_BLOCK_SIZE*8);
 
@@ -112,7 +112,7 @@ architecture FULL of TX_MAC_LITE_UMII is
 begin
 
     tx_mac_lite_i : entity work.TX_MAC_LITE
-    generic map(
+    generic map (
         TX_REGIONS      => TX_REGIONS,
         TX_REGION_SIZE  => TX_REGION_SIZE,
         TX_BLOCK_SIZE   => TX_BLOCK_SIZE,
@@ -127,10 +127,10 @@ begin
         CRC_INSERT_EN   => not RX_INCLUDE_CRC,
         IPG_GENERATE_EN => not RX_INCLUDE_IPG,
         USE_DSP_CNT     => USE_DSP_CNT,
-        ETH_VERSION     => tsel((MII_DW=64),"10Gb","over10Gb"),
+        ETH_VERSION     => tsel((MII_DW = 64),"10Gb","over10Gb"),
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         MI_CLK         => MI_CLK,
         MI_RESET       => MI_RESET,
         MI_DWR         => MI_DWR,
@@ -167,14 +167,14 @@ begin
     );
 
     umii_enc_i : entity work.UMII_ENC
-    generic map(
+    generic map (
         MII_DW      => MII_DW,
         REGIONS     => TX_REGIONS,
         BLOCK_SIZE  => TX_BLOCK_SIZE,
         ITEM_WIDTH  => TX_ITEM_WIDTH,
         REGION_SIZE => TX_REGION_SIZE
     )
-    port map(
+    port map (
         CLK        => MII_CLK,
         RESET      => MII_RESET,
 

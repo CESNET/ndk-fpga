@@ -47,10 +47,10 @@ entity MVB_DEMUX2 is
     );
 end entity;
 
-architecture behavioral of MVB_DEMUX2 is
+architecture BEHAVIORAL of MVB_DEMUX2 is
 
-    signal tx_data_int : std_logic_vector(2 * MVB_ITEMS * DATA_WIDTH - 1 downto 0);
-    signal tx_vld_int : std_logic_vector(2 * MVB_ITEMS - 1 downto 0);
+    signal tx_data_int    : std_logic_vector(2 * MVB_ITEMS * DATA_WIDTH - 1 downto 0);
+    signal tx_vld_int     : std_logic_vector(2 * MVB_ITEMS - 1 downto 0);
     signal tx_src_rdy_int : std_logic_vector(2-1 downto 0);
     signal tx_dst_rdy_int : std_logic_vector(2-1 downto 0);
 
@@ -79,14 +79,14 @@ begin
         TX_DST_RDY  => tx_dst_rdy_int
     );
 
-    TX0_DATA <= tx_data_int(MVB_ITEMS * DATA_WIDTH - 1 downto 0);
-    TX0_VLD <= tx_vld_int(MVB_ITEMS - 1 downto 0);
-    TX0_SRC_RDY <= tx_src_rdy_int(0);
+    TX0_DATA          <= tx_data_int(MVB_ITEMS * DATA_WIDTH - 1 downto 0);
+    TX0_VLD           <= tx_vld_int(MVB_ITEMS - 1 downto 0);
+    TX0_SRC_RDY       <= tx_src_rdy_int(0);
     tx_dst_rdy_int(0) <= TX0_DST_RDY;
 
-    TX1_DATA <= tx_data_int(2 * MVB_ITEMS * DATA_WIDTH - 1 downto MVB_ITEMS * DATA_WIDTH);
-    TX1_VLD <= tx_vld_int(2 * MVB_ITEMS - 1 downto MVB_ITEMS);
-    TX1_SRC_RDY <= tx_src_rdy_int(1);
+    TX1_DATA          <= tx_data_int(2 * MVB_ITEMS * DATA_WIDTH - 1 downto MVB_ITEMS * DATA_WIDTH);
+    TX1_VLD           <= tx_vld_int(2 * MVB_ITEMS - 1 downto MVB_ITEMS);
+    TX1_SRC_RDY       <= tx_src_rdy_int(1);
     tx_dst_rdy_int(1) <= TX1_DST_RDY;
 
 end architecture;

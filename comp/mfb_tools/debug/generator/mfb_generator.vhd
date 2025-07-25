@@ -23,7 +23,7 @@ use work.type_pack.all;
 use work.math_pack.all;
 
 entity MFB_GENERATOR is
-    Generic (
+    generic (
         -- number of regions in a data word
         REGIONS         : natural := 2;
         -- number of blocks in a region
@@ -43,7 +43,7 @@ entity MFB_GENERATOR is
         -- FPGA device string
         DEVICE          : string  := "STRATIX10"
     );
-    Port (
+    port (
         CLK             : in  std_logic;
         RST             : in  std_logic;
 
@@ -68,7 +68,7 @@ entity MFB_GENERATOR is
         TX_MFB_SRC_RDY  : out std_logic;
         TX_MFB_DST_RDY  : in  std_logic
     );
-    end entity;
+end entity;
 
 architecture BEHAV of MFB_GENERATOR is
 
@@ -104,7 +104,7 @@ architecture BEHAV of MFB_GENERATOR is
     -- Confirmation signal that packets requested with gen_vld will be generated
     signal gen_accept           : std_logic_vector(REGIONS -1 downto 0);
 
-    type burst_fsm_state_t is (S_TRIGGER_DETECT, S_BURST_COUNTDOWN);
+    type   burst_fsm_state_t is (S_TRIGGER_DETECT, S_BURST_COUNTDOWN);
     signal burst_fsm_pst : burst_fsm_state_t := S_TRIGGER_DETECT;
     signal burst_fsm_nst : burst_fsm_state_t := S_TRIGGER_DETECT;
 
@@ -164,14 +164,14 @@ begin
     core_arch_gen : if (not USE_PACP_ARCH) generate
 
         core_i : entity work.MFB_GENERATOR_CORE
-        generic map(
+        generic map (
             REGIONS        => REGIONS,
             REGION_SIZE    => REGION_SIZE,
             BLOCK_SIZE     => BLOCK_SIZE,
             ITEM_WIDTH     => ITEM_WIDTH,
             LENGTH_WIDTH   => LENGTH_WIDTH
         )
-        port map(
+        port map (
             CLK            => CLK,
             RESET          => RST,
 
@@ -190,7 +190,7 @@ begin
     else generate
 
         core_pacp_i : entity work.MFB_GENERATOR_CORE_PACP
-        generic map(
+        generic map (
             REGIONS        => REGIONS,
             REGION_SIZE    => REGION_SIZE,
             BLOCK_SIZE     => BLOCK_SIZE,
@@ -198,7 +198,7 @@ begin
             LENGTH_WIDTH   => LENGTH_WIDTH,
             DEVICE         => DEVICE
         )
-        port map(
+        port map (
             CLK            => CLK,
             RESET          => RST,
 
@@ -223,7 +223,7 @@ begin
         -- =============================================================================================
         -- Burst mode control
         -- =============================================================================================
-        ctrl_en_delay_reg_p: process (CLK) is
+        ctrl_en_delay_reg_p : process (CLK) is
         begin
             if (rising_edge(CLK)) then
                 ctrl_en_delay     <= CTRL_EN;
@@ -238,7 +238,7 @@ begin
         begin
             if (rising_edge(CLK)) then
                 if (RST = '1') then
-                    burst_fsm_pst <= S_TRIGGER_DETECT;
+                    burst_fsm_pst     <= S_TRIGGER_DETECT;
                     my_burst_cntr_pst <= (others => '0');
                 else
                     burst_fsm_pst     <= burst_fsm_nst;
@@ -247,7 +247,7 @@ begin
             end if;
         end process;
 
-        burst_mod_fsm_out_logic: process (all) is
+        burst_mod_fsm_out_logic : process (all) is
             variable accepted_regions : unsigned(log2(REGIONS) downto 0);
         begin
             burst_fsm_nst     <= burst_fsm_pst;
@@ -288,7 +288,7 @@ begin
 
                     if (dst_rdy = '1') then
                         my_burst_cntr_nst <= my_burst_cntr_pst - accepted_regions;
-                        ones_insert_en <= '1';
+                        ones_insert_en    <= '1';
                     end if;
 
                     if (my_burst_cntr_pst > REGIONS) then
@@ -304,13 +304,15 @@ begin
         end process;
 
         ones_insertor_i : entity work.ONES_INSERTOR
-            generic map (
-                OFFSET_WIDTH => log2(REGIONS))
-            port map (
-                OFFSET_LOW  => (others => '0'),
-                OFFSET_HIGH => ones_offs_high,
-                VALID       => ones_insert_en,
-                ONES_VECTOR => gen_vld_regions);
+        generic map (
+            OFFSET_WIDTH => log2(REGIONS)
+        )
+        port map (
+            OFFSET_LOW  => (others => '0'),
+            OFFSET_HIGH => ones_offs_high,
+            VALID       => ones_insert_en,
+            ONES_VECTOR => gen_vld_regions
+        );
     end generate;
 
     -- ======================================================================================
@@ -319,7 +321,7 @@ begin
     pkt_cnt_p : process (all)
         variable v_pkt_cnt : unsigned(log2(REGIONS+1)-1 downto 0);
     begin
-        v_pkt_cnt := (others => '0');
+        v_pkt_cnt  := (others => '0');
         pkt_cnt(0) <= pkt_cnt_reg;
         pkt_cnt_l : for i in 0 to REGIONS-1 loop
             if (sof(i) = '1') then
@@ -386,7 +388,7 @@ begin
     begin
         -- One cycle delay is not a problem
         if (rising_edge(CLK)) then
-            if ((or burst_size)='1') then
+            if ((or burst_size) = '1') then
                 -- Channel burst size is used decremented
                 chan_burst <= burst_size - 1;
             else
@@ -404,16 +406,16 @@ begin
                 if (burst_cnt(i) < chan_burst) then
                     -- Increment the counter
                     burst_cnt(i+1) <= burst_cnt(i) + 1;
-                else -- Reset the counter to zero
+                else                                                                               -- Reset the counter to zero
                     burst_cnt(i+1) <= (others => '0');
                 end if;
 
                 if (burst_cnt(i) = chan_burst) then
                     -- Change channel counter
-                    if (chan_cnt(i) < chan_max) and (chan_cnt(i) < (CHANNELS-1)) then
+                    if ((chan_cnt(i) < chan_max) and (chan_cnt(i) < (CHANNELS-1))) then
                         -- Increment the counter
                         chan_cnt(i+1) <= chan_cnt(i) + resize(chan_inc,minimum(CHANNELS_WIDTH,8));
-                    else -- Reset the counter to min value
+                    else                                                                           -- Reset the counter to min value
                         chan_cnt(i+1) <= resize(chan_min,CHANNELS_WIDTH);
                     end if;
                 else
@@ -472,9 +474,9 @@ begin
         dport(i) <= X"0000";
         sport(i) <= X"0000";
 
-        --UDP proto, Time To Live, Identification+Flags+FragmentOffset, l3len, DSCP+ECN, IHL+version
-        ipv4_hdr(i) <= dip(i) & sip(i) & X"0000" & X"11" & X"FF" & X"00000000" & l3len(7 downto 0) & l3len(15 downto 8) & X"00" & X"45";
-        udp_hdr(i) <= X"0000" & l4len(7 downto 0) & l4len(15 downto 8) & dport(i) & sport(i);
+        -- UDP proto, Time To Live, Identification+Flags+FragmentOffset, l3len, DSCP+ECN, IHL+version
+        ipv4_hdr(i)     <= dip(i) & sip(i) & X"0000" & X"11" & X"FF" & X"00000000" & l3len(7 downto 0) & l3len(15 downto 8) & X"00" & X"45";
+        udp_hdr(i)      <= X"0000" & l4len(7 downto 0) & l4len(15 downto 8) & dport(i) & sport(i);
         eth_hdr_384b(i) <= X"000000000000" & udp_hdr(i) & ipv4_hdr(i) & ETHER_TYPE & CTRL_MAC_SRC & CTRL_MAC_DST;
     end generate;
 
@@ -482,7 +484,7 @@ begin
 
     process (all)
     begin
-        data_word_plus <= (others => (others => '0'));
+        data_word_plus               <= (others => (others => '0'));
         data_word_plus(6-1 downto 0) <= data_word_plus_reg;
         for ii in 0 to REGIONS-1 loop
             sof_index(ii) <= resize(unsigned(sof_pos_arr(ii)), log2(REGIONS*REGION_SIZE)) + ii*REGION_SIZE;
@@ -503,7 +505,7 @@ begin
         end if;
     end process;
 
-    data_word <= data_word_plus(REGIONS*REGION_SIZE-1 downto 0);
+    data_word     <= data_word_plus(REGIONS*REGION_SIZE-1 downto 0);
     data_word_ser <= slv_array_ser(data_word,REGIONS*REGION_SIZE,BLOCK_SIZE*ITEM_WIDTH);
 
     data_meta_g : for i in 0 to REGIONS-1 generate
@@ -518,18 +520,18 @@ begin
     end process;
 
     mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
-       REGIONS     => REGIONS,
-       REGION_SIZE => REGION_SIZE,
-       BLOCK_SIZE  => BLOCK_SIZE,
-       ITEM_WIDTH  => ITEM_WIDTH,
-       META_WIDTH  => CHANNELS_WIDTH+LENGTH_WIDTH,
-       FAKE_PIPE   => false,
-       USE_DST_RDY => true,
-       --PIPE_TYPE   => PIPE_TYPE,
-       DEVICE      => DEVICE
+    generic map (
+        REGIONS     => REGIONS,
+        REGION_SIZE => REGION_SIZE,
+        BLOCK_SIZE  => BLOCK_SIZE,
+        ITEM_WIDTH  => ITEM_WIDTH,
+        META_WIDTH  => CHANNELS_WIDTH+LENGTH_WIDTH,
+        FAKE_PIPE   => false,
+        USE_DST_RDY => true,
+        -- PIPE_TYPE   => PIPE_TYPE,
+        DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RST,
 

@@ -58,96 +58,96 @@ use work.math_pack.all;
 --   - PPS_REG = Register PPS (96b, RO)
 --
 entity TSU_GEN is
-generic (
-    -- Selects smarter DSPs arrangement for timestamp format conversion.
-    -- Meanings of supported values: true = use multiplication in DSPs composed
-    -- of adds and shifts; false = look at TS_MULT_USE_DSP
-    TS_MULT_SMART_DSP            : boolean := true;
-    -- Selects whether to use DSPs for timestamp format conversion:
-    -- Meanings of supported values: true = use multipliers in DSPs;
-    -- false = disable DSPs, use logic
-    TS_MULT_USE_DSP              : boolean := true;
-    -- Width of PPS select signal: Used value must be in range from 1 to 16.
-    -- Should be greater or equal to base 2 logarithm from number of available
-    -- PPS sources.
-    PPS_SEL_WIDTH                : integer := 8;
-    -- Width of main CLK select signal: Used value must be in range from 1 to 16.
-    -- Should be greater or equal to base 2 logarithm from number of available
-    -- CLK sources.
-    CLK_SEL_WIDTH                : integer := 8;
-    -- Name of selected FPGA device
-    DEVICE                       : string  := "ULTRASCALE"
-);
-port (
-    -- =========================================================================
-    --  Signals for MI32 interface
-    -- =========================================================================
+    generic (
+        -- Selects smarter DSPs arrangement for timestamp format conversion.
+        -- Meanings of supported values: true = use multiplication in DSPs composed
+        -- of adds and shifts; false = look at TS_MULT_USE_DSP
+        TS_MULT_SMART_DSP            : boolean := true;
+        -- Selects whether to use DSPs for timestamp format conversion:
+        -- Meanings of supported values: true = use multipliers in DSPs;
+        -- false = disable DSPs, use logic
+        TS_MULT_USE_DSP              : boolean := true;
+        -- Width of PPS select signal: Used value must be in range from 1 to 16.
+        -- Should be greater or equal to base 2 logarithm from number of available
+        -- PPS sources.
+        PPS_SEL_WIDTH                : integer := 8;
+        -- Width of main CLK select signal: Used value must be in range from 1 to 16.
+        -- Should be greater or equal to base 2 logarithm from number of available
+        -- CLK sources.
+        CLK_SEL_WIDTH                : integer := 8;
+        -- Name of selected FPGA device
+        DEVICE                       : string  := "ULTRASCALE"
+    );
+    port (
+        -- =========================================================================
+        --  Signals for MI32 interface
+        -- =========================================================================
 
-    -- Clock for MI32 interface.
-    MI_CLK   	  : in  std_logic;
-    -- Synchronious reset with MI_CLK.
-    MI_RESET 	  : in  std_logic;
-    -- MI bus: data from master to slave (write data)
-    MI_DWR        : in  std_logic_vector(31 downto 0);
-    -- MI bus: slave address
-    MI_ADDR       : in  std_logic_vector(31 downto 0);
-    -- MI bus: read request
-    MI_RD         : in  std_logic;
-    -- MI bus: write request
-    MI_WR         : in  std_logic;
-    -- MI bus: byte enable, not supported in this component!
-    MI_BE         : in  std_logic_vector(3 downto 0);
-    -- MI bus: data from slave to master (read data)
-    MI_DRD        : out std_logic_vector(31 downto 0);
-    -- MI bus: ready of slave module
-    MI_ARDY       : out std_logic;
-    -- MI bus: valid of MI_DRD data signal
-    MI_DRDY       : out std_logic;
+        -- Clock for MI32 interface.
+        MI_CLK        : in  std_logic;
+        -- Synchronious reset with MI_CLK.
+        MI_RESET      : in  std_logic;
+        -- MI bus: data from master to slave (write data)
+        MI_DWR        : in  std_logic_vector(31 downto 0);
+        -- MI bus: slave address
+        MI_ADDR       : in  std_logic_vector(31 downto 0);
+        -- MI bus: read request
+        MI_RD         : in  std_logic;
+        -- MI bus: write request
+        MI_WR         : in  std_logic;
+        -- MI bus: byte enable, not supported in this component!
+        MI_BE         : in  std_logic_vector(3 downto 0);
+        -- MI bus: data from slave to master (read data)
+        MI_DRD        : out std_logic_vector(31 downto 0);
+        -- MI bus: ready of slave module
+        MI_ARDY       : out std_logic;
+        -- MI bus: valid of MI_DRD data signal
+        MI_DRDY       : out std_logic;
 
-    -- =========================================================================
-    --  PPS signal interface
-    -- =========================================================================
+        -- =========================================================================
+        --  PPS signal interface
+        -- =========================================================================
 
-    -- Input PPS_N signal
-    PPS_N         : in std_logic;
-    -- Number of different PPS sources (on MI_CLK)
-    PPS_SRC       : in std_logic_vector(15 downto 0);
-    -- Select PPS source (on main CLK)
-    PPS_SEL       : out std_logic_vector(max(PPS_SEL_WIDTH-1,0) downto 0);
+        -- Input PPS_N signal
+        PPS_N         : in std_logic;
+        -- Number of different PPS sources (on MI_CLK)
+        PPS_SRC       : in std_logic_vector(15 downto 0);
+        -- Select PPS source (on main CLK)
+        PPS_SEL       : out std_logic_vector(max(PPS_SEL_WIDTH-1,0) downto 0);
 
-    -- =========================================================================
-    --  Main CLK signal interface
-    -- =========================================================================
+        -- =========================================================================
+        --  Main CLK signal interface
+        -- =========================================================================
 
-    -- Input CLK signal (main clock)
-    CLK           : in  std_logic;
-    -- Synchronious reset with main clock
-    RESET         : in  std_logic;
+        -- Input CLK signal (main clock)
+        CLK           : in  std_logic;
+        -- Synchronious reset with main clock
+        RESET         : in  std_logic;
 
-    -- =========================================================================
-    --  CLK signal configuration interface
-    -- =========================================================================
+        -- =========================================================================
+        --  CLK signal configuration interface
+        -- =========================================================================
 
-    -- Frequency of input CLK signal (on MI_CLK)
-    CLK_FREQ      : in  std_logic_vector(31 downto 0);
-    -- Number of different CLK sources (on MI_CLK)
-    CLK_SRC       : in std_logic_vector(15 downto 0);
-    -- Select CLK source (on MI_CLK)
-    CLK_SEL       : out std_logic_vector(max(CLK_SEL_WIDTH-1,0) downto 0);
+        -- Frequency of input CLK signal (on MI_CLK)
+        CLK_FREQ      : in  std_logic_vector(31 downto 0);
+        -- Number of different CLK sources (on MI_CLK)
+        CLK_SRC       : in std_logic_vector(15 downto 0);
+        -- Select CLK source (on MI_CLK)
+        CLK_SEL       : out std_logic_vector(max(CLK_SEL_WIDTH-1,0) downto 0);
 
-    -- =========================================================================
-    --  Output timestamp interface (on main CLK)
-    -- =========================================================================
+        -- =========================================================================
+        --  Output timestamp interface (on main CLK)
+        -- =========================================================================
 
-    -- Timestamp in fractional (old) format: Fractional part of timestamp
-    -- represents number of xanoseconds (one xanosecond is 2^(-32) seconds).
-    TS  	 	    : out std_logic_vector(63 downto 0);
-    -- Timestamp in nanosecond (new) format: Fractional part of timestamp
-    -- represents number of nanoseconds (one nanosecond is 10^(-9) seconds).
-    -- Maximum number of nanoseconds is 999 999 999, therefor highest 2 bits of
-    -- fractional part are unused.
-    TS_NS 	    : out std_logic_vector(63 downto 0);
-    -- Timestamp is valid in this cycle
-    TS_DV	     : out std_logic
-);
+        -- Timestamp in fractional (old) format: Fractional part of timestamp
+        -- represents number of xanoseconds (one xanosecond is 2^(-32) seconds).
+        TS           : out std_logic_vector(63 downto 0);
+        -- Timestamp in nanosecond (new) format: Fractional part of timestamp
+        -- represents number of nanoseconds (one nanosecond is 10^(-9) seconds).
+        -- Maximum number of nanoseconds is 999 999 999, therefor highest 2 bits of
+        -- fractional part are unused.
+        TS_NS        : out std_logic_vector(63 downto 0);
+        -- Timestamp is valid in this cycle
+        TS_DV        : out std_logic
+    );
 end entity;

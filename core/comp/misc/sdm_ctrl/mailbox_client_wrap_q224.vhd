@@ -11,18 +11,18 @@ use IEEE.numeric_std.all;
 architecture Q224 of SDM_CTRL_MAILBOX_CLIENT_WRAP is
 
     component mailbox_client_ip is
-    port (
-        in_clk_clk         : in  std_logic                     := 'X';             -- clk
-        in_reset_reset     : in  std_logic                     := 'X';             -- reset
-        avmm_address       : in  std_logic_vector(3 downto 0)  := (others => 'X'); -- address
-        avmm_write         : in  std_logic                     := 'X';             -- write
-        avmm_writedata     : in  std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
-        avmm_read          : in  std_logic                     := 'X';             -- read
-        avmm_readdata      : out std_logic_vector(31 downto 0);                    -- readdata
-        avmm_readdatavalid : out std_logic;                                        -- readdatavalid
-        irq_irq            : out std_logic                                         -- irq
-    );
-    end component mailbox_client_ip;
+        port (
+            IN_CLK_CLK         : in  std_logic                     := 'X';
+            IN_RESET_RESET     : in  std_logic                     := 'X';
+            AVMM_ADDRESS       : in  std_logic_vector(3 downto 0)  := (others => 'X');
+            AVMM_WRITE         : in  std_logic                     := 'X';
+            AVMM_WRITEDATA     : in  std_logic_vector(31 downto 0) := (others => 'X');
+            AVMM_READ          : in  std_logic                     := 'X';
+            AVMM_READDATA      : out std_logic_vector(31 downto 0);
+            AVMM_READDATAVALID : out std_logic;
+            IRQ_IRQ            : out std_logic
+        );
+    end component;
 
 begin
 

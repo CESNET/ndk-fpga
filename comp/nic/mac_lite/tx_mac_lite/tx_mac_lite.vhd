@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE is
-    generic(
+    generic (
         -- =====================================================================
         -- MFB CONFIGURATION:
         -- =====================================================================
@@ -79,7 +79,7 @@ entity TX_MAC_LITE is
         -- Possible values: "10Gb", "over10Gb"
         ETH_VERSION     : string := "over10Gb"
     );
-    port(
+    port (
         -- =====================================================================
         --  MI32 INTERFACE (MI_CLK)
         -- =====================================================================
@@ -166,7 +166,7 @@ end entity;
 
 architecture FULL of TX_MAC_LITE is
 
-    function fce_crcfifo_afull_threshold(
+    function fce_crcfifo_afull_threshold (
         REGION_SIZE  : natural;
         BLOCK_SIZE   : natural;
         CRC_END_IMPL : string
@@ -180,7 +180,7 @@ architecture FULL of TX_MAC_LITE is
         else
             return 6+log2(REGION_SIZE*BLOCK_SIZE);
         end if;
-    end;
+    end function;
 
     constant MD_REGIONS          : natural := tsel(RESIZE_ON_TX,RX_REGIONS,TX_REGIONS);
     constant MD_REGION_SIZE      : natural := tsel(RESIZE_ON_TX,RX_REGION_SIZE,TX_REGION_SIZE);
@@ -189,7 +189,7 @@ architecture FULL of TX_MAC_LITE is
 
     constant MD_DATA_W           : natural := MD_REGIONS*MD_REGION_SIZE*MD_BLOCK_SIZE*MD_ITEM_WIDTH;
 
-    constant NUM_OF_PKTS         : natural := tsel(DEVICE="ULTRASCALE" and TX_REGIONS = 1 and TX_REGION_SIZE = 1,1,4);
+    constant NUM_OF_PKTS         : natural := tsel(DEVICE = "ULTRASCALE" and TX_REGIONS = 1 and TX_REGION_SIZE = 1,1,4);
     constant LEN_WIDTH           : natural := log2(PKT_MTU_BYTES+1);
     constant DFIFO_ITEMS         : natural := 2**log2(div_roundup((PKT_MTU_BYTES+1),(MD_DATA_W/8)));
     constant FRAME_LEN_MIN       : natural := tsel(RX_INCLUDE_CRC,64,60);
@@ -342,7 +342,7 @@ begin
     end generate;
 
     mfb_reconf_i : entity work.MFB_RECONFIGURATOR
-    generic map(
+    generic map (
         RX_REGIONS           => RX_REGIONS,
         RX_REGION_SIZE       => RX_REGION_SIZE,
         RX_BLOCK_SIZE        => RX_BLOCK_SIZE,
@@ -355,7 +355,7 @@ begin
         FRAMES_OVER_TX_BLOCK => 0,
         DEVICE               => DEVICE
     )
-    port map(
+    port map (
         CLK        => RX_CLK,
         RESET      => RX_RESET,
 
@@ -384,7 +384,7 @@ begin
     rc_mfb_dst_rdy     <= rc_mfb_dst_rdy_len and not ctrl_off_stop;
 
     mfb_frame_len_i : entity work.MFB_FRAME_LNG
-    generic map(
+    generic map (
         REGIONS        => MD_REGIONS,
         REGION_SIZE    => MD_REGION_SIZE,
         BLOCK_SIZE     => MD_BLOCK_SIZE,
@@ -394,7 +394,7 @@ begin
         REG_BITMAP     => "111",
         IMPLEMENTATION => "parallel"
     )
-    port map(
+    port map (
         CLK          => RX_CLK,
         RESET        => RX_RESET,
 
@@ -464,14 +464,14 @@ begin
 
     crc_gen_g : if CRC_GEN generate
         crc_gen_i : entity work.TX_MAC_LITE_CRC_GEN
-        generic map(
+        generic map (
             REGIONS        => MD_REGIONS,
             REGION_SIZE    => MD_REGION_SIZE,
             BLOCK_SIZE     => MD_BLOCK_SIZE,
             ITEM_WIDTH     => MD_ITEM_WIDTH,
             CRC_END_IMPL   => CRC_END_IMPL
         )
-        port map(
+        port map (
             -- CLOCK AND RESET
             CLK           => RX_CLK,
             RESET         => RX_RESET,
@@ -500,7 +500,7 @@ begin
         --      report "TX_MAC_LITE: crc_discard_fifo_i overflow!";
 
         crc_discard_fifo_i : entity work.FIFOX
-        generic map(
+        generic map (
             DATA_WIDTH          => MD_REGIONS,
             ITEMS               => 32,
             RAM_TYPE            => "LUT",
@@ -508,7 +508,7 @@ begin
             ALMOST_FULL_OFFSET  => 1,
             ALMOST_EMPTY_OFFSET => 1
         )
-        port map(
+        port map (
             CLK    => RX_CLK,
             RESET  => RX_RESET,
 
@@ -534,11 +534,11 @@ begin
         -- ---------------------------------------------------------------------
 
         -- Discard CRC of undersized frames
-        crc32_vld_masked <= crc32_vld and cd_fifo_do and crc32_src_rdy;
+        crc32_vld_masked     <= crc32_vld and cd_fifo_do and crc32_src_rdy;
         crc32_src_rdy_masked <= or crc32_vld_masked;
 
         crc_asfifo_i : entity work.MVB_ASFIFOX
-        generic map(
+        generic map (
             MVB_ITEMS          => MD_REGIONS,
             MVB_ITEM_WIDTH     => CRC_WIDTH,
             FIFO_ITEMS         => CRC_ASFIFO_ITEMS,
@@ -548,7 +548,7 @@ begin
             ALMOST_FULL_OFFSET => CRC_ASFIFO_AFULL_TH,
             DEVICE             => DEVICE
         )
-        port map(
+        port map (
             RX_CLK     => RX_CLK,
             RX_RESET   => RX_RESET,
             RX_DATA    => crc32_data,
@@ -588,7 +588,7 @@ begin
 
     spacer_g : if SPACER_GEN generate
         spacer_i : entity work.CROSSBARX_STREAM
-        generic map(
+        generic map (
             CX_USE_CLK2           => false,
             CX_USE_CLK_ARB        => false,
             OBUF_META_EQ_OUTPUT   => false,
@@ -602,14 +602,14 @@ begin
             TRANS_FIFO_SIZE       => TRANS_FIFO_SIZE,
             F_GAP_ADJUST_EN       => true,
             F_GAP_ADJUST_SIZE_AVG => 24,
-            F_GAP_ADJUST_SIZE_MIN => tsel((ETH_VERSION="10Gb"),24-3,24-7),
+            F_GAP_ADJUST_SIZE_MIN => tsel((ETH_VERSION = "10Gb"),24-3,24-7),
             F_EXTEND_START_EN     => false,
             F_EXTEND_START_SIZE   => 4,
             F_EXTEND_END_EN       => false,
             F_EXTEND_END_SIZE     => 4,
             DEVICE                => DEVICE
         )
-        port map(
+        port map (
             RX_CLK         => RX_CLK,
             RX_CLK2        => RX_CLK_X2,
             RX_RESET       => RX_RESET,
@@ -638,7 +638,7 @@ begin
     else generate
         pdfifo_buff_g: if not LL_MODE generate
             buffer_i : entity work.MFB_PD_ASFIFO
-            generic map(
+            generic map (
                 ITEMS              => DFIFO_ITEMS,
                 -- More time is needed to calculate CRC.
                 -- Lack of time is reported as error: "TX_MAC_LITE_CRC_INSERT: CRC32 out of sync!".
@@ -649,7 +649,7 @@ begin
                 ITEM_WIDTH         => MD_ITEM_WIDTH,
                 DEVICE             => DEVICE
             )
-            port map(
+            port map (
                 RX_CLK           => RX_CLK,
                 RX_RESET         => RX_RESET,
                 RX_DATA          => fd_mfb_data,
@@ -690,14 +690,14 @@ begin
 
     crc_insert_g : if CRC_GEN generate
         crc_insert_i : entity work.TX_MAC_LITE_CRC_INSERT
-        generic map(
+        generic map (
             MFB_REGIONS     => MD_REGIONS,
             MFB_REGION_SIZE => MD_REGION_SIZE,
             MFB_BLOCK_SIZE  => MD_BLOCK_SIZE,
             MFB_ITEM_WIDTH  => MD_ITEM_WIDTH,
             DEVICE          => DEVICE
         )
-        port map(
+        port map (
             CLK                => TX_CLK,
             RESET              => TX_RESET,
 
@@ -737,7 +737,7 @@ begin
     -- =========================================================================
 
     tx_mfb_reconf_i : entity work.MFB_RECONFIGURATOR
-    generic map(
+    generic map (
         RX_REGIONS           => MD_REGIONS,
         RX_REGION_SIZE       => MD_REGION_SIZE,
         RX_BLOCK_SIZE        => MD_BLOCK_SIZE,
@@ -750,7 +750,7 @@ begin
         FRAMES_OVER_TX_BLOCK => 0,
         DEVICE               => DEVICE
     )
-    port map(
+    port map (
         CLK        => TX_CLK,
         RESET      => TX_RESET,
 
@@ -806,14 +806,14 @@ begin
     end process;
 
     stat_unit_i : entity work.TX_MAC_LITE_STAT_UNIT
-    generic map(
+    generic map (
         MFB_REGIONS        => MD_REGIONS,
         LENGTH_WIDTH       => LEN_WIDTH,
         DEVICE             => DEVICE,
         USE_DSP_CNT        => USE_DSP_CNT,
         FRAME_LEN_WITH_CRC => RX_INCLUDE_CRC
     )
-    port map(
+    port map (
         CLK                         => RX_CLK,
         RESET                       => RX_RESET,
 
@@ -846,11 +846,11 @@ begin
     -- =========================================================================
 
     adc_i : entity work.TX_MAC_LITE_ADDR_DEC
-    generic map(
+    generic map (
         CRC_INSERTION_EN => CRC_GEN,
         DEVICE           => DEVICE
     )
-    port map(
+    port map (
         CLK                         => RX_CLK,
         RESET                       => RX_RESET,
 

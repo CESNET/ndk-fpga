@@ -103,7 +103,7 @@ package dma_hdr_pkg is
     --=============================================================================================================
 
 
-    constant DMA_HDR_WIDTH : natural := 64;
+    constant DMA_HDR_WIDTH          : natural := 64;
     -- Lengths of two variants of the PCIe header
     constant PCIE_BIG_UPHDR_WIDTH   : natural := 128;
     constant PCIE_SMALL_UPHDR_WIDTH : natural := 96;

@@ -17,7 +17,7 @@ architecture FULL of DSP_COMPARATOR_INTEL is
     -- signals for non DSP counter
     signal input1_behind_regs : std_logic_vector(INPUT_DATA_WIDTH-1 downto 0) := (others => '0'); -- renamed input1 signal and delayed one clock cycle when input registers are enabled
     signal input2_behind_regs : std_logic_vector(INPUT_DATA_WIDTH-1 downto 0) := (others => '0'); -- renamed input2 signal and delayed one clock cycle when input registers are enabled
-    signal early_result       : std_logic_vector(1 downto 0); -- the result after comparison; "early" because it needs to be delayed one clock cycle to match the the specified latency
+    signal early_result       : std_logic_vector(1 downto 0);                                     -- the result after comparison; "early" because it needs to be delayed one clock cycle to match the the specified latency
 
 begin
 

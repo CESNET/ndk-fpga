@@ -12,10 +12,10 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 
 entity HBM_TESTER_MON is
-    generic(
+    generic (
         CNT_WIDTH : natural := 16
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -64,7 +64,7 @@ entity HBM_TESTER_MON is
         RD_DATA_VALID    : in  std_logic;
         RD_DATA_READY    : in  std_logic
     );
-end HBM_TESTER_MON;
+end entity;
 
 architecture FULL of HBM_TESTER_MON is
 
@@ -197,14 +197,14 @@ begin
     s_counter0_rst <= RESET or CS_MONITOR_RESET;
     s_counter0_max <= s_counter0(CNT_WIDTH-1);
 
-    with CS_COUNTER0_MODE select
-    s_counter0_en <= s_rd_data_word_inc when "000", -- read data words monitoring
-                     s_wr_data_word_inc when "001", -- write data words monitoring
-                     s_rd_latency_inc   when "010", -- read latency monitoring
-                     s_wr_latency_inc   when "011", -- write latency monitoring
-                     s_rd_data_ok_inc   when "100", -- read data ok monitoring
-                     s_rd_data_err_inc  when "101", -- read data error monitoring
-                     '0'                when others;
+    with CS_COUNTER0_MODE select s_counter0_en <=
+        s_rd_data_word_inc when "000", -- read data words monitoring
+        s_wr_data_word_inc when "001", -- write data words monitoring
+        s_rd_latency_inc when "010",   -- read latency monitoring
+        s_wr_latency_inc when "011",   -- write latency monitoring
+        s_rd_data_ok_inc when "100",   -- read data ok monitoring
+        s_rd_data_err_inc when "101",  -- read data error monitoring
+        '0' when others;
 
     counter0_p : process (CLK)
     begin
@@ -226,14 +226,14 @@ begin
     s_counter1_rst <= RESET or CS_MONITOR_RESET;
     s_counter1_max <= s_counter1(CNT_WIDTH-1);
 
-    with CS_COUNTER1_MODE select
-    s_counter1_en <= s_rd_data_word_inc when "000", -- read data words monitoring
-                     s_wr_data_word_inc when "001", -- write data words monitoring
-                     s_rd_latency_inc   when "010", -- read latency monitoring
-                     s_wr_latency_inc   when "011", -- write latency monitoring
-                     s_rd_data_ok_inc   when "100", -- read data ok monitoring
-                     s_rd_data_err_inc  when "101", -- read data error monitoring
-                     '0'                when others;
+    with CS_COUNTER1_MODE select s_counter1_en <=
+        s_rd_data_word_inc when "000", -- read data words monitoring
+        s_wr_data_word_inc when "001", -- write data words monitoring
+        s_rd_latency_inc when "010",   -- read latency monitoring
+        s_wr_latency_inc when "011",   -- write latency monitoring
+        s_rd_data_ok_inc when "100",   -- read data ok monitoring
+        s_rd_data_err_inc when "101",  -- read data error monitoring
+        '0' when others;
 
     counter1_p : process (CLK)
     begin

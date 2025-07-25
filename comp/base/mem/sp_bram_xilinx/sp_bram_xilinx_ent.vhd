@@ -20,47 +20,47 @@ use IEEE.std_logic_unsigned.all;
 
 --! \brief Entity of single port Xilinx BRAM declaration
 entity SP_BRAM_XILINX is
-   generic (
-      --! Select target device "VIRTEX5", "VIRTEX6", "7SERIES", "SPARTAN6", "ULTRASCALE".
-      DEVICE : string := "ULTRASCALE";
+    generic (
+        --! Select target device "VIRTEX5", "VIRTEX6", "7SERIES", "SPARTAN6", "ULTRASCALE".
+        DEVICE : string := "ULTRASCALE";
 
-      --! A read operation is implicitly performed to address ADDR combinatorially,
-      --! regardless of RE inputs. The data output is than registered each CLK
-      --! cycle that EN is asserted.
+        --! A read operation is implicitly performed to address ADDR combinatorially,
+        --! regardless of RE inputs. The data output is than registered each CLK
+        --! cycle that EN is asserted.
 
-      --! Input/output data width.
-      DATA_WIDTH     : integer := 108;
+        --! Input/output data width.
+        DATA_WIDTH     : integer := 108;
 
-      --! Address bus width.
-      ADDRESS_WIDTH  : integer := 10;
+        --! Address bus width.
+        ADDRESS_WIDTH  : integer := 10;
 
-      --! Enable output register.
-      ENABLE_OUT_REG : boolean := true;
+        --! Enable output register.
+        ENABLE_OUT_REG : boolean := true;
 
-      --! Block RAM type, 18Kb or 36Kb blocks.
-      --! - Only for non ULTRASCALE devices (DEVICE /= "ULTRASCALE")!
-      BRAM_TYPE      : integer := 36;
-      --! Enable check write before read. For more info check *.psl file
-      PSL_WR_BEFFORE_RD : boolean := true
-   );
-   port (
-      --! Clock.
-      CLK : in std_logic;
-      --! Output register synchronous reset.
-      RST : in std_logic := '0';
-      --! Enable.
-      PIPE_EN : in std_logic;
-      --! Read enable (implicit when PIPE_ENA = '1').
-      RE : in std_logic := '1';
-      --! Write enable.
-      WE : in std_logic;
-      --! Address.
-      ADDR : in std_logic_vector(ADDRESS_WIDTH-1 downto 0);
-      --! Write data.
-      DI : in std_logic_vector(DATA_WIDTH-1 downto 0);
-      --! Output data.
-      DO : out std_logic_vector(DATA_WIDTH-1 downto 0);
-      --! Output data validity.
-      DO_DV : out std_logic
-   );
+        --! Block RAM type, 18Kb or 36Kb blocks.
+        --! - Only for non ULTRASCALE devices (DEVICE /= "ULTRASCALE")!
+        BRAM_TYPE         : integer := 36;
+        --! Enable check write before read. For more info check *.psl file
+        PSL_WR_BEFFORE_RD : boolean := true
+    );
+    port (
+        --! Clock.
+        CLK     : in std_logic;
+        --! Output register synchronous reset.
+        RST     : in std_logic := '0';
+        --! Enable.
+        PIPE_EN : in std_logic;
+        --! Read enable (implicit when PIPE_ENA = '1').
+        RE      : in std_logic := '1';
+        --! Write enable.
+        WE      : in std_logic;
+        --! Address.
+        ADDR    : in std_logic_vector(ADDRESS_WIDTH-1 downto 0);
+        --! Write data.
+        DI      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+        --! Output data.
+        DO      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        --! Output data validity.
+        DO_DV   : out std_logic
+    );
 end entity;

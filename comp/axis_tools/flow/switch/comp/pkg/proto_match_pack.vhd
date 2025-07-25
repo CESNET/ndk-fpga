@@ -24,7 +24,7 @@ package proto_match_pack is
         match_protocols   : natural_array_t;
         match_range_highs : natural_array_t;
         match_range_lows  : natural_array_t;
-    end record mat_config_t;
+    end record;
 
     -- Switch configuration.
     type config_array_t is array (natural range <>) of mat_config_t;
@@ -34,17 +34,17 @@ package proto_match_pack is
     constant MAT_CONFIG_MATCH_WIDTH : natural := 1; -- calculated from ranges
 
     -- Get data vector width in bits.
-    function mat_match_width(mat_config : mat_config_t) return natural;
+    function mat_match_width (mat_config : mat_config_t) return natural;
 
     -- Get data vector field offsets.
-    function mat_match_data_bases(mat_config : mat_config_t) return natural_array_t;
+    function mat_match_data_bases (mat_config : mat_config_t) return natural_array_t;
 
     -- Get max value from the given configuration object based on selector.
-    function config_array_get_max(config_array : config_array_t; selector : natural) return natural;
+    function config_array_get_max (config_array : config_array_t; selector : natural) return natural;
 
     -- Empty configuration object.
     constant CONFIG_NONE : config_array_t := (
-        0 => (
+        0                     => (
             match_num_fields  => 0,
             match_items       => 0,
             match_protocols   => (0 => 0),
@@ -60,7 +60,7 @@ end package;
 -- -----------------------------------------------------------------------------
 package body proto_match_pack is
 
-    function mat_match_width(mat_config : mat_config_t) return natural is
+    function mat_match_width (mat_config : mat_config_t) return natural is
         variable match_data_width : natural := 0;
         variable field_data_width : natural := 0;
     begin
@@ -69,18 +69,18 @@ package body proto_match_pack is
             match_data_width := match_data_width + field_data_width;
         end loop;
         return match_data_width;
-    end function mat_match_width;
+    end function;
 
-    function mat_match_data_bases(mat_config : mat_config_t) return natural_array_t is
+    function mat_match_data_bases (mat_config : mat_config_t) return natural_array_t is
         variable match_data_bases : natural_array_t(mat_config.match_num_fields+1-1 downto 0) := (others => 0);
     begin
         for i in 0 to mat_config.match_num_fields-1 loop
             match_data_bases(i+1) := mat_config.match_range_highs(i) - mat_config.match_range_lows(i) + 1 + match_data_bases(i);
         end loop;
         return match_data_bases;
-    end function mat_match_data_bases;
+    end function;
 
-    function config_array_get_max(config_array : config_array_t; selector : natural) return natural is
+    function config_array_get_max (config_array : config_array_t; selector : natural) return natural is
         variable max_value : natural := 0;
         variable tmp_value : natural := 0;
     begin
@@ -96,6 +96,6 @@ package body proto_match_pack is
             max_value := max(max_value, tmp_value);
         end loop;
         return max_value;
-    end function config_array_get_max;
+    end function;
 
 end package body;

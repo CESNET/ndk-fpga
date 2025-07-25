@@ -20,7 +20,7 @@ use work.math_pack.all;
 --      Default and recommended latency for comparator using DSPs is 2 clock cycles,
 --      latency of 1 clock cycle is achieved when input registers are disabled.
 entity DSP_COMPARATOR is
-    Generic (
+    generic (
         -- The width of inputs; maximum width of 25 bits applies only in modes ">= " or "<= " when
         -- using DSP blocks, "unlimited" in other cases
         INPUT_DATA_WIDTH : natural := 25;
@@ -44,8 +44,8 @@ entity DSP_COMPARATOR is
         -- * "ULTRASCALE"
         -- * "7SERIES"
         DEVICE           : string  := "AGILEX"
-        );
-    Port (
+    );
+    port (
         CLK     :  in std_logic;
         CLK_EN  :  in std_logic;
         RESET   :  in std_logic;
@@ -85,15 +85,15 @@ begin
 
         comparator_i: entity work.CMP_DSP
         generic map (
-            DATA_WIDTH => INPUT_DATA_WIDTH         ,
+            DATA_WIDTH => INPUT_DATA_WIDTH,
             REG_IN     => tsel(INPUT_REGS_EN, 1, 0),
             REG_OUT    => 1
         )
         port map (
-            CLK    => CLK    ,
-            CE_IN  => CLK_EN ,
-            CE_OUT => CLK_EN ,
-            RESET  => RESET  ,
+            CLK    => CLK,
+            CE_IN  => CLK_EN,
+            CE_OUT => CLK_EN,
+            RESET  => RESET,
             A      => INPUT_1,
             B      => INPUT_2,
             P      => cmp_dsp_output
@@ -118,15 +118,15 @@ begin
         comparator_i: entity work.DSP_COMPARATOR_INTEL
         generic map (
             INPUT_DATA_WIDTH => INPUT_DATA_WIDTH,
-            INPUT_REGS_EN    => INPUT_REGS_EN   ,
-            DSP_EN           => use_dsp         ,
-            MODE             => MODE            ,
+            INPUT_REGS_EN    => INPUT_REGS_EN,
+            DSP_EN           => use_dsp,
+            MODE             => MODE,
             DEVICE           => DEVICE
         )
         port map (
-            CLK     => CLK    ,
-            CLK_EN  => CLK_EN ,
-            RESET   => RESET  ,
+            CLK     => CLK,
+            CLK_EN  => CLK_EN,
+            RESET   => RESET,
             INPUT_1 => INPUT_1,
             INPUT_2 => INPUT_2,
             RESULT  => RESULT

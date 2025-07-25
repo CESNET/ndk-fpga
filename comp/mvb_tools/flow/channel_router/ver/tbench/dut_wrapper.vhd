@@ -13,7 +13,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity DUT_WRAPPER is
-    generic(
+    generic (
         ITEMS         : natural := 4;
         ITEM_WIDTH    : natural := 32;
         SRC_CHANNELS  : natural := 4;  -- max value = DST_CHANNELS
@@ -22,7 +22,7 @@ entity DUT_WRAPPER is
         MI_ADDR_WIDTH : natural := 32;
         DEVICE        : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -45,7 +45,7 @@ entity DUT_WRAPPER is
         --  INPUT MVB INTERFACE
         -- =====================================================================
         RX_DATA    : in  std_logic_vector(ITEMS*(ITEM_WIDTH+log2(SRC_CHANNELS))-1 downto 0);
-        --RX_CHANNEL : in  std_logic_vector(ITEMS*log2(SRC_CHANNELS)-1 downto 0);
+        -- RX_CHANNEL : in  std_logic_vector(ITEMS*log2(SRC_CHANNELS)-1 downto 0);
         RX_VLD     : in  std_logic_vector(ITEMS-1 downto 0);
         RX_SRC_RDY : in  std_logic;
         RX_DST_RDY : out std_logic;
@@ -54,12 +54,12 @@ entity DUT_WRAPPER is
         --  OUTPUT MVB INTERFACE
         -- =====================================================================
         TX_DATA    : out std_logic_vector(ITEMS*(ITEM_WIDTH+log2(DST_CHANNELS))-1 downto 0);
-        --TX_CHANNEL : in  std_logic_vector(ITEMS*log2(DST_CHANNELS)-1 downto 0);
+        -- TX_CHANNEL : in  std_logic_vector(ITEMS*log2(DST_CHANNELS)-1 downto 0);
         TX_VLD     : out std_logic_vector(ITEMS-1 downto 0);
         TX_SRC_RDY : out std_logic;
         TX_DST_RDY : in  std_logic
 
-        ---------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
     );
 end entity;
 
@@ -84,10 +84,10 @@ begin
     rx_data_all_arr <= slv_array_deser(RX_DATA,ITEMS,ITEM_WIDTH+log2(SRC_CHANNELS));
     rx_unpack_g : for i in 0 to ITEMS-1 generate
         rx_channel_arr(i) <= rx_data_all_arr(i)(log2(SRC_CHANNELS)-1 downto 0);
-        rx_data_arr(i) <= rx_data_all_arr(i)(ITEM_WIDTH+log2(SRC_CHANNELS)-1 downto log2(SRC_CHANNELS));
+        rx_data_arr(i)    <= rx_data_all_arr(i)(ITEM_WIDTH+log2(SRC_CHANNELS)-1 downto log2(SRC_CHANNELS));
     end generate;
 
-    mvb_ch_arr_deser <= slv_array_deser(mvb_tx_ch,ITEMS,log2(DST_CHANNELS));
+    mvb_ch_arr_deser   <= slv_array_deser(mvb_tx_ch,ITEMS,log2(DST_CHANNELS));
     mvb_data_arr_deser <= slv_array_deser(mvb_data,ITEMS,ITEM_WIDTH);
 
     data_g : for i in 0 to ITEMS-1 generate
@@ -95,10 +95,10 @@ begin
     end generate;
 
     mvb_new_data_ser <= slv_array_ser(mvb_new_data_arr,ITEMS,NEW_DATA_WIDTH);
-    TX_DATA <= mvb_new_data_ser;
+    TX_DATA          <= mvb_new_data_ser;
 
     dut_i : entity work.MVB_CHANNEL_ROUTER_MI
-    generic map(
+    generic map (
         ITEMS          => ITEMS,
         ITEM_WIDTH     => ITEM_WIDTH,
         SRC_CHANNELS   => SRC_CHANNELS,
@@ -106,8 +106,9 @@ begin
         MI_DATA_WIDTH  => MI_DATA_WIDTH,
         MI_ADDR_WIDTH  => MI_ADDR_WIDTH,
 
-        DEVICE  => DEVICE    )
-    port map(
+        DEVICE  => DEVICE
+    )
+    port map (
         CLK         => CLK,
         RESET       => RESET,
 

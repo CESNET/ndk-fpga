@@ -18,39 +18,39 @@ use work.math_pack.all;
 -- ----------------------------------------------------------------------------
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
-entity dec1fn is
-   generic(
-      ITEMS       : integer := 8
-   );
-   port(
-      ADDR        : in  std_logic_vector(max(1,log2(ITEMS))-1 downto 0);
-      DO          : out std_logic_vector(ITEMS-1 downto 0)
-   );
-end entity dec1fn;
+entity DEC1FN is
+    generic (
+        ITEMS       : integer := 8
+    );
+    port (
+        ADDR        : in  std_logic_vector(max(1,log2(ITEMS))-1 downto 0);
+        DO          : out std_logic_vector(ITEMS-1 downto 0)
+    );
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
-architecture behavioral of dec1fn is
+architecture BEHAVIORAL of DEC1FN is
 
 
 begin
 
-fake_gen : if ITEMS=1 generate
-   DO(0) <= '1';
-end generate;
+    fake_gen : if ITEMS = 1 generate
+        DO(0) <= '1';
+    end generate;
 
-real_gen : if ITEMS>1 generate
-   process(ADDR)
-   begin
-      DO    <= (others => '0');
-      for i in 0 to (ITEMS-1) loop
-         if (conv_std_logic_vector(i, log2(ITEMS)) = ADDR) then
-            DO(i) <= '1';
-         end if;
-      end loop;
-   end process;
-end generate;
+    real_gen : if ITEMS > 1 generate
+        process (ADDR)
+        begin
+            DO    <= (others => '0');
+            for i in 0 to (ITEMS-1) loop
+                if (conv_std_logic_vector(i, log2(ITEMS)) = ADDR) then
+                    DO(i) <= '1';
+                end if;
+            end loop;
+        end process;
+    end generate;
 
-end architecture behavioral;
+end architecture;
 

@@ -129,7 +129,7 @@ entity MVB_OPERATION is
     );
 end entity;
 
-architecture behavioral of MVB_OPERATION is
+architecture BEHAVIORAL of MVB_OPERATION is
 
     signal rx_data_arr                  : slv_array_t(MVB_ITEMS - 1 downto 0)(ITEM_WIDTH + 1 + CONSUME_ITEM_WIDTH - 1 downto 0);
 
@@ -162,8 +162,8 @@ architecture behavioral of MVB_OPERATION is
 begin
 
     rx_data_g : for i in 0 to MVB_ITEMS - 1 generate
-        rx_data_arr(i)(ITEM_WIDTH - 1 downto 0) <= RX_DATA((i+1) * ITEM_WIDTH - 1 downto i * ITEM_WIDTH);
-        rx_data_arr(i)(ITEM_WIDTH) <= RX_OP_EN(i);
+        rx_data_arr(i)(ITEM_WIDTH - 1 downto 0)                                       <= RX_DATA((i+1) * ITEM_WIDTH - 1 downto i * ITEM_WIDTH);
+        rx_data_arr(i)(ITEM_WIDTH)                                                    <= RX_OP_EN(i);
         rx_data_arr(i)(ITEM_WIDTH + 1 + CONSUME_ITEM_WIDTH - 1 downto ITEM_WIDTH + 1) <= RX_DATA_CONSUME((i+1) * CONSUME_ITEM_WIDTH - 1 downto i * CONSUME_ITEM_WIDTH);
     end generate;
 
@@ -223,7 +223,7 @@ begin
 
     discard_tx_data_arr <= slv_array_deser(discard_tx_data, MVB_ITEMS);
     tx_op_g : for i in 0 to MVB_ITEMS - 1 generate
-        TX_OP_DATA((i+1)*ITEM_WIDTH - 1 downto i*ITEM_WIDTH) <= discard_tx_data_arr(i)(ITEM_WIDTH - 1 downto 0);
+        TX_OP_DATA((i+1)*ITEM_WIDTH - 1 downto i*ITEM_WIDTH)                         <= discard_tx_data_arr(i)(ITEM_WIDTH - 1 downto 0);
         TX_OP_DATA_CONSUME((i+1)*CONSUME_ITEM_WIDTH - 1 downto i*CONSUME_ITEM_WIDTH) <= discard_tx_data_arr(i)(ITEM_WIDTH + CONSUME_ITEM_WIDTH - 1 downto ITEM_WIDTH);
     end generate;
 
@@ -280,18 +280,18 @@ begin
     lat_data_g : for i in 0 to MVB_ITEMS - 1 generate
         lat_fifox_tx_data_op_en(i) <= lat_fifox_tx_data(i * (ITEM_WIDTH + 1) + ITEM_WIDTH);
     end generate;
-    lat_fifox_tx_data_op_sent <= lat_fifox_tx_vld and lat_fifox_tx_data_op_en;
+    lat_fifox_tx_data_op_sent  <= lat_fifox_tx_vld and lat_fifox_tx_data_op_en;
     lat_fifox_tx_data_wait_rsp <= or lat_fifox_tx_data_op_sent;
 
     -- Optional handshake logic generated from truth table
-    lat_fifox_tx_dst_rdy <= ((not lat_fifox_tx_data_wait_rsp) and TX_DST_RDY) or (rx_op_pipe_tx_src_rdy and TX_DST_RDY);
+    lat_fifox_tx_dst_rdy  <= ((not lat_fifox_tx_data_wait_rsp) and TX_DST_RDY) or (rx_op_pipe_tx_src_rdy and TX_DST_RDY);
     rx_op_pipe_tx_dst_rdy <= lat_fifox_tx_data_wait_rsp and lat_fifox_tx_src_rdy and TX_DST_RDY;
-    TX_SRC_RDY <= ((not lat_fifox_tx_data_wait_rsp) and lat_fifox_tx_src_rdy) or (lat_fifox_tx_src_rdy and rx_op_pipe_tx_src_rdy);
+    TX_SRC_RDY            <= ((not lat_fifox_tx_data_wait_rsp) and lat_fifox_tx_src_rdy) or (lat_fifox_tx_src_rdy and rx_op_pipe_tx_src_rdy);
 
     tx_data_g : for i in 0 to MVB_ITEMS - 1 generate
         TX_DATA((i+1) * ITEM_WIDTH - 1 downto i * ITEM_WIDTH) <= lat_fifox_tx_data(i * (ITEM_WIDTH + 1) + ITEM_WIDTH - 1 downto i * (ITEM_WIDTH + 1));
-        TX_RESPONSE_VLD(i) <= lat_fifox_tx_data(i * (ITEM_WIDTH + 1) + ITEM_WIDTH);
-        TX_VLD <= lat_fifox_tx_vld;
+        TX_RESPONSE_VLD(i)                                    <= lat_fifox_tx_data(i * (ITEM_WIDTH + 1) + ITEM_WIDTH);
+        TX_VLD                                                <= lat_fifox_tx_vld;
     end generate;
     TX_RESPONSE <= rx_op_pipe_tx_data;
 

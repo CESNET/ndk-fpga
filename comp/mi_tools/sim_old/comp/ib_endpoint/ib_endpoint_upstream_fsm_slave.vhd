@@ -20,62 +20,62 @@ use work.ib_pkg.all; -- Internal Bus package
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
 entity IB_ENDPOINT_UPSTREAM_FSM_SLAVE is
-   port (
-   -- ========================
-   -- Common Interface
-   -- ========================
+    port (
+        -- ========================
+        -- Common Interface
+        -- ========================
 
-   -- Clk
-   CLK                : in std_logic;
-   -- Reset
-   RESET              : in std_logic;
+        -- Clk
+        CLK                : in std_logic;
+        -- Reset
+        RESET              : in std_logic;
 
-   -- ========================
-   -- HDR_GEN Interface
-   -- ========================
+        -- ========================
+        -- HDR_GEN Interface
+        -- ========================
 
-   RD_COMPL_REQ       : in  std_logic;
-   RD_COMPL_ACK       : out std_logic;
+        RD_COMPL_REQ       : in  std_logic;
+        RD_COMPL_ACK       : out std_logic;
 
-   -- ========================
-   -- Control
-   -- ========================
+        -- ========================
+        -- Control
+        -- ========================
 
-   -- Get second header
-   GET_SECOND_HDR     : out std_logic;
+        -- Get second header
+        GET_SECOND_HDR     : out std_logic;
 
-   -- ========================
-   -- Align buffer Interface
-   -- ========================
+        -- ========================
+        -- Align buffer Interface
+        -- ========================
 
-   -- Align buffer src_rdy
-   RD_SRC_RDY         : in  std_logic;
-   -- Align buffer dst_rdy
-   RD_DST_RDY         : out std_logic;
-   -- Align buffer eof
-   RD_EOF             : in  std_logic;
+        -- Align buffer src_rdy
+        RD_SRC_RDY         : in  std_logic;
+        -- Align buffer dst_rdy
+        RD_DST_RDY         : out std_logic;
+        -- Align buffer eof
+        RD_EOF             : in  std_logic;
 
-   -- ========================
-   -- Multipexor Interface
-   -- ========================
+        -- ========================
+        -- Multipexor Interface
+        -- ========================
 
-   -- Select HEADER/DATA
-   MUX_SEL            : out std_logic;
+        -- Select HEADER/DATA
+        MUX_SEL            : out std_logic;
 
-   -- ========================
-   -- Upstream Interface
-   -- ========================
+        -- ========================
+        -- Upstream Interface
+        -- ========================
 
-   -- Start of Packet (Start of transaction)
-   SOP                : out std_logic;
-   -- Ent of Packet (End of Transaction)
-   EOP                : out std_logic;
-   -- Source Ready
-   SRC_RDY            : out std_logic;
-   -- Destination Ready
-   DST_RDY            : in  std_logic
-   );
-end entity IB_ENDPOINT_UPSTREAM_FSM_SLAVE;
+        -- Start of Packet (Start of transaction)
+        SOP                : out std_logic;
+        -- Ent of Packet (End of Transaction)
+        EOP                : out std_logic;
+        -- Source Ready
+        SRC_RDY            : out std_logic;
+        -- Destination Ready
+        DST_RDY            : in  std_logic
+    );
+end entity;
 
 
 -- ----------------------------------------------------------------------------
@@ -83,107 +83,108 @@ end entity IB_ENDPOINT_UPSTREAM_FSM_SLAVE;
 -- ----------------------------------------------------------------------------
 architecture IB_ENDPOINT_UPSTREAM_FSM_SLAVE_ARCH of IB_ENDPOINT_UPSTREAM_FSM_SLAVE is
 
-   -- Control FSM declaration
-   type   t_states is (st_idle, st_read_wait, st_rd_hdr, st_data);
-   signal present_state, next_state : t_states;
+    -- Control FSM declaration
+    type   t_states is (ST_IDLE, ST_READ_WAIT, ST_RD_HDR, ST_DATA);
+    signal present_state : t_states;
+    signal next_state    : t_states;
 
 begin
 
 
--- UPSTREAM FSM -----------------------------------------------------------
--- next state clk logic
-clk_d: process(CLK, RESET)
-  begin
-    if RESET = '1' then
-      present_state <= st_idle;
-    elsif (CLK='1' and CLK'event) then
-      present_state <= next_state;
-    end if;
-  end process;
+    -- UPSTREAM FSM -----------------------------------------------------------
+    -- next state clk logic
+    clk_d : process (CLK, RESET)
+    begin
+        if (RESET = '1') then
+            present_state <= ST_IDLE;
+        elsif (CLK = '1' and CLK'event) then
+            present_state <= next_state;
+        end if;
+    end process;
 
--- TODO : Priorita na RD a WR
+    -- TODO : Priorita na RD a WR
 
--- next state logic
-state_trans: process(present_state, RD_COMPL_REQ, DST_RDY, RD_EOF, RD_SRC_RDY)
-  begin
-    case present_state is
+    -- next state logic
+    state_trans : process (present_state, RD_COMPL_REQ, DST_RDY, RD_EOF, RD_SRC_RDY)
+    begin
+        case present_state is
 
-      -- ST_IDLE
-      when st_idle =>
-         -- Header Valid
-         if (RD_COMPL_REQ = '1') then
-            next_state <= st_read_wait;
-         else
-            next_state <= st_idle;
-         end if;
+            -- ST_IDLE
+            when ST_IDLE =>
+                -- Header Valid
+                if (RD_COMPL_REQ = '1') then
+                    next_state <= ST_READ_WAIT;
+                else
+                    next_state <= ST_IDLE;
+                end if;
 
-      -- Wait for readed data
-      when st_read_wait =>
-         if (DST_RDY = '1' and RD_SRC_RDY = '1') then
-            next_state <= st_rd_hdr;
-         else
-            next_state <= st_read_wait;
-         end if;
+            -- Wait for readed data
+            when ST_READ_WAIT =>
+                if (DST_RDY = '1' and RD_SRC_RDY = '1') then
+                    next_state <= ST_RD_HDR;
+                else
+                    next_state <= ST_READ_WAIT;
+                end if;
 
-      -- ST_RD_HDR
-      when st_rd_hdr =>
-         if (DST_RDY = '1') then
-            next_state <= st_data;
-         else
-            next_state <= st_rd_hdr;
-         end if;
+            -- ST_RD_HDR
+            when ST_RD_HDR =>
+                if (DST_RDY = '1') then
+                    next_state <= ST_DATA;
+                else
+                    next_state <= ST_RD_HDR;
+                end if;
 
-      -- ST_DATA
-      when st_data =>
-         -- When Last data readed
-         if (DST_RDY = '1' and RD_EOF = '1') then
-           next_state <= st_idle;
-         else
-           next_state <= st_data;
-         end if;
+            -- ST_DATA
+            when ST_DATA =>
+                -- When Last data readed
+                if (DST_RDY = '1' and RD_EOF = '1') then
+                    next_state <= ST_IDLE;
+                else
+                    next_state <= ST_DATA;
+                end if;
 
-      end case;
-  end process;
+        end case;
+    end process;
 
--- output logic
-output_logic: process(present_state, RD_COMPL_REQ, DST_RDY, RD_EOF, RD_SRC_RDY)
-  begin
-   MUX_SEL            <= '0'; -- Select HEADER/DATA
-   RD_DST_RDY         <= '0'; -- RD_DST_RDY
-   SOP                <= '0'; -- Start of Packet (Start of transaction)
-   EOP                <= '0'; -- Ent of Packet (End of Transaction)
-   SRC_RDY            <= '0'; -- Source Ready
-   GET_SECOND_HDR     <= '0';
-   RD_COMPL_ACK       <= '0';
+    -- output logic
+    output_logic : process (present_state, RD_COMPL_REQ, DST_RDY, RD_EOF, RD_SRC_RDY)
+    begin
+        MUX_SEL            <= '0';                           -- Select HEADER/DATA
+        RD_DST_RDY         <= '0';                           -- RD_DST_RDY
+        SOP                <= '0';                           -- Start of Packet (Start of transaction)
+        EOP                <= '0';                           -- Ent of Packet (End of Transaction)
+        SRC_RDY            <= '0';                           -- Source Ready
+        GET_SECOND_HDR     <= '0';
+        RD_COMPL_ACK       <= '0';
 
-   case present_state is
+        case present_state is
 
-      -- ST_IDLE
-      when st_idle =>
-         RD_DST_RDY <= '0';
-         if (RD_COMPL_REQ = '1') then
-            RD_COMPL_ACK  <= '1';
-         end if;
+            -- ST_IDLE
+            when ST_IDLE =>
+                RD_DST_RDY <= '0';
+                if (RD_COMPL_REQ = '1') then
+                    RD_COMPL_ACK  <= '1';
+                end if;
 
-      when st_read_wait =>
-         if (DST_RDY = '1' and RD_SRC_RDY = '1') then
-            SOP               <= '1';
-            SRC_RDY           <= '1';
-         end if;
+            when ST_READ_WAIT =>
+                if (DST_RDY = '1' and RD_SRC_RDY = '1') then
+                    SOP               <= '1';
+                    SRC_RDY           <= '1';
+                end if;
 
-      -- ST_RD_HDR
-      when st_rd_hdr =>
-         GET_SECOND_HDR    <= '1';
-         SRC_RDY           <= DST_RDY;
+            -- ST_RD_HDR
+            when ST_RD_HDR =>
+                GET_SECOND_HDR    <= '1';
+                SRC_RDY           <= DST_RDY;
 
-      -- ST_DATA
-      when st_data =>
-         RD_DST_RDY        <= DST_RDY;
-         EOP               <= RD_EOF;
-         SRC_RDY           <= RD_SRC_RDY;
-         MUX_SEL           <= '1';
-      end case;
-  end process;
+            -- ST_DATA
+            when ST_DATA =>
+                RD_DST_RDY        <= DST_RDY;
+                EOP               <= RD_EOF;
+                SRC_RDY           <= RD_SRC_RDY;
+                MUX_SEL           <= '1';
+        end case;
+    end process;
 
-end architecture IB_ENDPOINT_UPSTREAM_FSM_SLAVE_ARCH;
+end architecture;
 

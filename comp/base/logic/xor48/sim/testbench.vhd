@@ -13,95 +13,95 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-entity testbench is
+entity TESTBENCH is
 
-end testbench;
+end entity;
 
-architecture behavioral of testbench is
+architecture BEHAVIORAL of TESTBENCH is
 
 
-   constant clkper         : time := 10 ns; --Clock period
-   constant reset_time     : time := 10*clkper + 1 ns; --Reset duration
+    constant CLKPER         : time := 10 ns;            -- Clock period
+    constant RESET_TIME     : time := 10*CLKPER + 1 ns; -- Reset duration
 
-   -- Clock and reset signals
-   signal CLK              : std_logic;
-   signal RESET            : std_logic;
+    -- Clock and reset signals
+    signal clk              : std_logic;
+    signal reset            : std_logic;
 
-   -- input and output
-   signal A                : std_logic_vector(47 downto 0);
-   signal B                : std_logic_vector(47 downto 0);
-   signal CEAB             : std_logic;
-   signal CEP              : std_logic;
-   signal P                : std_logic_vector(47 downto 0);
+    -- input and output
+    signal a                : std_logic_vector(47 downto 0);
+    signal b                : std_logic_vector(47 downto 0);
+    signal ceab             : std_logic;
+    signal cep              : std_logic;
+    signal p                : std_logic_vector(47 downto 0);
 
 begin
 
-   -- XOR48
-   uut : entity work.XOR48(V7_DSP)
-   generic map (
-      ABREG       => 1,
-      PREG        => 1
-   )
-   port map (
-      CLK         => CLK,
-      RESET       => RESET,
+    -- XOR48
+    uut : entity work.XOR48(V7_DSP)
+    generic map (
+        ABREG       => 1,
+        PREG        => 1
+    )
+    port map (
+        CLK         => clk,
+        RESET       => reset,
 
-      A           => A,
-      B           => B,
-      CEAB        => CEAB,
-      CEP         => CEP,
-      P           => P
-   );
+        A           => a,
+        B           => b,
+        CEAB        => ceab,
+        CEP         => cep,
+        P           => p
+    );
 
-   --Generate clock
-   clk_gen_p : process
-   begin
-      CLK <= '1';
-      wait for clkper/2;
-      CLK <= '0';
-      wait for clkper/2;
-   end process clk_gen_p;
+    -- Generate clock
+    clk_gen_p : process
+    begin
+        clk <= '1';
+        wait for CLKPER/2;
+        clk <= '0';
+        wait for CLKPER/2;
+    end process;
 
-   --Generate reset
-   reset_gen : process
-   begin
-      RESET <= '1';
-      wait for reset_time;
-      RESET <= '0';
-   wait;
-   end process;
+    -- Generate reset
+    reset_gen : process
+    begin
+        reset <= '1';
+        wait for RESET_TIME;
+        reset <= '0';
+        wait;
+    end process;
 
-   -- Simulating input flow
-   input_flow : process
-   begin
+    -- Simulating input flow
+    input_flow : process
+    begin
 
-      -- Initialize input interface
-      A <= X"000000000000";
-      B <= X"000000000000";
-      CEAB <= '1';
-      CEP <= '1';
+        -- Initialize input interface
+        a    <= X"000000000000";
+        b    <= X"000000000000";
+        ceab <= '1';
+        cep  <= '1';
 
-      wait for reset_time;
-      wait for 10*clkper;
+        wait for RESET_TIME;
+        wait for 10*CLKPER;
 
-      A <= X"00FF00FF00FF";
-      B <= X"0F0F0F0F0F0F";
-      wait for clkper;
+        a <= X"00FF00FF00FF";
+        b <= X"0F0F0F0F0F0F";
+        wait for CLKPER;
 
-      A <= X"0123456789AB";
-      B <= X"FEDCBA987654";
-      wait for clkper;
+        a <= X"0123456789AB";
+        b <= X"FEDCBA987654";
+        wait for CLKPER;
 
-      A <= X"0123456789AB";
-      B <= X"0123456789AB";
-      wait for clkper;
+        a <= X"0123456789AB";
+        b <= X"0123456789AB";
+        wait for CLKPER;
 
-      A <= X"EDCBA9876543";
-      B <= X"FEDCBA987654";
-      wait for clkper;
+        a <= X"EDCBA9876543";
+        b <= X"FEDCBA987654";
+        wait for CLKPER;
 
-      wait;
+        wait;
 
-   end process input_flow;
+    end process;
 
 end architecture;

@@ -66,13 +66,13 @@ architecture FULL of AXIS_OP_MANAGER is
     signal s_tx_axi_transfer_tlast : std_logic;
     signal s_op_conn_sel_hot_en    : std_logic_vector(NUM_PORTS-1 downto 0);
 
-    constant FRAME_CNT_WIDTH       : integer := log2(max(NUM_ITEMS_PER_PORT))+1;
-    signal s_viq_frame_cnt_arr     : slv_array_t(NUM_PORTS-1 downto 0)(FRAME_CNT_WIDTH-1 downto 0);
-    signal s_viq_not_empty_arr     : std_logic_vector(NUM_PORTS-1 downto 0);
-    signal s_viq_next_hot          : std_logic_vector(NUM_PORTS-1 downto 0);
-    signal s_viq_next_hot_reg      : std_logic_vector(NUM_PORTS-1 downto 0);
-    signal s_viq_next              : std_logic_vector(log2(NUM_PORTS)-1 downto 0);
-    signal s_viq_next_vld          : std_logic;
+    constant FRAME_CNT_WIDTH         : integer := log2(max(NUM_ITEMS_PER_PORT))+1;
+    signal   s_viq_frame_cnt_arr     : slv_array_t(NUM_PORTS-1 downto 0)(FRAME_CNT_WIDTH-1 downto 0);
+    signal   s_viq_not_empty_arr     : std_logic_vector(NUM_PORTS-1 downto 0);
+    signal   s_viq_next_hot          : std_logic_vector(NUM_PORTS-1 downto 0);
+    signal   s_viq_next_hot_reg      : std_logic_vector(NUM_PORTS-1 downto 0);
+    signal   s_viq_next              : std_logic_vector(log2(NUM_PORTS)-1 downto 0);
+    signal   s_viq_next_vld          : std_logic;
 
 begin
 
@@ -123,8 +123,8 @@ begin
         signal s_viq_frame_cnt_inc : std_logic;
         signal s_viq_frame_cnt_dec : std_logic;
     begin
-        s_viq_frame_cnt_inc <= s_op_conn_sel_hot_en(i) and s_rx_axi_transfer_tlast;
-        s_viq_frame_cnt_dec <= s_viq_next_hot(i) and s_tx_axi_transfer_tlast;
+        s_viq_frame_cnt_inc    <= s_op_conn_sel_hot_en(i) and s_rx_axi_transfer_tlast;
+        s_viq_frame_cnt_dec    <= s_viq_next_hot(i) and s_tx_axi_transfer_tlast;
         frame_cnt_reg_p : process (CLK)
         begin
             if (rising_edge(CLK)) then

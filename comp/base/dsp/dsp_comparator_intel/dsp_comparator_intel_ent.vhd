@@ -11,7 +11,7 @@ use IEEE.numeric_std.all;
 -- NOTE: the default latency of this comparator is 2 clock cycles (with input registers enabled), to achieve latency of 1 clock cycle, disable input registers
 
 entity DSP_COMPARATOR_INTEL is
-    Generic (
+    generic (
         -- the width of input; maximum width of 25 bits applies only in modes ">= " or "<= " when using DSP blocks, unlimited in other cases
         INPUT_DATA_WIDTH : natural := 25;
         -- enable input registers
@@ -26,8 +26,8 @@ entity DSP_COMPARATOR_INTEL is
         MODE             : string  := "><=";
         -- "AGILEX" or "STRATIX10"
         DEVICE           : string  := "AGILEX"
-        );
-    Port (
+    );
+    port (
         CLK     :  in std_logic;
         CLK_EN  :  in std_logic;
         RESET   :  in std_logic;

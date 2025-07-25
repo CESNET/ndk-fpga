@@ -11,14 +11,14 @@ use IEEE.std_logic_1164.all;
 -- Simple gate for MVB bus. Has option for instation of FIFO,
 -- which can smooth out stopping of the bus.
 entity MVB_GATE is
-    generic(
-        ITEMS           :       natural := 4;
-        ITEM_WIDTH      :       natural := 8;
-        RX_FIFO_EN      :       boolean := false;
-        RX_FIFO_DEPTH   :       natural := 32;
-        DEVICE          :       string  := "AGILEX"
+    generic (
+        ITEMS           : natural := 4;
+        ITEM_WIDTH      : natural := 8;
+        RX_FIFO_EN      : boolean := false;
+        RX_FIFO_DEPTH   : natural := 32;
+        DEVICE          : string  := "AGILEX"
     );
-    port(
+    port (
         CLK             : in    std_logic;
         RESET           : in    std_logic;
 

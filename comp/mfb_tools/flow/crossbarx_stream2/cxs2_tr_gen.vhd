@@ -12,68 +12,68 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MFB_CROSSBARX_STREAM2_TR_GEN is
-generic (
-    MFB_REGIONS : natural := 4;
-    PKT_MTU     : natural := 2**14;
-    USERMETA_W  : natural := 32;
-    MOD_W       : natural := 7;
-    RXBUF_BYTES : natural := 32768;
-    STREAMS     : natural := 4;
-    STREAM_ID   : natural := 0;
-    PKT_ID_W    : natural := 9;
-    PLAN_META_W : natural := MOD_W + 1 + USERMETA_W + log2(RXBUF_BYTES) + STREAMS + PKT_ID_W;
-    DEVICE      : string  := "AGILEX"
-);
-port (
-    -- =========================================================================
-    -- Clock and Resets inputs
-    -- =========================================================================
-    CLK                    : in  std_logic;
-    RESET                  : in  std_logic;
+    generic (
+        MFB_REGIONS : natural := 4;
+        PKT_MTU     : natural := 2**14;
+        USERMETA_W  : natural := 32;
+        MOD_W       : natural := 7;
+        RXBUF_BYTES : natural := 32768;
+        STREAMS     : natural := 4;
+        STREAM_ID   : natural := 0;
+        PKT_ID_W    : natural := 9;
+        PLAN_META_W : natural := MOD_W + 1 + USERMETA_W + log2(RXBUF_BYTES) + STREAMS + PKT_ID_W;
+        DEVICE      : string  := "AGILEX"
+    );
+    port (
+        -- =========================================================================
+        -- Clock and Resets inputs
+        -- =========================================================================
+        CLK                    : in  std_logic;
+        RESET                  : in  std_logic;
 
-    -- =========================================================================
-    -- INPUT MVB INTERFACE WITH RX INSTRUCTION AND METADATA
-    -- =========================================================================
-    RX_MVB_USERMETA        : in  slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_W-1 downto 0);
-    RX_MVB_DISCARD         : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MVB_MOD_SOF_SIZE    : in  slv_array_t(MFB_REGIONS-1 downto 0)(MOD_W-1 downto 0);
-    RX_MVB_MOD_SOF_TYPE    : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MVB_MOD_SOF_EN      : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MVB_MOD_EOF_SIZE    : in  slv_array_t(MFB_REGIONS-1 downto 0)(MOD_W-1 downto 0);
-    RX_MVB_MOD_EOF_TYPE    : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MVB_MOD_EOF_EN      : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MVB_VLD             : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MVB_SRC_RDY         : in  std_logic;
-    RX_MVB_DST_RDY         : out std_logic;
+        -- =========================================================================
+        -- INPUT MVB INTERFACE WITH RX INSTRUCTION AND METADATA
+        -- =========================================================================
+        RX_MVB_USERMETA        : in  slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_W-1 downto 0);
+        RX_MVB_DISCARD         : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MVB_MOD_SOF_SIZE    : in  slv_array_t(MFB_REGIONS-1 downto 0)(MOD_W-1 downto 0);
+        RX_MVB_MOD_SOF_TYPE    : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MVB_MOD_SOF_EN      : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MVB_MOD_EOF_SIZE    : in  slv_array_t(MFB_REGIONS-1 downto 0)(MOD_W-1 downto 0);
+        RX_MVB_MOD_EOF_TYPE    : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MVB_MOD_EOF_EN      : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MVB_VLD             : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MVB_SRC_RDY         : in  std_logic;
+        RX_MVB_DST_RDY         : out std_logic;
 
-    -- =========================================================================
-    -- INPUT MVB INTERFACE WITH RX BUFFER TRANSACTIONS
-    -- =========================================================================
-    RXBUF_MVB_PKT_ID       : in  slv_array_t(MFB_REGIONS-1 downto 0)(PKT_ID_W-1 downto 0);
-    RXBUF_MVB_EOF_ADDR     : in  slv_array_t(MFB_REGIONS-1 downto 0)(log2(RXBUF_BYTES)-1 downto 0);
-    RXBUF_MVB_LEN          : in  slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
-    RXBUF_MVB_VLD          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RXBUF_MVB_SRC_RDY      : in  std_logic;
-    RXBUF_MVB_DST_RDY      : out std_logic;
+        -- =========================================================================
+        -- INPUT MVB INTERFACE WITH RX BUFFER TRANSACTIONS
+        -- =========================================================================
+        RXBUF_MVB_PKT_ID       : in  slv_array_t(MFB_REGIONS-1 downto 0)(PKT_ID_W-1 downto 0);
+        RXBUF_MVB_EOF_ADDR     : in  slv_array_t(MFB_REGIONS-1 downto 0)(log2(RXBUF_BYTES)-1 downto 0);
+        RXBUF_MVB_LEN          : in  slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+        RXBUF_MVB_VLD          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RXBUF_MVB_SRC_RDY      : in  std_logic;
+        RXBUF_MVB_DST_RDY      : out std_logic;
 
-    -- =========================================================================
-    -- OUTPUT MVB INTERFACE WITH DISCARD ID
-    -- =========================================================================
-    DIS_MVB_PKT_ID         : out slv_array_t(MFB_REGIONS-1 downto 0)(PKT_ID_W-1 downto 0);
-    DIS_MVB_VLD            : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    DIS_MVB_SRC_RDY        : out std_logic;
+        -- =========================================================================
+        -- OUTPUT MVB INTERFACE WITH DISCARD ID
+        -- =========================================================================
+        DIS_MVB_PKT_ID         : out slv_array_t(MFB_REGIONS-1 downto 0)(PKT_ID_W-1 downto 0);
+        DIS_MVB_VLD            : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        DIS_MVB_SRC_RDY        : out std_logic;
 
-    -- =========================================================================
-    -- OUTPUT INTERFACE WITH TRANSACTIONS FOR PLANNER
-    -- =========================================================================
-    GEN_TR_MVB_USERMETA    : out slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_W-1 downto 0);
-    GEN_TR_MVB_RXBUF_ADDR  : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(RXBUF_BYTES)-1 downto 0);
-    GEN_TR_MVB_LEN         : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
-    GEN_TR_MVB_PLANMETA    : out slv_array_t(MFB_REGIONS-1 downto 0)(PLAN_META_W-1 downto 0);
-    GEN_TR_MVB_VLD         : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    GEN_TR_MVB_SRC_RDY     : out std_logic;
-    GEN_TR_MVB_AFULL       : in  std_logic
-);
+        -- =========================================================================
+        -- OUTPUT INTERFACE WITH TRANSACTIONS FOR PLANNER
+        -- =========================================================================
+        GEN_TR_MVB_USERMETA    : out slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_W-1 downto 0);
+        GEN_TR_MVB_RXBUF_ADDR  : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(RXBUF_BYTES)-1 downto 0);
+        GEN_TR_MVB_LEN         : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+        GEN_TR_MVB_PLANMETA    : out slv_array_t(MFB_REGIONS-1 downto 0)(PLAN_META_W-1 downto 0);
+        GEN_TR_MVB_VLD         : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        GEN_TR_MVB_SRC_RDY     : out std_logic;
+        GEN_TR_MVB_AFULL       : in  std_logic
+    );
 end entity;
 
 architecture FULL of MFB_CROSSBARX_STREAM2_TR_GEN is
@@ -137,7 +137,7 @@ begin
     end generate;
 
     mvb_merge_i : entity work.MVB_MERGE_ITEMS
-    generic map(
+    generic map (
         RX0_ITEMS      => MFB_REGIONS,
         RX0_ITEM_WIDTH => RXBUF_DATA_W,
         RX1_ITEMS      => MFB_REGIONS,
@@ -147,7 +147,7 @@ begin
         OUTPUT_REG     => True,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK         => CLK,
         RESET       => RESET,
 
@@ -175,7 +175,7 @@ begin
     me_arr_g : for i in 0 to MFB_REGIONS-1 generate
         process (all)
         begin
-            me_mvb_streams(i) <= (others => '0');
+            me_mvb_streams(i)            <= (others => '0');
             me_mvb_streams(i)(STREAM_ID) <= '1';
         end process;
 
@@ -203,20 +203,20 @@ begin
 
         process (all)
         begin
-            if (me_mvb_ext_sof_type(i) = '1') then -- trim sof
+            if (me_mvb_ext_sof_type(i) = '1') then                                                                            -- trim sof
                 mod_mvb_rxbuf_addr(i) <= std_logic_vector(unsigned(me_mvb_rxbuf_addr(i)) + unsigned(me_mvb_ext_sof_size(i)));
                 mod_mvb_len(i)        <= std_logic_vector(unsigned(me_mvb_len(i)) - unsigned(me_mvb_ext_sof_size(i)));
-            else -- extend sof
-                mod_mvb_rxbuf_addr(i) <= me_mvb_rxbuf_addr(i); --std_logic_vector(unsigned(me_mvb_rxbuf_addr(i)) - unsigned(me_mvb_ext_sof_size(i)));
+            else                                                                                                              -- extend sof
+                mod_mvb_rxbuf_addr(i) <= me_mvb_rxbuf_addr(i);                                                                -- std_logic_vector(unsigned(me_mvb_rxbuf_addr(i)) - unsigned(me_mvb_ext_sof_size(i)));
                 mod_mvb_len(i)        <= std_logic_vector(unsigned(me_mvb_len(i)) + unsigned(me_mvb_ext_sof_size(i)));
             end if;
         end process;
 
         process (all)
         begin
-            if (me_mvb_ext_eof_type(i) = '1') then -- trim eof
+            if (me_mvb_ext_eof_type(i) = '1') then                                                                -- trim eof
                 mod_mvb_len2(i) <= std_logic_vector(unsigned(mod_mvb_len(i)) - unsigned(me_mvb_ext_eof_size(i)));
-            else -- extend eof
+            else                                                                                                  -- extend eof
                 mod_mvb_len2(i) <= std_logic_vector(unsigned(mod_mvb_len(i)) + unsigned(me_mvb_ext_eof_size(i)));
             end if;
         end process;
@@ -260,7 +260,7 @@ begin
     -- DEBUG LOGIC
     -- =========================================================================
 
-    --pragma synthesis_off
+    -- pragma synthesis_off
     process (CLK)
         variable dbg_pkt_cnt_v : unsigned(63 downto 0);
     begin
@@ -308,6 +308,6 @@ begin
             end if;
         end if;
     end process;
-    --pragma synthesis_on
+    -- pragma synthesis_on
 
 end architecture;

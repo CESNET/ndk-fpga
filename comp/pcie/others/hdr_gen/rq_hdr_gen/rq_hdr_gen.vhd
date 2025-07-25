@@ -18,7 +18,7 @@ entity PCIE_RQ_HDR_GEN is
         -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE"
         DEVICE        : string  := "STRATIX10"
     );
-    port(
+    port (
         -- ===================================
         -- RQ interface
         -- ===================================
@@ -59,39 +59,40 @@ end entity;
 --                             Architecture
 -- ----------------------------------------------------------------------------
 
-architecture full of PCIE_RQ_HDR_GEN is
+architecture FULL of PCIE_RQ_HDR_GEN is
 
 begin
 
-    assert (DEVICE = "STRATIX10" OR DEVICE = "AGILEX" OR DEVICE = "ULTRASCALE" OR DEVICE = "7SERIES")
-        report "PCIE_RQ_HDR_GEN: unsupported device!" severity failure;
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+        report "PCIE_RQ_HDR_GEN: unsupported device!"
+        severity failure;
 
-   -- -------------------------------------------------------------------------
-   -- RQ PCIE Header construction
-   -- -------------------------------------------------------------------------
+    -- -------------------------------------------------------------------------
+    -- RQ PCIE Header construction
+    -- -------------------------------------------------------------------------
 
-    xilinx_pcie_hdr_gen : if (DEVICE="ULTRASCALE" or DEVICE="7SERIES") generate
+    xilinx_pcie_hdr_gen : if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
 
         OUT_HEADER <=
-            '0'                        & -- force ECRC
-            IN_ATTRIBUTES              & -- attributes
-            "000"                      & -- transaction class
-            '0'                        & -- requester ID enable
-            X"0000"                    & -- completer ID
-            IN_TAG(7 downto 0)         & -- tag
-            X"00" & IN_VFID            & -- requester ID
-            '0'                        & -- poisoned request
-            "000" & IN_REQ_TYPE        & -- request type
-            IN_DW_CNT                  & -- Dword count
-            IN_ADDRESS                 & -- address
-            "00";                       -- address type
+                      '0'                        & -- force ECRC
+                      IN_ATTRIBUTES              & -- attributes
+                      "000"                      & -- transaction class
+                      '0'                        & -- requester ID enable
+                      X"0000"                    & -- completer ID
+                      IN_TAG(7 downto 0)         & -- tag
+                      X"00" & IN_VFID            & -- requester ID
+                      '0'                        & -- poisoned request
+                      "000" & IN_REQ_TYPE        & -- request type
+                      IN_DW_CNT                  & -- Dword count
+                      IN_ADDRESS                 & -- address
+                      "00";                        -- address type
 
     end generate;
 
-    intel_pcie_hdr_gen : if (DEVICE="STRATIX10" or DEVICE="AGILEX") generate
+    intel_pcie_hdr_gen : if (DEVICE = "STRATIX10" or DEVICE = "AGILEX") generate
 
         OUT_HEADER <=
-            -- 96 bit header type
+        -- 96 bit header type
             (32-1 downto 0 => '0')     & -- padding
             IN_ADDRESS(30-1 downto 0)  & -- lower address
             "00"                       & -- padding
@@ -114,7 +115,7 @@ begin
 
         when IN_ADDR_LEN = '0' else
 
-            -- 128 bit header type
+        -- 128 bit header type
             IN_ADDRESS(30-1 downto 0)  & -- lower address
             "00"                       & -- padding
             IN_ADDRESS(62-1 downto 30) & -- higher address

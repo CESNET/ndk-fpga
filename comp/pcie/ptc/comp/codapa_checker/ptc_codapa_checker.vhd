@@ -13,7 +13,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity PTC_CODAPA_CHECKER is
-    generic(
+    generic (
         -- =====================================================================
         -- MVB HEADER BUS CONFIGURATION:
         -- =====================================================================
@@ -30,7 +30,7 @@ entity PTC_CODAPA_CHECKER is
         CODAPA_CNT_WIDTH   : natural := 8;
         DEVICE             : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- =======================================================================
         -- CLOCK AND RESET
         -- =======================================================================
@@ -86,10 +86,10 @@ architecture FULL of PTC_CODAPA_CHECKER is
 
     constant MVB_FIFO_ITEMS    : natural := 32;
     constant CODAPA_INC_DELAY  : natural := 10;
-    constant PIPE_W : natural := MVB_ITEMS*(MVB_ITEM_WIDTH+TRANS_SIZE_WIDTH+8+1+1+1);
+    constant PIPE_W            : natural := MVB_ITEMS*(MVB_ITEM_WIDTH+TRANS_SIZE_WIDTH+8+1+1+1);
 
     signal s_pipe_din                : std_logic_vector(PIPE_W-1 downto 0);
-    signal RX_MVB_n_DST_RDY          : std_logic;
+    signal rx_mvb_n_dst_rdy          : std_logic;
     signal s_pipe_dout               : std_logic_vector(PIPE_W-1 downto 0);
 
     signal s_po_mvb_data             : std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0);
@@ -114,24 +114,24 @@ architecture FULL of PTC_CODAPA_CHECKER is
 
 begin
 
-    s_pipe_din <= RX_MVB_DATA & RX_MVB_BE & RX_MVB_PAYLOAD & RX_MVB_PAYLOAD_SIZE & RX_MVB_TYPE & RX_MVB_VLD;
-    RX_MVB_DST_RDY <= not RX_MVB_n_DST_RDY;
+    s_pipe_din     <= RX_MVB_DATA & RX_MVB_BE & RX_MVB_PAYLOAD & RX_MVB_PAYLOAD_SIZE & RX_MVB_TYPE & RX_MVB_VLD;
+    RX_MVB_DST_RDY <= not rx_mvb_n_dst_rdy;
 
     fifox_i : entity work.FIFOX
-    generic map(
+    generic map (
         DATA_WIDTH          => PIPE_W,
         ITEMS               => MVB_FIFO_ITEMS,
         RAM_TYPE            => "AUTO",
         DEVICE              => DEVICE,
-        ALMOST_FULL_OFFSET  => 0     ,
-        ALMOST_EMPTY_OFFSET => 0     ,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
         FAKE_FIFO           => false
-    ) port map(
+    ) port map (
         CLK         => CLK,
         RESET       => RESET,
         DI          => s_pipe_din,
         WR          => RX_MVB_SRC_RDY,
-        FULL        => RX_MVB_n_DST_RDY,
+        FULL        => rx_mvb_n_dst_rdy,
         DO          => s_pipe_dout,
         EMPTY       => s_po_mvb_n_src_rdy,
         RD          => s_po_mvb_dst_rdy
@@ -181,7 +181,7 @@ begin
     begin
         v_rx_payload_packets_cnt := (others => '0');
         for i in 0 to MVB_ITEMS-1 loop
-            if (s_po_mvb_vld(i)='1' and s_po_mvb_payload(i)='1') then
+            if (s_po_mvb_vld(i) = '1' and s_po_mvb_payload(i) = '1') then
                 v_rx_payload_packets_cnt := v_rx_payload_packets_cnt+1;
             end if;
         end loop;
@@ -190,9 +190,9 @@ begin
     end process;
 
     s_codapa_dec_vld  <= s_codapa_check_ok and s_po_mvb_src_rdy and s_po_mvb_dst_rdy; -- only actually update if ready for data transfer
-    s_codapa_dec      <= s_rx_payload_packets_cnt when (s_codapa_dec_vld='1') else (others => '0');
+    s_codapa_dec      <= s_rx_payload_packets_cnt when (s_codapa_dec_vld = '1') else (others => '0');
 
-    s_codapa_check_ok <= '1' when s_codapa_cnt>=s_rx_payload_packets_cnt else '0';
+    s_codapa_check_ok <= '1' when s_codapa_cnt >= s_rx_payload_packets_cnt else '0';
 
     ----------------------------------------------------------------------------
     -- TX generation

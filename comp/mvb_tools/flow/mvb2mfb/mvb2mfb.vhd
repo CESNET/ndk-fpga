@@ -17,7 +17,7 @@ use work.type_pack.all;
 -- However, there are several limiting conditions, see the description of
 -- generics ports. MFB metadata are valid with each SOF.
 entity MVB2MFB is
-    generic(
+    generic (
         MVB_ITEMS       : natural := 4;
         -- MVB_ITEM_WIDTH must be a multiple of MFB_ITEM_WIDTH;
         -- MVB_ITEM_WIDTH must be >= MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH
@@ -40,7 +40,7 @@ entity MVB2MFB is
         -- FPGA device string (required for FIFO)
         DEVICE          : string := "AGILEX"
     );
-    port(
+    port (
         -- Clock input
         CLK            : in  std_logic;
         -- Reset input synchronized with CLK
@@ -148,18 +148,18 @@ begin
         rx_mvb_data_ext_arr(ii) <= std_logic_vector(resize(unsigned(rx_mvb_data_arr(ii)), (MVB_BLOCKS*MVB_BLOCK_W)));
 
         fdi_pack_g2: for bb in 0 to MVB_BLOCKS-1 generate
-            fifoxm_di_arr(ii*MVB_BLOCKS+bb)(MVB_BLOCK_W-1 downto 0) <= rx_mvb_data_ext_arr(ii)((bb+1)*MVB_BLOCK_W-1 downto bb*MVB_BLOCK_W);
+            fifoxm_di_arr(ii*MVB_BLOCKS+bb)(MVB_BLOCK_W-1 downto 0)                                           <= rx_mvb_data_ext_arr(ii)((bb+1)*MVB_BLOCK_W-1 downto bb*MVB_BLOCK_W);
             fifoxm_di_arr(ii*MVB_BLOCKS+bb)(MVB_BLOCK_W+META_WIDTH-1 downto MVB_BLOCK_W)                      <= rx_mvb_meta_arr(ii);
             fifoxm_di_arr(ii*MVB_BLOCKS+bb)(MVB_BLOCK_W+META_WIDTH+END_POS_W-1 downto MVB_BLOCK_W+META_WIDTH) <= std_logic_vector(to_unsigned(END_POS, END_POS_W) - 1); -- position of end in block
-            fifoxm_di_arr(ii*MVB_BLOCKS+bb)(MVB_BLOCK_W+META_WIDTH+END_POS_W)                                 <= '1' when (bb = 0) else '0'; -- start block
-            fifoxm_di_arr(ii*MVB_BLOCKS+bb)(MVB_BLOCK_W+META_WIDTH+END_POS_W+1)                               <= '1' when (bb = MVB_BLOCKS-1) else '0'; -- end block
+            fifoxm_di_arr(ii*MVB_BLOCKS+bb)(MVB_BLOCK_W+META_WIDTH+END_POS_W)                                 <= '1' when (bb = 0) else '0';                            -- start block
+            fifoxm_di_arr(ii*MVB_BLOCKS+bb)(MVB_BLOCK_W+META_WIDTH+END_POS_W+1)                               <= '1' when (bb = MVB_BLOCKS-1) else '0';                 -- end block
 
             fifoxm_wr(ii*MVB_BLOCKS+bb) <= RX_MVB_VLD(ii) and RX_MVB_SRC_RDY;
         end generate;
     end generate;
 
     fifoxm_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH     => FIFO_DATA_W,
         ITEMS          => max(WRITE_PORTS, READ_PORTS)*FIFO_DEPTH,
         WRITE_PORTS    => WRITE_PORTS,
@@ -168,7 +168,7 @@ begin
         SAFE_READ_MODE => False,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RESET,
 
@@ -238,12 +238,12 @@ begin
                 ADDR  => mfb_eof_pos_hi_arr(rr)
             );
 
-            fifoxm_sof_sel(rr) <= to_unsigned(rr, log2(MFB_REGIONS)) & unsigned(mfb_sof_pos_arr(rr));
-            fifoxm_eof_sel(rr) <= to_unsigned(rr, log2(MFB_REGIONS)) & unsigned(mfb_eof_pos_hi_arr(rr));
+            fifoxm_sof_sel(rr)  <= to_unsigned(rr, log2(MFB_REGIONS)) & unsigned(mfb_sof_pos_arr(rr));
+            fifoxm_eof_sel(rr)  <= to_unsigned(rr, log2(MFB_REGIONS)) & unsigned(mfb_eof_pos_hi_arr(rr));
         else generate
             mfb_sof_pos_arr(rr) <= (others => '0');
-            fifoxm_sof_sel(rr) <= to_unsigned(rr, log2(MFB_REGIONS));
-            fifoxm_eof_sel(rr) <= to_unsigned(rr, log2(MFB_REGIONS));
+            fifoxm_sof_sel(rr)  <= to_unsigned(rr, log2(MFB_REGIONS));
+            fifoxm_eof_sel(rr)  <= to_unsigned(rr, log2(MFB_REGIONS));
         end generate;
 
         mfb_meta_arr(rr) <= fifoxm_meta_arr(to_integer(fifoxm_sof_sel(rr)));
@@ -268,7 +268,7 @@ begin
     mfb_src_rdy <= or fifoxm_rd_mask;
 
     mfb_reconf_i : entity work.MFB_RECONFIGURATOR
-    generic map(
+    generic map (
         RX_REGIONS            => MFB_REGIONS,
         RX_REGION_SIZE        => READ_REGION_S,
         RX_BLOCK_SIZE         => MFB_ALIGNMENT,
@@ -283,7 +283,7 @@ begin
         FRAMES_OVER_TX_REGION => 1,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -328,7 +328,7 @@ begin
     -- DEBUG LOGIC
     -- =========================================================================
 
-    --pragma synthesis_off
+    -- pragma synthesis_off
     process (CLK)
         variable dbg_pkt_cnt_v : unsigned(63 downto 0);
     begin
@@ -356,10 +356,10 @@ begin
                 for i in 0 to MFB_REGIONS-1 loop
                     dbg_pkt_cnt_v := dbg_pkt_cnt_v + TX_MFB_SOF(i);
                 end loop;
-                    dbg_tx_pkt_cnt <= dbg_tx_pkt_cnt + dbg_pkt_cnt_v;
+                dbg_tx_pkt_cnt <= dbg_tx_pkt_cnt + dbg_pkt_cnt_v;
             end if;
         end if;
     end process;
-    --pragma synthesis_on
+    -- pragma synthesis_on
 
 end architecture;

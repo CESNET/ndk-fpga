@@ -20,7 +20,7 @@ use work.math_pack.all;
 
 -- This component transmits received packets on one interface to one out of the two outputs according to the select bit.
 entity MFB_SPLITTER_SIMPLE is
-    Generic (
+    generic (
         -- number of regions in a data word
         REGIONS         : natural := 2;
         -- number of blocks in a region
@@ -32,7 +32,7 @@ entity MFB_SPLITTER_SIMPLE is
         -- number of bits for metadata in a single region
         META_WIDTH      : natural := 8
     );
-    Port (
+    port (
         CLK             : in  std_logic;
         RST             : in  std_logic;
 
@@ -79,7 +79,7 @@ entity MFB_SPLITTER_SIMPLE is
     );
 end entity;
 
-architecture behav of MFB_SPLITTER_SIMPLE is
+architecture BEHAV of MFB_SPLITTER_SIMPLE is
 
     signal rx_dst_rdy           : std_logic;
     signal rx_sel               : std_logic_vector(REGIONS-1 downto 0);
@@ -132,7 +132,7 @@ architecture behav of MFB_SPLITTER_SIMPLE is
     signal new_src_rdy1         : std_logic;
     signal new_dst_rdy1         : std_logic;
 
-    begin
+begin
 
     -- -------------------------------------------------------------------------
     --  data duplication
@@ -206,7 +206,7 @@ architecture behav of MFB_SPLITTER_SIMPLE is
         if (rising_edge(CLK)) then
             if (RST = '1') then
                 need_eof0_reg <= '0';
-            elsif ((tx0_src_rdy ='1') and (new_dst_rdy0 = '1')) then
+            elsif ((tx0_src_rdy = '1') and (new_dst_rdy0 = '1')) then
                 need_eof0_reg <= need_eof0(REGIONS);
             end if;
         end if;
@@ -354,7 +354,7 @@ architecture behav of MFB_SPLITTER_SIMPLE is
         if (rising_edge(CLK)) then
             if (RST = '1') then
                 need_eof1_reg <= '0';
-            elsif ((tx1_src_rdy ='1') and (new_dst_rdy1 = '1')) then
+            elsif ((tx1_src_rdy = '1') and (new_dst_rdy1 = '1')) then
                 need_eof1_reg <= need_eof1(REGIONS);
             end if;
         end if;
@@ -457,4 +457,4 @@ architecture behav of MFB_SPLITTER_SIMPLE is
     -- -------------------------------------------------------------------------
     RX_MFB_DST_RDY <= new_dst_rdy0 and new_dst_rdy1;
 
-end behav;
+end architecture;

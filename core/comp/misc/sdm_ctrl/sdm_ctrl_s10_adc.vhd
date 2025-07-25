@@ -13,10 +13,10 @@ architecture S10_ADC of SDM_CTRL is
 begin
 
     sensor_interface_i: entity work.SENSOR_INTERFACE
-    Generic map (
+    generic map (
         VERI => false
     )
-    Port map (
+    port map (
         CLK   => CLK,
         RESET => RESET,
         DWR   => MI_DWR,

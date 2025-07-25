@@ -26,7 +26,7 @@ entity SR_SYNC_LATCH is
     generic (
         -- Width of the data being latched.
         DATA_WIDTH : positive := 32
-        );
+    );
 
     port (
         CLK       : in  std_logic;
@@ -37,7 +37,7 @@ entity SR_SYNC_LATCH is
         -- Input data to being latched, usage of this port is optional.
         DATA_IN   : in  std_logic_vector((DATA_WIDTH - 1) downto 0) := (others => '1');
         LATCH_OUT : out std_logic_vector((DATA_WIDTH - 1) downto 0)
-        );
+    );
 
 end entity;
 
@@ -50,8 +50,8 @@ begin  -- architecture FULL
     -- purpose: latches output according to its input
     -- type : sequential
     latch_output_p : process (CLK) is
-    begin  -- process latch_output_p
-        if (rising_edge(CLK)) then      -- rising clock edge
+    begin                                                                        -- process latch_output_p
+        if (rising_edge(CLK)) then                                               -- rising clock edge
             if ((RESET = '1' and SET = '1') or (RESET = '0' and SET = '0')) then
 
                 latch_out_int <= latch_out_int;

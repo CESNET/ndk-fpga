@@ -43,7 +43,7 @@ entity TX_DMA_PKT_DISPATCHER is
 
         DATA_POINTER_WIDTH    : natural := 16;
         DMA_HDR_POINTER_WIDTH : natural := 9
-        );
+    );
     port (
         CLK   : in std_logic;
         RESET : in std_logic;
@@ -102,7 +102,7 @@ entity TX_DMA_PKT_DISPATCHER is
         UPD_HHP_CHAN : out std_logic_vector(log2(CHANNELS) -1 downto 0);
         UPD_HHP_DATA : out std_logic_vector(DMA_HDR_POINTER_WIDTH -1 downto 0);
         UPD_HHP_EN   : out std_logic
-        );
+    );
 end entity;
 
 architecture FULL of TX_DMA_PKT_DISPATCHER is
@@ -115,7 +115,7 @@ architecture FULL of TX_DMA_PKT_DISPATCHER is
     -- =============================================================================================
     -- Dispatch FSM signals
     -- =============================================================================================
-    type pkt_dispatch_state_t is (S_IDLE, S_PKT_BEGIN, S_PKT_MIDDLE, S_UPDATE_STATUS);
+    type   pkt_dispatch_state_t is (S_IDLE, S_PKT_BEGIN, S_PKT_MIDDLE, S_UPDATE_STATUS);
     signal pkt_dispatch_pst : pkt_dispatch_state_t := S_IDLE;
     signal pkt_dispatch_nst : pkt_dispatch_state_t := S_IDLE;
 
@@ -220,11 +220,11 @@ begin
                     -- if (ENABLED_CHANS(to_integer(unsigned(HDR_BUFF_CHAN))) = '0') then
                     --     HDR_BUFF_DST_RDY <= '1';
                     -- else
-                        addr_cntr_nst <= dma_hdr_frame_ptr_v(BUFF_RD_ADDR'range) + (USR_MFB_DATA'length /8);
-                        byte_cntr_nst <= resize(dma_hdr_frame_length_v, byte_cntr_nst'length);
+                    addr_cntr_nst <= dma_hdr_frame_ptr_v(BUFF_RD_ADDR'range) + (USR_MFB_DATA'length /8);
+                    byte_cntr_nst <= resize(dma_hdr_frame_length_v, byte_cntr_nst'length);
 
-                        BUFF_RD_ADDR <= std_logic_vector(dma_hdr_frame_ptr_v(BUFF_RD_ADDR'range));
-                        BUFF_RD_EN <= '1';
+                    BUFF_RD_ADDR <= std_logic_vector(dma_hdr_frame_ptr_v(BUFF_RD_ADDR'range));
+                    BUFF_RD_EN   <= '1';
                     -- end if;
                 end if;
 

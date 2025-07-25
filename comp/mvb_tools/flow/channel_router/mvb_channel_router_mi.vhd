@@ -72,7 +72,7 @@ use work.type_pack.all;
 --   ch_cnt = (ch_cnt + incr) and (ch_diff);
 --
 entity MVB_CHANNEL_ROUTER_MI is
-    generic(
+    generic (
         -- MVB parameters: number of items in word
         ITEMS         : natural := 4;
         -- MVB parameters: width of item in bits
@@ -96,7 +96,7 @@ entity MVB_CHANNEL_ROUTER_MI is
         -- Name of FPGA device
         DEVICE        : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================

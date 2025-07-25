@@ -16,53 +16,53 @@ use work.type_pack.all;
 -- ----------------------------------------------------------------------------
 
 entity CROSSBARX_PLANNER_SYNCHRONISATOR is
-generic(
-    -- Number of independent Transaction Streams with independent Color Conformation mechanism
-    TRANS_STREAMS       : integer := 1;
+    generic (
+        -- Number of independent Transaction Streams with independent Color Conformation mechanism
+        TRANS_STREAMS       : integer := 1;
 
-    -- Create asynch transfer (CLK_PLAN is different from CLK_OTHER)
-    ASYNC_EN            : boolean := false;
+        -- Create asynch transfer (CLK_PLAN is different from CLK_OTHER)
+        ASYNC_EN            : boolean := false;
 
-    -- Color confirmation delay
-    COLOR_CONF_DELAY    : integer := 16;
+        -- Color confirmation delay
+        COLOR_CONF_DELAY    : integer := 16;
 
-    -- Target Device
-    -- "ULTRASCALE", "7SERIES", ...
-    DEVICE              : string := "STRATIX10"
-);
-port(
-    -- Clock and Reset
-    CLK_PLAN            : in  std_logic;
-    RESET_PLAN          : in  std_logic;
-    CLK_OTHER           : in  std_logic;
-    RESET_OTHER         : in  std_logic;
+        -- Target Device
+        -- "ULTRASCALE", "7SERIES", ...
+        DEVICE              : string := "STRATIX10"
+    );
+    port (
+        -- Clock and Reset
+        CLK_PLAN            : in  std_logic;
+        RESET_PLAN          : in  std_logic;
+        CLK_OTHER           : in  std_logic;
+        RESET_OTHER         : in  std_logic;
 
-    -- ========================
-    -- Planner-side interface
-    -- ========================
+        -- ========================
+        -- Planner-side interface
+        -- ========================
 
-    -- Color Conformation Timeout cancel signal
-    P_NEW_RX_TRANS      : out std_logic_vector(TRANS_STREAMS-1 downto 0);
+        -- Color Conformation Timeout cancel signal
+        P_NEW_RX_TRANS      : out std_logic_vector(TRANS_STREAMS-1 downto 0);
 
-    -- Color Conformation signal
-    P_CONF_COLOR        : in  std_logic_vector(TRANS_STREAMS-1 downto 0);
-    P_CONF_VLD          : in  std_logic_vector(TRANS_STREAMS-1 downto 0);
-    P_CONF_PROPAGATED   : out std_logic_vector(TRANS_STREAMS-1 downto 0);
+        -- Color Conformation signal
+        P_CONF_COLOR        : in  std_logic_vector(TRANS_STREAMS-1 downto 0);
+        P_CONF_VLD          : in  std_logic_vector(TRANS_STREAMS-1 downto 0);
+        P_CONF_PROPAGATED   : out std_logic_vector(TRANS_STREAMS-1 downto 0);
 
-    -- ========================
-    -- Other-CLK-side interface
-    -- ========================
+        -- ========================
+        -- Other-CLK-side interface
+        -- ========================
 
-    -- Color Conformation Timeout cancel signal
-    O_NEW_RX_TRANS      : in  std_logic_vector(TRANS_STREAMS-1 downto 0);
+        -- Color Conformation Timeout cancel signal
+        O_NEW_RX_TRANS      : in  std_logic_vector(TRANS_STREAMS-1 downto 0);
 
-    -- Color Conformation signal
-    O_CONF_COLOR        : out std_logic_vector(TRANS_STREAMS-1 downto 0);
-    O_CONF_VLD          : out std_logic_vector(TRANS_STREAMS-1 downto 0);
-    O_CONF_PROPAGATED   : in  std_logic_vector(TRANS_STREAMS-1 downto 0)
+        -- Color Conformation signal
+        O_CONF_COLOR        : out std_logic_vector(TRANS_STREAMS-1 downto 0);
+        O_CONF_VLD          : out std_logic_vector(TRANS_STREAMS-1 downto 0);
+        O_CONF_PROPAGATED   : in  std_logic_vector(TRANS_STREAMS-1 downto 0)
 
     -- -----------------------------------------------------------------
-);
+    );
 end entity;
 
 -- ----------------------------------------------------------------------------
@@ -110,14 +110,14 @@ begin
 
                 reg_tmp := p_in_reg;
 
-                if (p2o_asfifo_full='0') then
+                if (p2o_asfifo_full = '0') then
                     reg_tmp := (others => '0');
                 end if;
 
                 for i in 0 to TRANS_STREAMS-1 loop
-                    if (P_CONF_VLD(i)='1') then
+                    if (P_CONF_VLD(i) = '1') then
                         -- Add new propagation
-                        reg_tmp(i) := '1';
+                        reg_tmp(i)               := '1';
                         -- Override old color (should only happen for previously non-valid items)
                         reg_tmp(TRANS_STREAMS+i) := P_CONF_COLOR(i);
                     end if;
@@ -125,38 +125,38 @@ begin
 
                 p_in_reg <= reg_tmp;
 
-                if (RESET_PLAN='1') then
+                if (RESET_PLAN = '1') then
                     p_in_reg <= (others => '0');
                 end if;
             end if;
         end process;
 
         p_to_o_asfifox_i : entity work.ASFIFOX
-        generic map(
+        generic map (
             DATA_WIDTH          => 2*TRANS_STREAMS,
-            ITEMS               => 64             ,
-            RAM_TYPE            => "LUT"          ,
-            FWFT_MODE           => true           ,
-            OUTPUT_REG          => true           ,
-            DEVICE              => DEVICE         ,
-            ALMOST_FULL_OFFSET  => 0              ,
+            ITEMS               => 64,
+            RAM_TYPE            => "LUT",
+            FWFT_MODE           => true,
+            OUTPUT_REG          => true,
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
             ALMOST_EMPTY_OFFSET => 0
         )
-        port map(
-            WR_CLK    => CLK_PLAN       ,
-            WR_RST    => RESET_PLAN     ,
-            WR_DATA   => p_in_reg       ,
+        port map (
+            WR_CLK    => CLK_PLAN,
+            WR_RST    => RESET_PLAN,
+            WR_DATA   => p_in_reg,
             WR_EN     => (or p_in_reg(TRANS_STREAMS-1 downto 0)), -- Write when at least one signal is valid
             WR_FULL   => p2o_asfifo_full,
-            WR_AFULL  => open           ,
-            WR_STATUS => open           ,
+            WR_AFULL  => open,
+            WR_STATUS => open,
 
-            RD_CLK    => CLK_OTHER       ,
-            RD_RST    => RESET_OTHER     ,
-            RD_DATA   => p2o_asfifo_do   ,
-            RD_EN     => '1'             ,
+            RD_CLK    => CLK_OTHER,
+            RD_RST    => RESET_OTHER,
+            RD_DATA   => p2o_asfifo_do,
+            RD_EN     => '1',
             RD_EMPTY  => p2o_asfifo_empty,
-            RD_AEMPTY => open            ,
+            RD_AEMPTY => open,
             RD_STATUS => open
         );
 
@@ -178,16 +178,16 @@ begin
 
                 reg_tmp := o_in_reg;
 
-                if (o2p_asfifo_full='0') then
+                if (o2p_asfifo_full = '0') then
                     reg_tmp := (others => '0');
                 end if;
 
                 for i in 0 to TRANS_STREAMS-1 loop
-                    if (O_NEW_RX_TRANS(i)='1') then
+                    if (O_NEW_RX_TRANS(i) = '1') then
                         -- Add new propagation
                         reg_tmp(i) := '1';
                     end if;
-                    if (O_CONF_PROPAGATED(i)='1') then
+                    if (O_CONF_PROPAGATED(i) = '1') then
                         -- Add new propagation
                         reg_tmp(TRANS_STREAMS+i) := '1';
                     end if;
@@ -195,45 +195,45 @@ begin
 
                 o_in_reg <= reg_tmp;
 
-                if (RESET_OTHER='1') then
+                if (RESET_OTHER = '1') then
                     o_in_reg <= (others => '0');
                 end if;
             end if;
         end process;
 
         o_to_p_asfifox_i : entity work.ASFIFOX
-        generic map(
+        generic map (
             DATA_WIDTH          => 2*TRANS_STREAMS,
-            ITEMS               => 64             ,
-            RAM_TYPE            => "LUT"          ,
-            FWFT_MODE           => true           ,
-            OUTPUT_REG          => true           ,
-            DEVICE              => DEVICE         ,
-            ALMOST_FULL_OFFSET  => 0              ,
+            ITEMS               => 64,
+            RAM_TYPE            => "LUT",
+            FWFT_MODE           => true,
+            OUTPUT_REG          => true,
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
             ALMOST_EMPTY_OFFSET => 0
         )
-        port map(
-            WR_CLK    => CLK_OTHER      ,
-            WR_RST    => RESET_OTHER    ,
-            WR_DATA   => o_in_reg       ,
-            WR_EN     => (or o_in_reg)  , -- Write when at least one signal is valid
+        port map (
+            WR_CLK    => CLK_OTHER,
+            WR_RST    => RESET_OTHER,
+            WR_DATA   => o_in_reg,
+            WR_EN     => (or o_in_reg), -- Write when at least one signal is valid
             WR_FULL   => o2p_asfifo_full,
-            WR_AFULL  => open           ,
-            WR_STATUS => open           ,
+            WR_AFULL  => open,
+            WR_STATUS => open,
 
-            RD_CLK    => CLK_PLAN        ,
-            RD_RST    => RESET_PLAN      ,
-            RD_DATA   => o2p_asfifo_do   ,
-            RD_EN     => '1'             ,
+            RD_CLK    => CLK_PLAN,
+            RD_RST    => RESET_PLAN,
+            RD_DATA   => o2p_asfifo_do,
+            RD_EN     => '1',
             RD_EMPTY  => o2p_asfifo_empty,
-            RD_AEMPTY => open            ,
+            RD_AEMPTY => open,
             RD_STATUS => open
         );
 
         P_CONF_PROPAGATED <= o2p_asfifo_do(TRANS_STREAMS*2-1 downto TRANS_STREAMS) and (not o2p_asfifo_empty);
         P_NEW_RX_TRANS    <= o2p_asfifo_do(TRANS_STREAMS-1 downto 0) and (not o2p_asfifo_empty);
 
-        -- -----------------------------------------------------------------
+    -- -----------------------------------------------------------------
 
     else generate
 
@@ -266,7 +266,7 @@ begin
                 plan_conf_vld_delayed  (i) <= plan_conf_vld_delayed  (i+1);
             end loop;
 
-            if (RESET_OTHER='1') then
+            if (RESET_OTHER = '1') then
                 plan_conf_vld_delayed(COLOR_CONF_DELAY-1 downto 0) <= (others => (others => '0'));
             end if;
         end if;

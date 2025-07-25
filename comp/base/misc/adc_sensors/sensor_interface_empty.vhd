@@ -14,12 +14,12 @@ begin
 
     ARDY <= RD or WR;
 
-    process(CLK)
+    process (CLK)
     begin
         if (rising_edge(CLK)) then
             DRD  <= X"DEADCAFE";
             DRDY <= RD;
-            if (RESET='1') then
+            if (RESET = '1') then
                 DRDY <= '0';
             end if;
         end if;

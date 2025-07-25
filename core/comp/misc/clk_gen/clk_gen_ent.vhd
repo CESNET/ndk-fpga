@@ -13,7 +13,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity COMMON_CLK_GEN is
-    generic(
+    generic (
         -- Reference clock period in ns
         REFCLK_PERIOD   : real    := 10.0;
         -- Configuration of MMCM
@@ -34,7 +34,7 @@ entity COMMON_CLK_GEN is
         -- FPGA device
         DEVICE             : string := "AGILEX"
     );
-    port(
+    port (
         -- Reference clock input
         REFCLK      : in  std_logic;
         -- PLL async reset

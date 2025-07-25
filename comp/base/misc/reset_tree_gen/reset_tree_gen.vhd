@@ -9,11 +9,11 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity RESET_TREE_GEN is
-    generic(
+    generic (
         CLK_COUNT    : natural := 2;
         RST_REPLICAS : natural := 4
     );
-    port(
+    port (
         -- stable clock
         STABLE_CLK   : in  std_logic;
         -- input global reset synced with stable clock

@@ -12,14 +12,14 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity EASA_COMPRESSOR_LITE is
-    generic(
+    generic (
         -- ====================================================================
         -- BUS CONFIGURATION:
         -- ====================================================================
         ITEMS      : natural := 2;
         ITEM_WIDTH : natural := 512
     );
-    port(
+    port (
         -- ====================================================================
         -- CLOCK AND RESET
         -- ====================================================================
@@ -83,11 +83,11 @@ begin
     s_rx_data_arr <= slv_array_downto_deser(RX_DATA,ITEMS,ITEM_WIDTH);
 
     rx_vld_sum_i : entity work.SUM_ONE
-    generic map(
+    generic map (
         INPUT_WIDTH => ITEMS,
         OUTPUT_REG  => False
     )
-    port map(
+    port map (
         CLK      => CLK,
         RESET    => RESET,
         DIN      => RX_VLD,
@@ -116,8 +116,8 @@ begin
     ---------------------------------------------------------------------------
 
     bs_data_in_arr_g : for i in 0 to ITEMS-1 generate
-        s_bs_data_in_arr(i)(0) <= s_rx_vld_reg(i);
-        s_bs_data_in_arr(i)(1) <= s_rx_last_reg(i);
+        s_bs_data_in_arr(i)(0)                       <= s_rx_vld_reg(i);
+        s_bs_data_in_arr(i)(1)                       <= s_rx_last_reg(i);
         s_bs_data_in_arr(i)(2+ITEM_WIDTH-1 downto 2) <= s_rx_data_arr_reg(i);
     end generate;
 
@@ -181,8 +181,8 @@ begin
         begin
             if (rising_edge(CLK)) then
                 if (s_bs_out_vld(i) = '1') then
-                s_reg_last(i) <= s_bs_out_last(i);
-                s_reg_data(i) <= s_bs_out_data_arr(i);
+                    s_reg_last(i) <= s_bs_out_last(i);
+                    s_reg_data(i) <= s_bs_out_data_arr(i);
                 end if;
             end if;
         end process;

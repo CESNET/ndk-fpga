@@ -13,7 +13,7 @@ use work.type_pack.all;
 use work.eth_hdr_pack.all;
 
 entity RX_MAC_LITE_ILL100GE is
-    generic(
+    generic (
         -- =====================================================================
         -- MFB CONFIGURATION (read only values):
         -- =====================================================================
@@ -50,7 +50,7 @@ entity RX_MAC_LITE_ILL100GE is
         -- ULTRASCALE
         DEVICE          : string := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -148,10 +148,10 @@ begin
 
     -- avst simple module support only readyLatency=0
     avst_simple_i : entity work.ETH_AVST_ADAPTER
-    generic map(
+    generic map (
         DATA_WIDTH => REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH
     )
-    port map(
+    port map (
         CLK              => RX_CLK,
         RESET            => RX_RESET,
 
@@ -175,7 +175,7 @@ begin
     );
 
     rx_mac_lite_i : entity work.RX_MAC_LITE
-    generic map(
+    generic map (
         RX_REGIONS      => REGIONS,
         RX_REGION_SIZE  => REGION_SIZE,
         RX_BLOCK_SIZE   => BLOCK_SIZE,
@@ -190,7 +190,7 @@ begin
         TIMESTAMP_EN    => TIMESTAMP_EN,
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         RX_CLK          => RX_CLK,
         RX_RESET        => RX_RESET,
         TX_CLK          => TX_CLK,

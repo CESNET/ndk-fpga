@@ -24,7 +24,7 @@ architecture FULL of NETWORK_MOD is
     -- =========================================================================
     --                           FUNCTION declarations
     -- =========================================================================
-    function region_size_core_f  return natural;
+    function region_size_core_f return natural;
 
     function region_size_core_f return natural is
     begin
@@ -233,7 +233,7 @@ begin
         user_reset_i : entity work.ASYNC_RESET
         generic map (
             TWO_REG  => false,
-            OUT_REG  => true ,
+            OUT_REG  => true,
             REPLICAS => ETH_CHANNELS
         )
         port map (
@@ -245,7 +245,7 @@ begin
         network_mod_reset_i : entity work.ASYNC_RESET
         generic map (
             TWO_REG  => false,
-            OUT_REG  => true ,
+            OUT_REG  => true,
             REPLICAS => RESET_REPLICAS
         )
         port map (
@@ -258,7 +258,7 @@ begin
             network_mod_logic_reset_i : entity work.ASYNC_RESET
             generic map (
                 TWO_REG  => false,
-                OUT_REG  => true ,
+                OUT_REG  => true,
                 REPLICAS => 2
             )
             port map (
@@ -273,41 +273,41 @@ begin
     --  MI SPLITTER for Network Module Logic (MAC Lites)
     -- =========================================================================
     mi_splitter_plus_gen_i : entity work.MI_SPLITTER_PLUS_GEN
-    generic map(
-        ADDR_WIDTH  => MI_ADDR_WIDTH      ,
-        DATA_WIDTH  => MI_DATA_WIDTH      ,
-        META_WIDTH  => 0                  ,
-        PORTS       => MI_ADDR_BASES      ,
-        PIPE_OUT    => (others => true)   ,
-        PIPE_TYPE   => "REG"              ,
-        ADDR_BASES  => MI_ADDR_BASES      ,
+    generic map (
+        ADDR_WIDTH  => MI_ADDR_WIDTH,
+        DATA_WIDTH  => MI_DATA_WIDTH,
+        META_WIDTH  => 0,
+        PORTS       => MI_ADDR_BASES,
+        PIPE_OUT    => (others => true),
+        PIPE_TYPE   => "REG",
+        ADDR_BASES  => MI_ADDR_BASES,
         ADDR_BASE   => mi_addr_base_init_f,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         -- Common interface ----------
-        CLK         => MI_CLK         ,
-        RESET       => MI_RESET       ,
+        CLK         => MI_CLK,
+        RESET       => MI_RESET,
         -- Input MI interface --------
-        RX_DWR      => MI_DWR         ,
+        RX_DWR      => MI_DWR,
         RX_MWR      => (others => '0'),
-        RX_ADDR     => MI_ADDR        ,
-        RX_BE       => MI_BE          ,
-        RX_RD       => MI_RD          ,
-        RX_WR       => MI_WR          ,
-        RX_ARDY     => MI_ARDY        ,
-        RX_DRD      => MI_DRD         ,
-        RX_DRDY     => MI_DRDY        ,
+        RX_ADDR     => MI_ADDR,
+        RX_BE       => MI_BE,
+        RX_RD       => MI_RD,
+        RX_WR       => MI_WR,
+        RX_ARDY     => MI_ARDY,
+        RX_DRD      => MI_DRD,
+        RX_DRDY     => MI_DRDY,
         -- Output MI interfaces ------
-        TX_DWR     => mi_split_dwr    ,
-        TX_MWR     => open            ,
-        TX_ADDR    => mi_split_addr   ,
-        TX_BE      => mi_split_be     ,
-        TX_RD      => mi_split_rd     ,
-        TX_WR      => mi_split_wr     ,
-        TX_ARDY    => mi_split_ardy   ,
-        TX_DRD     => mi_split_drd    ,
-        TX_DRDY    => mi_split_drdy
+        TX_DWR      => mi_split_dwr,
+        TX_MWR      => open,
+        TX_ADDR     => mi_split_addr,
+        TX_BE       => mi_split_be,
+        TX_RD       => mi_split_rd,
+        TX_WR       => mi_split_wr,
+        TX_ARDY     => mi_split_ardy,
+        TX_DRD      => mi_split_drd,
+        TX_DRDY     => mi_split_drdy
     );
 
     -- =========================================================================
@@ -316,52 +316,52 @@ begin
     -- QSFP_CTRL is at Port(0), addresses from X"0080_0000" to X"0080_1000",
     -- the rest of the Ports is for Network Module Core(s) with IA_OFF offset.
     mi_splitter_plus_gen_phy_i : entity work.MI_SPLITTER_PLUS_GEN
-    generic map(
-        ADDR_WIDTH  => MI_ADDR_WIDTH_PHY      ,
-        DATA_WIDTH  => MI_DATA_WIDTH_PHY      ,
-        META_WIDTH  => 0                      ,
-        PORTS       => MI_ADDR_BASES_PHY      ,
-        PIPE_OUT    => (others => true)       ,
-        PIPE_TYPE   => "REG"                  ,
-        ADDR_BASES  => MI_ADDR_BASES_PHY      ,
+    generic map (
+        ADDR_WIDTH  => MI_ADDR_WIDTH_PHY,
+        DATA_WIDTH  => MI_DATA_WIDTH_PHY,
+        META_WIDTH  => 0,
+        PORTS       => MI_ADDR_BASES_PHY,
+        PIPE_OUT    => (others => true),
+        PIPE_TYPE   => "REG",
+        ADDR_BASES  => MI_ADDR_BASES_PHY,
         ADDR_BASE   => mi_addr_base_init_phy_f,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         -- Common interface -----------
-        CLK         => MI_CLK_PHY      ,
-        RESET       => MI_RESET_PHY    ,
+        CLK         => MI_CLK_PHY,
+        RESET       => MI_RESET_PHY,
         -- Input MI interface ---------
-        RX_DWR      => MI_DWR_PHY      ,
-        RX_MWR      => (others => '0') ,
-        RX_ADDR     => MI_ADDR_PHY     ,
-        RX_BE       => MI_BE_PHY       ,
-        RX_RD       => MI_RD_PHY       ,
-        RX_WR       => MI_WR_PHY       ,
-        RX_ARDY     => MI_ARDY_PHY     ,
-        RX_DRD      => MI_DRD_PHY      ,
-        RX_DRDY     => MI_DRDY_PHY     ,
+        RX_DWR      => MI_DWR_PHY,
+        RX_MWR      => (others => '0'),
+        RX_ADDR     => MI_ADDR_PHY,
+        RX_BE       => MI_BE_PHY,
+        RX_RD       => MI_RD_PHY,
+        RX_WR       => MI_WR_PHY,
+        RX_ARDY     => MI_ARDY_PHY,
+        RX_DRD      => MI_DRD_PHY,
+        RX_DRDY     => MI_DRDY_PHY,
         -- Output MI interfaces -------
-        TX_DWR     => mi_split_dwr_phy ,
-        TX_ADDR    => mi_split_addr_phy,
-        TX_BE      => mi_split_be_phy  ,
-        TX_RD      => mi_split_rd_phy  ,
-        TX_WR      => mi_split_wr_phy  ,
-        TX_ARDY    => mi_split_ardy_phy,
-        TX_DRD     => mi_split_drd_phy ,
-        TX_DRDY    => mi_split_drdy_phy
+        TX_DWR      => mi_split_dwr_phy,
+        TX_ADDR     => mi_split_addr_phy,
+        TX_BE       => mi_split_be_phy,
+        TX_RD       => mi_split_rd_phy,
+        TX_WR       => mi_split_wr_phy,
+        TX_ARDY     => mi_split_ardy_phy,
+        TX_DRD      => mi_split_drd_phy,
+        TX_DRDY     => mi_split_drdy_phy
     );
 
     -- =========================================================================
     -- Serialization and deserialization of user MFB+MVB interfaces
     -- =========================================================================
 
-    rx_usr_mfb_data_arr    <= slv_array_2d_deser(RX_MFB_DATA   , ETH_PORTS, ETH_PORT_STREAMS);
-    rx_usr_mfb_hdr_arr     <= slv_array_2d_deser(RX_MFB_HDR    , ETH_PORTS, ETH_PORT_STREAMS);
+    rx_usr_mfb_data_arr    <= slv_array_2d_deser(RX_MFB_DATA, ETH_PORTS, ETH_PORT_STREAMS);
+    rx_usr_mfb_hdr_arr     <= slv_array_2d_deser(RX_MFB_HDR, ETH_PORTS, ETH_PORT_STREAMS);
     rx_usr_mfb_sof_pos_arr <= slv_array_2d_deser(RX_MFB_SOF_POS, ETH_PORTS, ETH_PORT_STREAMS);
     rx_usr_mfb_eof_pos_arr <= slv_array_2d_deser(RX_MFB_EOF_POS, ETH_PORTS, ETH_PORT_STREAMS);
-    rx_usr_mfb_sof_arr     <= slv_array_2d_deser(RX_MFB_SOF    , ETH_PORTS, ETH_PORT_STREAMS);
-    rx_usr_mfb_eof_arr     <= slv_array_2d_deser(RX_MFB_EOF    , ETH_PORTS, ETH_PORT_STREAMS);
+    rx_usr_mfb_sof_arr     <= slv_array_2d_deser(RX_MFB_SOF, ETH_PORTS, ETH_PORT_STREAMS);
+    rx_usr_mfb_eof_arr     <= slv_array_2d_deser(RX_MFB_EOF, ETH_PORTS, ETH_PORT_STREAMS);
     rx_usr_mfb_src_rdy_arr <= slv_array_deser(RX_MFB_SRC_RDY, ETH_PORTS);
     RX_MFB_DST_RDY         <= slv_array_ser(rx_usr_mfb_dst_rdy_arr);
 
@@ -383,34 +383,34 @@ begin
         -- Network Module Logic
         -- =====================================================================
         network_mod_logic_i : entity work.NETWORK_MOD_LOGIC
-        generic map(
+        generic map (
             -- ETH
             ETH_STREAMS      => ETH_PORT_STREAMS,
-            ETH_PORT_CHAN    => ETH_PORT_CHAN(p)  ,
-            ETH_PORT_ID      => p                 ,
+            ETH_PORT_CHAN    => ETH_PORT_CHAN(p),
+            ETH_PORT_ID      => p,
             ETH_PORT_RX_MTU  => ETH_PORT_RX_MTU(p),
             ETH_PORT_TX_MTU  => ETH_PORT_TX_MTU(p),
             ETH_MAC_BYPASS   => ETH_MAC_BYPASS,
             -- MFB
-            USER_REGIONS     => REGIONS         ,
-            USER_REGION_SIZE => REGION_SIZE     ,
-            CORE_REGIONS     => REGIONS_CORE    ,
+            USER_REGIONS     => REGIONS,
+            USER_REGION_SIZE => REGION_SIZE,
+            CORE_REGIONS     => REGIONS_CORE,
             CORE_REGION_SIZE => REGION_SIZE_CORE,
-            BLOCK_SIZE       => BLOCK_SIZE      ,
-            ITEM_WIDTH       => ITEM_WIDTH      ,
+            BLOCK_SIZE       => BLOCK_SIZE,
+            ITEM_WIDTH       => ITEM_WIDTH,
             -- MI
-            MI_DATA_WIDTH    => MI_DATA_WIDTH   ,
-            MI_ADDR_WIDTH    => MI_ADDR_WIDTH   ,
+            MI_DATA_WIDTH    => MI_DATA_WIDTH,
+            MI_ADDR_WIDTH    => MI_ADDR_WIDTH,
             -- Other
-            LL_MODE          => LL_MODE         ,
+            LL_MODE          => LL_MODE,
             USE_FULL_MAC     => IS_USP_10G4_25G4,
-            RESET_USER_WIDTH => ETH_CHANNELS    ,
+            RESET_USER_WIDTH => ETH_CHANNELS,
             RESET_CORE_WIDTH => logic_rst_arr(p)'length,
-            RESIZE_BUFFER    => RESIZE_BUFFER   ,
-            DEVICE           => DEVICE          ,
+            RESIZE_BUFFER    => RESIZE_BUFFER,
+            DEVICE           => DEVICE,
             BOARD            => BOARD
         )
-        port map(
+        port map (
             CLK_USER            => CLK_USER,
             TX_CLK_CORE         => logic_tx_clk(p),
             RX_CLK_CORE         => logic_rx_clk(p),
@@ -464,8 +464,8 @@ begin
             TX_CORE_MFB_DST_RDY => tx_mfb_dst_rdy_i(p),
 
             -- MI
-            MI_CLK          => MI_CLK          ,
-            MI_RESET        => MI_RESET        ,
+            MI_CLK          => MI_CLK,
+            MI_RESET        => MI_RESET,
             MI_DWR          => mi_split_dwr (p),
             MI_ADDR         => mi_split_addr(p),
             MI_RD           => mi_split_rd  (p),
@@ -484,25 +484,25 @@ begin
         -- =====================================================================
         network_mod_core_i: entity work.NETWORK_MOD_CORE
         generic map (
-            ETH_PORT_SPEED    => ETH_PORT_SPEED(p),
-            ETH_PORT_CHAN     => ETH_PORT_CHAN (p),
-            CHANNEL_MAP       => ETH_CHAN_MAP     ,
-            EHIP_TYPE         => EHIP_TYPE        ,
-            LANES             => LANES            ,
-            REGIONS           => REGIONS_CORE     ,
-            REGION_SIZE       => REGION_SIZE_CORE ,
-            BLOCK_SIZE        => BLOCK_SIZE       ,
-            ITEM_WIDTH        => ITEM_WIDTH       ,
-            MI_DATA_WIDTH_PHY => MI_DATA_WIDTH_PHY,
-            MI_ADDR_WIDTH_PHY => MI_ADDR_WIDTH_PHY,
-            CLK_ETH_IN_ENABLE => LL_MODE          ,
-            TS_DEMO_EN        => TS_DEMO_EN       ,
-            TX_DMA_CHANNELS   => TX_DMA_CHANNELS  ,
-            LANE_RX_POLARITY  => LANE_RX_POLARITY(p*LANES+LANES-1 downto p*LANES),
-            LANE_TX_POLARITY  => LANE_TX_POLARITY(p*LANES+LANES-1 downto p*LANES),
+            ETH_PORT_SPEED     => ETH_PORT_SPEED(p),
+            ETH_PORT_CHAN      => ETH_PORT_CHAN (p),
+            CHANNEL_MAP        => ETH_CHAN_MAP,
+            EHIP_TYPE          => EHIP_TYPE,
+            LANES              => LANES,
+            REGIONS            => REGIONS_CORE,
+            REGION_SIZE        => REGION_SIZE_CORE,
+            BLOCK_SIZE         => BLOCK_SIZE,
+            ITEM_WIDTH         => ITEM_WIDTH,
+            MI_DATA_WIDTH_PHY  => MI_DATA_WIDTH_PHY,
+            MI_ADDR_WIDTH_PHY  => MI_ADDR_WIDTH_PHY,
+            CLK_ETH_IN_ENABLE  => LL_MODE,
+            TS_DEMO_EN         => TS_DEMO_EN,
+            TX_DMA_CHANNELS    => TX_DMA_CHANNELS,
+            LANE_RX_POLARITY   => LANE_RX_POLARITY(p*LANES+LANES-1 downto p*LANES),
+            LANE_TX_POLARITY   => LANE_TX_POLARITY(p*LANES+LANES-1 downto p*LANES),
             MISC_TOP2NET_WIDTH => MISC_TOP2NET_WIDTH,
             MISC_NET2TOP_WIDTH => MISC_NET2TOP_WIDTH,
-            DEVICE            => DEVICE
+            DEVICE             => DEVICE
         )
         port map (
             -- clock and reset
@@ -604,14 +604,14 @@ begin
                 DEVICE    => DEVICE
             )
             port map (
-                IN_CLK    => CLK_ETH     (0)   ,
+                IN_CLK    => CLK_ETH     (0),
                 IN_RESET  => repl_rst_arr(0)(1),
-                IN_TS_NS  => TSU_TS_NS         ,
-                IN_TS_DV  => TSU_TS_DV         ,
+                IN_TS_NS  => TSU_TS_NS,
+                IN_TS_DV  => TSU_TS_DV,
 
                 OUT_RESET => logic_rst_arr(p)(ch*2),
-                OUT_CLK   => logic_rx_clk (p)(ch)  ,
-                OUT_TS_NS => synced_ts_ns (p)(ch)  ,
+                OUT_CLK   => logic_rx_clk (p)(ch),
+                OUT_TS_NS => synced_ts_ns (p)(ch),
                 OUT_TS_DV => synced_ts_dv (p)(ch)
             );
         end generate;
@@ -623,7 +623,7 @@ begin
         end generate;
 
         -- ETH clock is used as TSU main clock
-        TSU_CLK <= CLK_ETH     (0)   ;
+        TSU_CLK <= CLK_ETH     (0);
         TSU_RST <= repl_rst_arr(0)(1);
 
         -- =====================================================================
@@ -638,39 +638,39 @@ begin
 
             -- Sloppy serialization (and deserialization) - do not use elsewhere
             demo_asfifo_din(p) <= eth_tx_mvb_channel_arr(p) & eth_tx_mvb_timestamp_arr(p) & eth_tx_mvb_vld_arr(p);
-            demo_asfifo_wr(p) <= or eth_tx_mvb_vld_arr(p);
+            demo_asfifo_wr(p)  <= or eth_tx_mvb_vld_arr(p);
 
             demo_asfifox_i : entity work.ASFIFOX
-            generic map(
+            generic map (
                 DATA_WIDTH => REGIONS*(max(1,log2(TX_DMA_CHANNELS))+48+1),
-                ITEMS      => 8     ,
-                RAM_TYPE   => "LUT" ,
-                FWFT_MODE  => true  ,
-                OUTPUT_REG => true  ,
+                ITEMS      => 8,
+                RAM_TYPE   => "LUT",
+                FWFT_MODE  => true,
+                OUTPUT_REG => true,
                 DEVICE     => DEVICE
             )
             port map (
-                WR_CLK    => CLK_USER               ,
-                WR_RST    => RESET_USER       (0)   ,
-                WR_DATA   => demo_asfifo_din  (p)   ,
-                WR_EN     => demo_asfifo_wr   (p)   ,
-                WR_FULL   => open                   ,
-                WR_AFULL  => open                   ,
-                WR_STATUS => open                   ,
+                WR_CLK    => CLK_USER,
+                WR_RST    => RESET_USER       (0),
+                WR_DATA   => demo_asfifo_din  (p),
+                WR_EN     => demo_asfifo_wr   (p),
+                WR_FULL   => open,
+                WR_AFULL  => open,
+                WR_STATUS => open,
 
-                RD_CLK    => CLK_ETH          (p)   ,
+                RD_CLK    => CLK_ETH          (p),
                 RD_RST    => repl_rst_arr     (p)(1),
-                RD_DATA   => demo_asfifo_dout (p)   ,
-                RD_EN     => '1'                    ,
-                RD_EMPTY  => demo_asfifo_empty(p)   ,
-                RD_AEMPTY => open                   ,
+                RD_DATA   => demo_asfifo_dout (p),
+                RD_EN     => '1',
+                RD_EMPTY  => demo_asfifo_empty(p),
+                RD_AEMPTY => open,
                 RD_STATUS => open
             );
 
             mvb_ch (p) <= demo_asfifo_dout(p)(REGIONS*(max(1,log2(TX_DMA_CHANNELS))+48+1)-1 downto REGIONS*(48+1));
             mvb_ts (p) <= demo_asfifo_dout(p)(REGIONS*(48+1)-1 downto REGIONS);
             mvb_vld(p) <= demo_asfifo_dout(p)(REGIONS-1 downto 0) and not demo_asfifo_empty(p);
-            -- TODO add conversion from REGIONS to REGIONS_CORE...
+        -- TODO add conversion from REGIONS to REGIONS_CORE...
         else generate
             mvb_ch (p) <= (others => '0');
             mvb_ts (p) <= (others => '0');
@@ -685,49 +685,49 @@ begin
         sync_act_link_p_g : for p in 0 to ETH_PORTS-1 generate
             sync_act_link_g : for ch in 0 to ETH_CHANNELS-1 generate
                 act_rx_sync_i : entity work.ASYNC_OPEN_LOOP
-                generic map(
+                generic map (
                     IN_REG  => false,
                     TWO_REG => true
                 )
-                port map(
+                port map (
                     ADATAIN  => sig_activity_rx(p)(ch),
-                    BCLK => CLK_ETH(p),
-                    BRST => '0',
+                    BCLK     => CLK_ETH(p),
+                    BRST     => '0',
                     BDATAOUT => sig_activity_rx_sync(p)(ch)
                 );
 
                 act_tx_sync_i : entity work.ASYNC_OPEN_LOOP
-                generic map(
+                generic map (
                     IN_REG  => false,
                     TWO_REG => true
                 )
-                port map(
+                port map (
                     ADATAIN  => sig_activity_tx(p)(ch),
-                    BCLK => CLK_ETH(p),
-                    BRST => '0',
+                    BCLK     => CLK_ETH(p),
+                    BRST     => '0',
                     BDATAOUT => sig_activity_tx_sync(p)(ch)
                 );
 
                 rx_link_up_sync_i : entity work.ASYNC_OPEN_LOOP
-                generic map(
+                generic map (
                     IN_REG  => false,
                     TWO_REG => true
                 )
-                port map(
+                port map (
                     ADATAIN  => sig_rx_link_up(p)(ch),
-                    BCLK => CLK_ETH(p),
-                    BRST => '0',
+                    BCLK     => CLK_ETH(p),
+                    BRST     => '0',
                     BDATAOUT => sig_rx_link_up_sync(p)(ch)
                 );
                 tx_link_up_sync_i : entity work.ASYNC_OPEN_LOOP
-                generic map(
+                generic map (
                     IN_REG  => false,
                     TWO_REG => true
                 )
-                port map(
+                port map (
                     ADATAIN  => sig_tx_link_up(p)(ch),
-                    BCLK => CLK_ETH(p),
-                    BRST => '0',
+                    BCLK     => CLK_ETH(p),
+                    BRST     => '0',
                     BDATAOUT => sig_tx_link_up_sync(p)(ch)
                 );
             end generate;
@@ -751,43 +751,43 @@ begin
     qsfp_ctrl_g: if QSFP_I2C_CTRL_EN generate
         qsfp_ctrl_i : entity work.QSFP_CTRL
         generic map (
-           QSFP_PORTS     => QSFP_PORTS,
-           QSFP_I2C_PORTS => QSFP_I2C_PORTS,
-           FPC202_INIT_EN => FPC202_INIT_EN,
-           I2C_TRISTATE   => QSFP_I2C_TRISTATE
+            QSFP_PORTS     => QSFP_PORTS,
+            QSFP_I2C_PORTS => QSFP_I2C_PORTS,
+            FPC202_INIT_EN => FPC202_INIT_EN,
+            I2C_TRISTATE   => QSFP_I2C_TRISTATE
         )
         port map (
-           RST            => MI_RESET_PMD,
-           --
-           TX_READY       => (others => '1'),
-           -- QSFP control/status
-           QSFP_MODSEL_N  => QSFP_MODSEL_N,
-           QSFP_LPMODE    => QSFP_LPMODE,
-           QSFP_RESET_N   => QSFP_RESET_N,
-           QSFP_MODPRS_N  => QSFP_MODPRS_N,
-           QSFP_INT_N     => QSFP_INT_N,
-           QSFP_I2C_SCL   => QSFP_I2C_SCL,
-           QSFP_I2C_SDA   => QSFP_I2C_SDA,
-           QSFP_I2C_DIR   => QSFP_I2C_DIR,
-           QSFP_I2C_SDA_I => QSFP_I2C_SDA_I,
-           QSFP_I2C_SCL_I => QSFP_I2C_SCL_I,
-           QSFP_I2C_SCL_O  => QSFP_I2C_SCL_O,
-           QSFP_I2C_SCL_OE => QSFP_I2C_SCL_OE,
-           QSFP_I2C_SDA_O  => QSFP_I2C_SDA_O,
-           QSFP_I2C_SDA_OE => QSFP_I2C_SDA_OE,
-           -- Select which QSFP port is targetting during MI read/writes
-           MI_QSFP_SEL    => MI_ADDR_PMD(8+max(log2(QSFP_PORTS),1)-1 downto 8),
-           -- MI interface
-           MI_CLK_PHY     => MI_CLK_PMD  ,
-           MI_RESET_PHY   => MI_RESET_PMD,
-           MI_DWR_PHY     => MI_DWR_PMD  ,
-           MI_ADDR_PHY    => MI_ADDR_PMD ,
-           MI_RD_PHY      => MI_RD_PMD   ,
-           MI_WR_PHY      => MI_WR_PMD   ,
-           MI_BE_PHY      => MI_BE_PMD   ,
-           MI_DRD_PHY     => MI_DRD_PMD  ,
-           MI_ARDY_PHY    => MI_ARDY_PMD ,
-           MI_DRDY_PHY    => MI_DRDY_PMD
+            RST             => MI_RESET_PMD,
+            --
+            TX_READY        => (others => '1'),
+            -- QSFP control/status
+            QSFP_MODSEL_N   => QSFP_MODSEL_N,
+            QSFP_LPMODE     => QSFP_LPMODE,
+            QSFP_RESET_N    => QSFP_RESET_N,
+            QSFP_MODPRS_N   => QSFP_MODPRS_N,
+            QSFP_INT_N      => QSFP_INT_N,
+            QSFP_I2C_SCL    => QSFP_I2C_SCL,
+            QSFP_I2C_SDA    => QSFP_I2C_SDA,
+            QSFP_I2C_DIR    => QSFP_I2C_DIR,
+            QSFP_I2C_SDA_I  => QSFP_I2C_SDA_I,
+            QSFP_I2C_SCL_I  => QSFP_I2C_SCL_I,
+            QSFP_I2C_SCL_O  => QSFP_I2C_SCL_O,
+            QSFP_I2C_SCL_OE => QSFP_I2C_SCL_OE,
+            QSFP_I2C_SDA_O  => QSFP_I2C_SDA_O,
+            QSFP_I2C_SDA_OE => QSFP_I2C_SDA_OE,
+            -- Select which QSFP port is targetting during MI read/writes
+            MI_QSFP_SEL     => MI_ADDR_PMD(8+max(log2(QSFP_PORTS),1)-1 downto 8),
+            -- MI interface
+            MI_CLK_PHY      => MI_CLK_PMD,
+            MI_RESET_PHY    => MI_RESET_PMD,
+            MI_DWR_PHY      => MI_DWR_PMD,
+            MI_ADDR_PHY     => MI_ADDR_PMD,
+            MI_RD_PHY       => MI_RD_PMD,
+            MI_WR_PHY       => MI_WR_PMD,
+            MI_BE_PHY       => MI_BE_PMD,
+            MI_DRD_PHY      => MI_DRD_PMD,
+            MI_ARDY_PHY     => MI_ARDY_PMD,
+            MI_DRDY_PHY     => MI_DRDY_PMD
         );
     end generate;
 

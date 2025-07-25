@@ -18,8 +18,8 @@ use ieee.std_logic_textio.all;
 use ieee.numeric_std.all;
 use std.textio.all;
 
-library STD_DEVELOPERSKIT;
-use     STD_DEVELOPERSKIT.std_iopak.all;       -- To_string
+library std_developerskit;
+use std_developerskit.std_iopak.all;       -- To_string
 
 use work.math_pack.all;
 use work.ib_pkg.all;
@@ -29,750 +29,779 @@ use work.ib_bfm_rdy_pkg.all;
 -- ----------------------------------------------------------------------------
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
-ENTITY IB_BFM IS
-   GENERIC (
-       MEMORY_BASE_ADDR : std_logic_vector(63 downto 0) := X"FFFFFFFF00000000"; -- Memory Base ADDR
-       MEMORY_SIZE      : integer := 1024; -- Defaul 1024 Bytes
-       MEMORY_DELAY     : integer := 10    -- Delay before sending completition
-       );
-   PORT (
-      CLK          : in  std_logic;
-      -- Internal Bus Interface
-      IB           : inout t_internal_bus64
-      );
-END ENTITY IB_BFM;
+entity IB_BFM is
+    generic (
+        MEMORY_BASE_ADDR : std_logic_vector(63 downto 0) := X"FFFFFFFF00000000"; -- Memory Base ADDR
+        MEMORY_SIZE      : integer := 1024;                                      -- Defaul 1024 Bytes
+        MEMORY_DELAY     : integer := 10                                         -- Delay before sending completition
+    );
+    port (
+        CLK          : in  std_logic;
+        -- Internal Bus Interface
+        IB           : inout t_internal_bus64
+    );
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
-ARCHITECTURE IB_BFM_ARCH OF IB_BFM IS
+architecture IB_BFM_ARCH of IB_BFM is
 
-   -- Request for completition
-   SIGNAL ComplReq               : IbCmdType := ('0', 'Z', 'Z');
-   SHARED VARIABLE ComplDataCmdV : IbCmdVType;
+    -- Request for completition
+    signal          complreq               : IbCmdType := ('0', 'Z', 'Z');
+    shared variable compldatacmdv          : IbCmdVType;
 
-   -- Transactions
-   SHARED VARIABLE LclIbCmdV        : IbCmdVType;
-   SHARED VARIABLE LclIbCmdVReceive : IbCmdVType;
+    -- Transactions
+    shared variable lclibcmdv        : IbCmdVType;
+    shared variable lclibcmdvreceive : IbCmdVType;
 
-   -- Host Memory
-   TYPE MemoryType IS ARRAY (0 TO MEMORY_SIZE/8) of std_logic_vector(63 downto 0);
-   SHARED VARIABLE Memory : MemoryType;
+    -- Host Memory
+    type            memorytype is array (0 to MEMORY_SIZE/8) of std_logic_vector(63 downto 0);
+    shared variable memory : memorytype;
 
-   -- Logging settings
-   SHARED VARIABLE LogTranscript : boolean := true;
-   SHARED VARIABLE LogFile       : boolean := false;
+    -- Logging settings
+    shared variable logtranscript : boolean := true;
+    shared variable logfile       : boolean := false;
 
-   -- Write Align Type
-   TYPE WriteAlignType IS
-    RECORD
-      Align    : integer;
-      AlignReg : std_logic_vector(63 downto 0);
-    END RECORD;
+    -- Write Align Type
+    type writealigntype is record
 
-   ----------------------------------------------------------------------------
-   -- Completition FIFO for G2LR
-   CONSTANT FIFO_LEN : integer := 256;
-   TYPE FifoType IS ARRAY (0 TO FIFO_LEN-1) of IbCmdVType;
-   TYPE CompletitionFifoType IS
-    RECORD
-      BeginPtr : integer;
-      EndPtr   : integer;
-      Items    : integer;
-      Empty    : boolean;
-      Fifo     : FifoType;
-    END RECORD;
-   SHARED VARIABLE ComplFifo : CompletitionFifoType;
+        Align    : integer;
+        AlignReg : std_logic_vector(63 downto 0);
+    end record;
 
-   -- -------------------------------------------------------------------------
-   PROCEDURE InitFifo IS
-   BEGIN
-     ComplFifo.EndPtr   := 0;
-     ComplFifo.BeginPtr := 0;
-     ComplFifo.Empty    := true;
-     ComplFifo.Items    := 0;
-   END PROCEDURE;
+    ----------------------------------------------------------------------------
+    -- Completition FIFO for G2LR
+    constant FIFO_LEN : integer := 256;
+    type     fifotype is array (0 to FIFO_LEN-1) of IbCmdVType;
+    type     completitionfifotype is record
 
-   -- -------------------------------------------------------------------------
-   PROCEDURE insertFifo(input  :  IN  IbCmdVType) IS
-   BEGIN
-     ComplFifo.Fifo(ComplFifo.EndPtr) := input;
-     ComplFifo.EndPtr := ComplFifo.EndPtr+1;
-     ComplFifo.Items  := ComplFifo.Items+1;
-     if (ComplFifo.EndPtr = FIFO_LEN) then
-       ComplFifo.EndPtr := 0;
-     end if;
-     ComplFifo.Empty  := false;
-     ASSERT (ComplFifo.EndPtr /= ComplFifo.BeginPtr or ComplFifo.Items=0)
-            REPORT "IB_BFM: Completition fifo overflow";
-   END PROCEDURE;
+        BeginPtr : integer;
+        EndPtr   : integer;
+        Items    : integer;
+        Empty    : boolean;
+        Fifo     : fifotype;
+    end record;
+    shared variable complfifo : completitionfifotype;
 
-   -- -------------------------------------------------------------------------
-   PROCEDURE getFifo(output : INOUT IbCmdVType) IS
-   BEGIN
-     if (not ComplFifo.Empty) then
-       output:=ComplFifo.Fifo(ComplFifo.BeginPtr);
-       ComplFifo.BeginPtr := ComplFifo.BeginPtr + 1;
-       if (ComplFifo.BeginPtr = FIFO_LEN) then
-         ComplFifo.BeginPtr := 0;
-       end if;
-       ComplFifo.Items:=ComplFifo.Items-1;
-       ComplFifo.Empty:=ComplFifo.BeginPtr=ComplFifo.EndPtr;
-     end if;
-   END PROCEDURE;
+    -- -------------------------------------------------------------------------
+    procedure initfifo is
+    begin
+        ComplFifo.EndPtr   := 0;
+        ComplFifo.BeginPtr := 0;
+        ComplFifo.Empty    := true;
+        ComplFifo.Items    := 0;
+    end procedure initfifo;
 
-   -- -------------------------------------------------------------------------
-   PROCEDURE to_bit_vector(input  :  IN  std_logic_vector;
-                           output :  OUT bit_vector) IS
-     VARIABLE i : integer;
-   BEGIN
-   for i in 0 to input'high loop
-      if (input(i) = '1') then
-        output(i) := '1';
-      else
-        output(i) := '0';
-      end if;
-   end loop;
-   END PROCEDURE;
+    -- -------------------------------------------------------------------------
+    procedure insertfifo (
+        input  :  in  IbCmdVType
+    ) is
+    begin
+        ComplFifo.Fifo(ComplFifo.EndPtr) := input;
+        ComplFifo.EndPtr                 := ComplFifo.EndPtr+1;
+        ComplFifo.Items                  := ComplFifo.Items+1;
+        if (ComplFifo.EndPtr = FIFO_LEN) then
+            ComplFifo.EndPtr := 0;
+        end if;
+        ComplFifo.Empty  := false;
+        assert (ComplFifo.EndPtr /= ComplFifo.BeginPtr or ComplFifo.Items = 0)
+            report "IB_BFM: Completition fifo overflow";
+    end procedure insertfifo;
 
-   -- -------------------------------------------------------------------------
-   -- ShowCommand Info
-   PROCEDURE ShowCommandInfo(cmdV :  IN IbCmdVType; info : in string) IS
-      VARIABLE SrcAddr    : bit_vector(31 downto 0);
-      VARIABLE DstAddr    : bit_vector(31 downto 0);
-      VARIABLE LocalAddr  : bit_vector(31 downto 0);
-      VARIABLE GlobalAddr : bit_vector(63 downto 0);
-      VARIABLE Data       : bit_vector(63 downto 0);
-      VARIABLE i          : integer;
-      file output         : ascii_text open write_mode  is "STD_OUTPUT";
-      file outfile        : ascii_text open append_mode is "internal_bus.log";
-   BEGIN
-    to_bit_vector(cmdV.Di.SrcAddr,    SrcAddr);
-    to_bit_vector(cmdV.Di.DstAddr,    DstAddr);
-    to_bit_vector(cmdV.Di.LocalAddr,  LocalAddr);
-    to_bit_vector(cmdV.Di.GlobalAddr, GlobalAddr);
-
-
-
-    CASE cmdV.CmdOp IS
-
-       WHEN LocalRead =>
-         if (LogTranscript) then
-           fprint(output,"IB_BFM: %s Local2Local Read:  SrcAddr: 0x%s DstAddr: 0x%s Tag: %s Length: %s\n",
-                          info, to_string(SrcAddr, "%x"), to_string(DstAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length));
-         end if;
-         if (LogFile) then
-           fprint(outfile,"IB_BFM: %s Local2Local Read:  SrcAddr: 0x%s DstAddr: 0x%s Tag: %s Length: %s\n",
-                          info, to_string(SrcAddr, "%x"), to_string(DstAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length));
-         end if;
-
-       WHEN LocalWrite =>
-         if (LogTranscript) then
-           fprint(output,"IB_BFM: %s Local2Local Write: DstAddr: 0x%s SrcAddr: 0x%s Tag: %s Length: %s\n",
-                          info, to_string(DstAddr, "%x"), to_string(SrcAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length));
-         end if;
-         if (LogFile) then
-           fprint(outfile,"IB_BFM: %s Local2Local Write: DstAddr: 0x%s SrcAddr: 0x%s Tag: %s Length: %s\n",
-                          info, to_string(DstAddr, "%x"), to_string(SrcAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length));
-         end if;
-         i:= 0;
-         while i < cmdV.Di.Length loop
-           to_bit_vector(cmdV.Di.Data(i/8), Data);
-           if (LogTranscript) then
-             fprint(output,"        DATA: 0x%s\n", to_string(Data, "%x"));
-           end if;
-           if (LogFile) then
-             fprint(outfile,"        DATA: 0x%s\n", to_string(Data, "%x"));
-           end if;
-
-           i:=i+8;
-         end loop;
-
-       WHEN Completition =>
-         if (LogTranscript) then
-           fprint(output,"IB_BFM: %s Completition: DstAddr: 0x%s SrcAddr: 0x%s Tag: %s Length: %s LastFlag: %s\n",
-                          info, to_string(DstAddr, "%x"), to_string(SrcAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length), to_string(cmdV.Di.LastFlag));
-         end if;
-         if (LogFile) then
-           fprint(outfile,"IB_BFM: %s Completition: DstAddr: 0x%s SrcAddr: 0x%s Tag: %s Length: %s LastFlag: %s\n",
-                          info, to_string(DstAddr, "%x"), to_string(SrcAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length), to_string(cmdV.Di.LastFlag));
-         end if;
-         i:= 0;
-         while i < cmdV.Di.Length loop
-           to_bit_vector(cmdV.Di.Data(i/8), Data);
-           if (LogTranscript) then
-             fprint(output,"        DATA: 0x%s\n", to_string(Data, "%x"));
-           end if;
-           if (LogFile) then
-             fprint(outfile,"        DATA: 0x%s\n", to_string(Data, "%x"));
-           end if;
-           i:=i+8;
-         end loop;
-
-       WHEN G2LR =>
-         if (LogTranscript) then
-           fprint(output,"IB_BFM: %s Global2Local Read:  GlobalAddr: 0x%s LocalAddr: 0x%s Tag: %s Length: %s\n",
-                          info, to_string(GlobalAddr, "%x"), to_string(LocalAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length));
-         end if;
-         if (LogFile) then
-           fprint(outfile,"IB_BFM: %s Global2Local Read:  GlobalAddr: 0x%s LocalAddr: 0x%s Tag: %s Length: %s\n",
-                          info, to_string(GlobalAddr, "%x"), to_string(LocalAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length));
-         end if;
-
-       WHEN L2GW =>
-         if (LogTranscript) then
-           fprint(output,"IB_BFM: %s Local2Global Write:  GlobalAddr: 0x%s LocalAddr: 0x%s Tag: %s Length: %s\n",
-                          info, to_string(GlobalAddr, "%x"), to_string(LocalAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length));
-         end if;
-         if (LogFile) then
-           fprint(outfile,"IB_BFM: %s Local2Global Write:  GlobalAddr: 0x%s LocalAddr: 0x%s Tag: %s Length: %s\n",
-                          info, to_string(GlobalAddr, "%x"), to_string(LocalAddr, "%x"),to_string(cmdV.Di.Tag),
-                          to_string(cmdV.Di.Length));
-         end if;
-         i:= 0;
-         while i < cmdV.Di.Length loop
-           to_bit_vector(cmdV.Di.Data(i/8), Data);
-           if (LogTranscript) then
-             fprint(output,"        DATA: 0x%s\n", to_string(Data, "%x"));
-           end if;
-           if (LogFile) then
-             fprint(outfile,"        DATA: 0x%s\n", to_string(Data, "%x"));
-           end if;
-           i:=i+8;
-         end loop;
-
-       WHEN others =>
-
-    END CASE;
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- Init Align
-   PROCEDURE AlignInit(Align :  IN integer; WriteAlign : INOUT WriteAlignType) IS
-   BEGIN
-     WriteAlign.Align    := Align;
-     WriteAlign.AlignReg := X"0000000000000000";
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- GetWriteCount
-   FUNCTION GetWriteCount(Align  :  IN integer;
-                          Length :  IN integer) RETURN integer IS
-     VARIABLE Plus : integer;
-   BEGIN
-     if (((Length+Align) mod 8) > 0) then
-       Plus := 1;
-     else
-       Plus := 0;
-     end if;
-     RETURN (Length+Align)/8 + Plus;
-   END FUNCTION;
-
-   -- -------------------------------------------------------------------------
-   -- GetWriteData
-   PROCEDURE GetWriteData(DataIn         : IN std_logic_vector(63 downto 0);
-                          SIGNAL DataOut : OUT std_logic_vector(63 downto 0);
-                          WriteAlign     : INOUT WriteAlignType) IS
-   VARIABLE i : integer;
-   VARIABLE j : integer;
-   BEGIN
-     if (WriteAlign.Align = 0) then
-       DataOut <= DataIn;
-     else
-       j:=0;
-       for i in WriteAlign.Align*8-1 downto 0 loop
-         DataOut(i) <= WriteAlign.AlignReg(64-(WriteAlign.Align*8)+i);
-       end loop;
-       for i in WriteAlign.Align*8 to 63  loop
-         DataOut(i) <= DataIn(j);
-         j:=j+1;
-       end loop;
-       WriteAlign.AlignReg := DataIn;
-     end if;
-   END PROCEDURE;
-
-
-   -- -------------------------------------------------------------------------
-   -- Generate LocalRead Transaction
-   PROCEDURE LocalRead (variable trans     :  IN IbCmdVType;
-                        signal   CLK       :  IN std_logic;
-                        signal   DATA      : OUT std_logic_vector(63 downto 0);
-                        signal   SOP_N     : OUT std_logic;
-                        signal   EOP_N     : OUT std_logic;
-                        signal   SRC_RDY_N : OUT std_logic;
-                        signal   DST_RDY_N :  IN std_logic) IS
-   BEGIN
-
-     DATA      <= trans.Di.SrcAddr & conv_std_logic_vector(trans.Di.Tag, 16) &
-                  '0' & C_IB_L2LR_TRANSACTION & conv_std_logic_vector(trans.Di.Length,12);
-     SRC_RDY_N <= '0';
-     SOP_N     <= '0';
-     EOP_N     <= '1';
-     wait until (CLK'event and CLK='1' and DST_RDY_N='0');
-     DATA      <= X"00000000" & trans.Di.DstAddr;
-     SRC_RDY_N <= '0';
-     SOP_N     <= '1';
-     EOP_N     <= '0';
-     wait until (CLK'event and CLK='1' and DST_RDY_N='0');
-     SOP_N     <= '1';
-     EOP_N     <= '1';
-     SRC_RDY_N <= '1';
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- Generate LocalWrite Transaction
-   PROCEDURE LocalWrite(variable trans     :  IN IbCmdVType;
-                        signal   CLK       :  IN std_logic;
-                        signal   DATA      : OUT std_logic_vector(63 downto 0);
-                        signal   SOP_N     : OUT std_logic;
-                        signal   EOP_N     : OUT std_logic;
-                        signal   SRC_RDY_N : OUT std_logic;
-                        signal   DST_RDY_N :  IN std_logic) IS
-     VARIABLE i           : integer;
-     VARIABLE len         : integer;
-     VARIABLE aux_len     : integer;
-     VARIABLE count       : integer;
-     VARIABLE WriteAlign  :  WriteAlignType;
-   BEGIN
-     -- Set maximum length to 0 in header
-     if (trans.Di.Length = 4096) then
-        aux_len:= 0;
-     else
-        aux_len:=trans.Di.Length;
-     end if;
-
-     -- Send HDR0
-     DATA      <= trans.Di.DstAddr & conv_std_logic_vector(trans.Di.Tag, 16) &
-                  '0' & C_IB_L2LW_TRANSACTION & conv_std_logic_vector(aux_len,12);
-     SRC_RDY_N <= '0';
-     SOP_N     <= '0';
-     EOP_N     <= '1';
-     wait until (CLK'event and CLK='1' and DST_RDY_N='0');
-
-     -- Send HDR1
-     DATA      <= X"00000000" & trans.Di.SrcAddr;
-     SRC_RDY_N <= '0';
-     SOP_N     <= '1';
-     EOP_N     <= '1';
-     wait until (CLK'event and CLK='1' and DST_RDY_N='0');
-
-     -- Send DATA
-     AlignInit(conv_integer(trans.Di.DstAddr(2 downto 0)), WriteAlign);
-     len   := trans.Di.Length;
-     count := GetWriteCount(conv_integer(trans.Di.DstAddr(2 downto 0)),conv_integer(trans.Di.Length));
-     for i in 0 to count-1 loop
-       if (len > 0) then
-         GetWriteData(trans.Di.Data(i), DATA, WriteAlign);
-       else
-         GetWriteData(X"0000000000000000", DATA, WriteAlign);
-       end if;
-       SRC_RDY_N <= '0';
-       SOP_N     <= '1';
-       if (i = (count-1)) then
-         EOP_N   <= '0';
-       else
-         EOP_N   <= '1';
-       end if;
-       wait until (CLK'event and CLK='1' and DST_RDY_N='0');
-       len := len - 8;
-     end loop;
-
-     SOP_N     <= '1';
-     EOP_N     <= '1';
-     SRC_RDY_N <= '1';
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- Generate Completition Transaction
-   PROCEDURE Completition(variable trans     :  IN IbCmdVType;
-                          signal   CLK       :  IN std_logic;
-                          signal   DATA      : OUT std_logic_vector(63 downto 0);
-                          signal   SOP_N     : OUT std_logic;
-                          signal   EOP_N     : OUT std_logic;
-                          signal   SRC_RDY_N : OUT std_logic;
-                          signal   DST_RDY_N :  IN std_logic) IS
-     VARIABLE i          : integer;
-     VARIABLE len        : integer;
-     VARIABLE count      : integer;
-     VARIABLE WriteAlign : WriteAlignType;
-   BEGIN
-
-     -- Send HDR0
-     DATA      <= trans.Di.DstAddr & conv_std_logic_vector(trans.Di.Tag, 16) &
-                  trans.Di.LastFlag & C_IB_RD_COMPL_TRANSACTION & conv_std_logic_vector(trans.Di.Length,12);
-     SRC_RDY_N <= '0';
-     SOP_N     <= '0';
-     EOP_N     <= '1';
-     wait until (CLK'event and CLK='1' and DST_RDY_N='0');
-
-     -- Send HDR1
-     DATA      <= X"00000000" & trans.Di.SrcAddr;
-     SRC_RDY_N <= '0';
-     SOP_N     <= '1';
-     EOP_N     <= '1';
-     wait until (CLK'event and CLK='1' and DST_RDY_N='0');
-
-     -- Send DATA
-     AlignInit(conv_integer(trans.Di.DstAddr(2 downto 0)),WriteAlign);
-     len   := trans.Di.Length;
-     count := GetWriteCount(conv_integer(trans.Di.DstAddr(2 downto 0)),conv_integer(trans.Di.Length));
-     for i in 0 to count-1 loop
-       if (len > 0) then
-         GetWriteData(trans.Di.Data(i), DATA, WriteAlign);
-       else
-         GetWriteData(X"0000000000000000", DATA, WriteAlign);
-       end if;
-       SRC_RDY_N <= '0';
-       SOP_N     <= '1';
-       if (i = (count-1)) then
-         EOP_N   <= '0';
-       else
-         EOP_N   <= '1';
-       end if;
-       wait until (CLK'event and CLK='1' and DST_RDY_N='0');
-       len := len - 8;
-     end loop;
-
-     SOP_N     <= '1';
-     EOP_N     <= '1';
-     SRC_RDY_N <= '1';
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- Receive Completition Transaction
-   PROCEDURE ReceiveCompletition(signal CLK       :  IN std_logic;
-                                 signal DATA      :  IN std_logic_vector(63 downto 0);
-                                 signal SOP_N     :  IN std_logic;
-                                 signal EOP_N     :  IN std_logic;
-                                 signal SRC_RDY_N :  IN std_logic;
-                                 signal DST_RDY_N :  IN std_logic) IS
-     VARIABLE i     : integer;
-   BEGIN
-     -- Receive Header 1
-     LclIbCmdVReceive.CmdOp       := Completition;
-     LclIbCmdVReceive.Di.DstAddr  := DATA(63 downto 32);
-     LclIbCmdVReceive.Di.Tag      := conv_integer(DATA(31 downto 16));
-     LclIbCmdVReceive.Di.LastFlag := DATA(15);
-     LclIbCmdVReceive.Di.Length   := conv_integer(DATA(11 downto  0));
-     wait until (CLK'event and CLK='1' and SRC_RDY_N='0' and DST_RDY_N='0');
-     -- Receive Header2
-     LclIbCmdVReceive.Di.SrcAddr := DATA(63 downto 32);
-     -- Receive Data
-     i:=0;
-     while i < LclIbCmdVReceive.Di.Length loop
-       wait until (CLK'event and CLK='1' and SRC_RDY_N='0' and DST_RDY_N='0');
-       LclIbCmdVReceive.Di.Data(i/8) := DATA;
-       i:=i+8;
-     end loop;
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- Receive G2LR Transaction
-   PROCEDURE ReceiveG2LR(signal CLK       :  IN std_logic;
-                         signal DATA      :  IN std_logic_vector(63 downto 0);
-                         signal SOP_N     :  IN std_logic;
-                         signal EOP_N     :  IN std_logic;
-                         signal SRC_RDY_N :  IN std_logic;
-                         signal DST_RDY_N :  IN std_logic) IS
-   BEGIN
-     -- Receive Header 1
-     LclIbCmdVReceive.CmdOp                       := G2LR;
-     LclIbCmdVReceive.Di.GlobalAddr(31 downto 0)  := DATA(63 downto 32);
-     LclIbCmdVReceive.Di.Tag                      := conv_integer(DATA(31 downto 16));
-     if (conv_integer(DATA(11 downto 0)) = 0) then
-       LclIbCmdVReceive.Di.Length                 := 4096;
-     else
-       LclIbCmdVReceive.Di.Length                 := conv_integer(DATA(11 downto  0));
-     end if;
-     wait until (CLK'event and CLK='1' and SRC_RDY_N='0' and DST_RDY_N='0');
-     -- Receive Header2
-     LclIbCmdVReceive.Di.GlobalAddr(63 downto 32) := DATA(63 downto 32);
-     LclIbCmdVReceive.Di.LocalAddr                := DATA(31 downto 0);
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- Receive L2GW Transaction
-   PROCEDURE ReceiveL2GW(signal CLK       :  IN std_logic;
-                         signal DATA      :  IN std_logic_vector(63 downto 0);
-                         signal SOP_N     :  IN std_logic;
-                         signal EOP_N     :  IN std_logic;
-                         signal SRC_RDY_N :  IN std_logic;
-                         signal DST_RDY_N :  IN std_logic) IS
-     VARIABLE i     : integer;
-   BEGIN
-     -- Receive Header 1
-     LclIbCmdVReceive.CmdOp       := L2GW;
-     LclIbCmdVReceive.Di.GlobalAddr(31 downto 0)  := DATA(63 downto 32);
-     LclIbCmdVReceive.Di.Tag                      := conv_integer(DATA(31 downto 16));
-     if (conv_integer(DATA(11 downto 0)) = 0) then
-       LclIbCmdVReceive.Di.Length                 := 4096;
-     else
-       LclIbCmdVReceive.Di.Length                 := conv_integer(DATA(11 downto  0));
-     end if;
-     wait until (CLK'event and CLK='1' and SRC_RDY_N='0' and DST_RDY_N='0');
-     -- Receive Header2
-     LclIbCmdVReceive.Di.GlobalAddr(63 downto 32) := DATA(63 downto 32);
-     LclIbCmdVReceive.Di.LocalAddr                := DATA(31 downto 0);
-     -- Receive Data
-     i:=0;
-     while i < LclIbCmdVReceive.Di.Length loop
-       wait until (CLK'event and CLK='1' and SRC_RDY_N='0' and DST_RDY_N='0');
-       LclIbCmdVReceive.Di.Data(i/8) := DATA;
-       i:=i+8;
-     end loop;
-   END PROCEDURE;
-
-
-   -- -------------------------------------------------------------------------
-   -- Load Host Memory Data
-   PROCEDURE InitHostMemory IS
-     VARIABLE i     : integer;
-   BEGIN
-     -- Init Memory with data
-     i:=0;
-     while i < LclIbCmdV.Di.Length loop
-       Memory((LclIbCmdV.Di.MemAddr+i)/8) := LclIbCmdV.Di.Data(i/8);
-       i:=i+8;
-     end loop;
-
-     while (LclIbCmdV.Di.MemAddr+i) < MEMORY_SIZE loop
-       Memory((LclIbCmdV.Di.MemAddr+i)/8) := X"0000000000000000";
-       i:=i+8;
-     end loop;
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- Show Host Memory
-   PROCEDURE ShowHostMemory IS
-      VARIABLE Data       : bit_vector(63 downto 0);
-      VARIABLE i          : integer;
-      file output  : ascii_text open write_mode is "STD_OUTPUT";
-      file outfile : ascii_text open append_mode is "internal_bus.log";
-   BEGIN
-     if (LogTranscript) then
-       fprint(output,"IB_BFM: Host Memory Content\n");
-       -- Show Content
-       for i in 0 to MEMORY_SIZE/8 loop
-         to_bit_vector(Memory(i), Data);
-         fprint(output,"        DATA: 0x%s\n", to_string(Data, "%x"));
-       end loop;
-     end if;
-     if (LogFile) then
-       fprint(outfile,"IB_BFM: Host Memory Content\n");
-     -- Show Content
-       for i in 0 to MEMORY_SIZE/8 loop
-         to_bit_vector(Memory(i), Data);
-         fprint(outfile,"        DATA: 0x%s\n", to_string(Data, "%x"));
-       end loop;
-     end if;
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- Process L2GW Transaction (Save Transaction into memory)
-   PROCEDURE ProcessL2GW(trans :  IN IbCmdVType) IS
-     VARIABLE DstAddr : std_logic_vector(63 downto 0);
-     VARIABLE start   : integer;
-     VARIABLE i       : integer;
-     VARIABLE j       : integer;
-   BEGIN
-   DstAddr := trans.Di.GlobalAddr - MEMORY_BASE_ADDR;
-   ASSERT (DstAddr >=0 and DstAddr+trans.Di.Length <= MEMORY_SIZE)
-     REPORT "L2GW outside of Host Memory address space";
-
-   start := conv_integer(DstAddr(31 downto 0));
-   j:=0;
-   for i in start to (start+trans.Di.Length)-1 loop
-     Memory(i/8)( (i mod 8)*8+7 downto (i mod 8)*8) :=
-     trans.Di.Data(j/8)((j mod 8)*8+7 downto (j mod 8)*8);
-     j:=j+1;
-   end loop;
-   END PROCEDURE;
-
-   -- -------------------------------------------------------------------------
-   -- Process G2LR Transaction (Save Transaction into Completition FIFO)
-   PROCEDURE ProcessG2LR(trans :  IN IbCmdVType) IS
-     VARIABLE DstAddr : std_logic_vector(63 downto 0);
-     VARIABLE start   : integer;
-     VARIABLE i       : integer;
-     VARIABLE j       : integer;
-     VARIABLE compl   : IbCmdVType;
-   BEGIN
-   DstAddr := trans.Di.GlobalAddr - MEMORY_BASE_ADDR;
-   ASSERT (DstAddr >=0 and DstAddr+trans.Di.Length <= MEMORY_SIZE)
-     REPORT "L2GW outside of Host Memory address space";
-
-   compl.CmdOp       := Completition;
-   compl.Di.DstAddr  := trans.Di.LocalAddr;
-   compl.Di.SrcAddr  := X"FFFFFFFF";
-   compl.Di.Tag      := trans.Di.Tag;
-   compl.Di.Length   := trans.Di.Length;
-   compl.Di.LastFlag := '1';
-
-   -- Get Data from memory into field
-   start := conv_integer(DstAddr(31 downto 0));
-   j:=0;
-   for i in start to (start+trans.Di.Length)-1 loop
-     compl.Di.Data(j/8)((j mod 8)*8+7 downto (j mod 8)*8) :=
-     Memory(i/8)( (i mod 8)*8+7 downto (i mod 8)*8);
-     j:=j+1;
-   end loop;
-   -- Insert Completition Into Fifo
-   insertFifo(compl);
-   END PROCEDURE;
-
-BEGIN
-
-
--- Send Packet Process --------------------------------------------------------
-SEND_PACKETS: PROCESS
-   file     log_file  : text;
-BEGIN
-  IB.DOWN.DATA      <= (others => '0');
-  IB.DOWN.SOP_N     <= '1';
-  IB.DOWN.EOP_N     <= '1';
-  IB.DOWN.SRC_RDY_N <= '1';
-
-  IbCmd.Ack         <= '0';
-  ComplReq.Ack      <= '0';
-  IbCmd.ReqAck      <= '0';
-  ComplReq.ReqAck   <= '0';
-
-  LOOP
-    -- Get Command
-    WHILE (IbCmd.Req = '0' and ComplReq.Req = '0') LOOP
-       WAIT UNTIL (IbCmd.Req = '1' or ComplReq.Req = '1');
-    END LOOP;
-
-    if (IbCmd.Req = '1') then
-      -- Send Request Acknowledge
-      IbCmd.ReqAck <= NOT(IbCmd.ReqAck);
-      -- Wait for Reqest Deasert
-      WAIT ON IbCmd.Req;
-
-      ReadIbCmdV(LclIbCmdV);
-      ShowCommandInfo(LclIbCmdV,"Downstream");
-      -- Process Command
-      CASE LclIbCmdV.CmdOp IS
-         WHEN LocalRead      =>
-           LocalRead(LclIbCmdV, CLK, IB.DOWN.DATA, IB.DOWN.SOP_N, IB.DOWN.EOP_N, IB.DOWN.SRC_RDY_N, IB.DOWN.DST_RDY_N);
-         WHEN LocalWrite     =>
-           LocalWrite(LclIbCmdV, CLK, IB.DOWN.DATA, IB.DOWN.SOP_N, IB.DOWN.EOP_N, IB.DOWN.SRC_RDY_N, IB.DOWN.DST_RDY_N);
-         WHEN Completition   =>
-           Completition(LclIbCmdV, CLK, IB.DOWN.DATA, IB.DOWN.SOP_N, IB.DOWN.EOP_N, IB.DOWN.SRC_RDY_N, IB.DOWN.DST_RDY_N);
-         WHEN InitMemory     =>
-           InitHostMemory;
-         WHEN InitMemoryFromAddr =>
-           InitHostMemory;
-         WHEN ShowMemory     =>
-           ShowHostMemory;
-         WHEN TranscriptLogging =>
-            LogTranscript := LclIbCmdV.Di.Enable;
-         WHEN FileLogging       =>
-            LogFile       := LclIbCmdV.Di.Enable;
-            if (LogFile) then
-              file_open(log_file, "internal_bus.log", WRITE_MODE);
-              file_close(log_file);
+    -- -------------------------------------------------------------------------
+    procedure getfifo (
+        output : inout IbCmdVType
+    ) is
+    begin
+        if (not ComplFifo.Empty) then
+            output             :=ComplFifo.Fifo(ComplFifo.BeginPtr);
+            ComplFifo.BeginPtr := ComplFifo.BeginPtr + 1;
+            if (ComplFifo.BeginPtr = FIFO_LEN) then
+                ComplFifo.BeginPtr := 0;
             end if;
-         WHEN others            =>
-      END CASE;
+            ComplFifo.Items := ComplFifo.Items-1;
+            ComplFifo.Empty := ComplFifo.BeginPtr = ComplFifo.EndPtr;
+        end if;
+    end procedure getfifo;
 
-      -- Send Command done
-      IbCmd.Ack <= NOT(IbCmd.Ack);
-    end if;
+    -- -------------------------------------------------------------------------
+    procedure to_bit_vector (
+        input  :  in  std_logic_vector;
+        output :  out bit_vector
+    ) is
+        variable i : integer;
+    begin
+        for i in 0 to input'high loop
+            if (input(i) = '1') then
+                output(i) := '1';
+            else
+                output(i) := '0';
+            end if;
+        end loop;
+    end procedure to_bit_vector;
 
-    if (ComplReq.Req = '1') then
-      -- Send Request Acknowledge
-      ComplReq.ReqAck <= NOT(ComplReq.ReqAck);
-      -- Wait for Reqest Deasert
-      WAIT ON ComplReq.Req;
-
-      ShowCommandInfo(ComplDataCmdV,"Downstream");
-      Completition(ComplDataCmdV, CLK, IB.DOWN.DATA, IB.DOWN.SOP_N, IB.DOWN.EOP_N, IB.DOWN.SRC_RDY_N, IB.DOWN.DST_RDY_N);
-
-      -- Send Command done
-      ComplReq.Ack <= NOT(ComplReq.Ack);
-    end if;
-
-  END LOOP;
-END PROCESS;
-
--- Drive DST_RDY_N ---------------------------------------------------------------
-DRIVE_DST_RDY_N: PROCESS
-BEGIN
-  LOOP
-  DriveDstRdyN(CLK, IB.UP.DST_RDY_N);
-  END LOOP;
-END PROCESS;
-
-
--- Receive Packet Process --------------------------------------------------------
-RECEIVE_PACKETS: PROCESS
-BEGIN
-  InitFifo; -- Init Completition fifo
---  IB.UP.DST_RDY_N <= '0'; Replaced by DRIVE_DST_RDY_N process
-  LOOP
-    wait until (CLK'event and CLK='1' and IB.UP.SRC_RDY_N='0' and IB.UP.SOP_N='0' and IB.UP.DST_RDY_N='0');
-
-    CASE IB.UP.DATA(14 downto 12) IS
-       WHEN C_IB_L2GW_TRANSACTION =>
-         -- Receive Transaction
-         ReceiveL2GW(CLK, IB.UP.DATA, IB.UP.SOP_N, IB.UP.EOP_N, IB.UP.SRC_RDY_N, IB.UP.DST_RDY_N);
-         -- Show Transaction info
-         ShowCommandInfo(LclIbCmdVReceive,"Upstream");
-         -- Store transaction data into memory
-         ProcessL2GW(LclIbCmdVReceive);
-       WHEN C_IB_G2LR_TRANSACTION =>
-         -- Receive Transaction
-         ReceiveG2LR(CLK, IB.UP.DATA, IB.UP.SOP_N, IB.UP.EOP_N, IB.UP.SRC_RDY_N, IB.UP.DST_RDY_N);
-         -- Show Transaction info
-         ShowCommandInfo(LclIbCmdVReceive,"Upstream");
-         -- Store Reqest into fifo
-         ProcessG2LR(LclIbCmdVReceive);
-       WHEN C_IB_RD_COMPL_TRANSACTION =>
-         -- Receive Transaction
-         ReceiveCompletition(CLK, IB.UP.DATA, IB.UP.SOP_N, IB.UP.EOP_N, IB.UP.SRC_RDY_N, IB.UP.DST_RDY_N);
-         -- Show Transaction info
-         ShowCommandInfo(LclIbCmdVReceive,"Upstream");
-       WHEN OTHERS =>
-         ASSERT false REPORT "IB_BFM: Unexcepted transaction on upstream port";
-    END CASE;
-
-  END LOOP;
-END PROCESS;
-
--- Send Completitions --------------------------------------------------------
-SEND_COMPLETITIONS: PROCESS
-  VARIABLE i : integer;
-BEGIN
-  wait until (CLK'event and CLK='1');
-  LOOP
-    while (ComplFifo.Empty) loop
-      wait until (CLK'event and CLK='1');
-    end loop;
-    getFifo(ComplDataCmdV);
-
-    -- Memory delay
-    for i in 0 to MEMORY_DELAY loop
-      wait until (CLK'event and CLK='1');
-    end loop;
-
-    ComplReq.Req <= '1';
-    WAIT ON ComplReq.ReqAck;
-    ComplReq.Req <= '0';
-    WAIT ON ComplReq.Ack;
-
-  END LOOP;
-END PROCESS;
+    -- -------------------------------------------------------------------------
+    -- ShowCommand Info
+    procedure showcommandinfo (
+        cmdv :  in IbCmdVType;
+        info : in string
+    ) is
+        variable srcaddr        : bit_vector(31 downto 0);
+        variable dstaddr        : bit_vector(31 downto 0);
+        variable localaddr      : bit_vector(31 downto 0);
+        variable globaladdr     : bit_vector(63 downto 0);
+        variable data           : bit_vector(63 downto 0);
+        variable i              : integer;
+        file     output         : ascii_text open write_mode  is "STD_OUTPUT";
+        file     outfile        : ascii_text open append_mode is "internal_bus.log";
+    begin
+        to_bit_vector(cmdV.Di.SrcAddr,    srcaddr);
+        to_bit_vector(cmdV.Di.DstAddr,    dstaddr);
+        to_bit_vector(cmdV.Di.LocalAddr,  localaddr);
+        to_bit_vector(cmdV.Di.GlobalAddr, globaladdr);
 
 
-END ARCHITECTURE IB_BFM_ARCH;
+
+        case cmdV.CmdOp is
+
+            when LocalRead =>
+                if (LogTranscript) then
+                    fprint(output,"IB_BFM: %s Local2Local Read:  SrcAddr: 0x%s DstAddr: 0x%s Tag: %s Length: %s\n",
+                           info, to_string(srcaddr, "%x"), to_string(dstaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length));
+                end if;
+                if (LogFile) then
+                    fprint(outfile,"IB_BFM: %s Local2Local Read:  SrcAddr: 0x%s DstAddr: 0x%s Tag: %s Length: %s\n",
+                           info, to_string(srcaddr, "%x"), to_string(dstaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length));
+                end if;
+
+            when LocalWrite =>
+                if (LogTranscript) then
+                    fprint(output,"IB_BFM: %s Local2Local Write: DstAddr: 0x%s SrcAddr: 0x%s Tag: %s Length: %s\n",
+                           info, to_string(dstaddr, "%x"), to_string(srcaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length));
+                end if;
+                if (LogFile) then
+                    fprint(outfile,"IB_BFM: %s Local2Local Write: DstAddr: 0x%s SrcAddr: 0x%s Tag: %s Length: %s\n",
+                           info, to_string(dstaddr, "%x"), to_string(srcaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length));
+                end if;
+                i := 0;
+                while i < cmdV.Di.Length loop
+                    to_bit_vector(cmdV.Di.Data(i/8), data);
+                    if (LogTranscript) then
+                        fprint(output,"        DATA: 0x%s\n", to_string(data, "%x"));
+                    end if;
+                    if (LogFile) then
+                        fprint(outfile,"        DATA: 0x%s\n", to_string(data, "%x"));
+                    end if;
+
+                    i := i+8;
+                end loop;
+
+            when Completition =>
+                if (LogTranscript) then
+                    fprint(output,"IB_BFM: %s Completition: DstAddr: 0x%s SrcAddr: 0x%s Tag: %s Length: %s LastFlag: %s\n",
+                           info, to_string(dstaddr, "%x"), to_string(srcaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length), to_string(cmdV.Di.LastFlag));
+                end if;
+                if (LogFile) then
+                    fprint(outfile,"IB_BFM: %s Completition: DstAddr: 0x%s SrcAddr: 0x%s Tag: %s Length: %s LastFlag: %s\n",
+                           info, to_string(dstaddr, "%x"), to_string(srcaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length), to_string(cmdV.Di.LastFlag));
+                end if;
+                i := 0;
+                while i < cmdV.Di.Length loop
+                    to_bit_vector(cmdV.Di.Data(i/8), data);
+                    if (LogTranscript) then
+                        fprint(output,"        DATA: 0x%s\n", to_string(data, "%x"));
+                    end if;
+                    if (LogFile) then
+                        fprint(outfile,"        DATA: 0x%s\n", to_string(data, "%x"));
+                    end if;
+                    i := i+8;
+                end loop;
+
+            when G2LR =>
+                if (LogTranscript) then
+                    fprint(output,"IB_BFM: %s Global2Local Read:  GlobalAddr: 0x%s LocalAddr: 0x%s Tag: %s Length: %s\n",
+                           info, to_string(globaladdr, "%x"), to_string(localaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length));
+                end if;
+                if (LogFile) then
+                    fprint(outfile,"IB_BFM: %s Global2Local Read:  GlobalAddr: 0x%s LocalAddr: 0x%s Tag: %s Length: %s\n",
+                           info, to_string(globaladdr, "%x"), to_string(localaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length));
+                end if;
+
+            when L2GW =>
+                if (LogTranscript) then
+                    fprint(output,"IB_BFM: %s Local2Global Write:  GlobalAddr: 0x%s LocalAddr: 0x%s Tag: %s Length: %s\n",
+                           info, to_string(globaladdr, "%x"), to_string(localaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length));
+                end if;
+                if (LogFile) then
+                    fprint(outfile,"IB_BFM: %s Local2Global Write:  GlobalAddr: 0x%s LocalAddr: 0x%s Tag: %s Length: %s\n",
+                           info, to_string(globaladdr, "%x"), to_string(localaddr, "%x"),to_string(cmdV.Di.Tag),
+                           to_string(cmdV.Di.Length));
+                end if;
+                i := 0;
+                while i < cmdV.Di.Length loop
+                    to_bit_vector(cmdV.Di.Data(i/8), data);
+                    if (LogTranscript) then
+                        fprint(output,"        DATA: 0x%s\n", to_string(data, "%x"));
+                    end if;
+                    if (LogFile) then
+                        fprint(outfile,"        DATA: 0x%s\n", to_string(data, "%x"));
+                    end if;
+                    i := i+8;
+                end loop;
+
+            when others =>
+
+        end case;
+    end procedure showcommandinfo;
+
+    -- -------------------------------------------------------------------------
+    -- Init Align
+    procedure aligninit (
+        align      :  in integer;
+        writealign : inout writealigntype
+    ) is
+    begin
+        WriteAlign.Align    := align;
+        WriteAlign.AlignReg := X"0000000000000000";
+    end procedure aligninit;
+
+    -- -------------------------------------------------------------------------
+    -- GetWriteCount
+    function getwritecount (Align  :  in integer;
+        Length :  in integer) return integer is
+        variable plus : integer;
+    begin
+        if (((Length+Align) mod 8) > 0) then
+            plus := 1;
+        else
+            plus := 0;
+        end if;
+        return (Length+Align)/8 + plus;
+    end function;
+
+    -- -------------------------------------------------------------------------
+    -- GetWriteData
+    procedure getwritedata (
+        datain         : in std_logic_vector(63 downto 0);
+        signal dataout : out std_logic_vector(63 downto 0);
+        writealign     : inout writealigntype
+    ) is
+        variable i : integer;
+        variable j : integer;
+    begin
+        if (WriteAlign.Align = 0) then
+            dataout <= datain;
+        else
+            j := 0;
+            for i in WriteAlign.Align*8-1 downto 0 loop
+                dataout(i) <= WriteAlign.AlignReg(64-(WriteAlign.Align*8)+i);
+            end loop;
+            for i in WriteAlign.Align*8 to 63 loop
+                dataout(i) <= datain(j);
+                j          := j+1;
+            end loop;
+            WriteAlign.AlignReg := datain;
+        end if;
+    end procedure getwritedata;
+
+
+    -- -------------------------------------------------------------------------
+    -- Generate LocalRead Transaction
+    procedure localread (
+        variable trans     :  in IbCmdVType;
+        signal   clk       :  in std_logic;
+        signal   data      : out std_logic_vector(63 downto 0);
+        signal   sop_n     : out std_logic;
+        signal   eop_n     : out std_logic;
+        signal   src_rdy_n : out std_logic;
+        signal   dst_rdy_n :  in std_logic
+    ) is
+    begin
+
+        data      <= trans.Di.SrcAddr & conv_std_logic_vector(trans.Di.Tag, 16) &
+                     '0' & C_IB_L2LR_TRANSACTION & conv_std_logic_vector(trans.Di.Length,12);
+        src_rdy_n <= '0';
+        sop_n     <= '0';
+        eop_n     <= '1';
+        wait until (clk'event and clk = '1' and dst_rdy_n = '0');
+        data      <= X"00000000" & trans.Di.DstAddr;
+        src_rdy_n <= '0';
+        sop_n     <= '1';
+        eop_n     <= '0';
+        wait until (clk'event and clk = '1' and dst_rdy_n = '0');
+        sop_n     <= '1';
+        eop_n     <= '1';
+        src_rdy_n <= '1';
+    end procedure localread;
+
+    -- -------------------------------------------------------------------------
+    -- Generate LocalWrite Transaction
+    procedure localwrite (
+        variable trans     :  in IbCmdVType;
+        signal   clk       :  in std_logic;
+        signal   data      : out std_logic_vector(63 downto 0);
+        signal   sop_n     : out std_logic;
+        signal   eop_n     : out std_logic;
+        signal   src_rdy_n : out std_logic;
+        signal   dst_rdy_n :  in std_logic
+    ) is
+        variable i           : integer;
+        variable len         : integer;
+        variable aux_len     : integer;
+        variable count       : integer;
+        variable writealign  : writealigntype;
+    begin
+        -- Set maximum length to 0 in header
+        if (trans.Di.Length = 4096) then
+            aux_len := 0;
+        else
+            aux_len := trans.Di.Length;
+        end if;
+
+        -- Send HDR0
+        data      <= trans.Di.DstAddr & conv_std_logic_vector(trans.Di.Tag, 16) &
+                     '0' & C_IB_L2LW_TRANSACTION & conv_std_logic_vector(aux_len,12);
+        src_rdy_n <= '0';
+        sop_n     <= '0';
+        eop_n     <= '1';
+        wait until (clk'event and clk = '1' and dst_rdy_n = '0');
+
+        -- Send HDR1
+        data      <= X"00000000" & trans.Di.SrcAddr;
+        src_rdy_n <= '0';
+        sop_n     <= '1';
+        eop_n     <= '1';
+        wait until (clk'event and clk = '1' and dst_rdy_n = '0');
+
+        -- Send DATA
+        AlignInit(conv_integer(trans.Di.DstAddr(2 downto 0)), writealign);
+        len   := trans.Di.Length;
+        count := GetWriteCount(conv_integer(trans.Di.DstAddr(2 downto 0)),conv_integer(trans.Di.Length));
+        for i in 0 to count-1 loop
+            if (len > 0) then
+                GetWriteData(trans.Di.Data(i), data, writealign);
+            else
+                GetWriteData(X"0000000000000000", data, writealign);
+            end if;
+            src_rdy_n <= '0';
+            sop_n     <= '1';
+            if (i = (count-1)) then
+                eop_n   <= '0';
+            else
+                eop_n   <= '1';
+            end if;
+            wait until (clk'event and clk = '1' and dst_rdy_n = '0');
+            len := len - 8;
+        end loop;
+
+        sop_n     <= '1';
+        eop_n     <= '1';
+        src_rdy_n <= '1';
+    end procedure localwrite;
+
+    -- -------------------------------------------------------------------------
+    -- Generate Completition Transaction
+    procedure completition (
+        variable trans     :  in IbCmdVType;
+        signal   clk       :  in std_logic;
+        signal   data      : out std_logic_vector(63 downto 0);
+        signal   sop_n     : out std_logic;
+        signal   eop_n     : out std_logic;
+        signal   src_rdy_n : out std_logic;
+        signal   dst_rdy_n :  in std_logic
+    ) is
+        variable i          : integer;
+        variable len        : integer;
+        variable count      : integer;
+        variable writealign : writealigntype;
+    begin
+
+        -- Send HDR0
+        data      <= trans.Di.DstAddr & conv_std_logic_vector(trans.Di.Tag, 16) &
+                     trans.Di.LastFlag & C_IB_RD_COMPL_TRANSACTION & conv_std_logic_vector(trans.Di.Length,12);
+        src_rdy_n <= '0';
+        sop_n     <= '0';
+        eop_n     <= '1';
+        wait until (clk'event and clk = '1' and dst_rdy_n = '0');
+
+        -- Send HDR1
+        data      <= X"00000000" & trans.Di.SrcAddr;
+        src_rdy_n <= '0';
+        sop_n     <= '1';
+        eop_n     <= '1';
+        wait until (clk'event and clk = '1' and dst_rdy_n = '0');
+
+        -- Send DATA
+        AlignInit(conv_integer(trans.Di.DstAddr(2 downto 0)),writealign);
+        len   := trans.Di.Length;
+        count := GetWriteCount(conv_integer(trans.Di.DstAddr(2 downto 0)),conv_integer(trans.Di.Length));
+        for i in 0 to count-1 loop
+            if (len > 0) then
+                GetWriteData(trans.Di.Data(i), data, writealign);
+            else
+                GetWriteData(X"0000000000000000", data, writealign);
+            end if;
+            src_rdy_n <= '0';
+            sop_n     <= '1';
+            if (i = (count-1)) then
+                eop_n   <= '0';
+            else
+                eop_n   <= '1';
+            end if;
+            wait until (clk'event and clk = '1' and dst_rdy_n = '0');
+            len := len - 8;
+        end loop;
+
+        sop_n     <= '1';
+        eop_n     <= '1';
+        src_rdy_n <= '1';
+    end procedure completition;
+
+    -- -------------------------------------------------------------------------
+    -- Receive Completition Transaction
+    procedure receivecompletition (
+        signal clk       :  in std_logic;
+        signal data      :  in std_logic_vector(63 downto 0);
+        signal sop_n     :  in std_logic;
+        signal eop_n     :  in std_logic;
+        signal src_rdy_n :  in std_logic;
+        signal dst_rdy_n :  in std_logic
+    ) is
+        variable i     : integer;
+    begin
+        -- Receive Header 1
+        LclIbCmdVReceive.CmdOp       := Completition;
+        LclIbCmdVReceive.Di.DstAddr  := data(63 downto 32);
+        LclIbCmdVReceive.Di.Tag      := conv_integer(data(31 downto 16));
+        LclIbCmdVReceive.Di.LastFlag := data(15);
+        LclIbCmdVReceive.Di.Length   := conv_integer(data(11 downto  0));
+        wait until (clk'event and clk = '1' and src_rdy_n = '0' and dst_rdy_n = '0');
+        -- Receive Header2
+        LclIbCmdVReceive.Di.SrcAddr  := data(63 downto 32);
+        -- Receive Data
+        i                            := 0;
+        while i < LclIbCmdVReceive.Di.Length loop
+            wait until (clk'event and clk = '1' and src_rdy_n = '0' and dst_rdy_n = '0');
+            LclIbCmdVReceive.Di.Data(i/8) := data;
+            i                             := i+8;
+        end loop;
+    end procedure receivecompletition;
+
+    -- -------------------------------------------------------------------------
+    -- Receive G2LR Transaction
+    procedure receiveg2lr (
+        signal clk       :  in std_logic;
+        signal data      :  in std_logic_vector(63 downto 0);
+        signal sop_n     :  in std_logic;
+        signal eop_n     :  in std_logic;
+        signal src_rdy_n :  in std_logic;
+        signal dst_rdy_n :  in std_logic
+    ) is
+    begin
+        -- Receive Header 1
+        LclIbCmdVReceive.CmdOp                       := G2LR;
+        LclIbCmdVReceive.Di.GlobalAddr(31 downto 0)  := data(63 downto 32);
+        LclIbCmdVReceive.Di.Tag                      := conv_integer(data(31 downto 16));
+        if (conv_integer(data(11 downto 0)) = 0) then
+            LclIbCmdVReceive.Di.Length                 := 4096;
+        else
+            LclIbCmdVReceive.Di.Length                 := conv_integer(data(11 downto  0));
+        end if;
+        wait until (clk'event and clk = '1' and src_rdy_n = '0' and dst_rdy_n = '0');
+        -- Receive Header2
+        LclIbCmdVReceive.Di.GlobalAddr(63 downto 32) := data(63 downto 32);
+        LclIbCmdVReceive.Di.LocalAddr                := data(31 downto 0);
+    end procedure receiveg2lr;
+
+    -- -------------------------------------------------------------------------
+    -- Receive L2GW Transaction
+    procedure receivel2gw (
+        signal clk       :  in std_logic;
+        signal data      :  in std_logic_vector(63 downto 0);
+        signal sop_n     :  in std_logic;
+        signal eop_n     :  in std_logic;
+        signal src_rdy_n :  in std_logic;
+        signal dst_rdy_n :  in std_logic
+    ) is
+        variable i     : integer;
+    begin
+        -- Receive Header 1
+        LclIbCmdVReceive.CmdOp                       := L2GW;
+        LclIbCmdVReceive.Di.GlobalAddr(31 downto 0)  := data(63 downto 32);
+        LclIbCmdVReceive.Di.Tag                      := conv_integer(data(31 downto 16));
+        if (conv_integer(data(11 downto 0)) = 0) then
+            LclIbCmdVReceive.Di.Length                 := 4096;
+        else
+            LclIbCmdVReceive.Di.Length                 := conv_integer(data(11 downto  0));
+        end if;
+        wait until (clk'event and clk = '1' and src_rdy_n = '0' and dst_rdy_n = '0');
+        -- Receive Header2
+        LclIbCmdVReceive.Di.GlobalAddr(63 downto 32) := data(63 downto 32);
+        LclIbCmdVReceive.Di.LocalAddr                := data(31 downto 0);
+        -- Receive Data
+        i                                            := 0;
+        while i < LclIbCmdVReceive.Di.Length loop
+            wait until (clk'event and clk = '1' and src_rdy_n = '0' and dst_rdy_n = '0');
+            LclIbCmdVReceive.Di.Data(i/8) := data;
+            i                             := i+8;
+        end loop;
+    end procedure receivel2gw;
+
+
+    -- -------------------------------------------------------------------------
+    -- Load Host Memory Data
+    procedure inithostmemory is
+        variable i     : integer;
+    begin
+        -- Init Memory with data
+        i := 0;
+        while i < LclIbCmdV.Di.Length loop
+            Memory((LclIbCmdV.Di.MemAddr+i)/8) := LclIbCmdV.Di.Data(i/8);
+            i                                  := i+8;
+        end loop;
+
+        while (LclIbCmdV.Di.MemAddr+i) < MEMORY_SIZE loop
+            Memory((LclIbCmdV.Di.MemAddr+i)/8) := X"0000000000000000";
+            i                                  := i+8;
+        end loop;
+    end procedure inithostmemory;
+
+    -- -------------------------------------------------------------------------
+    -- Show Host Memory
+    procedure showhostmemory is
+        variable data       : bit_vector(63 downto 0);
+        variable i          : integer;
+        file     output     : ascii_text open write_mode is "STD_OUTPUT";
+        file     outfile    : ascii_text open append_mode is "internal_bus.log";
+    begin
+        if (LogTranscript) then
+            fprint(output,"IB_BFM: Host Memory Content\n");
+            -- Show Content
+            for i in 0 to MEMORY_SIZE/8 loop
+                to_bit_vector(Memory(i), data);
+                fprint(output,"        DATA: 0x%s\n", to_string(data, "%x"));
+            end loop;
+        end if;
+        if (LogFile) then
+            fprint(outfile,"IB_BFM: Host Memory Content\n");
+            -- Show Content
+            for i in 0 to MEMORY_SIZE/8 loop
+                to_bit_vector(Memory(i), data);
+                fprint(outfile,"        DATA: 0x%s\n", to_string(data, "%x"));
+            end loop;
+        end if;
+    end procedure showhostmemory;
+
+    -- -------------------------------------------------------------------------
+    -- Process L2GW Transaction (Save Transaction into memory)
+    procedure processl2gw (
+        trans :  in IbCmdVType
+    ) is
+        variable dstaddr : std_logic_vector(63 downto 0);
+        variable start   : integer;
+        variable i       : integer;
+        variable j       : integer;
+    begin
+        dstaddr := trans.Di.GlobalAddr - MEMORY_BASE_ADDR;
+        assert (dstaddr >= 0 and dstaddr+trans.Di.Length <= MEMORY_SIZE)
+            report "L2GW outside of Host Memory address space";
+
+        start := conv_integer(DstAddr(31 downto 0));
+        j     := 0;
+        for i in start to (start+trans.Di.Length)-1 loop
+            Memory(i/8)( (i mod 8)*8+7 downto (i mod 8)*8) := trans.Di.Data(j/8)((j mod 8)*8+7 downto (j mod 8)*8);
+            j                                              := j+1;
+        end loop;
+    end procedure processl2gw;
+
+    -- -------------------------------------------------------------------------
+    -- Process G2LR Transaction (Save Transaction into Completition FIFO)
+    procedure processg2lr (
+        trans :  in IbCmdVType
+    ) is
+        variable dstaddr : std_logic_vector(63 downto 0);
+        variable start   : integer;
+        variable i       : integer;
+        variable j       : integer;
+        variable compl   : IbCmdVType;
+    begin
+        dstaddr := trans.Di.GlobalAddr - MEMORY_BASE_ADDR;
+        assert (dstaddr >= 0 and dstaddr+trans.Di.Length <= MEMORY_SIZE)
+            report "L2GW outside of Host Memory address space";
+
+        compl.CmdOp       := Completition;
+        compl.Di.DstAddr  := trans.Di.LocalAddr;
+        compl.Di.SrcAddr  := X"FFFFFFFF";
+        compl.Di.Tag      := trans.Di.Tag;
+        compl.Di.Length   := trans.Di.Length;
+        compl.Di.LastFlag := '1';
+
+        -- Get Data from memory into field
+        start := conv_integer(DstAddr(31 downto 0));
+        j     := 0;
+        for i in start to (start+trans.Di.Length)-1 loop
+            compl.Di.Data(j/8)((j mod 8)*8+7 downto (j mod 8)*8) := Memory(i/8)((i mod 8)*8+7 downto (i mod 8)*8);
+            j                                                    := j+1;
+        end loop;
+        -- Insert Completition Into Fifo
+        insertFifo(compl);
+    end procedure processg2lr;
+
+begin
+
+
+    -- Send Packet Process --------------------------------------------------------
+    send_packets : process
+        file     log_file  : text;
+    begin
+        IB.DOWN.DATA      <= (others => '0');
+        IB.DOWN.SOP_N     <= '1';
+        IB.DOWN.EOP_N     <= '1';
+        IB.DOWN.SRC_RDY_N <= '1';
+
+        IbCmd.Ack         <= '0';
+        ComplReq.Ack      <= '0';
+        IbCmd.ReqAck      <= '0';
+        ComplReq.ReqAck   <= '0';
+
+        loop
+            -- Get Command
+            while (IbCmd.Req = '0' and ComplReq.Req = '0') loop
+                wait until (IbCmd.Req = '1' or ComplReq.Req = '1');
+            end loop;
+
+            if (IbCmd.Req = '1') then
+                -- Send Request Acknowledge
+                IbCmd.ReqAck <= NOT(IbCmd.ReqAck);
+                -- Wait for Reqest Deasert
+                wait on IbCmd.Req;
+
+                ReadIbCmdV(lclibcmdv);
+                showcommandinfo(lclibcmdv,"Downstream");
+                -- Process Command
+                case LclIbCmdV.CmdOp is
+                    when LocalRead      =>
+                        localread(lclibcmdv, CLK, IB.DOWN.DATA, IB.DOWN.SOP_N, IB.DOWN.EOP_N, IB.DOWN.SRC_RDY_N, IB.DOWN.DST_RDY_N);
+                    when LocalWrite     =>
+                        localwrite(lclibcmdv, CLK, IB.DOWN.DATA, IB.DOWN.SOP_N, IB.DOWN.EOP_N, IB.DOWN.SRC_RDY_N, IB.DOWN.DST_RDY_N);
+                    when Completition   =>
+                        completition(lclibcmdv, CLK, IB.DOWN.DATA, IB.DOWN.SOP_N, IB.DOWN.EOP_N, IB.DOWN.SRC_RDY_N, IB.DOWN.DST_RDY_N);
+                    when InitMemory     =>
+                        inithostmemory;
+                    when InitMemoryFromAddr =>
+                        inithostmemory;
+                    when ShowMemory     =>
+                        showhostmemory;
+                    when TranscriptLogging =>
+                        logtranscript := LclIbCmdV.Di.Enable;
+                    when FileLogging       =>
+                        logfile       := LclIbCmdV.Di.Enable;
+                        if (logfile) then
+                            file_open(log_file, "internal_bus.log", WRITE_MODE);
+                            file_close(log_file);
+                        end if;
+                    when others            =>
+                end case;
+
+                -- Send Command done
+                IbCmd.Ack <= NOT(IbCmd.Ack);
+            end if;
+
+            if (ComplReq.Req = '1') then
+                -- Send Request Acknowledge
+                ComplReq.ReqAck <= NOT(ComplReq.ReqAck);
+                -- Wait for Reqest Deasert
+                wait on ComplReq.Req;
+
+                showcommandinfo(compldatacmdv,"Downstream");
+                completition(compldatacmdv, CLK, IB.DOWN.DATA, IB.DOWN.SOP_N, IB.DOWN.EOP_N, IB.DOWN.SRC_RDY_N, IB.DOWN.DST_RDY_N);
+
+                -- Send Command done
+                ComplReq.Ack <= NOT(ComplReq.Ack);
+            end if;
+
+        end loop;
+    end process;
+
+    -- Drive DST_RDY_N ---------------------------------------------------------------
+    drive_dst_rdy_n : process
+    begin
+        loop
+            DriveDstRdyN(CLK, IB.UP.DST_RDY_N);
+        end loop;
+    end process;
+
+
+    -- Receive Packet Process --------------------------------------------------------
+    receive_packets : process
+    begin
+        initfifo; -- Init Completition fifo
+        --  IB.UP.DST_RDY_N <= '0'; Replaced by DRIVE_DST_RDY_N process
+        loop
+            wait until (CLK'event and CLK = '1' and IB.UP.SRC_RDY_N = '0' and IB.UP.SOP_N = '0' and IB.UP.DST_RDY_N = '0');
+
+            case IB.UP.DATA(14 downto 12) is
+                when C_IB_L2GW_TRANSACTION =>
+                    -- Receive Transaction
+                    receivel2gw(CLK, IB.UP.DATA, IB.UP.SOP_N, IB.UP.EOP_N, IB.UP.SRC_RDY_N, IB.UP.DST_RDY_N);
+                    -- Show Transaction info
+                    showcommandinfo(lclibcmdvreceive,"Upstream");
+                    -- Store transaction data into memory
+                    processl2gw(lclibcmdvreceive);
+                when C_IB_G2LR_TRANSACTION =>
+                    -- Receive Transaction
+                    receiveg2lr(CLK, IB.UP.DATA, IB.UP.SOP_N, IB.UP.EOP_N, IB.UP.SRC_RDY_N, IB.UP.DST_RDY_N);
+                    -- Show Transaction info
+                    showcommandinfo(lclibcmdvreceive,"Upstream");
+                    -- Store Reqest into fifo
+                    processg2lr(lclibcmdvreceive);
+                when C_IB_RD_COMPL_TRANSACTION =>
+                    -- Receive Transaction
+                    receivecompletition(CLK, IB.UP.DATA, IB.UP.SOP_N, IB.UP.EOP_N, IB.UP.SRC_RDY_N, IB.UP.DST_RDY_N);
+                    -- Show Transaction info
+                    showcommandinfo(lclibcmdvreceive,"Upstream");
+                when others =>
+                    assert false
+                        report "IB_BFM: Unexcepted transaction on upstream port";
+            end case;
+
+        end loop;
+    end process;
+
+    -- Send Completitions --------------------------------------------------------
+    send_completitions : process
+        variable i : integer;
+    begin
+        wait until (CLK'event and CLK = '1');
+        loop
+            while (ComplFifo.Empty) loop
+                wait until (CLK'event and CLK = '1');
+            end loop;
+            getfifo(compldatacmdv);
+
+            -- Memory delay
+            for i in 0 to MEMORY_DELAY loop
+                wait until (CLK'event and CLK = '1');
+            end loop;
+
+            ComplReq.Req <= '1';
+            wait on ComplReq.ReqAck;
+            ComplReq.Req <= '0';
+            wait on ComplReq.Ack;
+
+        end loop;
+    end process;
+
+
+end architecture;
 

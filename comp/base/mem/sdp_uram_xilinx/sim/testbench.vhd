@@ -17,124 +17,124 @@ use ieee.numeric_std.all;
 -- ----------------------------------------------------------------------------
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
-entity testbench is
-end entity testbench;
+entity TESTBENCH is
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
-architecture SDP_URAM_XILINX of testbench is
-   signal CLK : std_logic := '1';
-   signal RSTB : std_logic := '0';
-   signal PIPE_EN : std_logic := '1';
-   signal REB : std_logic := '0';
-   signal WEA : std_logic := '0';
-   signal ADDRA : std_logic_vector(11 downto 0);
-   signal ADDRB : std_logic_vector(11 downto 0);
-   signal DIA : std_logic_vector(71 downto 0);
-   signal DOB : std_logic_vector(71 downto 0);
-   signal DOB_DV : std_logic;
+architecture SDP_URAM_XILINX of TESTBENCH is
+    signal clk     : std_logic := '1';
+    signal rstb    : std_logic := '0';
+    signal pipe_en : std_logic := '1';
+    signal reb     : std_logic := '0';
+    signal wea     : std_logic := '0';
+    signal addra   : std_logic_vector(11 downto 0);
+    signal addrb   : std_logic_vector(11 downto 0);
+    signal dia     : std_logic_vector(71 downto 0);
+    signal dob     : std_logic_vector(71 downto 0);
+    signal dob_dv  : std_logic;
 begin
-   uut: entity work.SDP_URAM_XILINX
-   generic map(
-      DEVICE                        => "BEHAVIORAL",
-      WRITE_MODE                    => "WRITE_FIRST",
-      DATA_WIDTH                    => 72,
-      ADDRESS_WIDTH                 => 12,
-      ADDITIONAL_REG                => 0,
-      EXTERNAL_OUT_REG              => false,
-      INTERNAL_OUT_REG              => false
-   )
-   port map(
-      CLK            => CLK,
-      RSTB           => RSTB,
-      PIPE_EN        => PIPE_EN,
-      REB            => REB,
-      WEA            => WEA,
-      ADDRA          => ADDRA,
-      ADDRB          => ADDRB,
-      DIA            => DIA,
-      DOB            => DOB,
-      DOB_DV         => DOB_DV
-   );
+    uut: entity work.SDP_URAM_XILINX
+    generic map (
+        DEVICE                        => "BEHAVIORAL",
+        WRITE_MODE                    => "WRITE_FIRST",
+        DATA_WIDTH                    => 72,
+        ADDRESS_WIDTH                 => 12,
+        ADDITIONAL_REG                => 0,
+        EXTERNAL_OUT_REG              => false,
+        INTERNAL_OUT_REG              => false
+    )
+    port map (
+        CLK            => clk,
+        RSTB           => rstb,
+        PIPE_EN        => pipe_en,
+        REB            => reb,
+        WEA            => wea,
+        ADDRA          => addra,
+        ADDRB          => addrb,
+        DIA            => dia,
+        DOB            => dob,
+        DOB_DV         => dob_dv
+    );
 
-   CLK <= not CLK after 10 ns;
+    clk <= not clk after 10 ns;
 
-   test : process
-   begin
-   RSTB <= '1';
-   wait for 80 ns;
-   RSTB <= '0';
-   PIPE_EN <= '1';
-   wait for 80 ns;
-   ADDRA <= std_logic_vector(to_unsigned(48,12));
-   ADDRB <= std_logic_vector(to_unsigned(48,12));
-   DIA <= std_logic_vector(to_unsigned(121, 72));
-   WEA <= '1';
-   REB <= '1';
-   wait for 20 ns;
-   WEA <= '0';
-   REB <= '0';
-   wait for 20 ns;
+    test : process
+    begin
+        rstb    <= '1';
+        wait for 80 ns;
+        rstb    <= '0';
+        pipe_en <= '1';
+        wait for 80 ns;
+        addra   <= std_logic_vector(to_unsigned(48,12));
+        addrb   <= std_logic_vector(to_unsigned(48,12));
+        dia     <= std_logic_vector(to_unsigned(121, 72));
+        wea     <= '1';
+        reb     <= '1';
+        wait for 20 ns;
+        wea     <= '0';
+        reb     <= '0';
+        wait for 20 ns;
 
-   ADDRA <= std_logic_vector(to_unsigned(42, 12));
-   DIA <= std_logic_vector(to_unsigned(22,72));
-   WEA <= '1';
-   wait for 20 ns;
-   ADDRB <= std_logic_vector(to_unsigned(42, 12));
-   WEA <= '0';
-   REB <= '1';
-   wait for 20 ns;
-   REB <= '0';
-   wait for 20 ns;
-   REB <= '1';
-   wait for 20 ns;
-   REB <= '0';
-   wait for 20 ns;
-   ADDRA <= std_logic_vector(to_unsigned(99, 12));
-   DIA <= std_logic_vector(to_unsigned(44, 72));
-   WEA <= '1';
-   wait for 20 ns;
-   ADDRB <= std_logic_vector(to_unsigned(99, 12));
-   WEA <= '0';
-   REB <= '1';
-   wait for 20 ns;
-   REB <= '0';
-   wait for 60 ns;
-   ADDRA <= std_logic_vector(to_unsigned(77, 12));
-   DIA <= std_logic_vector(to_unsigned(66, 72));
-   WEA <= '1';
-   wait for 20 ns;
-   ADDRB <= std_logic_vector(to_unsigned(77, 12));
-   WEA <= '0';
-   REB <= '1';
-   wait for 20 ns;
-   REB <= '0';
-   wait for 40 ns;
-   ADDRA <= std_logic_vector(to_unsigned(48,12));
-   ADDRB <= std_logic_vector(to_unsigned(48,12));
-   DIA <= std_logic_vector(to_unsigned(111, 72));
-   WEA <= '1';
-   REB <= '1';
-   wait for 20 ns;
-   ADDRA <= std_logic_vector(to_unsigned(49,12));
-   ADDRB <= std_logic_vector(to_unsigned(49,12));
-   DIA <= std_logic_vector(to_unsigned(121, 72));
-   wait for 20 ns;
-   ADDRA <= std_logic_vector(to_unsigned(50,12));
-   DIA <= std_logic_vector(to_unsigned(131, 72));
-   wait for 20 ns;
-   ADDRA <= std_logic_vector(to_unsigned(51,12));
-   ADDRB <= std_logic_vector(to_unsigned(51,12));
-   DIA <= std_logic_vector(to_unsigned(231, 72));
-   wait for 20 ns;
-   PIPE_EN <= '0';
-   WEA <= '0';
-   REB <= '0';
-   wait for 60 ns;
-   PIPE_EN <= '1';
-   wait;
-   end process;
+        addra   <= std_logic_vector(to_unsigned(42, 12));
+        dia     <= std_logic_vector(to_unsigned(22,72));
+        wea     <= '1';
+        wait for 20 ns;
+        addrb   <= std_logic_vector(to_unsigned(42, 12));
+        wea     <= '0';
+        reb     <= '1';
+        wait for 20 ns;
+        reb     <= '0';
+        wait for 20 ns;
+        reb     <= '1';
+        wait for 20 ns;
+        reb     <= '0';
+        wait for 20 ns;
+        addra   <= std_logic_vector(to_unsigned(99, 12));
+        dia     <= std_logic_vector(to_unsigned(44, 72));
+        wea     <= '1';
+        wait for 20 ns;
+        addrb   <= std_logic_vector(to_unsigned(99, 12));
+        wea     <= '0';
+        reb     <= '1';
+        wait for 20 ns;
+        reb     <= '0';
+        wait for 60 ns;
+        addra   <= std_logic_vector(to_unsigned(77, 12));
+        dia     <= std_logic_vector(to_unsigned(66, 72));
+        wea     <= '1';
+        wait for 20 ns;
+        addrb   <= std_logic_vector(to_unsigned(77, 12));
+        wea     <= '0';
+        reb     <= '1';
+        wait for 20 ns;
+        reb     <= '0';
+        wait for 40 ns;
+        addra   <= std_logic_vector(to_unsigned(48,12));
+        addrb   <= std_logic_vector(to_unsigned(48,12));
+        dia     <= std_logic_vector(to_unsigned(111, 72));
+        wea     <= '1';
+        reb     <= '1';
+        wait for 20 ns;
+        addra   <= std_logic_vector(to_unsigned(49,12));
+        addrb   <= std_logic_vector(to_unsigned(49,12));
+        dia     <= std_logic_vector(to_unsigned(121, 72));
+        wait for 20 ns;
+        addra   <= std_logic_vector(to_unsigned(50,12));
+        dia     <= std_logic_vector(to_unsigned(131, 72));
+        wait for 20 ns;
+        addra   <= std_logic_vector(to_unsigned(51,12));
+        addrb   <= std_logic_vector(to_unsigned(51,12));
+        dia     <= std_logic_vector(to_unsigned(231, 72));
+        wait for 20 ns;
+        pipe_en <= '0';
+        wea     <= '0';
+        reb     <= '0';
+        wait for 60 ns;
+        pipe_en <= '1';
+        wait;
+    end process;
 
 
-end architecture SDP_URAM_XILINX;
+end architecture;

@@ -95,13 +95,13 @@ architecture FULL of SWITCH_CONTROLLER is
     ) return natural is
         variable num_regs : natural := 0;
     begin
-        if not empty then
+        if (not empty) then
             for i in 0 to config_array'length-1 loop
                 num_regs := num_regs + 2 + config_array(i).match_num_fields*3;
             end loop;
         end if;
         return num_regs;
-    end function config_get_num_mat_cfg_regs;
+    end function;
 
     -- Function to store the match-action tables' configuration in MI-addressable registers.
     function config_get_mat_cfg_regs (
@@ -109,23 +109,23 @@ architecture FULL of SWITCH_CONTROLLER is
         empty : boolean;
         width : natural
     ) return slv_array_t is
-        constant count : natural := config_get_num_mat_cfg_regs(cfg, empty);
-        variable regs  : slv_array_t(count-1 downto 0)(MI_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
+        constant COUNT : natural := config_get_num_mat_cfg_regs(cfg, empty);
+        variable regs  : slv_array_t(COUNT-1 downto 0)(MI_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
         variable idx   : natural := 0;
     begin
-        if not empty then
+        if (not empty) then
             for i in 0 to cfg'length-1 loop
                 regs(idx) := std_logic_vector(to_unsigned(cfg(i).match_num_fields, width)); idx := idx+1;
-                regs(idx) := std_logic_vector(to_unsigned(cfg(i).match_items     , width)); idx := idx+1;
+                regs(idx) := std_logic_vector(to_unsigned(cfg(i).match_items, width)); idx := idx+1;
                 for j in 0 to cfg(i).match_num_fields-1 loop
-                    regs(idx) := std_logic_vector(to_unsigned(cfg(i).match_protocols(j)  , width)); idx := idx+1;
+                    regs(idx) := std_logic_vector(to_unsigned(cfg(i).match_protocols(j), width)); idx := idx+1;
                     regs(idx) := std_logic_vector(to_unsigned(cfg(i).match_range_highs(j), width)); idx := idx+1;
-                    regs(idx) := std_logic_vector(to_unsigned(cfg(i).match_range_lows(j) , width)); idx := idx+1;
+                    regs(idx) := std_logic_vector(to_unsigned(cfg(i).match_range_lows(j), width)); idx := idx+1;
                 end loop;
             end loop;
         end if;
         return regs;
-    end function config_get_mat_cfg_regs;
+    end function;
 
     constant VERSION                   : natural := 1;
 
@@ -169,44 +169,44 @@ architecture FULL of SWITCH_CONTROLLER is
 
     constant NUM_REGS                  : natural := NUM_META_REGS + 1 + NUM_DATA_IN_REGS + NUM_DATA_OUT_REGS;
 
-    constant meta_mat_cfg_regs_arr     : slv_array_t(NUM_META_MAT_CFG_REGS-1 downto 0)(MI_DATA_WIDTH-1 downto 0) := config_get_mat_cfg_regs(CONFIG, NUM_MATS_PER_PORT = 0, MI_DATA_WIDTH);
-    constant meta_info_regs_arr        : slv_array_t(NUM_META_INFO_REGS   -1 downto 0)(MI_DATA_WIDTH-1 downto 0) := (
-        REG_IDX_NUM_META_REGS     => std_logic_vector(to_unsigned(NUM_META_REGS     , MI_DATA_WIDTH)),
-        REG_IDX_NUM_DATA_REGS     => std_logic_vector(to_unsigned(NUM_DATA_REGS     , MI_DATA_WIDTH)),
-        REG_IDX_VERSION           => std_logic_vector(to_unsigned(VERSION           , MI_DATA_WIDTH)),
+    constant META_MAT_CFG_REGS_ARR     : slv_array_t(NUM_META_MAT_CFG_REGS-1 downto 0)(MI_DATA_WIDTH-1 downto 0) := config_get_mat_cfg_regs(CONFIG, NUM_MATS_PER_PORT = 0, MI_DATA_WIDTH);
+    constant META_INFO_REGS_ARR        : slv_array_t(NUM_META_INFO_REGS   -1 downto 0)(MI_DATA_WIDTH-1 downto 0) := (
+        REG_IDX_NUM_META_REGS     => std_logic_vector(to_unsigned(NUM_META_REGS, MI_DATA_WIDTH)),
+        REG_IDX_NUM_DATA_REGS     => std_logic_vector(to_unsigned(NUM_DATA_REGS, MI_DATA_WIDTH)),
+        REG_IDX_VERSION           => std_logic_vector(to_unsigned(VERSION, MI_DATA_WIDTH)),
         REG_IDX_NUM_ACTIONS       => std_logic_vector(to_unsigned(CONFIG_NUM_ACTIONS, MI_DATA_WIDTH)),
-        REG_IDX_NUM_PORTS         => std_logic_vector(to_unsigned(CONFIG_NUM_PORTS  , MI_DATA_WIDTH)),
-        REG_IDX_NUM_MATS_PER_PORT => std_logic_vector(to_unsigned(NUM_MATS_PER_PORT , MI_DATA_WIDTH))
+        REG_IDX_NUM_PORTS         => std_logic_vector(to_unsigned(CONFIG_NUM_PORTS, MI_DATA_WIDTH)),
+        REG_IDX_NUM_MATS_PER_PORT => std_logic_vector(to_unsigned(NUM_MATS_PER_PORT, MI_DATA_WIDTH))
     );
 
     signal s_csr_requests              : std_logic_vector(CSR_NUM_FIELDS-1 downto 0);
     signal s_cs_reg                    : std_logic_vector(MI_DATA_WIDTH-1 downto 0) := (
-        CSR_CAP_READ => tsel(MAT_READ_ENABLE, '1', '0'),
-        others       => '0'
-    );
+                                                                                        CSR_CAP_READ => tsel(MAT_READ_ENABLE, '1', '0'),
+                                                                                        others       => '0'
+                                                                                       );
 
-    signal s_data_in_regs_arr          : slv_array_t(NUM_DATA_IN_REGS-1 downto 0)(MI_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
-    alias s_addr_in_reg                : std_logic_vector                        (MI_DATA_WIDTH-1 downto 0) is s_data_in_regs_arr(REG_IDX_ADDR);
-    alias s_data_in_reg                : slv_array_t(NUM_DATA_REGS   -1 downto 0)(MI_DATA_WIDTH-1 downto 0) is s_data_in_regs_arr(REG_IDX_MASK_IN_0-1 downto REG_IDX_DATA_IN_0);
-    alias s_mask_in_reg                : slv_array_t(NUM_DATA_REGS   -1 downto 0)(MI_DATA_WIDTH-1 downto 0) is s_data_in_regs_arr(REG_IDX_ACTION_IN-1 downto REG_IDX_MASK_IN_0);
-    alias s_action_in_reg              : std_logic_vector                        (MI_DATA_WIDTH-1 downto 0) is s_data_in_regs_arr(NUM_DATA_IN_REGS -1);
+    signal s_data_in_regs_arr           : slv_array_t(NUM_DATA_IN_REGS-1 downto 0)(MI_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
+    alias  s_addr_in_reg                : std_logic_vector                        (MI_DATA_WIDTH-1 downto 0) is s_data_in_regs_arr(REG_IDX_ADDR);
+    alias  s_data_in_reg                : slv_array_t(NUM_DATA_REGS   -1 downto 0)(MI_DATA_WIDTH-1 downto 0) is s_data_in_regs_arr(REG_IDX_MASK_IN_0-1 downto REG_IDX_DATA_IN_0);
+    alias  s_mask_in_reg                : slv_array_t(NUM_DATA_REGS   -1 downto 0)(MI_DATA_WIDTH-1 downto 0) is s_data_in_regs_arr(REG_IDX_ACTION_IN-1 downto REG_IDX_MASK_IN_0);
+    alias  s_action_in_reg              : std_logic_vector                        (MI_DATA_WIDTH-1 downto 0) is s_data_in_regs_arr(NUM_DATA_IN_REGS -1);
 
-    signal s_data_out_regs_arr         : slv_array_t(NUM_DATA_OUT_REGS-1 downto 0)(MI_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
-    alias s_data_out_reg               : slv_array_t(NUM_DATA_REGS    -1 downto 0)(MI_DATA_WIDTH-1 downto 0) is s_data_out_regs_arr(REG_IDX_MASK_OUT_0-1 downto REG_IDX_DATA_OUT_0);
-    alias s_mask_out_reg               : slv_array_t(NUM_DATA_REGS    -1 downto 0)(MI_DATA_WIDTH-1 downto 0) is s_data_out_regs_arr(REG_IDX_ACTION_OUT-1 downto REG_IDX_MASK_OUT_0);
-    alias s_action_out_reg             : std_logic_vector                         (MI_DATA_WIDTH-1 downto 0) is s_data_out_regs_arr(NUM_DATA_OUT_REGS -1);
+    signal s_data_out_regs_arr          : slv_array_t(NUM_DATA_OUT_REGS-1 downto 0)(MI_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
+    alias  s_data_out_reg               : slv_array_t(NUM_DATA_REGS    -1 downto 0)(MI_DATA_WIDTH-1 downto 0) is s_data_out_regs_arr(REG_IDX_MASK_OUT_0-1 downto REG_IDX_DATA_OUT_0);
+    alias  s_mask_out_reg               : slv_array_t(NUM_DATA_REGS    -1 downto 0)(MI_DATA_WIDTH-1 downto 0) is s_data_out_regs_arr(REG_IDX_ACTION_OUT-1 downto REG_IDX_MASK_OUT_0);
+    alias  s_action_out_reg             : std_logic_vector                         (MI_DATA_WIDTH-1 downto 0) is s_data_out_regs_arr(NUM_DATA_OUT_REGS -1);
 
-    constant NUM_MATS                  : natural := CONFIG_NUM_PORTS*NUM_MATS_PER_PORT;
-    signal s_mat_ops_busy              : slv_array_t(NUM_MATS-1 downto 0)(2-1 downto 0);
-    signal s_mat_read_rdy              : std_logic_vector(NUM_MATS-1 downto 0);
-    signal s_mat_read_in_progress      : std_logic := '0';
-    signal s_mat_en                    : std_logic_vector(NUM_MATS-1 downto 0);
-    alias s_mat_addr                   : std_logic_vector(CONFIG_MAX_ADDR_WIDTH-1 downto 0) is s_addr_in_reg(CONFIG_MAX_ADDR_WIDTH-1 downto 0);
-    alias s_mat_sel                    : std_logic_vector(max(1,log2(NUM_MATS))-1 downto 0) is s_addr_in_reg(MI_DATA_WIDTH-1 downto MI_DATA_WIDTH-max(1,log2(NUM_MATS)));
+    constant NUM_MATS                     : natural := CONFIG_NUM_PORTS*NUM_MATS_PER_PORT;
+    signal   s_mat_ops_busy               : slv_array_t(NUM_MATS-1 downto 0)(2-1 downto 0);
+    signal   s_mat_read_rdy               : std_logic_vector(NUM_MATS-1 downto 0);
+    signal   s_mat_read_in_progress       : std_logic := '0';
+    signal   s_mat_en                     : std_logic_vector(NUM_MATS-1 downto 0);
+    alias    s_mat_addr                   : std_logic_vector(CONFIG_MAX_ADDR_WIDTH-1 downto 0) is s_addr_in_reg(CONFIG_MAX_ADDR_WIDTH-1 downto 0);
+    alias    s_mat_sel                    : std_logic_vector(max(1,log2(NUM_MATS))-1 downto 0) is s_addr_in_reg(MI_DATA_WIDTH-1 downto MI_DATA_WIDTH-max(1,log2(NUM_MATS)));
 
-    signal s_regs_rst                  : std_logic;
-    signal s_regs_en                   : std_logic_vector(NUM_REGS-1 downto 0);
-    alias s_regs_addr                  : std_logic_vector(log2(NUM_REGS)-1 downto 0) is MI_ADDR(log2(NUM_REGS)+2-1 downto 2);
+    signal s_regs_rst                   : std_logic;
+    signal s_regs_en                    : std_logic_vector(NUM_REGS-1 downto 0);
+    alias  s_regs_addr                  : std_logic_vector(log2(NUM_REGS)-1 downto 0) is MI_ADDR(log2(NUM_REGS)+2-1 downto 2);
 
 begin
 
@@ -280,16 +280,16 @@ begin
     end generate;
 
     data_out_regs_g : if MAT_READ_ENABLE generate
-        constant MAT_READ_VEC_WIDTH        : natural := CONFIG_MAX_DATA_WIDTH*2 + CONFIG_ACTION_WIDTH + 1;
-        signal s_mat_read_data_arr         : slv_array_t(NUM_MATS-1 downto 0)(CONFIG_MAX_DATA_WIDTH-1 downto 0);
-        signal s_mat_read_mask_arr         : slv_array_t(NUM_MATS-1 downto 0)(CONFIG_MAX_DATA_WIDTH-1 downto 0);
-        signal s_mat_read_action_arr       : slv_array_t(NUM_MATS-1 downto 0)(CONFIG_ACTION_WIDTH-1 downto 0);
-        signal s_mat_read_vec_arr          : slv_array_t(NUM_MATS-1 downto 0)(MAT_READ_VEC_WIDTH-1 downto 0);
-        signal s_mat_read_vec_mux          : std_logic_vector(MAT_READ_VEC_WIDTH-1 downto 0);
-        signal s_mat_read_vld_mux          : std_logic;
-        signal s_mat_read_data_mux         : std_logic_vector(CONFIG_MAX_DATA_WIDTH-1 downto 0);
-        signal s_mat_read_mask_mux         : std_logic_vector(CONFIG_MAX_DATA_WIDTH-1 downto 0);
-        signal s_mat_read_action_mux       : std_logic_vector(CONFIG_ACTION_WIDTH-1 downto 0);
+        constant MAT_READ_VEC_WIDTH          : natural := CONFIG_MAX_DATA_WIDTH*2 + CONFIG_ACTION_WIDTH + 1;
+        signal   s_mat_read_data_arr         : slv_array_t(NUM_MATS-1 downto 0)(CONFIG_MAX_DATA_WIDTH-1 downto 0);
+        signal   s_mat_read_mask_arr         : slv_array_t(NUM_MATS-1 downto 0)(CONFIG_MAX_DATA_WIDTH-1 downto 0);
+        signal   s_mat_read_action_arr       : slv_array_t(NUM_MATS-1 downto 0)(CONFIG_ACTION_WIDTH-1 downto 0);
+        signal   s_mat_read_vec_arr          : slv_array_t(NUM_MATS-1 downto 0)(MAT_READ_VEC_WIDTH-1 downto 0);
+        signal   s_mat_read_vec_mux          : std_logic_vector(MAT_READ_VEC_WIDTH-1 downto 0);
+        signal   s_mat_read_vld_mux          : std_logic;
+        signal   s_mat_read_data_mux         : std_logic_vector(CONFIG_MAX_DATA_WIDTH-1 downto 0);
+        signal   s_mat_read_mask_mux         : std_logic_vector(CONFIG_MAX_DATA_WIDTH-1 downto 0);
+        signal   s_mat_read_action_mux       : std_logic_vector(CONFIG_ACTION_WIDTH-1 downto 0);
     begin
         s_mat_read_data_arr   <= slv_array_deser(MAT_READ_DATA, NUM_MATS);
         s_mat_read_mask_arr   <= slv_array_deser(MAT_READ_MASK, NUM_MATS);

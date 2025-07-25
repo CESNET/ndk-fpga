@@ -26,8 +26,8 @@ architecture FULL of APPLICATION_CORE is
     constant MI_PORTS          : natural := 2 ** log2(MI_PORTS_RAW);
 
     function mi_addr_base_f return slv_array_t is
-        constant ADDR_W    : natural := 25;
-        constant SUBADDR_W : natural := ADDR_W-log2(MI_PORTS);
+        constant ADDR_W      : natural := 25;
+        constant SUBADDR_W   : natural := ADDR_W-log2(MI_PORTS);
         variable v_addr_base : slv_array_t(MI_PORTS-1 downto 0)(MI_ADDR_WIDTH-1 downto 0) := (others => (others => '0'));
     begin
         for i in 0 to MI_PORTS-1 loop
@@ -168,12 +168,12 @@ begin
     -- =========================================================================
 
     mi_async_i : entity work.MI_ASYNC
-    generic map(
+    generic map (
         ADDR_WIDTH => MI_ADDR_WIDTH,
         DATA_WIDTH => MI_DATA_WIDTH,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         -- Master interface
         CLK_M     => MI_CLK,
         RESET_M   => MI_RESET(0),
@@ -200,14 +200,14 @@ begin
     );
 
     mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
-    generic map(
+    generic map (
         ADDR_WIDTH => MI_ADDR_WIDTH,
         DATA_WIDTH => MI_DATA_WIDTH,
         PORTS      => MI_PORTS,
         ADDR_BASE  => mi_addr_base_f,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         CLK        => APP_CLK,
         RESET      => APP_RESET(0),
 
@@ -252,7 +252,7 @@ begin
 
     core_g : for i in ETH_STREAMS-1 downto 0 generate
         core_i : entity work.APP_SUBCORE
-        generic map(
+        generic map (
             MFB_REGIONS        => MFB_REGIONS,
             MFB_REG_SIZE       => MFB_REG_SIZE,
             MFB_BLOCK_SIZE     => MFB_BLOCK_SIZE,
@@ -267,7 +267,7 @@ begin
             DMA_HDR_META_WIDTH => DMA_HDR_META_WIDTH,
             DEVICE             => DEVICE
         )
-        port map(
+        port map (
             CLK                     => APP_CLK,
             RESET                   => APP_RESET(1),
 
@@ -338,7 +338,7 @@ begin
         -- streams), APP_DMA_CHAN_MOD divides the DMA channels between the APP
         -- streams and adjusts signal widths accordingly.
         chan_mod_i : entity work.APP_DMA_CHAN_MOD
-        generic map(
+        generic map (
             MFB_REGIONS     => MFB_REGIONS,
             DMA_RX_CHANNELS => DMA_RX_CHANNELS,
             DMA_TX_CHANNELS => DMA_TX_CHANNELS,
@@ -346,7 +346,7 @@ begin
             STREAM_ID       => i,
             ENABLE_MOD      => (CORE_DMA_RX_CHAN /= DMA_RX_CHANNELS)
         )
-        port map(
+        port map (
             APP_RX_MVB_CHANNEL => app_dma_rx_mvb_channel_mod(i),
             DMA_RX_MVB_CHANNEL => app_dma_rx_mvb_channel_deser(i),
             APP_TX_MVB_CHANNEL => app_dma_tx_mvb_channel_mod(i),
@@ -362,7 +362,7 @@ begin
     -- one RX DMA stream and splitting one TX stream between multiple APP
     -- streams according to the upper bits of the DMA channel number.
     streams_merger_i : entity work.APP_DMA_STREAMS_MERGER
-    generic map(
+    generic map (
         APP_STREAMS           => ETH_STREAMS,
         DMA_STREAMS           => DMA_STREAMS,
         MFB_REGIONS           => MFB_REGIONS,
@@ -376,7 +376,7 @@ begin
         DMA_HDR_META_WIDTH    => DMA_HDR_META_WIDTH,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK                     => APP_CLK,
         RESET                   => APP_RESET(2),
 
@@ -500,7 +500,7 @@ begin
         MI_ADDR_WIDTH         => MI_ADDR_WIDTH,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK                    => APP_CLK,
         RESET                  => APP_RESET(3),
 

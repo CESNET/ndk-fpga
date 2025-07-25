@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity PCIE_CII2CFG_EXT is
-    port(
+    port (
         CLK                    : in  std_logic;
         RESET                  : in  std_logic;
 
@@ -48,15 +48,15 @@ architecture FULL of PCIE_CII2CFG_EXT is
     signal pcie_cii_req_edge         : std_logic;
     signal pcie_cii_addr_ok          : std_logic;
 
-    type cii_fsm_st_t is (st_idle, st_mem_access, st_mem_write, st_mem_read, st_mem_read2);
+    type   cii_fsm_st_t is (ST_IDLE, ST_MEM_ACCESS, ST_MEM_WRITE, ST_MEM_READ, ST_MEM_READ2);
     signal cii_fsm_pst            : cii_fsm_st_t;
     signal cii_fsm_nst            : cii_fsm_st_t;
 
     signal cii_vld_pulse          : std_logic;
     signal cfg_ext_write_reg      : std_logic;
-    SIGNAL cfg_ext_write_reg2     : std_logic;
-    SIGNAL cfg_ext_read_dv_reg    : std_logic;
-    SIGNAL cfg_ext_read_data_reg  : std_logic_vector(31 downto 0);
+    signal cfg_ext_write_reg2     : std_logic;
+    signal cfg_ext_read_dv_reg    : std_logic;
+    signal cfg_ext_read_data_reg  : std_logic_vector(31 downto 0);
 
 begin
 
@@ -71,7 +71,7 @@ begin
         end if;
     end process;
 
-    pcie_cii_req_edge <= PCIE_CII_REQ and not pcie_cii_req_reg;
+    pcie_cii_req_edge     <= PCIE_CII_REQ and not pcie_cii_req_reg;
     PCIE_CII_OVERRIDE_DIN <= cfg_ext_read_data_reg;
 
     -- Intel CII FSM STATE REGISTER
@@ -79,7 +79,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                cii_fsm_pst <= st_idle;
+                cii_fsm_pst <= ST_IDLE;
             else
                 cii_fsm_pst <= cii_fsm_nst;
             end if;
@@ -89,38 +89,38 @@ begin
     --  Intel CII FSM LOGIC
     cii_fsm_logic_p : process (all)
     begin
-        cii_fsm_nst <= cii_fsm_pst;
-        PCIE_CII_HALT <= '1';
+        cii_fsm_nst          <= cii_fsm_pst;
+        PCIE_CII_HALT        <= '1';
         PCIE_CII_OVERRIDE_EN <= '0';
-        CFG_EXT_WRITE <= '0';
-        CFG_EXT_READ <= '0';
+        CFG_EXT_WRITE        <= '0';
+        CFG_EXT_READ         <= '0';
 
         case (cii_fsm_pst) is
-            when st_idle =>
+            when ST_IDLE =>
                 if (pcie_cii_req_edge = '1') then
-                    cii_fsm_nst <= st_mem_access;
+                    cii_fsm_nst <= ST_MEM_ACCESS;
                 end if;
 
-            when st_mem_access =>
+            when ST_MEM_ACCESS =>
                 CFG_EXT_WRITE <= pcie_cii_wr_reg;
-                CFG_EXT_READ <= not pcie_cii_wr_reg;
+                CFG_EXT_READ  <= not pcie_cii_wr_reg;
                 if (pcie_cii_wr_reg = '1') then
-                    cii_fsm_nst <= st_mem_write;
+                    cii_fsm_nst <= ST_MEM_WRITE;
                 else
-                    cii_fsm_nst <= st_mem_read;
+                    cii_fsm_nst <= ST_MEM_READ;
                 end if;
 
-            when st_mem_write =>
+            when ST_MEM_WRITE =>
                 PCIE_CII_HALT <= '0';
-                cii_fsm_nst <= st_idle;
+                cii_fsm_nst   <= ST_IDLE;
 
-            when st_mem_read =>
-                cii_fsm_nst <= st_mem_read2;
+            when ST_MEM_READ =>
+                cii_fsm_nst <= ST_MEM_READ2;
 
-            when st_mem_read2 =>
-                PCIE_CII_HALT <= '0';
+            when ST_MEM_READ2 =>
+                PCIE_CII_HALT        <= '0';
                 PCIE_CII_OVERRIDE_EN <= cfg_ext_read_dv_reg;
-                cii_fsm_nst <= st_idle;
+                cii_fsm_nst          <= ST_IDLE;
         end case;
     end process;
 
@@ -128,7 +128,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             cfg_ext_read_data_reg <= CFG_EXT_READ_DATA;
-            cfg_ext_read_dv_reg <= CFG_EXT_READ_DV;
+            cfg_ext_read_dv_reg   <= CFG_EXT_READ_DV;
         end if;
     end process;
 

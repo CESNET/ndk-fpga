@@ -24,18 +24,18 @@ library ieee;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity am_check_4 is
+entity AM_CHECK_4 is
     port (
-        RESET     : in std_logic; -- Reset current computation and a start new one
-        CLK       : in std_logic; --
+        RESET     : in std_logic;                      -- Reset current computation and a start new one
+        CLK       : in std_logic;                      --
         EN        : in std_logic;
         D         : in std_logic_vector(65 downto 0);  -- Input data
         MATCH     : out std_logic_vector(3 downto 0);  -- Generated marker
         BIP_MATCH : out std_logic                      -- Bit parity computation OK
     );
-end am_check_4;
+end entity;
 
-    architecture behavioral of am_check_4 is
+architecture BEHAVIORAL of AM_CHECK_4 is
 
     constant M_0 : std_logic_vector(23 downto 0) := X"47" & X"76" & X"90";
     constant M_1 : std_logic_vector(23 downto 0) := X"E6" & X"C4" & X"F0";
@@ -74,14 +74,14 @@ begin
     bip(6) <= bip_prev(6) xor D(8) xor D(16) xor D(24) xor D(32) xor D(40) xor D(48) xor D(56) xor D(64);
     bip(7) <= bip_prev(7) xor D(9) xor D(17) xor D(25) xor D(33) xor D(41) xor D(49) xor D(57) xor D(65);
 
-    BIP_SEQ: process(clk,reset)
+    bip_seq : process (CLK,RESET)
     begin
-        if CLK'event and CLK = '1' then
-            if EN = '1' then
+        if rising_edge(CLK) then
+            if (EN = '1') then
                 bip_r <= bip;
             end if;
         end if;
     end process;
     --
 
-end behavioral;
+end architecture;

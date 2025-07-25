@@ -16,7 +16,7 @@ use work.type_pack.all;
 -- not cut out, are shifted to the original SOF position and the EOF is lowered by the number of
 -- items which have been cut out.
 entity MFB_CUTTER_SIMPLE is
-    generic(
+    generic (
         -- =======================================================================
         -- MFB DATA BUS CONFIGURATION:
         --
@@ -44,7 +44,7 @@ entity MFB_CUTTER_SIMPLE is
         -- Count of cutted items from SOF. Maximum value is REGION_SIZE*BLOCK_SIZE.
         CUTTED_ITEMS   : natural := 4
     );
-    port(
+    port (
         -- =======================================================================
         -- CLOCK AND RESET
         -- =======================================================================
@@ -81,7 +81,7 @@ entity MFB_CUTTER_SIMPLE is
         TX_SRC_RDY : out std_logic := '0';
         TX_DST_RDY : in  std_logic
     );
-end MFB_CUTTER_SIMPLE;
+end entity;
 
 architecture FULL of MFB_CUTTER_SIMPLE is
 
@@ -154,12 +154,12 @@ begin
     -- PREPARE MFB INPUTS
     -----------------------------------------------------------------------------
 
-    RX_DST_RDY <= s_rx_dst_rdy or not RX_SRC_RDY;
+    RX_DST_RDY   <= s_rx_dst_rdy or not RX_SRC_RDY;
     s_rx_sof_vld <= RX_SOF and RX_SRC_RDY;
 
     s_rx_sof_pos_arr <= slv_array_downto_deser(RX_SOF_POS,REGIONS,SOF_POS_WIDTH);
     s_rx_eof_pos_arr <= slv_array_downto_deser(RX_EOF_POS,REGIONS,EOF_POS_WIDTH);
-    s_rx_meta_arr    <= slv_array_downto_deser(RX_META   ,REGIONS,META_WIDTH   );
+    s_rx_meta_arr    <= slv_array_downto_deser(RX_META,REGIONS,META_WIDTH   );
 
     -----------------------------------------------------------------------------
     -- COMPUTE SELECTS FOR MULTIPLEXORS
@@ -176,10 +176,10 @@ begin
         end generate;
 
         sof_pos_item_onehot_i : entity work.BIN2HOT
-        generic map(
+        generic map (
             DATA_WIDTH => LOG2_REGION_ITEMS
         )
-        port map(
+        port map (
             EN     => s_rx_sof_vld(r),
             INPUT  => std_logic_vector(s_rx_sof_pos_items_arr(r)),
             OUTPUT => s_sof_items((r+1)*REGION_ITEMS-1 downto r*REGION_ITEMS)
@@ -189,7 +189,7 @@ begin
     -- compute selections of data multiplexors
     mux_sel_g : for r in 0 to REGIONS-1 generate
         mux_sel_g2 : for i in 0 to REGION_ITEMS-1 generate
-            s_mux_sel(r*REGION_ITEMS+i) <= RX_CUT(r) when (s_sof_items(r*REGION_ITEMS+i) = '1') else s_mux_sel_prev(r*REGION_ITEMS+i);
+            s_mux_sel(r*REGION_ITEMS+i)        <= RX_CUT(r) when (s_sof_items(r*REGION_ITEMS+i) = '1') else s_mux_sel_prev(r*REGION_ITEMS+i);
             s_mux_sel_prev(r*REGION_ITEMS+i+1) <= s_mux_sel(r*REGION_ITEMS+i);
         end generate;
     end generate;
@@ -213,7 +213,7 @@ begin
 
         -- compute new EOF_POS of current frame
         s_new_eof_pos_curr_arr_wid(r) <= ('0' & unsigned(s_rx_eof_pos_arr(r))) - s_cutted_items(r);
-        s_new_eof_pos_curr_arr(r) <= std_logic_vector(s_new_eof_pos_curr_arr_wid(r)(EOF_POS_WIDTH-1 downto 0));
+        s_new_eof_pos_curr_arr(r)     <= std_logic_vector(s_new_eof_pos_curr_arr_wid(r)(EOF_POS_WIDTH-1 downto 0));
 
         -- compute new EOF of current and previous region
         s_new_eof_curr(r) <= RX_EOF(r) and not s_new_eof_pos_curr_arr_wid(r)(EOF_POS_WIDTH);
@@ -222,11 +222,11 @@ begin
 
     -- set new correct EOF and EOF_POS
     new_eof_g : for r in 0 to REGIONS-2 generate
-        s_new_eof(r) <= '1' when (s_new_eof_prev(r+1) = '1') else s_new_eof_curr(r);
+        s_new_eof(r)         <= '1' when (s_new_eof_prev(r+1) = '1') else s_new_eof_curr(r);
         s_new_eof_pos_arr(r) <= s_new_eof_pos_curr_arr(r+1) when (s_new_eof_prev(r+1) = '1') else s_new_eof_pos_curr_arr(r);
         s_new_meta_arr   (r) <= s_rx_meta_arr         (r+1) when (s_new_eof_prev(r+1) = '1') else s_rx_meta_arr         (r);
     end generate;
-    s_new_eof(REGIONS-1) <= s_new_eof_curr(REGIONS-1);
+    s_new_eof(REGIONS-1)         <= s_new_eof_curr(REGIONS-1);
     s_new_eof_pos_arr(REGIONS-1) <= s_new_eof_pos_curr_arr(REGIONS-1);
     s_new_meta_arr   (REGIONS-1) <= s_rx_meta_arr         (REGIONS-1);
 
@@ -255,11 +255,11 @@ begin
 
     -- fix EOF and EOF_POS when new EOF overflow to previous word
     new_eof_reg_fix_g : for r in 0 to REGIONS-2 generate
-        s_new_eof_reg_fix(r) <= s_new_eof_reg(r);
+        s_new_eof_reg_fix(r)     <= s_new_eof_reg(r);
         s_new_eof_pos_reg_fix(r) <= s_new_eof_pos_reg(r);
         s_new_meta_reg_fix   (r) <= s_new_meta_reg   (r);
     end generate;
-    s_new_eof_reg_fix(REGIONS-1) <= '1' when (s_new_eof_prev(0) = '1') else s_new_eof_reg(REGIONS-1);
+    s_new_eof_reg_fix(REGIONS-1)     <= '1' when (s_new_eof_prev(0) = '1') else s_new_eof_reg(REGIONS-1);
     s_new_eof_pos_reg_fix(REGIONS-1) <= s_new_eof_pos_curr_arr(0) when (s_new_eof_prev(0) = '1') else s_new_eof_pos_reg(REGIONS-1);
     s_new_meta_reg_fix   (REGIONS-1) <= s_new_meta_arr        (0) when (s_new_eof_prev(0) = '1') else s_new_meta_reg   (REGIONS-1);
 
@@ -279,7 +279,7 @@ begin
     -----------------------------------------------------------------------------
 
     -- create big data array from all current word and first region from next word
-    s_data_big <= RX_DATA(REGION_WIDTH-1 downto 0) & s_rx_data_reg;
+    s_data_big     <= RX_DATA(REGION_WIDTH-1 downto 0) & s_rx_data_reg;
     s_data_big_arr <= slv_array_downto_deser(s_data_big,(WORD_ITEMS+REGION_ITEMS),ITEM_WIDTH);
 
     -- data multiplexor per items
@@ -325,7 +325,7 @@ begin
     -----------------------------------------------------------------------------
 
     s_tx_data    <= slv_array_ser(s_data_muxed_arr,WORD_ITEMS,ITEM_WIDTH);
-    s_tx_meta    <= tsel(META_ALIGNMENT=1, slv_array_ser(s_new_meta_reg_fix), s_rx_meta_reg);
+    s_tx_meta    <= tsel(META_ALIGNMENT = 1, slv_array_ser(s_new_meta_reg_fix), s_rx_meta_reg);
     s_tx_eof_pos <= slv_array_ser(s_new_eof_pos_reg_fix,REGIONS,EOF_POS_WIDTH);
     s_tx_eof     <= s_new_eof_reg_fix;
     s_tx_sof_pos <= s_rx_sof_pos_reg;

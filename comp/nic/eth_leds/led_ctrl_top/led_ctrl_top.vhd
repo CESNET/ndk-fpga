@@ -12,27 +12,27 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity ETH_LED_CTRL_TOP is
-generic (
-    ETH_PORTS      : natural := 2;
-    ETH_CHANNELS   : natural := 4;
-    LEDS_PER_PORT  : natural := 1;
-    SYS_CLK_PERIOD : natural := 5;
-    LED_ON_VAL     : std_logic := '1'
-);
-port (
-    ETH_CLK          : in  std_logic_vector(ETH_PORTS-1 downto 0);
-    SYS_CLK          : in  std_logic;
-    SYS_RESET        : in  std_logic;
+    generic (
+        ETH_PORTS      : natural := 2;
+        ETH_CHANNELS   : natural := 4;
+        LEDS_PER_PORT  : natural := 1;
+        SYS_CLK_PERIOD : natural := 5;
+        LED_ON_VAL     : std_logic := '1'
+    );
+    port (
+        ETH_CLK          : in  std_logic_vector(ETH_PORTS-1 downto 0);
+        SYS_CLK          : in  std_logic;
+        SYS_RESET        : in  std_logic;
 
-    ETH_RX_LINK_UP   : in  std_logic_vector(ETH_PORTS*ETH_CHANNELS-1 downto 0);
-    ETH_RX_ACTIVITY  : in  std_logic_vector(ETH_PORTS*ETH_CHANNELS-1 downto 0);
-    ETH_TX_ACTIVITY  : in  std_logic_vector(ETH_PORTS*ETH_CHANNELS-1 downto 0);
-    ETH_PORT_ENABLED : in  std_logic_vector(ETH_PORTS*ETH_CHANNELS-1 downto 0);
-    ETH_MODPRS_N     : in  std_logic_vector(ETH_PORTS-1 downto 0);
+        ETH_RX_LINK_UP   : in  std_logic_vector(ETH_PORTS*ETH_CHANNELS-1 downto 0);
+        ETH_RX_ACTIVITY  : in  std_logic_vector(ETH_PORTS*ETH_CHANNELS-1 downto 0);
+        ETH_TX_ACTIVITY  : in  std_logic_vector(ETH_PORTS*ETH_CHANNELS-1 downto 0);
+        ETH_PORT_ENABLED : in  std_logic_vector(ETH_PORTS*ETH_CHANNELS-1 downto 0);
+        ETH_MODPRS_N     : in  std_logic_vector(ETH_PORTS-1 downto 0);
 
-    ETH_LED_G        : out std_logic_vector(ETH_PORTS*LEDS_PER_PORT-1 downto 0);
-    ETH_LED_R        : out std_logic_vector(ETH_PORTS*LEDS_PER_PORT-1 downto 0)
-);
+        ETH_LED_G        : out std_logic_vector(ETH_PORTS*LEDS_PER_PORT-1 downto 0);
+        ETH_LED_R        : out std_logic_vector(ETH_PORTS*LEDS_PER_PORT-1 downto 0)
+    );
 end entity;
 
 architecture FULL of ETH_LED_CTRL_TOP is
@@ -52,7 +52,7 @@ architecture FULL of ETH_LED_CTRL_TOP is
 
 begin
 
-    process(all)
+    process (all)
     begin
         for i in 0 to ETH_CHANNELS-1 loop
             s_led_pwm(i) <= std_logic_vector(PWM_START - (i*PWM_STEP));
@@ -113,7 +113,7 @@ begin
             );
         end generate;
 
-        process(SYS_CLK)
+        process (SYS_CLK)
         begin
             if rising_edge(SYS_CLK) then
                 if (s_led_sync(p*ETH_CHANNELS) = '1') then
@@ -125,7 +125,7 @@ begin
             end if;
         end process;
 
-        process(all)
+        process (all)
         begin
             s_eth_led_r((p+1)*LEDS_PER_PORT-1 downto p*LEDS_PER_PORT) <= (others => not LED_ON_VAL);
             s_eth_led_g((p+1)*LEDS_PER_PORT-1 downto p*LEDS_PER_PORT) <= (others => not LED_ON_VAL);
@@ -149,7 +149,7 @@ begin
 
     end generate;
 
-    process(SYS_CLK)
+    process (SYS_CLK)
     begin
         if rising_edge(SYS_CLK) then
             ETH_LED_R <= s_eth_led_r;

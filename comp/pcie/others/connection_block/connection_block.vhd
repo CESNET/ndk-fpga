@@ -12,21 +12,21 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity PCIE_CONNECTION_BLOCK is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 2;
         MFB_REGION_SIZE     : natural := 1;
         MFB_BLOCK_SIZE      : natural := 8;
         MFB_ITEM_WIDTH      : natural := 32;
-        MFB_UP_META_WIDTH   : natural := 32+128; -- must be 32+128
-        MFB_DOWN_META_WIDTH : natural := 3+32+128; -- must be 3+32+128
+        MFB_UP_META_WIDTH   : natural := 32+128;      -- must be 32+128
+        MFB_DOWN_META_WIDTH : natural := 3+32+128;    -- must be 3+32+128
         -- Depth of FIFO instanced before MTC. For R-Tile only.
         MTC_FIFO_DEPTH      : natural := 512;
         -- Maximum write request (payload) size (in DWORDs)
         PCIE_MPS_DW         : natural := 512/4;
         DEVICE              : string  := "STRATIX10"; -- "STRATIX10" or "AGILEX"
-        ENDPOINT_TYPE       : string  := "H_TILE" -- "H_TILE" or "P_TILE" or "R_TILE"
+        ENDPOINT_TYPE       : string  := "H_TILE"     -- "H_TILE" or "P_TILE" or "R_TILE"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -38,22 +38,22 @@ entity PCIE_CONNECTION_BLOCK is
         -- DOWN stream
         RX_AVST_DATA      : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
         RX_AVST_HDR       : in  std_logic_vector(MFB_REGIONS*128-1 downto 0); -- not used in H-Tile
-        RX_AVST_PREFIX    : in  std_logic_vector(MFB_REGIONS*32-1 downto 0); -- not used in H-Tile
-		RX_AVST_SOP       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-		RX_AVST_EOP       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_AVST_PREFIX    : in  std_logic_vector(MFB_REGIONS*32-1 downto 0);  -- not used in H-Tile
+        RX_AVST_SOP       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_AVST_EOP       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         RX_AVST_EMPTY     : in  std_logic_vector(MFB_REGIONS*3-1 downto 0);
         RX_AVST_BAR_RANGE : in  std_logic_vector(MFB_REGIONS*3-1 downto 0);
         RX_AVST_VALID     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-		RX_AVST_READY     : out std_logic;
+        RX_AVST_READY     : out std_logic;
         -- UP stream
         TX_AVST_DATA      : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
         TX_AVST_HDR       : out std_logic_vector(MFB_REGIONS*128-1 downto 0); -- not used in H-Tile
-        TX_AVST_PREFIX    : out std_logic_vector(MFB_REGIONS*32-1 downto 0); -- not used in H-Tile
-		TX_AVST_SOP       : out std_logic_vector(MFB_REGIONS-1 downto 0);
-		TX_AVST_EOP       : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_AVST_PREFIX    : out std_logic_vector(MFB_REGIONS*32-1 downto 0);  -- not used in H-Tile
+        TX_AVST_SOP       : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_AVST_EOP       : out std_logic_vector(MFB_REGIONS-1 downto 0);
         TX_AVST_ERROR     : out std_logic_vector(MFB_REGIONS-1 downto 0);
         TX_AVST_VALID     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-		TX_AVST_READY     : in  std_logic;
+        TX_AVST_READY     : in  std_logic;
 
         -- DOWN stream credits (R-TILE only)
         CRDT_DOWN_INIT_DONE : in  std_logic := '0';
@@ -128,15 +128,15 @@ end entity;
 
 architecture FULL of PCIE_CONNECTION_BLOCK is
 
-    constant IS_RTILE_DEVICE        : boolean := ENDPOINT_TYPE="R_TILE";
-    constant AVST2MFB_FIFO_DEPTH    : natural := tsel((ENDPOINT_TYPE="H_TILE"),32,512);
+    constant IS_RTILE_DEVICE        : boolean := ENDPOINT_TYPE = "R_TILE";
+    constant AVST2MFB_FIFO_DEPTH    : natural := tsel((ENDPOINT_TYPE = "H_TILE"),32,512);
     constant AVST2MFB_FIFO_ENABLE   : boolean := not IS_RTILE_DEVICE;
     constant AVST2MFB_FIFO_RAM_TYPE : string  := "AUTO";
     -- latency for H-Tile is 18 cycles (20 cycles for safe)
     -- latency for P-Tile is 27 cycles (30 cycles for safe)
     -- latency for R-Tile is ignored
-    constant AVST2MFB_AVST_RDY_LAT  : natural := tsel((ENDPOINT_TYPE="H_TILE"),20,30);
-    constant DOWN_USE_DST_RDY       : boolean := True;--TODO (ENDPOINT_TYPE/="R_TILE");
+    constant AVST2MFB_AVST_RDY_LAT  : natural := tsel((ENDPOINT_TYPE = "H_TILE"),20,30);
+    constant DOWN_USE_DST_RDY       : boolean := True;  -- TODO (ENDPOINT_TYPE/="R_TILE");
     -- Optimalization parameters
     constant MFB_MERGER_CNT_MAX     : natural := 4;
     constant PIPE_TYPE              : string  := "REG"; -- "SHREG" or "REG"
@@ -289,15 +289,15 @@ begin
 
     rx_avst_meta_arr_g : for i in 0 to MFB_REGIONS-1 generate
         rx_avst_meta_arr(i) <= rx_avst_bar_range_arr(i) & rx_avst_prefix_arr(i) &
-            rx_avst_hdr_arr(i)(32-1 downto 0)  & rx_avst_hdr_arr(i)(64-1 downto 32) &
-            rx_avst_hdr_arr(i)(96-1 downto 64) & rx_avst_hdr_arr(i)(128-1 downto 96);
+                               rx_avst_hdr_arr(i)(32-1 downto 0)  & rx_avst_hdr_arr(i)(64-1 downto 32) &
+                               rx_avst_hdr_arr(i)(96-1 downto 64) & rx_avst_hdr_arr(i)(128-1 downto 96);
     end generate;
 
     rx_avst_meta <= slv_array_ser(rx_avst_meta_arr,MFB_REGIONS,MFB_DOWN_META_WIDTH);
 
     -- conversion AVST2MFB
     avst2mfb_i : entity work.PCIE_AVST2MFB
-    generic map(
+    generic map (
         REGIONS            => MFB_REGIONS,
         REGION_SIZE        => MFB_REGION_SIZE,
         BLOCK_SIZE         => MFB_BLOCK_SIZE,
@@ -309,7 +309,7 @@ begin
         FIFO_RAM_TYPE      => AVST2MFB_FIFO_RAM_TYPE,
         DEVICE             => DEVICE
     )
-    port map(
+    port map (
         CLK            => CLK,
         RST            => RESET,
 
@@ -345,7 +345,7 @@ begin
     end generate;
 
     down_mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -356,7 +356,7 @@ begin
         PIPE_TYPE   => PIPE_TYPE,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -398,24 +398,24 @@ begin
     end generate;
 
     down_mfb_sel_g : for i in 0 to MFB_REGIONS-1 generate
-        with down_pipe_tlp_type_arr(i) select
-        down_pipe_mfb_sel(i) <= '1' when "00001010", -- Completion without Data
-                                '1' when "01001010", -- Completion with Data
-                                '1' when "00001011", -- Completion for Locked Memory Read without Data
-                                '1' when "01001011", -- Completion for Locked Memory Read
-                                '0' when others;
+        with down_pipe_tlp_type_arr(i) select down_pipe_mfb_sel(i) <=
+            '1' when "00001010", -- Completion without Data
+            '1' when "01001010", -- Completion with Data
+            '1' when "00001011", -- Completion for Locked Memory Read without Data
+            '1' when "01001011", -- Completion for Locked Memory Read
+            '0' when others;
     end generate;
 
     -- MFB splitter
     mfb_splitter_i : entity work.MFB_SPLITTER_SIMPLE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
         ITEM_WIDTH  => MFB_ITEM_WIDTH,
         META_WIDTH  => MFB_DOWN_META_WIDTH
     )
-    port map(
+    port map (
         CLK             => CLK,
         RST             => RESET,
 
@@ -450,7 +450,7 @@ begin
 
     down0_pipe_g: if not IS_RTILE_DEVICE generate
         down0_mfb_pipe_i : entity work.MFB_PIPE
-        generic map(
+        generic map (
             REGIONS     => MFB_REGIONS,
             REGION_SIZE => MFB_REGION_SIZE,
             BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -461,7 +461,7 @@ begin
             PIPE_TYPE   => PIPE_TYPE,
             DEVICE      => DEVICE
         )
-        port map(
+        port map (
             CLK        => CLK,
             RESET      => RESET,
 
@@ -487,7 +487,7 @@ begin
 
     down0_fifo_g: if IS_RTILE_DEVICE generate
         down0_mfb_fifo_i : entity work.MFB_FIFOX
-        generic map(
+        generic map (
             REGIONS     => MFB_REGIONS,
             REGION_SIZE => MFB_REGION_SIZE,
             BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -496,7 +496,7 @@ begin
             FIFO_DEPTH  => MTC_FIFO_DEPTH,
             DEVICE      => DEVICE
         )
-        port map(
+        port map (
             CLK        => CLK,
             RST        => RESET,
 
@@ -553,11 +553,11 @@ begin
     down0_pipe_tlp_vld <= down0_pipe_mfb_src_rdy and down0_pipe_mfb_dst_rdy and down0_pipe_mfb_eof;
 
     crdt_down_mtc_i : entity work.CB_RTILE_CRDT_DOWN
-    generic map(
+    generic map (
         REGIONS          => MFB_REGIONS,
         CRDT_ENABLE      => IS_RTILE_DEVICE
     )
-    port map(
+    port map (
         CLK            => CLK,
         RESET          => RESET,
 
@@ -591,7 +591,7 @@ begin
     down0_pipe_mfb_dst_rdy <= CQ_MFB_DST_RDY;
 
     down1_mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -602,7 +602,7 @@ begin
         PIPE_TYPE   => PIPE_TYPE,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -658,11 +658,11 @@ begin
     down1_pipe_tlp_vld <= down1_pipe_mfb_src_rdy and down1_pipe_mfb_dst_rdy and down1_pipe_mfb_eof;
 
     crdt_down_ptc_i : entity work.CB_RTILE_CRDT_DOWN
-    generic map(
+    generic map (
         REGIONS          => MFB_REGIONS,
         CRDT_ENABLE      => IS_RTILE_DEVICE
     )
-    port map(
+    port map (
         CLK            => CLK,
         RESET          => RESET,
 
@@ -706,7 +706,7 @@ begin
     CC_MFB_DST_RDY  <= up0_mfb_dst_rdy;
 
     up0_mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -717,7 +717,7 @@ begin
         PIPE_TYPE   => PIPE_TYPE,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -759,12 +759,12 @@ begin
     up0_pipe_tlp_vld <= up0_pipe_mfb_src_rdy and up0_pipe_mfb_sof;
 
     crdt_up_mtc_i : entity work.CB_RTILE_CRDT_UP
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         CRDT_ENABLE => False,
         PCIE_MPS_DW => PCIE_MPS_DW
     )
-    port map(
+    port map (
         CLK            => CLK,
         RESET          => RESET,
 
@@ -796,7 +796,7 @@ begin
     RQ_MFB_DST_RDY  <= up1_mfb_dst_rdy;
 
     up1_mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -807,7 +807,7 @@ begin
         PIPE_TYPE   => PIPE_TYPE,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -849,12 +849,12 @@ begin
     up1_pipe_tlp_vld <= up1_pipe_mfb_src_rdy and up1_pipe_mfb_sof;
 
     crdt_up_ptc_i : entity work.CB_RTILE_CRDT_UP
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         CRDT_ENABLE => False,
         PCIE_MPS_DW => PCIE_MPS_DW
     )
-    port map(
+    port map (
         CLK            => CLK,
         RESET          => RESET,
 
@@ -879,7 +879,7 @@ begin
 
     -- MFB merger
     mfb_merger_i : entity work.MFB_MERGER_SIMPLE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -888,7 +888,7 @@ begin
         MASKING_EN  => False,
         CNT_MAX     => MFB_MERGER_CNT_MAX
     )
-    port map(
+    port map (
         CLK             => CLK,
         RST             => RESET,
 
@@ -921,7 +921,7 @@ begin
     );
 
     up_mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -932,7 +932,7 @@ begin
         PIPE_TYPE   => PIPE_TYPE,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -957,14 +957,14 @@ begin
 
     -- conversion MFB2AVST
     mfb2avst_i : entity work.PCIE_MFB2AVST
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
         ITEM_WIDTH  => MFB_ITEM_WIDTH,
         META_WIDTH  => MFB_UP_META_WIDTH
     )
-    port map(
+    port map (
         CLK            => CLK,
         RST            => RESET,
 
@@ -988,7 +988,7 @@ begin
     tx_avst_meta_arr <= slv_array_downto_deser(tx_avst_meta,MFB_REGIONS,MFB_UP_META_WIDTH);
 
     tx_avst_meta_unpack_g : for i in 0 to MFB_REGIONS-1 generate
-        tx_avst_prefix_arr(i) <= tx_avst_meta_arr(i)(MFB_UP_META_WIDTH-1 downto 128);
+        tx_avst_prefix_arr(i)               <= tx_avst_meta_arr(i)(MFB_UP_META_WIDTH-1 downto 128);
         tx_avst_hdr_arr(i)(128-1 downto 96) <= tx_avst_meta_arr(i)(32-1 downto 0);
         tx_avst_hdr_arr(i)(96-1 downto 64)  <= tx_avst_meta_arr(i)(64-1 downto 32);
         tx_avst_hdr_arr(i)(64-1 downto 32)  <= tx_avst_meta_arr(i)(96-1 downto 64);

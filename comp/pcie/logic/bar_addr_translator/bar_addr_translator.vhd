@@ -83,7 +83,7 @@ begin
     end process;
 
     -- address translation
-    out_addr_sig <= std_logic_vector((unsigned(IN_ADDR) AND tlp_addr_mask) + unsigned(bar_base_addr));
+    out_addr_sig <= std_logic_vector((unsigned(IN_ADDR) and tlp_addr_mask) + unsigned(bar_base_addr));
 
     out_reg_g: if OUTPUT_REG generate
         process (CLK)

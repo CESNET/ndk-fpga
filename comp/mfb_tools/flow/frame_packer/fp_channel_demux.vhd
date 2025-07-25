@@ -13,7 +13,7 @@ use work.type_pack.all;
 
 -- The purpose of this component to route data to its channel
 entity FP_CHANNEL_DEMUX is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
@@ -22,7 +22,7 @@ entity FP_CHANNEL_DEMUX is
         RX_CHANNELS         : natural := 16;
         RX_PKT_SIZE_MAX     : natural := 2**10
     );
-    port(
+    port (
         RX_CHANNEL_BS   : in  slv_array_t(MFB_REGIONS downto 0)(max(1,log2(RX_CHANNELS)) - 1 downto 0);
 
         RX_DATA         : in  slv_array_t(MFB_REGIONS downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
@@ -58,64 +58,64 @@ begin
 
     demux_g: for i in 0 to MFB_REGIONS generate
         data_demux_i: entity work.GEN_DEMUX
-            generic map(
-                DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH,
-                DEMUX_WIDTH => RX_CHANNELS,
-                DEF_VALUE   => '0'
-            )
-            port map(
-                DATA_IN     => RX_DATA(i),
-                SEL         => RX_CHANNEL_BS(i),
-                DATA_OUT    => data_demux(i)
+        generic map (
+            DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH,
+            DEMUX_WIDTH => RX_CHANNELS,
+            DEF_VALUE   => '0'
+        )
+        port map (
+            DATA_IN     => RX_DATA(i),
+            SEL         => RX_CHANNEL_BS(i),
+            DATA_OUT    => data_demux(i)
         );
         data_demux_arr(i) <= slv_array_deser(data_demux(i), RX_CHANNELS);
 
         block_vld_demux_i: entity work.GEN_DEMUX
-            generic map(
-                DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE,
-                DEMUX_WIDTH => RX_CHANNELS,
-                DEF_VALUE   => '0'
-            )
-            port map(
-                DATA_IN     => RX_BLOCK_VLD(i),
-                SEL         => RX_CHANNEL_BS(i),
-                DATA_OUT    =>block_vld_demux(i)
+        generic map (
+            DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE,
+            DEMUX_WIDTH => RX_CHANNELS,
+            DEF_VALUE   => '0'
+        )
+        port map (
+            DATA_IN     => RX_BLOCK_VLD(i),
+            SEL         => RX_CHANNEL_BS(i),
+            DATA_OUT    => block_vld_demux(i)
         );
         block_vld_demux_arr(i)  <= slv_array_deser(block_vld_demux(i), RX_CHANNELS);
 
         soh_demux_i: entity work.GEN_DEMUX
-            generic map(
-                DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE,
-                DEMUX_WIDTH => RX_CHANNELS,
-                DEF_VALUE   => '0'
-            )
-            port map(
-                DATA_IN     => RX_SOF_ONE_HOT(i),
-                SEL         => RX_CHANNEL_BS(i),
-                DATA_OUT    => sof_one_hot_demux(i)
+        generic map (
+            DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE,
+            DEMUX_WIDTH => RX_CHANNELS,
+            DEF_VALUE   => '0'
+        )
+        port map (
+            DATA_IN     => RX_SOF_ONE_HOT(i),
+            SEL         => RX_CHANNEL_BS(i),
+            DATA_OUT    => sof_one_hot_demux(i)
         );
         sof_one_hot_demux_arr(i)    <= slv_array_deser(sof_one_hot_demux(i), RX_CHANNELS);
 
         eoh_demux_i: entity work.GEN_DEMUX
-            generic map(
-                DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE,
-                DEMUX_WIDTH => RX_CHANNELS,
-                DEF_VALUE   => '0'
-            )
-            port map(
-                DATA_IN     => RX_EOF_ONE_HOT(i),
-                SEL         => RX_CHANNEL_BS(i),
-                DATA_OUT    => eof_one_hot_demux(i)
+        generic map (
+            DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE,
+            DEMUX_WIDTH => RX_CHANNELS,
+            DEF_VALUE   => '0'
+        )
+        port map (
+            DATA_IN     => RX_EOF_ONE_HOT(i),
+            SEL         => RX_CHANNEL_BS(i),
+            DATA_OUT    => eof_one_hot_demux(i)
         );
         eof_one_hot_demux_arr(i)    <= slv_array_deser(eof_one_hot_demux(i), RX_CHANNELS);
 
         pkt_lng_demux_i: entity work.GEN_DEMUX
-        generic map(
+        generic map (
             DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE*max(1, log2(RX_PKT_SIZE_MAX + 1)),
             DEMUX_WIDTH => RX_CHANNELS,
             DEF_VALUE   => '0'
         )
-        port map(
+        port map (
             DATA_IN     => RX_PKT_LNG(i),
             SEL         => RX_CHANNEL_BS(i),
             DATA_OUT    => pkt_lng_demux(i)

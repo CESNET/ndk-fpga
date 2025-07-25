@@ -35,47 +35,47 @@ library ieee;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity descrambler_gen is
+entity DESCRAMBLER_GEN is
     generic (
         WIDTH : natural
     );
     port (
         RESET     : in std_logic;
-        CLK       : in std_logic; -- Clock, 156.25MHz
-        EN        : in std_logic; -- Clock enable
-        BYPASS    : in std_logic := '0'; --
+        CLK       : in std_logic;                           -- Clock, 156.25MHz
+        EN        : in std_logic;                           -- Clock enable
+        BYPASS    : in std_logic := '0';                    --
         SEED      : in std_logic_vector(57 downto 0);       -- initial seed
         D         : in std_logic_vector(WIDTH-1 downto 0);  -- Input data
         Q         : out std_logic_vector(WIDTH-1 downto 0)  -- Output data
     );
-end descrambler_gen;
+end entity;
 
-architecture behavioral of descrambler_gen is
+architecture BEHAVIORAL of DESCRAMBLER_GEN is
 
-   signal sr   : std_logic_vector(57 downto 0);
-   signal din  : std_logic_vector(maximum(WIDTH-1, 57) downto 0) := (others => '0');
-   signal dout : std_logic_vector(maximum(WIDTH-1, 57) downto 0);
+    signal sr   : std_logic_vector(57 downto 0);
+    signal din  : std_logic_vector(maximum(WIDTH-1, 57) downto 0) := (others => '0');
+    signal dout : std_logic_vector(maximum(WIDTH-1, 57) downto 0);
 
 begin
 
     din(D'range) <= D;
 
-    GEN_S0_S38: for i in 0 to 38 generate
+    gen_s0_s38: for i in 0 to 38 generate
         dout(i) <= din(i) xor sr(38-i) xor sr(57-i);  -- Dout(i) = Di + Sr(38-i) + Sr(57-i)
     end generate;
 
-    GEN_S39_S57: for i in 39 to 57 generate
+    gen_s39_s57: for i in 39 to 57 generate
         dout(i) <= din(i) xor din(i-39) xor sr(57-i);  -- Dout(i) = Di + D(i-39) + Sr(57-i)
     end generate;
 
-    GEN_S58: for i in 58 to dout'high generate
+    gen_s58: for i in 58 to dout'high generate
         dout(i) <= din(i) xor din(i-39) xor din(i-58); -- Dout(i) = Di + D(i-39) + D(i-58)???
     end generate;
 
-    S_SEQ: process(clk, RESET)
+    s_seq : process (CLK, RESET)
     begin
-        if CLK'event and CLK = '1' then
-            if RESET = '1' then
+        if rising_edge(CLK) then
+            if (RESET = '1') then
                 sr <= SEED;
             elsif (EN = '1') then
                 sr(57 downto WIDTH) <= sr(57-WIDTH downto 0);
@@ -88,4 +88,4 @@ begin
 
     Q <= dout(Q'range) when BYPASS = '0' else D;
 
-end behavioral;
+end architecture;

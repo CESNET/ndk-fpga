@@ -19,7 +19,7 @@ use work.type_pack.all;
 
 -- MFB+MVB bus splitter with generic number of outputs
 entity MFB_SPLITTER_GEN is
-    generic(
+    generic (
         -- number of splitter outputs
         SPLITTER_OUTPUTS : integer := 2;
 
@@ -59,7 +59,7 @@ entity MFB_SPLITTER_GEN is
         -- "ULTRASCALE", "STRATIX10",...
         DEVICE          : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- ===================
         -- Common interface
         -- ===================
@@ -215,18 +215,18 @@ begin
     end generate;
 
     outputs_g : for i in 0 to SPLITTER_OUTPUTS-1 generate
-        TX_MVB_DATA(i)    <= s_rx_mvb_data   (TREE_STAGES)(i);
-        TX_MVB_PAYLOAD(i) <= s_rx_mvb_payload(TREE_STAGES)(i);
-        TX_MVB_VLD(i)     <= s_rx_mvb_vld    (TREE_STAGES)(i);
-        TX_MVB_SRC_RDY(i) <= s_rx_mvb_src_rdy(TREE_STAGES)(i);
+        TX_MVB_DATA(i)                   <= s_rx_mvb_data   (TREE_STAGES)(i);
+        TX_MVB_PAYLOAD(i)                <= s_rx_mvb_payload(TREE_STAGES)(i);
+        TX_MVB_VLD(i)                    <= s_rx_mvb_vld    (TREE_STAGES)(i);
+        TX_MVB_SRC_RDY(i)                <= s_rx_mvb_src_rdy(TREE_STAGES)(i);
         s_rx_mvb_dst_rdy(TREE_STAGES)(i) <= TX_MVB_DST_RDY(i);
 
-        TX_MFB_DATA(i)    <= s_rx_mfb_data   (TREE_STAGES)(i);
-        TX_MFB_SOF(i)     <= s_rx_mfb_sof    (TREE_STAGES)(i);
-        TX_MFB_EOF(i)     <= s_rx_mfb_eof    (TREE_STAGES)(i);
-        TX_MFB_SOF_POS(i) <= s_rx_mfb_sof_pos(TREE_STAGES)(i);
-        TX_MFB_EOF_POS(i) <= s_rx_mfb_eof_pos(TREE_STAGES)(i);
-        TX_MFB_SRC_RDY(i) <= s_rx_mfb_src_rdy(TREE_STAGES)(i);
+        TX_MFB_DATA(i)                   <= s_rx_mfb_data   (TREE_STAGES)(i);
+        TX_MFB_SOF(i)                    <= s_rx_mfb_sof    (TREE_STAGES)(i);
+        TX_MFB_EOF(i)                    <= s_rx_mfb_eof    (TREE_STAGES)(i);
+        TX_MFB_SOF_POS(i)                <= s_rx_mfb_sof_pos(TREE_STAGES)(i);
+        TX_MFB_EOF_POS(i)                <= s_rx_mfb_eof_pos(TREE_STAGES)(i);
+        TX_MFB_SRC_RDY(i)                <= s_rx_mfb_src_rdy(TREE_STAGES)(i);
         s_rx_mfb_dst_rdy(TREE_STAGES)(i) <= TX_MFB_DST_RDY(i);
     end generate;
 

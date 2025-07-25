@@ -13,7 +13,7 @@ use work.type_pack.all;
 use work.math_pack.all;
 
 entity DSP_COUNTER_INTEL is
-    Generic (
+    generic (
         -- AUTO_RESET lets the user to specify what happens when the counter reaches its maximum value
         -- with AUTO_RESET set to false the counter stops counting and hold: its MAXIMUM value when the MAX_VAL is reached (MAX_VAL must be set to (others => '1'))
         --                                                                   its MINIMUM value when the MAX_VAL is reached (MAX_VAL must be set to (others => '0'))
@@ -30,8 +30,8 @@ entity DSP_COUNTER_INTEL is
         COUNT_DOWN     : boolean := false;
         -- target FPGA: "AGILEX" or "STRATIX10"
         DEVICE         : string  := "AGILEX"
-        );
-    Port (
+    );
+    port (
         -- the source for clock 0 and clock 1, further explained in DSP_COUNTER_STRATIX_10_ATOM
         CLK      :  in std_logic;
         -- enables all registers

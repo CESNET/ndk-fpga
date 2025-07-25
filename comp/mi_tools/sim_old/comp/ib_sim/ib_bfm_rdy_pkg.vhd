@@ -20,36 +20,40 @@ use std.textio.all;
 -- ----------------------------------------------------------------------------
 --                        Internal Bus BFM Package
 -- ----------------------------------------------------------------------------
-PACKAGE ib_bfm_rdy_pkg IS
+package ib_bfm_rdy_pkg is
 
-  ----------------------------------------------------------------------------
-  -- PKG FUNCTIONS
-  ----------------------------------------------------------------------------
+    ----------------------------------------------------------------------------
+    -- PKG FUNCTIONS
+    ----------------------------------------------------------------------------
 
-----------------------------------------------------------------------------
-  --
-  PROCEDURE DriveDstRdyN(signal CLK       : IN    std_logic;
-                         signal DST_RDY_N : OUT std_logic);
+    ----------------------------------------------------------------------------
+    --
+    procedure drivedstrdyn (
+        signal clk       : in    std_logic;
+        signal dst_rdy_n : out std_logic
+    );
 
-END ib_bfm_rdy_pkg;
+end package;
 
 
 
 -- ----------------------------------------------------------------------------
 --                      Internal Bus BFM Package BODY
 -- ----------------------------------------------------------------------------
-PACKAGE BODY ib_bfm_rdy_pkg IS
+package body ib_bfm_rdy_pkg is
 
-  -----------------------------------------------------------------------------
-  --
-  PROCEDURE DriveDstRdyN (signal CLK       : IN  std_logic;
-                          signal DST_RDY_N : OUT std_logic) IS
-  BEGIN
-    DST_RDY_N <= '0';
-    wait until (CLK'event and CLK='1');
-    --DST_RDY_N <= '1';
-    --wait until (CLK'event and CLK='1');
-  END;
+    -----------------------------------------------------------------------------
+    --
+    procedure drivedstrdyn (
+        signal clk       : in  std_logic;
+        signal dst_rdy_n : out std_logic
+    ) is
+    begin
+        dst_rdy_n <= '0';
+        wait until (clk'event and clk = '1');
+        -- DST_RDY_N <= '1';
+        -- wait until (CLK'event and CLK='1');
+    end procedure drivedstrdyn;
 
-END ib_bfm_rdy_pkg;
+end package body;
 

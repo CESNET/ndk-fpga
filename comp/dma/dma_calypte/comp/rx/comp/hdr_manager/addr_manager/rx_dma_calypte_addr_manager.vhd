@@ -35,7 +35,7 @@ entity RX_DMA_CALYPTE_ADDR_MANAGER is
         RSP_OUT_REG   : boolean := False;
         -- Specified device: "ULTRASCALE", "STRATIX10" or "AGILEX"
         DEVICE        : string  := "ULTRASCALE"
-        );
+    );
 
     port (
         -- =====================================================================
@@ -86,7 +86,7 @@ entity RX_DMA_CALYPTE_ADDR_MANAGER is
         ADDR     : out std_logic_vector(ADDR_WIDTH-1 downto 0);
         OFFSET   : out std_logic_vector(POINTER_WIDTH-1 downto 0);
         ADDR_VLD : out std_logic
-        );
+    );
 
 end entity;
 
@@ -146,26 +146,28 @@ begin
     hw_pointer_wr_data <= std_logic_vector(hw_pointer_new)  when START_REQ_VLD = '0' else (others => '0');
 
     hw_pointers_lutram_i : entity work.GEN_LUTRAM
-        generic map (
-            DATA_WIDTH         => POINTER_WIDTH,
-            ITEMS              => CHANNELS,
-            RD_PORTS           => 1,
-            RD_LATENCY         => 0,
-            WRITE_USE_RD_ADDR0 => FALSE,
-            MLAB_CONSTR_RDW_DC => FALSE,
-            DEVICE             => DEVICE)
-        port map (
-            CLK     => CLK,
-            WR_EN   => hw_pointer_wr,
-            WR_ADDR => hw_pointer_wr_addr,
-            WR_DATA => hw_pointer_wr_data,
-            RD_ADDR => std_logic_vector(channel_act_reg),
-            RD_DATA => hw_pointer_rd_data);
+    generic map (
+        DATA_WIDTH         => POINTER_WIDTH,
+        ITEMS              => CHANNELS,
+        RD_PORTS           => 1,
+        RD_LATENCY         => 0,
+        WRITE_USE_RD_ADDR0 => FALSE,
+        MLAB_CONSTR_RDW_DC => FALSE,
+        DEVICE             => DEVICE
+    )
+    port map (
+        CLK     => CLK,
+        WR_EN   => hw_pointer_wr,
+        WR_ADDR => hw_pointer_wr_addr,
+        WR_DATA => hw_pointer_wr_data,
+        RD_ADDR => std_logic_vector(channel_act_reg),
+        RD_DATA => hw_pointer_rd_data
+    );
 
     --=====================================================================
     -- STORE CHANNEL
     --=====================================================================
-    channel_act_p : process(CLK)
+    channel_act_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
 
@@ -175,7 +177,7 @@ begin
                 channel_act_reg     <= (others => '0');
 
             -- awaits for the instruction to process the next packet
-            elsif(packet_next = '1') then
+            elsif (packet_next = '1') then
 
                 channel_act_vld_reg <= CHANNEL_VLD;
                 channel_act_reg     <= unsigned(CHANNEL);
@@ -205,7 +207,7 @@ begin
     hw_offset <=
         (ADDR_WIDTH-1 downto POINTER_WIDTH +log2(BLOCK_SIZE) => '0')
         & unsigned(hw_pointer_rd_data)
-        & (log2(BLOCK_SIZE)-1 downto 0 => '0');
+        & (log2(BLOCK_SIZE)-1 downto 0                       => '0');
 
     rsp_out_reg_g: if (RSP_OUT_REG = True) generate
         process (CLK) is

@@ -13,7 +13,7 @@ use work.type_pack.all;
 use work.pcie_meta_pack.all;
 
 entity DMA_CALYPTE is
-    generic(
+    generic (
         -- ==========================================================================================
         -- Global settings
         --
@@ -109,7 +109,7 @@ entity DMA_CALYPTE is
         ST_SP_DBG_SIGNAL_W : natural := 4;
         -- Width of MI bus
         MI_WIDTH           : natural := 32
-        );
+    );
     port (
         CLK   : in std_logic;
         RESET : in std_logic;
@@ -190,7 +190,7 @@ entity DMA_CALYPTE is
         MI_DRD  : out std_logic_vector (MI_WIDTH -1 downto 0);
         MI_ARDY : out std_logic;
         MI_DRDY : out std_logic
-        );
+    );
 
 end entity;
 
@@ -259,63 +259,65 @@ begin
 
     rx_dma_calypte_g : if (RX_GEN_EN) generate
         rx_dma_calypte_i : entity work.RX_DMA_CALYPTE
-            generic map (
-                DEVICE   => DEVICE,
-                MI_WIDTH => MI_WIDTH,
+        generic map (
+            DEVICE   => DEVICE,
+            MI_WIDTH => MI_WIDTH,
 
-                USER_RX_MFB_REGIONS     => USR_MFB_REGIONS,
-                USER_RX_MFB_REGION_SIZE => USR_MFB_REGION_SIZE,
-                USER_RX_MFB_BLOCK_SIZE  => USR_MFB_BLOCK_SIZE,
-                USER_RX_MFB_ITEM_WIDTH  => USR_MFB_ITEM_WIDTH,
+            USER_RX_MFB_REGIONS     => USR_MFB_REGIONS,
+            USER_RX_MFB_REGION_SIZE => USR_MFB_REGION_SIZE,
+            USER_RX_MFB_BLOCK_SIZE  => USR_MFB_BLOCK_SIZE,
+            USER_RX_MFB_ITEM_WIDTH  => USR_MFB_ITEM_WIDTH,
 
-                PCIE_UP_MFB_REGIONS     => PCIE_RQ_MFB_REGIONS,
-                PCIE_UP_MFB_REGION_SIZE => PCIE_RQ_MFB_REGION_SIZE,
-                PCIE_UP_MFB_BLOCK_SIZE  => PCIE_RQ_MFB_BLOCK_SIZE,
-                PCIE_UP_MFB_ITEM_WIDTH  => PCIE_RQ_MFB_ITEM_WIDTH,
+            PCIE_UP_MFB_REGIONS     => PCIE_RQ_MFB_REGIONS,
+            PCIE_UP_MFB_REGION_SIZE => PCIE_RQ_MFB_REGION_SIZE,
+            PCIE_UP_MFB_BLOCK_SIZE  => PCIE_RQ_MFB_BLOCK_SIZE,
+            PCIE_UP_MFB_ITEM_WIDTH  => PCIE_RQ_MFB_ITEM_WIDTH,
 
-                CHANNELS       => RX_CHANNELS,
-                POINTER_WIDTH  => RX_PTR_WIDTH,
-                SW_ADDR_WIDTH  => 64,
-                CNTRS_WIDTH    => DSP_CNT_WIDTH,
-                HDR_META_WIDTH => HDR_META_WIDTH,
-                PKT_SIZE_MAX   => USR_RX_PKT_SIZE_MAX,
-                TRBUF_REG_EN   => TRBUF_REG_EN,
-                PERF_CNTR_EN   => PERF_CNTR_EN)
+            CHANNELS       => RX_CHANNELS,
+            POINTER_WIDTH  => RX_PTR_WIDTH,
+            SW_ADDR_WIDTH  => 64,
+            CNTRS_WIDTH    => DSP_CNT_WIDTH,
+            HDR_META_WIDTH => HDR_META_WIDTH,
+            PKT_SIZE_MAX   => USR_RX_PKT_SIZE_MAX,
+            TRBUF_REG_EN   => TRBUF_REG_EN,
+            PERF_CNTR_EN   => PERF_CNTR_EN
+        )
 
-            port map (
-                CLK   => CLK,
-                RESET => RESET,
+        port map (
+            CLK   => CLK,
+            RESET => RESET,
 
-                MI_ADDR => mi_split_addr(0),
-                MI_DWR  => mi_split_dwr(0),
-                MI_BE   => mi_split_be(0),
-                MI_RD   => mi_split_rd(0),
-                MI_WR   => mi_split_wr(0),
-                MI_DRD  => mi_split_drd(0),
-                MI_ARDY => mi_split_ardy(0),
-                MI_DRDY => mi_split_drdy(0),
+            MI_ADDR => mi_split_addr(0),
+            MI_DWR  => mi_split_dwr(0),
+            MI_BE   => mi_split_be(0),
+            MI_RD   => mi_split_rd(0),
+            MI_WR   => mi_split_wr(0),
+            MI_DRD  => mi_split_drd(0),
+            MI_ARDY => mi_split_ardy(0),
+            MI_DRDY => mi_split_drdy(0),
 
-                USER_RX_MFB_META_HDR_META => USR_RX_MFB_META_HDR_META,
-                USER_RX_MFB_META_CHAN     => USR_RX_MFB_META_CHAN,
+            USER_RX_MFB_META_HDR_META => USR_RX_MFB_META_HDR_META,
+            USER_RX_MFB_META_CHAN     => USR_RX_MFB_META_CHAN,
 
-                USER_RX_MFB_DATA    => USR_RX_MFB_DATA,
-                USER_RX_MFB_SOF     => USR_RX_MFB_SOF,
-                USER_RX_MFB_EOF     => USR_RX_MFB_EOF,
-                USER_RX_MFB_SOF_POS => USR_RX_MFB_SOF_POS,
-                USER_RX_MFB_EOF_POS => USR_RX_MFB_EOF_POS,
-                USER_RX_MFB_SRC_RDY => USR_RX_MFB_SRC_RDY,
-                USER_RX_MFB_DST_RDY => USR_RX_MFB_DST_RDY,
+            USER_RX_MFB_DATA    => USR_RX_MFB_DATA,
+            USER_RX_MFB_SOF     => USR_RX_MFB_SOF,
+            USER_RX_MFB_EOF     => USR_RX_MFB_EOF,
+            USER_RX_MFB_SOF_POS => USR_RX_MFB_SOF_POS,
+            USER_RX_MFB_EOF_POS => USR_RX_MFB_EOF_POS,
+            USER_RX_MFB_SRC_RDY => USR_RX_MFB_SRC_RDY,
+            USER_RX_MFB_DST_RDY => USR_RX_MFB_DST_RDY,
 
-                PCIE_UP_MFB_DATA    => PCIE_RQ_MFB_DATA,
-                PCIE_UP_MFB_META    => PCIE_RQ_MFB_META,
-                PCIE_UP_MFB_SOF     => PCIE_RQ_MFB_SOF,
-                PCIE_UP_MFB_EOF     => PCIE_RQ_MFB_EOF,
-                PCIE_UP_MFB_SOF_POS => PCIE_RQ_MFB_SOF_POS,
-                PCIE_UP_MFB_EOF_POS => PCIE_RQ_MFB_EOF_POS,
-                PCIE_UP_MFB_SRC_RDY => PCIE_RQ_MFB_SRC_RDY,
-                PCIE_UP_MFB_DST_RDY => PCIE_RQ_MFB_DST_RDY);
+            PCIE_UP_MFB_DATA    => PCIE_RQ_MFB_DATA,
+            PCIE_UP_MFB_META    => PCIE_RQ_MFB_META,
+            PCIE_UP_MFB_SOF     => PCIE_RQ_MFB_SOF,
+            PCIE_UP_MFB_EOF     => PCIE_RQ_MFB_EOF,
+            PCIE_UP_MFB_SOF_POS => PCIE_RQ_MFB_SOF_POS,
+            PCIE_UP_MFB_EOF_POS => PCIE_RQ_MFB_EOF_POS,
+            PCIE_UP_MFB_SRC_RDY => PCIE_RQ_MFB_SRC_RDY,
+            PCIE_UP_MFB_DST_RDY => PCIE_RQ_MFB_DST_RDY
+        );
     else generate
-        mi_split_drd(0)  <= x"DEAD_BEAD";
+        mi_split_drd(0)  <= X"DEAD_BEAD";
         mi_split_ardy(0) <= mi_split_rd(0) or mi_split_wr(0);
         mi_split_drdy(0) <= mi_split_rd(0);
 
@@ -332,65 +334,67 @@ begin
     tx_dma_calypte_g : if (TX_GEN_EN) generate
     begin
         tx_dma_calypte_i : entity work.TX_DMA_CALYPTE
-            generic map (
-                DEVICE   => DEVICE,
-                MI_WIDTH => MI_WIDTH,
+        generic map (
+            DEVICE   => DEVICE,
+            MI_WIDTH => MI_WIDTH,
 
-                USR_TX_MFB_REGIONS     => USR_MFB_REGIONS,
-                USR_TX_MFB_REGION_SIZE => USR_MFB_REGION_SIZE,
-                USR_TX_MFB_BLOCK_SIZE  => USR_MFB_BLOCK_SIZE,
-                USR_TX_MFB_ITEM_WIDTH  => USR_MFB_ITEM_WIDTH,
+            USR_TX_MFB_REGIONS     => USR_MFB_REGIONS,
+            USR_TX_MFB_REGION_SIZE => USR_MFB_REGION_SIZE,
+            USR_TX_MFB_BLOCK_SIZE  => USR_MFB_BLOCK_SIZE,
+            USR_TX_MFB_ITEM_WIDTH  => USR_MFB_ITEM_WIDTH,
 
-                PCIE_CQ_MFB_REGIONS     => PCIE_CQ_MFB_REGIONS,
-                PCIE_CQ_MFB_REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
-                PCIE_CQ_MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
-                PCIE_CQ_MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
+            PCIE_CQ_MFB_REGIONS     => PCIE_CQ_MFB_REGIONS,
+            PCIE_CQ_MFB_REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
+            PCIE_CQ_MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
+            PCIE_CQ_MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
 
-                POINTER_WIDTH      => TX_PTR_WIDTH,
-                CHANNELS           => TX_CHANNELS,
-                CNTRS_WIDTH        => DSP_CNT_WIDTH,
-                HDR_META_WIDTH     => HDR_META_WIDTH,
-                ST_SP_DBG_SIGNAL_W => ST_SP_DBG_SIGNAL_W,
-                PKT_SIZE_MAX       => USR_TX_PKT_SIZE_MAX)
-            port map (
-                CLK   => CLK,
-                RESET => RESET,
+            POINTER_WIDTH      => TX_PTR_WIDTH,
+            CHANNELS           => TX_CHANNELS,
+            CNTRS_WIDTH        => DSP_CNT_WIDTH,
+            HDR_META_WIDTH     => HDR_META_WIDTH,
+            ST_SP_DBG_SIGNAL_W => ST_SP_DBG_SIGNAL_W,
+            PKT_SIZE_MAX       => USR_TX_PKT_SIZE_MAX
+        )
+        port map (
+            CLK   => CLK,
+            RESET => RESET,
 
-                USR_TX_MFB_META_PKT_SIZE => USR_TX_MFB_META_PKT_SIZE,
-                USR_TX_MFB_META_CHAN     => USR_TX_MFB_META_CHAN,
-                USR_TX_MFB_META_HDR_META => USR_TX_MFB_META_HDR_META,
+            USR_TX_MFB_META_PKT_SIZE => USR_TX_MFB_META_PKT_SIZE,
+            USR_TX_MFB_META_CHAN     => USR_TX_MFB_META_CHAN,
+            USR_TX_MFB_META_HDR_META => USR_TX_MFB_META_HDR_META,
 
-                USR_TX_MFB_DATA    => USR_TX_MFB_DATA,
-                USR_TX_MFB_SOF     => USR_TX_MFB_SOF,
-                USR_TX_MFB_EOF     => USR_TX_MFB_EOF,
-                USR_TX_MFB_SOF_POS => USR_TX_MFB_SOF_POS,
-                USR_TX_MFB_EOF_POS => USR_TX_MFB_EOF_POS,
-                USR_TX_MFB_SRC_RDY => USR_TX_MFB_SRC_RDY,
-                USR_TX_MFB_DST_RDY => USR_TX_MFB_DST_RDY,
+            USR_TX_MFB_DATA    => USR_TX_MFB_DATA,
+            USR_TX_MFB_SOF     => USR_TX_MFB_SOF,
+            USR_TX_MFB_EOF     => USR_TX_MFB_EOF,
+            USR_TX_MFB_SOF_POS => USR_TX_MFB_SOF_POS,
+            USR_TX_MFB_EOF_POS => USR_TX_MFB_EOF_POS,
+            USR_TX_MFB_SRC_RDY => USR_TX_MFB_SRC_RDY,
+            USR_TX_MFB_DST_RDY => USR_TX_MFB_DST_RDY,
 
-                PCIE_CQ_MFB_DATA    => PCIE_CQ_MFB_DATA,
-                PCIE_CQ_MFB_META    => PCIE_CQ_MFB_META,
-                PCIE_CQ_MFB_SOF     => PCIE_CQ_MFB_SOF,
-                PCIE_CQ_MFB_EOF     => PCIE_CQ_MFB_EOF,
-                PCIE_CQ_MFB_SOF_POS => PCIE_CQ_MFB_SOF_POS,
-                PCIE_CQ_MFB_EOF_POS => PCIE_CQ_MFB_EOF_POS,
-                PCIE_CQ_MFB_SRC_RDY => PCIE_CQ_MFB_SRC_RDY,
-                PCIE_CQ_MFB_DST_RDY => PCIE_CQ_MFB_DST_RDY,
+            PCIE_CQ_MFB_DATA    => PCIE_CQ_MFB_DATA,
+            PCIE_CQ_MFB_META    => PCIE_CQ_MFB_META,
+            PCIE_CQ_MFB_SOF     => PCIE_CQ_MFB_SOF,
+            PCIE_CQ_MFB_EOF     => PCIE_CQ_MFB_EOF,
+            PCIE_CQ_MFB_SOF_POS => PCIE_CQ_MFB_SOF_POS,
+            PCIE_CQ_MFB_EOF_POS => PCIE_CQ_MFB_EOF_POS,
+            PCIE_CQ_MFB_SRC_RDY => PCIE_CQ_MFB_SRC_RDY,
+            PCIE_CQ_MFB_DST_RDY => PCIE_CQ_MFB_DST_RDY,
 
-                ST_SP_DBG_CHAN => ST_SP_DBG_CHAN,
-                ST_SP_DBG_META => ST_SP_DBG_META,
+            ST_SP_DBG_CHAN => ST_SP_DBG_CHAN,
+            ST_SP_DBG_META => ST_SP_DBG_META,
 
-                MI_ADDR => mi_split_addr(1),
-                MI_DWR  => mi_split_dwr(1),
-                MI_BE   => mi_split_be(1),
-                MI_RD   => mi_split_rd(1),
-                MI_WR   => mi_split_wr(1),
-                MI_DRD  => mi_split_drd(1),
-                MI_ARDY => mi_split_ardy(1),
-                MI_DRDY => mi_split_drdy(1));
+            MI_ADDR => mi_split_addr(1),
+            MI_DWR  => mi_split_dwr(1),
+            MI_BE   => mi_split_be(1),
+            MI_RD   => mi_split_rd(1),
+            MI_WR   => mi_split_wr(1),
+            MI_DRD  => mi_split_drd(1),
+            MI_ARDY => mi_split_ardy(1),
+            MI_DRDY => mi_split_drdy(1)
+        );
 
     else generate
-        mi_split_drd(1) <= x"DEAD_BEAD";
+        mi_split_drd(1)  <= X"DEAD_BEAD";
         mi_split_ardy(1) <= mi_split_rd(1) or mi_split_wr(1);
         mi_split_drdy(1) <= mi_split_rd(1);
 
@@ -412,39 +416,41 @@ begin
     end generate;
 
     mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
-        generic map (
-            ADDR_WIDTH => MI_WIDTH,
-            DATA_WIDTH => MI_WIDTH,
-            META_WIDTH => 0,
-            PORTS      => 2,
-            PIPE_OUT   => (others => FALSE),
+    generic map (
+        ADDR_WIDTH => MI_WIDTH,
+        DATA_WIDTH => MI_WIDTH,
+        META_WIDTH => 0,
+        PORTS      => 2,
+        PIPE_OUT   => (others => FALSE),
 
-            ADDR_BASES => 2,
-            ADDR_BASE  => MI_SPLIT_BASES,
-            ADDR_MASK  => x"00200000",
+        ADDR_BASES => 2,
+        ADDR_BASE  => MI_SPLIT_BASES,
+        ADDR_MASK  => x"00200000",
 
-            DEVICE => DEVICE)
-        port map (
-            CLK   => CLK,
-            RESET => RESET,
+        DEVICE => DEVICE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            RX_DWR  => MI_DWR,
-            RX_MWR  => (others => '0'),
-            RX_ADDR => MI_ADDR,
-            RX_BE   => MI_BE,
-            RX_RD   => MI_RD,
-            RX_WR   => MI_WR,
-            RX_ARDY => MI_ARDY,
-            RX_DRD  => MI_DRD,
-            RX_DRDY => MI_DRDY,
+        RX_DWR  => MI_DWR,
+        RX_MWR  => (others => '0'),
+        RX_ADDR => MI_ADDR,
+        RX_BE   => MI_BE,
+        RX_RD   => MI_RD,
+        RX_WR   => MI_WR,
+        RX_ARDY => MI_ARDY,
+        RX_DRD  => MI_DRD,
+        RX_DRDY => MI_DRDY,
 
-            TX_DWR  => mi_split_dwr,
-            TX_MWR  => open,
-            TX_ADDR => mi_split_addr,
-            TX_BE   => mi_split_be,
-            TX_RD   => mi_split_rd,
-            TX_WR   => mi_split_wr,
-            TX_ARDY => mi_split_ardy,
-            TX_DRD  => mi_split_drd,
-            TX_DRDY => mi_split_drdy);
+        TX_DWR  => mi_split_dwr,
+        TX_MWR  => open,
+        TX_ADDR => mi_split_addr,
+        TX_BE   => mi_split_be,
+        TX_RD   => mi_split_rd,
+        TX_WR   => mi_split_wr,
+        TX_ARDY => mi_split_ardy,
+        TX_DRD  => mi_split_drd,
+        TX_DRDY => mi_split_drdy
+    );
 end architecture;

@@ -19,26 +19,26 @@ use ieee.std_logic_unsigned.all;
 
 --! \brief Generic first one detector entity.
 entity FIRST_ONE is
-   generic(
-      --! \brief Width of input/output signal. Output address is one-hot encoded
-      --! \details Must be greater than 0.
-      DATA_WIDTH    : integer
-   );
-   port(
-      --! Input data vector
-      DI  : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-      --! Output data vector - one-hot encoded
-      DO  : out std_logic_vector(DATA_WIDTH-1 downto 0)
-   );
+    generic (
+        --! \brief Width of input/output signal. Output address is one-hot encoded
+        --! \details Must be greater than 0.
+        DATA_WIDTH    : integer
+    );
+    port (
+        --! Input data vector
+        DI  : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        --! Output data vector - one-hot encoded
+        DO  : out std_logic_vector(DATA_WIDTH-1 downto 0)
+    );
 end entity;
 
 --! \brief Implementation of generic first one detector.
-architecture full of FIRST_ONE is
+architecture FULL of FIRST_ONE is
 begin
 
-   --! First one detector without priority
-   --! Other implementations possible...
-   DO <= (DI) and ((not DI) + 1);
+    --! First one detector without priority
+    --! Other implementations possible...
+    DO <= (DI) and ((not DI) + 1);
 
 end architecture;
 

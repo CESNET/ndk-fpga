@@ -13,7 +13,7 @@ entity MI_TEST_SPACE is
         -- Supported devices: AGILEX, STRATIX10, ULTRASCALE, 7SERIES
         DEVICE  : string := "ULTRASCALE"
     );
-    port(
+    port (
         CLK     : in  std_logic;
         RESET   : in  std_logic;
         MI_DWR  : in  std_logic_vector(32-1 downto 0);
@@ -44,17 +44,18 @@ architecture FULL of MI_TEST_SPACE is
     attribute ram_style : string; -- for Vivado
     attribute ram_style of bram_xilinx : signal is "block";
     attribute ramstyle  : string; -- for Quartus
-    attribute ramstyle  of bram_intel : signal is "M20K";
+    attribute ramstyle of bram_intel   : signal is "M20K";
 
 begin
 
-    assert (DEVICE = "STRATIX10" OR DEVICE = "AGILEX" OR DEVICE = "ULTRASCALE" OR DEVICE = "7SERIES")
-        report "MI_TEST_SPACE: unsupported device!" severity failure;
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+        report "MI_TEST_SPACE: unsupported device!"
+        severity failure;
 
     MI_ARDY   <= MI_RD or MI_WR;
     bram_addr <= unsigned(MI_ADDR(BRAM_ADDR_WIDTH+2-1 downto 2));
 
-    be_bram_intel_g : if DEVICE = "STRATIX10" OR DEVICE = "AGILEX" generate
+    be_bram_intel_g : if DEVICE = "STRATIX10" or DEVICE = "AGILEX" generate
         bram_intel_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
@@ -76,13 +77,13 @@ begin
             end if;
         end process;
 
-        MI_DRD(8-1 downto 0) <= rd_data(0);
-        MI_DRD(16-1 downto 8) <= rd_data(1);
+        MI_DRD(8-1 downto 0)   <= rd_data(0);
+        MI_DRD(16-1 downto 8)  <= rd_data(1);
         MI_DRD(24-1 downto 16) <= rd_data(2);
         MI_DRD(32-1 downto 24) <= rd_data(3);
     end generate;
 
-    be_bram_xilinx_g : if DEVICE = "ULTRASCALE" OR DEVICE = "7SERIES" generate
+    be_bram_xilinx_g : if DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" generate
         bram_xilinx_p : process (CLK)
         begin
             if (rising_edge(CLK)) then

@@ -56,112 +56,112 @@ use work.type_pack.all;
 -- +----------------+----------------------------------------------------+
 --
 entity MFB_TIMESTAMP_LIMITER is
-generic(
-    -- Number of Regions within a data word, must be power of 2.
-    MFB_REGIONS           : natural := 1;
-    -- Region size (in Blocks).
-    MFB_REGION_SIZE       : natural := 8;
-    -- Block size (in Items), must be 8.
-    MFB_BLOCK_SIZE        : natural := 8;
-    -- Item width (in bits), must be 8.
-    MFB_ITEM_WIDTH        : natural := 8;
-    -- Metadata width (in bits).
-    MFB_META_WIDTH        : natural := 0;
+    generic (
+        -- Number of Regions within a data word, must be power of 2.
+        MFB_REGIONS           : natural := 1;
+        -- Region size (in Blocks).
+        MFB_REGION_SIZE       : natural := 8;
+        -- Block size (in Items), must be 8.
+        MFB_BLOCK_SIZE        : natural := 8;
+        -- Item width (in bits), must be 8.
+        MFB_ITEM_WIDTH        : natural := 8;
+        -- Metadata width (in bits).
+        MFB_META_WIDTH        : natural := 0;
 
-    MI_DATA_WIDTH         : natural := 32;
-    MI_ADDR_WIDTH         : natural := 32;
+        MI_DATA_WIDTH         : natural := 32;
+        MI_ADDR_WIDTH         : natural := 32;
 
-    -- Freq of the CLK signal (in Hz).
-    CLK_FREQUENCY         : natural := 200000000;
-    -- Width of Timestamps (in bits).
-    TIMESTAMP_WIDTH       : natural := 48;
-    -- Format of Timestamps. Options:
-    --
-    -- - ``0`` number of NS between individual packets,
-    -- - ``1`` number of NS from RESET.
-    TIMESTAMP_FORMAT      : natural := 0;
-    -- Select Time source. Options:
-    --
-    -- True - use external source of time (port :vhdl:portsignal:`EXTERNAL_TIME <mfb_timestamp_limiter.external_time>`),
-    -- False (default) - internal "Time Counter" with increment given by CLK_FREQUENCY.
-    EXTERNAL_TIME_SRC     : boolean := False;
-    -- Number of Items in the Packet Delayer's RX FIFO (the main buffer).
-    BUFFER_SIZE           : natural := 2048;
-    -- Almost Full Offset of the main buffer in Packet Delayers.
-    -- Packet Delayers pause the appropriate DMA channel when Almost Full is asserted.
-    BUFFER_AF_OFFSET      : natural := 1000;
-    -- Almost Empty Offset of the main buffer in Packet Delayers.
-    -- Packet Delayers unpause (resume) the appropriate DMA channel when Almost Empty is asserted.
-    BUFFER_AE_OFFSET      : natural := 1000;
-    -- The number of Queues (DMA Channels).
-    QUEUES                : natural := 1;
-    -- The number of selected Queues (DMA Channels) for timestamp limiting.
-    -- The range is from 0 to SELECTED_QUEUES-1.
-    -- Timestamps in other Queues are ignored as packets pass through FIFOs instead of Packet Delayers.
-    SELECTED_QUEUES       : natural := QUEUES;
+        -- Freq of the CLK signal (in Hz).
+        CLK_FREQUENCY         : natural := 200000000;
+        -- Width of Timestamps (in bits).
+        TIMESTAMP_WIDTH       : natural := 48;
+        -- Format of Timestamps. Options:
+        --
+        -- - ``0`` number of NS between individual packets,
+        -- - ``1`` number of NS from RESET.
+        TIMESTAMP_FORMAT      : natural := 0;
+        -- Select Time source. Options:
+        --
+        -- True - use external source of time (port :vhdl:portsignal:`EXTERNAL_TIME <mfb_timestamp_limiter.external_time>`),
+        -- False (default) - internal "Time Counter" with increment given by CLK_FREQUENCY.
+        EXTERNAL_TIME_SRC     : boolean := False;
+        -- Number of Items in the Packet Delayer's RX FIFO (the main buffer).
+        BUFFER_SIZE           : natural := 2048;
+        -- Almost Full Offset of the main buffer in Packet Delayers.
+        -- Packet Delayers pause the appropriate DMA channel when Almost Full is asserted.
+        BUFFER_AF_OFFSET      : natural := 1000;
+        -- Almost Empty Offset of the main buffer in Packet Delayers.
+        -- Packet Delayers unpause (resume) the appropriate DMA channel when Almost Empty is asserted.
+        BUFFER_AE_OFFSET      : natural := 1000;
+        -- The number of Queues (DMA Channels).
+        QUEUES                : natural := 1;
+        -- The number of selected Queues (DMA Channels) for timestamp limiting.
+        -- The range is from 0 to SELECTED_QUEUES-1.
+        -- Timestamps in other Queues are ignored as packets pass through FIFOs instead of Packet Delayers.
+        SELECTED_QUEUES       : natural := QUEUES;
 
-    -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
-    DEVICE                : string := "STRATIX10"
-);
-port(
-    -- =====================================================================
-    --  Clock and Reset
-    -- =====================================================================
+        -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
+        DEVICE                : string := "STRATIX10"
+    );
+    port (
+        -- =====================================================================
+        --  Clock and Reset
+        -- =====================================================================
 
-    CLK              : in  std_logic;
-    RESET            : in  std_logic;
+        CLK              : in  std_logic;
+        RESET            : in  std_logic;
 
-    -- Connect your own Time source to this port (used when the :vhdl:genconstant:`EXTERNAL_TIME_SRC <mfb_timestamp_limiter.external_time_src>` generic is ``True``).
-    EXTERNAL_TIME    : in  std_logic_vector(64-1 downto 0);
+        -- Connect your own Time source to this port (used when the :vhdl:genconstant:`EXTERNAL_TIME_SRC <mfb_timestamp_limiter.external_time_src>` generic is ``True``).
+        EXTERNAL_TIME    : in  std_logic_vector(64-1 downto 0);
 
-    -- Issues a request to pause corresponding DMA channel.
-    PAUSE_QUEUE      : out std_logic_vector(QUEUES-1 downto 0);
+        -- Issues a request to pause corresponding DMA channel.
+        PAUSE_QUEUE      : out std_logic_vector(QUEUES-1 downto 0);
 
-    -- =====================================================================
-    --  RX MFB STREAM
-    -- =====================================================================
+        -- =====================================================================
+        --  RX MFB STREAM
+        -- =====================================================================
 
-    RX_MFB_DATA      : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- Valid with SOF.
-    RX_MFB_META      : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
-    -- ID of the packet's DMA channel or queue.
-    RX_MFB_QUEUE     : in  std_logic_vector(MFB_REGIONS*max(1,log2(QUEUES))-1 downto 0) := (others => '0');
-    -- Timestamps are valid with each SOF.
-    RX_MFB_TIMESTAMP : in  std_logic_vector(MFB_REGIONS*TIMESTAMP_WIDTH-1 downto 0) := (others => '0');
-    RX_MFB_SOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SRC_RDY   : in  std_logic;
-    RX_MFB_DST_RDY   : out std_logic;
+        RX_MFB_DATA      : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- Valid with SOF.
+        RX_MFB_META      : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
+        -- ID of the packet's DMA channel or queue.
+        RX_MFB_QUEUE     : in  std_logic_vector(MFB_REGIONS*max(1,log2(QUEUES))-1 downto 0) := (others => '0');
+        -- Timestamps are valid with each SOF.
+        RX_MFB_TIMESTAMP : in  std_logic_vector(MFB_REGIONS*TIMESTAMP_WIDTH-1 downto 0) := (others => '0');
+        RX_MFB_SOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SRC_RDY   : in  std_logic;
+        RX_MFB_DST_RDY   : out std_logic;
 
-    -- =====================================================================
-    --  TX MFB STREAM
-    -- =====================================================================
+        -- =====================================================================
+        --  TX MFB STREAM
+        -- =====================================================================
 
-    TX_MFB_DATA      : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- Valid with SOF.
-    TX_MFB_META      : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
-    TX_MFB_SOF_POS   : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    TX_MFB_EOF_POS   : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    TX_MFB_SOF       : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_EOF       : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_SRC_RDY   : out std_logic;
-    TX_MFB_DST_RDY   : in  std_logic;
+        TX_MFB_DATA      : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- Valid with SOF.
+        TX_MFB_META      : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
+        TX_MFB_SOF_POS   : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        TX_MFB_EOF_POS   : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        TX_MFB_SOF       : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_EOF       : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_SRC_RDY   : out std_logic;
+        TX_MFB_DST_RDY   : in  std_logic;
 
-    -- =====================================================================
-    --  MI INTERFACE
-    -- =====================================================================
+        -- =====================================================================
+        --  MI INTERFACE
+        -- =====================================================================
 
-    MI_DWR     : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_ADDR    : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
-    MI_BE      : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0); -- Not supported!
-    MI_WR      : in  std_logic;
-    MI_RD      : in  std_logic;
-    MI_ARDY    : out std_logic;
-    MI_DRD     : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_DRDY    : out std_logic
-);
+        MI_DWR     : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_ADDR    : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
+        MI_BE      : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0); -- Not supported!
+        MI_WR      : in  std_logic;
+        MI_RD      : in  std_logic;
+        MI_ARDY    : out std_logic;
+        MI_DRD     : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_DRDY    : out std_logic
+    );
 end entity;
 
 architecture FULL of MFB_TIMESTAMP_LIMITER is
@@ -214,8 +214,8 @@ architecture FULL of MFB_TIMESTAMP_LIMITER is
 
     signal pd_time_reset        : std_logic_vector(QUEUES-1 downto 0);
 
-    signal RX_MFB_TIMESTAMP_adj : std_logic_vector(MFB_REGIONS*TIMESTAMP_WIDTH-1 downto 0);
-    signal RX_MFB_QUEUE_adj     : std_logic_vector(MFB_REGIONS*max(1,log2(QUEUES))-1 downto 0);
+    signal rx_mfb_timestamp_adj : std_logic_vector(MFB_REGIONS*TIMESTAMP_WIDTH-1 downto 0);
+    signal rx_mfb_queue_adj     : std_logic_vector(MFB_REGIONS*max(1,log2(QUEUES))-1 downto 0);
 
     signal time_cnt             : std_logic_vector(64-1 downto 0);
     signal input_time           : std_logic_vector(64-1 downto 0);
@@ -304,7 +304,7 @@ begin
             if (time_reset_reg_wr = '1') then
                 time_reset_reg <= MI_DWR(0);
             end if;
-            if (RESET = '1') or (time_reset_edge = '1') then
+            if ((RESET = '1') or (time_reset_edge = '1')) then
                 time_reset_reg <= '0';
             end if;
         end if;
@@ -339,7 +339,7 @@ begin
     -- ------------------
     -- Detect rising edge of the time_reset_reg signal.
     edge_detect_i : entity work.EDGE_DETECT
-    port map(
+    port map (
         CLK  => CLK,
         DI   => time_reset_reg,
         EDGE => time_reset_edge
@@ -347,10 +347,10 @@ begin
 
     -- Use the detected edge to extend the reset pulse.
     pulse_extend_i : entity work.PULSE_EXTEND
-    generic map(
+    generic map (
         N => 5
     )
-    port map(
+    port map (
         RST => RESET,
         CLK => CLK,
         I   => time_reset_edge,
@@ -363,8 +363,8 @@ begin
     -- ----------------------
     --  Top speed activation
     -- ----------------------
-    RX_MFB_TIMESTAMP_adj <= (others => '0') when (top_speed_reg = '1') else RX_MFB_TIMESTAMP;
-    RX_MFB_QUEUE_adj     <= (others => '0') when (top_speed_reg = '1') else RX_MFB_QUEUE;
+    rx_mfb_timestamp_adj <= (others => '0') when (top_speed_reg = '1') else RX_MFB_TIMESTAMP;
+    rx_mfb_queue_adj     <= (others => '0') when (top_speed_reg = '1') else RX_MFB_QUEUE;
 
     -- ========================================================================
     -- Time counter
@@ -401,8 +401,8 @@ begin
     -- Input MFB Splitter
     -- ========================================================================
 
-    rx_mfb_meta_arr <= slv_array_deser(RX_MFB_META         , MFB_REGIONS);
-    rx_mfb_ts_arr   <= slv_array_deser(RX_MFB_TIMESTAMP_adj, MFB_REGIONS);
+    rx_mfb_meta_arr <= slv_array_deser(RX_MFB_META, MFB_REGIONS);
+    rx_mfb_ts_arr   <= slv_array_deser(rx_mfb_timestamp_adj, MFB_REGIONS);
 
     rx_splitter_g : for r in 0 to MFB_REGIONS-1 generate
         rx_mfb_comb_meta_arr(r) <= rx_mfb_meta_arr(r) & rx_mfb_ts_arr(r);
@@ -411,35 +411,35 @@ begin
     rx_mfb_comb_meta <= slv_array_ser(rx_mfb_comb_meta_arr);
 
     mfb_splitter_tree_i : entity work.MFB_SPLITTER_SIMPLE_GEN
-    generic map(
-        SPLITTER_OUTPUTS => QUEUES         ,
-        REGIONS          => MFB_REGIONS    ,
+    generic map (
+        SPLITTER_OUTPUTS => QUEUES,
+        REGIONS          => MFB_REGIONS,
         REGION_SIZE      => MFB_REGION_SIZE,
-        BLOCK_SIZE       => MFB_BLOCK_SIZE ,
-        ITEM_WIDTH       => MFB_ITEM_WIDTH ,
+        BLOCK_SIZE       => MFB_BLOCK_SIZE,
+        ITEM_WIDTH       => MFB_ITEM_WIDTH,
         META_WIDTH       => MFB_META_COMB_WIDTH
     )
-    port map(
+    port map (
         CLK             => CLK,
         RESET           => RESET,
 
-        RX_MFB_SEL      => RX_MFB_QUEUE_adj,
-        RX_MFB_DATA     => RX_MFB_DATA     ,
+        RX_MFB_SEL      => rx_mfb_queue_adj,
+        RX_MFB_DATA     => RX_MFB_DATA,
         RX_MFB_META     => rx_mfb_comb_meta,
-        RX_MFB_SOF      => RX_MFB_SOF      ,
-        RX_MFB_EOF      => RX_MFB_EOF      ,
-        RX_MFB_SOF_POS  => RX_MFB_SOF_POS  ,
-        RX_MFB_EOF_POS  => RX_MFB_EOF_POS  ,
-        RX_MFB_SRC_RDY  => RX_MFB_SRC_RDY  ,
-        RX_MFB_DST_RDY  => RX_MFB_DST_RDY  ,
+        RX_MFB_SOF      => RX_MFB_SOF,
+        RX_MFB_EOF      => RX_MFB_EOF,
+        RX_MFB_SOF_POS  => RX_MFB_SOF_POS,
+        RX_MFB_EOF_POS  => RX_MFB_EOF_POS,
+        RX_MFB_SRC_RDY  => RX_MFB_SRC_RDY,
+        RX_MFB_DST_RDY  => RX_MFB_DST_RDY,
 
-        TX_MFB_DATA     => rx_pd_data      ,
-        TX_MFB_META     => rx_pd_comb_meta ,
-        TX_MFB_SOF      => rx_pd_sof       ,
-        TX_MFB_EOF      => rx_pd_eof       ,
-        TX_MFB_SOF_POS  => rx_pd_sof_pos   ,
-        TX_MFB_EOF_POS  => rx_pd_eof_pos   ,
-        TX_MFB_SRC_RDY  => rx_pd_src_rdy   ,
+        TX_MFB_DATA     => rx_pd_data,
+        TX_MFB_META     => rx_pd_comb_meta,
+        TX_MFB_SOF      => rx_pd_sof,
+        TX_MFB_EOF      => rx_pd_eof,
+        TX_MFB_SOF_POS  => rx_pd_sof_pos,
+        TX_MFB_EOF_POS  => rx_pd_eof_pos,
+        TX_MFB_SRC_RDY  => rx_pd_src_rdy,
         TX_MFB_DST_RDY  => rx_pd_dst_rdy
     );
 
@@ -461,26 +461,26 @@ begin
         selected_queues_g : if q <= SELECTED_QUEUES generate
 
             packet_delayer_i : entity work.MFB_PACKET_DELAYER
-            generic map(
-                MFB_REGIONS     => MFB_REGIONS     ,
-                MFB_REGION_SIZE => MFB_REGION_SIZE ,
-                MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE  ,
-                MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH  ,
-                MFB_META_WIDTH  => MFB_META_WIDTH  ,
+            generic map (
+                MFB_REGIONS     => MFB_REGIONS,
+                MFB_REGION_SIZE => MFB_REGION_SIZE,
+                MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+                MFB_META_WIDTH  => MFB_META_WIDTH,
 
-                TS_WIDTH        => TIMESTAMP_WIDTH ,
+                TS_WIDTH        => TIMESTAMP_WIDTH,
                 TS_FORMAT       => TIMESTAMP_FORMAT,
-                FIFO_DEPTH      => BUFFER_SIZE     ,
+                FIFO_DEPTH      => BUFFER_SIZE,
                 FIFO_AF_OFFSET  => BUFFER_AF_OFFSET,
                 FIFO_AE_OFFSET  => BUFFER_AE_OFFSET,
                 DEVICE          => DEVICE
             )
-            port map(
+            port map (
                 CLK   => CLK,
                 RESET => RESET,
 
                 TIME_RESET     => pd_time_reset(q),
-                CURRENT_TIME   => input_time      ,
+                CURRENT_TIME   => input_time,
                 PAUSE_REQUEST  => PAUSE_QUEUE  (q),
 
                 RX_MFB_DATA    => rx_pd_data   (q),
@@ -507,19 +507,19 @@ begin
 
             PAUSE_QUEUE(q) <= '0';
             mfb_fifox_i : entity work.MFB_FIFOX
-            generic map(
-                REGIONS             => MFB_REGIONS    ,
+            generic map (
+                REGIONS             => MFB_REGIONS,
                 REGION_SIZE         => MFB_REGION_SIZE,
-                BLOCK_SIZE          => MFB_BLOCK_SIZE ,
-                ITEM_WIDTH          => MFB_ITEM_WIDTH ,
-                META_WIDTH          => MFB_META_WIDTH ,
-                FIFO_DEPTH          => 256            ,
-                RAM_TYPE            => "AUTO"         ,
-                DEVICE              => DEVICE         ,
-                ALMOST_FULL_OFFSET  => 0              ,
+                BLOCK_SIZE          => MFB_BLOCK_SIZE,
+                ITEM_WIDTH          => MFB_ITEM_WIDTH,
+                META_WIDTH          => MFB_META_WIDTH,
+                FIFO_DEPTH          => 256,
+                RAM_TYPE            => "AUTO",
+                DEVICE              => DEVICE,
+                ALMOST_FULL_OFFSET  => 0,
                 ALMOST_EMPTY_OFFSET => 0
             )
-            port map(
+            port map (
                 CLK => CLK,
                 RST => RESET,
 
@@ -541,8 +541,8 @@ begin
                 TX_SRC_RDY  => tx_pd_src_rdy(q),
                 TX_DST_RDY  => tx_pd_dst_rdy(q),
 
-                FIFO_STATUS => open            ,
-                FIFO_AFULL  => open            ,
+                FIFO_STATUS => open,
+                FIFO_AFULL  => open,
                 FIFO_AEMPTY => open
             );
 
@@ -555,33 +555,33 @@ begin
     -- ========================================================================
 
     mfb_merger_tree_i : entity work.MFB_MERGER_SIMPLE_GEN
-    generic map(
-        MERGER_INPUTS   => QUEUES         ,
-        MFB_REGIONS     => MFB_REGIONS    ,
+    generic map (
+        MERGER_INPUTS   => QUEUES,
+        MFB_REGIONS     => MFB_REGIONS,
         MFB_REGION_SIZE => MFB_REGION_SIZE,
-        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE ,
-        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH ,
-        MFB_META_WIDTH  => MFB_META_WIDTH ,
-        MASKING_EN      => True           ,
+        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+        MFB_META_WIDTH  => MFB_META_WIDTH,
+        MASKING_EN      => True,
         CNT_MAX         => 64
     )
-    port map(
+    port map (
         CLK             => CLK,
         RST             => RESET,
 
-        RX_MFB_DATA     => tx_pd_data    ,
-        RX_MFB_META     => tx_pd_meta    ,
-        RX_MFB_SOF      => tx_pd_sof     ,
-        RX_MFB_EOF      => tx_pd_eof     ,
-        RX_MFB_SOF_POS  => tx_pd_sof_pos ,
-        RX_MFB_EOF_POS  => tx_pd_eof_pos ,
-        RX_MFB_SRC_RDY  => tx_pd_src_rdy ,
-        RX_MFB_DST_RDY  => tx_pd_dst_rdy ,
+        RX_MFB_DATA     => tx_pd_data,
+        RX_MFB_META     => tx_pd_meta,
+        RX_MFB_SOF      => tx_pd_sof,
+        RX_MFB_EOF      => tx_pd_eof,
+        RX_MFB_SOF_POS  => tx_pd_sof_pos,
+        RX_MFB_EOF_POS  => tx_pd_eof_pos,
+        RX_MFB_SRC_RDY  => tx_pd_src_rdy,
+        RX_MFB_DST_RDY  => tx_pd_dst_rdy,
 
-        TX_MFB_DATA     => TX_MFB_DATA   ,
-        TX_MFB_META     => TX_MFB_META   ,
-        TX_MFB_SOF      => TX_MFB_SOF    ,
-        TX_MFB_EOF      => TX_MFB_EOF    ,
+        TX_MFB_DATA     => TX_MFB_DATA,
+        TX_MFB_META     => TX_MFB_META,
+        TX_MFB_SOF      => TX_MFB_SOF,
+        TX_MFB_EOF      => TX_MFB_EOF,
         TX_MFB_SOF_POS  => TX_MFB_SOF_POS,
         TX_MFB_EOF_POS  => TX_MFB_EOF_POS,
         TX_MFB_SRC_RDY  => TX_MFB_SRC_RDY,

@@ -20,7 +20,7 @@ use work.math_pack.all;
 -- For more information about ASFIFOX see the :ref:`documentation<asfifox>`
 --
 entity MFB_ASFIFOX is
-    generic(
+    generic (
         -- ==================
         -- MFB parameters
         -- ==================
@@ -44,25 +44,25 @@ entity MFB_ASFIFOX is
         -- Select memory implementation. Options:
         -- "LUT"  - effective for shallow FIFO (approx. ITEMS <= 64),
         -- "BRAM" - effective for deep FIFO (approx. ITEMS > 64).
-        RAM_TYPE            : string  := "BRAM";
+        RAM_TYPE                 : string  := "BRAM";
         -- First Word Fall Through mode. If FWFT_MODE=True, valid data will be
         -- ready at the ASFIFOX output without RD_EN requests.
-        FWFT_MODE           : boolean := True;
+        FWFT_MODE                : boolean := True;
         -- Enabled output registers allow better timing for a few flip-flops.
-        OUTPUT_REG          : boolean := True;
+        OUTPUT_REG               : boolean := True;
         -- Width of Metadata
-        METADATA_WIDTH      : natural := 0;
+        METADATA_WIDTH           : natural := 0;
         -- The DEVICE parameter is ignored in the current component version.
         -- It can be used in the future.
-        DEVICE              : string  := "ULTRASCALE";
+        DEVICE                   : string  := "ULTRASCALE";
         -- Sets the maximum number of remaining free data words in the ASFIFOX
         -- that triggers the WR_AFULL signal.
-        ALMOST_FULL_OFFSET  : natural := FIFO_ITEMS/2;
+        ALMOST_FULL_OFFSET       : natural := FIFO_ITEMS/2;
         -- Sets the maximum number of data words stored in the ASFIFOX that
         -- triggers the RD_AEMPTY signal.
-        ALMOST_EMPTY_OFFSET : natural := FIFO_ITEMS/2
+        ALMOST_EMPTY_OFFSET      : natural := FIFO_ITEMS/2
     );
-    port(
+    port (
         -- ==================
         -- RX MFB interface
         --
@@ -107,13 +107,13 @@ end entity;
 
 
 
-architecture full of MFB_ASFIFOX is
+architecture FULL of MFB_ASFIFOX is
 
     constant WORD_WIDTH        : integer := MFB_REGIONS * MFB_REG_SIZE * MFB_BLOCK_SIZE * MFB_ITEM_WIDTH;
     constant META_WIDTH        : integer := MFB_REGIONS * METADATA_WIDTH;
     constant SOF_POS_WIDTH     : integer := MFB_REGIONS * max(1,log2(MFB_REG_SIZE));
     constant EOF_POS_WIDTH     : integer := MFB_REGIONS * max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE));
-    constant DW : integer := WORD_WIDTH + META_WIDTH + SOF_POS_WIDTH + EOF_POS_WIDTH + MFB_REGIONS + MFB_REGIONS;
+    constant DW                : integer := WORD_WIDTH + META_WIDTH + SOF_POS_WIDTH + EOF_POS_WIDTH + MFB_REGIONS + MFB_REGIONS;
 
     subtype DW_DATA          is natural range WORD_WIDTH+META_WIDTH+SOF_POS_WIDTH+EOF_POS_WIDTH+MFB_REGIONS+MFB_REGIONS-1 downto META_WIDTH+SOF_POS_WIDTH+EOF_POS_WIDTH+MFB_REGIONS+MFB_REGIONS;
     subtype DW_META          is natural range META_WIDTH+SOF_POS_WIDTH+EOF_POS_WIDTH+MFB_REGIONS+MFB_REGIONS-1 downto SOF_POS_WIDTH+EOF_POS_WIDTH+MFB_REGIONS+MFB_REGIONS;
@@ -122,48 +122,50 @@ architecture full of MFB_ASFIFOX is
     subtype DW_SOF           is natural range MFB_REGIONS+MFB_REGIONS-1 downto MFB_REGIONS;
     subtype DW_EOF           is natural range MFB_REGIONS-1 downto 0;
 
-    signal di, do : std_logic_vector(DW-1 downto 0);
-    signal full, empty : std_logic;
+    signal di    : std_logic_vector(DW-1 downto 0);
+    signal do    : std_logic_vector(DW-1 downto 0);
+    signal full  : std_logic;
+    signal empty : std_logic;
 
 begin
 
     fifo_core : entity work.ASFIFOX
     generic map (
-        DATA_WIDTH          => DW                 ,
-        ITEMS               => FIFO_ITEMS         ,
-        RAM_TYPE            => RAM_TYPE           ,
-        FWFT_MODE           => FWFT_MODE          ,
-        OUTPUT_REG          => OUTPUT_REG         ,
-        DEVICE              => DEVICE             ,
-        ALMOST_FULL_OFFSET  => ALMOST_FULL_OFFSET ,
+        DATA_WIDTH          => DW,
+        ITEMS               => FIFO_ITEMS,
+        RAM_TYPE            => RAM_TYPE,
+        FWFT_MODE           => FWFT_MODE,
+        OUTPUT_REG          => OUTPUT_REG,
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => ALMOST_FULL_OFFSET,
         ALMOST_EMPTY_OFFSET => ALMOST_EMPTY_OFFSET
     ) port map (
-        WR_CLK    => RX_CLK    ,
-        WR_RST    => RX_RESET  ,
+        WR_CLK    => RX_CLK,
+        WR_RST    => RX_RESET,
 
-        WR_DATA   => di        ,
+        WR_DATA   => di,
         WR_EN     => RX_SRC_RDY,
-        WR_FULL   => full      ,
-        WR_AFULL  => RX_AFULL  ,
-        WR_STATUS => RX_STATUS ,
+        WR_FULL   => full,
+        WR_AFULL  => RX_AFULL,
+        WR_STATUS => RX_STATUS,
 
-        RD_CLK    => TX_CLK    ,
-        RD_RST    => TX_RESET  ,
+        RD_CLK    => TX_CLK,
+        RD_RST    => TX_RESET,
 
-        RD_DATA   => do        ,
+        RD_DATA   => do,
         RD_EN     => TX_DST_RDY,
-        RD_EMPTY  => empty     ,
-        RD_AEMPTY => TX_AEMPTY ,
+        RD_EMPTY  => empty,
+        RD_AEMPTY => TX_AEMPTY,
         RD_STATUS => TX_STATUS
     );
 
-    di(DW_DATA) <= RX_DATA;
-    di(DW_META) <= RX_META;
+    di(DW_DATA)    <= RX_DATA;
+    di(DW_META)    <= RX_META;
     di(DW_SOF_POS) <= RX_SOF_POS;
     di(DW_EOF_POS) <= RX_EOF_POS;
-    di(DW_SOF) <= RX_SOF;
-    di(DW_EOF) <= RX_EOF;
-    RX_DST_RDY <= not full;
+    di(DW_SOF)     <= RX_SOF;
+    di(DW_EOF)     <= RX_EOF;
+    RX_DST_RDY     <= not full;
 
     TX_DATA    <= do(DW_DATA);
     TX_META    <= do(DW_META);

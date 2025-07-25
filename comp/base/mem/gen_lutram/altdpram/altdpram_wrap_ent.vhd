@@ -9,7 +9,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity ALTDPRAM_WRAP is
-    generic(
+    generic (
         DATA_WIDTH      : natural := 8;
         ADDR_WIDTH      : natural := 5;
         RAM_TYPE        : string  := "MLAB";
@@ -17,7 +17,7 @@ entity ALTDPRAM_WRAP is
         OUTPUT_REG      : boolean := False;
         DEVICE          : string  := "STRATIX10"
     );
-    port(
+    port (
         DATA      : in  std_logic_vector(DATA_WIDTH-1 downto 0);
         INCLOCK   : in  std_logic;
         RDADDRESS : in  std_logic_vector(ADDR_WIDTH-1 downto 0);

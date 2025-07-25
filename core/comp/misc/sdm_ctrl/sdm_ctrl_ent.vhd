@@ -9,7 +9,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity SDM_CTRL is
-    generic(
+    generic (
         -- Data word width in bits
         DATA_WIDTH   : natural := 32;
         -- Address word width in bits
@@ -19,7 +19,7 @@ entity SDM_CTRL is
         -- Target device (Intel only)
         DEVICE       : string  := "AGILEX"
     );
-    port(
+    port (
         -- Clock and Reset
         CLK   : in  std_logic;
         RESET : in  std_logic;

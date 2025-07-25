@@ -10,10 +10,10 @@ use ieee.numeric_std.all;
 
 use work.math_pack.all;
 
-entity testbench is
-end testbench;
+entity TESTBENCH is
+end entity;
 
-architecture FULL of testbench is
+architecture FULL of TESTBENCH is
 
     -- BAR0 base address for PCIE->MI32 transalation
     constant BAR0_BASE_ADDR         : std_logic_vector(31 downto 0) := X"00000000";
@@ -64,9 +64,9 @@ architecture FULL of testbench is
                                                              X"00000001";
 
     constant SSPL_PCIE_PKT : std_logic_vector(127 downto 0) := X"BEEFBEEF" &
-                                                             X"00000000" &
-                                                             X"00420250" &
-                                                             X"74000001";
+                                                               X"00000000" &
+                                                               X"00420250" &
+                                                               X"74000001";
 
     signal clk               : std_logic;
     signal reset             : std_logic;
@@ -168,12 +168,12 @@ begin
         -- =====================================================================
         -- DOWN stream
         RX_AVST_DATA      => pcie_avst_rx_data,
-		RX_AVST_SOP       => pcie_avst_rx_sop,
-		RX_AVST_EOP       => pcie_avst_rx_eop,
+        RX_AVST_SOP       => pcie_avst_rx_sop,
+        RX_AVST_EOP       => pcie_avst_rx_eop,
         RX_AVST_EMPTY     => pcie_avst_rx_empty,
         RX_AVST_BAR_RANGE => pcie_avst_rx_bar_range,
         RX_AVST_VALID     => pcie_avst_rx_valid,
-		RX_AVST_READY     => pcie_avst_rx_ready,
+        RX_AVST_READY     => pcie_avst_rx_ready,
         -- UP stream
         TX_AVST_DATA      => pcie_avst_tx_data,
         TX_AVST_SOP       => pcie_avst_tx_sop,
@@ -219,7 +219,7 @@ begin
         TX_AXI_CQ_READY   => axi_cq_ready
     );
 
-    axi2mi_i : entity work.axi2mi
+    axi2mi_i : entity work.AXI2MI
     generic map (
         AXI_DATA_WIDTH    => AXI_DATA_WIDTH,
         AXI_CQUSER_WIDTH  => AXI_CQUSER_WIDTH,
@@ -297,7 +297,7 @@ begin
     mi_drd_reg_p : process (clk)
     begin
         if (rising_edge(clk)) then
-            case(mi_addr(7 downto 0)) is
+            case (mi_addr(7 downto 0)) is
                 when X"00" =>
                     mi_drd <= X"20190520";
                 when X"04" =>
@@ -348,78 +348,78 @@ begin
         wait for 2 * RESET_TIME;
         wait for 0.9 * CLK_PERIOD;
 
-        pcie_avst_rx_bar_range <= (others => '0');
+        pcie_avst_rx_bar_range            <= (others => '0');
         pcie_avst_rx_data(511 downto 128) <= (others => '0');
-        pcie_avst_rx_data(127 downto 0) <= SSPL_PCIE_PKT;
-        pcie_avst_rx_sop <= "01";
-        pcie_avst_rx_eop <= "01";
-        pcie_avst_rx_empty(2 downto 0) <= std_logic_vector(to_unsigned(3,3));
-        pcie_avst_rx_empty(5 downto 3) <= std_logic_vector(to_unsigned(0,3));
-        pcie_avst_rx_valid <= "01";
+        pcie_avst_rx_data(127 downto 0)   <= SSPL_PCIE_PKT;
+        pcie_avst_rx_sop                  <= "01";
+        pcie_avst_rx_eop                  <= "01";
+        pcie_avst_rx_empty(2 downto 0)    <= std_logic_vector(to_unsigned(3,3));
+        pcie_avst_rx_empty(5 downto 3)    <= std_logic_vector(to_unsigned(0,3));
+        pcie_avst_rx_valid                <= "01";
 
         wait for CLK_PERIOD;
 
-        pcie_avst_rx_data <= (others => '0');
-        pcie_avst_rx_sop <= (others => '0');
-        pcie_avst_rx_eop <= (others => '0');
+        pcie_avst_rx_data  <= (others => '0');
+        pcie_avst_rx_sop   <= (others => '0');
+        pcie_avst_rx_eop   <= (others => '0');
         pcie_avst_rx_empty <= (others => '0');
         pcie_avst_rx_valid <= (others => '0');
 
         wait for 3*CLK_PERIOD;
 
-        pcie_avst_rx_bar_range <= (others => '0');
+        pcie_avst_rx_bar_range            <= (others => '0');
         pcie_avst_rx_data(511 downto 128) <= (others => '0');
-        pcie_avst_rx_data(127 downto 0) <= WR_PCIE_PKT;
-        pcie_avst_rx_sop <= "01";
-        pcie_avst_rx_eop <= "01";
-        pcie_avst_rx_empty(2 downto 0) <= std_logic_vector(to_unsigned(4,3));
-        pcie_avst_rx_empty(5 downto 3) <= std_logic_vector(to_unsigned(0,3));
-        pcie_avst_rx_valid <= "01";
+        pcie_avst_rx_data(127 downto 0)   <= WR_PCIE_PKT;
+        pcie_avst_rx_sop                  <= "01";
+        pcie_avst_rx_eop                  <= "01";
+        pcie_avst_rx_empty(2 downto 0)    <= std_logic_vector(to_unsigned(4,3));
+        pcie_avst_rx_empty(5 downto 3)    <= std_logic_vector(to_unsigned(0,3));
+        pcie_avst_rx_valid                <= "01";
 
         wait for CLK_PERIOD;
 
-        pcie_avst_rx_bar_range <= (others => '0');
+        pcie_avst_rx_bar_range            <= (others => '0');
         pcie_avst_rx_data(511 downto 128) <= (others => '0');
-        pcie_avst_rx_data(127 downto 0) <= RD_PCIE_PKT;
-        pcie_avst_rx_sop <= "01";
-        pcie_avst_rx_eop <= "01";
-        pcie_avst_rx_empty(2 downto 0) <= std_logic_vector(to_unsigned(5,3));
-        pcie_avst_rx_empty(5 downto 3) <= std_logic_vector(to_unsigned(0,3));
-        pcie_avst_rx_valid <= "01";
+        pcie_avst_rx_data(127 downto 0)   <= RD_PCIE_PKT;
+        pcie_avst_rx_sop                  <= "01";
+        pcie_avst_rx_eop                  <= "01";
+        pcie_avst_rx_empty(2 downto 0)    <= std_logic_vector(to_unsigned(5,3));
+        pcie_avst_rx_empty(5 downto 3)    <= std_logic_vector(to_unsigned(0,3));
+        pcie_avst_rx_valid                <= "01";
 
         wait for CLK_PERIOD;
 
-        pcie_avst_rx_bar_range <= (others => '0');
+        pcie_avst_rx_bar_range            <= (others => '0');
         pcie_avst_rx_data(511 downto 384) <= (others => '0');
         pcie_avst_rx_data(383 downto 256) <= WR_PCIE_PKT;
         pcie_avst_rx_data(255 downto 128) <= (others => '0');
-        pcie_avst_rx_data(127 downto 0) <= RD_PCIE_PKT;
-        pcie_avst_rx_sop <= "11";
-        pcie_avst_rx_eop <= "11";
-        pcie_avst_rx_empty(2 downto 0) <= std_logic_vector(to_unsigned(5,3));
-        pcie_avst_rx_empty(5 downto 3) <= std_logic_vector(to_unsigned(4,3));
-        pcie_avst_rx_valid <= "11";
+        pcie_avst_rx_data(127 downto 0)   <= RD_PCIE_PKT;
+        pcie_avst_rx_sop                  <= "11";
+        pcie_avst_rx_eop                  <= "11";
+        pcie_avst_rx_empty(2 downto 0)    <= std_logic_vector(to_unsigned(5,3));
+        pcie_avst_rx_empty(5 downto 3)    <= std_logic_vector(to_unsigned(4,3));
+        pcie_avst_rx_valid                <= "11";
 
         wait for CLK_PERIOD;
 
-        pcie_avst_rx_bar_range <= (others => '0');
+        pcie_avst_rx_bar_range            <= (others => '0');
         pcie_avst_rx_data(511 downto 128) <= (others => '0');
-        pcie_avst_rx_data(127 downto 0) <= RD_PCIE_PKT;
-        pcie_avst_rx_sop <= "01";
-        pcie_avst_rx_eop <= "01";
-        pcie_avst_rx_empty(2 downto 0) <= std_logic_vector(to_unsigned(5,3));
-        pcie_avst_rx_empty(5 downto 3) <= std_logic_vector(to_unsigned(0,3));
-        pcie_avst_rx_valid <= "01";
+        pcie_avst_rx_data(127 downto 0)   <= RD_PCIE_PKT;
+        pcie_avst_rx_sop                  <= "01";
+        pcie_avst_rx_eop                  <= "01";
+        pcie_avst_rx_empty(2 downto 0)    <= std_logic_vector(to_unsigned(5,3));
+        pcie_avst_rx_empty(5 downto 3)    <= std_logic_vector(to_unsigned(0,3));
+        pcie_avst_rx_valid                <= "01";
 
         wait for CLK_PERIOD;
 
-        pcie_avst_rx_data <= (others => '0');
-        pcie_avst_rx_sop <= (others => '0');
-        pcie_avst_rx_eop <= (others => '0');
+        pcie_avst_rx_data  <= (others => '0');
+        pcie_avst_rx_sop   <= (others => '0');
+        pcie_avst_rx_eop   <= (others => '0');
         pcie_avst_rx_empty <= (others => '0');
         pcie_avst_rx_valid <= (others => '0');
 
         wait;
     end process;
 
-end FULL;
+end architecture;

@@ -8,7 +8,7 @@ library ieee;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity ber_mon is
+entity BER_MON is
     generic (
         NUM_LANES       : natural := 4;
         -- Window size - number of blocks to evaluate BER, max 2^24 (= number of
@@ -19,19 +19,19 @@ entity ber_mon is
         HI_BER_TRESHOLD : natural := 97
     );
     port (
-        RESET         : in std_logic; -- Synchronous reset
+        RESET         : in std_logic;                                -- Synchronous reset
         CLK           : in std_logic;
-        CE            : in std_logic;   -- Clock enable for each lane
+        CE            : in std_logic;                                -- Clock enable for each lane
         SH            : in std_logic_vector(NUM_LANES*2-1 downto 0); -- Sync header for each lane
         --
         BER_CNT       : out std_logic_vector(23 downto 0);           -- Actual BER value (number of invalid blocks within the HDR_CNT_MAX window). See IEEE802.3 82.2.18.2.4: ber_cnt
-        BER_COUNT_CLR : in std_logic; -- Async BER_COUNT clear
+        BER_COUNT_CLR : in std_logic;                                -- Async BER_COUNT clear
         BER_COUNT     : out std_logic_vector(21 downto 0);           -- Defined in IEEE802.3 82.2.18.2.4: ber_count
         HI_BER        : out std_logic := '0'
     );
-end ber_mon;
+end entity;
 
-architecture behavioral of ber_mon is
+architecture BEHAVIORAL of BER_MON is
 
     constant BER_COUNTER_MAX : unsigned(BER_COUNT'high downto 0) := (others => '1');
 
@@ -39,9 +39,9 @@ architecture behavioral of ber_mon is
     signal sh_invalid_count     : natural range 0 to NUM_LANES;
     signal sh_invalid_count_reg : natural range 0 to NUM_LANES;
     signal hdr_cntr             : natural range 0 to (HDR_CNT_MAX+NUM_LANES) := 0; -- Equivalent to IEEE802.3 Fig 82.13: xus_timer
-    signal hdr_cntr_ov          : std_logic; -- Header counter overflow
+    signal hdr_cntr_ov          : std_logic;                                       -- Header counter overflow
     signal ber_cntr             : natural range 0 to (HDR_CNT_MAX+NUM_LANES) := 0; -- Defined in IEEE802.3 82.2.18.2.4: ber_cnt
-    signal ber_cntr_ov          : std_logic; -- BER counter overflow
+    signal ber_cntr_ov          : std_logic;                                       -- BER counter overflow
     signal ber_counter          : unsigned(BER_COUNT'high downto 0) := (others => '0');
     signal ber_counter_inc      : natural range 0 to NUM_LANES;
     signal timer_done           : std_logic;
@@ -49,56 +49,58 @@ architecture behavioral of ber_mon is
 
 begin
 
-    GEN_HDR_CHECK: for i in 0 to NUM_LANES-1 generate
+    gen_hdr_check: for i in 0 to NUM_LANES-1 generate
         sh_valid(i) <= SH(i*2) xor SH(i*2+1);
     end generate;
 
-    INVLD_HDR_SUM: process(sh_valid)
-    variable count1, count2 : natural range 0 to NUM_LANES;
+    invld_hdr_sum : process (sh_valid)
+        variable count1 : natural range 0 to NUM_LANES;
+        variable count2 : natural range 0 to NUM_LANES;
     begin
         -- Compute number of invalid headers on all lanes
         count1 := 0; count2 := 0;
         for i in 0 to (NUM_LANES/2) loop
-            if sh_valid(i) = '0' then
+            if (sh_valid(i) = '0') then
                 count1 := count1 + 1;
             end if;
         end loop;
         for i in (NUM_LANES/2+1) to (NUM_LANES - 1) loop
-            if sh_valid(i) = '0' then
+            if (sh_valid(i) = '0') then
                 count2 := count2 + 1;
             end if;
         end loop;
         sh_invalid_count <= count1 + count2;
     end process;
 
-    CNTRS: process(CLK)
+    cntrs : process (CLK)
     begin
-        if CLK'event and CLK = '1' then
+        if rising_edge(CLK) then
             -- Total header counter
-            if (timer_done = '1') or (RESET = '1')  then
+            if ((timer_done = '1') or (RESET = '1')) then
                 hdr_cntr <= 0;
-            elsif (CE = '1') and (hdr_cntr_ov = '0') then
+            elsif ((CE = '1') and (hdr_cntr_ov = '0')) then
                 hdr_cntr <= hdr_cntr + NUM_LANES;
             end if;
             -- Invalid header (BER) counter
-            if (timer_done = '1') or (RESET = '1') then
-                ber_cntr <= 0;
+            if ((timer_done = '1') or (RESET = '1')) then
+                ber_cntr      <= 0;
                 ber_count_reg <= 0;
             elsif (CE = '1') then
                 ber_count_reg <= sh_invalid_count;
-                ber_cntr <= ber_cntr + ber_count_reg;
+                ber_cntr      <= ber_cntr + ber_count_reg;
             end if;
 
         end if;
     end process;
 
     -- Total invalid header counter
-    BER_COUNTER_P: process(CLK, RESET, BER_COUNT_CLR)
-    variable count1, count2 : natural;
+    ber_counter_p : process (CLK, RESET, BER_COUNT_CLR)
+        variable count1 : natural;
+        variable count2 : natural;
     begin
-        if (RESET = '1') or (BER_COUNT_CLR = '1') then
+        if ((RESET = '1') or (BER_COUNT_CLR = '1')) then
             ber_counter <= (others => '0');
-        elsif CLK'event and CLK = '1' then
+        elsif rising_edge(CLK) then
             if (CE = '1') then
                 sh_invalid_count_reg <= sh_invalid_count;
                 if ((ber_counter + sh_invalid_count_reg) < BER_COUNTER_MAX) then
@@ -111,9 +113,9 @@ begin
         end if;
     end process;
 
-    CONTROL: process(CLK)
+    control : process (CLK)
     begin
-        if CLK'event and CLK = '1' then
+        if rising_edge(CLK) then
 
             if (hdr_cntr_ov = '1') then
                 timer_done <= '1';
@@ -136,4 +138,4 @@ begin
 
     BER_COUNT <= std_logic_vector(ber_counter);
 
-end behavioral;
+end architecture;

@@ -42,48 +42,48 @@ use work.type_pack.all;
 --      0x14 - TABLE_CAPACITY
 --
 entity MVB_HASH_TABLE_SIMPLE is
-generic (
-    TABLE_CAPACITY    : natural := 256;
-    MVB_ITEMS         : natural := 4;
-    MVB_KEY_WIDTH     : natural := 8;
-    DATA_OUT_WIDTH    : natural := 8;
-    MI_WIDTH          : natural := 32;
-    HASH_KEY_WIDTH    : natural := 32;
-    DEVICE            : string  := "STRATIX10"
-);
-port (
-    CLK               : in  std_logic;
-    RST               : in  std_logic;
+    generic (
+        TABLE_CAPACITY    : natural := 256;
+        MVB_ITEMS         : natural := 4;
+        MVB_KEY_WIDTH     : natural := 8;
+        DATA_OUT_WIDTH    : natural := 8;
+        MI_WIDTH          : natural := 32;
+        HASH_KEY_WIDTH    : natural := 32;
+        DEVICE            : string  := "STRATIX10"
+    );
+    port (
+        CLK               : in  std_logic;
+        RST               : in  std_logic;
 
-    -- ===========================================================================
-    -- PORTS OF INPUT MVB BUS
-    -- ===========================================================================
-    RX_MVB_KEY        : in  std_logic_vector(MVB_ITEMS*MVB_KEY_WIDTH-1 downto 0);
-    RX_MVB_VLD        : in  std_logic_vector(MVB_ITEMS-1 downto 0);
-    RX_MVB_SRC_RDY    : in  std_logic;
-    RX_MVB_DST_RDY    : out std_logic;
+        -- ===========================================================================
+        -- PORTS OF INPUT MVB BUS
+        -- ===========================================================================
+        RX_MVB_KEY        : in  std_logic_vector(MVB_ITEMS*MVB_KEY_WIDTH-1 downto 0);
+        RX_MVB_VLD        : in  std_logic_vector(MVB_ITEMS-1 downto 0);
+        RX_MVB_SRC_RDY    : in  std_logic;
+        RX_MVB_DST_RDY    : out std_logic;
 
-    -- ===========================================================================
-    -- PORTS OF OUTPUT MVB BUS
-    -- ===========================================================================
-    TX_MVB_DATA       : out std_logic_vector(MVB_ITEMS*DATA_OUT_WIDTH-1 downto 0);
-    TX_MVB_MATCH      : out std_logic_vector(MVB_ITEMS-1 downto 0);
-    TX_MVB_VLD        : out std_logic_vector(MVB_ITEMS-1 downto 0);
-    TX_MVB_SRC_RDY    : out std_logic;
-    TX_MVB_DST_RDY    : in  std_logic;
+        -- ===========================================================================
+        -- PORTS OF OUTPUT MVB BUS
+        -- ===========================================================================
+        TX_MVB_DATA       : out std_logic_vector(MVB_ITEMS*DATA_OUT_WIDTH-1 downto 0);
+        TX_MVB_MATCH      : out std_logic_vector(MVB_ITEMS-1 downto 0);
+        TX_MVB_VLD        : out std_logic_vector(MVB_ITEMS-1 downto 0);
+        TX_MVB_SRC_RDY    : out std_logic;
+        TX_MVB_DST_RDY    : in  std_logic;
 
-    -- ===========================================================================
-    -- PORTS OF MI BUS
-    -- ===========================================================================
-    MI_ADDR           : in  std_logic_vector(MI_WIDTH-1 downto 0);
-    MI_DWR            : in  std_logic_vector(MI_WIDTH-1 downto 0);
-    MI_BE             : in  std_logic_vector(MI_WIDTH/8-1 downto 0);
-    MI_WR             : in  std_logic;
-    MI_RD             : in  std_logic;
-    MI_ARDY           : out std_logic;
-    MI_DRD            : out std_logic_vector(MI_WIDTH-1 downto 0);
-    MI_DRDY           : out std_logic
-);
+        -- ===========================================================================
+        -- PORTS OF MI BUS
+        -- ===========================================================================
+        MI_ADDR           : in  std_logic_vector(MI_WIDTH-1 downto 0);
+        MI_DWR            : in  std_logic_vector(MI_WIDTH-1 downto 0);
+        MI_BE             : in  std_logic_vector(MI_WIDTH/8-1 downto 0);
+        MI_WR             : in  std_logic;
+        MI_RD             : in  std_logic;
+        MI_ARDY           : out std_logic;
+        MI_DRD            : out std_logic_vector(MI_WIDTH-1 downto 0);
+        MI_DRDY           : out std_logic
+    );
 end entity;
 
 architecture FULL of MVB_HASH_TABLE_SIMPLE is
@@ -91,84 +91,84 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- ===========================================================================
     -- DECLARATION OF CONTROL SIGNALS
     -- ===========================================================================
-    constant TABLE_ITEM_WIDTH  : natural := MVB_KEY_WIDTH+DATA_OUT_WIDTH+1;
-    constant DATA_WR_REG_WIDTH : natural := div_roundup(TABLE_ITEM_WIDTH,MI_WIDTH)*MI_WIDTH;
-    constant HASH_WIDTH        : natural := log2(TABLE_CAPACITY);
-    signal mvb_key_local       : slv_array_t(MVB_ITEMS-1 downto 0)(MVB_KEY_WIDTH-1 downto 0);
-    signal mi_addr_local       : unsigned(8-1 downto 0);
-    signal t_hash_out          : slv_array_t(MVB_ITEMS-1 downto 0)(HASH_WIDTH-1 downto 0);
-    signal t_mi_wr_en          : std_logic;
-    signal t_rd_data           : slv_array_t(MVB_ITEMS-1 downto 0)(TABLE_ITEM_WIDTH-1 downto 0);
-    signal t_wr_addr           : std_logic_vector(HASH_WIDTH-1 downto 0);
-    signal t_wr_data           : std_logic_vector(TABLE_ITEM_WIDTH-1 downto 0);
-    signal t_wr_en             : std_logic;
-    signal x_hash_out          : slv_array_t(MVB_ITEMS-1 downto 0)(HASH_WIDTH-1 downto 0);
-    signal x_mi_wr_en          : std_logic;
-    signal x_rd_data           : slv_array_t(MVB_ITEMS-1 downto 0)(TABLE_ITEM_WIDTH-1 downto 0);
-    signal x_wr_addr           : std_logic_vector(HASH_WIDTH-1 downto 0);
-    signal x_wr_data           : std_logic_vector(TABLE_ITEM_WIDTH-1 downto 0);
-    signal x_wr_en             : std_logic;
-    signal clear_wr_en         : std_logic;
-    signal clear_wr_en_vld     : std_logic;
-    signal clear_wr_addr       : std_logic_vector(HASH_WIDTH-1 downto 0);
-    signal clear_wr_data       : std_logic_vector(TABLE_ITEM_WIDTH-1 downto 0);
-    signal cap_cnt             : unsigned(HASH_WIDTH-1 downto 0);
-    signal ardy_en             : std_logic;
-    signal mi_wr_addr          : std_logic_vector(HASH_WIDTH-1 downto 0);
-    signal mi_wr_data          : std_logic_vector(TABLE_ITEM_WIDTH-1 downto 0);
-    signal cmd_reg             : std_logic_vector(2-1 downto 0);
-    signal mi_wr_data_reg      : std_logic_vector(DATA_WR_REG_WIDTH-1 downto 0);
-    signal table_choice        : std_logic;
-    signal hash_key            : std_logic_vector(HASH_KEY_WIDTH-1 downto 0);
-    signal src_rdy_reg         : std_logic_vector(3-1 downto 0);
-    signal mvb_vld_reg         : slv_array_t(MVB_ITEMS-1 downto 0)(3-1 downto 0);
-    signal prev_mvb_key_reg    : slv_array_t(MVB_ITEMS-1 downto 0)(2*MVB_KEY_WIDTH-1 downto 0);
-    signal prev_mvb_key        : slv_array_t(MVB_ITEMS-1 downto 0)(MVB_KEY_WIDTH-1 downto 0);
-    signal mvb_key_t           : slv_array_t(MVB_ITEMS-1 downto 0)(MVB_KEY_WIDTH-1 downto 0);
-    signal mvb_key_x           : slv_array_t(MVB_ITEMS-1 downto 0)(MVB_KEY_WIDTH-1 downto 0);
-    signal mvb_data_t          : slv_array_t(MVB_ITEMS-1 downto 0)(DATA_OUT_WIDTH-1 downto 0);
-    signal mvb_data_x          : slv_array_t(MVB_ITEMS-1 downto 0)(DATA_OUT_WIDTH-1 downto 0);
-    signal prev_mvb_key_t_cmp  : std_logic_vector(MVB_ITEMS-1 downto 0);
-    signal prev_mvb_key_x_cmp  : std_logic_vector(MVB_ITEMS-1 downto 0);
-    signal match_t             : std_logic_vector(MVB_ITEMS-1 downto 0);
-    signal match_x             : std_logic_vector(MVB_ITEMS-1 downto 0);
-    signal out_data_sig        : slv_array_t(MVB_ITEMS-1 downto 0)(DATA_OUT_WIDTH-1 downto 0);
-    signal out_match_sig       : std_logic_vector(MVB_ITEMS-1 downto 0);
+    constant TABLE_ITEM_WIDTH    : natural := MVB_KEY_WIDTH+DATA_OUT_WIDTH+1;
+    constant DATA_WR_REG_WIDTH   : natural := div_roundup(TABLE_ITEM_WIDTH,MI_WIDTH)*MI_WIDTH;
+    constant HASH_WIDTH          : natural := log2(TABLE_CAPACITY);
+    signal   mvb_key_local       : slv_array_t(MVB_ITEMS-1 downto 0)(MVB_KEY_WIDTH-1 downto 0);
+    signal   mi_addr_local       : unsigned(8-1 downto 0);
+    signal   t_hash_out          : slv_array_t(MVB_ITEMS-1 downto 0)(HASH_WIDTH-1 downto 0);
+    signal   t_mi_wr_en          : std_logic;
+    signal   t_rd_data           : slv_array_t(MVB_ITEMS-1 downto 0)(TABLE_ITEM_WIDTH-1 downto 0);
+    signal   t_wr_addr           : std_logic_vector(HASH_WIDTH-1 downto 0);
+    signal   t_wr_data           : std_logic_vector(TABLE_ITEM_WIDTH-1 downto 0);
+    signal   t_wr_en             : std_logic;
+    signal   x_hash_out          : slv_array_t(MVB_ITEMS-1 downto 0)(HASH_WIDTH-1 downto 0);
+    signal   x_mi_wr_en          : std_logic;
+    signal   x_rd_data           : slv_array_t(MVB_ITEMS-1 downto 0)(TABLE_ITEM_WIDTH-1 downto 0);
+    signal   x_wr_addr           : std_logic_vector(HASH_WIDTH-1 downto 0);
+    signal   x_wr_data           : std_logic_vector(TABLE_ITEM_WIDTH-1 downto 0);
+    signal   x_wr_en             : std_logic;
+    signal   clear_wr_en         : std_logic;
+    signal   clear_wr_en_vld     : std_logic;
+    signal   clear_wr_addr       : std_logic_vector(HASH_WIDTH-1 downto 0);
+    signal   clear_wr_data       : std_logic_vector(TABLE_ITEM_WIDTH-1 downto 0);
+    signal   cap_cnt             : unsigned(HASH_WIDTH-1 downto 0);
+    signal   ardy_en             : std_logic;
+    signal   mi_wr_addr          : std_logic_vector(HASH_WIDTH-1 downto 0);
+    signal   mi_wr_data          : std_logic_vector(TABLE_ITEM_WIDTH-1 downto 0);
+    signal   cmd_reg             : std_logic_vector(2-1 downto 0);
+    signal   mi_wr_data_reg      : std_logic_vector(DATA_WR_REG_WIDTH-1 downto 0);
+    signal   table_choice        : std_logic;
+    signal   hash_key            : std_logic_vector(HASH_KEY_WIDTH-1 downto 0);
+    signal   src_rdy_reg         : std_logic_vector(3-1 downto 0);
+    signal   mvb_vld_reg         : slv_array_t(MVB_ITEMS-1 downto 0)(3-1 downto 0);
+    signal   prev_mvb_key_reg    : slv_array_t(MVB_ITEMS-1 downto 0)(2*MVB_KEY_WIDTH-1 downto 0);
+    signal   prev_mvb_key        : slv_array_t(MVB_ITEMS-1 downto 0)(MVB_KEY_WIDTH-1 downto 0);
+    signal   mvb_key_t           : slv_array_t(MVB_ITEMS-1 downto 0)(MVB_KEY_WIDTH-1 downto 0);
+    signal   mvb_key_x           : slv_array_t(MVB_ITEMS-1 downto 0)(MVB_KEY_WIDTH-1 downto 0);
+    signal   mvb_data_t          : slv_array_t(MVB_ITEMS-1 downto 0)(DATA_OUT_WIDTH-1 downto 0);
+    signal   mvb_data_x          : slv_array_t(MVB_ITEMS-1 downto 0)(DATA_OUT_WIDTH-1 downto 0);
+    signal   prev_mvb_key_t_cmp  : std_logic_vector(MVB_ITEMS-1 downto 0);
+    signal   prev_mvb_key_x_cmp  : std_logic_vector(MVB_ITEMS-1 downto 0);
+    signal   match_t             : std_logic_vector(MVB_ITEMS-1 downto 0);
+    signal   match_x             : std_logic_vector(MVB_ITEMS-1 downto 0);
+    signal   out_data_sig        : slv_array_t(MVB_ITEMS-1 downto 0)(DATA_OUT_WIDTH-1 downto 0);
+    signal   out_match_sig       : std_logic_vector(MVB_ITEMS-1 downto 0);
 
     -- ===========================================================================
     -- DEFINITION OF HASH FUNCTIONS
     -- ===========================================================================
-    function f_toeplitz_hash(din : std_logic_vector; key : std_logic_vector) return std_logic_vector is
+    function f_toeplitz_hash (din : std_logic_vector; key : std_logic_vector) return std_logic_vector is
         variable v_hash      : std_logic_vector(HASH_WIDTH-1 downto 0);
         variable v_key_slice : std_logic_vector(HASH_WIDTH-1 downto 0);
         variable v_key_hash  : std_logic_vector(HASH_WIDTH-1 downto 0);
     begin
         v_hash := (others => '0');
 
-        --report "THASH: din=" & to_hstring(din) & "h";
-        --report "THASH: key=" & to_hstring(key) & "h";
+        -- report "THASH: din=" & to_hstring(din) & "h";
+        -- report "THASH: key=" & to_hstring(key) & "h";
         for i in din'length-1 downto 0 loop
             v_key_slice := key((key'length-(din'length-1-i)-1) downto (key'length-HASH_WIDTH-(din'length-1-i)));
-            v_key_hash := (others => '0');
+            v_key_hash  := (others => '0');
             if (din(i) = '1') then
                 v_key_hash := v_key_slice;
             end if;
             v_hash := v_hash xor v_key_hash;
         end loop;
-        --report "THASH: hash=" & to_hstring(v_hash) & "h";
+        -- report "THASH: hash=" & to_hstring(v_hash) & "h";
 
         return v_hash;
-    end;
+    end function;
 
-    function f_simple_xor_hash(din : std_logic_vector; key : std_logic_vector) return std_logic_vector is
+    function f_simple_xor_hash (din : std_logic_vector; key : std_logic_vector) return std_logic_vector is
         variable v_hash : std_logic_vector(HASH_WIDTH-1 downto 0);
     begin
         v_hash := din(HASH_WIDTH-1 downto 0) xor key(HASH_WIDTH-1 downto 0);
 
         return v_hash;
-    end;
+    end function;
 
-    begin
+begin
 
     mvb_key_local_g: for g in 0 to MVB_ITEMS-1 generate
         mvb_key_local(g) <= RX_MVB_KEY((g+1)*MVB_KEY_WIDTH-1 downto g*MVB_KEY_WIDTH);
@@ -232,7 +232,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- ===========================================================================
     -- MI COMMAND REGISTER
     -- ===========================================================================
-    mi_cmd_reg_p: process(CLK)
+    mi_cmd_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if ((MI_WR = '1') and (mi_addr_local = X"00")) then
@@ -255,7 +255,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- ===========================================================================
     -- MI ADDRESS REGISTER
     -- ===========================================================================
-    mi_addr_reg_p: process(CLK)
+    mi_addr_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if ((MI_WR = '1') and (mi_addr_local = X"04")) then
@@ -267,7 +267,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- ===========================================================================
     -- MI DATA REGISTER
     -- ===========================================================================
-    mi_data_reg_p: process(CLK)
+    mi_data_reg_p : process (CLK)
         variable be_dwr : std_logic_vector(MI_DWR'LENGTH-1 downto 0);
     begin
         if rising_edge(CLK) then
@@ -286,7 +286,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- ===========================================================================
     -- MI WRITE ENABLE REGISTER
     -- ===========================================================================
-    mi_write_en_reg_p: process(CLK)
+    mi_write_en_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if ((MI_WR = '1') and (mi_addr_local = X"0C")) then
@@ -307,7 +307,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- ===========================================================================
     -- HASH KEY CONFIGURATION REGISTER
     -- ===========================================================================
-    hash_key_config_reg_p: process(CLK)
+    hash_key_config_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if ((MI_WR = '1') and (mi_addr_local = X"10")) then
@@ -319,7 +319,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- ===========================================================================
     -- CLEAR TABLE
     -- ===========================================================================
-    clear_table_p: process(CLK)
+    clear_table_p : process (CLK)
     begin
         if rising_edge(CLK) then
             clear_wr_en_vld <= '1';
@@ -346,7 +346,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
 
     clear_wr_data <= (others => '0');
 
-    clear_table_cntr_p: process(CLK)
+    clear_table_cntr_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (clear_wr_en = '1') then
@@ -360,7 +360,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- ===========================================================================
     -- CONFIGURATION READOUT
     -- ===========================================================================
-    capacity_readout_p: process(CLK)
+    capacity_readout_p : process (CLK)
     begin
         if rising_edge(CLK) then
             case mi_addr_local is
@@ -400,12 +400,12 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
         out_data_sig(g)  <= mvb_data_t(g) when (match_t(g) = '1') else mvb_data_x(g);
         out_match_sig(g) <= match_t(g) or match_x(g);
 
-        mvb_key_comparator_p: process(CLK)
+        mvb_key_comparator_p : process (CLK)
         begin
             if rising_edge(CLK) then
                 if (TX_MVB_DST_RDY = '1') then
                     TX_MVB_DATA((g+1)*DATA_OUT_WIDTH-1 downto g*DATA_OUT_WIDTH) <= out_data_sig(g);
-                    TX_MVB_MATCH(g) <= out_match_sig(g);
+                    TX_MVB_MATCH(g)                                             <= out_match_sig(g);
                 end if;
             end if;
         end process;
@@ -415,7 +415,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- PREVIOUS MVB KEY SHIFT REGISTERS
     -- ===========================================================================
     prev_mvb_key_shift_reg_g: for g in 0 to MVB_ITEMS-1 generate
-        prev_mvb_key_shift_reg_p: process(CLK)
+        prev_mvb_key_shift_reg_p : process (CLK)
         begin
             if rising_edge(CLK) then
                 if (TX_MVB_DST_RDY = '1') then
@@ -430,7 +430,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- ===========================================================================
     -- TX_MVB_SRC_RDY SHIFT REGISTERS
     -- ===========================================================================
-    src_rdy_shift_reg_p: process(CLK)
+    src_rdy_shift_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (TX_MVB_DST_RDY = '1') then
@@ -449,7 +449,7 @@ architecture FULL of MVB_HASH_TABLE_SIMPLE is
     -- MVB VLD SIGNAL SHIFT REGISTERS
     -- ===========================================================================
     mvb_vld_shift_reg_g: for g in 0 to MVB_ITEMS-1 generate
-        mvb_vld_shift_reg_p: process(CLK)
+        mvb_vld_shift_reg_p : process (CLK)
         begin
             if rising_edge(CLK) then
                 if (TX_MVB_DST_RDY = '1') then

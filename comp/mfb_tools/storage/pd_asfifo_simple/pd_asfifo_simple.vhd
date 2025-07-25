@@ -14,7 +14,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MFB_PD_ASFIFO_SIMPLE is
-    generic(
+    generic (
         -- ==================
         -- MFB parameters
         -- ==================
@@ -34,7 +34,7 @@ entity MFB_PD_ASFIFO_SIMPLE is
         -- Defines target FPGA device.
         DEVICE          : string  := "AGILEX"
     );
-    port(
+    port (
         -- ==================
         -- RX MFB interface
         --
@@ -190,7 +190,7 @@ begin
     rx_dfifo_src_rdy <= (or RX_EOF) and RX_SRC_RDY and RX_DST_RDY;
 
     dfifo_i : entity work.MVB_ASFIFOX
-    generic map(
+    generic map (
         MVB_ITEMS           => MFB_REGIONS,
         MVB_ITEM_WIDTH      => 1,
         FIFO_ITEMS          => 2*FIFO_ITEMS,
@@ -201,7 +201,7 @@ begin
         ALMOST_FULL_OFFSET  => 1,
         ALMOST_EMPTY_OFFSET => 1
     )
-    port map(
+    port map (
         RX_CLK     => RX_CLK,
         RX_RESET   => RX_RESET,
         RX_DATA    => rx_dfifo_data,
@@ -226,7 +226,7 @@ begin
     --      report "MFB_PD_ASFIFO_SIMPLE: Illegal write to full dfifo_i FIFO!";
 
     mins_i : entity work.METADATA_INSERTOR
-    generic map(
+    generic map (
         MVB_ITEMS       => MFB_REGIONS,
         MVB_ITEM_WIDTH  => 1,
 
@@ -236,12 +236,12 @@ begin
         MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
         MFB_META_WIDTH  => MFB_META_WIDTH,
 
-        INSERT_MODE     => 0, -- insert to SOF region
+        INSERT_MODE     => 0,    -- insert to SOF region
         MVB_FIFO_SIZE   => 16,
         MVB_FIFOX_MULTI => True, -- we need also MVB_ASFIFOX
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         CLK             => TX_CLK,
         RESET           => TX_RESET,
 
@@ -271,7 +271,7 @@ begin
     );
 
     drop_i : entity work.MFB_DROPPER
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,

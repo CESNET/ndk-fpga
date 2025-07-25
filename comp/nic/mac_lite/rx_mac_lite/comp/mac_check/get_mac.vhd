@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_GET_MAC is
-    generic(
+    generic (
         -- must be power of 2
         REGION_SIZE : natural := 8;
         -- must be power of 2, BLOCK_SIZE*ITEM_WIDTH >= 48!
@@ -20,7 +20,7 @@ entity RX_MAC_LITE_GET_MAC is
         -- must be power of 2, BLOCK_SIZE*ITEM_WIDTH >= 48!
         ITEM_WIDTH  : natural := 8
     );
-    port(
+    port (
         -- ===============
         -- CLOCK AND RESET
         -- ===============
@@ -66,7 +66,7 @@ begin
     end generate;
 
     data_arr_on_g: if (REGION_SIZE > 1) generate
-        s_data_array <= slv_array_downto_deser(RX_DATA,REGION_SIZE,BLOCK_SIZE*ITEM_WIDTH);
+        s_data_array  <= slv_array_downto_deser(RX_DATA,REGION_SIZE,BLOCK_SIZE*ITEM_WIDTH);
         -- multiplexor for extract destination MAC address
         s_ext_mac_dst <= s_data_array(to_integer(unsigned(RX_SOF_POS)))(47 downto 0);
     end generate;

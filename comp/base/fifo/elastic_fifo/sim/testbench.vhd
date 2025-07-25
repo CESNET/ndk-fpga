@@ -13,7 +13,7 @@ use work.math_pack.all;
 entity TESTBENCH is
 end entity;
 
-architecture behavioral of TESTBENCH is
+architecture BEHAVIORAL of TESTBENCH is
     constant WR_CLK_PER : time := 10ns;
     constant RD_CLK_PER : time := 10.2ns;
 
@@ -57,25 +57,27 @@ begin
 
     wr_tb_p : process
 
-        procedure send_data(data : std_logic_vector(DIN_WIDTH - 1 downto 0);
-                            aux  : std_logic_vector(DIN_WIDTH / 8 - 1 downto 0);
-                            mask : std_logic_vector(BLOCK_COUNT - 1 downto 0)) is
+        procedure send_data (
+            data : std_logic_vector(DIN_WIDTH - 1 downto 0);
+            aux  : std_logic_vector(DIN_WIDTH / 8 - 1 downto 0);
+            mask : std_logic_vector(BLOCK_COUNT - 1 downto 0)
+        ) is
         begin
             data_in <= data;
-            aux_in <= aux;
+            aux_in  <= aux;
             mask_in <= mask;
             wait until rising_edge(wr_clk);
-        end;
+        end procedure send_data;
 
     begin
 
-        rst <= '1';
+        rst     <= '1';
         data_in <= (others => '0');
-        aux_in <= (others => '0');
+        aux_in  <= (others => '0');
         mask_in <= (others => '0');
-        wr_ce <= '1';
+        wr_ce   <= '1';
         wait until rising_edge(wr_clk);
-        rst <= '0';
+        rst     <= '0';
         for i in 0 to 7 loop
             wait until rising_edge(wr_clk);
         end loop;
@@ -99,11 +101,13 @@ begin
 
     rd_tb_p : process
 
-        procedure send_rd_mask(mask : std_logic_vector(BLOCK_COUNT - 1 downto 0)) is
+        procedure send_rd_mask (
+            mask : std_logic_vector(BLOCK_COUNT - 1 downto 0)
+        ) is
         begin
             mask_out <= mask;
             wait until rising_edge(rd_clk);
-        end;
+        end procedure send_rd_mask;
 
     begin
         rd_ce <= '1';
@@ -124,20 +128,20 @@ begin
 
     elastic_fifo_e : entity work.ELASTIC_FIFO
     generic map (
-        BLOCK_WIDTH => BLOCK_WIDTH,
-        BLOCK_COUNT => BLOCK_COUNT,
+        BLOCK_WIDTH      => BLOCK_WIDTH,
+        BLOCK_COUNT      => BLOCK_COUNT,
         OUTPUT_REGISTERS => true
     )
     port map (
-        WR_CLK => wr_clk,
-        WR_CE => wr_ce,
-        RD_CLK => rd_clk,
-        RD_CE => rd_ce,
-        AS_RST => rst,
-        DIN => data_in,
-        AUX_IN => aux_in,
+        WR_CLK  => wr_clk,
+        WR_CE   => wr_ce,
+        RD_CLK  => rd_clk,
+        RD_CE   => rd_ce,
+        AS_RST  => rst,
+        DIN     => data_in,
+        AUX_IN  => aux_in,
         MASK_IN => mask_in,
-        DOUT => data_out,
+        DOUT    => data_out,
         AUX_OUT => aux_out
     );
 

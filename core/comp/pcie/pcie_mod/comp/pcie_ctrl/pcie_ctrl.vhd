@@ -16,7 +16,7 @@ use work.dma_bus_pack.all;
 use work.pcie_meta_pack.all;
 
 entity PCIE_CTRL is
-    generic(
+    generic (
         -- =====================================================================
         -- BAR base address configuration
         -- =====================================================================
@@ -65,7 +65,7 @@ entity PCIE_CTRL is
         -- FPGA device
         DEVICE              : string  := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         --  CLOCK AND RESETS
         -- =====================================================================
@@ -281,7 +281,7 @@ architecture FULL of PCIE_CTRL is
     -- Address offset for each Streaming Debug Probe.
     constant DBG_PROBE_OFFSET      : natural := 16#40#;
     -- Address offset of all Debug Probes per Endpoint.
-    constant DBG_PROBES_OFFSET     : natural := 16#200#;--DBG_PROBES*DBG_PROBE_OFFSET;
+    constant DBG_PROBES_OFFSET     : natural := 16#200#; -- DBG_PROBES*DBG_PROBE_OFFSET;
     -- Name(s) (4-letter IDs) of Streaming Debug Probes.
     -- DRQ0 = DMA RQ 0
     constant DBG_PROBE_STR         : string := "DRQFDRQVDRCFDRCV";
@@ -290,9 +290,9 @@ architecture FULL of PCIE_CTRL is
     constant DBG_EVENTS              : natural := 4;
     constant DBG_MAX_INTERVAL_CYCLES : natural := 2**24-1;
     constant DBG_MAX_INTERVALS       : natural := 1024;
-    constant DBG_MI_INTERVAL_ADDR    : std_logic_vector(32-1 downto 0) := std_logic_vector(to_unsigned(0 , 32));
-    constant DBG_MI_EVENTS_ADDR      : std_logic_vector(32-1 downto 0) := std_logic_vector(to_unsigned(4 , 32));
-    constant DBG_MI_CAPTURE_EN_ADDR  : std_logic_vector(32-1 downto 0) := std_logic_vector(to_unsigned(8 , 32));
+    constant DBG_MI_INTERVAL_ADDR    : std_logic_vector(32-1 downto 0) := std_logic_vector(to_unsigned(0, 32));
+    constant DBG_MI_EVENTS_ADDR      : std_logic_vector(32-1 downto 0) := std_logic_vector(to_unsigned(4, 32));
+    constant DBG_MI_CAPTURE_EN_ADDR  : std_logic_vector(32-1 downto 0) := std_logic_vector(to_unsigned(8, 32));
     constant DBG_MI_CAPTURE_RD_ADDR  : std_logic_vector(32-1 downto 0) := std_logic_vector(to_unsigned(12, 32));
     constant DBG_MI_ADDR_MASK        : std_logic_vector(32-1 downto 0) := (3 downto 2 => '1', others => '0');
     constant DBG_EVENT_OFFSET        : std_logic_vector(32-1 downto 0) := X"0000_0010";
@@ -431,8 +431,8 @@ begin
         rq_mfb_meta_g: for i in 0 to RQ_MFB_REGIONS-1 generate
             pcie_rq_mfb_meta_arr(i)(PCIE_RQ_META_HEADER) <= pcie_rq_mfb_hdr_arr(i);
             pcie_rq_mfb_meta_arr(i)(PCIE_RQ_META_PREFIX) <= pcie_rq_mfb_prefix_arr(i);
-            pcie_rq_mfb_meta_arr(i)(PCIE_RQ_META_FBE) <= pcie_rq_mfb_be_arr(i)(PCIE_META_FBE_W-1 downto 0);
-            pcie_rq_mfb_meta_arr(i)(PCIE_RQ_META_LBE) <= pcie_rq_mfb_be_arr(i)(PCIE_META_LBE_W+PCIE_META_FBE_W-1 downto PCIE_META_FBE_W);
+            pcie_rq_mfb_meta_arr(i)(PCIE_RQ_META_FBE)    <= pcie_rq_mfb_be_arr(i)(PCIE_META_FBE_W-1 downto 0);
+            pcie_rq_mfb_meta_arr(i)(PCIE_RQ_META_LBE)    <= pcie_rq_mfb_be_arr(i)(PCIE_META_LBE_W+PCIE_META_FBE_W-1 downto PCIE_META_FBE_W);
         end generate;
 
         PCIE_RQ_MFB_META <= slv_array_ser(pcie_rq_mfb_meta_arr);
@@ -445,7 +445,7 @@ begin
         end generate;
 
         ptc_i : entity work.PCIE_TRANSACTION_CTRL
-        generic map(
+        generic map (
             DMA_PORTS            => DMA_PORTS,
 
             MVB_UP_ITEMS         => RQ_MFB_REGIONS,
@@ -471,7 +471,7 @@ begin
             ENDPOINT_TYPE        => ENDPOINT_TYPE,
             DEVICE               => DEVICE
         )
-        port map(
+        port map (
             CLK                => PCIE_CLK,
             RESET              => PCIE_RESET(0),
 
@@ -581,7 +581,7 @@ begin
         pcie_cq_mfb_data_arr <= slv_array_deser(PCIE_CQ_MFB_DATA,CQ_MFB_REGIONS);
 
         cq_mfb_sel_g: for i in 0 to CQ_MFB_REGIONS-1 generate
-            bar_index_g: if (DEVICE="ULTRASCALE") generate
+            bar_index_g: if (DEVICE = "ULTRASCALE") generate
                 -- BAR index is in AXI header
                 pcie_cq_mfb_bar(i) <= pcie_cq_mfb_data_arr(i)(114 downto 112);
             else generate -- Intel FPGA (R-Tile, P-Tile)
@@ -591,14 +591,14 @@ begin
         end generate;
 
         cq_splitter_i : entity work.MFB_SPLITTER_SIMPLE
-        generic map(
+        generic map (
             REGIONS     => CQ_MFB_REGIONS,
             REGION_SIZE => CQ_MFB_REGION_SIZE,
             BLOCK_SIZE  => CQ_MFB_BLOCK_SIZE,
             ITEM_WIDTH  => CQ_MFB_ITEM_WIDTH,
             META_WIDTH  => PCIE_CQ_META_WIDTH
         )
-        port map(
+        port map (
             CLK             => PCIE_CLK,
             RST             => PCIE_RESET(3),
 
@@ -632,7 +632,7 @@ begin
         );
 
         cc_merger_i : entity work.MFB_MERGER_SIMPLE
-        generic map(
+        generic map (
             REGIONS     => CC_MFB_REGIONS,
             REGION_SIZE => CC_MFB_REGION_SIZE,
             BLOCK_SIZE  => CC_MFB_BLOCK_SIZE,
@@ -641,7 +641,7 @@ begin
             MASKING_EN  => False,
             CNT_MAX     => CC_MFB_MERGER_CNT_MAX
         )
-        port map(
+        port map (
             CLK             => PCIE_CLK,
             RST             => PCIE_RESET(4),
 
@@ -766,49 +766,51 @@ begin
     );
 
     mtc_fifo_i : entity work.MFB_FIFOX
-        generic map (
-            REGIONS             => CQ_MFB_REGIONS,
-            REGION_SIZE         => CQ_MFB_REGION_SIZE,
-            BLOCK_SIZE          => CQ_MFB_BLOCK_SIZE,
-            ITEM_WIDTH          => CQ_MFB_ITEM_WIDTH,
+    generic map (
+        REGIONS             => CQ_MFB_REGIONS,
+        REGION_SIZE         => CQ_MFB_REGION_SIZE,
+        BLOCK_SIZE          => CQ_MFB_BLOCK_SIZE,
+        ITEM_WIDTH          => CQ_MFB_ITEM_WIDTH,
 
-            META_WIDTH          => PCIE_CQ_META_WIDTH,
-            FIFO_DEPTH          => 512,
-            RAM_TYPE            => "AUTO",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 2,
-            ALMOST_EMPTY_OFFSET => 2)
-        port map (
-            CLK         => PCIE_CLK,
-            RST         => PCIE_RESET(1),
+        META_WIDTH          => PCIE_CQ_META_WIDTH,
+        FIFO_DEPTH          => 512,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 2,
+        ALMOST_EMPTY_OFFSET => 2
+    )
+    port map (
+        CLK         => PCIE_CLK,
+        RST         => PCIE_RESET(1),
 
-            RX_DATA     => mtc_fifo_mfb_data,
-            RX_META     => mtc_fifo_mfb_meta,
-            RX_SOF_POS  => mtc_fifo_mfb_sof_pos,
-            RX_EOF_POS  => mtc_fifo_mfb_eof_pos,
-            RX_SOF      => mtc_fifo_mfb_sof,
-            RX_EOF      => mtc_fifo_mfb_eof,
-            RX_SRC_RDY  => mtc_fifo_mfb_src_rdy,
-            RX_DST_RDY  => mtc_fifo_mfb_dst_rdy,
+        RX_DATA     => mtc_fifo_mfb_data,
+        RX_META     => mtc_fifo_mfb_meta,
+        RX_SOF_POS  => mtc_fifo_mfb_sof_pos,
+        RX_EOF_POS  => mtc_fifo_mfb_eof_pos,
+        RX_SOF      => mtc_fifo_mfb_sof,
+        RX_EOF      => mtc_fifo_mfb_eof,
+        RX_SRC_RDY  => mtc_fifo_mfb_src_rdy,
+        RX_DST_RDY  => mtc_fifo_mfb_dst_rdy,
 
-            TX_DATA     => mtc_cq_mfb_data,
-            TX_META     => mtc_cq_mfb_meta,
-            TX_SOF_POS  => mtc_cq_mfb_sof_pos,
-            TX_EOF_POS  => mtc_cq_mfb_eof_pos,
-            TX_SOF      => mtc_cq_mfb_sof,
-            TX_EOF      => mtc_cq_mfb_eof,
-            TX_SRC_RDY  => mtc_cq_mfb_src_rdy,
-            TX_DST_RDY  => mtc_cq_mfb_dst_rdy,
+        TX_DATA     => mtc_cq_mfb_data,
+        TX_META     => mtc_cq_mfb_meta,
+        TX_SOF_POS  => mtc_cq_mfb_sof_pos,
+        TX_EOF_POS  => mtc_cq_mfb_eof_pos,
+        TX_SOF      => mtc_cq_mfb_sof,
+        TX_EOF      => mtc_cq_mfb_eof,
+        TX_SRC_RDY  => mtc_cq_mfb_src_rdy,
+        TX_DST_RDY  => mtc_cq_mfb_dst_rdy,
 
-            FIFO_STATUS => open,
-            FIFO_AFULL  => open,
-            FIFO_AEMPTY => open);
+        FIFO_STATUS => open,
+        FIFO_AFULL  => open,
+        FIFO_AEMPTY => open
+    );
 
     mi_async_i : entity work.MI_ASYNC
-    generic map(
+    generic map (
         DEVICE => DEVICE
     )
-    port map(
+    port map (
         -- Master interface
         CLK_M     => PCIE_CLK,
         RESET_M   => PCIE_RESET(2),
@@ -835,7 +837,7 @@ begin
     );
 
     mi_pipe_i : entity work.MI_PIPE
-    generic map(
+    generic map (
         DEVICE      => DEVICE,
         DATA_WIDTH  => 32,
         ADDR_WIDTH  => 32,
@@ -843,7 +845,7 @@ begin
         USE_OUTREG  => True,
         FAKE_PIPE   => False
     )
-    port map(
+    port map (
         -- Common interface
         CLK      => MI_CLK,
         RESET    => MI_RESET,
@@ -876,45 +878,45 @@ begin
     debug_logic_g : if DEBUG_EN generate
 
         mi_splitter_endpts_i : entity work.MI_SPLITTER_PLUS_GEN
-        generic map(
-            ADDR_WIDTH => 32               ,
-            DATA_WIDTH => 32               ,
-            PORTS      => DBG_MI_PORTS     ,
-            ADDR_BASE  => mi_addr_base_f   ,
+        generic map (
+            ADDR_WIDTH => 32,
+            DATA_WIDTH => 32,
+            PORTS      => DBG_MI_PORTS,
+            ADDR_BASE  => mi_addr_base_f,
             PIPE_OUT   => (others => false),
             DEVICE     => DEVICE
         )
-        port map(
+        port map (
             CLK     => MI_CLK,
             RESET   => MI_RESET,
 
-            RX_DWR  => MI_DBG_DWR       ,
-            RX_ADDR => MI_DBG_ADDR      ,
-            RX_BE   => MI_DBG_BE        ,
-            RX_RD   => MI_DBG_RD        ,
-            RX_WR   => MI_DBG_WR        ,
-            RX_ARDY => MI_DBG_ARDY      ,
-            RX_DRD  => MI_DBG_DRD       ,
-            RX_DRDY => MI_DBG_DRDY      ,
+            RX_DWR  => MI_DBG_DWR,
+            RX_ADDR => MI_DBG_ADDR,
+            RX_BE   => MI_DBG_BE,
+            RX_RD   => MI_DBG_RD,
+            RX_WR   => MI_DBG_WR,
+            RX_ARDY => MI_DBG_ARDY,
+            RX_DRD  => MI_DBG_DRD,
+            RX_DRDY => MI_DBG_DRDY,
 
-            TX_DWR  => mi_split_dbg_dwr ,
+            TX_DWR  => mi_split_dbg_dwr,
             TX_ADDR => mi_split_dbg_addr,
-            TX_BE   => mi_split_dbg_be  ,
-            TX_RD   => mi_split_dbg_rd  ,
-            TX_WR   => mi_split_dbg_wr  ,
+            TX_BE   => mi_split_dbg_be,
+            TX_RD   => mi_split_dbg_rd,
+            TX_WR   => mi_split_dbg_wr,
             TX_ARDY => mi_split_dbg_ardy,
-            TX_DRD  => mi_split_dbg_drd ,
+            TX_DRD  => mi_split_dbg_drd,
             TX_DRDY => mi_split_dbg_drdy
         );
 
         dbg_mi_ports_g : for dp in 0 to DBG_MI_PORTS-2 generate
             mi_async_dbg_i : entity work.MI_ASYNC
-            generic map(
+            generic map (
                 DEVICE => DEVICE
             )
-            port map(
-                CLK_M     => MI_CLK               ,
-                RESET_M   => MI_RESET             ,
+            port map (
+                CLK_M     => MI_CLK,
+                RESET_M   => MI_RESET,
                 MI_M_DWR  => mi_split_dbg_dwr (dp),
                 MI_M_ADDR => mi_split_dbg_addr(dp),
                 MI_M_RD   => mi_split_dbg_rd  (dp),
@@ -924,8 +926,8 @@ begin
                 MI_M_ARDY => mi_split_dbg_ardy(dp),
                 MI_M_DRDY => mi_split_dbg_drdy(dp),
 
-                CLK_S     => DMA_CLK              ,
-                RESET_S   => DMA_RESET            ,
+                CLK_S     => DMA_CLK,
+                RESET_S   => DMA_RESET,
                 MI_S_DWR  => mi_sync_dbg_dwr  (dp),
                 MI_S_ADDR => mi_sync_dbg_addr (dp),
                 MI_S_RD   => mi_sync_dbg_rd   (dp),
@@ -938,12 +940,12 @@ begin
         end generate;
 
         mi_async_dbg_ptc_i : entity work.MI_ASYNC
-        generic map(
+        generic map (
             DEVICE => DEVICE
         )
-        port map(
-            CLK_M     => MI_CLK               ,
-            RESET_M   => MI_RESET             ,
+        port map (
+            CLK_M     => MI_CLK,
+            RESET_M   => MI_RESET,
             MI_M_DWR  => mi_split_dbg_dwr (DBG_MI_PORTS-1),
             MI_M_ADDR => mi_split_dbg_addr(DBG_MI_PORTS-1),
             MI_M_RD   => mi_split_dbg_rd  (DBG_MI_PORTS-1),
@@ -953,8 +955,8 @@ begin
             MI_M_ARDY => mi_split_dbg_ardy(DBG_MI_PORTS-1),
             MI_M_DRDY => mi_split_dbg_drdy(DBG_MI_PORTS-1),
 
-            CLK_S     => PCIE_CLK             ,
-            RESET_S   => PCIE_RESET(0)        ,
+            CLK_S     => PCIE_CLK,
+            RESET_S   => PCIE_RESET(0),
             MI_S_DWR  => mi_sync_dbg_dwr  (DBG_MI_PORTS-1),
             MI_S_ADDR => mi_sync_dbg_addr (DBG_MI_PORTS-1),
             MI_S_RD   => mi_sync_dbg_rd   (DBG_MI_PORTS-1),
@@ -971,10 +973,10 @@ begin
             --  Streaming Debug Master + Probe(s)
             -- -----------------------------------
             debug_master_i : entity work.STREAMING_DEBUG_MASTER
-            generic map(
-                CONNECTED_PROBES   => DBG_PROBES              ,
-                REGIONS            => RQ_MFB_REGIONS          ,
-                DEBUG_ENABLED      => true                    ,
+            generic map (
+                CONNECTED_PROBES   => DBG_PROBES,
+                REGIONS            => RQ_MFB_REGIONS,
+                DEBUG_ENABLED      => true,
                 PROBE_ENABLED      => (1 to DBG_PROBES => 'E'),
                 COUNTER_WORD       => (1 to DBG_PROBES => 'E'),
                 COUNTER_WAIT       => (1 to DBG_PROBES => 'E'),
@@ -983,10 +985,10 @@ begin
                 COUNTER_SOP        => (1 to DBG_PROBES => 'D'), -- disabled
                 COUNTER_EOP        => (1 to DBG_PROBES => 'D'), -- disabled
                 BUS_CONTROL        => (1 to DBG_PROBES => 'D'), -- disabled
-                PROBE_NAMES        => DBG_PROBE_STR           ,
+                PROBE_NAMES        => DBG_PROBE_STR,
                 DEBUG_REG          => true
             )
-            port map(
+            port map (
                 CLK           => DMA_CLK,
                 RESET         => DMA_RESET,
 
@@ -999,116 +1001,116 @@ begin
                 MI_ARDY       => mi_sync_dbg_ardy(dp),
                 MI_DRDY       => mi_sync_dbg_drdy(dp),
 
-                DEBUG_BLOCK   => open                ,
-                DEBUG_DROP    => open                ,
-                DEBUG_SOP     => (others => '0')     ,
-                DEBUG_EOP     => (others => '0')     ,
+                DEBUG_BLOCK   => open,
+                DEBUG_DROP    => open,
+                DEBUG_SOP     => (others => '0'),
+                DEBUG_EOP     => (others => '0'),
                 DEBUG_SRC_RDY => dp_out_src_rdy  (dp),
                 DEBUG_DST_RDY => dp_out_dst_rdy  (dp)
             );
 
             debug_probe0_i : entity work.STREAMING_DEBUG_PROBE_MFB
-            generic map(
+            generic map (
                 REGIONS => RQ_MFB_REGIONS
             )
-            port map(
-                RX_SOF         => (others => '0')          , -- SOP counters are unecessary => disabled in the Master Probe
-                RX_EOF         => (others => '0')          , -- EOP counters are unecessary => disabled in the Master Probe
-                RX_SRC_RDY     => DMA_RQ_MFB_SRC_RDY(dp)   ,
-                RX_DST_RDY     => open                     ,
+            port map (
+                RX_SOF         => (others => '0'), -- SOP counters are unecessary => disabled in the Master Probe
+                RX_EOF         => (others => '0'), -- EOP counters are unecessary => disabled in the Master Probe
+                RX_SRC_RDY     => DMA_RQ_MFB_SRC_RDY(dp),
+                RX_DST_RDY     => open,
 
-                TX_SOF         => open                     ,
-                TX_EOF         => open                     ,
-                TX_SRC_RDY     => open                     ,
-                TX_DST_RDY     => DMA_RQ_MFB_DST_RDY(dp)   ,
+                TX_SOF         => open,
+                TX_EOF         => open,
+                TX_SRC_RDY     => open,
+                TX_DST_RDY     => DMA_RQ_MFB_DST_RDY(dp),
 
-                DEBUG_BLOCK    => '0'                      ,
-                DEBUG_DROP     => '0'                      ,
-                DEBUG_SOF      => open                     ,
-                DEBUG_EOF      => open                     ,
+                DEBUG_BLOCK    => '0',
+                DEBUG_DROP     => '0',
+                DEBUG_SOF      => open,
+                DEBUG_EOF      => open,
                 DEBUG_SRC_RDY  => dp_out_src_rdy    (dp)(0),
                 DEBUG_DST_RDY  => dp_out_dst_rdy    (dp)(0)
             );
 
             debug_probe1_i : entity work.STREAMING_DEBUG_PROBE_MFB
-            generic map(
+            generic map (
                 REGIONS => RQ_MFB_REGIONS
             )
-            port map(
-                RX_SOF         => (others => '0')          ,
-                RX_EOF         => (others => '0')          ,
-                RX_SRC_RDY     => DMA_RQ_MVB_SRC_RDY(dp)   ,
-                RX_DST_RDY     => open                     ,
+            port map (
+                RX_SOF         => (others => '0'),
+                RX_EOF         => (others => '0'),
+                RX_SRC_RDY     => DMA_RQ_MVB_SRC_RDY(dp),
+                RX_DST_RDY     => open,
 
-                TX_SOF         => open                     ,
-                TX_EOF         => open                     ,
-                TX_SRC_RDY     => open                     ,
-                TX_DST_RDY     => DMA_RQ_MVB_DST_RDY(dp)   ,
+                TX_SOF         => open,
+                TX_EOF         => open,
+                TX_SRC_RDY     => open,
+                TX_DST_RDY     => DMA_RQ_MVB_DST_RDY(dp),
 
-                DEBUG_BLOCK    => '0'                      ,
-                DEBUG_DROP     => '0'                      ,
-                DEBUG_SOF      => open                     ,
-                DEBUG_EOF      => open                     ,
+                DEBUG_BLOCK    => '0',
+                DEBUG_DROP     => '0',
+                DEBUG_SOF      => open,
+                DEBUG_EOF      => open,
                 DEBUG_SRC_RDY  => dp_out_src_rdy    (dp)(1),
                 DEBUG_DST_RDY  => dp_out_dst_rdy    (dp)(1)
             );
 
             debug_probe2_i : entity work.STREAMING_DEBUG_PROBE_MFB
-            generic map(
+            generic map (
                 REGIONS => RQ_MFB_REGIONS
             )
-            port map(
-                RX_SOF         => (others => '0')          ,
-                RX_EOF         => (others => '0')          ,
-                RX_SRC_RDY     => DMA_RC_MFB_SRC_RDY(dp)   ,
-                RX_DST_RDY     => open                     ,
+            port map (
+                RX_SOF         => (others => '0'),
+                RX_EOF         => (others => '0'),
+                RX_SRC_RDY     => DMA_RC_MFB_SRC_RDY(dp),
+                RX_DST_RDY     => open,
 
-                TX_SOF         => open                     ,
-                TX_EOF         => open                     ,
-                TX_SRC_RDY     => open                     ,
-                TX_DST_RDY     => DMA_RC_MFB_DST_RDY(dp)   ,
+                TX_SOF         => open,
+                TX_EOF         => open,
+                TX_SRC_RDY     => open,
+                TX_DST_RDY     => DMA_RC_MFB_DST_RDY(dp),
 
-                DEBUG_BLOCK    => '0'                      ,
-                DEBUG_DROP     => '0'                      ,
-                DEBUG_SOF      => open                     ,
-                DEBUG_EOF      => open                     ,
+                DEBUG_BLOCK    => '0',
+                DEBUG_DROP     => '0',
+                DEBUG_SOF      => open,
+                DEBUG_EOF      => open,
                 DEBUG_SRC_RDY  => dp_out_src_rdy    (dp)(2),
                 DEBUG_DST_RDY  => dp_out_dst_rdy    (dp)(2)
             );
 
             debug_probe3_i : entity work.STREAMING_DEBUG_PROBE_MFB
-            generic map(
+            generic map (
                 REGIONS => RQ_MFB_REGIONS
             )
-            port map(
-                RX_SOF         => (others => '0')          ,
-                RX_EOF         => (others => '0')          ,
-                RX_SRC_RDY     => DMA_RC_MVB_SRC_RDY(dp)   ,
-                RX_DST_RDY     => open                     ,
+            port map (
+                RX_SOF         => (others => '0'),
+                RX_EOF         => (others => '0'),
+                RX_SRC_RDY     => DMA_RC_MVB_SRC_RDY(dp),
+                RX_DST_RDY     => open,
 
-                TX_SOF         => open                     ,
-                TX_EOF         => open                     ,
-                TX_SRC_RDY     => open                     ,
-                TX_DST_RDY     => DMA_RC_MVB_DST_RDY(dp)   ,
+                TX_SOF         => open,
+                TX_EOF         => open,
+                TX_SRC_RDY     => open,
+                TX_DST_RDY     => DMA_RC_MVB_DST_RDY(dp),
 
-                DEBUG_BLOCK    => '0'                      ,
-                DEBUG_DROP     => '0'                      ,
-                DEBUG_SOF      => open                     ,
-                DEBUG_EOF      => open                     ,
+                DEBUG_BLOCK    => '0',
+                DEBUG_DROP     => '0',
+                DEBUG_SOF      => open,
+                DEBUG_EOF      => open,
                 DEBUG_SRC_RDY  => dp_out_src_rdy    (dp)(3),
                 DEBUG_DST_RDY  => dp_out_dst_rdy    (dp)(3)
             );
         end generate;
 
         mi_splitter_events_i : entity work.MI_SPLITTER_PLUS_GEN
-        generic map(
+        generic map (
             ADDR_WIDTH => 32,
             DATA_WIDTH => 32,
             PORTS      => DBG_EVENTS,
             ADDR_BASE  => mi_addr_base_eve_f,
             DEVICE     => DEVICE
         )
-        port map(
+        port map (
             CLK     => DMA_CLK,
             RESET   => DMA_RESET,
 
@@ -1134,29 +1136,29 @@ begin
         process (DMA_CLK)
         begin
             if (rising_edge(DMA_CLK)) then
-                eve_tags(0) <= '1' when (unsigned(PCIE_TAG_STATUS) = 0) else '0';                                          -- 0      available tags
-                eve_tags(1) <= '1' when (unsigned(PCIE_TAG_STATUS) >= 1)  and (unsigned(PCIE_TAG_STATUS) <= 31)  else '0'; -- 1-31   available tags
-                eve_tags(2) <= '1' when (unsigned(PCIE_TAG_STATUS) >= 32) and (unsigned(PCIE_TAG_STATUS) <= 127) else '0'; -- 32-127 available tags
-                eve_tags(3) <= '1' when (unsigned(PCIE_TAG_STATUS) >= 128) else '0';                                       -- 128+   available tags
+                eve_tags(0)  <= '1' when (unsigned(PCIE_TAG_STATUS) = 0) else '0';                                          -- 0      available tags
+                eve_tags(1)  <= '1' when (unsigned(PCIE_TAG_STATUS) >= 1)  and (unsigned(PCIE_TAG_STATUS) <= 31)  else '0'; -- 1-31   available tags
+                eve_tags(2)  <= '1' when (unsigned(PCIE_TAG_STATUS) >= 32) and (unsigned(PCIE_TAG_STATUS) <= 127) else '0'; -- 32-127 available tags
+                eve_tags(3)  <= '1' when (unsigned(PCIE_TAG_STATUS) >= 128) else '0';                                       -- 128+   available tags
                 eve_tags_reg <= eve_tags;
             end if;
         end process;
 
         eve_cnt_g : for e in 0 to DBG_EVENTS-1 generate
             eve_cnt_i : entity work.EVENT_COUNTER_MI_WRAPPER
-            generic map(
+            generic map (
                 MAX_INTERVAL_CYCLES   => DBG_MAX_INTERVAL_CYCLES,
-                MAX_CONCURRENT_EVENTS => 1                      ,
-                CAPTURE_EN            => True                   ,
-                CAPTURE_FIFO_ITEMS    => DBG_MAX_INTERVALS      ,
-                MI_WIDTH              => 32                     ,
-                MI_INTERVAL_ADDR      => DBG_MI_INTERVAL_ADDR   ,
-                MI_EVENTS_ADDR        => DBG_MI_EVENTS_ADDR     ,
-                MI_CPT_EN_ADDR        => DBG_MI_CAPTURE_EN_ADDR ,
-                MI_CPT_RD_ADDR        => DBG_MI_CAPTURE_RD_ADDR ,
+                MAX_CONCURRENT_EVENTS => 1,
+                CAPTURE_EN            => True,
+                CAPTURE_FIFO_ITEMS    => DBG_MAX_INTERVALS,
+                MI_WIDTH              => 32,
+                MI_INTERVAL_ADDR      => DBG_MI_INTERVAL_ADDR,
+                MI_EVENTS_ADDR        => DBG_MI_EVENTS_ADDR,
+                MI_CPT_EN_ADDR        => DBG_MI_CAPTURE_EN_ADDR,
+                MI_CPT_RD_ADDR        => DBG_MI_CAPTURE_RD_ADDR,
                 MI_ADDR_MASK          => DBG_MI_ADDR_MASK
             )
-            port map(
+            port map (
                 CLK       => DMA_CLK,
                 RESET     => DMA_RESET,
 

@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_STAT_UNIT is
-    generic(
+    generic (
         -- =====================================================================
         -- MFB CONFIGURATION:
         -- =====================================================================
@@ -31,7 +31,7 @@ entity RX_MAC_LITE_STAT_UNIT is
         SIZE_EN            : boolean := true;
         LEN_HISTOGRAM_EN   : boolean := true
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -454,8 +454,8 @@ begin
         begin
             if (rising_edge(CLK)) then
                 if (s_snapshot_en = '0') then
-                OUT_RX_BYTES <= s_cnt_sum_rx_frame_size;
-                OUT_TX_BYTES <= s_cnt_sum_tx_frame_size;
+                    OUT_RX_BYTES <= s_cnt_sum_rx_frame_size;
+                    OUT_TX_BYTES <= s_cnt_sum_tx_frame_size;
                 end if;
             end if;
         end process;
@@ -463,8 +463,8 @@ begin
     end generate;
 
     no_size_g : if not SIZE_EN generate
-        OUT_RX_BYTES <= (others=>'0');
-        OUT_TX_BYTES <= (others=>'0');
+        OUT_RX_BYTES <= (others => '0');
+        OUT_TX_BYTES <= (others => '0');
     end generate;
 
     -- =========================================================================
@@ -546,18 +546,18 @@ begin
     end generate;
 
     no_len_hist_g : if not LEN_HISTOGRAM_EN generate
-        OUT_HIST_UNDERSIZE <= (others=>'0');
-        OUT_HIST_64        <= (others=>'0');
-        OUT_HIST_65_127    <= (others=>'0');
-        OUT_HIST_128_255   <= (others=>'0');
-        OUT_HIST_256_511   <= (others=>'0');
-        OUT_HIST_512_1023  <= (others=>'0');
-        OUT_HIST_1024_1518 <= (others=>'0');
-        OUT_HIST_OVER_1518 <= (others=>'0');
-        OUT_HIST_1519_2047 <= (others=>'0');
-        OUT_HIST_2048_4095 <= (others=>'0');
-        OUT_HIST_4096_8191 <= (others=>'0');
-        OUT_HIST_OVER_8191 <= (others=>'0');
+        OUT_HIST_UNDERSIZE <= (others => '0');
+        OUT_HIST_64        <= (others => '0');
+        OUT_HIST_65_127    <= (others => '0');
+        OUT_HIST_128_255   <= (others => '0');
+        OUT_HIST_256_511   <= (others => '0');
+        OUT_HIST_512_1023  <= (others => '0');
+        OUT_HIST_1024_1518 <= (others => '0');
+        OUT_HIST_OVER_1518 <= (others => '0');
+        OUT_HIST_1519_2047 <= (others => '0');
+        OUT_HIST_2048_4095 <= (others => '0');
+        OUT_HIST_4096_8191 <= (others => '0');
+        OUT_HIST_OVER_8191 <= (others => '0');
     end generate;
 
 end architecture;

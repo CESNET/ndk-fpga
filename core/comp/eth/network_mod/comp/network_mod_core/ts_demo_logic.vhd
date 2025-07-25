@@ -64,57 +64,57 @@ use work.type_pack.all;
 -- +----------------------------+----------+
 --
 entity TS_DEMO_LOGIC is
-generic(
+    generic (
 
-    REGIONS           : natural := 1;
+        REGIONS           : natural := 1;
 
-    ETH_PORT_CHAN     : natural := 8;
+        ETH_PORT_CHAN     : natural := 8;
 
-    MI_DATA_WIDTH     : natural := 32;
-    MI_ADDR_WIDTH     : natural := 32;
+        MI_DATA_WIDTH     : natural := 32;
+        MI_ADDR_WIDTH     : natural := 32;
 
-    TX_DMA_CHANNELS   : natural := 8;
+        TX_DMA_CHANNELS   : natural := 8;
 
-    -- Select correct FPGA device.
-    -- "AGILEX", "STRATIX10", "ULTRASCALE", ...
-    DEVICE            : string  := "STRATIX10"
-);
-port(
-    -- =====================================================================
-    -- CLOCK AND RESET
-    -- =====================================================================
-    CLK_ETH       : in  std_logic;
-    RESET_ETH     : in  std_logic;
+        -- Select correct FPGA device.
+        -- "AGILEX", "STRATIX10", "ULTRASCALE", ...
+        DEVICE            : string  := "STRATIX10"
+    );
+    port (
+        -- =====================================================================
+        -- CLOCK AND RESET
+        -- =====================================================================
+        CLK_ETH       : in  std_logic;
+        RESET_ETH     : in  std_logic;
 
-    MI_CLK        : in  std_logic;
-    MI_RESET      : in  std_logic;
+        MI_CLK        : in  std_logic;
+        MI_RESET      : in  std_logic;
 
-    -- =====================================================================
-    -- RX interface (Packets for transmit to Ethernet)
-    -- =====================================================================
-    CORE_SOP      : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    CORE_SRC_RDY  : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    CORE_DST_RDY  : out std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        -- =====================================================================
+        -- RX interface (Packets for transmit to Ethernet)
+        -- =====================================================================
+        CORE_SOP      : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        CORE_SRC_RDY  : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        CORE_DST_RDY  : out std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
-    APP_CHANNEL   : in  std_logic_vector(REGIONS*log2(TX_DMA_CHANNELS)-1 downto 0);
-    APP_TIMESTAMP : in  std_logic_vector(REGIONS*48-1 downto 0);
-    APP_VLD       : in  std_logic_vector(REGIONS-1 downto 0);
+        APP_CHANNEL   : in  std_logic_vector(REGIONS*log2(TX_DMA_CHANNELS)-1 downto 0);
+        APP_TIMESTAMP : in  std_logic_vector(REGIONS*48-1 downto 0);
+        APP_VLD       : in  std_logic_vector(REGIONS-1 downto 0);
 
-    TSU_TS_NS     : in  std_logic_vector(64-1 downto 0);
-    TSU_TS_DV     : in  std_logic;
+        TSU_TS_NS     : in  std_logic_vector(64-1 downto 0);
+        TSU_TS_DV     : in  std_logic;
 
-    -- =====================================================================
-    -- MI interface
-    -- =====================================================================
-    MI_DWR        : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_ADDR       : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
-    MI_RD         : in  std_logic;
-    MI_WR         : in  std_logic;
-    MI_BE         : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0);
-    MI_DRD        : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_ARDY       : out std_logic;
-    MI_DRDY       : out std_logic
-);
+        -- =====================================================================
+        -- MI interface
+        -- =====================================================================
+        MI_DWR        : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_ADDR       : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
+        MI_RD         : in  std_logic;
+        MI_WR         : in  std_logic;
+        MI_BE         : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0);
+        MI_DRD        : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_ARDY       : out std_logic;
+        MI_DRDY       : out std_logic
+    );
 end entity;
 
 architecture FULL of TS_DEMO_LOGIC is
@@ -127,8 +127,8 @@ architecture FULL of TS_DEMO_LOGIC is
     --                                SIGNALS
     -- =========================================================================
 
-    signal app_channel_arr         : slv_array_t     (REGIONS-1 downto 0)(log2(TX_DMA_CHANNELS)-1 downto 0);
-    signal app_timestamp_arr       : slv_array_t     (REGIONS-1 downto 0)(48-1 downto 0);
+    signal app_channel_arr            : slv_array_t     (REGIONS-1 downto 0)(log2(TX_DMA_CHANNELS)-1 downto 0);
+    signal app_timestamp_arr          : slv_array_t     (REGIONS-1 downto 0)(48-1 downto 0);
     signal fifoxm_din_arr             : slv_array_t     (REGIONS-1 downto 0)(log2(TX_DMA_CHANNELS)+48-1 downto 0);
     signal fifoxm_din                 : std_logic_vector(REGIONS*            log2(TX_DMA_CHANNELS)+48-1 downto 0);
     signal fifoxm_wr                  : std_logic_vector(REGIONS-1 downto 0);
@@ -227,10 +227,10 @@ architecture FULL of TS_DEMO_LOGIC is
     signal demo_ts_reg                   : std_logic_vector(2*MI_DATA_WIDTH-1 downto 0);
     signal demo_ts_min_reg               : std_logic_vector(2*MI_DATA_WIDTH-1 downto 0);
     signal demo_ts_max_reg               : std_logic_vector(2*MI_DATA_WIDTH-1 downto 0);
-    signal fifoxm_wr_err_reg             : std_logic_vector(  MI_DATA_WIDTH-1 downto 0);
-    signal fifoxm_rd_err_reg             : std_logic_vector(  MI_DATA_WIDTH-1 downto 0);
-    signal asfifox_wr_err_reg            : std_logic_vector(  MI_DATA_WIDTH-1 downto 0);
-    signal asfifox2_full_reg             : std_logic_vector(  MI_DATA_WIDTH-1 downto 0);
+    signal fifoxm_wr_err_reg             : std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+    signal fifoxm_rd_err_reg             : std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+    signal asfifox_wr_err_reg            : std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+    signal asfifox2_full_reg             : std_logic_vector(MI_DATA_WIDTH-1 downto 0);
 
     signal demo_drd                      : std_logic_vector(MI_DATA_WIDTH-1 downto 0);
     signal demo_drdy                     : std_logic;
@@ -332,13 +332,13 @@ begin
     end generate;
 
     -- Watch out for the relation between CORE signals (ETH_PORT_CHAN-1:0) and the FIFOXM_RD signal (REGIONS-1:0)
-    valid_sop <= '1' when (CORE_SOP(0) = '1') and (CORE_SRC_RDY(0) = '1') and (CORE_DST_RDY(0) = '1') else '0';
+    valid_sop    <= '1' when (CORE_SOP(0) = '1') and (CORE_SRC_RDY(0) = '1') and (CORE_DST_RDY(0) = '1') else '0';
     fifoxm_rd(0) <= '1' when (valid_sop = '1') and (fifoxm_empty(0) = '0') else '0';
 
     -- Error report register
     fifoxm_read_error  <= '1' when (valid_sop = '1') and (fifoxm_empty(0) = '1') else '0';
     fifoxm_write_error <= '1' when (fifoxm_wr(0) = '1') and (fifoxm_full = '1')  else '0';
-    process(CLK_ETH)
+    process (CLK_ETH)
     begin
         if rising_edge(CLK_ETH) then
             if (fifoxm_read_error = '1') then
@@ -360,7 +360,7 @@ begin
 
     -- Timestamp (+ valid) register
     -- Store only valid values
-    process(CLK_ETH)
+    process (CLK_ETH)
     begin
         if rising_edge(CLK_ETH) then
             if (RESET_ETH = '1') then
@@ -373,25 +373,25 @@ begin
 
     -- TSU format to ns conversion
     tsu_format_to_ns_i : entity work.TSU_FORMAT_TO_NS
-    generic map(
+    generic map (
         REG_BITMAP => "111"
     )
-    port map(
-        CLK    => CLK_ETH           ,
-        RESET  => RESET_ETH         ,
-        TS_TSU => tsu_ts_ns_reg     ,
+    port map (
+        CLK    => CLK_ETH,
+        RESET  => RESET_ETH,
+        TS_TSU => tsu_ts_ns_reg,
         TS_NS  => tsu_ts_ns_reg_conv
     );
 
     -- TSU TS store and compare logic per DMA channel
     tsu_ts_diff_channel_g : for ch in 0 to log2(TX_DMA_CHANNELS)-1 generate
         -- Store valid TSU TS into appropriate channels
-        process(CLK_ETH)
+        process (CLK_ETH)
         begin
             if rising_edge(CLK_ETH) then
-                if (RESET_ETH = '1') or (sw_reset = '1') then
+                if ((RESET_ETH = '1') or (sw_reset = '1')) then
                     tsu_ts_channel_arr_reg(ch) <= (others => '0');
-                elsif (fifoxm_rd(0) = '1') and (mvb_channel_arr(0) = ch) then
+                elsif ((fifoxm_rd(0) = '1') and (mvb_channel_arr(0) = ch)) then
                     tsu_ts_channel_arr_reg(ch) <= unsigned(tsu_ts_ns_reg_conv);
                 end if;
             end if;
@@ -408,12 +408,12 @@ begin
     -- TSU TS store and compare logic per DMA channel
     mvb_ts_diff_channel_g : for ch in 0 to log2(TX_DMA_CHANNELS)-1 generate
         -- Store valid TSU TS into appropriate channels
-        process(CLK_ETH)
+        process (CLK_ETH)
         begin
             if rising_edge(CLK_ETH) then
-                if (RESET_ETH = '1') or (sw_reset = '1') then
+                if ((RESET_ETH = '1') or (sw_reset = '1')) then
                     mvb_ts_channel_arr_reg(ch) <= (others => '0');
-                elsif (fifoxm_rd(0) = '1') and (mvb_channel_arr(0) = ch) then
+                elsif ((fifoxm_rd(0) = '1') and (mvb_channel_arr(0) = ch)) then
                     mvb_ts_channel_arr_reg(ch) <= mvb_ts_arr(0);
                 end if;
             end if;
@@ -430,13 +430,13 @@ begin
 
     first_pkt_g : for ch in 0 to TX_DMA_CHANNELS-1 generate
 
-        process(CLK_ETH)
+        process (CLK_ETH)
         begin
             if rising_edge(CLK_ETH) then
-                if (valid_sop = '1') and (fifoxm_empty(0) = '0') and (mvb_channel_arr(0) = ch) then
+                if ((valid_sop = '1') and (fifoxm_empty(0) = '0') and (mvb_channel_arr(0) = ch)) then
                     wait_for_first_pkt(ch) <= '0';
                 end if;
-                if (RESET_ETH = '1') or (sw_reset = '1') then
+                if ((RESET_ETH = '1') or (sw_reset = '1')) then
                     wait_for_first_pkt(ch) <= '1';
                 end if;
             end if;
@@ -454,13 +454,13 @@ begin
     -- A valid TS (packet), which is not the first
     not_first_valid_ts <= '1' when (fifoxm_rd(0) = '1') and (first_pkt(to_integer(mvb_channel_arr(0))) = '0') else '0';
     -- A register to avoid timing issues
-    process(CLK_ETH)
+    process (CLK_ETH)
     begin
         if rising_edge(CLK_ETH) then
             ts_actual   <= resize(tsu_ts_diff, 48);
             ts_expected <= mvb_ts_diff;
             ts_valid    <= not_first_valid_ts;
-            if (RESET_ETH = '1') or (sw_reset = '1') then
+            if ((RESET_ETH = '1') or (sw_reset = '1')) then
                 ts_actual   <= (others => '0');
                 ts_expected <= (others => '0');
                 ts_valid    <= '0';
@@ -472,15 +472,15 @@ begin
     -- Negative value = ahead of schedule
     final_ts_diff_signed <= signed(ts_actual) - signed(ts_expected);
     -- Absolute value for complete deviation (=sum of deviations, positive as well as negative)
-    final_ts_diff <= absolute2slv(final_ts_diff_signed);
+    final_ts_diff        <= absolute2slv(final_ts_diff_signed);
 
     -- A register to avoid timing issues
-    process(CLK_ETH)
+    process (CLK_ETH)
     begin
         if rising_edge(CLK_ETH) then
             asfifox_din <= final_ts_diff;
             asfifox_wr  <= ts_valid;
-            if (RESET_ETH = '1') or (sw_reset = '1') then
+            if ((RESET_ETH = '1') or (sw_reset = '1')) then
                 asfifox_wr <= '0';
             end if;
         end if;
@@ -506,29 +506,29 @@ begin
 
     asfifox_wr_error <= '1' when (asfifox_wr = '1') and (asfifox_full = '1') else '0';
     demo_asfifox_i : entity work.ASFIFOX
-    generic map(
-        DATA_WIDTH => 48    ,
-        ITEMS      => 512   ,
-        RAM_TYPE   => "LUT" ,
-        FWFT_MODE  => true  ,
-        OUTPUT_REG => true  ,
+    generic map (
+        DATA_WIDTH => 48,
+        ITEMS      => 512,
+        RAM_TYPE   => "LUT",
+        FWFT_MODE  => true,
+        OUTPUT_REG => true,
         DEVICE     => DEVICE
     )
     port map (
-        WR_CLK    => CLK_ETH      ,
-        WR_RST    => RESET_ETH    ,
-        WR_DATA   => asfifox_din  ,
-        WR_EN     => asfifox_wr   ,
-        WR_FULL   => asfifox_full ,
-        WR_AFULL  => open         ,
-        WR_STATUS => open         ,
+        WR_CLK    => CLK_ETH,
+        WR_RST    => RESET_ETH,
+        WR_DATA   => asfifox_din,
+        WR_EN     => asfifox_wr,
+        WR_FULL   => asfifox_full,
+        WR_AFULL  => open,
+        WR_STATUS => open,
 
-        RD_CLK    => MI_CLK   ,
-        RD_RST    => MI_RESET ,
-        RD_DATA   => asfifox_dout ,
-        RD_EN     => asfifox_rd   ,
+        RD_CLK    => MI_CLK,
+        RD_RST    => MI_RESET,
+        RD_DATA   => asfifox_dout,
+        RD_EN     => asfifox_rd,
         RD_EMPTY  => asfifox_empty,
-        RD_AEMPTY => open         ,
+        RD_AEMPTY => open,
         RD_STATUS => open
     );
 
@@ -538,7 +538,7 @@ begin
     final_ts_diff_synced_vld  <= not asfifox_empty;
 
     demo_asreset_i : entity work.ASYNC_RESET
-    generic map(
+    generic map (
         TWO_REG  => false,
         OUT_REG  => true,
         REPLICAS => 1
@@ -557,33 +557,33 @@ begin
                     asfifox2_full;       -- failing to write one of the errors above (is Full)
 
     asfifox2_wr <= fifoxm_write_error or
-                    fifoxm_read_error  or
-                    asfifox_wr_error;
+                   fifoxm_read_error  or
+                   asfifox_wr_error;
 
     demo_asfifox2_i : entity work.ASFIFOX
-    generic map(
-        DATA_WIDTH => 4     ,
-        ITEMS      => 512   ,
-        RAM_TYPE   => "LUT" ,
-        FWFT_MODE  => true  ,
-        OUTPUT_REG => true  ,
+    generic map (
+        DATA_WIDTH => 4,
+        ITEMS      => 512,
+        RAM_TYPE   => "LUT",
+        FWFT_MODE  => true,
+        OUTPUT_REG => true,
         DEVICE     => DEVICE
     )
     port map (
-        WR_CLK    => CLK_ETH       ,
-        WR_RST    => RESET_ETH     ,
-        WR_DATA   => asfifox2_din  ,
-        WR_EN     => asfifox2_wr   ,
-        WR_FULL   => asfifox2_full ,
-        WR_AFULL  => open          ,
-        WR_STATUS => open          ,
+        WR_CLK    => CLK_ETH,
+        WR_RST    => RESET_ETH,
+        WR_DATA   => asfifox2_din,
+        WR_EN     => asfifox2_wr,
+        WR_FULL   => asfifox2_full,
+        WR_AFULL  => open,
+        WR_STATUS => open,
 
-        RD_CLK    => MI_CLK    ,
-        RD_RST    => MI_RESET  ,
-        RD_DATA   => asfifox2_dout ,
-        RD_EN     => asfifox2_rd   ,
+        RD_CLK    => MI_CLK,
+        RD_RST    => MI_RESET,
+        RD_DATA   => asfifox2_dout,
+        RD_EN     => asfifox2_rd,
         RD_EMPTY  => asfifox2_empty,
-        RD_AEMPTY => open          ,
+        RD_AEMPTY => open,
         RD_STATUS => open
     );
 
@@ -594,7 +594,7 @@ begin
     -- --------------------------------------------------------
 
     -- Accumulation of transmitted packets (SOFs)
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (accum_reset = '1') then
@@ -605,7 +605,7 @@ begin
         end if;
     end process;
     -- Accumulation of timestamp differences
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (accum_reset = '1') then
@@ -618,7 +618,7 @@ begin
 
     -- First packet logic (again)
     -- This time it is to get a real minimal value (otherwise would be stuck at 0 forever)
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (final_ts_diff_synced_vld = '1') then
@@ -633,43 +633,43 @@ begin
     first_ts_diff_synced <= '1' when (final_ts_diff_synced_vld = '1') and (wait_for_first_ts_diff_synced = '1') else '0';
 
     -- Store the minimum deviation
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (accum_reset = '1') then
                 ts_diff_min <= (others => '0');
-            elsif (final_ts_diff_synced_vld = '1') and ((final_ts_diff_synced < ts_diff_min) or (first_ts_diff_synced = '1')) then
+            elsif ((final_ts_diff_synced_vld = '1') and ((final_ts_diff_synced < ts_diff_min) or (first_ts_diff_synced = '1'))) then
                 ts_diff_min <= resize(final_ts_diff_synced, 64);
             end if;
         end if;
     end process;
 
     -- Store the maximum deviation
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (accum_reset = '1') then
                 ts_diff_max <= (others => '0');
-            elsif (final_ts_diff_synced_vld = '1') and (final_ts_diff_synced > ts_diff_max) then
+            elsif ((final_ts_diff_synced_vld = '1') and (final_ts_diff_synced > ts_diff_max)) then
                 ts_diff_max <= resize(final_ts_diff_synced, 64);
             end if;
         end if;
     end process;
 
     -- Error registers -----------------------------------------
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
-            if (asfifox2_dout(3) = '1') and (asfifox2_empty = '0') then
+            if ((asfifox2_dout(3) = '1') and (asfifox2_empty = '0')) then
                 fifoxm_wr_errs <= fifoxm_wr_errs + 1;
             end if;
-            if (asfifox2_dout(2) = '1') and (asfifox2_empty = '0') then
+            if ((asfifox2_dout(2) = '1') and (asfifox2_empty = '0')) then
                 fifoxm_rd_errs <= fifoxm_rd_errs + 1;
             end if;
-            if (asfifox2_dout(1) = '1') and (asfifox2_empty = '0') then
+            if ((asfifox2_dout(1) = '1') and (asfifox2_empty = '0')) then
                 asfifox_wr_errs <= asfifox_wr_errs + 1;
             end if;
-            if (asfifox2_dout(0) = '1') and (asfifox2_empty = '0') then
+            if ((asfifox2_dout(0) = '1') and (asfifox2_empty = '0')) then
                 asfifox2_fulls <= asfifox2_fulls + 1;
             end if;
             if (accum_reset = '1') then
@@ -707,10 +707,10 @@ begin
     demo_rd_asfifox2_full_cmd  <= '1' when (MI_RD = '1') and (MI_ADDR(6 downto 2) = "01101") else '0'; -- 0x34
 
     -- Reset register
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
-            if (MI_RESET = '1') or (demo_reset_pulse = '1') then
+            if ((MI_RESET = '1') or (demo_reset_pulse = '1')) then
                 demo_reset_reg <= '0';
             end if;
             if (demo_reset_cmd = '1') then
@@ -721,7 +721,7 @@ begin
 
     -- Detect rising edge
     edge_detect_i : entity work.EDGE_DETECT
-    port map(
+    port map (
         CLK  => MI_CLK,
         DI   => demo_reset_reg,
         EDGE => demo_reset_edge
@@ -729,10 +729,10 @@ begin
 
     -- Use the detected edge to extend the reset pulse
     pulse_extend_i : entity work.PULSE_EXTEND
-    generic map(
+    generic map (
         N => 5
     )
-    port map(
+    port map (
         RST => MI_RESET,
         CLK => MI_CLK,
         I   => demo_reset_edge,
@@ -746,10 +746,10 @@ begin
 
     -- MI packet accumulation and TS accumulation registers (RO)
     -- Sample values of the accumulation registers
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
-            if (MI_RESET = '1') or (sw_reset = '1') then
+            if ((MI_RESET = '1') or (sw_reset = '1')) then
                 demo_pkts_reg      <= (others => '0');
                 demo_ts_reg        <= (others => '0');
                 demo_ts_min_reg    <= (others => '0');
@@ -784,23 +784,23 @@ begin
                  demo_rd_asfifox_wr_err_cmd or
                  demo_rd_asfifox2_full_cmd;
 
-    demo_drd <= demo_pkts_reg     (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_pkts_lo_cmd        = '1') else
-                demo_pkts_reg     (MI_DATA_WIDTH*2-1 downto MI_DATA_WIDTH) when (demo_rd_pkts_hi_cmd        = '1') else
+    demo_drd <= demo_pkts_reg     (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_pkts_lo_cmd = '1') else
+                demo_pkts_reg     (MI_DATA_WIDTH*2-1 downto MI_DATA_WIDTH) when (demo_rd_pkts_hi_cmd = '1') else
 
-                demo_ts_reg       (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_ts_lo_cmd          = '1') else
-                demo_ts_reg       (MI_DATA_WIDTH*2-1 downto MI_DATA_WIDTH) when (demo_rd_ts_hi_cmd          = '1') else
+                demo_ts_reg       (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_ts_lo_cmd = '1') else
+                demo_ts_reg       (MI_DATA_WIDTH*2-1 downto MI_DATA_WIDTH) when (demo_rd_ts_hi_cmd = '1') else
 
-                demo_ts_min_reg   (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_ts_min_lo_cmd      = '1') else
-                demo_ts_min_reg   (MI_DATA_WIDTH*2-1 downto MI_DATA_WIDTH) when (demo_rd_ts_min_hi_cmd      = '1') else
+                demo_ts_min_reg   (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_ts_min_lo_cmd = '1') else
+                demo_ts_min_reg   (MI_DATA_WIDTH*2-1 downto MI_DATA_WIDTH) when (demo_rd_ts_min_hi_cmd = '1') else
 
-                demo_ts_max_reg   (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_ts_max_lo_cmd      = '1') else
-                demo_ts_max_reg   (MI_DATA_WIDTH*2-1 downto MI_DATA_WIDTH) when (demo_rd_ts_max_hi_cmd      = '1') else
+                demo_ts_max_reg   (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_ts_max_lo_cmd = '1') else
+                demo_ts_max_reg   (MI_DATA_WIDTH*2-1 downto MI_DATA_WIDTH) when (demo_rd_ts_max_hi_cmd = '1') else
 
-                -- Error registers - not included in the Device Tree
-                fifoxm_wr_err_reg (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_fifoxm_wr_err_cmd  = '1') else
-                fifoxm_rd_err_reg (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_fifoxm_rd_err_cmd  = '1') else
+    -- Error registers - not included in the Device Tree
+                fifoxm_wr_err_reg (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_fifoxm_wr_err_cmd = '1') else
+                fifoxm_rd_err_reg (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_fifoxm_rd_err_cmd = '1') else
                 asfifox_wr_err_reg(MI_DATA_WIDTH  -1 downto             0) when (demo_rd_asfifox_wr_err_cmd = '1') else
-                asfifox2_full_reg (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_asfifox2_full_cmd  = '1') else
+                asfifox2_full_reg (MI_DATA_WIDTH  -1 downto             0) when (demo_rd_asfifox2_full_cmd = '1') else
 
                 (others => '0');
 

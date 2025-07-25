@@ -13,12 +13,12 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_ADDR_DEC is
-    generic(
+    generic (
         -- Is enabled CRC insertion in TX_MAC_LITE?
         CRC_INSERTION_EN : boolean := True;
         DEVICE           : string  := "STRATIX10"
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK                             : in  std_logic;
         RESET                           : in  std_logic;
@@ -105,17 +105,17 @@ architecture FULL of TX_MAC_LITE_ADDR_DEC is
     signal status_reg_we      : std_logic;
 
     -- MI32 registers
-    signal cmd_strobe_cnt     : std_logic;
-    signal cmd_strobe_cnt_reg : std_logic;
-    signal cmd_reset_cnt      : std_logic;
-    signal cmd_reset_cnt_reg  : std_logic;
-    signal obuf_en_reg        : std_logic;
-    signal ld_discard_dis_reg : std_logic;
-    signal off_discard_dis_reg: std_logic;
-    signal obuf_en_reg_32     : std_logic_vector(31 downto 0);
-    signal status_disable_crc : std_logic;
-    signal status_reg         : std_logic_vector(6 downto 0) := "1010000";
-    signal status_reg_32      : std_logic_vector(31 downto 0);
+    signal cmd_strobe_cnt      : std_logic;
+    signal cmd_strobe_cnt_reg  : std_logic;
+    signal cmd_reset_cnt       : std_logic;
+    signal cmd_reset_cnt_reg   : std_logic;
+    signal obuf_en_reg         : std_logic;
+    signal ld_discard_dis_reg  : std_logic;
+    signal off_discard_dis_reg : std_logic;
+    signal obuf_en_reg_32      : std_logic_vector(31 downto 0);
+    signal status_disable_crc  : std_logic;
+    signal status_reg          : std_logic_vector(6 downto 0) := "1010000";
+    signal status_reg_32       : std_logic_vector(31 downto 0);
 
 begin
 
@@ -124,10 +124,10 @@ begin
     -- =========================================================================
 
     mi_async_i : entity work.MI_ASYNC
-    generic map(
+    generic map (
         DEVICE => DEVICE
     )
-    port map(
+    port map (
         -- Master side
         CLK_M     => MI_CLK,
         RESET_M   => MI_RESET,
@@ -158,7 +158,7 @@ begin
 
     -- MI32 write control logic ------------------------------------------------
 
-    reg_sel_p : process(mi_s_addr)
+    reg_sel_p : process (mi_s_addr)
     begin
         case (mi_s_addr(7 downto 0)) is
             when ADDR_REG_OBUF_EN =>
@@ -191,7 +191,7 @@ begin
     obuf_en_reg_32 <= (31 downto 9 => '0') & ld_discard_dis_reg & "0000000" & obuf_en_reg;
     status_reg_32  <= (31 downto 7 => '0') & ETH_SPEED_CODE & "00" & status_disable_crc & obuf_en_reg;
 
-    mi_s_drd_mux_p : process(all)
+    mi_s_drd_mux_p : process (all)
     begin
         case (mi_s_addr(7 downto 0)) is
             when ADDR_CNT_TOTAL_FRAMES_L =>
@@ -238,7 +238,7 @@ begin
 
     -- MI32 common control logic -----------------------------------------------
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (mi_s_rd = '1' or mi_s_wr = '1') then
@@ -256,7 +256,7 @@ begin
     mi_s_ardy <= mi_s_active_reg;
     mi_s_drdy <= mi_s_rd and mi_s_active_reg;
 
-    mi_s_drdy_reg_p : process(CLK)
+    mi_s_drdy_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (RESET = '1') then
@@ -267,7 +267,7 @@ begin
         end if;
     end process;
 
-    mi_s_drd_reg_p : process(CLK)
+    mi_s_drd_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             mi_s_drd_reg <= mi_s_drd;
@@ -281,7 +281,7 @@ begin
     cmd_strobe_cnt <= '1' when ((mi_s_dwr(7 downto 0) = OBUFCMD_STROBE_COUNTERS) and (ctrl_regs_we = '1')) else '0';
     cmd_reset_cnt  <= '1' when ((mi_s_dwr(7 downto 0) = OBUFCMD_RESET_COUNTERS)  and (ctrl_regs_we = '1')) else '0';
 
-    cmd_regs_p : process(CLK)
+    cmd_regs_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             cmd_strobe_cnt_reg <= cmd_strobe_cnt;
@@ -289,13 +289,13 @@ begin
         end if;
     end process;
 
-    obuf_en_reg_p : process(CLK)
+    obuf_en_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
                 obuf_en_reg         <= '0';
-                ld_discard_dis_reg  <= '0'; -- link down discard is enabled by default
-                off_discard_dis_reg <= '0'; -- when OBUF/TXMAC is disabled, frames are dropped by default
+                ld_discard_dis_reg  <= '0';          -- link down discard is enabled by default
+                off_discard_dis_reg <= '0';          -- when OBUF/TXMAC is disabled, frames are dropped by default
             elsif (obuf_en_reg_we = '1') then
                 obuf_en_reg         <= mi_s_dwr(0);
                 ld_discard_dis_reg  <= mi_s_dwr(8);

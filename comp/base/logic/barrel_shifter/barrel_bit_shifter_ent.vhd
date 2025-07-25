@@ -21,16 +21,16 @@ use work.math_pack.all;
 -- ----------------------------------------------------------------------------
 
 entity BARREL_BIT_SHIFTER is
-   generic (
-      DATA_WIDTH  : integer := 8;
-      -- set true to shift left, false to shift right
-      SHIFT_LEFT  : boolean := true
-   );
-   port (
-      -- Input interface ------------------------------------------------------
-      DATA_IN     : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-      DATA_OUT    : out std_logic_vector(DATA_WIDTH-1 downto 0);
-      SEL         : in  std_logic_vector(log2(DATA_WIDTH)-1 downto 0)
-   );
-end BARREL_BIT_SHIFTER;
+    generic (
+        DATA_WIDTH  : integer := 8;
+        -- set true to shift left, false to shift right
+        SHIFT_LEFT  : boolean := true
+    );
+    port (
+        -- Input interface ------------------------------------------------------
+        DATA_IN     : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        DATA_OUT    : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        SEL         : in  std_logic_vector(log2(DATA_WIDTH)-1 downto 0)
+    );
+end entity;
 

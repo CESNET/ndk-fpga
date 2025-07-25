@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity FP_TMP_REG is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
@@ -20,7 +20,7 @@ entity FP_TMP_REG is
 
         RX_PKT_SIZE_MAX     : natural := 2**10
     );
-    port(
+    port (
         CLK : in std_logic;
         RST : in std_logic;
 
@@ -46,7 +46,7 @@ architecture FULL of FP_TMP_REG is
     signal en_tmp_reg       : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0);
     signal tmp_enable       : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0);
 
-    --[SOF_OH] [EOF_OH]
+    -- [SOF_OH] [EOF_OH]
     signal xof_reg          : slv_array_t(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0)(1 + 1 - 1 downto 0);
     signal xof_reg_input    : slv_array_t(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0)(1 + 1 - 1 downto 0);
 
@@ -55,31 +55,31 @@ begin
     ---                                TMP_ENABLE                                ---
     --------------------------------------------------------------------------------
     -- This part decides which blocks to store, based on the value of the pointer
-    en_one_hot_p: process(all)
+    en_one_hot_p : process (all)
     begin
         en_one_hot                              <= (others => '0');
         en_one_hot(to_integer(RX_TMP_PTR_UNS))  <= '1';
     end process;
 
     en_before_one_i : entity work.BEFORE_ONE
-    generic map(
+    generic map (
         DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE
     )
-    port map(
+    port map (
         DI  => en_one_hot,
         DO  => en_tmp_n
     );
 
-    en_reg_p: process(CLK)
+    en_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             en_tmp_reg  <= not en_tmp_n;
         end if;
     end process;
 
-    enable_p: process(all)
+    enable_p : process (all)
     begin
-        if RX_TMP_OVERFLOW = '1' then
+        if (RX_TMP_OVERFLOW = '1') then
             tmp_enable  <= (others => '1');
         else
             tmp_enable  <= en_tmp_reg;
@@ -91,12 +91,12 @@ begin
     --------------------------------------------------------------------------------
     -- Temporary register stores overflow data
     tmp_reg_g: for i in MFB_REGIONS*MFB_REGION_SIZE -1 downto 0 generate
-        tmp_reg_data_p: process(CLK)
+        tmp_reg_data_p : process (CLK)
         begin
             if rising_edge(CLK) then
-                if RST = '1' then
+                if (RST = '1') then
                     TX_TMP_DATA(i) <= (others => '0');
-                elsif tmp_enable(i) = '1' then
+                elsif (tmp_enable(i) = '1') then
                     TX_TMP_DATA(i) <= RX_TMP_DATA_ARR(i);
                 end if;
             end if;
@@ -111,12 +111,12 @@ begin
     end generate;
 
     xof_reg_g: for i in MFB_REGIONS*MFB_REGION_SIZE -1 downto 0 generate
-        tmp_reg_xof_p: process(CLK)
+        tmp_reg_xof_p : process (CLK)
         begin
             if rising_edge(CLK) then
-                if RST = '1' then
+                if (RST = '1') then
                     xof_reg(i) <= (others => '0');
-                elsif tmp_enable(i) = '1' then
+                elsif (tmp_enable(i) = '1') then
                     xof_reg(i) <= xof_reg_input(i);
                 end if;
             end if;
@@ -132,12 +132,12 @@ begin
     ---                           TMP_REG - PKT_LNG                              ---
     --------------------------------------------------------------------------------
     pkt_lng_reg_g: for i in MFB_REGIONS*MFB_REGION_SIZE -1 downto 0 generate
-        tmp_reg_lng_p: process(CLK)
+        tmp_reg_lng_p : process (CLK)
         begin
             if rising_edge(CLK) then
-                if RST = '1' then
+                if (RST = '1') then
                     TX_PKT_LNG(i)   <= (others => '0');
-                elsif tmp_enable(i) = '1' then
+                elsif (tmp_enable(i) = '1') then
                     TX_PKT_LNG(i)   <= RX_PKT_LNG(i);
                 end if;
             end if;

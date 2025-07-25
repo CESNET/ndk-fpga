@@ -20,42 +20,42 @@ use work.type_pack.all;
 -- of the lookup table can be configured through a simple SW interface.
 --
 entity MVB_LOOKUP_TABLE is
-generic (
-    MVB_ITEMS  : natural := 4;
-    LUT_DEPTH  : natural := 128;
-    LUT_WIDTH  : natural := 32;
-    LUT_ARCH   : string  := "AUTO";
-    SW_WIDTH   : natural := 32;
-    META_WIDTH : natural := 1;
-    OUTPUT_REG : boolean := True;
-    DEVICE     : string  := "AGILEX"
-);
-port (
-    CLK             : in  std_logic;
-    RESET           : in  std_logic;
+    generic (
+        MVB_ITEMS  : natural := 4;
+        LUT_DEPTH  : natural := 128;
+        LUT_WIDTH  : natural := 32;
+        LUT_ARCH   : string  := "AUTO";
+        SW_WIDTH   : natural := 32;
+        META_WIDTH : natural := 1;
+        OUTPUT_REG : boolean := True;
+        DEVICE     : string  := "AGILEX"
+    );
+    port (
+        CLK             : in  std_logic;
+        RESET           : in  std_logic;
 
-    RX_MVB_LUT_ADDR : in  slv_array_t(MVB_ITEMS-1 downto 0)(max(log2(LUT_DEPTH),1)-1 downto 0);
-    RX_MVB_METADATA : in  slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0) := (others => (others => '0'));
-    RX_MVB_VLD      : in  std_logic_vector(MVB_ITEMS-1 downto 0);
-    RX_MVB_SRC_RDY  : in  std_logic;
-    RX_MVB_DST_RDY  : out std_logic;
+        RX_MVB_LUT_ADDR : in  slv_array_t(MVB_ITEMS-1 downto 0)(max(log2(LUT_DEPTH),1)-1 downto 0);
+        RX_MVB_METADATA : in  slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0) := (others => (others => '0'));
+        RX_MVB_VLD      : in  std_logic_vector(MVB_ITEMS-1 downto 0);
+        RX_MVB_SRC_RDY  : in  std_logic;
+        RX_MVB_DST_RDY  : out std_logic;
 
-    TX_MVB_LUT_DATA : out slv_array_t(MVB_ITEMS-1 downto 0)(LUT_WIDTH-1 downto 0);
-    TX_MVB_LUT_ADDR : out slv_array_t(MVB_ITEMS-1 downto 0)(max(log2(LUT_DEPTH),1)-1 downto 0);
-    TX_MVB_METADATA : out slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0);
-    TX_MVB_VLD      : out std_logic_vector(MVB_ITEMS-1 downto 0);
-    TX_MVB_SRC_RDY  : out std_logic;
-    TX_MVB_DST_RDY  : in  std_logic;
+        TX_MVB_LUT_DATA : out slv_array_t(MVB_ITEMS-1 downto 0)(LUT_WIDTH-1 downto 0);
+        TX_MVB_LUT_ADDR : out slv_array_t(MVB_ITEMS-1 downto 0)(max(log2(LUT_DEPTH),1)-1 downto 0);
+        TX_MVB_METADATA : out slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0);
+        TX_MVB_VLD      : out std_logic_vector(MVB_ITEMS-1 downto 0);
+        TX_MVB_SRC_RDY  : out std_logic;
+        TX_MVB_DST_RDY  : in  std_logic;
 
-    SW_ADDR         : in  std_logic_vector(max(log2(LUT_DEPTH),1)-1 downto 0);
-    SW_SLICE        : in  std_logic_vector(max(log2(LUT_WIDTH/SW_WIDTH),1)-1 downto 0);
-    SW_DIN          : in  std_logic_vector(SW_WIDTH-1 downto 0);
-    SW_BE           : in  std_logic_vector(SW_WIDTH/8-1 downto 0);
-    SW_WRITE        : in  std_logic;
-    SW_READ         : in  std_logic;
-    SW_DOUT         : out std_logic_vector(SW_WIDTH-1 downto 0);
-    SW_DOUT_VLD     : out std_logic
-);
+        SW_ADDR         : in  std_logic_vector(max(log2(LUT_DEPTH),1)-1 downto 0);
+        SW_SLICE        : in  std_logic_vector(max(log2(LUT_WIDTH/SW_WIDTH),1)-1 downto 0);
+        SW_DIN          : in  std_logic_vector(SW_WIDTH-1 downto 0);
+        SW_BE           : in  std_logic_vector(SW_WIDTH/8-1 downto 0);
+        SW_WRITE        : in  std_logic;
+        SW_READ         : in  std_logic;
+        SW_DOUT         : out std_logic_vector(SW_WIDTH-1 downto 0);
+        SW_DOUT_VLD     : out std_logic
+    );
 end entity;
 
 architecture FULL of MVB_LOOKUP_TABLE is
@@ -101,7 +101,7 @@ begin
 
         lut_reg <= slv_array_ser(lut_reg_arr);
 
-        lut_reg_sw_nsw <= std_logic_vector(resize(unsigned(lut_reg),(SW_WORDS_PER_LUT*SW_WIDTH)));
+        lut_reg_sw_nsw     <= std_logic_vector(resize(unsigned(lut_reg),(SW_WORDS_PER_LUT*SW_WIDTH)));
         lut_reg_sw_nsw_arr <= slv_array_deser(lut_reg_sw_nsw,SW_WORDS_PER_LUT);
 
         process (all)
@@ -156,7 +156,7 @@ begin
 
     lutram_g: if ((LUT_DEPTH > 1 and LUT_DEPTH <= 64 and LUT_ARCH = "AUTO") or (LUT_DEPTH > 1 and LUT_ARCH = "LUT")) generate
         lutram_i : entity work.MVB_LOOKUP_TABLE_LUTRAM
-        generic map(
+        generic map (
             MVB_ITEMS  => MVB_ITEMS,
             LUT_DEPTH  => LUT_DEPTH,
             LUT_WIDTH  => LUT_WIDTH,
@@ -165,7 +165,7 @@ begin
             OUTPUT_REG => OUTPUT_REG,
             DEVICE     => DEVICE
         )
-        port map(
+        port map (
             CLK             => CLK,
             RESET           => RESET,
 
@@ -195,7 +195,7 @@ begin
 
     bram_g: if ((LUT_DEPTH > 64 and LUT_ARCH = "AUTO") or (LUT_DEPTH > 1 and LUT_ARCH = "BRAM")) generate
         bram_i : entity work.MVB_LOOKUP_TABLE_BRAM
-        generic map(
+        generic map (
             MVB_ITEMS  => MVB_ITEMS,
             LUT_DEPTH  => LUT_DEPTH,
             LUT_WIDTH  => LUT_WIDTH,
@@ -204,7 +204,7 @@ begin
             OUTPUT_REG => OUTPUT_REG,
             DEVICE     => DEVICE
         )
-        port map(
+        port map (
             CLK             => CLK,
             RESET           => RESET,
 

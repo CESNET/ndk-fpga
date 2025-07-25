@@ -26,72 +26,72 @@ use work.type_pack.all;
 -- ----------------------------------------------------------------------------
 
 entity CROSSBARX_UINSTR_SPLITTER is
-generic (
-    -- Data transfer direction
-    -- false -> from A to B
-    -- true  -> from B to A
-    DATA_DIR        : boolean := true;
+    generic (
+        -- Data transfer direction
+        -- false -> from A to B
+        -- true  -> from B to A
+        DATA_DIR        : boolean := true;
 
-    -- Number of input instructions per Instruction Stream
-    INSTRS          : integer := 4;
-    -- Buffer A size
-    BUF_A_COLS      : integer := 512;
-    -- Buffer B size
-    BUF_B_COLS      : integer := 512;
-    -- max(BUF_B_TRUE_ROWS)
-    BUF_B_ROWS      : integer := 4;
+        -- Number of input instructions per Instruction Stream
+        INSTRS          : integer := 4;
+        -- Buffer A size
+        BUF_A_COLS      : integer := 512;
+        -- Buffer B size
+        BUF_B_COLS      : integer := 512;
+        -- max(BUF_B_TRUE_ROWS)
+        BUF_B_ROWS      : integer := 4;
 
-    -- Number of non-overlapping Sections of Buffer B
-    -- (All Instructions must overflow inside space
-    --  of one Buffer B Section.)
-    BUF_B_SECTIONS  : integer := 1;
+        -- Number of non-overlapping Sections of Buffer B
+        -- (All Instructions must overflow inside space
+        --  of one Buffer B Section.)
+        BUF_B_SECTIONS  : integer := 1;
 
-    -- Number of items in one bufer row
-    ROW_ITEMS       : integer := 8;
-    -- Width of one item
-    ITEM_WIDTH      : integer := 8;
+        -- Number of items in one bufer row
+        ROW_ITEMS       : integer := 8;
+        -- Width of one item
+        ITEM_WIDTH      : integer := 8;
 
-    -- Target Device
-    -- "ULTRASCALE", "7SERIES", ...
-    DEVICE          : string := "STRATIX10"
-);
-port (
-    -- ====================
-    -- Clock and Reset
-    -- ====================
+        -- Target Device
+        -- "ULTRASCALE", "7SERIES", ...
+        DEVICE          : string := "STRATIX10"
+    );
+    port (
+        -- ====================
+        -- Clock and Reset
+        -- ====================
 
-    CLK                : in  std_logic;
-    RESET              : in  std_logic;
+        CLK                : in  std_logic;
+        RESET              : in  std_logic;
 
-    -- ====================
-    -- Input uInstructions
-    -- ====================
+        -- ====================
+        -- Input uInstructions
+        -- ====================
 
-    RX_UINSTR_A_COL    : in  std_logic_vector(log2(BUF_A_COLS)-1 downto 0);
-    -- item within one row
-    RX_UINSTR_A_ITEM   : in  std_logic_vector(log2(ROW_ITEMS)-1 downto 0);
-    RX_UINSTR_B_COL    : in  std_logic_vector(log2(BUF_B_COLS)-1 downto 0);
-    RX_UINSTR_B_ITEM   : in  std_logic_vector(log2(BUF_B_ROWS*ROW_ITEMS)-1 downto 0);
-    RX_UINSTR_LEN      : in  std_logic_vector(log2(ROW_ITEMS+1)-1 downto 0);
-    RX_UINSTR_COLOR    : in  std_logic;
-    RX_UINSTR_SRC_RDY  : in  std_logic;
-    RX_UINSTR_DST_RDY  : out std_logic;
+        RX_UINSTR_A_COL    : in  std_logic_vector(log2(BUF_A_COLS)-1 downto 0);
+        -- item within one row
+        RX_UINSTR_A_ITEM   : in  std_logic_vector(log2(ROW_ITEMS)-1 downto 0);
+        RX_UINSTR_B_COL    : in  std_logic_vector(log2(BUF_B_COLS)-1 downto 0);
+        RX_UINSTR_B_ITEM   : in  std_logic_vector(log2(BUF_B_ROWS*ROW_ITEMS)-1 downto 0);
+        RX_UINSTR_LEN      : in  std_logic_vector(log2(ROW_ITEMS+1)-1 downto 0);
+        RX_UINSTR_COLOR    : in  std_logic;
+        RX_UINSTR_SRC_RDY  : in  std_logic;
+        RX_UINSTR_DST_RDY  : out std_logic;
 
-    -- ====================
-    -- Output uInstructions
-    -- ====================
+        -- ====================
+        -- Output uInstructions
+        -- ====================
 
-    TX_UINSTR_A_COL    : out std_logic_vector(log2(BUF_A_COLS)-1 downto 0);
-    TX_UINSTR_B_COL    : out std_logic_vector(log2(BUF_B_COLS)-1 downto 0);
-    TX_UINSTR_B_ROW    : out std_logic_vector(log2(BUF_B_ROWS)-1 downto 0);
-    -- row rotation
-    TX_UINSTR_ROW_ROT  : out std_logic_vector(log2(ROW_ITEMS)-1 downto 0);
-    -- item enable
-    TX_UINSTR_IE       : out std_logic_vector(ROW_ITEMS-1 downto 0);
-    TX_UINSTR_COLOR    : out std_logic;
-    TX_UINSTR_SRC_RDY  : out std_logic;
-    TX_UINSTR_DST_RDY  : in  std_logic
-);
+        TX_UINSTR_A_COL    : out std_logic_vector(log2(BUF_A_COLS)-1 downto 0);
+        TX_UINSTR_B_COL    : out std_logic_vector(log2(BUF_B_COLS)-1 downto 0);
+        TX_UINSTR_B_ROW    : out std_logic_vector(log2(BUF_B_ROWS)-1 downto 0);
+        -- row rotation
+        TX_UINSTR_ROW_ROT  : out std_logic_vector(log2(ROW_ITEMS)-1 downto 0);
+        -- item enable
+        TX_UINSTR_IE       : out std_logic_vector(ROW_ITEMS-1 downto 0);
+        TX_UINSTR_COLOR    : out std_logic;
+        TX_UINSTR_SRC_RDY  : out std_logic;
+        TX_UINSTR_DST_RDY  : in  std_logic
+    );
 end entity;
 
 architecture FULL of CROSSBARX_UINSTR_SPLITTER is
@@ -137,7 +137,7 @@ begin
     begin
         rx_uinstr_b_bitmap <= (others => '0');
         for i in 0 to ROW_ITEMS*2-1 loop
-            if (i>=rx_uinstr_b_first_row_item and i<=rx_uinstr_b_last_row_item) then
+            if (i >= rx_uinstr_b_first_row_item and i <= rx_uinstr_b_last_row_item) then
                 -- item is within uInstruction space boundaries
                 rx_uinstr_b_bitmap(i) <= '1';
             end if;
@@ -164,23 +164,23 @@ begin
     current_step_reg_pr : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (ROW_ITEMS>1) then -- uInstructions are only being split when there are multiple Items in Buffer Row
-                if (RX_UINSTR_SRC_RDY='1' and TX_UINSTR_DST_RDY='1') then
+            if (ROW_ITEMS > 1) then -- uInstructions are only being split when there are multiple Items in Buffer Row
+                if (RX_UINSTR_SRC_RDY = '1' and TX_UINSTR_DST_RDY = '1') then
                     current_step_reg <= next_step;
                 end if;
             end if;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 current_step_reg <= '0';
             end if;
         end if;
     end process;
 
     --           '1' when (not already in step 1) and (uInstruction ends in different data block then where it begins) else '0';
-    next_step <= '1' when (current_step_reg/='1') and (      rx_uinstr_b_last_row_item(log2(2*ROW_ITEMS)-1)='1'      ) else '0';
+    next_step <= '1' when (current_step_reg /= '1') and (rx_uinstr_b_last_row_item(log2(2*ROW_ITEMS)-1) = '1'      ) else '0';
 
     -- read RX when output FIFOX is ready and we won't be processing this uInstruction any more
-    RX_UINSTR_DST_RDY <= '1' when TX_UINSTR_DST_RDY='1' and (next_step='0' or RX_UINSTR_SRC_RDY='0') else '0';
+    RX_UINSTR_DST_RDY <= '1' when TX_UINSTR_DST_RDY = '1' and (next_step = '0' or RX_UINSTR_SRC_RDY = '0') else '0';
 
     -----------------------------------------------------------------------
 
@@ -194,12 +194,12 @@ begin
         variable v_last_ie  : std_logic_vector(ROW_ITEMS-1 downto 0);
     begin
         (v_last_ie,v_first_ie) := rx_uinstr_b_bitmap;
-        first_ie <= v_first_ie;
-        last_ie  <= v_last_ie;
+        first_ie               <= v_first_ie;
+        last_ie                <= v_last_ie;
         -- rotating item enables if transfering data from B to A
-        if (DATA_DIR=false) then
+        if (DATA_DIR = false) then
             -- This rotation is avoided in case which does not work in Quartus
-            if (ROW_ITEMS>1) then
+            if (ROW_ITEMS > 1) then
                 first_ie <= (v_first_ie ror to_integer(rx_uinstr_a2b_shift));
                 last_ie  <= (v_last_ie  ror to_integer(rx_uinstr_a2b_shift));
             end if;
@@ -213,7 +213,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             -- only update the register, when TX is ready or not currently valid
-            if (TX_UINSTR_DST_RDY='1' or TX_UINSTR_SRC_RDY='0') then
+            if (TX_UINSTR_DST_RDY = '1' or TX_UINSTR_SRC_RDY = '0') then
                 -- write all valid uInstructions
                 TX_UINSTR_SRC_RDY <= RX_UINSTR_SRC_RDY;
 
@@ -222,7 +222,7 @@ begin
 
                 -- data block rotation is determined by the distance from buffer B item offset and buffer A item offset in row
                 -- it depends on the direction of planning
-                TX_UINSTR_ROW_ROT <= std_logic_vector(rx_uinstr_a2b_shift) when DATA_DIR=true else std_logic_vector(rx_uinstr_b2a_shift);
+                TX_UINSTR_ROW_ROT <= std_logic_vector(rx_uinstr_a2b_shift) when DATA_DIR = true else std_logic_vector(rx_uinstr_b2a_shift);
                 -- a_col and color are just propagated
                 TX_UINSTR_A_COL   <= RX_UINSTR_A_COL;
                 TX_UINSTR_COLOR   <= RX_UINSTR_COLOR;
@@ -232,7 +232,7 @@ begin
                 -----------------
                 -- some values are specific according to the current step
 
-                if (current_step_reg='0') then
+                if (current_step_reg = '0') then
 
                     -- Use the same address as the RX uInstruction
                     TX_UINSTR_B_COL <= RX_UINSTR_B_COL;
@@ -245,12 +245,12 @@ begin
 
                     -- Use the computed address of the last item of the uInstruction
                     (tmp_b_col,
-                     tmp_b_row ) := std_logic_vector(enlarge_right(rx_uinstr_b_last_item,-log2(ROW_ITEMS)));
+                        tmp_b_row ) := std_logic_vector(enlarge_right(rx_uinstr_b_last_item,-log2(ROW_ITEMS)));
 
                     -- Buffer B Column must overflow within space of one Buffer B Section
                     tmp_b_col(log2(BUF_B_COLS)-1 downto log2(BUF_B_COLS)-1-log2(BUF_B_SECTIONS)+1) := RX_UINSTR_B_COL(log2(BUF_B_COLS)-1 downto log2(BUF_B_COLS)-1-log2(BUF_B_SECTIONS)+1);
-                    TX_UINSTR_B_COL <= tmp_b_col;
-                    TX_UINSTR_B_ROW <= tmp_b_row;
+                    TX_UINSTR_B_COL                                                                <= tmp_b_col;
+                    TX_UINSTR_B_ROW                                                                <= tmp_b_row;
 
                     -- a_ie is determined by the address of the valid items in the last row in buffer B
                     TX_UINSTR_IE <= last_ie;
@@ -261,7 +261,7 @@ begin
 
             end if;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 TX_UINSTR_SRC_RDY <= '0';
             end if;
         end if;

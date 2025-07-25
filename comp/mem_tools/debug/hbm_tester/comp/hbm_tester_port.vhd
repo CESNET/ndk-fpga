@@ -12,7 +12,7 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 
 entity HBM_TESTER_PORT is
-    generic(
+    generic (
         DEBUG           : boolean := True;
         -- when USE_AXI_ID is false, you can disable Re-order buffer in HBM IP
         USE_AXI_ID      : boolean := True;
@@ -29,7 +29,7 @@ entity HBM_TESTER_PORT is
         PORT_ADDR_HBIT  : natural := AXI_ADDR_WIDTH;
         DEVICE          : string := "AGILEX"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -143,8 +143,8 @@ entity HBM_TESTER_PORT is
         -- Outputs of configurable counters
         DB_STAT_CNT0      : out std_logic_vector(CNT_WIDTH-1 downto 0);
         DB_STAT_CNT1      : out std_logic_vector(CNT_WIDTH-1 downto 0)
-   );
-end HBM_TESTER_PORT;
+    );
+end entity;
 
 architecture FULL of HBM_TESTER_PORT is
 
@@ -286,46 +286,46 @@ architecture FULL of HBM_TESTER_PORT is
     attribute keep of s_db_stat_cnt0_reg     : signal is "true";
     attribute keep of s_db_stat_cnt1_reg     : signal is "true";
 
-    --attribute mark_debug : string;
-    --attribute mark_debug of s_axi_awid : signal is "true";
-    --attribute mark_debug of s_axi_awaddr : signal is "true";
-    --attribute mark_debug of s_axi_awlen : signal is "true";
-    --attribute mark_debug of s_axi_awsize : signal is "true";
-    --attribute mark_debug of s_axi_awburst : signal is "true";
-    --attribute mark_debug of s_axi_awprot : signal is "true";
-    --attribute mark_debug of s_axi_awqos : signal is "true";
-    --attribute mark_debug of s_axi_awuser : signal is "true";
-    --attribute mark_debug of s_axi_awvalid : signal is "true";
-    --attribute mark_debug of s_axi_awready : signal is "true";
-    --attribute mark_debug of s_axi_wdata : signal is "true";
-    --attribute mark_debug of s_axi_wstrb : signal is "true";
-    --attribute mark_debug of s_axi_wuser_data : signal is "true";
-    --attribute mark_debug of s_axi_wuser_strb : signal is "true";
-    --attribute mark_debug of s_axi_wlast : signal is "true";
-    --attribute mark_debug of s_axi_wvalid : signal is "true";
-    --attribute mark_debug of s_axi_wready : signal is "true";
-    --attribute mark_debug of s_axi_bid : signal is "true";
-    --attribute mark_debug of s_axi_bresp : signal is "true";
-    --attribute mark_debug of s_axi_bvalid : signal is "true";
-    --attribute mark_debug of s_axi_bready : signal is "true";
-    --attribute mark_debug of s_axi_arid : signal is "true";
-    --attribute mark_debug of s_axi_araddr : signal is "true";
-    --attribute mark_debug of s_axi_arlen : signal is "true";
-    --attribute mark_debug of s_axi_arsize : signal is "true";
-    --attribute mark_debug of s_axi_arburst : signal is "true";
-    --attribute mark_debug of s_axi_arprot : signal is "true";
-    --attribute mark_debug of s_axi_arqos : signal is "true";
-    --attribute mark_debug of s_axi_aruser : signal is "true";
-    --attribute mark_debug of s_axi_arvalid : signal is "true";
-    --attribute mark_debug of s_axi_arready : signal is "true";
-    --attribute mark_debug of s_axi_rid : signal is "true";
-    --attribute mark_debug of s_axi_rdata : signal is "true";
-    --attribute mark_debug of s_axi_ruser_data : signal is "true";
-    --attribute mark_debug of s_axi_ruser_err_dbe : signal is "true";
-    --attribute mark_debug of s_axi_rresp : signal is "true";
-    --attribute mark_debug of s_axi_rlast : signal is "true";
-    --attribute mark_debug of s_axi_rvalid : signal is "true";
-    --attribute mark_debug of s_axi_rready : signal is "true";
+    -- attribute mark_debug : string;
+    -- attribute mark_debug of s_axi_awid : signal is "true";
+    -- attribute mark_debug of s_axi_awaddr : signal is "true";
+    -- attribute mark_debug of s_axi_awlen : signal is "true";
+    -- attribute mark_debug of s_axi_awsize : signal is "true";
+    -- attribute mark_debug of s_axi_awburst : signal is "true";
+    -- attribute mark_debug of s_axi_awprot : signal is "true";
+    -- attribute mark_debug of s_axi_awqos : signal is "true";
+    -- attribute mark_debug of s_axi_awuser : signal is "true";
+    -- attribute mark_debug of s_axi_awvalid : signal is "true";
+    -- attribute mark_debug of s_axi_awready : signal is "true";
+    -- attribute mark_debug of s_axi_wdata : signal is "true";
+    -- attribute mark_debug of s_axi_wstrb : signal is "true";
+    -- attribute mark_debug of s_axi_wuser_data : signal is "true";
+    -- attribute mark_debug of s_axi_wuser_strb : signal is "true";
+    -- attribute mark_debug of s_axi_wlast : signal is "true";
+    -- attribute mark_debug of s_axi_wvalid : signal is "true";
+    -- attribute mark_debug of s_axi_wready : signal is "true";
+    -- attribute mark_debug of s_axi_bid : signal is "true";
+    -- attribute mark_debug of s_axi_bresp : signal is "true";
+    -- attribute mark_debug of s_axi_bvalid : signal is "true";
+    -- attribute mark_debug of s_axi_bready : signal is "true";
+    -- attribute mark_debug of s_axi_arid : signal is "true";
+    -- attribute mark_debug of s_axi_araddr : signal is "true";
+    -- attribute mark_debug of s_axi_arlen : signal is "true";
+    -- attribute mark_debug of s_axi_arsize : signal is "true";
+    -- attribute mark_debug of s_axi_arburst : signal is "true";
+    -- attribute mark_debug of s_axi_arprot : signal is "true";
+    -- attribute mark_debug of s_axi_arqos : signal is "true";
+    -- attribute mark_debug of s_axi_aruser : signal is "true";
+    -- attribute mark_debug of s_axi_arvalid : signal is "true";
+    -- attribute mark_debug of s_axi_arready : signal is "true";
+    -- attribute mark_debug of s_axi_rid : signal is "true";
+    -- attribute mark_debug of s_axi_rdata : signal is "true";
+    -- attribute mark_debug of s_axi_ruser_data : signal is "true";
+    -- attribute mark_debug of s_axi_ruser_err_dbe : signal is "true";
+    -- attribute mark_debug of s_axi_rresp : signal is "true";
+    -- attribute mark_debug of s_axi_rlast : signal is "true";
+    -- attribute mark_debug of s_axi_rvalid : signal is "true";
+    -- attribute mark_debug of s_axi_rready : signal is "true";
 
 begin
 
@@ -416,13 +416,13 @@ begin
         -- ---------------------------------------------------------------------
 
         generator_i : entity work.HBM_TESTER_GEN
-        generic map(
+        generic map (
             USR_DATA_WIDTH => USR_DATA_WIDTH,
             AXI_ADDR_WIDTH => AXI_ADDR_WIDTH,
             PORT_ADDR_HBIT => PORT_ADDR_HBIT,
             PORT_ID        => PORT_ID
         )
-        port map(
+        port map (
             CLK               => CLK,
             RESET             => s_reset_reg,
 
@@ -488,10 +488,10 @@ begin
         -- ---------------------------------------------------------------------
 
         monitor_i : entity work.HBM_TESTER_MON
-        generic map(
+        generic map (
             CNT_WIDTH => CNT_WIDTH
         )
-        port map(
+        port map (
             CLK              => CLK,
             RESET            => s_reset_reg,
 
@@ -527,12 +527,12 @@ begin
     s_mid_wr_pdata <= s_mid_wr_addr & s_mid_wr_data & s_mid_wr_data_last;
 
     wr_req_pipe_i : entity work.PIPE
-    generic map(
+    generic map (
         DATA_WIDTH => AXI_ADDR_WIDTH+USR_DATA_WIDTH+1,
         USE_OUTREG => True,
         FAKE_PIPE  => False,
         DEVICE     => DEVICE
-    ) port map(
+    ) port map (
         CLK         => CLK,
         RESET       => s_reset_reg,
         IN_DATA     => s_mid_wr_pdata,
@@ -550,12 +550,12 @@ begin
     -- WRITE RESPONSE SIGNALS ##################################################
 
     wr_resp_pipe_i : entity work.PIPE
-    generic map(
+    generic map (
         DATA_WIDTH => 1,
         USE_OUTREG => True,
         FAKE_PIPE  => False,
         DEVICE     => DEVICE
-    ) port map(
+    ) port map (
         CLK         => CLK,
         RESET       => s_reset_reg,
         IN_DATA(0)  => s_hbm_wr_rsp_ack,
@@ -569,12 +569,12 @@ begin
     -- READ ADDR SIGNALS #######################################################
 
     rd_req_pipe_i : entity work.PIPE
-    generic map(
+    generic map (
         DATA_WIDTH => AXI_ADDR_WIDTH,
         USE_OUTREG => True,
         FAKE_PIPE  => False,
         DEVICE     => DEVICE
-    ) port map(
+    ) port map (
         CLK         => CLK,
         RESET       => s_reset_reg,
         IN_DATA     => s_mid_rd_addr,
@@ -590,12 +590,12 @@ begin
     s_hbm_rd_pdata <= s_hbm_rd_data & s_hbm_rd_data_last;
 
     rd_resp_pipe_i : entity work.PIPE
-    generic map(
+    generic map (
         DATA_WIDTH => USR_DATA_WIDTH+1,
         USE_OUTREG => True,
         FAKE_PIPE  => False,
         DEVICE     => DEVICE
-    ) port map(
+    ) port map (
         CLK         => CLK,
         RESET       => s_reset_reg,
         IN_DATA     => s_hbm_rd_pdata,
@@ -655,7 +655,7 @@ begin
     s_axi_awid    <= std_logic_vector(s_hbm_wr_id_cnt);
     s_axi_awaddr  <= s_hbm_wr_addr;
     s_axi_awlen   <= s_hbm_burst_size;
-    s_axi_awsize  <= std_logic_vector(to_unsigned(5, AXI_SIZE_WIDTH)); -- MUST be 32B
+    s_axi_awsize  <= std_logic_vector(to_unsigned(5, AXI_SIZE_WIDTH));  -- MUST be 32B
     s_axi_awburst <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH)); -- INCR mode
     s_axi_awprot  <= (others => '0');
     s_axi_awqos   <= (others => '0');
@@ -706,7 +706,7 @@ begin
     s_axi_arid          <= std_logic_vector(s_hbm_rd_id_cnt);
     s_axi_araddr        <= s_hbm_rd_addr;
     s_axi_arlen         <= s_hbm_burst_size;
-    s_axi_arsize        <= std_logic_vector(to_unsigned(5, AXI_SIZE_WIDTH)); -- MUST be 32B
+    s_axi_arsize        <= std_logic_vector(to_unsigned(5, AXI_SIZE_WIDTH));  -- MUST be 32B
     s_axi_arburst       <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH)); -- INCR mode
     s_axi_arprot        <= (others => '0');
     s_axi_arqos         <= (others => '0');
@@ -716,9 +716,9 @@ begin
 
     -- HBM read data signals
     hbm_rd_data_g: if (USR_DATA_WIDTH = AXI_DATA_WIDTH) generate
-        s_hbm_rd_data <= s_axi_rdata;
+        s_hbm_rd_data                                         <= s_axi_rdata;
     else generate
-        s_hbm_rd_data(AXI_DATA_WIDTH-1 downto 0) <= s_axi_rdata;
+        s_hbm_rd_data(AXI_DATA_WIDTH-1 downto 0)              <= s_axi_rdata;
         s_hbm_rd_data(USR_DATA_WIDTH-1 downto AXI_DATA_WIDTH) <= s_axi_ruser_data;
     end generate;
     s_hbm_rd_data_last  <= s_axi_rlast;

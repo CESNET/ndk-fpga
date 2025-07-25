@@ -7,24 +7,24 @@ library ieee;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-architecture structural of phy_40ge is
+architecture STRUCTURAL of PHY_40GE is
 
-    signal refclk_i          : std_logic;
-    signal pma_txreset_done  : std_logic;
-    signal pma_rxreset_done  : std_logic;
-    signal pma_rxclk_stable  : std_logic;
-    signal pma_txclk_stable  : std_logic;
-    signal pcs_tx_reset      : std_logic;
-    signal pcs_rx_reset      : std_logic;
-    signal pcs_tx_reset_i    : std_logic;
-    signal pcs_rx_reset_i    : std_logic;
-    signal pma_txclk         : std_logic;
-    signal pcs_rx_rst_async  : std_logic;
-    signal pcs_tx_rst_async  : std_logic;
-    signal pma_tx_reset      : std_logic;
-    signal pma_tx_reset_async: std_logic;
-    signal pma_rx_reset      : std_logic;
-    signal pma_rx_reset_async: std_logic;
+    signal refclk_i           : std_logic;
+    signal pma_txreset_done   : std_logic;
+    signal pma_rxreset_done   : std_logic;
+    signal pma_rxclk_stable   : std_logic;
+    signal pma_txclk_stable   : std_logic;
+    signal pcs_tx_reset       : std_logic;
+    signal pcs_rx_reset       : std_logic;
+    signal pcs_tx_reset_i     : std_logic;
+    signal pcs_rx_reset_i     : std_logic;
+    signal pma_txclk          : std_logic;
+    signal pcs_rx_rst_async   : std_logic;
+    signal pcs_tx_rst_async   : std_logic;
+    signal pma_tx_reset       : std_logic;
+    signal pma_tx_reset_async : std_logic;
+    signal pma_rx_reset       : std_logic;
+    signal pma_rx_reset_async : std_logic;
 
     signal txd               : std_logic_vector(66*4-1 downto 0);
     signal txready           : std_logic_vector( 3 downto 0);
@@ -39,26 +39,26 @@ architecture structural of phy_40ge is
     signal gt_txpolarity     : std_logic_vector(TXPOLARITY'range);
 
     --
-    signal algn_locked   : std_logic;
-    signal bip_err_cntrs : std_logic_vector(4*16-1 downto 0);
-    signal lane_map      : std_logic_vector(4*5-1 downto 0);
-    signal lane_align    : std_logic_vector(4-1 downto 0);
-    signal bip_err_clr   : std_logic_vector(4-1 downto 0);
-    signal pma_lpbck     : std_logic;
-    signal pma_rem_lpbck : std_logic;
-    signal pma_reset     : std_logic;
-    signal force_pma_reset: std_logic;
-    signal hi_ber        : std_logic;
-    signal blk_lock      : std_logic_vector(4-1 downto 0);
-    signal linkstatus    : std_logic;
-    signal ber_count     : std_logic_vector(21 downto 0);
-    signal clr_ber_cnt   : std_logic;
-    signal blk_err_cntr  : std_logic_vector(21 downto 0);
-    signal blk_err_clr   : std_logic;
-    signal rx_scr_bypass : std_logic;
-    signal tx_scr_bypass : std_logic;
-    signal scr_bypass_i  : std_logic_vector(1 downto 0);
-    signal pcs_reset     : std_logic;
+    signal algn_locked     : std_logic;
+    signal bip_err_cntrs   : std_logic_vector(4*16-1 downto 0);
+    signal lane_map        : std_logic_vector(4*5-1 downto 0);
+    signal lane_align      : std_logic_vector(4-1 downto 0);
+    signal bip_err_clr     : std_logic_vector(4-1 downto 0);
+    signal pma_lpbck       : std_logic;
+    signal pma_rem_lpbck   : std_logic;
+    signal pma_reset       : std_logic;
+    signal force_pma_reset : std_logic;
+    signal hi_ber          : std_logic;
+    signal blk_lock        : std_logic_vector(4-1 downto 0);
+    signal linkstatus      : std_logic;
+    signal ber_count       : std_logic_vector(21 downto 0);
+    signal clr_ber_cnt     : std_logic;
+    signal blk_err_cntr    : std_logic_vector(21 downto 0);
+    signal blk_err_clr     : std_logic;
+    signal rx_scr_bypass   : std_logic;
+    signal tx_scr_bypass   : std_logic;
+    signal scr_bypass_i    : std_logic_vector(1 downto 0);
+    signal pcs_reset       : std_logic;
 
     signal am_cntr_o     : std_logic;
     signal am_found_o    : std_logic_vector(3 downto 0);
@@ -80,7 +80,7 @@ begin
     -- =========================================================================
     --           Management
     -- =========================================================================
-    MGMT: entity work.mgmt
+    mgmt: entity work.MGMT
     generic map (
         NUM_LANES     => 4,
         PMA_LANES     => 4,
@@ -128,24 +128,24 @@ begin
         PCS_LPBCK     => open
     );
 
-    gt_loopback <= pma_rem_lpbck & pma_lpbck & '0';
+    gt_loopback   <= pma_rem_lpbck & pma_lpbck & '0';
     -- Disable polarity swaps when local loopback is active
     gt_rxpolarity <= (others => '0') when gt_loopback(1) = '1' else RXPOLARITY;
     gt_txpolarity <= (others => '0') when gt_loopback(1) = '1' else TXPOLARITY;
 
-    GEN_SCR_BYPASS: if (SIMULATION /= 0) generate
+    gen_scr_bypass: if (SIMULATION /= 0) generate
         rx_scr_bypass <= '1';
         tx_scr_bypass <= '1';
     end generate;
 
-    NO_SCR_BYPASS: if (SIMULATION = 0) generate
+    no_scr_bypass: if (SIMULATION = 0) generate
 
         reclock_rx_scr_bypass_i: entity work.ASYNC_OPEN_LOOP
-        generic map(
+        generic map (
             IN_REG  => false,
             TWO_REG => false -- Three FFs
         )
-        port map(
+        port map (
             ACLK     => '0',
             ARST     => '0',
             BCLK     => pma_rxclk,
@@ -155,11 +155,11 @@ begin
         );
 
         reclock_tx_scr_bypass_i: entity work.ASYNC_OPEN_LOOP
-        generic map(
+        generic map (
             IN_REG  => false,
             TWO_REG => false -- Three FFs
         )
-        port map(
+        port map (
             ACLK     => '0',
             ARST     => '0',
             BCLK     => pma_txclk,
@@ -173,7 +173,7 @@ begin
     -- =========================================================================
     --           TX PCS
     -- =========================================================================
-    TX_PATH: entity work.tx_path_40g
+    tx_path: entity work.TX_PATH_40G
     generic map (
         DEVICE    => DEVICE
     )
@@ -186,22 +186,22 @@ begin
         SCR_BYPASS => tx_scr_bypass,
         ENC_BYPASS => '0',
         -- HS interface
-        RESET_PMA => pma_tx_reset,
-        TXCLK     => pma_txclk,
-        TXREADY   => txready,
-        TXD0      => txd(66*1-1 downto 66*0),
-        TXD1      => txd(66*2-1 downto 66*1),
-        TXD2      => txd(66*3-1 downto 66*2),
-        TXD3      => txd(66*4-1 downto 66*3),
+        RESET_PMA  => pma_tx_reset,
+        TXCLK      => pma_txclk,
+        TXREADY    => txready,
+        TXD0       => txd(66*1-1 downto 66*0),
+        TXD1       => txd(66*2-1 downto 66*1),
+        TXD2       => txd(66*3-1 downto 66*2),
+        TXD3       => txd(66*4-1 downto 66*3),
         --
-        DEBUG_V   => txdebug_v,
-        TXD_O     => txd_o
+        DEBUG_V    => txdebug_v,
+        TXD_O      => txd_o
     );
 
     -- =========================================================================
     --           RX PCS
     -- =========================================================================
-    RX_PATH: entity work.rx_path_40g
+    rx_path: entity work.RX_PATH_40G
     generic map (
         DEVICE    => DEVICE
     )
@@ -249,12 +249,12 @@ begin
     -- =========================================================================
     --           PMA
     -- =========================================================================
-    PMA: entity work.pma_xlaui_gty
-    generic map
-    (
-        EXAMPLE_SIM_GTRESET_SPEEDUP => "TRUE",     -- simulation setting for GT SecureIP model
-        EXAMPLE_SIMULATION          => SIMULATION, -- Set to 1 for simulation
-        STABLE_CLOCK_PERIOD         => 10,          --Period of the stable clock driving this state-machine, unit is [ns]
+    pma: entity work.PMA_XLAUI_GTY
+    generic map (
+
+        EXAMPLE_SIM_GTRESET_SPEEDUP => "TRUE",      -- simulation setting for GT SecureIP model
+        EXAMPLE_SIMULATION          => SIMULATION,  -- Set to 1 for simulation
+        STABLE_CLOCK_PERIOD         => 10,          -- Period of the stable clock driving this state-machine, unit is [ns]
         CLK_SLAVE                   => CLK_SLAVE
     )
     port map (
@@ -271,8 +271,8 @@ begin
         RX_OK             => pma_rx_ok,
         --
         TXCLK_OUT         => pma_txclk,
-        TXDATA_IN         => txd,     -- TXCLK domain
-        TXREADY_OUT       => txready, -- TXCLK domain
+        TXDATA_IN         => txd,       -- TXCLK domain
+        TXREADY_OUT       => txready,   -- TXCLK domain
         RXCLK_OUT         => pma_rxclk,
         RXDATA_OUT        => rxd,       -- RXCLK domain
         RXVALID_OUT       => rxd_valid, -- RXCLK domain
@@ -283,9 +283,9 @@ begin
         SIGNAL_DET        => SIGNAL_DET,
         POWERDOWN_IN      => '0',
         LOOPBACK_IN       => gt_loopback,
-        TXPRBSSEL_IN      => "000",  -- TXCLK domain
-        TXPRBSFORCEERR_IN => "0000", -- TXCLK domain
-        RXPRBSSEL_IN      => "000",  -- RXCLK domain
+        TXPRBSSEL_IN      => "000",     -- TXCLK domain
+        TXPRBSFORCEERR_IN => "0000",    -- TXCLK domain
+        RXPRBSSEL_IN      => "000",     -- RXCLK domain
         RXPRBSERR_OUT     => open,
         RXPOLARITY        => gt_rxpolarity,
         TXPOLARITY        => gt_txpolarity,
@@ -306,10 +306,10 @@ begin
     -- PCS reset sync - MAC/XLGMII RX side
     pcs_rx_rst_async <=  RESET or (not pma_txclk_stable) or pcs_reset or (not pma_rxreset_done);
     pcs_rx_rst_sync_i: entity work.ASYNC_RESET
-    generic map(
+    generic map (
         TWO_REG => false
     )
-    port map(
+    port map (
         CLK        => XLGMII_CLK,
         ASYNC_RST  => pcs_rx_rst_async,
         OUT_RST(0) => pcs_rx_reset
@@ -318,10 +318,10 @@ begin
     -- PCS reset sync - MAC/XLGMII TX side
     pcs_tx_rst_async <=  RESET or (not pma_txclk_stable) or pcs_reset or (not pma_txreset_done);
     pcs_tx_rst_sync_i: entity work.ASYNC_RESET
-    generic map(
+    generic map (
         TWO_REG => false
     )
-    port map(
+    port map (
         CLK        => XLGMII_CLK,
         ASYNC_RST  => pcs_tx_rst_async,
         OUT_RST(0) => pcs_tx_reset
@@ -329,11 +329,11 @@ begin
 
     -- PCS reset sync - PMA TX side
     pma_tx_reset_async <= (not pma_txclk_stable) or RESET or pma_reset;
-    PMA_TXRESET_SYNC: entity work.ASYNC_RESET
-    generic map(
+    pma_txreset_sync: entity work.ASYNC_RESET
+    generic map (
         TWO_REG => false -- For two reg = true, for three reg = false
     )
-    port map(
+    port map (
         CLK        => pma_txclk,
         ASYNC_RST  => pma_tx_reset_async,
         OUT_RST(0) => pma_tx_reset
@@ -341,11 +341,11 @@ begin
 
     -- PCS reset sync - PMA RX side
     pma_rx_reset_async <= (not pma_rxclk_stable) or RESET or pma_reset;
-    PMA_RXRESET_SYNC: entity work.ASYNC_RESET
-    generic map(
+    pma_rxreset_sync: entity work.ASYNC_RESET
+    generic map (
         TWO_REG => false -- For two reg = true, for three reg = false
     )
-    port map(
+    port map (
         CLK        => pma_rxclk,
         ASYNC_RST  => pma_rx_reset_async,
         OUT_RST(0) => pma_rx_reset
@@ -357,4 +357,4 @@ begin
     CLK_STABLE <= pma_txclk_stable;
     REFCLK_OUT <= refclk_i;
 
-end structural;
+end architecture;

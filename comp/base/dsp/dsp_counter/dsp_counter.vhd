@@ -19,7 +19,7 @@ use work.math_pack.all;
 --               rather than reading comments I recommend running the simulation and studying the wave diagram
 
 entity DSP_COUNTER is
-    Generic (
+    generic (
         -- set the device on which the counter will be impemented: AGILEX (Intel), STRATIX10 (Intel), 7SERIES (Xilinx), ULTRASCALE (Xilinx)
         DEVICE       : string  := "AGILEX";
         -- enable input registers, then the latency will be 2 clock cycles
@@ -30,8 +30,8 @@ entity DSP_COUNTER is
         OUTPUT_WIDTH : natural := 64;
         -- set as true to use DSP for the counter
         DSP_ENABLE   : boolean := true
-        );
-    Port (
+    );
+    port (
         -- clock input
         CLK       :  in std_logic;
         -- enable input
@@ -56,10 +56,12 @@ begin
 
     -- when using counter on Stratix 10, MAX_VAL must be se to (others => '1')
     assert (((DEVICE /= "STRATIX10") or (DEVICE /= "AGILEX")) or (and MAX_VAL = '1'))
-    report "Wrong value of MAX_VAL, check port decription for more information." severity failure;
+        report "Wrong value of MAX_VAL, check port decription for more information."
+        severity failure;
 
     assert ((DEVICE = "AGILEX") or (DEVICE = "STRATIX10") or (DEVICE = "ULTRASCALE") or (DEVICE = "7SERIES"))
-    report "Wrong / unsupported device !! See comment near DEVICE generic." severity failure;
+        report "Wrong / unsupported device !! See comment near DEVICE generic."
+        severity failure;
 
     increment_resized <= std_logic_vector(resize(unsigned(INCREMENT), OUTPUT_WIDTH)); -- for counter on Xilinx
 
@@ -67,19 +69,19 @@ begin
 
         dsp_counter_i: entity work.DSP_COUNTER_INTEL
         generic map (
-            INPUT_REGS     => INPUT_REGS  ,
-            COUNT_BY_WIDTH => INPUT_WIDTH ,
+            INPUT_REGS     => INPUT_REGS,
+            COUNT_BY_WIDTH => INPUT_WIDTH,
             RESULT_WIDTH   => OUTPUT_WIDTH,
-            DSP_ENABLE     => DSP_ENABLE  ,
-            COUNT_DOWN     => false       ,
+            DSP_ENABLE     => DSP_ENABLE,
+            COUNT_DOWN     => false,
             DEVICE         => DEVICE
         )
         port map (
-            CLK        => CLK      ,
-            CLK_EN     => CLK_EN   ,
-            RESET      => RESET    ,
+            CLK        => CLK,
+            CLK_EN     => CLK_EN,
+            RESET      => RESET,
             COUNT_BY   => INCREMENT,
-            MAX_VAL    => MAX_VAL  ,
+            MAX_VAL    => MAX_VAL,
             RESULT     => RESULT
         );
 
@@ -90,20 +92,20 @@ begin
         dsp_counter_i : entity work.COUNT_DSP
         generic map (
             REG_IN     => tsel(INPUT_REGS = true, 1, 0), -- more than 1 input register does not work anyway
-            DATA_WIDTH => OUTPUT_WIDTH                 ,
-            DSP_EN     => DSP_ENABLE                   ,
-            DIR        => true                         ,
+            DATA_WIDTH => OUTPUT_WIDTH,
+            DSP_EN     => DSP_ENABLE,
+            DIR        => true,
             DEVICE     => DEVICE
         )
         port map (
-            CLK    => CLK              ,
-            ENABLE => CLK_EN           ,
-            RESET  => RESET            ,
+            CLK    => CLK,
+            ENABLE => CLK_EN,
+            RESET  => RESET,
             A      => increment_resized,
-            MAX    => MAX_VAL          ,
+            MAX    => MAX_VAL,
             P      => RESULT
         );
 
     end generate;
 
-end STRUCT;
+end architecture;

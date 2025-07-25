@@ -18,18 +18,18 @@ use work.type_pack.all;
 -- Note: This version is specifically adjusted to function in frame_packer.vhd
 
 entity FP_MFB_DROPPER is
-    generic(
+    generic (
         REGIONS     : natural := 1; -- 4 regions is necessary to validate
         REGION_SIZE : natural := 8; -- any power of two
         BLOCK_SIZE  : natural := 8; -- any power of two
         ITEM_WIDTH  : natural := 8  -- any power of two
     );
-    port(
+    port (
         -- =======================================================================
         -- CLOCK AND RESET
         -- =======================================================================
-        CLK     : in  std_logic;
-        RESET   : in  std_logic;
+        CLK         : in  std_logic;
+        RESET       : in  std_logic;
         -- =======================================================================
         -- INPUT MFB INTERFACE WITH DROP ENABLE FLAGS
         -- =======================================================================
@@ -57,7 +57,7 @@ entity FP_MFB_DROPPER is
         TX_SRC_RDY  : out std_logic;
         TX_DST_RDY  : in  std_logic
     );
-end FP_MFB_DROPPER;
+end entity;
 
 architecture FULL of FP_MFB_DROPPER is
 
@@ -121,8 +121,8 @@ begin
     -----------------------------------------------------------------------------
 
     inc_pkt_g : for r in 0 to REGIONS-1 generate
-        s_inc_pkt(r+1) <=   (    s_sof(r) and not s_eof(r) and not s_inc_pkt(r)) or
-                            (    s_sof(r) and     s_eof(r) and     s_inc_pkt(r)) or
+        s_inc_pkt(r+1) <=   (s_sof(r) and not s_eof(r) and not s_inc_pkt(r)) or
+                            (s_sof(r) and     s_eof(r) and     s_inc_pkt(r)) or
                             (not s_sof(r) and not s_eof(r) and     s_inc_pkt(r));
     end generate;
 
@@ -130,7 +130,7 @@ begin
     s_inc_pkt(0)    <= RX_PKT_CONT;
     TX_PKT_CONT     <= s_inc_pkt(REGIONS);
 
-   -- calculate valid of regions
+    -- calculate valid of regions
     region_vld_g : for r in 0 to REGIONS-1 generate
         s_region_vld(r) <= s_sof(r) or s_inc_pkt(r);
     end generate;

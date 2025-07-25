@@ -87,7 +87,7 @@ package dma_bus_pack is
     constant DMA_TYPE_WRITE             : std_logic_vector(0 downto 0) := "1";
     constant DMA_TYPE_READ              : std_logic_vector(0 downto 0) := "0";
 
-end dma_bus_pack;
+end package;
 
 -- ----------------------------------------------------------------------------
 --                        DMA BUS package body
@@ -95,5 +95,5 @@ end dma_bus_pack;
 
 package body dma_bus_pack is
 
-end dma_bus_pack;
+end package body;
 

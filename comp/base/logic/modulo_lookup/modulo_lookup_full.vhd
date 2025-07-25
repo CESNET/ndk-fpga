@@ -21,89 +21,89 @@ use IEEE.std_logic_arith.all;
 use work.math_pack.all;
 
 --! \brief Implementation of Modulo look-up table
-architecture behavioral of MODULO_LOOKUP is
+architecture BEHAVIORAL of MODULO_LOOKUP is
 
-   -- Type & constant declaration ---------------------------------------------
+    -- Type & constant declaration ---------------------------------------------
 
-   attribute ram_style : string;
-   constant ITEMS : integer := 2**(OPERAND_WIDTH+MODULO_WIDTH);
-   constant ADDR_WIDTH : integer := OPERAND_WIDTH+MODULO_WIDTH;
-   type t_mem is array(0 to ITEMS-1) of std_logic_vector(MODULO_WIDTH-1 downto 0);
-
-
-   -- Memory initialization function ------------------------------------------
-
-   function INIT_MEM return t_mem is
-      variable init : t_mem;
-      variable addr : std_logic_vector(ADDR_WIDTH-1 downto 0);
-   begin
-      for i in 1 to 2**MODULO_WIDTH loop
-         for j in 0 to 2**OPERAND_WIDTH-1 loop
-            init(j*2**MODULO_WIDTH+i-1) := conv_std_logic_vector(j mod i, MODULO_WIDTH);
-         end loop;
-      end loop;
-
-      return init;
-   end function;
+    attribute ram_style : string;
+    constant ITEMS      : integer := 2**(OPERAND_WIDTH+MODULO_WIDTH);
+    constant ADDR_WIDTH : integer := OPERAND_WIDTH+MODULO_WIDTH;
+    type     t_mem is array(0 to ITEMS-1) of std_logic_vector(MODULO_WIDTH-1 downto 0);
 
 
-   -- Signal declaration ------------------------------------------------------
+    -- Memory initialization function ------------------------------------------
 
-   signal addr     : std_logic_vector(ADDR_WIDTH-1 downto 0);
-   signal data     : std_logic_vector(MODULO_WIDTH-1 downto 0);
+    function init_mem return t_mem is
+        variable init : t_mem;
+        variable addr : std_logic_vector(ADDR_WIDTH-1 downto 0);
+    begin
+        for i in 1 to 2**MODULO_WIDTH loop
+            for j in 0 to 2**OPERAND_WIDTH-1 loop
+                init(j*2**MODULO_WIDTH+i-1) := conv_std_logic_vector(j mod i, MODULO_WIDTH);
+            end loop;
+        end loop;
 
-   signal reg_data : std_logic_vector(MODULO_WIDTH-1 downto 0);
-   signal reg_vld1 : std_logic;
-   signal reg_vld2 : std_logic;
+        return init;
+    end function;
 
-   signal memory : t_mem := INIT_MEM;
-   attribute ram_style of memory: signal is MEM_TYPE;
+
+    -- Signal declaration ------------------------------------------------------
+
+    signal addr     : std_logic_vector(ADDR_WIDTH-1 downto 0);
+    signal data     : std_logic_vector(MODULO_WIDTH-1 downto 0);
+
+    signal reg_data : std_logic_vector(MODULO_WIDTH-1 downto 0);
+    signal reg_vld1 : std_logic;
+    signal reg_vld2 : std_logic;
+
+    signal memory : t_mem := init_mem;
+    attribute ram_style of memory : signal is MEM_TYPE;
 
 
 begin
 
-   addr <= OPERAND & MODULO;
+    addr <= OPERAND & MODULO;
 
-   rom_p: process(CLK)
-   begin
-      if (CLK'event and CLK = '1') then
-         data <= memory(conv_integer(unsigned(addr)));
-      end if;
-   end process;
+    rom_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            data <= memory(conv_integer(unsigned(addr)));
+        end if;
+    end process;
 
-   output_reg_gen: if (OUTPUT_REG = true) generate
-      output_reg_p: process(CLK)
-      begin
-         if (CLK'event and CLK = '1') then
-            if (RESET = '1') then
-               reg_data <= (others => '0');
-               reg_vld1 <= '0';
-               reg_vld2 <= '0';
-            else
-               reg_data <= data;
-               reg_vld1 <= IN_VLD;
-               reg_vld2 <= reg_vld1;
+    output_reg_gen: if (OUTPUT_REG = true) generate
+        output_reg_p : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    reg_data <= (others => '0');
+                    reg_vld1 <= '0';
+                    reg_vld2 <= '0';
+                else
+                    reg_data <= data;
+                    reg_vld1 <= IN_VLD;
+                    reg_vld2 <= reg_vld1;
+                end if;
             end if;
-         end if;
-      end process;
+        end process;
 
-      RESULT <= reg_data;
-      OUT_VLD <= reg_vld2;
-   end generate;
+        RESULT  <= reg_data;
+        OUT_VLD <= reg_vld2;
+    end generate;
 
-   nooutput_reg_gen: if (OUTPUT_REG = false) generate
-      nooutput_reg_p: process(RESET, CLK)
-      begin
-         if (CLK'event AND CLK = '1') then
-            if (RESET = '1') then
-               OUT_VLD <= '0';
-            else
-               OUT_VLD <= IN_VLD;
+    nooutput_reg_gen: if (OUTPUT_REG = false) generate
+        nooutput_reg_p : process (RESET, CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    OUT_VLD <= '0';
+                else
+                    OUT_VLD <= IN_VLD;
+                end if;
             end if;
-         end if;
-      end process;
+        end process;
 
-      RESULT <= data;
-   end generate;
+        RESULT <= data;
+    end generate;
 
 end architecture;

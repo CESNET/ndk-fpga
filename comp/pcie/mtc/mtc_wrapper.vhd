@@ -12,7 +12,7 @@ use work.type_pack.all;
 use work.pcie_meta_pack.all;
 
 entity MTC_WRAPPER is
-    generic(
+    generic (
         -- AXI bus: width of data word in bits
         AXI_DATA_WIDTH    : natural := 512;
         -- AXI bus: width of CQ user word in bits
@@ -202,10 +202,10 @@ entity MTC_WRAPPER is
     );
 end entity;
 
-architecture full of MTC_WRAPPER is
+architecture FULL of MTC_WRAPPER is
 
-    constant IS_XILINX_DEV   : boolean := DEVICE="ULTRASCALE" or DEVICE="7SERIES";
-    constant IS_INTEL_DEV    : boolean := DEVICE="STRATIX10" or DEVICE="AGILEX";
+    constant IS_XILINX_DEV   : boolean := DEVICE = "ULTRASCALE" or DEVICE = "7SERIES";
+    constant IS_INTEL_DEV    : boolean := DEVICE = "STRATIX10" or DEVICE = "AGILEX";
 
     -- CQ MFB output
 
@@ -238,7 +238,7 @@ begin
 
     cq_mfb_xilinx_g: if IS_XILINX_DEV generate
         mfb2pcie_axi_i : entity work.PCIE_CQ_AXI2MFB
-        generic map(
+        generic map (
             MFB_REGIONS      => MFB_REGIONS,
             MFB_REGION_SIZE  => MFB_REGION_SIZE,
             MFB_BLOCK_SIZE   => MFB_BLOCK_SIZE,
@@ -248,7 +248,7 @@ begin
             AXI_DATA_WIDTH   => AXI_DATA_WIDTH,
             STRADDLING       => false
         )
-        port map(
+        port map (
 
             CQ_AXI_DATA    => CQ_AXI_DATA,
             CQ_AXI_USER    => CQ_AXI_USER,
@@ -258,7 +258,7 @@ begin
             CQ_AXI_READY   => CQ_AXI_READY,
 
             CQ_MFB_DATA    => cq_mfb_data_out,
-            --CQ_MFB_META    => cq_mfb_meta_out,
+            -- CQ_MFB_META    => cq_mfb_meta_out,
             CQ_MFB_SOF     => cq_mfb_sof_out,
             CQ_MFB_EOF     => cq_mfb_eof_out,
             CQ_MFB_SOF_POS => cq_mfb_sof_pos_out,
@@ -273,7 +273,7 @@ begin
         );
 
         mfb_cc2axi_i : entity work.PCIE_CC_MFB2AXI
-        generic map(
+        generic map (
             MFB_REGIONS      => MFB_REGIONS,
             MFB_REGION_SIZE  => MFB_REGION_SIZE,
             MFB_BLOCK_SIZE   => MFB_BLOCK_SIZE,
@@ -283,7 +283,7 @@ begin
             AXI_DATA_WIDTH   => AXI_DATA_WIDTH,
             STRADDLING       => false
         )
-        port map(
+        port map (
 
             CC_MFB_DATA    => CC_MFB_DATA,
             CC_MFB_SOF     => CC_MFB_SOF,
@@ -332,7 +332,7 @@ begin
     end generate;
 
     mtc_i : entity work.MTC
-    generic map(
+    generic map (
         MFB_REGIONS       => MFB_REGIONS,
         MFB_REGION_SIZE   => MFB_REGION_SIZE,
         MFB_BLOCK_SIZE    => MFB_BLOCK_SIZE,
@@ -353,7 +353,7 @@ begin
         DEVICE            => DEVICE,
         ENDPOINT_TYPE     => ENDPOINT_TYPE
     )
-    port map(
+    port map (
         CLK                  => CLK,
         RESET                => RESET,
 

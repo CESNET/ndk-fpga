@@ -12,7 +12,7 @@ use IEEE.numeric_std.all;
 use work.type_pack.all;
 
 entity DUT_WRAPPER is
-    generic(
+    generic (
         -- Number of items
         ITEMS      : natural := 4;
         -- Item width in bits
@@ -20,7 +20,7 @@ entity DUT_WRAPPER is
         -- Optional output register
         OUTPUT_REG : boolean := True
     );
-    port(
+    port (
         -- Clock input
         CLK         : in  std_logic;
         -- Reset input synchronized with CLK
@@ -62,12 +62,12 @@ begin
     end generate;
 
     dut_i : entity work.MVB_DISCARD
-    generic map(
+    generic map (
         ITEMS      => ITEMS,
         ITEM_WIDTH => ITEM_WIDTH,
         OUTPUT_REG => OUTPUT_REG
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RESET,
 

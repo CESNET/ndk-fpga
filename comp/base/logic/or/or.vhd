@@ -19,33 +19,33 @@ use ieee.std_logic_unsigned.all;
 
 --! \brief Generic OR entity.
 entity GEN_OR is
-   generic(
-      --! \brief Width of input signal, number of bits to OR.
-      --! \details Must be greater than 0.
-      OR_WIDTH    : integer  -- or width (number of inputs)
-   );
-   port(
-      --! Input data, vector of bits to OR.
-      DI  : in  std_logic_vector(OR_WIDTH-1 downto 0);
-      --! Output data, result of OR.
-      DO  : out std_logic
-   );
+    generic (
+        --! \brief Width of input signal, number of bits to OR.
+        --! \details Must be greater than 0.
+        OR_WIDTH    : integer  -- or width (number of inputs)
+    );
+    port (
+        --! Input data, vector of bits to OR.
+        DI  : in  std_logic_vector(OR_WIDTH-1 downto 0);
+        --! Output data, result of OR.
+        DO  : out std_logic
+    );
 end entity;
 
 --! \brief Behavioral implementation of generic OR.
-architecture behav of GEN_OR is
+architecture BEHAV of GEN_OR is
 begin
 
-   --! ORing process
-   genorp:process(DI)
-      variable o : std_logic;
-   begin
-      o := '0';
-      for i in 0 to OR_WIDTH-1 loop
-         o := o or DI(i);
-      end loop;
-      DO <= o;
-   end process;
+    --! ORing process
+    genorp : process (DI)
+        variable o : std_logic;
+    begin
+        o := '0';
+        for i in 0 to OR_WIDTH-1 loop
+            o := o or DI(i);
+        end loop;
+        DO <= o;
+    end process;
 
 end architecture;
 

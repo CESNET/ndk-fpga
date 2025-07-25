@@ -13,17 +13,17 @@ use IEEE.math_real.all;
 entity TESTBENCH is
 end entity;
 
-architecture behavioral of TESTBENCH is
+architecture BEHAVIORAL of TESTBENCH is
 
     constant C_CLK_PER    : time := 10.0 ns;
 
     signal clk            : std_logic := '0';
     signal rst            : std_logic := '0';
 
-    signal rx_header_in : std_logic_vector(1 downto 0) := "00";
+    signal rx_header_in    : std_logic_vector(1 downto 0) := "00";
     signal rx_header_valid : std_logic := '0';
     signal rx_lock_aquired : std_logic := '0';
-    signal slip_command : std_logic := '0';
+    signal slip_command    : std_logic := '0';
 
     signal tb1 : std_logic := '1';
     signal tb2 : std_logic := '0';
@@ -31,39 +31,42 @@ architecture behavioral of TESTBENCH is
 
 begin
 
-    clk_gen: process
+    clk_gen : process
     begin
-       clk <= '1';
-       wait for C_CLK_PER / 2;
-       clk <= '0';
-       wait for C_CLK_PER / 2;
-    end process clk_gen;
+        clk <= '1';
+        wait for C_CLK_PER / 2;
+        clk <= '0';
+        wait for C_CLK_PER / 2;
+    end process;
 
     dut : entity work.BLOCK_LOCK
     generic map (
-        SH_CNT_MAX => 64,
+        SH_CNT_MAX         => 64,
         SH_INVALID_CNT_MAX => 16,
-        SLIP_WAIT_TIME => 32,
-        SLIP_PULSE => true
+        SLIP_WAIT_TIME     => 32,
+        SLIP_PULSE         => true
     )
     port map (
-        RX_HEADER_IN => rx_header_in,
+        RX_HEADER_IN    => rx_header_in,
         RX_HEADER_VALID => rx_header_valid,
         RX_LOCK_AQUIRED => rx_lock_aquired,
-        CLK => clk,
-        RST => rst,
-        SLIP_CMD => slip_command
+        CLK             => clk,
+        RST             => rst,
+        SLIP_CMD        => slip_command
     );
 
     tb : process
 
-        procedure send_header(header : std_logic_vector(1 downto 0); h_valid : std_logic) is
+        procedure send_header (
+            header  : std_logic_vector(1 downto 0);
+            h_valid : std_logic
+        ) is
         begin
-            rx_header_in <= header;
+            rx_header_in    <= header;
             rx_header_valid <= h_valid;
             wait for C_CLK_PER;
             rx_header_valid <= '0';
-        end send_header;
+        end procedure send_header;
 
         procedure reset is
         begin
@@ -71,7 +74,7 @@ begin
             wait for C_CLK_PER;
             rst <= '0';
             wait for C_CLK_PER;
-        end reset;
+        end procedure reset;
 
     begin
 
@@ -83,22 +86,22 @@ begin
             send_header("01", '1');
         end loop;
 
-        wait for C_CLK_PER; -- wait for changes
+        wait for C_CLK_PER;         -- wait for changes
         reset;
 
         -- slip test
         for i in 1 to 8 loop
             send_header("10", '1');
         end loop;
-        send_header("11", '1'); -- expect slip
+        send_header("11", '1');     -- expect slip
         wait for C_CLK_PER*33;
 
         for i in 1 to 34 loop
             send_header("10", '1');
             send_header("01", '1');
-        end loop; -- expect lock aquired
+        end loop;                   -- expect lock aquired
 
-        wait for C_CLK_PER; -- wait for changes
+        wait for C_CLK_PER;         -- wait for changes
         reset;
 
         -- invalid header tolerance test
@@ -114,7 +117,7 @@ begin
             send_header("01", '1');
         end loop;
 
-        wait for C_CLK_PER; -- wait for changes
+        wait for C_CLK_PER;         -- wait for changes
         reset;
 
         -- lock drop test
@@ -142,4 +145,4 @@ begin
 
     end process;
 
-end architecture behavioral;
+end architecture;

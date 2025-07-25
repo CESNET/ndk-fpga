@@ -20,7 +20,7 @@ entity PCIE_CQ_HDR_DEPARSER is
         -- width of CQ user word in bits (Supported value are 88, 85 and 183)
         CQUSER_WIDTH : natural := 183
     );
-    port(
+    port (
         -- ========================================================================
         -- CQ interface (same for both)
         -- ========================================================================
@@ -82,19 +82,20 @@ end entity;
 --                             Architecture
 -- ----------------------------------------------------------------------------
 
-architecture full of PCIE_CQ_HDR_DEPARSER is
+architecture FULL of PCIE_CQ_HDR_DEPARSER is
     signal cq_addr32 : std_logic_vector(62-1 downto 0);
     signal cq_addr64 : std_logic_vector(62-1 downto 0);
 begin
 
-    assert (DEVICE = "STRATIX10" OR DEVICE = "AGILEX" OR DEVICE = "ULTRASCALE" OR DEVICE = "7SERIES")
-        report "PCIE_CQ_HDR_DEPARSER: unsupported device!" severity failure;
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+        report "PCIE_CQ_HDR_DEPARSER: unsupported device!"
+        severity failure;
 
-   -- -------------------------------------------------------------------------
-   -- CQ Header deparsing
-   -- -------------------------------------------------------------------------
+    -- -------------------------------------------------------------------------
+    -- CQ Header deparsing
+    -- -------------------------------------------------------------------------
 
-    cq_hdr_xilinx_g: if (DEVICE="ULTRASCALE" or DEVICE="7SERIES") generate
+    cq_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
         OUT_ADDRESS_TYPE <= IN_HEADER(1 downto 0);
         OUT_ADDRESS      <= IN_HEADER(63 downto 2) & "00";
         OUT_DW_CNT       <= IN_HEADER(74 downto 64);
@@ -108,13 +109,13 @@ begin
         OUT_FBE          <= IN_FBE;
         OUT_LBE          <= IN_LBE;
 
-        OUT_REQ_TYPE(0) <= '1' when (unsigned(IN_HEADER(78 downto 75)) = 0) else '0';
-        OUT_REQ_TYPE(1) <= '1' when (unsigned(IN_HEADER(78 downto 75)) = 1) else '0';
+        OUT_REQ_TYPE(0)          <= '1' when (unsigned(IN_HEADER(78 downto 75)) = 0) else '0';
+        OUT_REQ_TYPE(1)          <= '1' when (unsigned(IN_HEADER(78 downto 75)) = 1) else '0';
         OUT_REQ_TYPE(3 downto 2) <= "00";
-        OUT_ADDR_LEN <= '1';
+        OUT_ADDR_LEN             <= '1';
     end generate;
 
-    cq_hdr_intel_g: if (DEVICE="STRATIX10" or DEVICE="AGILEX") generate
+    cq_hdr_intel_g: if (DEVICE = "STRATIX10" or DEVICE = "AGILEX") generate
         OUT_DW_CNT       <= '0' & IN_HEADER(9 downto 0);
         OUT_ADDRESS_TYPE <= IN_HEADER(11 downto 10);
         OUT_ATTRIBUTES   <= IN_HEADER(18) & IN_HEADER(13 downto 12);
@@ -131,17 +132,17 @@ begin
         OUT_BAR_ID       <= IN_INTEL_META(10 downto 8);
         OUT_BAR_APERTURE <= IN_INTEL_META(16 downto 11);
 
-        with IN_HEADER(31 downto 24) select
-        OUT_REQ_TYPE(1 downto 0) <= "01" when "00000000", -- 32b mem rd
-                                    "10" when "01000000", -- 32b mem wr
-                                    "01" when "00100000", -- 64b mem rd
-                                    "10" when "01100000", -- 64b mem wr
-                                    "00" when others;
+        with IN_HEADER(31 downto 24) select OUT_REQ_TYPE(1 downto 0) <=
+            "01" when "00000000", -- 32b mem rd
+            "10" when "01000000", -- 32b mem wr
+            "01" when "00100000", -- 64b mem rd
+            "10" when "01100000", -- 64b mem wr
+            "00" when others;
 
-        with IN_HEADER(31 downto 27) select
-        OUT_REQ_TYPE(3 downto 2) <= "01" when "00110", -- Msg
-                                    "10" when "01110", -- MsgD
-                                    "00" when others;
+        with IN_HEADER(31 downto 27) select OUT_REQ_TYPE(3 downto 2) <=
+            "01" when "00110", -- Msg
+            "10" when "01110", -- MsgD
+            "00" when others;
 
         OUT_ADDR_LEN <= IN_HEADER(29);
     end generate;

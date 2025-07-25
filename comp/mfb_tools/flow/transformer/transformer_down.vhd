@@ -75,7 +75,7 @@ architecture FULL of MFB_TRANSFORMER_DOWN is
     signal tx_eop_sel        : std_logic_vector(TX_EOP'range);
     signal inside_packet_reg : std_logic := '0';
 
-    type t_state is (S_IDLE, S_MAX, S_OTHERS);
+    type   t_state is (S_IDLE, S_MAX, S_OTHERS);
     signal state : t_state;
 
 begin
@@ -84,7 +84,8 @@ begin
     data_mux_i : entity work.GEN_MUX
     generic map (
         DATA_WIDTH => TX_REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH,
-        MUX_WIDTH  => RX_BLOCKS)
+        MUX_WIDTH  => RX_BLOCKS
+    )
     port map (
         DATA_IN    => rx_data_reg,
         SEL        => sel(sel'high-1 downto 0),
@@ -94,7 +95,8 @@ begin
     meta_mux_i : entity work.GEN_MUX
     generic map (
         DATA_WIDTH => TX_REGIONS*META_WIDTH,
-        MUX_WIDTH  => RX_BLOCKS)
+        MUX_WIDTH  => RX_BLOCKS
+    )
     port map (
         DATA_IN    => rx_meta_reg,
         SEL        => sel(sel'high-1 downto 0),
@@ -104,7 +106,8 @@ begin
     sop_mux_i : entity work.GEN_MUX
     generic map (
         DATA_WIDTH => TX_REGIONS,
-        MUX_WIDTH  => RX_BLOCKS)
+        MUX_WIDTH  => RX_BLOCKS
+    )
     port map (
         DATA_IN    => rx_sop_reg,
         SEL        => sel(sel'high-1 downto 0),
@@ -114,7 +117,8 @@ begin
     eop_mux_i : entity work.GEN_MUX
     generic map (
         DATA_WIDTH => TX_REGIONS,
-        MUX_WIDTH  => RX_BLOCKS)
+        MUX_WIDTH  => RX_BLOCKS
+    )
     port map (
         DATA_IN    => rx_eop_reg,
         SEL        => sel(sel'high-1 downto 0),
@@ -126,7 +130,8 @@ begin
         sop_pos_mux_i : entity work.GEN_MUX
         generic map (
             DATA_WIDTH => TX_REGIONS*log2(REGION_SIZE),
-            MUX_WIDTH  => RX_BLOCKS)
+            MUX_WIDTH  => RX_BLOCKS
+        )
         port map (
             DATA_IN    => rx_sop_pos_reg,
             SEL        => sel(sel'high-1 downto 0),
@@ -141,7 +146,8 @@ begin
     eop_pos_mux_i : entity work.GEN_MUX
     generic map (
         DATA_WIDTH => TX_REGIONS*log2(REGION_SIZE*BLOCK_SIZE),
-        MUX_WIDTH  => RX_BLOCKS)
+        MUX_WIDTH  => RX_BLOCKS
+    )
     port map (
         DATA_IN    => rx_eop_pos_reg,
         SEL        => sel(sel'high-1 downto 0),
@@ -154,27 +160,27 @@ begin
 
     -- counter handles the select signal for multiplexers
     -- sel signal is one bit wider (for IDLE state)
-    cnt_p : process(CLK)
+    cnt_p : process (CLK)
     begin
         if rising_edge(CLK) then
-            if RESET = '1' then
+            if (RESET = '1') then
                 sel <= IDLE;
             else
                 case state is
                     when S_IDLE =>
-                        if RX_SRC_RDY = '1' then
+                        if (RX_SRC_RDY = '1') then
                             sel <= (others => '0');
                         end if;
                     when S_MAX =>
-                        if TX_DST_RDY = '1' then
-                            if RX_SRC_RDY = '1' then
+                        if (TX_DST_RDY = '1') then
+                            if (RX_SRC_RDY = '1') then
                                 sel <= (others => '0');
                             else
                                 sel <= IDLE;
                             end if;
                         end if;
                     when S_OTHERS =>
-                        if TX_DST_RDY = '1' then
+                        if (TX_DST_RDY = '1') then
                             sel <= std_logic_vector(unsigned(sel)+1);
                         end if;
                 end case;
@@ -183,32 +189,32 @@ begin
     end process;
 
     -- logic defining RX_DST_RDY, TX_SRC_RDY
-    communication_logic_p : process(RESET, state, sel, TX_DST_RDY, tx_sop_sel, tx_eop_sel, inside_packet_reg)
+    communication_logic_p : process (RESET, state, sel, TX_DST_RDY, tx_sop_sel, tx_eop_sel, inside_packet_reg)
     begin
-            RX_DST_RDY <= '0';
-            TX_SRC_RDY <= '0';
-            case state is
-                when S_IDLE =>
+        RX_DST_RDY <= '0';
+        TX_SRC_RDY <= '0';
+        case state is
+            when S_IDLE =>
+                RX_DST_RDY <= '1';
+            when S_MAX =>
+                if (TX_DST_RDY = '1') then
                     RX_DST_RDY <= '1';
-                when S_MAX =>
-                    if TX_DST_RDY = '1' then
-                        RX_DST_RDY <= '1';
-                    end if;
-                    TX_SRC_RDY <= '0' when inside_packet_reg = '0' and unsigned(tx_sop_sel) = 0 and unsigned(tx_eop_sel) = 0 else '1';
-                when S_OTHERS =>
-                    TX_SRC_RDY <= '0' when inside_packet_reg = '0' and unsigned(tx_sop_sel) = 0 and unsigned(tx_eop_sel) = 0 else '1';
-            end case;
+                end if;
+                TX_SRC_RDY <= '0' when inside_packet_reg = '0' and unsigned(tx_sop_sel) = 0 and unsigned(tx_eop_sel) = 0 else '1';
+            when S_OTHERS =>
+                TX_SRC_RDY <= '0' when inside_packet_reg = '0' and unsigned(tx_sop_sel) = 0 and unsigned(tx_eop_sel) = 0 else '1';
+        end case;
     end process;
 
     -- process controlling whether we're inside a packet or not
     -- tmp and for loop handle the logic for TX_REGIONS > 1
-    packet_logic_p : process(CLK)
+    packet_logic_p : process (CLK)
         variable tmp : std_logic;
     begin
         if rising_edge(CLK) then
-            if RESET = '1' then
+            if (RESET = '1') then
                 inside_packet_reg <= '0';
-            elsif sel /= IDLE then
+            elsif (sel /= IDLE) then
                 tmp := inside_packet_reg;
                 for i in 0 to TX_REGIONS-1 loop
                     tmp := '1' when (tx_eop_sel(i) = '0' and (tmp = '1' or tx_sop_sel(i) = '1')) or (tx_sop_sel(i) = '1' and tmp = '1') else '0';
@@ -219,14 +225,14 @@ begin
     end process;
 
     -- input registers
-    regs_p : process(CLK)
+    regs_p : process (CLK)
     begin
         if rising_edge(CLK) then
-            if RX_DST_RDY = '1' then
-                rx_data_reg <= RX_DATA;
-                rx_meta_reg <= RX_META;
-                rx_sop_reg <= RX_SOP;
-                rx_eop_reg <= RX_EOP;
+            if (RX_DST_RDY = '1') then
+                rx_data_reg    <= RX_DATA;
+                rx_meta_reg    <= RX_META;
+                rx_sop_reg     <= RX_SOP;
+                rx_eop_reg     <= RX_EOP;
                 rx_sop_pos_reg <= RX_SOP_POS;
                 rx_eop_pos_reg <= RX_EOP_POS;
             end if;

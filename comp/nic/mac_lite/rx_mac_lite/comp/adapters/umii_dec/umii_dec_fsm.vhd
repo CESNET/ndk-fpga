@@ -11,10 +11,10 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 
 entity UMII_DEC_FSM is
-    generic(
+    generic (
         REGIONS : natural := 4
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK, RESET AND ENABLE
         -- =====================================================================
@@ -42,7 +42,7 @@ end entity;
 
 architecture FULL of UMII_DEC_FSM is
 
-    type fsm_states is (st_ready, st_packet, st_error);
+    type fsm_states is (ST_READY, ST_PACKET, ST_ERROR);
     type fsm_states_array is array (REGIONS downto 0) of fsm_states;
 
     signal s_any_error : std_logic_vector(REGIONS-1 downto 0);
@@ -62,7 +62,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                s_state(0) <= st_ready;
+                s_state(0) <= ST_READY;
             elsif (ENABLE = '1') then
                 s_state(0) <= s_state(REGIONS);
             end if;
@@ -78,65 +78,65 @@ begin
         begin
             case (s_state(r)) is
                 -- st_ready
-                when st_ready =>
+                when ST_READY =>
                     if (IN_SOF(r) = '1' and s_any_error(r) = '0') then
-                        s_state(r+1) <= st_packet;
+                        s_state(r+1) <= ST_PACKET;
                     elsif (IN_SOF(r) = '1' and IN_EOF(r) = '0' and s_any_error(r) = '1') then
                         if (IN_DATA_ERR(r) = '1') then
-                            s_state(r+1) <= st_ready;
+                            s_state(r+1) <= ST_READY;
                         else
-                            s_state(r+1) <= st_error;
+                            s_state(r+1) <= ST_ERROR;
                         end if;
                     elsif (IN_SOF(r) = '1' and IN_EOF(r) = '1' and s_any_error(r) = '1') then
                         if (IN_WF(r) = '1' or IN_DATA_ERR(r) = '1') then
-                            s_state(r+1) <= st_ready;
+                            s_state(r+1) <= ST_READY;
                         elsif (IN_WF(r) = '0' and IN_SOF_ERR(r) = '1') then
-                            s_state(r+1) <= st_error;
+                            s_state(r+1) <= ST_ERROR;
                         else
-                            s_state(r+1) <= st_packet;
+                            s_state(r+1) <= ST_PACKET;
                         end if;
                     else
-                        s_state(r+1) <= st_ready;
+                        s_state(r+1) <= ST_READY;
                     end if;
 
                 -- st_packet
-                when st_packet =>
+                when ST_PACKET =>
                     if (IN_SOF(r) = '0' and IN_EOF(r) = '1') then
-                        s_state(r+1) <= st_ready;
+                        s_state(r+1) <= ST_READY;
                     elsif ((IN_SOF(r) = '1' and IN_EOF(r) = '0') or (IN_SOF(r) = '0' and IN_EOF(r) = '0' and s_any_error(r) = '1')) then
-                        s_state(r+1) <= st_error;
+                        s_state(r+1) <= ST_ERROR;
                     elsif (IN_SOF(r) = '1' and IN_EOF(r) = '1' and s_any_error(r) = '1') then
                         if (IN_WF(r) = '1' or IN_DATA_ERR(r) = '1') then
-                            s_state(r+1) <= st_ready;
+                            s_state(r+1) <= ST_READY;
                         elsif (IN_WF(r) = '0' and IN_SOF_ERR(r) = '1') then
-                            s_state(r+1) <= st_error;
+                            s_state(r+1) <= ST_ERROR;
                         else
-                            s_state(r+1) <= st_packet;
+                            s_state(r+1) <= ST_PACKET;
                         end if;
                     else
-                        s_state(r+1) <= st_packet;
+                        s_state(r+1) <= ST_PACKET;
                     end if;
 
                 -- st_error
-                when st_error =>
+                when ST_ERROR =>
                     if (IN_SOF(r) = '0' and IN_EOF(r) = '1') then
-                        s_state(r+1) <= st_ready;
+                        s_state(r+1) <= ST_READY;
                     elsif (IN_SOF(r) = '1' and IN_EOF(r) = '1' and s_any_error(r) = '0') then
-                        s_state(r+1) <= st_packet;
+                        s_state(r+1) <= ST_PACKET;
                     elsif (IN_SOF(r) = '1' and IN_EOF(r) = '1' and s_any_error(r) = '1') then
                         if (IN_WF(r) = '1' or IN_DATA_ERR(r) = '1') then
-                            s_state(r+1) <= st_ready;
+                            s_state(r+1) <= ST_READY;
                         elsif (IN_WF(r) = '0' and IN_SOF_ERR(r) = '1') then
-                            s_state(r+1) <= st_error;
+                            s_state(r+1) <= ST_ERROR;
                         else
-                            s_state(r+1) <= st_packet;
+                            s_state(r+1) <= ST_PACKET;
                         end if;
                     else
-                        s_state(r+1) <= st_error;
+                        s_state(r+1) <= ST_ERROR;
                     end if;
 
                 when others =>
-                    s_state(r+1) <= st_ready;
+                    s_state(r+1) <= ST_READY;
             end case;
         end process;
     end generate;
@@ -154,7 +154,7 @@ begin
 
             case (s_state(r)) is
                 -- st_ready
-                when st_ready =>
+                when ST_READY =>
                     if (IN_SOF(r) = '1' and s_any_error(r) = '0') then
                         OUT_SOF(r) <= '1';
                     elsif (IN_SOF(r) = '1' and IN_EOF(r) = '0' and s_any_error(r) = '1') then
@@ -185,7 +185,7 @@ begin
                     end if;
 
                 -- st_packet
-                when st_packet =>
+                when ST_PACKET =>
                     if (IN_SOF(r) = '0' and IN_EOF(r) = '1') then
                         OUT_EOF(r) <= '1';
                         OUT_ERR(r) <= s_any_error(r);
@@ -210,7 +210,7 @@ begin
                     end if;
 
                 -- st_error
-                when st_error =>
+                when ST_ERROR =>
                     if (IN_SOF(r) = '0' and IN_EOF(r) = '1') then
                         OUT_EOF(r) <= '1';
                         OUT_ERR(r) <= '1';

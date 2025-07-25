@@ -13,7 +13,7 @@ use work.type_pack.all;
 use work.pcie_meta_pack.all;
 
 entity PCIE_CORE is
-    generic(
+    generic (
         -- =====================================================================
         -- MFB configuration
         -- =====================================================================
@@ -56,21 +56,21 @@ entity PCIE_CORE is
         -- Other configuration
         -- =====================================================================
         -- MI width - for access to debugging probes
-        MI_WIDTH         : natural := 32;
+        MI_WIDTH            : natural := 32;
         -- Enable of XCV IP, for Xilinx only
-        XVC_ENABLE       : boolean := false;
+        XVC_ENABLE          : boolean := false;
         -- Width of CARD/FPGA ID number
-        CARD_ID_WIDTH    : natural := 0;
+        CARD_ID_WIDTH       : natural := 0;
         -- Reset width for effective reset duplication
-        RESET_WIDTH      : natural := 8;
+        RESET_WIDTH         : natural := 8;
         -- Width of MISC signal between Top-Level FPGA design and PCIE core logic
         MISC_TOP2PCIE_WIDTH : natural := 1;
         -- Width of MISC signal between PCIE core logic and Top-Level FPGA design
         MISC_PCIE2TOP_WIDTH : natural := 1;
         -- FPGA device
-        DEVICE           : string  := "STRATIX10"
+        DEVICE              : string  := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         -- Input clock and reset
         -- =====================================================================

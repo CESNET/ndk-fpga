@@ -16,64 +16,64 @@ use work.type_pack.all;
 -- ----------------------------------------------------------------------------
 
 entity CROSSBARX_UINSTR_GEN is
-generic(
-    -- Number of input instructions per Instruction Stream
-    INSTRS          : integer := 4;
-    -- Buffer A size
-    BUF_A_COLS      : integer := 512;
-    -- max(BUF_A_TRUE_ROWS)
-    BUF_A_ROWS      : integer := 4;
-    -- Buffer B size
-    BUF_B_COLS      : integer := 512;
-    -- max(BUF_B_TRUE_ROWS)
-    BUF_B_ROWS      : integer := 4;
-    -- Number of non-overlapping Sections of Buffer B
-    -- (All Instructions must overflow inside space
-    --  of one Buffer B Section.)
-    BUF_B_SECTIONS  : integer := 1;
-    -- Number of items in one bufer row
-    ROW_ITEMS       : integer := 8;
-    -- Width of one item
-    ITEM_WIDTH      : integer := 8;
+    generic (
+        -- Number of input instructions per Instruction Stream
+        INSTRS          : integer := 4;
+        -- Buffer A size
+        BUF_A_COLS      : integer := 512;
+        -- max(BUF_A_TRUE_ROWS)
+        BUF_A_ROWS      : integer := 4;
+        -- Buffer B size
+        BUF_B_COLS      : integer := 512;
+        -- max(BUF_B_TRUE_ROWS)
+        BUF_B_ROWS      : integer := 4;
+        -- Number of non-overlapping Sections of Buffer B
+        -- (All Instructions must overflow inside space
+        --  of one Buffer B Section.)
+        BUF_B_SECTIONS  : integer := 1;
+        -- Number of items in one bufer row
+        ROW_ITEMS       : integer := 8;
+        -- Width of one item
+        ITEM_WIDTH      : integer := 8;
 
-    -- Target Device
-    -- "ULTRASCALE", "7SERIES", ...
-    DEVICE          : string := "STRATIX10"
-);
-port(
-    -- ====================
-    -- Clock and Reset
-    -- ====================
+        -- Target Device
+        -- "ULTRASCALE", "7SERIES", ...
+        DEVICE          : string := "STRATIX10"
+    );
+    port (
+        -- ====================
+        -- Clock and Reset
+        -- ====================
 
-    CLK             : in  std_logic;
-    RESET           : in  std_logic;
+        CLK             : in  std_logic;
+        RESET           : in  std_logic;
 
-    -- ====================
-    -- Input Instructions
-    -- ====================
+        -- ====================
+        -- Input Instructions
+        -- ====================
 
-    INSTR_A_COL     : in  std_logic_vector(log2(BUF_A_COLS)-1 downto 0);
-    INSTR_A_ITEM    : in  slv_array_t     (INSTRS-1 downto 0)(log2(BUF_A_ROWS*ROW_ITEMS)-1 downto 0);
-    INSTR_B_COL     : in  slv_array_t     (INSTRS-1 downto 0)(log2(BUF_B_COLS)-1 downto 0);
-    INSTR_B_ITEM    : in  slv_array_t     (INSTRS-1 downto 0)(log2(BUF_B_ROWS*ROW_ITEMS)-1 downto 0);
-    INSTR_LEN       : in  slv_array_t     (INSTRS-1 downto 0)(log2(BUF_A_ROWS*ROW_ITEMS+1)-1 downto 0);
-    INSTR_COLOR     : in  std_logic_vector(INSTRS-1 downto 0);
-    INSTR_VLD       : in  std_logic_vector(INSTRS-1 downto 0);
-    INSTR_SRC_RDY   : in  std_logic;
+        INSTR_A_COL     : in  std_logic_vector(log2(BUF_A_COLS)-1 downto 0);
+        INSTR_A_ITEM    : in  slv_array_t     (INSTRS-1 downto 0)(log2(BUF_A_ROWS*ROW_ITEMS)-1 downto 0);
+        INSTR_B_COL     : in  slv_array_t     (INSTRS-1 downto 0)(log2(BUF_B_COLS)-1 downto 0);
+        INSTR_B_ITEM    : in  slv_array_t     (INSTRS-1 downto 0)(log2(BUF_B_ROWS*ROW_ITEMS)-1 downto 0);
+        INSTR_LEN       : in  slv_array_t     (INSTRS-1 downto 0)(log2(BUF_A_ROWS*ROW_ITEMS+1)-1 downto 0);
+        INSTR_COLOR     : in  std_logic_vector(INSTRS-1 downto 0);
+        INSTR_VLD       : in  std_logic_vector(INSTRS-1 downto 0);
+        INSTR_SRC_RDY   : in  std_logic;
 
-    -- ====================
-    -- Output uInstructions
-    -- ====================
+        -- ====================
+        -- Output uInstructions
+        -- ====================
 
-    UINSTR_A_COL    : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(BUF_A_COLS)-1 downto 0);
-    -- item within one row
-    UINSTR_A_ITEM   : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(ROW_ITEMS)-1 downto 0);
-    UINSTR_B_COL    : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(BUF_B_COLS)-1 downto 0);
-    UINSTR_B_ITEM   : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(BUF_B_ROWS*ROW_ITEMS)-1 downto 0);
-    UINSTR_LEN      : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(ROW_ITEMS+1)-1 downto 0);
-    UINSTR_COLOR    : out std_logic_vector(BUF_A_ROWS-1 downto 0);
-    UINSTR_VLD      : out std_logic_vector(BUF_A_ROWS-1 downto 0)
-);
+        UINSTR_A_COL    : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(BUF_A_COLS)-1 downto 0);
+        -- item within one row
+        UINSTR_A_ITEM   : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(ROW_ITEMS)-1 downto 0);
+        UINSTR_B_COL    : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(BUF_B_COLS)-1 downto 0);
+        UINSTR_B_ITEM   : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(BUF_B_ROWS*ROW_ITEMS)-1 downto 0);
+        UINSTR_LEN      : out slv_array_t     (BUF_A_ROWS-1 downto 0)(log2(ROW_ITEMS+1)-1 downto 0);
+        UINSTR_COLOR    : out std_logic_vector(BUF_A_ROWS-1 downto 0);
+        UINSTR_VLD      : out std_logic_vector(BUF_A_ROWS-1 downto 0)
+    );
 end entity;
 
 architecture FULL of CROSSBARX_UINSTR_GEN is
@@ -111,21 +111,21 @@ begin
 
             -- Saving input to registers
             reg0_instr_a_col <= INSTR_A_COL;
-            for I in 0 to INSTRS-1 loop
+            for i in 0 to INSTRS-1 loop
                 reg0_instr_b_col (I) <= unsigned(INSTR_B_COL (I));
                 reg0_instr_b_item(I) <= unsigned(INSTR_B_ITEM(I));
                 reg0_instr_len   (I) <= unsigned(INSTR_LEN   (I));
             end loop;
             reg0_instr_color <= INSTR_COLOR;
-            reg0_instr_vld <= INSTR_VLD and INSTR_SRC_RDY;
+            reg0_instr_vld   <= INSTR_VLD and INSTR_SRC_RDY;
 
             -- Calculate starting and ending item in buffer A column
-            for I in 0 to INSTRS-1 loop
+            for i in 0 to INSTRS-1 loop
                 reg0_instr_a_sop(I) <= unsigned(INSTR_A_ITEM(I));
                 reg0_instr_a_eop(I) <= unsigned(INSTR_A_ITEM(I))+resize_left(unsigned(INSTR_LEN(I))-1,log2(BUF_A_ROWS*ROW_ITEMS));
             end loop;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 reg0_instr_vld <= (others => '0');
             end if;
         end if;
@@ -150,7 +150,7 @@ begin
             -- Buffer A column is the same for all uInstructions
             reg1_uinstr_a_col  <= reg0_instr_a_col;
 
-            for I in 0 to INSTRS-1 loop
+            for i in 0 to INSTRS-1 loop
 
                 -- Setting default values to avoid latch
                 reg1_uinstr_a_item(I) <= (others => (others => '0'));
@@ -163,15 +163,15 @@ begin
                 -- Init loop variables
                 b_ptr_tmp := (others => '0');
 
-                for R in 0 to BUF_A_ROWS-1 loop
+                for r in 0 to BUF_A_ROWS-1 loop
 
                     -- Detect first and last row
-                    first_row := (R=resize_right(reg0_instr_a_sop(I),log2(BUF_A_ROWS)) or BUF_A_ROWS<2);
-                    last_row  := (R=resize_right(reg0_instr_a_eop(I),log2(BUF_A_ROWS)) or BUF_A_ROWS<2);
+                    first_row := (R = resize_right(reg0_instr_a_sop(I),log2(BUF_A_ROWS)) or BUF_A_ROWS < 2);
+                    last_row  := (R = resize_right(reg0_instr_a_eop(I),log2(BUF_A_ROWS)) or BUF_A_ROWS < 2);
 
                     -- Set valid
                     -- Valid are all rows from SOP to EOP
-                    reg1_uinstr_vld(I)(R) <= reg0_instr_vld(I) when (R>=resize_right(reg0_instr_a_sop(I),log2(BUF_A_ROWS)) and R<=resize_right(reg0_instr_a_eop(I),log2(BUF_A_ROWS))) or BUF_A_ROWS<2 else '0';
+                    reg1_uinstr_vld(I)(R) <= reg0_instr_vld(I) when (R >= resize_right(reg0_instr_a_sop(I),log2(BUF_A_ROWS)) and R <= resize_right(reg0_instr_a_eop(I),log2(BUF_A_ROWS))) or BUF_A_ROWS < 2 else '0';
 
                     -- Set buffer A item address
                     -- Only the first row can have an unaligned item address
@@ -185,11 +185,11 @@ begin
                     -- Only the first and the last row of the uInstruction can have an unaligned number of items
                     reg1_uinstr_len(I)(R) <= to_unsigned(ROW_ITEMS,log2(ROW_ITEMS+1));
 
-                    if (first_row and last_row) then -- the Instruction only describes one row in buffer A
+                    if (first_row and last_row) then                                                                                                                                                                  -- the Instruction only describes one row in buffer A
                         reg1_uinstr_len(I)(R) <= resize_left(reg0_instr_len(I),log2(ROW_ITEMS+1));
-                    elsif (first_row) then -- currently in the first row
+                    elsif (first_row) then                                                                                                                                                                            -- currently in the first row
                         reg1_uinstr_len(I)(R) <= to_unsigned(ROW_ITEMS,log2(ROW_ITEMS+1)) - resize_left(resize_left(reg0_instr_a_sop(I),log2(ROW_ITEMS)),log2(ROW_ITEMS+1));
-                    elsif (last_row) then -- currently in the last row
+                    elsif (last_row) then                                                                                                                                                                             -- currently in the last row
                         reg1_uinstr_len(I)(R) <= enlarge_left(resize_left(reg0_instr_a_eop(I),log2(ROW_ITEMS)),1)+1;
                     end if;
 
@@ -217,7 +217,7 @@ begin
 
             end loop;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 reg1_uinstr_vld <= (others => (others => '0'));
             end if;
         end if;
@@ -237,7 +237,7 @@ begin
     begin
         if (rising_edge(CLK)) then
 
-            for R in 0 to BUF_A_ROWS-1 loop
+            for r in 0 to BUF_A_ROWS-1 loop
 
                 -- Setting default values to avoid latch
                 UINSTR_A_COL (R) <= reg1_uinstr_a_col;
@@ -245,31 +245,32 @@ begin
                 UINSTR_B_COL (R) <= std_logic_vector(reg1_uinstr_b_col (0)(R));
                 UINSTR_B_ITEM(R) <= std_logic_vector(reg1_uinstr_b_item(0)(R));
                 UINSTR_LEN   (R) <= std_logic_vector(reg1_uinstr_len   (0)(R));
-                UINSTR_COLOR (R) <=                  reg1_uinstr_color (0)(R);
+                UINSTR_COLOR (R) <= reg1_uinstr_color (0)(R);
                 -- uInstruction is invalid until some Intruction covers it
                 UINSTR_VLD   (R) <= '0';
                 v_uinstr_vld (R) := '0';
                 v_uinstr_i   (R) := 0;
 
-                for I in 0 to INSTRS-1 loop
+                for i in 0 to INSTRS-1 loop
 
-                    if (reg1_uinstr_vld(I)(R)='1') then
+                    if (reg1_uinstr_vld(I)(R) = '1') then
 
                         UINSTR_A_ITEM(R) <= std_logic_vector(reg1_uinstr_a_item(I)(R));
                         UINSTR_B_COL (R) <= std_logic_vector(reg1_uinstr_b_col (I)(R));
                         UINSTR_B_ITEM(R) <= std_logic_vector(reg1_uinstr_b_item(I)(R));
                         UINSTR_LEN   (R) <= std_logic_vector(reg1_uinstr_len   (I)(R));
-                        UINSTR_COLOR (R) <=                  reg1_uinstr_color (I)(R);
+                        UINSTR_COLOR (R) <= reg1_uinstr_color (I)(R);
                         UINSTR_VLD   (R) <= '1';
 
                         -- Check for Instruction overlapping
-                        if (v_uinstr_vld(R)='1') then
+                        if (v_uinstr_vld(R) = '1') then
                             report "ERROR: Uinstr Gen: Buffer A collision! Overlapping Instructions received!";
                             report "Instructions " & integer'image(v_uinstr_i(R)) &
                                    " and " & integer'image(I) &
                                    " both describe buffer A row " & integer'image(R) &
                                    "!";
-                            report "" severity failure;
+                            report ""
+                                severity failure;
                         end if;
                         v_uinstr_vld(R) := '1';
                         v_uinstr_i  (R) := I;
@@ -280,7 +281,7 @@ begin
 
             end loop;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 UINSTR_VLD <= (others => '0');
             end if;
         end if;

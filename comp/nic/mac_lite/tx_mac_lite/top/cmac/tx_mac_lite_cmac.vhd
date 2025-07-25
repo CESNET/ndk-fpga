@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_CMAC is
-    generic(
+    generic (
         -- =====================================================================
         -- MFB CONFIGURATION (read only values):
         -- =====================================================================
@@ -35,7 +35,7 @@ entity TX_MAC_LITE_CMAC is
         -- only ULTRASCALE is supported
         DEVICE          : string := "ULTRASCALE"
     );
-    port(
+    port (
         -- =====================================================================
         --  MI32 INTERFACE (MI_CLK)
         -- =====================================================================
@@ -106,7 +106,7 @@ architecture FULL of TX_MAC_LITE_CMAC is
 begin
 
     tx_mac_lite_i : entity work.TX_MAC_LITE
-    generic map(
+    generic map (
         TX_REGIONS      => MFB_REGIONS,
         TX_REGION_SIZE  => MFB_REGION_SIZE,
         TX_BLOCK_SIZE   => MFB_BLOCK_SIZE,
@@ -119,7 +119,7 @@ begin
         USE_DSP_CNT     => USE_DSP_CNT,
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         MI_CLK         => MI_CLK,
         MI_RESET       => MI_RESET,
         MI_DWR         => MI_DWR,
@@ -157,49 +157,49 @@ begin
 
     -- conversion to MFB(1,4,16,8)
     rebase_i : entity work.CMAC_OBUF_REBASE
-    port map(
-       -- CLOCK AND RESET
-       CMAC_CLK   => TX_CLK,
-       CMAC_RESET => TX_RESET,
+    port map (
+        -- CLOCK AND RESET
+        CMAC_CLK   => TX_CLK,
+        CMAC_RESET => TX_RESET,
 
-       RX_DATA    => mac_mfb_data,
-       RX_SOP_POS => mac_mfb_sof_pos,
-       RX_EOP_POS => mac_mfb_eof_pos,
-       RX_SOP     => mac_mfb_sof(0),
-       RX_EOP     => mac_mfb_eof(0),
-       RX_SRC_RDY => mac_mfb_src_rdy,
-       RX_DST_RDY => mac_mfb_dst_rdy,
+        RX_DATA    => mac_mfb_data,
+        RX_SOP_POS => mac_mfb_sof_pos,
+        RX_EOP_POS => mac_mfb_eof_pos,
+        RX_SOP     => mac_mfb_sof(0),
+        RX_EOP     => mac_mfb_eof(0),
+        RX_SRC_RDY => mac_mfb_src_rdy,
+        RX_DST_RDY => mac_mfb_dst_rdy,
 
-       TX_DATA    => rbas_mfb_data,
-       TX_SOF_POS => rbas_mfb_sof_pos,
-       TX_EOF_POS => rbas_mfb_eof_pos,
-       TX_SOF     => rbas_mfb_sof,
-       TX_EOF     => rbas_mfb_eof,
-       TX_SRC_RDY => rbas_mfb_src_rdy,
-       TX_DST_RDY => rbas_mfb_dst_rdy
+        TX_DATA    => rbas_mfb_data,
+        TX_SOF_POS => rbas_mfb_sof_pos,
+        TX_EOF_POS => rbas_mfb_eof_pos,
+        TX_SOF     => rbas_mfb_sof,
+        TX_EOF     => rbas_mfb_eof,
+        TX_SRC_RDY => rbas_mfb_src_rdy,
+        TX_DST_RDY => rbas_mfb_dst_rdy
     );
 
     -- SOF of every first packet in word must be at first byte
     corrector_i : entity work.CMAC_OBUF_REBASE_CORRECTOR
-    port map(
-       CMAC_CLK   => TX_CLK,
-       CMAC_RESET => TX_RESET,
+    port map (
+        CMAC_CLK   => TX_CLK,
+        CMAC_RESET => TX_RESET,
 
-       RX_DATA    => rbas_mfb_data,
-       RX_SOF_POS => rbas_mfb_sof_pos,
-       RX_EOF_POS => rbas_mfb_eof_pos,
-       RX_SOF     => rbas_mfb_sof,
-       RX_EOF     => rbas_mfb_eof,
-       RX_SRC_RDY => rbas_mfb_src_rdy,
-       RX_DST_RDY => rbas_mfb_dst_rdy,
+        RX_DATA    => rbas_mfb_data,
+        RX_SOF_POS => rbas_mfb_sof_pos,
+        RX_EOF_POS => rbas_mfb_eof_pos,
+        RX_SOF     => rbas_mfb_sof,
+        RX_EOF     => rbas_mfb_eof,
+        RX_SRC_RDY => rbas_mfb_src_rdy,
+        RX_DST_RDY => rbas_mfb_dst_rdy,
 
-       TX_DATA    => TX_MFB_DATA,
-       TX_SOF_POS => TX_MFB_SOF_POS,
-       TX_EOF_POS => TX_MFB_EOF_POS,
-       TX_SOF     => TX_MFB_SOF,
-       TX_EOF     => TX_MFB_EOF,
-       TX_SRC_RDY => TX_MFB_SRC_RDY,
-       TX_DST_RDY => TX_MFB_DST_RDY
+        TX_DATA    => TX_MFB_DATA,
+        TX_SOF_POS => TX_MFB_SOF_POS,
+        TX_EOF_POS => TX_MFB_EOF_POS,
+        TX_SOF     => TX_MFB_SOF,
+        TX_EOF     => TX_MFB_EOF,
+        TX_SRC_RDY => TX_MFB_SRC_RDY,
+        TX_DST_RDY => TX_MFB_DST_RDY
     );
 
 end architecture;

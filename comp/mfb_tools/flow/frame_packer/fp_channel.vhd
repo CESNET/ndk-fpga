@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity FP_CHANNEL is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
@@ -26,7 +26,7 @@ entity FP_CHANNEL is
 
         DEVICE              : string  := "AGILEX"
     );
-    port(
+    port (
         CLK : in std_logic;
         RST : in std_logic;
 
@@ -161,17 +161,17 @@ begin
     ------------------------------------------------------------
     -- Generates signal for each input MUX
     mux_sel_i: entity work.FP_MUX_CTRL
-        generic map(
-            MFB_REGIONS     => MFB_REGIONS,
-            MFB_REGION_SIZE => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+    generic map (
+        MFB_REGIONS     => MFB_REGIONS,
+        MFB_REGION_SIZE => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
 
-            MUX_WIDTH       => MUX_WIDTH
-        )
-        port map(
-            RX_VLD_ARR  => RX_BLOCK_VLD,
-            TX_SEL_ARR  => mux_select
+        MUX_WIDTH       => MUX_WIDTH
+    )
+    port map (
+        RX_VLD_ARR  => RX_BLOCK_VLD,
+        TX_SEL_ARR  => mux_select
     );
 
     ------------------------------------------------------------
@@ -187,14 +187,14 @@ begin
     -- Input MUX Array
     mux_data_arr_g: for i in 0 to MFB_REGIONS*MFB_REGION_SIZE - 1 generate
         mux_i: entity work.GEN_MUX
-            generic map(
-                DATA_WIDTH  => MFB_BLOCK_SIZE*MFB_ITEM_WIDTH,   -- block width
-                MUX_WIDTH   => MUX_WIDTH
-            )
-            port map(
-                DATA_IN     => slv_array_ser(mux_arr_data_in(i)),
-                SEL         => mux_select(i),
-                DATA_OUT    => mux_block_out(i)
+        generic map (
+            DATA_WIDTH  => MFB_BLOCK_SIZE*MFB_ITEM_WIDTH,   -- block width
+            MUX_WIDTH   => MUX_WIDTH
+        )
+        port map (
+            DATA_IN     => slv_array_ser(mux_arr_data_in(i)),
+            SEL         => mux_select(i),
+            DATA_OUT    => mux_block_out(i)
         );
     end generate;
 
@@ -208,14 +208,14 @@ begin
     -- Packet Length
     mux_pkt_lng_arr_g: for blk in 0 to MFB_REGIONS*MFB_REGION_SIZE - 1 generate
         mux_pkt_lng_i: entity work.GEN_MUX
-            generic map(
-                DATA_WIDTH  => max(1, log2(RX_PKT_SIZE_MAX+1)), -- Packet length
-                MUX_WIDTH   => MUX_WIDTH
-            )
-            port map(
-                DATA_IN     => slv_array_ser(mux_in_pkt_lng_arr(blk)),
-                SEL         => mux_select(blk),
-                DATA_OUT    => mux_out_pkt_lng_arr(blk)
+        generic map (
+            DATA_WIDTH  => max(1, log2(RX_PKT_SIZE_MAX+1)), -- Packet length
+            MUX_WIDTH   => MUX_WIDTH
+        )
+        port map (
+            DATA_IN     => slv_array_ser(mux_in_pkt_lng_arr(blk)),
+            SEL         => mux_select(blk),
+            DATA_OUT    => mux_out_pkt_lng_arr(blk)
         );
     end generate;
 
@@ -223,7 +223,7 @@ begin
     --                    Temporary register                  --
     ------------------------------------------------------------
     -- Temporary register holds overflow data
-    eof_or_std_p: process(all)
+    eof_or_std_p : process (all)
         variable sof_or_std_v : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0);
         variable sof_or_arr_v : slv_array_t(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0)(MFB_REGIONS downto 0);
         variable eof_or_std_v : std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0);
@@ -249,28 +249,28 @@ begin
     end process;
 
     tmp_reg_i: entity work.FP_TMP_REG
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-            RX_PKT_SIZE_MAX     => RX_PKT_SIZE_MAX
-        )
-        port map(
-            CLK => CLK,
-            RST => RST,
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+        RX_PKT_SIZE_MAX     => RX_PKT_SIZE_MAX
+    )
+    port map (
+        CLK => CLK,
+        RST => RST,
 
-            RX_TMP_OVERFLOW         => RX_TMP_OVERFLOW,
-            RX_TMP_PTR_UNS          => RX_TMP_PTR_UNS,
-            RX_TMP_DATA_ARR         => mux_block_out,
-            RX_TMP_SOF_ONE_HOT      => sof_or_std,
-            RX_TMP_EOF_ONE_HOT      => eof_or_std,
-            RX_PKT_LNG              => mux_out_pkt_lng_arr,
+        RX_TMP_OVERFLOW         => RX_TMP_OVERFLOW,
+        RX_TMP_PTR_UNS          => RX_TMP_PTR_UNS,
+        RX_TMP_DATA_ARR         => mux_block_out,
+        RX_TMP_SOF_ONE_HOT      => sof_or_std,
+        RX_TMP_EOF_ONE_HOT      => eof_or_std,
+        RX_PKT_LNG              => mux_out_pkt_lng_arr,
 
-            TX_TMP_DATA             => tmp_reg,
-            TX_TMP_SOF_ONE_HOT      => tmp_sof_one_hot,
-            TX_TMP_EOF_ONE_HOT      => tmp_eof_one_hot,
-            TX_PKT_LNG              => tmp_pkt_lng
+        TX_TMP_DATA             => tmp_reg,
+        TX_TMP_SOF_ONE_HOT      => tmp_sof_one_hot,
+        TX_TMP_EOF_ONE_HOT      => tmp_eof_one_hot,
+        TX_PKT_LNG              => tmp_pkt_lng
     );
 
     ------------------------------------------------------------
@@ -279,36 +279,36 @@ begin
     -- External timeout controls whether there is data in TMP_REG
     -- The second task is to correctly represent SOF and EOF
     ext_timeout_i: entity work.FP_TIMEOUT_EXT
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-            RX_PKT_SIZE_MAX     => RX_PKT_SIZE_MAX,
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+        RX_PKT_SIZE_MAX     => RX_PKT_SIZE_MAX,
 
-            TIMEOUT_CLK_NO      => TIMEOUT_CLK_NO
-        )
-        port map(
-            CLK => CLK,
-            RST => RST,
+        TIMEOUT_CLK_NO      => TIMEOUT_CLK_NO
+    )
+    port map (
+        CLK => CLK,
+        RST => RST,
 
-            RX_SOF_ONE_HOT_CURR  => sof_or_std,
-            RX_EOF_ONE_HOT_CURR  => eof_or_std,
-            RX_PKT_LNG_CURR      => mux_out_pkt_lng_arr,
+        RX_SOF_ONE_HOT_CURR  => sof_or_std,
+        RX_EOF_ONE_HOT_CURR  => eof_or_std,
+        RX_PKT_LNG_CURR      => mux_out_pkt_lng_arr,
 
-            RX_SOF_ONE_HOT_REG   => tmp_sof_one_hot,
-            RX_EOF_ONE_HOT_REG   => tmp_eof_one_hot,
-            RX_PKT_LNG_REG       => tmp_pkt_lng,
+        RX_SOF_ONE_HOT_REG   => tmp_sof_one_hot,
+        RX_EOF_ONE_HOT_REG   => tmp_eof_one_hot,
+        RX_PKT_LNG_REG       => tmp_pkt_lng,
 
-            RX_OVERFLOW          => RX_TMP_OVERFLOW,
-            RX_TMP_PTR           => RX_TMP_PTR_UNS,
+        RX_OVERFLOW          => RX_TMP_OVERFLOW,
+        RX_TMP_PTR           => RX_TMP_PTR_UNS,
 
-            TX_PKT_LNG           => ext_timeout_pkt_len,
-            TX_SOF               => ext_timeout_sof,
-            TX_EOF               => ext_timeout_eof,
-            TX_EOF_POS           => ext_timeout_eof_pos,
-            TX_SOF_POS           => ext_timeout_sof_pos,
-            TX_TIMEOUT_EXT       => ext_timeout_event
+        TX_PKT_LNG           => ext_timeout_pkt_len,
+        TX_SOF               => ext_timeout_sof,
+        TX_EOF               => ext_timeout_eof,
+        TX_EOF_POS           => ext_timeout_eof_pos,
+        TX_SOF_POS           => ext_timeout_sof_pos,
+        TX_TIMEOUT_EXT       => ext_timeout_event
     );
 
     ------------------------------------------------------------
@@ -316,39 +316,39 @@ begin
     ------------------------------------------------------------
     -- Selects correct data (Current or Register)
     out_ctrl_i: entity work.FP_DATA_SEL
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
 
-            RX_PKT_SIZE_MAX     => RX_PKT_SIZE_MAX
-        )
-        port map(
-            CLK => CLK,
-            RST => RST,
+        RX_PKT_SIZE_MAX     => RX_PKT_SIZE_MAX
+    )
+    port map (
+        CLK => CLK,
+        RST => RST,
 
-            RX_TMP_REG_DATA => slv_array_ser(tmp_reg),
-            RX_CURRENT_DATA => slv_array_ser(mux_block_out),
-            RX_TMP_PTR      => RX_TMP_PTR_UNS,
-            RX_SRC_RDY      => RX_TMP_OVERFLOW or ext_timeout_event,
+        RX_TMP_REG_DATA => slv_array_ser(tmp_reg),
+        RX_CURRENT_DATA => slv_array_ser(mux_block_out),
+        RX_TMP_PTR      => RX_TMP_PTR_UNS,
+        RX_SRC_RDY      => RX_TMP_OVERFLOW or ext_timeout_event,
 
-            RX_TIMEOUT_EXT  => ext_timeout_event,
-            RX_PKT_LNG      => ext_timeout_pkt_len,
-            RX_SOF          => ext_timeout_sof,
-            RX_EOF          => ext_timeout_eof,
-            RX_SOF_POS      => ext_timeout_sof_pos,
-            RX_EOF_POS      => ext_timeout_eof_pos,
+        RX_TIMEOUT_EXT  => ext_timeout_event,
+        RX_PKT_LNG      => ext_timeout_pkt_len,
+        RX_SOF          => ext_timeout_sof,
+        RX_EOF          => ext_timeout_eof,
+        RX_SOF_POS      => ext_timeout_sof_pos,
+        RX_EOF_POS      => ext_timeout_eof_pos,
 
-            TX_DATA         => out_ctrl_data,
-            TX_PKT_LNG      => out_ctrl_pkt_lng,
-            TX_META         => open,
-            TX_TIMEOUT_EXT  => out_ctrl_timeout,
-            TX_SOF          => out_ctrl_sof,
-            TX_EOF          => out_ctrl_eof,
-            TX_SOF_POS      => out_ctrl_sof_pos,
-            TX_EOF_POS      => out_ctrl_eof_pos,
-            TX_SRC_RDY      => out_ctrl_src_rdy
+        TX_DATA         => out_ctrl_data,
+        TX_PKT_LNG      => out_ctrl_pkt_lng,
+        TX_META         => open,
+        TX_TIMEOUT_EXT  => out_ctrl_timeout,
+        TX_SOF          => out_ctrl_sof,
+        TX_EOF          => out_ctrl_eof,
+        TX_SOF_POS      => out_ctrl_sof_pos,
+        TX_EOF_POS      => out_ctrl_eof_pos,
+        TX_SRC_RDY      => out_ctrl_src_rdy
     );
     ------------------------------------------------------------
     --                       SPKT_LENGTH                      --
@@ -356,31 +356,31 @@ begin
     -- Keeps track of the size of the SuperPacket and passes the
     -- number of packets that make up the SuperPacket.
     spkt_len_i: entity work.FP_SPKT_LNG
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-            FIFO_DEPTH          => FIFO_DEPTH,
-            TIMEOUT_CLK_NO      => 2*TIMEOUT_CLK_NO,
-            SPKT_SIZE_MIN       => RX_PKT_SIZE_MIN,
-            SPKT_SIZE_MAX       => RX_PKT_SIZE_MAX,
-            DEVICE              => DEVICE
-        )
-        port map(
-            CLK => CLK,
-            RST => RST,
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+        FIFO_DEPTH          => FIFO_DEPTH,
+        TIMEOUT_CLK_NO      => 2*TIMEOUT_CLK_NO,
+        SPKT_SIZE_MIN       => RX_PKT_SIZE_MIN,
+        SPKT_SIZE_MAX       => RX_PKT_SIZE_MAX,
+        DEVICE              => DEVICE
+    )
+    port map (
+        CLK => CLK,
+        RST => RST,
 
-            RX_EXT_TIMEOUT     => out_ctrl_timeout,
-            RX_PKT_SOF         => out_ctrl_sof,
-            RX_PKT_EOF         => out_ctrl_eof,
-            RX_PKT_SRC_RDY     => out_ctrl_src_rdy,
-            RX_PKT_LENGTH      => out_ctrl_pkt_lng,
+        RX_EXT_TIMEOUT     => out_ctrl_timeout,
+        RX_PKT_SOF         => out_ctrl_sof,
+        RX_PKT_EOF         => out_ctrl_eof,
+        RX_PKT_SRC_RDY     => out_ctrl_src_rdy,
+        RX_PKT_LENGTH      => out_ctrl_pkt_lng,
 
-            TX_SPKT_EOF_NUM    => spkt_tx_eof_num,
-            TX_SPKT_LENGTH     => spkt_tx_length,
-            TX_SPKT_SRC_RDY    => spkt_tx_src_rdy,
-            TX_SPKT_DST_RDY    => spkt_tx_dst_rdy
+        TX_SPKT_EOF_NUM    => spkt_tx_eof_num,
+        TX_SPKT_LENGTH     => spkt_tx_length,
+        TX_SPKT_SRC_RDY    => spkt_tx_src_rdy,
+        TX_SPKT_DST_RDY    => spkt_tx_dst_rdy
     );
 
     out_ctrl_eof_pos_arr    <= slv_array_deser(out_ctrl_eof_pos, MFB_REGIONS);
@@ -393,40 +393,40 @@ begin
     ------------------------------------------------------------
     -- Holds SuperPacket
     mfb_out_fifo_i: entity work.MFB_FIFOX
-        generic map(
-            REGIONS             => MFB_REGIONS,
-            REGION_SIZE         => MFB_REGION_SIZE,
-            BLOCK_SIZE          => MFB_BLOCK_SIZE,
-            ITEM_WIDTH          => MFB_ITEM_WIDTH,
-            META_WIDTH          => 0,
-            FIFO_DEPTH          => FIFO_DEPTH,
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 8,
-            ALMOST_EMPTY_OFFSET => 0
-        )
-        port map(
-            CLK => CLK,
-            RST => RST,
+    generic map (
+        REGIONS             => MFB_REGIONS,
+        REGION_SIZE         => MFB_REGION_SIZE,
+        BLOCK_SIZE          => MFB_BLOCK_SIZE,
+        ITEM_WIDTH          => MFB_ITEM_WIDTH,
+        META_WIDTH          => 0,
+        FIFO_DEPTH          => FIFO_DEPTH,
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 8,
+        ALMOST_EMPTY_OFFSET => 0
+    )
+    port map (
+        CLK => CLK,
+        RST => RST,
 
-            RX_DATA     => out_ctrl_data,
-            RX_SOF      => out_ctrl_sof,
-            RX_EOF      => out_ctrl_eof,
-            RX_SOF_POS  => out_ctrl_sof_pos,
-            RX_EOF_POS  => slv_array_ser(fixed_eof_pos_arr),
-            RX_SRC_RDY  => out_ctrl_src_rdy,
-            RX_DST_RDY  => open,
+        RX_DATA     => out_ctrl_data,
+        RX_SOF      => out_ctrl_sof,
+        RX_EOF      => out_ctrl_eof,
+        RX_SOF_POS  => out_ctrl_sof_pos,
+        RX_EOF_POS  => slv_array_ser(fixed_eof_pos_arr),
+        RX_SRC_RDY  => out_ctrl_src_rdy,
+        RX_DST_RDY  => open,
 
-            TX_DATA     => TX_DATA,
-            TX_SOF      => fifo_tx_sof,
-            TX_EOF      => fifo_tx_eof,
-            TX_SOF_POS  => TX_SOF_POS,
-            TX_EOF_POS  => TX_EOF_POS,
-            TX_SRC_RDY  => fifo_tx_src_rdy,
-            TX_DST_RDY  => fifo_tx_dst_rdy,
+        TX_DATA     => TX_DATA,
+        TX_SOF      => fifo_tx_sof,
+        TX_EOF      => fifo_tx_eof,
+        TX_SOF_POS  => TX_SOF_POS,
+        TX_EOF_POS  => TX_EOF_POS,
+        TX_SRC_RDY  => fifo_tx_src_rdy,
+        TX_DST_RDY  => fifo_tx_dst_rdy,
 
-            FIFO_STATUS => fifo_status,
-            FIFO_AFULL  => TX_STOP,
-            FIFO_AEMPTY => fifo_aempty
+        FIFO_STATUS => fifo_status,
+        FIFO_AFULL  => TX_STOP,
+        FIFO_AEMPTY => fifo_aempty
     );
 
     ------------------------------------------------------------
@@ -434,38 +434,38 @@ begin
     ------------------------------------------------------------
     -- Keeps track of SuperPacket boundaries
     fifo_ctrl_i: entity work.FP_FIFO_CTRL
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-            FIFO_DEPTH          => FIFO_DEPTH,
-            RX_PKT_SIZE_MAX     => RX_PKT_SIZE_MAX
-        )
-        port map(
-            CLK => CLK,
-            RST => RST,
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+        FIFO_DEPTH          => FIFO_DEPTH,
+        RX_PKT_SIZE_MAX     => RX_PKT_SIZE_MAX
+    )
+    port map (
+        CLK => CLK,
+        RST => RST,
 
-            FIFO_TX_SRC_RDY     => fifo_tx_src_rdy,
-            FIFO_TX_DST_RDY     => fifo_tx_dst_rdy,
-            FIFO_TX_SOF         => fifo_tx_sof,
-            FIFO_TX_EOF         => fifo_tx_eof,
-            FIFO_TX_SOF_POS     => TX_SOF_POS,
-            FIFO_TX_EOF_POS     => TX_EOF_POS,
+        FIFO_TX_SRC_RDY     => fifo_tx_src_rdy,
+        FIFO_TX_DST_RDY     => fifo_tx_dst_rdy,
+        FIFO_TX_SOF         => fifo_tx_sof,
+        FIFO_TX_EOF         => fifo_tx_eof,
+        FIFO_TX_SOF_POS     => TX_SOF_POS,
+        FIFO_TX_EOF_POS     => TX_EOF_POS,
 
-            SPKT_RX_EOF_NUM     => spkt_tx_eof_num,
-            SPKT_RX_LENGTH      => spkt_tx_length,
-            SPKT_RX_SRC_RDY     => spkt_tx_src_rdy,
-            SPKT_RX_DST_RDY     => spkt_tx_dst_rdy,
+        SPKT_RX_EOF_NUM     => spkt_tx_eof_num,
+        SPKT_RX_LENGTH      => spkt_tx_length,
+        SPKT_RX_SRC_RDY     => spkt_tx_src_rdy,
+        SPKT_RX_DST_RDY     => spkt_tx_dst_rdy,
 
-            -- Valid with SOF
-            TX_PKT_LEN_DST_RDY  => TX_DST_RDY,
-            TX_PKT_LEN_DATA     => TX_PKT_LNG,
+        -- Valid with SOF
+        TX_PKT_LEN_DST_RDY  => TX_DST_RDY,
+        TX_PKT_LEN_DATA     => TX_PKT_LNG,
 
-            CH_TX_SRC_RDY       => TX_SRC_RDY,
-            CH_TX_DST_RDY       => TX_DST_RDY,
-            CH_TX_SOF           => TX_SOF,
-            CH_TX_EOF           => TX_EOF
+        CH_TX_SRC_RDY       => TX_SRC_RDY,
+        CH_TX_DST_RDY       => TX_DST_RDY,
+        CH_TX_SOF           => TX_SOF,
+        CH_TX_EOF           => TX_EOF
     );
 
 end architecture;

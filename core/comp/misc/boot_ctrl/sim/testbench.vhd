@@ -4,16 +4,16 @@
 --
 -- SPDX-License-Identifier: BSD-3-Clause
 
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
-USE IEEE.std_logic_textio.ALL;
-USE ieee.numeric_std.ALL;
-USE std.textio.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use IEEE.std_logic_textio.all;
+use ieee.numeric_std.all;
+use std.textio.all;
 
-ENTITY TESTBENCH IS
-END TESTBENCH;
+entity TESTBENCH is
+end entity;
 
-ARCHITECTURE FULL OF TESTBENCH IS
+architecture FULL of TESTBENCH is
 
     signal mi_clk        : std_logic;
     signal mi_reset      : std_logic;
@@ -42,30 +42,30 @@ ARCHITECTURE FULL OF TESTBENCH IS
     signal axi_mi_wr     : std_logic;
     signal axi_mi_rd     : std_logic;
     signal axi_mi_be     : std_logic_vector((32/8)-1 downto 0);
-    signal axi_mi_ardy   : std_logic :='0';
+    signal axi_mi_ardy   : std_logic := '0';
     signal axi_mi_drd    : std_logic_vector(32 - 1 downto 0) := (others => '0');
-    signal axi_mi_drdy   : std_logic :='0';
+    signal axi_mi_drdy   : std_logic := '0';
     signal bmc_mi_addr   : std_logic_vector(8 - 1 downto 0);
     signal bmc_mi_dwr    : std_logic_vector(32 - 1 downto 0);
     signal bmc_mi_wr     : std_logic;
     signal bmc_mi_rd     : std_logic;
     signal bmc_mi_be     : std_logic_vector((32/8)-1 downto 0);
-    signal bmc_mi_ardy   : std_logic :='0';
+    signal bmc_mi_ardy   : std_logic := '0';
     signal bmc_mi_drd    : std_logic_vector(32 - 1 downto 0) := (others => '0');
-    signal bmc_mi_drdy   : std_logic :='0';
+    signal bmc_mi_drdy   : std_logic := '0';
 
     constant PERIOD_MI_CLK   : time := 5 ns;
     constant PERIOD_BOOT_CLK : time := 10 ns;
 
-BEGIN
+begin
 
     -- Instantiate the Unit Under Test (UUT)
     uut_i: entity work.BOOT_CTRL
-    generic map(
+    generic map (
         BOOT_TYPE      => 1,
         BOOT_TIMEOUT_W => 18
     )
-    PORT MAP(
+    port map (
         MI_CLK        => mi_clk,
         MI_RESET      => mi_reset,
         MI_DWR        => mi_dwr,
@@ -168,4 +168,4 @@ BEGIN
         wait;
     end process;
 
-end;
+end architecture;

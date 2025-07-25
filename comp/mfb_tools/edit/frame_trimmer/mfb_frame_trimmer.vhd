@@ -17,7 +17,7 @@ use work.type_pack.all;
 -- - max value is original frame length
 -- - min value is ((BLOCK_SIZE*ITEM_WIDTH)-(ITEM_WIDTH-1))
 entity MFB_FRAME_TRIMMER is
-    generic(
+    generic (
         REGIONS     : natural := 4;
         REGION_SIZE : natural := 8;
         BLOCK_SIZE  : natural := 8;
@@ -26,7 +26,7 @@ entity MFB_FRAME_TRIMMER is
         PKT_MTU     : natural := 2**14;
         DEVICE      : string  := "AGILEX"
     );
-    port(
+    port (
         CLK            : in  std_logic;
         RESET          : in  std_logic;
 
@@ -197,7 +197,7 @@ begin
         -- last valid of trim valid
         s_trim_lvld(r+1) <= RX_TRIM_EN(r) when (RX_SOF(r) = '1') else s_trim_lvld(r);
         -- trim valid of first packet in region
-        s_trim_fpir(r) <= RX_TRIM_EN(r) when (s_rx_sof_before_eof_vld(r) = '1') else s_trim_lvld(r);
+        s_trim_fpir(r)   <= RX_TRIM_EN(r) when (s_rx_sof_before_eof_vld(r) = '1') else s_trim_lvld(r);
 
         s_nl_word_off(r)        <= s_rx_new_len_ext(r+1)(LEN_WIDTH-1 downto log2(REGIONS*REGION_ITEMS));
         s_nl_region_off(r)      <= s_rx_new_len_ext(r+1)(log2(REGIONS*REGION_ITEMS)-1 downto log2(REGION_ITEMS));
@@ -229,8 +229,8 @@ begin
 
     final_eof_g : for r in 0 to REGIONS-1 generate
         -- New EOF for trimmed frames
-        s_new_eof(r)     <= s_nl_ok(r) or s_nl_prev_ok(r);
-        s_new_eof_pos(r) <= std_logic_vector(s_nl_pos_off(r)) when (s_nl_ok(r) = '1') else std_logic_vector(s_nl_pos_off_prev(r));
+        s_new_eof(r)       <= s_nl_ok(r) or s_nl_prev_ok(r);
+        s_new_eof_pos(r)   <= std_logic_vector(s_nl_pos_off(r)) when (s_nl_ok(r) = '1') else std_logic_vector(s_nl_pos_off_prev(r));
         -- EOF for NON-trimmed frames
         s_rx_eof_masked(r) <= RX_EOF(r) and not s_trim_fpir(r);
         -- Final EOF logic

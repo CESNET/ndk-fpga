@@ -64,7 +64,7 @@ begin
             intel_wr_be <= (others => '1');
         end generate;
 
-        bram_i : altera_syncram
+        bram_i : component altera_syncram
         generic map (
             address_aclr_b                     => "NONE",
             address_reg_b                      => INTEL_PORTB_CLK,

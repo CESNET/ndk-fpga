@@ -15,14 +15,14 @@ use work.type_pack.all;
 -- OUTPUT - AXI CQ: DATA=512, CQ=183 for Gen3x16 PCIe (Ultrascale+), no straddling!
 
 entity PCIE_MFB2AXICQ is
-    generic(
+    generic (
         BAR_APERTURE      : natural := 63;
         FIFO_DEPTH        : natural := 512;
         FIFO_RAM_TYPE     : string  := "BRAM";
         FIFO_AFULL_OFFSET : natural := 20;
         DEVICE            : string  := "STRATIX10"
     );
-    port(
+    port (
         CLK              : in  std_logic;
         RESET            : in  std_logic;
         -- =====================================================================
@@ -104,7 +104,7 @@ architecture FULL of PCIE_MFB2AXICQ is
     signal s_last_dw_is_eof : std_logic;
     signal s_shift_en       : std_logic_vector(512/32-1 downto 0);
 
-    type t_fsm_state is (idle,shifted_pkt,new_word);
+    type   t_fsm_state is (IDLE,SHIFTED_PKT,NEW_WORD);
     signal s_fsm_pst : t_fsm_state;
     signal s_fsm_nst : t_fsm_state;
 
@@ -187,7 +187,7 @@ begin
     s_rx_mfb_dst_rdy <= not s_fifoxm_full;
 
     mfb_fifoxm_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH         => 256+3+3+1+1,
         ITEMS              => FIFO_DEPTH,
         RAM_TYPE           => FIFO_RAM_TYPE,
@@ -197,7 +197,7 @@ begin
         READ_PORTS         => 2,
         SAFE_READ_MODE     => true
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RESET,
         DI     => s_fifoxm_din,
@@ -210,7 +210,7 @@ begin
         AEMPTY => open
     );
 
-    s_fifoxm_dout_arr <= slv_array_downto_deser(s_fifoxm_dout,2,(256+3+3+1+1));
+    s_fifoxm_dout_arr       <= slv_array_downto_deser(s_fifoxm_dout,2,(256+3+3+1+1));
     s_fifoxm_mfb_region_vld <= not s_fifoxm_empty;
 
     fifoxm_dout_arr_unpack_g : for i in 0 to 1 generate
@@ -271,7 +271,7 @@ begin
     s_sh_mfb_bar_range <= s_reg_mfb_bar_range;
 
     data_shifted_g: for i in 0 to (512/32)-1 generate
-        s_mfb_data_parr(i+1) <= s_reg_mfb_data((i+1)*32-1 downto i*32);
+        s_mfb_data_parr(i+1)                  <= s_reg_mfb_data((i+1)*32-1 downto i*32);
         s_sh_mfb_data((i+1)*32-1 downto i*32) <= s_mfb_data_parr(i) when (s_shift_en(i) = '1') else s_mfb_data_parr(i+1);
     end generate;
 
@@ -287,21 +287,21 @@ begin
     s_is_3dw_header  <= not s_reg_mfb_data(29) and s_reg_mfb_sof and s_reg_mfb_src_rdy;
     s_last_dw_is_eof <= and s_reg_mfb_eof_pos;
 
-    fsm_reg_p: process(CLK)
+    fsm_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                s_fsm_pst <= idle;
+                s_fsm_pst <= IDLE;
             elsif (s_mfb_dst_rdy = '1') then
                 s_fsm_pst <= s_fsm_nst;
             end if;
         end if;
     end process;
 
-    fsm_logic_p: process (all)
+    fsm_logic_p : process (all)
     begin
         case s_fsm_pst is
-            when idle =>
+            when IDLE =>
                 s_shift_en       <= (others => '0');
                 s_sh_mfb_sof     <= s_reg_mfb_sof;
                 s_sh_mfb_eof     <= s_reg_mfb_eof;
@@ -314,20 +314,20 @@ begin
                 end if;
 
                 if (s_is_3dw_header = '1' and s_reg_mfb_eof = '0') then
-                    s_fsm_nst <= shifted_pkt;
+                    s_fsm_nst <= SHIFTED_PKT;
                 elsif (s_is_3dw_header = '1' and s_reg_mfb_eof = '1') then
                     if (s_last_dw_is_eof = '1') then
                         s_sh_mfb_eof <= '0';
-                        s_fsm_nst <= new_word;
+                        s_fsm_nst    <= NEW_WORD;
                     else
                         s_sh_mfb_eof_pos <= std_logic_vector(unsigned(s_reg_mfb_eof_pos) + 1);
-                        s_fsm_nst <= idle;
+                        s_fsm_nst        <= IDLE;
                     end if;
                 else
-                    s_fsm_nst <= idle;
+                    s_fsm_nst <= IDLE;
                 end if;
 
-            when shifted_pkt =>
+            when SHIFTED_PKT =>
                 s_shift_en       <= (others => '1');
                 s_sh_mfb_sof     <= '0';
                 s_sh_mfb_eof     <= s_reg_mfb_eof;
@@ -338,15 +338,15 @@ begin
                 if (s_reg_mfb_eof = '1' and s_reg_mfb_src_rdy = '1') then
                     if (s_last_dw_is_eof = '1') then
                         s_sh_mfb_eof <= '0';
-                        s_fsm_nst <= new_word;
+                        s_fsm_nst    <= NEW_WORD;
                     else
-                        s_fsm_nst <= idle;
+                        s_fsm_nst <= IDLE;
                     end if;
                 else
-                    s_fsm_nst <= shifted_pkt;
+                    s_fsm_nst <= SHIFTED_PKT;
                 end if;
 
-            when new_word =>
+            when NEW_WORD =>
                 s_shift_en       <= (others => '0');
                 s_sh_mfb_sof     <= '0';
                 s_sh_mfb_eof     <= '1';
@@ -354,7 +354,7 @@ begin
                 s_sh_mfb_src_rdy <= '1';
                 s_sh_mfb_dst_rdy <= '0';
 
-                s_fsm_nst <= idle;
+                s_fsm_nst <= IDLE;
 
             when others => null;
         end case;
@@ -392,41 +392,41 @@ begin
     s_axi_cq_addr32 <= std_logic_vector(to_unsigned(0,32)) & s_reg1_mfb_data(95 downto 66);
     s_axi_cq_addr64 <= s_reg1_mfb_data(95 downto 64) & s_reg1_mfb_data(127 downto 98);
     -- 64bit or 32bit address
-    s_axi_cq_addr <= s_axi_cq_addr64 when (s_reg1_mfb_data(29) = '1') else s_axi_cq_addr32;
+    s_axi_cq_addr   <= s_axi_cq_addr64 when (s_reg1_mfb_data(29) = '1') else s_axi_cq_addr32;
 
     -- decode AXI PCIe packet type (support only memory R/W now)
-    with s_reg1_mfb_data(31 downto 24) select
-    s_axi_cq_type <= "0000" when "00000000", -- 32b mem rd
-                     "0000" when "00100000", -- 64b mem rd
-                     "0001" when "01000000", -- 32b mem wr
-                     "0001" when "01100000", -- 64b mem wr
-                     "1111" when others;
+    with s_reg1_mfb_data(31 downto 24) select s_axi_cq_type <=
+        "0000" when "00000000", -- 32b mem rd
+        "0000" when "00100000", -- 64b mem rd
+        "0001" when "01000000", -- 32b mem wr
+        "0001" when "01100000", -- 64b mem wr
+        "1111" when others;
 
-    with s_reg1_mfb_data(31 downto 24) select
-    s_tpl_mem_wr_req <= '1' when "01000000", -- 32b mem wr
-                        '1' when "01100000", -- 64b mem wr
-                        '0' when others;
+    with s_reg1_mfb_data(31 downto 24) select s_tpl_mem_wr_req <=
+        '1' when "01000000", -- 32b mem wr
+        '1' when "01100000", -- 64b mem wr
+        '0' when others;
 
     s_cq_data_p : process (all)
     begin
-        if (s_reg1_mfb_sof = '1') then -- header and data
+        if (s_reg1_mfb_sof = '1') then                                                            -- header and data
             -- copy Intel header and data
-            s_axi_cq_data <= s_reg1_mfb_data;
+            s_axi_cq_data                 <= s_reg1_mfb_data;
             -- header modifications (Intel to Xilinx)
-            s_axi_cq_data(127) <= '0'; -- reserved bit
+            s_axi_cq_data(127)            <= '0';                                                 -- reserved bit
             s_axi_cq_data(126 downto 124) <= s_reg1_mfb_data(18) & s_reg1_mfb_data(13 downto 12); -- Attr
-            s_axi_cq_data(123 downto 121) <= s_reg1_mfb_data(22 downto 20); -- TC
-            s_axi_cq_data(120 downto 115) <= std_logic_vector(to_unsigned(BAR_APERTURE,6)); -- BAR Aperture
-            s_axi_cq_data(114 downto 112) <= s_reg1_mfb_bar_range; -- BAR ID
-            s_axi_cq_data(111 downto 104) <= (others => '0'); -- target fce/function ID (don't support yet)
-            s_axi_cq_data(103 downto 96)  <= s_reg1_mfb_data(47 downto 40); -- tag
-            s_axi_cq_data(95 downto 80)   <= s_reg1_mfb_data(63 downto 48); -- req id
-            s_axi_cq_data(79) <= '0'; -- reserved bit
-            s_axi_cq_data(78 downto 75) <= s_axi_cq_type; -- req type
-            s_axi_cq_data(74 downto 64) <= '0' & s_reg1_mfb_data(9 downto 0); -- dword count
-            s_axi_cq_data(63 downto 2)  <= s_axi_cq_addr; -- address (every time is 62bits)
-            s_axi_cq_data(1 downto 0)   <= s_reg1_mfb_data(11 downto 10); -- AT
-        else -- only data
+            s_axi_cq_data(123 downto 121) <= s_reg1_mfb_data(22 downto 20);                       -- TC
+            s_axi_cq_data(120 downto 115) <= std_logic_vector(to_unsigned(BAR_APERTURE,6));       -- BAR Aperture
+            s_axi_cq_data(114 downto 112) <= s_reg1_mfb_bar_range;                                -- BAR ID
+            s_axi_cq_data(111 downto 104) <= (others => '0');                                     -- target fce/function ID (don't support yet)
+            s_axi_cq_data(103 downto 96)  <= s_reg1_mfb_data(47 downto 40);                       -- tag
+            s_axi_cq_data(95 downto 80)   <= s_reg1_mfb_data(63 downto 48);                       -- req id
+            s_axi_cq_data(79)             <= '0';                                                 -- reserved bit
+            s_axi_cq_data(78 downto 75)   <= s_axi_cq_type;                                       -- req type
+            s_axi_cq_data(74 downto 64)   <= '0' & s_reg1_mfb_data(9 downto 0);                   -- dword count
+            s_axi_cq_data(63 downto 2)    <= s_axi_cq_addr;                                       -- address (every time is 62bits)
+            s_axi_cq_data(1 downto 0)     <= s_reg1_mfb_data(11 downto 10);                       -- AT
+        else                                                                                      -- only data
             s_axi_cq_data <= s_reg1_mfb_data;
         end if;
     end process;
@@ -434,22 +434,22 @@ begin
     s_cq_user_p : process (s_reg1_mfb_data, s_reg1_mfb_sof, s_tpl_mem_wr_req)
     begin
         -- initial value
-        s_axi_cq_user <= (others => '0');
+        s_axi_cq_user              <= (others => '0');
         -- set user values
-        s_axi_cq_user(3 downto 0)  <= s_reg1_mfb_data(35 downto 32); -- first BE
-        s_axi_cq_user(11 downto 8) <= s_reg1_mfb_data(39 downto 36); -- last BE
+        s_axi_cq_user(3 downto 0)  <= s_reg1_mfb_data(35 downto 32);        -- first BE
+        s_axi_cq_user(11 downto 8) <= s_reg1_mfb_data(39 downto 36);        -- last BE
         s_axi_cq_user(80)          <= s_reg1_mfb_sof;
 
         -- TPH values
-        s_axi_cq_user(97) <= s_reg1_mfb_data(16); -- cq_user_tph_present (TH)
+        s_axi_cq_user(97) <= s_reg1_mfb_data(16);                           -- cq_user_tph_present (TH)
 
-        if (s_reg1_mfb_data(29) = '1') then -- is 4DW header
-            s_axi_cq_user(100 downto 99) <= s_reg1_mfb_data(97 downto 96); -- cq_user_tph_type (PH)
+        if (s_reg1_mfb_data(29) = '1') then                                 -- is 4DW header
+            s_axi_cq_user(100 downto 99) <= s_reg1_mfb_data(97 downto 96);  -- cq_user_tph_type (PH)
         else
-            s_axi_cq_user(100 downto 99) <= s_reg1_mfb_data(65 downto 64); -- cq_user_tph_type (PH)
+            s_axi_cq_user(100 downto 99) <= s_reg1_mfb_data(65 downto 64);  -- cq_user_tph_type (PH)
         end if;
 
-        if (s_tpl_mem_wr_req = '1') then -- is memory write request
+        if (s_tpl_mem_wr_req = '1') then                                    -- is memory write request
             s_axi_cq_user(110 downto 103) <= s_reg1_mfb_data(47 downto 40); -- cq_user_tph_st_tag (ST)
         else
             s_axi_cq_user(110 downto 103) <= s_reg1_mfb_data(39 downto 32); -- cq_user_tph_st_tag (ST)
@@ -459,15 +459,15 @@ begin
     -- keep signal serves as valid for each DWORD of CQ_DATA signal
     s_cq_keep_p : process (s_reg1_mfb_src_rdy, s_reg1_mfb_eof, s_reg1_mfb_eof_pos)
     begin
-        if (s_reg1_mfb_src_rdy = '0') then -- no data
+        if (s_reg1_mfb_src_rdy = '0') then                                -- no data
             s_axi_cq_keep <= (others => '0');
-        elsif (s_reg1_mfb_eof = '1') then -- end of data
+        elsif (s_reg1_mfb_eof = '1') then                                 -- end of data
             s_axi_cq_keep <= (others => '0');
             for i in 0 to 512/32-1 loop
                 s_axi_cq_keep(i) <= '1';
                 exit when (i = to_integer(unsigned(s_reg1_mfb_eof_pos)));
             end loop;
-        else -- start or middle of data
+        else                                                              -- start or middle of data
             s_axi_cq_keep <= (others => '1');
         end if;
     end process;

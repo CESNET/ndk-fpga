@@ -16,53 +16,53 @@ use work.type_pack.all;
 -- ----------------------------------------------------------------------------
 
 entity BARREL_SHIFTER_GEN_PIPED is
-generic (
-    -- input/output data width in BLOCKs
-    BLOCKS       : integer := 256;
-    -- width of one block in bits
-    BLOCK_WIDTH  : integer := 64;
-    -- NOTE: data_width = blocks*block_size
+    generic (
+        -- input/output data width in BLOCKs
+        BLOCKS       : integer := 256;
+        -- width of one block in bits
+        BLOCK_WIDTH  : integer := 64;
+        -- NOTE: data_width = blocks*block_size
 
-    -- barrel shifting latency
-    BAR_SHIFT_LATENCY : integer := 0;
-    -- input register enable (adds additional 1 CLK latency)
-    INPUT_REG         : boolean := false;
-    -- output register enable (adds additional 1 CLK latency)
-    OUTPUT_REG        : boolean := false;
+        -- barrel shifting latency
+        BAR_SHIFT_LATENCY : integer := 0;
+        -- input register enable (adds additional 1 CLK latency)
+        INPUT_REG         : boolean := false;
+        -- output register enable (adds additional 1 CLK latency)
+        OUTPUT_REG        : boolean := false;
 
-    -- set true to shift left, false to shift right
-    SHIFT_LEFT  : boolean := false ;
+        -- set true to shift left, false to shift right
+        SHIFT_LEFT  : boolean := false;
 
-    -- Metadata can be useful when you want to send additional info to the TX side
-    -- along with the rotated value. (for example the value of the RX_SEL signal)
-    METADATA_WIDTH : integer := 0
-);
-port (
-    CLK         : in  std_logic := '0'; -- unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false
-    RESET       : in  std_logic := '0'; -- unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false
+        -- Metadata can be useful when you want to send additional info to the TX side
+        -- along with the rotated value. (for example the value of the RX_SEL signal)
+        METADATA_WIDTH : integer := 0
+    );
+    port (
+        CLK         : in  std_logic := '0'; -- unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false
+        RESET       : in  std_logic := '0'; -- unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false
 
-    RX_DATA     : in  std_logic_vector(BLOCK_WIDTH*BLOCKS-1 downto 0);
-    RX_SEL      : in  std_logic_vector(log2(BLOCKS)-1 downto 0);
-    RX_METADATA : in  std_logic_vector(METADATA_WIDTH-1 downto 0) := (others => '0');
-    RX_SRC_RDY  : in  std_logic := '1';
-    RX_DST_RDY  : out std_logic;
+        RX_DATA     : in  std_logic_vector(BLOCK_WIDTH*BLOCKS-1 downto 0);
+        RX_SEL      : in  std_logic_vector(log2(BLOCKS)-1 downto 0);
+        RX_METADATA : in  std_logic_vector(METADATA_WIDTH-1 downto 0) := (others => '0');
+        RX_SRC_RDY  : in  std_logic := '1';
+        RX_DST_RDY  : out std_logic;
 
-    TX_DATA     : out std_logic_vector(BLOCK_WIDTH*BLOCKS-1 downto 0);
-    TX_METADATA : out std_logic_vector(METADATA_WIDTH-1 downto 0);
-    TX_SRC_RDY  : out std_logic;
-    TX_DST_RDY  : in  std_logic := '1'
-);
-end BARREL_SHIFTER_GEN_PIPED;
+        TX_DATA     : out std_logic_vector(BLOCK_WIDTH*BLOCKS-1 downto 0);
+        TX_METADATA : out std_logic_vector(METADATA_WIDTH-1 downto 0);
+        TX_SRC_RDY  : out std_logic;
+        TX_DST_RDY  : in  std_logic := '1'
+    );
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                       ARCHITECTURE DECLARATION                            --
 -- ----------------------------------------------------------------------------
 
-architecture full of BARREL_SHIFTER_GEN_PIPED is
+architecture FULL of BARREL_SHIFTER_GEN_PIPED is
 
-    function getMuxMetadata(metadata : std_logic_vector; index : integer) return std_logic_vector is
+    function getmuxmetadata (metadata : std_logic_vector; index : integer) return std_logic_vector is
     begin
-        if (index=0) then
+        if (index = 0) then
             return metadata;
         else
             return (metadata'high downto 0 => '0');
@@ -98,7 +98,7 @@ begin
 
     muxg: for i in 0 to BLOCKS-1 generate
         muxi: entity work.GEN_MUX_PIPED
-        generic map(
+        generic map (
             DATA_WIDTH     => BLOCK_WIDTH,
             MUX_WIDTH      => BLOCKS,
             MUX_LATENCY    => BAR_SHIFT_LATENCY,
@@ -106,7 +106,7 @@ begin
             OUTPUT_REG     => OUTPUT_REG,
             METADATA_WIDTH => METADATA_WIDTH
         )
-        port map(
+        port map (
             CLK   => CLK,
             RESET => RESET,
 
@@ -127,4 +127,4 @@ begin
     TX_METADATA <= mux_meta_out(0);
     TX_SRC_RDY  <= mux_out_src_rdy(0);
 
-end full;
+end architecture;

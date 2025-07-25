@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity FP_SPKT_LNG is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
@@ -25,7 +25,7 @@ entity FP_SPKT_LNG is
         SPKT_SIZE_MAX       : natural := 2**14;
         DEVICE              : string  := "AGILEX"
     );
-    port(
+    port (
         CLK : in std_logic;
         RST : in std_logic;
 
@@ -53,7 +53,7 @@ architecture FULL of FP_SPKT_LNG is
     -- EOF counter
     signal spkt_eof_num       : unsigned(EOF_NUM_LEN - 1 downto 0);
 
-    --FIFOX
+    -- FIFOX
     signal rx_fifox_length    : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
     signal rx_fifox_pkt_num   : unsigned(EOF_NUM_LEN - 1 downto 0);
     -- [length][eofs]
@@ -65,7 +65,7 @@ architecture FULL of FP_SPKT_LNG is
     -- Timeout
     signal timeout_event      : std_logic;
     signal timeout_en         : std_logic;
-    signal timeout_cnt        : unsigned(max(1, log2(TIMEOUT_CLK_NO) + 1) - 1 downto 0):= (others => '0');
+    signal timeout_cnt        : unsigned(max(1, log2(TIMEOUT_CLK_NO) + 1) - 1 downto 0) := (others => '0');
     signal timeout            : std_logic;
 
     -- Enable
@@ -75,14 +75,14 @@ architecture FULL of FP_SPKT_LNG is
 begin
 
     -- Timeout
-    timeout_p: process(all)
+    timeout_p : process (all)
     begin
         if rising_edge(CLK) then
             timeout_event <= '0';
-            if RX_EXT_TIMEOUT = '0' then
-                if timeout_en = '1' then
-                    if RX_PKT_SRC_RDY = '0' then
-                        if timeout_cnt = TIMEOUT_CLK_NO then
+            if (RX_EXT_TIMEOUT = '0') then
+                if (timeout_en = '1') then
+                    if (RX_PKT_SRC_RDY = '0') then
+                        if (timeout_cnt = TIMEOUT_CLK_NO) then
                             timeout_event <= '1';
                             timeout_cnt   <= (others => '0');
                         else
@@ -103,19 +103,19 @@ begin
     timeout <= ((timeout_event and (not RX_PKT_SRC_RDY)) or RX_EXT_TIMEOUT);
 
     -- Post timeout handle
-    process(all)
+    process (all)
     begin
         if rising_edge(CLK) then
-            if timeout = '1' then
+            if (timeout = '1') then
                 timeout_en  <= '0';
-            elsif RX_PKT_SRC_RDY = '1' then
+            elsif (RX_PKT_SRC_RDY = '1') then
                 timeout_en  <= '1';
             end if;
         end if;
     end process;
 
     -- Sum possible length and decide whether it will fit into MTU
-    pkt_lng_sum_p: process(all)
+    pkt_lng_sum_p : process (all)
         variable pkt_lng_sum_v : u_array_t(MFB_REGIONS downto 0)(log2(SPKT_SIZE_MAX+1) - 1 downto 0);
     begin
         pkt_lng_sum_v   := (others => (others => '0'));
@@ -127,11 +127,11 @@ begin
     end process;
 
     -- Decide whether the packet will fit into SuperPacket
-    process(all)
+    process (all)
         variable new_length_v       : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
         variable current_length_v   : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
     begin
-        spkt_wr_en  <= '0';
+        spkt_wr_en       <= '0';
         new_length_v     := pkt_lng_sum + length_reg_q;
         current_length_v := pkt_lng_sum;
 
@@ -139,18 +139,18 @@ begin
 
         -- Compare new_length_v with the upper limit of SuperPacket
         -- In other words if new_length >= 8192
-        if (or (new_length_v(new_length_v'high downto log2(SPKT_SIZE_MIN)))) = '1' then
+        if ((or (new_length_v(new_length_v'high downto log2(SPKT_SIZE_MIN)))) = '1') then
             -- overflow - Stored values are sent and the current length is stored
             length_reg_d    <= current_length_v;
-            if spkt_eof_num = 0 then
+            if (spkt_eof_num = 0) then
                 spkt_wr_en      <= '0';
             else
                 spkt_wr_en      <= '1';
             end if;
         else
             -- the current packet will fit into set limits
-            if timeout = '1' then
-                if rx_fifox_pkt_num = 0 then
+            if (timeout = '1') then
+                if (rx_fifox_pkt_num = 0) then
                     spkt_wr_en  <= '0';
                 else
                     spkt_wr_en  <= '1';
@@ -163,10 +163,10 @@ begin
     end process;
 
     -- Length register
-    process(all)
+    process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 length_reg_q  <= (others => '0');
             elsif (timeout = '1') then
                 length_reg_q  <= (others => '0');
@@ -177,10 +177,10 @@ begin
     end process;
 
     -- EOF counter - This process determines how many packets make up a SuperPacket
-    process(all)
+    process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 spkt_eof_num    <= (others => '0');
             elsif (timeout = '1') then
                 spkt_eof_num    <= (others => '0');
@@ -190,16 +190,16 @@ begin
                 else
                     spkt_eof_num    <= (others => '0');
                 end if;
-            elsif (RX_PKT_SRC_RDY = '1') and (or(RX_PKT_SOF) = '1') then
+            elsif ((RX_PKT_SRC_RDY = '1') and (or(RX_PKT_SOF) = '1')) then
                 spkt_eof_num    <= spkt_eof_num + to_unsigned(count_ones(RX_PKT_SOF), spkt_eof_num'length);
             end if;
         end if;
     end process;
 
     -- Send data at the same clock when timeout occurs
-    timeout_handle_p: process(all)
+    timeout_handle_p : process (all)
     begin
-        if timeout = '1' then
+        if (timeout = '1') then
             rx_fifox_length     <= length_reg_q + pkt_lng_sum;
             rx_fifox_pkt_num    <= spkt_eof_num + to_unsigned(count_ones(RX_PKT_SOF), spkt_eof_num'length);
         else
@@ -216,12 +216,12 @@ begin
 
     -- Let the output logic decide when to get the length of the superpacket
     pkt_len_fifo_i: entity work.FIFOX
-    generic map(
+    generic map (
         DATA_WIDTH  => ((log2(SPKT_SIZE_MAX+ 1) ) + (EOF_NUM_LEN)),
         ITEMS       => FIFO_DEPTH,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RST,
 
@@ -238,29 +238,29 @@ begin
     );
 
     -- EOF counter - to find out whether the SP is already in the FIFO or not
-    eof_cnt_p: process(all)
+    eof_cnt_p : process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 eof_cnt <= (others => '0');
-            elsif (TX_SPKT_SRC_RDY = '1') and (TX_SPKT_DST_RDY = '1') then
+            elsif ((TX_SPKT_SRC_RDY = '1') and (TX_SPKT_DST_RDY = '1')) then
                 eof_cnt <= eof_cnt - unsigned(tx_fifox_data(EOF_NUM_LEN - 1 downto 0));
-                if (or(RX_PKT_EOF) = '1') and (RX_PKT_SRC_RDY = '1') then
+                if ((or(RX_PKT_EOF) = '1') and (RX_PKT_SRC_RDY = '1')) then
                     eof_cnt <= eof_cnt - unsigned(tx_fifox_data(EOF_NUM_LEN - 1 downto 0)) + to_unsigned(count_ones(RX_PKT_EOF), eof_cnt'length);
                 end if;
-            elsif (or(RX_PKT_EOF) = '1') and (RX_PKT_SRC_RDY = '1') then
+            elsif ((or(RX_PKT_EOF) = '1') and (RX_PKT_SRC_RDY = '1')) then
                 eof_cnt <= eof_cnt + to_unsigned(count_ones(RX_PKT_EOF), eof_cnt'length);
             end if;
         end if;
     end process;
 
     -- Highest bit indicates whether the SP is ready or not (1 = not ready, 0 = ready)
-    process(all)
+    process (all)
         variable sp_completed_cnt_v : unsigned(max(1, log2(MFB_REGIONS*FIFO_DEPTH)) downto 0);
     begin
         sp_completed_cnt_v := ('0' & eof_cnt) - unsigned(tx_fifox_data(EOF_NUM_LEN - 1 downto 0));
 
-        if fifox_empty = '0' then
+        if (fifox_empty = '0') then
             rd_en   <= not(sp_completed_cnt_v(sp_completed_cnt_v'high));
         else
             rd_en   <= '0';

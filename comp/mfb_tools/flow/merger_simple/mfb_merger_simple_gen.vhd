@@ -30,7 +30,7 @@ entity MFB_MERGER_SIMPLE_GEN is
         MASKING_EN : boolean := TRUE;
         -- Maximum amount of clock periods with destination ready before it tries to switch to the other input.
         CNT_MAX    : integer := 64
-        );
+    );
     port (
         -- =====================================================================
         -- Clock and Reset
@@ -61,7 +61,7 @@ entity MFB_MERGER_SIMPLE_GEN is
         TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
         TX_MFB_SRC_RDY : out std_logic;
         TX_MFB_DST_RDY : in  std_logic
-        );
+    );
 end entity;
 
 architecture FULL of MFB_MERGER_SIMPLE_GEN is
@@ -86,52 +86,54 @@ begin
 
     mfb_merger_simple_tree_g : for i in 0 to (MERGER_INPUTS - 2) generate
         mfb_merger_simple_i : entity work.MFB_MERGER_SIMPLE
-            generic map (
-                REGIONS     => MFB_REGIONS,
-                REGION_SIZE => MFB_REGION_SIZE,
-                BLOCK_SIZE  => MFB_BLOCK_SIZE,
-                ITEM_WIDTH  => MFB_ITEM_WIDTH,
-                META_WIDTH  => MFB_META_WIDTH,
-                MASKING_EN  => MASKING_EN,
-                CNT_MAX     => CNT_MAX)
-            port map (
-                CLK => CLK,
-                RST => RST,
+        generic map (
+            REGIONS     => MFB_REGIONS,
+            REGION_SIZE => MFB_REGION_SIZE,
+            BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            ITEM_WIDTH  => MFB_ITEM_WIDTH,
+            META_WIDTH  => MFB_META_WIDTH,
+            MASKING_EN  => MASKING_EN,
+            CNT_MAX     => CNT_MAX
+        )
+        port map (
+            CLK => CLK,
+            RST => RST,
 
-                RX_MFB0_DATA    => mfb_data_int(i),
-                RX_MFB0_META    => mfb_meta_int(i),
-                RX_MFB0_SOF     => mfb_sof_int(i),
-                RX_MFB0_SOF_POS => mfb_sof_pos_int(i),
-                RX_MFB0_EOF     => mfb_eof_int(i),
-                RX_MFB0_EOF_POS => mfb_eof_pos_int(i),
-                RX_MFB0_SRC_RDY => mfb_src_rdy_int(i),
-                RX_MFB0_DST_RDY => mfb_dst_rdy_int(i),
+            RX_MFB0_DATA    => mfb_data_int(i),
+            RX_MFB0_META    => mfb_meta_int(i),
+            RX_MFB0_SOF     => mfb_sof_int(i),
+            RX_MFB0_SOF_POS => mfb_sof_pos_int(i),
+            RX_MFB0_EOF     => mfb_eof_int(i),
+            RX_MFB0_EOF_POS => mfb_eof_pos_int(i),
+            RX_MFB0_SRC_RDY => mfb_src_rdy_int(i),
+            RX_MFB0_DST_RDY => mfb_dst_rdy_int(i),
 
-                RX_MFB1_DATA    => RX_MFB_DATA(i+1),
-                RX_MFB1_META    => RX_MFB_META(i+1),
-                RX_MFB1_SOF     => RX_MFB_SOF(i+1),
-                RX_MFB1_SOF_POS => RX_MFB_SOF_POS(i+1),
-                RX_MFB1_EOF     => RX_MFB_EOF(i+1),
-                RX_MFB1_EOF_POS => RX_MFB_EOF_POS(i+1),
-                RX_MFB1_SRC_RDY => RX_MFB_SRC_RDY(i+1),
-                RX_MFB1_DST_RDY => RX_MFB_DST_RDY(i+1),
+            RX_MFB1_DATA    => RX_MFB_DATA(i+1),
+            RX_MFB1_META    => RX_MFB_META(i+1),
+            RX_MFB1_SOF     => RX_MFB_SOF(i+1),
+            RX_MFB1_SOF_POS => RX_MFB_SOF_POS(i+1),
+            RX_MFB1_EOF     => RX_MFB_EOF(i+1),
+            RX_MFB1_EOF_POS => RX_MFB_EOF_POS(i+1),
+            RX_MFB1_SRC_RDY => RX_MFB_SRC_RDY(i+1),
+            RX_MFB1_DST_RDY => RX_MFB_DST_RDY(i+1),
 
-                TX_MFB_DATA    => mfb_data_int(i+1),
-                TX_MFB_META    => mfb_meta_int(i+1),
-                TX_MFB_SOF     => mfb_sof_int(i+1),
-                TX_MFB_SOF_POS => mfb_sof_pos_int(i+1),
-                TX_MFB_EOF     => mfb_eof_int(i+1),
-                TX_MFB_EOF_POS => mfb_eof_pos_int(i+1),
-                TX_MFB_SRC_RDY => mfb_src_rdy_int(i+1),
-                TX_MFB_DST_RDY => mfb_dst_rdy_int(i+1));
+            TX_MFB_DATA    => mfb_data_int(i+1),
+            TX_MFB_META    => mfb_meta_int(i+1),
+            TX_MFB_SOF     => mfb_sof_int(i+1),
+            TX_MFB_SOF_POS => mfb_sof_pos_int(i+1),
+            TX_MFB_EOF     => mfb_eof_int(i+1),
+            TX_MFB_EOF_POS => mfb_eof_pos_int(i+1),
+            TX_MFB_SRC_RDY => mfb_src_rdy_int(i+1),
+            TX_MFB_DST_RDY => mfb_dst_rdy_int(i+1)
+        );
     end generate;
 
-    TX_MFB_DATA        <= mfb_data_int(mfb_data_int'high);
-    TX_MFB_META        <= mfb_meta_int(mfb_meta_int'high);
-    TX_MFB_SOF         <= mfb_sof_int(mfb_sof_int'high);
-    TX_MFB_EOF         <= mfb_eof_int(mfb_eof_int'high);
-    TX_MFB_SOF_POS     <= mfb_sof_pos_int(mfb_sof_pos_int'high);
-    TX_MFB_EOF_POS     <= mfb_eof_pos_int(mfb_eof_pos_int'high);
-    TX_MFB_SRC_RDY     <= mfb_src_rdy_int(mfb_src_rdy_int'high);
+    TX_MFB_DATA                           <= mfb_data_int(mfb_data_int'high);
+    TX_MFB_META                           <= mfb_meta_int(mfb_meta_int'high);
+    TX_MFB_SOF                            <= mfb_sof_int(mfb_sof_int'high);
+    TX_MFB_EOF                            <= mfb_eof_int(mfb_eof_int'high);
+    TX_MFB_SOF_POS                        <= mfb_sof_pos_int(mfb_sof_pos_int'high);
+    TX_MFB_EOF_POS                        <= mfb_eof_pos_int(mfb_eof_pos_int'high);
+    TX_MFB_SRC_RDY                        <= mfb_src_rdy_int(mfb_src_rdy_int'high);
     mfb_dst_rdy_int(mfb_dst_rdy_int'high) <= TX_MFB_DST_RDY;
 end architecture;

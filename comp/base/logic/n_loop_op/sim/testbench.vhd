@@ -20,14 +20,14 @@ use std.env.stop;
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
 
-entity testbench is
-end entity testbench;
+entity TESTBENCH is
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
 
-architecture behavioral of testbench is
+architecture BEHAVIORAL of TESTBENCH is
 
     -- Constants declaration ---------------------------------------------------
 
@@ -64,13 +64,13 @@ architecture behavioral of testbench is
     signal read_addr      : slv_array_t(READ_PORTS-1 downto 0)(log2(ITEMS)-1 downto 0);
     signal read_data      : slv_array_t(READ_PORTS-1 downto 0)(DATA_WIDTH-1 downto 0);
 
-    signal TEST_STATUS    : std_logic := '1';
+    signal test_status    : std_logic := '1';
 
     function get_init_mem return slv_array_t is
         variable mem : slv_array_t(ITEMS-1 downto 0)(DATA_WIDTH-1 downto 0);
     begin
         mem := (others => (others => '0'));
-        if (QUICK_RESET_EN=true) then
+        if (QUICK_RESET_EN = true) then
             mem := (others => std_logic_vector(to_unsigned(RESET_VAL,DATA_WIDTH)));
         end if;
         return mem;
@@ -78,9 +78,9 @@ architecture behavioral of testbench is
 
     signal fake_mem : slv_array_t(ITEMS-1 downto 0)(DATA_WIDTH-1 downto 0) := get_init_mem;
     signal op_ops_s : slv_array_t(ITEMS-1 downto 0)(OPERATIONS-1 downto 0) := (others => (others => '0'));
--- ----------------------------------------------------------------------------
---                            Architecture body
--- ----------------------------------------------------------------------------
+    -- ----------------------------------------------------------------------------
+    --                            Architecture body
+    -- ----------------------------------------------------------------------------
 
 begin
 
@@ -88,8 +88,8 @@ begin
     -- CROSSBAR SCHEDULER planner
     -- -------------------------------------------------------------------------
 
-    uut: entity work.n_loop_op
-    generic map(
+    uut: entity work.N_LOOP_OP
+    generic map (
         DATA_WIDTH     => DATA_WIDTH,
         ITEMS          => ITEMS,
         QUICK_RESET_EN => QUICK_RESET_EN,
@@ -101,7 +101,7 @@ begin
         META_WIDTH     => META_WIDTH,
         USE_REG_ARRAY  => USE_REG_ARRAY
     )
-    port map(
+    port map (
         CLK           => clk,
         RESET         => rst,
 
@@ -123,7 +123,7 @@ begin
     -- -------------------------------------------------------------------------
 
     -- generating clk
-    clk_gen: process
+    clk_gen : process
     begin
         for i in 0 to VER_LENGTH-1 loop
             clk <= '1';
@@ -134,41 +134,41 @@ begin
         report "Verification finished successfully!";
         stop;
         wait;
-    end process clk_gen;
+    end process;
 
     -- generating reset
-    rst_gen: process
+    rst_gen : process
     begin
         rst <= '1';
         wait for C_RST_TIME;
         rst <= '0';
         wait;
-    end process rst_gen;
+    end process;
 
     -- -------------------------------------------------------------------------
 
-    op: process (op_in_data,op_in_ops)
+    op : process (op_in_data,op_in_ops)
         variable data : slv_array_t(OPERATORS-1 downto 0)(DATA_WIDTH-1 downto 0);
     begin
         -- operators
         for i in 0 to OPERATORS-1 loop
-            data(i) := op_in_data(i);
+            data(i)        := op_in_data(i);
             op_out_data(i) <= (others => 'X');
             for e in 0 to OPERATIONS-1 loop
-                if (op_in_ops(i)(e)='1') then
-                    data(i) := std_logic_vector(unsigned(data(i))+e+1);
+                if (op_in_ops(i)(e) = '1') then
+                    data(i)        := std_logic_vector(unsigned(data(i))+e+1);
                     op_out_data(i) <= data(i);
                 end if;
             end loop;
         end loop;
     end process;
 
-    tb: process
+    tb : process
         variable seed1 : positive := 42;
         variable seed2 : positive := 42;
 
         variable rand  : real;
-        variable X     : integer;
+        variable x     : integer;
 
         variable op_ops : slv_array_t(ITEMS-1 downto 0)(OPERATIONS-1 downto 0) := (others => (others => '0'));
 
@@ -176,12 +176,12 @@ begin
     begin
         wait for 1 ns;
         -- Wait for the reset
-        if (rst='1') then
-            wait until rst='0';
+        if (rst = '1') then
+            wait until rst = '0';
         end if;
 
         -- fail
-        assert (TEST_STATUS/='0')
+        assert (test_status /= '0')
             report "ERROR: INCORRECT VALUE READ FROM DUT!"
             severity failure;
 
@@ -190,29 +190,29 @@ begin
             for e in 0 to OPERATIONS-1 loop
                 op_operations(i)(e) <= '0';
                 uniform(seed1,seed2,rand);
-                X := integer(rand*real(2));
-                if (X=0) then
+                x                   := integer(rand*real(2));
+                if (x = 0) then
                     op_operations(i)(e) <= '1';
                 end if;
             end loop;
             uniform(seed1,seed2,rand);
-            X := integer(rand*real(ITEMS));
-            op_item_sel(i) <= std_logic_vector(to_unsigned(X,log2(ITEMS)));
+            x              := integer(rand*real(ITEMS));
+            op_item_sel(i) <= std_logic_vector(to_unsigned(x,log2(ITEMS)));
             uniform(seed1,seed2,rand);
-            op_meta(i) <= std_logic_vector(to_unsigned(X,META_WIDTH));
+            op_meta(i)     <= std_logic_vector(to_unsigned(x,META_WIDTH));
         end loop;
 
         -- read gen
         for i in 0 to READ_PORTS-1 loop
             uniform(seed1,seed2,rand);
-            X := integer(rand*real(ITEMS));
-            read_addr(i) <= std_logic_vector(to_unsigned(X,log2(ITEMS)));
+            x            := integer(rand*real(ITEMS));
+            read_addr(i) <= std_logic_vector(to_unsigned(x,log2(ITEMS)));
         end loop;
 
         -- fake mem op
         for i in 0 to ITEMS-1 loop
             for e in 0 to OPERATIONS-1 loop
-                if (op_ops(i)(e)='1') then
+                if (op_ops(i)(e) = '1') then
                     fake_mem_v(i) := std_logic_vector(unsigned(fake_mem_v(i))+e+1);
                 end if;
             end loop;
@@ -227,14 +227,14 @@ begin
         op_ops_s <= op_ops;
 
         -- check
-        TEST_STATUS <= '1';
+        test_status <= '1';
         for i in 0 to READ_PORTS-1 loop
-            if (read_data(i)/=fake_mem_v(to_integer(unsigned(read_addr(i))))) then
-                TEST_STATUS <= '0';
+            if (read_data(i) /= fake_mem_v(to_integer(unsigned(read_addr(i))))) then
+                test_status <= '0';
             end if;
         end loop;
 
         wait for C_CLK_PER -1 ns;
     end process;
 
-end architecture behavioral;
+end architecture;

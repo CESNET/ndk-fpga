@@ -19,7 +19,7 @@ use work.math_pack.all;
 -- Component for pipelining AXI data paths with source and destination ready signals.
 -- Compatible with Xilinx and Intel FPGAs.
 entity AXI_PIPE is
-    generic(
+    generic (
         -- =========================================================================
         -- AXI STREAM parameters
         -- =========================================================================
@@ -39,7 +39,7 @@ entity AXI_PIPE is
         PIPE_TYPE      : string  := "SHREG";
         DEVICE         : string  := "7SERIES"
     );
-    port(
+    port (
         -- =============================
         -- Clock and Reset
         -- =============================
@@ -73,7 +73,7 @@ end entity;
 
 
 
-architecture arch of AXI_PIPE is
+architecture ARCH of AXI_PIPE is
 
     constant TLAST_WIDTH        : integer := 1;
     constant TKEEP_WIDTH        : integer := AXI_DATA_WIDTH / 8;
@@ -97,17 +97,17 @@ begin
     pipe_in_data(PIPE_TUSER) <= RX_AXI_TUSER;
 
     true_pipe_gen : if USE_DST_RDY generate
-        pipe_i :  entity  work.PIPE
-        generic map(
+        pipe_i : entity  work.PIPE
+        generic map (
             DATA_WIDTH      => PIPE_WIDTH,
             USE_OUTREG      => not FAKE_PIPE,
             FAKE_PIPE       => FAKE_PIPE,
             PIPE_TYPE       => PIPE_TYPE,
             RESET_BY_INIT   => false,
             DEVICE          => DEVICE
-         )
-        port map(
-              CLK           => CLK,
+        )
+        port map (
+            CLK           => CLK,
             RESET         => RESET,
             IN_DATA       => pipe_in_data,
             IN_SRC_RDY    => RX_AXI_TVALID,
@@ -131,10 +131,10 @@ begin
         end generate;
 
         full_gen : if not FAKE_PIPE generate
-            pipe_core : process(CLK)
+            pipe_core : process (CLK)
             begin
                 if rising_edge(CLK) then
-                    if RESET='1' then
+                    if (RESET = '1') then
                         TX_AXI_TVALID <= '0';
                     else
                         TX_AXI_TVALID <= RX_AXI_TVALID;

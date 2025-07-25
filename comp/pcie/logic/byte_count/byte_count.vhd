@@ -51,85 +51,85 @@ begin
     -- computation of invalid bytes
     process (IN_FIRST_BE, IN_LAST_BE)
     begin
-        if (std_match(IN_FIRST_BE,"1--1") AND std_match(IN_LAST_BE,"0000")) then
+        if (std_match(IN_FIRST_BE,"1--1") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(0,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"01-1") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"01-1") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(1,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"1-10") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"1-10") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(1,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"0011") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"0011") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(2,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"0110") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"0110") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(2,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"1100") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"1100") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(2,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"0001") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"0001") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(3,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"0010") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"0010") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(3,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"0100") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"0100") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(3,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"1000") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"1000") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(3,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"0000") AND std_match(IN_LAST_BE,"0000")) then
+        elsif (std_match(IN_FIRST_BE,"0000") and std_match(IN_LAST_BE,"0000")) then
             tlp_first_ib <= to_unsigned(3,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"---1") AND std_match(IN_LAST_BE,"1---")) then
+        elsif (std_match(IN_FIRST_BE,"---1") and std_match(IN_LAST_BE,"1---")) then
             tlp_first_ib <= to_unsigned(0,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"---1") AND std_match(IN_LAST_BE,"01--")) then
+        elsif (std_match(IN_FIRST_BE,"---1") and std_match(IN_LAST_BE,"01--")) then
             tlp_first_ib <= to_unsigned(0,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(1,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"---1") AND std_match(IN_LAST_BE,"001-")) then
+        elsif (std_match(IN_FIRST_BE,"---1") and std_match(IN_LAST_BE,"001-")) then
             tlp_first_ib <= to_unsigned(0,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(2,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"---1") AND std_match(IN_LAST_BE,"0001")) then
+        elsif (std_match(IN_FIRST_BE,"---1") and std_match(IN_LAST_BE,"0001")) then
             tlp_first_ib <= to_unsigned(0,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(3,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"--10") AND std_match(IN_LAST_BE,"1---")) then
+        elsif (std_match(IN_FIRST_BE,"--10") and std_match(IN_LAST_BE,"1---")) then
             tlp_first_ib <= to_unsigned(1,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"--10") AND std_match(IN_LAST_BE,"01--")) then
+        elsif (std_match(IN_FIRST_BE,"--10") and std_match(IN_LAST_BE,"01--")) then
             tlp_first_ib <= to_unsigned(1,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(1,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"--10") AND std_match(IN_LAST_BE,"001-")) then
+        elsif (std_match(IN_FIRST_BE,"--10") and std_match(IN_LAST_BE,"001-")) then
             tlp_first_ib <= to_unsigned(1,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(2,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"--10") AND std_match(IN_LAST_BE,"0001")) then
+        elsif (std_match(IN_FIRST_BE,"--10") and std_match(IN_LAST_BE,"0001")) then
             tlp_first_ib <= to_unsigned(1,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(3,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"-100") AND std_match(IN_LAST_BE,"1---")) then
+        elsif (std_match(IN_FIRST_BE,"-100") and std_match(IN_LAST_BE,"1---")) then
             tlp_first_ib <= to_unsigned(2,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"-100") AND std_match(IN_LAST_BE,"01--")) then
+        elsif (std_match(IN_FIRST_BE,"-100") and std_match(IN_LAST_BE,"01--")) then
             tlp_first_ib <= to_unsigned(2,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(1,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"-100") AND std_match(IN_LAST_BE,"001-")) then
+        elsif (std_match(IN_FIRST_BE,"-100") and std_match(IN_LAST_BE,"001-")) then
             tlp_first_ib <= to_unsigned(2,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(2,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"-100") AND std_match(IN_LAST_BE,"0001")) then
+        elsif (std_match(IN_FIRST_BE,"-100") and std_match(IN_LAST_BE,"0001")) then
             tlp_first_ib <= to_unsigned(2,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(3,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"1000") AND std_match(IN_LAST_BE,"1---")) then
+        elsif (std_match(IN_FIRST_BE,"1000") and std_match(IN_LAST_BE,"1---")) then
             tlp_first_ib <= to_unsigned(3,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(0,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"1000") AND std_match(IN_LAST_BE,"01--")) then
+        elsif (std_match(IN_FIRST_BE,"1000") and std_match(IN_LAST_BE,"01--")) then
             tlp_first_ib <= to_unsigned(3,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(1,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"1000") AND std_match(IN_LAST_BE,"001-")) then
+        elsif (std_match(IN_FIRST_BE,"1000") and std_match(IN_LAST_BE,"001-")) then
             tlp_first_ib <= to_unsigned(3,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(2,tlp_last_ib'length);
-        elsif (std_match(IN_FIRST_BE,"1000") AND std_match(IN_LAST_BE,"0001")) then
+        elsif (std_match(IN_FIRST_BE,"1000") and std_match(IN_LAST_BE,"0001")) then
             tlp_first_ib <= to_unsigned(3,tlp_first_ib'length);
             tlp_last_ib  <= to_unsigned(3,tlp_last_ib'length);
         else

@@ -21,14 +21,14 @@ use std.env.stop;
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
 
-entity testbench is
-end entity testbench;
+entity TESTBENCH is
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
 
-architecture behavioral of testbench is
+architecture BEHAVIORAL of TESTBENCH is
 
     -- Constants declaration ---------------------------------------------------
 
@@ -50,27 +50,27 @@ architecture behavioral of testbench is
     -- Signals declaration -----------------------------------------------------
 
     -- Synchronization
-    signal CLK                                : std_logic;
-    signal RESET                              : std_logic;
+    signal clk                                : std_logic;
+    signal reset                              : std_logic;
 
-    signal INC_CH       : std_logic_vector(log2(CHANNELS)-1 downto 0);
-    signal INC_VAL      : std_logic_vector(INC_WIDTH-1 downto 0);
-    signal INC_VLD      : std_logic;
-    signal INC_RDY      : std_logic;
-    signal RST_CH       : std_logic_vector(log2(CHANNELS)-1 downto 0);
-    signal RST_VLD      : std_logic;
-    signal RD_CH        : std_logic_vector(log2(CHANNELS)-1 downto 0);
-    signal RD_VLD       : std_logic;
-    signal RD_VAL       : std_logic_vector(CNT_WIDTH-1 downto 0); -- 1 CLK latency
+    signal inc_ch       : std_logic_vector(log2(CHANNELS)-1 downto 0);
+    signal inc_val      : std_logic_vector(INC_WIDTH-1 downto 0);
+    signal inc_vld      : std_logic;
+    signal inc_rdy      : std_logic;
+    signal rst_ch       : std_logic_vector(log2(CHANNELS)-1 downto 0);
+    signal rst_vld      : std_logic;
+    signal rd_ch        : std_logic_vector(log2(CHANNELS)-1 downto 0);
+    signal rd_vld       : std_logic;
+    signal rd_val       : std_logic_vector(CNT_WIDTH-1 downto 0); -- 1 CLK latency
 
     shared variable seed0 : positive := 42;
     shared variable seed1 : positive := 211;
-    shared variable X     : integer;
-    shared variable CH    : std_logic_vector(log2(CHANNELS)-1 downto 0);
-    shared variable VAL   : std_logic_vector(INC_WIDTH-1 downto 0);
+    shared variable x     : integer;
+    shared variable ch    : std_logic_vector(log2(CHANNELS)-1 downto 0);
+    shared variable val   : std_logic_vector(INC_WIDTH-1 downto 0);
 
-    shared variable go : boolean := false;
-    signal final_ch : unsigned(1+log2(CHANNELS)-1 downto 0);
+    shared variable go       : boolean := false;
+    signal          final_ch : unsigned(1+log2(CHANNELS)-1 downto 0);
 
     signal rst_vld_reg  : std_logic;
     signal rst_ch_reg   : std_logic_vector(log2(CHANNELS)-1 downto 0);
@@ -78,9 +78,9 @@ architecture behavioral of testbench is
     signal cntr     : u_array_t(CHANNELS-1 downto 0)(CNT_WIDTH-1 downto 0);
     signal cntr_ref : u_array_t(CHANNELS-1 downto 0)(CNT_WIDTH-1 downto 0);
 
--- ----------------------------------------------------------------------------
---                            Architecture body
--- ----------------------------------------------------------------------------
+    -- ----------------------------------------------------------------------------
+    --                            Architecture body
+    -- ----------------------------------------------------------------------------
 
 begin
 
@@ -89,28 +89,28 @@ begin
     -- -------------------------------------------------------------------------
 
     uut: entity work.CNT_MULTI_MEMX
-    generic map(
-        DEVICE        => DEVICE       ,
-        CHANNELS      => CHANNELS     ,
-        CNT_WIDTH     => CNT_WIDTH    ,
-        INC_WIDTH     => INC_WIDTH    ,
+    generic map (
+        DEVICE        => DEVICE,
+        CHANNELS      => CHANNELS,
+        CNT_WIDTH     => CNT_WIDTH,
+        INC_WIDTH     => INC_WIDTH,
         INC_FIFO_SIZE => INC_FIFO_SIZE
     )
-    port map(
-        CLK     => CLK    ,
-        RESET   => RESET  ,
+    port map (
+        CLK     => clk,
+        RESET   => reset,
 
-        INC_CH  => INC_CH ,
-        INC_VAL => INC_VAL,
-        INC_VLD => INC_VLD,
-        INC_RDY => INC_RDY,
+        INC_CH  => inc_ch,
+        INC_VAL => inc_val,
+        INC_VLD => inc_vld,
+        INC_RDY => inc_rdy,
 
-        RST_CH  => RST_CH ,
-        RST_VLD => RST_VLD,
+        RST_CH  => rst_ch,
+        RST_VLD => rst_vld,
 
-        RD_CH   => RD_CH  ,
-        RD_VLD  => RD_VLD ,
-        RD_VAL  => RD_VAL
+        RD_CH   => rd_ch,
+        RD_VLD  => rd_vld,
+        RD_VAL  => rd_val
     );
 
     -- -------------------------------------------------------------------------
@@ -118,107 +118,109 @@ begin
     -- -------------------------------------------------------------------------
 
     -- generating clk
-    clk_gen: process
+    clk_gen : process
     begin
         for i in 0 to VER_LENGTH-1 loop
-            go := true;
-            CLK <= '1';
+            go  := true;
+            clk <= '1';
             wait for C_CLK_PER / 2;
-            CLK <= '0';
+            clk <= '0';
             wait for C_CLK_PER / 2;
         end loop;
         go := false;
         for i in 0 to 100+4*CHANNELS-1 loop
-            CLK <= '1';
+            clk <= '1';
             wait for C_CLK_PER / 2;
-            CLK <= '0';
+            clk <= '0';
             wait for C_CLK_PER / 2;
         end loop;
-        assert (cntr=cntr_ref) report "ERROR: Incorrect counter value!" severity failure;
+        assert (cntr = cntr_ref)
+            report "ERROR: Incorrect counter value!"
+            severity failure;
         report "Verification finished successfully!";
         stop;
         wait;
-    end process clk_gen;
+    end process;
 
     -- generating reset
-    rst_gen: process
+    rst_gen : process
     begin
-        RESET <= '1';
+        reset <= '1';
         wait for C_RST_TIME;
-        RESET <= '0';
+        reset <= '0';
         wait;
-    end process rst_gen;
+    end process;
 
     -- -------------------------------------------------------------------------
 
-    gen_pr : process (CLK)
+    gen_pr : process (clk)
     begin
-        if (rising_edge(CLK)) then
+        if (rising_edge(clk)) then
 
-            random_vector_proc(seed0,seed1,VAL);
-            if ((or VAL)='0') then
-                VAL := (0 => '1', others => '0');
+            random_vector_proc(seed0,seed1,val);
+            if ((or val) = '0') then
+                val := (0 => '1', others => '0');
             end if;
-            INC_VAL <= VAL;
+            inc_val <= val;
 
-            random_vector_proc(seed0,seed1,CH);
-            INC_CH <= CH;
-            random_vector_proc(seed0,seed1,CH);
-            RST_CH <= CH;
-            --random_vector_proc(seed0,seed1,CH );
-            RD_CH  <= CH;
+            random_vector_proc(seed0,seed1,ch);
+            inc_ch <= ch;
+            random_vector_proc(seed0,seed1,ch);
+            rst_ch <= ch;
+            -- random_vector_proc(seed0,seed1,CH );
+            rd_ch  <= ch;
 
-            INC_VLD <= '0';
-            RST_VLD <= '0';
-            RD_VLD  <= '0';
+            inc_vld <= '0';
+            rst_vld <= '0';
+            rd_vld  <= '0';
 
-            randint(seed0,seed1,0,99,X);
-            if (X<INC_CHANCE) then
-                INC_VLD <= '1';
+            randint(seed0,seed1,0,99,x);
+            if (x < INC_CHANCE) then
+                inc_vld <= '1';
             end if;
-            randint(seed0,seed1,0,99,X);
-            if (X<RST_CHANCE) then
-                RST_VLD <= '1';
-                RD_VLD  <= '1';
+            randint(seed0,seed1,0,99,x);
+            if (x < RST_CHANCE) then
+                rst_vld <= '1';
+                rd_vld  <= '1';
             end if;
-            randint(seed0,seed1,0,99,X);
-            if (X<RD_CHANCE) then
-                RD_VLD  <= '1';
+            randint(seed0,seed1,0,99,x);
+            if (x < RD_CHANCE) then
+                rd_vld  <= '1';
             end if;
 
-            rst_vld_reg <= RST_VLD;
-            rst_ch_reg  <= RST_CH;
+            rst_vld_reg <= rst_vld;
+            rst_ch_reg  <= rst_ch;
 
             final_ch <= (others => '0');
 
             if (not go) then
-                INC_VLD <= '0';
-                RST_VLD <= final_ch(final_ch'high);
-                RD_VLD  <= final_ch(final_ch'high);
-                RST_CH  <= std_logic_vector(enlarge_left(final_ch,-1));
-                RD_CH   <= std_logic_vector(enlarge_left(final_ch,-1));
+                inc_vld  <= '0';
+                rst_vld  <= final_ch(final_ch'high);
+                rd_vld   <= final_ch(final_ch'high);
+                rst_ch   <= std_logic_vector(enlarge_left(final_ch,-1));
+                rd_ch    <= std_logic_vector(enlarge_left(final_ch,-1));
                 final_ch <= final_ch+1;
             end if;
         end if;
     end process;
 
-    cntr_pr : process (CLK)
+    cntr_pr : process (clk)
     begin
-        if (rising_edge(CLK)) then
+        if (rising_edge(clk)) then
 
-            if (INC_VLD='1' and INC_RDY='1') then
-                cntr_ref(to_integer(unsigned(INC_CH))) <= cntr_ref(to_integer(unsigned(INC_CH)))+unsigned(INC_VAL);
+            if (inc_vld = '1' and inc_rdy = '1') then
+                cntr_ref(to_integer(unsigned(inc_ch))) <= cntr_ref(to_integer(unsigned(inc_ch)))+unsigned(inc_val);
             end if;
 
-            if (rst_vld_reg='1') then
-                cntr(to_integer(unsigned(rst_ch_reg))) <= cntr(to_integer(unsigned(rst_ch_reg)))+unsigned(RD_VAL);
+            if (rst_vld_reg = '1') then
+                cntr(to_integer(unsigned(rst_ch_reg))) <= cntr(to_integer(unsigned(rst_ch_reg)))+unsigned(rd_val);
             end if;
 
-            if (RESET='1') then
+            if (reset = '1') then
                 cntr     <= (others => (others => '0'));
                 cntr_ref <= (others => (others => '0'));
             end if;
         end if;
     end process;
 
-end architecture behavioral;
+end architecture;

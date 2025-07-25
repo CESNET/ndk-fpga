@@ -12,13 +12,13 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 
 entity HBM_TESTER_GEN is
-    generic(
+    generic (
         USR_DATA_WIDTH : natural := 256;
         AXI_ADDR_WIDTH : natural := 32;
         PORT_ADDR_HBIT : natural := AXI_ADDR_WIDTH;
         PORT_ID        : natural := 0
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -72,7 +72,7 @@ entity HBM_TESTER_GEN is
         RD_DATA_VALID     : in  std_logic;
         RD_DATA_READY     : out std_logic
     );
-end HBM_TESTER_GEN;
+end entity;
 
 architecture FULL of HBM_TESTER_GEN is
 
@@ -174,11 +174,11 @@ begin
     -- -------------------------------------------------------------------------
 
     rand_i : entity work.LFSR_SIMPLE_RANDOM_GEN
-    generic map(
+    generic map (
         DATA_WIDTH => ADDR_GEN_WIDTH+1,
         RESET_SEED => std_logic_vector(to_unsigned(PORT_ID, ADDR_GEN_WIDTH+1))
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RESET,
         ENABLE => '1',
@@ -255,7 +255,7 @@ begin
 
     s_data_ok <= '1' when (unsigned(RD_DATA(7 downto 0)) = s_data_cnt2) else '0';
 
-    STAT_DATA_OK_INC <= s_data_ok and s_read_data_vld;
+    STAT_DATA_OK_INC  <= s_data_ok and s_read_data_vld;
     STAT_DATA_ERR_INC <= not s_data_ok and s_read_data_vld;
 
     -- -------------------------------------------------------------------------
@@ -269,7 +269,7 @@ begin
                 WR_DATA((i+1)*32-1 downto i*32) <= X"DEADCAFE";
             end loop;
         else
-            WR_DATA <= (others => '0');
+            WR_DATA             <= (others => '0');
             WR_DATA(7 downto 0) <= std_logic_vector(s_data_cnt);
         end if;
     end process;
@@ -279,16 +279,16 @@ begin
     end generate;
     WR_ADDR(PORT_ADDR_HBIT-1 downto 5) <= s_rand_wr_addr when (CS_GEN_ADDR_MODE = '1') else std_logic_vector(s_sequ_wr_addr);
     WR_ADDR(4 downto 0)                <= (others => '0'); -- Unused Address Bits
-    WR_DATA_LAST <= s_gen_data_last;
-    WR_VALID     <= s_gen_run and CS_GEN_RUN_MODE(0) and s_sequ_wr_addr_en;
-    WR_RSP_READY <= '1';
+    WR_DATA_LAST                       <= s_gen_data_last;
+    WR_VALID                           <= s_gen_run and CS_GEN_RUN_MODE(0) and s_sequ_wr_addr_en;
+    WR_RSP_READY                       <= '1';
 
     rd_port_addr_g: if PORT_ADDR_WIDTH > 0 generate
         RD_ADDR(AXI_ADDR_WIDTH-1 downto PORT_ADDR_HBIT) <= std_logic_vector(to_unsigned(PORT_ID, PORT_ADDR_WIDTH)); -- Port Address Bits
     end generate;
     RD_ADDR(PORT_ADDR_HBIT-1 downto 5) <= s_rand_rd_addr when (CS_GEN_ADDR_MODE = '1') else std_logic_vector(s_sequ_rd_addr);
     RD_ADDR(4 downto 0)                <= (others => '0'); -- Unused Address Bits
-    RD_ADDR_VALID <= s_gen_run and CS_GEN_RUN_MODE(1) and s_sequ_rd_addr_en;
-    RD_DATA_READY <= '1';
+    RD_ADDR_VALID                      <= s_gen_run and CS_GEN_RUN_MODE(1) and s_sequ_rd_addr_en;
+    RD_DATA_READY                      <= '1';
 
 end architecture;

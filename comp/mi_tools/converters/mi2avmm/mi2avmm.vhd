@@ -12,7 +12,7 @@ use IEEE.numeric_std.all;
 -- In the current implementation these are just directly connected wires and one not gate.
 entity MI2AVMM is
 
-    generic(
+    generic (
         -- Data word width in bits
         DATA_WIDTH : natural := 32;
         -- Address word width in bits
@@ -23,7 +23,7 @@ entity MI2AVMM is
         DEVICE     : string  := "AGILEX"
     );
 
-    port(
+    port (
         -- Clock and Reset
 
         CLK   : in  std_logic;

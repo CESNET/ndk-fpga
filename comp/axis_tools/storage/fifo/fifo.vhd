@@ -80,8 +80,8 @@ end entity;
 
 architecture FULL of AXIS_FIFO is
     constant FIFO_DATA_WIDTH : natural := 1 + AXI_TUSER_WIDTH + (AXI_TDATA_WIDTH/8) + AXI_TDATA_WIDTH;
-    subtype AXI_TDATA_R     is natural range  AXI_TDATA_WIDTH                           -1 downto 0;
-    subtype AXI_TKEEP_R     is natural range (AXI_TDATA_R'high+1) + (AXI_TDATA_WIDTH/8) -1 downto (AXI_TDATA_R'high+1);
+    subtype  AXI_TDATA_R     is natural range  AXI_TDATA_WIDTH                           -1 downto 0;
+    subtype  AXI_TKEEP_R     is natural range (AXI_TDATA_R'high+1) + (AXI_TDATA_WIDTH/8) -1 downto (AXI_TDATA_R'high+1);
 
     signal s_rx_axi_ifc_packed : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
     signal s_tx_axi_ifc_packed : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
@@ -100,7 +100,7 @@ begin
     end generate;
 
     fifo_comp_g : case FIFO_TYPE generate
-        when 0 =>
+        when 0      =>
             s_sync_regs_arr(0) <= RX_AXI_TVALID & s_rx_axi_ifc_packed;
             RX_AXI_TREADY      <= TX_AXI_TREADY;
             sync_regs_g : for i in 1 to ITEMS generate
@@ -117,10 +117,10 @@ begin
                 s_sync_regs_vld_arr(i-1) <= s_sync_regs_arr(i)(FIFO_DATA_WIDTH);
             end generate;
             (TX_AXI_TVALID, s_tx_axi_ifc_packed) <= s_sync_regs_arr(ITEMS);
-            FULL  <= and s_sync_regs_vld_arr;
-            EMPTY <= nor s_sync_regs_vld_arr;
+            FULL                                 <= and s_sync_regs_vld_arr;
+            EMPTY                                <= nor s_sync_regs_vld_arr;
 
-        when 1 =>
+        when 1      =>
             fifox_i : entity work.FIFOX
             generic map (
                 DATA_WIDTH          => FIFO_DATA_WIDTH,
@@ -148,7 +148,7 @@ begin
             RX_AXI_TREADY <= not FULL;
             TX_AXI_TVALID <= not EMPTY;
 
-        when 2 =>
+        when 2      =>
             reg_fifo_i : entity work.REG_FIFO
             generic map (
                 DATA_WIDTH => FIFO_DATA_WIDTH,

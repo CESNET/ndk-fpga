@@ -123,7 +123,7 @@ architecture FULL of AXIS_DISPATCHER is
     signal s_tx_end_of_frame   : std_logic;
     signal s_tx_in_frame_reg   : std_logic;
 
-    type mode is (NORMAL, STOP, RECOVER);
+    type   mode is (NORMAL, STOP, RECOVER);
     signal p_state : mode := NORMAL;
     signal n_state : mode;
 
@@ -134,14 +134,14 @@ architecture FULL of AXIS_DISPATCHER is
     signal s_hdr_vlan2_swap_arr : slv_array_t(VLAN_HDR_W/8-1 downto 0)(8-1 downto 0);
     signal s_hdr_vlan2_swap     : std_logic_vector(VLAN_HDR_W-1 downto 0);
 
-    function reverse(slv: std_logic_vector) return std_logic_vector is
+    function reverse (slv: std_logic_vector) return std_logic_vector is
         variable slv_rev : std_logic_vector(slv'length-1 downto 0);
     begin
         for i in 0 to slv'length-1 loop
             slv_rev(i) := slv(slv'high-i);
         end loop;
         return slv_rev;
-    end function reverse;
+    end function;
 
 begin
 
@@ -252,16 +252,16 @@ begin
             subtype PROTO_HDR_RANGE  is natural range CONFIG(i).match_range_highs(j) downto CONFIG(i).match_range_lows(j);
         begin
             mat_match_protocols_g : case CONFIG(i).match_protocols(j) generate
-                when MATCH_PROTOCOL_MAC =>
+                when MATCH_PROTOCOL_MAC     =>
                     s_mat_match_data(MATCH_DATA_RANGE) <= HDR_MAC(PROTO_HDR_RANGE);
                     s_mat_match_en(j)                  <= HDR_MAC_VLD;
-                when MATCH_PROTOCOL_VLAN_Q =>
+                when MATCH_PROTOCOL_VLAN_Q  =>
                     s_mat_match_data(MATCH_DATA_RANGE) <= reverse(s_hdr_vlan1_swap(PROTO_HDR_RANGE));
                     s_mat_match_en(j)                  <= HDR_VLAN1_VLD;
                 when MATCH_PROTOCOL_VLAN_AD =>
                     s_mat_match_data(MATCH_DATA_RANGE) <= reverse(s_hdr_vlan2_swap(PROTO_HDR_RANGE));
                     s_mat_match_en(j)                  <= HDR_VLAN2_VLD;
-                when others =>
+                when others                 =>
                     s_mat_match_data(MATCH_DATA_RANGE) <= (others => '0');
                     s_mat_match_en(j)                  <= '0';
             end generate;

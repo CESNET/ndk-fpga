@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RATE_LIMITER is
-    generic(
+    generic (
         -- MI Data word width (in bits)
         MI_DATA_WIDTH   : natural := 32;
         -- MI Address word width (in bits)
@@ -42,7 +42,7 @@ entity RATE_LIMITER is
         -- Target device
         DEVICE          : string  := "AGILEX"
     );
-    port(
+    port (
         -- Clock and Reset
         CLK            : in  std_logic;
         RESET          : in  std_logic;
@@ -122,7 +122,7 @@ architecture FULL of RATE_LIMITER is
     signal mi_speed_regs_ptr         : std_logic_vector(max(1, log2(INTERVAL_COUNT))-1 downto 0);
     signal mi_speed_regs_vld_ptr     : std_logic_vector(max(1, log2(INTERVAL_COUNT))-1 downto 0);
 
-    type mode is (IDLE, CONF, RUN);
+    type   mode is (IDLE, CONF, RUN);
     signal p_state                   : mode := IDLE;
     signal n_state                   : mode;
     signal write_ctrl_flag           : std_logic;
@@ -191,9 +191,9 @@ begin
 
     -- register address decoding
     mi_regs_addr <= MI_ADDR(MI_REG_ADDR_OFFSET+MI_REG_ADDR_WIDTH-1 downto MI_REG_ADDR_OFFSET);
-    mi_regs_addr_dec_p: process (mi_regs_addr)
+    mi_regs_addr_dec_p : process (mi_regs_addr)
     begin
-        mi_regs_en <= (others => '0');
+        mi_regs_en                                     <= (others => '0');
         mi_regs_en(to_integer(unsigned(mi_regs_addr))) <= '1';
     end process;
 
@@ -227,7 +227,7 @@ begin
     end generate;
 
     -- mode register
-    fsm_mode_reg_p: process (CLK)
+    fsm_mode_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
@@ -239,22 +239,22 @@ begin
     end process;
 
     -- mode n_state and output signals logic
-    fsm_mode_n_state_logic_p: process (p_state, start_conf_flag, start_run_flag, stop_conf_flag, stop_run_flag)
+    fsm_mode_n_state_logic_p : process (p_state, start_conf_flag, start_run_flag, stop_conf_flag, stop_run_flag)
     begin
-        n_state <= p_state;
+        n_state       <= p_state;
         start_shaping <= '0';
         case p_state is
             when IDLE =>
                 if (start_conf_flag = '1') then
                     n_state <= CONF;
                 elsif (start_run_flag = '1') then
-                    n_state <= RUN;
+                    n_state       <= RUN;
                     start_shaping <= '1';
                 end if;
             when CONF =>
                 if (stop_conf_flag = '1') then
                     if (start_run_flag = '1') then
-                        n_state <= RUN;
+                        n_state       <= RUN;
                         start_shaping <= '1';
                     else
                         n_state <= IDLE;
@@ -286,7 +286,7 @@ begin
 
     -- status register
     mi_status_reg_write_flag <= mi_regs_en(MI_STATUS_REG_POS) and MI_WR and MI_BE(0);
-    mi_status_reg_p: process (CLK)
+    mi_status_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
@@ -318,10 +318,10 @@ begin
     end process;
 
     -- section length register
-    mi_sec_len_reg_p: process (CLK)
+    mi_sec_len_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') or (p_state = IDLE) then
+            if ((RESET = '1') or (p_state = IDLE)) then
                 mi_sec_len_reg <= MI_SEC_LEN_REG_INIT;
             elsif (p_state = CONF and mi_regs_en(MI_SEC_LEN_REG_POS) = '1' and MI_WR = '1') then
                 mi_sec_len_reg <= mi_regs_dwr;
@@ -330,10 +330,10 @@ begin
     end process;
 
     -- interval length register
-    mi_int_len_reg_p: process (CLK)
+    mi_int_len_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') or (p_state = IDLE) then
+            if ((RESET = '1') or (p_state = IDLE)) then
                 mi_int_len_reg <= MI_INT_LEN_REG_INIT;
             elsif (p_state = CONF and mi_regs_en(MI_INT_LEN_REG_POS) = '1' and MI_WR = '1') then
                 mi_int_len_reg <= mi_regs_dwr;
@@ -342,23 +342,23 @@ begin
     end process;
 
     -- speed registers
-    mi_speed_reg_first_p: process (CLK)
+    mi_speed_reg_first_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') or (start_conf_flag = '1') or (p_state = IDLE) then
+            if ((RESET = '1') or (start_conf_flag = '1') or (p_state = IDLE)) then
                 mi_speed_regs(0)         <= MI_SPEED_REG_INIT;
                 mi_speed_regs_vld_reg(0) <= '1'; -- The first Speed register is always valid
-            elsif (p_state = CONF) and (mi_regs_en(MI_FIRST_SPEED_REG_POS) = '1') and (MI_WR = '1') then
+            elsif ((p_state = CONF) and (mi_regs_en(MI_FIRST_SPEED_REG_POS) = '1') and (MI_WR = '1')) then
                 mi_speed_regs(0)         <= mi_regs_dwr;
             end if;
         end if;
     end process;
 
     mi_speed_regs_g: for i in 1 to INTERVAL_COUNT-1 generate
-        mi_speed_regs_p: process (CLK)
+        mi_speed_regs_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
-                if (RESET = '1') or (start_conf_flag = '1') or (p_state = IDLE) then
+                if ((RESET = '1') or (start_conf_flag = '1') or (p_state = IDLE)) then
                     mi_speed_regs(i)         <= (others => '0');
                     mi_speed_regs_vld_reg(i) <= '0';
                 elsif (p_state = CONF and mi_regs_en(MI_CONFIG_REGS-INTERVAL_COUNT+i) = '1' and MI_WR = '1') then
@@ -370,7 +370,7 @@ begin
     end generate;
 
     -- speed registers pointer
-    mi_speed_regs_ptr_p: process (CLK)
+    mi_speed_regs_ptr_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
@@ -418,7 +418,7 @@ begin
     next_speed_req <= end_of_int and end_of_sec;
 
     -- section length counter
-    sec_len_cnt_p: process (CLK)
+    sec_len_cnt_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
@@ -431,7 +431,7 @@ begin
         end if;
     end process;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (RESET = '1') then
@@ -443,7 +443,7 @@ begin
     end process;
 
     -- interval length counter
-    int_len_cnt_p: process (CLK)
+    int_len_cnt_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
@@ -522,7 +522,7 @@ begin
     rx_mfb_sof_rest   <= RX_MFB_SRC_RDY and RX_MFB_SOF and not rx_mfb_sof_mask;
     rx_mfb_sof_masked <= rx_mfb_sof_rest_reg when send_rest = '1' else RX_MFB_SOF;
 
-    rx_mfb_rest_regs_p: process (CLK)
+    rx_mfb_rest_regs_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (send_last_eof = '1') then
@@ -534,7 +534,7 @@ begin
 
     -- control logic for sending masked eof
     send_last_eof <= not limit_bytes and packets_over and TX_MFB_DST_RDY and not send_last_eof_reg;
-    send_last_eof_reg_p: process (CLK)
+    send_last_eof_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1' or send_rest = '1') then -- or p_state /= RUN  ??

@@ -13,7 +13,7 @@ use work.type_pack.all;
 use work.eth_hdr_pack.all;
 
 entity RX_MAC_LITE_UMII is
-    generic(
+    generic (
         -- =====================================================================
         -- MII CONFIGURATION:
         -- =====================================================================
@@ -40,24 +40,24 @@ entity RX_MAC_LITE_UMII is
         -- OTHERS CONFIGURATION:
         -- =====================================================================
         -- ID of this network port, it is inserted into the packet metadata.
-        NETWORK_PORT_ID : natural := 0;
+        NETWORK_PORT_ID  : natural := 0;
         -- Maximum allowed size of packet in bytes.
-        PKT_MTU_BYTES   : natural := 16384;
+        PKT_MTU_BYTES    : natural := 16384;
         -- Enable of CRC checking, when is disable, resources are ~60% lower.
-        CRC_CHECK_EN    : boolean := true;
+        CRC_CHECK_EN     : boolean := true;
         -- Enable of CRC removing.
-        CRC_REMOVE_EN   : boolean := true;
+        CRC_REMOVE_EN    : boolean := true;
         -- Enable of MAC checking.
-        MAC_CHECK_EN    : boolean := true;
+        MAC_CHECK_EN     : boolean := true;
         -- Number of maximum MAC address in CAM memory, maximum value is 16.
-        MAC_COUNT       : natural := 4;
+        MAC_COUNT        : natural := 4;
         -- Enable of timestamping frames.
-        TIMESTAMP_EN    : boolean := true;
+        TIMESTAMP_EN     : boolean := true;
         -- Select correct FPGA device.
         -- ULTRASCALE,...
-        DEVICE          : string := "STRATIX10"
+        DEVICE           : string := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -151,7 +151,7 @@ architecture FULL of RX_MAC_LITE_UMII is
 begin
 
     umii_dec_i : entity work.UMII_DEC
-    generic map(
+    generic map (
         MII_DW           => MII_DW,
         CNT_ERROR_LENGTH => CNT_ERROR_LENGTH,
         REGIONS          => RX_REGIONS,
@@ -159,7 +159,7 @@ begin
         BLOCK_SIZE       => RX_BLOCK_SIZE,
         ITEM_WIDTH       => RX_ITEM_WIDTH
     )
-    port map(
+    port map (
         CLK            => RX_CLK,
         RESET          => RX_RESET,
 
@@ -180,7 +180,7 @@ begin
     );
 
     rx_mac_lite_i : entity work.RX_MAC_LITE
-    generic map(
+    generic map (
         RX_REGIONS      => RX_REGIONS,
         RX_REGION_SIZE  => RX_REGION_SIZE,
         RX_BLOCK_SIZE   => RX_BLOCK_SIZE,
@@ -200,7 +200,7 @@ begin
         TIMESTAMP_EN    => TIMESTAMP_EN,
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         RX_CLK          => RX_CLK,
         RX_RESET        => RX_RESET,
         TX_CLK          => TX_CLK,

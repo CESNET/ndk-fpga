@@ -20,22 +20,22 @@ use work.math_pack.all; -- Math Pack
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
 entity LB_ENDPOINT is
-   generic(
-      BASE_ADDR        : std_logic_vector(31 downto 0):= X"00000000";
-      LIMIT            : std_logic_vector(31 downto 0):= X"00000800";
-      FREQUENCY        : integer:= 100;
-      BUFFER_EN        : boolean:= false
-   );
-   port(
-      -- Common Interface
-      RESET         : in std_logic;
+    generic (
+        BASE_ADDR        : std_logic_vector(31 downto 0) := X"00000000";
+        LIMIT            : std_logic_vector(31 downto 0) := X"00000800";
+        FREQUENCY        : integer := 100;
+        BUFFER_EN        : boolean := false
+    );
+    port (
+        -- Common Interface
+        RESET         : in std_logic;
 
-      -- Local Bus Interface
-      LB_CLK        : in std_logic;
-      LOCALBUS      : inout t_local_bus16;
+        -- Local Bus Interface
+        LB_CLK        : in std_logic;
+        LOCALBUS      : inout t_local_bus16;
 
-      -- User Component Interface
-      CLK           : in  std_logic;
-      MI32          : inout t_mi32
-  );
-end entity LB_ENDPOINT;
+        -- User Component Interface
+        CLK           : in  std_logic;
+        MI32          : inout t_mi32
+    );
+end entity;

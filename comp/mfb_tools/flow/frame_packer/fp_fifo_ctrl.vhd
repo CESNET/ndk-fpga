@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity FP_FIFO_CTRL is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 4;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
@@ -21,7 +21,7 @@ entity FP_FIFO_CTRL is
         FIFO_DEPTH          : natural := 512;
         RX_PKT_SIZE_MAX     : natural := 2**10
     );
-    port(
+    port (
         CLK : in std_logic;
         RST : in std_logic;
 
@@ -56,12 +56,13 @@ end entity;
 architecture FULL of FP_FIFO_CTRL is
     subtype MFB_EOF_BLOCK_SLICE     is natural range max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) - max(1,log2(MFB_REGION_SIZE));
 
-    type fifo_ctrl_fsm is (
-        st_LOAD_LNG,        -- Load length of the SuperPacket
-        st_FIRST_PAC,       -- Pass SOF of the SuperPacket
-        st_PASS             -- Pass rest of the SuperPacket
+    type   fifo_ctrl_fsm is (
+        ST_LOAD_LNG,        -- Load length of the SuperPacket
+        ST_FIRST_PAC,       -- Pass SOF of the SuperPacket
+        ST_PASS             -- Pass rest of the SuperPacket
     );
-    signal state, next_state: fifo_ctrl_fsm := st_LOAD_LNG;
+    signal state      : fifo_ctrl_fsm := ST_LOAD_LNG;
+    signal next_state : fifo_ctrl_fsm := ST_LOAD_LNG;
 
     signal pkt_read         : std_logic;
     signal load_en          : std_logic;
@@ -96,22 +97,22 @@ begin
     end generate;
 
     -- SOF mask
-    sof_mask_p: process(all)
+    sof_mask_p : process (all)
         variable index  : integer range 0 to 4;
     begin
         new_sof    <= (others => '0');
         index      := 0;
         for r in 0 to MFB_REGIONS - 1 loop
-            if eof_mask(r) = '1' then
+            if (eof_mask(r) = '1') then
                 index := r;
                 exit;
             end if;
         end loop;
 
-        if pkt_cont(index+1) = '1' then
+        if (pkt_cont(index+1) = '1') then
             new_sof(index)   <= '1';
         else
-            if eof_last(index) = '1' then
+            if (eof_last(index) = '1') then
                 new_sof(index+1) <= '1';
             else
                 new_sof(index)   <= '1';
@@ -120,13 +121,13 @@ begin
 
     end process;
 
-    sof_mask_reg_p: process(all)
+    sof_mask_reg_p : process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 sof_mask    <= (0 => '1', others => '0');
-            elsif pkt_last = '1' then
-                if new_sof(MFB_REGIONS) = '1' then
+            elsif (pkt_last = '1') then
+                if (new_sof(MFB_REGIONS) = '1') then
                     sof_mask    <= (0 => '1', others => '0');
                 else
                     sof_mask    <= new_sof(new_sof'high - 1 downto 0);
@@ -136,30 +137,30 @@ begin
     end process;
 
     disable_i: entity work.BEFORE_ONE
-        generic map(
-           DATA_WIDTH     => MFB_REGIONS,
-           IMPLEMENTATION => "BEHAV"
-        )
-        port map(
-           DI => eof_mask(eof_mask'high - 1 downto 0),
-           DO => before_one_mask
-        );
+    generic map (
+        DATA_WIDTH     => MFB_REGIONS,
+        IMPLEMENTATION => "BEHAV"
+    )
+    port map (
+        DI => eof_mask(eof_mask'high - 1 downto 0),
+        DO => before_one_mask
+    );
 
-    processed_eofs_p: process(all)
+    processed_eofs_p : process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 eof_enable  <= (others => '0');
-            elsif FIFO_TX_DST_RDY = '1' then
+            elsif (FIFO_TX_DST_RDY = '1') then
                 eof_enable  <= (others => '0');
-            elsif pkt_last = '1' then
+            elsif (pkt_last = '1') then
                 eof_enable  <= eof_mask(eof_mask'high - 1 downto 0) or before_one_mask;
             end if;
         end if;
     end process;
 
     -- EOF mask
-    eof_mask_p: process(all)
+    eof_mask_p : process (all)
         variable eof_cnt_v  : unsigned(max(1, log2(MFB_REGIONS*FIFO_DEPTH)) - 1 downto 0);
         variable index      : integer range 0 to 4;
     begin
@@ -168,13 +169,13 @@ begin
         index     := MFB_REGIONS;
         eof_cnt_v := (others => '0');
         for r in 0 to MFB_REGIONS - 1 loop
-            if (FIFO_TX_EOF(r) and (not eof_enable(r))) = '1' then
+            if ((FIFO_TX_EOF(r) and (not eof_enable(r))) = '1') then
                 eof_cnt_v  := eof_cnt_v + 1;
             else
                 eof_cnt_v  := eof_cnt_v;
             end if;
 
-            if pkts_to_read - eof_cnt_v = 0 then
+            if (pkts_to_read - eof_cnt_v = 0) then
                 index   := r;
                 exit;
             end if;
@@ -186,8 +187,8 @@ begin
 
     -- Packet continues
     pkt_cont_g : for r in 0 to MFB_REGIONS - 1 generate
-        pkt_cont(r+1) <=    (    FIFO_TX_SOF(r) and not FIFO_TX_EOF(r) and not pkt_cont(r)) or
-                            (    FIFO_TX_SOF(r) and     FIFO_TX_EOF(r) and     pkt_cont(r)) or
+        pkt_cont(r+1) <=    (FIFO_TX_SOF(r) and not FIFO_TX_EOF(r) and not pkt_cont(r)) or
+                            (FIFO_TX_SOF(r) and     FIFO_TX_EOF(r) and     pkt_cont(r)) or
                             (not FIFO_TX_SOF(r) and not FIFO_TX_EOF(r) and     pkt_cont(r));
     end generate;
 
@@ -197,7 +198,7 @@ begin
         if (rising_edge(CLK)) then
             if (RST = '1') then
                 pkt_cont(0) <= '0';
-            elsif (FIFO_TX_SRC_RDY = '1') and (FIFO_TX_DST_RDY = '1') then
+            elsif ((FIFO_TX_SRC_RDY = '1') and (FIFO_TX_DST_RDY = '1')) then
                 pkt_cont(0) <= pkt_cont(MFB_REGIONS);
             end if;
         end if;
@@ -207,16 +208,16 @@ begin
     load_en     <= SPKT_RX_SRC_RDY and SPKT_RX_DST_RDY;
     pkt_read    <= FIFO_TX_SRC_RDY and FIFO_TX_DST_RDY and (or(FIFO_TX_EOF));
 
-    process(all)
+    process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 pkts_to_read    <= (others => '0');
-            elsif load_en = '1' then
+            elsif (load_en = '1') then
                 pkts_to_read    <= pkts_to_read + unsigned(SPKT_RX_EOF_NUM);
-            elsif block_counter = '1' then
+            elsif (block_counter = '1') then
                 pkts_to_read    <= pkts_to_read;
-            elsif (pkt_read = '1') or (pkt_last = '1') then
+            elsif ((pkt_read = '1') or (pkt_last = '1')) then
                 pkts_to_read    <= pkts_to_read - pkts_read;
             end if;
         end if;
@@ -225,18 +226,18 @@ begin
     -- Indication that some packets are still in the word
     pkt_underflow <= pkts_to_read - to_unsigned(count_ones(FIFO_TX_EOF and (not eof_enable)),pkt_underflow'length);
 
-    fifo_ctrl_reg_p: process(all)
+    fifo_ctrl_reg_p : process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
-                state   <= st_LOAD_LNG;
+            if (RST = '1') then
+                state   <= ST_LOAD_LNG;
             else
                 state   <= next_state;
             end if;
         end if;
     end process;
 
-    fifo_ctrl_state_p: process(all)
+    fifo_ctrl_state_p : process (all)
         variable eof_v : std_logic;
         variable sof_v : std_logic;
     begin
@@ -257,40 +258,40 @@ begin
         pkt_last        <= '0';
 
         case (state) is
-            when st_LOAD_LNG    =>
-                if FIFO_TX_SRC_RDY = '1' then
+            when ST_LOAD_LNG    =>
+                if (FIFO_TX_SRC_RDY = '1') then
                     CH_TX_SRC_RDY   <= '0';
                     FIFO_TX_DST_RDY <= '0';
 
                     -- Load number of packets within a SuperPacket
-                    if SPKT_RX_SRC_RDY = '1' then
+                    if (SPKT_RX_SRC_RDY = '1') then
                         SPKT_RX_DST_RDY <= '1';
-                        next_state      <= st_FIRST_PAC;
+                        next_state      <= ST_FIRST_PAC;
                     end if;
                 end if;
 
-            when st_FIRST_PAC   =>
-                if (FIFO_TX_SRC_RDY and CH_TX_DST_RDY) = '1' then
+            when ST_FIRST_PAC   =>
+                if ((FIFO_TX_SRC_RDY and CH_TX_DST_RDY) = '1') then
                     -- Pass SOF of the SuperPacket
                     CH_TX_SOF       <= FIFO_TX_SOF and sof_mask;
                     CH_TX_EOF       <= FIFO_TX_EOF and eof_mask(eof_mask'high - 1 downto 0);
-                    if eof_v = '1' then
+                    if (eof_v = '1') then
                         FIFO_TX_DST_RDY <= (not pkt_cont(MFB_REGIONS)) and (not pkt_underflow(pkt_underflow'high));
-                        next_state      <= st_LOAD_LNG;
+                        next_state      <= ST_LOAD_LNG;
                         pkt_last        <= '1';
                     else
-                        next_state      <= st_PASS;
+                        next_state      <= ST_PASS;
                     end if;
                 end if;
 
-            when st_PASS        =>
-                if (FIFO_TX_SRC_RDY and CH_TX_DST_RDY) = '1' then
+            when ST_PASS        =>
+                if ((FIFO_TX_SRC_RDY and CH_TX_DST_RDY) = '1') then
                     -- Mask off SOF and EOF of small packets
                     CH_TX_SOF   <= (others => '0');
                     CH_TX_EOF   <= FIFO_TX_EOF and eof_mask(eof_mask'high - 1 downto 0);
-                    if eof_v = '1' then
+                    if (eof_v = '1') then
                         FIFO_TX_DST_RDY <= (not pkt_cont(MFB_REGIONS)) and (not pkt_underflow(pkt_underflow'high));
-                        next_state      <= st_LOAD_LNG;
+                        next_state      <= ST_LOAD_LNG;
                         pkt_last        <= '1';
                     end if;
                 end if;
@@ -299,10 +300,10 @@ begin
     end process;
 
     -- Length register
-    process(all)
+    process (all)
     begin
         if rising_edge(CLK) then
-            if (SPKT_RX_SRC_RDY = '1') and (SPKT_RX_DST_RDY = '1') then
+            if ((SPKT_RX_SRC_RDY = '1') and (SPKT_RX_DST_RDY = '1')) then
                 TX_PKT_LEN_DATA <= SPKT_RX_LENGTH;
             end if;
         end if;

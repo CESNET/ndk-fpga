@@ -28,229 +28,229 @@ use unisim.vcomponents.all;
 --                        architectuere
 -- ----------------------------------------------------------------------------
 
-architecture sh_reg_dynamic_arch of SH_REG_BASE_DYNAMIC is
+architecture SH_REG_DYNAMIC_ARCH of SH_REG_BASE_DYNAMIC is
 
-  --constants
-  constant OPT_THRESHOLD : integer := 16;
+    -- constants
+    constant OPT_THRESHOLD : integer := 16;
 
-  constant DEVICE_HAS_SRL16E : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE");
-
-
-  --signals in/out data
-  signal sig_in  : std_logic_vector(DATA_WIDTH -1 downto 0);
-  signal sig_out : std_logic_vector(DATA_WIDTH -1 downto 0);
+    constant DEVICE_HAS_SRL16E : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE");
 
 
-  -- type
-  type array_slv is array (DATA_WIDTH -1 downto 0) of std_logic_vector(NUM_BITS -1 downto 0);
+    -- signals in/out data
+    signal sig_in  : std_logic_vector(DATA_WIDTH -1 downto 0);
+    signal sig_out : std_logic_vector(DATA_WIDTH -1 downto 0);
 
-  ------------------------
-  -- conversion function
-  function sh_reg_init_conv  return array_slv is
-    variable out_init : array_slv;
-  begin
-    --type of init
-    --if (INIT_TYPE = 0) then
-    for i in  (DATA_WIDTH -1) downto 0 loop
-      out_init(i) := (others => '0');
-    end loop;
 
-    if (INIT_TYPE = 1) then
-      for i in (DATA_WIDTH -1) downto 0 loop
-        out_init(i) := INIT(0 to NUM_BITS-1);
-      end loop;
-    elsif (INIT_TYPE = 2) then
-      for i in (DATA_WIDTH -1) downto 0 loop
-        for k in (NUM_BITS -1) downto 0 loop
-          out_init(i)(k) := INIT(DATA_WIDTH -1 - i);
+    -- type
+    type array_slv is array (DATA_WIDTH -1 downto 0) of std_logic_vector(NUM_BITS -1 downto 0);
+
+    ------------------------
+    -- conversion function
+    function sh_reg_init_conv return array_slv is
+        variable out_init : array_slv;
+    begin
+        -- type of init
+        -- if (INIT_TYPE = 0) then
+        for i in  (DATA_WIDTH -1) downto 0 loop
+            out_init(i) := (others => '0');
         end loop;
-      end loop;
-    elsif (INIT_TYPE = 3) then
-       for i in (DATA_WIDTH -1) downto 0 loop
-        for k in (NUM_BITS -1) downto 0 loop
-          out_init(i)(k) := INIT(DATA_WIDTH*NUM_BITS -1 - k*DATA_WIDTH - i);
-        end loop;
-      end loop;
-    end if;
 
-    --return value
-    return out_init;
-  end sh_reg_init_conv;
+        if (INIT_TYPE = 1) then
+            for i in (DATA_WIDTH -1) downto 0 loop
+                out_init(i) := INIT(0 to NUM_BITS-1);
+            end loop;
+        elsif (INIT_TYPE = 2) then
+            for i in (DATA_WIDTH -1) downto 0 loop
+                for k in (NUM_BITS -1) downto 0 loop
+                    out_init(i)(k) := INIT(DATA_WIDTH -1 - i);
+                end loop;
+            end loop;
+        elsif (INIT_TYPE = 3) then
+            for i in (DATA_WIDTH -1) downto 0 loop
+                for k in (NUM_BITS -1) downto 0 loop
+                    out_init(i)(k) := INIT(DATA_WIDTH*NUM_BITS -1 - k*DATA_WIDTH - i);
+                end loop;
+            end loop;
+        end if;
 
-
-  ------------------------------
-  -- conversion function to init srl register
-  function sh_reg_init_conv_srl (poz : integer) return std_logic_vector is
-    variable ret : std_logic_vector(15 downto 0);
-  begin
-    -- set 0 to all values
-    ret := (others => '0');
-
-    if(INIT_TYPE = 1) then
-      ret(NUM_BITS-1 downto 0) := INIT(0 to NUM_BITS -1);
-    elsif (INIT_TYPE = 2) then
-      for i in (NUM_BITS-1) downto 0 loop
-        ret(i) := INIT(DATA_WIDTH -1 -poz);
-      end loop;
-    elsif (INIT_TYPE = 3) then
-      for i in (NUM_BITS-1) downto 0 loop
-        ret(i) := INIT(DATA_WIDTH*NUM_BITS -1 - i*DATA_WIDTH - poz);
-      end loop;
-    end if;
-
-    return ret;
-  end sh_reg_init_conv_srl;
+        -- return value
+        return out_init;
+    end function;
 
 
-  -------------------------------------
-  -- choose optimalization betven REG, VIVADO
-  function get_shreg_extract_opt return string is
-  begin
-    if (OPT = "REG") then
-      return "no";
-    end if;
+    ------------------------------
+    -- conversion function to init srl register
+    function sh_reg_init_conv_srl (poz : integer) return std_logic_vector is
+        variable ret : std_logic_vector(15 downto 0);
+    begin
+        -- set 0 to all values
+        ret := (others => '0');
 
-    -- default value
-    return "yes";
-  end get_shreg_extract_opt;
+        if (INIT_TYPE = 1) then
+            ret(NUM_BITS-1 downto 0) := INIT(0 to NUM_BITS -1);
+        elsif (INIT_TYPE = 2) then
+            for i in (NUM_BITS-1) downto 0 loop
+                ret(i) := INIT(DATA_WIDTH -1 -poz);
+            end loop;
+        elsif (INIT_TYPE = 3) then
+            for i in (NUM_BITS-1) downto 0 loop
+                ret(i) := INIT(DATA_WIDTH*NUM_BITS -1 - i*DATA_WIDTH - poz);
+            end loop;
+        end if;
+
+        return ret;
+    end function;
 
 
-  -- AREA, SPEED, BALANCE, OFF
-  -- attribute OPTIMIZE : string;
-  -- attribute OPTIMIZE of sh_reg_dynamic_arch : architecture is "AREA";
+    -------------------------------------
+    -- choose optimalization betven REG, VIVADO
+    function get_shreg_extract_opt return string is
+    begin
+        if (OPT = "REG") then
+            return "no";
+        end if;
 
-   component SRL16E
-   generic (
-      INIT            : bit_vector(15 downto 0);
-      IS_CLK_INVERTED : bit
-   );
-   port (
-      Q   : out std_logic;
-      CE  : in  std_logic;
-      CLK : in  std_logic;
-      D   : in  std_logic;
-      A0  : in  std_logic;
-      A1  : in  std_logic;
-      A2  : in  std_logic;
-      A3  : in  std_logic
-   );
-   end component;
+        -- default value
+        return "yes";
+    end function;
+
+
+    -- AREA, SPEED, BALANCE, OFF
+    -- attribute OPTIMIZE : string;
+    -- attribute OPTIMIZE of sh_reg_dynamic_arch : architecture is "AREA";
+
+    component srl16e is
+        generic (
+            INIT            : bit_vector(15 downto 0);
+            IS_CLK_INVERTED : bit
+        );
+        port (
+            Q   : out std_logic;
+            CE  : in  std_logic;
+            CLK : in  std_logic;
+            D   : in  std_logic;
+            A0  : in  std_logic;
+            A1  : in  std_logic;
+            A2  : in  std_logic;
+            A3  : in  std_logic
+        );
+    end component;
 
 begin
 
-  -------------------------------
-  -- I/O signals
-  sig_in <= DIN;
-  DOUT   <= sig_out;
+    -------------------------------
+    -- I/O signals
+    sig_in <= DIN;
+    DOUT   <= sig_out;
 
 
 
 
-    --SH_REG_VIVADO : if (NUM_BITS > OPT_THRESHOLD or OPTIMALIZATION = "VIVADO") generate
-    SH_REG_VIVADO : if ((not DEVICE_HAS_SRL16E) or NUM_BITS > OPT_THRESHOLD or OPT /= "SRL") generate
-      signal sig_addr : std_logic_vector(log2(NUM_BITS) -1  downto 0);
+    -- SH_REG_VIVADO : if (NUM_BITS > OPT_THRESHOLD or OPTIMALIZATION = "VIVADO") generate
+    sh_reg_vivado : if ((not DEVICE_HAS_SRL16E) or NUM_BITS > OPT_THRESHOLD or OPT /= "SRL") generate
+        signal sig_addr : std_logic_vector(log2(NUM_BITS) -1  downto 0);
     begin
-      -- adress
-      sig_addr <= ADDR;
+        -- adress
+        sig_addr <= ADDR;
 
-    -------------------------------------
-    -- CLK not invertid
-    SH_REG_VIVADO_NOT_CLK_INVERTED : if(IS_CLK_INVERTED = '0') generate
-      signal reg_shift : array_slv := sh_reg_init_conv;
+        -------------------------------------
+        -- CLK not invertid
+        sh_reg_vivado_not_clk_inverted : if(IS_CLK_INVERTED = '0') generate
+            signal reg_shift : array_slv := sh_reg_init_conv;
 
-      attribute SHREG_EXTRACT : string;
-      attribute SHREG_EXTRACT of reg_shift : signal is get_shreg_extract_opt; -- "no" => REG, "yes" => VIVADO
-    begin
-      process (CLK)
-      begin
-         if CLK='1' and CLK'event then
-            if CE = '1' then
-             for i in 0 to DATA_WIDTH-1 loop
-                 reg_shift(i) <= reg_shift(i)(NUM_BITS-2 downto 0) & sig_in(i);
-             end loop;
-            end if;
-         end if;
-      end process;
+            attribute shreg_extract : string;
+            attribute shreg_extract of reg_shift : signal is get_shreg_extract_opt; -- "no" => REG, "yes" => VIVADO
+        begin
+            process (CLK)
+            begin
+                if (CLK = '1' and CLK'event) then
+                    if (CE = '1') then
+                        for i in 0 to DATA_WIDTH-1 loop
+                            reg_shift(i) <= reg_shift(i)(NUM_BITS-2 downto 0) & sig_in(i);
+                        end loop;
+                    end if;
+                end if;
+            end process;
 
-      process(reg_shift,sig_addr)
-      begin
-         for i in 0 to DATA_WIDTH-1 loop
-            sig_out(i) <= reg_shift(i)(conv_integer(sig_addr));
-         end loop;
-      end process;
+            process (reg_shift,sig_addr)
+            begin
+                for i in 0 to DATA_WIDTH-1 loop
+                    sig_out(i) <= reg_shift(i)(conv_integer(sig_addr));
+                end loop;
+            end process;
+        end generate;
+
+        -------------------------------------
+        -- CLK invertid
+        sh_reg_vivado_clk_inverted : if(IS_CLK_INVERTED = '1') generate
+            signal reg_shift : array_slv := sh_reg_init_conv;
+
+            attribute shreg_extract : string;
+            attribute shreg_extract of reg_shift : signal is get_shreg_extract_opt; -- "no" => REG, "yes" => VIVADO
+        begin
+            process (CLK)
+            begin
+                if (CLK = '0' and CLK'event) then
+                    if (CE = '1') then
+                        for i in 0 to DATA_WIDTH-1 loop
+                            reg_shift(i) <= reg_shift(i)(NUM_BITS-2 downto 0) & sig_in(i);
+                        end loop;
+                    end if;
+                end if;
+            end process;
+
+            process (reg_shift,sig_addr)
+            begin
+                for i in 0 to DATA_WIDTH-1 loop
+                    sig_out(i) <= reg_shift(i)(conv_integer(sig_addr));
+                end loop;
+            end process;
+        end generate;
+        -- end generate optimalization
     end generate;
 
-    -------------------------------------
-    -- CLK invertid
-    SH_REG_VIVADO_CLK_INVERTED : if( IS_CLK_INVERTED = '1') generate
-      signal reg_shift : array_slv := sh_reg_init_conv;
 
-      attribute SHREG_EXTRACT : string;
-      attribute SHREG_EXTRACT of reg_shift : signal is get_shreg_extract_opt; -- "no" => REG, "yes" => VIVADO
+
+
+
+
+
+    --------------------------------------------
+    -- 16- bit
+    sh_reg_srl : if (DEVICE_HAS_SRL16E and NUM_BITS <= OPT_THRESHOLD and OPT = "SRL") generate
+        constant ADDR_MAX   : integer := 3;
+        constant ADDR_SPLIT : integer := ADDR'left;
+        signal   sig_addr   : std_logic_vector(3 downto 0);
     begin
-      process (CLK)
-      begin
-         if CLK='0' and CLK'event then
-            if CE = '1' then
-             for i in 0 to DATA_WIDTH-1 loop
-                 reg_shift(i) <= reg_shift(i)(NUM_BITS-2 downto 0) & sig_in(i);
-             end loop;
-            end if;
-         end if;
-      end process;
+        -- addres if ADDR is to small
+        sig_addr(ADDR_MAX   downto ADDR_SPLIT +1) <= (others => '0');
+        sig_addr(ADDR_SPLIT downto 0)             <= ADDR;
 
-      process(reg_shift,sig_addr)
-      begin
-         for i in 0 to DATA_WIDTH-1 loop
-            sig_out(i) <= reg_shift(i)(conv_integer(sig_addr));
-         end loop;
-      end process;
+
+        -- generate data width
+        sh_reg_srl_width: for i in (DATA_WIDTH -1) downto 0 generate
+            sh_reg_srl16 : component srl16e
+            generic map (
+                INIT            => to_bitvector(sh_reg_init_conv_srl(i)),
+                IS_CLK_INVERTED => IS_CLK_INVERTED
+            )
+            port map (
+                -- output
+                Q   => sig_out(i),
+                CE  => CE,
+                CLK => CLK,
+                D   => sig_in(i),
+
+                A0 => sig_addr(0),
+                A1 => sig_addr(1),
+                A2 => sig_addr(2),
+                A3 => sig_addr(3)
+            );
+        end generate;
     end generate;
-  --end generate optimalization
-  end generate;
 
 
-
-
-
-
-
-  --------------------------------------------
-  -- 16- bit
-  SH_REG_SRL : if (DEVICE_HAS_SRL16E and NUM_BITS  <= OPT_THRESHOLD and OPT = "SRL") generate
-    constant ADDR_MAX   : integer := 3;
-    constant ADDR_SPLIT : integer := ADDR'left;
-    signal sig_addr : std_logic_vector(3 downto 0);
-  begin
-    --addres if ADDR is to small
-    sig_addr(ADDR_MAX   downto ADDR_SPLIT +1) <= (others => '0');
-    sig_addr(ADDR_SPLIT downto 0) <= ADDR;
-
-
-    --generate data width
-    SH_REG_SRL_WIDTH: for i in (DATA_WIDTH -1) downto 0 generate
-      SH_REG_SRL16 : SRL16E
-        generic map(
-          INIT => to_bitvector(sh_reg_init_conv_srl(i)),
-          IS_CLK_INVERTED => IS_CLK_INVERTED
-        )
-        port map(
-           --output
-          Q   => sig_out(i),
-          CE  => CE,
-          CLK => CLK,
-          D   => sig_in(i),
-
-          A0 => sig_addr(0),
-          A1 => sig_addr(1),
-          A2 => sig_addr(2),
-          A3 => sig_addr(3)
-        );
-    end generate;
-  end generate;
-
-
-end sh_reg_dynamic_arch;
+end architecture;
 
 
 

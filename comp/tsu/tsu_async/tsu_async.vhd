@@ -49,7 +49,7 @@ begin
     fifo_di(2*TS_W-1 downto TS_W) <= IN_TS;
 
     asfifox_i : entity work.ASFIFOX
-    generic map(
+    generic map (
         DATA_WIDTH => 2*TS_W,
         ITEMS      => FIFO_DEPTH,
         RAM_TYPE   => "LUT",
@@ -75,19 +75,19 @@ begin
         RD_STATUS => open
     );
 
-    process(OUT_CLK)
+    process (OUT_CLK)
     begin
         if (rising_edge(OUT_CLK)) then
-            if (fifo_dv_n = '1') and (timeout_cnt(TIMEOUT_W-1) = '0') then
+            if ((fifo_dv_n = '1') and (timeout_cnt(TIMEOUT_W-1) = '0')) then
                 timeout_cnt <= timeout_cnt + 1;
             end if;
-            if (OUT_RESET = '1') or (fifo_dv_n = '0') then
+            if ((OUT_RESET = '1') or (fifo_dv_n = '0')) then
                 timeout_cnt <= (others => '0');
             end if;
         end if;
     end process;
 
-    process(OUT_CLK)
+    process (OUT_CLK)
     begin
         if (rising_edge(OUT_CLK)) then
             if (fifo_dv_n = '0') then
@@ -102,7 +102,7 @@ begin
     -- Synced TS is valid if the value is current or if the value is a few
     -- clock cycles old. This provides filtering for occasional flushing of
     -- the asynchronous FIFO.
-    process(OUT_CLK)
+    process (OUT_CLK)
     begin
         if (rising_edge(OUT_CLK)) then
             if (fifo_dv_n = '0') then

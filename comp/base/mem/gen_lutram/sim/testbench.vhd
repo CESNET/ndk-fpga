@@ -11,10 +11,10 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
-entity testbench is
-end testbench;
+entity TESTBENCH is
+end entity;
 
-architecture FULL of testbench is
+architecture FULL of TESTBENCH is
 
     constant CLK_PERIOD : time := 5 ns;
 
@@ -71,7 +71,7 @@ begin
     sim_p : process
     begin
 
-        wr_en <= '0';
+        wr_en   <= '0';
         wr_addr <= (others => '0');
         wr_data <= (others => '0');
         rd_addr <= (others => '0');
@@ -79,7 +79,7 @@ begin
         wait for 1.1 * CLK_PERIOD;
 
         for i in 0 to ITEMS-1 loop
-            wr_en <= '1';
+            wr_en   <= '1';
             wr_addr <= std_logic_vector(to_unsigned(i,log2(ITEMS)));
             wr_data <= std_logic_vector(to_unsigned(i,DATA_WIDTH));
             rd_addr <= std_logic_vector(to_unsigned(i,log2(ITEMS)));
@@ -87,13 +87,13 @@ begin
         end loop;
 
         for i in 0 to ITEMS-1 loop
-            wr_en <= '0';
+            wr_en   <= '0';
             rd_addr <= std_logic_vector(to_unsigned(i,log2(ITEMS)));
             wait for CLK_PERIOD;
         end loop;
 
         for i in 0 to ITEMS-1 loop
-            wr_en <= '1';
+            wr_en   <= '1';
             wr_addr <= std_logic_vector(to_unsigned(i,log2(ITEMS)));
             wr_data <= std_logic_vector(to_unsigned(32+i,DATA_WIDTH));
             rd_addr <= std_logic_vector(to_unsigned(i,log2(ITEMS)));
@@ -110,4 +110,4 @@ begin
         wait;
     end process;
 
-end FULL;
+end architecture;

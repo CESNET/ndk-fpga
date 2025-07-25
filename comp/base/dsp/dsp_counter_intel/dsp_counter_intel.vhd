@@ -25,20 +25,21 @@ architecture BEHAV of DSP_COUNTER_INTEL is
     end function;
 
     signal count_by_behind_regs : std_logic_vector(COUNT_BY_WIDTH-1 downto 0); -- COUNT_BY signal delayed by input registers (0 or 1 clock cycle, depends if input regs are enabled)
-    signal clk_en_behind_regs   : std_logic; -- CLK_EN signal delayed by input registers (0 or 1 clock cycle, depends if input regs are enabled)
-    signal cnt_result           : std_logic_vector(RESULT_WIDTH-1 downto 0); -- intern result of the counter
+    signal clk_en_behind_regs   : std_logic;                                   -- CLK_EN signal delayed by input registers (0 or 1 clock cycle, depends if input regs are enabled)
+    signal cnt_result           : std_logic_vector(RESULT_WIDTH-1 downto 0);   -- intern result of the counter
     ------------------------ AUTO_RESET signals -----------------------
-    signal cnt_result_msb_dly   : std_logic; -- holds the MSB of previous result of the counter, it is used to detect overflow and underflow
-    signal freeze_at_max        : std_logic; -- stops the counter when over/underflow is detected
-    signal init_underflow       : std_logic; -- used when counting down; signals, if the counter has initially underflowed ('1') or not ('0'), because the counter starts at value 0, it underflows with the first subtraction
-    signal init_underflow_dly   : std_logic := '0'; -- stores the init_underflow value until reset
-    signal underflow            : std_logic; -- used when counting down; is '1' when underflow is detected, then with init_underflow decides the right time to assert freeze_at_max
+    signal cnt_result_msb_dly   : std_logic;                                   -- holds the MSB of previous result of the counter, it is used to detect overflow and underflow
+    signal freeze_at_max        : std_logic;                                   -- stops the counter when over/underflow is detected
+    signal init_underflow       : std_logic;                                   -- used when counting down; signals, if the counter has initially underflowed ('1') or not ('0'), because the counter starts at value 0, it underflows with the first subtraction
+    signal init_underflow_dly   : std_logic := '0';                            -- stores the init_underflow value until reset
+    signal underflow            : std_logic;                                   -- used when counting down; is '1' when underflow is detected, then with init_underflow decides the right time to assert freeze_at_max
 
 begin
 
     -- assert to check if MAX_VAL is set correctly - it is only important when AUTO_RESET = false
     assert ((AUTO_RESET = true) or (((COUNT_DOWN = false) and (and MAX_VAL = '1')) or ((COUNT_DOWN = true) and (or MAX_VAL = '0'))))
-    report "Wrong value of MAX_VAL, check port decription for more information." severity failure;
+        report "Wrong value of MAX_VAL, check port decription for more information."
+        severity failure;
 
     -- -------------------------------------------------------------------------
     -- delaying CLK_EN if input registers are enabled
@@ -77,7 +78,7 @@ begin
         freeze_g : if (COUNT_DOWN = true) generate
 
             -- AUTO_RESET logic: underflow is detected when MSB goes from '0' (MSB of previous result) to '1' (MSB of current result)
-            underflow <= not cnt_result_msb_dly and cnt_result(RESULT_WIDTH-1);
+            underflow     <= not cnt_result_msb_dly and cnt_result(RESULT_WIDTH-1);
             -- storing the value of init_underflow so it can be reset and also used to calculate new init_underflow (via line above)
             init_underflow_dly_p : process (CLK)
             begin
@@ -172,24 +173,24 @@ begin
                     RESULT   => cnt_result
                 );
 
-                -- if DEVICE is "AGILEX"
-                else generate
+            -- if DEVICE is "AGILEX"
+            else generate
 
-                    dsp_counter_stratix_10_atom_i: entity work.DSP_COUNTER_AGILEX_ATOM
-                    generic map (
-                        COUNT_BY_WIDTH => COUNT_BY_WIDTH,
-                        RESULT_WIDTH   => RESULT_WIDTH,
-                        COUNT_DOWN     => bool_to_sl(COUNT_DOWN),
-                        REG_0_EN       => INPUT_REGS
-                    )
-                    port map (
-                        CLK      => CLK,
-                        CLK_EN0  => (CLK_EN and not freeze_at_max),
-                        CLK_EN1  => (clk_en_behind_regs and not freeze_at_max),
-                        RESET    => RESET,
-                        COUNT_BY => COUNT_BY,
-                        RESULT   => cnt_result
-                    );
+                dsp_counter_stratix_10_atom_i: entity work.DSP_COUNTER_AGILEX_ATOM
+                generic map (
+                    COUNT_BY_WIDTH => COUNT_BY_WIDTH,
+                    RESULT_WIDTH   => RESULT_WIDTH,
+                    COUNT_DOWN     => bool_to_sl(COUNT_DOWN),
+                    REG_0_EN       => INPUT_REGS
+                )
+                port map (
+                    CLK      => CLK,
+                    CLK_EN0  => (CLK_EN and not freeze_at_max),
+                    CLK_EN1  => (clk_en_behind_regs and not freeze_at_max),
+                    RESET    => RESET,
+                    COUNT_BY => COUNT_BY,
+                    RESULT   => cnt_result
+                );
 
             end generate;
 
@@ -273,24 +274,24 @@ begin
                     RESULT   => RESULT
                 );
 
-                -- if DEVICE is "AGILEX"
-                else generate
+            -- if DEVICE is "AGILEX"
+            else generate
 
-                    dsp_counter_stratix_10_atom_i: entity work.DSP_COUNTER_AGILEX_ATOM
-                    generic map (
-                        COUNT_BY_WIDTH => COUNT_BY_WIDTH,
-                        RESULT_WIDTH   => RESULT_WIDTH,
-                        COUNT_DOWN     => bool_to_sl(COUNT_DOWN),
-                        REG_0_EN       => INPUT_REGS
-                    )
-                    port map (
-                        CLK      => CLK,
-                        CLK_EN0  => CLK_EN,
-                        CLK_EN1  => clk_en_behind_regs,
-                        RESET    => RESET,
-                        COUNT_BY => COUNT_BY,
-                        RESULT   => RESULT
-                    );
+                dsp_counter_stratix_10_atom_i: entity work.DSP_COUNTER_AGILEX_ATOM
+                generic map (
+                    COUNT_BY_WIDTH => COUNT_BY_WIDTH,
+                    RESULT_WIDTH   => RESULT_WIDTH,
+                    COUNT_DOWN     => bool_to_sl(COUNT_DOWN),
+                    REG_0_EN       => INPUT_REGS
+                )
+                port map (
+                    CLK      => CLK,
+                    CLK_EN0  => CLK_EN,
+                    CLK_EN1  => clk_en_behind_regs,
+                    RESET    => RESET,
+                    COUNT_BY => COUNT_BY,
+                    RESULT   => RESULT
+                );
 
             end generate;
 

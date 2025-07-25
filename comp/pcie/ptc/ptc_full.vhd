@@ -12,23 +12,23 @@ use work.math_pack.all;
 use work.type_pack.all;
 use work.dma_bus_pack.all; -- contains definitions for MVB header fields
 
-architecture full of PCIE_TRANSACTION_CTRL is
+architecture FULL of PCIE_TRANSACTION_CTRL is
 
-    function getDmaUphdrWidthDW return integer is
+    function getdmauphdrwidthdw return integer is
         variable width : integer := 0;
     begin
         width := DMA_UPHDR_WIDTH/(8*4);
-        if ((DMA_UPHDR_WIDTH mod (8*4))/=0) then
+        if ((DMA_UPHDR_WIDTH mod (8*4)) /= 0) then
             width := width + 1;
         end if;
         return width;
     end function;
 
-    function getPcieLowAddrWidth return integer is
+    function getpcielowaddrwidth return integer is
         variable width : integer := 12;
     begin
         width := 12;
-        if (DEVICE="STRATIX10" or DEVICE="AGILEX") then
+        if (DEVICE = "STRATIX10" or DEVICE = "AGILEX") then
             width := 7;
         end if;
         return width;
@@ -38,16 +38,16 @@ architecture full of PCIE_TRANSACTION_CTRL is
     -- Constants
     ---------------------------------------------------------------------------
 
-    constant DOWN_ASFIFO_AFULL_OFFSET : integer := 32;--4+4+1; -- Based on number of pipe levels from Down storage FIFO to Down ASFIFO. +4 because PRECISE_FULL is false. +1 for afull register
+    constant DOWN_ASFIFO_AFULL_OFFSET : integer := 32; -- 4+4+1; -- Based on number of pipe levels from Down storage FIFO to Down ASFIFO. +4 because PRECISE_FULL is false. +1 for afull register
 
     constant DMA_REQUEST_LEN_WIDTH    : integer := DMA_REQUEST_LENGTH'high-DMA_REQUEST_LENGTH'low+1;
-    constant DMA_UPHDR_WIDTH_DW       : integer := getDmaUphdrWidthDW;
+    constant DMA_UPHDR_WIDTH_DW       : integer := getdmauphdrwidthdw;
 
     constant MFB_UP_WIDTH             : integer := MFB_UP_REGIONS*MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE*MFB_UP_ITEM_WIDTH;
     constant MFB_DOWN_WIDTH           : integer := MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH;
 
     -- Width of 'lower address' field in PCIE completion header
-    constant PCIE_LOW_ADDR_WIDTH      : integer := getPcieLowAddrWidth;
+    constant PCIE_LOW_ADDR_WIDTH      : integer := getpcielowaddrwidth;
 
     -- HDM (Header Data Merge) MFB FIFO is ready for 16 MPS transaction
     constant HDM_MFB_FIFO_DEPTH       : integer := (16*MPS*8)/MFB_UP_WIDTH;
@@ -58,8 +58,8 @@ architecture full of PCIE_TRANSACTION_CTRL is
     -- on some devices.
     -- (DEVICE="ULTRASCALE")
     constant DISABLE_STFIFO           : boolean := false;
-    constant CUT_HDR_BYPASS_DEV       : boolean := (DEVICE="STRATIX10" and ENDPOINT_TYPE/="H_TILE") or (DEVICE="AGILEX");
-    constant INTEL_DEV                : boolean := (DEVICE="STRATIX10" or DEVICE="AGILEX");
+    constant CUT_HDR_BYPASS_DEV       : boolean := (DEVICE = "STRATIX10" and ENDPOINT_TYPE /= "H_TILE") or (DEVICE = "AGILEX");
+    constant INTEL_DEV                : boolean := (DEVICE = "STRATIX10" or DEVICE = "AGILEX");
 
     constant DBG_PROBES            : natural := 6;
     -- Name(s) (4-letter IDs) of Streaming Debug Probes.
@@ -287,11 +287,13 @@ architecture full of PCIE_TRANSACTION_CTRL is
 
 begin
 
-    assert (DEVICE = "STRATIX10" OR DEVICE = "AGILEX" OR DEVICE = "ULTRASCALE" OR DEVICE = "7SERIES")
-        report "PCIE_TRANSACTION_CTRL: unsupported device!" severity failure;
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+        report "PCIE_TRANSACTION_CTRL: unsupported device!"
+        severity failure;
 
-    assert (ENDPOINT_TYPE = "H_TILE" OR ENDPOINT_TYPE = "P_TILE" OR ENDPOINT_TYPE = "R_TILE" OR INTEL_DEV = False)
-        report "PCIE_TRANSACTION_CTRL: unsupported ENDPOINT_TYPE (Intel FPGA only)!" severity failure;
+    assert (ENDPOINT_TYPE = "H_TILE" or ENDPOINT_TYPE = "P_TILE" or ENDPOINT_TYPE = "R_TILE" or INTEL_DEV = False)
+        report "PCIE_TRANSACTION_CTRL: unsupported ENDPOINT_TYPE (Intel FPGA only)!"
+        severity failure;
 
     -- ========================================================================
     -- UPSTREAM
@@ -303,29 +305,29 @@ begin
         ---------------------------------------------------------------------------
 
         up_mvb_asynch_fifo_i : entity work.MVB_ASFIFOX
-        generic map(
-            DEVICE         => DEVICE         ,
+        generic map (
+            DEVICE         => DEVICE,
             MVB_ITEM_WIDTH => DMA_UPHDR_WIDTH,
             MVB_ITEMS      => DMA_MVB_UP_ITEMS,
             FIFO_ITEMS     => UP_ASFIFO_ITEMS,
-            OUTPUT_REG     => true           ,
-            RAM_TYPE       => "BRAM"         ,
+            OUTPUT_REG     => true,
+            RAM_TYPE       => "BRAM",
             FWFT_MODE      => false
         )
-        port map(
-            RX_CLK       => CLK_DMA  ,
+        port map (
+            RX_CLK       => CLK_DMA,
             RX_RESET     => RESET_DMA,
 
-            RX_DATA      => UP_MVB_DATA(i)   ,
-            RX_VLD       => UP_MVB_VLD(i)    ,
+            RX_DATA      => UP_MVB_DATA(i),
+            RX_VLD       => UP_MVB_VLD(i),
             RX_SRC_RDY   => UP_MVB_SRC_RDY(i),
             RX_DST_RDY   => UP_MVB_DST_RDY(i),
 
-            TX_CLK       => CLK  ,
+            TX_CLK       => CLK,
             TX_RESET     => RESET,
 
-            TX_DATA      => up_mvb_asfifo_out_data(i)   ,
-            TX_VLD       => up_mvb_asfifo_out_vld(i)    ,
+            TX_DATA      => up_mvb_asfifo_out_data(i),
+            TX_VLD       => up_mvb_asfifo_out_vld(i),
             TX_SRC_RDY   => up_mvb_asfifo_out_src_rdy(i),
             TX_DST_RDY   => up_mvb_asfifo_out_dst_rdy(i)
         );
@@ -338,23 +340,23 @@ begin
 
         up_mvb_shake_on_g: if (MVB_UP_ITEMS /= DMA_MVB_UP_ITEMS) generate
             up_mvb_shake_i : entity work.MVB_SHAKEDOWN
-            generic map(
+            generic map (
                 RX_ITEMS    => DMA_MVB_UP_ITEMS,
                 TX_ITEMS    => MVB_UP_ITEMS,
                 ITEM_WIDTH  => DMA_UPHDR_WIDTH,
                 SHAKE_PORTS => 1
             )
-            port map(
+            port map (
                 CLK        => CLK,
                 RESET      => RESET,
 
-                RX_DATA    => up_mvb_asfifo_out_data(i)   ,
-                RX_VLD     => up_mvb_asfifo_out_vld(i)    ,
+                RX_DATA    => up_mvb_asfifo_out_data(i),
+                RX_VLD     => up_mvb_asfifo_out_vld(i),
                 RX_SRC_RDY => up_mvb_asfifo_out_src_rdy(i),
                 RX_DST_RDY => up_mvb_asfifo_out_dst_rdy(i),
 
                 TX_DATA    => up_mvb_trans_out_data(i),
-                TX_VLD     => up_mvb_trans_out_vld(i) ,
+                TX_VLD     => up_mvb_trans_out_vld(i),
                 TX_NEXT    => (others => up_mvb_trans_out_dst_rdy(i))
             );
 
@@ -375,37 +377,37 @@ begin
         ---------------------------------------------------------------------------
 
         up_mfb_asynch_fifo_i : entity work.MFB_ASFIFOX
-        generic map(
-            DEVICE           => DEVICE            ,
+        generic map (
+            DEVICE           => DEVICE,
             MFB_REGIONS      => DMA_MFB_UP_REGIONS,
-            MFB_REG_SIZE     => MFB_UP_REG_SIZE   ,
-            MFB_BLOCK_SIZE   => MFB_UP_BLOCK_SIZE ,
-            MFB_ITEM_WIDTH   => MFB_UP_ITEM_WIDTH ,
-            FIFO_ITEMS       => UP_ASFIFO_ITEMS   ,
-            OUTPUT_REG       => true              ,
-            RAM_TYPE         => "BRAM"            ,
+            MFB_REG_SIZE     => MFB_UP_REG_SIZE,
+            MFB_BLOCK_SIZE   => MFB_UP_BLOCK_SIZE,
+            MFB_ITEM_WIDTH   => MFB_UP_ITEM_WIDTH,
+            FIFO_ITEMS       => UP_ASFIFO_ITEMS,
+            OUTPUT_REG       => true,
+            RAM_TYPE         => "BRAM",
             FWFT_MODE        => false
         )
-        port map(
-            RX_CLK       => CLK_DMA  ,
+        port map (
+            RX_CLK       => CLK_DMA,
             RX_RESET     => RESET_DMA,
 
-            RX_DATA      => UP_MFB_DATA(i)   ,
+            RX_DATA      => UP_MFB_DATA(i),
             RX_SOF_POS   => UP_MFB_SOF_POS(i),
             RX_EOF_POS   => UP_MFB_EOF_POS(i),
-            RX_SOF       => UP_MFB_SOF(i)    ,
-            RX_EOF       => UP_MFB_EOF(i)    ,
+            RX_SOF       => UP_MFB_SOF(i),
+            RX_EOF       => UP_MFB_EOF(i),
             RX_SRC_RDY   => UP_MFB_SRC_RDY(i),
             RX_DST_RDY   => UP_MFB_DST_RDY(i),
 
-            TX_CLK       => CLK  ,
+            TX_CLK       => CLK,
             TX_RESET     => RESET,
 
-            TX_DATA      => up_mfb_asfifo_out_data(i)   ,
+            TX_DATA      => up_mfb_asfifo_out_data(i),
             TX_SOF_POS   => up_mfb_asfifo_out_sof_pos(i),
             TX_EOF_POS   => up_mfb_asfifo_out_eof_pos(i),
-            TX_SOF       => up_mfb_asfifo_out_sof(i)    ,
-            TX_EOF       => up_mfb_asfifo_out_eof(i)    ,
+            TX_SOF       => up_mfb_asfifo_out_sof(i),
+            TX_EOF       => up_mfb_asfifo_out_eof(i),
             TX_SRC_RDY   => up_mfb_asfifo_out_src_rdy(i),
             TX_DST_RDY   => up_mfb_asfifo_out_dst_rdy(i)
         );
@@ -417,14 +419,14 @@ begin
         ---------------------------------------------------------------------------
 
         up_mfb_transformer_i : entity work.MFB_TRANSFORMER
-        generic map(
+        generic map (
             RX_REGIONS  => DMA_MFB_UP_REGIONS,
             TX_REGIONS  => MFB_UP_REGIONS,
             REGION_SIZE => MFB_UP_REG_SIZE,
             BLOCK_SIZE  => MFB_UP_BLOCK_SIZE,
             ITEM_WIDTH  => MFB_UP_ITEM_WIDTH
         )
-        port map(
+        port map (
             CLK         => CLK,
             RESET       => RESET,
 
@@ -454,7 +456,7 @@ begin
 
     up_mvb_trans_out_payload_g : for i in 0 to DMA_PORTS-1 generate
         up_mvb_trans_out_payload_g2 : for e in 0 to MVB_UP_ITEMS-1 generate
-            up_mvb_trans_out_payload(i)(e) <= '1' when up_mvb_trans_out_data(i)(e*DMA_UPHDR_WIDTH+DMA_REQUEST_TYPE'high downto e*DMA_UPHDR_WIDTH+DMA_REQUEST_TYPE'low)=DMA_TYPE_WRITE else '0';
+            up_mvb_trans_out_payload(i)(e) <= '1' when up_mvb_trans_out_data(i)(e*DMA_UPHDR_WIDTH+DMA_REQUEST_TYPE'high downto e*DMA_UPHDR_WIDTH+DMA_REQUEST_TYPE'low) = DMA_TYPE_WRITE else '0';
         end generate;
     end generate;
 
@@ -475,7 +477,7 @@ begin
 
     dma_up_ports_merge_g : if DMA_PORTS > 1 generate
         dma_up_merger_i : entity work.MFB_MERGER_GEN
-        generic map(
+        generic map (
             MERGER_INPUTS   => DMA_PORTS,
             MVB_ITEMS       => MVB_UP_ITEMS,
             MVB_ITEM_WIDTH  => DMA_UPHDR_WIDTH,
@@ -489,7 +491,7 @@ begin
             OUT_PIPE_EN     => true,
             DEVICE          => DEVICE
         )
-        port map(
+        port map (
             CLK            => CLK,
             RESET          => RESET,
 
@@ -523,26 +525,26 @@ begin
         );
 
         dma_up_merger_fifo_i : entity work.MVB_FIFOX
-        generic map(
-            ITEMS               => MVB_UP_ITEMS   ,
+        generic map (
+            ITEMS               => MVB_UP_ITEMS,
             ITEM_WIDTH          => DMA_UPHDR_WIDTH,
-            FIFO_DEPTH          => 32             ,
-            RAM_TYPE            => "AUTO"         ,
-            DEVICE              => DEVICE         ,
-            ALMOST_FULL_OFFSET  => 0              ,
+            FIFO_DEPTH          => 32,
+            RAM_TYPE            => "AUTO",
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
             ALMOST_EMPTY_OFFSET => 0
         )
-        port map(
-            CLK   => CLK  ,
+        port map (
+            CLK   => CLK,
             RESET => RESET,
 
-            RX_DATA    => up_mvb_merge_out_data   ,
-            RX_VLD     => up_mvb_merge_out_vld    ,
+            RX_DATA    => up_mvb_merge_out_data,
+            RX_VLD     => up_mvb_merge_out_vld,
             RX_SRC_RDY => up_mvb_merge_out_src_rdy,
             RX_DST_RDY => up_mvb_merge_out_dst_rdy,
 
-            TX_DATA    => up_mvb_mrgfi_out_data   ,
-            TX_VLD     => up_mvb_mrgfi_out_vld    ,
+            TX_DATA    => up_mvb_mrgfi_out_data,
+            TX_VLD     => up_mvb_mrgfi_out_vld,
             TX_SRC_RDY => up_mvb_mrgfi_out_src_rdy,
             TX_DST_RDY => up_mvb_mrgfi_out_dst_rdy,
 
@@ -557,26 +559,26 @@ begin
     ---------------------------------------------------------------------------
 
     sum_stored_eof_i : entity work.SUM_ONE
-    generic map(
+    generic map (
         INPUT_WIDTH  => MFB_UP_REGIONS,
         OUTPUT_WIDTH => log2(MFB_UP_REGIONS+1),
         OUTPUT_REG   => True
     )
-    port map(
-        CLK      => CLK  ,
+    port map (
+        CLK      => CLK,
         RESET    => RESET,
 
         DIN      => up_mfb_merge_out_eof,
-        DIN_MASK => (others => '1')     ,
+        DIN_MASK => (others => '1'),
         DIN_VLD  => up_mfb_merge_out_src_rdy and up_mfb_merge_out_dst_rdy,
 
-        DOUT     => s_codapa_inc_sync    ,
+        DOUT     => s_codapa_inc_sync,
         DOUT_VLD => s_codapa_inc_sync_vld
     );
 
     codapa_inc_sync_reg_pr : process (CLK)
     begin
-        if (CLK'event and CLK='1') then
+        if (rising_edge(CLK)) then
             if (s_codapa_inc_sync_vld = '1') then
                 s_codapa_inc_sync_reg <= s_codapa_inc_sync;
             else
@@ -596,40 +598,40 @@ begin
     ---------------------------------------------------------------------------
 
     dma2pcie_hdr_trans_i : entity work.PTC_DMA2PCIE_HDR_TRANSFORM
-    generic map(
-        MVB_ITEMS        => MVB_UP_ITEMS    ,
+    generic map (
+        MVB_ITEMS        => MVB_UP_ITEMS,
         PCIE_UPHDR_WIDTH => PCIE_UPHDR_WIDTH,
-        PCIE_TAG_WIDTH   => PCIE_TAG_WIDTH  ,
+        PCIE_TAG_WIDTH   => PCIE_TAG_WIDTH,
         TRANS_SIZE_WIDTH => DMA_REQUEST_LEN_WIDTH,
         DEVICE           => DEVICE
     )
-    port map(
-        CLK       => CLK  ,
+    port map (
+        CLK       => CLK,
         RESET     => RESET,
 
-        RX_MVB_DATA          => up_mvb_mrgfi_out_data   ,
-        RX_MVB_VLD           => up_mvb_mrgfi_out_vld    ,
+        RX_MVB_DATA          => up_mvb_mrgfi_out_data,
+        RX_MVB_VLD           => up_mvb_mrgfi_out_vld,
         RX_MVB_SRC_RDY       => up_mvb_mrgfi_out_src_rdy,
         RX_MVB_DST_RDY       => up_mvb_mrgfi_out_dst_rdy,
 
-        TAGM_MVB_IN          => tagm_mvb_in         ,
-        TAGM_MVB_IN_VLD      => tagm_mvb_in_vld     ,
-        TAGM_MVB_IN_SRC_RDY  => tagm_mvb_in_src_rdy ,
-        TAGM_MVB_IN_DST_RDY  => tagm_mvb_in_dst_rdy ,
+        TAGM_MVB_IN          => tagm_mvb_in,
+        TAGM_MVB_IN_VLD      => tagm_mvb_in_vld,
+        TAGM_MVB_IN_SRC_RDY  => tagm_mvb_in_src_rdy,
+        TAGM_MVB_IN_DST_RDY  => tagm_mvb_in_dst_rdy,
 
-        TAGM_MVB_OUT         => tagm_mvb_out        ,
-        TAGM_MVB_OUT_TAG     => tagm_mvb_out_tag    ,
-        TAGM_MVB_OUT_VLD     => tagm_mvb_out_vld    ,
+        TAGM_MVB_OUT         => tagm_mvb_out,
+        TAGM_MVB_OUT_TAG     => tagm_mvb_out_tag,
+        TAGM_MVB_OUT_VLD     => tagm_mvb_out_vld,
         TAGM_MVB_OUT_SRC_RDY => tagm_mvb_out_src_rdy,
         TAGM_MVB_OUT_DST_RDY => tagm_mvb_out_dst_rdy,
 
-        TX_MVB_DATA          => up_mvb_dma2pcie_out_data        ,
-        TX_MVB_BE            => up_mvb_dma2pcie_out_be          ,
-        TX_MVB_PAYLOAD       => up_mvb_dma2pcie_out_payload     ,
+        TX_MVB_DATA          => up_mvb_dma2pcie_out_data,
+        TX_MVB_BE            => up_mvb_dma2pcie_out_be,
+        TX_MVB_PAYLOAD       => up_mvb_dma2pcie_out_payload,
         TX_MVB_PAYLOAD_SIZE  => up_mvb_dma2pcie_out_payload_size,
-        TX_MVB_TYPE          => up_mvb_dma2pcie_out_type        ,
-        TX_MVB_VLD           => up_mvb_dma2pcie_out_vld         ,
-        TX_MVB_SRC_RDY       => up_mvb_dma2pcie_out_src_rdy     ,
+        TX_MVB_TYPE          => up_mvb_dma2pcie_out_type,
+        TX_MVB_VLD           => up_mvb_dma2pcie_out_vld,
+        TX_MVB_SRC_RDY       => up_mvb_dma2pcie_out_src_rdy,
         TX_MVB_DST_RDY       => up_mvb_dma2pcie_out_dst_rdy
     );
 
@@ -640,36 +642,36 @@ begin
     ---------------------------------------------------------------------------
 
     codapa_checker : entity work.PTC_CODAPA_CHECKER
-    generic map(
-        MVB_ITEMS           => MVB_UP_ITEMS          ,
-        MVB_ITEM_WIDTH      => PCIE_UPHDR_WIDTH      ,
-        TRANS_SIZE_WIDTH    => DMA_REQUEST_LEN_WIDTH ,
+    generic map (
+        MVB_ITEMS           => MVB_UP_ITEMS,
+        MVB_ITEM_WIDTH      => PCIE_UPHDR_WIDTH,
+        TRANS_SIZE_WIDTH    => DMA_REQUEST_LEN_WIDTH,
         CODAPA_INC_WIDTH    => log2(MFB_UP_REGIONS+1),
-        CODAPA_CNT_WIDTH    => CODAPA_CNT_WIDTH      ,
+        CODAPA_CNT_WIDTH    => CODAPA_CNT_WIDTH,
         DEVICE              => DEVICE
     )
-    port map(
-        CLK     => CLK  ,
+    port map (
+        CLK     => CLK,
         RESET   => RESET,
 
-        RX_MVB_DATA         => up_mvb_dma2pcie_out_data         ,
-        RX_MVB_BE           => up_mvb_dma2pcie_out_be           ,
-        RX_MVB_PAYLOAD      => up_mvb_dma2pcie_out_payload      ,
-        RX_MVB_PAYLOAD_SIZE => up_mvb_dma2pcie_out_payload_size ,
-        RX_MVB_TYPE         => up_mvb_dma2pcie_out_type         ,
-        RX_MVB_VLD          => up_mvb_dma2pcie_out_vld          ,
-        RX_MVB_SRC_RDY      => up_mvb_dma2pcie_out_src_rdy      ,
-        RX_MVB_DST_RDY      => up_mvb_dma2pcie_out_dst_rdy      ,
+        RX_MVB_DATA         => up_mvb_dma2pcie_out_data,
+        RX_MVB_BE           => up_mvb_dma2pcie_out_be,
+        RX_MVB_PAYLOAD      => up_mvb_dma2pcie_out_payload,
+        RX_MVB_PAYLOAD_SIZE => up_mvb_dma2pcie_out_payload_size,
+        RX_MVB_TYPE         => up_mvb_dma2pcie_out_type,
+        RX_MVB_VLD          => up_mvb_dma2pcie_out_vld,
+        RX_MVB_SRC_RDY      => up_mvb_dma2pcie_out_src_rdy,
+        RX_MVB_DST_RDY      => up_mvb_dma2pcie_out_dst_rdy,
 
-        RX_CODAPA_INC       => s_codapa_inc_sync_reg            ,
+        RX_CODAPA_INC       => s_codapa_inc_sync_reg,
 
-        TX_MVB_DATA         => up_mvb_c_checker_out_data        ,
-        TX_MVB_BE           => up_mvb_c_checker_out_be          ,
-        TX_MVB_PAYLOAD      => up_mvb_c_checker_out_payload     ,
+        TX_MVB_DATA         => up_mvb_c_checker_out_data,
+        TX_MVB_BE           => up_mvb_c_checker_out_be,
+        TX_MVB_PAYLOAD      => up_mvb_c_checker_out_payload,
         TX_MVB_PAYLOAD_SIZE => up_mvb_c_checker_out_payload_size,
-        TX_MVB_TYPE         => up_mvb_c_checker_out_type        ,
-        TX_MVB_VLD          => up_mvb_c_checker_out_vld         ,
-        TX_MVB_SRC_RDY      => up_mvb_c_checker_out_src_rdy     ,
+        TX_MVB_TYPE         => up_mvb_c_checker_out_type,
+        TX_MVB_VLD          => up_mvb_c_checker_out_vld,
+        TX_MVB_SRC_RDY      => up_mvb_c_checker_out_src_rdy,
         TX_MVB_DST_RDY      => up_mvb_c_checker_out_dst_rdy
     );
 
@@ -680,48 +682,48 @@ begin
     ---------------------------------------------------------------------------
 
     mfb_hdr_data_merge : entity work.PTC_HDR_DATA_MERGE
-    generic map(
-        MFB_REGIONS         => MFB_UP_REGIONS       ,
-        MFB_REGION_SIZE     => MFB_UP_REG_SIZE      ,
-        MFB_BLOCK_SIZE      => MFB_UP_BLOCK_SIZE    ,
-        MFB_ITEM_WIDTH      => MFB_UP_ITEM_WIDTH    ,
+    generic map (
+        MFB_REGIONS         => MFB_UP_REGIONS,
+        MFB_REGION_SIZE     => MFB_UP_REG_SIZE,
+        MFB_BLOCK_SIZE      => MFB_UP_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_UP_ITEM_WIDTH,
 
-        MVB_ITEMS           => MVB_UP_ITEMS         ,
-        MVB_ITEM_WIDTH      => PCIE_UPHDR_WIDTH     ,
+        MVB_ITEMS           => MVB_UP_ITEMS,
+        MVB_ITEM_WIDTH      => PCIE_UPHDR_WIDTH,
 
-        MFB_FIFO_DEPTH      => HDM_MFB_FIFO_DEPTH   ,
+        MFB_FIFO_DEPTH      => HDM_MFB_FIFO_DEPTH,
 
         TRANS_SIZE_WIDTH    => DMA_REQUEST_LEN_WIDTH,
-        DEVICE              => DEVICE               ,
+        DEVICE              => DEVICE,
         ENDPOINT_TYPE       => ENDPOINT_TYPE
     )
-    port map(
-        CLK     => CLK  ,
+    port map (
+        CLK     => CLK,
         RESET   => RESET,
 
-        RX_MVB_DATA         => up_mvb_c_checker_out_data        ,
-        RX_MVB_BE           => up_mvb_c_checker_out_be          ,
-        RX_MVB_PAYLOAD      => up_mvb_c_checker_out_payload     ,
+        RX_MVB_DATA         => up_mvb_c_checker_out_data,
+        RX_MVB_BE           => up_mvb_c_checker_out_be,
+        RX_MVB_PAYLOAD      => up_mvb_c_checker_out_payload,
         RX_MVB_PAYLOAD_SIZE => up_mvb_c_checker_out_payload_size,
-        RX_MVB_TYPE         => up_mvb_c_checker_out_type        ,
-        RX_MVB_VLD          => up_mvb_c_checker_out_vld         ,
-        RX_MVB_SRC_RDY      => up_mvb_c_checker_out_src_rdy     ,
-        RX_MVB_DST_RDY      => up_mvb_c_checker_out_dst_rdy     ,
+        RX_MVB_TYPE         => up_mvb_c_checker_out_type,
+        RX_MVB_VLD          => up_mvb_c_checker_out_vld,
+        RX_MVB_SRC_RDY      => up_mvb_c_checker_out_src_rdy,
+        RX_MVB_DST_RDY      => up_mvb_c_checker_out_dst_rdy,
 
-        RX_MFB_DATA         => up_mfb_merge_out_data      ,
-        RX_MFB_SOF          => up_mfb_merge_out_sof       ,
-        RX_MFB_EOF          => up_mfb_merge_out_eof       ,
-        RX_MFB_SOF_POS      => up_mfb_merge_out_sof_pos   ,
-        RX_MFB_EOF_POS      => up_mfb_merge_out_eof_pos   ,
-        RX_MFB_SRC_RDY      => up_mfb_merge_out_src_rdy   ,
-        RX_MFB_DST_RDY      => up_mfb_merge_out_dst_rdy   ,
+        RX_MFB_DATA         => up_mfb_merge_out_data,
+        RX_MFB_SOF          => up_mfb_merge_out_sof,
+        RX_MFB_EOF          => up_mfb_merge_out_eof,
+        RX_MFB_SOF_POS      => up_mfb_merge_out_sof_pos,
+        RX_MFB_EOF_POS      => up_mfb_merge_out_eof_pos,
+        RX_MFB_SRC_RDY      => up_mfb_merge_out_src_rdy,
+        RX_MFB_DST_RDY      => up_mfb_merge_out_dst_rdy,
 
         TX_MVB_DATA         => RQ_MVB_HDR_DATA,
-        TX_MVB_VLD          => RQ_MVB_VLD     ,
+        TX_MVB_VLD          => RQ_MVB_VLD,
 
-        TX_MFB_DATA         => RQ_MFB_DATA   ,
-        TX_MFB_SOF          => RQ_MFB_SOF    ,
-        TX_MFB_EOF          => RQ_MFB_EOF    ,
+        TX_MFB_DATA         => RQ_MFB_DATA,
+        TX_MFB_SOF          => RQ_MFB_SOF,
+        TX_MFB_EOF          => RQ_MFB_EOF,
         TX_MFB_SOF_POS      => RQ_MFB_SOF_POS,
         TX_MFB_EOF_POS      => RQ_MFB_EOF_POS,
         TX_MFB_SRC_RDY      => RQ_MFB_SRC_RDY,
@@ -743,24 +745,24 @@ begin
     ---------------------------------------------------------------------------
 
     tag_manager_i : entity work.PTC_TAG_MANAGER
-    generic map(
-        MVB_UP_ITEMS               => MVB_UP_ITEMS    ,
+    generic map (
+        MVB_UP_ITEMS               => MVB_UP_ITEMS,
 
-        MVB_DOWN_ITEMS             => MVB_DOWN_ITEMS  ,
+        MVB_DOWN_ITEMS             => MVB_DOWN_ITEMS,
 
         MFB_DOWN_REGIONS           => MFB_DOWN_REGIONS,
         MFB_DOWN_REG_SIZE          => MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE*MFB_DOWN_ITEM_WIDTH/32,
 
-        DMA_TAG_WIDTH              => DMA_TAG_WIDTH      ,
-        DMA_ID_WIDTH               => DMA_ID_WIDTH       ,
+        DMA_TAG_WIDTH              => DMA_TAG_WIDTH,
+        DMA_ID_WIDTH               => DMA_ID_WIDTH,
 
-        PCIE_TAG_WIDTH             => PCIE_TAG_WIDTH     ,
+        PCIE_TAG_WIDTH             => PCIE_TAG_WIDTH,
         PCIE_LOW_ADDR_WIDTH        => PCIE_LOW_ADDR_WIDTH,
 
-        CHECK_CPL_CREDITS          => not DISABLE_STFIFO ,
-        EXTRA_WORDS                => DOWN_FIFO_ITEMS    ,
+        CHECK_CPL_CREDITS          => not DISABLE_STFIFO,
+        EXTRA_WORDS                => DOWN_FIFO_ITEMS,
 
-        AUTO_ASSIGN_TAGS           => AUTO_ASSIGN_TAGS   ,
+        AUTO_ASSIGN_TAGS           => AUTO_ASSIGN_TAGS,
 
         DMA_IN_FIFO_ITEMS          => 32,
 
@@ -769,34 +771,34 @@ begin
 
         DEVICE                     => DEVICE
     )
-    port map(
-        CLK        => CLK  ,
+    port map (
+        CLK        => CLK,
         RESET      => RESET,
 
-        MVB_UP_HDR_IN           => tagm_mvb_in            ,
-        MVB_UP_HDR_IN_VLD       => tagm_mvb_in_vld        ,
-        MVB_UP_HDR_IN_SRC_RDY   => tagm_mvb_in_src_rdy    ,
-        MVB_UP_HDR_IN_DST_RDY   => tagm_mvb_in_dst_rdy    ,
+        MVB_UP_HDR_IN           => tagm_mvb_in,
+        MVB_UP_HDR_IN_VLD       => tagm_mvb_in_vld,
+        MVB_UP_HDR_IN_SRC_RDY   => tagm_mvb_in_src_rdy,
+        MVB_UP_HDR_IN_DST_RDY   => tagm_mvb_in_dst_rdy,
 
-        MVB_UP_HDR_OUT          => tagm_mvb_out           ,
-        MVB_UP_TAG_OUT          => tagm_mvb_out_tag       ,
-        MVB_UP_HDR_OUT_VLD      => tagm_mvb_out_vld       ,
-        MVB_UP_HDR_OUT_SRC_RDY  => tagm_mvb_out_src_rdy   ,
-        MVB_UP_HDR_OUT_DST_RDY  => tagm_mvb_out_dst_rdy   ,
+        MVB_UP_HDR_OUT          => tagm_mvb_out,
+        MVB_UP_TAG_OUT          => tagm_mvb_out_tag,
+        MVB_UP_HDR_OUT_VLD      => tagm_mvb_out_vld,
+        MVB_UP_HDR_OUT_SRC_RDY  => tagm_mvb_out_src_rdy,
+        MVB_UP_HDR_OUT_DST_RDY  => tagm_mvb_out_dst_rdy,
 
-        TAG_ASSIGN              => TAG_ASSIGN             ,
-        TAG_ASSIGN_VLD          => TAG_ASSIGN_VLD         ,
+        TAG_ASSIGN              => TAG_ASSIGN,
+        TAG_ASSIGN_VLD          => TAG_ASSIGN_VLD,
 
-        TAG                     => tagm_tag               ,
+        TAG                     => tagm_tag,
         TAG_COMPL_LOW_ADDR      => tagm_tag_compl_low_addr,
-        TAG_COMPL_LEN           => tagm_tag_compl_len     ,
-        TAG_RELEASE             => tagm_tag_release       ,
-        TAG_VLD                 => tagm_tag_vld           ,
+        TAG_COMPL_LEN           => tagm_tag_compl_len,
+        TAG_RELEASE             => tagm_tag_release,
+        TAG_VLD                 => tagm_tag_vld,
 
-        DMA_DOWN_HDR_TAG        => tagm_dma_down_tag      ,
-        DMA_DOWN_HDR_ID         => tagm_dma_down_id       ,
+        DMA_DOWN_HDR_TAG        => tagm_dma_down_tag,
+        DMA_DOWN_HDR_ID         => tagm_dma_down_id,
 
-        RCB_SIZE                => RCB_SIZE               ,
+        RCB_SIZE                => RCB_SIZE,
         PCIE_TAG_STATUS         => pcie_tag_status_async
     );
 
@@ -854,9 +856,9 @@ begin
         ---------------------------------------------------------------------------
 
         mfb_get_items_i : entity work.MFB_GET_ITEMS
-        generic map(
-            REGIONS          => MFB_DOWN_REGIONS   ,
-            REGION_SIZE      => MFB_DOWN_REG_SIZE  ,
+        generic map (
+            REGIONS          => MFB_DOWN_REGIONS,
+            REGION_SIZE      => MFB_DOWN_REG_SIZE,
             BLOCK_SIZE       => MFB_DOWN_BLOCK_SIZE,
             ITEM_WIDTH       => MFB_DOWN_ITEM_WIDTH,
 
@@ -866,21 +868,21 @@ begin
 
             EXTRACTED_OFFSET => 0
         )
-        port map(
-            CLK        => CLK  ,
+        port map (
+            CLK        => CLK,
             RESET      => RESET,
 
-            RX_DATA    => RC_MFB_DATA   ,
-            RX_SOF     => RC_MFB_SOF    ,
-            RX_EOF     => RC_MFB_EOF    ,
+            RX_DATA    => RC_MFB_DATA,
+            RX_SOF     => RC_MFB_SOF,
+            RX_EOF     => RC_MFB_EOF,
             RX_SOF_POS => RC_MFB_SOF_POS,
             RX_EOF_POS => RC_MFB_EOF_POS,
             RX_SRC_RDY => RC_MFB_SRC_RDY,
             RX_DST_RDY => RC_MFB_DST_RDY,
 
-            TX_DATA    => down_mfb_cutter_in_data   ,
-            TX_SOF     => down_mfb_cutter_in_sof    ,
-            TX_EOF     => down_mfb_cutter_in_eof    ,
+            TX_DATA    => down_mfb_cutter_in_data,
+            TX_SOF     => down_mfb_cutter_in_sof,
+            TX_EOF     => down_mfb_cutter_in_eof,
             TX_SOF_POS => down_mfb_cutter_in_sof_pos,
             TX_EOF_POS => down_mfb_cutter_in_eof_pos,
             TX_SRC_RDY => down_mfb_cutter_in_src_rdy,
@@ -901,33 +903,33 @@ begin
         ---------------------------------------------------------------------------
 
         mfb_cutter_i : entity work.MFB_CUTTER_SIMPLE
-        generic map(
-            REGIONS      => MFB_DOWN_REGIONS   ,
-            REGION_SIZE  => MFB_DOWN_REG_SIZE  ,
+        generic map (
+            REGIONS      => MFB_DOWN_REGIONS,
+            REGION_SIZE  => MFB_DOWN_REG_SIZE,
             BLOCK_SIZE   => MFB_DOWN_BLOCK_SIZE,
             ITEM_WIDTH   => MFB_DOWN_ITEM_WIDTH,
 
             CUTTED_ITEMS => 96/MFB_DOWN_ITEM_WIDTH
         )
-        port map(
-            CLK    => CLK  ,
+        port map (
+            CLK    => CLK,
             RESET  => RESET,
 
-            RX_DATA    => down_mfb_cutter_in_data   ,
+            RX_DATA    => down_mfb_cutter_in_data,
             RX_SOF_POS => down_mfb_cutter_in_sof_pos,
             RX_EOF_POS => down_mfb_cutter_in_eof_pos,
-            RX_SOF     => down_mfb_cutter_in_sof    ,
-            RX_EOF     => down_mfb_cutter_in_eof    ,
+            RX_SOF     => down_mfb_cutter_in_sof,
+            RX_EOF     => down_mfb_cutter_in_eof,
             RX_SRC_RDY => down_mfb_cutter_in_src_rdy,
             RX_DST_RDY => down_mfb_cutter_in_dst_rdy,
 
             RX_CUT     => (others => '1'),
 
-            TX_DATA    => down_mfb_stfifo_in_data   ,
+            TX_DATA    => down_mfb_stfifo_in_data,
             TX_SOF_POS => down_mfb_stfifo_in_sof_pos,
             TX_EOF_POS => down_mfb_stfifo_in_eof_pos,
-            TX_SOF     => down_mfb_stfifo_in_sof    ,
-            TX_EOF     => down_mfb_stfifo_in_eof    ,
+            TX_SOF     => down_mfb_stfifo_in_sof,
+            TX_EOF     => down_mfb_stfifo_in_eof,
             TX_SRC_RDY => down_mfb_stfifo_in_src_rdy,
             TX_DST_RDY => down_mfb_stfifo_in_dst_rdy
         );
@@ -949,7 +951,7 @@ begin
         down_mfb_stfifo_in_sof_pos <= RC_MFB_SOF_POS;
         down_mfb_stfifo_in_eof_pos <= RC_MFB_EOF_POS;
         down_mfb_stfifo_in_src_rdy <= RC_MFB_SRC_RDY;
-        RC_MFB_DST_RDY <= down_mfb_stfifo_in_dst_rdy;
+        RC_MFB_DST_RDY             <= down_mfb_stfifo_in_dst_rdy;
 
     end generate;
 
@@ -960,108 +962,108 @@ begin
     down_storage_fifo_gen : if (not DISABLE_STFIFO) generate
 
         down_storage_fifo_i : entity work.PTC_STORAGE_FIFO
-        generic map(
-            DEVICE                 => DEVICE             ,
-            MVB_ITEMS              => MVB_DOWN_ITEMS     ,
-            MVB_ITEM_WIDTH         => PCIE_DOWNHDR_WIDTH ,
-            MFB_REGIONS            => MFB_DOWN_REGIONS   ,
-            MFB_REG_SIZE           => MFB_DOWN_REG_SIZE  ,
+        generic map (
+            DEVICE                 => DEVICE,
+            MVB_ITEMS              => MVB_DOWN_ITEMS,
+            MVB_ITEM_WIDTH         => PCIE_DOWNHDR_WIDTH,
+            MFB_REGIONS            => MFB_DOWN_REGIONS,
+            MFB_REG_SIZE           => MFB_DOWN_REG_SIZE,
             MFB_BLOCK_SIZE         => MFB_DOWN_BLOCK_SIZE,
             MFB_ITEM_WIDTH         => MFB_DOWN_ITEM_WIDTH,
-            MAIN_FIFO_ITEMS        => DOWN_FIFO_ITEMS    ,
+            MAIN_FIFO_ITEMS        => DOWN_FIFO_ITEMS,
             INPUT_MFB_FIFOXM_ITEMS => 8
         )
-        port map(
-            CLK     => CLK  ,
+        port map (
+            CLK     => CLK,
             RESET   => RESET,
 
-            RX_MVB_DATA     => down_mvb_stfifo_in_data   ,
-            RX_MVB_VLD      => down_mvb_stfifo_in_vld    ,
+            RX_MVB_DATA     => down_mvb_stfifo_in_data,
+            RX_MVB_VLD      => down_mvb_stfifo_in_vld,
             RX_MVB_SRC_RDY  => down_mvb_stfifo_in_src_rdy,
             RX_MVB_DST_RDY  => down_mvb_stfifo_in_dst_rdy,
 
-            RX_MFB_DATA     => down_mfb_stfifo_in_data   ,
-            RX_MFB_SOF      => down_mfb_stfifo_in_sof    ,
-            RX_MFB_EOF      => down_mfb_stfifo_in_eof    ,
+            RX_MFB_DATA     => down_mfb_stfifo_in_data,
+            RX_MFB_SOF      => down_mfb_stfifo_in_sof,
+            RX_MFB_EOF      => down_mfb_stfifo_in_eof,
             RX_MFB_SOF_POS  => down_mfb_stfifo_in_sof_pos,
             RX_MFB_EOF_POS  => down_mfb_stfifo_in_eof_pos,
             RX_MFB_SRC_RDY  => down_mfb_stfifo_in_src_rdy,
             RX_MFB_DST_RDY  => down_mfb_stfifo_in_dst_rdy,
 
-            TX_MVB_DATA     => down_mvb_pcie2dma_in_data        ,
-            TX_MVB_VLD      => down_mvb_pcie2dma_in_vld         ,
+            TX_MVB_DATA     => down_mvb_pcie2dma_in_data,
+            TX_MVB_VLD      => down_mvb_pcie2dma_in_vld,
             TX_MVB_SRC_RDY  => down_mvb_pcie2dma_in_src_rdy,
-            TX_MVB_DST_RDY  => down_mvb_pcie2dma_in_dst_rdy     ,
+            TX_MVB_DST_RDY  => down_mvb_pcie2dma_in_dst_rdy,
 
-            TX_MFB_DATA     => down_mfb_splfi_in_data        ,
-            TX_MFB_SOF      => down_mfb_splfi_in_sof         ,
-            TX_MFB_EOF      => down_mfb_splfi_in_eof         ,
-            TX_MFB_SOF_POS  => down_mfb_splfi_in_sof_pos     ,
-            TX_MFB_EOF_POS  => down_mfb_splfi_in_eof_pos     ,
+            TX_MFB_DATA     => down_mfb_splfi_in_data,
+            TX_MFB_SOF      => down_mfb_splfi_in_sof,
+            TX_MFB_EOF      => down_mfb_splfi_in_eof,
+            TX_MFB_SOF_POS  => down_mfb_splfi_in_sof_pos,
+            TX_MFB_EOF_POS  => down_mfb_splfi_in_eof_pos,
             TX_MFB_SRC_RDY  => down_mfb_splfi_in_src_rdy,
             TX_MFB_DST_RDY  => down_mfb_splfi_in_dst_rdy
         );
 
-        -- psl assert_down_mfb_fifo_owerflow :
-        --      assert always (not (down_mfb_stfifo_in_dst_rdy = '0' and down_mfb_stfifo_in_src_rdy = '1')) abort (RESET) @rising_edge(CLK)
-        --      report "PTC: No dst_rdy part error! Writing in full DOWN MFB storage FIFO!";
+    -- psl assert_down_mfb_fifo_owerflow :
+    --      assert always (not (down_mfb_stfifo_in_dst_rdy = '0' and down_mfb_stfifo_in_src_rdy = '1')) abort (RESET) @rising_edge(CLK)
+    --      report "PTC: No dst_rdy part error! Writing in full DOWN MFB storage FIFO!";
     else generate
 
         mvb_pipe_i : entity work.MVB_PIPE
-        generic map(
-            ITEMS       => MVB_DOWN_ITEMS    ,
+        generic map (
+            ITEMS       => MVB_DOWN_ITEMS,
             ITEM_WIDTH  => PCIE_DOWNHDR_WIDTH,
-            OPT         => "SRL"             ,
-            FAKE_PIPE   => false             ,
-            USE_DST_RDY => true              ,
+            OPT         => "SRL",
+            FAKE_PIPE   => false,
+            USE_DST_RDY => true,
             DEVICE      => DEVICE
         )
-        port map(
-            CLK        => CLK  ,
+        port map (
+            CLK        => CLK,
             RESET      => RESET,
 
-            RX_DATA    => down_mvb_stfifo_in_data   ,
-            RX_VLD     => down_mvb_stfifo_in_vld    ,
+            RX_DATA    => down_mvb_stfifo_in_data,
+            RX_VLD     => down_mvb_stfifo_in_vld,
             RX_SRC_RDY => down_mvb_stfifo_in_src_rdy,
             RX_DST_RDY => down_mvb_stfifo_in_dst_rdy,
 
-            TX_DATA    => down_mvb_pcie2dma_in_data        ,
-            TX_VLD     => down_mvb_pcie2dma_in_vld         ,
+            TX_DATA    => down_mvb_pcie2dma_in_data,
+            TX_VLD     => down_mvb_pcie2dma_in_vld,
             TX_SRC_RDY => down_mvb_pcie2dma_in_src_rdy,
             TX_DST_RDY => down_mvb_pcie2dma_in_dst_rdy
         );
 
         mfb_pipe_i : entity work.MFB_PIPE
-        generic map(
-         REGIONS     => MFB_DOWN_REGIONS   ,
-         REGION_SIZE => MFB_DOWN_REG_SIZE  ,
-         BLOCK_SIZE  => MFB_DOWN_BLOCK_SIZE,
-         ITEM_WIDTH  => MFB_DOWN_ITEM_WIDTH,
-         META_WIDTH  => 0                  ,
-         FAKE_PIPE   => false              ,
-         USE_DST_RDY => true               ,
-         PIPE_TYPE   => "SHREG"            ,
-         DEVICE      => DEVICE
+        generic map (
+            REGIONS     => MFB_DOWN_REGIONS,
+            REGION_SIZE => MFB_DOWN_REG_SIZE,
+            BLOCK_SIZE  => MFB_DOWN_BLOCK_SIZE,
+            ITEM_WIDTH  => MFB_DOWN_ITEM_WIDTH,
+            META_WIDTH  => 0,
+            FAKE_PIPE   => false,
+            USE_DST_RDY => true,
+            PIPE_TYPE   => "SHREG",
+            DEVICE      => DEVICE
         )
-        port map(
-           CLK        => CLK  ,
-           RESET      => RESET,
+        port map (
+            CLK        => CLK,
+            RESET      => RESET,
 
-           RX_DATA    => down_mfb_stfifo_in_data   ,
-           RX_SOF     => down_mfb_stfifo_in_sof    ,
-           RX_EOF     => down_mfb_stfifo_in_eof    ,
-           RX_SOF_POS => down_mfb_stfifo_in_sof_pos,
-           RX_EOF_POS => down_mfb_stfifo_in_eof_pos,
-           RX_SRC_RDY => down_mfb_stfifo_in_src_rdy,
-           RX_DST_RDY => down_mfb_stfifo_in_dst_rdy,
+            RX_DATA    => down_mfb_stfifo_in_data,
+            RX_SOF     => down_mfb_stfifo_in_sof,
+            RX_EOF     => down_mfb_stfifo_in_eof,
+            RX_SOF_POS => down_mfb_stfifo_in_sof_pos,
+            RX_EOF_POS => down_mfb_stfifo_in_eof_pos,
+            RX_SRC_RDY => down_mfb_stfifo_in_src_rdy,
+            RX_DST_RDY => down_mfb_stfifo_in_dst_rdy,
 
-           TX_DATA    => down_mfb_splfi_in_data        ,
-           TX_SOF     => down_mfb_splfi_in_sof         ,
-           TX_EOF     => down_mfb_splfi_in_eof         ,
-           TX_SOF_POS => down_mfb_splfi_in_sof_pos     ,
-           TX_EOF_POS => down_mfb_splfi_in_eof_pos     ,
-           TX_SRC_RDY => down_mfb_splfi_in_src_rdy,
-           TX_DST_RDY => down_mfb_splfi_in_dst_rdy
+            TX_DATA    => down_mfb_splfi_in_data,
+            TX_SOF     => down_mfb_splfi_in_sof,
+            TX_EOF     => down_mfb_splfi_in_eof,
+            TX_SOF_POS => down_mfb_splfi_in_sof_pos,
+            TX_EOF_POS => down_mfb_splfi_in_eof_pos,
+            TX_SRC_RDY => down_mfb_splfi_in_src_rdy,
+            TX_DST_RDY => down_mfb_splfi_in_dst_rdy
         );
 
     end generate;
@@ -1072,47 +1074,47 @@ begin
     -- PCIe to DMA Header transform
     ---------------------------------------------------------------------------
 
-    down_mvb_pcie2dma_in_dst_rdy <= not down_mvb_tfifo_afull_reg;
+    down_mvb_pcie2dma_in_dst_rdy       <= not down_mvb_tfifo_afull_reg;
     down_mvb_pcie2dma_in_src_rdy_force <= down_mvb_pcie2dma_in_src_rdy and not down_mvb_tfifo_afull_reg;
 
     pcie2dma_hdr_transform_i : entity work.PTC_PCIE2DMA_HDR_TRANSFORM
-    generic map(
-        MVB_ITEMS           => MVB_DOWN_ITEMS    ,
+    generic map (
+        MVB_ITEMS           => MVB_DOWN_ITEMS,
 
         PCIE_DOWNHDR_WIDTH  => PCIE_DOWNHDR_WIDTH,
 
-        DMA_TAG_WIDTH       => DMA_TAG_WIDTH     ,
-        DMA_ID_WIDTH        => DMA_ID_WIDTH      ,
+        DMA_TAG_WIDTH       => DMA_TAG_WIDTH,
+        DMA_ID_WIDTH        => DMA_ID_WIDTH,
 
-        PCIE_TAG_WIDTH      => PCIE_TAG_WIDTH    ,
+        PCIE_TAG_WIDTH      => PCIE_TAG_WIDTH,
         PCIE_LOW_ADDR_WIDTH => PCIE_LOW_ADDR_WIDTH,
 
         DEVICE              => DEVICE
     )
-    port map(
-        CLK      => CLK  ,
+    port map (
+        CLK      => CLK,
         RESET    => RESET,
 
-        RX_MVB_DATA        => down_mvb_pcie2dma_in_data   ,
-        RX_MVB_VLD         => down_mvb_pcie2dma_in_vld    ,
+        RX_MVB_DATA        => down_mvb_pcie2dma_in_data,
+        RX_MVB_VLD         => down_mvb_pcie2dma_in_vld,
         RX_MVB_SRC_RDY     => down_mvb_pcie2dma_in_src_rdy_force,
 
-        TAG                => tagm_tag               ,
+        TAG                => tagm_tag,
         TAG_COMPL_LOW_ADDR => tagm_tag_compl_low_addr,
-        TAG_COMPL_LEN      => tagm_tag_compl_len     ,
-        TAG_RELEASE        => tagm_tag_release       ,
-        TAG_VLD            => tagm_tag_vld           ,
+        TAG_COMPL_LEN      => tagm_tag_compl_len,
+        TAG_RELEASE        => tagm_tag_release,
+        TAG_VLD            => tagm_tag_vld,
 
         DMA_DOWN_HDR_TAG   => tagm_dma_down_tag,
-        DMA_DOWN_HDR_ID    => tagm_dma_down_id ,
+        DMA_DOWN_HDR_ID    => tagm_dma_down_id,
 
-        TX_MVB_DATA        => down_mvb_tfifo_in_data   ,
-        TX_MVB_VLD         => down_mvb_tfifo_in_vld    ,
+        TX_MVB_DATA        => down_mvb_tfifo_in_data,
+        TX_MVB_VLD         => down_mvb_tfifo_in_vld,
         TX_MVB_SRC_RDY     => down_mvb_tfifo_in_src_rdy
     );
 
     down_mvb_tfifo_i : entity work.MVB_FIFOX
-    generic map(
+    generic map (
         ITEMS               => MVB_DOWN_ITEMS,
         ITEM_WIDTH          => DMA_DOWNHDR_WIDTH,
         FIFO_DEPTH          => 16,
@@ -1121,7 +1123,7 @@ begin
         ALMOST_FULL_OFFSET  => 8,
         ALMOST_EMPTY_OFFSET => 0
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
@@ -1160,7 +1162,7 @@ begin
 
     down_mvb_split_in_data_arr <= slv_array_deser(down_mvb_split_in_data,MVB_DOWN_ITEMS);
     down_mvb_split_in_switch_g : for i in 0 to MVB_DOWN_ITEMS-1 generate
-        down_mvb_split_in_tag_arr(i) <= down_mvb_split_in_data_arr(i)(DMA_COMPLETION_TAG);
+        down_mvb_split_in_tag_arr(i)    <= down_mvb_split_in_data_arr(i)(DMA_COMPLETION_TAG);
         down_mvb_split_in_switch_arr(i) <= down_mvb_split_in_tag_arr(i)(DMA_COMPLETION_TAG_W-1 downto DMA_COMPLETION_TAG_W-log2(DMA_PORTS));
     end generate;
     down_mvb_split_in_switch <= slv_array_ser(down_mvb_split_in_switch_arr);
@@ -1183,32 +1185,32 @@ begin
     dma_down_ports_split_g : if DMA_PORTS > 1 generate
         -- FIFO for transactions freed from Storage FIFO, but not yet accepted by the Splitter
         dma_down_splitter_fifo_i : entity work.MFB_FIFOX
-        generic map(
-            REGIONS             => MFB_DOWN_REGIONS           ,
-            REGION_SIZE         => MFB_DOWN_REG_SIZE          ,
-            BLOCK_SIZE          => MFB_DOWN_BLOCK_SIZE        ,
-            ITEM_WIDTH          => MFB_DOWN_ITEM_WIDTH        ,
+        generic map (
+            REGIONS             => MFB_DOWN_REGIONS,
+            REGION_SIZE         => MFB_DOWN_REG_SIZE,
+            BLOCK_SIZE          => MFB_DOWN_BLOCK_SIZE,
+            ITEM_WIDTH          => MFB_DOWN_ITEM_WIDTH,
             FIFO_DEPTH          => 4*(MRRS*4*8)/MFB_DOWN_WIDTH, -- Must fit at least 1 MRRS transaction + possible gap
-            RAM_TYPE            => "AUTO"                     ,
-            DEVICE              => DEVICE                     ,
-            ALMOST_FULL_OFFSET  => 0                          ,
+            RAM_TYPE            => "AUTO",
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
             ALMOST_EMPTY_OFFSET => 0
         )
-        port map(
-            CLK => CLK  ,
+        port map (
+            CLK => CLK,
             RST => RESET,
 
-            RX_DATA     => down_mfb_splfi_in_data   ,
-            RX_SOF      => down_mfb_splfi_in_sof    ,
-            RX_EOF      => down_mfb_splfi_in_eof    ,
+            RX_DATA     => down_mfb_splfi_in_data,
+            RX_SOF      => down_mfb_splfi_in_sof,
+            RX_EOF      => down_mfb_splfi_in_eof,
             RX_SOF_POS  => down_mfb_splfi_in_sof_pos,
             RX_EOF_POS  => down_mfb_splfi_in_eof_pos,
             RX_SRC_RDY  => down_mfb_splfi_in_src_rdy,
             RX_DST_RDY  => down_mfb_splfi_in_dst_rdy,
 
-            TX_DATA     => down_mfb_split_in_data   ,
-            TX_SOF      => down_mfb_split_in_sof    ,
-            TX_EOF      => down_mfb_split_in_eof    ,
+            TX_DATA     => down_mfb_split_in_data,
+            TX_SOF      => down_mfb_split_in_sof,
+            TX_EOF      => down_mfb_split_in_eof,
             TX_SOF_POS  => down_mfb_split_in_sof_pos,
             TX_EOF_POS  => down_mfb_split_in_eof_pos,
             TX_SRC_RDY  => down_mfb_split_in_src_rdy,
@@ -1220,7 +1222,7 @@ begin
         );
 
         dma_down_splitter_i : entity work.MFB_SPLITTER_GEN
-        generic map(
+        generic map (
             SPLITTER_OUTPUTS => DMA_PORTS,
             MVB_ITEMS        => MVB_DOWN_ITEMS,
             MVB_ITEM_WIDTH   => DMA_DOWNHDR_WIDTH,
@@ -1232,7 +1234,7 @@ begin
             OUT_PIPE_EN      => true,
             DEVICE           => DEVICE
         )
-        port map(
+        port map (
             CLK            => CLK,
             RESET          => RESET,
 
@@ -1276,13 +1278,13 @@ begin
 
         down_mvb_resize_down_g: if (MVB_DOWN_ITEMS > DMA_MVB_DOWN_ITEMS) generate
             down_mvb_shake_i : entity work.MVB_SHAKEDOWN
-            generic map(
+            generic map (
                 RX_ITEMS    => MVB_DOWN_ITEMS,
                 TX_ITEMS    => DMA_MVB_DOWN_ITEMS,
                 ITEM_WIDTH  => DMA_DOWNHDR_WIDTH,
                 SHAKE_PORTS => 1
             )
-            port map(
+            port map (
                 CLK        => CLK,
                 RESET      => RESET,
 
@@ -1292,7 +1294,7 @@ begin
                 RX_DST_RDY => down_mvb_trans_in_dst_rdy(i),
 
                 TX_DATA    => down_mvb_asfifo_in_data(i),
-                TX_VLD     => down_mvb_asfifo_in_vld(i) ,
+                TX_VLD     => down_mvb_asfifo_in_vld(i),
                 TX_NEXT    => (others => down_mvb_asfifo_in_dst_rdy(i))
             );
 
@@ -1301,9 +1303,9 @@ begin
 
         down_mvb_resize_up_g: if (MVB_DOWN_ITEMS < DMA_MVB_DOWN_ITEMS) generate
             down_mvb_asfifo_in_data(i)(MVB_DOWN_ITEMS*DMA_DOWNHDR_WIDTH-1 downto 0) <= down_mvb_trans_in_data(i);
-            down_mvb_asfifo_in_vld(i)(MVB_DOWN_ITEMS-1 downto 0) <= down_mvb_trans_in_vld(i);
-            down_mvb_asfifo_in_src_rdy(i) <= down_mvb_trans_in_src_rdy(i);
-            down_mvb_trans_in_dst_rdy(i) <= down_mvb_asfifo_in_dst_rdy(i);
+            down_mvb_asfifo_in_vld(i)(MVB_DOWN_ITEMS-1 downto 0)                    <= down_mvb_trans_in_vld(i);
+            down_mvb_asfifo_in_src_rdy(i)                                           <= down_mvb_trans_in_src_rdy(i);
+            down_mvb_trans_in_dst_rdy(i)                                            <= down_mvb_asfifo_in_dst_rdy(i);
         end generate;
 
         down_mvb_noresize_g: if (MVB_DOWN_ITEMS = DMA_MVB_DOWN_ITEMS) generate
@@ -1320,31 +1322,31 @@ begin
         ---------------------------------------------------------------------------
 
         down_mvb_asynch_fifo_i : entity work.MVB_ASFIFOX
-        generic map(
-            DEVICE             => DEVICE                  ,
-            MVB_ITEM_WIDTH     => DMA_DOWNHDR_WIDTH       ,
-            MVB_ITEMS          => DMA_MVB_DOWN_ITEMS      ,
-            FIFO_ITEMS         => DOWN_ASFIFO_ITEMS       ,
+        generic map (
+            DEVICE             => DEVICE,
+            MVB_ITEM_WIDTH     => DMA_DOWNHDR_WIDTH,
+            MVB_ITEMS          => DMA_MVB_DOWN_ITEMS,
+            FIFO_ITEMS         => DOWN_ASFIFO_ITEMS,
             ALMOST_FULL_OFFSET => DOWN_ASFIFO_AFULL_OFFSET,
-            OUTPUT_REG         => true                    ,
-            RAM_TYPE           => "BRAM"                  ,
+            OUTPUT_REG         => true,
+            RAM_TYPE           => "BRAM",
             FWFT_MODE          => true
         )
-        port map(
-            RX_CLK       => CLK  ,
+        port map (
+            RX_CLK       => CLK,
             RX_RESET     => RESET,
 
-            RX_DATA      => down_mvb_asfifo_in_data(i)   ,
-            RX_VLD       => down_mvb_asfifo_in_vld(i)    ,
+            RX_DATA      => down_mvb_asfifo_in_data(i),
+            RX_VLD       => down_mvb_asfifo_in_vld(i),
             RX_SRC_RDY   => down_mvb_asfifo_in_src_rdy(i),
             RX_DST_RDY   => down_mvb_asfifo_in_dst_rdy(i),
             RX_AFULL     => open,
 
-            TX_CLK       => CLK_DMA  ,
+            TX_CLK       => CLK_DMA,
             TX_RESET     => RESET_DMA,
 
-            TX_DATA      => DOWN_MVB_DATA(i)   ,
-            TX_VLD       => DOWN_MVB_VLD(i)    ,
+            TX_DATA      => DOWN_MVB_DATA(i),
+            TX_VLD       => DOWN_MVB_VLD(i),
             TX_SRC_RDY   => DOWN_MVB_SRC_RDY(i),
             TX_DST_RDY   => DOWN_MVB_DST_RDY(i)
         );
@@ -1356,14 +1358,14 @@ begin
         ---------------------------------------------------------------------------
 
         down_mfb_transformer_i : entity work.MFB_TRANSFORMER
-        generic map(
+        generic map (
             RX_REGIONS  => MFB_DOWN_REGIONS,
             TX_REGIONS  => DMA_MFB_DOWN_REGIONS,
             REGION_SIZE => MFB_DOWN_REG_SIZE,
             BLOCK_SIZE  => MFB_DOWN_BLOCK_SIZE,
             ITEM_WIDTH  => MFB_DOWN_ITEM_WIDTH
         )
-        port map(
+        port map (
             CLK         => CLK,
             RESET       => RESET,
 
@@ -1389,20 +1391,20 @@ begin
         ---------------------------------------------------------------------------
 
         down_mfb_asynch_fifo_i : entity work.MFB_ASFIFOX
-        generic map(
-            DEVICE              => DEVICE                  ,
-            MFB_REGIONS         => DMA_MFB_DOWN_REGIONS    ,
-            MFB_REG_SIZE        => MFB_DOWN_REG_SIZE       ,
-            MFB_BLOCK_SIZE      => MFB_DOWN_BLOCK_SIZE     ,
-            MFB_ITEM_WIDTH      => MFB_DOWN_ITEM_WIDTH     ,
-            FIFO_ITEMS          => DOWN_ASFIFO_ITEMS       ,
+        generic map (
+            DEVICE              => DEVICE,
+            MFB_REGIONS         => DMA_MFB_DOWN_REGIONS,
+            MFB_REG_SIZE        => MFB_DOWN_REG_SIZE,
+            MFB_BLOCK_SIZE      => MFB_DOWN_BLOCK_SIZE,
+            MFB_ITEM_WIDTH      => MFB_DOWN_ITEM_WIDTH,
+            FIFO_ITEMS          => DOWN_ASFIFO_ITEMS,
             ALMOST_FULL_OFFSET  => DOWN_ASFIFO_AFULL_OFFSET,
-            OUTPUT_REG          => true                    ,
-            RAM_TYPE            => "BRAM"                  ,
+            OUTPUT_REG          => true,
+            RAM_TYPE            => "BRAM",
             FWFT_MODE           => true
         )
-        port map(
-            RX_CLK       => CLK  ,
+        port map (
+            RX_CLK       => CLK,
             RX_RESET     => RESET,
 
             RX_DATA      => down_mfb_asfifo_in_data(i),
@@ -1414,14 +1416,14 @@ begin
             RX_DST_RDY   => down_mfb_asfifo_in_dst_rdy(i),
             RX_AFULL     => open,
 
-            TX_CLK       => CLK_DMA  ,
+            TX_CLK       => CLK_DMA,
             TX_RESET     => RESET_DMA,
 
-            TX_DATA      => DOWN_MFB_DATA(i)   ,
+            TX_DATA      => DOWN_MFB_DATA(i),
             TX_SOF_POS   => DOWN_MFB_SOF_POS(i),
             TX_EOF_POS   => DOWN_MFB_EOF_POS(i),
-            TX_SOF       => DOWN_MFB_SOF(i)    ,
-            TX_EOF       => DOWN_MFB_EOF(i)    ,
+            TX_SOF       => DOWN_MFB_SOF(i),
+            TX_EOF       => DOWN_MFB_EOF(i),
             TX_SRC_RDY   => DOWN_MFB_SRC_RDY(i),
             TX_DST_RDY   => DOWN_MFB_DST_RDY(i)
         );
@@ -1434,7 +1436,7 @@ begin
 
     gebug_g: if DBG_ENABLE generate
         dbg_master_i : entity work.STREAMING_DEBUG_MASTER
-        generic map(
+        generic map (
             CONNECTED_PROBES   => DBG_PROBES,
             REGIONS            => 1,
             DEBUG_ENABLED      => true,
@@ -1449,7 +1451,7 @@ begin
             PROBE_NAMES        => DBG_PROBE_STR,
             DEBUG_REG          => true
         )
-        port map(
+        port map (
             CLK           => CLK,
             RESET         => RESET,
 
@@ -1471,10 +1473,10 @@ begin
         );
 
         dbg_probe0_i : entity work.STREAMING_DEBUG_PROBE_MFB
-        generic map(
+        generic map (
             REGIONS => 1
         )
-        port map(
+        port map (
             RX_SOF         => (others => '0'),
             RX_EOF         => (others => '0'),
             RX_SRC_RDY     => up_mfb_merge_out_src_rdy,
@@ -1494,10 +1496,10 @@ begin
         );
 
         dbg_probe1_i : entity work.STREAMING_DEBUG_PROBE_MFB
-        generic map(
+        generic map (
             REGIONS => 1
         )
-        port map(
+        port map (
             RX_SOF         => (others => '0'),
             RX_EOF         => (others => '0'),
             RX_SRC_RDY     => up_mvb_merge_out_src_rdy,
@@ -1517,10 +1519,10 @@ begin
         );
 
         dbg_probe2_i : entity work.STREAMING_DEBUG_PROBE_MFB
-        generic map(
+        generic map (
             REGIONS => 1
         )
-        port map(
+        port map (
             RX_SOF         => (others => '0'),
             RX_EOF         => (others => '0'),
             RX_SRC_RDY     => RQ_MFB_SRC_RDY,
@@ -1540,10 +1542,10 @@ begin
         );
 
         dbg_probe3_i : entity work.STREAMING_DEBUG_PROBE_MFB
-        generic map(
+        generic map (
             REGIONS => 1
         )
-        port map(
+        port map (
             RX_SOF         => (others => '0'),
             RX_EOF         => (others => '0'),
             RX_SRC_RDY     => down_mfb_split_in_src_rdy,
@@ -1563,10 +1565,10 @@ begin
         );
 
         dbg_probe4_i : entity work.STREAMING_DEBUG_PROBE_MFB
-        generic map(
+        generic map (
             REGIONS => 1
         )
-        port map(
+        port map (
             RX_SOF         => (others => '0'),
             RX_EOF         => (others => '0'),
             RX_SRC_RDY     => down_mvb_split_in_src_rdy,
@@ -1586,10 +1588,10 @@ begin
         );
 
         dbg_probe5_i : entity work.STREAMING_DEBUG_PROBE_MFB
-        generic map(
+        generic map (
             REGIONS => 1
         )
-        port map(
+        port map (
             RX_SOF         => (others => '0'),
             RX_EOF         => (others => '0'),
             RX_SRC_RDY     => RC_MFB_SRC_RDY,
@@ -1613,7 +1615,7 @@ begin
         DBG_MI_DRDY <= DBG_MI_RD;
     end generate;
 
-    --pragma synthesis_off
+    -- pragma synthesis_off
     process (CLK)
         variable dbg_rq_cnt_v : unsigned(63 downto 0);
     begin
@@ -1625,7 +1627,7 @@ begin
                 for i in 0 to MFB_UP_REGIONS-1 loop
                     dbg_rq_cnt_v := dbg_rq_cnt_v + RQ_MVB_VLD(i);
                 end loop;
-                    dbg_rq_cnt <= dbg_rq_cnt + dbg_rq_cnt_v;
+                dbg_rq_cnt <= dbg_rq_cnt + dbg_rq_cnt_v;
             end if;
         end if;
     end process;
@@ -1641,7 +1643,7 @@ begin
                 for i in 0 to MFB_DOWN_REGIONS-1 loop
                     dbg_rc_cnt_v := dbg_rc_cnt_v + RC_MVB_VLD(i);
                 end loop;
-                    dbg_rc_cnt <= dbg_rc_cnt + dbg_rc_cnt_v;
+                dbg_rc_cnt <= dbg_rc_cnt + dbg_rc_cnt_v;
             end if;
         end if;
     end process;
@@ -1657,7 +1659,7 @@ begin
                 for i in 0 to MFB_DOWN_REGIONS-1 loop
                     dbg_di_cnt_v := dbg_di_cnt_v + down_mvb_split_in_vld(i);
                 end loop;
-                    dbg_di_mvb_cnt <= dbg_di_mvb_cnt + dbg_di_cnt_v;
+                dbg_di_mvb_cnt <= dbg_di_mvb_cnt + dbg_di_cnt_v;
             end if;
         end if;
     end process;
@@ -1673,10 +1675,10 @@ begin
                 for i in 0 to MFB_DOWN_REGIONS-1 loop
                     dbg_di_cnt_v := dbg_di_cnt_v + down_mfb_split_in_eof(i);
                 end loop;
-                    dbg_di_mfb_cnt <= dbg_di_mfb_cnt + dbg_di_cnt_v;
+                dbg_di_mfb_cnt <= dbg_di_mfb_cnt + dbg_di_cnt_v;
             end if;
         end if;
     end process;
-    --pragma synthesis_on
+    -- pragma synthesis_on
 
 end architecture;

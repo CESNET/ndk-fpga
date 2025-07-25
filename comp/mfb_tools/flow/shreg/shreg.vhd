@@ -11,7 +11,7 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 
 entity MFB_SHREG is
-    generic(
+    generic (
         -- Number of regions within a data word.
         MFB_REGIONS     : natural := 4;
         -- Region size (in blocks).
@@ -25,7 +25,7 @@ entity MFB_SHREG is
         -- FPGA device name.
         DEVICE          : string := "STRATIX10"
     );
-    port(
+    port (
         CLK        : in  std_logic;
         RESET      : in  std_logic;
 
@@ -65,12 +65,12 @@ begin
     shreg_in <= RX_DATA & RX_SOF_POS & RX_EOF_POS & RX_SOF & RX_EOF;
 
     shreg_i : entity work.SH_REG_BASE_STATIC
-    generic map(
+    generic map (
         NUM_BITS   => SHREG_DEPTH,
         DATA_WIDTH => SHREG_W,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         DIN        => shreg_in,
         CE         => TX_DST_RDY,

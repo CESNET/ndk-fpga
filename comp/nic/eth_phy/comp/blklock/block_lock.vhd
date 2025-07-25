@@ -11,7 +11,7 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 
 entity BLOCK_LOCK is
-    generic(
+    generic (
         -- number of correct headers to aquire lock, eg. number of sampled headers
         SH_CNT_MAX          : integer := 64;
 
@@ -75,7 +75,7 @@ architecture RTL of BLOCK_LOCK is
 begin
 
     -- FSM state process
-    fsm_state_p : process(CLK, RST)
+    fsm_state_p : process (CLK, RST)
     begin
         if (RST = '1') then
             curr_state <= INIT;
@@ -85,7 +85,7 @@ begin
     end process;
 
     -- FSM next state logic
-    fsm_next_state_logic_p : process(curr_state, RX_HEADER_VALID, header_found, sh_cnt, sh_invalid_cnt, rx_lock_aquired_r, RST, slip_wait_reg)
+    fsm_next_state_logic_p : process (curr_state, RX_HEADER_VALID, header_found, sh_cnt, sh_invalid_cnt, rx_lock_aquired_r, RST, slip_wait_reg)
     begin
         case curr_state is
             when INIT =>
@@ -127,19 +127,19 @@ begin
     end process;
 
     -- FSM output logic
-    fsm_output_logic_p : process(curr_state)
+    fsm_output_logic_p : process (curr_state)
     begin
-        sh_cnt_rst <= '0';
+        sh_cnt_rst         <= '0';
         sh_invalid_cnt_rst <= '0';
-        sh_cnt_en <= '0';
-        slip_cmd_sig <= '0';
+        sh_cnt_en          <= '0';
+        slip_cmd_sig       <= '0';
 
         case curr_state is
             when INIT =>
                 null;
 
             when RESET_CNT =>
-                sh_cnt_rst <= '1';
+                sh_cnt_rst         <= '1';
                 sh_invalid_cnt_rst <= '1';
 
             when TEST_SH =>
@@ -162,7 +162,7 @@ begin
     header_found <= '1' when (RX_HEADER_IN = "10" or RX_HEADER_IN = "01") else '0';
 
     -- lock aquired register process
-    rx_lock_aquired_p : process(CLK)
+    rx_lock_aquired_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (curr_state = LOCK) then
@@ -174,7 +174,7 @@ begin
     end process;
 
     -- counter counting number of incoming valid (RX_HEADER_VALID = '1') headers
-    sh_cnt_p : process(CLK)
+    sh_cnt_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (sh_cnt_rst = '1') then
@@ -186,7 +186,7 @@ begin
     end process;
 
     -- counter of incorrect headers
-    sh_invalid_cnt_p : process(CLK)
+    sh_invalid_cnt_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (sh_invalid_cnt_rst = '1') then
@@ -198,14 +198,14 @@ begin
     end process;
 
     -- shift register to wait for SLIP_WAIT_TIME cycles after slip command was set log. 1
-    slip_wait_p : process(CLK, RST)
+    slip_wait_p : process (CLK, RST)
     begin
-        if RST = '1' then
+        if (RST = '1') then
             slip_wait_reg <= (others => '0');
         elsif rising_edge(CLK) then
-            if next_state = SLIP and slip_wait_reg = (slip_wait_reg'range => '0') then
+            if (next_state = SLIP and slip_wait_reg = (slip_wait_reg'range => '0')) then
                 slip_wait_reg(0) <= '1';
-            elsif not (slip_wait_reg = (slip_wait_reg'range => '0')) then
+            elsif (not (slip_wait_reg = (slip_wait_reg'range => '0'))) then
                 slip_wait_reg <= slip_wait_reg(SLIP_WAIT_TIME - 2 downto 0) & '0';
             end if;
         end if;
@@ -214,9 +214,9 @@ begin
     -- if pulse on slip is needed, generate rising edge detector on slip_cmd_sig
     pulse_g : if SLIP_PULSE generate
 
-        slip_cmd_p : process(CLK, RST, slip_cmd_sig)
+        slip_cmd_p : process (CLK, RST, slip_cmd_sig)
         begin
-            if RST = '1' then
+            if (RST = '1') then
                 slip_cmd_reg <= '0';
             elsif rising_edge(CLK) then
                 slip_cmd_reg <= slip_cmd_sig;

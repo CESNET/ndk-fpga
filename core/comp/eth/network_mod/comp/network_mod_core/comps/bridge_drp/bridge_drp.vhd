@@ -10,13 +10,13 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity BRIDGE_DRP is
-    generic(
+    generic (
         MI_DATA_WIDTH_PHY : natural := 32;
         MI_ADDR_WIDTH_PHY : natural := 18;
         MI_SEL_RANGE      : natural := 16;
         MI_EN_MAP         : std_logic_vector(MI_SEL_RANGE-1 downto 0) := (others => '0')
     );
-    port(
+    port (
         -- MGMT_DRP interface
         DRPCLK                  : in  std_logic;
         DRPDO                   : out std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
@@ -40,30 +40,30 @@ entity BRIDGE_DRP is
 end entity;
 
 architecture FULL of BRIDGE_DRP is
-    signal drp_sel   : std_logic_vector (DRPSEL'range);
+    signal drp_sel     : std_logic_vector (DRPSEL'range);
     signal drpardy_vld : std_logic;
     signal drp_rd_sig  : std_logic;
 
 begin
     -- Store mi_ia_sel for read operations
-    sel_reg_p: process(DRPCLK)
+    sel_reg_p : process (DRPCLK)
     begin
         if rising_edge(DRPCLK) then
-            if DRPEN = '1' then
+            if (DRPEN = '1') then
                 drp_sel <= DRPSEL;
             end if;
             -- DRPARDY is valid one clock cycle after DRPEN at the earliest
             drpardy_vld <= DRPEN;
             if (DRP_DRDY = '1') then
                 drp_rd_sig <= '0';
-            elsif (DRPEN = '1') and (DRPWE = '0') then
+            elsif ((DRPEN = '1') and (DRPWE = '0')) then
                 drp_rd_sig <= '1';
             end if;
         end if;
     end process;
 
     -- Assign WR/RD signals for Eth blocks
-    drd_mux_p: process(all)
+    drd_mux_p : process (all)
     begin
         for j in 0 to MI_SEL_RANGE-1 loop
             if (MI_EN_MAP(j) = '1') then

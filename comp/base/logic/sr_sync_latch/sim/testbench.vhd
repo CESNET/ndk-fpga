@@ -27,44 +27,46 @@ architecture BEHAVIORAL of TESTBENCH is
     signal data_in   : std_logic_vector((DATA_WIDTH - 1) downto 0);
     signal latch_out : std_logic_vector((DATA_WIDTH - 1) downto 0);
 
-    constant clk_period : time := 2640 ps;
+    constant CLK_PERIOD : time := 2640 ps;
 begin  -- architecture BEHAVIORAL
 
     -- component instantiation
     uut_i: entity work.SR_SYNC_LATCH
-        generic map (
-            DATA_WIDTH => DATA_WIDTH)
-        port map (
-            CLK       => clk,
-            SET       => set,
-            RESET     => reset,
-            LATCH_OUT => latch_out);
+    generic map (
+        DATA_WIDTH => DATA_WIDTH
+    )
+    port map (
+        CLK       => clk,
+        SET       => set,
+        RESET     => reset,
+        LATCH_OUT => latch_out
+    );
 
--- clock generation
-    clk_p: process
+    -- clock generation
+    clk_p : process
     begin
         clk <= '0';
-        wait for clk_period/2;
+        wait for CLK_PERIOD/2;
         clk <= '1';
-        wait for clk_period/2;
+        wait for CLK_PERIOD/2;
     end process;
 
     -- waveform generation
-    stim_p: process
+    stim_p : process
     begin
         -- insert signal assignments here
         reset <= '1';
         wait for 1 US;
         reset <= '0';
-        set <= '0';
+        set   <= '0';
 
-        wait for 10*clk_period;
+        wait for 10*CLK_PERIOD;
 
         data_in <= "1001";
-        wait for 10*clk_period;
+        wait for 10*CLK_PERIOD;
 
         set <= '1';
-        wait for clk_period;
+        wait for CLK_PERIOD;
         set <= '0';
 
         wait for 1 US;
@@ -74,13 +76,13 @@ begin  -- architecture BEHAVIORAL
 
         wait for 1 US;
         set <= '1';
-        wait for clk_period;
+        wait for CLK_PERIOD;
         set <= '0';
 
         wait for 1 US;
 
         reset <= '1';
-        wait for clk_period;
+        wait for CLK_PERIOD;
         reset <= '0';
 
         wait;

@@ -15,7 +15,7 @@ use work.type_pack.all;
 use work.math_pack.all;
 
 entity DMA_MFB_GENERATOR is
-    Generic (
+    generic (
         -- number of regions in a data word
         REGIONS        : natural := 2;
         -- number of blocks in a region
@@ -44,7 +44,7 @@ entity DMA_MFB_GENERATOR is
         -- FPGA device string
         DEVICE         : string  := "STRATIX10"
     );
-    Port (
+    port (
         -- ---------------------------------------------------------------------
         -- MI32 interface
         -- ---------------------------------------------------------------------
@@ -121,22 +121,22 @@ architecture FULL of DMA_MFB_GENERATOR is
     signal mfb_gen_src_rdy  : std_logic;
     signal mfb_gen_dst_rdy  : std_logic;
 
-    signal mfb_gen_meta_arr : slv_array_t(REGIONS-1 downto 0)(DMA_CHANNELS_WIDTH+LENGTH_WIDTH-1 downto 0);
-    signal pkt_len          : slv_array_t(REGIONS-1 downto 0)(LENGTH_WIDTH-1 downto 0);
-    signal dma_meta_hdr_data: slv_array_t(REGIONS-1 downto 0)(HDR_META_WIDTH-1 downto 0) := (others => (others => '0'));
-    signal dma_hdr_data     : slv_array_t(REGIONS-1 downto 0)(NPP_HDR_SIZE*8-1 downto 0);
-    signal dma_channel      : slv_array_t(REGIONS-1 downto 0)(DMA_CHANNELS_WIDTH-1 downto 0);
-    signal dma_blk_len      : slv_array_t(REGIONS-1 downto 0)(log2(PKT_MTU/8+1)-1 downto 0);
+    signal mfb_gen_meta_arr  : slv_array_t(REGIONS-1 downto 0)(DMA_CHANNELS_WIDTH+LENGTH_WIDTH-1 downto 0);
+    signal pkt_len           : slv_array_t(REGIONS-1 downto 0)(LENGTH_WIDTH-1 downto 0);
+    signal dma_meta_hdr_data : slv_array_t(REGIONS-1 downto 0)(HDR_META_WIDTH-1 downto 0) := (others => (others => '0'));
+    signal dma_hdr_data      : slv_array_t(REGIONS-1 downto 0)(NPP_HDR_SIZE*8-1 downto 0);
+    signal dma_channel       : slv_array_t(REGIONS-1 downto 0)(DMA_CHANNELS_WIDTH-1 downto 0);
+    signal dma_blk_len       : slv_array_t(REGIONS-1 downto 0)(log2(PKT_MTU/8+1)-1 downto 0);
 
 begin
 
     mi_clk_diff_g : if (not SAME_CLK) generate
 
         mi_async_i : entity work.MI_ASYNC
-        generic map(
+        generic map (
             DEVICE => DEVICE
         )
-        port map(
+        port map (
             -- Master interface
             CLK_M     => MI_CLK,
             RESET_M   => MI_RESET,
@@ -177,7 +177,7 @@ begin
     end generate;
 
     mi_pipe_i : entity work.MI_PIPE
-    generic map(
+    generic map (
         DEVICE      => DEVICE,
         DATA_WIDTH  => 32,
         ADDR_WIDTH  => 32,
@@ -185,7 +185,7 @@ begin
         USE_OUTREG  => True,
         FAKE_PIPE   => (not MI_PIPE_EN)
     )
-    port map(
+    port map (
         -- Common interface
         CLK      => CLK,
         RESET    => RESET,
@@ -212,7 +212,7 @@ begin
     );
 
     mfb_generator_i : entity work.MFB_GENERATOR_MI32
-    generic map(
+    generic map (
         REGIONS        => REGIONS,
         REGION_SIZE    => REGION_SIZE,
         BLOCK_SIZE     => BLOCK_SIZE,
@@ -222,7 +222,7 @@ begin
         CHANNELS_WIDTH => DMA_CHANNELS_WIDTH,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK            => CLK,
         RST            => RESET,
 
@@ -248,11 +248,11 @@ begin
     mfb_gen_meta_arr <= slv_array_deser(mfb_gen_meta,REGIONS,(DMA_CHANNELS_WIDTH+LENGTH_WIDTH));
 
     dma_hdr_instr_g : for i in 0 to REGIONS-1 generate
-        pkt_len(i)           <= mfb_gen_meta_arr(i)(LENGTH_WIDTH-1 downto 0);
-        dma_channel(i)       <= mfb_gen_meta_arr(i)(LENGTH_WIDTH+DMA_CHANNELS_WIDTH-1 downto LENGTH_WIDTH);
-        dma_blk_len(i)       <= std_logic_vector(resize(enlarge_right(round_up(resize(unsigned(pkt_len(i)),LENGTH_WIDTH+1),3),-3),log2(PKT_MTU/8+1)));
+        pkt_len(i)                                <= mfb_gen_meta_arr(i)(LENGTH_WIDTH-1 downto 0);
+        dma_channel(i)                            <= mfb_gen_meta_arr(i)(LENGTH_WIDTH+DMA_CHANNELS_WIDTH-1 downto LENGTH_WIDTH);
+        dma_blk_len(i)                            <= std_logic_vector(resize(enlarge_right(round_up(resize(unsigned(pkt_len(i)),LENGTH_WIDTH+1),3),-3),log2(PKT_MTU/8+1)));
         dma_meta_hdr_data(i)(USER_HDR_FLAG_INDEX) <= '1';
-        dma_hdr_data(i)      <= "0000" & dma_meta_hdr_data(i) & std_logic_vector(resize(unsigned(pkt_len(i)),NPP_HDR_SIZE*8-4-HDR_META_WIDTH));
+        dma_hdr_data(i)                           <= "0000" & dma_meta_hdr_data(i) & std_logic_vector(resize(unsigned(pkt_len(i)),NPP_HDR_SIZE*8-4-HDR_META_WIDTH));
     end generate;
 
     mfb_gen_dst_rdy <= INSTR_MVB_DST_RDY and ETH_MFB_DST_RDY;
@@ -297,7 +297,7 @@ begin
                     for i in 0 to REGIONS-1 loop
                         tmp_sof_pos := resize(unsigned(mfb_gen_sof_pos((i+1)*max(1,log2(REGION_SIZE))-1 downto i*max(1,log2(REGION_SIZE)))),log2(REGION_SIZE));
                         for e in 0 to REGION_SIZE-1 loop
-                            if (mfb_gen_sof(i)='1' and (REGION_SIZE<=1 or tmp_sof_pos=e)) then
+                            if (mfb_gen_sof(i) = '1' and (REGION_SIZE <= 1 or tmp_sof_pos = e)) then
                                 ETH_MFB_DATA(i*REGION_WIDTH+e*BLOCK_WIDTH+NPP_HDR_SIZE*8-1 downto i*REGION_WIDTH+e*BLOCK_WIDTH) <= dma_hdr_data(i);
                             end if;
                         end loop;

@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_CRC_INSERT is
-    generic(
+    generic (
         -- Number of regions within a data word.
         MFB_REGIONS     : natural := 4;
         -- Region size (in blocks).
@@ -24,7 +24,7 @@ entity TX_MAC_LITE_CRC_INSERT is
         -- FPGA device name.
         DEVICE          : string := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         --  CLOCK AND RESET
         -- =====================================================================
@@ -153,11 +153,11 @@ begin
     --  FIFOX MULTI
     -- =========================================================================
 
-    crc_fifoxm_wr <= RX_MVB_CRC_VLD and RX_MVB_CRC_SRC_RDY;
+    crc_fifoxm_wr      <= RX_MVB_CRC_VLD and RX_MVB_CRC_SRC_RDY;
     RX_MVB_CRC_DST_RDY <= not crc_fifoxm_full;
 
     crc_fifoxm_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH          => CRC_W,
         ITEMS               => 32,
         WRITE_PORTS         => MFB_REGIONS,
@@ -168,7 +168,7 @@ begin
         ALMOST_EMPTY_OFFSET => 0,
         SAFE_READ_MODE      => false
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RESET,
 
@@ -199,7 +199,7 @@ begin
         for i in 0 to MFB_REGIONS-1 loop
             if (reg0_mfb_eof(i) = '1') then
                 v_crc_accept(v_eof_index) := '1';
-                v_eof_index := v_eof_index + 1;
+                v_eof_index               := v_eof_index + 1;
             end if;
         end loop;
         crc_accept <= v_crc_accept;
@@ -220,7 +220,7 @@ begin
         v_eof_index := 0;
         for i in 0 to MFB_REGIONS-1 loop
             crc32_data_shifted_arr(i) <= crc32_data_arr(v_eof_index);
-            if (reg0_mfb_EOF(i) = '1') then
+            if (reg0_mfb_eof(i) = '1') then
                 v_eof_index := v_eof_index + 1;
             end if;
         end loop;
@@ -244,16 +244,16 @@ begin
     end generate;
 
     crc_insert_p : process (all)
-        variable v_crc_offset : integer := 0;
+        variable v_crc_offset       : integer := 0;
         variable v_ci_mfb_data_plus : std_logic_vector(MFB_DATA_W+CRC_W-1 downto 0);
     begin
         v_ci_mfb_data_plus := ci_mfb_data_plus_masked;
-        crc_byte_en <= (others => '0');
+        crc_byte_en        <= (others => '0');
         for i in 0 to MFB_REGIONS-1 loop
             v_crc_offset := to_integer(unsigned(reg0_mfb_eof_pos_arr(i))) + i*MFB_REGION_SIZE*MFB_BLOCK_SIZE + 1;
             if (reg0_mfb_eof(i) = '1' and ci_mfb_src_rdy = '1') then
                 v_ci_mfb_data_plus(v_crc_offset*8+CRC_W-1 downto v_crc_offset*8) := crc32_data_shifted_arr(i);
-                crc_byte_en(v_crc_offset+4-1 downto v_crc_offset) <= "1111";
+                crc_byte_en(v_crc_offset+4-1 downto v_crc_offset)                <= "1111";
             end if;
         end loop;
         ci_mfb_data_plus <= v_ci_mfb_data_plus;
@@ -264,17 +264,17 @@ begin
         if rising_edge(CLK) then
             if (ci_mfb_dst_rdy = '1') then
                 ci_mfb_plus_mask_reg <= ci_mfb_data_plus(MFB_DATA_W+CRC_W-1 downto MFB_DATA_W);
-                crc_byte_en_reg <= crc_byte_en(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE+4-1 downto MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE);
+                crc_byte_en_reg      <= crc_byte_en(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE+4-1 downto MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE);
             end if;
         end if;
     end process;
 
-    ci_mfb_data    <= ci_mfb_data_plus(MFB_DATA_W-1 downto 0);
-    ci_mfb_sof     <= reg0_mfb_sof and reg0_mfb_src_rdy;
-    ci_mfb_eof     <= reg0_mfb_eof and reg0_mfb_src_rdy;
-    ci_mfb_sof_pos <= reg0_mfb_sof_pos;
-    ci_mfb_eof_pos <= reg0_mfb_eof_pos;
-    ci_mfb_src_rdy <= reg0_mfb_src_rdy;
+    ci_mfb_data      <= ci_mfb_data_plus(MFB_DATA_W-1 downto 0);
+    ci_mfb_sof       <= reg0_mfb_sof and reg0_mfb_src_rdy;
+    ci_mfb_eof       <= reg0_mfb_eof and reg0_mfb_src_rdy;
+    ci_mfb_sof_pos   <= reg0_mfb_sof_pos;
+    ci_mfb_eof_pos   <= reg0_mfb_eof_pos;
+    ci_mfb_src_rdy   <= reg0_mfb_src_rdy;
     reg0_mfb_dst_rdy <= ci_mfb_dst_rdy;
 
     -- =========================================================================
@@ -290,7 +290,7 @@ begin
 
         process (all)
         begin
-            ci_mfb_eof_new(i) <= ci_mfb_eof(i);
+            ci_mfb_eof_new(i)         <= ci_mfb_eof(i);
             ci_mfb_eof_pos_new_arr(i) <= ci_mfb_eof_pos_val_arr(i+1);
 
             -- EOF in current region overflowed to next region
@@ -300,7 +300,7 @@ begin
 
             -- EOF from previous region overflowed to current region
             if (ci_mfb_eof_pos_over(i) = '1') then
-                ci_mfb_eof_new(i) <= '1';
+                ci_mfb_eof_new(i)         <= '1';
                 ci_mfb_eof_pos_new_arr(i) <= ci_mfb_eof_pos_val_arr(i);
             end if;
         end process;

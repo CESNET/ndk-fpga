@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MFB_FRAME_EXTENDER_DATAMOVER is
-    generic(
+    generic (
         REGIONS        : natural := 4;
         REGION_SIZE    : natural := 8;
         BLOCK_SIZE     : natural := 8;
@@ -22,7 +22,7 @@ entity MFB_FRAME_EXTENDER_DATAMOVER is
         LEN_WIDTH      : natural := 14;
         DEVICE         : string  := "AGILEX"
     );
-    port(
+    port (
         CLK                 : in  std_logic;
         RESET               : in  std_logic;
 
@@ -108,7 +108,7 @@ begin
     -- -------------------------------------------------------------------------
 
     blk_vld_i : entity work.MFB_AUXILIARY_SIGNALS
-    generic map(
+    generic map (
         REGIONS       => REGIONS,
         REGION_SIZE   => REGION_SIZE,
         BLOCK_SIZE    => BLOCK_SIZE,
@@ -118,7 +118,7 @@ begin
         BLOCK_AUX_EN  => True,
         ITEM_AUX_EN   => False
     )
-    port map(
+    port map (
         CLK              => CLK,
         RESET            => RESET,
 
@@ -152,22 +152,22 @@ begin
 
     process (CLK)
     begin
-    if (rising_edge(CLK)) then
-        if (s_rx_dst_rdy = '1') then
-            s_rx_data_reg0 <= s_rx_data;
+        if (rising_edge(CLK)) then
+            if (s_rx_dst_rdy = '1') then
+                s_rx_data_reg0 <= s_rx_data;
+            end if;
         end if;
-    end if;
     end process;
 
     process (CLK)
     begin
-    if (rising_edge(CLK)) then
-        if (RESET = '1') then
-            s_rx_valid_reg0 <= (others => '0');
-        elsif (s_rx_dst_rdy = '1') then
-            s_rx_valid_reg0 <= s_rx_valid and RX_MFB_SRC_RDY;
+        if (rising_edge(CLK)) then
+            if (RESET = '1') then
+                s_rx_valid_reg0 <= (others => '0');
+            elsif (s_rx_dst_rdy = '1') then
+                s_rx_valid_reg0 <= s_rx_valid and RX_MFB_SRC_RDY;
+            end if;
         end if;
-    end if;
     end process;
 
     -- -------------------------------------------------------------------------
@@ -177,7 +177,7 @@ begin
     s_rx_dst_rdy <= not s_fifox_full;
 
     fifox_multi_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH          => BLOCK_SIZE*ITEM_WIDTH,
         ITEMS               => REGIONS*REGION_SIZE*FIFO_DEPTH,
         WRITE_PORTS         => REGIONS*REGION_SIZE,
@@ -188,7 +188,7 @@ begin
         ALMOST_FULL_OFFSET  => 1,
         ALMOST_EMPTY_OFFSET => 1
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RESET,
 
@@ -205,25 +205,25 @@ begin
 
     s_fifox_vld <= not s_fifox_empty;
 
-   -- ==========================================================================
-   --  0. LOGIC STAGE
-   -- ==========================================================================
+    -- ==========================================================================
+    --  0. LOGIC STAGE
+    -- ==========================================================================
 
-   -- data block array, only for debug
-   s_rx_data_arr <= slv_array_deser(s_fifox_data, WORD_BLOCKS, BLOCK_WIDTH);
+    -- data block array, only for debug
+    s_rx_data_arr <= slv_array_deser(s_fifox_data, WORD_BLOCKS, BLOCK_WIDTH);
 
-   -- control of packet template destination ready
-   RX_CTRL_DST_RDY <= (TX_MFB_DST_RDY and RX_CTRL_INSERT_VLD and s_fifox_rdy) or
+    -- control of packet template destination ready
+    RX_CTRL_DST_RDY <= (TX_MFB_DST_RDY and RX_CTRL_INSERT_VLD and s_fifox_rdy) or
                       (TX_MFB_DST_RDY and not RX_CTRL_INSERT_VLD) or
                       (not RX_CTRL_SRC_RDY);
 
-   -- control of payload accept
-   s_last_addr <= unsigned(RX_CTRL_INSERT_MOVE(REGIONS*REGION_SIZE-1));
-   s_fifox_rdy <= s_fifox_vld(to_integer(s_last_addr));
-   s_fifox_rd  <= RX_CTRL_INSERT_MASK and RX_CTRL_INSERT_VLD and TX_MFB_DST_RDY and s_fifox_rdy;
+    -- control of payload accept
+    s_last_addr <= unsigned(RX_CTRL_INSERT_MOVE(REGIONS*REGION_SIZE-1));
+    s_fifox_rdy <= s_fifox_vld(to_integer(s_last_addr));
+    s_fifox_rd  <= RX_CTRL_INSERT_MASK and RX_CTRL_INSERT_VLD and TX_MFB_DST_RDY and s_fifox_rdy;
 
-   -- control of output source ready
-   s_src_rdy <= (RX_CTRL_SRC_RDY and RX_CTRL_INSERT_VLD and s_fifox_rdy) or
+    -- control of output source ready
+    s_src_rdy <= (RX_CTRL_SRC_RDY and RX_CTRL_INSERT_VLD and s_fifox_rdy) or
                 (RX_CTRL_SRC_RDY and not RX_CTRL_INSERT_VLD);
 
     -- =========================================================================
@@ -262,20 +262,20 @@ begin
 
     block_mux_g : for i in 0 to WORD_BLOCKS-1 generate
         block_mux_i : entity work.GEN_MUX
-        generic map(
+        generic map (
             DATA_WIDTH => BLOCK_WIDTH,
             MUX_WIDTH  => i+1
         )
-        port map(
+        port map (
             DATA_IN  => s_data_reg0((i+1)*BLOCK_WIDTH-1 downto 0),
             SEL      => s_mux_sel_reg0(i)(max(1,log2(i+1))-1 downto 0),
             DATA_OUT => s_muxed_data(i)
         );
     end generate;
 
-   -- ==========================================================================
-   --  1. REGISTER STAGE
-   -- ==========================================================================
+    -- ==========================================================================
+    --  1. REGISTER STAGE
+    -- ==========================================================================
 
     process (CLK)
     begin

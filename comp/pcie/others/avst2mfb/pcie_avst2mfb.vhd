@@ -13,10 +13,10 @@ use work.type_pack.all;
 use work.math_pack.all;
 
 entity PCIE_AVST2MFB is
-    Generic(
+    generic (
         REGIONS            : natural := 2;
-        REGION_SIZE        : natural := 1; -- not to be changed
-        BLOCK_SIZE         : natural := 8; -- not to be changed
+        REGION_SIZE        : natural := 1;  -- not to be changed
+        BLOCK_SIZE         : natural := 8;  -- not to be changed
         ITEM_WIDTH         : natural := 32; -- not to be changed
         META_WIDTH         : natural := 8;
         AVALON_RDY_LATENCY : natural := 1;
@@ -25,7 +25,7 @@ entity PCIE_AVST2MFB is
         FIFO_RAM_TYPE      : string  := "AUTO";
         DEVICE             : string  := "STRATIX10"
     );
-    Port(
+    port (
         CLK            : in  std_logic;
         RST            : in  std_logic;
         -- rx interface
@@ -47,7 +47,7 @@ entity PCIE_AVST2MFB is
     );
 end entity;
 
-architecture behav of PCIE_AVST2MFB is
+architecture BEHAV of PCIE_AVST2MFB is
 
     constant META_SIGNAL_WIDTH : natural := REGIONS*META_WIDTH;
     constant DATA_WIDTH        : natural := REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
@@ -96,7 +96,7 @@ begin
             end if;
         end process;
 
-        avst_ready_reg_p :process (CLK)
+        avst_ready_reg_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 if (RST = '1') then
@@ -108,14 +108,14 @@ begin
         end process;
 
         fifox_i: entity work.FIFOX
-        generic map(
-           DATA_WIDTH         => FIFO_DATA_WIDTH,
-           ITEMS              => FIFO_DEPTH,
-           ALMOST_FULL_OFFSET => AVALON_RDY_LATENCY+1+1,
-           DEVICE             => DEVICE,
-           RAM_TYPE           => FIFO_RAM_TYPE
+        generic map (
+            DATA_WIDTH         => FIFO_DATA_WIDTH,
+            ITEMS              => FIFO_DEPTH,
+            ALMOST_FULL_OFFSET => AVALON_RDY_LATENCY+1+1,
+            DEVICE             => DEVICE,
+            RAM_TYPE           => FIFO_RAM_TYPE
         )
-        port map(
+        port map (
             CLK    => CLK,
             RESET  => RST,
             DI     => fifo_data_in,
@@ -139,13 +139,13 @@ begin
         avst_meta  <= fifo_data_out(DATA_WIDTH+META_SIGNAL_WIDTH-1 downto DATA_WIDTH);
         avst_data  <= fifo_data_out(DATA_WIDTH-1 downto 0);
 
-        --(avst_sop, avst_eop, avst_empty, avst_meta, avst_data) <= fifo_data_out;
+        -- (avst_sop, avst_eop, avst_empty, avst_meta, avst_data) <= fifo_data_out;
 
         avst_empty_arr <= slv_array_downto_deser(avst_empty, REGIONS, log2(REGION_SIZE*BLOCK_SIZE));
 
         eof_pos_array_g : for i in 0 to REGIONS - 1 generate
             mfb_eof_pos_arr(i) <= std_logic_vector((REGION_SIZE*BLOCK_SIZE-1) - unsigned(avst_empty_arr(i)));
-        end generate ;
+        end generate;
 
         mfb_eof_pos <= slv_array_ser(mfb_eof_pos_arr, REGIONS, log2(REGION_SIZE*BLOCK_SIZE));
 
@@ -169,7 +169,7 @@ begin
 
         eof_pos_array_g : for i in 0 to REGIONS - 1 generate
             mfb_eof_pos_arr(i) <= std_logic_vector((REGION_SIZE*BLOCK_SIZE-1) - unsigned(avst_empty_arr(i)));
-        end generate ;
+        end generate;
 
         TX_MFB_EOF_POS <= slv_array_ser(mfb_eof_pos_arr, REGIONS, log2(REGION_SIZE*BLOCK_SIZE));
 
@@ -179,4 +179,4 @@ begin
     end generate;
 
 
-end behav;
+end architecture;

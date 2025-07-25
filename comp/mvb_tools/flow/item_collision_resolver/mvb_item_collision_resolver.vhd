@@ -19,29 +19,29 @@ use work.type_pack.all;
 -- This mechanism nullifies Item collisions at the cost of lowering the throughput in such cases.
 --
 entity MVB_ITEM_COLLISION_RESOLVER is
-generic (
-    ITEM_WIDTH : natural := 10;
-    META_WIDTH : natural := 10;
-    ITEMS      : natural := 4;
-    DEVICE     : string  := "AGILEX"
-);
-port (
-    CLK        : in  std_logic;
-    RESET      : in  std_logic;
+    generic (
+        ITEM_WIDTH : natural := 10;
+        META_WIDTH : natural := 10;
+        ITEMS      : natural := 4;
+        DEVICE     : string  := "AGILEX"
+    );
+    port (
+        CLK        : in  std_logic;
+        RESET      : in  std_logic;
 
-    RX_DATA    : in  slv_array_t     (ITEMS-1 downto 0)(ITEM_WIDTH-1 downto 0);
-    RX_META    : in  slv_array_t     (ITEMS-1 downto 0)(META_WIDTH-1 downto 0);
-    RX_VALID   : in  std_logic_vector(ITEMS-1 downto 0);
-    RX_SRC_RDY : in  std_logic;
-    RX_DST_RDY : out std_logic;
+        RX_DATA    : in  slv_array_t     (ITEMS-1 downto 0)(ITEM_WIDTH-1 downto 0);
+        RX_META    : in  slv_array_t     (ITEMS-1 downto 0)(META_WIDTH-1 downto 0);
+        RX_VALID   : in  std_logic_vector(ITEMS-1 downto 0);
+        RX_SRC_RDY : in  std_logic;
+        RX_DST_RDY : out std_logic;
 
-    TX_DATA    : out slv_array_t     (ITEMS-1 downto 0)(ITEM_WIDTH-1 downto 0);
-    TX_META    : out slv_array_t     (ITEMS-1 downto 0)(META_WIDTH-1 downto 0);
-    TX_VALID   : out std_logic_vector(ITEMS-1 downto 0);
-    TX_SRC_RDY : out std_logic;
-    TX_DST_RDY : in  std_logic
+        TX_DATA    : out slv_array_t     (ITEMS-1 downto 0)(ITEM_WIDTH-1 downto 0);
+        TX_META    : out slv_array_t     (ITEMS-1 downto 0)(META_WIDTH-1 downto 0);
+        TX_VALID   : out std_logic_vector(ITEMS-1 downto 0);
+        TX_SRC_RDY : out std_logic;
+        TX_DST_RDY : in  std_logic
 
-);
+    );
 end entity;
 
 architecture FULL of MVB_ITEM_COLLISION_RESOLVER is
@@ -74,29 +74,29 @@ begin
     -- Pure shakedown could be used instead of FIFOXM.
     -- Also, no shakedown should be a possibility as well.
     shakedown_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH          => FIFOXM_WIDTH,
-        ITEMS               => 32          ,
-        WRITE_PORTS         => ITEMS       ,
-        READ_PORTS          => ITEMS       ,
-        RAM_TYPE            => "AUTO"      ,
-        DEVICE              => DEVICE      ,
-        ALMOST_FULL_OFFSET  => 0           ,
-        ALMOST_EMPTY_OFFSET => 0           ,
-        ALLOW_SINGLE_FIFO   => True        ,
+        ITEMS               => 32,
+        WRITE_PORTS         => ITEMS,
+        READ_PORTS          => ITEMS,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        ALLOW_SINGLE_FIFO   => True,
         SAFE_READ_MODE      => False
     )
-    port map(
-        CLK     => CLK         ,
-        RESET   => RESET       ,
+    port map (
+        CLK     => CLK,
+        RESET   => RESET,
 
-        DI      => fifoxm_din  ,
+        DI      => fifoxm_din,
         WR      => fifoxm_write,
-        FULL    => fifoxm_full ,
-        AFULL   => open        ,
+        FULL    => fifoxm_full,
+        AFULL   => open,
 
-        DO      => fifoxm_dout ,
-        RD      => fifoxm_read ,
+        DO      => fifoxm_dout,
+        RD      => fifoxm_read,
         EMPTY   => fifoxm_empty,
         AEMPTY  => open
     );
@@ -109,7 +109,7 @@ begin
         tx_data_arr(i) <= fifoxm_dout_arr(i)(ITEM_WIDTH  -1 downto          0);
     end generate;
 
-    process(all)
+    process (all)
     begin
         item_same <= (others => '0'); -- validated by "not fifoxm_empty" below
         for i in 1 to ITEMS-1 loop

@@ -18,7 +18,7 @@ use work.type_pack.all;
 use work.ab_init_pack.all;
 
 entity MI_SPLITTER_PLUS_GEN_WRAPPER is
-    generic(
+    generic (
         -- Width of MI address
         ADDR_WIDTH    : integer := 32;
         -- Width of MI data
@@ -42,7 +42,7 @@ entity MI_SPLITTER_PLUS_GEN_WRAPPER is
         -- Target FPGA
         DEVICE        : string  := "STRATIX10"
     );
-    port(
+    port (
         -- Common interface -----------------------------------------------------
         CLK         : in std_logic;
         RESET       : in std_logic;
@@ -93,41 +93,41 @@ architecture FULL of MI_SPLITTER_PLUS_GEN_WRAPPER is
 
 begin
     mi_splitter_plus_gen_i: entity work.MI_SPLITTER_PLUS_GEN
-        generic map(
-            ADDR_WIDTH   => ADDR_WIDTH,
-            DATA_WIDTH   => DATA_WIDTH,
-            META_WIDTH   => META_WIDTH,
-            PORTS        => PORTS,
-            ADDR_MASK    => ADDR_MASK,
-            ADDR_BASES   => ADDR_BASES,
-            ADDR_BASE    => make_to_downto_addr_base,
-            PORT_MAPPING => make_to_downto_port_mapping,
-            PIPE_OUT     => PIPE_OUT,
-            DEVICE       => DEVICE
-        )
-        port map(
-            CLK       => CLK,
-            RESET     => RESET,
+    generic map (
+        ADDR_WIDTH   => ADDR_WIDTH,
+        DATA_WIDTH   => DATA_WIDTH,
+        META_WIDTH   => META_WIDTH,
+        PORTS        => PORTS,
+        ADDR_MASK    => ADDR_MASK,
+        ADDR_BASES   => ADDR_BASES,
+        ADDR_BASE    => make_to_downto_addr_base,
+        PORT_MAPPING => make_to_downto_port_mapping,
+        PIPE_OUT     => PIPE_OUT,
+        DEVICE       => DEVICE
+    )
+    port map (
+        CLK       => CLK,
+        RESET     => RESET,
 
-            RX_DWR    => RX_DWR,
-            RX_MWR    => RX_MWR,
-            RX_ADDR   => RX_ADDR,
-            RX_BE     => RX_BE,
-            RX_WR     => RX_WR,
-            RX_RD     => RX_RD,
-            RX_ARDY   => RX_ARDY,
-            RX_DRD    => RX_DRD,
-            RX_DRDY   => RX_DRDY,
+        RX_DWR    => RX_DWR,
+        RX_MWR    => RX_MWR,
+        RX_ADDR   => RX_ADDR,
+        RX_BE     => RX_BE,
+        RX_WR     => RX_WR,
+        RX_RD     => RX_RD,
+        RX_ARDY   => RX_ARDY,
+        RX_DRD    => RX_DRD,
+        RX_DRDY   => RX_DRDY,
 
-            TX_DWR   => TX_DWR,
-            TX_MWR   => TX_MWR,
-            TX_ADDR  => TX_ADDR,
-            TX_BE    => TX_BE,
-            TX_WR    => TX_WR,
-            TX_RD    => TX_RD,
-            TX_ARDY  => TX_ARDY,
-            TX_DRD   => TX_DRD,
-            TX_DRDY  => TX_DRDY
-        );
+        TX_DWR   => TX_DWR,
+        TX_MWR   => TX_MWR,
+        TX_ADDR  => TX_ADDR,
+        TX_BE    => TX_BE,
+        TX_WR    => TX_WR,
+        TX_RD    => TX_RD,
+        TX_ARDY  => TX_ARDY,
+        TX_DRD   => TX_DRD,
+        TX_DRDY  => TX_DRDY
+    );
 
 end architecture;

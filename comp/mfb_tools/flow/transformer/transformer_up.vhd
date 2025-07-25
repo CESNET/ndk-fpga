@@ -62,7 +62,7 @@ architecture FULL of MFB_TRANSFORMER_UP is
     constant RX_SOP_POS_WIDTH : integer := RX_REGIONS*log2(REGION_SIZE);
     constant RX_EOP_POS_WIDTH : integer := RX_REGIONS*log2(REGION_SIZE*BLOCK_SIZE);
 
-    type fsm_t is (st_idle, st_load);
+    type fsm_t is (ST_IDLE, ST_LOAD);
 
     signal rx_timout_cnt  : unsigned(log2(16*TX_BLOCKS)-1 downto 0);
     signal timeout_export : std_logic;
@@ -112,38 +112,38 @@ begin
     begin
         if (rising_edge(CLK)) then
             fsm_pst <= fsm_nst;
-            cnt <= cnt_next;
+            cnt     <= cnt_next;
             if (RESET = '1') then
-                fsm_pst <= st_idle;
-                cnt <= (others => '0');
+                fsm_pst <= ST_IDLE;
+                cnt     <= (others => '0');
             end if;
         end if;
     end process;
 
     process (all)
     begin
-        fsm_nst <= fsm_pst;
-        cnt_next <= cnt;
+        fsm_nst    <= fsm_pst;
+        cnt_next   <= cnt;
         TX_SRC_RDY <= '0';
         RX_DST_RDY <= TX_DST_RDY;
         case (fsm_pst) is
-            when st_idle =>
+            when ST_IDLE =>
                 RX_DST_RDY <= '1';
                 if (RX_SRC_RDY = '1') then
-                    fsm_nst <= st_load;
+                    fsm_nst  <= ST_LOAD;
                     cnt_next <= cnt + 1;
                 end if;
 
-            when st_load =>
-                if (cnt=TX_BLOCKS or timeout_export='1') then
+            when ST_LOAD =>
+                if (cnt = TX_BLOCKS or timeout_export = '1') then
                     TX_SRC_RDY <= '1';
                     RX_DST_RDY <= TX_DST_RDY;
                     if (TX_DST_RDY = '1') then
                         cnt_next <= (others => '0');
-                        fsm_nst <= st_idle;
+                        fsm_nst  <= ST_IDLE;
                         if (RX_SRC_RDY = '1') then
                             cnt_next <= to_unsigned(1,cnt_next'length);
-                            fsm_nst <= st_load;
+                            fsm_nst  <= ST_LOAD;
                         end if;
                     end if;
                 else
@@ -158,7 +158,7 @@ begin
     export_sel <= std_logic_vector(cnt(log2(TX_BLOCKS)-1 downto 0));
 
     -- shift registers with output data
-    shregs_p : process(CLK)
+    shregs_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (RX_SRC_RDY = '1' and RX_DST_RDY = '1') then
@@ -173,7 +173,7 @@ begin
 
     -- sop_pos has significance only when REGION_SIZE > 1
     gen_sop_pos_g : if REGION_SIZE > 1 generate
-        sop_pos_p : process(CLK)
+        sop_pos_p : process (CLK)
         begin
             if rising_edge(CLK)then
                 if (RX_SRC_RDY = '1' and RX_DST_RDY = '1') then
@@ -186,7 +186,8 @@ begin
         generic map (
             BLOCKS     => TX_BLOCKS,
             BLOCK_SIZE => RX_SOP_POS_WIDTH,
-            SHIFT_LEFT => true)
+            SHIFT_LEFT => true
+        )
         port map (
             DATA_IN    => tx_sop_pos_reg,
             DATA_OUT   => TX_SOP_POS,
@@ -200,13 +201,13 @@ begin
     end generate;
 
     -- mask for SOP and EOP according to valid data in register
-    mask_p : process(export_sel)
+    mask_p : process (export_sel)
         variable tmp : std_logic_vector(TX_SOP'range);
     begin
         tmp := (others => '1');
-        if unsigned(export_sel) /= 0 then
+        if (unsigned(export_sel) /= 0) then
             for i in TX_REGIONS downto 1 loop
-                if i > to_integer(unsigned(export_sel))*RX_REGIONS then
+                if (i > to_integer(unsigned(export_sel))*RX_REGIONS) then
                     tmp := '0' & tmp(TX_REGIONS-1 downto 1);
                 end if;
             end loop;
@@ -217,57 +218,62 @@ begin
     -- output barrel shifters
     data_shifter_i : entity work.BARREL_SHIFTER_GEN
     generic map (
-        BLOCKS => TX_BLOCKS,
+        BLOCKS     => TX_BLOCKS,
         BLOCK_SIZE => RX_DATA_WIDTH,
-        SHIFT_LEFT => true)
+        SHIFT_LEFT => true
+    )
     port map (
-        DATA_IN => tx_data_reg,
+        DATA_IN  => tx_data_reg,
         DATA_OUT => TX_DATA,
-        SEL => export_sel
+        SEL      => export_sel
     );
 
     meta_shifter_i : entity work.BARREL_SHIFTER_GEN
     generic map (
-        BLOCKS => TX_BLOCKS,
+        BLOCKS     => TX_BLOCKS,
         BLOCK_SIZE => RX_META_WIDTH,
-        SHIFT_LEFT => true)
+        SHIFT_LEFT => true
+    )
     port map (
-        DATA_IN => tx_meta_reg,
+        DATA_IN  => tx_meta_reg,
         DATA_OUT => TX_META,
-        SEL => export_sel
+        SEL      => export_sel
     );
 
     sop_shifter_i : entity work.BARREL_SHIFTER_GEN
     generic map (
-        BLOCKS => TX_BLOCKS,
+        BLOCKS     => TX_BLOCKS,
         BLOCK_SIZE => RX_REGIONS,
-        SHIFT_LEFT => true)
+        SHIFT_LEFT => true
+    )
     port map (
-        DATA_IN => tx_sop_reg,
+        DATA_IN  => tx_sop_reg,
         DATA_OUT => tx_sop_unmasked,
-        SEL => export_sel
+        SEL      => export_sel
     );
 
     eop_shifter_i : entity work.BARREL_SHIFTER_GEN
     generic map (
-        BLOCKS => TX_BLOCKS,
+        BLOCKS     => TX_BLOCKS,
         BLOCK_SIZE => RX_REGIONS,
-        SHIFT_LEFT => true)
+        SHIFT_LEFT => true
+    )
     port map (
-        DATA_IN => tx_eop_reg,
+        DATA_IN  => tx_eop_reg,
         DATA_OUT => tx_eop_unmasked,
-        SEL => export_sel
+        SEL      => export_sel
     );
 
     eop_pos_shifter_i : entity work.BARREL_SHIFTER_GEN
     generic map (
-        BLOCKS => TX_BLOCKS,
+        BLOCKS     => TX_BLOCKS,
         BLOCK_SIZE => RX_EOP_POS_WIDTH,
-        SHIFT_LEFT => true)
+        SHIFT_LEFT => true
+    )
     port map (
-        DATA_IN => tx_eop_pos_reg,
+        DATA_IN  => tx_eop_pos_reg,
         DATA_OUT => TX_EOP_POS,
-        SEL => export_sel
+        SEL      => export_sel
     );
 
     TX_SOP <= tx_sop_unmasked and mask;
@@ -275,13 +281,13 @@ begin
 
     -- decides whether EOP came last for REGION_SIZE = 1
     last_eop_fake_g : if REGION_SIZE = 1 generate
-        last_eop_fake_p : process(tx_sop_reg, tx_eop_reg)
+        last_eop_fake_p : process (tx_sop_reg, tx_eop_reg)
         begin
             last_eop <= '0';
             for i in 0 to TX_REGIONS-1 loop
-                if tx_eop_reg(i) = '1' then
+                if (tx_eop_reg(i) = '1') then
                     last_eop <= '1';
-                elsif tx_sop_reg(i) = '1' then
+                elsif (tx_sop_reg(i) = '1') then
                     last_eop <= '0';
                 end if;
             end loop;
@@ -290,17 +296,17 @@ begin
 
     -- decides whether EOP came last for REGION_SIZE /= 1
     last_eop_g : if REGION_SIZE /= 1 generate
-        last_eop_p : process(tx_sop_reg, tx_eop_reg, tx_sop_pos_reg, tx_eop_pos_reg)
+        last_eop_p : process (tx_sop_reg, tx_eop_reg, tx_sop_pos_reg, tx_eop_pos_reg)
         begin
             last_eop <= '0';
             for i in 0 to TX_REGIONS-1 loop
-                if tx_eop_reg(i) = '1' then
-                    if tx_sop_reg(i) = '1' and to_integer(unsigned(tx_sop_pos_reg((i+1)*log2(REGION_SIZE)-1 downto i*log2(REGION_SIZE))))*BLOCK_SIZE > to_integer(unsigned(tx_eop_pos_reg((i+1)*log2(REGION_SIZE*BLOCK_SIZE)-1 downto i*log2(REGION_SIZE*BLOCK_SIZE)))) then
+                if (tx_eop_reg(i) = '1') then
+                    if (tx_sop_reg(i) = '1' and to_integer(unsigned(tx_sop_pos_reg((i+1)*log2(REGION_SIZE)-1 downto i*log2(REGION_SIZE))))*BLOCK_SIZE > to_integer(unsigned(tx_eop_pos_reg((i+1)*log2(REGION_SIZE*BLOCK_SIZE)-1 downto i*log2(REGION_SIZE*BLOCK_SIZE))))) then
                         last_eop <= '0';
                     else
                         last_eop <= '1';
                     end if;
-                elsif tx_sop_reg(i) = '1' then
+                elsif (tx_sop_reg(i) = '1') then
                     last_eop <= '0';
                 end if;
             end loop;

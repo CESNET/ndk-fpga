@@ -12,12 +12,12 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_ADAPTER_MAC_SEG is
-    generic(
+    generic (
         REGIONS     : natural := 2;
         REGION_SIZE : natural := 8;
         SEGMENTS    : natural := REGIONS*REGION_SIZE
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK               : in  std_logic;
         RESET             : in  std_logic;
@@ -62,7 +62,7 @@ architecture FULL of TX_MAC_LITE_ADAPTER_MAC_SEG is
 begin
 
     rx_aux_i : entity work.MFB_AUXILIARY_SIGNALS
-    generic map(
+    generic map (
         REGIONS        => REGIONS,
         REGION_SIZE    => REGION_SIZE,
         BLOCK_SIZE     => 8,
@@ -72,8 +72,8 @@ begin
         BLOCK_AUX_EN   => true,
         ITEM_AUX_EN    => false
     )
-    port map(
-        CLK              => CLK  ,
+    port map (
+        CLK              => CLK,
         RESET            => RESET,
 
         RX_DATA          => IN_MFB_DATA,
@@ -94,8 +94,8 @@ begin
         TX_SRC_RDY       => aux_src_rdy,
         TX_DST_RDY       => OUT_MAC_VALID,
 
-        TX_REGION_SHARED => open         ,
-        TX_REGION_VLD    => open         ,
+        TX_REGION_SHARED => open,
+        TX_REGION_VLD    => open,
         TX_BLOCK_VLD     => aux_block_vld,
         TX_ITEM_VLD      => open
     );
@@ -104,7 +104,7 @@ begin
 
     aux_mfb_g : for i in 0 to REGIONS-1 generate
 
-        one_mfb_block_g : if REGION_SIZE>1 generate
+        one_mfb_block_g : if REGION_SIZE > 1 generate
             eof_oh_i : entity work.DEC1FN_ENABLE
             generic map (
                 ITEMS => REGION_SIZE

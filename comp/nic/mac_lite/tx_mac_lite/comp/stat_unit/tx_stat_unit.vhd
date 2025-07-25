@@ -14,7 +14,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_STAT_UNIT is
-    generic(
+    generic (
         -- Number of regions within a data word, must be power of 2.
         MFB_REGIONS        : natural := 4;
         -- Width of length signals in bits.
@@ -26,7 +26,7 @@ entity TX_MAC_LITE_STAT_UNIT is
         -- Frame length is counted with CRC
         FRAME_LEN_WITH_CRC : boolean := False
     );
-    port(
+    port (
         -- =====================================================================
         --  CLOCK AND RESET
         -- =====================================================================
@@ -100,12 +100,12 @@ begin
     -- Sum One counters --------------------------------------------------------
 
     sum_one_total_frame_i : entity work.SUM_ONE
-    generic map(
+    generic map (
         INPUT_WIDTH  => MFB_REGIONS,
         OUTPUT_WIDTH => REGION_CNT_W,
         OUTPUT_REG   => True
     )
-    port map(
+    port map (
         -- CLOCK AND RESET
         CLK      => CLK,
         RESET    => RESET,
@@ -119,12 +119,12 @@ begin
     );
 
     sum_one_sent_frame_i : entity work.SUM_ONE
-    generic map(
+    generic map (
         INPUT_WIDTH  => MFB_REGIONS,
         OUTPUT_WIDTH => REGION_CNT_W,
         OUTPUT_REG   => True
     )
-    port map(
+    port map (
         -- CLOCK AND RESET
         CLK      => CLK,
         RESET    => RESET,
@@ -138,12 +138,12 @@ begin
     );
 
     sum_one_discarded_frame_i : entity work.SUM_ONE
-    generic map(
+    generic map (
         INPUT_WIDTH  => MFB_REGIONS,
         OUTPUT_WIDTH => REGION_CNT_W,
         OUTPUT_REG   => True
     )
-    port map(
+    port map (
         -- CLOCK AND RESET
         CLK      => CLK,
         RESET    => RESET,
@@ -157,12 +157,12 @@ begin
     );
 
     sum_one_link_err_frame_i : entity work.SUM_ONE
-    generic map(
+    generic map (
         INPUT_WIDTH  => MFB_REGIONS,
         OUTPUT_WIDTH => REGION_CNT_W,
         OUTPUT_REG   => True
     )
-    port map(
+    port map (
         -- CLOCK AND RESET
         CLK      => CLK,
         RESET    => RESET,
@@ -176,12 +176,12 @@ begin
     );
 
     sum_one_len_err_frame_i : entity work.SUM_ONE
-    generic map(
+    generic map (
         INPUT_WIDTH  => MFB_REGIONS,
         OUTPUT_WIDTH => REGION_CNT_W,
         OUTPUT_REG   => True
     )
-    port map(
+    port map (
         -- CLOCK AND RESET
         CLK      => CLK,
         RESET    => RESET,
@@ -195,12 +195,12 @@ begin
     );
 
     sum_one_disabled_frame_i : entity work.SUM_ONE
-    generic map(
+    generic map (
         INPUT_WIDTH  => MFB_REGIONS,
         OUTPUT_WIDTH => REGION_CNT_W,
         OUTPUT_REG   => True
     )
-    port map(
+    port map (
         -- CLOCK AND RESET
         CLK      => CLK,
         RESET    => RESET,
@@ -403,7 +403,7 @@ begin
     --  LAST STAGE
     -- =========================================================================
 
-    cnt_out_regs_p : process(CLK)
+    cnt_out_regs_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (CTRL_STROBE_CNT = '1') then

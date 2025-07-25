@@ -30,7 +30,7 @@ use work.ab_init_pack.all;
 -- than one AB can be assigned to a single output port. It doesn't work the
 -- other way around though.
 entity MI_SPLITTER_PLUS_GEN is
-    generic(
+    generic (
         -- Width of MI address.
         ADDR_WIDTH    : integer := 32;
         -- Width of MI data.
@@ -64,7 +64,7 @@ entity MI_SPLITTER_PLUS_GEN is
         -- Target FPGA.
         DEVICE        : string  := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         -- Clock and Reset
         -- =====================================================================
@@ -107,7 +107,7 @@ architecture FULL of MI_SPLITTER_PLUS_GEN is
     -- ========================================================================
     --                                FUNCTIONS
     -- ========================================================================
-    function port_resolution(address : std_logic_vector) return natural is
+    function port_resolution (address : std_logic_vector) return natural is
         variable p : natural := 0;
     begin
         for i in 0 to ADDR_BASES-1 loop
@@ -143,9 +143,9 @@ architecture FULL of MI_SPLITTER_PLUS_GEN is
     signal drd_in_pipe       : slv_array_t(PORTS-1 downto 0)(DATA_WIDTH-1 downto 0);
     signal drdy_in_pipe      : std_logic_vector(PORTS-1 downto 0);
     -- state signals for FSM
-    type state is (run, hold);
-    signal present_st        : state := run;
-    signal next_st           : state := run;
+    type   state is (RUN, HOLD);
+    signal present_st        : state := RUN;
+    signal next_st           : state := RUN;
     -- control logic signals
     signal rd_resp_immediate : std_logic; -- immediate response to read request
     signal rd_resp_overdue   : std_logic; -- overdue response to read request
@@ -155,8 +155,12 @@ architecture FULL of MI_SPLITTER_PLUS_GEN is
 
 begin
 
-    assert ((or ADDR_BASE(0)) = '0') report "The lowest base address must be 0."    severity failure;
-    assert (ab_in_order = true)      report "Portbases must be in ascending order!" severity failure;
+    assert ((or ADDR_BASE(0)) = '0')
+        report "The lowest base address must be 0."
+        severity failure;
+    assert (ab_in_order = true)
+        report "Portbases must be in ascending order!"
+        severity failure;
 
     -- assigning the port number to a signal for easier usage and debugging
     current_port <= port_resolution(RX_ADDR);
@@ -192,7 +196,7 @@ begin
         if (rising_edge(CLK)) then
             present_st <= next_st;
             if (RESET = '1') then
-                present_st <= run;
+                present_st <= RUN;
             end if;
         end if;
     end process;
@@ -202,22 +206,22 @@ begin
     begin
         case present_st is
 
-            when run =>
+            when RUN =>
                 if ((RX_RD = '1') and (ardy_in_pipe(current_port) = '1') and (drdy_in_pipe(current_port) = '0')) then
-                    next_st <= hold;
+                    next_st <= HOLD;
                 else
-                    next_st <= run;
+                    next_st <= RUN;
                 end if;
 
-            when hold =>
+            when HOLD =>
                 if ((RX_RD = '1') and (ardy_in_pipe(current_port) = '0') and (drdy_in_pipe(current_port) = '1')) then
-                    next_st <= run;
+                    next_st <= RUN;
                 else
-                    next_st <= hold;
+                    next_st <= HOLD;
                 end if;
 
             when others =>
-                next_st <= run;
+                next_st <= RUN;
 
         end case;
     end process;
@@ -228,9 +232,9 @@ begin
         rd_in_pipe <= (others => '0');
 
         case present_st is
-            when run =>
+            when RUN =>
                 rd_in_pipe(current_port) <= RX_RD;
-            when hold =>
+            when HOLD =>
                 rd_in_pipe(current_port) <= '0';
         end case;
     end process;
@@ -263,7 +267,7 @@ begin
     -- ========================================================================
     output_pipes_g : for i in PORTS-1 downto 0 generate
         pipe_i: entity work.MI_PIPE
-        generic map(
+        generic map (
             DATA_WIDTH => DATA_WIDTH,
             ADDR_WIDTH => ADDR_WIDTH,
             META_WIDTH => META_WIDTH,
@@ -272,7 +276,7 @@ begin
             FAKE_PIPE  => not PIPE_OUT(i),
             DEVICE     => DEVICE
         )
-        port map(
+        port map (
             CLK       => CLK,
             RESET     => RESET,
 

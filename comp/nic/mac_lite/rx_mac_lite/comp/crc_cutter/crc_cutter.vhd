@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_CRC_CUTTER is
-    generic(
+    generic (
         REGIONS     : natural := 4; -- any possitive value
         REGION_SIZE : natural := 8; -- any possitive value
         BLOCK_SIZE  : natural := 8; -- must be >= 4 and power of two
@@ -20,7 +20,7 @@ entity RX_MAC_LITE_CRC_CUTTER is
         META_WIDTH  : natural := 2;
         OUTPUT_REG  : boolean := True
     );
-    port(
+    port (
         -- =======================================================================
         -- CLOCK AND RESET
         -- =======================================================================
@@ -192,12 +192,12 @@ begin
         -- generate overflow EOF OK flag
         s_move_eof_allowed(r+1) <= s_need_move_eof(r+1) and not s_eof_mca(r);
         -- cut CRC error
-        s_crc_cut_error(r) <= (s_need_move_eof(r) and not s_move_eof_allowed(r)) or s_one_blk_frame(r);
+        s_crc_cut_error(r)      <= (s_need_move_eof(r) and not s_move_eof_allowed(r)) or s_one_blk_frame(r);
 
         -- generate new EOF for cut CRC
         new_eof_p : process (s_move_eof_allowed,s_eof_mca)
         begin
-            if (s_move_eof_allowed(r+1) = '1') then -- move EOF allowed, created new EOF
+            if (s_move_eof_allowed(r+1) = '1') then  -- move EOF allowed, created new EOF
                 s_new_eof(r) <= '1';
             elsif (s_move_eof_allowed(r) = '1') then -- removed old EOF
                 s_new_eof(r) <= '0';
@@ -219,11 +219,11 @@ begin
         -- generate new EOF_POS for cut CRC
         new_eof_pos_arr_p : process (all)
         begin
-            if (s_move_eof_allowed(r+1) = '1') then -- move EOF allowed
+            if (s_move_eof_allowed(r+1) = '1') then                                                               -- move EOF allowed
                 s_new_eof_pos_arr(r) <= std_logic_vector(unsigned(s_eof_pos_mca(r+1)) - 4);
             elsif ((s_need_move_eof(r) = '1' and s_move_eof_allowed(r) = '0') or (s_one_blk_frame(r) = '1')) then -- move EOF NOT allowed or CRC cut is disabled due to one block frame
                 s_new_eof_pos_arr(r) <= s_eof_pos_mca(r);
-            else -- simple cuting - only changed EOF_POS
+            else                                                                                                  -- simple cuting - only changed EOF_POS
                 s_new_eof_pos_arr(r) <= std_logic_vector(unsigned(s_eof_pos_mca(r)) - 4);
             end if;
         end process;
@@ -279,9 +279,9 @@ begin
         begin
             if (rising_edge(CLK)) then
                 if (RESET = '1') then
-                s_reg2_src_rdy <= '0';
+                    s_reg2_src_rdy <= '0';
                 else
-                s_reg2_src_rdy <= s_valid_word;
+                    s_reg2_src_rdy <= s_valid_word;
                 end if;
             end if;
         end process;

@@ -12,21 +12,21 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_MAC_CHECK is
-    generic(
+    generic (
         -- =====================================================================
         -- MFB CONFIGURATION:
         -- =====================================================================
-        REGIONS     : natural := 4; -- any possitive value
-        REGION_SIZE : natural := 8; -- must be power of 2
-        BLOCK_SIZE  : natural := 8; -- must be power of 2
-        ITEM_WIDTH  : natural := 8; -- must be power of 2
+        REGIONS     : natural := 4;  -- any possitive value
+        REGION_SIZE : natural := 8;  -- must be power of 2
+        BLOCK_SIZE  : natural := 8;  -- must be power of 2
+        ITEM_WIDTH  : natural := 8;  -- must be power of 2
         -- =====================================================================
         -- MAC CHECK CONFIGURATION:
         -- =====================================================================
         MAC_COUNT   : natural := 16; -- any possitive value, max is 16
         DEVICE      : string  := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -196,12 +196,12 @@ begin
     -- extraction of destination MAC address from Ethernet frames (1 cycle)
     get_mac_g : for r in 0 to REGIONS-1 generate
         get_crc32_i : entity work.RX_MAC_LITE_GET_MAC
-        generic map(
+        generic map (
             REGION_SIZE => REGION_SIZE,
             BLOCK_SIZE  => BLOCK_SIZE,
             ITEM_WIDTH  => ITEM_WIDTH
         )
-        port map(
+        port map (
             -- CLOCK AND RESET
             CLK         => CLK,
             RESET       => RESET,
@@ -276,7 +276,7 @@ begin
         end process;
 
         tcam_i : entity work.TCAM2
-        generic map(
+        generic map (
             DATA_WIDTH         => 49,
             ITEMS              => MAC_COUNT,
             RESOURCES_SAVING   => 0,
@@ -285,7 +285,7 @@ begin
             OUTPUT_READ_REGS   => false,
             DEVICE             => DEVICE
         )
-        port map(
+        port map (
             CLK            => CLK,
             RST            => RESET,
             READ_ADDR      => (others => '0'),
@@ -310,10 +310,10 @@ begin
         s_cam_err(r) <= (not s_cam_match_out_vld_reg3(r)) or (not s_cam_match_out_hit(r));
 
         hot2bin_i : entity work.DEC1FN2B
-        generic map(
+        generic map (
             ITEMS => MAC_COUNT
         )
-        port map(
+        port map (
             ENABLE => s_cam_match_out_vld_reg3(r),
             DI     => s_cam_match_out_arr_reg3(r),
             ADDR   => s_mac_hit_addr_arr_reg3(r)

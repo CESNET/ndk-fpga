@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_CTRL_UNIT is
-    generic(
+    generic (
         LEN_WIDTH          : natural := 14;
         INBANDFCS          : boolean := true;
         MAC_COUNT          : natural := 16;
@@ -20,7 +20,7 @@ entity RX_MAC_LITE_CTRL_UNIT is
         SM_CNT_BYTES_WIDTH : natural := 32;
         DEVICE             : string  := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -341,10 +341,10 @@ begin
     -- =========================================================================
 
     mi_async_i : entity work.MI_ASYNC
-    generic map(
+    generic map (
         DEVICE => DEVICE
     )
-    port map(
+    port map (
         -- Master interface
         CLK_M     => MI_CLK,
         RESET_M   => MI_RESET,
@@ -375,15 +375,15 @@ begin
     -- =========================================================================
 
     mi_pipe_i : entity work.MI_PIPE
-    generic map(
+    generic map (
         DEVICE      => DEVICE,
         DATA_WIDTH  => 32,
         ADDR_WIDTH  => 32,
-        --PIPE_TYPE   => "REG",
+        -- PIPE_TYPE   => "REG",
         USE_OUTREG  => True,
         FAKE_PIPE   => False
     )
-    port map(
+    port map (
         -- Common interface
         CLK      => CLK,
         RESET    => RESET,
@@ -461,7 +461,7 @@ begin
     CAM_WRITE_DATA(7  downto 0)  <= s_reg_data_wr_h(15 downto 8);  -- MSB
 
     -- Register storing cam_we value
-    reg_cam_we_p : process(CLK)
+    reg_cam_we_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             s_reg_cam_we <= s_reg_data_wr_h_we and not s_reg_enable;
@@ -676,9 +676,9 @@ begin
     sm_cnt_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            s_sm_cnt_ticks_reg   <= (others => '0');
-            s_sm_cnt_bytes_reg   <= (others => '0');
-            s_sm_cnt_packets_reg <= (others => '0');
+            s_sm_cnt_ticks_reg                                  <= (others => '0');
+            s_sm_cnt_bytes_reg                                  <= (others => '0');
+            s_sm_cnt_packets_reg                                <= (others => '0');
             s_sm_cnt_ticks_reg(SM_CNT_TICKS_WIDTH-1 downto 0)   <= SM_CNT_TICKS;
             s_sm_cnt_bytes_reg(SM_CNT_BYTES_WIDTH-1 downto 0)   <= SM_CNT_BYTES;
             s_sm_cnt_packets_reg(SM_CNT_BYTES_WIDTH-1 downto 0) <= SM_CNT_PACKETS;
@@ -868,22 +868,22 @@ begin
         end if;
     end process;
 
-    s_mi_drd <= s_mi_drd1 when s_cam_re_reg1='1' else s_mi_drd0;
+    s_mi_drd <= s_mi_drd1 when s_cam_re_reg1 = '1' else s_mi_drd0;
 
     -- -------------------------------------------------------------------------
     --  MI-readable TCAM copy
     -- -------------------------------------------------------------------------
 
     tcam_memx_i : entity work.SDP_MEMX
-    generic map(
-        DATA_WIDTH => 32         ,
+    generic map (
+        DATA_WIDTH => 32,
         ITEMS      => MAC_COUNT*2,
-        RAM_TYPE   => "AUTO"     ,
-        DEVICE     => DEVICE     ,
+        RAM_TYPE   => "AUTO",
+        DEVICE     => DEVICE,
         OUTPUT_REG => true
     )
-    port map(
-        CLK   => CLK  ,
+    port map (
+        CLK   => CLK,
         RESET => RESET,
 
         WR_DATA    => s_mi_dwr,

@@ -30,51 +30,51 @@ use work.type_pack.all;
 -- ----------------------------------------------------------------------------
 
 entity MFB_PD_ASFIFO is
-generic (
-   -- Numer of items (words) in buffer
-   --    (Must be able to hold at least one maximum sized packet plus one word for beginning of next packet)
-   ITEMS       : natural := 512;
-   -- You can set additional latency of write pointer to read side.
-   WR_PTR_ADD_LATENCY : natural := 0;
+    generic (
+        -- Numer of items (words) in buffer
+        --    (Must be able to hold at least one maximum sized packet plus one word for beginning of next packet)
+        ITEMS              : natural := 512;
+        -- You can set additional latency of write pointer to read side.
+        WR_PTR_ADD_LATENCY : natural := 0;
 
-   -- MFB bus characteristics
-   REGIONS     : natural := 4;
-   REGION_SIZE : natural := 8;
-   BLOCK_SIZE  : natural := 8;
-   ITEM_WIDTH  : natural := 8;
-   DEVICE      : string  := "ULTRASCALE"
-);
-port (
-   -- RX Synchronization
-   RX_CLK           : in  std_logic;
-   RX_RESET         : in  std_logic;
+        -- MFB bus characteristics
+        REGIONS     : natural := 4;
+        REGION_SIZE : natural := 8;
+        BLOCK_SIZE  : natural := 8;
+        ITEM_WIDTH  : natural := 8;
+        DEVICE      : string  := "ULTRASCALE"
+    );
+    port (
+        -- RX Synchronization
+        RX_CLK           : in  std_logic;
+        RX_RESET         : in  std_logic;
 
-   -- RX MFB
-   RX_DATA          : in  std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-   RX_SOF_POS       : in  std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
-   RX_EOF_POS       : in  std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
-   RX_SOF           : in  std_logic_vector(REGIONS-1 downto 0);
-   RX_EOF           : in  std_logic_vector(REGIONS-1 downto 0);
-   RX_SRC_RDY       : in  std_logic;
-   RX_DST_RDY       : out std_logic;
-   -- Discard packet on corresponding RX_MFB_EOF
-   RX_DISCARD       : in  std_logic_vector(REGIONS-1 downto 0);
-   -- Discard currently inserted packet (the packet's SOF has already been sent)
-   RX_FORCE_DISCARD : in  std_logic;
-   -- Current number of taken items in FIFO (is not precise as this is an asynchronous FIFO) (Clocked on RX_CLK)
-   STATUS           : out std_logic_vector(log2(ITEMS+1)-1 downto 0);
+        -- RX MFB
+        RX_DATA          : in  std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+        RX_SOF_POS       : in  std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
+        RX_EOF_POS       : in  std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+        RX_SOF           : in  std_logic_vector(REGIONS-1 downto 0);
+        RX_EOF           : in  std_logic_vector(REGIONS-1 downto 0);
+        RX_SRC_RDY       : in  std_logic;
+        RX_DST_RDY       : out std_logic;
+        -- Discard packet on corresponding RX_MFB_EOF
+        RX_DISCARD       : in  std_logic_vector(REGIONS-1 downto 0);
+        -- Discard currently inserted packet (the packet's SOF has already been sent)
+        RX_FORCE_DISCARD : in  std_logic;
+        -- Current number of taken items in FIFO (is not precise as this is an asynchronous FIFO) (Clocked on RX_CLK)
+        STATUS           : out std_logic_vector(log2(ITEMS+1)-1 downto 0);
 
-   -- TX Synchronization
-   TX_CLK           : in  std_logic;
-   TX_RESET         : in  std_logic;
-   -- RX MFB
-   TX_DATA          : out std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-   TX_SOF_POS       : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
-   TX_EOF_POS       : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
-   TX_SOF           : out std_logic_vector(REGIONS-1 downto 0);
-   TX_EOF           : out std_logic_vector(REGIONS-1 downto 0);
-   TX_SRC_RDY       : out std_logic;
-   TX_DST_RDY       : in  std_logic
+        -- TX Synchronization
+        TX_CLK           : in  std_logic;
+        TX_RESET         : in  std_logic;
+        -- RX MFB
+        TX_DATA          : out std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+        TX_SOF_POS       : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
+        TX_EOF_POS       : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+        TX_SOF           : out std_logic_vector(REGIONS-1 downto 0);
+        TX_EOF           : out std_logic_vector(REGIONS-1 downto 0);
+        TX_SRC_RDY       : out std_logic;
+        TX_DST_RDY       : in  std_logic
 
-);
-end MFB_PD_ASFIFO;
+    );
+end entity;

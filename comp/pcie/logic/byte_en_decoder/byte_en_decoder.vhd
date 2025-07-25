@@ -26,7 +26,8 @@ entity PCIE_BYTE_EN_DECODER is
         FBE_IN   : in  std_logic_vector(3 downto 0);
         LBE_IN   : in  std_logic_vector(3 downto 0);
         FBE_OUT  : out std_logic_vector(3 downto 0);
-        LBE_OUT  : out std_logic_vector(3 downto 0));
+        LBE_OUT  : out std_logic_vector(3 downto 0)
+    );
 end entity;
 
 architecture FULL of PCIE_BYTE_EN_DECODER is
@@ -36,42 +37,54 @@ begin
         FBE_OUT <= FBE_IN;
         LBE_OUT <= LBE_IN;
 
-        if (std_match(FBE_IN,"1--1") AND std_match(LBE_IN,"0000")) then
-                  FBE_OUT <= "1111";
-        elsif (std_match(FBE_IN,"01-1") AND std_match(LBE_IN,"0000")) then
-                     FBE_OUT <= "0111";
-        elsif (std_match(FBE_IN,"1-10") AND std_match(LBE_IN,"0000")) then
-                     FBE_OUT <= "1110";
-        elsif (std_match(FBE_IN,"---1") AND std_match(LBE_IN,"1---")) then
-                     FBE_OUT <= "1111";           LBE_OUT <= "1111";
-        elsif (std_match(FBE_IN,"---1") AND std_match(LBE_IN,"01--")) then
-                     FBE_OUT <= "1111";           LBE_OUT <= "0111";
-        elsif (std_match(FBE_IN,"---1") AND std_match(LBE_IN,"001-")) then
-                     FBE_OUT <= "1111";           LBE_OUT <= "0011";
-        elsif (std_match(FBE_IN,"---1") AND std_match(LBE_IN,"0001")) then
-                     FBE_OUT <= "1111";
-        elsif (std_match(FBE_IN,"--10") AND std_match(LBE_IN,"1---")) then
-                     FBE_OUT <= "1110";           LBE_OUT <= "1111";
-        elsif (std_match(FBE_IN,"--10") AND std_match(LBE_IN,"01--")) then
-                     FBE_OUT <= "1110";           LBE_OUT <= "0111";
-        elsif (std_match(FBE_IN,"--10") AND std_match(LBE_IN,"001-")) then
-                     FBE_OUT <= "1110";           LBE_OUT <= "0011";
-        elsif (std_match(FBE_IN,"--10") AND std_match(LBE_IN,"0001")) then
-                     FBE_OUT <= "1110";
-        elsif (std_match(FBE_IN,"-100") AND std_match(LBE_IN,"1---")) then
-                     FBE_OUT <= "1100";           LBE_OUT <= "1111";
-        elsif (std_match(FBE_IN,"-100") AND std_match(LBE_IN,"01--")) then
-                     FBE_OUT <= "1100";           LBE_OUT <= "0111";
-        elsif (std_match(FBE_IN,"-100") AND std_match(LBE_IN,"001-")) then
-                     FBE_OUT <= "1100";           LBE_OUT <= "0011";
-        elsif (std_match(FBE_IN,"-100") AND std_match(LBE_IN,"0001")) then
-                     FBE_OUT <= "1100";
-        elsif (std_match(FBE_IN,"1000") AND std_match(LBE_IN,"1---")) then
-                     FBE_OUT <= "1000";           LBE_OUT <= "1111";
-        elsif (std_match(FBE_IN,"1000") AND std_match(LBE_IN,"01--")) then
-                     FBE_OUT <= "1000";           LBE_OUT <= "0111";
-        elsif (std_match(FBE_IN,"1000") AND std_match(LBE_IN,"001-")) then
-                     FBE_OUT <= "1000";           LBE_OUT <= "0011";
+        if (std_match(FBE_IN,"1--1") and std_match(LBE_IN,"0000")) then
+            FBE_OUT <= "1111";
+        elsif (std_match(FBE_IN,"01-1") and std_match(LBE_IN,"0000")) then
+            FBE_OUT <= "0111";
+        elsif (std_match(FBE_IN,"1-10") and std_match(LBE_IN,"0000")) then
+            FBE_OUT <= "1110";
+        elsif (std_match(FBE_IN,"---1") and std_match(LBE_IN,"1---")) then
+            FBE_OUT <= "1111";
+            LBE_OUT <= "1111";
+        elsif (std_match(FBE_IN,"---1") and std_match(LBE_IN,"01--")) then
+            FBE_OUT <= "1111";
+            LBE_OUT <= "0111";
+        elsif (std_match(FBE_IN,"---1") and std_match(LBE_IN,"001-")) then
+            FBE_OUT <= "1111";
+            LBE_OUT <= "0011";
+        elsif (std_match(FBE_IN,"---1") and std_match(LBE_IN,"0001")) then
+            FBE_OUT <= "1111";
+        elsif (std_match(FBE_IN,"--10") and std_match(LBE_IN,"1---")) then
+            FBE_OUT <= "1110";
+            LBE_OUT <= "1111";
+        elsif (std_match(FBE_IN,"--10") and std_match(LBE_IN,"01--")) then
+            FBE_OUT <= "1110";
+            LBE_OUT <= "0111";
+        elsif (std_match(FBE_IN,"--10") and std_match(LBE_IN,"001-")) then
+            FBE_OUT <= "1110";
+            LBE_OUT <= "0011";
+        elsif (std_match(FBE_IN,"--10") and std_match(LBE_IN,"0001")) then
+            FBE_OUT <= "1110";
+        elsif (std_match(FBE_IN,"-100") and std_match(LBE_IN,"1---")) then
+            FBE_OUT <= "1100";
+            LBE_OUT <= "1111";
+        elsif (std_match(FBE_IN,"-100") and std_match(LBE_IN,"01--")) then
+            FBE_OUT <= "1100";
+            LBE_OUT <= "0111";
+        elsif (std_match(FBE_IN,"-100") and std_match(LBE_IN,"001-")) then
+            FBE_OUT <= "1100";
+            LBE_OUT <= "0011";
+        elsif (std_match(FBE_IN,"-100") and std_match(LBE_IN,"0001")) then
+            FBE_OUT <= "1100";
+        elsif (std_match(FBE_IN,"1000") and std_match(LBE_IN,"1---")) then
+            FBE_OUT <= "1000";
+            LBE_OUT <= "1111";
+        elsif (std_match(FBE_IN,"1000") and std_match(LBE_IN,"01--")) then
+            FBE_OUT <= "1000";
+            LBE_OUT <= "0111";
+        elsif (std_match(FBE_IN,"1000") and std_match(LBE_IN,"001-")) then
+            FBE_OUT <= "1000";
+            LBE_OUT <= "0011";
         end if;
     end process;
 end architecture;

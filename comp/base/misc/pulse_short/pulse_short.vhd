@@ -31,18 +31,18 @@ entity PULSE_SHORT is
         -- bit 1 -> EN,
         -- bit 2 -> TRIGGER
         ASYNC_MASK : std_logic_vector(2 downto 0) := "000"
-        );
+    );
 
     port (
         -- Input clock, usage is optional but needs to be used when some
         -- bit in the ASYNC_MASK generic parameter is set to 1
         ACLK      : in  std_logic := '0';
-        BCLK      : in  std_logic;      -- Output clock
-        RST       : in  std_logic;      -- Reset signal
+        BCLK      : in  std_logic;         -- Output clock
+        RST       : in  std_logic;         -- Reset signal
         EN        : in  std_logic := '1';  -- Enable signal, usage is optional
-        TRIGGER   : in  std_logic;      -- Input triggering pulse
-        PULSE_OUT : out std_logic  -- Output pulse with one BCLK period duration
-        );
+        TRIGGER   : in  std_logic;         -- Input triggering pulse
+        PULSE_OUT : out std_logic          -- Output pulse with one BCLK period duration
+    );
 
 end entity;
 
@@ -57,7 +57,7 @@ architecture FULL of PULSE_SHORT is
 
     signal del_cntr       : unsigned(DELAY_COUNTER_LENGTH-1 downto 0);
     signal counter_trigg  : std_logic;
-    type del_cntr_state_type is (WT_FOR_CNTR_TRIGGER, CNT_DELAY);
+    type   del_cntr_state_type is (WT_FOR_CNTR_TRIGGER, CNT_DELAY);
     signal del_cntr_state : del_cntr_state_type := WT_FOR_CNTR_TRIGGER;
 
     signal rst_sync     : std_logic;
@@ -69,8 +69,14 @@ begin  -- architecture str
     cdc_rst_g : if (ASYNC_MASK(0) = '1') generate
 
         cdc_rst_i : entity work.ASYNC_RESET
-            generic map (TWO_REG => FALSE, OUT_REG => TRUE, REPLICAS => 0)
-            port map (CLK        => BCLK, ASYNC_RST => RST, OUT_RST(0) => rst_sync);
+        generic map (
+            TWO_REG => FALSE, OUT_REG => TRUE, REPLICAS => 0
+        )
+        port map (
+            CLK        => BCLK,
+            ASYNC_RST  => RST,
+            OUT_RST(0) => rst_sync
+        );
 
     else generate
         rst_sync <= RST;
@@ -79,8 +85,14 @@ begin  -- architecture str
     cdc_en_g : if (ASYNC_MASK(1) = '1') generate
 
         cdc_en_i : entity work.ASYNC_OPEN_LOOP
-            generic map (IN_REG => FALSE, TWO_REG => TRUE)
-            port map (ADATAIN   => EN, BCLK => BCLK, BDATAOUT => en_sync);
+        generic map (
+            IN_REG => FALSE, TWO_REG => TRUE
+        )
+        port map (
+            ADATAIN   => EN,
+            BCLK      => BCLK,
+            BDATAOUT  => en_sync
+        );
 
     else generate
         en_sync <= EN;
@@ -88,19 +100,21 @@ begin  -- architecture str
 
     cdc_trigger_g : if (ASYNC_MASK(2) = '1') generate
 
-        ASYNC_GENERAL_1 : entity work.ASYNC_GENERAL
-            generic map (
-                TWO_REG             => FALSE,
-                DETECT_RISING_EDGE  => TRUE,
-                DETECT_FALLING_EDGE => FALSE)
-            port map (
-                ACLK     => ACLK,
-                ARST     => RST,
-                ADATAIN  => TRIGGER,
-                AREADY   => open,
-                BCLK     => BCLK,
-                BRST     => '0',
-                BDATAOUT => trigger_sync);
+        async_general_1 : entity work.ASYNC_GENERAL
+        generic map (
+            TWO_REG             => FALSE,
+            DETECT_RISING_EDGE  => TRUE,
+            DETECT_FALLING_EDGE => FALSE
+        )
+        port map (
+            ACLK     => ACLK,
+            ARST     => RST,
+            ADATAIN  => TRIGGER,
+            AREADY   => open,
+            BCLK     => BCLK,
+            BRST     => '0',
+            BDATAOUT => trigger_sync
+        );
 
     else generate
         trigger_sync <= TRIGGER;
@@ -114,9 +128,9 @@ begin  -- architecture str
 
         -- purpose: delays output pulse by one clock period
         -- type   : sequential
-        del_out_pulse_p: process (BCLK) is
-        begin  -- process del_out_pulse_p
-            if (rising_edge(BCLK)) then  -- rising clock edge
+        del_out_pulse_p : process (BCLK) is
+        begin                               -- process del_out_pulse_p
+            if (rising_edge(BCLK)) then     -- rising clock edge
 
                 PULSE_OUT <= counter_trigg;
 
@@ -128,12 +142,12 @@ begin  -- architecture str
         -- purpose: counts the delay in which the input pulse should be delayed
         -- type   : sequential
         del_cntr_p : process (BCLK) is
-        begin  -- process del_cntr_p
-            if (rising_edge(BCLK)) then  -- rising clock edge
+        begin                                                          -- process del_cntr_p
+            if (rising_edge(BCLK)) then                                -- rising clock edge
 
                 PULSE_OUT <= '0';
 
-                if (rst_sync = '1') then  -- synchronous reset (active high)
+                if (rst_sync = '1') then                               -- synchronous reset (active high)
 
                     del_cntr_state <= WT_FOR_CNTR_TRIGGER;
 
@@ -175,12 +189,12 @@ begin  -- architecture str
     -- purpose: two-state state machine which waits for trigger set and then waits for trigger deassert
     -- type   : sequential
     short_by_trigg_p : process (BCLK) is
-    begin  -- process short_by_trigg_g
-        if (rising_edge(BCLK)) then     -- rising clock edge
+    begin                                        -- process short_by_trigg_g
+        if (rising_edge(BCLK)) then              -- rising clock edge
 
             counter_trigg <= '0';
 
-            if (rst_sync = '1') then    -- synchronous reset (active high)
+            if (rst_sync = '1') then             -- synchronous reset (active high)
 
                 idle <= '1';
 

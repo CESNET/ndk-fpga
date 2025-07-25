@@ -13,7 +13,7 @@ use IEEE.numeric_std.all;
 -- with the discard flag will be discarded (masked) in the internal logic.
 -- There is a built-in optional output register.
 entity MVB_DISCARD is
-    generic(
+    generic (
         -- Number of items
         ITEMS      : natural := 4;
         -- Item width in bits
@@ -21,7 +21,7 @@ entity MVB_DISCARD is
         -- Optional output register
         OUTPUT_REG : boolean := True
     );
-    port(
+    port (
         -- Clock input
         CLK         : in  std_logic;
         -- Reset input synchronized with CLK

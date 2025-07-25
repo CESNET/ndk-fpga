@@ -21,63 +21,63 @@ use work.math_pack.all;
 -- When the Offset is reached (Word and Region), the Offset gets rounded up to the following Region.
 -- And also, the Length is decremented by the number of Items that are from the Offset to the end of the Region.
 entity VALIDATION_PREPARE is
-generic(
-    -- Number of Regions within a data word, must be power of 2.
-    MFB_REGIONS     : natural := 4;
-    -- Region size (in Blocks).
-    MFB_REGION_SIZE : natural := 8;
-    -- Block size (in Items).
-    MFB_BLOCK_SIZE  : natural := 8;
+    generic (
+        -- Number of Regions within a data word, must be power of 2.
+        MFB_REGIONS     : natural := 4;
+        -- Region size (in Blocks).
+        MFB_REGION_SIZE : natural := 8;
+        -- Block size (in Items).
+        MFB_BLOCK_SIZE  : natural := 8;
 
-    -- Maximum amount of Words a single packet can stretch over.
-    MAX_WORDS       : natural := 10;
-    -- Width of the Offset signals.
-    OFFSET_WIDTH    : integer := log2(MAX_WORDS*MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE)
-);
-port(
-    -- ========================================================================
-    -- Clock and Reset
-    -- ========================================================================
+        -- Maximum amount of Words a single packet can stretch over.
+        MAX_WORDS       : natural := 10;
+        -- Width of the Offset signals.
+        OFFSET_WIDTH    : integer := log2(MAX_WORDS*MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE)
+    );
+    port (
+        -- ========================================================================
+        -- Clock and Reset
+        -- ========================================================================
 
-    CLK             : in  std_logic;
-    RESET           : in  std_logic;
+        CLK             : in  std_logic;
+        RESET           : in  std_logic;
 
-    -- ========================================================================
-    -- RX inf
-    -- ========================================================================
+        -- ========================================================================
+        -- RX inf
+        -- ========================================================================
 
-    -- Number of the current word (counted from each SOF).
-    RX_WORD         : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MAX_WORDS)-1 downto 0);
-    RX_WORD_PREV    : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MAX_WORDS)-1 downto 0);
-    -- Offset of the Start of the Section-to-be-validated (from the beginning of the word; in Items).
-    RX_OFFSET_START : in  u_array_t       (MFB_REGIONS-1 downto 0)(OFFSET_WIDTH-1 downto 0);
-    -- Offset of the End of the Section-to-be-validated (from the beginning of the word; in Items).
-    RX_OFFSET_END   : in  u_array_t       (MFB_REGIONS-1 downto 0)(OFFSET_WIDTH-1 downto 0);
-    RX_VALID        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_SRC_RDY      : in  std_logic;
-    RX_DST_RDY      : out std_logic;
+        -- Number of the current word (counted from each SOF).
+        RX_WORD         : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MAX_WORDS)-1 downto 0);
+        RX_WORD_PREV    : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MAX_WORDS)-1 downto 0);
+        -- Offset of the Start of the Section-to-be-validated (from the beginning of the word; in Items).
+        RX_OFFSET_START : in  u_array_t       (MFB_REGIONS-1 downto 0)(OFFSET_WIDTH-1 downto 0);
+        -- Offset of the End of the Section-to-be-validated (from the beginning of the word; in Items).
+        RX_OFFSET_END   : in  u_array_t       (MFB_REGIONS-1 downto 0)(OFFSET_WIDTH-1 downto 0);
+        RX_VALID        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_SRC_RDY      : in  std_logic;
+        RX_DST_RDY      : out std_logic;
 
-    -- ========================================================================
-    -- TX inf
-    -- ========================================================================
+        -- ========================================================================
+        -- TX inf
+        -- ========================================================================
 
-    -- With current SOF
-    TX_OFFSET1_START : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    TX_OFFSET1_END   : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    TX_VALID1        : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_END1_POINTER  : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    TX_END1          : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        -- With current SOF
+        TX_OFFSET1_START : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        TX_OFFSET1_END   : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        TX_VALID1        : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_END1_POINTER  : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        TX_END1          : out std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    -- With older SOF
-    TX_OFFSET2_START : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    TX_OFFSET2_END   : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    TX_VALID2        : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_END2_POINTER  : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    TX_END2          : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        -- With older SOF
+        TX_OFFSET2_START : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        TX_OFFSET2_END   : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        TX_VALID2        : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_END2_POINTER  : out u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        TX_END2          : out std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    TX_SRC_RDY       : out std_logic;
-    TX_DST_RDY       : in  std_logic
-);
+        TX_SRC_RDY       : out std_logic;
+        TX_DST_RDY       : in  std_logic
+    );
 end entity;
 
 architecture FULL of VALIDATION_PREPARE is
@@ -127,14 +127,14 @@ begin
     offset_reached1_g : for r in 0 to MFB_REGIONS-1 generate
 
         offset_start_reached1_i : entity work.OFFSET_REACHED
-        generic map(
-            MAX_WORDS     => MAX_WORDS    ,
-            OFFSET_WIDTH  => OFFSET_WIDTH ,
-            REGIONS       => MFB_REGIONS  ,
-            REGION_ITEMS  => REGION_ITEMS ,
+        generic map (
+            MAX_WORDS     => MAX_WORDS,
+            OFFSET_WIDTH  => OFFSET_WIDTH,
+            REGIONS       => MFB_REGIONS,
+            REGION_ITEMS  => REGION_ITEMS,
             REGION_NUMBER => r
         )
-        port map(
+        port map (
             RX_WORD    => RX_WORD        (r),
             RX_OFFSET  => RX_OFFSET_START(r),
             RX_VALID   => RX_VALID       (r),
@@ -143,14 +143,14 @@ begin
         );
 
         offset_end_reached1_i : entity work.OFFSET_REACHED
-        generic map(
-            MAX_WORDS     => MAX_WORDS    ,
-            OFFSET_WIDTH  => OFFSET_WIDTH ,
-            REGIONS       => MFB_REGIONS  ,
-            REGION_ITEMS  => REGION_ITEMS ,
+        generic map (
+            MAX_WORDS     => MAX_WORDS,
+            OFFSET_WIDTH  => OFFSET_WIDTH,
+            REGIONS       => MFB_REGIONS,
+            REGION_ITEMS  => REGION_ITEMS,
             REGION_NUMBER => r
         )
-        port map(
+        port map (
             RX_WORD    => RX_WORD      (r),
             RX_OFFSET  => RX_OFFSET_END(r),
             RX_VALID   => RX_VALID     (r),
@@ -175,15 +175,15 @@ begin
     -- --------------------------------------------
     validation_prepare_r_g : for r in 0 to MFB_REGIONS-1 generate
         validation_prepare_r_i : entity work.VALIDATION_PREPARE_R
-        generic map(
-            MFB_REGIONS     => MFB_REGIONS    ,
+        generic map (
+            MFB_REGIONS     => MFB_REGIONS,
             MFB_REGION_SIZE => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE ,
-            REGION_NUMBER   => r              ,
-            MAX_WORDS       => MAX_WORDS      ,
+            MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            REGION_NUMBER   => r,
+            MAX_WORDS       => MAX_WORDS,
             OFFSET_WIDTH    => OFFSET_WIDTH
         )
-        port map(
+        port map (
             RX_WORD             => vp_rx_word            (r),
             RX_WORD_PREV        => vp_rx_word_prev       (r),
             RX_NEW_OFFSET_START => vp_rx_new_offset_start(r),
@@ -208,10 +208,10 @@ begin
         vp_rx_old_valid       (r+1) <= vp_tx_valid       (r);
     end generate;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
-            if (RX_SRC_RDY = '1') and (TX_DST_RDY = '1') then
+            if ((RX_SRC_RDY = '1') and (TX_DST_RDY = '1')) then
                 vp_rx_old_offset_start(0) <= vp_tx_offset_start(MFB_REGIONS-1);
                 vp_rx_old_offset_end  (0) <= vp_tx_offset_end  (MFB_REGIONS-1);
                 vp_rx_old_valid       (0) <= vp_tx_valid       (MFB_REGIONS-1);
@@ -228,14 +228,14 @@ begin
     offset_reached2_g : for r in 0 to MFB_REGIONS-1 generate
 
         offset_start_reached2_i : entity work.OFFSET_REACHED
-        generic map(
-            MAX_WORDS     => MAX_WORDS    ,
-            OFFSET_WIDTH  => OFFSET_WIDTH ,
-            REGIONS       => MFB_REGIONS  ,
-            REGION_ITEMS  => REGION_ITEMS ,
+        generic map (
+            MAX_WORDS     => MAX_WORDS,
+            OFFSET_WIDTH  => OFFSET_WIDTH,
+            REGIONS       => MFB_REGIONS,
+            REGION_ITEMS  => REGION_ITEMS,
             REGION_NUMBER => r
         )
-        port map(
+        port map (
             RX_WORD    => vp_rx_word_prev       (r),
             RX_OFFSET  => vp_rx_old_offset_start(r),
             RX_VALID   => vp_rx_old_valid       (r),
@@ -244,14 +244,14 @@ begin
         );
 
         offset_end_reached2_i : entity work.OFFSET_REACHED
-        generic map(
-            MAX_WORDS     => MAX_WORDS    ,
-            OFFSET_WIDTH  => OFFSET_WIDTH ,
-            REGIONS       => MFB_REGIONS  ,
-            REGION_ITEMS  => REGION_ITEMS ,
+        generic map (
+            MAX_WORDS     => MAX_WORDS,
+            OFFSET_WIDTH  => OFFSET_WIDTH,
+            REGIONS       => MFB_REGIONS,
+            REGION_ITEMS  => REGION_ITEMS,
             REGION_NUMBER => r
         )
-        port map(
+        port map (
             RX_WORD    => vp_rx_word_prev     (r),
             RX_OFFSET  => vp_rx_old_offset_end(r),
             RX_VALID   => vp_rx_old_valid     (r),

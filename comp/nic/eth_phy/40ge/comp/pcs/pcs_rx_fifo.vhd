@@ -8,20 +8,20 @@ library ieee;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity pcs_rx_fifo is
+entity PCS_RX_FIFO is
     generic (
         NUM_LANES : natural := 8;
         DEVICE    : string  := "ULTRASCALE" --! "VIRTEX6", "7SERIES", "ULTRASCALE"
     );
     port (
-        RESET_D : in std_logic;
-        CLK_D   : in std_logic; -- D clock
-        WE      : in std_logic; -- Data write enable
-        D       : in std_logic_vector(NUM_LANES*66-1 downto 0);  -- Input data
+        RESET_D    : in std_logic;
+        CLK_D      : in std_logic;                                   -- D clock
+        WE         : in std_logic;                                   -- Data write enable
+        D          : in std_logic_vector(NUM_LANES*66-1 downto 0);   -- Input data
         --
-        RESET_Q : in std_logic;
-        CLK_Q   : in std_logic; -- Q clock
-        Q       : out std_logic_vector(NUM_LANES*66-1 downto 0);  -- Output data
+        RESET_Q    : in std_logic;
+        CLK_Q      : in std_logic;                                   -- Q clock
+        Q          : out std_logic_vector(NUM_LANES*66-1 downto 0);  -- Output data
         -- Status
         FIFO_FULL  : out std_logic;
         FIFO_EMPTY : out std_logic;
@@ -30,9 +30,9 @@ entity pcs_rx_fifo is
         DBG_FIFO_AEMPTY : out std_logic;
         DBG_FIFO_RDEN   : out std_logic
     );
-end pcs_rx_fifo;
+end entity;
 
-architecture behavioral of pcs_rx_fifo is
+architecture BEHAVIORAL of PCS_RX_FIFO is
 
     signal discard      : std_logic;
     signal insert       : std_logic;
@@ -66,13 +66,13 @@ begin
     we_dly <= WE after 500 ps;
 
     -- Idle drop logic  -----------------------------------------------------------
-    IDLE_DETECT_DROP: process(d_dly)
+    idle_detect_drop : process (d_dly)
     begin
         idle_found0 <= '0';
         -- Detect IDLE characters on individual lanes
         for i in 0 to NUM_LANES-1 loop
-            if (d_dly(1+i*66 downto i*66) = "01") and (d_dly(9+i*66 downto i*66+2) = X"1E") then
-                idle0(i) <= '1';
+            if ((d_dly(1+i*66 downto i*66) = "01") and (d_dly(9+i*66 downto i*66+2) = X"1E")) then
+                idle0(i)    <= '1';
                 idle_found0 <= '1';
             else
                 idle0(i) <= '0';
@@ -80,11 +80,11 @@ begin
         end loop;
     end process;
 
-    GEN_DROP_INDEX : process(idle0)
+    gen_drop_index : process (idle0)
     begin
         drop_index <= 0;
         for i in 0 to NUM_LANES-1 loop
-            if idle0(i) = '1' then
+            if (idle0(i) = '1') then
                 drop_index <= i;
             end if;
         end loop;
@@ -92,10 +92,10 @@ begin
 
     drop <= discard and idle_found0;
 
-    GEN_MULTILANE_DROP: if (NUM_LANES > 1) generate
-        PIPE: process(CLK_D)
+    gen_multilane_drop: if (NUM_LANES > 1) generate
+        pipe : process (CLK_D)
         begin
-            if CLK_D'event and CLK_D = '1' then
+            if rising_edge(CLK_D) then
                 discard  <= fifo_afull;
                 sh_din   <= d_dly;
                 sh_drop  <= drop;
@@ -104,7 +104,7 @@ begin
             end if;
         end process;
 
-        BLOCK_DROP: entity work.block_shifter
+        block_drop: entity work.BLOCK_SHIFTER
         generic map (
             NUM_LANES => NUM_LANES
         )
@@ -122,10 +122,10 @@ begin
         );
     end generate;
 
-    GEN_SINGLELANE_DROP: if (NUM_LANES = 1) generate
-        PIPE: process(CLK_D)
+    gen_singlelane_drop: if (NUM_LANES = 1) generate
+        pipe : process (CLK_D)
         begin
-            if CLK_D'event and CLK_D = '1' then
+            if rising_edge(CLK_D) then
                 discard  <= fifo_afull;
                 if (we_dly = '1') then
                     sh_din   <= d_dly;
@@ -139,7 +139,7 @@ begin
     end generate;
 
 
-    ASFIFO: entity work.ASFIFO_BRAM_XILINX
+    asfifo: entity work.ASFIFO_BRAM_XILINX
     generic map (
         DEVICE                  => DEVICE,
         DATA_WIDTH              => 66*NUM_LANES,
@@ -171,13 +171,13 @@ begin
     emptying <= fifo_aempty;
 
     -- Idle insert logic  --------------------------------------------------------
-    IDLE_DETECT_INSERT: process(fifo_dout)
+    idle_detect_insert : process (fifo_dout)
     begin
         idle_found <= '0';
         -- Detect IDLE characters on individual lanes
         for i in 0 to NUM_LANES-1 loop
-            if (fifo_dout(1+i*66 downto i*66) = "01") and (fifo_dout(9+i*66 downto i*66+2) = X"1E") then
-                idle(i) <= '1';
+            if ((fifo_dout(1+i*66 downto i*66) = "01") and (fifo_dout(9+i*66 downto i*66+2) = X"1E")) then
+                idle(i)    <= '1';
                 idle_found <= '1';
             else
                 idle(i) <= '0';
@@ -185,16 +185,16 @@ begin
         end loop;
     end process;
 
-    PIPELINE: process(CLK_Q)
+    pipeline : process (CLK_Q)
     begin
-        if CLK_Q'event and CLK_Q = '1' then
-            if fifo_ren = '1' then
-                fifo_dout_r <= fifo_dout;
-                insert <= emptying and idle_found;
+        if rising_edge(CLK_Q) then
+            if (fifo_ren = '1') then
+                fifo_dout_r  <= fifo_dout;
+                insert       <= emptying and idle_found;
                 --
                 insert_index <= 0;
                 for i in 0 to NUM_LANES-1 loop
-                    if idle(i) = '1' then
+                    if (idle(i) = '1') then
                         insert_index <= i;
                     end if;
                 end loop;
@@ -202,8 +202,8 @@ begin
         end if;
     end process;
 
-    GEN_MULTILANE_INSERT: if (NUM_LANES > 1) generate
-        BLOCK_INSERT: entity work.block_shifter
+    gen_multilane_insert: if (NUM_LANES > 1) generate
+        block_insert: entity work.BLOCK_SHIFTER
         generic map (
             NUM_LANES => NUM_LANES
         )
@@ -212,7 +212,7 @@ begin
             CLK   => CLK_Q,
             D     => fifo_dout_r,
             RE    => fifo_ren,
-            DROP  => '0', --drop,
+            DROP  => '0', -- drop,
             INS   => insert,
             IDX   => insert_index,
             --
@@ -221,13 +221,13 @@ begin
         );
     end generate;
 
-    GEN_SINGLELANE_INSERT: if (NUM_LANES = 1) generate
+    gen_singlelane_insert: if (NUM_LANES = 1) generate
         fifo_ren <= '0' when ((insert = '1' and emptying = '1') or (fifo_empty_i = '1')) else '1';
-        Q <= fifo_dout_r;
+        Q        <= fifo_dout_r;
     end generate;
 
     DBG_FIFO_AFULL  <= fifo_afull;
     DBG_FIFO_AEMPTY <= fifo_aempty;
     DBG_FIFO_RDEN   <= fifo_ren;
 
-end behavioral;
+end architecture;

@@ -12,14 +12,14 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_GET_CRC32 is
-    generic(
-        REGIONS     : natural := 4; -- any possitive value
-        REGION_SIZE : natural := 8; -- any possitive value
-        BLOCK_SIZE  : natural := 8; -- any possitive value
-        ITEM_WIDTH  : natural := 8; -- must be 8
+    generic (
+        REGIONS     : natural := 4;   -- any possitive value
+        REGION_SIZE : natural := 8;   -- any possitive value
+        BLOCK_SIZE  : natural := 8;   -- any possitive value
+        ITEM_WIDTH  : natural := 8;   -- must be 8
         INBANDFCS   : boolean := True -- True = CRC is not removed, False = CRC is removed
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK             : in  std_logic;
         RESET           : in  std_logic;
@@ -91,11 +91,11 @@ begin
 
             mux_g : for i in 0 to 3 generate
                 mux_i : entity work.GEN_MUX
-                generic map(
+                generic map (
                     DATA_WIDTH => 8,
                     MUX_WIDTH  => BYTES_COUNT
                 )
-                port map(
+                port map (
                     DATA_IN  => s_mux_din_arr(r)((2*BYTES_COUNT-i)*8-1 downto (BYTES_COUNT-i)*8),
                     SEL      => s_mux_sel_arr(r),
                     DATA_OUT => s_crc32_arr(r)(((3-i)+1)*8-1 downto (3-i)*8)
@@ -111,11 +111,11 @@ begin
 
             mux_g : for i in 0 to 3 generate
                 mux_i : entity work.GEN_MUX
-                generic map(
+                generic map (
                     DATA_WIDTH => 8,
                     MUX_WIDTH  => BYTES_COUNT
                 )
-                port map(
+                port map (
                     DATA_IN  => s_mux_din_arr(r)((BYTES_COUNT+i+1)*8-1 downto (i+1)*8),
                     SEL      => s_mux_sel_arr(r),
                     DATA_OUT => s_crc32_arr(r)((i+1)*8-1 downto i*8)

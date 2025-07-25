@@ -22,20 +22,20 @@ use work.math_pack.all;
 --!                            Entity declaration
 --! -----------------------------------------------------------------------------
 
-entity gen_enc is
-generic (
-   --! \brief Data width of input vector
-   ITEMS           : integer := 4096;
-   DEVICE          : string := "none" --! "VIRTEX6", "7SERIES", "ULTRASCALE", "none" (behavioral)
+entity GEN_ENC is
+    generic (
+        --! \brief Data width of input vector
+        ITEMS           : integer := 4096;
+        DEVICE          : string := "none" --! "VIRTEX6", "7SERIES", "ULTRASCALE", "none" (behavioral)
 
-);
-port (
-   --! \name Input vector
-   --! --------------------------------------------------------------------------
-   DI                 : in  std_logic_vector(ITEMS-1 downto 0);
-   --! \name Output address
-   --! --------------------------------------------------------------------------
-   ADDR                 : out std_logic_vector(max(log2(ITEMS),1)-1 downto 0)
+    );
+    port (
+        --! \name Input vector
+        --! --------------------------------------------------------------------------
+        DI                   : in  std_logic_vector(ITEMS-1 downto 0);
+        --! \name Output address
+        --! --------------------------------------------------------------------------
+        ADDR                 : out std_logic_vector(max(log2(ITEMS),1)-1 downto 0)
 
-);
-end entity gen_enc;
+    );
+end entity;

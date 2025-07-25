@@ -12,98 +12,98 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-   --! -------------------------------------------------------------------------
-   --!                      Entity declaration
-   --! -------------------------------------------------------------------------
+--! -------------------------------------------------------------------------
+--!                      Entity declaration
+--! -------------------------------------------------------------------------
 
 entity BUS_HANDSHAKE_FSM is
-   Port (
-      CLK       : in  STD_LOGIC;    --! Clock
-      RST       : in  STD_LOGIC;    --! Reset
-      ACK       : in  STD_LOGIC;    --! Signal ACK
-      EVENT     : in  STD_LOGIC;    --! Signal EVENT
-      READY     : out STD_LOGIC     --! Signal READY
-   );
-end BUS_HANDSHAKE_FSM;
+    port (
+        CLK       : in  STD_LOGIC;    --! Clock
+        RST       : in  STD_LOGIC;    --! Reset
+        ACK       : in  STD_LOGIC;    --! Signal ACK
+        EVENT     : in  STD_LOGIC;    --! Signal EVENT
+        READY     : out STD_LOGIC     --! Signal READY
+    );
+end entity;
 
-   --! -------------------------------------------------------------------------
-   --!                      Architecture declaration
-   --! -------------------------------------------------------------------------
+--! -------------------------------------------------------------------------
+--!                      Architecture declaration
+--! -------------------------------------------------------------------------
 
 architecture FULL of BUS_HANDSHAKE_FSM is
 
-   --! -------------------------------------------------------------------------
-   --!                      SIGNALS
-   --! -------------------------------------------------------------------------
+    --! -------------------------------------------------------------------------
+    --!                      SIGNALS
+    --! -------------------------------------------------------------------------
 
-   type state is (st0,st1);
-   signal present_st : state := st0;
-   signal next_st    : state;
+    type   state is (ST0,ST1);
+    signal present_st : state := ST0;
+    signal next_st    : state;
 
---! -------------------------------------------------------------------------
+    --! -------------------------------------------------------------------------
 begin
---! -------------------------------------------------------------------------
+    --! -------------------------------------------------------------------------
 
-   --! Present State register
-   present_state_reg: process(CLK)
-      begin
-      if (rising_edge(CLK)) then
-         if (RST='1') then
-            present_st <= st0;
-         else
-            present_st <= next_st;
-         end if;
-      end if;
-   end process;
-
-   --! Next State logic
-   next_state_logic: process (present_st, ACK, EVENT)
-   begin
-      case present_st is
-
-         --! STATE st0
-         when st0 =>
-
-            if (EVENT = '1') then
-               next_st <= st1;
+    --! Present State register
+    present_state_reg : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (RST = '1') then
+                present_st <= ST0;
             else
-               next_st <= st0;
+                present_st <= next_st;
             end if;
+        end if;
+    end process;
 
-         --! STATE st1
-         when st1 =>
+    --! Next State logic
+    next_state_logic : process (present_st, ACK, EVENT)
+    begin
+        case present_st is
 
-            if (ACK = '1') then
-               next_st <= st0;
-            else
-               next_st <= st1;
-            end if;
+            --! STATE st0
+            when ST0 =>
 
-         --! Others STATE
-         when others => null;
+                if (EVENT = '1') then
+                    next_st <= ST1;
+                else
+                    next_st <= ST0;
+                end if;
 
-      end case;
-   end process;
+            --! STATE st1
+            when ST1 =>
 
-   --! Output logic
-   output_logic: process (present_st)
-   begin
-      case present_st is
+                if (ACK = '1') then
+                    next_st <= ST0;
+                else
+                    next_st <= ST1;
+                end if;
 
-         --! STATE st0
-         when st0 =>
+            --! Others STATE
+            when others => null;
 
-            READY <= '1';
+        end case;
+    end process;
 
-         --! STATE st1
-         when st1 =>
+    --! Output logic
+    output_logic : process (present_st)
+    begin
+        case present_st is
 
-            READY <= '0';
+            --! STATE st0
+            when ST0 =>
 
-         --! Others STATE
-         when others => null;
+                READY <= '1';
 
-      end case;
-   end process;
+            --! STATE st1
+            when ST1 =>
 
-end architecture FULL;
+                READY <= '0';
+
+            --! Others STATE
+            when others => null;
+
+        end case;
+    end process;
+
+end architecture;

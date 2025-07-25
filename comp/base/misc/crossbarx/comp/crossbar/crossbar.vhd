@@ -16,80 +16,80 @@ use work.type_pack.all;
 -- ----------------------------------------------------------------------------
 
 entity CROSSBARX_CROSSBAR is
-generic (
-    -- Transfer data on double frequency Clock
-    USE_CLK2        : boolean := true;
+    generic (
+        -- Transfer data on double frequency Clock
+        USE_CLK2        : boolean := true;
 
-    -- Source buffer size
-    SRC_BUF_COLS    : integer := 512;
-    SRC_BUF_ROWS    : integer := 8;
-    -- Destination buffer size
-    DST_BUF_COLS    : integer := 512;
-    DST_BUF_ROWS    : integer := 4;
+        -- Source buffer size
+        SRC_BUF_COLS    : integer := 512;
+        SRC_BUF_ROWS    : integer := 8;
+        -- Destination buffer size
+        DST_BUF_COLS    : integer := 512;
+        DST_BUF_ROWS    : integer := 4;
 
-    -- Number of items in one bufer row
-    ROW_ITEMS       : integer := 8;
-    -- Width of one item
-    ITEM_WIDTH      : integer := 8;
+        -- Number of items in one bufer row
+        ROW_ITEMS       : integer := 8;
+        -- Width of one item
+        ITEM_WIDTH      : integer := 8;
 
-    -- Source buffer read latency
-    RD_LATENCY      : integer := 1;
+        -- Source buffer read latency
+        RD_LATENCY      : integer := 1;
 
-    -- Data multiplexer's latency (increase for better timing)
-    DATA_MUX_LATENCY            : integer := 0;
-    -- Data multiplexer's output register enable (set to TRUE for better timing)
-    DATA_MUX_OUTPUT_REG_EN      : boolean := true;
+        -- Data multiplexer's latency (increase for better timing)
+        DATA_MUX_LATENCY            : integer := 0;
+        -- Data multiplexer's output register enable (set to TRUE for better timing)
+        DATA_MUX_OUTPUT_REG_EN      : boolean := true;
 
-    -- Data blocks rotation latency (increase for better timing)
-    DATA_ROTATION_LATENCY       : integer := 0;
-    -- Data blocks rotation output register enable (set to TRUE for better timing)
-    DATA_ROTATION_OUTPUT_REG_EN : boolean := true;
+        -- Data blocks rotation latency (increase for better timing)
+        DATA_ROTATION_LATENCY       : integer := 0;
+        -- Data blocks rotation output register enable (set to TRUE for better timing)
+        DATA_ROTATION_OUTPUT_REG_EN : boolean := true;
 
-    -- Target Device
-    -- "ULTRASCALE", "7SERIES", ...
-    DEVICE          : string := "STRATIX10"
-);
-port (
-    -- =================================
-    -- Clock and reset
-    -- =================================
+        -- Target Device
+        -- "ULTRASCALE", "7SERIES", ...
+        DEVICE          : string := "STRATIX10"
+    );
+    port (
+        -- =================================
+        -- Clock and reset
+        -- =================================
 
-    CLK             : in  std_logic;
-    CLK2            : in  std_logic;
-    RESET           : in  std_logic;
+        CLK             : in  std_logic;
+        CLK2            : in  std_logic;
+        RESET           : in  std_logic;
 
-    -- =================================
-    -- Input uInstructions
-    -- =================================
+        -- =================================
+        -- Input uInstructions
+        -- =================================
 
-    -- per src row
-    RX_UINSTR_SRC_COL : in  slv_array_2d_t(2-1 downto 0)(SRC_BUF_ROWS-1 downto 0)(log2(SRC_BUF_COLS)-1 downto 0);
-    -- per dst row
-    RX_UINSTR_SRC_ROW : in  slv_array_2d_t(2-1 downto 0)(DST_BUF_ROWS-1 downto 0)(log2(SRC_BUF_ROWS)-1 downto 0);
-    RX_UINSTR_DST_COL : in  slv_array_2d_t(2-1 downto 0)(DST_BUF_ROWS-1 downto 0)(log2(DST_BUF_COLS)-1 downto 0);
-    -- row rotation
-    RX_UINSTR_ROW_ROT : in  slv_array_2d_t(2-1 downto 0)(DST_BUF_ROWS-1 downto 0)(log2(ROW_ITEMS)-1 downto 0);
-    -- item enable
-    RX_UINSTR_IE      : in  slv_array_2d_t(2-1 downto 0)(DST_BUF_ROWS-1 downto 0)(ROW_ITEMS-1 downto 0);
-    RX_UINSTR_SRC_RDY : in  slv_array_t   (2-1 downto 0)(DST_BUF_ROWS-1 downto 0);
+        -- per src row
+        RX_UINSTR_SRC_COL : in  slv_array_2d_t(2-1 downto 0)(SRC_BUF_ROWS-1 downto 0)(log2(SRC_BUF_COLS)-1 downto 0);
+        -- per dst row
+        RX_UINSTR_SRC_ROW : in  slv_array_2d_t(2-1 downto 0)(DST_BUF_ROWS-1 downto 0)(log2(SRC_BUF_ROWS)-1 downto 0);
+        RX_UINSTR_DST_COL : in  slv_array_2d_t(2-1 downto 0)(DST_BUF_ROWS-1 downto 0)(log2(DST_BUF_COLS)-1 downto 0);
+        -- row rotation
+        RX_UINSTR_ROW_ROT : in  slv_array_2d_t(2-1 downto 0)(DST_BUF_ROWS-1 downto 0)(log2(ROW_ITEMS)-1 downto 0);
+        -- item enable
+        RX_UINSTR_IE      : in  slv_array_2d_t(2-1 downto 0)(DST_BUF_ROWS-1 downto 0)(ROW_ITEMS-1 downto 0);
+        RX_UINSTR_SRC_RDY : in  slv_array_t   (2-1 downto 0)(DST_BUF_ROWS-1 downto 0);
 
-    -- =================================
-    -- Source buffer read interface
-    -- =================================
+        -- =================================
+        -- Source buffer read interface
+        -- =================================
 
-    SRC_BUF_RD_ADDR : out slv_array_t(SRC_BUF_ROWS-1 downto 0)(log2(SRC_BUF_COLS)-1 downto 0);
-    SRC_BUF_RD_DATA : in  slv_array_t(SRC_BUF_ROWS-1 downto 0)(ROW_ITEMS*ITEM_WIDTH-1 downto 0);
+        SRC_BUF_RD_ADDR : out slv_array_t(SRC_BUF_ROWS-1 downto 0)(log2(SRC_BUF_COLS)-1 downto 0);
+        SRC_BUF_RD_DATA : in  slv_array_t(SRC_BUF_ROWS-1 downto 0)(ROW_ITEMS*ITEM_WIDTH-1 downto 0);
 
-    -- =================================
-    -- Destination buffer read interface
-    -- =================================
+        -- =================================
+        -- Destination buffer read interface
+        -- =================================
 
-    DST_BUF_WR_ADDR : out slv_array_t(DST_BUF_ROWS-1 downto 0)(log2(DST_BUF_COLS)-1 downto 0);
-    DST_BUF_WR_DATA : out slv_array_t(DST_BUF_ROWS-1 downto 0)(ROW_ITEMS*ITEM_WIDTH-1 downto 0);
-    -- item enable
-    DST_BUF_WR_IE   : out slv_array_t(DST_BUF_ROWS-1 downto 0)(ROW_ITEMS-1 downto 0);
-    DST_BUF_WR_EN   : out std_logic_vector(DST_BUF_ROWS-1 downto 0)
-);
+        DST_BUF_WR_ADDR : out slv_array_t(DST_BUF_ROWS-1 downto 0)(log2(DST_BUF_COLS)-1 downto 0);
+        DST_BUF_WR_DATA : out slv_array_t(DST_BUF_ROWS-1 downto 0)(ROW_ITEMS*ITEM_WIDTH-1 downto 0);
+        -- item enable
+        DST_BUF_WR_IE   : out slv_array_t(DST_BUF_ROWS-1 downto 0)(ROW_ITEMS-1 downto 0);
+        DST_BUF_WR_EN   : out std_logic_vector(DST_BUF_ROWS-1 downto 0)
+    );
 end entity;
 
 -- ----------------------------------------------------------------------------
@@ -101,10 +101,10 @@ architecture FULL of CROSSBARX_CROSSBAR is
     constant ROW_WIDTH : integer := ROW_ITEMS*ITEM_WIDTH;
 
     constant UINSTR_WORD_WIDTH : integer := SRC_BUF_ROWS*log2(ROW_ITEMS)
-                                           +DST_BUF_ROWS*log2(SRC_BUF_ROWS)
-                                           +DST_BUF_ROWS*ROW_ITEMS
-                                           +DST_BUF_ROWS*log2(DST_BUF_COLS)
-                                           +DST_BUF_ROWS;
+                                            +DST_BUF_ROWS*log2(SRC_BUF_ROWS)
+                                            +DST_BUF_ROWS*ROW_ITEMS
+                                            +DST_BUF_ROWS*log2(DST_BUF_COLS)
+                                            +DST_BUF_ROWS;
 
     -- ----------------------------------------------------------------------------
     -- Signals
@@ -130,7 +130,7 @@ architecture FULL of CROSSBARX_CROSSBAR is
 
     -- control plan select register
     signal plan_sel_reg  : std_logic_vector(0 downto 0);
-    signal plan_sel_regI : integer := 0;
+    signal plan_sel_regi : integer := 0;
 
     --------
     -- data transmission path
@@ -160,7 +160,7 @@ architecture FULL of CROSSBARX_CROSSBAR is
     signal s1_data_reg      : slv_array_t(SRC_BUF_ROWS-1 downto 0)(ROW_WIDTH-1 downto 0);
 
     -- step 2 - Source buffer blocks rotation
-    signal s2_rot_sel_dst_be_dst_word_reg : slv_array_t(DST_BUF_ROWS-1 downto 0)( log2(ROW_ITEMS)
+    signal s2_rot_sel_dst_be_dst_word_reg : slv_array_t(DST_BUF_ROWS-1 downto 0)(log2(ROW_ITEMS)
                                                                                  +ROW_ITEMS
                                                                                  +log2(DST_BUF_COLS)-1 downto 0);
 
@@ -171,7 +171,7 @@ architecture FULL of CROSSBARX_CROSSBAR is
     signal s2_data_reg      : slv_array_t(DST_BUF_ROWS-1 downto 0)(ROW_WIDTH-1 downto 0);
 
     -- step 3 - data multiplex, Destination buffer write addr and data insert
-    signal dst_buf_wr_addr_ie : slv_array_t(DST_BUF_ROWS-1 downto 0)( log2(DST_BUF_COLS)
+    signal dst_buf_wr_addr_ie : slv_array_t(DST_BUF_ROWS-1 downto 0)(log2(DST_BUF_COLS)
                                                                      +ROW_ITEMS-1 downto 0);
 
     --------
@@ -181,7 +181,7 @@ architecture FULL of CROSSBARX_CROSSBAR is
     -- Setting maximum fanout for select signal register of data multiplexers for better routing
     -- Quartus
     attribute maxfan : integer;
-    attribute maxfan of s1_src_block_reg : signal is 32;
+    attribute maxfan of s1_src_block_reg     : signal is 32;
     -- Vivado
     attribute max_fanout : integer;
     attribute max_fanout of s1_src_block_reg : signal is 32;
@@ -214,7 +214,7 @@ begin
             uinstr_dst_be_reg    <= RX_UINSTR_IE;
             uinstr_dst_word_reg  <= RX_UINSTR_DST_COL;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 uinstr_vld_reg <= (others => (others => '0'));
             end if;
         end if;
@@ -229,13 +229,13 @@ begin
                 plan_sel_reg(0) <= not plan_sel_reg(0);
             end if;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 plan_sel_reg(0) <= '0';
             end if;
         end if;
     end process;
 
-    plan_sel_regI <= to_integer(unsigned(plan_sel_reg));
+    plan_sel_regi <= to_integer(unsigned(plan_sel_reg));
 
     --------
     -- data transmission path
@@ -246,16 +246,16 @@ begin
     s_1_reg_pr : process (d_clk)
     begin
         if (rising_edge(d_clk)) then
-            s_1_rot_sel_reg   <= delayed_uinstr_rot_sel_reg  (plan_sel_regI);
-            s_1_src_block_reg <= delayed_uinstr_src_block_reg(plan_sel_regI);
-            s_1_dst_be_reg    <= delayed_uinstr_dst_be_reg   (plan_sel_regI);
-            s_1_dst_word_reg  <= delayed_uinstr_dst_word_reg (plan_sel_regI);
-            s_1_vld_reg       <= delayed_uinstr_vld_reg      (plan_sel_regI);
+            s_1_rot_sel_reg   <= delayed_uinstr_rot_sel_reg  (plan_sel_regi);
+            s_1_src_block_reg <= delayed_uinstr_src_block_reg(plan_sel_regi);
+            s_1_dst_be_reg    <= delayed_uinstr_dst_be_reg   (plan_sel_regi);
+            s_1_dst_word_reg  <= delayed_uinstr_dst_word_reg (plan_sel_regi);
+            s_1_vld_reg       <= delayed_uinstr_vld_reg      (plan_sel_regi);
             for i in 0 to SRC_BUF_ROWS-1 loop
-                SRC_BUF_RD_ADDR(i) <= delayed_uinstr_src_word_reg(plan_sel_regI)(i);
+                SRC_BUF_RD_ADDR(i) <= delayed_uinstr_src_word_reg(plan_sel_regi)(i);
             end loop;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 s_1_vld_reg <= (others => '0');
             end if;
         end if;
@@ -263,7 +263,7 @@ begin
 
     -- step 0 - wait for Source buffer read response
 
-    rd_latency_wait_gen : if (RD_LATENCY>0) generate
+    rd_latency_wait_gen : if (RD_LATENCY > 0) generate
 
         -- generate RD_LATENCY number of shift registers
         s0_reg_pr : process (d_clk)
@@ -283,7 +283,7 @@ begin
                     s0_vld_reg      (i) <= s0_vld_reg      (i+1);
                 end loop;
 
-                if (RESET='1') then
+                if (RESET = '1') then
                     s0_vld_reg <= (others => (others => '0'));
                 end if;
             end if;
@@ -314,7 +314,7 @@ begin
                 s1_data_reg(i) <= SRC_BUF_RD_DATA(i);
             end loop;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 s1_vld_reg <= (others => '0');
             end if;
         end if;
@@ -329,9 +329,9 @@ begin
     begin
         data_mux_i : entity work.GEN_MUX_PIPED
         generic map (
-            DATA_WIDTH     => ROW_WIDTH             ,
-            MUX_WIDTH      => SRC_BUF_ROWS          ,
-            MUX_LATENCY    => DATA_MUX_LATENCY      ,
+            DATA_WIDTH     => ROW_WIDTH,
+            MUX_WIDTH      => SRC_BUF_ROWS,
+            MUX_LATENCY    => DATA_MUX_LATENCY,
             OUTPUT_REG     => DATA_MUX_OUTPUT_REG_EN,
             METADATA_WIDTH => log2(ROW_ITEMS)
                              +ROW_ITEMS
@@ -341,15 +341,15 @@ begin
             CLK   => d_clk,
             RESET => RESET,
 
-            RX_DATA     => slv_array_ser(s1_data_reg,SRC_BUF_ROWS,ROW_WIDTH)        ,
-            RX_SEL      => s1_src_block_reg(i)                                      ,
+            RX_DATA     => slv_array_ser(s1_data_reg,SRC_BUF_ROWS,ROW_WIDTH),
+            RX_SEL      => s1_src_block_reg(i),
             RX_METADATA => s1_rot_sel_reg(i) & s1_dst_be_reg(i) & s1_dst_word_reg(i),
-            RX_SRC_RDY  => s1_vld_reg(i)                                            ,
-            RX_DST_RDY  => open                                                     ,
+            RX_SRC_RDY  => s1_vld_reg(i),
+            RX_DST_RDY  => open,
 
-            TX_DATA     => s2_data_reg(i)                   ,
+            TX_DATA     => s2_data_reg(i),
             TX_METADATA => s2_rot_sel_dst_be_dst_word_reg(i),
-            TX_SRC_RDY  => s2_vld_reg(i)                    ,
+            TX_SRC_RDY  => s2_vld_reg(i),
             TX_DST_RDY  => '1'
         );
 
@@ -366,16 +366,16 @@ begin
     -- step 2 - Source buffer blocks rotation
 
     block_bar_shift_gen : for i in 0 to DST_BUF_ROWS-1 generate
-        signal DST_BUF_WR_ADDR_tmp : std_logic_vector(log2(DST_BUF_COLS)-1 downto 0);
-        signal DST_BUF_WR_IE_tmp   : std_logic_vector(ROW_ITEMS-1 downto 0);
+        signal dst_buf_wr_addr_tmp : std_logic_vector(log2(DST_BUF_COLS)-1 downto 0);
+        signal dst_buf_wr_ie_tmp   : std_logic_vector(ROW_ITEMS-1 downto 0);
     begin
         block_bar_shift_i : entity work.BARREL_SHIFTER_GEN_PIPED
         generic map (
-            BLOCKS            => ROW_ITEMS                  ,
-            BLOCK_WIDTH       => ITEM_WIDTH                 ,
-            BAR_SHIFT_LATENCY => DATA_ROTATION_LATENCY      ,
+            BLOCKS            => ROW_ITEMS,
+            BLOCK_WIDTH       => ITEM_WIDTH,
+            BAR_SHIFT_LATENCY => DATA_ROTATION_LATENCY,
             OUTPUT_REG        => DATA_ROTATION_OUTPUT_REG_EN,
-            SHIFT_LEFT        => true                       ,
+            SHIFT_LEFT        => true,
             METADATA_WIDTH    => ROW_ITEMS
                                 +log2(DST_BUF_COLS)
         )
@@ -383,13 +383,13 @@ begin
             CLK         => d_clk,
             RESET       => RESET,
 
-            RX_DATA     => s2_data_reg(i)                       ,
-            RX_SEL      => s2_rot_sel_reg(i)                    ,
+            RX_DATA     => s2_data_reg(i),
+            RX_SEL      => s2_rot_sel_reg(i),
             RX_METADATA => s2_dst_be_reg(i) & s2_dst_word_reg(i),
-            RX_SRC_RDY  => s2_vld_reg(i)                        ,
-            RX_DST_RDY  => open                                 ,
+            RX_SRC_RDY  => s2_vld_reg(i),
+            RX_DST_RDY  => open,
 
-            TX_DATA     => DST_BUF_WR_DATA(i)   ,
+            TX_DATA     => DST_BUF_WR_DATA(i),
             TX_METADATA => dst_buf_wr_addr_ie(i),
             TX_SRC_RDY  => DST_BUF_WR_EN(i),
             TX_DST_RDY  => '1'
