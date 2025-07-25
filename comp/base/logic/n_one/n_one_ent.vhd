@@ -21,33 +21,33 @@ use work.math_pack.all;
 --!                            Entity declaration
 --! -----------------------------------------------------------------------------
 
-entity n_one is
-generic (
-   --! \brief Data width of input vector
-   DATA_WIDTH           : integer := 16
-);
-port (
+entity N_ONE is
+    generic (
+        --! \brief Data width of input vector
+        DATA_WIDTH           : integer := 16
+    );
+    port (
 
-   --! \name Clock & reset interface
-   --! --------------------------------------------------------------------------
-   --! \brief Common clock
-   CLK               : in  std_logic;
-   --! \brief Common reset
-   RESET             : in  std_logic;
+        --! \name Clock & reset interface
+        --! --------------------------------------------------------------------------
+        --! \brief Common clock
+        CLK               : in  std_logic;
+        --! \brief Common reset
+        RESET             : in  std_logic;
 
-   --! \name Input vector
-   --! --------------------------------------------------------------------------
-   D                 : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        --! \name Input vector
+        --! --------------------------------------------------------------------------
+        D                 : in  std_logic_vector(DATA_WIDTH-1 downto 0);
 
-   --! \name N one number
-   --! -------------------------------------------------------------------------
-   N                 : in  std_logic_vector(max(log2(DATA_WIDTH),1)-1 downto 0);
+        --! \name N one number
+        --! -------------------------------------------------------------------------
+        N                 : in  std_logic_vector(max(log2(DATA_WIDTH),1)-1 downto 0);
 
-   --! \name Output address
-   --! --------------------------------------------------------------------------
-   A                 : out std_logic_vector(max(log2(DATA_WIDTH),1)-1 downto 0);
-   --! \brief Valid bit
-   VLD               : out std_logic
+        --! \name Output address
+        --! --------------------------------------------------------------------------
+        A                 : out std_logic_vector(max(log2(DATA_WIDTH),1)-1 downto 0);
+        --! \brief Valid bit
+        VLD               : out std_logic
 
-);
-end entity n_one;
+    );
+end entity;

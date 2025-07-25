@@ -21,86 +21,86 @@ use work.type_pack.all;
 -- where it is valid with SOF.
 --
 entity MFB_FRAME_EXTENDER is
-generic (
-    -- The number of MFB regions
-    MFB_REGIONS     : natural := 4;
-    -- MFB region size in blocks, must be power of two
-    MFB_REGION_SIZE : natural := 8;
-    -- MFB block size in items, must be 8
-    MFB_BLOCK_SIZE  : natural := 8;
-    -- MFB item size in bits, must be 8
-    MFB_ITEM_WIDTH  : natural := 8;
-    -- Maximum size of a MFB frame (in bytes)
-    PKT_MTU         : natural := 2**14;
-    -- Set the depth of RX MVB FIFOX Multi
-    MVB_FIFO_DEPTH  : natural := 32;
-    -- Set the depth of RX MFB FIFOX Multi
-    MFB_FIFO_DEPTH  : natural := 32;
-    -- Width of User Metadata information
-    USERMETA_WIDTH  : natural := 32;
-    -- Enables generation of shared regions (end of old frame and start of new
-    -- one in one region) on TX MFB. Disabling shared regions allows work with
-    -- frames from 1B in size. Otherwise, the minimum frame size is 57B.
-    -- Disabling this generic may reduce throughput.
-    SHARED_REGIONS  : boolean := True;
-    -- Target device: AGILEX, STRATIX10, ULTRASCALE,...
-    DEVICE          : string  := "AGILEX"
-);
-port (
-    -- =========================================================================
-    -- Clock and Resets inputs
-    -- =========================================================================
-    CLK                    : in  std_logic;
-    RESET                  : in  std_logic;
+    generic (
+        -- The number of MFB regions
+        MFB_REGIONS     : natural := 4;
+        -- MFB region size in blocks, must be power of two
+        MFB_REGION_SIZE : natural := 8;
+        -- MFB block size in items, must be 8
+        MFB_BLOCK_SIZE  : natural := 8;
+        -- MFB item size in bits, must be 8
+        MFB_ITEM_WIDTH  : natural := 8;
+        -- Maximum size of a MFB frame (in bytes)
+        PKT_MTU         : natural := 2**14;
+        -- Set the depth of RX MVB FIFOX Multi
+        MVB_FIFO_DEPTH  : natural := 32;
+        -- Set the depth of RX MFB FIFOX Multi
+        MFB_FIFO_DEPTH  : natural := 32;
+        -- Width of User Metadata information
+        USERMETA_WIDTH  : natural := 32;
+        -- Enables generation of shared regions (end of old frame and start of new
+        -- one in one region) on TX MFB. Disabling shared regions allows work with
+        -- frames from 1B in size. Otherwise, the minimum frame size is 57B.
+        -- Disabling this generic may reduce throughput.
+        SHARED_REGIONS  : boolean := True;
+        -- Target device: AGILEX, STRATIX10, ULTRASCALE,...
+        DEVICE          : string  := "AGILEX"
+    );
+    port (
+        -- =========================================================================
+        -- Clock and Resets inputs
+        -- =========================================================================
+        CLK                    : in  std_logic;
+        RESET                  : in  std_logic;
 
-    -- =========================================================================
-    -- RX MFB+MVB interface
-    -- =========================================================================
-    RX_MVB_USERMETA        : in  std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
-    -- RX MFB frame size in MFB items
-    -- Maximum size is PKT_MTU MFB items
-    RX_MVB_FRAME_LENGTH    : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
-    -- Frame extension size in MFB items, but must be divisible by MFB_BLOCK_SIZE
-    -- Minimum size is 60 MFB items
-    -- If EXT_EN is active and EXT_ONLY is not, then the sum of RX_MVB_FRAME_LENGTH and RX_MVB_EXT_SIZE cannot be higher than PKT_MTU
-    -- If both EXT_EN and EXT_ONLY are active, then RX_MVB_EXT_SIZE cannot be higher than PKT_MTU
-    RX_MVB_EXT_SIZE        : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
-    -- It only uses the new part (EXT_SIZE) of the frame, the rest is discarded.
-    -- This can be useful, for example, when we need to send only metadata instead of the frame.
-    RX_MVB_EXT_ONLY        : in  std_logic_vector(MFB_REGIONS-1 downto 0) := (others => '0');
-    -- Enables the extension of the MFB frame
-    RX_MVB_EXT_EN          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MVB_VLD             : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MVB_SRC_RDY         : in  std_logic;
-    RX_MVB_DST_RDY         : out std_logic;
+        -- =========================================================================
+        -- RX MFB+MVB interface
+        -- =========================================================================
+        RX_MVB_USERMETA        : in  std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
+        -- RX MFB frame size in MFB items
+        -- Maximum size is PKT_MTU MFB items
+        RX_MVB_FRAME_LENGTH    : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
+        -- Frame extension size in MFB items, but must be divisible by MFB_BLOCK_SIZE
+        -- Minimum size is 60 MFB items
+        -- If EXT_EN is active and EXT_ONLY is not, then the sum of RX_MVB_FRAME_LENGTH and RX_MVB_EXT_SIZE cannot be higher than PKT_MTU
+        -- If both EXT_EN and EXT_ONLY are active, then RX_MVB_EXT_SIZE cannot be higher than PKT_MTU
+        RX_MVB_EXT_SIZE        : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
+        -- It only uses the new part (EXT_SIZE) of the frame, the rest is discarded.
+        -- This can be useful, for example, when we need to send only metadata instead of the frame.
+        RX_MVB_EXT_ONLY        : in  std_logic_vector(MFB_REGIONS-1 downto 0) := (others => '0');
+        -- Enables the extension of the MFB frame
+        RX_MVB_EXT_EN          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MVB_VLD             : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MVB_SRC_RDY         : in  std_logic;
+        RX_MVB_DST_RDY         : out std_logic;
 
-    RX_MFB_DATA            : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    RX_MFB_SOF             : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF             : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SOF_POS         : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS         : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SRC_RDY         : in  std_logic;
-    RX_MFB_DST_RDY         : out std_logic;
+        RX_MFB_DATA            : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        RX_MFB_SOF             : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF             : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SOF_POS         : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS         : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SRC_RDY         : in  std_logic;
+        RX_MFB_DST_RDY         : out std_logic;
 
-    -- =========================================================================
-    --  TX MFB+MVB interface
-    -- =========================================================================
-    TX_MVB_USERMETA        : out std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
-    TX_MVB_VLD             : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MVB_SRC_RDY         : out std_logic;
-    TX_MVB_DST_RDY         : in  std_logic;
+        -- =========================================================================
+        --  TX MFB+MVB interface
+        -- =========================================================================
+        TX_MVB_USERMETA        : out std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
+        TX_MVB_VLD             : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MVB_SRC_RDY         : out std_logic;
+        TX_MVB_DST_RDY         : in  std_logic;
 
-    TX_MFB_DATA            : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- The TX_MFB_USERMETA signal is valid with SOF and the transmitted items
-    -- are the same as on the TX_MVB_USERMETA signal.
-    TX_MFB_USERMETA        : out std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
-    TX_MFB_SOF             : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_EOF             : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_SOF_POS         : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    TX_MFB_EOF_POS         : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    TX_MFB_SRC_RDY         : out std_logic;
-    TX_MFB_DST_RDY         : in  std_logic
-);
+        TX_MFB_DATA            : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- The TX_MFB_USERMETA signal is valid with SOF and the transmitted items
+        -- are the same as on the TX_MVB_USERMETA signal.
+        TX_MFB_USERMETA        : out std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
+        TX_MFB_SOF             : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_EOF             : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_SOF_POS         : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        TX_MFB_EOF_POS         : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        TX_MFB_SRC_RDY         : out std_logic;
+        TX_MFB_DST_RDY         : in  std_logic
+    );
 end entity;
 
 architecture FULL of MFB_FRAME_EXTENDER is
@@ -190,11 +190,11 @@ begin
         --      assert always ((RX_MVB_SRC_RDY='1' and RX_MVB_DST_RDY='1' and RX_MVB_VLD(rr)='1' and RX_MVB_EXT_EN(rr)='0') -> (unsigned(rx_mvb_frame_length_arr(rr)) <= PKT_MTU)) abort (RESET) @rising_edge(CLK)
         --      report "RX_MVB_FRAME_LENGTH is higher than PKT_MTU!";
 
-        with gen_mode(rr) select
-            gen_len(rr) <= std_logic_vector(gen_len_ext_on(rr))   when "10",
-                           std_logic_vector(gen_len_ext_only(rr)) when "11",
-                           std_logic_vector(gen_len_ext_off(rr))  when "00",
-                           std_logic_vector(gen_len_ext_off(rr))  when others;
+        with gen_mode(rr) select gen_len(rr) <=
+            std_logic_vector(gen_len_ext_on(rr)) when "10",
+            std_logic_vector(gen_len_ext_only(rr)) when "11",
+            std_logic_vector(gen_len_ext_off(rr)) when "00",
+            std_logic_vector(gen_len_ext_off(rr)) when others;
 
         gen_offset(rr) <= std_logic_vector(resize(unsigned(rx_mvb_ext_size_arr(rr)), LEN_WIDTH)) when (gen_mode(rr) = "10") else (others => '0');
         gen_insert(rr) <= not (RX_MVB_EXT_EN(rr) and RX_MVB_EXT_ONLY(rr));
@@ -205,13 +205,13 @@ begin
     end generate;
 
     tx_mvb_fifo_i : entity work.MVB_FIFOX
-    generic map(
+    generic map (
         ITEMS      => MFB_REGIONS,
         ITEM_WIDTH => USERMETA_WIDTH,
         FIFO_DEPTH => MVB_FIFO_DEPTH,
         RAM_TYPE   => "AUTO",
         DEVICE     => DEVICE
-    ) port map(
+    ) port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -227,7 +227,7 @@ begin
     );
 
     pkt_gen_i : entity work.MFB_USER_PACKET_GEN
-    generic map(
+    generic map (
         REGIONS        => MFB_REGIONS,
         REGION_SIZE    => MFB_REGION_SIZE,
         BLOCK_SIZE     => MFB_BLOCK_SIZE,
@@ -238,7 +238,7 @@ begin
         SHARED_REGIONS => SHARED_REGIONS,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK         => CLK,
         RESET       => RESET,
 
@@ -267,7 +267,7 @@ begin
     end generate;
 
     dm_ctrl_i : entity work.MFB_FRAME_EXTENDER_DM_CTRL
-    generic map(
+    generic map (
         REGIONS        => MFB_REGIONS,
         REGION_SIZE    => MFB_REGION_SIZE,
         BLOCK_SIZE     => MFB_BLOCK_SIZE,
@@ -276,7 +276,7 @@ begin
         USERMETA_WIDTH => USERMETA_WIDTH,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK            => CLK,
         RESET          => RESET,
 
@@ -303,7 +303,7 @@ begin
     );
 
     data_mover_i : entity work.MFB_FRAME_EXTENDER_DATAMOVER
-    generic map(
+    generic map (
         REGIONS        => MFB_REGIONS,
         REGION_SIZE    => MFB_REGION_SIZE,
         BLOCK_SIZE     => MFB_BLOCK_SIZE,
@@ -313,7 +313,7 @@ begin
         USERMETA_WIDTH => USERMETA_WIDTH,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK                 => CLK,
         RESET               => RESET,
 
@@ -350,7 +350,7 @@ begin
     -- DEBUG LOGIC
     -- =========================================================================
 
-    --pragma synthesis_off
+    -- pragma synthesis_off
     process (CLK)
         variable dbg_pkt_cnt_v : unsigned(63 downto 0);
     begin
@@ -394,10 +394,10 @@ begin
                 for i in 0 to MFB_REGIONS-1 loop
                     dbg_pkt_cnt_v := dbg_pkt_cnt_v + TX_MFB_EOF(i);
                 end loop;
-                    dbg_tx_mfb_pkt_cnt <= dbg_tx_mfb_pkt_cnt + dbg_pkt_cnt_v;
+                dbg_tx_mfb_pkt_cnt <= dbg_tx_mfb_pkt_cnt + dbg_pkt_cnt_v;
             end if;
         end if;
     end process;
-    --pragma synthesis_on
+    -- pragma synthesis_on
 
 end architecture;

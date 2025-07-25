@@ -13,7 +13,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity HBM_TESTER is
-    generic(
+    generic (
         DEBUG           : boolean := True;
         PORTS           : natural := 32;
         BL8_MODE        : std_logic_vector(PORTS-1 downto 0) := (others => '1');
@@ -29,7 +29,7 @@ entity HBM_TESTER is
         PORT_ADDR_HBIT  : natural := AXI_ADDR_WIDTH;
         DEVICE          : string := "AGILEX"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -121,7 +121,7 @@ entity HBM_TESTER is
         AXI_RVALID          : in  std_logic_vector(PORTS-1 downto 0);
         AXI_RREADY          : out std_logic_vector(PORTS-1 downto 0)
     );
-end HBM_TESTER;
+end entity;
 
 architecture FULL of HBM_TESTER is
 
@@ -154,7 +154,7 @@ begin
 
     port_g : for i in 0 to PORTS-1 generate
         port_i : entity work.HBM_TESTER_PORT
-        generic map(
+        generic map (
             DEBUG           => DEBUG,
             CNT_WIDTH       => CNT_WIDTH,
             PORT_ID         => i,
@@ -169,7 +169,7 @@ begin
             PORT_ADDR_HBIT  => PORT_ADDR_HBIT,
             DEVICE          => DEVICE
         )
-        port map(
+        port map (
             CLK               => HBM_CLK,
             RESET             => HBM_RESET,
 
@@ -251,10 +251,10 @@ begin
     end generate;
 
     mi32_async_i : entity work.MI_ASYNC
-    generic map(
+    generic map (
         DEVICE => DEVICE
     )
-    port map(
+    port map (
         CLK_M     => MI_CLK,
         RESET_M   => MI_RESET,
         MI_M_DWR  => MI_DWR,
@@ -279,11 +279,11 @@ begin
     );
 
     adc_i : entity work.HBM_TESTER_ADC
-    generic map(
+    generic map (
         PORTS     => PORTS,
         CNT_WIDTH => CNT_WIDTH
     )
-    port map(
+    port map (
         CLK              => HBM_CLK,
         RESET            => HBM_RESET,
 

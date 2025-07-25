@@ -8,17 +8,17 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use std.env.all;
-use STD.textio.all;
+use std.textio.all;
 
 library work;
 use work.type_pack.all;
 use work.math_pack.all;
 use work.basics_test_pkg.all;
 use std.env.stop;
-use STD.textio.all;
+use std.textio.all;
 
 entity TESTBENCH is
-end entity TESTBENCH;
+end entity;
 
 architecture BEHAVIORAL of TESTBENCH is
 
@@ -33,62 +33,62 @@ architecture BEHAVIORAL of TESTBENCH is
     constant MI_EVENTS_ADDR        : std_logic_vector(MI_WIDTH-1 downto 0) := (9 => '1', 0 => '1', others => '0');
     constant MI_ADDR_MASK          : std_logic_vector(MI_WIDTH-1 downto 0) := (0 => '1', others => '0');
 
-    signal CLK       : std_logic;
-    signal RESET     : std_logic;
+    signal clk       : std_logic;
+    signal reset     : std_logic;
 
-    signal MI_DWR    : std_logic_vector(MI_WIDTH-1 downto 0);
-    signal MI_ADDR   : std_logic_vector(MI_WIDTH-1 downto 0);
-    signal MI_RD     : std_logic;
-    signal MI_WR     : std_logic;
-    signal MI_ARDY   : std_logic;
-    signal MI_DRD    : std_logic_vector(MI_WIDTH-1 downto 0);
-    signal MI_DRDY   : std_logic;
+    signal mi_dwr    : std_logic_vector(MI_WIDTH-1 downto 0);
+    signal mi_addr   : std_logic_vector(MI_WIDTH-1 downto 0);
+    signal mi_rd     : std_logic;
+    signal mi_wr     : std_logic;
+    signal mi_ardy   : std_logic;
+    signal mi_drd    : std_logic_vector(MI_WIDTH-1 downto 0);
+    signal mi_drdy   : std_logic;
 
-    signal EVENT_CNT : std_logic_vector(log2(MAX_CONCURRENT_EVENTS+1)-1 downto 0);
-    signal EVENT_VLD : std_logic;
+    signal event_cnt : std_logic_vector(log2(MAX_CONCURRENT_EVENTS+1)-1 downto 0);
+    signal event_vld : std_logic;
 
 begin
 
     uut : entity work.EVENT_COUNTER_MI_WRAPPER
-    generic map(
-        MAX_INTERVAL_CYCLES   => MAX_INTERVAL_CYCLES  ,
+    generic map (
+        MAX_INTERVAL_CYCLES   => MAX_INTERVAL_CYCLES,
         MAX_CONCURRENT_EVENTS => MAX_CONCURRENT_EVENTS,
-        MI_WIDTH              => MI_WIDTH             ,
-        MI_INTERVAL_ADDR      => MI_INTERVAL_ADDR     ,
-        MI_EVENTS_ADDR        => MI_EVENTS_ADDR       ,
+        MI_WIDTH              => MI_WIDTH,
+        MI_INTERVAL_ADDR      => MI_INTERVAL_ADDR,
+        MI_EVENTS_ADDR        => MI_EVENTS_ADDR,
         MI_ADDR_MASK          => MI_ADDR_MASK
     )
-    port map(
-        CLK   => CLK  ,
-        RESET => RESET,
+    port map (
+        CLK   => clk,
+        RESET => reset,
 
-        MI_DWR  => MI_DWR ,
-        MI_ADDR => MI_ADDR,
-        MI_RD   => MI_RD  ,
-        MI_WR   => MI_WR  ,
-        MI_ARDY => MI_ARDY,
-        MI_DRD  => MI_DRD ,
-        MI_DRDY => MI_DRDY,
+        MI_DWR  => mi_dwr,
+        MI_ADDR => mi_addr,
+        MI_RD   => mi_rd,
+        MI_WR   => mi_wr,
+        MI_ARDY => mi_ardy,
+        MI_DRD  => mi_drd,
+        MI_DRDY => mi_drdy,
 
-        EVENT_CNT => EVENT_CNT,
-        EVENT_VLD => EVENT_VLD
+        EVENT_CNT => event_cnt,
+        EVENT_VLD => event_vld
     );
 
     -- generating clock signal
     clk_pr : process
     begin
-        CLK <= '1';
+        clk <= '1';
         wait for CLK_PERIOD/2;
-        CLK <= '0';
+        clk <= '0';
         wait for CLK_PERIOD/2;
     end process;
 
     -- generating reset signal
     reset_pr : process
     begin
-        RESET <= '1';
+        reset <= '1';
         wait for CLK_PERIOD*2;
-        RESET <= '0';
+        reset <= '0';
         wait;
     end process;
 
@@ -96,22 +96,22 @@ begin
     eve_input_pr : process
         variable s0 : integer := 11;
         variable s1 : integer := 15;
-        variable X  : integer := 0;
+        variable x  : integer := 0;
     begin
-        EVENT_VLD <= '0';
+        event_vld <= '0';
 
         wait for CLK_PERIOD/2;
-        wait until RESET/='1';
+        wait until reset /= '1';
         wait for CLK_PERIOD/2;
 
         while (true) loop
-            randint(s0,s1,0,MAX_CONCURRENT_EVENTS,X);
-            EVENT_CNT <= std_logic_vector(to_unsigned(X,EVENT_CNT'length));
-            EVENT_VLD <= '0';
+            randint(s0,s1,0,MAX_CONCURRENT_EVENTS,x);
+            event_cnt <= std_logic_vector(to_unsigned(x,event_cnt'length));
+            event_vld <= '0';
 
-            randint(s0,s1,0,99,X);
-            if (X<EVENT_VLD_CH) then
-                EVENT_VLD <= '1';
+            randint(s0,s1,0,99,x);
+            if (x < EVENT_VLD_CH) then
+                event_vld <= '1';
             end if;
             wait for CLK_PERIOD;
         end loop;
@@ -123,48 +123,48 @@ begin
     mi_input_pr : process
         variable s0 : integer := 11;
         variable s1 : integer := 15;
-        variable X  : integer := 0;
+        variable x  : integer := 0;
     begin
-        MI_WR     <= '0';
-        MI_RD     <= '0';
+        mi_wr     <= '0';
+        mi_rd     <= '0';
 
         wait for CLK_PERIOD/2;
-        wait until RESET/='1';
+        wait until reset /= '1';
         wait for CLK_PERIOD/2;
 
         wait for CLK_PERIOD*8;
 
         while (true) loop
             -- Generate random interval
-            randint(s0,s1,1,20,X);
+            randint(s0,s1,1,20,x);
             -- Set interval
-            MI_ADDR <= (5 => '1', others => '0');
-            MI_DWR  <= std_logic_vector(to_unsigned(X,MI_WIDTH));
-            MI_WR   <= '1';
-            MI_RD   <= '0';
+            mi_addr <= (5 => '1', others => '0');
+            mi_dwr  <= std_logic_vector(to_unsigned(x,MI_WIDTH));
+            mi_wr   <= '1';
+            mi_rd   <= '0';
 
             wait for CLK_PERIOD;
 
-            for i in 0 to 2*X+2-1 loop
-                MI_DWR  <= std_logic_vector(to_unsigned(X+i,MI_WIDTH));
+            for i in 0 to 2*x+2-1 loop
+                mi_dwr  <= std_logic_vector(to_unsigned(x+i,MI_WIDTH));
 
                 -- Read interval
-                MI_ADDR <= (1 => '1', 0 => '0', others => '0');
-                MI_WR   <= '0';
-                MI_RD   <= '1';
+                mi_addr <= (1 => '1', 0 => '0', others => '0');
+                mi_wr   <= '0';
+                mi_rd   <= '1';
 
                 wait for CLK_PERIOD;
 
                 -- Read events count
-                MI_ADDR <= (6 => '1', 0 => '1', others => '0');
-                MI_WR   <= '0';
-                MI_RD   <= '1';
+                mi_addr <= (6 => '1', 0 => '1', others => '0');
+                mi_wr   <= '0';
+                mi_rd   <= '1';
 
                 wait for CLK_PERIOD;
             end loop;
 
-            MI_WR <= '0';
-            MI_RD <= '1';
+            mi_wr <= '0';
+            mi_rd <= '1';
             wait for CLK_PERIOD*8;
         end loop;
 

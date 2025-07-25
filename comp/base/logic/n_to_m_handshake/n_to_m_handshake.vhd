@@ -38,44 +38,44 @@ use work.type_pack.all;
 -- -----------------------------------------------------------------------------
 
 entity N_TO_M_HANDSHAKE is
-generic (
+    generic (
 
-    -- Number of sources
-    SOURCES            : integer := 1;
-    -- Number of destinations
-    DESTINATIONS       : integer := 2;
-    -- Width of the widest data
-    -- (All data ports are set to this width since they are declared as an array.)
-    MAX_DATA_WIDTH     : integer := 8;
+        -- Number of sources
+        SOURCES            : integer := 1;
+        -- Number of destinations
+        DESTINATIONS       : integer := 2;
+        -- Width of the widest data
+        -- (All data ports are set to this width since they are declared as an array.)
+        MAX_DATA_WIDTH     : integer := 8;
 
-    -- Output register enable
-    OUTPUT_REG_EN      : boolean := false
+        -- Output register enable
+        OUTPUT_REG_EN      : boolean := false
 
-);
-port (
+    );
+    port (
 
-    -- Clock and Reset (only used when OUTPUT_REG_EN==true) --
-    CLK               : in  std_logic;
-    RESET             : in  std_logic;
+        -- Clock and Reset (only used when OUTPUT_REG_EN==true) --
+        CLK               : in  std_logic;
+        RESET             : in  std_logic;
 
-    -- Data input --
-    -- Every surce can send data to all destinations can choose any combination of them.
-    IN_DATA           : in  slv_array_2d_t(SOURCES-1 downto 0)(DESTINATIONS-1 downto 0)(MAX_DATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
-    IN_SRC_RDY        : in  std_logic_vector(SOURCES-1 downto 0);
-    IN_DST_RDY        : out std_logic_vector(SOURCES-1 downto 0);
+        -- Data input --
+        -- Every surce can send data to all destinations can choose any combination of them.
+        IN_DATA           : in  slv_array_2d_t(SOURCES-1 downto 0)(DESTINATIONS-1 downto 0)(MAX_DATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+        IN_SRC_RDY        : in  std_logic_vector(SOURCES-1 downto 0);
+        IN_DST_RDY        : out std_logic_vector(SOURCES-1 downto 0);
 
-    -- Data output --
-    -- Every destination has access to all input data and can choose any combination of them.
-    -- All the other data paths get optimised out.
-    OUT_DATA          : out slv_array_2d_t(DESTINATIONS-1 downto 0)(SOURCES-1 downto 0)(MAX_DATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
-    OUT_SRC_RDY       : out std_logic_vector(DESTINATIONS-1 downto 0);
-    OUT_DST_RDY       : in  std_logic_vector(DESTINATIONS-1 downto 0);
+        -- Data output --
+        -- Every destination has access to all input data and can choose any combination of them.
+        -- All the other data paths get optimised out.
+        OUT_DATA          : out slv_array_2d_t(DESTINATIONS-1 downto 0)(SOURCES-1 downto 0)(MAX_DATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+        OUT_SRC_RDY       : out std_logic_vector(DESTINATIONS-1 downto 0);
+        OUT_DST_RDY       : in  std_logic_vector(DESTINATIONS-1 downto 0);
 
-    -- Data transfer ready
-    ALL_RDY           : out std_logic
+        -- Data transfer ready
+        ALL_RDY           : out std_logic
 
-);
-end entity N_TO_M_HANDSHAKE;
+    );
+end entity;
 
 -- -----------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ end entity N_TO_M_HANDSHAKE;
 --                           Architecture declaration
 -- -----------------------------------------------------------------------------
 
-architecture full of N_TO_M_HANDSHAKE is
+architecture FULL of N_TO_M_HANDSHAKE is
 
     -- internal otuput signals
     signal s_out_data    : slv_array_2d_t(DESTINATIONS-1 downto 0)(SOURCES-1 downto 0)(MAX_DATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
@@ -103,13 +103,13 @@ begin
         for i in 0 to SOURCES-1 loop
 
             for e in 0 to SOURCES-1 loop
-                if (i/=e and IN_SRC_RDY(e)='0') then
+                if (i /= e and IN_SRC_RDY(e) = '0') then
                     -- some OF THE OTHER sources is not ready for data transfer
                     IN_DST_RDY(i) <= '0';
                 end if;
             end loop;
 
-            if ((and s_out_dst_rdy)='0') then
+            if ((and s_out_dst_rdy) = '0') then
                 -- some of the destinations is not ready for data transfer
                 IN_DST_RDY(i) <= '0';
             end if;
@@ -130,13 +130,13 @@ begin
         for i in 0 to DESTINATIONS-1 loop
 
             for e in 0 to DESTINATIONS-1 loop
-                if (i/=e and s_out_dst_rdy(e)='0') then
+                if (i /= e and s_out_dst_rdy(e) = '0') then
                     -- some OF THE OTHER destinations is not ready for data transfer
                     s_out_src_rdy(i) <= '0';
                 end if;
             end loop;
 
-            if ((and IN_SRC_RDY)='0') then
+            if ((and IN_SRC_RDY) = '0') then
                 -- some of the sources is not ready for data transfer
                 s_out_src_rdy(i) <= '0';
             end if;
@@ -171,18 +171,18 @@ begin
         begin
             if (rising_edge(CLK)) then
                 for i in 0 to DESTINATIONS-1 loop
-                    if (s_out_dst_rdy(i)='1') then
+                    if (s_out_dst_rdy(i) = '1') then
                         OUT_DATA   (i) <= s_out_data   (i);
                         OUT_SRC_RDY(i) <= s_out_src_rdy(i);
                     end if;
                 end loop;
 
---                if (ALL_RDY='1') then
---                    OUT_DATA    <= s_out_data;
---                    OUT_SRC_RDY <= s_out_src_rdy;
---                end if;
+                --                if (ALL_RDY='1') then
+                --                    OUT_DATA    <= s_out_data;
+                --                    OUT_SRC_RDY <= s_out_src_rdy;
+                --                end if;
 
-                if (RESET='1') then
+                if (RESET = '1') then
                     OUT_SRC_RDY <= (others => '0');
                 end if;
             end if;

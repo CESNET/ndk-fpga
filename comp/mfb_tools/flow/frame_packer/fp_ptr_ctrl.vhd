@@ -13,13 +13,13 @@ use work.type_pack.all;
 
 -- This unit handles pointer for the given channel and generates overflow signal
 entity FP_PTR_CTRL is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
         MFB_ITEM_WIDTH      : natural := 8
     );
-    port(
+    port (
         CLK : in std_logic;
         RST : in std_logic;
 
@@ -41,17 +41,17 @@ begin
         ptr_inc(i+1) <= ptr_inc(i) + RX_PTR_INC(i+1);
     end generate;
 
-    ptr_p: process(CLK)
+    ptr_p : process (CLK)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 ptr_reg <= (others => '0');
-            elsif RX_SRC_RDY = '1' then
+            elsif (RX_SRC_RDY = '1') then
                 ptr_reg <= '0' & ptr_reg(ptr_reg'high -1 downto 0) + ptr_inc(MFB_REGIONS);
             else
-                ptr_reg(ptr_reg'high) <='0';
+                ptr_reg(ptr_reg'high) <= '0';
             end if;
-         end if;
+        end if;
     end process;
 
     TX_CH_PTR       <= ptr_reg(ptr_reg'high -1 downto 0);

@@ -15,12 +15,12 @@ use work.math_pack.all;
 -- This is just a wrapper for backward compatibility.
 
 entity QP_DISTMEM is
-    generic(
+    generic (
         DATA_WIDTH : integer := 128; -- Data Width
         ITEMS      : integer := 64;  -- Item in memory needed, one item size is DATA_WIDTH
         DEVICE     : string  := "7SERIES"
     );
-    port(
+    port (
         -- R/W Port
         DI     : in std_logic_vector(DATA_WIDTH-1 downto 0);
         WE     : in std_logic;

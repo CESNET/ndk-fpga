@@ -23,7 +23,7 @@ use work.type_pack.all;
 -- version this could result in sending a packet larger than USR_PKT_SIZE_MAX.
 --
 entity FRAME_PACKER is
-    generic(
+    generic (
         -- Number of regions for incoming and outgoing packets. Note that the 4 region version is not resource optimized and will most likely not fit in the FPGA.
         MFB_REGIONS         : natural := 4;
         -- Number of blocks in each region for incoming and outgoing packets. Only this configuration was tested.
@@ -47,7 +47,7 @@ entity FRAME_PACKER is
         -- Optimization for FIFOs
         DEVICE              : string := "AGILEX"
     );
-    port(
+    port (
         -- =========================================================================
         -- Clock and Resets inputs
         -- =========================================================================
@@ -239,10 +239,10 @@ begin
     ------------------------------------------------------------
     --                  Packet Counter [DEBUG]                --
     ------------------------------------------------------------
-    process(all)
+    process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 pkt_cnt_debug   <= (others => '0');
             elsif (RX_MFB_SRC_RDY = '1' and RX_MFB_DST_RDY = '1') then
                 pkt_cnt_debug   <= pkt_cnt_debug + to_unsigned(count_ones(RX_MFB_SOF), pkt_cnt_debug'length);
@@ -250,10 +250,10 @@ begin
         end if;
     end process;
 
-    process(all)
+    process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 sp_pkt_cnt_debug   <= (others => '0');
             elsif (TX_MFB_SRC_RDY = '1' and TX_MFB_DST_RDY = '1') then
                 sp_pkt_cnt_debug   <= sp_pkt_cnt_debug + to_unsigned(count_ones(TX_MFB_SOF), sp_pkt_cnt_debug'length);
@@ -265,7 +265,7 @@ begin
     --                   METADATA INSERTOR                    --
     ------------------------------------------------------------
     mvb_len_arr         <= slv_array_deser(RX_MVB_LEN, MFB_REGIONS);
-    mvb_channel_arr     <=slv_array_deser(RX_MVB_CHANNEL, MFB_REGIONS);
+    mvb_channel_arr     <= slv_array_deser(RX_MVB_CHANNEL, MFB_REGIONS);
 
     metadata_insertion_g: for r in 0 to MFB_REGIONS - 1 generate
         mvb_data_arr(r) <= mvb_len_arr(r) & mvb_channel_arr(r);
@@ -273,45 +273,45 @@ begin
 
     -- Synchronization of MVB and MFB data
     metadata_insertor_i: entity work.METADATA_INSERTOR
-        generic map(
-            MVB_ITEMS       => MFB_REGIONS,
-            MVB_ITEM_WIDTH  => log2(USR_RX_PKT_SIZE_MAX+1) + max(1,log2(RX_CHANNELS)),
-            MFB_REGIONS     => MFB_REGIONS,
-            MFB_REGION_SIZE => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
-            INSERT_MODE     => 0,
-            MVB_FIFO_SIZE   => 64,
-            DEVICE          => DEVICE
-        )
-        port map(
-            CLK             => CLK,
-            RESET           => RST,
+    generic map (
+        MVB_ITEMS       => MFB_REGIONS,
+        MVB_ITEM_WIDTH  => log2(USR_RX_PKT_SIZE_MAX+1) + max(1,log2(RX_CHANNELS)),
+        MFB_REGIONS     => MFB_REGIONS,
+        MFB_REGION_SIZE => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+        INSERT_MODE     => 0,
+        MVB_FIFO_SIZE   => 64,
+        DEVICE          => DEVICE
+    )
+    port map (
+        CLK             => CLK,
+        RESET           => RST,
 
-            -- [Length][Channel]
-            RX_MVB_DATA     => slv_array_ser(mvb_data_arr),
-            RX_MVB_VLD      => RX_MVB_VLD,
-            RX_MVB_SRC_RDY  => RX_MVB_SRC_RDY,
-            RX_MVB_DST_RDY  => RX_MVB_DST_RDY,
+        -- [Length][Channel]
+        RX_MVB_DATA     => slv_array_ser(mvb_data_arr),
+        RX_MVB_VLD      => RX_MVB_VLD,
+        RX_MVB_SRC_RDY  => RX_MVB_SRC_RDY,
+        RX_MVB_DST_RDY  => RX_MVB_DST_RDY,
 
-            RX_MFB_DATA     => RX_MFB_DATA,
-            RX_MFB_META     => (others => '0'),
-            RX_MFB_SOF      => RX_MFB_SOF,
-            RX_MFB_EOF      => RX_MFB_EOF,
-            RX_MFB_SOF_POS  => RX_MFB_SOF_POS,
-            RX_MFB_EOF_POS  => RX_MFB_EOF_POS,
-            RX_MFB_SRC_RDY  => RX_MFB_SRC_RDY,
-            RX_MFB_DST_RDY  => RX_MFB_DST_RDY,
+        RX_MFB_DATA     => RX_MFB_DATA,
+        RX_MFB_META     => (others => '0'),
+        RX_MFB_SOF      => RX_MFB_SOF,
+        RX_MFB_EOF      => RX_MFB_EOF,
+        RX_MFB_SOF_POS  => RX_MFB_SOF_POS,
+        RX_MFB_EOF_POS  => RX_MFB_EOF_POS,
+        RX_MFB_SRC_RDY  => RX_MFB_SRC_RDY,
+        RX_MFB_DST_RDY  => RX_MFB_DST_RDY,
 
-            TX_MFB_DATA     => tx_mins_data,
-            TX_MFB_META     => open,
-            TX_MFB_META_NEW => tx_mins_mvb,
-            TX_MFB_SOF      => tx_mins_sof,
-            TX_MFB_EOF      => tx_mins_eof,
-            TX_MFB_SOF_POS  => tx_mins_sof_pos,
-            TX_MFB_EOF_POS  => tx_mins_eof_pos,
-            TX_MFB_SRC_RDY  => tx_mins_src_rdy,
-            TX_MFB_DST_RDY  => tx_mins_dst_rdy
+        TX_MFB_DATA     => tx_mins_data,
+        TX_MFB_META     => open,
+        TX_MFB_META_NEW => tx_mins_mvb,
+        TX_MFB_SOF      => tx_mins_sof,
+        TX_MFB_EOF      => tx_mins_eof,
+        TX_MFB_SOF_POS  => tx_mins_sof_pos,
+        TX_MFB_EOF_POS  => tx_mins_eof_pos,
+        TX_MFB_SRC_RDY  => tx_mins_src_rdy,
+        TX_MFB_DST_RDY  => tx_mins_dst_rdy
     );
 
     ------------------------------------------------------------
@@ -328,39 +328,39 @@ begin
     ------------------------------------------------------------
     -- Generates signals necessary for the proper functioning of the following parts
     aux_gen_i: entity work.FP_AUX_GEN
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-            META_WIDTH          => log2(USR_RX_PKT_SIZE_MAX+1) + max(1,log2(RX_CHANNELS)),
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+        META_WIDTH          => log2(USR_RX_PKT_SIZE_MAX+1) + max(1,log2(RX_CHANNELS)),
 
-            RX_CHANNELS         => RX_CHANNELS,
-            RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
-        )
-        port map(
-            CLK => CLK,
-            RST => RST,
+        RX_CHANNELS         => RX_CHANNELS,
+        RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
+    )
+    port map (
+        CLK => CLK,
+        RST => RST,
 
-            RX_MFB_DATA     => tx_mins_data,
-            RX_MFB_META     => tx_mins_mvb,
-            RX_MFB_SOF      => tx_mins_sof,
-            RX_MFB_EOF      => tx_mins_eof,
-            RX_MFB_SOF_POS  => tx_mins_sof_pos,
-            RX_MFB_EOF_POS  => tx_mins_eof_pos,
-            RX_MFB_SRC_RDY  => aux_rx_src_rdy,
-            RX_MFB_DST_RDY  => aux_rx_dst_rdy,
+        RX_MFB_DATA     => tx_mins_data,
+        RX_MFB_META     => tx_mins_mvb,
+        RX_MFB_SOF      => tx_mins_sof,
+        RX_MFB_EOF      => tx_mins_eof,
+        RX_MFB_SOF_POS  => tx_mins_sof_pos,
+        RX_MFB_EOF_POS  => tx_mins_eof_pos,
+        RX_MFB_SRC_RDY  => aux_rx_src_rdy,
+        RX_MFB_DST_RDY  => aux_rx_dst_rdy,
 
-            TX_MFB_DATA     => aux_tx_mfb_data,
-            TX_MFB_SRC_RDY  => aux_tx_mfb_src_rdy,
-            TX_MFB_DST_RDY  => aux_tx_mfb_dst_rdy,
+        TX_MFB_DATA     => aux_tx_mfb_data,
+        TX_MFB_SRC_RDY  => aux_tx_mfb_src_rdy,
+        TX_MFB_DST_RDY  => aux_tx_mfb_dst_rdy,
 
-            TX_CHANNEL_BS   => aux_tx_channel_bs,
-            TX_PKT_LNG      => aux_tx_pkt_lng,
-            TX_BLOCK_VLD    => aux_tx_block_vld,
-            TX_SOF_ONE_HOT  => aux_tx_sof_one_hot,
-            TX_EOF_ONE_HOT  => aux_tx_eof_one_hot,
-            TX_SOF_POS_BS   => aux_tx_sof_pos_bs
+        TX_CHANNEL_BS   => aux_tx_channel_bs,
+        TX_PKT_LNG      => aux_tx_pkt_lng,
+        TX_BLOCK_VLD    => aux_tx_block_vld,
+        TX_SOF_ONE_HOT  => aux_tx_sof_one_hot,
+        TX_EOF_ONE_HOT  => aux_tx_eof_one_hot,
+        TX_SOF_POS_BS   => aux_tx_sof_pos_bs
     );
 
     ------------------------------------------------------------
@@ -368,27 +368,27 @@ begin
     ------------------------------------------------------------
     -- Generates select signal for BSs and increment for each channel pointer
     bs_ctrl_i: entity work.FP_BS_CTRL
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-            RX_CHANNELS         => RX_CHANNELS
-        )
-        port map(
-            CLK => CLK,
-            RST => RST,
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+        RX_CHANNELS         => RX_CHANNELS
+    )
+    port map (
+        CLK => CLK,
+        RST => RST,
 
-            RX_BLOCK_VLD    => aux_tx_block_vld,
-            RX_SOF_POS_BS   => aux_tx_sof_pos_bs,
-            RX_CH_PTR       => ch_ptr_tx_ch_ptr,
-            RX_SRC_RDY      => or aux_tx_mfb_src_rdy,
-            RX_CHANNEL_BS   => aux_tx_channel_bs,
+        RX_BLOCK_VLD    => aux_tx_block_vld,
+        RX_SOF_POS_BS   => aux_tx_sof_pos_bs,
+        RX_CH_PTR       => ch_ptr_tx_ch_ptr,
+        RX_SRC_RDY      => or aux_tx_mfb_src_rdy,
+        RX_CHANNEL_BS   => aux_tx_channel_bs,
 
-            TX_SEL          => bs_ctrl_tx_sel,
-            TX_PTR_INC      => bs_ctrl_tx_ptr_inc,
-            TX_SRC_RDY      => bs_ctrl_tx_src_rdy,
-            TX_CHANNEL_BS   => bs_ctrl_tx_channel_bs
+        TX_SEL          => bs_ctrl_tx_sel,
+        TX_PTR_INC      => bs_ctrl_tx_ptr_inc,
+        TX_SRC_RDY      => bs_ctrl_tx_src_rdy,
+        TX_CHANNEL_BS   => bs_ctrl_tx_channel_bs
     );
 
     ------------------------------------------------------------
@@ -397,21 +397,21 @@ begin
     -- Keeps track of the status of each TMP_REG
     ch_ptr_g: for i in 0 to RX_CHANNELS - 1 generate
         ch_ptr_i: entity work.FP_PTR_CTRL
-            generic map(
-                MFB_REGIONS         => MFB_REGIONS,
-                MFB_REGION_SIZE     => MFB_REGION_SIZE,
-                MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-                MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH
-            )
-            port map(
-                CLK => CLK,
-                RST => RST,
+        generic map (
+            MFB_REGIONS         => MFB_REGIONS,
+            MFB_REGION_SIZE     => MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH
+        )
+        port map (
+            CLK => CLK,
+            RST => RST,
 
-                RX_SRC_RDY      => bs_ctrl_tx_src_rdy(i),
-                RX_PTR_INC      => bs_ctrl_tx_ptr_inc(i),
+            RX_SRC_RDY      => bs_ctrl_tx_src_rdy(i),
+            RX_PTR_INC      => bs_ctrl_tx_ptr_inc(i),
 
-                TX_CH_PTR       => ch_ptr_tx_ch_ptr(i),
-                TX_CH_OVERFLOW  => ch_ptr_tx_ch_overflow(i)
+            TX_CH_PTR       => ch_ptr_tx_ch_ptr(i),
+            TX_CH_OVERFLOW  => ch_ptr_tx_ch_overflow(i)
         );
     end generate;
 
@@ -420,20 +420,20 @@ begin
     ------------------------------------------------------------
     -- Concatenation of DATA with auxiliary signals - these are shifted with the data
     packet_concatenate_i: entity work.FP_META_CONCATENATE
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-            RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
-        )
-        port map(
-            RX_MFB_DATA     => aux_tx_mfb_data,
-            RX_BLOCK_VLD    => aux_tx_block_vld,
-            RX_SOF_ONE_HOT  => aux_tx_sof_one_hot,
-            RX_EOF_ONE_HOT  => aux_tx_eof_one_hot,
-            RX_PKT_LNG      => aux_tx_pkt_lng,
-            TX_DATA_CONC    => conc_tx_data
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+        RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
+    )
+    port map (
+        RX_MFB_DATA     => aux_tx_mfb_data,
+        RX_BLOCK_VLD    => aux_tx_block_vld,
+        RX_SOF_ONE_HOT  => aux_tx_sof_one_hot,
+        RX_EOF_ONE_HOT  => aux_tx_eof_one_hot,
+        RX_PKT_LNG      => aux_tx_pkt_lng,
+        TX_DATA_CONC    => conc_tx_data
     );
 
     ------------------------------------------------------------
@@ -441,23 +441,23 @@ begin
     ------------------------------------------------------------
     -- Encapsulation of BSs and data extraction
     bs_per_packet_i: entity work.FP_BS_PER_PACKET
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-            RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
-        )
-        port map(
-            CLK             => CLK,
-            RX_DATA         => conc_tx_data,
-            RX_SEL          => bs_ctrl_tx_sel,
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+        RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
+    )
+    port map (
+        CLK             => CLK,
+        RX_DATA         => conc_tx_data,
+        RX_SEL          => bs_ctrl_tx_sel,
 
-            TX_DATA         => bs_per_pkt_tx_data,
-            TX_BLOCK_VLD    => bs_per_pkt_tx_block_vld,
-            TX_SOF_ONE_HOT  => bs_per_pkt_tx_sof_one_hot,
-            TX_EOF_ONE_HOT  => bs_per_pkt_tx_eof_one_hot,
-            TX_PKT_LNG      => bs_per_pkt_tx_pkt_lng
+        TX_DATA         => bs_per_pkt_tx_data,
+        TX_BLOCK_VLD    => bs_per_pkt_tx_block_vld,
+        TX_SOF_ONE_HOT  => bs_per_pkt_tx_sof_one_hot,
+        TX_EOF_ONE_HOT  => bs_per_pkt_tx_eof_one_hot,
+        TX_PKT_LNG      => bs_per_pkt_tx_pkt_lng
     );
 
     ------------------------------------------------------------
@@ -465,28 +465,28 @@ begin
     ------------------------------------------------------------
     -- Demultiplexer - routes data to correct Channel Cell
     ch_demux_i: entity work.FP_CHANNEL_DEMUX
-        generic map(
-            MFB_REGIONS         => MFB_REGIONS,
-            MFB_REGION_SIZE     => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-            RX_CHANNELS         => RX_CHANNELS,
-            RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
-        )
-        port map(
-            RX_CHANNEL_BS   => bs_ctrl_tx_channel_bs,
+    generic map (
+        MFB_REGIONS         => MFB_REGIONS,
+        MFB_REGION_SIZE     => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+        RX_CHANNELS         => RX_CHANNELS,
+        RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
+    )
+    port map (
+        RX_CHANNEL_BS   => bs_ctrl_tx_channel_bs,
 
-            RX_DATA         => bs_per_pkt_tx_data,
-            RX_PKT_LNG      => bs_per_pkt_tx_pkt_lng,
-            RX_BLOCK_VLD    => bs_per_pkt_tx_block_vld,
-            RX_SOF_ONE_HOT  => bs_per_pkt_tx_sof_one_hot,
-            RX_EOF_ONE_HOT  => bs_per_pkt_tx_eof_one_hot,
+        RX_DATA         => bs_per_pkt_tx_data,
+        RX_PKT_LNG      => bs_per_pkt_tx_pkt_lng,
+        RX_BLOCK_VLD    => bs_per_pkt_tx_block_vld,
+        RX_SOF_ONE_HOT  => bs_per_pkt_tx_sof_one_hot,
+        RX_EOF_ONE_HOT  => bs_per_pkt_tx_eof_one_hot,
 
-            TX_DATA         => ch_demux_tx_data,
-            TX_BLOCK_VLD    => ch_demux_tx_block_vld,
-            TX_SOF_ONE_HOT  => ch_demux_tx_sof_one_hot,
-            TX_EOF_ONE_HOT  => ch_demux_tx_eof_one_hot,
-            TX_PKT_LNG      => ch_demux_tx_pkt_lng
+        TX_DATA         => ch_demux_tx_data,
+        TX_BLOCK_VLD    => ch_demux_tx_block_vld,
+        TX_SOF_ONE_HOT  => ch_demux_tx_sof_one_hot,
+        TX_EOF_ONE_HOT  => ch_demux_tx_eof_one_hot,
+        TX_PKT_LNG      => ch_demux_tx_pkt_lng
     );
 
     ------------------------------------------------------------
@@ -495,50 +495,50 @@ begin
     -- This entity encapsulates components for handling shifted data
     dma_channel_g: for i in 0 to RX_CHANNELS - 1 generate
         dma_channel_i: entity work.FP_CHANNEL
-            generic map(
-                MFB_REGIONS         => MFB_REGIONS,
-                MFB_REGION_SIZE     => MFB_REGION_SIZE,
-                MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
-                MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
-                MUX_WIDTH           => MUX_WIDTH,
-                FIFO_DEPTH          => FIFO_DEPTH,
-                TIMEOUT_CLK_NO      => TIMEOUT_CLK_NO,
-                DEVICE              => DEVICE,
-                RX_PKT_SIZE_MIN     => SPKT_SIZE_MIN,
-                RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
-            )
-            port map(
-                CLK => CLK,
-                RST => RST,
+        generic map (
+            MFB_REGIONS         => MFB_REGIONS,
+            MFB_REGION_SIZE     => MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+            MUX_WIDTH           => MUX_WIDTH,
+            FIFO_DEPTH          => FIFO_DEPTH,
+            TIMEOUT_CLK_NO      => TIMEOUT_CLK_NO,
+            DEVICE              => DEVICE,
+            RX_PKT_SIZE_MIN     => SPKT_SIZE_MIN,
+            RX_PKT_SIZE_MAX     => USR_RX_PKT_SIZE_MAX
+        )
+        port map (
+            CLK => CLK,
+            RST => RST,
 
-                DEBUG_PKT_NUM           => debug_pkt_num(i),
-                DEBUG_PKT_NUM_SRC_RDY   => debug_pkt_num_src_rdy(i),
+            DEBUG_PKT_NUM           => debug_pkt_num(i),
+            DEBUG_PKT_NUM_SRC_RDY   => debug_pkt_num_src_rdy(i),
 
-                DEBUG_EOF               => debug_eof(i),
-                DEBUG_EOF_SRC_RDY       => debug_eof_src_rdy(i),
-                DEBUG_SP_EOF            => debug_sp_eof(i),
-                DEBUG_SP_EOF_SRC_RDY    => debug_sp_eof_src_rdy(i),
+            DEBUG_EOF               => debug_eof(i),
+            DEBUG_EOF_SRC_RDY       => debug_eof_src_rdy(i),
+            DEBUG_SP_EOF            => debug_sp_eof(i),
+            DEBUG_SP_EOF_SRC_RDY    => debug_sp_eof_src_rdy(i),
 
-                RX_TMP_PTR_UNS  => ch_ptr_tx_ch_ptr(i),
-                RX_TMP_OVERFLOW => ch_ptr_tx_ch_overflow(i),
+            RX_TMP_PTR_UNS  => ch_ptr_tx_ch_ptr(i),
+            RX_TMP_OVERFLOW => ch_ptr_tx_ch_overflow(i),
 
-                RX_DATA         => ch_demux_tx_data(i),
-                RX_PKT_LNG      => ch_demux_tx_pkt_lng(i),
-                RX_BLOCK_VLD    => ch_demux_tx_block_vld(i),
-                RX_SOF_ONE_HOT  => ch_demux_tx_sof_one_hot(i),
-                RX_EOF_ONE_HOT  => ch_demux_tx_eof_one_hot(i),
+            RX_DATA         => ch_demux_tx_data(i),
+            RX_PKT_LNG      => ch_demux_tx_pkt_lng(i),
+            RX_BLOCK_VLD    => ch_demux_tx_block_vld(i),
+            RX_SOF_ONE_HOT  => ch_demux_tx_sof_one_hot(i),
+            RX_EOF_ONE_HOT  => ch_demux_tx_eof_one_hot(i),
 
-                TX_DATA         => dma_ch_tx_data(i),
-                TX_PKT_LNG      => dma_ch_tx_pkt_len(i),
-                TX_SOF          => dma_ch_tx_sof(i),
-                TX_EOF          => dma_ch_tx_eof(i),
-                TX_SOF_POS      => dma_ch_tx_sof_pos(i),
-                TX_EOF_POS      => dma_ch_tx_eof_pos(i),
-                TX_SRC_RDY      => dma_ch_tx_src_rdy(i),
-                TX_DST_RDY      => dma_ch_tx_dst_rdy(i),
+            TX_DATA         => dma_ch_tx_data(i),
+            TX_PKT_LNG      => dma_ch_tx_pkt_len(i),
+            TX_SOF          => dma_ch_tx_sof(i),
+            TX_EOF          => dma_ch_tx_eof(i),
+            TX_SOF_POS      => dma_ch_tx_sof_pos(i),
+            TX_EOF_POS      => dma_ch_tx_eof_pos(i),
+            TX_SRC_RDY      => dma_ch_tx_src_rdy(i),
+            TX_DST_RDY      => dma_ch_tx_dst_rdy(i),
 
-                -- Stop signal -- can be registered as needed
-                TX_STOP         => dma_ch_tx_stop(i)
+            -- Stop signal -- can be registered as needed
+            TX_STOP         => dma_ch_tx_stop(i)
         );
 
         -- Channel & PKT_LEN
@@ -556,38 +556,38 @@ begin
     ------------------------------------------------------------
     -- Merger combines outputs of DMA Cells to the single interface
     merger_i: entity work.FP_MERGER
-        generic map(
-            -- MFB parameters
-            MFB_REGIONS     => MFB_REGIONS,
-            MFB_REGION_SIZE => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
-            MFB_META_WIDTH  => max(1,log2(RX_CHANNELS)) + log2(USR_RX_PKT_SIZE_MAX+ 1) ,
+    generic map (
+        -- MFB parameters
+        MFB_REGIONS     => MFB_REGIONS,
+        MFB_REGION_SIZE => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+        MFB_META_WIDTH  => max(1,log2(RX_CHANNELS)) + log2(USR_RX_PKT_SIZE_MAX+ 1),
 
-            MERGER_INPUTS       => RX_CHANNELS,
-            DEVICE              => DEVICE
-        )
-        port map(
-            CLK => CLK,
-            RST => RST,
+        MERGER_INPUTS       => RX_CHANNELS,
+        DEVICE              => DEVICE
+    )
+    port map (
+        CLK => CLK,
+        RST => RST,
 
-            RX_MFB_DATA    => dma_ch_tx_data,
-            RX_MFB_META    => dma_ch_tx_ch_meta_slv,
-            RX_MFB_SOF     => dma_ch_tx_sof,
-            RX_MFB_EOF     => dma_ch_tx_eof,
-            RX_MFB_SOF_POS => dma_ch_tx_sof_pos,
-            RX_MFB_EOF_POS => dma_ch_tx_eof_pos,
-            RX_MFB_SRC_RDY => dma_ch_tx_src_rdy,
-            RX_MFB_DST_RDY => dma_ch_tx_dst_rdy,
+        RX_MFB_DATA    => dma_ch_tx_data,
+        RX_MFB_META    => dma_ch_tx_ch_meta_slv,
+        RX_MFB_SOF     => dma_ch_tx_sof,
+        RX_MFB_EOF     => dma_ch_tx_eof,
+        RX_MFB_SOF_POS => dma_ch_tx_sof_pos,
+        RX_MFB_EOF_POS => dma_ch_tx_eof_pos,
+        RX_MFB_SRC_RDY => dma_ch_tx_src_rdy,
+        RX_MFB_DST_RDY => dma_ch_tx_dst_rdy,
 
-            TX_MFB_DATA    => TX_MFB_DATA,
-            TX_MFB_META    => tx_merger_meta,
-            TX_MFB_SOF     => TX_MFB_SOF,
-            TX_MFB_EOF     => TX_MFB_EOF,
-            TX_MFB_SOF_POS => TX_MFB_SOF_POS,
-            TX_MFB_EOF_POS => TX_MFB_EOF_POS,
-            TX_MFB_SRC_RDY => TX_MFB_SRC_RDY,
-            TX_MFB_DST_RDY => TX_MFB_DST_RDY
+        TX_MFB_DATA    => TX_MFB_DATA,
+        TX_MFB_META    => tx_merger_meta,
+        TX_MFB_SOF     => TX_MFB_SOF,
+        TX_MFB_EOF     => TX_MFB_EOF,
+        TX_MFB_SOF_POS => TX_MFB_SOF_POS,
+        TX_MFB_EOF_POS => TX_MFB_EOF_POS,
+        TX_MFB_SRC_RDY => TX_MFB_SRC_RDY,
+        TX_MFB_DST_RDY => TX_MFB_DST_RDY
     );
 
     ------------------------------------------------------------
@@ -595,30 +595,30 @@ begin
     ------------------------------------------------------------
     -- MVB FIFO - Helps meet the strict synchronization requirements of UVM
     mvb_hdr_fifo_i: entity work.MVB_FIFO
-        generic map(
-          ITEMS          => MFB_REGIONS,
-          ITEM_WIDTH     => max(1, log2(RX_CHANNELS)) + log2(USR_RX_PKT_SIZE_MAX+ 1) ,
-          FIFO_ITEMS     => MVB_FIFO_ITEMS
-        )
-        port map(
-          CLK   => CLK,
-          RESET => RST,
+    generic map (
+        ITEMS          => MFB_REGIONS,
+        ITEM_WIDTH     => max(1, log2(RX_CHANNELS)) + log2(USR_RX_PKT_SIZE_MAX+ 1),
+        FIFO_ITEMS     => MVB_FIFO_ITEMS
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RST,
 
-          RX_DATA       => tx_merger_meta,
-          RX_VLD        => TX_MFB_SOF,
-          RX_SRC_RDY    => TX_MFB_SRC_RDY and TX_MFB_DST_RDY and (or (TX_MFB_SOF)),
-          RX_DST_RDY    => open,
+        RX_DATA       => tx_merger_meta,
+        RX_VLD        => TX_MFB_SOF,
+        RX_SRC_RDY    => TX_MFB_SRC_RDY and TX_MFB_DST_RDY and (or (TX_MFB_SOF)),
+        RX_DST_RDY    => open,
 
-          -- Channel & PKT_LEN
-          TX_DATA       => tx_mvb_data,
-          TX_VLD        => TX_MVB_VLD,
-          TX_SRC_RDY    => TX_MVB_SRC_RDY,
-          TX_DST_RDY    => TX_MVB_DST_RDY,
+        -- Channel & PKT_LEN
+        TX_DATA       => tx_mvb_data,
+        TX_VLD        => TX_MVB_VLD,
+        TX_SRC_RDY    => TX_MVB_SRC_RDY,
+        TX_DST_RDY    => TX_MVB_DST_RDY,
 
-          LSTBLK         => open,
-          FULL           => mvb_hdr_full,
-          EMPTY          => mvb_hdr_empty,
-          STATUS         => mvb_hdr_status
+        LSTBLK         => open,
+        FULL           => mvb_hdr_full,
+        EMPTY          => mvb_hdr_empty,
+        STATUS         => mvb_hdr_status
     );
 
     tx_mvb_data_arr <= slv_array_deser(tx_mvb_data, MFB_REGIONS);
@@ -639,34 +639,34 @@ begin
     -- The verification module helps with the verification of SuperPacket boundaries and timeout
     ver_mod_g: for i in 0 to RX_CHANNELS - 1 generate
         ver_mod_i: entity work.FP_VER_MOD
-            generic map(
-                MFB_REGIONS     => MFB_REGIONS,
-                MFB_REGION_SIZE => MFB_REGION_SIZE,
-                MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
-                MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+        generic map (
+            MFB_REGIONS     => MFB_REGIONS,
+            MFB_REGION_SIZE => MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
 
-                FIFO_DEPTH          => FIFO_DEPTH,
-                USR_RX_PKT_SIZE_MAX => USR_RX_PKT_SIZE_MAX,
-                USR_RX_PKT_SIZE_MIN => USR_RX_PKT_SIZE_MIN
-            )
-            port map(
-                CLK             => CLK,
-                RST             => RST,
-                RX_READ_EN      => TX_MFB_SRC_RDY,
+            FIFO_DEPTH          => FIFO_DEPTH,
+            USR_RX_PKT_SIZE_MAX => USR_RX_PKT_SIZE_MAX,
+            USR_RX_PKT_SIZE_MIN => USR_RX_PKT_SIZE_MIN
+        )
+        port map (
+            CLK             => CLK,
+            RST             => RST,
+            RX_READ_EN      => TX_MFB_SRC_RDY,
 
-                RX_PKT_NUM          => debug_pkt_num(i),
-                RX_PKT_NUM_SRC_RDY  => debug_pkt_num_src_rdy(i),
+            RX_PKT_NUM          => debug_pkt_num(i),
+            RX_PKT_NUM_SRC_RDY  => debug_pkt_num_src_rdy(i),
 
-                RX_EOF              => debug_eof(i),
-                RX_EOF_SRC_RDY      => debug_eof_src_rdy(i),
-                RX_SP_EOF           => debug_sp_eof(i),
-                RX_SP_EOF_SRC_RDY   => debug_sp_eof_src_rdy(i),
+            RX_EOF              => debug_eof(i),
+            RX_EOF_SRC_RDY      => debug_eof_src_rdy(i),
+            RX_SP_EOF           => debug_sp_eof(i),
+            RX_SP_EOF_SRC_RDY   => debug_sp_eof_src_rdy(i),
 
-                VER_EOF         => ver_eof(i),
-                VER_LAST        => ver_last(i),
-                VER_VLD         => ver_vld(i),
-                VER_SRC_RDY     => ver_src_rdy(i),
-                VER_DST_RDY     => ver_dst_rdy(i)
+            VER_EOF         => ver_eof(i),
+            VER_LAST        => ver_last(i),
+            VER_VLD         => ver_vld(i),
+            VER_SRC_RDY     => ver_src_rdy(i),
+            VER_DST_RDY     => ver_dst_rdy(i)
         );
     end generate;
 

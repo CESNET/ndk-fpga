@@ -11,10 +11,10 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
-entity testbench is
-end testbench;
+entity TESTBENCH is
+end entity;
 
-architecture FULL of testbench is
+architecture FULL of TESTBENCH is
 
     constant CLK_PERIOD : time := 5 ns;
 
@@ -79,9 +79,9 @@ begin
 
         for w in 0 to WR_PORTS-1 loop
             for i in 0 to ITEMS-1 loop
-                wr_en(w) <= '1';
+                wr_en(w)                                          <= '1';
                 wr_addr((w+1)*log2(ITEMS)-1 downto w*log2(ITEMS)) <= std_logic_vector(to_unsigned(i,log2(ITEMS)));
-                wr_data((w+1)*DATA_WIDTH-1 downto w*DATA_WIDTH) <= std_logic_vector(to_unsigned(w+1,DATA_WIDTH));
+                wr_data((w+1)*DATA_WIDTH-1 downto w*DATA_WIDTH)   <= std_logic_vector(to_unsigned(w+1,DATA_WIDTH));
                 rd_addr((w+1)*log2(ITEMS)-1 downto w*log2(ITEMS)) <= std_logic_vector(to_unsigned(i,log2(ITEMS)));
                 wait for CLK_PERIOD;
             end loop;
@@ -90,7 +90,7 @@ begin
 
         -- write colision
         for w in 0 to WR_PORTS-1 loop
-            wr_en(w) <= '1';
+            wr_en(w)                                        <= '1';
             wr_data((w+1)*DATA_WIDTH-1 downto w*DATA_WIDTH) <= std_logic_vector(to_unsigned(4-w,DATA_WIDTH));
             wait for CLK_PERIOD;
         end loop;
@@ -111,4 +111,4 @@ begin
         wait;
     end process;
 
-end FULL;
+end architecture;

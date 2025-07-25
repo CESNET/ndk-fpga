@@ -18,41 +18,41 @@ use work.math_pack.all;
 -- ----------------------------------------------------------------------------
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
-entity dec1fn_enable is
-   generic(
-      ITEMS       : integer
-   );
-   port(
-      ADDR        : in std_logic_vector(max(1,log2(ITEMS))-1 downto 0);
-      ENABLE      : in std_logic;
-      DO          : out std_logic_vector(ITEMS-1 downto 0)
-   );
-end entity dec1fn_enable;
+entity DEC1FN_ENABLE is
+    generic (
+        ITEMS       : integer
+    );
+    port (
+        ADDR        : in std_logic_vector(max(1,log2(ITEMS))-1 downto 0);
+        ENABLE      : in std_logic;
+        DO          : out std_logic_vector(ITEMS-1 downto 0)
+    );
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
-architecture behavioral of dec1fn_enable is
+architecture BEHAVIORAL of DEC1FN_ENABLE is
 
 
 begin
 
-fake_gen : if ITEMS=1 generate
-   DO(0) <= ENABLE;
-end generate;
+    fake_gen : if ITEMS = 1 generate
+        DO(0) <= ENABLE;
+    end generate;
 
-real_gen : if ITEMS>1 generate
-   process(ADDR, ENABLE)
-   begin
-      DO    <= (others => '0');
-      if ENABLE = '1' then
-         for i in 0 to (ITEMS-1) loop
-            if (conv_std_logic_vector(i, log2(ITEMS)) = ADDR) then
-               DO(i) <= '1';
+    real_gen : if ITEMS > 1 generate
+        process (ADDR, ENABLE)
+        begin
+            DO    <= (others => '0');
+            if (ENABLE = '1') then
+                for i in 0 to (ITEMS-1) loop
+                    if (conv_std_logic_vector(i, log2(ITEMS)) = ADDR) then
+                        DO(i) <= '1';
+                    end if;
+                end loop;
             end if;
-         end loop;
-      end if;
-   end process;
-end generate;
+        end process;
+    end generate;
 
-end architecture behavioral;
+end architecture;

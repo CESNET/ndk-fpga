@@ -12,54 +12,54 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MFB_CROSSBARX_STREAM2_TR_FIFO is
-generic (
-    MFB_REGIONS : natural := 4;
-    STREAMS     : natural := 4;
-    PKT_MTU     : natural := 2**14;
-    PKT_ID_W    : natural := 9;
-    USERMETA_W  : natural := 32;
-    TXBUF_BYTES : natural := 512;
-    DEVICE      : string  := "AGILEX"
-);
-port (
-    -- =========================================================================
-    -- Clock and Resets inputs
-    -- =========================================================================
-    CLK                  : in  std_logic;
-    RESET                : in  std_logic;
+    generic (
+        MFB_REGIONS : natural := 4;
+        STREAMS     : natural := 4;
+        PKT_MTU     : natural := 2**14;
+        PKT_ID_W    : natural := 9;
+        USERMETA_W  : natural := 32;
+        TXBUF_BYTES : natural := 512;
+        DEVICE      : string  := "AGILEX"
+    );
+    port (
+        -- =========================================================================
+        -- Clock and Resets inputs
+        -- =========================================================================
+        CLK                  : in  std_logic;
+        RESET                : in  std_logic;
 
-    -- =========================================================================
-    -- Input transaction MVB interface
-    -- =========================================================================
-    RX_TR_MVB_STREAMS    : in  slv_array_t(MFB_REGIONS-1 downto 0)(STREAMS-1 downto 0);
-    RX_TR_MVB_USERMETA   : in  slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_W-1 downto 0);
-    RX_TR_MVB_TXBUF_ADDR : in  slv_array_t(MFB_REGIONS-1 downto 0)(log2(TXBUF_BYTES)-1 downto 0);
-    RX_TR_MVB_LEN        : in  slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
-    RX_TR_MVB_VLD        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_TR_MVB_SRC_RDY    : in  std_logic;
-    RX_TR_MVB_DST_RDY    : out std_logic;
+        -- =========================================================================
+        -- Input transaction MVB interface
+        -- =========================================================================
+        RX_TR_MVB_STREAMS    : in  slv_array_t(MFB_REGIONS-1 downto 0)(STREAMS-1 downto 0);
+        RX_TR_MVB_USERMETA   : in  slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_W-1 downto 0);
+        RX_TR_MVB_TXBUF_ADDR : in  slv_array_t(MFB_REGIONS-1 downto 0)(log2(TXBUF_BYTES)-1 downto 0);
+        RX_TR_MVB_LEN        : in  slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+        RX_TR_MVB_VLD        : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_TR_MVB_SRC_RDY    : in  std_logic;
+        RX_TR_MVB_DST_RDY    : out std_logic;
 
-    -- =========================================================================
-    -- Input TXBUF done valids
-    -- =========================================================================
-    TXBUF_DONE_VLD       : in  slv_array_t(STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        -- =========================================================================
+        -- Input TXBUF done valids
+        -- =========================================================================
+        TXBUF_DONE_VLD       : in  slv_array_t(STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
 
-    -- =========================================================================
-    -- Output transaction MVB interface
-    -- =========================================================================
-    TX_TR_MVB_USERMETA   : out slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_W-1 downto 0);
-    TX_TR_MVB_TXBUF_ADDR : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(TXBUF_BYTES)-1 downto 0);
-    TX_TR_MVB_LEN        : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
-    TX_TR_MVB_VLD        : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_TR_MVB_SRC_RDY    : out std_logic;
-    TX_TR_MVB_DST_RDY    : in  std_logic
-);
+        -- =========================================================================
+        -- Output transaction MVB interface
+        -- =========================================================================
+        TX_TR_MVB_USERMETA   : out slv_array_t(MFB_REGIONS-1 downto 0)(USERMETA_W-1 downto 0);
+        TX_TR_MVB_TXBUF_ADDR : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(TXBUF_BYTES)-1 downto 0);
+        TX_TR_MVB_LEN        : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+        TX_TR_MVB_VLD        : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_TR_MVB_SRC_RDY    : out std_logic;
+        TX_TR_MVB_DST_RDY    : in  std_logic
+    );
 end entity;
 
 architecture FULL of MFB_CROSSBARX_STREAM2_TR_FIFO is
 
     constant FIFO_ITEM_W : natural := log2(PKT_MTU+1) + log2(TXBUF_BYTES) + USERMETA_W + STREAMS;
-    constant FIFO_DEPTH  : natural := 512; --TODO
+    constant FIFO_DEPTH  : natural := 512; -- TODO
     constant DONE_CNT_W  : natural := log2((MFB_REGIONS*FIFO_DEPTH) + (2**PKT_ID_W)) + 1;
 
     signal rx_tr_mvb_data_arr  : slv_array_t(MFB_REGIONS-1 downto 0)(FIFO_ITEM_W-1 downto 0);
@@ -86,13 +86,13 @@ begin
     end generate;
 
     fifo_i : entity work.MVB_FIFOX
-    generic map(
+    generic map (
         ITEMS      => MFB_REGIONS,
         ITEM_WIDTH => FIFO_ITEM_W,
         FIFO_DEPTH => FIFO_DEPTH,
         RAM_TYPE   => "AUTO",
         DEVICE     => DEVICE
-    ) port map(
+    ) port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -129,7 +129,7 @@ begin
             fifo_req_done_sum(s) <= v_sum;
         end process;
 
-        stream_ready(s) <= '1' when (txbuf_done_cnt(s) >= fifo_req_done_sum(s)) else '0';
+        stream_ready(s)   <= '1' when (txbuf_done_cnt(s) >= fifo_req_done_sum(s)) else '0';
         txbuf_done_dec(s) <= fifo_req_done_sum(s) and (fifo_mvb_src_rdy and fifo_mvb_dst_rdy);
     end generate;
 

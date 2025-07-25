@@ -1,0 +1,276 @@
+rule:
+    global:
+        disable: true
+        indent_size: 4
+
+    group:
+        alignment:
+            disable: false
+            compact_alignment: 'no'
+            comment_line_ends_group: 'no'
+        indent:
+            disable: false
+        naming:
+            disable: false
+            prefixes: ['']
+            suffixes: ['']
+        structure:
+            disable: false
+        whitespace:
+            disable: false
+        case:
+            disable: false
+        case::name:
+            case_exceptions:
+                - 'IEEE'
+
+    entity_003:
+        style : allow_comment
+    entity_008:
+        case: 'upper'
+    entity_012:
+        disable : true
+    # for discussion
+    entity_018:
+        disable : true
+    entity_019:
+        action: 'remove'
+
+    generic_007:
+        case: 'upper'
+
+    port_007:
+        disable : true
+    port_008:
+        disable : true
+    port_009:
+        disable : true
+    port_010:
+        case: 'upper'
+    port_012:
+        disable : true
+
+    architecture_013:
+        case: 'upper'
+    architecture_014:
+        case: 'upper'
+    architecture_024:
+        action: 'remove'
+    architecture_025:
+        disable : true
+
+    constant_004:
+        case: 'upper'
+    constant_012:
+        disable : true
+    constant_016:
+        disable : true
+    constant_100:
+        number_of_spaces: '1+'
+
+    signal_007:
+        disable : true
+    signal_015:
+        consecutive : 1
+    signal_100:
+        number_of_spaces: '1+'
+
+    variable_007:
+        disable : true
+    variable_015 :
+        consecutive : 1
+
+    loop_statement_006:
+        disable : true
+    loop_statement_007:
+        action: 'remove'
+
+    process_012:
+        disable : true
+    process_016:
+        disable : true
+    process_018:
+        action: 'remove'
+    process_029:
+        clock: 'edge'
+
+    # for discussion
+    generic_map_002:
+        case: 'upper'
+        disable: true
+
+    # for discussion
+    port_map_002:
+        case: 'upper'
+        disable: true
+    port_map_010:
+        disable: true
+
+    comment_011:
+        disable: true
+    comment_012:
+        disable: true
+
+    instantiation_003:
+        disable: true
+    instantiation_005:
+        disable: true
+    instantiation_028:
+        case: 'upper'
+    instantiation_034:
+        disable: true
+    instantiation_036:
+        disable: true
+
+    generate_002:
+        disable : true
+    generate_011:
+        action: 'remove'
+
+    alias_declaration_103:
+        number_of_spaces: '1+'
+
+    case_005:
+        number_of_spaces: '1+'
+    case_012:
+        disable : true
+    case_200:
+        disable : true
+    case_201:
+        disable : true
+
+    case_generate_alternative_100:
+        number_of_spaces: '1+'
+    case_generate_alternative_101:
+        number_of_spaces: '1+'
+
+    # for discussion
+    concurrent_002:
+        number_of_spaces: '1+'
+    concurrent_009:
+        disable : true
+    concurrent_011:
+        disable : true
+    concurrent_012:
+        disable : true
+    concurrent_401:
+        disable : true
+
+    sequential_003:
+        number_of_spaces: '1+'
+    sequential_009:
+        disable : true
+    sequential_402:
+        disable : true
+
+    file_100:
+        number_of_spaces: '1+'
+
+    type_100:
+        number_of_spaces: '1+'
+    type_500:
+        case: 'upper'
+    type_501:
+        case: 'upper'
+
+    subtype_100:
+        number_of_spaces: '1+'
+    subtype_101:
+        disable : true
+    subtype_501:
+        case: 'upper'
+
+    # for discussion
+    whitespace_006:
+        disable : true
+    whitespace_007:
+        disable : true
+    # for discussion
+    whitespace_008:
+        disable : true
+    # for discussion
+    whitespace_010:
+        disable : true
+    whitespace_011:
+        disable : true
+
+    element_association_100:
+        number_of_spaces: '1+'
+    bit_string_literal_500:
+        case: 'upper'
+    null_statement_500:
+        disable : true
+    attribute_500:
+        disable : true
+
+    # for discussion
+    function_019:
+        disable : true
+    function_020:
+        action: 'remove'
+    # for discussion
+    function_507:
+        disable : true
+
+    record_type_definition_005:
+        action: 'remove'
+
+    block_comment_001:
+        disable : true
+    block_comment_002:
+        disable : true
+    block_comment_003:
+        disable : true
+
+    conditional_waveforms_001:
+        allow_single_line: yes
+    conditional_waveforms_100:
+        number_of_spaces: '1+'
+    conditional_waveforms_102:
+        number_of_spaces: '1+'
+    # for discussion
+    conditional_waveforms_501:
+        disable : true
+    # for discussion
+    conditional_waveforms_500:
+        disable : true
+
+    component_022:
+        action: 'remove'
+
+    declarative_part_400:
+        disable : true
+
+    after_001:
+        disable : true
+
+    type_mark_500:
+        disable : true
+
+    package_014:
+        action: 'remove'
+    package_008:
+        disable : true
+
+    package_body_003:
+        action: 'remove'
+    package_body_507:
+        disable : true
+
+indent:
+    tokens:
+        use_clause:
+            keyword:
+                token_after_library_clause: 'current'
+                token_if_no_matching_library_clause: 'current'
+        component_instantiation_statement:
+            instantiation_label:
+                after: 'current'
+                token: 'current'
+            semicolon:
+                after: 'current'
+                token: 'current'
+    options:
+        comment:
+            align_with_end_of_declarative_part: true
+            align_with_end_of_statement_part: true

@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity CB_RTILE_CRDT_DOWN is
-    generic(
+    generic (
         REGIONS          : natural := 2;
         CRDT_ENABLE      : boolean := True
     );
@@ -74,39 +74,39 @@ begin
         region_g: for i in 0 to REGIONS-1 generate
             tlp_code(i) <= TLP_FMT_TYPE(i)(6) & TLP_FMT_TYPE(i)(4 downto 0);
 
-            process(CLK)
+            process (CLK)
             begin
                 if (rising_edge(CLK)) then
-                    crdt_valid(i) <= TLP_VALID(i);
+                    crdt_valid(i)  <= TLP_VALID(i);
                     crdt_pd_inc(i) <= enlarge_right(round_up(unsigned(TLP_LENGTH(i)),2),-2);
                     -- crdt_status: CPLD,NPD,PD,CPLH,NPH,PH
                     if std_match(tlp_code(i),"010---") then
                         -- Message Request without Data
-                        crdt_status(i) <= "000001"; -- PH
-                    elsif std_match(tlp_code(i),"100000") or std_match(tlp_code(i),"110---") then
+                        crdt_status(i) <= "000001";                                                                                    -- PH
+                    elsif (std_match(tlp_code(i),"100000") or std_match(tlp_code(i),"110---")) then
                         -- Memory Write Request, Message Request with Data
-                        crdt_status(i) <= "001001"; -- PH + n*PD
-                    elsif std_match(tlp_code(i),"00000-") or std_match(tlp_code(i),"00010-") or std_match(tlp_code(i),"000010") then
+                        crdt_status(i) <= "001001";                                                                                    -- PH + n*PD
+                    elsif (std_match(tlp_code(i),"00000-") or std_match(tlp_code(i),"00010-") or std_match(tlp_code(i),"000010")) then
                         -- Memory Read Request, Configuration Read, I/O Read Request
-                        crdt_status(i) <= "000010"; -- NPH
-                    elsif std_match(tlp_code(i),"1011--") or std_match(tlp_code(i),"10010-") or std_match(tlp_code(i),"100010") then
+                        crdt_status(i) <= "000010";                                                                                    -- NPH
+                    elsif (std_match(tlp_code(i),"1011--") or std_match(tlp_code(i),"10010-") or std_match(tlp_code(i),"100010")) then
                         -- AtomicOp Requests, Configuration Write, I/O Write Request
-                        crdt_status(i) <= "010010"; -- NPH + n*NPD
+                        crdt_status(i) <= "010010";                                                                                    -- NPH + n*NPD
                     elsif std_match(tlp_code(i),"00101-") then
                         -- Completion without Data
-                        crdt_status(i) <= "000100"; -- CLPH
+                        crdt_status(i) <= "000100";                                                                                    -- CLPH
                     elsif std_match(tlp_code(i),"10101-") then
                         -- Completion with Data
-                        crdt_status(i) <= "100100"; -- CLPH + n*CLPD
+                        crdt_status(i) <= "100100";                                                                                    -- CLPH + n*CLPD
                     else
-                        crdt_status(i) <= "000000"; -- none
+                        crdt_status(i) <= "000000";                                                                                    -- none
                     end if;
                 end if;
             end process;
         end generate;
 
         crdt_ph_g : for i in 0 to 3-1 generate
-            process(CLK)
+            process (CLK)
                 variable crdt_cnt_v : unsigned(log2(REGIONS+1)-1 downto 0);
             begin
                 if (rising_edge(CLK)) then
@@ -126,7 +126,7 @@ begin
                                    crdt_ph_cnt(i)(1 downto 0) when (crdt_ph_cnt_last(i) = '1') else
                                    (others => '1');
 
-            process(CLK)
+            process (CLK)
             begin
                 if (rising_edge(CLK)) then
                     crdt_ph_cnt(i) <= crdt_ph_cnt(i) - crdt_ph_cnt_dec(i) + crdt_ph_cnt_inc(i);
@@ -138,7 +138,7 @@ begin
         end generate;
 
         crdt_pd_g : for i in 0 to 3-1 generate
-            process(CLK)
+            process (CLK)
                 variable crdt_cnt_v : unsigned(log2(REGIONS+1)+8-1 downto 0);
             begin
                 if (rising_edge(CLK)) then
@@ -158,7 +158,7 @@ begin
                                    crdt_pd_cnt(i)(3 downto 0) when (crdt_pd_cnt_last(i) = '1') else
                                    (others => '1');
 
-            process(CLK)
+            process (CLK)
             begin
                 if (rising_edge(CLK)) then
                     crdt_pd_cnt(i) <= crdt_pd_cnt(i) - crdt_pd_cnt_dec(i) + crdt_pd_cnt_inc(i);
@@ -169,7 +169,7 @@ begin
             end process;
         end generate;
 
-        process(CLK)
+        process (CLK)
         begin
             if (rising_edge(CLK)) then
                 CRDT_CNT_PH   <= std_logic_vector(crdt_ph_cnt_dec(0));

@@ -19,7 +19,7 @@ use work.type_pack.all;
 -- achieved by enabling input MVB SHAKEDOWNS (parameter RX_SHAKEDOWN_EN).
 --
 entity MVB_MERGE_STREAMS is
-    generic(
+    generic (
         -- Number of MVB items
         MVB_ITEMS       : natural := 4;
         -- MVB item width in bits
@@ -34,7 +34,7 @@ entity MVB_MERGE_STREAMS is
         -- FPGA device string
         DEVICE          : string := "AGILEX"
     );
-    port(
+    port (
         -- Clock input
         CLK        : in  std_logic;
         -- Reset input synchronized with CLK
@@ -92,13 +92,13 @@ begin
     rx_g: for ii in 0 to RX_STREAMS-1 generate
         shake_g: if RX_SHAKEDOWN_EN generate
             shake_i : entity work.MVB_SHAKEDOWN
-            generic map(
+            generic map (
                 RX_ITEMS    => MVB_ITEMS,
                 TX_ITEMS    => MVB_ITEMS,
                 ITEM_WIDTH  => MVB_ITEM_WIDTH,
                 SHAKE_PORTS => 2
             )
-            port map(
+            port map (
                 CLK        => CLK,
                 RESET      => RESET,
 
@@ -199,7 +199,7 @@ begin
     -- The timeout counter counts the number of transmitted valid words within
     -- one uninterrupted service of the selected input stream.
     s_timeout_rst <= RESET or s_mux_sel_en;
-    s_timeout_en <= s_mux_tx_src_rdy and s_mux_tx_dst_rdy;
+    s_timeout_en  <= s_mux_tx_src_rdy and s_mux_tx_dst_rdy;
 
     process (CLK)
     begin

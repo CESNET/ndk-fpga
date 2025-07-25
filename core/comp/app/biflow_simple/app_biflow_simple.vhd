@@ -12,60 +12,60 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity APP_BIFLOW_SIMPLE is
-generic (
-    IN_STREAMS            : natural := 1;
-    OUT_STREAMS           : natural := 2;
-    MFB_REGIONS           : natural := 1;
-    MFB_REGION_SIZE       : natural := 8;
-    MFB_BLOCK_SIZE        : natural := 8;
-    MFB_ITEM_WIDTH        : natural := 8;
-    MVB_ITEM_WIDTH        : natural := 8;
-    MVB_FIFO_DEPTH        : natural := 32;
-    MFB_FIFO_DEPTH        : natural := 512;
-    MFB_FIFO_ENABLE       : boolean := True;
-    MFB_FIFO_TYPE         : string  := "AUTO";
-    DEVICE                : string  := "AGILEX"
-);
-port (
-    -- =========================================================================
-    -- Clock and Resets inputs
-    -- =========================================================================
-    CLK              : in  std_logic;
-    RESET            : in  std_logic;
+    generic (
+        IN_STREAMS            : natural := 1;
+        OUT_STREAMS           : natural := 2;
+        MFB_REGIONS           : natural := 1;
+        MFB_REGION_SIZE       : natural := 8;
+        MFB_BLOCK_SIZE        : natural := 8;
+        MFB_ITEM_WIDTH        : natural := 8;
+        MVB_ITEM_WIDTH        : natural := 8;
+        MVB_FIFO_DEPTH        : natural := 32;
+        MFB_FIFO_DEPTH        : natural := 512;
+        MFB_FIFO_ENABLE       : boolean := True;
+        MFB_FIFO_TYPE         : string  := "AUTO";
+        DEVICE                : string  := "AGILEX"
+    );
+    port (
+        -- =========================================================================
+        -- Clock and Resets inputs
+        -- =========================================================================
+        CLK              : in  std_logic;
+        RESET            : in  std_logic;
 
-    -- =========================================================================
-    -- Input MFB+MVB interface
-    -- =========================================================================
-    IN_MVB_DATA      : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MVB_ITEM_WIDTH-1 downto 0);
-    IN_MVB_SEL       : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(OUT_STREAMS))-1 downto 0);
-    IN_MVB_VLD       : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    IN_MVB_SRC_RDY   : in  std_logic_vector(IN_STREAMS-1 downto 0);
-    IN_MVB_DST_RDY   : out std_logic_vector(IN_STREAMS-1 downto 0);
+        -- =========================================================================
+        -- Input MFB+MVB interface
+        -- =========================================================================
+        IN_MVB_DATA      : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MVB_ITEM_WIDTH-1 downto 0);
+        IN_MVB_SEL       : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(OUT_STREAMS))-1 downto 0);
+        IN_MVB_VLD       : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        IN_MVB_SRC_RDY   : in  std_logic_vector(IN_STREAMS-1 downto 0);
+        IN_MVB_DST_RDY   : out std_logic_vector(IN_STREAMS-1 downto 0);
 
-    IN_MFB_DATA      : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    IN_MFB_SOF       : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    IN_MFB_EOF       : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    IN_MFB_SOF_POS   : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    IN_MFB_EOF_POS   : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    IN_MFB_SRC_RDY   : in  std_logic_vector(IN_STREAMS-1 downto 0);
-    IN_MFB_DST_RDY   : out std_logic_vector(IN_STREAMS-1 downto 0);
+        IN_MFB_DATA      : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        IN_MFB_SOF       : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        IN_MFB_EOF       : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        IN_MFB_SOF_POS   : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        IN_MFB_EOF_POS   : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        IN_MFB_SRC_RDY   : in  std_logic_vector(IN_STREAMS-1 downto 0);
+        IN_MFB_DST_RDY   : out std_logic_vector(IN_STREAMS-1 downto 0);
 
-    -- =========================================================================
-    -- Output MFB+MVB interface
-    -- =========================================================================
-    OUT_MVB_DATA     : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*MVB_ITEM_WIDTH-1 downto 0);
-    OUT_MVB_VLD      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    OUT_MVB_SRC_RDY  : out std_logic_vector(OUT_STREAMS-1 downto 0);
-    OUT_MVB_DST_RDY  : in  std_logic_vector(OUT_STREAMS-1 downto 0);
+        -- =========================================================================
+        -- Output MFB+MVB interface
+        -- =========================================================================
+        OUT_MVB_DATA     : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*MVB_ITEM_WIDTH-1 downto 0);
+        OUT_MVB_VLD      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        OUT_MVB_SRC_RDY  : out std_logic_vector(OUT_STREAMS-1 downto 0);
+        OUT_MVB_DST_RDY  : in  std_logic_vector(OUT_STREAMS-1 downto 0);
 
-    OUT_MFB_DATA     : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    OUT_MFB_SOF      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    OUT_MFB_EOF      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    OUT_MFB_SOF_POS  : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    OUT_MFB_EOF_POS  : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    OUT_MFB_SRC_RDY  : out std_logic_vector(OUT_STREAMS-1 downto 0);
-    OUT_MFB_DST_RDY  : in  std_logic_vector(OUT_STREAMS-1 downto 0)
-);
+        OUT_MFB_DATA     : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        OUT_MFB_SOF      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        OUT_MFB_EOF      : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        OUT_MFB_SOF_POS  : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        OUT_MFB_EOF_POS  : out slv_array_t(OUT_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        OUT_MFB_SRC_RDY  : out std_logic_vector(OUT_STREAMS-1 downto 0);
+        OUT_MFB_DST_RDY  : in  std_logic_vector(OUT_STREAMS-1 downto 0)
+    );
 end entity;
 
 architecture FULL of APP_BIFLOW_SIMPLE is
@@ -103,7 +103,7 @@ architecture FULL of APP_BIFLOW_SIMPLE is
 
 begin
 
-    --assert ((OUT_STREAMS = IN_STREAMS) or (OUT_STREAMS < IN_STREAMS and OUT_STREAMS = 1))
+    -- assert ((OUT_STREAMS = IN_STREAMS) or (OUT_STREAMS < IN_STREAMS and OUT_STREAMS = 1))
     --    report "APP_BIFLOW_SIMPLE: The number of OUT_STREAMS must be equal to IN_STREAMS, or OUT_STREAMS must be 1 and OUT_STREAMS < IN_STREAMS!"
     --    severity failure;
 
@@ -129,7 +129,7 @@ begin
             subtype IPO_RANGE is natural range (i+1)*(OUT_STREAMS)-1 downto i*(OUT_STREAMS);
         begin
             biflow_port_i : entity work.APP_BIFLOW_PORT
-            generic map(
+            generic map (
                 IN_STREAMS      => 1,
                 OUT_STREAMS     => OUT_STREAMS,
                 MFB_REGIONS     => MFB_REGIONS,
@@ -139,7 +139,7 @@ begin
                 MVB_ITEM_WIDTH  => MVB_ITEM_WIDTH,
                 DEVICE          => DEVICE
             )
-            port map(
+            port map (
                 CLK             => CLK,
                 RESET           => RESET,
 
@@ -178,22 +178,22 @@ begin
 
             -- remap ports
             port_out_g: for j in 0 to IN_STREAMS-1 generate
-                port_out_mvb_data(i*IN_STREAMS+j)    <= port_in_mvb_data(j*OUT_STREAMS+i);
-                port_out_mvb_vld(i*IN_STREAMS+j)     <= port_in_mvb_vld(j*OUT_STREAMS+i);
-                port_out_mvb_src_rdy(i*IN_STREAMS+j) <= port_in_mvb_src_rdy(j*OUT_STREAMS+i);
+                port_out_mvb_data(i*IN_STREAMS+j)     <= port_in_mvb_data(j*OUT_STREAMS+i);
+                port_out_mvb_vld(i*IN_STREAMS+j)      <= port_in_mvb_vld(j*OUT_STREAMS+i);
+                port_out_mvb_src_rdy(i*IN_STREAMS+j)  <= port_in_mvb_src_rdy(j*OUT_STREAMS+i);
                 port_in_mvb_dst_rdy(j*OUT_STREAMS+i)  <= port_out_mvb_dst_rdy(i*IN_STREAMS+j);
 
-                port_out_mfb_data(i*IN_STREAMS+j)    <= port_in_mfb_data(j*OUT_STREAMS+i);
-                port_out_mfb_sof(i*IN_STREAMS+j)     <= port_in_mfb_sof(j*OUT_STREAMS+i);
-                port_out_mfb_eof(i*IN_STREAMS+j)     <= port_in_mfb_eof(j*OUT_STREAMS+i);
-                port_out_mfb_sof_pos(i*IN_STREAMS+j) <= port_in_mfb_sof_pos(j*OUT_STREAMS+i);
-                port_out_mfb_eof_pos(i*IN_STREAMS+j) <= port_in_mfb_eof_pos(j*OUT_STREAMS+i);
-                port_out_mfb_src_rdy(i*IN_STREAMS+j) <= port_in_mfb_src_rdy(j*OUT_STREAMS+i);
+                port_out_mfb_data(i*IN_STREAMS+j)     <= port_in_mfb_data(j*OUT_STREAMS+i);
+                port_out_mfb_sof(i*IN_STREAMS+j)      <= port_in_mfb_sof(j*OUT_STREAMS+i);
+                port_out_mfb_eof(i*IN_STREAMS+j)      <= port_in_mfb_eof(j*OUT_STREAMS+i);
+                port_out_mfb_sof_pos(i*IN_STREAMS+j)  <= port_in_mfb_sof_pos(j*OUT_STREAMS+i);
+                port_out_mfb_eof_pos(i*IN_STREAMS+j)  <= port_in_mfb_eof_pos(j*OUT_STREAMS+i);
+                port_out_mfb_src_rdy(i*IN_STREAMS+j)  <= port_in_mfb_src_rdy(j*OUT_STREAMS+i);
                 port_in_mfb_dst_rdy(j*OUT_STREAMS+i)  <= port_out_mfb_dst_rdy(i*IN_STREAMS+j);
             end generate;
 
             mfb_merger_tree_i : entity work.MFB_MERGER_GEN
-            generic map(
+            generic map (
                 MERGER_INPUTS   => IN_STREAMS,
                 MVB_ITEMS       => MFB_REGIONS,
                 MVB_ITEM_WIDTH  => MVB_ITEM_WIDTH,
@@ -207,7 +207,7 @@ begin
                 OUT_PIPE_EN     => true,
                 DEVICE          => DEVICE
             )
-            port map(
+            port map (
                 CLK             => CLK,
                 RESET           => RESET,
 

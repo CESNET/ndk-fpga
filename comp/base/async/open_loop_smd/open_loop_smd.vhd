@@ -7,18 +7,18 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-    -- README:
-    -- This component is cross domain crossing synchronizer only for sequential
-    -- Grey code. It is usually used for synchronization pointers in ASFIFOs.
+-- README:
+-- This component is cross domain crossing synchronizer only for sequential
+-- Grey code. It is usually used for synchronization pointers in ASFIFOs.
 
 entity ASYNC_OPEN_LOOP_SMD is
-    Generic (
+    generic (
         -- Data width of grey code data signal in bits
         DATA_WIDTH : natural := 8;
         -- Use asynchronous reset in flop-flops
         ASYNC_RST  : boolean := False
     );
-    Port (
+    port (
         -- Clock domain A (source)
         ACLK     : in  std_logic;
         ARST     : in  std_logic;
@@ -29,15 +29,15 @@ entity ASYNC_OPEN_LOOP_SMD is
         BRST     : in  std_logic;
         BDATAOUT : out std_logic_vector(DATA_WIDTH-1 downto 0)
     );
-end ASYNC_OPEN_LOOP_SMD;
+end entity;
 
 architecture FULL of ASYNC_OPEN_LOOP_SMD is
 
     -- Signal declarations
-    signal input_reg : std_logic_vector(DATA_WIDTH-1 downto 0) := (others=>'0');
-    signal sync1_reg : std_logic_vector(DATA_WIDTH-1 downto 0) := (others=>'0');
-    signal sync2_reg : std_logic_vector(DATA_WIDTH-1 downto 0) := (others=>'0');
-    signal sync3_reg : std_logic_vector(DATA_WIDTH-1 downto 0) := (others=>'0');
+    signal input_reg : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
+    signal sync1_reg : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
+    signal sync2_reg : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
+    signal sync3_reg : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
 
     signal arst_async : std_logic := '0';
     signal brst_async : std_logic := '0';
@@ -55,10 +55,10 @@ architecture FULL of ASYNC_OPEN_LOOP_SMD is
     attribute async_reg of sync3_reg       : signal is "true";
 
     -- Intel attributes
-    attribute ALTERA_ATTRIBUTE              : string;
-    attribute ALTERA_ATTRIBUTE of sync1_reg : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON; -name SYNCHRONIZER_IDENTIFICATION FORCED";
-    attribute ALTERA_ATTRIBUTE of sync2_reg : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON";
-    attribute ALTERA_ATTRIBUTE of sync3_reg : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON";
+    attribute altera_attribute              : string;
+    attribute altera_attribute of sync1_reg : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON; -name SYNCHRONIZER_IDENTIFICATION FORCED";
+    attribute altera_attribute of sync2_reg : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON";
+    attribute altera_attribute of sync3_reg : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON";
 
 begin
 
@@ -78,10 +78,10 @@ begin
     process (ACLK, arst_async)
     begin
         if (arst_async = '1') then
-            input_reg <= (others=>'0');
+            input_reg <= (others => '0');
         elsif (rising_edge(ACLK)) then
             if (arst_sync = '1') then
-                input_reg <= (others=>'0');
+                input_reg <= (others => '0');
             else
                 input_reg <= ADATAIN;
             end if;
@@ -92,14 +92,14 @@ begin
     process (BCLK, brst_async)
     begin
         if (brst_async = '1') then
-            sync1_reg <= (others=>'0');
-            sync2_reg <= (others=>'0');
-            sync3_reg <= (others=>'0');
+            sync1_reg <= (others => '0');
+            sync2_reg <= (others => '0');
+            sync3_reg <= (others => '0');
         elsif (rising_edge(BCLK)) then
             if (brst_sync = '1') then
-                sync1_reg <= (others=>'0');
-                sync2_reg <= (others=>'0');
-                sync3_reg <= (others=>'0');
+                sync1_reg <= (others => '0');
+                sync2_reg <= (others => '0');
+                sync3_reg <= (others => '0');
             else
                 sync1_reg <= input_reg;
                 sync2_reg <= sync1_reg;

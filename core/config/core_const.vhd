@@ -26,11 +26,11 @@ package combo_const is
     constant BAR5_BASE_ADDR    : std_logic_vector := X"80000000";
     constant EXP_ROM_BASE_ADDR : std_logic_vector := X"80000000";
 
-end package combo_const;
+end package;
 
 -- ----------------------------------------------------------------------------
 --                               Package body
 -- ----------------------------------------------------------------------------
 
 package body combo_const is
-end package body combo_const;
+end package body;

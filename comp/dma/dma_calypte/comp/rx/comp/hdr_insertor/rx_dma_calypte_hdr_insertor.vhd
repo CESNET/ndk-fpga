@@ -99,15 +99,15 @@ architecture FULL of RX_DMA_CALYPTE_HDR_INSERTOR is
     signal high_shift_val_pst : unsigned(log2(32)-4 downto 0);
     signal high_shift_val_nst : unsigned(log2(32)-4 downto 0);
 
-    type tran_process_state_type is (IDLE, TRANSACTION_SEND, DMA_HDR_SEND, PKT_DROP);
+    type   tran_process_state_type is (IDLE, TRANSACTION_SEND, DMA_HDR_SEND, PKT_DROP);
     signal tprocess_pst : tran_process_state_type := IDLE;
     signal tprocess_nst : tran_process_state_type := IDLE;
 
     signal tx_mfb_meta_arr : slv_array_t(TX_REGIONS-1 downto 0)(PCIE_RQ_META_WIDTH-1 downto 0);
 
     -- varies its value according to the generic parameters
-    signal SHIFT_INC  : unsigned(1 downto 0);
-    signal INIT_SHIFT : unsigned(1 downto 0);
+    signal shift_inc  : unsigned(1 downto 0);
+    signal init_shift : unsigned(1 downto 0);
 
     -- attribute mark_debug                       : string;
     -- attribute mark_debug of tprocess_pst       : signal is "true";
@@ -170,13 +170,13 @@ begin
                         if (HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
                             -- The data in "intel packet" will be aligned - there is no room for DMA_HDR in second region
                             and (IS_INTEL
-                                -- The PCIe HDR for DMA HDR is handled in different place
-                                or (TX_REGIONS = 1
-                                    -- For Xilinx we are waiting for PCIE HDR of DMA_HDR because it will fit in the last word of MFB (in second region)
-                                    or (TX_REGIONS = 2 and HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and RX_MFB_EOF = '1' and HDRM_DMA_HDR_SRC_RDY = '1')
-                                    -- Normal data transafer
-                                    or (TX_REGIONS = 2 and RX_MFB_EOF = '0')
-                        ))) then
+                            -- The PCIe HDR for DMA HDR is handled in different place
+                                    or (TX_REGIONS = 1
+                            -- For Xilinx we are waiting for PCIE HDR of DMA_HDR because it will fit in the last word of MFB (in second region)
+                                           or (TX_REGIONS = 2 and HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and RX_MFB_EOF = '1' and HDRM_DMA_HDR_SRC_RDY = '1')
+                            -- Normal data transafer
+                                           or (TX_REGIONS = 2 and RX_MFB_EOF = '0')
+                                       ))) then
                             tprocess_nst <= TRANSACTION_SEND;
                         end if;
                     end if;
@@ -295,7 +295,7 @@ begin
                     else
                         if (high_shift_val_pst = "11") then
 
-                            RX_MFB_DST_RDY        <= TX_MFB_DST_RDY;
+                            RX_MFB_DST_RDY             <= TX_MFB_DST_RDY;
                             -- switch the PCIE header on the input to the next one (for the next transaction)
                             HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
 
@@ -356,13 +356,13 @@ begin
     -- Same for Intel ... the reset value must change
     -- my attempt to make the set of constants which change according to the specified generic parameters
     shift_cntr_incr_g : if (TX_REGIONS = 1) generate
-        INIT_SHIFT <= "00";
-        SHIFT_INC  <= "01";
+        init_shift <= "00";
+        shift_inc  <= "01";
     else generate
-        INIT_SHIFT <= "01";
+        init_shift <= "01";
         -- increment by two, the barrel shifter remains the same for both of the configurations so the
         -- shifting by two is needed
-        SHIFT_INC  <= "10";
+        shift_inc  <= "10";
     end generate;
 
     --=============================================================================================================
@@ -390,22 +390,22 @@ begin
                     -- Not a valid drop signal for the current packet
                     and (not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1'))
                     and (IS_INTEL
-                        or (TX_REGIONS = 1
-                            or (TX_REGIONS = 2 and HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '1')
-                            -- The 2 region configuration needs to have a valid DMA header with the
-                            -- ending transaction since this can fit to the second region of the last
-                            -- of the last word of a PCIe transaction
-                            or (TX_REGIONS = 2 and RX_MFB_EOF = '0')
-                ))) then
+                            or (TX_REGIONS = 1
+                                   or (TX_REGIONS = 2 and HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '1')
+                    -- The 2 region configuration needs to have a valid DMA header with the
+                    -- ending transaction since this can fit to the second region of the last
+                    -- of the last word of a PCIe transaction
+                                   or (TX_REGIONS = 2 and RX_MFB_EOF = '0')
+                               ))) then
 
                     -- Place the PCIe header at the beginning of the data (Xilinx only)
                     -- For Intel, the header is placed in Meta signal and is valid with SOF - The HDR_TYPE is not relevant
                     if (IS_INTEL = FALSE) then
-                        high_shift_val_nst <= INIT_SHIFT;
+                        high_shift_val_nst <= init_shift;
                         TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 128) & HDRM_DATA_PCIE_HDR;
                     else
                         -- There is no such think as INIT_SHIFT needed for Intel devices
-                        high_shift_val_nst  <= high_shift_val_pst + SHIFT_INC;
+                        high_shift_val_nst  <= high_shift_val_pst + shift_inc;
                         TX_MFB_DATA         <= bshifter_data_out(TX_MFB_DATA'high downto 0);
                     end if;
 
@@ -417,7 +417,7 @@ begin
 
             when TRANSACTION_SEND =>
 
-                high_shift_val_nst <= high_shift_val_pst + SHIFT_INC;
+                high_shift_val_nst <= high_shift_val_pst + shift_inc;
 
                 -- Xilinx
                 if (IS_INTEL = FALSE) then
@@ -444,7 +444,7 @@ begin
                             TX_MFB_DATA <= (TX_MFB_DATA'high downto 128 + 64 + (TX_MFB_DATA'length / 2) => '0')
                                         & HDRM_DMA_HDR_DATA
                                         & HDRM_DMA_PCIE_HDR
-                                        & ((TX_MFB_DATA'length / 2) - 1 downto 128 => '0')
+                                        & ((TX_MFB_DATA'length / 2) - 1 downto 128                      => '0')
                                         & bshifter_data_out(127 downto 0);
 
                             -- the value of "101" & "011"
@@ -509,15 +509,17 @@ begin
     -- Shifter of the output data
     --=============================================================================================================
     input_data_shifter_i : entity work.BARREL_SHIFTER_GEN
-        generic map (
-            -- 32 DWs and each has 32b
-            BLOCKS     => 8,
-            BLOCK_SIZE => 128,
-            SHIFT_LEFT => FALSE)
-        port map (
-            DATA_IN  => RX_MFB_DATA,
-            DATA_OUT => bshifter_data_out,
-            SEL      => std_logic_vector(high_shift_val_pst) & low_shift_val);
+    generic map (
+        -- 32 DWs and each has 32b
+        BLOCKS     => 8,
+        BLOCK_SIZE => 128,
+        SHIFT_LEFT => FALSE
+    )
+    port map (
+        DATA_IN  => RX_MFB_DATA,
+        DATA_OUT => bshifter_data_out,
+        SEL      => std_logic_vector(high_shift_val_pst) & low_shift_val
+    );
 
     -- In intel devices the PCIe header is sent in separate signal.
     intel_lowbits: if (IS_INTEL = FALSE) generate
@@ -526,7 +528,7 @@ begin
         tx_mfb_meta_g: for i in 0 to TX_REGIONS-1 generate
             process (all) is
             begin
-                tx_mfb_meta_arr(i) <= (others => '0');
+                tx_mfb_meta_arr(i)                   <= (others => '0');
                 -- FBE and LBE for Xilinx FPGA
                 tx_mfb_meta_arr(i)(PCIE_RQ_META_FBE) <= (others => '1');
                 tx_mfb_meta_arr(i)(PCIE_RQ_META_LBE) <= (others => '1');

@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_BUFFER is
-    generic(
+    generic (
         REGIONS        : natural := 4;
         REGION_SIZE    : natural := 8;
         BLOCK_SIZE     : natural := 8;
@@ -25,7 +25,7 @@ entity RX_MAC_LITE_BUFFER is
         MFIFO_RAM_TYPE : string  := "BRAM";
         DEVICE         : string  := "STRATIX10"
     );
-   port(
+    port (
         -- =====================================================================
         -- INPUT INTERFACES
         -- =====================================================================
@@ -85,9 +85,9 @@ end entity;
 architecture FULL of RX_MAC_LITE_BUFFER is
 
     constant SOF_INDEX_WIDTH : natural := log2(REGIONS);
-    constant MBUF_WIDTH      : natural := META_WIDTH;--+SOF_INDEX_WIDTH+1+1;
+    constant MBUF_WIDTH      : natural := META_WIDTH; --+SOF_INDEX_WIDTH+1+1;
 
-    type fsm_t is (st_idle, st_last_word, st_overfull);
+    type fsm_t is (ST_IDLE, ST_LAST_WORD, ST_OVERFULL);
 
     signal s_inc_frame          : std_logic_vector(REGIONS downto 0);
     signal s_inc_frame_reg      : std_logic;
@@ -147,7 +147,7 @@ architecture FULL of RX_MAC_LITE_BUFFER is
     signal s_mfb_error_reg : std_logic;
 
     attribute preserve_for_debug : boolean;
-    attribute preserve_for_debug of s_mfb_error : signal is true;
+    attribute preserve_for_debug of s_mfb_error     : signal is true;
     attribute preserve_for_debug of s_mfb_error_reg : signal is true;
 
 begin
@@ -211,14 +211,14 @@ begin
         if (rising_edge(RX_CLK)) then
             fsm_pst <= fsm_nst;
             if (RX_RESET = '1') then
-                fsm_pst <= st_idle;
+                fsm_pst <= ST_IDLE;
             end if;
         end if;
     end process;
 
     process (all)
     begin
-        fsm_nst <= fsm_pst;
+        fsm_nst          <= fsm_pst;
         s_rx_sof_mod     <= RX_SOF;
         s_rx_eof_mod     <= RX_EOF;
         s_rx_eof_pos_mod <= s_rx_eof_pos_arr;
@@ -226,33 +226,33 @@ begin
         s_rx_force_drop  <= (others => '0');
 
         case (fsm_pst) is
-            when st_idle =>
+            when ST_IDLE =>
                 if (s_full_flag = '1') then
-                    fsm_nst <= st_last_word;
+                    fsm_nst <= ST_LAST_WORD;
                 end if;
 
-            when st_last_word =>
-                s_rx_sof_mod <= RX_SOF and RX_SRC_RDY;
-                s_rx_eof_mod <= RX_EOF and RX_SRC_RDY;
+            when ST_LAST_WORD =>
+                s_rx_sof_mod     <= RX_SOF and RX_SRC_RDY;
+                s_rx_eof_mod     <= RX_EOF and RX_SRC_RDY;
                 s_rx_src_rdy_mod <= RX_SRC_RDY;
-                if (s_rx_word_end_ok = '0') then -- force end is needed
+                if (s_rx_word_end_ok = '0') then                                                                                  -- force end is needed
                     -- discard the last SOF if an EOF exists in the last region
                     s_rx_sof_mod(REGIONS-1)     <= (RX_SOF(REGIONS-1) and RX_SRC_RDY) and not (RX_EOF(REGIONS-1) and RX_SRC_RDY);
-                    s_rx_eof_mod(REGIONS-1)     <= '1'; -- force end in the last region ...
-                    s_rx_eof_pos_mod(REGIONS-1) <= (others => '1'); -- ... and the last byte to truncate the packet at the very end of the word
-                    s_rx_force_drop(REGIONS-1)  <= '1'; -- mark the packet to be dropped (valid with EOF)
-                    s_rx_src_rdy_mod <= '1';
+                    s_rx_eof_mod(REGIONS-1)     <= '1';                                                                           -- force end in the last region ...
+                    s_rx_eof_pos_mod(REGIONS-1) <= (others => '1');                                                               -- ... and the last byte to truncate the packet at the very end of the word
+                    s_rx_force_drop(REGIONS-1)  <= '1';                                                                           -- mark the packet to be dropped (valid with EOF)
+                    s_rx_src_rdy_mod            <= '1';
                 end if;
-                fsm_nst <= st_overfull;
+                fsm_nst <= ST_OVERFULL;
 
-            when st_overfull =>
+            when ST_OVERFULL =>
                 s_rx_force_drop  <= (others => '1');
                 s_rx_src_rdy_mod <= '0';
                 if (s_rx_rdy2recovery = '1' and s_full_flag = '0') then
                     s_rx_force_drop  <= s_rx_first_eof;
-                    s_rx_eof_mod     <= RX_EOF and not s_rx_first_eof; -- discard first the EOF if it ever arrives
-                    s_rx_src_rdy_mod <= RX_SRC_RDY and not s_rx_without_sof; -- clear word without any SOF
-                    fsm_nst          <= st_idle;
+                    s_rx_eof_mod     <= RX_EOF and not s_rx_first_eof;                                                            -- discard first the EOF if it ever arrives
+                    s_rx_src_rdy_mod <= RX_SRC_RDY and not s_rx_without_sof;                                                      -- clear word without any SOF
+                    fsm_nst          <= ST_IDLE;
                 end if;
         end case;
     end process;
@@ -329,7 +329,7 @@ begin
     -- -------------------------------------------------------------------------
 
     dbuf_i : entity work.MFB_PD_ASFIFO_SIMPLE
-    generic map(
+    generic map (
         MFB_REGIONS     => REGIONS,
         MFB_REGION_SIZE => REGION_SIZE,
         MFB_BLOCK_SIZE  => BLOCK_SIZE,
@@ -337,7 +337,7 @@ begin
         FIFO_ITEMS      => DFIFO_ITEMS,
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         RX_CLK           => RX_CLK,
         RX_RESET         => RX_RESET,
 
@@ -387,7 +387,7 @@ begin
     s_mbuf_src_rdy <= or s_mbuf_vld;
 
     mbuf_i : entity work.MVB_ASFIFOX
-    generic map(
+    generic map (
         MVB_ITEMS      => REGIONS,
         MVB_ITEM_WIDTH => MBUF_WIDTH,
         FIFO_ITEMS     => MFIFO_ITEMS,
@@ -396,7 +396,7 @@ begin
         OUTPUT_REG     => True,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         RX_CLK     => RX_CLK,
         RX_RESET   => RX_RESET,
         RX_DATA    => s_mbuf_din,

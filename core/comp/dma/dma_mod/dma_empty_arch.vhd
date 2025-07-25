@@ -189,7 +189,7 @@ begin
     -- =====================================================================
 
     mi_splitter_gls_i : entity work.MI_SPLITTER_PLUS_GEN
-    generic map(
+    generic map (
         ADDR_WIDTH  => 32,
         DATA_WIDTH  => 32,
         META_WIDTH  => 0,
@@ -197,7 +197,7 @@ begin
         ADDR_BASE   => gls_mi_addr_base_f,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK         => MI_CLK,
         RESET       => MI_RESET,
 
@@ -223,21 +223,21 @@ begin
     gls_g : for i in 0 to DMA_STREAMS-1 generate
         gls_en_g : if (GEN_LOOP_EN) generate
             gen_loop_switch_i : entity work.GEN_LOOP_SWITCH
-            generic map(
-                REGIONS           => IUSR_MFB_REGIONS    ,
+            generic map (
+                REGIONS           => IUSR_MFB_REGIONS,
                 REGION_SIZE       => USR_MFB_REGION_SIZE,
-                BLOCK_SIZE        => USR_MFB_BLOCK_SIZE ,
-                ITEM_WIDTH        => USR_MFB_ITEM_WIDTH ,
+                BLOCK_SIZE        => USR_MFB_BLOCK_SIZE,
+                ITEM_WIDTH        => USR_MFB_ITEM_WIDTH,
                 PKT_MTU           => USR_RX_PKT_SIZE_MAX,
-                RX_DMA_CHANNELS   => RX_CHANNELS        ,
-                TX_DMA_CHANNELS   => TX_CHANNELS        ,
-                HDR_META_WIDTH    => HDR_META_WIDTH     ,
-                RX_HDR_INS_EN     => false              , -- only enable for version 1 to DMA Medusa
-                SAME_CLK          => false              ,
-                MI_PIPE_EN        => true               ,
+                RX_DMA_CHANNELS   => RX_CHANNELS,
+                TX_DMA_CHANNELS   => TX_CHANNELS,
+                HDR_META_WIDTH    => HDR_META_WIDTH,
+                RX_HDR_INS_EN     => false, -- only enable for version 1 to DMA Medusa
+                SAME_CLK          => false,
+                MI_PIPE_EN        => true,
                 DEVICE            => DEVICE
             )
-            port map(
+            port map (
                 MI_CLK              => MI_CLK,
                 MI_RESET            => MI_RESET,
                 MI_DWR              => gls_mi_dwr(i),
@@ -249,99 +249,99 @@ begin
                 MI_DRD              => gls_mi_drd(i),
                 MI_DRDY             => gls_mi_drdy(i),
 
-                CLK                 => USR_CLK                ,
-                RESET               => USR_RESET              ,
+                CLK                 => USR_CLK,
+                RESET               => USR_RESET,
 
-                ETH_RX_MVB_LEN      => rx_usr_arr_mvb_len(i)     ,
+                ETH_RX_MVB_LEN      => rx_usr_arr_mvb_len(i),
                 ETH_RX_MVB_HDR_META => rx_usr_arr_mvb_hdr_meta(i),
-                ETH_RX_MVB_CHANNEL  => rx_usr_arr_mvb_channel(i) ,
-                ETH_RX_MVB_DISCARD  => rx_usr_arr_mvb_discard(i) ,
-                ETH_RX_MVB_VLD      => rx_usr_arr_mvb_vld(i)     ,
-                ETH_RX_MVB_SRC_RDY  => rx_usr_arr_mvb_src_rdy(i) ,
-                ETH_RX_MVB_DST_RDY  => rx_usr_arr_mvb_dst_rdy(i) ,
+                ETH_RX_MVB_CHANNEL  => rx_usr_arr_mvb_channel(i),
+                ETH_RX_MVB_DISCARD  => rx_usr_arr_mvb_discard(i),
+                ETH_RX_MVB_VLD      => rx_usr_arr_mvb_vld(i),
+                ETH_RX_MVB_SRC_RDY  => rx_usr_arr_mvb_src_rdy(i),
+                ETH_RX_MVB_DST_RDY  => rx_usr_arr_mvb_dst_rdy(i),
 
-                ETH_RX_MFB_DATA     => rx_usr_arr_mfb_data(i)    ,
-                ETH_RX_MFB_SOF      => rx_usr_arr_mfb_sof(i)     ,
-                ETH_RX_MFB_EOF      => rx_usr_arr_mfb_eof(i)     ,
-                ETH_RX_MFB_SOF_POS  => rx_usr_arr_mfb_sof_pos(i) ,
-                ETH_RX_MFB_EOF_POS  => rx_usr_arr_mfb_eof_pos(i) ,
-                ETH_RX_MFB_SRC_RDY  => rx_usr_arr_mfb_src_rdy(i) ,
-                ETH_RX_MFB_DST_RDY  => rx_usr_arr_mfb_dst_rdy(i) ,
+                ETH_RX_MFB_DATA     => rx_usr_arr_mfb_data(i),
+                ETH_RX_MFB_SOF      => rx_usr_arr_mfb_sof(i),
+                ETH_RX_MFB_EOF      => rx_usr_arr_mfb_eof(i),
+                ETH_RX_MFB_SOF_POS  => rx_usr_arr_mfb_sof_pos(i),
+                ETH_RX_MFB_EOF_POS  => rx_usr_arr_mfb_eof_pos(i),
+                ETH_RX_MFB_SRC_RDY  => rx_usr_arr_mfb_src_rdy(i),
+                ETH_RX_MFB_DST_RDY  => rx_usr_arr_mfb_dst_rdy(i),
 
-                ETH_TX_MVB_LEN      => tx_usr_arr_mvb_len(i)     ,
+                ETH_TX_MVB_LEN      => tx_usr_arr_mvb_len(i),
                 ETH_TX_MVB_HDR_META => tx_usr_arr_mvb_hdr_meta(i),
-                ETH_TX_MVB_CHANNEL  => tx_usr_arr_mvb_channel(i) ,
-                ETH_TX_MVB_VLD      => tx_usr_arr_mvb_vld(i)     ,
-                ETH_TX_MVB_SRC_RDY  => tx_usr_arr_mvb_src_rdy(i) ,
-                ETH_TX_MVB_DST_RDY  => tx_usr_arr_mvb_dst_rdy(i) ,
+                ETH_TX_MVB_CHANNEL  => tx_usr_arr_mvb_channel(i),
+                ETH_TX_MVB_VLD      => tx_usr_arr_mvb_vld(i),
+                ETH_TX_MVB_SRC_RDY  => tx_usr_arr_mvb_src_rdy(i),
+                ETH_TX_MVB_DST_RDY  => tx_usr_arr_mvb_dst_rdy(i),
 
-                ETH_TX_MFB_DATA     => tx_usr_arr_mfb_data(i)    ,
-                ETH_TX_MFB_SOF      => tx_usr_arr_mfb_sof(i)     ,
-                ETH_TX_MFB_EOF      => tx_usr_arr_mfb_eof(i)     ,
-                ETH_TX_MFB_SOF_POS  => tx_usr_arr_mfb_sof_pos(i) ,
-                ETH_TX_MFB_EOF_POS  => tx_usr_arr_mfb_eof_pos(i) ,
-                ETH_TX_MFB_SRC_RDY  => tx_usr_arr_mfb_src_rdy(i) ,
-                ETH_TX_MFB_DST_RDY  => tx_usr_arr_mfb_dst_rdy(i) ,
+                ETH_TX_MFB_DATA     => tx_usr_arr_mfb_data(i),
+                ETH_TX_MFB_SOF      => tx_usr_arr_mfb_sof(i),
+                ETH_TX_MFB_EOF      => tx_usr_arr_mfb_eof(i),
+                ETH_TX_MFB_SOF_POS  => tx_usr_arr_mfb_sof_pos(i),
+                ETH_TX_MFB_EOF_POS  => tx_usr_arr_mfb_eof_pos(i),
+                ETH_TX_MFB_SRC_RDY  => tx_usr_arr_mfb_src_rdy(i),
+                ETH_TX_MFB_DST_RDY  => tx_usr_arr_mfb_dst_rdy(i),
 
-                DMA_RX_MVB_LEN      => dma_rx_usr_mvb_len(i)     ,
+                DMA_RX_MVB_LEN      => dma_rx_usr_mvb_len(i),
                 DMA_RX_MVB_HDR_META => dma_rx_usr_mvb_hdr_meta(i),
-                DMA_RX_MVB_CHANNEL  => dma_rx_usr_mvb_channel(i) ,
-                DMA_RX_MVB_DISCARD  => dma_rx_usr_mvb_discard(i) ,
-                DMA_RX_MVB_VLD      => dma_rx_usr_mvb_vld(i)     ,
-                DMA_RX_MVB_SRC_RDY  => dma_rx_usr_mvb_src_rdy(i) ,
-                DMA_RX_MVB_DST_RDY  => dma_rx_usr_mvb_dst_rdy(i) ,
+                DMA_RX_MVB_CHANNEL  => dma_rx_usr_mvb_channel(i),
+                DMA_RX_MVB_DISCARD  => dma_rx_usr_mvb_discard(i),
+                DMA_RX_MVB_VLD      => dma_rx_usr_mvb_vld(i),
+                DMA_RX_MVB_SRC_RDY  => dma_rx_usr_mvb_src_rdy(i),
+                DMA_RX_MVB_DST_RDY  => dma_rx_usr_mvb_dst_rdy(i),
 
-                DMA_RX_MFB_DATA     => dma_rx_usr_mfb_data(i)    ,
-                DMA_RX_MFB_SOF      => dma_rx_usr_mfb_sof(i)     ,
-                DMA_RX_MFB_EOF      => dma_rx_usr_mfb_eof(i)     ,
-                DMA_RX_MFB_SOF_POS  => dma_rx_usr_mfb_sof_pos(i) ,
-                DMA_RX_MFB_EOF_POS  => dma_rx_usr_mfb_eof_pos(i) ,
-                DMA_RX_MFB_SRC_RDY  => dma_rx_usr_mfb_src_rdy(i) ,
-                DMA_RX_MFB_DST_RDY  => dma_rx_usr_mfb_dst_rdy(i) ,
+                DMA_RX_MFB_DATA     => dma_rx_usr_mfb_data(i),
+                DMA_RX_MFB_SOF      => dma_rx_usr_mfb_sof(i),
+                DMA_RX_MFB_EOF      => dma_rx_usr_mfb_eof(i),
+                DMA_RX_MFB_SOF_POS  => dma_rx_usr_mfb_sof_pos(i),
+                DMA_RX_MFB_EOF_POS  => dma_rx_usr_mfb_eof_pos(i),
+                DMA_RX_MFB_SRC_RDY  => dma_rx_usr_mfb_src_rdy(i),
+                DMA_RX_MFB_DST_RDY  => dma_rx_usr_mfb_dst_rdy(i),
 
-                DMA_TX_MVB_LEN      => dma_tx_usr_mvb_len(i)     ,
+                DMA_TX_MVB_LEN      => dma_tx_usr_mvb_len(i),
                 DMA_TX_MVB_HDR_META => dma_tx_usr_mvb_hdr_meta(i),
-                DMA_TX_MVB_CHANNEL  => dma_tx_usr_mvb_channel(i) ,
-                DMA_TX_MVB_VLD      => dma_tx_usr_mvb_vld(i)     ,
-                DMA_TX_MVB_SRC_RDY  => dma_tx_usr_mvb_src_rdy(i) ,
-                DMA_TX_MVB_DST_RDY  => dma_tx_usr_mvb_dst_rdy(i) ,
+                DMA_TX_MVB_CHANNEL  => dma_tx_usr_mvb_channel(i),
+                DMA_TX_MVB_VLD      => dma_tx_usr_mvb_vld(i),
+                DMA_TX_MVB_SRC_RDY  => dma_tx_usr_mvb_src_rdy(i),
+                DMA_TX_MVB_DST_RDY  => dma_tx_usr_mvb_dst_rdy(i),
 
-                DMA_TX_MFB_DATA     => dma_tx_usr_mfb_data(i)    ,
-                DMA_TX_MFB_SOF      => dma_tx_usr_mfb_sof(i)     ,
-                DMA_TX_MFB_EOF      => dma_tx_usr_mfb_eof(i)     ,
-                DMA_TX_MFB_SOF_POS  => dma_tx_usr_mfb_sof_pos(i) ,
-                DMA_TX_MFB_EOF_POS  => dma_tx_usr_mfb_eof_pos(i) ,
-                DMA_TX_MFB_SRC_RDY  => dma_tx_usr_mfb_src_rdy(i) ,
+                DMA_TX_MFB_DATA     => dma_tx_usr_mfb_data(i),
+                DMA_TX_MFB_SOF      => dma_tx_usr_mfb_sof(i),
+                DMA_TX_MFB_EOF      => dma_tx_usr_mfb_eof(i),
+                DMA_TX_MFB_SOF_POS  => dma_tx_usr_mfb_sof_pos(i),
+                DMA_TX_MFB_EOF_POS  => dma_tx_usr_mfb_eof_pos(i),
+                DMA_TX_MFB_SRC_RDY  => dma_tx_usr_mfb_src_rdy(i),
                 DMA_TX_MFB_DST_RDY  => dma_tx_usr_mfb_dst_rdy(i)
             );
         else generate
-            dma_rx_usr_mvb_len(i)      <= rx_usr_arr_mvb_len(i)     ;
+            dma_rx_usr_mvb_len(i)      <= rx_usr_arr_mvb_len(i);
             dma_rx_usr_mvb_hdr_meta(i) <= rx_usr_arr_mvb_hdr_meta(i);
-            dma_rx_usr_mvb_channel(i)  <= rx_usr_arr_mvb_channel(i) ;
-            dma_rx_usr_mvb_discard(i)  <= rx_usr_arr_mvb_discard(i) ;
-            dma_rx_usr_mvb_vld(i)      <= rx_usr_arr_mvb_vld(i)     ;
-            dma_rx_usr_mvb_src_rdy(i)  <= rx_usr_arr_mvb_src_rdy(i) ;
-            rx_usr_arr_mvb_dst_rdy(i)  <= dma_rx_usr_mvb_dst_rdy(i) ;
-            dma_rx_usr_mfb_data(i)     <= rx_usr_arr_mfb_data(i)    ;
-            dma_rx_usr_mfb_sof(i)      <= rx_usr_arr_mfb_sof(i)     ;
-            dma_rx_usr_mfb_eof(i)      <= rx_usr_arr_mfb_eof(i)     ;
-            dma_rx_usr_mfb_sof_pos(i)  <= rx_usr_arr_mfb_sof_pos(i) ;
-            dma_rx_usr_mfb_eof_pos(i)  <= rx_usr_arr_mfb_eof_pos(i) ;
-            dma_rx_usr_mfb_src_rdy(i)  <= rx_usr_arr_mfb_src_rdy(i) ;
-            rx_usr_arr_mfb_dst_rdy(i)  <= dma_rx_usr_mfb_dst_rdy(i) ;
-            tx_usr_arr_mvb_len(i)      <= dma_tx_usr_mvb_len(i)     ;
+            dma_rx_usr_mvb_channel(i)  <= rx_usr_arr_mvb_channel(i);
+            dma_rx_usr_mvb_discard(i)  <= rx_usr_arr_mvb_discard(i);
+            dma_rx_usr_mvb_vld(i)      <= rx_usr_arr_mvb_vld(i);
+            dma_rx_usr_mvb_src_rdy(i)  <= rx_usr_arr_mvb_src_rdy(i);
+            rx_usr_arr_mvb_dst_rdy(i)  <= dma_rx_usr_mvb_dst_rdy(i);
+            dma_rx_usr_mfb_data(i)     <= rx_usr_arr_mfb_data(i);
+            dma_rx_usr_mfb_sof(i)      <= rx_usr_arr_mfb_sof(i);
+            dma_rx_usr_mfb_eof(i)      <= rx_usr_arr_mfb_eof(i);
+            dma_rx_usr_mfb_sof_pos(i)  <= rx_usr_arr_mfb_sof_pos(i);
+            dma_rx_usr_mfb_eof_pos(i)  <= rx_usr_arr_mfb_eof_pos(i);
+            dma_rx_usr_mfb_src_rdy(i)  <= rx_usr_arr_mfb_src_rdy(i);
+            rx_usr_arr_mfb_dst_rdy(i)  <= dma_rx_usr_mfb_dst_rdy(i);
+            tx_usr_arr_mvb_len(i)      <= dma_tx_usr_mvb_len(i);
             tx_usr_arr_mvb_hdr_meta(i) <= dma_tx_usr_mvb_hdr_meta(i);
-            tx_usr_arr_mvb_channel(i)  <= dma_tx_usr_mvb_channel(i) ;
-            tx_usr_arr_mvb_vld(i)      <= dma_tx_usr_mvb_vld(i)     ;
-            tx_usr_arr_mvb_src_rdy(i)  <= dma_tx_usr_mvb_src_rdy(i) ;
-            dma_tx_usr_mvb_dst_rdy(i)  <= tx_usr_arr_mvb_dst_rdy(i) ;
-            tx_usr_arr_mfb_data(i)     <= dma_tx_usr_mfb_data(i)    ;
-            tx_usr_arr_mfb_sof(i)      <= dma_tx_usr_mfb_sof(i)     ;
-            tx_usr_arr_mfb_eof(i)      <= dma_tx_usr_mfb_eof(i)     ;
-            tx_usr_arr_mfb_sof_pos(i)  <= dma_tx_usr_mfb_sof_pos(i) ;
-            tx_usr_arr_mfb_eof_pos(i)  <= dma_tx_usr_mfb_eof_pos(i) ;
-            tx_usr_arr_mfb_src_rdy(i)  <= dma_tx_usr_mfb_src_rdy(i) ;
-            dma_tx_usr_mfb_dst_rdy(i)  <= tx_usr_arr_mfb_dst_rdy(i) ;
+            tx_usr_arr_mvb_channel(i)  <= dma_tx_usr_mvb_channel(i);
+            tx_usr_arr_mvb_vld(i)      <= dma_tx_usr_mvb_vld(i);
+            tx_usr_arr_mvb_src_rdy(i)  <= dma_tx_usr_mvb_src_rdy(i);
+            dma_tx_usr_mvb_dst_rdy(i)  <= tx_usr_arr_mvb_dst_rdy(i);
+            tx_usr_arr_mfb_data(i)     <= dma_tx_usr_mfb_data(i);
+            tx_usr_arr_mfb_sof(i)      <= dma_tx_usr_mfb_sof(i);
+            tx_usr_arr_mfb_eof(i)      <= dma_tx_usr_mfb_eof(i);
+            tx_usr_arr_mfb_sof_pos(i)  <= dma_tx_usr_mfb_sof_pos(i);
+            tx_usr_arr_mfb_eof_pos(i)  <= dma_tx_usr_mfb_eof_pos(i);
+            tx_usr_arr_mfb_src_rdy(i)  <= dma_tx_usr_mfb_src_rdy(i);
+            dma_tx_usr_mfb_dst_rdy(i)  <= tx_usr_arr_mfb_dst_rdy(i);
 
             gls_mi_ardy(i) <= gls_mi_rd(i) or gls_mi_wr(i);
             gls_mi_drd(i)  <= (others => '0');

@@ -36,7 +36,7 @@ end entity;
 
 architecture FULL of AVMM_BRAM is
 
-    type fsm_st is (ST_IDLE, ST_WRITE, ST_READ);
+    type   fsm_st is (ST_IDLE, ST_WRITE, ST_READ);
     signal fsm_pst            : fsm_st;
     signal fsm_nst            : fsm_st;
     signal fsm_addr_sig       : unsigned(ADDR_WIDTH-1 downto 0);
@@ -122,26 +122,26 @@ begin
     end process;
 
     bram_i : entity work.SDP_BRAM_BEHAV
-    generic map(
-       DATA_WIDTH  => DATA_WIDTH,
-       ITEMS       => 2**ADDR_WIDTH,
-       OUTPUT_REG  => True
+    generic map (
+        DATA_WIDTH  => DATA_WIDTH,
+        ITEMS       => 2**ADDR_WIDTH,
+        OUTPUT_REG  => True
     )
-    port map(
-       --WRITE INTERFACE
-       WR_CLK      => CLK,
-       WR_ADDR     => std_logic_vector(fsm_bram_addr),
-       WR_EN       => fsm_bram_wr,
-       WR_DIN      => AVMM_WRITEDATA,
-       --READ INTERFACE
-       RD_CLK      => CLK,
-       RD_RST      => RESET,
-       RD_CE       => '1',
-       RD_REG_CE   => '1',
-       RD_ADDR     => std_logic_vector(fsm_bram_addr),
-       RD_EN       => fsm_bram_rd,
-       RD_DOUT     => AVMM_READDATA,
-       RD_DOUT_VLD => AVMM_READDATAVALID
+    port map (
+        -- WRITE INTERFACE
+        WR_CLK      => CLK,
+        WR_ADDR     => std_logic_vector(fsm_bram_addr),
+        WR_EN       => fsm_bram_wr,
+        WR_DIN      => AVMM_WRITEDATA,
+        -- READ INTERFACE
+        RD_CLK      => CLK,
+        RD_RST      => RESET,
+        RD_CE       => '1',
+        RD_REG_CE   => '1',
+        RD_ADDR     => std_logic_vector(fsm_bram_addr),
+        RD_EN       => fsm_bram_rd,
+        RD_DOUT     => AVMM_READDATA,
+        RD_DOUT_VLD => AVMM_READDATAVALID
     );
 
 end architecture;

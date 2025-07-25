@@ -10,56 +10,59 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity etile_xcvr_init is
-port (
-    RST              : in  std_logic;
-    CLK              : in  std_logic;
-    XCVR_RDY         : in  std_logic;
-    BUSY             : out std_logic;
-    DONE             : out std_logic;
-    -- AVMM
-    ADDRESS          : out std_logic_vector(18 downto 0);
-    READ             : out std_logic;
-    WRITE            : out std_logic;
-    READDATA         : in  std_logic_vector(31 downto 0);
-    WRITEDATA        : out std_logic_vector(31 downto 0);
-    WAITREQUEST      : in  std_logic;
-    --
-    STATE            : out std_logic_vector(31 downto 0)  -- Debug & status
- );
+entity ETILE_XCVR_INIT is
+    port (
+        RST              : in  std_logic;
+        CLK              : in  std_logic;
+        XCVR_RDY         : in  std_logic;
+        BUSY             : out std_logic;
+        DONE             : out std_logic;
+        -- AVMM
+        ADDRESS          : out std_logic_vector(18 downto 0);
+        READ             : out std_logic;
+        WRITE            : out std_logic;
+        READDATA         : in  std_logic_vector(31 downto 0);
+        WRITEDATA        : out std_logic_vector(31 downto 0);
+        WAITREQUEST      : in  std_logic;
+        --
+        STATE            : out std_logic_vector(31 downto 0)  -- Debug & status
+    );
 end entity;
 
-architecture full of etile_xcvr_init is
+architecture FULL of ETILE_XCVR_INIT is
 
-    type t_avst_state is (AVMM_INIT,
-                          AVMM_WAIT,
-                          AVMM_BUSY,
-                          AVMM_DONE
-                         );
+    type   t_avst_state is (
+        AVMM_INIT,
+        AVMM_WAIT,
+        AVMM_BUSY,
+        AVMM_DONE
+    );
     signal avst_state : t_avst_state := AVMM_INIT;
 
-    type t_attr_state is (ATTR_INIT,
-                          ATTR_CLR_STAT,
-                          ATTR_CODE_WR0,
-                          ATTR_CODE_WR1,
-                          ATTR_VAL_WR0,
-                          ATTR_VAL_WR1,
-                          ATTR_OP_START,
-                          ATTR_BUSY_CHECK,
-                          ATTR_WAIT,
-                          ATTR_READ0,
-                          ATTR_READ1,
-                          ATTR_DONE
-                         );
+    type   t_attr_state is (
+        ATTR_INIT,
+        ATTR_CLR_STAT,
+        ATTR_CODE_WR0,
+        ATTR_CODE_WR1,
+        ATTR_VAL_WR0,
+        ATTR_VAL_WR1,
+        ATTR_OP_START,
+        ATTR_BUSY_CHECK,
+        ATTR_WAIT,
+        ATTR_READ0,
+        ATTR_READ1,
+        ATTR_DONE
+    );
     signal attr_state : t_attr_state := ATTR_INIT;
 
-    type t_init_fsm_state is (INIT,
-                              START,
-                              READ_CHECK,
-                              AREAD_CHECK,
-                              ADDR_INC,
-                              INIT_DONE
-                             );
+    type   t_init_fsm_state is (
+        INIT,
+        START,
+        READ_CHECK,
+        AREAD_CHECK,
+        ADDR_INC,
+        INIT_DONE
+    );
     signal init_fsm_state : t_init_fsm_state := INIT;
 
     constant OP_READ   : std_logic_vector(1 downto 0) := "00";
@@ -67,25 +70,25 @@ architecture full of etile_xcvr_init is
     constant OP_AREAD  : std_logic_vector(1 downto 0) := "10";
     constant OP_AWRITE : std_logic_vector(1 downto 0) := "11";
 
-    type t_config_rom is array(natural range <>) of std_logic_vector(2+32+16+16-1 downto 0);
-    constant etile_config_rom : t_config_rom(0 to 11) := (
+    type     t_config_rom is array(natural range <>) of std_logic_vector(2+32+16+16-1 downto 0);
+    constant ETILE_CONFIG_ROM : t_config_rom(0 to 11) := (
      -- |   OP    | Addr/val+code |   Data    |  Mask
         std_logic_vector'(OP_WRITE  & X"000400E2"   &  X"0055"  &  X"0000"), -- 1. Activate reset: write(0x400E2, 0x0f)
         std_logic_vector'(OP_AWRITE & X"03250002"   &  X"0000"  &  X"0000"), -- 2. PRBS generator on: attrib(0x0325,0x0002)
         std_logic_vector'(OP_AWRITE & X"01010008"   &  X"0000"  &  X"0000"), -- 3. Change to internal serial loopback mode: attrib(0x0101, 0x0008)
-        std_logic_vector'(OP_AWRITE & X"0001000a"   &  X"0000"  &  X"0000"), -- 4. Enable initial coarse adaptive equalization: attrib(0x0001, 0x000a)
-        std_logic_vector'(OP_AREAD  & X"0b000126"   &  X"0000"  &  X"0001"), -- 5. Read initial coarse adaptation status: val = attrib(0x0b00, 0x0126). Repeat current step until val[0] = 0 to indicate that initial coarse adaptation has completed.
+        std_logic_vector'(OP_AWRITE & X"0001000A"   &  X"0000"  &  X"0000"), -- 4. Enable initial coarse adaptive equalization: attrib(0x0001, 0x000a)
+        std_logic_vector'(OP_AREAD  & X"0B000126"   &  X"0000"  &  X"0001"), -- 5. Read initial coarse adaptation status: val = attrib(0x0b00, 0x0126). Repeat current step until val[0] = 0 to indicate that initial coarse adaptation has completed.
         std_logic_vector'(OP_AWRITE & X"01000008"   &  X"0000"  &  X"0000"), -- 6. Disable Internal Serial Loopback: attrib(0x0100, 0x0008)
-        std_logic_vector'(OP_AWRITE & X"0001000a"   &  X"0000"  &  X"0000"), -- 7. Perform initial adaptation: attrib(0x0001, 0x000A)
-        std_logic_vector'(OP_AREAD  & X"0b000126"   &  X"0080"  &  X"00FF"), -- 8. Read adaptation status: val=0; while (val & 0x00ff) != 0x80: val = attrib(0x0b00, 0x0126)
+        std_logic_vector'(OP_AWRITE & X"0001000A"   &  X"0000"  &  X"0000"), -- 7. Perform initial adaptation: attrib(0x0001, 0x000A)
+        std_logic_vector'(OP_AREAD  & X"0B000126"   &  X"0080"  &  X"00FF"), -- 8. Read adaptation status: val=0; while (val & 0x00ff) != 0x80: val = attrib(0x0b00, 0x0126)
         std_logic_vector'(OP_WRITE  & X"000400E2"   &  X"0000"  &  X"0000"), -- 9. Deassert tx_reset/rx_reset: write(0x400E2, 0x0)
-        std_logic_vector'(OP_AREAD  & X"03ff0002"   &  X"0002"  &  X"00FF"), -- 10. PRBS generator off: ret = 0 while (ret & 0x00ff) != 0x02: ret = attrib(0x3ff, 0x0002)
-        std_logic_vector'(OP_AWRITE & X"0006000a"   &  X"0000"  &  X"0000"), -- 11. Enable continuous adaptive equalization: attrib(0x0006, 0x000A);
-        std_logic_vector'(OP_AREAD  & X"0b000126"   &  X"00E2"  &  X"00FF")  -- 12. Read initial coarse adaptation status: val = 0 while (val & 0x00ff) != 0xE2: val = attrib(0x0b00, 0x0126)
+        std_logic_vector'(OP_AREAD  & X"03FF0002"   &  X"0002"  &  X"00FF"), -- 10. PRBS generator off: ret = 0 while (ret & 0x00ff) != 0x02: ret = attrib(0x3ff, 0x0002)
+        std_logic_vector'(OP_AWRITE & X"0006000A"   &  X"0000"  &  X"0000"), -- 11. Enable continuous adaptive equalization: attrib(0x0006, 0x000A);
+        std_logic_vector'(OP_AREAD  & X"0B000126"   &  X"00E2"  &  X"00FF")  -- 12. Read initial coarse adaptation status: val = 0 while (val & 0x00ff) != 0xE2: val = attrib(0x0b00, 0x0126)
     );
 
     signal cfg_rom_out : std_logic_vector(etile_config_rom(0)'range);
-    signal rom_cntr    : natural range 0 to etile_config_rom'high;
+    signal rom_cntr    : natural range 0 to ETILE_CONFIG_ROM'high;
 
     alias rom_op   : std_logic_vector( 1 downto 0) is cfg_rom_out(2+32+16+16-1 downto 32+16+16); -- Operation type
     alias rom_val  : std_logic_vector(15 downto 0) is cfg_rom_out(  32+16+16-1 downto 16+16+16); -- "Value" in attribute operations
@@ -118,7 +121,7 @@ begin
     rst_sync_i : entity work.ASYNC_RESET
     generic map (
         TWO_REG  => false,
-        OUT_REG  => true ,
+        OUT_REG  => true,
         REPLICAS => 1
     )
     port map (
@@ -130,7 +133,7 @@ begin
     -- --------------------------------------------------------------------------
     -- AVMM read/write FSM
     -- --------------------------------------------------------------------------
-    avst_fsm: process(CLK)
+    avst_fsm : process (CLK)
     begin
         if rising_edge(CLK) then
             avst_fsm_done <= '0';
@@ -141,19 +144,19 @@ begin
                     WRITE     <= avst_fsm_wr;
                     ADDRESS   <= avst_addr(ADDRESS'range);
                     WRITEDATA <= X"0000" & avst_dwr;
-                    if avst_fsm_rd = '1' then
+                    if (avst_fsm_rd = '1') then
                         avst_state <= AVMM_WAIT;
-                    elsif avst_fsm_wr = '1' then
+                    elsif (avst_fsm_wr = '1') then
                         avst_state <= AVMM_BUSY;
                     end if;
 
                 when AVMM_WAIT =>
-                    if WAITREQUEST = '1' then
+                    if (WAITREQUEST = '1') then
                         avst_state <= AVMM_BUSY;
                     end if;
 
                 when AVMM_BUSY  =>
-                    if WAITREQUEST = '0' then
+                    if (WAITREQUEST = '0') then
                         READ          <= '0';
                         WRITE         <= '0';
                         avst_drd      <= READDATA;
@@ -165,7 +168,7 @@ begin
                     avst_state <= AVMM_INIT;
             end case;
 
-            if rst_sync = '1' then
+            if (rst_sync = '1') then
                 avst_state <= AVMM_INIT;
             end if;
         end if;
@@ -179,7 +182,7 @@ begin
     -- --------------------------------------------------------------------------
     -- XCVR attribute read/write FSM (read/write attribute code and data)
     -- --------------------------------------------------------------------------
-    attr_ctrl_fsm: process(CLK)
+    attr_ctrl_fsm : process (CLK)
     begin
         -- See https://www.intel.com/content/www/us/en/docs/programmable/683723/current/pma-attribute-codes.html
         -- see https://www.intel.com/content/www/us/en/docs/programmable/683723/current/reconfiguring-the-duplex-pma-using-the.html
@@ -191,16 +194,16 @@ begin
             case attr_state is
                 when ATTR_INIT =>
                     if (attr_avst_start = '1') then
-                      -- TBD: stop operation when done
+                        -- TBD: stop operation when done
                         attr_state <= ATTR_CLR_STAT;
                     end if;
 
                 when ATTR_CLR_STAT =>
                     -- Clear 0x8a[7]: write(0x8a, 0x80)
-                    attr_avst_addr <= X"0008a";
+                    attr_avst_addr <= X"0008A";
                     attr_avst_dwr  <= X"0080";
                     attr_avst_wr   <= '1';
-                    if avst_fsm_done = '1' then
+                    if (avst_fsm_done = '1') then
                         attr_state   <= ATTR_CODE_WR0;
                         attr_avst_wr <= '0';
                     end if;
@@ -210,7 +213,7 @@ begin
                     attr_avst_addr <= X"00084";
                     attr_avst_dwr  <= rom_val;
                     attr_avst_wr   <= '1';
-                    if avst_fsm_done = '1' then
+                    if (avst_fsm_done = '1') then
                         attr_state   <= ATTR_CODE_WR1;
                         attr_avst_wr <= '0';
                     end if;
@@ -220,48 +223,48 @@ begin
                     attr_avst_addr <= X"00085";
                     attr_avst_dwr  <= X"00" & rom_val(15 downto 8);
                     attr_avst_wr   <= '1';
-                    if avst_fsm_done = '1' then
+                    if (avst_fsm_done = '1') then
                         attr_state   <= ATTR_VAL_WR0;
                         attr_avst_wr <= '0';
                     end if;
 
                 when ATTR_VAL_WR0 =>
-                --         write(0x86, (code & 0x00ff))
+                    --         write(0x86, (code & 0x00ff))
                     attr_avst_addr <= X"00086";
                     attr_avst_dwr  <= rom_code(15 downto 0);
                     attr_avst_wr   <= '1';
-                    if avst_fsm_done = '1' then
+                    if (avst_fsm_done = '1') then
                         attr_state   <= ATTR_VAL_WR1;
                         attr_avst_wr <= '0';
                     end if;
 
                 when ATTR_VAL_WR1 =>
-                --        write(0x87, (code >> 8))
+                    --        write(0x87, (code >> 8))
                     attr_avst_addr <= X"00087";
                     attr_avst_dwr  <= X"00" & rom_code(15 downto 8);
                     attr_avst_wr   <= '1';
-                    if avst_fsm_done = '1' then
+                    if (avst_fsm_done = '1') then
                         attr_state   <= ATTR_OP_START;
                         attr_avst_wr <= '0';
                     end if;
 
                 when ATTR_OP_START =>
-                --         write(0x90, 0x1)
+                    --         write(0x90, 0x1)
                     attr_avst_addr <= X"00090";
                     attr_avst_dwr  <= X"0001";
                     attr_avst_wr   <= '1';
-                    if avst_fsm_done = '1' then
+                    if (avst_fsm_done = '1') then
                         attr_state   <= ATTR_BUSY_CHECK;
                         attr_avst_wr <= '0';
                     end if;
 
                 when ATTR_BUSY_CHECK =>
                     -- Read 0x8a. Bit 7 should be 1: if bit(read(0x8a, 7) != 1: return False
-                    attr_avst_addr <= X"0008a";
+                    attr_avst_addr <= X"0008A";
                     attr_avst_rd   <= '1';
-                    if avst_fsm_done = '1' then
+                    if (avst_fsm_done = '1') then
                         attr_avst_rd  <= '0';
-                        if avst_drd(7) = '0' then
+                        if (avst_drd(7) = '0') then
                             attr_state <= ATTR_OP_START;
                         else
                             attr_state <= ATTR_WAIT;
@@ -270,17 +273,17 @@ begin
 
                 when ATTR_WAIT =>
                     -- while bit(read(0x8b), 0) != 0: time.sleep(0.001)
-                    attr_avst_addr <= X"0008b";
+                    attr_avst_addr <= X"0008B";
                     attr_avst_rd   <= '1';
-                    if avst_fsm_done = '1' then
+                    if (avst_fsm_done = '1') then
                         attr_avst_rd  <= '0';
-                        if avst_drd(0) = '1' then
+                        if (avst_drd(0) = '1') then
                             attr_state <= ATTR_WAIT;
                         else
-                            if rom_op = OP_AREAD then
+                            if (rom_op = OP_AREAD) then
                                 attr_state <= ATTR_READ0;
                             else
-                                attr_state <= ATTR_DONE;
+                                attr_state     <= ATTR_DONE;
                                 attr_avst_done <= '1';
                             end if;
                         end if;
@@ -290,21 +293,21 @@ begin
                     -- # Read return data: ret = read(0x89); ret = ret << 8
                     attr_avst_addr <= X"00089";
                     attr_avst_rd   <= '1';
-                    if avst_fsm_done = '1' then
-                        attr_avst_rd  <= '0';
+                    if (avst_fsm_done = '1') then
+                        attr_avst_rd               <= '0';
                         attr_avst_drd(15 downto 8) <= avst_drd(7 downto 0);
-                        attr_state <= ATTR_READ1;
+                        attr_state                 <= ATTR_READ1;
                     end if;
 
                 when ATTR_READ1 =>
                     --  ret |= (read(0x88) & 0x000000ff)
                     attr_avst_addr <= X"00088";
                     attr_avst_rd   <= '1';
-                    if avst_fsm_done = '1' then
-                        attr_avst_rd  <= '0';
+                    if (avst_fsm_done = '1') then
+                        attr_avst_rd              <= '0';
                         attr_avst_drd(7 downto 0) <= avst_drd(7 downto 0);
-                        attr_state <= ATTR_DONE;
-                        attr_avst_done <= '1';
+                        attr_state                <= ATTR_DONE;
+                        attr_avst_done            <= '1';
                     end if;
 
                 when ATTR_DONE =>
@@ -313,7 +316,7 @@ begin
                 when others => null;
 
             end case;
-            if rst_sync = '1' then
+            if (rst_sync = '1') then
                 attr_state <= ATTR_INIT;
             end if;
         end if;
@@ -322,7 +325,7 @@ begin
     -- --------------------------------------------------------------------------
     -- Main FSM (Read config ROM and perform the sequence)
     -- --------------------------------------------------------------------------
-    init_fsm: process(CLK)
+    init_fsm : process (CLK)
     begin
         if rising_edge(CLK) then
             init_avst_wr    <= '0';
@@ -338,7 +341,7 @@ begin
                     init_avst_rd    <= '0';
                     attr_avst_start <= '0';
                     BUSY            <= '0';
-                    if XCVR_RDY = '1' then
+                    if (XCVR_RDY = '1') then
                         init_fsm_state  <= START;
                     end if;
 
@@ -346,26 +349,26 @@ begin
                     BUSY  <= '1';
                     if (rom_op = OP_WRITE) then
                         init_avst_wr <= '1';
-                        if avst_fsm_done = '1' then
+                        if (avst_fsm_done = '1') then
                             init_fsm_state <= ADDR_INC;
-                            init_avst_wr <= '0';
+                            init_avst_wr   <= '0';
                         end if;
                     elsif (rom_op = OP_READ) then
                         init_avst_rd <= '1';
-                        if avst_fsm_done = '1' then
+                        if (avst_fsm_done = '1') then
                             init_fsm_state <= READ_CHECK;
-                            init_avst_rd <= '0';
+                            init_avst_rd   <= '0';
                         end if;
                     elsif (rom_op = OP_AREAD) then
                         attr_avst_start <= '1';
-                        if attr_avst_done = '1' then
-                            init_fsm_state <= AREAD_CHECK;
+                        if (attr_avst_done = '1') then
+                            init_fsm_state  <= AREAD_CHECK;
                             attr_avst_start <= '0';
                         end if;
                     else
                         attr_avst_start <= '1';
-                        if attr_avst_done = '1' then
-                            init_fsm_state <= ADDR_INC;
+                        if (attr_avst_done = '1') then
+                            init_fsm_state  <= ADDR_INC;
                             attr_avst_start <= '0';
                         end if;
                     end if;
@@ -375,7 +378,7 @@ begin
                     if ((avst_drd(rom_mask'range) and rom_mask) = rom_data) then
                         init_fsm_state <= ADDR_INC;
                     else
-                        init_fsm_state <= START;  -- Retry the read operation
+                        init_fsm_state <= START;                                      -- Retry the read operation
                     end if;
 
                 when AREAD_CHECK =>
@@ -383,14 +386,14 @@ begin
                     if ((attr_avst_drd(rom_mask'range) and rom_mask) = rom_data) then
                         init_fsm_state <= ADDR_INC;
                     else
-                        init_fsm_state <= START;  -- Retry the read operation
+                        init_fsm_state <= START;                                      -- Retry the read operation
                     end if;
 
                 when ADDR_INC =>
-                    if rom_cntr = etile_config_rom'high then -- Last address in ROM - all done
+                    if (rom_cntr = ETILE_CONFIG_ROM'high) then                        -- Last address in ROM - all done
                         init_fsm_state <= INIT_DONE;
-                        BUSY  <= '0';
-                        DONE  <= '1';
+                        BUSY           <= '0';
+                        DONE           <= '1';
                     else
                         rom_cntr       <= rom_cntr + 1;
                         init_fsm_state <= START;
@@ -401,7 +404,7 @@ begin
 
             end case;
 
-            if rst_sync = '1' then
+            if (rst_sync = '1') then
                 rom_cntr        <= 0;
                 init_fsm_state  <= INIT;
             end if;

@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity SDP_BRAM is
-    Generic (
+    generic (
         -- Data word width in bits. If BLOCK_ENABLE is True then DATA_WIDTH must
         -- be N*BLOCK_WIDTH.
         DATA_WIDTH     : integer := 64;
@@ -43,7 +43,7 @@ entity SDP_BRAM is
         -- * "AGILEX"
         DEVICE         : string := "ULTRASCALE"
     );
-    Port (
+    port (
         -- =====================================================================
         --  WRITE PORT
         -- =====================================================================
@@ -113,7 +113,7 @@ begin
         report "SDP_BRAM: Illegal value of parameter DEVICE '" & DEVICE & "'; allowed devices are: SIM, 7SERIES, ULTRASCALE, STRATIX10, ARRIA10, AGILEX!"
         severity failure;
 
-        assert (not  BLOCK_ENABLE or (BLOCK_ENABLE and ((BLOCK_WIDTH = 8) or (BLOCK_WIDTH = 9))))
+    assert (not  BLOCK_ENABLE or (BLOCK_ENABLE and ((BLOCK_WIDTH = 8) or (BLOCK_WIDTH = 9))))
         report "SDP_BRAM: Illegal value of BLOCK_WIDTH parameter, allowed values are: 8, 9!"
         severity failure;
 
@@ -208,17 +208,17 @@ begin
 
     behav_g : if (DEVICE = "SIM") generate
         be_g : if BLOCK_ENABLE generate
-            signal wr_data_arr_internal: slv_array_t(DATA_WIDTH/BLOCK_WIDTH-1 downto 0)(BLOCK_WIDTH-1 downto 0);
-            signal data_internal : slv_array_2d_t(ITEMS-1 downto 0)(DATA_WIDTH/BLOCK_WIDTH-1 downto 0)(BLOCK_WIDTH-1 downto 0);
+            signal wr_data_arr_internal : slv_array_t(DATA_WIDTH/BLOCK_WIDTH-1 downto 0)(BLOCK_WIDTH-1 downto 0);
+            signal data_internal        : slv_array_2d_t(ITEMS-1 downto 0)(DATA_WIDTH/BLOCK_WIDTH-1 downto 0)(BLOCK_WIDTH-1 downto 0);
         begin
             wr_data_arr_internal <= slv_array_deser(wr_data_internal,DATA_WIDTH/BLOCK_WIDTH);
 
             wr_p : process (wr_clk_internal)
             begin
                 if (rising_edge(wr_clk_internal)) then
-                    if (wr_en_internal='1') then
+                    if (wr_en_internal = '1') then
                         for i in 0 to DATA_WIDTH/BLOCK_WIDTH-1 loop
-                            if (wr_be_internal(i)='1') then
+                            if (wr_be_internal(i) = '1') then
                                 data_internal(to_integer(unsigned(wr_addr_internal)))(i) <= wr_data_arr_internal(i);
                             end if;
                         end loop;
@@ -253,7 +253,7 @@ begin
             wr_p : process (wr_clk_internal)
             begin
                 if (rising_edge(wr_clk_internal)) then
-                    if (wr_en_internal='1') then
+                    if (wr_en_internal = '1') then
                         data_internal(to_integer(unsigned(wr_addr_internal))) <= wr_data_internal;
                     end if;
                 end if;

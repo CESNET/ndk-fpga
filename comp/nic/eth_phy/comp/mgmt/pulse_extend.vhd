@@ -12,41 +12,41 @@ use IEEE.std_logic_arith.all;
 use IEEE.std_logic_misc.all;
 
 entity PULSE_EXTEND is
-   generic (
-      N   : natural := 4 -- Number of clock cycles to which the input pulse should be extend
-   );
-   Port (
-      RST     : in  STD_LOGIC := '0'; -- synchronous reset, optional
-      CLK     : in  STD_LOGIC;    -- clock
-      I       : in  STD_LOGIC;    -- Pulse input
-      O       : out STD_LOGIC     -- Output pulse, N clock cycles long
-   );
-end PULSE_EXTEND;
+    generic (
+        N   : natural := 4 -- Number of clock cycles to which the input pulse should be extend
+    );
+    port (
+        RST     : in  STD_LOGIC := '0'; -- synchronous reset, optional
+        CLK     : in  STD_LOGIC;        -- clock
+        I       : in  STD_LOGIC;        -- Pulse input
+        O       : out STD_LOGIC         -- Output pulse, N clock cycles long
+    );
+end entity;
 
-   --! -------------------------------------------------------------------------
-   --!                      Architecture declaration
-   --! -------------------------------------------------------------------------
+--! -------------------------------------------------------------------------
+--!                      Architecture declaration
+--! -------------------------------------------------------------------------
 
-architecture behavioral of PULSE_EXTEND is
+architecture BEHAVIORAL of PULSE_EXTEND is
 
-   signal i_dly    : std_logic_vector(N-1 downto 0);
-   attribute shreg_extract                : string;
+    signal i_dly    : std_logic_vector(N-1 downto 0);
+    attribute shreg_extract                : string;
 
 begin
 
-   process(CLK)
-   begin
-      if (rising_edge(CLK)) then
-         if (RST = '1') then
-            i_dly <= (others => '0');
-         else
-            i_dly(0) <= I;
-            for i in 1 to N-1 loop
-               i_dly(i) <= i_dly(i-1);
-            end loop;
-            O <= OR_REDUCE(i_dly);
-         end if;
-      end if;
-   end process;
+    process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (RST = '1') then
+                i_dly <= (others => '0');
+            else
+                i_dly(0) <= I;
+                for ii in 1 to N-1 loop
+                    i_dly(ii) <= i_dly(ii-1);
+                end loop;
+                O <= OR_REDUCE(i_dly);
+            end if;
+        end if;
+    end process;
 
-end architecture behavioral;
+end architecture;

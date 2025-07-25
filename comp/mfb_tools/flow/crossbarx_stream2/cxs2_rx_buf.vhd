@@ -12,60 +12,60 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MFB_CROSSBARX_STREAM2_RX_BUF is
-generic (
-    MFB_REGIONS     : natural := 4;
-    MFB_REGION_SIZE : natural := 8;
-    MFB_BLOCK_SIZE  : natural := 8;
-    MFB_ITEM_WIDTH  : natural := 8;
-    BUF_BLOCK_WIDTH : natural := MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
-    BUF_BLOCKS      : natural := (MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/BUF_BLOCK_WIDTH;
-    BUF_WORDS       : natural := 512;
-    BUF_BYTES       : natural := (BUF_WORDS*BUF_BLOCKS*BUF_BLOCK_WIDTH)/8;
-    PKT_MTU         : natural := 2**14;
-    PKT_ID_W        : natural := 9;
-    DEVICE          : string  := "AGILEX"
-);
-port (
-    -- =========================================================================
-    -- CLOCK AND RESETS INPUTS
-    -- =========================================================================
-    CLK              : in  std_logic;
-    CLK_X2           : in  std_logic;
-    RESET            : in  std_logic;
+    generic (
+        MFB_REGIONS     : natural := 4;
+        MFB_REGION_SIZE : natural := 8;
+        MFB_BLOCK_SIZE  : natural := 8;
+        MFB_ITEM_WIDTH  : natural := 8;
+        BUF_BLOCK_WIDTH : natural := MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
+        BUF_BLOCKS      : natural := (MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/BUF_BLOCK_WIDTH;
+        BUF_WORDS       : natural := 512;
+        BUF_BYTES       : natural := (BUF_WORDS*BUF_BLOCKS*BUF_BLOCK_WIDTH)/8;
+        PKT_MTU         : natural := 2**14;
+        PKT_ID_W        : natural := 9;
+        DEVICE          : string  := "AGILEX"
+    );
+    port (
+        -- =========================================================================
+        -- CLOCK AND RESETS INPUTS
+        -- =========================================================================
+        CLK              : in  std_logic;
+        CLK_X2           : in  std_logic;
+        RESET            : in  std_logic;
 
-    -- =========================================================================
-    -- INPUT MFB INTERFACE (CLK)
-    -- =========================================================================
-    RX_MFB_DATA      : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    RX_MFB_SOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SRC_RDY   : in  std_logic;
-    RX_MFB_DST_RDY   : out std_logic;
+        -- =========================================================================
+        -- INPUT MFB INTERFACE (CLK)
+        -- =========================================================================
+        RX_MFB_DATA      : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        RX_MFB_SOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS   : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SRC_RDY   : in  std_logic;
+        RX_MFB_DST_RDY   : out std_logic;
 
-    -- =========================================================================
-    -- OUTPUT MVB INTERFACE WITH TRANSACTIONS STORED IN RX BUFFER (CLK)
-    -- =========================================================================
-    BUF_MVB_PKT_ID   : out slv_array_t(MFB_REGIONS-1 downto 0)(PKT_ID_W-1 downto 0);
-    BUF_MVB_EOF_ADDR : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(BUF_BYTES)-1 downto 0);
-    BUF_MVB_LEN      : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
-    BUF_MVB_VLD      : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    BUF_MVB_SRC_RDY  : out std_logic;
-    BUF_MVB_DST_RDY  : in  std_logic;
+        -- =========================================================================
+        -- OUTPUT MVB INTERFACE WITH TRANSACTIONS STORED IN RX BUFFER (CLK)
+        -- =========================================================================
+        BUF_MVB_PKT_ID   : out slv_array_t(MFB_REGIONS-1 downto 0)(PKT_ID_W-1 downto 0);
+        BUF_MVB_EOF_ADDR : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(BUF_BYTES)-1 downto 0);
+        BUF_MVB_LEN      : out slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+        BUF_MVB_VLD      : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        BUF_MVB_SRC_RDY  : out std_logic;
+        BUF_MVB_DST_RDY  : in  std_logic;
 
-    -- =========================================================================
-    -- INPUT INTERFACE WITH DONE PKT ID (CLK)
-    -- =========================================================================
-    BUF_RD_DONE_ID   : in  slv_array_t(MFB_REGIONS-1 downto 0)(PKT_ID_W-1 downto 0);
-    BUF_RD_DONE_VLD  : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        -- =========================================================================
+        -- INPUT INTERFACE WITH DONE PKT ID (CLK)
+        -- =========================================================================
+        BUF_RD_DONE_ID   : in  slv_array_t(MFB_REGIONS-1 downto 0)(PKT_ID_W-1 downto 0);
+        BUF_RD_DONE_VLD  : in  std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    -- =========================================================================
-    -- READ INTERFACE OF RX BUFFER (CLK_X2)
-    -- =========================================================================
-    BUF_RD_ADDR      : in  slv_array_t(BUF_BLOCKS-1 downto 0)(log2(BUF_WORDS)-1 downto 0);
-    BUF_RD_DATA      : out slv_array_t(BUF_BLOCKS-1 downto 0)(BUF_BLOCK_WIDTH-1 downto 0)
-);
+        -- =========================================================================
+        -- READ INTERFACE OF RX BUFFER (CLK_X2)
+        -- =========================================================================
+        BUF_RD_ADDR      : in  slv_array_t(BUF_BLOCKS-1 downto 0)(log2(BUF_WORDS)-1 downto 0);
+        BUF_RD_DATA      : out slv_array_t(BUF_BLOCKS-1 downto 0)(BUF_BLOCK_WIDTH-1 downto 0)
+    );
 end entity;
 
 architecture FULL of MFB_CROSSBARX_STREAM2_RX_BUF is
@@ -123,7 +123,7 @@ architecture FULL of MFB_CROSSBARX_STREAM2_RX_BUF is
 begin
 
     mfb_len_i : entity work.MFB_FRAME_LNG
-    generic map(
+    generic map (
         REGIONS        => MFB_REGIONS,
         REGION_SIZE    => MFB_REGION_SIZE,
         BLOCK_SIZE     => MFB_BLOCK_SIZE,
@@ -132,7 +132,7 @@ begin
         REG_BITMAP     => "100",
         IMPLEMENTATION => "parallel"
     )
-        port map(
+    port map (
         CLK          => CLK,
         RESET        => RESET,
 
@@ -177,7 +177,7 @@ begin
 
     bram_g : for i in 0 to BUF_BLOCKS-1 generate
         bram_i : entity work.SDP_BRAM
-        generic map(
+        generic map (
             DATA_WIDTH   => BUF_BLOCK_WIDTH,
             ITEMS        => BUF_WORDS,
             BLOCK_ENABLE => False,
@@ -186,7 +186,7 @@ begin
             OUTPUT_REG   => False,
             DEVICE       => DEVICE
         )
-        port map(
+        port map (
             WR_CLK      => CLK,
             WR_RST      => RESET,
             WR_EN       => buf_wr_en_reg,
@@ -209,7 +209,7 @@ begin
     -- =========================================================================
 
     buf_rd_pointer_word <= unsigned(buf_rd_pointer_reg(log2(BUF_BYTES)-1 downto log2(BUF_BYTES)-log2(BUF_WORDS)));
-    buf_wr_en   <= len_mfb_src_rdy and not buf_full and acc_mvb_dst_rdy;
+    buf_wr_en           <= len_mfb_src_rdy and not buf_full and acc_mvb_dst_rdy;
 
     process (CLK)
     begin
@@ -316,10 +316,10 @@ begin
     BUF_MVB_SRC_RDY  <= acc2_mvb_src_rdy and not trsr_mvb_afull_reg;
 
     acc_mvb_dst_rdy <= not trsr_mvb_afull_reg and BUF_MVB_DST_RDY;
-    trsr_mvb_vld <= acc2_mvb_vld and acc2_mvb_src_rdy and acc_mvb_dst_rdy;
+    trsr_mvb_vld    <= acc2_mvb_vld and acc2_mvb_src_rdy and acc_mvb_dst_rdy;
 
     trsr_i : entity work.TRANS_SORTER
-    generic map(
+    generic map (
         RX_TRANSS           => MFB_REGIONS,
         TX_TRANSS           => MFB_REGIONS,
         ID_CONFS            => MFB_REGIONS,
@@ -332,7 +332,7 @@ begin
         ALMOST_FULL_OFFSET  => 2*MFB_REGIONS,
         DEVICE              => DEVICE
     )
-    port map(
+    port map (
         CLK              => CLK,
         RESET            => RESET,
 
@@ -380,7 +380,7 @@ begin
         end if;
     end process;
 
-    --pragma synthesis_off
+    -- pragma synthesis_off
     process (CLK)
         variable dbg_pkt_cnt_v : unsigned(63 downto 0);
     begin
@@ -408,7 +408,7 @@ begin
                 for i in 0 to MFB_REGIONS-1 loop
                     dbg_pkt_cnt_v := dbg_pkt_cnt_v + trsr_mvb_vld(i);
                 end loop;
-                    dbg_cnt_trsr_rx <= dbg_cnt_trsr_rx + dbg_pkt_cnt_v;
+                dbg_cnt_trsr_rx <= dbg_cnt_trsr_rx + dbg_pkt_cnt_v;
             end if;
         end if;
     end process;
@@ -424,10 +424,10 @@ begin
                 for i in 0 to MFB_REGIONS-1 loop
                     dbg_pkt_cnt_v := dbg_pkt_cnt_v + trsr_tx_vld(i);
                 end loop;
-                    dbg_cnt_trsr_tx <= dbg_cnt_trsr_tx + dbg_pkt_cnt_v;
+                dbg_cnt_trsr_tx <= dbg_cnt_trsr_tx + dbg_pkt_cnt_v;
             end if;
         end if;
     end process;
-    --pragma synthesis_on
+    -- pragma synthesis_on
 
 end architecture;

@@ -14,7 +14,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity DUT_WRAPPER is
-    generic(
+    generic (
         CX_USE_CLK2           : boolean := true;
         CX_USE_CLK_ARB        : boolean := false;
         OBUF_META_EQ_OUTPUT   : boolean := false;
@@ -41,7 +41,7 @@ entity DUT_WRAPPER is
 
         DEVICE                : string := "STRATIX10"
     );
-    port(
+    port (
         RX_CLK         : in  std_logic;
         RX_CLK2        : in  std_logic;
         RX_RESET       : in  std_logic;
@@ -83,11 +83,11 @@ begin
     -- Merges metadata with discard
     rx_unpack_g : for i in 0 to MFB_REGIONS-1 generate
         rx_discard_arr(i) <= rx_meta_all_arr(i)(0 downto 0);
-        rx_meta_arr(i) <= rx_meta_all_arr(i)(MFB_META_WIDTH+1-1 downto 1);
+        rx_meta_arr(i)    <= rx_meta_all_arr(i)(MFB_META_WIDTH+1-1 downto 1);
     end generate;
 
     dut_i : entity work.CROSSBARX_STREAM
-    generic map(
+    generic map (
         CX_USE_CLK2           => CX_USE_CLK2,
         CX_USE_CLK_ARB        => CX_USE_CLK_ARB,
         OBUF_META_EQ_OUTPUT   => OBUF_META_EQ_OUTPUT,
@@ -108,7 +108,7 @@ begin
         F_EXTEND_END_SIZE     => F_EXTEND_END_SIZE,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         RX_CLK         => RX_CLK,
         RX_CLK2        => RX_CLK2,
         RX_RESET       => RX_RESET,

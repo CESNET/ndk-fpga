@@ -36,7 +36,7 @@ use work.math_pack.all;
 --
 
 entity MFB2AXI is
-    generic(
+    generic (
         -- =========================================================================
         -- input/output reg. config
         -- =========================================================================
@@ -77,8 +77,8 @@ entity MFB2AXI is
         -- "SHREG" or "REG"
         PIPE_TYPE      : string  := "SHREG";
         DEVICE         : string  := "7SERIES"
-   );
-   port(
+    );
+    port (
         -- =========================================================================
         -- CLOCK AND RESET
         -- =========================================================================
@@ -107,21 +107,21 @@ entity MFB2AXI is
         TX_AXI_TLAST     : out std_logic;
         TX_AXI_TVALID    : out std_logic;
         TX_AXI_TREADY    : in  std_logic
-   );
-end MFB2AXI;
+    );
+end entity;
 
-architecture behavioral of MFB2AXI is
+architecture BEHAVIORAL of MFB2AXI is
 
-    constant REG_SOF_POS_WIDTH : natural := max(1,log2(REGION_SIZE));
-    constant REG_EOF_POS_WIDTH : natural := max(1,log2(REGION_SIZE*BLOCK_SIZE));
-    constant MFB_DATA_WIDTH    : natural := REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
-    constant MFB_SOF_POS_WIDTH : natural := REGIONS*max(1,log2(REGION_SIZE));
-    constant MFB_EOF_POS_WIDTH : natural := REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE));
-    constant REP_CNT           : natural := ITEM_WIDTH / 8;
+    constant REG_SOF_POS_WIDTH     : natural := max(1,log2(REGION_SIZE));
+    constant REG_EOF_POS_WIDTH     : natural := max(1,log2(REGION_SIZE*BLOCK_SIZE));
+    constant MFB_DATA_WIDTH        : natural := REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
+    constant MFB_SOF_POS_WIDTH     : natural := REGIONS*max(1,log2(REGION_SIZE));
+    constant MFB_EOF_POS_WIDTH     : natural := REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE));
+    constant REP_CNT               : natural := ITEM_WIDTH / 8;
     constant GLOBAL_EOF_POS_WIDTH  : natural := max(1, log2(REGIONS*REGION_SIZE*BLOCK_SIZE));
     constant GLOBAL_SOF_POS_WIDTH  : natural := max(1, log2(REGIONS*REGION_SIZE));
-    constant REG_PTR_WIDTH     : natural := max(1, log2(REGIONS));
-    constant PP_CNT_WIDTH      : natural := work.math_pack.min(2, log2(REGIONS)+1);
+    constant REG_PTR_WIDTH         : natural := max(1, log2(REGIONS));
+    constant PP_CNT_WIDTH          : natural := work.math_pack.min(2, log2(REGIONS)+1);
 
     subtype  SOF2EOF_POS_RANGE  is natural range GLOBAL_EOF_POS_WIDTH-1 downto GLOBAL_EOF_POS_WIDTH - GLOBAL_SOF_POS_WIDTH;
 
@@ -130,40 +130,40 @@ architecture behavioral of MFB2AXI is
     function is_powerof2 (n : natural) return boolean is
     begin
         return (2 ** log2(n)) = n;
-    end is_powerof2;
+    end function;
 
     -- find LSB one index
-    function lsb_one(slv : std_logic_vector) return natural is
+    function lsb_one (slv : std_logic_vector) return natural is
         variable res : natural := 0;
     begin
         for i in 0 to slv'LENGTH - 1 loop
-            if slv(i) = '1' then
+            if (slv(i) = '1') then
                 res := i;
                 exit;
             end if;
         end loop;
         return res;
-    end;
+    end function;
 
     -- find MSB one index
-    function msb_one(slv : std_logic_vector) return natural is
+    function msb_one (slv : std_logic_vector) return natural is
         variable res : natural := 0;
     begin
         for i in slv'LENGTH - 1 downto 0 loop
-            if slv(i) = '1' then
+            if (slv(i) = '1') then
                 res := i;
                 exit;
             end if;
         end loop;
         return res;
-    end;
+    end function;
 
     -- array for SOF to global SOF conversion
-    type global_sof_array_t is array (0 to REGIONS -1) of unsigned (GLOBAL_SOF_POS_WIDTH-1 downto 0);
+    type   global_sof_array_t is array (0 to REGIONS -1) of unsigned (GLOBAL_SOF_POS_WIDTH-1 downto 0);
     signal global_sof_array : global_sof_array_t;
 
     -- array for EOF to global EOF conversion
-    type global_eof_array_t is array (0 to REGIONS -1) of unsigned (GLOBAL_EOF_POS_WIDTH-1 downto 0);
+    type   global_eof_array_t is array (0 to REGIONS -1) of unsigned (GLOBAL_EOF_POS_WIDTH-1 downto 0);
     signal global_eof_array : global_eof_array_t;
 
     -- signals
@@ -186,7 +186,7 @@ architecture behavioral of MFB2AXI is
     signal tready_out    : std_logic;
 
     -- PRE-PROCESSOR FSM
-    type t_state_preproc is (st_PP_DONE, st_PP_WAIT_EOF, st_PP_ONG);
+    type   t_state_preproc is (ST_PP_DONE, ST_PP_WAIT_EOF, ST_PP_ONG);
     signal pp_curr_state : t_state_preproc;
     signal pp_next_state : t_state_preproc;
 
@@ -222,79 +222,87 @@ architecture behavioral of MFB2AXI is
     signal pp_valid_q         : std_logic;
 
     -- bridge FSM
-    type t_state_bridge is (st_BR_DONE, st_BR_ONG_ALIGN, st_BR_ONG_UNALIGN, st_BR_STALL_UNALIGN, st_BR_ONG_UNALIGN_EOF);
+    type   t_state_bridge is (ST_BR_DONE, ST_BR_ONG_ALIGN, ST_BR_ONG_UNALIGN, ST_BR_STALL_UNALIGN, ST_BR_ONG_UNALIGN_EOF);
     signal br_curr_state : t_state_bridge;
     signal br_next_state : t_state_bridge;
 
     -- bridge logic
-    signal br_data_ptr_q    : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
-    signal br_data_ptr_d    : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
-    signal br_data_buffer_q : std_logic_vector(RX_MFB_DATA'RANGE);
-    signal br_data_update   : std_logic;
+    signal br_data_ptr_q       : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
+    signal br_data_ptr_d       : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
+    signal br_data_buffer_q    : std_logic_vector(RX_MFB_DATA'RANGE);
+    signal br_data_update      : std_logic;
     signal br_eof_data_len_off : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
-    signal br_eof_data_len_h: unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
-    signal br_eof_data_len_l: unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
-    signal br_eof_data_len  : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
-    signal br_shift_cnt     : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
-    signal br_eof_pos_q     : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
-    signal br_data_ext      : std_logic_vector(2*MFB_DATA_WIDTH - 1 downto 0);
-    signal br_data_shift    : std_logic_vector(2*MFB_DATA_WIDTH - 1 downto 0);
-    signal br_rdy           : std_logic;
+    signal br_eof_data_len_h   : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
+    signal br_eof_data_len_l   : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
+    signal br_eof_data_len     : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
+    signal br_shift_cnt        : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
+    signal br_eof_pos_q        : unsigned(GLOBAL_EOF_POS_WIDTH-1 downto 0);
+    signal br_data_ext         : std_logic_vector(2*MFB_DATA_WIDTH - 1 downto 0);
+    signal br_data_shift       : std_logic_vector(2*MFB_DATA_WIDTH - 1 downto 0);
+    signal br_rdy              : std_logic;
 
 begin
     -----------------------------------------------------------------------------
     -- valid parameters checks
     -----------------------------------------------------------------------------
     -- 1. MFB ITEM needs to be *byte - AXI stream use TKEEP by byte
-    assert (ITEM_WIDTH mod 8 = 0)   report "ITEM_WIDTH/8 != 0"   severity FAILURE;
+    assert (ITEM_WIDTH mod 8 = 0)
+        report "ITEM_WIDTH/8 != 0"
+        severity FAILURE;
 
     -- 2. MFB REGIONS_SIZE is expected to be 2^n
-    assert (is_powerof2(REGION_SIZE))   report "REGION_SIZE is not power of 2"   severity FAILURE;
+    assert (is_powerof2(REGION_SIZE))
+        report "REGION_SIZE is not power of 2"
+        severity FAILURE;
 
     -- 3. MFB BLOCK_SIZE is expected to be 2^n
-    assert (is_powerof2(BLOCK_SIZE))   report "BLOCK_SIZE is not power of 2"   severity FAILURE;
+    assert (is_powerof2(BLOCK_SIZE))
+        report "BLOCK_SIZE is not power of 2"
+        severity FAILURE;
 
     -- 4. MFB and AXI stream data width needs to be equal
-    assert (MFB_DATA_WIDTH = AXI_DATA_WIDTH)   report "MFB and AXIs data width is not matching"   severity FAILURE;
+    assert (MFB_DATA_WIDTH = AXI_DATA_WIDTH)
+        report "MFB and AXIs data width is not matching"
+        severity FAILURE;
 
     -----------------------------------------------------------------------------
     -- input stage
     -----------------------------------------------------------------------------
-    input_pipe_i :  entity  work.MFB_PIPE
-        generic map(
-            REGIONS       => REGIONS,
-            REGION_SIZE   => REGION_SIZE,
-            BLOCK_SIZE    => BLOCK_SIZE,
-            ITEM_WIDTH    => ITEM_WIDTH,
-            META_WIDTH    => 0,
+    input_pipe_i : entity  work.MFB_PIPE
+    generic map (
+        REGIONS       => REGIONS,
+        REGION_SIZE   => REGION_SIZE,
+        BLOCK_SIZE    => BLOCK_SIZE,
+        ITEM_WIDTH    => ITEM_WIDTH,
+        META_WIDTH    => 0,
 
-            FAKE_PIPE     => not USE_IN_PIPE,
-            USE_DST_RDY   => true,
-            PIPE_TYPE     => PIPE_TYPE,
-            DEVICE        => DEVICE
-        )
-        port map(
-            CLK           => CLK,
-            RESET         => RST,
+        FAKE_PIPE     => not USE_IN_PIPE,
+        USE_DST_RDY   => true,
+        PIPE_TYPE     => PIPE_TYPE,
+        DEVICE        => DEVICE
+    )
+    port map (
+        CLK           => CLK,
+        RESET         => RST,
 
-            RX_DATA       => RX_MFB_DATA,
-            RX_META       => (others => '0'),
-            RX_SOF_POS    => RX_MFB_SOF_POS,
-            RX_EOF_POS    => RX_MFB_EOF_POS,
-            RX_SOF        => RX_MFB_SOF,
-            RX_EOF        => RX_MFB_EOF,
-            RX_SRC_RDY    => RX_MFB_SRC_RDY,
-            RX_DST_RDY    => RX_MFB_DST_RDY,
+        RX_DATA       => RX_MFB_DATA,
+        RX_META       => (others => '0'),
+        RX_SOF_POS    => RX_MFB_SOF_POS,
+        RX_EOF_POS    => RX_MFB_EOF_POS,
+        RX_SOF        => RX_MFB_SOF,
+        RX_EOF        => RX_MFB_EOF,
+        RX_SRC_RDY    => RX_MFB_SRC_RDY,
+        RX_DST_RDY    => RX_MFB_DST_RDY,
 
-            TX_DATA       => mfb_data_in,
-            TX_META       => open,
-            TX_SOF_POS    => mfb_sof_pos_in,
-            TX_EOF_POS    => mfb_eof_pos_in,
-            TX_SOF        => mfb_sof_in,
-            TX_EOF        => mfb_eof_in,
-            TX_SRC_RDY    => src_rdy_in,
-            TX_DST_RDY    => dst_rdy_in
-        );
+        TX_DATA       => mfb_data_in,
+        TX_META       => open,
+        TX_SOF_POS    => mfb_sof_pos_in,
+        TX_EOF_POS    => mfb_eof_pos_in,
+        TX_SOF        => mfb_sof_in,
+        TX_EOF        => mfb_eof_in,
+        TX_SRC_RDY    => src_rdy_in,
+        TX_DST_RDY    => dst_rdy_in
+    );
 
     -----------------------------------------------------------------------------
     -- bridge logic
@@ -345,10 +353,10 @@ begin
         else generate
             -- decoding the incomming MFB transaction
             -- mask already processed regions
-            sof_reg_mask <= (REGIONS-1 downto 0 => '1') sll to_integer(sof_reg_ptr_q);
-            eof_reg_mask <= (REGIONS-1 downto 0 => '1') sll to_integer(eof_reg_ptr_q);
-            sof_masked <= mfb_sof_in and sof_reg_mask;
-            eof_masked <= mfb_eof_in and eof_reg_mask;
+            sof_reg_mask       <= (REGIONS-1 downto 0 => '1') sll to_integer(sof_reg_ptr_q);
+            eof_reg_mask       <= (REGIONS-1 downto 0 => '1') sll to_integer(eof_reg_ptr_q);
+            sof_masked         <= mfb_sof_in and sof_reg_mask;
+            eof_masked         <= mfb_eof_in and eof_reg_mask;
 
             -- count number of SOFs and EOFs in transaction
             sof_cnt <= to_unsigned(count_ones(sof_masked), sof_cnt'LENGTH);
@@ -360,15 +368,15 @@ begin
             eof_first <= to_unsigned(lsb_one(eof_masked), eof_first'LENGTH);
 
             -- create global position arrays
-            global_pos_array_p: process(all)
+            global_pos_array_p : process (all)
             begin
                 for i in 0 to REGIONS -1 loop
                     -- EOF
-                    global_eof_array(i)(REG_EOF_POS_WIDTH-1 downto 0) <= unsigned(mfb_eof_pos_in((i + 1) * REG_EOF_POS_WIDTH - 1 downto i * REG_EOF_POS_WIDTH));
+                    global_eof_array(i)(REG_EOF_POS_WIDTH-1 downto 0)                    <= unsigned(mfb_eof_pos_in((i + 1) * REG_EOF_POS_WIDTH - 1 downto i * REG_EOF_POS_WIDTH));
                     global_eof_array(i)(GLOBAL_EOF_POS_WIDTH-1 downto REG_EOF_POS_WIDTH) <= to_unsigned(i, GLOBAL_EOF_POS_WIDTH - REG_EOF_POS_WIDTH);
 
                     -- SOF
-                    global_sof_array(i)(REG_SOF_POS_WIDTH-1 downto 0) <= unsigned(mfb_sof_pos_in((i + 1) * REG_SOF_POS_WIDTH - 1 downto i * REG_SOF_POS_WIDTH));
+                    global_sof_array(i)(REG_SOF_POS_WIDTH-1 downto 0)                    <= unsigned(mfb_sof_pos_in((i + 1) * REG_SOF_POS_WIDTH - 1 downto i * REG_SOF_POS_WIDTH));
                     global_sof_array(i)(GLOBAL_SOF_POS_WIDTH-1 downto REG_SOF_POS_WIDTH) <= to_unsigned(i, GLOBAL_SOF_POS_WIDTH - REG_SOF_POS_WIDTH);
                 end loop;
             end process;
@@ -379,11 +387,11 @@ begin
             eof_pos_first <= global_eof_array(to_integer(eof_first));
 
             -- pre-process seq. logic
-            pp_seq_p: process(CLK)
+            pp_seq_p : process (CLK)
             begin
                 if (rising_edge(CLK)) then
                     if (RST = '1') then
-                        pp_curr_state <= st_PP_DONE;
+                        pp_curr_state <= ST_PP_DONE;
                         sof_reg_ptr_q <= (others => '0');
                         eof_reg_ptr_q <= (others => '0');
                     else
@@ -395,59 +403,59 @@ begin
             end process;
 
             -- pre-processor next state logic
-            pp_next_state_logic_p: process(all)
+            pp_next_state_logic_p : process (all)
             begin
                 -- default assignment
                 pp_next_state <= pp_curr_state;
 
                 if (src_rdy_in = '1' and br_rdy = '1') then
                     case pp_curr_state is
-                        when st_PP_DONE =>
+                        when ST_PP_DONE =>
                             if (sof_cnt > 2 or sof_cnt = eof_cnt) then
                                 -- 2*(SOF + EOF) + <...> / N*(SOF + EOF)
-                                pp_next_state <= st_PP_DONE;
+                                pp_next_state <= ST_PP_DONE;
                             else
                                 -- <SOF + EOF> + SOF
-                                pp_next_state <= st_PP_WAIT_EOF;
+                                pp_next_state <= ST_PP_WAIT_EOF;
                             end if;
 
-                        when st_PP_WAIT_EOF =>
+                        when ST_PP_WAIT_EOF =>
                             if (sof_cnt = 0 and eof_cnt = 1) then
                                 -- EOF
-                                pp_next_state <= st_PP_DONE;
+                                pp_next_state <= ST_PP_DONE;
                             elsif (sof_cnt = 1 and eof_cnt = 1) then
                                 -- EOF + SOF
-                                pp_next_state <= st_PP_WAIT_EOF;
+                                pp_next_state <= ST_PP_WAIT_EOF;
                             elsif (eof_cnt > 1) then
                                 -- EOF + SOF + EOF + <...>
                                 -- only EOF will be send this cycle, PP_ONG is SOF aligned again
-                                pp_next_state <= st_PP_ONG;
+                                pp_next_state <= ST_PP_ONG;
                             else
                                 -- none
-                                pp_next_state <= st_PP_WAIT_EOF;
+                                pp_next_state <= ST_PP_WAIT_EOF;
                             end if;
 
-                        when st_PP_ONG =>
+                        when ST_PP_ONG =>
                             if (sof_cnt = 1 and eof_cnt = 1) then
                                 -- SOF + EOF
-                                pp_next_state <= st_PP_DONE;
+                                pp_next_state <= ST_PP_DONE;
                             elsif (sof_cnt = 2 and eof_cnt = 1) then
                                 -- SOF + EOF + SOF
-                                pp_next_state <= st_PP_WAIT_EOF;
+                                pp_next_state <= ST_PP_WAIT_EOF;
                             else
                                 -- N*(SOF + EOF) + SOF
-                                pp_next_state <= st_PP_ONG;
+                                pp_next_state <= ST_PP_ONG;
                             end if;
 
                         when others =>
-                            pp_next_state <= st_PP_DONE;
+                            pp_next_state <= ST_PP_DONE;
 
                     end case;
                 end if;
             end process;
 
             -- pre-processor comb. logic
-            pp_comb_logic_p: process(all)
+            pp_comb_logic_p : process (all)
             begin
                 -- default assignment
                 pp_valid      <= '0';
@@ -463,7 +471,7 @@ begin
                     eof_reg_ptr_d <= eof_first + 1;
 
                     case pp_curr_state is
-                        when st_PP_DONE =>
+                        when ST_PP_DONE =>
                             if (eof_cnt = 1 or sof_cnt = 1) then
                                 -- last SOF + <EOF> or <SOF> + EOF
                                 dst_rdy_in    <= '1';
@@ -481,7 +489,7 @@ begin
                                 -- send as is (default)
                             end if;
 
-                        when st_PP_WAIT_EOF =>
+                        when ST_PP_WAIT_EOF =>
                             if (eof_cnt = 1 or (sof_cnt = 0 and eof_cnt = 0)) then
                                 -- last EOF or none symbol
                                 dst_rdy_in    <= '1';
@@ -490,11 +498,11 @@ begin
                             end if;
 
                             if (sof_cnt = 0 and eof_cnt = 1) then
-                                -- EOF
-                                -- send as is (default)
+                            -- EOF
+                            -- send as is (default)
                             elsif (sof_cnt = 1 and eof_cnt = 1) then
-                                -- EOF + SOF
-                                -- send as is (default)
+                            -- EOF + SOF
+                            -- send as is (default)
                             elsif (eof_cnt > 1) then
                                 -- EOF + SOF + EOF + <...>
                                 -- only EOF will be send this cycle, SOF ptr not updated as not used
@@ -506,7 +514,7 @@ begin
                                 -- send as is (default)
                             end if;
 
-                        when st_PP_ONG =>
+                        when ST_PP_ONG =>
                             if (eof_cnt = 1) then
                                 -- last EOF
                                 dst_rdy_in    <= '1';
@@ -516,11 +524,11 @@ begin
 
 
                             if (sof_cnt = 1 and eof_cnt = 1) then
-                                -- SOF + EOF
-                                -- send as is (default)
+                            -- SOF + EOF
+                            -- send as is (default)
                             elsif (sof_cnt = 2 and eof_cnt = 1) then
-                                -- SOF + EOF + SOF
-                                -- send as is (default)
+                            -- SOF + EOF + SOF
+                            -- send as is (default)
                             else
                                 -- N*(SOF + EOF) + SOF
                                 -- will send only first SOF + EOF frame
@@ -536,7 +544,7 @@ begin
             end process;
 
             -- pre-process output register logic
-            pp_out_reg_p: process(CLK)
+            pp_out_reg_p : process (CLK)
             begin
                 if (rising_edge(CLK)) then
                     -- FF with reset
@@ -569,140 +577,140 @@ begin
         -- translates pre-processed MFB to AXI
 
         -- bridge seq. logic
-        br_fsm_seq_p: process(CLK)
+        br_fsm_seq_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
                 if (RST = '1') then
-                    br_curr_state <= st_BR_DONE;
+                    br_curr_state <= ST_BR_DONE;
                     br_data_ptr_q <= (others => '0');
                 else
                     br_curr_state <= br_next_state;
                     if (br_data_update = '1') then
                         -- low bits are always 0, synthesis should optimize it
                         br_data_ptr_q(SOF2EOF_POS_RANGE) <= br_data_ptr_d(SOF2EOF_POS_RANGE);
-                        br_data_buffer_q <= pp_mfb_data_q;
-                        br_eof_pos_q <= pp_eof_pos_first_q;
+                        br_data_buffer_q                 <= pp_mfb_data_q;
+                        br_eof_pos_q                     <= pp_eof_pos_first_q;
                     end if;
                 end if;
             end if;
         end process;
 
         -- bridge next state logic
-        br_next_state_logic_p: process(all)
+        br_next_state_logic_p : process (all)
         begin
             -- default assignment
             br_next_state <= br_curr_state;
 
             case br_curr_state is
-                when st_BR_DONE =>
+                when ST_BR_DONE =>
                     if (pp_valid_q = '1') then
                         -- pre-processor stage valid
                         if (pp_sof_cnt_q = 1 and pp_eof_cnt_q = 1 and tready_out = '1') then
                             -- SOF + EOF + output stage ready (need to send)
-                            br_next_state <= st_BR_DONE;
+                            br_next_state <= ST_BR_DONE;
                         elsif (pp_sof_cnt_q = 2 and tready_out = '1') then
                             -- SOF + EOF + SOF + output stage ready (need to send)
-                            br_next_state <= st_BR_ONG_UNALIGN;
+                            br_next_state <= ST_BR_ONG_UNALIGN;
                         elsif (pp_sof_cnt_q = 1 and pp_eof_cnt_q = 0) then
                             -- SOF
                             if (pp_sof_pos_first_q = 0 and tready_out = '1') then
                                 -- SOF is aligned => check output stage ready (need to send)
-                                br_next_state <= st_BR_ONG_ALIGN;
+                                br_next_state <= ST_BR_ONG_ALIGN;
                             elsif (pp_sof_pos_first_q /= 0) then
                                 -- SOF is NOT aligned => cannot send, output stage does not have to be ready in this cycle
-                                br_next_state <= st_BR_ONG_UNALIGN;
+                                br_next_state <= ST_BR_ONG_UNALIGN;
                             end if;
                         end if;
                     end if;
 
-                when st_BR_ONG_ALIGN =>
+                when ST_BR_ONG_ALIGN =>
                     if (pp_valid_q = '1'  and tready_out = '1') then
                         -- pre-processor stage valid + output stage ready (need to send)
                         if (pp_eof_cnt_q = 1 and pp_sof_cnt_q = 0) then
                             -- EOF
-                            br_next_state <= st_BR_DONE;
+                            br_next_state <= ST_BR_DONE;
                         elsif (pp_eof_cnt_q = 1 and pp_sof_cnt_q = 1) then
                             -- EOF + SOF
-                            br_next_state <= st_BR_ONG_UNALIGN;
+                            br_next_state <= ST_BR_ONG_UNALIGN;
                         else
                             -- none
-                            br_next_state <= st_BR_ONG_ALIGN;
+                            br_next_state <= ST_BR_ONG_ALIGN;
                         end if;
                     end if;
 
-                when st_BR_ONG_UNALIGN =>
+                when ST_BR_ONG_UNALIGN =>
                     if (pp_valid_q = '1'  and tready_out = '1') then
                         -- pre-processor stage valid + output stage ready (need to send)
                         if (pp_eof_cnt_q = 1 and br_data_ptr_q > pp_eof_pos_first_q) then
                             -- EOF + all data available
                             if (pp_sof_cnt_q = 0) then
                                 -- not SOF
-                                br_next_state <= st_BR_DONE;
+                                br_next_state <= ST_BR_DONE;
                             else
                                 -- another SOF (always unaligned)
-                                br_next_state <= st_BR_ONG_UNALIGN;
+                                br_next_state <= ST_BR_ONG_UNALIGN;
                             end if;
                         elsif (pp_eof_cnt_q = 1  and br_data_ptr_q <= pp_eof_pos_first_q) then
                             -- EOF + all data not available
                             if (pp_sof_cnt_q = 0) then
                                 -- not SOF => stall may not be necassary (next cycle the frame will be finished)
-                                br_next_state <= st_BR_ONG_UNALIGN_EOF;
+                                br_next_state <= ST_BR_ONG_UNALIGN_EOF;
                             else
                                 -- another SOF => need to stall the bus finish last frame next clock cycle
-                                br_next_state <= st_BR_STALL_UNALIGN;
+                                br_next_state <= ST_BR_STALL_UNALIGN;
                             end if;
                         else
                             -- none
-                            br_next_state <= st_BR_ONG_UNALIGN;
+                            br_next_state <= ST_BR_ONG_UNALIGN;
                         end if;
                     end if;
 
-                when st_BR_STALL_UNALIGN =>
+                when ST_BR_STALL_UNALIGN =>
                     if (tready_out = '1') then
                         -- output stage ready (need to send)
                         -- finish ongoing frame
-                        br_next_state <= st_BR_ONG_UNALIGN;
+                        br_next_state <= ST_BR_ONG_UNALIGN;
                     end if;
 
-                when st_BR_ONG_UNALIGN_EOF =>
+                when ST_BR_ONG_UNALIGN_EOF =>
                     if (tready_out = '1') then
                         -- output stage ready (need to send)
                         -- finish ongoing frame
-                        if (pp_valid_q = '1'and pp_eof_cnt_q = 0 and pp_sof_cnt_q = 1 and pp_sof_pos_first_q /= 0) then
+                        if (pp_valid_q = '1' and pp_eof_cnt_q = 0 and pp_sof_cnt_q = 1 and pp_sof_pos_first_q /= 0) then
                             -- SOF which is not aligned
-                            br_next_state <= st_BR_ONG_UNALIGN;
+                            br_next_state <= ST_BR_ONG_UNALIGN;
                         else
                             -- not valid transaction / SOF + EOF + <...> / SOF aligned
-                            br_next_state <= st_BR_DONE;
+                            br_next_state <= ST_BR_DONE;
                         end if;
                     end if;
 
                 when others =>
-                    br_next_state <= st_BR_DONE;
+                    br_next_state <= ST_BR_DONE;
 
             end case;
         end process;
 
         -- bridge output. logic
-        br_output_logic_p: process(all)
+        br_output_logic_p : process (all)
         begin
             -- default assignment
-            br_data_update <= '0';
-            br_data_ptr_d  <= br_data_ptr_q;
-            axi_tlast_out  <= '0';
-            tvalid_out     <= pp_valid_q;
-            br_rdy         <= tready_out;
+            br_data_update      <= '0';
+            br_data_ptr_d       <= br_data_ptr_q;
+            axi_tlast_out       <= '0';
+            tvalid_out          <= pp_valid_q;
+            br_rdy              <= tready_out;
             br_eof_data_len_off <= (others => '0');
-            br_eof_data_len_h <= (others => '0');
-            br_eof_data_len_l <= (others => '0');
-            br_shift_cnt      <= br_data_ptr_q;
+            br_eof_data_len_h   <= (others => '0');
+            br_eof_data_len_l   <= (others => '0');
+            br_shift_cnt        <= br_data_ptr_q;
 
             -- current state decoding
             case br_curr_state is
-                when st_BR_DONE =>
+                when ST_BR_DONE =>
                     -- data_len = 0 + EOF_POS - SOF_POS
-                    br_eof_data_len_off <= (others => '0');
-                    br_eof_data_len_h   <= pp_eof_pos_first_q;
+                    br_eof_data_len_off                  <= (others => '0');
+                    br_eof_data_len_h                    <= pp_eof_pos_first_q;
                     br_eof_data_len_l(SOF2EOF_POS_RANGE) <= pp_sof_pos_first_q;
 
                     -- data shift
@@ -719,18 +727,18 @@ begin
                             -- SOF + EOF + SOF + output stage ready (need to send)
                             -- frame finished, another started
                             -- => st_BR_ONG_UNALIGN
-                            axi_tlast_out <= '1';
-                            br_data_update <= '1';
+                            axi_tlast_out                    <= '1';
+                            br_data_update                   <= '1';
                             br_data_ptr_d(SOF2EOF_POS_RANGE) <= pp_sof_pos_last_q;
                         elsif (pp_sof_cnt_q = 1 and pp_eof_cnt_q = 0) then
                             -- SOF
-                            br_data_update <= '1';
+                            br_data_update                   <= '1';
                             br_data_ptr_d(SOF2EOF_POS_RANGE) <= pp_sof_pos_first_q;
 
                             if (pp_sof_pos_first_q = 0 and tready_out = '1') then
-                                -- SOF is aligned => check output stage ready (need to send)
-                                -- => st_BR_ONG_ALIGN
-                                -- default
+                            -- SOF is aligned => check output stage ready (need to send)
+                            -- => st_BR_ONG_ALIGN
+                            -- default
                             elsif (pp_sof_pos_first_q /= 0) then
                                 -- SOF is NOT aligned => cannot send, output stage does not have to be ready in this cycle
                                 -- => st_BR_ONG_UNALIGN
@@ -740,7 +748,7 @@ begin
                         end if;
                     end if;
 
-                when st_BR_ONG_ALIGN =>
+                when ST_BR_ONG_ALIGN =>
                     -- data_len = 0 + EOF_POS - 0
                     br_eof_data_len_off <= (others => '0');
                     br_eof_data_len_h   <= pp_eof_pos_first_q;
@@ -759,7 +767,7 @@ begin
                             -- EOF + SOF
                             -- frame finished, another started
                             -- => st_BR_ONG_UNALIGN
-                            axi_tlast_out <= '1';
+                            axi_tlast_out                    <= '1';
                             br_data_ptr_d(SOF2EOF_POS_RANGE) <= pp_sof_pos_first_q;
                         else
                             -- none
@@ -768,11 +776,11 @@ begin
                         end if;
                     end if;
 
-                when st_BR_ONG_UNALIGN =>
+                when ST_BR_ONG_UNALIGN =>
                     -- data_len = CONST + EOF_POS - DATA_PTR (EOF < PTR)
                     br_eof_data_len_off <= to_unsigned(REGIONS*REGION_SIZE*BLOCK_SIZE, br_eof_data_len_off'LENGTH);
-                    br_eof_data_len_h <= pp_eof_pos_first_q;
-                    br_eof_data_len_l <= br_data_ptr_q;
+                    br_eof_data_len_h   <= pp_eof_pos_first_q;
+                    br_eof_data_len_l   <= br_data_ptr_q;
 
                     if (pp_valid_q = '1'  and tready_out = '1') then
                         -- pre-processor stage valid + output stage ready (need to send)
@@ -783,8 +791,8 @@ begin
                             -- frame finished
                             axi_tlast_out <= '1';
                             if (pp_sof_cnt_q = 0) then
-                                -- not SOF
-                                -- => st_BR_DONE
+                            -- not SOF
+                            -- => st_BR_DONE
                             else
                                 -- another SOF (always unaligned)
                                 -- => st_BR_ONG_UNALIGN
@@ -793,9 +801,9 @@ begin
                         elsif (pp_eof_cnt_q = 1 and br_data_ptr_q <= pp_eof_pos_first_q) then
                             -- EOF + all data not available
                             if (pp_sof_cnt_q = 0) then
-                                -- not SOF => stall may not be necassary (next cycle the frame will be finished)
-                                -- => st_BR_ONG_UNALIGN_EOF
-                                -- default
+                            -- not SOF => stall may not be necassary (next cycle the frame will be finished)
+                            -- => st_BR_ONG_UNALIGN_EOF
+                            -- default
                             else
                                 -- another SOF => need to stall the bus finish last frame next clock cycle
                                 -- => st_BR_STALL_UNALIGN
@@ -809,35 +817,35 @@ begin
                     end if;
 
 
-                when st_BR_STALL_UNALIGN =>
+                when ST_BR_STALL_UNALIGN =>
                     -- data_len = 0 + EOF_POS - DATA_PTR ... (EOF > PTR)
                     br_eof_data_len_off <= (others => '0');
-                    br_eof_data_len_h <= pp_eof_pos_first_q;
-                    br_eof_data_len_l <= br_data_ptr_q;
+                    br_eof_data_len_h   <= pp_eof_pos_first_q;
+                    br_eof_data_len_l   <= br_data_ptr_q;
 
                     -- axi control
                     -- frame finished
                     axi_tlast_out <= '1';
-                    tvalid_out   <= '1';
+                    tvalid_out    <= '1';
 
                     if (tready_out = '1') then
                         -- output stage ready (need to send)
                         -- finish ongoing frame
                         -- => st_BR_ONG_UNALIGN
-                        br_data_update <= '1';
+                        br_data_update                   <= '1';
                         br_data_ptr_d(SOF2EOF_POS_RANGE) <= pp_sof_pos_first_q;
                     end if;
 
-                when st_BR_ONG_UNALIGN_EOF =>
+                when ST_BR_ONG_UNALIGN_EOF =>
                     -- data_len = 0 + EOF_POS (register) - DATA_PTR  ... (EOF > PTR)
                     br_eof_data_len_off <= (others => '0');
-                    br_eof_data_len_h <= br_eof_pos_q;
-                    br_eof_data_len_l <= br_data_ptr_q;
+                    br_eof_data_len_h   <= br_eof_pos_q;
+                    br_eof_data_len_l   <= br_data_ptr_q;
 
                     -- axi control
                     -- frame finished
                     axi_tlast_out <= '1';
-                    tvalid_out   <= '1';
+                    tvalid_out    <= '1';
 
                     if (tready_out = '1') then
                         -- output stage ready (need to send)
@@ -845,7 +853,7 @@ begin
                         if (pp_valid_q = '1' and pp_eof_cnt_q = 0 and pp_sof_cnt_q = 1 and pp_sof_pos_first_q /= 0) then
                             -- SOF which is not aligned
                             -- => st_BR_ONG_UNALIGN
-                            br_data_update <= '1';
+                            br_data_update                   <= '1';
                             br_data_ptr_d(SOF2EOF_POS_RANGE) <= pp_sof_pos_first_q;
                         else
                             -- not valid transaction / SOF + EOF + <...> / SOF aligned
@@ -855,8 +863,8 @@ begin
                     end if;
 
                 when others =>
-                    tvalid_out   <= '0';
-                    br_rdy  <= '0';
+                    tvalid_out     <= '0';
+                    br_rdy         <= '0';
                     br_data_update <= '1';
                     br_data_ptr_d  <= (others => '0');
 
@@ -867,7 +875,7 @@ begin
         br_eof_data_len <= resize(('0' & br_eof_data_len_off) + ('0' & br_eof_data_len_h) - ('0' & br_eof_data_len_l), br_eof_data_len);
 
         -- concatenate input data with buffer if needed
-        br_data_ext <= pp_mfb_data_q & pp_mfb_data_q when (br_curr_state = st_BR_DONE or br_curr_state = st_BR_ONG_ALIGN) else
+        br_data_ext <= pp_mfb_data_q & pp_mfb_data_q when (br_curr_state = ST_BR_DONE or br_curr_state = ST_BR_ONG_ALIGN) else
                        pp_mfb_data_q & br_data_buffer_q;
 
         -- shift the transmited data to LSB
@@ -907,29 +915,29 @@ begin
     -----------------------------------------------------------------------------
     -- output stage
     -----------------------------------------------------------------------------
-    output_pipe_i :  entity  work.AXI_PIPE
-        generic map(
-            AXI_DATA_WIDTH  => AXI_DATA_WIDTH,
-            FAKE_PIPE       => not USE_OUT_PIPE,
-            USE_DST_RDY     => true,
-            PIPE_TYPE       => PIPE_TYPE,
-            DEVICE          => DEVICE
-        )
-        port map(
-            CLK           => CLK,
-            RESET         => RST,
+    output_pipe_i : entity  work.AXI_PIPE
+    generic map (
+        AXI_DATA_WIDTH  => AXI_DATA_WIDTH,
+        FAKE_PIPE       => not USE_OUT_PIPE,
+        USE_DST_RDY     => true,
+        PIPE_TYPE       => PIPE_TYPE,
+        DEVICE          => DEVICE
+    )
+    port map (
+        CLK           => CLK,
+        RESET         => RST,
 
-            RX_AXI_TDATA   => axi_tdata_out,
-            RX_AXI_TKEEP   => axi_tkeep_out,
-            RX_AXI_TLAST   => axi_tlast_out,
-            RX_AXI_TVALID  => tvalid_out,
-            RX_AXI_TREADY  => tready_out,
+        RX_AXI_TDATA   => axi_tdata_out,
+        RX_AXI_TKEEP   => axi_tkeep_out,
+        RX_AXI_TLAST   => axi_tlast_out,
+        RX_AXI_TVALID  => tvalid_out,
+        RX_AXI_TREADY  => tready_out,
 
-            TX_AXI_TDATA   => TX_AXI_TDATA,
-            TX_AXI_TKEEP   => TX_AXI_TKEEP,
-            TX_AXI_TLAST   => TX_AXI_TLAST,
-            TX_AXI_TVALID  => TX_AXI_TVALID,
-            TX_AXI_TREADY  => TX_AXI_TREADY
-        );
+        TX_AXI_TDATA   => TX_AXI_TDATA,
+        TX_AXI_TKEEP   => TX_AXI_TKEEP,
+        TX_AXI_TLAST   => TX_AXI_TLAST,
+        TX_AXI_TVALID  => TX_AXI_TVALID,
+        TX_AXI_TREADY  => TX_AXI_TREADY
+    );
 
 end architecture;

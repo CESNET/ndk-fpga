@@ -12,162 +12,162 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-entity testbench is
+entity TESTBENCH is
 
-end testbench;
+end entity;
 
-architecture behavioral of testbench is
+architecture BEHAVIORAL of TESTBENCH is
 
 
-   constant clkper         : time := 10 ns; --Clock period
-   constant reset_time     : time := 2*clkper + 1 ns; --Reset durati
+    constant CLKPER         : time := 10 ns;           -- Clock period
+    constant RESET_TIME     : time := 2*CLKPER + 1 ns; -- Reset durati
 
-   -- Clock and reset signals
-   signal CLK              : std_logic;
-   signal RESET            : std_logic;
-   signal A                : std_logic_vector(95 downto 0);
-   signal B                : std_logic_vector(95 downto 0);
-   signal CE_IN            : std_logic;
-   signal CE_OUT           : std_logic;
-   signal ALUMODE          : std_logic_vector(3 downto 0);
-   signal CARRY_IN         : std_logic;
-   signal CARRY_OUT        : std_logic;
-   signal P                : std_logic_vector(95 downto 0);
+    -- Clock and reset signals
+    signal clk              : std_logic;
+    signal reset            : std_logic;
+    signal a                : std_logic_vector(95 downto 0);
+    signal b                : std_logic_vector(95 downto 0);
+    signal ce_in            : std_logic;
+    signal ce_out           : std_logic;
+    signal alumode          : std_logic_vector(3 downto 0);
+    signal carry_in         : std_logic;
+    signal carry_out        : std_logic;
+    signal p                : std_logic_vector(95 downto 0);
 
 begin
 
-   uut : entity work.ALU_DSP(structural)
-   generic map(
-      DATA_WIDTH   => 96,
-      REG_IN       => 1,
-      REG_OUT      => 1
-   )
-   port map (
-      CLK         => CLK,
-      RESET       => RESET,
-      A           => A,
-      B           => B,
-      CE_IN       => CE_IN,
-      CE_OUT      => CE_OUT,
-      ALUMODE     => ALUMODE,
-      CARRY_IN    => CARRY_IN,
-      CARRY_OUT   => CARRY_OUT,
-      P           => P
-   );
+    uut : entity work.ALU_DSP(structural)
+    generic map (
+        DATA_WIDTH   => 96,
+        REG_IN       => 1,
+        REG_OUT      => 1
+    )
+    port map (
+        CLK         => clk,
+        RESET       => reset,
+        A           => a,
+        B           => b,
+        CE_IN       => ce_in,
+        CE_OUT      => ce_out,
+        ALUMODE     => alumode,
+        CARRY_IN    => carry_in,
+        CARRY_OUT   => carry_out,
+        P           => p
+    );
 
-   --Generate clock
-   clk_gen_p : process
-   begin
-      CLK <= '1';
-      wait for clkper/2;
-      CLK <= '0';
-      wait for clkper/2;
-   end process clk_gen_p;
+    -- Generate clock
+    clk_gen_p : process
+    begin
+        clk <= '1';
+        wait for CLKPER/2;
+        clk <= '0';
+        wait for CLKPER/2;
+    end process;
 
-   --Generate reset
-   reset_gen : process
-   begin
-      RESET <= '1';
-      wait for reset_time;
-      RESET <= '0';
-   wait;
-   end process;
+    -- Generate reset
+    reset_gen : process
+    begin
+        reset <= '1';
+        wait for RESET_TIME;
+        reset <= '0';
+        wait;
+    end process;
 
-   -- Simulating input flow
-   input_flow : process
-   begin
+    -- Simulating input flow
+    input_flow : process
+    begin
 
-      CARRY_IN <= '0';
-      ALUMODE <= "0000";
-      -- Initialize input interface
-      A <= (others => '0');
-      B <= (others => '0');
-      CE_IN <= '0';
-      CE_OUT <= '0';
+        carry_in <= '0';
+        alumode  <= "0000";
+        -- Initialize input interface
+        a        <= (others => '0');
+        b        <= (others => '0');
+        ce_in    <= '0';
+        ce_out   <= '0';
 
-      wait for reset_time;
-      wait for 3*clkper;
+        wait for RESET_TIME;
+        wait for 3*CLKPER;
 
-      ALUMODE <= "0000";
+        alumode <= "0000";
 
-      A <= (1 => '1', 3 => '1', others => '0');
-      B <= (0 => '1', others => '0');
-      wait for clkper;
+        a <= (1 => '1', 3 => '1', others => '0');
+        b <= (0 => '1', others => '0');
+        wait for CLKPER;
 
-      CE_IN  <= '1';
-      CE_OUT <= '1';
-      wait for clkper;
+        ce_in  <= '1';
+        ce_out <= '1';
+        wait for CLKPER;
 
-      CARRY_IN <= '1';
-      wait for clkper;
+        carry_in <= '1';
+        wait for CLKPER;
 
-      CARRY_IN <= '0';
-      A <= (others => '1');
-      B <= (0 => '1', others => '0');
-      wait for clkper;
+        carry_in <= '0';
+        a        <= (others => '1');
+        b        <= (0 => '1', others => '0');
+        wait for CLKPER;
 
-      CARRY_IN <= '0';
-      A <= (47 => '1', 94 => '1', others => '0');
-      B <= (47 => '1', 94 => '1', others => '0');
-      wait for clkper;
+        carry_in <= '0';
+        a        <= (47 => '1', 94 => '1', others => '0');
+        b        <= (47 => '1', 94 => '1', others => '0');
+        wait for CLKPER;
 
-      ALUMODE <= "0001";
+        alumode <= "0001";
 
-      A <= (1 => '1', 3 => '1', others => '0');
-      B <= (0 => '1', others => '0');
-      wait for clkper;
+        a <= (1 => '1', 3 => '1', others => '0');
+        b <= (0 => '1', others => '0');
+        wait for CLKPER;
 
-      CE_IN  <= '1';
-      CE_OUT <= '1';
-      wait for clkper;
+        ce_in  <= '1';
+        ce_out <= '1';
+        wait for CLKPER;
 
-      CARRY_IN <= '1';
-      wait for clkper;
+        carry_in <= '1';
+        wait for CLKPER;
 
-      CARRY_IN <= '0';
-      A <= (others => '1');
-      B <= (0 => '1', others => '0');
-      wait for clkper;
+        carry_in <= '0';
+        a        <= (others => '1');
+        b        <= (0 => '1', others => '0');
+        wait for CLKPER;
 
-      A <= (others => '0');
-      B <= (0 => '1', others => '0');
-      wait for clkper;
+        a <= (others => '0');
+        b <= (0 => '1', others => '0');
+        wait for CLKPER;
 
-      ALUMODE <= "0010";
+        alumode <= "0010";
 
-      A <= (0 => '1', 1 => '1', 2 => '1', 3 => '1', others => '0');
-      A <= (0 => '1', 1 => '1', 2 => '1', 3 => '1', 4 => '1', 5 => '1', 6 => '1', 7 => '1', others => '0');
-      wait for clkper;
+        a <= (0 => '1', 1 => '1', 2 => '1', 3 => '1', others => '0');
+        a <= (0 => '1', 1 => '1', 2 => '1', 3 => '1', 4 => '1', 5 => '1', 6 => '1', 7 => '1', others => '0');
+        wait for CLKPER;
 
-      ALUMODE <= "0011";
-      wait for clkper;
+        alumode <= "0011";
+        wait for CLKPER;
 
-      ALUMODE <= "0100";
-      wait for clkper;
+        alumode <= "0100";
+        wait for CLKPER;
 
-      ALUMODE <= "0101";
-      wait for clkper;
+        alumode <= "0101";
+        wait for CLKPER;
 
-      ALUMODE <= "0110";
-      wait for clkper;
+        alumode <= "0110";
+        wait for CLKPER;
 
-      ALUMODE <= "0111";
-      wait for clkper;
+        alumode <= "0111";
+        wait for CLKPER;
 
-      ALUMODE <= "1000";
-      wait for clkper;
+        alumode <= "1000";
+        wait for CLKPER;
 
-      ALUMODE <= "1001";
-      wait for clkper;
+        alumode <= "1001";
+        wait for CLKPER;
 
-      ALUMODE <= "1010";
-      wait for clkper;
+        alumode <= "1010";
+        wait for CLKPER;
 
-      ALUMODE <= "1011";
-      wait for clkper;
+        alumode <= "1011";
+        wait for CLKPER;
 
-      wait;
+        wait;
 
-   end process input_flow;
+    end process;
 
 end architecture;

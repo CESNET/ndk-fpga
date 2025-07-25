@@ -12,41 +12,41 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MVB_LOOKUP_TABLE_LUTRAM is
-generic (
-    MVB_ITEMS  : natural := 4;
-    LUT_DEPTH  : natural := 128;
-    LUT_WIDTH  : natural := 32;
-    SW_WIDTH   : natural := 32;
-    META_WIDTH : natural := 1;
-    OUTPUT_REG : boolean := True;
-    DEVICE     : string  := "AGILEX"
-);
-port (
-    CLK             : in  std_logic;
-    RESET           : in  std_logic;
+    generic (
+        MVB_ITEMS  : natural := 4;
+        LUT_DEPTH  : natural := 128;
+        LUT_WIDTH  : natural := 32;
+        SW_WIDTH   : natural := 32;
+        META_WIDTH : natural := 1;
+        OUTPUT_REG : boolean := True;
+        DEVICE     : string  := "AGILEX"
+    );
+    port (
+        CLK             : in  std_logic;
+        RESET           : in  std_logic;
 
-    RX_MVB_LUT_ADDR : in  slv_array_t(MVB_ITEMS-1 downto 0)(log2(LUT_DEPTH)-1 downto 0);
-    RX_MVB_METADATA : in  slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0) := (others => (others => '0'));
-    RX_MVB_VLD      : in  std_logic_vector(MVB_ITEMS-1 downto 0);
-    RX_MVB_SRC_RDY  : in  std_logic;
-    RX_MVB_DST_RDY  : out std_logic;
+        RX_MVB_LUT_ADDR : in  slv_array_t(MVB_ITEMS-1 downto 0)(log2(LUT_DEPTH)-1 downto 0);
+        RX_MVB_METADATA : in  slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0) := (others => (others => '0'));
+        RX_MVB_VLD      : in  std_logic_vector(MVB_ITEMS-1 downto 0);
+        RX_MVB_SRC_RDY  : in  std_logic;
+        RX_MVB_DST_RDY  : out std_logic;
 
-    TX_MVB_LUT_DATA : out slv_array_t(MVB_ITEMS-1 downto 0)(LUT_WIDTH-1 downto 0);
-    TX_MVB_LUT_ADDR : out slv_array_t(MVB_ITEMS-1 downto 0)(log2(LUT_DEPTH)-1 downto 0);
-    TX_MVB_METADATA : out slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0);
-    TX_MVB_VLD      : out std_logic_vector(MVB_ITEMS-1 downto 0);
-    TX_MVB_SRC_RDY  : out std_logic;
-    TX_MVB_DST_RDY  : in  std_logic;
+        TX_MVB_LUT_DATA : out slv_array_t(MVB_ITEMS-1 downto 0)(LUT_WIDTH-1 downto 0);
+        TX_MVB_LUT_ADDR : out slv_array_t(MVB_ITEMS-1 downto 0)(log2(LUT_DEPTH)-1 downto 0);
+        TX_MVB_METADATA : out slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0);
+        TX_MVB_VLD      : out std_logic_vector(MVB_ITEMS-1 downto 0);
+        TX_MVB_SRC_RDY  : out std_logic;
+        TX_MVB_DST_RDY  : in  std_logic;
 
-    SW_ADDR         : in  std_logic_vector(log2(LUT_DEPTH)-1 downto 0);
-    SW_SLICE        : in  std_logic_vector(max(log2(LUT_WIDTH/SW_WIDTH),1)-1 downto 0);
-    SW_DIN          : in  std_logic_vector(SW_WIDTH-1 downto 0);
-    SW_BE           : in  std_logic_vector(SW_WIDTH/8-1 downto 0);
-    SW_WRITE        : in  std_logic;
-    SW_READ         : in  std_logic;
-    SW_DOUT         : out std_logic_vector(SW_WIDTH-1 downto 0);
-    SW_DOUT_VLD     : out std_logic
-);
+        SW_ADDR         : in  std_logic_vector(log2(LUT_DEPTH)-1 downto 0);
+        SW_SLICE        : in  std_logic_vector(max(log2(LUT_WIDTH/SW_WIDTH),1)-1 downto 0);
+        SW_DIN          : in  std_logic_vector(SW_WIDTH-1 downto 0);
+        SW_BE           : in  std_logic_vector(SW_WIDTH/8-1 downto 0);
+        SW_WRITE        : in  std_logic;
+        SW_READ         : in  std_logic;
+        SW_DOUT         : out std_logic_vector(SW_WIDTH-1 downto 0);
+        SW_DOUT_VLD     : out std_logic
+    );
 end entity;
 
 architecture FULL of MVB_LOOKUP_TABLE_LUTRAM is
@@ -93,7 +93,7 @@ begin
         generic map (
             DATA_WIDTH         => 8,
             ITEMS              => LUT_DEPTH,
-            RD_PORTS           => 1+MVB_ITEMS, --SW+MVB
+            RD_PORTS           => 1+MVB_ITEMS, -- SW+MVB
             RD_LATENCY         => 0,
             WRITE_USE_RD_ADDR0 => True,
             MLAB_CONSTR_RDW_DC => True,
@@ -115,7 +115,7 @@ begin
         end generate;
     end generate;
 
-    ram_sw_dout_nsw <= std_logic_vector(resize(unsigned(lram_rd_data(0)),(SW_WORDS_PER_LUT*SW_WIDTH)));
+    ram_sw_dout_nsw     <= std_logic_vector(resize(unsigned(lram_rd_data(0)),(SW_WORDS_PER_LUT*SW_WIDTH)));
     ram_sw_dout_nsw_arr <= slv_array_deser(ram_sw_dout_nsw,SW_WORDS_PER_LUT);
 
     process (all)

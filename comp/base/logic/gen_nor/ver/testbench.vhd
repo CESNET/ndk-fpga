@@ -17,7 +17,7 @@ use work.math_pack.all;
 use work.dma_bus_pack.all;
 use work.basics_test_pkg.all;
 use std.env.stop;
-use STD.textio.all;
+use std.textio.all;
 
 use work.test_pkg.all;
 
@@ -25,14 +25,14 @@ use work.test_pkg.all;
 --                                  Entity
 -- ----------------------------------------------------------------------------
 
-entity testbench is
-end entity testbench;
+entity TESTBENCH is
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                               Architecture
 -- ----------------------------------------------------------------------------
 
-architecture full of testbench is
+architecture FULL of TESTBENCH is
 
     -- Synchronization
     signal clk   : std_logic;
@@ -49,8 +49,8 @@ architecture full of testbench is
     shared variable l     : line;
     shared variable seed1 : positive := RAND_SEED+415;
     shared variable seed2 : positive := RAND_SEED+80;
-    shared variable X     : integer;
-    shared variable Y     : integer;
+    shared variable x     : integer;
+    shared variable y     : integer;
 
     -- tb functions and procedures
 
@@ -77,7 +77,7 @@ begin
     -- -------------------------------------------------------------------------
 
     -- generating clk
-    clk_gen: process
+    clk_gen : process
     begin
         clk <= '1';
         wait for C_CLK_PER / 2;
@@ -92,16 +92,16 @@ begin
     -- -------------------------------------------------------------------------
 
     -- input driver
-    in_driver_gen_pr : process(clk)
+    in_driver_gen_pr : process (clk)
     begin
         if (rising_edge(clk)) then
 
             -- default values
             di <= random_vector(di'length,seed1);
 
-            randint(seed1,seed2,0,99,X);
+            randint(seed1,seed2,0,99,x);
 
-            if (X<ZEROES_CH) then
+            if (x < ZEROES_CH) then
                 di <= (others => '0');
             end if;
         end if;
@@ -109,11 +109,11 @@ begin
     ----
 
     -- output monitor
-    out_monitor_gen_pr : process(clk)
+    out_monitor_gen_pr : process (clk)
     begin
         if (rising_edge(clk)) then
 
-            if (do/=(nor di)) then
+            if (do /= (nor di)) then
                 write(l,string'("ERROR: incorrect result!"));
                 writeline(output,l);
                 stop(1);

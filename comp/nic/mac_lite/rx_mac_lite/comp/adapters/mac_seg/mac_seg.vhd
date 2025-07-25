@@ -13,12 +13,12 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_ADAPTER_MAC_SEG is
-    generic(
+    generic (
         REGIONS     : natural := 2;
         REGION_SIZE : natural := 8;
         SEGMENTS    : natural := REGIONS*REGION_SIZE
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -132,10 +132,10 @@ architecture FULL of RX_MAC_LITE_ADAPTER_MAC_SEG is
 
 begin
 
-    mac_boundary_g : if (SEGMENTS=1) generate
+    mac_boundary_g : if (SEGMENTS = 1) generate
         in_mac_boundary(0) <= reg1_mac_inframe(0) xor IN_MAC_INFRAME(0);
     else generate
-        in_mac_boundary <= (IN_MAC_INFRAME(SEGMENTS-2 downto 0) & reg1_mac_inframe(SEGMENTS-1)) xor IN_MAC_INFRAME;
+        in_mac_boundary    <= (IN_MAC_INFRAME(SEGMENTS-2 downto 0) & reg1_mac_inframe(SEGMENTS-1)) xor IN_MAC_INFRAME;
     end generate;
 
     process (CLK)
@@ -154,8 +154,8 @@ begin
     in_mac_eop <= IN_MAC_VALID and in_mac_boundary and not IN_MAC_INFRAME;
 
     in_mac_pkt_cont_g : for s in 0 to SEGMENTS-1 generate
-        in_mac_pkt_cont(s+1) <= (    in_mac_sop(s) and not in_mac_eop(s) and not in_mac_pkt_cont(s)) or
-                                (    in_mac_sop(s) and     in_mac_eop(s) and     in_mac_pkt_cont(s)) or
+        in_mac_pkt_cont(s+1) <= (in_mac_sop(s) and not in_mac_eop(s) and not in_mac_pkt_cont(s)) or
+                                (in_mac_sop(s) and     in_mac_eop(s) and     in_mac_pkt_cont(s)) or
                                 (not in_mac_sop(s) and not in_mac_eop(s) and     in_mac_pkt_cont(s));
 
         in_mac_seg_vld(s) <= in_mac_sop(s) or in_mac_eop(s) or in_mac_pkt_cont(s);
@@ -211,24 +211,24 @@ begin
         IMPLEMENTATION => "parallel"
     )
     port map (
-        CLK              => CLK  ,
+        CLK              => CLK,
         RESET            => RESET,
 
-        RX_DATA          => reg1_mac_data   ,
-        RX_META          => reg1_mac_error  ,
-        RX_SOF_POS       => (others => '0') ,
+        RX_DATA          => reg1_mac_data,
+        RX_META          => reg1_mac_error,
+        RX_SOF_POS       => (others => '0'),
         RX_EOF_POS       => reg1_mac_eop_pos,
-        RX_SOF           => reg1_mac_sop    ,
-        RX_EOF           => reg1_mac_eop    ,
+        RX_SOF           => reg1_mac_sop,
+        RX_EOF           => reg1_mac_eop,
         RX_SRC_RDY       => reg1_mac_src_rdy,
-        RX_DST_RDY       => open            ,
+        RX_DST_RDY       => open,
 
-        TX_DATA          => tx_mfb_lng_data   ,
-        TX_META          => tx_mfb_lng_error  ,
-        TX_SOF_POS       => open              ,
+        TX_DATA          => tx_mfb_lng_data,
+        TX_META          => tx_mfb_lng_error,
+        TX_SOF_POS       => open,
         TX_EOF_POS       => tx_mfb_lng_eop_pos,
-        TX_SOF           => tx_mfb_lng_sop    ,
-        TX_EOF           => tx_mfb_lng_eop    ,
+        TX_SOF           => tx_mfb_lng_sop,
+        TX_EOF           => tx_mfb_lng_eop,
         TX_SRC_RDY       => tx_mfb_lng_src_rdy,
         TX_DST_RDY       => '1',
 
@@ -243,7 +243,7 @@ begin
         tx_mfb_lng_undersized (s) <= '1' when ((tx_mfb_lng_bytes_count(s) < 60) and (tx_mfb_lng_eop(s) = '1')) else '0';
     end generate;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (tx_mfb_lng_src_rdy = '1') then
@@ -283,18 +283,18 @@ begin
         OUTPUT_REG   => false
     )
     port map (
-        CLK      => CLK  ,
+        CLK      => CLK,
         RESET    => RESET,
 
         DIN      => tx_mfb_lng_undersized,
         DIN_MASK => (others => '1'),
-        DIN_VLD  => '1'            ,
+        DIN_VLD  => '1',
 
         DOUT     => discarded_pkts,
         DOUT_VLD => open
     );
 
-    process(all)
+    process (all)
         variable dis_bytes_count : unsigned(max(6, log2(2*SEGMENTS*8))-1 downto 0);
     begin
         dis_bytes_count := (others => '0');
@@ -306,7 +306,7 @@ begin
         discarded_bytes <= std_logic_vector(dis_bytes_count);
     end process;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (RESET = '1') then
@@ -324,7 +324,7 @@ begin
     -- ========================================================================
     -- Is the first packet in the previous word (tx_mfb_lng_*) undersized?
     -- Then mask last SOP in the current word (reg2_mac_*)!
-    process(all)
+    process (all)
     begin
         first_pkt_undersized <= '0';
         for s in 0 to SEGMENTS-1 loop
@@ -341,7 +341,7 @@ begin
         -- init
         reg2_mac_sop_masked <= reg2_mac_sop;
         reg2_mac_eop_masked <= reg2_mac_eop;
-        mask_sop := '0';
+        mask_sop            := '0';
         if ((tx_mfb_lng_cof(0) = '1') and (first_pkt_undersized = '1')) then
             mask_sop := '1';
         end if;
@@ -350,12 +350,12 @@ begin
             -- mask the current EOP
             if (reg2_undersized(s) = '1') then
                 reg2_mac_eop_masked(s) <= '0';
-                mask_sop := '1';
+                mask_sop               := '1';
             end if;
             -- mask the following SOP
             if ((mask_sop = '1') and (reg2_mac_sop(s) = '1')) then
                 reg2_mac_sop_masked(s) <= '0';
-                mask_sop := '0';
+                mask_sop               := '0';
             end if;
         end loop;
     end process;
@@ -366,7 +366,7 @@ begin
     -- ========================================================================
     -- Convert to MFB
     -- ========================================================================
-    one_segment_opt_g : if SEGMENTS>1 generate
+    one_segment_opt_g : if SEGMENTS > 1 generate
         sig1_mfb_g : for i in 0 to REGIONS-1 generate
             sig1_mfb_sof(i) <= or reg2_mac_sop_masked((i+1)*REGION_SIZE-1 downto i*REGION_SIZE);
             sig1_mfb_eof(i) <= or reg2_mac_eop_masked((i+1)*REGION_SIZE-1 downto i*REGION_SIZE);
@@ -416,8 +416,8 @@ begin
     end generate;
 
     sig1_mfb_pkt_cont_g : for r in 0 to REGIONS-1 generate
-        sig1_mfb_pkt_cont(r+1) <= (    sig1_mfb_sof(r) and not sig1_mfb_eof(r) and not sig1_mfb_pkt_cont(r)) or
-                                  (    sig1_mfb_sof(r) and     sig1_mfb_eof(r) and     sig1_mfb_pkt_cont(r)) or
+        sig1_mfb_pkt_cont(r+1) <= (sig1_mfb_sof(r) and not sig1_mfb_eof(r) and not sig1_mfb_pkt_cont(r)) or
+                                  (sig1_mfb_sof(r) and     sig1_mfb_eof(r) and     sig1_mfb_pkt_cont(r)) or
                                   (not sig1_mfb_sof(r) and not sig1_mfb_eof(r) and     sig1_mfb_pkt_cont(r));
 
         sig1_mfb_vld(r) <= sig1_mfb_sof(r) or sig1_mfb_eof(r) or sig1_mfb_pkt_cont(r);

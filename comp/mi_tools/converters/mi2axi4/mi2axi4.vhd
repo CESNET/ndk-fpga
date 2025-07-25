@@ -10,7 +10,7 @@ use IEEE.numeric_std.all;
 
 -- This component converts MI interface (slave) to AXI4 interface (master).
 entity MI2AXI4 is
-    generic(
+    generic (
         -- MI data word width in bits, must be 32
         MI_DATA_WIDTH  : natural  := 32;
         -- AXI data word width in bits, 32 or 64
@@ -22,7 +22,7 @@ entity MI2AXI4 is
         -- Target device
         DEVICE         : string  := "AGILEX"
     );
-    port(
+    port (
         -- =====================================================================
         -- Clock and Reset
         -- =====================================================================
@@ -80,7 +80,7 @@ end entity;
 
 architecture FULL of MI2AXI4 is
 
-    type fsm_states is (st_idle, st_read, st_read_resp, st_write, st_write_data, st_write_resp);
+    type fsm_states is (ST_IDLE, ST_READ, ST_READ_RESP, ST_WRITE, ST_WRITE_DATA, ST_WRITE_RESP);
 
     signal fsm_pstate  : fsm_states;
     signal fsm_nstate  : fsm_states;
@@ -103,12 +103,12 @@ begin
     AXI_BREADY  <= '1';
     AXI_RREADY  <= '1';
 
-    mi_drd_axi64_g: if AXI_DATA_WIDTH=64 generate
+    mi_drd_axi64_g: if AXI_DATA_WIDTH = 64 generate
         MI_DRD <= AXI_RDATA(2*MI_DATA_WIDTH-1 downto MI_DATA_WIDTH) when (AXI_ARADDR(2) = '1') else
                   AXI_RDATA(MI_DATA_WIDTH-1 downto 0);
     end generate;
 
-    mi_drd_axi32_g: if AXI_DATA_WIDTH=32 generate
+    mi_drd_axi32_g: if AXI_DATA_WIDTH = 32 generate
         MI_DRD <= AXI_RDATA(MI_DATA_WIDTH-1 downto 0);
     end generate;
 
@@ -126,7 +126,7 @@ begin
             if (mi_wr_valid = '1') then
                 AXI_WSTRB <= (others => '0');
                 AXI_WDATA <= (others => '0');
-                if (MI_ADDR(2) = '1' and AXI_DATA_WIDTH=64) then
+                if (MI_ADDR(2) = '1' and AXI_DATA_WIDTH = 64) then
                     AXI_WSTRB(2*(MI_DATA_WIDTH/8)-1 downto (MI_DATA_WIDTH/8)) <= MI_BE;
                     AXI_WDATA(2*MI_DATA_WIDTH-1 downto MI_DATA_WIDTH)         <= MI_DWR;
                 else
@@ -141,7 +141,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                fsm_pstate <= st_idle;
+                fsm_pstate <= ST_IDLE;
             else
                 fsm_pstate <= fsm_nstate;
             end if;
@@ -158,45 +158,45 @@ begin
         AXI_ARVALID <= '0';
 
         case (fsm_pstate) is
-            when st_idle =>
+            when ST_IDLE =>
                 MI_ARDY <= '1';
                 if (MI_WR = '1') then
-                    fsm_nstate <= st_write;
+                    fsm_nstate <= ST_WRITE;
                 elsif (MI_RD = '1') then
-                    fsm_nstate <= st_read;
+                    fsm_nstate <= ST_READ;
                 end if;
 
-            when st_write =>
+            when ST_WRITE =>
                 AXI_AWVALID <= '1';
                 if (AXI_AWREADY = '1') then
-                    fsm_nstate <= st_write_data;
+                    fsm_nstate <= ST_WRITE_DATA;
                 end if;
 
-            when st_write_data =>
+            when ST_WRITE_DATA =>
                 AXI_WVALID <= '1';
                 if (AXI_WREADY = '1') then
-                    fsm_nstate <= st_write_resp;
+                    fsm_nstate <= ST_WRITE_RESP;
                 end if;
 
-            when st_write_resp =>
+            when ST_WRITE_RESP =>
                 if (AXI_BVALID = '1') then
-                    fsm_nstate <= st_idle;
+                    fsm_nstate <= ST_IDLE;
                 end if;
 
-            when st_read =>
+            when ST_READ =>
                 AXI_ARVALID <= '1';
                 if (AXI_ARREADY = '1') then
-                    fsm_nstate <= st_read_resp;
+                    fsm_nstate <= ST_READ_RESP;
                 end if;
 
-            when st_read_resp =>
+            when ST_READ_RESP =>
                 if (AXI_RVALID = '1') then
                     MI_DRDY    <= '1';
-                    fsm_nstate <= st_idle;
+                    fsm_nstate <= ST_IDLE;
                 end if;
 
             when others =>
-                fsm_nstate <= st_idle;
+                fsm_nstate <= ST_IDLE;
 
         end case;
     end process;

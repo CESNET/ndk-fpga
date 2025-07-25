@@ -20,11 +20,11 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity ETH_AVST_ADAPTER_SHAKEDOWN is
-    generic(
+    generic (
         DATA_WIDTH     : natural := 512;
         TX_REGION_SIZE : natural := DATA_WIDTH/64
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK               : in  std_logic;
         RESET             : in  std_logic;
@@ -34,7 +34,7 @@ entity ETH_AVST_ADAPTER_SHAKEDOWN is
         IN_MFB_EOF        : in std_logic;
         IN_MFB_EOF_POS    : in std_logic_vector(max(1,log2(TX_REGION_SIZE*8))-1 downto 0);
         IN_MFB_ERROR      : in std_logic_vector(1-1 downto 0) := (others => '0'); -- aligned to EOF
-        IN_MFB_UNDERSIZED : in std_logic; -- aligned to EOF
+        IN_MFB_UNDERSIZED : in std_logic;                                         -- aligned to EOF
         IN_MFB_SRC_RDY    : in std_logic;
         -- OUTPUT MFB INTERFACE
         OUT_MFB_DATA      : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -42,7 +42,7 @@ entity ETH_AVST_ADAPTER_SHAKEDOWN is
         OUT_MFB_SOF_POS   : out std_logic_vector(max(1,log2(TX_REGION_SIZE))-1 downto 0);
         OUT_MFB_EOF       : out std_logic_vector(1-1 downto 0);
         OUT_MFB_EOF_POS   : out std_logic_vector(max(1,log2(TX_REGION_SIZE*8))-1 downto 0);
-        OUT_MFB_ERROR     : out std_logic_vector(1-1 downto 0); -- aligned to EOF
+        OUT_MFB_ERROR     : out std_logic_vector(1-1 downto 0);                   -- aligned to EOF
         OUT_MFB_SRC_RDY   : out std_logic
     );
 end entity;
@@ -65,12 +65,12 @@ architecture FULL of ETH_AVST_ADAPTER_SHAKEDOWN is
     -- ========================================================================
     --                              Signals
     -- ========================================================================
-    signal IN_MFB_DATA_arr               : slv_array_t     (COMPR_ITEMS-1 downto 0)(INT_BLOCK_WIDTH-1 downto 0);
+    signal in_mfb_data_arr               : slv_array_t     (COMPR_ITEMS-1 downto 0)(INT_BLOCK_WIDTH-1 downto 0);
     signal last_valid_block              : unsigned        (max(1,log2(COMPR_ITEMS))-1 downto 0);
     signal last_valid_item               : unsigned        (max(1,log2(INT_BLOCK_SIZE))-1 downto 0);
-    signal IN_MFB_SOF_arr                : std_logic_vector(COMPR_ITEMS-1 downto 0);
-    signal IN_MFB_EOF_arr                : std_logic_vector(COMPR_ITEMS-1 downto 0);
-    signal IN_MFB_ERROR_arr              : std_logic_vector(COMPR_ITEMS-1 downto 0);
+    signal in_mfb_sof_arr                : std_logic_vector(COMPR_ITEMS-1 downto 0);
+    signal in_mfb_eof_arr                : std_logic_vector(COMPR_ITEMS-1 downto 0);
+    signal in_mfb_error_arr              : std_logic_vector(COMPR_ITEMS-1 downto 0);
 
     signal compr_in_data_arr             : slv_array_t     (COMPR_ITEMS-1 downto 0)(COMPR_ITEM_WIDTH-1 downto 0);
     signal compr_in_data                 : std_logic_vector(COMPR_ITEMS*            COMPR_ITEM_WIDTH-1 downto 0);
@@ -118,11 +118,11 @@ begin
     -- ========================================================================
     --  Input logic
     -- ========================================================================
-    IN_MFB_DATA_arr <= slv_array_deser(IN_MFB_DATA, COMPR_ITEMS);
+    in_mfb_data_arr <= slv_array_deser(IN_MFB_DATA, COMPR_ITEMS);
 
-    last_valid_block_item_p : process(all)
+    last_valid_block_item_p : process (all)
     begin
-        last_valid_block <= resize_right(unsigned(IN_MFB_EOF_POS), log2(COMPR_ITEMS)); -- first few bits of EOF_POS indicate BLOCK
+        last_valid_block <= resize_right(unsigned(IN_MFB_EOF_POS), log2(COMPR_ITEMS));    -- first few bits of EOF_POS indicate BLOCK
         last_valid_item  <= resize_left (unsigned(IN_MFB_EOF_POS), log2(INT_BLOCK_SIZE)); -- last few bits of EOF_POS indicate ITEM
         if ((IN_MFB_UNDERSIZED = '1') and (IN_MFB_EOF = '1')) then
             last_valid_block <= to_unsigned(COMPR_ITEMS-1, max(1,log2(COMPR_ITEMS)));
@@ -130,16 +130,16 @@ begin
         end if;
     end process;
 
-    in_sof_eof_p: process(all)
+    in_sof_eof_p : process (all)
     begin
         -- assign sof only to the first BLOCK -> serves to identify sof_pos at shakedown's output
-        IN_MFB_SOF_arr    <= (others => '0');
-        IN_MFB_SOF_arr(0) <= IN_MFB_SOF and IN_MFB_SRC_RDY;
+        in_mfb_sof_arr                               <= (others => '0');
+        in_mfb_sof_arr(0)                            <= IN_MFB_SOF and IN_MFB_SRC_RDY;
         -- assign eof only to the last BLOCK -> serves as first 2 bits of eof_pos (indicates BLOCK)
-        IN_MFB_EOF_arr                               <= (others => '0');
-        IN_MFB_EOF_arr(to_integer(last_valid_block)) <= IN_MFB_EOF and IN_MFB_SRC_RDY;
+        in_mfb_eof_arr                               <= (others => '0');
+        in_mfb_eof_arr(to_integer(last_valid_block)) <= IN_MFB_EOF and IN_MFB_SRC_RDY;
         -- error is only valid with EOF
-        IN_MFB_ERROR_arr <= (others => (IN_MFB_ERROR(0) and IN_MFB_EOF));
+        in_mfb_error_arr                             <= (others => (IN_MFB_ERROR(0) and IN_MFB_EOF));
     end process;
 
     -- ========================================================================
@@ -147,7 +147,7 @@ begin
     -- ========================================================================
     compr_in_data_g : for i in COMPR_ITEMS-1 downto 0 generate
         --                       data               & sof               & eof               & last 4 bits of EOF_POS            & error
-        compr_in_data_arr(i) <= IN_MFB_DATA_arr(i) & IN_MFB_SOF_arr(i) & IN_MFB_EOF_arr(i) & std_logic_vector(last_valid_item) & IN_MFB_ERROR_arr(i);
+        compr_in_data_arr(i) <= in_mfb_data_arr(i) & in_mfb_sof_arr(i) & in_mfb_eof_arr(i) & std_logic_vector(last_valid_item) & in_mfb_error_arr(i);
     end generate;
     compr_in_data <= slv_array_ser(compr_in_data_arr);
 
@@ -158,15 +158,15 @@ begin
     end generate;
 
     -- Input regs -------------------------------------------------------------
-    shakedown_in_regs: process(CLK)
+    shakedown_in_regs : process (CLK)
     begin
         if rising_edge(CLK) then
             compr_in_data_reg0            <= compr_in_data;
-            compr_in_last_reg0            <= IN_MFB_EOF_arr;
+            compr_in_last_reg0            <= in_mfb_eof_arr;
             compr_in_valid_per_block_reg0 <= compr_in_valid_per_block;
 
             if (RESET = '1') then
-                compr_in_last_reg0 <= (others => '0');
+                compr_in_last_reg0            <= (others => '0');
                 compr_in_valid_per_block_reg0 <= (others => '0');
                 compr_in_valid_per_block_reg1 <= (others => '0');
             end if;
@@ -174,11 +174,11 @@ begin
     end process;
 
     compress_i : entity work.EASA_COMPRESSOR_LITE
-    generic map(
+    generic map (
         ITEMS      => COMPR_ITEMS,
         ITEM_WIDTH => COMPR_ITEM_WIDTH
     )
-    port map(
+    port map (
         CLK     => CLK,
         RESET   => RESET,
         RX_DATA => compr_in_data_reg0,
@@ -198,7 +198,7 @@ begin
     end generate;
 
     -- Output regs ------------------------------------------------------------
-    shakedown_out_regs : process(CLK)
+    shakedown_out_regs : process (CLK)
     begin
         if rising_edge(CLK) then
             mfb_data_arr_reg2         <= mfb_data_arr;
@@ -230,7 +230,7 @@ begin
 
     mfb_sof(0) <= or (mfb_sof_arr_reg3);
 
-    out_sof_pos_p : process(all)
+    out_sof_pos_p : process (all)
     begin
         mfb_sof_pos <= (others => '0');
         for i in COMPR_ITEMS-1 downto 0 loop
@@ -243,7 +243,7 @@ begin
 
     mfb_eof(0) <= or (mfb_eof_arr_reg3);
 
-    out_eof_pos_p : process(all)
+    out_eof_pos_p : process (all)
     begin
         mfb_eof_pos <= (others => '0');
         mfb_error   <= (others => '0');

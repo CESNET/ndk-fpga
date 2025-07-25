@@ -14,9 +14,9 @@ use work.math_pack.all;
 -- (Byte Enable with arbitrary width.)
 --
 entity SDP_BRAM_BE is
-    Generic (
+    generic (
         -- Use Block Enable
-        BLOCK_ENABLE   : boolean := False;
+        BLOCK_ENABLE    : boolean := False;
         -- Width of Block enabled by signal WR_BE
         -- Use multiples of 8 or 9 for highest effectivness
         BLOCK_WIDTH     : integer := 8;
@@ -33,7 +33,7 @@ entity SDP_BRAM_BE is
         METADATA_WIDTH : integer := 0;
         DEVICE         : string := "ULTRASCALE"
     );
-    Port (
+    port (
         -- =========================================================================================
         -- SDP_BRAM ports
         --
@@ -71,7 +71,7 @@ architecture FULL of SDP_BRAM_BE is
         -- Count number of bits to the closet multiple of 8 and 9
         mod_8 := (8 - mod_8) mod 8;
         mod_9 := (9 - mod_9) mod 9;
-        if (mod_9<mod_8) then
+        if (mod_9 < mod_8) then
             return 9;
         end if;
         return 8;
@@ -92,7 +92,7 @@ begin
         report "SDP_BRAM: Illegal value of DATA_WIDTH (" & integer'image(DATA_WIDTH) & ") and BLOCK_WIDTH (" & integer'image(BLOCK_WIDTH) & ") parameters. When BLOCK_ENABLE is True, DATA_WIDTH parameter must be N*BLOCK_WIDTH!"
         severity failure;
 
-    --assert (false)
+    -- assert (false)
     --    report "DATA_WIDTH (" & integer'image(DATA_WIDTH) & " BLOCK_WIDTH (" & integer'image(BLOCK_WIDTH) & " INTERNAL_BLOCK_WIDTH (" & integer'image(INTERNAL_BLOCK_WIDTH) & " BLOCKS (" & integer'image(BLOCKS) & " SUBBLOCKS (" & integer'image(SUBBLOCKS)
     --    severity note;
 
@@ -102,7 +102,7 @@ begin
         internal_wr_be   <= (others => '0');
         internal_wr_data <= (others => '0');
         for i in 0 to BLOCKS-1 loop
-            internal_wr_be((i+1)*SUBBLOCKS-1 downto i*SUBBLOCKS) <= (others => WR_BE(i));
+            internal_wr_be((i+1)*SUBBLOCKS-1 downto i*SUBBLOCKS)                                                     <= (others => WR_BE(i));
             internal_wr_data(i*SUBBLOCKS*INTERNAL_BLOCK_WIDTH+BLOCK_WIDTH-1 downto i*SUBBLOCKS*INTERNAL_BLOCK_WIDTH) <= WR_DATA((i+1)*BLOCK_WIDTH-1 downto i*BLOCK_WIDTH);
         end loop;
     end process;
@@ -111,30 +111,30 @@ begin
     internal_sdp_bram_i : entity work.SDP_BRAM
     generic map (
         DATA_WIDTH     => BLOCKS*SUBBLOCKS*INTERNAL_BLOCK_WIDTH,
-        ITEMS          => ITEMS                                ,
-        BLOCK_ENABLE   => BLOCK_ENABLE                         ,
-        BLOCK_WIDTH    => INTERNAL_BLOCK_WIDTH                 ,
-        COMMON_CLOCK   => COMMON_CLOCK                         ,
-        OUTPUT_REG     => OUTPUT_REG                           ,
-        METADATA_WIDTH => METADATA_WIDTH                       ,
+        ITEMS          => ITEMS,
+        BLOCK_ENABLE   => BLOCK_ENABLE,
+        BLOCK_WIDTH    => INTERNAL_BLOCK_WIDTH,
+        COMMON_CLOCK   => COMMON_CLOCK,
+        OUTPUT_REG     => OUTPUT_REG,
+        METADATA_WIDTH => METADATA_WIDTH,
         DEVICE         => DEVICE
     )
     port map (
-        WR_CLK      => WR_CLK          ,
-        WR_RST      => WR_RST          ,
-        WR_EN       => WR_EN           ,
-        WR_BE       => internal_wr_be  ,
-        WR_ADDR     => WR_ADDR         ,
+        WR_CLK      => WR_CLK,
+        WR_RST      => WR_RST,
+        WR_EN       => WR_EN,
+        WR_BE       => internal_wr_be,
+        WR_ADDR     => WR_ADDR,
         WR_DATA     => internal_wr_data,
 
-        RD_CLK      => RD_CLK          ,
-        RD_RST      => RD_RST          ,
-        RD_EN       => RD_EN           ,
-        RD_PIPE_EN  => RD_PIPE_EN      ,
-        RD_META_IN  => RD_META_IN      ,
-        RD_ADDR     => RD_ADDR         ,
+        RD_CLK      => RD_CLK,
+        RD_RST      => RD_RST,
+        RD_EN       => RD_EN,
+        RD_PIPE_EN  => RD_PIPE_EN,
+        RD_META_IN  => RD_META_IN,
+        RD_ADDR     => RD_ADDR,
         RD_DATA     => internal_rd_data,
-        RD_META_OUT => RD_META_OUT     ,
+        RD_META_OUT => RD_META_OUT,
         RD_DATA_VLD => RD_DATA_VLD
     );
 

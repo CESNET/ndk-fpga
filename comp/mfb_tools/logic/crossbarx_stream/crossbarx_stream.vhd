@@ -28,141 +28,141 @@ use work.type_pack.all;
 -- The instructions consist of a transaction's length, its address in the
 -- Input buffer, and in the Output buffer.
 entity CROSSBARX_STREAM is
-generic(
-    -- Clock settings for 1) CrossbarX and 2) Output buffer
-    -- 1) CrossbarX
-    -- Transfer data on double frequency Clock.
-    CX_USE_CLK2           : boolean := true;
-    -- Transfer data on arbitrary frequency Clock.
-    -- (Overrides CX_USE_CLK2 when set to True.)
-    -- See entity of CrossbarX for more detail.
-    CX_USE_CLK_ARB        : boolean := false;
-    -- 2) Output buffer
-    -- Set True when RX_CLK has the same period as TX_CLK.
-    OBUF_META_EQ_OUTPUT   : boolean := false;
-    -- Set True when not using CLK2 or CLK_ARB and
-    -- RX_CLK has the same period as TX_CLK.
-    OBUF_INPUT_EQ_OUTPUT  : boolean := false;
+    generic (
+        -- Clock settings for 1) CrossbarX and 2) Output buffer
+        -- 1) CrossbarX
+        -- Transfer data on double frequency Clock.
+        CX_USE_CLK2           : boolean := true;
+        -- Transfer data on arbitrary frequency Clock.
+        -- (Overrides CX_USE_CLK2 when set to True.)
+        -- See entity of CrossbarX for more detail.
+        CX_USE_CLK_ARB        : boolean := false;
+        -- 2) Output buffer
+        -- Set True when RX_CLK has the same period as TX_CLK.
+        OBUF_META_EQ_OUTPUT   : boolean := false;
+        -- Set True when not using CLK2 or CLK_ARB and
+        -- RX_CLK has the same period as TX_CLK.
+        OBUF_INPUT_EQ_OUTPUT  : boolean := false;
 
-    -- Number of Regions within a data word, must be power of 2.
-    MFB_REGIONS           : natural := 4;
-    -- Region size (in Blocks).
-    MFB_REGION_SIZE       : natural := 8;
-    -- Block size (in Items).
-    MFB_BLOCK_SIZE        : natural := 8;
-    -- Item width (in bits), must be 8.
-    MFB_ITEM_WIDTH        : natural := 8;
-    -- Width of MFB metadata (in bits).
-    MFB_META_WIDTH        : natural := 1;
+        -- Number of Regions within a data word, must be power of 2.
+        MFB_REGIONS           : natural := 4;
+        -- Region size (in Blocks).
+        MFB_REGION_SIZE       : natural := 8;
+        -- Block size (in Items).
+        MFB_BLOCK_SIZE        : natural := 8;
+        -- Item width (in bits), must be 8.
+        MFB_ITEM_WIDTH        : natural := 8;
+        -- Width of MFB metadata (in bits).
+        MFB_META_WIDTH        : natural := 1;
 
-    -- Maximum packet size in MFB ITEMS.
-    PKT_MTU               : natural := 1024;
+        -- Maximum packet size in MFB ITEMS.
+        PKT_MTU               : natural := 1024;
 
-    -- Number of maximum sized packets in Input and Output buffer
-    -- MUST be a power of 2
-    -- (4 -> ~150 Gb/s, 8 -> ~400 Gb/s)
-    NUM_OF_PKTS           : natural := 4;
+        -- Number of maximum sized packets in Input and Output buffer
+        -- MUST be a power of 2
+        -- (4 -> ~150 Gb/s, 8 -> ~400 Gb/s)
+        NUM_OF_PKTS           : natural := 4;
 
-    -- Maximum number of Transaction waiting for data transfer.
-    -- Setting this value too low will lead to lower throughput,
-    -- which should trigger a simulation assert warning in component CrossbarX.
-    TRANS_FIFO_SIZE       : natural := 64;
+        -- Maximum number of Transaction waiting for data transfer.
+        -- Setting this value too low will lead to lower throughput,
+        -- which should trigger a simulation assert warning in component CrossbarX.
+        TRANS_FIFO_SIZE       : natural := 64;
 
-    -- CrossbarX Stream functions setup ------------------------------------
-    -- Insert gaps of defined size between packets.
-    -- When set to False, the smallest possible gap is used.
-    F_GAP_ADJUST_EN       : boolean := false;
-    -- Required average gap after every packet in MFB ITEMS.
-    -- Differences in gaps are calculated according to the Deficit Idle Count algorithm.
-    -- If AVG size is equal to MIN size, all gap sizes will be greater or equal to MIN size.
-    -- MUST be greater or equal to F_GAP_ADJUST_SIZE_MIN!
-    F_GAP_ADJUST_SIZE_AVG : natural := 24;
-    -- MUST be greater or equal to MFB_BLOCK_SIZE!
-    F_GAP_ADJUST_SIZE_MIN : natural := 24;
+        -- CrossbarX Stream functions setup ------------------------------------
+        -- Insert gaps of defined size between packets.
+        -- When set to False, the smallest possible gap is used.
+        F_GAP_ADJUST_EN       : boolean := false;
+        -- Required average gap after every packet in MFB ITEMS.
+        -- Differences in gaps are calculated according to the Deficit Idle Count algorithm.
+        -- If AVG size is equal to MIN size, all gap sizes will be greater or equal to MIN size.
+        -- MUST be greater or equal to F_GAP_ADJUST_SIZE_MIN!
+        F_GAP_ADJUST_SIZE_AVG : natural := 24;
+        -- MUST be greater or equal to MFB_BLOCK_SIZE!
+        F_GAP_ADJUST_SIZE_MIN : natural := 24;
 
-    -- Enable to extend (or shrink) packets at the front.
-    F_EXTEND_START_EN     : boolean := false;
-    -- In MFB ITEMS, negative number for packet shrinking.
-    F_EXTEND_START_SIZE   : integer := -4;
+        -- Enable to extend (or shrink) packets at the front.
+        F_EXTEND_START_EN     : boolean := false;
+        -- In MFB ITEMS, negative number for packet shrinking.
+        F_EXTEND_START_SIZE   : integer := -4;
 
-    -- Enable to extend (or shrink) packets at the back.
-    F_EXTEND_END_EN       : boolean := false;
-    -- In MFB ITEMS, negative number for packet shrinking.
-    F_EXTEND_END_SIZE     : integer := -5;
+        -- Enable to extend (or shrink) packets at the back.
+        F_EXTEND_END_EN       : boolean := false;
+        -- In MFB ITEMS, negative number for packet shrinking.
+        F_EXTEND_END_SIZE     : integer := -5;
 
-    -- FPGA device name: ULTRASCALE, STRATIX10, ..
-    DEVICE                : string := "STRATIX10"
-);
-port(
-    -- =====================================================================
-    --  Clock and Reset
-    -- =====================================================================
+        -- FPGA device name: ULTRASCALE, STRATIX10, ..
+        DEVICE                : string := "STRATIX10"
+    );
+    port (
+        -- =====================================================================
+        --  Clock and Reset
+        -- =====================================================================
 
-    RX_CLK         : in  std_logic;
-    -- Double frequency and same source as RX_CLK
-    -- Only used when CX_USE_CLK2==True and CX_USE_CLK_ARB==False
-    RX_CLK2        : in  std_logic;
-    RX_RESET       : in  std_logic;
-    TX_CLK         : in  std_logic;
-    TX_RESET       : in  std_logic;
-    -- Arbitrary Clock and Reset for CrossbarX, only used when CX_USE_CLK_ARB==True
-    CX_CLK_ARB     : in  std_logic;
-    CX_RESET_ARB   : in  std_logic;
+        RX_CLK         : in  std_logic;
+        -- Double frequency and same source as RX_CLK
+        -- Only used when CX_USE_CLK2==True and CX_USE_CLK_ARB==False
+        RX_CLK2        : in  std_logic;
+        RX_RESET       : in  std_logic;
+        TX_CLK         : in  std_logic;
+        TX_RESET       : in  std_logic;
+        -- Arbitrary Clock and Reset for CrossbarX, only used when CX_USE_CLK_ARB==True
+        CX_CLK_ARB     : in  std_logic;
+        CX_RESET_ARB   : in  std_logic;
 
-    -- =====================================================================
-    --  RX MFB STREAM
-    -- =====================================================================
+        -- =====================================================================
+        --  RX MFB STREAM
+        -- =====================================================================
 
-    RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- valid with EOF
-    RX_MFB_META    : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
-    -- valid with EOF
-    RX_MFB_DISCARD : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SRC_RDY : in  std_logic;
-    RX_MFB_DST_RDY : out std_logic;
+        RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- valid with EOF
+        RX_MFB_META    : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
+        -- valid with EOF
+        RX_MFB_DISCARD : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SRC_RDY : in  std_logic;
+        RX_MFB_DST_RDY : out std_logic;
 
-    -- =====================================================================
-    --  TX MFB STREAM
-    -- =====================================================================
+        -- =====================================================================
+        --  TX MFB STREAM
+        -- =====================================================================
 
-    TX_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- valid with EOF
-    TX_MFB_META    : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
-    TX_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    TX_MFB_SOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_EOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_SRC_RDY : out std_logic;
-    TX_MFB_DST_RDY : in  std_logic
-);
+        TX_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- valid with EOF
+        TX_MFB_META    : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
+        TX_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        TX_MFB_SOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_EOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_SRC_RDY : out std_logic;
+        TX_MFB_DST_RDY : in  std_logic
+    );
 end entity;
 
 architecture FULL of CROSSBARX_STREAM is
 
-    function ALLOW_BLOCK_SIZE_1 return boolean is
+    function allow_block_size_1 return boolean is
     begin
-        --pragma synthesis_off
+        -- pragma synthesis_off
         return true;
-        --pragma synthesis_on
+        -- pragma synthesis_on
         return false;
     end function;
 
     -- Change DEVICE to "NONE" if this is a simulation
     -- altera_syncram does not work correctly in simulation in some configurations
     -- Using "NONE" device switches the memory to behavioral architecture
-    function SDP_BRAM_DEVICE return string is
+    function sdp_bram_device return string is
         variable dev0 : string(DEVICE'range) := DEVICE;
         variable dev1 : string(1 to 3) := "SIM";
     begin
-        --pragma synthesis_off
+        -- pragma synthesis_off
         if (DEVICE = "STRATIX10" or DEVICE = "ARRIA10") then
             return dev1;
         end if;
-        --pragma synthesis_on
+        -- pragma synthesis_on
         return dev0;
     end function;
 
@@ -405,7 +405,7 @@ begin
         severity failure;
 
     -- Some workaround should be created in the future
-    assert ((MFB_BLOCK_SIZE > 1) or ALLOW_BLOCK_SIZE_1)
+    assert ((MFB_BLOCK_SIZE > 1) or allow_block_size_1)
         report "Due to a bug in Vivado 2019, MFB_BLOCK_SIZE must be greater than 1."
         severity failure;
 
@@ -427,7 +427,7 @@ begin
     -- =====================================================================
     --  Clock and Reset selection for Read inf of Input buffer and Write inf of Output buffer, CrossbarX selects the Clock signal internally
     -- =====================================================================
-    cx_data_inf_clk   <= tsel(CX_USE_CLK_ARB, CX_CLK_ARB  , tsel(CX_USE_CLK2, RX_CLK2, RX_CLK));
+    cx_data_inf_clk   <= tsel(CX_USE_CLK_ARB, CX_CLK_ARB, tsel(CX_USE_CLK2, RX_CLK2, RX_CLK));
     cx_data_inf_reset <= tsel(CX_USE_CLK_ARB, CX_RESET_ARB, RX_RESET);
 
     -- =====================================================================
@@ -443,45 +443,45 @@ begin
     fr_len_rx_meta <= slv_array_ser(fr_len_rx_meta_arr);
 
     mfb_len_cnt_i : entity work.MFB_FRAME_LNG
-    generic map(
-        REGIONS        => MFB_REGIONS      ,
-        REGION_SIZE    => MFB_REGION_SIZE  ,
-        BLOCK_SIZE     => MFB_BLOCK_SIZE   ,
-        ITEM_WIDTH     => MFB_ITEM_WIDTH   ,
+    generic map (
+        REGIONS        => MFB_REGIONS,
+        REGION_SIZE    => MFB_REGION_SIZE,
+        BLOCK_SIZE     => MFB_BLOCK_SIZE,
+        ITEM_WIDTH     => MFB_ITEM_WIDTH,
         META_WIDTH     => FR_LEN_META_WIDTH,
-        LNG_WIDTH      => log2(PKT_MTU+1)  ,
-        REG_BITMAP     => "100"            ,
+        LNG_WIDTH      => log2(PKT_MTU+1),
+        REG_BITMAP     => "100",
         IMPLEMENTATION => "parallel"
     )
-        port map(
-        CLK          => RX_CLK             ,
-        RESET        => RX_RESET           ,
+    port map (
+        CLK          => RX_CLK,
+        RESET        => RX_RESET,
 
-        RX_DATA      => RX_MFB_DATA        ,
-        RX_META      => fr_len_rx_meta     ,
-        RX_SOF       => RX_MFB_SOF         ,
-        RX_EOF       => RX_MFB_EOF         ,
-        RX_SOF_POS   => RX_MFB_SOF_POS     ,
-        RX_EOF_POS   => RX_MFB_EOF_POS     ,
-        RX_SRC_RDY   => RX_MFB_SRC_RDY     ,
-        RX_DST_RDY   => RX_MFB_DST_RDY     ,
+        RX_DATA      => RX_MFB_DATA,
+        RX_META      => fr_len_rx_meta,
+        RX_SOF       => RX_MFB_SOF,
+        RX_EOF       => RX_MFB_EOF,
+        RX_SOF_POS   => RX_MFB_SOF_POS,
+        RX_EOF_POS   => RX_MFB_EOF_POS,
+        RX_SRC_RDY   => RX_MFB_SRC_RDY,
+        RX_DST_RDY   => RX_MFB_DST_RDY,
 
-        TX_DATA      => fr_len_tx_data     ,
-        TX_META      => fr_len_tx_meta     ,
-        TX_FRAME_LNG => fr_len_tx_length   ,
-        TX_SOF       => fr_len_tx_sof      ,
-        TX_EOF       => fr_len_tx_eof      ,
-        TX_SOF_POS   => fr_len_tx_sof_pos  ,
-        TX_EOF_POS   => open               ,
-        TX_SRC_RDY   => fr_len_tx_src_rdy  ,
-        TX_DST_RDY   => fr_len_tx_dst_rdy  ,
-        TX_COF       => open               ,
+        TX_DATA      => fr_len_tx_data,
+        TX_META      => fr_len_tx_meta,
+        TX_FRAME_LNG => fr_len_tx_length,
+        TX_SOF       => fr_len_tx_sof,
+        TX_EOF       => fr_len_tx_eof,
+        TX_SOF_POS   => fr_len_tx_sof_pos,
+        TX_EOF_POS   => open,
+        TX_SRC_RDY   => fr_len_tx_src_rdy,
+        TX_DST_RDY   => fr_len_tx_dst_rdy,
+        TX_COF       => open,
         TX_TEMP_LNG  => open
     );
 
     -- Note: 1 source 2 destinations situation - Frame length counter is the source,
-                                              -- RX buffer is destination 0,
-                                              -- Transaction generator is destination 1
+    -- RX buffer is destination 0,
+    -- Transaction generator is destination 1
     fr_len_tx_dst_rdy <= trgen_mfb_dst_rdy and (not rx_buf_full);
 
     -- =====================================================================
@@ -496,25 +496,25 @@ begin
     rx_buf_fifoxm_di <= slv_array_ser(rx_buf_ptr_with_discard_arr);
 
     fifox_multi_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH          => FIFOXM_DATA_WIDTH,
-        ITEMS               => 256              , -- number of ITEMS must be GREATER than UGEN_F_ITEMS (= 32) in CrossbarX
-        WRITE_PORTS         => MFB_REGIONS      ,
-        READ_PORTS          => MFB_REGIONS      ,
-        RAM_TYPE            => "AUTO"           ,
-        DEVICE              => DEVICE           ,
+        ITEMS               => 256, -- number of ITEMS must be GREATER than UGEN_F_ITEMS (= 32) in CrossbarX
+        WRITE_PORTS         => MFB_REGIONS,
+        READ_PORTS          => MFB_REGIONS,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
         SAFE_READ_MODE      => true
     )
-    port map(
-        CLK   => RX_CLK                         ,
-        RESET => RX_RESET                       ,
+    port map (
+        CLK   => RX_CLK,
+        RESET => RX_RESET,
 
-        DI     => rx_buf_fifoxm_di              ,
-        WR     => rx_buf_fifoxm_wr              ,
-        FULL   => rx_buf_fifoxm_full            ,
+        DI     => rx_buf_fifoxm_di,
+        WR     => rx_buf_fifoxm_wr,
+        FULL   => rx_buf_fifoxm_full,
 
-        DO     => rx_buf_fifoxm_do              ,
-        RD     => rx_buf_fifoxm_rd              ,
+        DO     => rx_buf_fifoxm_do,
+        RD     => rx_buf_fifoxm_rd,
         EMPTY  => rx_buf_fifoxm_empty
     );
 
@@ -530,8 +530,8 @@ begin
 
     -- FifoX multi read logic
     -- Note: 1 source 2 destinations situation - CX (crox_comp inf) is the source,
-                                              -- Fifox Multi (read inf) is destination 0,
-                                              -- Asfifox (write inf) is destination 1
+    -- Fifox Multi (read inf) is destination 0,
+    -- Asfifox (write inf) is destination 1
     fifox_rd_setup_p : process (all)
         variable pkt_sent_ptr : integer;
     begin
@@ -604,44 +604,44 @@ begin
     end generate;
     trgen_mfb_sof_vld <= fr_len_tx_sof;
 
-    trgen_mfb_meta_arr   <= slv_array_deser(fr_len_tx_meta  , MFB_REGIONS);
+    trgen_mfb_meta_arr   <= slv_array_deser(fr_len_tx_meta, MFB_REGIONS);
     trgen_mfb_length_arr <= slv_array_deser(fr_len_tx_length, MFB_REGIONS);
     trgen_mfb_eof_vld    <= fr_len_tx_eof;
 
     trgen_mfb_src_rdy    <= fr_len_tx_src_rdy and (not rx_buf_full);
 
     trans_gen_i : entity work.CROSSBARX_STREAM_TRANS_GEN
-    generic map(
-        MFB_REGIONS     => MFB_REGIONS             ,
-        MFB_REGION_SIZE => MFB_REGION_SIZE         ,
-        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE          ,
-        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH          ,
-        RX_BUF_WORDS    => RX_BUF_WORDS            ,
-        PKT_MTU         => PKT_MTU                 ,
-        META_WIDTH      => TRGEN_META_WIDTH        ,
+    generic map (
+        MFB_REGIONS     => MFB_REGIONS,
+        MFB_REGION_SIZE => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+        RX_BUF_WORDS    => RX_BUF_WORDS,
+        PKT_MTU         => PKT_MTU,
+        META_WIDTH      => TRGEN_META_WIDTH,
         DEVICE          => DEVICE
     )
-    port map(
-        CLK   => RX_CLK                            ,
-        RESET => RX_RESET                          ,
+    port map (
+        CLK   => RX_CLK,
+        RESET => RX_RESET,
 
-        RX_MFB_SOF_ADDR    => trgen_mfb_sof_addr   ,
+        RX_MFB_SOF_ADDR    => trgen_mfb_sof_addr,
         RX_MFB_SOF_POS     => trgen_mfb_sof_pos_arr,
-        RX_MFB_SOF_VLD     => trgen_mfb_sof_vld    ,
+        RX_MFB_SOF_VLD     => trgen_mfb_sof_vld,
 
-        RX_MFB_EOF_META    => trgen_mfb_meta_arr   ,
-        RX_MFB_EOF_LEN     => trgen_mfb_length_arr ,
-        RX_MFB_EOF_VLD     => trgen_mfb_eof_vld    ,
+        RX_MFB_EOF_META    => trgen_mfb_meta_arr,
+        RX_MFB_EOF_LEN     => trgen_mfb_length_arr,
+        RX_MFB_EOF_VLD     => trgen_mfb_eof_vld,
 
-        RX_MFB_SRC_RDY     => trgen_mfb_src_rdy    ,
-        RX_MFB_DST_RDY     => trgen_mfb_dst_rdy    ,
+        RX_MFB_SRC_RDY     => trgen_mfb_src_rdy,
+        RX_MFB_DST_RDY     => trgen_mfb_dst_rdy,
 
-        TX_TRANS_A_COL     => trgen_trans_a_col    ,
-        TX_TRANS_A_ITEM    => trgen_trans_a_item   ,
-        TX_TRANS_META      => trgen_trans_meta_arr ,
-        TX_TRANS_LEN       => trgen_trans_len_arr  ,
-        TX_TRANS_VLD       => trgen_trans_vld      ,
-        TX_TRANS_SRC_RDY   => trgen_trans_src_rdy  ,
+        TX_TRANS_A_COL     => trgen_trans_a_col,
+        TX_TRANS_A_ITEM    => trgen_trans_a_item,
+        TX_TRANS_META      => trgen_trans_meta_arr,
+        TX_TRANS_LEN       => trgen_trans_len_arr,
+        TX_TRANS_VLD       => trgen_trans_vld,
+        TX_TRANS_SRC_RDY   => trgen_trans_src_rdy,
         TX_TRANS_DST_RDY   => trgen_trans_dst_rdy
     );
 
@@ -660,12 +660,12 @@ begin
         trgen_trans_addr    (i) <= trgen_trans_a_col & trgen_trans_a_item(i);
         -- Shifting the RD address of RX Buffer by F_EXTEND_START_SIZE when shrinking packets from the front
         -- By doing this and by using the shortened pkt length, packets from RX Buffer will have the required part cut off from the front
-        trgen_trans_addr_mod(i) <= std_logic_vector(signed(trgen_trans_addr(i)) - tsel(F_EXTEND_START_EN and (F_EXTEND_START_SIZE<0), F_EXTEND_START_SIZE, 0));
+        trgen_trans_addr_mod(i) <= std_logic_vector(signed(trgen_trans_addr(i)) - tsel(F_EXTEND_START_EN and (F_EXTEND_START_SIZE < 0), F_EXTEND_START_SIZE, 0));
         pacp_rx_pkt_meta (0)(i) <= trgen_trans_mfb_meta(i) & trgen_trans_addr_mod(i);
 
         pacp_rx_pkt_len_mod1(0)(i) <= trgen_trans_len_arr(i);
         pacp_rx_pkt_len_mod2(0)(i) <= std_logic_vector(signed(pacp_rx_pkt_len_mod1(0)(i)) + tsel(F_EXTEND_START_EN, F_EXTEND_START_SIZE, 0));
-        pacp_rx_pkt_len_mod3(0)(i) <= std_logic_vector(signed(pacp_rx_pkt_len_mod2(0)(i)) + tsel(F_EXTEND_END_EN  , F_EXTEND_END_SIZE  , 0));
+        pacp_rx_pkt_len_mod3(0)(i) <= std_logic_vector(signed(pacp_rx_pkt_len_mod2(0)(i)) + tsel(F_EXTEND_END_EN, F_EXTEND_END_SIZE, 0));
 
         -- When there's a valid transaction at tr_gen's output with discard = '0'
         pacp_rx_pkt_vld(0)(i) <= rx_buf_fifoxm_wr(i) and (not trgen_trans_discard(i));
@@ -703,38 +703,38 @@ begin
     pacp_space_rd_ptr      <= std_logic_vector(resize_right(unsigned(tx_buf_rd_ptr_addr), pacp_space_rd_ptr'length));
 
     pkt_planner_i : entity work.PACKET_PLANNER
-    generic map(
-        DEVICE            => DEVICE               ,
-        STREAMS           => 1                    ,
-        PKTS              => MFB_REGIONS          ,
-        PLANNED_PKTS      => MFB_REGIONS          ,
-        METADATA_WIDTH    => PACP_META_WIDTH      ,
-        SPACE_SIZE        => PCAP_SPACE_SIZE      ,
-        PKT_SIZE          => PKT_MTU              ,
-        GAP_SIZE          => GAP_SIZE_AVG         ,
-        GAP_SIZE_MIN      => GAP_SIZE_MIN         ,
-        ALIGN             => MFB_BLOCK_SIZE       ,
-        FIFO_ITEMS        => 32                   ,
-        FIFO_AFULL_OFFSET => 1                    ,
-        STREAM_OUT_EN     => true                 ,
+    generic map (
+        DEVICE            => DEVICE,
+        STREAMS           => 1,
+        PKTS              => MFB_REGIONS,
+        PLANNED_PKTS      => MFB_REGIONS,
+        METADATA_WIDTH    => PACP_META_WIDTH,
+        SPACE_SIZE        => PCAP_SPACE_SIZE,
+        PKT_SIZE          => PKT_MTU,
+        GAP_SIZE          => GAP_SIZE_AVG,
+        GAP_SIZE_MIN      => GAP_SIZE_MIN,
+        ALIGN             => MFB_BLOCK_SIZE,
+        FIFO_ITEMS        => 32,
+        FIFO_AFULL_OFFSET => 1,
+        STREAM_OUT_EN     => true,
         GLOBAL_OUT_EN     => false
     )
-    port map(
-        CLK   => RX_CLK                           ,
-        RESET => RX_RESET                         ,
+    port map (
+        CLK   => RX_CLK,
+        RESET => RX_RESET,
 
-        RX_STR_PKT_META    => pacp_rx_pkt_meta    ,
+        RX_STR_PKT_META    => pacp_rx_pkt_meta,
         RX_STR_PKT_LEN     => pacp_rx_pkt_len_mod3,
-        RX_STR_PKT_VLD     => pacp_rx_pkt_vld     ,
-        RX_STR_PKT_SRC_RDY => pacp_rx_pkt_src_rdy ,
-        RX_STR_PKT_AFULL   => pacp_rx_pkt_afull   ,
+        RX_STR_PKT_VLD     => pacp_rx_pkt_vld,
+        RX_STR_PKT_SRC_RDY => pacp_rx_pkt_src_rdy,
+        RX_STR_PKT_AFULL   => pacp_rx_pkt_afull,
 
-        SPACE_GLB_RD_PTR   => pacp_space_rd_ptr   ,
+        SPACE_GLB_RD_PTR   => pacp_space_rd_ptr,
 
-        TX_STR_PKT_META    => pacp_tx_pkt_meta    ,
-        TX_STR_PKT_LEN     => pacp_tx_pkt_len     ,
-        TX_STR_PKT_ADDR    => pacp_tx_pkt_addr    ,
-        TX_STR_PKT_VLD     => pacp_tx_pkt_vld     ,
+        TX_STR_PKT_META    => pacp_tx_pkt_meta,
+        TX_STR_PKT_LEN     => pacp_tx_pkt_len,
+        TX_STR_PKT_ADDR    => pacp_tx_pkt_addr,
+        TX_STR_PKT_VLD     => pacp_tx_pkt_vld,
         TX_STR_PKT_DST_RDY => pacp_tx_pkt_dst_rdy
     );
 
@@ -747,10 +747,10 @@ begin
         pacp_tx_pkt_a_item(i) <= pacp_tx_pkt_meta(0)(i)(log2(BUF_ROWS*MFB_BLOCK_SIZE)-1 downto 0);
 
         pacp_tx_pkt_len_mod1(i) <= unsigned(pacp_tx_pkt_len(0)(i));
-        pacp_tx_pkt_len_mod2(i) <= pacp_tx_pkt_len_mod1(i) - tsel(F_EXTEND_START_EN and (F_EXTEND_START_SIZE>0), F_EXTEND_START_SIZE, 0);
-        pacp_tx_pkt_len_mod3(i) <= pacp_tx_pkt_len_mod2(i) - tsel(F_EXTEND_END_EN   and (F_EXTEND_END_SIZE>0)  , F_EXTEND_END_SIZE  , 0);
+        pacp_tx_pkt_len_mod2(i) <= pacp_tx_pkt_len_mod1(i) - tsel(F_EXTEND_START_EN and (F_EXTEND_START_SIZE > 0), F_EXTEND_START_SIZE, 0);
+        pacp_tx_pkt_len_mod3(i) <= pacp_tx_pkt_len_mod2(i) - tsel(F_EXTEND_END_EN   and (F_EXTEND_END_SIZE > 0), F_EXTEND_END_SIZE, 0);
 
-        pacp_tx_pkt_addr_mod(i) <= std_logic_vector(unsigned(pacp_tx_pkt_addr(0)(i)) + tsel(F_EXTEND_START_EN and (F_EXTEND_START_SIZE>0), F_EXTEND_START_SIZE, 0));
+        pacp_tx_pkt_addr_mod(i) <= std_logic_vector(unsigned(pacp_tx_pkt_addr(0)(i)) + tsel(F_EXTEND_START_EN and (F_EXTEND_START_SIZE > 0), F_EXTEND_START_SIZE, 0));
         gapc_trans_b_col    (i) <= pacp_tx_pkt_addr_mod(i)(pacp_tx_pkt_addr_mod(i)'high downto log2(BUF_ROWS*MFB_BLOCK_SIZE));
         gapc_trans_b_item   (i) <= pacp_tx_pkt_addr_mod(i)(log2(BUF_ROWS*MFB_BLOCK_SIZE)-1 downto 0);
     end generate;
@@ -839,29 +839,29 @@ begin
     input_buffer_gen : for i in 0 to BUF_ROWS-1 generate
 
         input_buffer_i : entity work.SDP_BRAM_BE
-        generic map(
-            DATA_WIDTH   => ROW_WIDTH        ,
-            ITEMS        => RX_BUF_WORDS     ,
-            BLOCK_ENABLE => true             ,
-            BLOCK_WIDTH  => MFB_BLOCK_SIZE   ,
+        generic map (
+            DATA_WIDTH   => ROW_WIDTH,
+            ITEMS        => RX_BUF_WORDS,
+            BLOCK_ENABLE => true,
+            BLOCK_WIDTH  => MFB_BLOCK_SIZE,
             COMMON_CLOCK => RX_BUF_COMMON_CLK,
-            OUTPUT_REG   => false            , -- register present in CrossbarX
+            OUTPUT_REG   => false, -- register present in CrossbarX
             DEVICE       => SDP_BRAM_DEVICE
         )
-        port map(
-            WR_CLK      => RX_CLK            ,
-            WR_RST      => RX_RESET          ,
-            WR_EN       => rx_buf_wr_en(i)   ,
-            WR_BE       => (others => '1')   ,
-            WR_ADDR     => rx_buf_wr_addr(i) ,
-            WR_DATA     => rx_buf_wr_data(i) ,
+        port map (
+            WR_CLK      => RX_CLK,
+            WR_RST      => RX_RESET,
+            WR_EN       => rx_buf_wr_en(i),
+            WR_BE       => (others => '1'),
+            WR_ADDR     => rx_buf_wr_addr(i),
+            WR_DATA     => rx_buf_wr_data(i),
 
-            RD_CLK      => cx_data_inf_clk   ,
-            RD_RST      => cx_data_inf_reset ,
-            RD_EN       => '1'               ,
-            RD_PIPE_EN  => '1'               ,
-            RD_ADDR     => rx_buf_rd_addr(i) ,
-            RD_DATA     => rx_buf_rd_data(i) ,
+            RD_CLK      => cx_data_inf_clk,
+            RD_RST      => cx_data_inf_reset,
+            RD_EN       => '1',
+            RD_PIPE_EN  => '1',
+            RD_ADDR     => rx_buf_rd_addr(i),
+            RD_DATA     => rx_buf_rd_data(i),
             RD_DATA_VLD => open
         );
 
@@ -889,64 +889,64 @@ begin
 
     crox_meta_gen : for i in 0 to MFB_REGIONS-1 generate
         crox_instr_meta(0)(i) <= pacp_tx_mfb_meta   (i)
-                               & pacp_tx_pkt_len (0)(i)
-                               & pacp_tx_pkt_addr(0)(i);
+                                 & pacp_tx_pkt_len (0)(i)
+                                 & pacp_tx_pkt_addr(0)(i);
     end generate;
 
     crossbarx_i : entity work.CROSSBARX
-    generic map(
-        DATA_DIR            => true               ,
-        USE_CLK2            => CX_USE_CLK2        ,
-        USE_CLK_ARB         => CX_USE_CLK_ARB     ,
-        BUF_A_COLS          => RX_BUF_WORDS       ,
-        BUF_A_STREAM_ROWS   => BUF_ROWS           ,
-        BUF_B_COLS          => TX_BUF_WORDS       ,
-        BUF_B_ROWS          => BUF_ROWS           ,
+    generic map (
+        DATA_DIR            => true,
+        USE_CLK2            => CX_USE_CLK2,
+        USE_CLK_ARB         => CX_USE_CLK_ARB,
+        BUF_A_COLS          => RX_BUF_WORDS,
+        BUF_A_STREAM_ROWS   => BUF_ROWS,
+        BUF_B_COLS          => TX_BUF_WORDS,
+        BUF_B_ROWS          => BUF_ROWS,
 
-        ROW_ITEMS           => MFB_BLOCK_SIZE     ,
-        ITEM_WIDTH          => MFB_ITEM_WIDTH     ,
-        TRANS_MTU           => PKT_MTU            ,
+        ROW_ITEMS           => MFB_BLOCK_SIZE,
+        ITEM_WIDTH          => MFB_ITEM_WIDTH,
+        TRANS_MTU           => PKT_MTU,
 
-        METADATA_WIDTH      => CROX_META_WIDTH    ,
-        TRANSS              => MFB_REGIONS        ,
-        TRANS_FIFO_ITEMS    => TRANS_FIFO_SIZE    ,
-        COLOR_TIMEOUT_WIDTH => 6                  ,
-        COLOR_CONF_DELAY    => 20                 ,
-        RD_LATENCY          => 1                  ,
-        TRANS_STREAMS       => 1                  ,
-        DATA_MUX_LAT        => 0                  ,
-        DATA_MUX_OUTREG_EN  => true               ,
-        DATA_ROT_LAT        => 0                  ,
-        DATA_ROT_OUTREG_EN  => true               ,
+        METADATA_WIDTH      => CROX_META_WIDTH,
+        TRANSS              => MFB_REGIONS,
+        TRANS_FIFO_ITEMS    => TRANS_FIFO_SIZE,
+        COLOR_TIMEOUT_WIDTH => 6,
+        COLOR_CONF_DELAY    => 20,
+        RD_LATENCY          => 1,
+        TRANS_STREAMS       => 1,
+        DATA_MUX_LAT        => 0,
+        DATA_MUX_OUTREG_EN  => true,
+        DATA_ROT_LAT        => 0,
+        DATA_ROT_OUTREG_EN  => true,
         DEVICE              => DEVICE
     )
-    port map(
-        CLK       => RX_CLK                       ,
-        CLK2      => RX_CLK2                      ,
-        RESET     => RX_RESET                     ,
-        CLK_ARB   => CX_CLK_ARB                   ,
-        RESET_ARB => CX_RESET_ARB                 ,
+    port map (
+        CLK       => RX_CLK,
+        CLK2      => RX_CLK2,
+        RESET     => RX_RESET,
+        CLK_ARB   => CX_CLK_ARB,
+        RESET_ARB => CX_RESET_ARB,
 
-        TRANS_A_COL        => crox_instr_a_col    ,
-        TRANS_A_ITEM       => crox_instr_a_item   ,
-        TRANS_B_COL        => crox_instr_b_col    ,
-        TRANS_B_ITEM       => crox_instr_b_item   ,
-        TRANS_LEN          => crox_instr_len      ,
-        TRANS_META         => crox_instr_meta     ,
-        TRANS_VLD          => crox_instr_vld      ,
-        TRANS_SRC_RDY      => crox_instr_src_rdy  ,
-        TRANS_DST_RDY      => crox_instr_dst_rdy  ,
+        TRANS_A_COL        => crox_instr_a_col,
+        TRANS_A_ITEM       => crox_instr_a_item,
+        TRANS_B_COL        => crox_instr_b_col,
+        TRANS_B_ITEM       => crox_instr_b_item,
+        TRANS_LEN          => crox_instr_len,
+        TRANS_META         => crox_instr_meta,
+        TRANS_VLD          => crox_instr_vld,
+        TRANS_SRC_RDY      => crox_instr_src_rdy,
+        TRANS_DST_RDY      => crox_instr_dst_rdy,
 
         SRC_BUF_RD_ADDR    => crox_src_buf_rd_addr,
         SRC_BUF_RD_DATA    => crox_src_buf_rd_data,
 
         DST_BUF_WR_ADDR    => crox_dst_buf_wr_addr,
         DST_BUF_WR_DATA    => crox_dst_buf_wr_data,
-        DST_BUF_WR_IE      => crox_dst_buf_wr_ie  ,
-        DST_BUF_WR_EN      => crox_dst_buf_wr_en  ,
+        DST_BUF_WR_IE      => crox_dst_buf_wr_ie,
+        DST_BUF_WR_EN      => crox_dst_buf_wr_en,
 
-        TRANS_COMP_META    => crox_comp_meta      ,
-        TRANS_COMP_SRC_RDY => crox_comp_src_rdy   ,
+        TRANS_COMP_META    => crox_comp_meta,
+        TRANS_COMP_SRC_RDY => crox_comp_src_rdy,
         TRANS_COMP_DST_RDY => crox_comp_dst_rdy
     );
 
@@ -997,29 +997,29 @@ begin
     dst_rdy1_asfifox <= not asfifox_wr_full;
 
     asfifox_i : entity work.ASFIFOX
-    generic map(
+    generic map (
         DATA_WIDTH => ASFIFOX_DATA_WIDTH,
-        ITEMS      => 32                ,
-        RAM_TYPE   => "LUT"             ,
-        FWFT_MODE  => true              ,
-        OUTPUT_REG => true              ,
+        ITEMS      => 32,
+        RAM_TYPE   => "LUT",
+        FWFT_MODE  => true,
+        OUTPUT_REG => true,
         DEVICE     => DEVICE
     )
     port map (
-        WR_CLK    => RX_CLK             ,
-        WR_RST    => RX_RESET           ,
-        WR_DATA   => asfifox_wr_data    ,
-        WR_EN     => asfifox_wr_en      ,
-        WR_FULL   => asfifox_wr_full    ,
-        WR_AFULL  => open               ,
-        WR_STATUS => open               ,
+        WR_CLK    => RX_CLK,
+        WR_RST    => RX_RESET,
+        WR_DATA   => asfifox_wr_data,
+        WR_EN     => asfifox_wr_en,
+        WR_FULL   => asfifox_wr_full,
+        WR_AFULL  => open,
+        WR_STATUS => open,
 
-        RD_CLK    => TX_CLK             ,
-        RD_RST    => TX_RESET           ,
-        RD_DATA   => asfifox_rd_data    ,
-        RD_EN     => asfifox_rd_en      ,
-        RD_EMPTY  => asfifox_rd_empty   ,
-        RD_AEMPTY => open               ,
+        RD_CLK    => TX_CLK,
+        RD_RST    => TX_RESET,
+        RD_DATA   => asfifox_rd_data,
+        RD_EN     => asfifox_rd_en,
+        RD_EMPTY  => asfifox_rd_empty,
+        RD_AEMPTY => open,
         RD_STATUS => open
     );
 
@@ -1067,68 +1067,68 @@ begin
     -- end process;
 
     tx_buffer_i : entity work.MFB_CROSSBARX_OUTPUT_BUFFER
-    generic map(
-        DEVICE            => DEVICE                    ,
-        HDR_META_WIDTH    => 1                         ,
-        MVB_ITEMS         => 1                         ,
-        MFB_REGIONS       => MFB_REGIONS               ,
-        MFB_REGION_SIZE   => MFB_REGION_SIZE           ,
-        MFB_BLOCK_SIZE    => MFB_BLOCK_SIZE            ,
-        MFB_ITEM_WIDTH    => MFB_ITEM_WIDTH            ,
-        MFB_META_WIDTH    => MFB_META_WIDTH            ,
-        MFB_META_WITH_SOF => false                     ,
-        BUF_BLOCKS        => BUF_ROWS                  ,
-        DATA_BLOCK_SIZE   => MFB_BLOCK_SIZE            ,
-        DATA_ITEM_WIDTH   => MFB_ITEM_WIDTH            ,
-        BUF_WORDS         => TX_BUF_WORDS              ,
-        CHANNELS          => 2                         ,
-        PKT_SIZE_MAX      => PKT_MTU                   ,
-        META_EQ_OUTPUT    => OBUF_META_EQ_OUTPUT       ,
+    generic map (
+        DEVICE            => DEVICE,
+        HDR_META_WIDTH    => 1,
+        MVB_ITEMS         => 1,
+        MFB_REGIONS       => MFB_REGIONS,
+        MFB_REGION_SIZE   => MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE    => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH    => MFB_ITEM_WIDTH,
+        MFB_META_WIDTH    => MFB_META_WIDTH,
+        MFB_META_WITH_SOF => false,
+        BUF_BLOCKS        => BUF_ROWS,
+        DATA_BLOCK_SIZE   => MFB_BLOCK_SIZE,
+        DATA_ITEM_WIDTH   => MFB_ITEM_WIDTH,
+        BUF_WORDS         => TX_BUF_WORDS,
+        CHANNELS          => 2,
+        PKT_SIZE_MAX      => PKT_MTU,
+        META_EQ_OUTPUT    => OBUF_META_EQ_OUTPUT,
         INPUT_EQ_OUTPUT   => OBUF_INPUT_EQ_OUTPUT
     )
-    port map(
-        CLK_META          => RX_CLK                    ,
-        RESET_META        => RX_RESET                  ,
-        CLK_IN            => cx_data_inf_clk           ,
-        RESET_IN          => cx_data_inf_reset         ,
-        CLK_OUT           => TX_CLK                    ,
-        RESET_OUT         => TX_RESET                  ,
+    port map (
+        CLK_META          => RX_CLK,
+        RESET_META        => RX_RESET,
+        CLK_IN            => cx_data_inf_clk,
+        RESET_IN          => cx_data_inf_reset,
+        CLK_OUT           => TX_CLK,
+        RESET_OUT         => TX_RESET,
 
-        WR_ADDR          => tx_buf_wr_addr             ,
-        WR_DATA          => tx_buf_wr_data             ,
-        WR_IE            => tx_buf_wr_ie               ,
-        WR_EN            => tx_buf_wr_en               ,
+        WR_ADDR          => tx_buf_wr_addr,
+        WR_DATA          => tx_buf_wr_data,
+        WR_IE            => tx_buf_wr_ie,
+        WR_EN            => tx_buf_wr_en,
 
         RX_HDR_META      => (others => (others => '0')),
-        RX_HDR_MFB_META  => tx_buf_rx_instr_meta       ,
+        RX_HDR_MFB_META  => tx_buf_rx_instr_meta,
         RX_HDR_CHAN      => (others => (others => '0')),
-        RX_HDR_ADDR      => tx_buf_rx_instr_addr       ,
-        RX_HDR_LEN       => tx_buf_rx_instr_len        ,
-        RX_HDR_VLD       => tx_buf_rx_instr_vld        ,
-        RX_HDR_SRC_RDY   => tx_buf_rx_instr_src_rdy    ,
-        RX_HDR_DST_RDY   => tx_buf_rx_instr_dst_rdy    ,
+        RX_HDR_ADDR      => tx_buf_rx_instr_addr,
+        RX_HDR_LEN       => tx_buf_rx_instr_len,
+        RX_HDR_VLD       => tx_buf_rx_instr_vld,
+        RX_HDR_SRC_RDY   => tx_buf_rx_instr_src_rdy,
+        RX_HDR_DST_RDY   => tx_buf_rx_instr_dst_rdy,
 
-        RD_PTR           => tx_buf_rd_ptr_addr         ,
+        RD_PTR           => tx_buf_rd_ptr_addr,
 
-        PKT_SENT_CHAN    => open                       ,
-        PKT_SENT_LEN     => open                       ,
-        PKT_SENT_SRC_RDY => open                       ,
-        PKT_SENT_DST_RDY => '1'                        ,
+        PKT_SENT_CHAN    => open,
+        PKT_SENT_LEN     => open,
+        PKT_SENT_SRC_RDY => open,
+        PKT_SENT_DST_RDY => '1',
 
-        TX_MVB_LEN       => open                       ,
-        TX_MVB_HDR_META  => open                       ,
-        TX_MVB_CHANNEL   => open                       ,
-        TX_MVB_VLD       => open                       ,
-        TX_MVB_SRC_RDY   => open                       ,
-        TX_MVB_DST_RDY   => '1'                        ,
+        TX_MVB_LEN       => open,
+        TX_MVB_HDR_META  => open,
+        TX_MVB_CHANNEL   => open,
+        TX_MVB_VLD       => open,
+        TX_MVB_SRC_RDY   => open,
+        TX_MVB_DST_RDY   => '1',
 
-        TX_MFB_DATA      => TX_MFB_DATA                ,
-        TX_MFB_META      => TX_MFB_META                ,
-        TX_MFB_SOF       => TX_MFB_SOF                 ,
-        TX_MFB_EOF       => TX_MFB_EOF                 ,
-        TX_MFB_SOF_POS   => TX_MFB_SOF_POS             ,
-        TX_MFB_EOF_POS   => TX_MFB_EOF_POS             ,
-        TX_MFB_SRC_RDY   => TX_MFB_SRC_RDY             ,
+        TX_MFB_DATA      => TX_MFB_DATA,
+        TX_MFB_META      => TX_MFB_META,
+        TX_MFB_SOF       => TX_MFB_SOF,
+        TX_MFB_EOF       => TX_MFB_EOF,
+        TX_MFB_SOF_POS   => TX_MFB_SOF_POS,
+        TX_MFB_EOF_POS   => TX_MFB_EOF_POS,
+        TX_MFB_SRC_RDY   => TX_MFB_SRC_RDY,
         TX_MFB_DST_RDY   => TX_MFB_DST_RDY
     );
 

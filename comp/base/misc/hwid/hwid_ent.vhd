@@ -10,10 +10,10 @@ use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
 entity HWID is
-    generic(
+    generic (
         DEVICE            : string
     );
-    port(
+    port (
         CLK               : in std_logic;
         XILINX_DNA        : out std_logic_vector(95 downto 0);
         XILINX_DNA_VLD    : out std_logic

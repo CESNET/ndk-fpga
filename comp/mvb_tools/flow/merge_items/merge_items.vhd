@@ -17,7 +17,7 @@ use work.type_pack.all;
 -- receive the same number of items in the same order, but they can be aligned
 -- differently. TX MVB has same item aligment as RX0 MVB input.
 entity MVB_MERGE_ITEMS is
-    generic(
+    generic (
         -- Number of RX0 items, same for output (TX)
         RX0_ITEMS      : natural := 4;
         -- RX0 item width in bits
@@ -37,7 +37,7 @@ entity MVB_MERGE_ITEMS is
         -- FPGA device string (required for FIFOs)
         DEVICE         : string := "STRATIX10"
     );
-    port(
+    port (
         -- Clock input
         CLK         : in  std_logic;
         -- Reset input synchronized with CLK
@@ -100,14 +100,14 @@ architecture FULL of MVB_MERGE_ITEMS is
 begin
 
     rx0_fifo_i : entity work.MVB_FIFOX
-    generic map(
+    generic map (
         ITEMS      => RX0_ITEMS,
         ITEM_WIDTH => RX0_ITEM_WIDTH,
         FIFO_DEPTH => FIFO_DEPTH,
         DEVICE     => DEVICE,
         FAKE_FIFO  => not RX0_FIFO_EN
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -122,11 +122,11 @@ begin
         TX_DST_RDY => fifo_rx0_dst_rdy
     );
 
-    fifoxm_wr <= RX1_VLD and RX1_SRC_RDY;
+    fifoxm_wr   <= RX1_VLD and RX1_SRC_RDY;
     RX1_DST_RDY <= not fifoxm_full;
 
     fifoxm_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH     => RX1_ITEM_WIDTH,
         ITEMS          => max(RX0_ITEMS,RX1_ITEMS)*FIFO_DEPTH,
         WRITE_PORTS    => RX1_ITEMS,
@@ -135,7 +135,7 @@ begin
         SAFE_READ_MODE => false,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RESET,
 
@@ -156,14 +156,14 @@ begin
     begin
         v_vld_count := (others => '0');
         v_emp_count := (others => '0');
-        demux_sel <= (others => (others => '0'));
-        must_wait <= '0';
-        rd_vector <= (others => '0');
+        demux_sel   <= (others => (others => '0'));
+        must_wait   <= '0';
+        rd_vector   <= (others => '0');
         for i in 0 to RX0_ITEMS-1 loop
             demux_sel(i) <= resize(v_vld_count,log2(RX0_ITEMS));
             if (fifo_rx0_vld(i) = '1') then
                 rd_vector(to_integer(v_vld_count)) <= '1';
-                v_vld_count := v_vld_count + 1;
+                v_vld_count                        := v_vld_count + 1;
             end if;
             if (fifoxm_empty(i) = '0') then
                 v_emp_count := v_emp_count + 1;
@@ -177,12 +177,12 @@ begin
 
     fifoxm_rd <= rd_vector and not must_wait and fifo_rx0_src_rdy and TX_DST_RDY;
 
-    rx0_data_arr <= slv_array_deser(fifo_rx0_data,RX0_ITEMS,RX0_ITEM_WIDTH);
+    rx0_data_arr     <= slv_array_deser(fifo_rx0_data,RX0_ITEMS,RX0_ITEM_WIDTH);
     fifo_rx0_dst_rdy <= TX_DST_RDY and not must_wait;
 
     tx_data_g : for i in 0 to RX0_ITEMS-1 generate
         tx_data1_arr(i) <= fifoxm_do_arr(to_integer(tsel(log2(RX0_ITEMS) = 0, to_unsigned(0, 1), demux_sel(i))));
-        tx_data_arr(i) <= tx_data1_arr(i) & rx0_data_arr(i);
+        tx_data_arr(i)  <= tx_data1_arr(i) & rx0_data_arr(i);
     end generate;
 
     out_reg_on_g: if OUTPUT_REG generate

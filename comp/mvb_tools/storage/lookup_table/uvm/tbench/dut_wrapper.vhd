@@ -49,7 +49,7 @@ entity DUT_WRAPPER is
         MI_DOUT         : out std_logic_vector(SW_WIDTH-1 downto 0);
         MI_DOUT_VLD     : out std_logic
     );
-    end entity;
+end entity;
 
 
 architecture FULL of DUT_WRAPPER is
@@ -75,7 +75,7 @@ begin
     end generate;
 
     dut_i : entity work.MVB_LOOKUP_TABLE
-    generic map(
+    generic map (
         MVB_ITEMS  => MVB_ITEMS,
         LUT_DEPTH  => LUT_DEPTH,
         LUT_WIDTH  => LUT_WIDTH,
@@ -85,7 +85,7 @@ begin
         OUTPUT_REG => OUTPUT_REG,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         CLK             => CLK,
         RESET           => RESET,
 

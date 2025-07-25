@@ -11,7 +11,7 @@ use ieee.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 use work.basics_test_pkg.all;
-use STD.textio.all;
+use std.textio.all;
 
 package test_pkg is
 
@@ -42,8 +42,8 @@ package test_pkg is
 
     constant VERBOSITY_LEVEL         : natural := 0;
 
-    constant GENERATING_LOG_PERIOD   : natural := 0;--2*1024; -- set to 0 to turn OFF
-    constant THROUGHPUT_LOG_PERIOD   : natural := 0;--2*1024; -- set to 0 to turn OFF
+    constant GENERATING_LOG_PERIOD   : natural := 0; -- 2*1024; -- set to 0 to turn OFF
+    constant THROUGHPUT_LOG_PERIOD   : natural := 0; -- 2*1024; -- set to 0 to turn OFF
 
     -------------------------------------------------------------
 
@@ -105,20 +105,27 @@ package test_pkg is
 
     constant TRANS_WIDTH : natural := 32*8+METADATA_WIDTH+TRANS_LENGTH_MAX*ITEM_WIDTH;
 
-    function trans_ser  (t : trans_t) return std_logic_vector;
-    function trans_deser(vec : std_logic_vector) return trans_t;
+    function trans_ser (t : trans_t) return std_logic_vector;
+    function trans_deser (vec : std_logic_vector) return trans_t;
 
-    procedure trans_print(l : inout line; t : in trans_t);
+    procedure trans_print (
+        l : inout line;
+        t : in trans_t
+    );
 
     type trans_array_t is array (natural range <>) of trans_t;
     type trans_array_2d_t is array (natural range <>) of trans_array_t;
 
-    function get_a_start_addr(t : trans_t) return natural;
-    function get_a_end_addr  (t : trans_t) return natural;
-    function get_b_start_addr(t : trans_t) return natural;
-    function get_b_end_addr  (t : trans_t) return natural;
+    function get_a_start_addr (t : trans_t) return natural;
+    function get_a_end_addr (t : trans_t) return natural;
+    function get_b_start_addr (t : trans_t) return natural;
+    function get_b_end_addr (t : trans_t) return natural;
 
-    procedure gen_random(seed1, seed2 : inout natural; t : out trans_t);
+    procedure gen_random (
+        seed1,
+        seed2 : inout natural;
+        t     : out trans_t
+    );
 
     type fifo_array_t is array (natural range <>) of slv_fifo_t;
 
@@ -128,23 +135,23 @@ end package;
 
 package body test_pkg is
 
-    function trans_ser  (t : trans_t) return std_logic_vector is
+    function trans_ser (t : trans_t) return std_logic_vector is
         variable vec : std_logic_vector(TRANS_WIDTH-1 downto 0);
     begin
-        vec := std_logic_vector(to_unsigned(t.a_stream    ,32))
-              &std_logic_vector(to_unsigned(t.a_section   ,32))
-              &std_logic_vector(to_unsigned(t.a_ptr       ,32))
-              &std_logic_vector(to_unsigned(t.b_section   ,32))
-              &std_logic_vector(to_unsigned(t.b_ptr       ,32))
-              &std_logic_vector(to_unsigned(t.length      ,32))
-              &std_logic_vector(to_unsigned(t.a_gap_length,32))
-              &std_logic_vector(to_unsigned(t.b_gap_length,32))
-              &t.meta
-              &t.data;
+        vec := std_logic_vector(to_unsigned(t.a_stream,32))
+               &std_logic_vector(to_unsigned(t.a_section,32))
+               &std_logic_vector(to_unsigned(t.a_ptr,32))
+               &std_logic_vector(to_unsigned(t.b_section,32))
+               &std_logic_vector(to_unsigned(t.b_ptr,32))
+               &std_logic_vector(to_unsigned(t.length,32))
+               &std_logic_vector(to_unsigned(t.a_gap_length,32))
+               &std_logic_vector(to_unsigned(t.b_gap_length,32))
+               &t.meta
+               &t.data;
         return vec;
     end function;
 
-    function trans_deser(vec : std_logic_vector) return trans_t is
+    function trans_deser (vec : std_logic_vector) return trans_t is
         variable tmp_a_stream     : std_logic_vector(32-1 downto 0);
         variable tmp_a_section    : std_logic_vector(32-1 downto 0);
         variable tmp_a_ptr        : std_logic_vector(32-1 downto 0);
@@ -157,16 +164,16 @@ package body test_pkg is
         variable tmp_data         : std_logic_vector(TRANS_LENGTH_MAX*ITEM_WIDTH-1 downto 0);
         variable t : trans_t;
     begin
-        (tmp_a_stream    ,
-         tmp_a_section   ,
-         tmp_a_ptr       ,
-         tmp_b_section   ,
-         tmp_b_ptr       ,
-         tmp_length      ,
-         tmp_a_gap_length,
-         tmp_b_gap_length,
-         tmp_meta        ,
-         tmp_data         ) := vec;
+        (tmp_a_stream,
+            tmp_a_section,
+            tmp_a_ptr,
+            tmp_b_section,
+            tmp_b_ptr,
+            tmp_length,
+            tmp_a_gap_length,
+            tmp_b_gap_length,
+            tmp_meta,
+            tmp_data         ) := vec;
 
         t.a_stream     := to_integer(unsigned(tmp_a_stream    ));
         t.a_section    := to_integer(unsigned(tmp_a_section   ));
@@ -182,41 +189,44 @@ package body test_pkg is
         return t;
     end function;
 
-    procedure trans_print(l : inout line; t : in trans_t) is
+    procedure trans_print (
+        l : inout line;
+        t : in trans_t
+    ) is
         variable ptr : natural;
     begin
-         write(l,string'("Buffer A Stream   :   ")); write_dec(l,t.a_stream); writeline(output,l);
-         write(l,string'("Buffer A Section  : 0x")); write_hex(l,t.a_section);writeline(output,l);
-         write(l,string'("Buffer A Column   : 0x")); write_hex(l,t.a_ptr  /  (BUF_A_STREAM_ROWS*ROW_ITEMS));writeline(output,l);
-         write(l,string'("Buffer A Item     : 0x")); write_hex(l,t.a_ptr mod (BUF_A_STREAM_ROWS*ROW_ITEMS));writeline(output,l);
-         write(l,string'("Buffer B Section  : 0x")); write_hex(l,t.b_section);writeline(output,l);
-         write(l,string'("Buffer B Column   : 0x")); write_hex(l,t.b_ptr  /  (BUF_B_ROWS*ROW_ITEMS));writeline(output,l);
-         write(l,string'("Buffer B Item     : 0x")); write_hex(l,t.b_ptr mod (BUF_B_ROWS*ROW_ITEMS));writeline(output,l);
-         write(l,string'("Length            :   ")); write_dec(l,t.length);   writeline(output,l);
-         write(l,string'("Metadata          : 0x")); write_hex(l,t.meta);     writeline(output,l);
-         write(l,string'("Data:")); writeline(output,l);
-         ptr := 0;
-         for i in 0 to t.length-1 loop
-             for e in 0 to 4-1 loop
-                 for g in 0 to 8-1 loop
-                     write_hex(l,t.data((ptr+1)*ITEM_WIDTH-1 downto ptr*ITEM_WIDTH)); write(l,string'(" "));
-                     ptr := ptr+1;
-                     exit when (ptr=t.length);
-                 end loop;
-                 write(l,string'(" "));
-                 exit when (ptr=t.length);
-             end loop;
-             writeline(output,l);
-             exit when (ptr=t.length);
-         end loop;
-    end procedure;
+        write(l,string'("Buffer A Stream   :   ")); write_dec(l,t.a_stream); writeline(output,l);
+        write(l,string'("Buffer A Section  : 0x")); write_hex(l,t.a_section);writeline(output,l);
+        write(l,string'("Buffer A Column   : 0x")); write_hex(l,t.a_ptr  /  (BUF_A_STREAM_ROWS*ROW_ITEMS));writeline(output,l);
+        write(l,string'("Buffer A Item     : 0x")); write_hex(l,t.a_ptr mod (BUF_A_STREAM_ROWS*ROW_ITEMS));writeline(output,l);
+        write(l,string'("Buffer B Section  : 0x")); write_hex(l,t.b_section);writeline(output,l);
+        write(l,string'("Buffer B Column   : 0x")); write_hex(l,t.b_ptr  /  (BUF_B_ROWS*ROW_ITEMS));writeline(output,l);
+        write(l,string'("Buffer B Item     : 0x")); write_hex(l,t.b_ptr mod (BUF_B_ROWS*ROW_ITEMS));writeline(output,l);
+        write(l,string'("Length            :   ")); write_dec(l,t.length);   writeline(output,l);
+        write(l,string'("Metadata          : 0x")); write_hex(l,t.meta);     writeline(output,l);
+        write(l,string'("Data:")); writeline(output,l);
+        ptr := 0;
+        for i in 0 to t.length-1 loop
+            for e in 0 to 4-1 loop
+                for g in 0 to 8-1 loop
+                    write_hex(l,t.data((ptr+1)*ITEM_WIDTH-1 downto ptr*ITEM_WIDTH)); write(l,string'(" "));
+                    ptr := ptr+1;
+                    exit when (ptr = t.length);
+                end loop;
+                write(l,string'(" "));
+                exit when (ptr = t.length);
+            end loop;
+            writeline(output,l);
+            exit when (ptr = t.length);
+        end loop;
+    end procedure trans_print;
 
-    function get_a_start_addr(t : trans_t) return natural is
+    function get_a_start_addr (t : trans_t) return natural is
     begin
         return t.a_section*BUF_A_SECTION_COLS+t.a_ptr;
     end function;
 
-    function get_a_end_addr  (t : trans_t) return natural is
+    function get_a_end_addr (t : trans_t) return natural is
         variable addr : natural;
     begin
         addr := get_a_start_addr(t);
@@ -225,12 +235,12 @@ package body test_pkg is
         return addr;
     end function;
 
-    function get_b_start_addr(t : trans_t) return natural is
+    function get_b_start_addr (t : trans_t) return natural is
     begin
         return t.b_section*BUF_B_SECTION_COLS+t.b_ptr;
     end function;
 
-    function get_b_end_addr  (t : trans_t) return natural is
+    function get_b_end_addr (t : trans_t) return natural is
         variable addr : natural;
     begin
         addr := get_b_start_addr(t);
@@ -239,19 +249,23 @@ package body test_pkg is
         return addr;
     end function;
 
-    procedure gen_random(seed1, seed2 : inout natural; t : out trans_t) is
+    procedure gen_random (
+        seed1,
+        seed2 : inout natural;
+        t     : out trans_t
+    ) is
     begin
         randint(seed1,seed2,0,TRANS_STREAMS-1,t.a_stream);
         randint(seed1,seed2,0,BUF_A_SECTIONS-1,t.a_section);
-        t.a_ptr := 0;
+        t.a_ptr                                                          := 0;
         randint(seed1,seed2,0,BUF_B_SECTIONS-1,t.b_section);
-        t.b_ptr := 0;
+        t.b_ptr                                                          := 0;
         randint(seed1,seed2,TRANS_LENGTH_MIN,TRANS_LENGTH_MAX,t.length);
         randint(seed1,seed2,TRANS_GAP_LENGTH_MIN,TRANS_GAP_LENGTH_MAX,t.a_gap_length);
         randint(seed1,seed2,TRANS_GAP_LENGTH_MIN,TRANS_GAP_LENGTH_MAX,t.b_gap_length);
-        t.meta  := random_vector(METADATA_WIDTH, seed1);
-        t.data  := random_vector(TRANS_LENGTH_MAX*ITEM_WIDTH, seed2);
+        t.meta                                                           := random_vector(METADATA_WIDTH, seed1);
+        t.data                                                           := random_vector(TRANS_LENGTH_MAX*ITEM_WIDTH, seed2);
         t.data(TRANS_LENGTH_MAX*ITEM_WIDTH-1 downto t.length*ITEM_WIDTH) := (others => '0');
-    end procedure;
+    end procedure gen_random;
 
-end;
+end package body;

@@ -21,49 +21,49 @@ use work.dma_bus_pack.all;
 -- =========================================================================
 
 entity DEFICIT_IDLE_COUNTER is
-generic(
-    -- Maximum number of pakcets processed in one cycle
-    PKTS         : natural := 4;
-    -- Maximum packet size
-    PKT_SIZE     : natural := 2**12;
-    -- Required average inter-packet gap size (same units as PKT_SIZE)
-    GAP_SIZE     : natural := 12;
-    -- Start of packet alignment (causes inter-packet gap enlargement) (same units as PKT_SIZE)
-    ALIGN        : natural := 8;
-    -- Minimum inter-packet gap size (same units as PKT_SIZE)
-    -- Minimum value: GAP_SIZE-ALIGN+1
-    MIN_GAP_SIZE : integer := GAP_SIZE-4
-);
-port(
-    -- =====================================================================
-    --  Clock and Reset
-    -- =====================================================================
-    -- The Clock is only used for internal DIC register.
-    -- The inner RX-to-TX logic is purely asynchronous.
+    generic (
+        -- Maximum number of pakcets processed in one cycle
+        PKTS         : natural := 4;
+        -- Maximum packet size
+        PKT_SIZE     : natural := 2**12;
+        -- Required average inter-packet gap size (same units as PKT_SIZE)
+        GAP_SIZE     : natural := 12;
+        -- Start of packet alignment (causes inter-packet gap enlargement) (same units as PKT_SIZE)
+        ALIGN        : natural := 8;
+        -- Minimum inter-packet gap size (same units as PKT_SIZE)
+        -- Minimum value: GAP_SIZE-ALIGN+1
+        MIN_GAP_SIZE : integer := GAP_SIZE-4
+    );
+    port (
+        -- =====================================================================
+        --  Clock and Reset
+        -- =====================================================================
+        -- The Clock is only used for internal DIC register.
+        -- The inner RX-to-TX logic is purely asynchronous.
 
-    CLK   : in  std_logic;
-    RESET : in  std_logic;
+        CLK   : in  std_logic;
+        RESET : in  std_logic;
+
+        -- =====================================================================
+
+        -- =====================================================================
+        --  Other interfaces
+        -- =====================================================================
+
+        -- Input Packet lengths
+        RX_PKT_LEN     : in  slv_array_t     (PKTS-1 downto 0)(log2(PKT_SIZE+1)-1 downto 0);
+        RX_PKT_VLD     : in  std_logic_vector(PKTS-1 downto 0);
+        RX_PKT_SRC_RDY : in  std_logic;
+        RX_PKT_DST_RDY : out std_logic; -- propagated from TX_PKT_DST_RDY
+
+        -- Output Packet gap lengths
+        TX_PKT_GAP     : out slv_array_t     (PKTS-1 downto 0)(log2(GAP_SIZE+ALIGN+1)-1 downto 0);
+        TX_PKT_VLD     : out std_logic_vector(PKTS-1 downto 0);
+        TX_PKT_SRC_RDY : out std_logic; -- propagated from RX_PKT_SRC_RDY
+        TX_PKT_DST_RDY : in  std_logic
 
     -- =====================================================================
-
-    -- =====================================================================
-    --  Other interfaces
-    -- =====================================================================
-
-    -- Input Packet lengths
-    RX_PKT_LEN     : in  slv_array_t     (PKTS-1 downto 0)(log2(PKT_SIZE+1)-1 downto 0);
-    RX_PKT_VLD     : in  std_logic_vector(PKTS-1 downto 0);
-    RX_PKT_SRC_RDY : in  std_logic;
-    RX_PKT_DST_RDY : out std_logic; -- propagated from TX_PKT_DST_RDY
-
-    -- Output Packet gap lengths
-    TX_PKT_GAP     : out slv_array_t     (PKTS-1 downto 0)(log2(GAP_SIZE+ALIGN+1)-1 downto 0);
-    TX_PKT_VLD     : out std_logic_vector(PKTS-1 downto 0);
-    TX_PKT_SRC_RDY : out std_logic; -- propagated from RX_PKT_SRC_RDY
-    TX_PKT_DST_RDY : in  std_logic
-
-    -- =====================================================================
-);
+    );
 end entity;
 
 architecture FULL of DEFICIT_IDLE_COUNTER is
@@ -111,9 +111,9 @@ begin
 
             dic := dic_reg;
 
-            if (TX_PKT_DST_RDY='1' and RX_PKT_SRC_RDY='1') then
+            if (TX_PKT_DST_RDY = '1' and RX_PKT_SRC_RDY = '1') then
                 for i in 0 to PKTS-1 loop
-                    if (RX_PKT_VLD(i)='1') then
+                    if (RX_PKT_VLD(i) = '1') then
                         -- The DIC increases for every gap larger than average and decreases for every smaller one
                         dic := dic + (resize_left(unsigned(TX_PKT_GAP(i)),log2(PKTS*ALIGN)) - to_unsigned(GAP_SIZE,log2(PKTS*ALIGN)));
                     end if;
@@ -121,13 +121,13 @@ begin
             end if;
 
             -- Apply roofing by maximum value of DIC
-            if (dic>PKTS*MAX_DIC) then
+            if (dic > PKTS*MAX_DIC) then
                 dic_reg <= to_unsigned(PKTS*MAX_DIC,log2(PKTS*ALIGN));
             else
                 dic_reg <= dic;
             end if;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 dic_reg <= (others => '0');
             end if;
         end if;
@@ -159,11 +159,11 @@ begin
     -- Gap is calculated independently for each packet to eliminate
     -- inter-packet dependency and improve timing.
     gap_cnt_gen : for i in 0 to PKTS-1 generate
-        gap_cnt_pr : process(all)
+        gap_cnt_pr : process (all)
             variable gap : unsigned(log2(GAP_SIZE+ALIGN+1)-1 downto 0);
         begin
             gap := to_unsigned(GAP_SIZE,gap'length);
-            if (rx_pkt_len_end(i)<=dic_reg_part) then
+            if (rx_pkt_len_end(i) <= dic_reg_part) then
                 -- The gap can be reduced by the size of rx_pkt_len_end
                 gap := gap - resize_left(rx_pkt_len_end(i),gap'length);
             else

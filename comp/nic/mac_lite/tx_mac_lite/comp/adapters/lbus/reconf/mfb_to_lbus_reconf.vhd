@@ -15,7 +15,7 @@ use work.math_pack.all;
 -- generic paremeters are set from input to output in the following manner: MFB#(1,8,8,8) ->
 -- MFB#(1,4,16,8).
 entity MFB_TO_LBUS_RECONF is
-    port(
+    port (
         CLK : in std_logic;
         RST : in std_logic;
 
@@ -37,14 +37,14 @@ entity MFB_TO_LBUS_RECONF is
         TX_MFB_EOF_POS : out std_logic_vector(5 downto 0);
         TX_MFB_SRC_RDY : out std_logic;
         TX_MFB_DST_RDY : in  std_logic
-        --==========================================================================================
-        );
+    --==========================================================================================
+    );
 end entity;
 
 
 architecture FULL of MFB_TO_LBUS_RECONF is
 
-    type sh_fsm_t is (S_IDLE, S_PKT_PROCESS, S_PKT_END, S_PKT_HALT, S_WORD_REALIGN);
+    type   sh_fsm_t is (S_IDLE, S_PKT_PROCESS, S_PKT_END, S_PKT_HALT, S_WORD_REALIGN);
     signal sh_fsm_pst : sh_fsm_t := S_IDLE;
     signal sh_fsm_nst : sh_fsm_t := S_IDLE;
 
@@ -131,9 +131,9 @@ begin
 
     sh_fsm_nst_logic_p : process (all) is
 
-        variable rdcd_sof_pos     : unsigned(1 downto 0);
+        variable rdcd_sof_pos             : unsigned(1 downto 0);
         -- EOF's block position (the item position is the default)
-        variable eof_blk_pos      : unsigned(2 downto 0);
+        variable eof_blk_pos              : unsigned(2 downto 0);
         variable shifted_eof_blk_pos      : unsigned(2 downto 0);
 
     begin
@@ -273,9 +273,9 @@ begin
 
     sh_fsm_output_logic_p : process (all) is
 
-        variable sof_pos_uns      : unsigned(2 downto 0);
-        variable rdcd_sof_pos     : unsigned(1 downto 0);
-        variable eof_blk_pos      : unsigned(2 downto 0);
+        variable sof_pos_uns              : unsigned(2 downto 0);
+        variable rdcd_sof_pos             : unsigned(1 downto 0);
+        variable eof_blk_pos              : unsigned(2 downto 0);
         variable shifted_eof_blk_pos      : unsigned(2 downto 0);
 
     begin
@@ -400,7 +400,7 @@ begin
                         postpone_sof_nst <= '1';
                     else
 
-                        sh_fsm_tx_sof <= '1';
+                        sh_fsm_tx_sof        <= '1';
                         skdown_shift_sel_nst <= "1111";
 
                     end if;
@@ -448,26 +448,30 @@ begin
 
     -- shifts both words which are stored in the rx_mfb_data_reg
     shakedown_shifter_i : entity work.BARREL_SHIFTER_GEN
-        generic map (
-            BLOCKS     => 2*8,          -- shifts two MFB words
-            BLOCK_SIZE => 8*8,          -- blocks from the input MFB
-            SHIFT_LEFT => FALSE)
-        port map (
-            DATA_IN  => rx_mfb_data_reg(0) & rx_mfb_data_reg(1),
-            DATA_OUT => skdown_shift_data_out,
-            SEL      => std_logic_vector(skdown_shift_sel_nst));
+    generic map (
+        BLOCKS     => 2*8,          -- shifts two MFB words
+        BLOCK_SIZE => 8*8,          -- blocks from the input MFB
+        SHIFT_LEFT => FALSE
+    )
+    port map (
+        DATA_IN  => rx_mfb_data_reg(0) & rx_mfb_data_reg(1),
+        DATA_OUT => skdown_shift_data_out,
+        SEL      => std_logic_vector(skdown_shift_sel_nst)
+    );
 
 
     -- shifts only the last word in the input shift register
     word_shifter_i : entity work.BARREL_SHIFTER_GEN
-        generic map (
-            BLOCKS     => 8,            -- shifts inside one MFB word
-            BLOCK_SIZE => 8*8,          -- blocks from the input MFB
-            SHIFT_LEFT => FALSE)
-        port map (
-            DATA_IN  => rx_mfb_data_reg(1),
-            DATA_OUT => word_shift_data_out,
-            SEL      => std_logic_vector(word_shift_sel_pst));
+    generic map (
+        BLOCKS     => 8,            -- shifts inside one MFB word
+        BLOCK_SIZE => 8*8,          -- blocks from the input MFB
+        SHIFT_LEFT => FALSE
+    )
+    port map (
+        DATA_IN  => rx_mfb_data_reg(1),
+        DATA_OUT => word_shift_data_out,
+        SEL      => std_logic_vector(word_shift_sel_pst)
+    );
 
 
     -- purpose: output registered multiplexer, when there is a need to have a combination of blocks from both of the shifters

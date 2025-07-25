@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity BOOT_CTRL is
-    generic(
+    generic (
         -- ICAP WBSTAR register value (see UG570) for boot image 0 (Xilinx Only):
         -- [31:30] = RS[1:0] pin value on next warm boot in BPI mode. The default is 00.
         --    [29] = RS[1:0] pins 3-state enable:
@@ -36,7 +36,7 @@ entity BOOT_CTRL is
         -- BOOT timeout width in bites
         BOOT_TIMEOUT_W : natural := 26
     );
-    port(
+    port (
         -- =====================================================================
         -- MAIN MI slave interface (MI_CLK)
         -- =====================================================================
@@ -84,9 +84,9 @@ entity BOOT_CTRL is
         AXI_MI_WR   : out std_logic;
         AXI_MI_RD   : out std_logic;
         AXI_MI_BE   : out std_logic_vector((32/8)-1 downto 0);
-        AXI_MI_ARDY : in  std_logic :='0';
+        AXI_MI_ARDY : in  std_logic := '0';
         AXI_MI_DRD  : in  std_logic_vector(32 - 1 downto 0) := (others => '0');
-        AXI_MI_DRDY : in  std_logic :='0';
+        AXI_MI_DRDY : in  std_logic := '0';
 
         -- =====================================================================
         -- MI master interface for custom BMC controller (BOOT_CLK)
@@ -96,19 +96,19 @@ entity BOOT_CTRL is
         BMC_MI_WR   : out std_logic;
         BMC_MI_RD   : out std_logic;
         BMC_MI_BE   : out std_logic_vector((32/8)-1 downto 0);
-        BMC_MI_ARDY : in  std_logic :='0';
+        BMC_MI_ARDY : in  std_logic := '0';
         BMC_MI_DRD  : in  std_logic_vector(32 - 1 downto 0) := (others => '0');
-        BMC_MI_DRDY : in  std_logic :='0'
+        BMC_MI_DRDY : in  std_logic := '0'
     );
 end entity;
 
 architecture FULL of BOOT_CTRL is
     -- MI SPLITTER
-    constant MI_BOOT_PORTS : natural := 2;
-    constant MI_BOOT_ADDR_BASE : slv_array_t(MI_BOOT_PORTS-1 downto 0)(32-1 downto 0)
-    := ( 0 => X"0000_0000",     -- BMC
+    constant MI_BOOT_PORTS     : natural := 2;
+    constant MI_BOOT_ADDR_BASE : slv_array_t(MI_BOOT_PORTS-1 downto 0)(32-1 downto 0) :=
+     ( 0   => X"0000_0000",     -- BMC
          1 => X"0000_2100");    -- AXI Quad SPI
-    constant MASK :std_logic_vector(32 -1 downto 0):=(8 => '1', others => '0');
+    constant MASK              : std_logic_vector(32 -1 downto 0) := (8 => '1', others => '0');
 
     -- MI ASYNC
     signal mi_sync_dwr       : std_logic_vector(31 downto 0);
@@ -125,9 +125,9 @@ architecture FULL of BOOT_CTRL is
     signal mi_split_rd       : std_logic_vector(MI_BOOT_PORTS-1 downto 0);
     signal mi_split_wr       : std_logic_vector(MI_BOOT_PORTS-1 downto 0);
     signal mi_split_be       : slv_array_t(MI_BOOT_PORTS-1 downto 0)( 3 downto 0);
-    signal mi_split_drd      : slv_array_t(MI_BOOT_PORTS-1 downto 0)(31 downto 0):=(others => (others => '0'));
+    signal mi_split_drd      : slv_array_t(MI_BOOT_PORTS-1 downto 0)(31 downto 0) := (others => (others => '0'));
     signal mi_split_ardy     : std_logic_vector(MI_BOOT_PORTS-1 downto 0);
-    signal mi_split_drdy     : std_logic_vector(MI_BOOT_PORTS-1 downto 0):=(others => '0');
+    signal mi_split_drdy     : std_logic_vector(MI_BOOT_PORTS-1 downto 0) := (others => '0');
     -- MI BOOT
     signal mi_boot_dwr       : std_logic_vector(31 downto 0);
     signal mi_boot_addr      : std_logic_vector(31 downto 0);
@@ -149,8 +149,8 @@ architecture FULL of BOOT_CTRL is
     signal icap_boot_addr    : std_logic_vector(32-1 downto 0);
     signal icap_state_cnt    : unsigned(4-1 downto 0) := (others => '0');
 
-    type t_rom_8x32 is array (0 to 15) of std_logic_vector (31 downto 0);
-    constant icap_rom : t_rom_8x32 := (X"FFFFFFFF",  -- 0 = Dummy
+    type     t_rom_8x32 is array (0 to 15) of std_logic_vector (31 downto 0);
+    constant ICAP_ROM : t_rom_8x32 := (X"FFFFFFFF",  -- 0 = Dummy
                                        X"FFFFFFFF",  -- 1 = Dummy
                                        X"AA995566",  -- 2 = Sync
                                        X"20000000",  -- 3 = NoOP
@@ -169,10 +169,10 @@ architecture FULL of BOOT_CTRL is
 begin
 
     mi_async_i : entity work.MI_ASYNC
-    generic map(
+    generic map (
         DEVICE => DEVICE
     )
-    port map(
+    port map (
         -- Master interface
         CLK_M     => MI_CLK,
         RESET_M   => MI_RESET,
@@ -200,7 +200,7 @@ begin
 
     boot_type_1_or_3_g: if ((BOOT_TYPE = 1) or (BOOT_TYPE = 3)) generate
         mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
-        generic map(
+        generic map (
             ADDR_WIDTH    => 32,
             DATA_WIDTH    => 32,
             PORTS         => MI_BOOT_PORTS,
@@ -209,7 +209,7 @@ begin
             ADDR_MASK     => MASK,
             DEVICE        => DEVICE
         )
-        port map(
+        port map (
             CLK        => BOOT_CLK,
             RESET      => BOOT_RESET,
 
@@ -253,14 +253,14 @@ begin
         mi_split_drdy(0) <= mi_boot_drdy;
     else generate
         -- NO MI Splitter
-        mi_boot_addr <= mi_sync_addr;
-        mi_boot_dwr  <= mi_sync_dwr;
-        mi_boot_wr   <= mi_sync_wr;
-        mi_boot_rd   <= mi_sync_rd;
-        mi_boot_be   <= mi_sync_be;
-        mi_sync_ardy <= mi_boot_ardy;
-        mi_sync_drd  <= mi_boot_drd;
-        mi_sync_drdy <= mi_boot_drdy;
+        mi_boot_addr     <= mi_sync_addr;
+        mi_boot_dwr      <= mi_sync_dwr;
+        mi_boot_wr       <= mi_sync_wr;
+        mi_boot_rd       <= mi_sync_rd;
+        mi_boot_be       <= mi_sync_be;
+        mi_sync_ardy     <= mi_boot_ardy;
+        mi_sync_drd      <= mi_boot_drd;
+        mi_sync_drdy     <= mi_boot_drdy;
     end generate;
 
     -- MI interface for BMC device controller (only TYPE=3)
@@ -278,7 +278,7 @@ begin
     boot_type_1_or_2_g: if ((BOOT_TYPE = 1) or (BOOT_TYPE = 2)) generate
         mi_boot_ardy <= (mi_boot_rd or mi_boot_wr);
 
-        mi_rd_p : process(BOOT_CLK)
+        mi_rd_p : process (BOOT_CLK)
         begin
             if rising_edge(BOOT_CLK) then
                 case mi_boot_addr(3 downto 2) is
@@ -296,7 +296,7 @@ begin
             end if;
         end process;
 
-        mi_wr_p : process(BOOT_CLK)
+        mi_wr_p : process (BOOT_CLK)
         begin
             if rising_edge(BOOT_CLK) then
                 flash_wr_cmd <= '0';
@@ -306,12 +306,12 @@ begin
                             flash_wr_data_reg(31 downto  0) <= mi_boot_dwr;
                         when "01" =>
                             flash_wr_data_reg(63 downto 32) <= mi_boot_dwr;
-                            flash_wr_cmd <= '1';
+                            flash_wr_cmd                    <= '1';
                             -- Reboot FPGA command
                             if (mi_boot_dwr(31 downto 28) = X"E") then
                                 flash_wr_cmd <= '0';
-                                boot_cmd <= '1';
-                                boot_img <= not flash_wr_data_reg(0);
+                                boot_cmd     <= '1';
+                                boot_img     <= not flash_wr_data_reg(0);
                             end if;
 
                         when others => null;
@@ -324,13 +324,13 @@ begin
             end if;
         end process;
 
-        boot_timeout_p : process(BOOT_CLK)
+        boot_timeout_p : process (BOOT_CLK)
         begin
             if rising_edge(BOOT_CLK) then
                 if (boot_cmd = '1') then
                     boot_timeout <= boot_timeout + 1;
                 else
-                    boot_timeout <= (others =>'0');
+                    boot_timeout <= (others => '0');
                 end if;
             end if;
         end process;
@@ -348,20 +348,20 @@ begin
     end generate;
 
     icap_g: if (BOOT_TYPE = 1) generate
-        process(BOOT_CLK)
+        process (BOOT_CLK)
         begin
             if rising_edge(BOOT_CLK) then
                 if (BOOT_RESET = '1') then
                     icap_state_cnt <= X"0";
-                    ICAP_CSIB      <= '1'; -- ICAP enable active in low
-                elsif (icap_state_cnt = X"0") and (BOOT_REQUEST = '1') and (ICAP_AVAIL = '1') then
-                    icap_state_cnt <= X"1"; -- run boot sequence when is set boot request
+                    ICAP_CSIB      <= '1';                                                           -- ICAP enable active in low
+                elsif ((icap_state_cnt = X"0") and (BOOT_REQUEST = '1') and (ICAP_AVAIL = '1')) then
+                    icap_state_cnt <= X"1";                                                          -- run boot sequence when is set boot request
                     ICAP_CSIB      <= '0';
                 elsif (icap_state_cnt = X"0") then
-                    icap_state_cnt <= X"0"; -- stay in idle state
+                    icap_state_cnt <= X"0";                                                          -- stay in idle state
                     ICAP_CSIB      <= '1';
                 elsif (icap_state_cnt = X"9") then
-                    icap_state_cnt <= X"9"; -- stay in dummy state, boot request done
+                    icap_state_cnt <= X"9";                                                          -- stay in dummy state, boot request done
                     ICAP_CSIB      <= '1';
                 else
                     icap_state_cnt <= icap_state_cnt + 1;

@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_ADAPTER_LBUS is
-    generic(
+    generic (
         -- SEGMENTS must be 4
         SEGMENTS    : natural := 4;
         -- REGIONS must be 1
@@ -22,7 +22,7 @@ entity RX_MAC_LITE_ADAPTER_LBUS is
         -- Select correct FPGA device.
         DEVICE      : string := "ULTRASCALE"
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK              : in  std_logic;
         RESET            : in  std_logic;

@@ -27,14 +27,14 @@ use work.type_pack.all;
 -- +----------------------+--------------------------------------+
 
 entity GEN_LUTRAM is
-    generic(
+    generic (
         -- Data word width in bits. Multiples of 20 bits are effective on
         -- Intel FPGAs with MLAB cells.
         DATA_WIDTH         : natural := 16;
         -- LUTRAM depth in words. The effective and recommended values for
         -- the selected FPGAs:
-            -- Xilinx Ultrascale(+) = 32, 64
-            -- Intel Stratix 10     = 32
+        -- Xilinx Ultrascale(+) = 32, 64
+        -- Intel Stratix 10     = 32
         ITEMS              : natural := 32;
         -- Total number of read ports. Minimum value is 1.
         RD_PORTS           : natural := 1;
@@ -56,7 +56,7 @@ entity GEN_LUTRAM is
         -- "7SERIES", "ULTRASCALE", "STRATIX10", "ARRIA10", "AGILEX"
         DEVICE             : string  := "AGILEX"
     );
-    port(
+    port (
         CLK     : in  std_logic;
         WR_EN   : in  std_logic;
         WR_ADDR : in  std_logic_vector(log2(ITEMS)-1 downto 0);
@@ -92,7 +92,9 @@ architecture FULL of GEN_LUTRAM is
 
 begin
 
-    assert RD_LATENCY < 2 report "GEN_LUTRAM doesn't support RD_LATENCY > 1!" severity failure;
+    assert RD_LATENCY < 2
+        report "GEN_LUTRAM doesn't support RD_LATENCY > 1!"
+        severity failure;
 
     -- deserialization read address vector
     lutram_rd_addr_arr <= slv_array_downto_deser(RD_ADDR,RD_PORTS,ADDR_WIDTH);
@@ -116,7 +118,7 @@ begin
                 OUTPUT_REG      => MLAB_OUTPUT_REG,
                 DEVICE          => DEVICE
             )
-            PORT MAP (
+            port map (
                 DATA           => WR_DATA,
                 INCLOCK        => CLK,
                 RDADDRESS      => lutram_rd_addr_arr(i),

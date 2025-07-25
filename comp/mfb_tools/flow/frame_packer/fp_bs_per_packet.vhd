@@ -13,15 +13,15 @@ use work.type_pack.all;
 
 -- The purpose of this component is to encapsulate all BarrelShifters and extract its data
 entity FP_BS_PER_PACKET is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
         MFB_ITEM_WIDTH      : natural := 8;
         RX_PKT_SIZE_MAX     : natural := 2**10
     );
-    port(
-        CLK : in std_logic;
+    port (
+        CLK             : in std_logic;
         -- Input data [DATA] [VLD] [SOF_OH] [EOF_OH] [PKT_LNG]
         RX_DATA         : in slv_array_t(MFB_REGIONS downto 0)((MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)+MFB_REGIONS*MFB_REGION_SIZE+MFB_REGIONS*MFB_REGION_SIZE+MFB_REGIONS*MFB_REGION_SIZE+MFB_REGIONS*MFB_REGION_SIZE*max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1 downto 0);
         -- Rotation of data
@@ -44,17 +44,17 @@ architecture FULL of FP_BS_PER_PACKET is
     ------------------------------------------------------------
     --                  CONSTANT DECLARATION                  --
     ------------------------------------------------------------
-    constant RX_DATA_H      : natural:= MFB_BLOCK_SIZE*MFB_ITEM_WIDTH + 1 + 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
-    constant RX_VLD_H       : natural:= 1 + 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
-    constant RX_SOH_H       : natural:= 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
-    constant RX_EOH_H       : natural:= 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
-    constant RX_PKT_LNG_H   : natural:= max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
+    constant RX_DATA_H            : natural := MFB_BLOCK_SIZE*MFB_ITEM_WIDTH + 1 + 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
+    constant RX_VLD_H             : natural := 1 + 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
+    constant RX_SOH_H             : natural := 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
+    constant RX_EOH_H             : natural := 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
+    constant RX_PKT_LNG_H         : natural := max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1;
     ------------------------------------------------------------
     --                  SIGNAL DECLARATION                    --
     ------------------------------------------------------------
     -- Output of BSs
-    signal bs_data_out          : slv_array_t(MFB_REGIONS downto 0)((MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)+MFB_REGIONS*MFB_REGION_SIZE+MFB_REGIONS*MFB_REGION_SIZE+MFB_REGIONS*MFB_REGION_SIZE+MFB_REGIONS*MFB_REGION_SIZE*max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1 downto 0);
-    signal bs_data_out_arr      : slv_array_2d_t(MFB_REGIONS downto 0)(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0)(MFB_BLOCK_SIZE*MFB_ITEM_WIDTH + 1 + 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1 downto 0);
+    signal   bs_data_out          : slv_array_t(MFB_REGIONS downto 0)((MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)+MFB_REGIONS*MFB_REGION_SIZE+MFB_REGIONS*MFB_REGION_SIZE+MFB_REGIONS*MFB_REGION_SIZE+MFB_REGIONS*MFB_REGION_SIZE*max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1 downto 0);
+    signal   bs_data_out_arr      : slv_array_2d_t(MFB_REGIONS downto 0)(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0)(MFB_BLOCK_SIZE*MFB_ITEM_WIDTH + 1 + 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)) - 1 downto 0);
 
     -- Data extraction
     signal bs_data_arr          : slv_array_2d_t(MFB_REGIONS downto 0)(MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0)(MFB_BLOCK_SIZE*MFB_ITEM_WIDTH - 1 downto 0);
@@ -74,15 +74,15 @@ begin
     -- Barrel Shifters per packet
     bs_g: for i in 0 to MFB_REGIONS generate
         barrel_shifter_i: entity work.BARREL_SHIFTER_GEN
-            generic map(
-                BLOCKS      => MFB_REGIONS*MFB_REGION_SIZE,
-                BLOCK_SIZE  => MFB_BLOCK_SIZE*MFB_ITEM_WIDTH + 1 + 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)),
-                SHIFT_LEFT  => false
-            )
-            port map(
-                DATA_IN     => RX_DATA(i),
-                DATA_OUT    => bs_data_out(i),
-                SEL         => RX_SEL(i)
+        generic map (
+            BLOCKS      => MFB_REGIONS*MFB_REGION_SIZE,
+            BLOCK_SIZE  => MFB_BLOCK_SIZE*MFB_ITEM_WIDTH + 1 + 1 + 1 + max(1, log2(RX_PKT_SIZE_MAX + 1)),
+            SHIFT_LEFT  => false
+        )
+        port map (
+            DATA_IN     => RX_DATA(i),
+            DATA_OUT    => bs_data_out(i),
+            SEL         => RX_SEL(i)
         );
     end generate;
 
@@ -110,7 +110,7 @@ begin
     end generate;
 
     -- This register is necessary - helps with pointer synchronization
-    out_reg_p: process(all)
+    out_reg_p : process (all)
     begin
         if rising_edge(CLK) then
             TX_DATA         <= tx_data_s;

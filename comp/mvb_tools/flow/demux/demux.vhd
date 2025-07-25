@@ -70,7 +70,7 @@ entity GEN_MVB_DEMUX is
     );
 end entity;
 
-architecture behavioral of GEN_MVB_DEMUX is
+architecture BEHAVIORAL of GEN_MVB_DEMUX is
 
     constant SEL_WIDTH          : natural := max(1, log2(DEMUX_WIDTH));
 
@@ -99,9 +99,9 @@ begin
         process (CLK)
         begin
             if rising_edge(CLK) then
-                if RESET = '1' then
+                if (RESET = '1') then
                     rx_srdy_int <= '0';
-                elsif fork_rx_dst_rdy = '1' then
+                elsif (fork_rx_dst_rdy = '1') then
                     rx_sel_arr  <= slv_array_deser(RX_SEL, MVB_ITEMS);
                     rx_data_arr <= slv_array_deser(RX_DATA, MVB_ITEMS);
                     rx_vld_int  <= RX_VLD;
@@ -157,7 +157,7 @@ begin
     fork_tx_vld_arr     <= slv_array_deser(fork_tx_vld, DEMUX_WIDTH);
 
     discard_g : for i in 0 to DEMUX_WIDTH - 1 generate
-        signal discard_rx_all  : slv_array_t(MVB_ITEMS - 1 downto 0)(DATA_WIDTH + DEMUX_WIDTH - 1 downto 0);
+        signal discard_rx_all   : slv_array_t(MVB_ITEMS - 1 downto 0)(DATA_WIDTH + DEMUX_WIDTH - 1 downto 0);
         signal discard_rx_data  : slv_array_t(MVB_ITEMS - 1 downto 0)(DATA_WIDTH - 1 downto 0);
         signal discard_rx_sel   : slv_array_t(MVB_ITEMS - 1 downto 0)(DEMUX_WIDTH - 1 downto 0);
         signal dicard_rx_disc   : std_logic_vector(MVB_ITEMS - 1 downto 0);
@@ -196,4 +196,4 @@ begin
     TX_DATA <= slv_array_ser(tx_data_arr);
     TX_VLD  <= slv_array_ser(tx_vld_arr);
 
-end architecture behavioral;
+end architecture;

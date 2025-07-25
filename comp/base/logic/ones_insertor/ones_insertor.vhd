@@ -21,17 +21,17 @@ use work.math_pack.all;
 -- It is expected that OFFSET_LOW < OFFSET_HIGH.
 -- When it is not (OFFSET_LOW > OFFSET_HIGH), the output vector will be all 0s.
 entity ONES_INSERTOR is
-generic(
-    -- Width of the Offset signals, max 32 (due to Integer type limit).
-    OFFSET_WIDTH : integer := 6
-);
-port(
-    OFFSET_LOW  : in  unsigned(OFFSET_WIDTH-1 downto 0);
-    OFFSET_HIGH : in  unsigned(OFFSET_WIDTH-1 downto 0);
-    VALID       : in  std_logic := '1';
+    generic (
+        -- Width of the Offset signals, max 32 (due to Integer type limit).
+        OFFSET_WIDTH : integer := 6
+    );
+    port (
+        OFFSET_LOW  : in  unsigned(OFFSET_WIDTH-1 downto 0);
+        OFFSET_HIGH : in  unsigned(OFFSET_WIDTH-1 downto 0);
+        VALID       : in  std_logic := '1';
 
-    ONES_VECTOR : out std_logic_vector(2**OFFSET_WIDTH-1 downto 0)
-);
+        ONES_VECTOR : out std_logic_vector(2**OFFSET_WIDTH-1 downto 0)
+    );
 end entity;
 
 architecture FULL of ONES_INSERTOR is
@@ -45,7 +45,7 @@ architecture FULL of ONES_INSERTOR is
 
 begin
 
-    process(all)
+    process (all)
     begin
         -- init
         ones_vec1 <= (others => '0');
@@ -58,7 +58,7 @@ begin
         -- 1st vector: from the MSB to the first Offset
         ones_vec1(2**OFFSET_WIDTH-1 downto ptr1) <= (others => '1');
         -- 2nd vector: from the second Offset to 0
-        ones_vec2(ptr2 downto 0) <= (others => '1');
+        ones_vec2(ptr2 downto 0)                 <= (others => '1');
     end process;
 
     -- vectors combined

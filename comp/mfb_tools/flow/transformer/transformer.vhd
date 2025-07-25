@@ -98,65 +98,67 @@ begin
     -- RX regions > TX regions
     gen_arch_down_g: if (RX_REGIONS > TX_REGIONS) generate
         mfb_transformer_down_i: entity work.MFB_TRANSFORMER_DOWN
-            generic map (
-                RX_REGIONS  => RX_REGIONS,
-                TX_REGIONS  => TX_REGIONS,
-                REGION_SIZE => REGION_SIZE,
-                BLOCK_SIZE  => BLOCK_SIZE,
-                ITEM_WIDTH  => ITEM_WIDTH,
-                META_WIDTH  => META_WIDTH)
-            port map (
-                CLK         => CLK,
-                RESET       => RESET,
-                RX_DATA     => RX_DATA,
-                RX_META     => RX_META,
-                RX_SOP      => RX_SOP,
-                RX_EOP      => RX_EOP,
-                RX_SOP_POS  => RX_SOP_POS,
-                RX_EOP_POS  => RX_EOP_POS,
-                RX_SRC_RDY  => RX_SRC_RDY,
-                RX_DST_RDY  => RX_DST_RDY,
-                TX_DATA     => TX_DATA,
-                TX_META     => TX_META,
-                TX_SOP      => TX_SOP,
-                TX_EOP      => TX_EOP,
-                TX_SOP_POS  => TX_SOP_POS,
-                TX_EOP_POS  => TX_EOP_POS,
-                TX_SRC_RDY  => TX_SRC_RDY,
-                TX_DST_RDY  => TX_DST_RDY
-            );
+        generic map (
+            RX_REGIONS  => RX_REGIONS,
+            TX_REGIONS  => TX_REGIONS,
+            REGION_SIZE => REGION_SIZE,
+            BLOCK_SIZE  => BLOCK_SIZE,
+            ITEM_WIDTH  => ITEM_WIDTH,
+            META_WIDTH  => META_WIDTH
+        )
+        port map (
+            CLK         => CLK,
+            RESET       => RESET,
+            RX_DATA     => RX_DATA,
+            RX_META     => RX_META,
+            RX_SOP      => RX_SOP,
+            RX_EOP      => RX_EOP,
+            RX_SOP_POS  => RX_SOP_POS,
+            RX_EOP_POS  => RX_EOP_POS,
+            RX_SRC_RDY  => RX_SRC_RDY,
+            RX_DST_RDY  => RX_DST_RDY,
+            TX_DATA     => TX_DATA,
+            TX_META     => TX_META,
+            TX_SOP      => TX_SOP,
+            TX_EOP      => TX_EOP,
+            TX_SOP_POS  => TX_SOP_POS,
+            TX_EOP_POS  => TX_EOP_POS,
+            TX_SRC_RDY  => TX_SRC_RDY,
+            TX_DST_RDY  => TX_DST_RDY
+        );
     end generate;
 
     -- RX regions < TX regions
     gen_arch_up_g: if (RX_REGIONS < TX_REGIONS) generate
         mfb_transformer_up_i: entity work.MFB_TRANSFORMER_UP
-            generic map (
-                RX_REGIONS  => RX_REGIONS,
-                TX_REGIONS  => TX_REGIONS,
-                REGION_SIZE => REGION_SIZE,
-                BLOCK_SIZE  => BLOCK_SIZE,
-                ITEM_WIDTH  => ITEM_WIDTH,
-                META_WIDTH  => META_WIDTH)
-            port map (
-                CLK         => CLK,
-                RESET       => RESET,
-                RX_DATA     => RX_DATA,
-                RX_META     => RX_META,
-                RX_SOP      => RX_SOP,
-                RX_EOP      => RX_EOP,
-                RX_SOP_POS  => RX_SOP_POS,
-                RX_EOP_POS  => RX_EOP_POS,
-                RX_SRC_RDY  => RX_SRC_RDY,
-                RX_DST_RDY  => RX_DST_RDY,
-                TX_DATA     => TX_DATA,
-                TX_META     => TX_META,
-                TX_SOP      => TX_SOP,
-                TX_EOP      => TX_EOP,
-                TX_SOP_POS  => TX_SOP_POS,
-                TX_EOP_POS  => TX_EOP_POS,
-                TX_SRC_RDY  => TX_SRC_RDY,
-                TX_DST_RDY  => TX_DST_RDY
-            );
+        generic map (
+            RX_REGIONS  => RX_REGIONS,
+            TX_REGIONS  => TX_REGIONS,
+            REGION_SIZE => REGION_SIZE,
+            BLOCK_SIZE  => BLOCK_SIZE,
+            ITEM_WIDTH  => ITEM_WIDTH,
+            META_WIDTH  => META_WIDTH
+        )
+        port map (
+            CLK         => CLK,
+            RESET       => RESET,
+            RX_DATA     => RX_DATA,
+            RX_META     => RX_META,
+            RX_SOP      => RX_SOP,
+            RX_EOP      => RX_EOP,
+            RX_SOP_POS  => RX_SOP_POS,
+            RX_EOP_POS  => RX_EOP_POS,
+            RX_SRC_RDY  => RX_SRC_RDY,
+            RX_DST_RDY  => RX_DST_RDY,
+            TX_DATA     => TX_DATA,
+            TX_META     => TX_META,
+            TX_SOP      => TX_SOP,
+            TX_EOP      => TX_EOP,
+            TX_SOP_POS  => TX_SOP_POS,
+            TX_EOP_POS  => TX_EOP_POS,
+            TX_SRC_RDY  => TX_SRC_RDY,
+            TX_DST_RDY  => TX_DST_RDY
+        );
     end generate;
 
 end architecture;

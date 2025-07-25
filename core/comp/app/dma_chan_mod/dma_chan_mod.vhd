@@ -10,27 +10,27 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity APP_DMA_CHAN_MOD is
-generic (
-    -- MFB parameters
-    MFB_REGIONS     : natural := 1;
-    -- Number of channels for one DMA Stream
-    DMA_RX_CHANNELS : natural := 16;
-    DMA_TX_CHANNELS : natural := 16;
-    -- Divider of DMA channels, typically:
-    -- the number of APP streams per one DMA stream
-    DIVIDER         : natural := 2;
-    -- ID number of this instance
-    STREAM_ID       : natural := 0;
-    -- Enable channel modifications
-    ENABLE_MOD      : boolean := False
-);
-port (
-    APP_RX_MVB_CHANNEL : in  std_logic_vector(MFB_REGIONS*log2(DMA_RX_CHANNELS/DIVIDER)-1 downto 0);
-    DMA_RX_MVB_CHANNEL : out std_logic_vector(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
+    generic (
+        -- MFB parameters
+        MFB_REGIONS     : natural := 1;
+        -- Number of channels for one DMA Stream
+        DMA_RX_CHANNELS : natural := 16;
+        DMA_TX_CHANNELS : natural := 16;
+        -- Divider of DMA channels, typically:
+        -- the number of APP streams per one DMA stream
+        DIVIDER         : natural := 2;
+        -- ID number of this instance
+        STREAM_ID       : natural := 0;
+        -- Enable channel modifications
+        ENABLE_MOD      : boolean := False
+    );
+    port (
+        APP_RX_MVB_CHANNEL : in  std_logic_vector(MFB_REGIONS*log2(DMA_RX_CHANNELS/DIVIDER)-1 downto 0);
+        DMA_RX_MVB_CHANNEL : out std_logic_vector(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
 
-    APP_TX_MVB_CHANNEL : out std_logic_vector(MFB_REGIONS*log2(DMA_TX_CHANNELS/DIVIDER)-1 downto 0);
-    DMA_TX_MVB_CHANNEL : in  std_logic_vector(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0)
-);
+        APP_TX_MVB_CHANNEL : out std_logic_vector(MFB_REGIONS*log2(DMA_TX_CHANNELS/DIVIDER)-1 downto 0);
+        DMA_TX_MVB_CHANNEL : in  std_logic_vector(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0)
+    );
 end entity;
 
 architecture FULL of APP_DMA_CHAN_MOD is

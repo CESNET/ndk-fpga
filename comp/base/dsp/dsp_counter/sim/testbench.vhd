@@ -8,7 +8,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use std.env.all;
-use STD.textio.all;
+use std.textio.all;
 
 library work;
 use work.basics_test_pkg.all;
@@ -26,7 +26,7 @@ use work.basics_test_pkg.all;
 --                        Entity declaration
 -- ============================================================================
 entity TESTBENCH is
-end entity TESTBENCH;
+end entity;
 -- ============================================================================
 --                      Architecture declaration
 -- ============================================================================
@@ -40,7 +40,7 @@ architecture BEHAVIORAL of TESTBENCH is
     constant DSP_ENABLE    : boolean := true;
     -- number of clock cycles the simulation should run for - this must concur with the length of sumulation defined in sim_sig.fdo ("run ... us")
     constant LENGHT_OF_SIM : natural := 100000;
-    constant CLK_PERIOD : time := 10 ns;
+    constant CLK_PERIOD    : time := 10 ns;
 
     -- setting signals
     signal clk     : std_logic;
@@ -56,17 +56,17 @@ architecture BEHAVIORAL of TESTBENCH is
     signal stop_at_the_end   : std_logic := '0'; -- stops the simulation when LENGHT_OF_SIM is reached
 
     -- signals to simulate the counter
-    signal cnt_by_behind_regs      : std_logic_vector(INPUT_WIDTH-1 downto 0); -- this signal helps to adjust to the wierd latency of Xilinx DSP counter
-    signal cnt_by_behind_all_regs  : std_logic_vector(INPUT_WIDTH-1 downto 0); -- if input register is enabled, cnt_by signal must be delayed
-    signal clk_ena_behind_regs     : std_logic; -- this signal helps to adjust to the wierd latency of Xilinx DSP counter
-    signal clk_ena_behind_all_regs : std_logic; -- if input register is enabled, clk_ena signal must be delayed as well
-    signal rst_behind_regs         : std_logic; -- this signal helps to adjust to the wierd latency of Xilinx DSP counter
+    signal cnt_by_behind_regs      : std_logic_vector(INPUT_WIDTH-1 downto 0);                     -- this signal helps to adjust to the wierd latency of Xilinx DSP counter
+    signal cnt_by_behind_all_regs  : std_logic_vector(INPUT_WIDTH-1 downto 0);                     -- if input register is enabled, cnt_by signal must be delayed
+    signal clk_ena_behind_regs     : std_logic;                                                    -- this signal helps to adjust to the wierd latency of Xilinx DSP counter
+    signal clk_ena_behind_all_regs : std_logic;                                                    -- if input register is enabled, clk_ena signal must be delayed as well
+    signal rst_behind_regs         : std_logic;                                                    -- this signal helps to adjust to the wierd latency of Xilinx DSP counter
     signal sim_result              : std_logic_vector(OUTPUT_WIDTH-1 downto 0) := (others => '0'); -- result of the simulated counter
 
     -- signals to evaluate correct functioning of the counter
     signal correct_results   : integer := 1; -- counts successful iterations
     signal incorrect_results : integer := 1; -- counts incorrect results
-    signal result_ok         : std_logic; -- the result from comparing the simulation result with the counter result
+    signal result_ok         : std_logic;    -- the result from comparing the simulation result with the counter result
 
     shared variable l : line;
 
@@ -74,18 +74,18 @@ begin
 
     uut : entity work.DSP_COUNTER
     generic map (
-        DEVICE       => DEVICE      ,
-        INPUT_REGS   => INPUT_REGS  ,
-        INPUT_WIDTH  => INPUT_WIDTH ,
+        DEVICE       => DEVICE,
+        INPUT_REGS   => INPUT_REGS,
+        INPUT_WIDTH  => INPUT_WIDTH,
         OUTPUT_WIDTH => OUTPUT_WIDTH,
         DSP_ENABLE   => DSP_ENABLE
     )
-    port map(
-        CLK        => clk    ,
+    port map (
+        CLK        => clk,
         CLK_EN     => clk_ena,
-        RESET      => rst    ,
-        INCREMENT  => cnt_by ,
-        MAX_VAL    => max    ,
+        RESET      => rst,
+        INCREMENT  => cnt_by,
+        MAX_VAL    => max,
         RESULT     => cnt_result
     );
 
@@ -121,7 +121,7 @@ begin
     clk_ena_p : process
         variable s0 : integer := 3;
         variable s1 : integer := 2;
-        variable X  : integer := 6;
+        variable x  : integer := 6;
     begin
         clk_ena <= '0';
         wait until rst = '0';
@@ -130,8 +130,8 @@ begin
         clk_ena_rand_gen_l : for i in 0 to 1000 loop
             if (stop_at_the_end = '0') then
                 -- generate random times to assert and deassert clk_ena
-                randint(s0, s1, 2, 10, X);
-                wait for (i+1)*CLK_PERIOD*X;
+                randint(s0, s1, 2, 10, x);
+                wait for (i+1)*CLK_PERIOD*x;
                 clk_ena <= '0';
                 wait for 2*CLK_PERIOD;
                 clk_ena <= '1';
@@ -146,7 +146,7 @@ begin
     rst_p : process
         variable s0 : integer := 7;
         variable s1 : integer := 3;
-        variable X  : integer := 2;
+        variable x  : integer := 2;
     begin
         rst <= '1';
         wait for 3*CLK_PERIOD;
@@ -155,8 +155,8 @@ begin
         rst_rand_gen_l : for i in 0 to 100 loop
             if (stop_at_the_end = '0') then
                 -- generate random times to assert rst
-                randint(s0, s1, 5, 15, X);
-                wait for (i+1)*CLK_PERIOD*X*X;
+                randint(s0, s1, 5, 15, x);
+                wait for (i+1)*CLK_PERIOD*x*x;
                 rst <= '1';
                 wait for 3*CLK_PERIOD;
                 rst <= '0';
@@ -171,15 +171,15 @@ begin
     rand_cnt_by_p : process
         variable s0 : integer := 8;
         variable s1 : integer := 9;
-        variable X  : integer := 4;
+        variable x  : integer := 4;
     begin
         if (stop_at_the_end = '0') then
             wait until rising_edge(clk);
             -- generating random integer
-            randint(s0, s1, 1, integer'high, X);
+            randint(s0, s1, 1, integer'high, x);
             wait for 0.1*CLK_PERIOD;
             -- using the randomly generated integer (X) to generate a random std_logic_vector
-            cnt_by <= random_vector(INPUT_WIDTH, X);
+            cnt_by <= random_vector(INPUT_WIDTH, x);
         else
             wait;
         end if;
@@ -196,10 +196,10 @@ begin
         begin
             if (rising_edge(clk)) then
                 if (rst = '1') then
-                    clk_ena_behind_regs <= '0';
+                    clk_ena_behind_regs     <= '0';
                     clk_ena_behind_all_regs <= '0';
                 else
-                    clk_ena_behind_regs <= clk_ena;
+                    clk_ena_behind_regs     <= clk_ena;
                     clk_ena_behind_all_regs <= clk_ena_behind_regs;
                 end if;
             end if;
@@ -263,7 +263,7 @@ begin
         input_regs_g : if (INPUT_REGS = false) generate
 
             clk_ena_behind_all_regs <= clk_ena;
-            cnt_by_behind_all_regs <= cnt_by;
+            cnt_by_behind_all_regs  <= cnt_by;
 
         else generate
 
@@ -330,11 +330,11 @@ begin
         if (stop_at_the_end = '0') then
             if (result_ok = '0') then
                 incorrect_results <= incorrect_results + 1;
-                --if (incorrect_results mod 1000 = 0) then
-                    write(l, string'("Results do not match. ")); writeline(output, l);
-                    write(l, now);
-                    stop(0);
-                --end if;
+                -- if (incorrect_results mod 1000 = 0) then
+                write(l, string'("Results do not match. ")); writeline(output, l);
+                write(l, now);
+                stop(0);
+            -- end if;
             else
                 correct_results <= correct_results + 1;
                 if (correct_results mod 10000 = 0) then

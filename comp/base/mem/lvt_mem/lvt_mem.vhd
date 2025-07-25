@@ -65,9 +65,9 @@ architecture FULL of LVT_MEM is
         return ret;
     end function;
 
-    constant lvt_wr_data    : slv_array_t(WRITE_PORTS-1 downto 0)(WR_PORT_IND_W-1 downto 0) := wrport_indexes;
-    signal lvt_rd_data_arr  : slv_array_t(WRITE_PORTS-1 downto 0)(WR_PORT_IND_W-1 downto 0);
-    signal lvt_rd_data      : std_logic_vector(WRITE_PORTS*WR_PORT_IND_W-1 downto 0);
+    constant LVT_WR_DATA      : slv_array_t(WRITE_PORTS-1 downto 0)(WR_PORT_IND_W-1 downto 0) := wrport_indexes;
+    signal   lvt_rd_data_arr  : slv_array_t(WRITE_PORTS-1 downto 0)(WR_PORT_IND_W-1 downto 0);
+    signal   lvt_rd_data      : std_logic_vector(WRITE_PORTS*WR_PORT_IND_W-1 downto 0);
 
     signal lut_rd_data_arr  : slv_array_2d_t(WRITE_PORTS-1 downto 0)(READ_PORTS-1 downto 0)(DATA_WIDTH-1 downto 0);
 begin
@@ -179,7 +179,7 @@ begin
             addr_match <= or (addr_match_vec);
 
             -- Add registers for read port when rd latency is one
-            rdw_reg_g : if RD_LATENCY=1 generate
+            rdw_reg_g : if RD_LATENCY = 1 generate
                 process (CLK)
                 begin
                     if rising_edge(CLK) then

@@ -8,15 +8,15 @@
 -- $Id$
 --
 library IEEE;
---use IEEE.std_logic_1164.all;
---use work.math_pack.all;
+-- use IEEE.std_logic_1164.all;
+-- use work.math_pack.all;
 
 -- ----------------------------------------------------------------------------
 --                        Package declaration
 -- ----------------------------------------------------------------------------
-Package CNT_TYPES is
+package cnt_types is
 
-   -- counter type
-   type TCNT is (up, down);
+    -- counter type
+    type tcnt is (UP, DOWN);
 
-end  CNT_TYPES;
+end package;

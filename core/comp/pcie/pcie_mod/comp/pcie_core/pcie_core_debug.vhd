@@ -95,7 +95,7 @@ use work.type_pack.all;
 -- +---------+------------------------------------------------------------------------------------------------------+-----------------+
 --
 entity PCIE_CORE_DEBUG is
-    generic(
+    generic (
         -- Number of PCIe endpoints
         PCIE_ENDPOINTS   : natural := 1;
 
@@ -110,7 +110,7 @@ entity PCIE_CORE_DEBUG is
         -- FPGA device
         DEVICE           : string  := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         -- User PCIe clock and reset
         -- =====================================================================
@@ -164,9 +164,9 @@ architecture FULL of PCIE_CORE_DEBUG is
     constant DBG_EVENT_OFFSET        : natural := 16#10#;
     constant DBG_MAX_INTERVAL_CYCLES : natural := 2**24-1;
     constant DBG_MAX_INTERVALS       : natural := 1024;
-    constant DBG_MI_INTERVAL_ADDR    : std_logic_vector(MI_WIDTH-1 downto 0) := std_logic_vector(to_unsigned(0 , MI_WIDTH));
-    constant DBG_MI_EVENTS_ADDR      : std_logic_vector(MI_WIDTH-1 downto 0) := std_logic_vector(to_unsigned(4 , MI_WIDTH));
-    constant DBG_MI_CAPTURE_EN_ADDR  : std_logic_vector(MI_WIDTH-1 downto 0) := std_logic_vector(to_unsigned(8 , MI_WIDTH));
+    constant DBG_MI_INTERVAL_ADDR    : std_logic_vector(MI_WIDTH-1 downto 0) := std_logic_vector(to_unsigned(0, MI_WIDTH));
+    constant DBG_MI_EVENTS_ADDR      : std_logic_vector(MI_WIDTH-1 downto 0) := std_logic_vector(to_unsigned(4, MI_WIDTH));
+    constant DBG_MI_CAPTURE_EN_ADDR  : std_logic_vector(MI_WIDTH-1 downto 0) := std_logic_vector(to_unsigned(8, MI_WIDTH));
     constant DBG_MI_CAPTURE_RD_ADDR  : std_logic_vector(MI_WIDTH-1 downto 0) := std_logic_vector(to_unsigned(12, MI_WIDTH));
     constant DBG_MI_ADDR_MASK        : std_logic_vector(MI_WIDTH-1 downto 0) := (3 downto 2 => '1', others => '0');
     -- Number of Streaming Debug Probes per each PCIe Endpoint.
@@ -260,34 +260,34 @@ begin
     debug_g : if DBG_ENABLE generate
 
         mi_splitter_endpts_i : entity work.MI_SPLITTER_PLUS_GEN
-        generic map(
-            ADDR_WIDTH => MI_WIDTH             ,
-            DATA_WIDTH => MI_WIDTH             ,
-            PORTS      => PCIE_ENDPOINTS       ,
+        generic map (
+            ADDR_WIDTH => MI_WIDTH,
+            DATA_WIDTH => MI_WIDTH,
+            PORTS      => PCIE_ENDPOINTS,
             ADDR_BASE  => mi_addr_base_endpts_f,
-            PIPE_OUT   => (others => false)    ,
+            PIPE_OUT   => (others => false),
             DEVICE     => DEVICE
         )
-        port map(
-            CLK     => MI_CLK       ,
-            RESET   => MI_RESET     ,
+        port map (
+            CLK     => MI_CLK,
+            RESET   => MI_RESET,
 
-            RX_DWR  => MI_DWR       ,
-            RX_ADDR => MI_ADDR      ,
-            RX_BE   => MI_BE        ,
-            RX_RD   => MI_RD        ,
-            RX_WR   => MI_WR        ,
-            RX_ARDY => MI_ARDY      ,
-            RX_DRD  => MI_DRD       ,
-            RX_DRDY => MI_DRDY      ,
+            RX_DWR  => MI_DWR,
+            RX_ADDR => MI_ADDR,
+            RX_BE   => MI_BE,
+            RX_RD   => MI_RD,
+            RX_WR   => MI_WR,
+            RX_ARDY => MI_ARDY,
+            RX_DRD  => MI_DRD,
+            RX_DRDY => MI_DRDY,
 
-            TX_DWR  => mi_split_dwr ,
+            TX_DWR  => mi_split_dwr,
             TX_ADDR => mi_split_addr,
-            TX_BE   => mi_split_be  ,
-            TX_RD   => mi_split_rd  ,
-            TX_WR   => mi_split_wr  ,
+            TX_BE   => mi_split_be,
+            TX_RD   => mi_split_rd,
+            TX_WR   => mi_split_wr,
             TX_ARDY => mi_split_ardy,
-            TX_DRD  => mi_split_drd ,
+            TX_DRD  => mi_split_drd,
             TX_DRDY => mi_split_drdy
         );
 
@@ -297,10 +297,10 @@ begin
             --  MI Async
             -- ----------
             mi_async_i : entity work.MI_ASYNC
-            generic map(
+            generic map (
                 DEVICE => DEVICE
             )
-            port map(
+            port map (
                 CLK_M     => MI_CLK,
                 RESET_M   => MI_RESET,
                 MI_M_DWR  => mi_split_dwr (pe),
@@ -328,15 +328,15 @@ begin
             --  MI Splitter for all MI interfaces in each Endpoint
             -- ----------------------------------------------------
             mi_splitter_debug_i : entity work.MI_SPLITTER_PLUS_GEN
-            generic map(
-                ADDR_WIDTH => MI_WIDTH          ,
-                DATA_WIDTH => MI_WIDTH          ,
-                PORTS      => 1+DBG_EVENTS      ,
+            generic map (
+                ADDR_WIDTH => MI_WIDTH,
+                DATA_WIDTH => MI_WIDTH,
+                PORTS      => 1+DBG_EVENTS,
                 ADDR_BASE  => mi_addr_base_dbg_f,
-                PIPE_OUT   => (others => true)  ,
+                PIPE_OUT   => (others => true),
                 DEVICE     => DEVICE
             )
-            port map(
+            port map (
                 CLK     => PCIE_CLK         (pe),
                 RESET   => PCIE_RESET       (pe),
 
@@ -363,10 +363,10 @@ begin
             --  Streaming Debug Master for each PCIe Endpoint
             -- -----------------------------------------------
             debug_master_i : entity work.STREAMING_DEBUG_MASTER
-            generic map(
-                CONNECTED_PROBES   => DBG_PROBES              ,
-                REGIONS            => 1                       ,
-                DEBUG_ENABLED      => true                    ,
+            generic map (
+                CONNECTED_PROBES   => DBG_PROBES,
+                REGIONS            => 1,
+                DEBUG_ENABLED      => true,
                 PROBE_ENABLED      => (1 to DBG_PROBES => 'E'),
                 COUNTER_WORD       => (1 to DBG_PROBES => 'E'),
                 COUNTER_WAIT       => (1 to DBG_PROBES => 'E'),
@@ -375,10 +375,10 @@ begin
                 COUNTER_SOP        => (1 to DBG_PROBES => 'D'), -- disabled
                 COUNTER_EOP        => (1 to DBG_PROBES => 'D'), -- disabled
                 BUS_CONTROL        => (1 to DBG_PROBES => 'D'), -- disabled
-                PROBE_NAMES        => DBG_PROBE_STR           ,
+                PROBE_NAMES        => DBG_PROBE_STR,
                 DEBUG_REG          => true
             )
-            port map(
+            port map (
                 CLK           => PCIE_CLK         (pe),
                 RESET         => PCIE_RESET       (pe),
 
@@ -391,19 +391,19 @@ begin
                 MI_ARDY       => mi_split_dbg_ardy(pe)(0),
                 MI_DRDY       => mi_split_dbg_drdy(pe)(0),
 
-                DEBUG_BLOCK   => open                    ,
-                DEBUG_DROP    => open                    ,
-                DEBUG_SOP     => (others => '0')         ,
-                DEBUG_EOP     => (others => '0')         ,
-                DEBUG_SRC_RDY => dp_out_src_rdy   (pe)   ,
+                DEBUG_BLOCK   => open,
+                DEBUG_DROP    => open,
+                DEBUG_SOP     => (others => '0'),
+                DEBUG_EOP     => (others => '0'),
+                DEBUG_SRC_RDY => dp_out_src_rdy   (pe),
                 DEBUG_DST_RDY => dp_out_dst_rdy   (pe)
             );
 
             up_debug_probe_i : entity work.STREAMING_DEBUG_PROBE_MFB
-            generic map(
+            generic map (
                 REGIONS => 1
             )
-            port map(
+            port map (
                 RX_SOF         => (others => '0'),
                 RX_EOF         => (others => '0'),
                 RX_SRC_RDY     => DBG_UP_SRC_RDY(pe),
@@ -423,10 +423,10 @@ begin
             );
 
             down_debug_probe_i : entity work.STREAMING_DEBUG_PROBE_MFB
-            generic map(
+            generic map (
                 REGIONS => 1
             )
-            port map(
+            port map (
                 RX_SOF         => (others => '0'),
                 RX_EOF         => (others => '0'),
                 RX_SRC_RDY     => DBG_DW_SRC_RDY(pe),
@@ -441,7 +441,7 @@ begin
                 DEBUG_DROP     => '0',
                 DEBUG_SOF      => open,
                 DEBUG_EOF      => open,
-                DEBUG_SRC_RDY  => dp_out_src_rdy(pe)(1) ,
+                DEBUG_SRC_RDY  => dp_out_src_rdy(pe)(1),
                 DEBUG_DST_RDY  => dp_out_dst_rdy(pe)(1)
             );
 
@@ -450,19 +450,19 @@ begin
             -- ----------------
             eve_cnt_g : for de in 0 to DBG_EVENTS-1 generate
                 eve_cnt_i : entity work.EVENT_COUNTER_MI_WRAPPER
-                generic map(
+                generic map (
                     MAX_INTERVAL_CYCLES   => DBG_MAX_INTERVAL_CYCLES,
-                    MAX_CONCURRENT_EVENTS => 1                      ,
-                    CAPTURE_EN            => True                   ,
-                    CAPTURE_FIFO_ITEMS    => DBG_MAX_INTERVALS      ,
-                    MI_WIDTH              => MI_WIDTH               ,
-                    MI_INTERVAL_ADDR      => DBG_MI_INTERVAL_ADDR   ,
-                    MI_EVENTS_ADDR        => DBG_MI_EVENTS_ADDR     ,
-                    MI_CPT_EN_ADDR        => DBG_MI_CAPTURE_EN_ADDR ,
-                    MI_CPT_RD_ADDR        => DBG_MI_CAPTURE_RD_ADDR ,
+                    MAX_CONCURRENT_EVENTS => 1,
+                    CAPTURE_EN            => True,
+                    CAPTURE_FIFO_ITEMS    => DBG_MAX_INTERVALS,
+                    MI_WIDTH              => MI_WIDTH,
+                    MI_INTERVAL_ADDR      => DBG_MI_INTERVAL_ADDR,
+                    MI_EVENTS_ADDR        => DBG_MI_EVENTS_ADDR,
+                    MI_CPT_EN_ADDR        => DBG_MI_CAPTURE_EN_ADDR,
+                    MI_CPT_RD_ADDR        => DBG_MI_CAPTURE_RD_ADDR,
                     MI_ADDR_MASK          => DBG_MI_ADDR_MASK
                 )
-                port map(
+                port map (
                     CLK       => PCIE_CLK         (pe),
                     RESET     => PCIE_RESET       (pe),
 
@@ -474,7 +474,7 @@ begin
                     MI_DRDY   => mi_split_dbg_drdy(pe)(de+1),
                     MI_DRD    => mi_split_dbg_drd (pe)(de+1),
 
-                    EVENT_CNT => (others => '1')            ,
+                    EVENT_CNT => (others => '1'),
                     EVENT_VLD => eve_all_reg      (pe)(de)
                 );
             end generate;

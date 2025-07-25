@@ -38,93 +38,93 @@ use work.type_pack.all;
 -- a few Items behind the EOF POS of the individual frame).
 --
 entity FRAME_UNPACKER is
-generic(
-    -- Number of Regions within a data word, must be power of 2.
-    MFB_REGIONS           : natural := 4;
-    -- Region size (in Blocks).
-    MFB_REGION_SIZE       : natural := 8;
-    -- Block size (in Items), must be 8.
-    MFB_BLOCK_SIZE        : natural := 8;
-    -- Item width (in bits), must be 8.
-    MFB_ITEM_WIDTH        : natural := 8;
+    generic (
+        -- Number of Regions within a data word, must be power of 2.
+        MFB_REGIONS           : natural := 4;
+        -- Region size (in Blocks).
+        MFB_REGION_SIZE       : natural := 8;
+        -- Block size (in Items), must be 8.
+        MFB_BLOCK_SIZE        : natural := 8;
+        -- Item width (in bits), must be 8.
+        MFB_ITEM_WIDTH        : natural := 8;
 
-    -- Number of MVB headers.
-    MVB_ITEMS             : natural := MFB_REGIONS;
-    -- Width of each MVB header (in bits).
-    MVB_ITEM_WIDTH        : natural := 16;
+        -- Number of MVB headers.
+        MVB_ITEMS             : natural := MFB_REGIONS;
+        -- Width of each MVB header (in bits).
+        MVB_ITEM_WIDTH        : natural := 16;
 
-    -- Length of the prepended header (in Items).
-    -- The minimum is 2 Items (16b), which are for the Length field that is necesary for the unpacking process.
-    HEADER_LENGTH         : natural := 16;
-    -- Number of stages in the Offset pipeline.
-    -- It is also the maximum number of individual frames inside a single SuperPacket.
-    -- Must be greater than 0!
-    UNPACKING_STAGES      : natural := 20;
-    -- The extracted Header is output as:
-    --   - Insert header to output metadata with SOF (MODE 0),
-    --   - Insert header to output metadata with EOF (MODE 1),
-    --   - Insert header on MVB (MODE 2).
-    META_OUT_MODE         : natural := 0;
+        -- Length of the prepended header (in Items).
+        -- The minimum is 2 Items (16b), which are for the Length field that is necesary for the unpacking process.
+        HEADER_LENGTH         : natural := 16;
+        -- Number of stages in the Offset pipeline.
+        -- It is also the maximum number of individual frames inside a single SuperPacket.
+        -- Must be greater than 0!
+        UNPACKING_STAGES      : natural := 20;
+        -- The extracted Header is output as:
+        --   - Insert header to output metadata with SOF (MODE 0),
+        --   - Insert header to output metadata with EOF (MODE 1),
+        --   - Insert header on MVB (MODE 2).
+        META_OUT_MODE         : natural := 0;
 
-    -- Maximum size of a packet (in Items).
-    PKT_MTU               : natural := 2**14;
+        -- Maximum size of a packet (in Items).
+        PKT_MTU               : natural := 2**14;
 
-    -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
-    DEVICE                : string := "STRATIX10"
-);
-port(
-    -- =====================================================================
-    --  Clock and Reset
-    -- =====================================================================
+        -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
+        DEVICE                : string := "STRATIX10"
+    );
+    port (
+        -- =====================================================================
+        --  Clock and Reset
+        -- =====================================================================
 
-    CLK            : in  std_logic;
-    RESET          : in  std_logic;
+        CLK            : in  std_logic;
+        RESET          : in  std_logic;
 
-    -- =====================================================================
-    --  TX MVB Headers (per each SuperPacket)
-    -- =====================================================================
+        -- =====================================================================
+        --  TX MVB Headers (per each SuperPacket)
+        -- =====================================================================
 
-    RX_MVB_DATA    : in  std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0);
-    RX_MVB_VLD     : in  std_logic_vector(MVB_ITEMS-1 downto 0);
-    RX_MVB_SRC_RDY : in  std_logic;
-    RX_MVB_DST_RDY : out std_logic;
+        RX_MVB_DATA    : in  std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0);
+        RX_MVB_VLD     : in  std_logic_vector(MVB_ITEMS-1 downto 0);
+        RX_MVB_SRC_RDY : in  std_logic;
+        RX_MVB_DST_RDY : out std_logic;
 
-    -- =====================================================================
-    --  RX MFB STREAM (SuperPackets)
-    -- =====================================================================
+        -- =====================================================================
+        --  RX MFB STREAM (SuperPackets)
+        -- =====================================================================
 
-    RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SRC_RDY : in  std_logic;
-    RX_MFB_DST_RDY : out std_logic;
+        RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SRC_RDY : in  std_logic;
+        RX_MFB_DST_RDY : out std_logic;
 
-    -- =====================================================================
-    --  TX MFB STREAM (unpacked frames)
-    -- =====================================================================
+        -- =====================================================================
+        --  TX MFB STREAM (unpacked frames)
+        -- =====================================================================
 
-    TX_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- Valid with SOF, EOF, or not valid at all.
-    -- Contains concatenated MVB header and extracted SuperPacket header (RX_MVB_DATA & getit_indv_hdr_data).
-    TX_MFB_META    : out std_logic_vector(MFB_REGIONS*(MVB_ITEM_WIDTH+HEADER_LENGTH*MFB_ITEM_WIDTH)-1 downto 0) := (others => '0');
-    TX_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    TX_MFB_SOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_EOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_SRC_RDY : out std_logic;
-    TX_MFB_DST_RDY : in  std_logic;
+        TX_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- Valid with SOF, EOF, or not valid at all.
+        -- Contains concatenated MVB header and extracted SuperPacket header (RX_MVB_DATA & getit_indv_hdr_data).
+        TX_MFB_META    : out std_logic_vector(MFB_REGIONS*(MVB_ITEM_WIDTH+HEADER_LENGTH*MFB_ITEM_WIDTH)-1 downto 0) := (others => '0');
+        TX_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        TX_MFB_SOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_EOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_SRC_RDY : out std_logic;
+        TX_MFB_DST_RDY : in  std_logic;
 
-    -- =====================================================================
-    --  TX MVB Headers (MVB and SuperPacket headers)
-    -- =====================================================================
+        -- =====================================================================
+        --  TX MVB Headers (MVB and SuperPacket headers)
+        -- =====================================================================
 
-    TX_MVB_DATA    : out std_logic_vector(MFB_REGIONS*(MVB_ITEM_WIDTH+HEADER_LENGTH*MFB_ITEM_WIDTH)-1 downto 0);
-    TX_MVB_VLD     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MVB_SRC_RDY : out std_logic;
-    TX_MVB_DST_RDY : in  std_logic := '1'
-);
+        TX_MVB_DATA    : out std_logic_vector(MFB_REGIONS*(MVB_ITEM_WIDTH+HEADER_LENGTH*MFB_ITEM_WIDTH)-1 downto 0);
+        TX_MVB_VLD     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MVB_SRC_RDY : out std_logic;
+        TX_MVB_DST_RDY : in  std_logic := '1'
+    );
 end entity;
 
 architecture FULL of FRAME_UNPACKER is
@@ -155,19 +155,19 @@ architecture FULL of FRAME_UNPACKER is
     constant OFFSET_WIDTH_BLOCKS     : natural := log2(PKT_MAX_WORDS*MFB_REGIONS*MFB_REGION_SIZE);
 
     -- Offset Processor metadata:          SuPkt SOF POS    + SOF + EOF
-    constant OP_META_WIDTH    : natural := MFB_SOFPOS_WIDTH + 1   + 1;
+    constant OP_META_WIDTH      : natural := MFB_SOFPOS_WIDTH + 1   + 1;
     -- Width of merged MVB and SuPkt headers.
     constant MERGED_ITEMS_WIDTH : natural := MVB_ITEM_WIDTH + HDR_WIDTH;
     -- Last Valid implementation.
     -- Options: "serial", "parallel", "prefixsum"
-    constant LAST_VLD_IMPL : string := "serial";
+    constant LAST_VLD_IMPL      : string := "serial";
 
     -- ========================================================================
     --                                 SIGNALS
     -- ========================================================================
 
-    subtype my_integer is integer range MFB_REGIONS-1 downto 0;
-    type my_integer_vector is array(natural range <>) of my_integer;
+    subtype MY_INTEGER is integer range MFB_REGIONS-1 downto 0;
+    type    my_integer_vector is array(natural range <>) of MY_INTEGER;
 
     -- Debug cnt
     signal rx_pkt_count     : u_array_t(MFB_REGIONS downto 0)(16-1 downto 0);
@@ -203,7 +203,7 @@ architecture FULL of FRAME_UNPACKER is
     signal rx_supkt_meta         : slv_array_t(MFB_REGIONS-1 downto 0)(OP_META_WIDTH-1 downto 0);
 
     signal rx_data_blocks        : slv_array_t(MFB_REGIONS*MFB_REGION_SIZE-1 downto 0)(MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    signal rx_per_region_sof_pos : slv_array_t(MFB_REGIONS-1 downto 0)(max(1,log2(            MFB_REGION_SIZE))-1 downto 0);
+    signal rx_per_region_sof_pos : slv_array_t(MFB_REGIONS-1 downto 0)(max(1,log2(MFB_REGION_SIZE))-1 downto 0);
     signal rx_per_word_sof_pos   : u_array_t  (MFB_REGIONS-1 downto 0)(max(1,log2(MFB_REGIONS*MFB_REGION_SIZE))-1 downto 0);
     signal rx_global_sof_pos     : u_array_t  (MFB_REGIONS-1 downto 0)(OFFSET_WIDTH_ITEMS-1 downto 0);
     signal rx_ext_length         : slv_array_t(MFB_REGIONS-1 downto 0)(LENGTH_WIDTH  -1 downto 0);
@@ -439,11 +439,11 @@ begin
     -- Debug counter
     -- ========================================================================
 
-    --pragma synthesis_off
-    process(CLK)
+    -- pragma synthesis_off
+    process (CLK)
     begin
         if rising_edge(CLK) then
-            if (RX_MFB_SRC_RDY = '1') and (first_op_dst_rdy = '1') then
+            if ((RX_MFB_SRC_RDY = '1') and (first_op_dst_rdy = '1')) then
                 rx_pkt_count(0) <= rx_pkt_count(MFB_REGIONS);
                 -- report "Packet count: " & to_string(to_integer(rx_pkt_count(0)));
             end if;
@@ -457,39 +457,39 @@ begin
     dbg_cnt_g : for r in 0 to MFB_REGIONS-1 generate
         rx_pkt_count(r+1) <= rx_pkt_count(r)+1 when (RX_MFB_EOF(r) = '1') else rx_pkt_count(r);
     end generate;
-    --pragma synthesis_on
+    -- pragma synthesis_on
 
     -- ========================================================================
     -- SupekPacket MVB headers
     -- ========================================================================
 
-    fifoxm_data <= RX_MVB_DATA;
-    fifoxm_wr   <= RX_MVB_VLD and RX_MVB_SRC_RDY;
+    fifoxm_data    <= RX_MVB_DATA;
+    fifoxm_wr      <= RX_MVB_VLD and RX_MVB_SRC_RDY;
     RX_MVB_DST_RDY <= not fifoxm_full;
 
     -- -------------
     --  FIFOX MULTI
     -- -------------
     fifoxm_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH     => MVB_ITEM_WIDTH,
-        ITEMS          => 512           ,
-        WRITE_PORTS    => MVB_ITEMS     ,
-        READ_PORTS     => MVB_ITEMS     ,
-        RAM_TYPE       => "AUTO"        ,
-        SAFE_READ_MODE => false         ,
+        ITEMS          => 512,
+        WRITE_PORTS    => MVB_ITEMS,
+        READ_PORTS     => MVB_ITEMS,
+        RAM_TYPE       => "AUTO",
+        SAFE_READ_MODE => false,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        DI    => fifoxm_data ,
-        WR    => fifoxm_wr   ,
-        FULL  => fifoxm_full ,
+        DI    => fifoxm_data,
+        WR    => fifoxm_wr,
+        FULL  => fifoxm_full,
 
-        DO    => fifoxm_do   ,
-        RD    => fifoxm_rd   ,
+        DO    => fifoxm_do,
+        RD    => fifoxm_rd,
         EMPTY => fifoxm_empty
     );
 
@@ -505,9 +505,9 @@ begin
         last_eof_remapped <= (others => '0');
         last_eof_ptr      := 0;
         for r in 0 to MFB_REGIONS-1 loop
-            if (getit_indv_pkt_last_eof(r) = '1') and (getit_indv_pkt_src_rdy = '1') then
+            if ((getit_indv_pkt_last_eof(r) = '1') and (getit_indv_pkt_src_rdy = '1')) then
                 last_eof_remapped(last_eof_ptr) <= '1';
-                last_eof_ptr := last_eof_ptr + 1;
+                last_eof_ptr                    := last_eof_ptr + 1;
             end if;
         end loop;
     end process;
@@ -523,14 +523,14 @@ begin
     begin
         last_eof_respaced <= (others => '0');
         eof_remapped      <= (others => '0');
-        eof_ptr := 0;
+        eof_ptr           := 0;
         for r in 0 to MFB_REGIONS-1 loop
-            if (getit_indv_pkt_eof(r) = '1') and (getit_indv_pkt_src_rdy = '1') then
+            if ((getit_indv_pkt_eof(r) = '1') and (getit_indv_pkt_src_rdy = '1')) then
                 if (getit_indv_pkt_last_eof(r) = '1') then
                     last_eof_respaced(eof_ptr) <= '1';
                 end if;
                 eof_remapped(eof_ptr) <= '1';
-                eof_ptr := eof_ptr + 1;
+                eof_ptr               := eof_ptr + 1;
             end if;
         end loop;
     end process;
@@ -569,7 +569,7 @@ begin
     -- ----------------------------------------------
     --  Process the first header of each SuperPacket
     -- ----------------------------------------------
-    rx_data_blocks        <= slv_array_deser(RX_MFB_DATA   , MFB_REGIONS*MFB_REGION_SIZE);
+    rx_data_blocks        <= slv_array_deser(RX_MFB_DATA, MFB_REGIONS*MFB_REGION_SIZE);
     rx_per_region_sof_pos <= slv_array_deser(RX_MFB_SOF_POS, MFB_REGIONS);
 
     supkt_hdr_extract_g : for r in 0 to MFB_REGIONS-1 generate
@@ -578,7 +578,7 @@ begin
         rx_global_sof_pos  (r) <= resize_left(resize_right(rx_per_word_sof_pos(r), log2(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE)), OFFSET_WIDTH_ITEMS);
 
         -- Select a Block, extract the Length field value, and ...
-        rx_ext_length(r) <= rx_data_blocks(to_integer(rx_per_word_sof_pos(r)))(LENGTH_WIDTH-1 downto 0);
+        rx_ext_length(r)  <= rx_data_blocks(to_integer(rx_per_word_sof_pos(r)))(LENGTH_WIDTH-1 downto 0);
         -- ... add the Header length to it
         rx_full_length(r) <= resize(unsigned(rx_ext_length(r)), LENGTH_WIDTH+1) + to_unsigned(HEADER_LENGTH, LENGTH_WIDTH);
         rx_cut_length (r) <= rx_full_length(r)(LENGTH_WIDTH-1 downto 0);
@@ -607,7 +607,7 @@ begin
     word_cnt_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RX_MFB_SRC_RDY = '1') and (first_op_dst_rdy = '1') then
+            if ((RX_MFB_SRC_RDY = '1') and (first_op_dst_rdy = '1')) then
                 word_cnt_reg <= word_cnt(MFB_REGIONS-1) + 1;
             end if;
             if (RESET = '1') then
@@ -624,10 +624,10 @@ begin
     -- -----------------------------------------
     --  Precalculate the mask for the OM TX SOF
     -- -----------------------------------------
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
-            if (RX_MFB_SRC_RDY = '1') and (first_op_dst_rdy = '1') then
+            if ((RX_MFB_SRC_RDY = '1') and (first_op_dst_rdy = '1')) then
                 eof_propg_reg <= eof_propg(MFB_REGIONS);
             end if;
             if (RESET = '1') then
@@ -650,7 +650,7 @@ begin
     -- Input (first stage) register
     -- ========================================================================
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (first_op_dst_rdy = '1') then
@@ -685,20 +685,20 @@ begin
         --  Offset Processor
         -- ------------------
         offset_processor_i : entity work.OFFSET_PROCESSOR
-        generic map(
-            MFB_REGIONS     => MFB_REGIONS       ,
-            MFB_REGION_SIZE => MFB_REGION_SIZE   ,
-            MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE    ,
-            MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH    ,
-            MFB_META_WIDTH  => OP_META_WIDTH     ,
-            PKT_MTU         => PKT_MTU           ,
-            MAX_WORDS       => PKT_MAX_WORDS     ,
+        generic map (
+            MFB_REGIONS     => MFB_REGIONS,
+            MFB_REGION_SIZE => MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+            MFB_META_WIDTH  => OP_META_WIDTH,
+            PKT_MTU         => PKT_MTU,
+            MAX_WORDS       => PKT_MAX_WORDS,
             OFFSET_WIDTH    => OFFSET_WIDTH_ITEMS,
-            LENGTH_WIDTH    => LENGTH_WIDTH      ,
-            LAST_VLD_IMPL   => LAST_VLD_IMPL     ,
+            LENGTH_WIDTH    => LENGTH_WIDTH,
+            LAST_VLD_IMPL   => LAST_VLD_IMPL,
             DEVICE          => DEVICE
         )
-        port map(
+        port map (
             CLK   => CLK,
             RESET => RESET,
 
@@ -728,7 +728,7 @@ begin
         -- ----------------------------------------------------
         tx_op_dst_rdy(s) <= rx_sc_dst_rdy(s);
 
-        process(CLK)
+        process (CLK)
         begin
             if rising_edge(CLK) then
                 if (rx_sc_dst_rdy(s) = '1') then
@@ -755,20 +755,20 @@ begin
         sof_creator_g : for r in 0 to MFB_REGIONS-1 generate
 
             sof_creator_i : entity work.SOF_CREATOR
-            generic map(
-                MFB_REGIONS     => MFB_REGIONS       ,
-                MFB_REGION_SIZE => MFB_REGION_SIZE   ,
-                MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE    ,
-                MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH    ,
-                MFB_META_WIDTH  => OP_META_WIDTH     ,
-                PKT_MTU         => PKT_MTU           ,
-                MAX_WORDS       => PKT_MAX_WORDS     ,
+            generic map (
+                MFB_REGIONS     => MFB_REGIONS,
+                MFB_REGION_SIZE => MFB_REGION_SIZE,
+                MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+                MFB_META_WIDTH  => OP_META_WIDTH,
+                PKT_MTU         => PKT_MTU,
+                MAX_WORDS       => PKT_MAX_WORDS,
                 OFFSET_WIDTH    => OFFSET_WIDTH_ITEMS,
-                LENGTH_WIDTH    => LENGTH_WIDTH      ,
-                REGION_NUMBER   => r                 ,
+                LENGTH_WIDTH    => LENGTH_WIDTH,
+                REGION_NUMBER   => r,
                 DEVICE          => DEVICE
             )
-            port map(
+            port map (
                 CLK   => CLK,
                 RESET => RESET,
 
@@ -797,7 +797,7 @@ begin
         -- -----------------------------------------------------
         tx_sc_dst_rdy(s) <= rx_op_dst_rdy(s+1);
 
-        process(CLK)
+        process (CLK)
         begin
             if rising_edge(CLK) then
                 if (rx_op_dst_rdy(s+1) = '1') then
@@ -847,32 +847,32 @@ begin
     last_op_updated_sof <= last_op_old_sof or last_op_new_sof;
 
     last_vld_i : entity work.MVB_AGGREGATE_LAST_VLD
-    generic map(
-        ITEMS          => MFB_REGIONS       ,
+    generic map (
+        ITEMS          => MFB_REGIONS,
         ITEM_WIDTH     => OFFSET_WIDTH_ITEMS,
-        IMPLEMENTATION => LAST_VLD_IMPL     ,
+        IMPLEMENTATION => LAST_VLD_IMPL,
         INTERNAL_REG   => true
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
         RX_DATA         => slv_array_ser(u_arr_to_slv_arr(last_op_updated_offset)),
-        RX_VLD          => last_op_updated_sof                                    ,
-        RX_SRC_RDY      => last_op_src_rdy                                        ,
-        RX_DST_RDY      => last_op_dst_rdy                                        ,
+        RX_VLD          => last_op_updated_sof,
+        RX_SRC_RDY      => last_op_src_rdy,
+        RX_DST_RDY      => last_op_dst_rdy,
 
-        REG_IN_DATA     => (others => '0')                                        ,
-        REG_IN_VLD      => '0'                                                    ,
-        REG_OUT_DATA    => open                                                   ,
-        REG_OUT_VLD     => open                                                   ,
-        REG_OUT_WR      => open                                                   ,
+        REG_IN_DATA     => (others => '0'),
+        REG_IN_VLD      => '0',
+        REG_OUT_DATA    => open,
+        REG_OUT_VLD     => open,
+        REG_OUT_WR      => open,
 
-        TX_DATA         => last_offset_propg                                      ,
-        TX_VLD          => open                                                   ,
-        TX_PRESCAN_DATA => last_offset_propg_presc                                ,
-        TX_PRESCAN_VLD  => open                                                   ,
-        TX_SRC_RDY      => last_offset_propg_src_rdy                              ,
+        TX_DATA         => last_offset_propg,
+        TX_VLD          => open,
+        TX_PRESCAN_DATA => last_offset_propg_presc,
+        TX_PRESCAN_VLD  => open,
+        TX_SRC_RDY      => last_offset_propg_src_rdy,
         TX_DST_RDY      => last_offset_propg_dst_rdy
     );
 
@@ -882,13 +882,13 @@ begin
 
     last_offset_propg_dst_rdy <= last_dst_rdy;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (last_dst_rdy = '1') then
                 last_data         <= last_op_data;
                 last_meta         <= last_op_meta;
-                last_offset       <= slv_arr_to_u_arr(slv_array_deser(last_offset_propg      , MFB_REGIONS));
+                last_offset       <= slv_arr_to_u_arr(slv_array_deser(last_offset_propg, MFB_REGIONS));
                 last_offset_presc <= slv_arr_to_u_arr(slv_array_deser(last_offset_propg_presc, MFB_REGIONS));
                 last_word         <= last_op_word;
                 last_sof          <= last_op_updated_sof;
@@ -1009,13 +1009,13 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (indv_pkt_dst_rdy = '1') then
-                indv_pkt_data    <= slv_array_ser(data_new);
-                indv_pkt_sof_pos <= slv_array_ser(sof_pos_new);
-                indv_pkt_eof_pos <= slv_array_ser(eof_pos_new);
-                indv_pkt_sof     <= sof_new;
-                indv_pkt_eof     <= eof_new;
+                indv_pkt_data     <= slv_array_ser(data_new);
+                indv_pkt_sof_pos  <= slv_array_ser(sof_pos_new);
+                indv_pkt_eof_pos  <= slv_array_ser(eof_pos_new);
+                indv_pkt_sof      <= sof_new;
+                indv_pkt_eof      <= eof_new;
                 indv_pkt_last_eof <= last_supkt_eof;
-                indv_pkt_src_rdy <= src_rdy_new;
+                indv_pkt_src_rdy  <= src_rdy_new;
             end if;
             if (RESET = '1') then
                 indv_pkt_src_rdy <= '0';
@@ -1028,51 +1028,52 @@ begin
     -- ========================================================================
 
     mfb_get_items_i : entity work.MFB_GET_ITEMS
-    generic map(
-        REGIONS          => MFB_REGIONS    ,
+    generic map (
+        REGIONS          => MFB_REGIONS,
         REGION_SIZE      => MFB_REGION_SIZE,
-        BLOCK_SIZE       => MFB_BLOCK_SIZE ,
-        ITEM_WIDTH       => MFB_ITEM_WIDTH ,
-        META_WIDTH       => 1              ,
+        BLOCK_SIZE       => MFB_BLOCK_SIZE,
+        ITEM_WIDTH       => MFB_ITEM_WIDTH,
+        META_WIDTH       => 1,
 
-        MAX_FRAME_LENGHT => PKT_MTU        ,
-        EXTRACTED_ITEMS  => HEADER_LENGTH  ,
+        MAX_FRAME_LENGHT => PKT_MTU,
+        EXTRACTED_ITEMS  => HEADER_LENGTH,
         EXTRACTED_OFFSET => 0
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        RX_DATA    => indv_pkt_data          ,
-        RX_META    => indv_pkt_last_eof      ,
-        RX_SOF_POS => indv_pkt_sof_pos       ,
-        RX_EOF_POS => indv_pkt_eof_pos       ,
-        RX_SOF     => indv_pkt_sof           ,
-        RX_EOF     => indv_pkt_eof           ,
-        RX_SRC_RDY => indv_pkt_src_rdy       ,
-        RX_DST_RDY => indv_pkt_dst_rdy       ,
+        RX_DATA    => indv_pkt_data,
+        RX_META    => indv_pkt_last_eof,
+        RX_SOF_POS => indv_pkt_sof_pos,
+        RX_EOF_POS => indv_pkt_eof_pos,
+        RX_SOF     => indv_pkt_sof,
+        RX_EOF     => indv_pkt_eof,
+        RX_SRC_RDY => indv_pkt_src_rdy,
+        RX_DST_RDY => indv_pkt_dst_rdy,
 
-        TX_DATA    => getit_indv_pkt_data    ,
+        TX_DATA    => getit_indv_pkt_data,
         TX_META    => getit_indv_pkt_last_eof,
-        TX_SOF_POS => getit_indv_pkt_sof_pos ,
-        TX_EOF_POS => getit_indv_pkt_eof_pos ,
-        TX_SOF     => getit_indv_pkt_sof     ,
-        TX_EOF     => getit_indv_pkt_eof     ,
-        TX_SRC_RDY => getit_indv_pkt_src_rdy ,
+        TX_SOF_POS => getit_indv_pkt_sof_pos,
+        TX_EOF_POS => getit_indv_pkt_eof_pos,
+        TX_SOF     => getit_indv_pkt_sof,
+        TX_EOF     => getit_indv_pkt_eof,
+        TX_SRC_RDY => getit_indv_pkt_src_rdy,
         TX_DST_RDY => getit_indv_pkt_dst_rdy2,
 
-        EX_DATA    => getit_indv_hdr_data    ,
-        EX_VLD     => getit_indv_hdr_vld     ,
-        EX_SRC_RDY => getit_indv_hdr_src_rdy ,
+        EX_DATA    => getit_indv_hdr_data,
+        EX_VLD     => getit_indv_hdr_vld,
+        EX_SRC_RDY => getit_indv_hdr_src_rdy,
         EX_DST_RDY => getit_indv_hdr_dst_rdy
     );
 
     not_a_single_valid_hdr <= '1' when ((or getit_indv_pkt_eof and getit_indv_pkt_src_rdy) = '1') and (fifoxm_empty(0) = '1') else '0';
     too_many_eofs          <= '1' when (getit_indv_pkt_src_rdy = '1') and
-                                       (( count_ones(getit_indv_pkt_last_eof) > count_ones(not fifoxm_empty)) or
-                                        ((count_ones(getit_indv_pkt_last_eof) = count_ones(not fifoxm_empty)) and (more_indv_eofs_follow = '1'))) else '0';
+                                       ((count_ones(getit_indv_pkt_last_eof) > count_ones(not fifoxm_empty)) or
+                                        ((count_ones(getit_indv_pkt_last_eof) = count_ones(not fifoxm_empty)) and (more_indv_eofs_follow = '1'))) else
+ '0';
 
-    process(all)
+    process (all)
     begin
         more_indv_eofs_follow <= '0';
         for r in MFB_REGIONS-2 downto 0 loop
@@ -1100,7 +1101,7 @@ begin
 
 
     mvb_merge_items_i : entity work.MVB_MERGE_ITEMS
-    generic map(
+    generic map (
         RX0_ITEMS      => MFB_REGIONS,
         RX0_ITEM_WIDTH => HDR_WIDTH,
         RX1_ITEMS      => MVB_ITEMS,
@@ -1111,73 +1112,73 @@ begin
         OUTPUT_REG     => False,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        RX0_DATA    => getit_indv_hdr_data   ,
-        RX0_VLD     => getit_indv_hdr_vld    ,
+        RX0_DATA    => getit_indv_hdr_data,
+        RX0_VLD     => getit_indv_hdr_vld,
         RX0_SRC_RDY => getit_indv_hdr_src_rdy,
         RX0_DST_RDY => getit_indv_hdr_dst_rdy,
 
-        RX1_DATA    => fifoxm_hdr_data       ,
-        RX1_VLD     => fifoxm_hdr_vld        ,
-        RX1_SRC_RDY => fifoxm_hdr_src_rdy    ,
-        RX1_DST_RDY => fifoxm_hdr_dst_rdy    ,
+        RX1_DATA    => fifoxm_hdr_data,
+        RX1_VLD     => fifoxm_hdr_vld,
+        RX1_SRC_RDY => fifoxm_hdr_src_rdy,
+        RX1_DST_RDY => fifoxm_hdr_dst_rdy,
 
-        TX_DATA     => merg_hdr_data         ,
-        TX_DATA0    => open                  ,
-        TX_DATA1    => open                  ,
-        TX_VLD      => merg_hdr_vld          ,
-        TX_SRC_RDY  => merg_hdr_src_rdy      ,
+        TX_DATA     => merg_hdr_data,
+        TX_DATA0    => open,
+        TX_DATA1    => open,
+        TX_VLD      => merg_hdr_vld,
+        TX_SRC_RDY  => merg_hdr_src_rdy,
         TX_DST_RDY  => merg_hdr_dst_rdy
     );
 
     meta_insert_g : if (META_OUT_MODE = 0) or (META_OUT_MODE = 1) generate
 
-    -- ========================================================================
-    -- Insert headers to metadata
-    -- ========================================================================
+        -- ========================================================================
+        -- Insert headers to metadata
+        -- ========================================================================
 
-    -- new SRC RDY deasserts when stopping
-    getit_indv_pkt_src_rdy2 <= getit_indv_pkt_src_rdy and not wait_for_headers;
+        -- new SRC RDY deasserts when stopping
+        getit_indv_pkt_src_rdy2 <= getit_indv_pkt_src_rdy and not wait_for_headers;
 
         -- ------------------
         --  Delay MFB stream
         -- ------------------
         mfb_fifox_i2 : entity work.MFB_FIFOX
-        generic map(
-            REGIONS     => MFB_REGIONS    ,
+        generic map (
+            REGIONS     => MFB_REGIONS,
             REGION_SIZE => MFB_REGION_SIZE,
-            BLOCK_SIZE  => MFB_BLOCK_SIZE ,
-            ITEM_WIDTH  => MFB_ITEM_WIDTH ,
-            META_WIDTH  => 0              ,
+            BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            ITEM_WIDTH  => MFB_ITEM_WIDTH,
+            META_WIDTH  => 0,
 
-            FIFO_DEPTH          => 512    ,
-            RAM_TYPE            => "AUTO" ,
-            DEVICE              => DEVICE ,
-            ALMOST_FULL_OFFSET  => 0      ,
+            FIFO_DEPTH          => 512,
+            RAM_TYPE            => "AUTO",
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
             ALMOST_EMPTY_OFFSET => 0
         )
-        port map(
+        port map (
             CLK => CLK,
             RST => RESET,
 
-            RX_DATA    => getit_indv_pkt_data    ,
-            RX_META    => (others => '0')        ,
-            RX_SOF_POS => getit_indv_pkt_sof_pos ,
-            RX_EOF_POS => getit_indv_pkt_eof_pos ,
-            RX_SOF     => getit_indv_pkt_sof     ,
-            RX_EOF     => getit_indv_pkt_eof     ,
+            RX_DATA    => getit_indv_pkt_data,
+            RX_META    => (others => '0'),
+            RX_SOF_POS => getit_indv_pkt_sof_pos,
+            RX_EOF_POS => getit_indv_pkt_eof_pos,
+            RX_SOF     => getit_indv_pkt_sof,
+            RX_EOF     => getit_indv_pkt_eof,
             RX_SRC_RDY => getit_indv_pkt_src_rdy2,
-            RX_DST_RDY => getit_indv_pkt_dst_rdy ,
+            RX_DST_RDY => getit_indv_pkt_dst_rdy,
 
-            TX_DATA     => fifox_indv_pkt_data   ,
-            TX_META     => open                  ,
+            TX_DATA     => fifox_indv_pkt_data,
+            TX_META     => open,
             TX_SOF_POS  => fifox_indv_pkt_sof_pos,
             TX_EOF_POS  => fifox_indv_pkt_eof_pos,
-            TX_SOF      => fifox_indv_pkt_sof    ,
-            TX_EOF      => fifox_indv_pkt_eof    ,
+            TX_SOF      => fifox_indv_pkt_sof,
+            TX_EOF      => fifox_indv_pkt_eof,
             TX_SRC_RDY  => fifox_indv_pkt_src_rdy,
             TX_DST_RDY  => fifox_indv_pkt_dst_rdy
         );
@@ -1195,45 +1196,45 @@ begin
         --  The insertion
         -- ---------------
         metadata_insertor_i : entity work.METADATA_INSERTOR
-        generic map(
-            MVB_ITEMS            => MFB_REGIONS    ,
+        generic map (
+            MVB_ITEMS            => MFB_REGIONS,
             MVB_ITEM_WIDTH       => MERGED_ITEMS_WIDTH,
 
-            MFB_REGIONS          => MFB_REGIONS    ,
+            MFB_REGIONS          => MFB_REGIONS,
             MFB_REGION_SIZE      => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE       => MFB_BLOCK_SIZE ,
-            MFB_ITEM_WIDTH       => MFB_ITEM_WIDTH ,
-            MFB_META_WIDTH       => 0              ,
+            MFB_BLOCK_SIZE       => MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH       => MFB_ITEM_WIDTH,
+            MFB_META_WIDTH       => 0,
 
-            INSERT_MODE   => META_OUT_MODE         ,
-            MVB_FIFO_SIZE => 32                    ,
+            INSERT_MODE   => META_OUT_MODE,
+            MVB_FIFO_SIZE => 32,
             DEVICE        => DEVICE
         )
-        port map(
+        port map (
             CLK   => CLK,
             RESET => RESET,
 
-            RX_MVB_DATA    => fifox_indv_hdr_data      ,
-            RX_MVB_VLD     => fifox_indv_hdr_vld       ,
-            RX_MVB_SRC_RDY => fifox_indv_hdr_src_rdy   ,
-            RX_MVB_DST_RDY => fifox_indv_hdr_dst_rdy   ,
+            RX_MVB_DATA    => fifox_indv_hdr_data,
+            RX_MVB_VLD     => fifox_indv_hdr_vld,
+            RX_MVB_SRC_RDY => fifox_indv_hdr_src_rdy,
+            RX_MVB_DST_RDY => fifox_indv_hdr_dst_rdy,
 
-            RX_MFB_DATA    => fifox_indv_pkt_data      ,
-            RX_MFB_META    => (others => '0')          ,
-            RX_MFB_SOF_POS => fifox_indv_pkt_sof_pos   ,
-            RX_MFB_EOF_POS => fifox_indv_pkt_eof_pos   ,
-            RX_MFB_SOF     => fifox_indv_pkt_sof       ,
-            RX_MFB_EOF     => fifox_indv_pkt_eof       ,
-            RX_MFB_SRC_RDY => fifox_indv_pkt_src_rdy   ,
-            RX_MFB_DST_RDY => fifox_indv_pkt_dst_rdy   ,
+            RX_MFB_DATA    => fifox_indv_pkt_data,
+            RX_MFB_META    => (others => '0'),
+            RX_MFB_SOF_POS => fifox_indv_pkt_sof_pos,
+            RX_MFB_EOF_POS => fifox_indv_pkt_eof_pos,
+            RX_MFB_SOF     => fifox_indv_pkt_sof,
+            RX_MFB_EOF     => fifox_indv_pkt_eof,
+            RX_MFB_SRC_RDY => fifox_indv_pkt_src_rdy,
+            RX_MFB_DST_RDY => fifox_indv_pkt_dst_rdy,
 
-            TX_MFB_DATA     => metains_indv_pkt_data   ,
-            TX_MFB_META     => open                    ,
-            TX_MFB_META_NEW => metains_indv_pkt_hdr    ,
+            TX_MFB_DATA     => metains_indv_pkt_data,
+            TX_MFB_META     => open,
+            TX_MFB_META_NEW => metains_indv_pkt_hdr,
             TX_MFB_SOF_POS  => metains_indv_pkt_sof_pos,
             TX_MFB_EOF_POS  => metains_indv_pkt_eof_pos,
-            TX_MFB_SOF      => metains_indv_pkt_sof    ,
-            TX_MFB_EOF      => metains_indv_pkt_eof    ,
+            TX_MFB_SOF      => metains_indv_pkt_sof,
+            TX_MFB_EOF      => metains_indv_pkt_eof,
             TX_MFB_SRC_RDY  => metains_indv_pkt_src_rdy,
             TX_MFB_DST_RDY  => metains_indv_pkt_dst_rdy
         );
@@ -1280,37 +1281,37 @@ begin
     --  MFB stream
     -- ------------
     mfb_cutter_i : entity work.MFB_CUTTER_SIMPLE
-    generic map(
-        REGIONS        => MFB_REGIONS    ,
+    generic map (
+        REGIONS        => MFB_REGIONS,
         REGION_SIZE    => MFB_REGION_SIZE,
-        BLOCK_SIZE     => MFB_BLOCK_SIZE ,
-        ITEM_WIDTH     => MFB_ITEM_WIDTH ,
+        BLOCK_SIZE     => MFB_BLOCK_SIZE,
+        ITEM_WIDTH     => MFB_ITEM_WIDTH,
         META_WIDTH     => MERGED_ITEMS_WIDTH,
-        META_ALIGNMENT => META_OUT_MODE  ,
+        META_ALIGNMENT => META_OUT_MODE,
         CUTTED_ITEMS   => HEADER_LENGTH
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        RX_DATA    => metains_indv_pkt_data   ,
-        RX_META    => metains_indv_pkt_hdr    ,
-        RX_SOF     => metains_indv_pkt_sof    ,
-        RX_EOF     => metains_indv_pkt_eof    ,
+        RX_DATA    => metains_indv_pkt_data,
+        RX_META    => metains_indv_pkt_hdr,
+        RX_SOF     => metains_indv_pkt_sof,
+        RX_EOF     => metains_indv_pkt_eof,
         RX_SOF_POS => metains_indv_pkt_sof_pos,
         RX_EOF_POS => metains_indv_pkt_eof_pos,
         RX_SRC_RDY => metains_indv_pkt_src_rdy,
         RX_DST_RDY => metains_indv_pkt_dst_rdy,
 
-        RX_CUT     => (others => '1')         ,
+        RX_CUT     => (others => '1'),
 
-        TX_DATA    => cut_data                ,
-        TX_META    => cut_meta                ,
-        TX_SOF     => cut_sof                 ,
-        TX_EOF     => cut_eof                 ,
-        TX_SOF_POS => cut_sof_pos             ,
-        TX_EOF_POS => cut_eof_pos             ,
-        TX_SRC_RDY => cut_src_rdy             ,
+        TX_DATA    => cut_data,
+        TX_META    => cut_meta,
+        TX_SOF     => cut_sof,
+        TX_EOF     => cut_eof,
+        TX_SOF_POS => cut_sof_pos,
+        TX_EOF_POS => cut_eof_pos,
+        TX_SRC_RDY => cut_src_rdy,
         TX_DST_RDY => cut_dst_rdy
     );
 

@@ -13,7 +13,7 @@ use IEEE.std_logic_misc.all;
 use work.math_pack.all;
 
 entity MVB_ASFIFOX is
-    generic(
+    generic (
         -- Number of ITEMS in one Word
         MVB_ITEMS                   : integer := 4;
         -- Width of one MVB item
@@ -21,27 +21,27 @@ entity MVB_ASFIFOX is
         MVB_ITEM_WIDTH              : integer := 8;
         -- FIFO depth in number of data words, must be power of two!
         -- Minimum value is 2.
-        FIFO_ITEMS               : natural := 512;
+        FIFO_ITEMS                  : natural := 512;
         -- Select memory implementation. Options:
         -- "LUT"  - effective for shallow FIFO (approx. ITEMS <= 64),
         -- "BRAM" - effective for deep FIFO (approx. ITEMS > 64).
-        RAM_TYPE            : string  := "BRAM";
+        RAM_TYPE                    : string  := "BRAM";
         -- First Word Fall Through mode. If FWFT_MODE=True, valid data will be
         -- ready at the ASFIFOX output without RD_EN requests.
-        FWFT_MODE           : boolean := True;
+        FWFT_MODE                   : boolean := True;
         -- Enabled output registers allow better timing for a few flip-flops.
-        OUTPUT_REG          : boolean := True;
+        OUTPUT_REG                  : boolean := True;
         -- The DEVICE parameter is ignored in the current component version.
         -- It can be used in the future.
-        DEVICE              : string  := "ULTRASCALE";
+        DEVICE                      : string  := "ULTRASCALE";
         -- Sets the maximum number of remaining free data words in the ASFIFOX
         -- that triggers the WR_AFULL signal.
-        ALMOST_FULL_OFFSET  : natural := FIFO_ITEMS/2;
+        ALMOST_FULL_OFFSET          : natural := FIFO_ITEMS/2;
         -- Sets the maximum number of data words stored in the ASFIFOX that
         -- triggers the RD_AEMPTY signal.
-        ALMOST_EMPTY_OFFSET : natural := FIFO_ITEMS/2
+        ALMOST_EMPTY_OFFSET         : natural := FIFO_ITEMS/2
     );
-    port(
+    port (
         RX_CLK        : in  std_logic;
         RX_RESET      : in  std_logic;
 
@@ -66,45 +66,47 @@ end entity;
 
 
 
-architecture full of MVB_ASFIFOX is
+architecture FULL of MVB_ASFIFOX is
 
-    signal di, do : std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH+MVB_ITEMS-1 downto 0);
+    signal di : std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH+MVB_ITEMS-1 downto 0);
+    signal do : std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH+MVB_ITEMS-1 downto 0);
 
-    signal full, empty : std_logic;
+    signal full  : std_logic;
+    signal empty : std_logic;
 
 begin
 
     fifo_core : entity work.ASFIFOX
     generic map (
         DATA_WIDTH          => MVB_ITEMS*MVB_ITEM_WIDTH+MVB_ITEMS,
-        ITEMS               => FIFO_ITEMS         ,
-        RAM_TYPE            => RAM_TYPE           ,
-        FWFT_MODE           => FWFT_MODE          ,
-        OUTPUT_REG          => OUTPUT_REG         ,
-        DEVICE              => DEVICE             ,
-        ALMOST_FULL_OFFSET  => ALMOST_FULL_OFFSET ,
+        ITEMS               => FIFO_ITEMS,
+        RAM_TYPE            => RAM_TYPE,
+        FWFT_MODE           => FWFT_MODE,
+        OUTPUT_REG          => OUTPUT_REG,
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => ALMOST_FULL_OFFSET,
         ALMOST_EMPTY_OFFSET => ALMOST_EMPTY_OFFSET
     ) port map (
-        WR_CLK    => RX_CLK    ,
-        WR_RST    => RX_RESET  ,
+        WR_CLK    => RX_CLK,
+        WR_RST    => RX_RESET,
 
-        WR_DATA   => di        ,
+        WR_DATA   => di,
         WR_EN     => RX_SRC_RDY,
-        WR_FULL   => full      ,
-        WR_AFULL  => RX_AFULL  ,
-        WR_STATUS => RX_STATUS ,
+        WR_FULL   => full,
+        WR_AFULL  => RX_AFULL,
+        WR_STATUS => RX_STATUS,
 
-        RD_CLK    => TX_CLK    ,
-        RD_RST    => TX_RESET  ,
+        RD_CLK    => TX_CLK,
+        RD_RST    => TX_RESET,
 
-        RD_DATA   => do        ,
+        RD_DATA   => do,
         RD_EN     => TX_DST_RDY,
-        RD_EMPTY  => empty     ,
-        RD_AEMPTY => TX_AEMPTY ,
+        RD_EMPTY  => empty,
+        RD_AEMPTY => TX_AEMPTY,
         RD_STATUS => TX_STATUS
     );
 
-    di <= RX_DATA & RX_VLD;
+    di         <= RX_DATA & RX_VLD;
     RX_DST_RDY <= not full;
 
     TX_VLD     <= do(MVB_ITEMS-1 downto 0);

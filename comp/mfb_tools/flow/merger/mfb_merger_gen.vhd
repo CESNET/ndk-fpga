@@ -19,7 +19,7 @@ use work.type_pack.all;
 
 -- MFB+MVB bus merger with generic number of inputs
 entity MFB_MERGER_GEN is
-    generic(
+    generic (
         -- number of merger inputs
         MERGER_INPUTS   : integer := 2;
 
@@ -74,7 +74,7 @@ entity MFB_MERGER_GEN is
         -- "ULTRASCALE", "STRATIX10",...
         DEVICE          : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- =============================
         -- Common interface
         -- =============================
@@ -144,9 +144,9 @@ architecture FULL of MFB_MERGER_GEN is
 
     function get_payload_en (stage, index : integer) return boolean is
     begin
-        --JC: Reports do not work in Vivado!
-        --report "inputs " & to_string(MERGER_INPUTS) & "; inputs 2 pow " & to_string(MERGER_INPUTS_2_POW) & "; stages " & to_string(TREE_STAGES);
-        --report "gen_payload_en ( " & to_string(stage) & " , " & to_string(index) & " )";
+        -- JC: Reports do not work in Vivado!
+        -- report "inputs " & to_string(MERGER_INPUTS) & "; inputs 2 pow " & to_string(MERGER_INPUTS_2_POW) & "; stages " & to_string(TREE_STAGES);
+        -- report "gen_payload_en ( " & to_string(stage) & " , " & to_string(index) & " )";
         if (stage /= 0) then
             -- Recursive call to previous stage
             return get_payload_en(stage-1,2*index) or get_payload_en(stage-1,2*index+1);
@@ -197,23 +197,23 @@ begin
         merger_g : for i in 0 to (2**(TREE_STAGES-s-1))-1 generate
             merger_i: entity work.MFB_MERGER(FULL)
             generic map (
-                MVB_ITEMS           => MVB_ITEMS              ,
-                MFB_REGIONS         => MFB_REGIONS            ,
-                MFB_REG_SIZE        => MFB_REG_SIZE           ,
-                MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE         ,
-                MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH         ,
-                MFB_META_WIDTH      => MFB_META_WIDTH         ,
-                HDR_WIDTH           => MVB_ITEM_WIDTH         ,
+                MVB_ITEMS           => MVB_ITEMS,
+                MFB_REGIONS         => MFB_REGIONS,
+                MFB_REG_SIZE        => MFB_REG_SIZE,
+                MFB_BLOCK_SIZE      => MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH      => MFB_ITEM_WIDTH,
+                MFB_META_WIDTH      => MFB_META_WIDTH,
+                HDR_WIDTH           => MVB_ITEM_WIDTH,
                 RX0_PAYLOAD_ENABLED => get_payload_en(s,2*i  ),
                 RX1_PAYLOAD_ENABLED => get_payload_en(s,2*i+1),
-                INPUT_FIFO_SIZE     => INPUT_FIFO_SIZE        ,
-                SW_TIMEOUT_WIDTH    => SW_TIMEOUT_WIDTH       ,
-                IN_PIPE_EN          => IN_PIPE_EN             ,
-                OUT_PIPE_EN         => OUT_PIPE_EN            ,
+                INPUT_FIFO_SIZE     => INPUT_FIFO_SIZE,
+                SW_TIMEOUT_WIDTH    => SW_TIMEOUT_WIDTH,
+                IN_PIPE_EN          => IN_PIPE_EN,
+                OUT_PIPE_EN         => OUT_PIPE_EN,
                 DEVICE              => DEVICE
             )
             port map (
-                CLK             => CLK  ,
+                CLK             => CLK,
                 RESET           => RESET,
 
                 RX0_MVB_HDR     => s_rx_mvb_data   (s)(2*i),

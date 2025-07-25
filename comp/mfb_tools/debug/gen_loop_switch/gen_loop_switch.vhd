@@ -95,7 +95,7 @@ use work.math_pack.all;
 --   Only switch mux selection registers when there is no data on the input!
 --
 entity GEN_LOOP_SWITCH is
-    Generic (
+    generic (
         -- number of regions in a data word
         REGIONS           : natural := 2;
         -- number of blocks in a region
@@ -131,7 +131,7 @@ entity GEN_LOOP_SWITCH is
         -- FPGA device string
         DEVICE            : string  := "STRATIX10"
     );
-    Port (
+    port (
         -- ---------------------------------------------------------------------
         -- MI32 interface
         -- ---------------------------------------------------------------------
@@ -241,7 +241,7 @@ entity GEN_LOOP_SWITCH is
         DMA_TX_MFB_SRC_RDY  : in  std_logic;
         DMA_TX_MFB_DST_RDY  : out std_logic
 
-        -- ---------------------------------------------------------------------
+    -- ---------------------------------------------------------------------
     );
 end entity;
 
@@ -288,8 +288,8 @@ architecture FULL of GEN_LOOP_SWITCH is
     signal rx_loop_mux_sel_reg : std_logic;
     signal tx_loop_mux_sel_reg : std_logic;
 
-    signal DMA_TX_MVB_C_CH     : std_logic_vector(REGIONS*log2(RX_DMA_CHANNELS)-1 downto 0);
-    signal ETH_RX_MVB_C_CH     : std_logic_vector(REGIONS*log2(TX_DMA_CHANNELS)-1 downto 0);
+    signal dma_tx_mvb_c_ch     : std_logic_vector(REGIONS*log2(RX_DMA_CHANNELS)-1 downto 0);
+    signal eth_rx_mvb_c_ch     : std_logic_vector(REGIONS*log2(TX_DMA_CHANNELS)-1 downto 0);
 
     signal rx_gen_instr_mvb_len      : std_logic_vector(REGIONS*log2(PKT_MTU+1)-1 downto 0);
     signal rx_gen_instr_mvb_channel  : std_logic_vector(REGIONS*log2(RX_DMA_CHANNELS)-1 downto 0);
@@ -417,15 +417,15 @@ architecture FULL of GEN_LOOP_SWITCH is
     signal tx_loop_mfb_src_rdy : std_logic;
     signal tx_loop_mfb_dst_rdy : std_logic;
 
-    signal DMA_TX_MVB_DST_RDY_0 : std_logic;
-    signal DMA_TX_MVB_DST_RDY_1 : std_logic;
-    signal ETH_RX_MVB_DST_RDY_0 : std_logic;
-    signal ETH_RX_MVB_DST_RDY_1 : std_logic;
+    signal dma_tx_mvb_dst_rdy_0 : std_logic;
+    signal dma_tx_mvb_dst_rdy_1 : std_logic;
+    signal eth_rx_mvb_dst_rdy_0 : std_logic;
+    signal eth_rx_mvb_dst_rdy_1 : std_logic;
 
-    signal DMA_TX_MFB_DST_RDY_0 : std_logic;
-    signal DMA_TX_MFB_DST_RDY_1 : std_logic;
-    signal ETH_RX_MFB_DST_RDY_0 : std_logic;
-    signal ETH_RX_MFB_DST_RDY_1 : std_logic;
+    signal dma_tx_mfb_dst_rdy_0 : std_logic;
+    signal dma_tx_mfb_dst_rdy_1 : std_logic;
+    signal eth_rx_mfb_dst_rdy_0 : std_logic;
+    signal eth_rx_mfb_dst_rdy_1 : std_logic;
 
     signal rx_loop_mvb_len_arr      : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
     signal rx_loop_mvb_channel_arr  : slv_array_t     (REGIONS-1 downto 0)(log2(RX_DMA_CHANNELS)-1 downto 0);
@@ -434,12 +434,12 @@ architecture FULL of GEN_LOOP_SWITCH is
     signal rx_loop_mvb_data_arr     : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1-1 downto 0);
     signal rx_loop_mvb_data         : std_logic_vector(REGIONS*(log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1)-1 downto 0);
 
-    signal DMA_RX_MVB_LEN_arr      : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
-    signal DMA_RX_MVB_CHANNEL_arr  : slv_array_t     (REGIONS-1 downto 0)(log2(RX_DMA_CHANNELS)-1 downto 0);
-    signal DMA_RX_MVB_HDR_META_arr : slv_array_t     (REGIONS-1 downto 0)(HDR_META_WIDTH-1 downto 0);
-    signal DMA_RX_MVB_DISCARD_arr  : slv_array_t     (REGIONS-1 downto 0)(1-1 downto 0);
-    signal DMA_RX_MVB_DATA_arr     : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1-1 downto 0);
-    signal DMA_RX_MVB_DATA         : std_logic_vector(REGIONS*(log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1)-1 downto 0);
+    signal dma_rx_mvb_len_arr      : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+    signal dma_rx_mvb_channel_arr  : slv_array_t     (REGIONS-1 downto 0)(log2(RX_DMA_CHANNELS)-1 downto 0);
+    signal dma_rx_mvb_hdr_meta_arr : slv_array_t     (REGIONS-1 downto 0)(HDR_META_WIDTH-1 downto 0);
+    signal dma_rx_mvb_discard_arr  : slv_array_t     (REGIONS-1 downto 0)(1-1 downto 0);
+    signal dma_rx_mvb_data_arr     : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1-1 downto 0);
+    signal dma_rx_mvb_data         : std_logic_vector(REGIONS*(log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1)-1 downto 0);
 
     signal tx_loop_mvb_len_arr      : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
     signal tx_loop_mvb_channel_arr  : slv_array_t     (REGIONS-1 downto 0)(log2(TX_DMA_CHANNELS)-1 downto 0);
@@ -447,11 +447,11 @@ architecture FULL of GEN_LOOP_SWITCH is
     signal tx_loop_mvb_data_arr     : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH-1 downto 0);
     signal tx_loop_mvb_data         : std_logic_vector(REGIONS*(log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH)-1 downto 0);
 
-    signal ETH_TX_MVB_LEN_arr      : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
-    signal ETH_TX_MVB_CHANNEL_arr  : slv_array_t     (REGIONS-1 downto 0)(log2(TX_DMA_CHANNELS)-1 downto 0);
-    signal ETH_TX_MVB_HDR_META_arr : slv_array_t     (REGIONS-1 downto 0)(HDR_META_WIDTH-1 downto 0);
-    signal ETH_TX_MVB_DATA_arr     : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH-1 downto 0);
-    signal ETH_TX_MVB_DATA         : std_logic_vector(REGIONS*(log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH)-1 downto 0);
+    signal eth_tx_mvb_len_arr      : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+    signal eth_tx_mvb_channel_arr  : slv_array_t     (REGIONS-1 downto 0)(log2(TX_DMA_CHANNELS)-1 downto 0);
+    signal eth_tx_mvb_hdr_meta_arr : slv_array_t     (REGIONS-1 downto 0)(HDR_META_WIDTH-1 downto 0);
+    signal eth_tx_mvb_data_arr     : slv_array_t     (REGIONS-1 downto 0)(log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH-1 downto 0);
+    signal eth_tx_mvb_data         : std_logic_vector(REGIONS*(log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH)-1 downto 0);
 
     signal rx_cnt_ticks     : std_logic_vector(24-1 downto 0);
     signal rx_cnt_ticks_max : std_logic;
@@ -475,10 +475,10 @@ architecture FULL of GEN_LOOP_SWITCH is
 
     -- Quartus
     attribute maxfan : integer;
-    attribute maxfan of rx_gen_mux_sel_reg  : signal is 32;
-    attribute maxfan of tx_gen_mux_sel_reg  : signal is 32;
-    attribute maxfan of rx_loop_mux_sel_reg : signal is 32;
-    attribute maxfan of tx_loop_mux_sel_reg : signal is 32;
+    attribute maxfan of rx_gen_mux_sel_reg      : signal is 32;
+    attribute maxfan of tx_gen_mux_sel_reg      : signal is 32;
+    attribute maxfan of rx_loop_mux_sel_reg     : signal is 32;
+    attribute maxfan of tx_loop_mux_sel_reg     : signal is 32;
     -- Vivado
     attribute max_fanout : integer;
     attribute max_fanout of rx_gen_mux_sel_reg  : signal is 32;
@@ -488,945 +488,945 @@ architecture FULL of GEN_LOOP_SWITCH is
 
 begin
 
-fake_switch_gen : if (FAKE_SWITCH) generate
+    fake_switch_gen : if (FAKE_SWITCH) generate
 
-    MI_ARDY <= MI_RD or MI_WR;
-    MI_DRDY <= MI_RD;
-    MI_DRD  <= (others => '0');
+        MI_ARDY <= MI_RD or MI_WR;
+        MI_DRDY <= MI_RD;
+        MI_DRD  <= (others => '0');
 
-    ETH_TX_MVB_LEN      <= DMA_TX_MVB_LEN;
-    ETH_TX_MVB_CHANNEL  <= DMA_TX_MVB_CHANNEL;
-    ETH_TX_MVB_HDR_META <= DMA_TX_MVB_HDR_META;
-    ETH_TX_MVB_VLD      <= DMA_TX_MVB_VLD;
-    ETH_TX_MVB_SRC_RDY  <= DMA_TX_MVB_SRC_RDY;
-    DMA_TX_MVB_DST_RDY  <= ETH_TX_MVB_DST_RDY;
+        ETH_TX_MVB_LEN      <= DMA_TX_MVB_LEN;
+        ETH_TX_MVB_CHANNEL  <= DMA_TX_MVB_CHANNEL;
+        ETH_TX_MVB_HDR_META <= DMA_TX_MVB_HDR_META;
+        ETH_TX_MVB_VLD      <= DMA_TX_MVB_VLD;
+        ETH_TX_MVB_SRC_RDY  <= DMA_TX_MVB_SRC_RDY;
+        DMA_TX_MVB_DST_RDY  <= ETH_TX_MVB_DST_RDY;
 
-    ETH_TX_MFB_DATA     <= DMA_TX_MFB_DATA;
-    ETH_TX_MFB_SOF      <= DMA_TX_MFB_SOF;
-    ETH_TX_MFB_EOF      <= DMA_TX_MFB_EOF;
-    ETH_TX_MFB_SOF_POS  <= DMA_TX_MFB_SOF_POS;
-    ETH_TX_MFB_EOF_POS  <= DMA_TX_MFB_EOF_POS;
-    ETH_TX_MFB_SRC_RDY  <= DMA_TX_MFB_SRC_RDY;
-    DMA_TX_MFB_DST_RDY  <= ETH_TX_MFB_DST_RDY;
+        ETH_TX_MFB_DATA     <= DMA_TX_MFB_DATA;
+        ETH_TX_MFB_SOF      <= DMA_TX_MFB_SOF;
+        ETH_TX_MFB_EOF      <= DMA_TX_MFB_EOF;
+        ETH_TX_MFB_SOF_POS  <= DMA_TX_MFB_SOF_POS;
+        ETH_TX_MFB_EOF_POS  <= DMA_TX_MFB_EOF_POS;
+        ETH_TX_MFB_SRC_RDY  <= DMA_TX_MFB_SRC_RDY;
+        DMA_TX_MFB_DST_RDY  <= ETH_TX_MFB_DST_RDY;
 
-    DMA_RX_MVB_LEN      <= ETH_RX_MVB_LEN;
-    DMA_RX_MVB_CHANNEL  <= ETH_RX_MVB_CHANNEL;
-    DMA_RX_MVB_HDR_META <= ETH_RX_MVB_HDR_META;
-    DMA_RX_MVB_DISCARD  <= ETH_RX_MVB_DISCARD;
-    DMA_RX_MVB_VLD      <= ETH_RX_MVB_VLD;
-    DMA_RX_MVB_SRC_RDY  <= ETH_RX_MVB_SRC_RDY;
-    ETH_RX_MVB_DST_RDY  <= DMA_RX_MVB_DST_RDY;
+        DMA_RX_MVB_LEN      <= ETH_RX_MVB_LEN;
+        DMA_RX_MVB_CHANNEL  <= ETH_RX_MVB_CHANNEL;
+        DMA_RX_MVB_HDR_META <= ETH_RX_MVB_HDR_META;
+        DMA_RX_MVB_DISCARD  <= ETH_RX_MVB_DISCARD;
+        DMA_RX_MVB_VLD      <= ETH_RX_MVB_VLD;
+        DMA_RX_MVB_SRC_RDY  <= ETH_RX_MVB_SRC_RDY;
+        ETH_RX_MVB_DST_RDY  <= DMA_RX_MVB_DST_RDY;
 
-    DMA_RX_MFB_DATA     <= ETH_RX_MFB_DATA;
-    DMA_RX_MFB_SOF      <= ETH_RX_MFB_SOF;
-    DMA_RX_MFB_EOF      <= ETH_RX_MFB_EOF;
-    DMA_RX_MFB_SOF_POS  <= ETH_RX_MFB_SOF_POS;
-    DMA_RX_MFB_EOF_POS  <= ETH_RX_MFB_EOF_POS;
-    DMA_RX_MFB_SRC_RDY  <= ETH_RX_MFB_SRC_RDY;
-    ETH_RX_MFB_DST_RDY  <= DMA_RX_MFB_DST_RDY;
+        DMA_RX_MFB_DATA     <= ETH_RX_MFB_DATA;
+        DMA_RX_MFB_SOF      <= ETH_RX_MFB_SOF;
+        DMA_RX_MFB_EOF      <= ETH_RX_MFB_EOF;
+        DMA_RX_MFB_SOF_POS  <= ETH_RX_MFB_SOF_POS;
+        DMA_RX_MFB_EOF_POS  <= ETH_RX_MFB_EOF_POS;
+        DMA_RX_MFB_SRC_RDY  <= ETH_RX_MFB_SRC_RDY;
+        ETH_RX_MFB_DST_RDY  <= DMA_RX_MFB_DST_RDY;
 
-end generate;
+    end generate;
 
-not_fake_switch_gen : if (not FAKE_SWITCH) generate
+    not_fake_switch_gen : if (not FAKE_SWITCH) generate
 
-    -- -------------------------------------------------------------------------
-    -- MI32 Asynch
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- MI32 Asynch
+        -- -------------------------------------------------------------------------
 
-    mi_clk_diff_g : if (not SAME_CLK) generate
+        mi_clk_diff_g : if (not SAME_CLK) generate
 
-        mi_async_i : entity work.MI_ASYNC
-        generic map(
-            DEVICE => DEVICE
+            mi_async_i : entity work.MI_ASYNC
+            generic map (
+                DEVICE => DEVICE
+            )
+            port map (
+                -- Master interface
+                CLK_M     => MI_CLK,
+                RESET_M   => MI_RESET,
+                MI_M_DWR  => MI_DWR,
+                MI_M_ADDR => MI_ADDR,
+                MI_M_RD   => MI_RD,
+                MI_M_WR   => MI_WR,
+                MI_M_BE   => MI_BE,
+                MI_M_DRD  => MI_DRD,
+                MI_M_ARDY => MI_ARDY,
+                MI_M_DRDY => MI_DRDY,
+
+                -- Slave interface
+                CLK_S     => CLK,
+                RESET_S   => RESET,
+                MI_S_DWR  => mi_sync_dwr,
+                MI_S_ADDR => mi_sync_addr,
+                MI_S_RD   => mi_sync_rd,
+                MI_S_WR   => mi_sync_wr,
+                MI_S_BE   => mi_sync_be,
+                MI_S_DRD  => mi_sync_drd,
+                MI_S_ARDY => mi_sync_ardy,
+                MI_S_DRDY => mi_sync_drdy
+            );
+
+        else generate
+
+            mi_sync_dwr  <= MI_DWR;
+            mi_sync_addr <= MI_ADDR;
+            mi_sync_rd   <= MI_RD;
+            mi_sync_wr   <= MI_WR;
+            mi_sync_be   <= MI_BE;
+
+            MI_DRD       <= mi_sync_drd;
+            MI_ARDY      <= mi_sync_ardy;
+            MI_DRDY      <= mi_sync_drdy;
+
+        end generate;
+
+        -- -------------------------------------------------------------------------
+
+        -- -------------------------------------------------------------------------
+        -- MI splitting
+        -- -------------------------------------------------------------------------
+
+        mi_split_i : entity work.MI_SPLITTER_PLUS_GEN
+        generic map (
+            ADDR_WIDTH => 32,
+            DATA_WIDTH => 32,
+            PORTS      => MI_SPLIT_PORTS,
+            --            TX player, RX player, TX gen, RX gen, speed meter, local MUXes
+            ADDR_BASE  => MI_SPLIT_ADDR_BASE,
+            PIPE_OUT   => (MI_SPLIT_PORTS-1 downto 0 => MI_PIPE_EN),
+            DEVICE     => DEVICE
         )
-        port map(
-            -- Master interface
-            CLK_M     => MI_CLK,
-            RESET_M   => MI_RESET,
-            MI_M_DWR  => MI_DWR,
-            MI_M_ADDR => MI_ADDR,
-            MI_M_RD   => MI_RD,
-            MI_M_WR   => MI_WR,
-            MI_M_BE   => MI_BE,
-            MI_M_DRD  => MI_DRD,
-            MI_M_ARDY => MI_ARDY,
-            MI_M_DRDY => MI_DRDY,
+        port map (
+            CLK        => CLK,
+            RESET      => RESET,
 
-            -- Slave interface
-            CLK_S     => CLK,
-            RESET_S   => RESET,
-            MI_S_DWR  => mi_sync_dwr,
-            MI_S_ADDR => mi_sync_addr,
-            MI_S_RD   => mi_sync_rd,
-            MI_S_WR   => mi_sync_wr,
-            MI_S_BE   => mi_sync_be,
-            MI_S_DRD  => mi_sync_drd,
-            MI_S_ARDY => mi_sync_ardy,
-            MI_S_DRDY => mi_sync_drdy
+            RX_DWR     => mi_sync_dwr,
+            RX_ADDR    => mi_sync_addr,
+            RX_RD      => mi_sync_rd,
+            RX_WR      => mi_sync_wr,
+            RX_BE      => mi_sync_be,
+            RX_DRD     => mi_sync_drd,
+            RX_ARDY    => mi_sync_ardy,
+            RX_DRDY    => mi_sync_drdy,
+
+            TX_DWR     => mi_pipe_dwr,
+            TX_ADDR    => mi_pipe_addr,
+            TX_RD      => mi_pipe_rd,
+            TX_WR      => mi_pipe_wr,
+            TX_BE      => mi_pipe_be,
+            TX_DRD     => mi_pipe_drd,
+            TX_ARDY    => mi_pipe_ardy,
+            TX_DRDY    => mi_pipe_drdy
         );
 
-    else generate
+        -- -------------------------------------------------------------------------
 
-        mi_sync_dwr  <= MI_DWR;
-        mi_sync_addr <= MI_ADDR;
-        mi_sync_rd   <= MI_RD;
-        mi_sync_wr   <= MI_WR;
-        mi_sync_be   <= MI_BE;
+        -- -------------------------------------------------------------------------
+        -- Local MI connection
+        -- -------------------------------------------------------------------------
 
-        MI_DRD       <= mi_sync_drd;
-        MI_ARDY      <= mi_sync_ardy;
-        MI_DRDY      <= mi_sync_drdy;
+        mi_pipe_addr_local <= unsigned(mi_pipe_addr(0)(mi_pipe_addr_local'high downto 0));
 
-    end generate;
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- MI splitting
-    -- -------------------------------------------------------------------------
-
-    mi_split_i : entity work.MI_SPLITTER_PLUS_GEN
-    generic map(
-        ADDR_WIDTH => 32,
-        DATA_WIDTH => 32,
-        PORTS      => MI_SPLIT_PORTS,
-        --            TX player, RX player, TX gen, RX gen, speed meter, local MUXes
-        ADDR_BASE  => MI_SPLIT_ADDR_BASE,
-        PIPE_OUT   => (MI_SPLIT_PORTS-1 downto 0 => MI_PIPE_EN),
-        DEVICE     => DEVICE
-    )
-    port map(
-        CLK        => CLK  ,
-        RESET      => RESET,
-
-        RX_DWR     => mi_sync_dwr,
-        RX_ADDR    => mi_sync_addr,
-        RX_RD      => mi_sync_rd,
-        RX_WR      => mi_sync_wr,
-        RX_BE      => mi_sync_be,
-        RX_DRD     => mi_sync_drd,
-        RX_ARDY    => mi_sync_ardy,
-        RX_DRDY    => mi_sync_drdy,
-
-        TX_DWR     => mi_pipe_dwr,
-        TX_ADDR    => mi_pipe_addr,
-        TX_RD      => mi_pipe_rd,
-        TX_WR      => mi_pipe_wr,
-        TX_BE      => mi_pipe_be,
-        TX_DRD     => mi_pipe_drd,
-        TX_ARDY    => mi_pipe_ardy,
-        TX_DRDY    => mi_pipe_drdy
-    );
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- Local MI connection
-    -- -------------------------------------------------------------------------
-
-    mi_pipe_addr_local <= unsigned(mi_pipe_addr(0)(mi_pipe_addr_local'high downto 0));
-
-    mi_rd_pr : process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            case to_integer(mi_pipe_addr_local) is
-                -- MUX Selects
-                when 16#00# => mi_pipe_drd(0) <= (0 => rx_loop_mux_sel_reg, others => '0');
-                when 16#04# => mi_pipe_drd(0) <= (0 => tx_loop_mux_sel_reg, others => '0');
-                when 16#08# => mi_pipe_drd(0) <= (1 downto 0 => rx_gen_mux_sel_reg , others => '0');
-                when 16#0C# => mi_pipe_drd(0) <= (1 downto 0 => tx_gen_mux_sel_reg , others => '0');
-                -- Others
-                when others => mi_pipe_drd(0) <= X"DEAD1440";
-            end case;
-            mi_pipe_drdy(0) <= mi_pipe_rd(0);
-            if (RESET='1') then
-                mi_pipe_drdy(0) <= '0';
+        mi_rd_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                case to_integer(mi_pipe_addr_local) is
+                    -- MUX Selects
+                    when 16#00# => mi_pipe_drd(0) <= (0 => rx_loop_mux_sel_reg, others => '0');
+                    when 16#04# => mi_pipe_drd(0) <= (0 => tx_loop_mux_sel_reg, others => '0');
+                    when 16#08# => mi_pipe_drd(0) <= (1 downto 0 => rx_gen_mux_sel_reg, others => '0');
+                    when 16#0C# => mi_pipe_drd(0) <= (1 downto 0 => tx_gen_mux_sel_reg, others => '0');
+                    -- Others
+                    when others => mi_pipe_drd(0) <= X"DEAD1440";
+                end case;
+                mi_pipe_drdy(0) <= mi_pipe_rd(0);
+                if (RESET = '1') then
+                    mi_pipe_drdy(0) <= '0';
+                end if;
             end if;
-        end if;
-    end process;
+        end process;
 
-    mi_pipe_ardy(0) <= mi_pipe_rd(0) or mi_pipe_wr(0);
+        mi_pipe_ardy(0) <= mi_pipe_rd(0) or mi_pipe_wr(0);
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- MFB Speed Meters
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- MFB Speed Meters
+        -- -------------------------------------------------------------------------
 
-    mi_pipe_addr_sm <= unsigned(mi_pipe_addr(1)(mi_pipe_addr_sm'high downto 0));
+        mi_pipe_addr_sm <= unsigned(mi_pipe_addr(1)(mi_pipe_addr_sm'high downto 0));
 
-    process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            case to_integer(mi_pipe_addr_sm) is
-                -- MFB Speed Meters
-                when 16#00# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(rx_cnt_ticks),32));
-                when 16#04# => mi_pipe_drd(1) <= (0 => rx_cnt_ticks_max, others => '0');
-                when 16#08# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(rx_cnt_bytes),32));
-                when 16#10# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(tx_cnt_ticks),32));
-                when 16#14# => mi_pipe_drd(1) <= (0 => tx_cnt_ticks_max, others => '0');
-                when 16#18# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(tx_cnt_bytes),32));
-                when 16#20# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(eth_rx_cnt_ticks),32));
-                when 16#24# => mi_pipe_drd(1) <= (0 => eth_rx_cnt_ticks_max, others => '0');
-                when 16#28# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(eth_rx_cnt_bytes),32));
-                when 16#30# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(eth_tx_cnt_ticks),32));
-                when 16#34# => mi_pipe_drd(1) <= (0 => eth_tx_cnt_ticks_max, others => '0');
-                when 16#38# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(eth_tx_cnt_bytes),32));
-                -- Others
-                when others => mi_pipe_drd(1) <= X"DEAD1441";
-            end case;
-            mi_pipe_drdy(1) <= mi_pipe_rd(1);
-            if (RESET='1') then
-                mi_pipe_drdy(1) <= '0';
+        process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                case to_integer(mi_pipe_addr_sm) is
+                    -- MFB Speed Meters
+                    when 16#00# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(rx_cnt_ticks),32));
+                    when 16#04# => mi_pipe_drd(1) <= (0 => rx_cnt_ticks_max, others => '0');
+                    when 16#08# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(rx_cnt_bytes),32));
+                    when 16#10# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(tx_cnt_ticks),32));
+                    when 16#14# => mi_pipe_drd(1) <= (0 => tx_cnt_ticks_max, others => '0');
+                    when 16#18# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(tx_cnt_bytes),32));
+                    when 16#20# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(eth_rx_cnt_ticks),32));
+                    when 16#24# => mi_pipe_drd(1) <= (0 => eth_rx_cnt_ticks_max, others => '0');
+                    when 16#28# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(eth_rx_cnt_bytes),32));
+                    when 16#30# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(eth_tx_cnt_ticks),32));
+                    when 16#34# => mi_pipe_drd(1) <= (0 => eth_tx_cnt_ticks_max, others => '0');
+                    when 16#38# => mi_pipe_drd(1) <= std_logic_vector(resize(unsigned(eth_tx_cnt_bytes),32));
+                    -- Others
+                    when others => mi_pipe_drd(1) <= X"DEAD1441";
+                end case;
+                mi_pipe_drdy(1) <= mi_pipe_rd(1);
+                if (RESET = '1') then
+                    mi_pipe_drdy(1) <= '0';
+                end if;
             end if;
-        end if;
-    end process;
+        end process;
 
-    mi_pipe_ardy(1) <= mi_pipe_rd(1) or mi_pipe_wr(1);
+        mi_pipe_ardy(1) <= mi_pipe_rd(1) or mi_pipe_wr(1);
 
-    rx_cnt_clear <= '1' when mi_pipe_wr(1)='1' and mi_pipe_addr_sm=16#0C# else '0';
-    tx_cnt_clear <= '1' when mi_pipe_wr(1)='1' and mi_pipe_addr_sm=16#1C# else '0';
-    eth_rx_cnt_clear <= '1' when mi_pipe_wr(1)='1' and mi_pipe_addr_sm=16#2C# else '0';
-    eth_tx_cnt_clear <= '1' when mi_pipe_wr(1)='1' and mi_pipe_addr_sm=16#3C# else '0';
+        rx_cnt_clear     <= '1' when mi_pipe_wr(1) = '1' and mi_pipe_addr_sm = 16#0C# else '0';
+        tx_cnt_clear     <= '1' when mi_pipe_wr(1) = '1' and mi_pipe_addr_sm = 16#1C# else '0';
+        eth_rx_cnt_clear <= '1' when mi_pipe_wr(1) = '1' and mi_pipe_addr_sm = 16#2C# else '0';
+        eth_tx_cnt_clear <= '1' when mi_pipe_wr(1) = '1' and mi_pipe_addr_sm = 16#3C# else '0';
 
-    dma_rx_mfb_speed_i : entity work.MFB_SPEED_METER
-    generic map(
-        REGIONS         => REGIONS    ,
-        REGION_SIZE     => REGION_SIZE,
-        BLOCK_SIZE      => BLOCK_SIZE ,
-        ITEM_WIDTH      => ITEM_WIDTH ,
-        CNT_TICKS_WIDTH => 24         ,
-        CNT_BYTES_WIDTH => 32
-    )
-    port map(
-        CLK           => CLK  ,
-        RST           => RESET,
+        dma_rx_mfb_speed_i : entity work.MFB_SPEED_METER
+        generic map (
+            REGIONS         => REGIONS,
+            REGION_SIZE     => REGION_SIZE,
+            BLOCK_SIZE      => BLOCK_SIZE,
+            ITEM_WIDTH      => ITEM_WIDTH,
+            CNT_TICKS_WIDTH => 24,
+            CNT_BYTES_WIDTH => 32
+        )
+        port map (
+            CLK           => CLK,
+            RST           => RESET,
 
-        RX_SOF        => DMA_RX_MFB_SOF    ,
-        RX_EOF        => DMA_RX_MFB_EOF    ,
-        RX_SOF_POS    => DMA_RX_MFB_SOF_POS,
-        RX_EOF_POS    => DMA_RX_MFB_EOF_POS,
-        RX_SRC_RDY    => DMA_RX_MFB_SRC_RDY,
-        RX_DST_RDY    => DMA_RX_MFB_DST_RDY,
+            RX_SOF        => DMA_RX_MFB_SOF,
+            RX_EOF        => DMA_RX_MFB_EOF,
+            RX_SOF_POS    => DMA_RX_MFB_SOF_POS,
+            RX_EOF_POS    => DMA_RX_MFB_EOF_POS,
+            RX_SRC_RDY    => DMA_RX_MFB_SRC_RDY,
+            RX_DST_RDY    => DMA_RX_MFB_DST_RDY,
 
-        CNT_TICKS     => rx_cnt_ticks    ,
-        CNT_TICKS_MAX => rx_cnt_ticks_max,
-        CNT_BYTES     => rx_cnt_bytes    ,
-        CNT_CLEAR     => rx_cnt_clear
-    );
+            CNT_TICKS     => rx_cnt_ticks,
+            CNT_TICKS_MAX => rx_cnt_ticks_max,
+            CNT_BYTES     => rx_cnt_bytes,
+            CNT_CLEAR     => rx_cnt_clear
+        );
 
-    dma_tx_mfb_speed_i : entity work.MFB_SPEED_METER
-    generic map(
-        REGIONS         => REGIONS    ,
-        REGION_SIZE     => REGION_SIZE,
-        BLOCK_SIZE      => BLOCK_SIZE ,
-        ITEM_WIDTH      => ITEM_WIDTH ,
-        CNT_TICKS_WIDTH => 24         ,
-        CNT_BYTES_WIDTH => 32
-    )
-    port map(
-        CLK           => CLK  ,
-        RST           => RESET,
+        dma_tx_mfb_speed_i : entity work.MFB_SPEED_METER
+        generic map (
+            REGIONS         => REGIONS,
+            REGION_SIZE     => REGION_SIZE,
+            BLOCK_SIZE      => BLOCK_SIZE,
+            ITEM_WIDTH      => ITEM_WIDTH,
+            CNT_TICKS_WIDTH => 24,
+            CNT_BYTES_WIDTH => 32
+        )
+        port map (
+            CLK           => CLK,
+            RST           => RESET,
 
-        RX_SOF        => DMA_TX_MFB_SOF    ,
-        RX_EOF        => DMA_TX_MFB_EOF    ,
-        RX_SOF_POS    => DMA_TX_MFB_SOF_POS,
-        RX_EOF_POS    => DMA_TX_MFB_EOF_POS,
-        RX_SRC_RDY    => DMA_TX_MFB_SRC_RDY,
-        RX_DST_RDY    => DMA_TX_MFB_DST_RDY,
+            RX_SOF        => DMA_TX_MFB_SOF,
+            RX_EOF        => DMA_TX_MFB_EOF,
+            RX_SOF_POS    => DMA_TX_MFB_SOF_POS,
+            RX_EOF_POS    => DMA_TX_MFB_EOF_POS,
+            RX_SRC_RDY    => DMA_TX_MFB_SRC_RDY,
+            RX_DST_RDY    => DMA_TX_MFB_DST_RDY,
 
-        CNT_TICKS     => tx_cnt_ticks    ,
-        CNT_TICKS_MAX => tx_cnt_ticks_max,
-        CNT_BYTES     => tx_cnt_bytes    ,
-        CNT_CLEAR     => tx_cnt_clear
-    );
+            CNT_TICKS     => tx_cnt_ticks,
+            CNT_TICKS_MAX => tx_cnt_ticks_max,
+            CNT_BYTES     => tx_cnt_bytes,
+            CNT_CLEAR     => tx_cnt_clear
+        );
 
-    eth_rx_mfb_speed_i : entity work.MFB_SPEED_METER
-    generic map(
-        REGIONS         => REGIONS    ,
-        REGION_SIZE     => REGION_SIZE,
-        BLOCK_SIZE      => BLOCK_SIZE ,
-        ITEM_WIDTH      => ITEM_WIDTH ,
-        CNT_TICKS_WIDTH => 24         ,
-        CNT_BYTES_WIDTH => 32
-    )
-    port map(
-        CLK           => CLK  ,
-        RST           => RESET,
+        eth_rx_mfb_speed_i : entity work.MFB_SPEED_METER
+        generic map (
+            REGIONS         => REGIONS,
+            REGION_SIZE     => REGION_SIZE,
+            BLOCK_SIZE      => BLOCK_SIZE,
+            ITEM_WIDTH      => ITEM_WIDTH,
+            CNT_TICKS_WIDTH => 24,
+            CNT_BYTES_WIDTH => 32
+        )
+        port map (
+            CLK           => CLK,
+            RST           => RESET,
 
-        RX_SOF        => ETH_RX_MFB_SOF    ,
-        RX_EOF        => ETH_RX_MFB_EOF    ,
-        RX_SOF_POS    => ETH_RX_MFB_SOF_POS,
-        RX_EOF_POS    => ETH_RX_MFB_EOF_POS,
-        RX_SRC_RDY    => ETH_RX_MFB_SRC_RDY,
-        RX_DST_RDY    => ETH_RX_MFB_DST_RDY,
+            RX_SOF        => ETH_RX_MFB_SOF,
+            RX_EOF        => ETH_RX_MFB_EOF,
+            RX_SOF_POS    => ETH_RX_MFB_SOF_POS,
+            RX_EOF_POS    => ETH_RX_MFB_EOF_POS,
+            RX_SRC_RDY    => ETH_RX_MFB_SRC_RDY,
+            RX_DST_RDY    => ETH_RX_MFB_DST_RDY,
 
-        CNT_TICKS     => eth_rx_cnt_ticks    ,
-        CNT_TICKS_MAX => eth_rx_cnt_ticks_max,
-        CNT_BYTES     => eth_rx_cnt_bytes    ,
-        CNT_CLEAR     => eth_rx_cnt_clear
-    );
+            CNT_TICKS     => eth_rx_cnt_ticks,
+            CNT_TICKS_MAX => eth_rx_cnt_ticks_max,
+            CNT_BYTES     => eth_rx_cnt_bytes,
+            CNT_CLEAR     => eth_rx_cnt_clear
+        );
 
-    eth_tx_mfb_speed_i : entity work.MFB_SPEED_METER
-    generic map(
-        REGIONS         => REGIONS    ,
-        REGION_SIZE     => REGION_SIZE,
-        BLOCK_SIZE      => BLOCK_SIZE ,
-        ITEM_WIDTH      => ITEM_WIDTH ,
-        CNT_TICKS_WIDTH => 24         ,
-        CNT_BYTES_WIDTH => 32
-    )
-    port map(
-        CLK           => CLK  ,
-        RST           => RESET,
+        eth_tx_mfb_speed_i : entity work.MFB_SPEED_METER
+        generic map (
+            REGIONS         => REGIONS,
+            REGION_SIZE     => REGION_SIZE,
+            BLOCK_SIZE      => BLOCK_SIZE,
+            ITEM_WIDTH      => ITEM_WIDTH,
+            CNT_TICKS_WIDTH => 24,
+            CNT_BYTES_WIDTH => 32
+        )
+        port map (
+            CLK           => CLK,
+            RST           => RESET,
 
-        RX_SOF        => ETH_TX_MFB_SOF    ,
-        RX_EOF        => ETH_TX_MFB_EOF    ,
-        RX_SOF_POS    => ETH_TX_MFB_SOF_POS,
-        RX_EOF_POS    => ETH_TX_MFB_EOF_POS,
-        RX_SRC_RDY    => ETH_TX_MFB_SRC_RDY,
-        RX_DST_RDY    => ETH_TX_MFB_DST_RDY,
+            RX_SOF        => ETH_TX_MFB_SOF,
+            RX_EOF        => ETH_TX_MFB_EOF,
+            RX_SOF_POS    => ETH_TX_MFB_SOF_POS,
+            RX_EOF_POS    => ETH_TX_MFB_EOF_POS,
+            RX_SRC_RDY    => ETH_TX_MFB_SRC_RDY,
+            RX_DST_RDY    => ETH_TX_MFB_DST_RDY,
 
-        CNT_TICKS     => eth_tx_cnt_ticks    ,
-        CNT_TICKS_MAX => eth_tx_cnt_ticks_max,
-        CNT_BYTES     => eth_tx_cnt_bytes    ,
-        CNT_CLEAR     => eth_tx_cnt_clear
-    );
+            CNT_TICKS     => eth_tx_cnt_ticks,
+            CNT_TICKS_MAX => eth_tx_cnt_ticks_max,
+            CNT_BYTES     => eth_tx_cnt_bytes,
+            CNT_CLEAR     => eth_tx_cnt_clear
+        );
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- MUX SEL registers
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- MUX SEL registers
+        -- -------------------------------------------------------------------------
 
-    mux_sel_reg_pr : process (CLK)
-    begin
-        if (rising_edge(CLK)) then
+        mux_sel_reg_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
 
-            if (mi_pipe_wr(0)='1') then
+                if (mi_pipe_wr(0) = '1') then
 
-                if (mi_pipe_addr_local=16#00#) then
-                    rx_loop_mux_sel_reg <= mi_pipe_dwr(0)(0);
+                    if (mi_pipe_addr_local = 16#00#) then
+                        rx_loop_mux_sel_reg <= mi_pipe_dwr(0)(0);
+                    end if;
+
+                    if (mi_pipe_addr_local = 16#04#) then
+                        tx_loop_mux_sel_reg <= mi_pipe_dwr(0)(0);
+                    end if;
+
+                    if (mi_pipe_addr_local = 16#08#) then
+                        rx_gen_mux_sel_reg <= mi_pipe_dwr(0)(1 downto 0);
+                    end if;
+
+                    if (mi_pipe_addr_local = 16#0C#) then
+                        tx_gen_mux_sel_reg <= mi_pipe_dwr(0)(1 downto 0);
+                    end if;
+
                 end if;
 
-                if (mi_pipe_addr_local=16#04#) then
-                    tx_loop_mux_sel_reg <= mi_pipe_dwr(0)(0);
+                if (RESET = '1') then
+                    rx_gen_mux_sel_reg  <= (others => '0');
+                    tx_gen_mux_sel_reg  <= (others => '0');
+                    rx_loop_mux_sel_reg <= '0';
+                    tx_loop_mux_sel_reg <= '0';
                 end if;
-
-                if (mi_pipe_addr_local=16#08#) then
-                    rx_gen_mux_sel_reg <= mi_pipe_dwr(0)(1 downto 0);
-                end if;
-
-                if (mi_pipe_addr_local=16#0C#) then
-                    tx_gen_mux_sel_reg <= mi_pipe_dwr(0)(1 downto 0);
-                end if;
-
             end if;
+        end process;
 
-            if (RESET='1') then
-                rx_gen_mux_sel_reg  <= (others => '0');
-                tx_gen_mux_sel_reg  <= (others => '0');
-                rx_loop_mux_sel_reg <= '0';
-                tx_loop_mux_sel_reg <= '0';
-            end if;
-        end if;
-    end process;
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- RX Generator
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- RX Generator
-    -- -------------------------------------------------------------------------
+        rx_dma_gen_i : entity work.DMA_MFB_GENERATOR
+        generic map (
+            REGIONS        => REGIONS,
+            REGION_SIZE    => REGION_SIZE,
+            BLOCK_SIZE     => BLOCK_SIZE,
+            ITEM_WIDTH     => ITEM_WIDTH,
+            PKT_MTU        => PKT_MTU,
+            DMA_CHANNELS   => RX_DMA_CHANNELS,
+            NPP_HDR_SIZE   => NPP_HDR_SIZE,
+            HDR_META_WIDTH => HDR_META_WIDTH,
+            HDR_INS_EN     => RX_HDR_INS_EN,
+            SAME_CLK       => true,
+            MI_PIPE_EN     => false,
+            DEVICE         => DEVICE
+        )
+        port map (
+            MI_CLK   => CLK,
+            MI_RESET => RESET,
+            MI_DWR   => mi_pipe_dwr (2),
+            MI_ADDR  => mi_pipe_addr(2),
+            MI_BE    => mi_pipe_be  (2),
+            MI_RD    => mi_pipe_rd  (2),
+            MI_WR    => mi_pipe_wr  (2),
+            MI_ARDY  => mi_pipe_ardy(2),
+            MI_DRD   => mi_pipe_drd (2),
+            MI_DRDY  => mi_pipe_drdy(2),
 
-    rx_dma_gen_i : entity work.DMA_MFB_GENERATOR
-    generic map(
-        REGIONS        => REGIONS        ,
-        REGION_SIZE    => REGION_SIZE    ,
-        BLOCK_SIZE     => BLOCK_SIZE     ,
-        ITEM_WIDTH     => ITEM_WIDTH     ,
-        PKT_MTU        => PKT_MTU        ,
-        DMA_CHANNELS   => RX_DMA_CHANNELS,
-        NPP_HDR_SIZE   => NPP_HDR_SIZE   ,
-        HDR_META_WIDTH => HDR_META_WIDTH ,
-        HDR_INS_EN     => RX_HDR_INS_EN  ,
-        SAME_CLK       => true           ,
-        MI_PIPE_EN     => false          ,
-        DEVICE         => DEVICE
-    )
-    port map(
-        MI_CLK   => CLK            ,
-        MI_RESET => RESET          ,
-        MI_DWR   => mi_pipe_dwr (2),
-        MI_ADDR  => mi_pipe_addr(2),
-        MI_BE    => mi_pipe_be  (2),
-        MI_RD    => mi_pipe_rd  (2),
-        MI_WR    => mi_pipe_wr  (2),
-        MI_ARDY  => mi_pipe_ardy(2),
-        MI_DRD   => mi_pipe_drd (2),
-        MI_DRDY  => mi_pipe_drdy(2),
+            CLK               => CLK,
+            RESET             => RESET,
 
-        CLK               => CLK  ,
-        RESET             => RESET,
+            INSTR_MVB_LEN      => rx_gen_instr_mvb_len,
+            INSTR_MVB_CHANNEL  => rx_gen_instr_mvb_channel,
+            INSTR_MVB_HDR_META => rx_gen_instr_mvb_hdr_meta,
+            INSTR_MVB_DISCARD  => rx_gen_instr_mvb_discard,
+            INSTR_MVB_VLD      => rx_gen_instr_mvb_vld,
+            INSTR_MVB_SRC_RDY  => rx_gen_instr_mvb_src_rdy,
+            INSTR_MVB_DST_RDY  => rx_gen_instr_mvb_dst_rdy,
+            ETH_MFB_DATA       => rx_gen_eth_mfb_data,
+            ETH_MFB_SOF        => rx_gen_eth_mfb_sof,
+            ETH_MFB_EOF        => rx_gen_eth_mfb_eof,
+            ETH_MFB_SOF_POS    => rx_gen_eth_mfb_sof_pos,
+            ETH_MFB_EOF_POS    => rx_gen_eth_mfb_eof_pos,
+            ETH_MFB_SRC_RDY    => rx_gen_eth_mfb_src_rdy,
+            ETH_MFB_DST_RDY    => rx_gen_eth_mfb_dst_rdy
+        );
 
-        INSTR_MVB_LEN      => rx_gen_instr_mvb_len     ,
-        INSTR_MVB_CHANNEL  => rx_gen_instr_mvb_channel ,
-        INSTR_MVB_HDR_META => rx_gen_instr_mvb_hdr_meta,
-        INSTR_MVB_DISCARD  => rx_gen_instr_mvb_discard ,
-        INSTR_MVB_VLD      => rx_gen_instr_mvb_vld     ,
-        INSTR_MVB_SRC_RDY  => rx_gen_instr_mvb_src_rdy ,
-        INSTR_MVB_DST_RDY  => rx_gen_instr_mvb_dst_rdy ,
-        ETH_MFB_DATA       => rx_gen_eth_mfb_data      ,
-        ETH_MFB_SOF        => rx_gen_eth_mfb_sof       ,
-        ETH_MFB_EOF        => rx_gen_eth_mfb_eof       ,
-        ETH_MFB_SOF_POS    => rx_gen_eth_mfb_sof_pos   ,
-        ETH_MFB_EOF_POS    => rx_gen_eth_mfb_eof_pos   ,
-        ETH_MFB_SRC_RDY    => rx_gen_eth_mfb_src_rdy   ,
-        ETH_MFB_DST_RDY    => rx_gen_eth_mfb_dst_rdy
-    );
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- TX Generator
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- TX Generator
-    -- -------------------------------------------------------------------------
+        tx_dma_gen_i : entity work.DMA_MFB_GENERATOR
+        generic map (
+            REGIONS        => REGIONS,
+            REGION_SIZE    => REGION_SIZE,
+            BLOCK_SIZE     => BLOCK_SIZE,
+            ITEM_WIDTH     => ITEM_WIDTH,
+            PKT_MTU        => PKT_MTU,
+            DMA_CHANNELS   => TX_DMA_CHANNELS,
+            NPP_HDR_SIZE   => NPP_HDR_SIZE,
+            HDR_META_WIDTH => HDR_META_WIDTH,
+            HDR_INS_EN     => false,
+            SAME_CLK       => true,
+            MI_PIPE_EN     => false,
+            DEVICE         => DEVICE
+        )
+        port map (
+            MI_CLK   => CLK,
+            MI_RESET => RESET,
+            MI_DWR   => mi_pipe_dwr (3),
+            MI_ADDR  => mi_pipe_addr(3),
+            MI_BE    => mi_pipe_be  (3),
+            MI_RD    => mi_pipe_rd  (3),
+            MI_WR    => mi_pipe_wr  (3),
+            MI_ARDY  => mi_pipe_ardy(3),
+            MI_DRD   => mi_pipe_drd (3),
+            MI_DRDY  => mi_pipe_drdy(3),
 
-    tx_dma_gen_i : entity work.DMA_MFB_GENERATOR
-    generic map(
-        REGIONS        => REGIONS        ,
-        REGION_SIZE    => REGION_SIZE    ,
-        BLOCK_SIZE     => BLOCK_SIZE     ,
-        ITEM_WIDTH     => ITEM_WIDTH     ,
-        PKT_MTU        => PKT_MTU        ,
-        DMA_CHANNELS   => TX_DMA_CHANNELS,
-        NPP_HDR_SIZE   => NPP_HDR_SIZE   ,
-        HDR_META_WIDTH => HDR_META_WIDTH ,
-        HDR_INS_EN     => false          ,
-        SAME_CLK       => true           ,
-        MI_PIPE_EN     => false          ,
-        DEVICE         => DEVICE
-    )
-    port map(
-        MI_CLK   => CLK            ,
-        MI_RESET => RESET          ,
-        MI_DWR   => mi_pipe_dwr (3),
-        MI_ADDR  => mi_pipe_addr(3),
-        MI_BE    => mi_pipe_be  (3),
-        MI_RD    => mi_pipe_rd  (3),
-        MI_WR    => mi_pipe_wr  (3),
-        MI_ARDY  => mi_pipe_ardy(3),
-        MI_DRD   => mi_pipe_drd (3),
-        MI_DRDY  => mi_pipe_drdy(3),
+            CLK                => CLK,
+            RESET              => RESET,
 
-        CLK                => CLK  ,
-        RESET              => RESET,
+            INSTR_MVB_LEN      => tx_gen_instr_mvb_len,
+            INSTR_MVB_CHANNEL  => tx_gen_instr_mvb_channel,
+            INSTR_MVB_HDR_META => tx_gen_instr_mvb_hdr_meta,
+            INSTR_MVB_DISCARD  => tx_gen_instr_mvb_discard,
+            INSTR_MVB_VLD      => tx_gen_instr_mvb_vld,
+            INSTR_MVB_SRC_RDY  => tx_gen_instr_mvb_src_rdy,
+            INSTR_MVB_DST_RDY  => tx_gen_instr_mvb_dst_rdy,
+            ETH_MFB_DATA       => tx_gen_eth_mfb_data,
+            ETH_MFB_SOF        => tx_gen_eth_mfb_sof,
+            ETH_MFB_EOF        => tx_gen_eth_mfb_eof,
+            ETH_MFB_SOF_POS    => tx_gen_eth_mfb_sof_pos,
+            ETH_MFB_EOF_POS    => tx_gen_eth_mfb_eof_pos,
+            ETH_MFB_SRC_RDY    => tx_gen_eth_mfb_src_rdy,
+            ETH_MFB_DST_RDY    => tx_gen_eth_mfb_dst_rdy
+        );
 
-        INSTR_MVB_LEN      => tx_gen_instr_mvb_len     ,
-        INSTR_MVB_CHANNEL  => tx_gen_instr_mvb_channel ,
-        INSTR_MVB_HDR_META => tx_gen_instr_mvb_hdr_meta,
-        INSTR_MVB_DISCARD  => tx_gen_instr_mvb_discard ,
-        INSTR_MVB_VLD      => tx_gen_instr_mvb_vld     ,
-        INSTR_MVB_SRC_RDY  => tx_gen_instr_mvb_src_rdy ,
-        INSTR_MVB_DST_RDY  => tx_gen_instr_mvb_dst_rdy ,
-        ETH_MFB_DATA       => tx_gen_eth_mfb_data      ,
-        ETH_MFB_SOF        => tx_gen_eth_mfb_sof       ,
-        ETH_MFB_EOF        => tx_gen_eth_mfb_eof       ,
-        ETH_MFB_SOF_POS    => tx_gen_eth_mfb_sof_pos   ,
-        ETH_MFB_EOF_POS    => tx_gen_eth_mfb_eof_pos   ,
-        ETH_MFB_SRC_RDY    => tx_gen_eth_mfb_src_rdy   ,
-        ETH_MFB_DST_RDY    => tx_gen_eth_mfb_dst_rdy
-    );
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- RX Frame Player
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- RX Frame Player
-    -- -------------------------------------------------------------------------
+        rx_dma_plr_i : entity work.MFB_FRAME_PLAYER
+        generic map (
+            REGIONS        => REGIONS,
+            REGION_SIZE    => REGION_SIZE,
+            BLOCK_SIZE     => BLOCK_SIZE,
+            ITEM_WIDTH     => ITEM_WIDTH,
+            FIFO_DEPTH     => PLAYER_FIFO_DEPTH
+        )
+        port map (
+            CLK        => CLK,
+            RST        => RESET,
 
-    rx_dma_plr_i : entity work.MFB_FRAME_PLAYER
-    generic map(
-        REGIONS        => REGIONS    ,
-        REGION_SIZE    => REGION_SIZE,
-        BLOCK_SIZE     => BLOCK_SIZE ,
-        ITEM_WIDTH     => ITEM_WIDTH ,
-        FIFO_DEPTH     => PLAYER_FIFO_DEPTH
-    )
-    port map(
-        CLK        => CLK  ,
-        RST        => RESET,
+            MI_DWR     => mi_pipe_dwr (4),
+            MI_ADDR    => mi_pipe_addr(4),
+            MI_BE      => mi_pipe_be  (4),
+            MI_RD      => mi_pipe_rd  (4),
+            MI_WR      => mi_pipe_wr  (4),
+            MI_ARDY    => mi_pipe_ardy(4),
+            MI_DRD     => mi_pipe_drd (4),
+            MI_DRDY    => mi_pipe_drdy(4),
 
-        MI_DWR     => mi_pipe_dwr (4),
-        MI_ADDR    => mi_pipe_addr(4),
-        MI_BE      => mi_pipe_be  (4),
-        MI_RD      => mi_pipe_rd  (4),
-        MI_WR      => mi_pipe_wr  (4),
-        MI_ARDY    => mi_pipe_ardy(4),
-        MI_DRD     => mi_pipe_drd (4),
-        MI_DRDY    => mi_pipe_drdy(4),
+            TX_DATA    => rx_plr_eth_mfb_data,
+            TX_SOF     => rx_plr_eth_mfb_sof,
+            TX_EOF     => rx_plr_eth_mfb_eof,
+            TX_SOF_POS => rx_plr_eth_mfb_sof_pos,
+            TX_EOF_POS => rx_plr_eth_mfb_eof_pos,
+            TX_SRC_RDY => rx_plr_eth_mfb_src_rdy,
+            TX_DST_RDY => rx_plr_eth_mfb_dst_rdy
+        );
 
-        TX_DATA    => rx_plr_eth_mfb_data   ,
-        TX_SOF     => rx_plr_eth_mfb_sof    ,
-        TX_EOF     => rx_plr_eth_mfb_eof    ,
-        TX_SOF_POS => rx_plr_eth_mfb_sof_pos,
-        TX_EOF_POS => rx_plr_eth_mfb_eof_pos,
-        TX_SRC_RDY => rx_plr_eth_mfb_src_rdy,
-        TX_DST_RDY => rx_plr_eth_mfb_dst_rdy
-    );
+        -- TODO: RX Frame Player won't work without realistic Instructions!!
+        rx_plr_instr_mvb_len      <= (others => '0');
+        rx_plr_instr_mvb_channel  <= (others => '0');
+        rx_plr_instr_mvb_hdr_meta <= (others => '0');
+        rx_plr_instr_mvb_discard  <= (others => '0');
+        rx_plr_instr_mvb_vld      <= rx_plr_eth_mfb_sof;
+        rx_plr_instr_mvb_src_rdy  <= or rx_plr_instr_mvb_vld;
 
-    -- TODO: RX Frame Player won't work without realistic Instructions!!
-    rx_plr_instr_mvb_len      <= (others => '0');
-    rx_plr_instr_mvb_channel  <= (others => '0');
-    rx_plr_instr_mvb_hdr_meta <= (others => '0');
-    rx_plr_instr_mvb_discard  <= (others => '0');
-    rx_plr_instr_mvb_vld      <= rx_plr_eth_mfb_sof;
-    rx_plr_instr_mvb_src_rdy  <= or rx_plr_instr_mvb_vld;
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- TX Frame Player
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- TX Frame Player
-    -- -------------------------------------------------------------------------
+        tx_dma_plr_i : entity work.MFB_FRAME_PLAYER
+        generic map (
+            REGIONS        => REGIONS,
+            REGION_SIZE    => REGION_SIZE,
+            BLOCK_SIZE     => BLOCK_SIZE,
+            ITEM_WIDTH     => ITEM_WIDTH,
+            FIFO_DEPTH     => PLAYER_FIFO_DEPTH
+        )
+        port map (
+            CLK        => CLK,
+            RST        => RESET,
 
-    tx_dma_plr_i : entity work.MFB_FRAME_PLAYER
-    generic map(
-        REGIONS        => REGIONS    ,
-        REGION_SIZE    => REGION_SIZE,
-        BLOCK_SIZE     => BLOCK_SIZE ,
-        ITEM_WIDTH     => ITEM_WIDTH ,
-        FIFO_DEPTH     => PLAYER_FIFO_DEPTH
-    )
-    port map(
-        CLK        => CLK  ,
-        RST        => RESET,
+            MI_DWR     => mi_pipe_dwr (5),
+            MI_ADDR    => mi_pipe_addr(5),
+            MI_BE      => mi_pipe_be  (5),
+            MI_RD      => mi_pipe_rd  (5),
+            MI_WR      => mi_pipe_wr  (5),
+            MI_ARDY    => mi_pipe_ardy(5),
+            MI_DRD     => mi_pipe_drd (5),
+            MI_DRDY    => mi_pipe_drdy(5),
 
-        MI_DWR     => mi_pipe_dwr (5),
-        MI_ADDR    => mi_pipe_addr(5),
-        MI_BE      => mi_pipe_be  (5),
-        MI_RD      => mi_pipe_rd  (5),
-        MI_WR      => mi_pipe_wr  (5),
-        MI_ARDY    => mi_pipe_ardy(5),
-        MI_DRD     => mi_pipe_drd (5),
-        MI_DRDY    => mi_pipe_drdy(5),
+            TX_DATA    => tx_plr_eth_mfb_data,
+            TX_SOF     => tx_plr_eth_mfb_sof,
+            TX_EOF     => tx_plr_eth_mfb_eof,
+            TX_SOF_POS => tx_plr_eth_mfb_sof_pos,
+            TX_EOF_POS => tx_plr_eth_mfb_eof_pos,
+            TX_SRC_RDY => tx_plr_eth_mfb_src_rdy,
+            TX_DST_RDY => tx_plr_eth_mfb_dst_rdy
+        );
 
-        TX_DATA    => tx_plr_eth_mfb_data   ,
-        TX_SOF     => tx_plr_eth_mfb_sof    ,
-        TX_EOF     => tx_plr_eth_mfb_eof    ,
-        TX_SOF_POS => tx_plr_eth_mfb_sof_pos,
-        TX_EOF_POS => tx_plr_eth_mfb_eof_pos,
-        TX_SRC_RDY => tx_plr_eth_mfb_src_rdy,
-        TX_DST_RDY => tx_plr_eth_mfb_dst_rdy
-    );
+        tx_plr_instr_mvb_len      <= (others => '0');
+        tx_plr_instr_mvb_channel  <= (others => '0');
+        tx_plr_instr_mvb_hdr_meta <= (others => '0');
+        tx_plr_instr_mvb_discard  <= (others => '0');
+        tx_plr_instr_mvb_vld      <= tx_plr_eth_mfb_sof;
+        tx_plr_instr_mvb_src_rdy  <= or tx_plr_instr_mvb_vld;
 
-    tx_plr_instr_mvb_len      <= (others => '0');
-    tx_plr_instr_mvb_channel  <= (others => '0');
-    tx_plr_instr_mvb_hdr_meta <= (others => '0');
-    tx_plr_instr_mvb_discard  <= (others => '0');
-    tx_plr_instr_mvb_vld      <= tx_plr_eth_mfb_sof;
-    tx_plr_instr_mvb_src_rdy  <= or tx_plr_instr_mvb_vld;
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- RX_DMA_CHANNELS/TX_DMA_CHANNELS conversion
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- RX_DMA_CHANNELS/TX_DMA_CHANNELS conversion
-    -- -------------------------------------------------------------------------
+        chan_conv_gen : for i in 0 to REGIONS-1 generate
+            -- resize_right() is used, so that the packet are evenly distributed on all DMA Endpoints when RX_DMA_CHANNELS>TX_DMA_CHANNELS
+            dma_tx_mvb_c_ch((i+1)*log2(RX_DMA_CHANNELS)-1 downto i*log2(RX_DMA_CHANNELS)) <= std_logic_vector(resize_right(unsigned(DMA_TX_MVB_CHANNEL((i+1)*log2(TX_DMA_CHANNELS)-1 downto i*log2(TX_DMA_CHANNELS))),log2(RX_DMA_CHANNELS)));
+            eth_rx_mvb_c_ch((i+1)*log2(TX_DMA_CHANNELS)-1 downto i*log2(TX_DMA_CHANNELS)) <= std_logic_vector(resize_right(unsigned(ETH_RX_MVB_CHANNEL((i+1)*log2(RX_DMA_CHANNELS)-1 downto i*log2(RX_DMA_CHANNELS))),log2(TX_DMA_CHANNELS)));
+        end generate;
 
-    chan_conv_gen : for i in 0 to REGIONS-1 generate
-        -- resize_right() is used, so that the packet are evenly distributed on all DMA Endpoints when RX_DMA_CHANNELS>TX_DMA_CHANNELS
-        DMA_TX_MVB_C_CH((i+1)*log2(RX_DMA_CHANNELS)-1 downto i*log2(RX_DMA_CHANNELS)) <= std_logic_vector(resize_right(unsigned(DMA_TX_MVB_CHANNEL((i+1)*log2(TX_DMA_CHANNELS)-1 downto i*log2(TX_DMA_CHANNELS))),log2(RX_DMA_CHANNELS)));
-        ETH_RX_MVB_C_CH((i+1)*log2(TX_DMA_CHANNELS)-1 downto i*log2(TX_DMA_CHANNELS)) <= std_logic_vector(resize_right(unsigned(ETH_RX_MVB_CHANNEL((i+1)*log2(RX_DMA_CHANNELS)-1 downto i*log2(RX_DMA_CHANNELS))),log2(TX_DMA_CHANNELS)));
-    end generate;
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- RX Generator/Frame Player MUX
+        -- Frame Player not ready! (TODO: DMA headers)
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- RX Generator/Frame Player MUX
-    -- Frame Player not ready! (TODO: DMA headers)
-    -- -------------------------------------------------------------------------
-
-    -- MVB Instructions
-    rx_mvb_len      <= ETH_RX_MVB_LEN       when rx_gen_mux_sel_reg="00" else
-                       rx_gen_instr_mvb_len when rx_gen_mux_sel_reg="01" else
+        -- MVB Instructions
+        rx_mvb_len      <= ETH_RX_MVB_LEN       when rx_gen_mux_sel_reg = "00" else
+                       rx_gen_instr_mvb_len when rx_gen_mux_sel_reg = "01" else
                        rx_plr_instr_mvb_len;
 
-    rx_mvb_channel  <= ETH_RX_MVB_CHANNEL       when rx_gen_mux_sel_reg="00" else
-                       rx_gen_instr_mvb_channel when rx_gen_mux_sel_reg="01" else
+        rx_mvb_channel  <= ETH_RX_MVB_CHANNEL       when rx_gen_mux_sel_reg = "00" else
+                       rx_gen_instr_mvb_channel when rx_gen_mux_sel_reg = "01" else
                        rx_plr_instr_mvb_channel;
 
-    rx_mvb_hdr_meta <= ETH_RX_MVB_HDR_META       when rx_gen_mux_sel_reg="00" else
-                       rx_gen_instr_mvb_hdr_meta when rx_gen_mux_sel_reg="01" else
+        rx_mvb_hdr_meta <= ETH_RX_MVB_HDR_META       when rx_gen_mux_sel_reg = "00" else
+                       rx_gen_instr_mvb_hdr_meta when rx_gen_mux_sel_reg = "01" else
                        rx_plr_instr_mvb_hdr_meta;
 
-    rx_mvb_discard  <= ETH_RX_MVB_DISCARD       when rx_gen_mux_sel_reg="00" else
-                       rx_gen_instr_mvb_discard when rx_gen_mux_sel_reg="01" else
+        rx_mvb_discard  <= ETH_RX_MVB_DISCARD       when rx_gen_mux_sel_reg = "00" else
+                       rx_gen_instr_mvb_discard when rx_gen_mux_sel_reg = "01" else
                        rx_plr_instr_mvb_discard;
 
-    rx_mvb_vld      <= ETH_RX_MVB_VLD       when rx_gen_mux_sel_reg="00" else
-                       rx_gen_instr_mvb_vld when rx_gen_mux_sel_reg="01" else
+        rx_mvb_vld      <= ETH_RX_MVB_VLD       when rx_gen_mux_sel_reg = "00" else
+                       rx_gen_instr_mvb_vld when rx_gen_mux_sel_reg = "01" else
                        rx_plr_instr_mvb_vld;
 
-    rx_mvb_src_rdy  <= ETH_RX_MVB_SRC_RDY and ETH_RX_MVB_DST_RDY_1 when rx_gen_mux_sel_reg="00" else
-                       rx_gen_instr_mvb_src_rdy                    when rx_gen_mux_sel_reg="01" else
+        rx_mvb_src_rdy  <= ETH_RX_MVB_SRC_RDY and eth_rx_mvb_dst_rdy_1 when rx_gen_mux_sel_reg = "00" else
+                       rx_gen_instr_mvb_src_rdy                    when rx_gen_mux_sel_reg = "01" else
                        rx_plr_instr_mvb_src_rdy;
 
-    ETH_RX_MVB_DST_RDY_0     <= rx_mvb_dst_rdy when rx_gen_mux_sel_reg="00" else '1';
-    rx_gen_instr_mvb_dst_rdy <= rx_mvb_dst_rdy when rx_gen_mux_sel_reg="01" else '1';
+        eth_rx_mvb_dst_rdy_0     <= rx_mvb_dst_rdy when rx_gen_mux_sel_reg = "00" else '1';
+        rx_gen_instr_mvb_dst_rdy <= rx_mvb_dst_rdy when rx_gen_mux_sel_reg = "01" else '1';
 
-    -- MFB Eth frames
-    rx_mfb_data    <= ETH_RX_MFB_DATA     when rx_gen_mux_sel_reg="00" else
-                      rx_gen_eth_mfb_data when rx_gen_mux_sel_reg="01" else
+        -- MFB Eth frames
+        rx_mfb_data    <= ETH_RX_MFB_DATA     when rx_gen_mux_sel_reg = "00" else
+                      rx_gen_eth_mfb_data when rx_gen_mux_sel_reg = "01" else
                       rx_plr_eth_mfb_data;
 
-    rx_mfb_sof     <= ETH_RX_MFB_SOF     when rx_gen_mux_sel_reg="00" else
-                      rx_gen_eth_mfb_sof when rx_gen_mux_sel_reg="01" else
+        rx_mfb_sof     <= ETH_RX_MFB_SOF     when rx_gen_mux_sel_reg = "00" else
+                      rx_gen_eth_mfb_sof when rx_gen_mux_sel_reg = "01" else
                       rx_plr_eth_mfb_sof;
 
-    rx_mfb_eof     <= ETH_RX_MFB_EOF     when rx_gen_mux_sel_reg="00" else
-                      rx_gen_eth_mfb_eof when rx_gen_mux_sel_reg="01" else
+        rx_mfb_eof     <= ETH_RX_MFB_EOF     when rx_gen_mux_sel_reg = "00" else
+                      rx_gen_eth_mfb_eof when rx_gen_mux_sel_reg = "01" else
                       rx_plr_eth_mfb_eof;
 
-    rx_mfb_sof_pos <= ETH_RX_MFB_SOF_POS     when rx_gen_mux_sel_reg="00" else
-                      rx_gen_eth_mfb_sof_pos when rx_gen_mux_sel_reg="01" else
+        rx_mfb_sof_pos <= ETH_RX_MFB_SOF_POS     when rx_gen_mux_sel_reg = "00" else
+                      rx_gen_eth_mfb_sof_pos when rx_gen_mux_sel_reg = "01" else
                       rx_plr_eth_mfb_sof_pos;
 
-    rx_mfb_eof_pos <= ETH_RX_MFB_EOF_POS     when rx_gen_mux_sel_reg="00" else
-                      rx_gen_eth_mfb_eof_pos when rx_gen_mux_sel_reg="01" else
+        rx_mfb_eof_pos <= ETH_RX_MFB_EOF_POS     when rx_gen_mux_sel_reg = "00" else
+                      rx_gen_eth_mfb_eof_pos when rx_gen_mux_sel_reg = "01" else
                       rx_plr_eth_mfb_eof_pos;
 
-    rx_mfb_src_rdy <= ETH_RX_MFB_SRC_RDY and ETH_RX_MFB_DST_RDY_1 when rx_gen_mux_sel_reg="00" else
-                      rx_gen_eth_mfb_src_rdy                      when rx_gen_mux_sel_reg="01" else
+        rx_mfb_src_rdy <= ETH_RX_MFB_SRC_RDY and eth_rx_mfb_dst_rdy_1 when rx_gen_mux_sel_reg = "00" else
+                      rx_gen_eth_mfb_src_rdy                      when rx_gen_mux_sel_reg = "01" else
                       rx_plr_eth_mfb_src_rdy;
 
-    ETH_RX_MFB_DST_RDY_0   <= rx_mfb_dst_rdy when rx_gen_mux_sel_reg="00" else '1';
-    rx_gen_eth_mfb_dst_rdy <= rx_mfb_dst_rdy when rx_gen_mux_sel_reg="01" else '1';
-    rx_plr_eth_mfb_dst_rdy <= rx_mfb_dst_rdy when rx_gen_mux_sel_reg="10" else '1';
+        eth_rx_mfb_dst_rdy_0   <= rx_mfb_dst_rdy when rx_gen_mux_sel_reg = "00" else '1';
+        rx_gen_eth_mfb_dst_rdy <= rx_mfb_dst_rdy when rx_gen_mux_sel_reg = "01" else '1';
+        rx_plr_eth_mfb_dst_rdy <= rx_mfb_dst_rdy when rx_gen_mux_sel_reg = "10" else '1';
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- TX Generator/Frame Player MUX
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- TX Generator/Frame Player MUX
+        -- -------------------------------------------------------------------------
 
-    -- MVB Instructions
-    tx_mvb_len      <= DMA_TX_MVB_LEN       when tx_gen_mux_sel_reg="00" else
-                       tx_gen_instr_mvb_len when tx_gen_mux_sel_reg="01" else
+        -- MVB Instructions
+        tx_mvb_len      <= DMA_TX_MVB_LEN       when tx_gen_mux_sel_reg = "00" else
+                       tx_gen_instr_mvb_len when tx_gen_mux_sel_reg = "01" else
                        tx_plr_instr_mvb_len;
 
-    tx_mvb_channel  <= DMA_TX_MVB_CHANNEL       when tx_gen_mux_sel_reg="00" else
-                       tx_gen_instr_mvb_channel when tx_gen_mux_sel_reg="01" else
+        tx_mvb_channel  <= DMA_TX_MVB_CHANNEL       when tx_gen_mux_sel_reg = "00" else
+                       tx_gen_instr_mvb_channel when tx_gen_mux_sel_reg = "01" else
                        tx_plr_instr_mvb_channel;
 
-    tx_mvb_hdr_meta <= DMA_TX_MVB_HDR_META       when tx_gen_mux_sel_reg="00" else
-                       tx_gen_instr_mvb_hdr_meta when tx_gen_mux_sel_reg="01" else
+        tx_mvb_hdr_meta <= DMA_TX_MVB_HDR_META       when tx_gen_mux_sel_reg = "00" else
+                       tx_gen_instr_mvb_hdr_meta when tx_gen_mux_sel_reg = "01" else
                        tx_plr_instr_mvb_hdr_meta;
 
-    tx_mvb_vld      <= DMA_TX_MVB_VLD       when tx_gen_mux_sel_reg="00" else
-                       tx_gen_instr_mvb_vld when tx_gen_mux_sel_reg="01" else
+        tx_mvb_vld      <= DMA_TX_MVB_VLD       when tx_gen_mux_sel_reg = "00" else
+                       tx_gen_instr_mvb_vld when tx_gen_mux_sel_reg = "01" else
                        tx_plr_instr_mvb_vld;
 
-    tx_mvb_src_rdy  <= DMA_TX_MVB_SRC_RDY and DMA_TX_MVB_DST_RDY_1 when tx_gen_mux_sel_reg="00" else
-                       tx_gen_instr_mvb_src_rdy                    when tx_gen_mux_sel_reg="01" else
+        tx_mvb_src_rdy  <= DMA_TX_MVB_SRC_RDY and dma_tx_mvb_dst_rdy_1 when tx_gen_mux_sel_reg = "00" else
+                       tx_gen_instr_mvb_src_rdy                    when tx_gen_mux_sel_reg = "01" else
                        tx_plr_instr_mvb_src_rdy;
 
-    DMA_TX_MVB_DST_RDY_0     <= tx_mvb_dst_rdy when tx_gen_mux_sel_reg="00" else '1';
-    tx_gen_instr_mvb_dst_rdy <= tx_mvb_dst_rdy when tx_gen_mux_sel_reg="01" else '1';
+        dma_tx_mvb_dst_rdy_0     <= tx_mvb_dst_rdy when tx_gen_mux_sel_reg = "00" else '1';
+        tx_gen_instr_mvb_dst_rdy <= tx_mvb_dst_rdy when tx_gen_mux_sel_reg = "01" else '1';
 
-    -- MFB Eth frames
-    tx_mfb_data    <= DMA_TX_MFB_DATA     when tx_gen_mux_sel_reg="00" else
-                      tx_gen_eth_mfb_data when tx_gen_mux_sel_reg="01" else
+        -- MFB Eth frames
+        tx_mfb_data    <= DMA_TX_MFB_DATA     when tx_gen_mux_sel_reg = "00" else
+                      tx_gen_eth_mfb_data when tx_gen_mux_sel_reg = "01" else
                       tx_plr_eth_mfb_data;
 
-    tx_mfb_sof     <= DMA_TX_MFB_SOF     when tx_gen_mux_sel_reg="00" else
-                      tx_gen_eth_mfb_sof when tx_gen_mux_sel_reg="01" else
+        tx_mfb_sof     <= DMA_TX_MFB_SOF     when tx_gen_mux_sel_reg = "00" else
+                      tx_gen_eth_mfb_sof when tx_gen_mux_sel_reg = "01" else
                       tx_plr_eth_mfb_sof;
 
-    tx_mfb_eof     <= DMA_TX_MFB_EOF     when tx_gen_mux_sel_reg="00" else
-                      tx_gen_eth_mfb_eof when tx_gen_mux_sel_reg="01" else
+        tx_mfb_eof     <= DMA_TX_MFB_EOF     when tx_gen_mux_sel_reg = "00" else
+                      tx_gen_eth_mfb_eof when tx_gen_mux_sel_reg = "01" else
                       tx_plr_eth_mfb_eof;
 
-    tx_mfb_sof_pos <= DMA_TX_MFB_SOF_POS     when tx_gen_mux_sel_reg="00" else
-                      tx_gen_eth_mfb_sof_pos when tx_gen_mux_sel_reg="01" else
+        tx_mfb_sof_pos <= DMA_TX_MFB_SOF_POS     when tx_gen_mux_sel_reg = "00" else
+                      tx_gen_eth_mfb_sof_pos when tx_gen_mux_sel_reg = "01" else
                       tx_plr_eth_mfb_sof_pos;
 
-    tx_mfb_eof_pos <= DMA_TX_MFB_EOF_POS     when tx_gen_mux_sel_reg="00" else
-                      tx_gen_eth_mfb_eof_pos when tx_gen_mux_sel_reg="01" else
+        tx_mfb_eof_pos <= DMA_TX_MFB_EOF_POS     when tx_gen_mux_sel_reg = "00" else
+                      tx_gen_eth_mfb_eof_pos when tx_gen_mux_sel_reg = "01" else
                       tx_plr_eth_mfb_eof_pos;
 
-    tx_mfb_src_rdy <= DMA_TX_MFB_SRC_RDY and DMA_TX_MFB_DST_RDY_1 when tx_gen_mux_sel_reg="00" else
-                      tx_gen_eth_mfb_src_rdy                      when tx_gen_mux_sel_reg="01" else
+        tx_mfb_src_rdy <= DMA_TX_MFB_SRC_RDY and dma_tx_mfb_dst_rdy_1 when tx_gen_mux_sel_reg = "00" else
+                      tx_gen_eth_mfb_src_rdy                      when tx_gen_mux_sel_reg = "01" else
                       tx_plr_eth_mfb_src_rdy;
 
-    DMA_TX_MFB_DST_RDY_0   <= tx_mfb_dst_rdy when tx_gen_mux_sel_reg="00" else '1';
-    tx_gen_eth_mfb_dst_rdy <= tx_mfb_dst_rdy when tx_gen_mux_sel_reg="01" else '1';
-    tx_plr_eth_mfb_dst_rdy <= tx_mfb_dst_rdy when tx_gen_mux_sel_reg="10" else '1';
+        dma_tx_mfb_dst_rdy_0   <= tx_mfb_dst_rdy when tx_gen_mux_sel_reg = "00" else '1';
+        tx_gen_eth_mfb_dst_rdy <= tx_mfb_dst_rdy when tx_gen_mux_sel_reg = "01" else '1';
+        tx_plr_eth_mfb_dst_rdy <= tx_mfb_dst_rdy when tx_gen_mux_sel_reg = "10" else '1';
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- RX Loopback MUX
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- RX Loopback MUX
+        -- -------------------------------------------------------------------------
 
-    rx_loop_mvb_len      <= rx_mvb_len      when rx_loop_mux_sel_reg='0' else DMA_TX_MVB_LEN;
-    rx_loop_mvb_channel  <= rx_mvb_channel  when rx_loop_mux_sel_reg='0' else DMA_TX_MVB_C_CH;
-    rx_loop_mvb_hdr_meta <= rx_mvb_hdr_meta when rx_loop_mux_sel_reg='0' else DMA_TX_MVB_HDR_META;
-    rx_loop_mvb_discard  <= rx_mvb_discard  when rx_loop_mux_sel_reg='0' else (others => '0');
-    rx_loop_mvb_vld      <= rx_mvb_vld      when rx_loop_mux_sel_reg='0' else DMA_TX_MVB_VLD;
-    rx_loop_mvb_src_rdy  <= rx_mvb_src_rdy  when rx_loop_mux_sel_reg='0' else DMA_TX_MVB_SRC_RDY and DMA_TX_MVB_DST_RDY_0;
+        rx_loop_mvb_len      <= rx_mvb_len      when rx_loop_mux_sel_reg = '0' else DMA_TX_MVB_LEN;
+        rx_loop_mvb_channel  <= rx_mvb_channel  when rx_loop_mux_sel_reg = '0' else dma_tx_mvb_c_ch;
+        rx_loop_mvb_hdr_meta <= rx_mvb_hdr_meta when rx_loop_mux_sel_reg = '0' else DMA_TX_MVB_HDR_META;
+        rx_loop_mvb_discard  <= rx_mvb_discard  when rx_loop_mux_sel_reg = '0' else (others => '0');
+        rx_loop_mvb_vld      <= rx_mvb_vld      when rx_loop_mux_sel_reg = '0' else DMA_TX_MVB_VLD;
+        rx_loop_mvb_src_rdy  <= rx_mvb_src_rdy  when rx_loop_mux_sel_reg = '0' else DMA_TX_MVB_SRC_RDY and dma_tx_mvb_dst_rdy_0;
 
-    rx_mvb_dst_rdy       <= rx_loop_mvb_dst_rdy when rx_loop_mux_sel_reg='0' else '1';
-    DMA_TX_MVB_DST_RDY_1 <= rx_loop_mvb_dst_rdy when rx_loop_mux_sel_reg='1' else '1';
+        rx_mvb_dst_rdy       <= rx_loop_mvb_dst_rdy when rx_loop_mux_sel_reg = '0' else '1';
+        dma_tx_mvb_dst_rdy_1 <= rx_loop_mvb_dst_rdy when rx_loop_mux_sel_reg = '1' else '1';
 
-    rx_loop_mfb_data    <= rx_mfb_data    when rx_loop_mux_sel_reg='0' else DMA_TX_MFB_DATA;
-    rx_loop_mfb_sof     <= rx_mfb_sof     when rx_loop_mux_sel_reg='0' else DMA_TX_MFB_SOF;
-    rx_loop_mfb_eof     <= rx_mfb_eof     when rx_loop_mux_sel_reg='0' else DMA_TX_MFB_EOF;
-    rx_loop_mfb_sof_pos <= rx_mfb_sof_pos when rx_loop_mux_sel_reg='0' else DMA_TX_MFB_SOF_POS;
-    rx_loop_mfb_eof_pos <= rx_mfb_eof_pos when rx_loop_mux_sel_reg='0' else DMA_TX_MFB_EOF_POS;
-    rx_loop_mfb_src_rdy <= rx_mfb_src_rdy when rx_loop_mux_sel_reg='0' else DMA_TX_MFB_SRC_RDY and DMA_TX_MFB_DST_RDY_0;
+        rx_loop_mfb_data    <= rx_mfb_data    when rx_loop_mux_sel_reg = '0' else DMA_TX_MFB_DATA;
+        rx_loop_mfb_sof     <= rx_mfb_sof     when rx_loop_mux_sel_reg = '0' else DMA_TX_MFB_SOF;
+        rx_loop_mfb_eof     <= rx_mfb_eof     when rx_loop_mux_sel_reg = '0' else DMA_TX_MFB_EOF;
+        rx_loop_mfb_sof_pos <= rx_mfb_sof_pos when rx_loop_mux_sel_reg = '0' else DMA_TX_MFB_SOF_POS;
+        rx_loop_mfb_eof_pos <= rx_mfb_eof_pos when rx_loop_mux_sel_reg = '0' else DMA_TX_MFB_EOF_POS;
+        rx_loop_mfb_src_rdy <= rx_mfb_src_rdy when rx_loop_mux_sel_reg = '0' else DMA_TX_MFB_SRC_RDY and dma_tx_mfb_dst_rdy_0;
 
-    rx_mfb_dst_rdy       <= rx_loop_mfb_dst_rdy when rx_loop_mux_sel_reg='0' else '1';
-    DMA_TX_MFB_DST_RDY_1 <= rx_loop_mfb_dst_rdy when rx_loop_mux_sel_reg='1' else '1';
+        rx_mfb_dst_rdy       <= rx_loop_mfb_dst_rdy when rx_loop_mux_sel_reg = '0' else '1';
+        dma_tx_mfb_dst_rdy_1 <= rx_loop_mfb_dst_rdy when rx_loop_mux_sel_reg = '1' else '1';
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- TX Loopback MUX
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- TX Loopback MUX
+        -- -------------------------------------------------------------------------
 
-    tx_loop_mvb_len      <= tx_mvb_len      when tx_loop_mux_sel_reg='0' else ETH_RX_MVB_LEN;
-    tx_loop_mvb_channel  <= tx_mvb_channel  when tx_loop_mux_sel_reg='0' else ETH_RX_MVB_C_CH;
-    tx_loop_mvb_hdr_meta <= tx_mvb_hdr_meta when tx_loop_mux_sel_reg='0' else ETH_RX_MVB_HDR_META;
-    tx_loop_mvb_vld      <= tx_mvb_vld      when tx_loop_mux_sel_reg='0' else ETH_RX_MVB_VLD;
-    tx_loop_mvb_src_rdy  <= tx_mvb_src_rdy  when tx_loop_mux_sel_reg='0' else ETH_RX_MVB_SRC_RDY and ETH_RX_MVB_DST_RDY_0;
+        tx_loop_mvb_len      <= tx_mvb_len      when tx_loop_mux_sel_reg = '0' else ETH_RX_MVB_LEN;
+        tx_loop_mvb_channel  <= tx_mvb_channel  when tx_loop_mux_sel_reg = '0' else eth_rx_mvb_c_ch;
+        tx_loop_mvb_hdr_meta <= tx_mvb_hdr_meta when tx_loop_mux_sel_reg = '0' else ETH_RX_MVB_HDR_META;
+        tx_loop_mvb_vld      <= tx_mvb_vld      when tx_loop_mux_sel_reg = '0' else ETH_RX_MVB_VLD;
+        tx_loop_mvb_src_rdy  <= tx_mvb_src_rdy  when tx_loop_mux_sel_reg = '0' else ETH_RX_MVB_SRC_RDY and eth_rx_mvb_dst_rdy_0;
 
-    tx_mvb_dst_rdy       <= tx_loop_mvb_dst_rdy when tx_loop_mux_sel_reg='0' else '1';
-    ETH_RX_MVB_DST_RDY_1 <= tx_loop_mvb_dst_rdy when tx_loop_mux_sel_reg='1' else '1';
+        tx_mvb_dst_rdy       <= tx_loop_mvb_dst_rdy when tx_loop_mux_sel_reg = '0' else '1';
+        eth_rx_mvb_dst_rdy_1 <= tx_loop_mvb_dst_rdy when tx_loop_mux_sel_reg = '1' else '1';
 
-    tx_loop_mfb_data    <= tx_mfb_data    when tx_loop_mux_sel_reg='0' else ETH_RX_MFB_DATA;
-    tx_loop_mfb_sof     <= tx_mfb_sof     when tx_loop_mux_sel_reg='0' else ETH_RX_MFB_SOF;
-    tx_loop_mfb_eof     <= tx_mfb_eof     when tx_loop_mux_sel_reg='0' else ETH_RX_MFB_EOF;
-    tx_loop_mfb_sof_pos <= tx_mfb_sof_pos when tx_loop_mux_sel_reg='0' else ETH_RX_MFB_SOF_POS;
-    tx_loop_mfb_eof_pos <= tx_mfb_eof_pos when tx_loop_mux_sel_reg='0' else ETH_RX_MFB_EOF_POS;
-    tx_loop_mfb_src_rdy <= tx_mfb_src_rdy when tx_loop_mux_sel_reg='0' else ETH_RX_MFB_SRC_RDY and ETH_RX_MFB_DST_RDY_0;
+        tx_loop_mfb_data    <= tx_mfb_data    when tx_loop_mux_sel_reg = '0' else ETH_RX_MFB_DATA;
+        tx_loop_mfb_sof     <= tx_mfb_sof     when tx_loop_mux_sel_reg = '0' else ETH_RX_MFB_SOF;
+        tx_loop_mfb_eof     <= tx_mfb_eof     when tx_loop_mux_sel_reg = '0' else ETH_RX_MFB_EOF;
+        tx_loop_mfb_sof_pos <= tx_mfb_sof_pos when tx_loop_mux_sel_reg = '0' else ETH_RX_MFB_SOF_POS;
+        tx_loop_mfb_eof_pos <= tx_mfb_eof_pos when tx_loop_mux_sel_reg = '0' else ETH_RX_MFB_EOF_POS;
+        tx_loop_mfb_src_rdy <= tx_mfb_src_rdy when tx_loop_mux_sel_reg = '0' else ETH_RX_MFB_SRC_RDY and eth_rx_mfb_dst_rdy_0;
 
-    tx_mfb_dst_rdy       <= tx_loop_mfb_dst_rdy when tx_loop_mux_sel_reg='0' else '1';
-    ETH_RX_MFB_DST_RDY_1 <= tx_loop_mfb_dst_rdy when tx_loop_mux_sel_reg='1' else '1';
+        tx_mfb_dst_rdy       <= tx_loop_mfb_dst_rdy when tx_loop_mux_sel_reg = '0' else '1';
+        eth_rx_mfb_dst_rdy_1 <= tx_loop_mfb_dst_rdy when tx_loop_mux_sel_reg = '1' else '1';
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- Output DST_RDY
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- Output DST_RDY
+        -- -------------------------------------------------------------------------
 
-    DMA_TX_MVB_DST_RDY <= DMA_TX_MVB_DST_RDY_0 and DMA_TX_MVB_DST_RDY_1;
-    DMA_TX_MFB_DST_RDY <= DMA_TX_MFB_DST_RDY_0 and DMA_TX_MFB_DST_RDY_1;
-    ETH_RX_MVB_DST_RDY <= ETH_RX_MVB_DST_RDY_0 and ETH_RX_MVB_DST_RDY_1;
-    ETH_RX_MFB_DST_RDY <= ETH_RX_MFB_DST_RDY_0 and ETH_RX_MFB_DST_RDY_1;
+        DMA_TX_MVB_DST_RDY <= dma_tx_mvb_dst_rdy_0 and dma_tx_mvb_dst_rdy_1;
+        DMA_TX_MFB_DST_RDY <= dma_tx_mfb_dst_rdy_0 and dma_tx_mfb_dst_rdy_1;
+        ETH_RX_MVB_DST_RDY <= eth_rx_mvb_dst_rdy_0 and eth_rx_mvb_dst_rdy_1;
+        ETH_RX_MFB_DST_RDY <= eth_rx_mfb_dst_rdy_0 and eth_rx_mfb_dst_rdy_1;
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- RX FIFO
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- RX FIFO
+        -- -------------------------------------------------------------------------
 
-    rx_mvb_fifo_i : entity work.MVB_FIFOX
-    generic map(
-        ITEMS               => REGIONS,
-        ITEM_WIDTH          => log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1,
-        FIFO_DEPTH          => 512    ,
-        RAM_TYPE            => "AUTO" ,
-        DEVICE              => DEVICE ,
-        ALMOST_FULL_OFFSET  => 0      ,
-        ALMOST_EMPTY_OFFSET => 0
-    )
-    port map(
-        CLK        => CLK  ,
-        RESET      => RESET,
+        rx_mvb_fifo_i : entity work.MVB_FIFOX
+        generic map (
+            ITEMS               => REGIONS,
+            ITEM_WIDTH          => log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1,
+            FIFO_DEPTH          => 512,
+            RAM_TYPE            => "AUTO",
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
+            ALMOST_EMPTY_OFFSET => 0
+        )
+        port map (
+            CLK        => CLK,
+            RESET      => RESET,
 
-        RX_DATA    => rx_loop_mvb_data   ,
-        RX_VLD     => rx_loop_mvb_vld    ,
-        RX_SRC_RDY => rx_loop_mvb_src_rdy,
-        RX_DST_RDY => rx_loop_mvb_dst_rdy,
+            RX_DATA    => rx_loop_mvb_data,
+            RX_VLD     => rx_loop_mvb_vld,
+            RX_SRC_RDY => rx_loop_mvb_src_rdy,
+            RX_DST_RDY => rx_loop_mvb_dst_rdy,
 
-        TX_DATA    => DMA_RX_MVB_DATA    ,
-        TX_VLD     => DMA_RX_MVB_VLD     ,
-        TX_SRC_RDY => DMA_RX_MVB_SRC_RDY ,
-        TX_DST_RDY => DMA_RX_MVB_DST_RDY ,
+            TX_DATA    => dma_rx_mvb_data,
+            TX_VLD     => DMA_RX_MVB_VLD,
+            TX_SRC_RDY => DMA_RX_MVB_SRC_RDY,
+            TX_DST_RDY => DMA_RX_MVB_DST_RDY,
 
-        STATUS     => open               ,
-        AFULL      => open               ,
-        AEMPTY     => open
-    );
+            STATUS     => open,
+            AFULL      => open,
+            AEMPTY     => open
+        );
 
-    -- RX MVB FIFO input ----
-    rx_loop_mvb_len_arr      <= slv_array_deser(rx_loop_mvb_len     ,REGIONS);
-    rx_loop_mvb_channel_arr  <= slv_array_deser(rx_loop_mvb_channel ,REGIONS);
-    rx_loop_mvb_hdr_meta_arr <= slv_array_deser(rx_loop_mvb_hdr_meta,REGIONS);
-    rx_loop_mvb_discard_arr  <= slv_array_deser(rx_loop_mvb_discard ,REGIONS);
+        -- RX MVB FIFO input ----
+        rx_loop_mvb_len_arr      <= slv_array_deser(rx_loop_mvb_len,REGIONS);
+        rx_loop_mvb_channel_arr  <= slv_array_deser(rx_loop_mvb_channel,REGIONS);
+        rx_loop_mvb_hdr_meta_arr <= slv_array_deser(rx_loop_mvb_hdr_meta,REGIONS);
+        rx_loop_mvb_discard_arr  <= slv_array_deser(rx_loop_mvb_discard,REGIONS);
 
-    rx_loop_mvb_data_gen : for i in 0 to REGIONS-1 generate
-        rx_loop_mvb_data_arr(i) <= rx_loop_mvb_len_arr     (i)
-                                  &rx_loop_mvb_channel_arr (i)
-                                  &rx_loop_mvb_hdr_meta_arr(i)
-                                  &rx_loop_mvb_discard_arr (i);
+        rx_loop_mvb_data_gen : for i in 0 to REGIONS-1 generate
+            rx_loop_mvb_data_arr(i) <= rx_loop_mvb_len_arr     (i)
+                                       &rx_loop_mvb_channel_arr (i)
+                                       &rx_loop_mvb_hdr_meta_arr(i)
+                                       &rx_loop_mvb_discard_arr (i);
+        end generate;
+
+        rx_loop_mvb_data <= slv_array_ser(rx_loop_mvb_data_arr);
+        -------------------------
+
+        -- RX MVB FIFO output ---
+        dma_rx_mvb_data_arr <= slv_array_deser(dma_rx_mvb_data,REGIONS);
+
+        dma_rx_mvb_data_gen : for i in 0 to REGIONS-1 generate
+        begin
+            dma_rx_mvb_len_arr     (i) <= dma_rx_mvb_data_arr(i)(log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1-1 downto log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1);
+            dma_rx_mvb_channel_arr (i) <= dma_rx_mvb_data_arr(i)(log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1-1 downto                       HDR_META_WIDTH+1);
+            dma_rx_mvb_hdr_meta_arr(i) <= dma_rx_mvb_data_arr(i)(HDR_META_WIDTH+1-1 downto                                      1);
+            DMA_RX_MVB_DISCARD     (i) <= dma_rx_mvb_data_arr(i)(0);
+        end generate;
+
+        DMA_RX_MVB_LEN      <= slv_array_ser(dma_rx_mvb_len_arr     );
+        DMA_RX_MVB_CHANNEL  <= slv_array_ser(dma_rx_mvb_channel_arr );
+        DMA_RX_MVB_HDR_META <= slv_array_ser(dma_rx_mvb_hdr_meta_arr);
+        -------------------------
+
+        rx_mfb_fifo_i : entity work.MFB_FIFOX
+        generic map (
+            REGIONS             => REGIONS,
+            REGION_SIZE         => REGION_SIZE,
+            BLOCK_SIZE          => BLOCK_SIZE,
+            ITEM_WIDTH          => ITEM_WIDTH,
+            FIFO_DEPTH          => 512,
+            RAM_TYPE            => "AUTO",
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
+            ALMOST_EMPTY_OFFSET => 0
+        )
+        port map (
+            CLK         => CLK,
+            RST         => RESET,
+
+            RX_DATA     => rx_loop_mfb_data,
+            RX_SOF      => rx_loop_mfb_sof,
+            RX_EOF      => rx_loop_mfb_eof,
+            RX_SOF_POS  => rx_loop_mfb_sof_pos,
+            RX_EOF_POS  => rx_loop_mfb_eof_pos,
+            RX_SRC_RDY  => rx_loop_mfb_src_rdy,
+            RX_DST_RDY  => rx_loop_mfb_dst_rdy,
+
+            TX_DATA     => DMA_RX_MFB_DATA,
+            TX_SOF      => DMA_RX_MFB_SOF,
+            TX_EOF      => DMA_RX_MFB_EOF,
+            TX_SOF_POS  => DMA_RX_MFB_SOF_POS,
+            TX_EOF_POS  => DMA_RX_MFB_EOF_POS,
+            TX_SRC_RDY  => DMA_RX_MFB_SRC_RDY,
+            TX_DST_RDY  => DMA_RX_MFB_DST_RDY,
+
+            FIFO_STATUS => open,
+            FIFO_AFULL  => open,
+            FIFO_AEMPTY => open
+        );
+
+        -- -------------------------------------------------------------------------
+
+        -- -------------------------------------------------------------------------
+        -- TX FIFO
+        -- -------------------------------------------------------------------------
+
+        tx_mvb_fifo_i : entity work.MVB_FIFOX
+        generic map (
+            ITEMS               => REGIONS,
+            ITEM_WIDTH          => log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH,
+            FIFO_DEPTH          => 512,
+            RAM_TYPE            => "AUTO",
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
+            ALMOST_EMPTY_OFFSET => 0
+        )
+        port map (
+            CLK        => CLK,
+            RESET      => RESET,
+
+            RX_DATA    => tx_loop_mvb_data,
+            RX_VLD     => tx_loop_mvb_vld,
+            RX_SRC_RDY => tx_loop_mvb_src_rdy,
+            RX_DST_RDY => tx_loop_mvb_dst_rdy,
+
+            TX_DATA    => eth_tx_mvb_data,
+            TX_VLD     => ETH_TX_MVB_VLD,
+            TX_SRC_RDY => ETH_TX_MVB_SRC_RDY,
+            TX_DST_RDY => ETH_TX_MVB_DST_RDY,
+
+            STATUS     => open,
+            AFULL      => open,
+            AEMPTY     => open
+        );
+
+        -- TX MVB FIFO input ----
+        tx_loop_mvb_len_arr      <= slv_array_deser(tx_loop_mvb_len,REGIONS);
+        tx_loop_mvb_channel_arr  <= slv_array_deser(tx_loop_mvb_channel,REGIONS);
+        tx_loop_mvb_hdr_meta_arr <= slv_array_deser(tx_loop_mvb_hdr_meta,REGIONS);
+
+        tx_loop_mvb_data_gen : for i in 0 to REGIONS-1 generate
+            tx_loop_mvb_data_arr(i) <= tx_loop_mvb_len_arr     (i)
+                                       &tx_loop_mvb_channel_arr (i)
+                                       &tx_loop_mvb_hdr_meta_arr(i);
+        end generate;
+
+        tx_loop_mvb_data <= slv_array_ser(tx_loop_mvb_data_arr);
+        -------------------------
+
+        -- TX MVB FIFO output ---
+        eth_tx_mvb_data_arr <= slv_array_deser(eth_tx_mvb_data,REGIONS);
+
+        dma_tx_mvb_data_gen : for i in 0 to REGIONS-1 generate
+        begin
+            eth_tx_mvb_len_arr     (i) <= eth_tx_mvb_data_arr(i)(log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH-1 downto log2(TX_DMA_CHANNELS)+HDR_META_WIDTH);
+            eth_tx_mvb_channel_arr (i) <= eth_tx_mvb_data_arr(i)(log2(TX_DMA_CHANNELS)+HDR_META_WIDTH-1 downto                       HDR_META_WIDTH);
+            eth_tx_mvb_hdr_meta_arr(i) <= eth_tx_mvb_data_arr(i)(HDR_META_WIDTH-1 downto                                    0);
+        end generate;
+
+        ETH_TX_MVB_LEN      <= slv_array_ser(eth_tx_mvb_len_arr     );
+        ETH_TX_MVB_CHANNEL  <= slv_array_ser(eth_tx_mvb_channel_arr );
+        ETH_TX_MVB_HDR_META <= slv_array_ser(eth_tx_mvb_hdr_meta_arr);
+        -------------------------
+
+        tx_mfb_fifo_i : entity work.MFB_FIFOX
+        generic map (
+            REGIONS             => REGIONS,
+            REGION_SIZE         => REGION_SIZE,
+            BLOCK_SIZE          => BLOCK_SIZE,
+            ITEM_WIDTH          => ITEM_WIDTH,
+            FIFO_DEPTH          => 512,
+            RAM_TYPE            => "AUTO",
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
+            ALMOST_EMPTY_OFFSET => 0
+        )
+        port map (
+            CLK         => CLK,
+            RST         => RESET,
+
+            RX_DATA     => tx_loop_mfb_data,
+            RX_SOF      => tx_loop_mfb_sof,
+            RX_EOF      => tx_loop_mfb_eof,
+            RX_SOF_POS  => tx_loop_mfb_sof_pos,
+            RX_EOF_POS  => tx_loop_mfb_eof_pos,
+            RX_SRC_RDY  => tx_loop_mfb_src_rdy,
+            RX_DST_RDY  => tx_loop_mfb_dst_rdy,
+
+            TX_DATA     => ETH_TX_MFB_DATA,
+            TX_SOF      => ETH_TX_MFB_SOF,
+            TX_EOF      => ETH_TX_MFB_EOF,
+            TX_SOF_POS  => ETH_TX_MFB_SOF_POS,
+            TX_EOF_POS  => ETH_TX_MFB_EOF_POS,
+            TX_SRC_RDY  => ETH_TX_MFB_SRC_RDY,
+            TX_DST_RDY  => ETH_TX_MFB_DST_RDY,
+
+            FIFO_STATUS => open,
+            FIFO_AFULL  => open,
+            FIFO_AEMPTY => open
+        );
+
+        -- -------------------------------------------------------------------------
+
     end generate;
-
-    rx_loop_mvb_data <= slv_array_ser(rx_loop_mvb_data_arr);
-    -------------------------
-
-    -- RX MVB FIFO output ---
-    DMA_RX_MVB_DATA_arr <= slv_array_deser(DMA_RX_MVB_DATA,REGIONS);
-
-    dma_rx_mvb_data_gen : for i in 0 to REGIONS-1 generate
-    begin
-        DMA_RX_MVB_LEN_arr     (i) <= DMA_RX_MVB_DATA_arr(i)(log2(PKT_MTU+1)+log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1-1 downto log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1);
-        DMA_RX_MVB_CHANNEL_arr (i) <= DMA_RX_MVB_DATA_arr(i)(                log2(RX_DMA_CHANNELS)+HDR_META_WIDTH+1-1 downto                       HDR_META_WIDTH+1);
-        DMA_RX_MVB_HDR_META_arr(i) <= DMA_RX_MVB_DATA_arr(i)(                                      HDR_META_WIDTH+1-1 downto                                      1);
-        DMA_RX_MVB_DISCARD     (i) <= DMA_RX_MVB_DATA_arr(i)(0);
-    end generate;
-
-    DMA_RX_MVB_LEN      <= slv_array_ser(DMA_RX_MVB_LEN_arr     );
-    DMA_RX_MVB_CHANNEL  <= slv_array_ser(DMA_RX_MVB_CHANNEL_arr );
-    DMA_RX_MVB_HDR_META <= slv_array_ser(DMA_RX_MVB_HDR_META_arr);
-    -------------------------
-
-    rx_mfb_fifo_i : entity work.MFB_FIFOX
-    generic map(
-        REGIONS             => REGIONS    ,
-        REGION_SIZE         => REGION_SIZE,
-        BLOCK_SIZE          => BLOCK_SIZE ,
-        ITEM_WIDTH          => ITEM_WIDTH ,
-        FIFO_DEPTH          => 512        ,
-        RAM_TYPE            => "AUTO"     ,
-        DEVICE              => DEVICE     ,
-        ALMOST_FULL_OFFSET  => 0          ,
-        ALMOST_EMPTY_OFFSET => 0
-    )
-    port map(
-        CLK         => CLK  ,
-        RST         => RESET,
-
-        RX_DATA     => rx_loop_mfb_data   ,
-        RX_SOF      => rx_loop_mfb_sof    ,
-        RX_EOF      => rx_loop_mfb_eof    ,
-        RX_SOF_POS  => rx_loop_mfb_sof_pos,
-        RX_EOF_POS  => rx_loop_mfb_eof_pos,
-        RX_SRC_RDY  => rx_loop_mfb_src_rdy,
-        RX_DST_RDY  => rx_loop_mfb_dst_rdy,
-
-        TX_DATA     => DMA_RX_MFB_DATA    ,
-        TX_SOF      => DMA_RX_MFB_SOF     ,
-        TX_EOF      => DMA_RX_MFB_EOF     ,
-        TX_SOF_POS  => DMA_RX_MFB_SOF_POS ,
-        TX_EOF_POS  => DMA_RX_MFB_EOF_POS ,
-        TX_SRC_RDY  => DMA_RX_MFB_SRC_RDY ,
-        TX_DST_RDY  => DMA_RX_MFB_DST_RDY ,
-
-        FIFO_STATUS => open               ,
-        FIFO_AFULL  => open               ,
-        FIFO_AEMPTY => open
-    );
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- TX FIFO
-    -- -------------------------------------------------------------------------
-
-    tx_mvb_fifo_i : entity work.MVB_FIFOX
-    generic map(
-        ITEMS               => REGIONS,
-        ITEM_WIDTH          => log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH,
-        FIFO_DEPTH          => 512    ,
-        RAM_TYPE            => "AUTO" ,
-        DEVICE              => DEVICE ,
-        ALMOST_FULL_OFFSET  => 0      ,
-        ALMOST_EMPTY_OFFSET => 0
-    )
-    port map(
-        CLK        => CLK  ,
-        RESET      => RESET,
-
-        RX_DATA    => tx_loop_mvb_data   ,
-        RX_VLD     => tx_loop_mvb_vld    ,
-        RX_SRC_RDY => tx_loop_mvb_src_rdy,
-        RX_DST_RDY => tx_loop_mvb_dst_rdy,
-
-        TX_DATA    => ETH_TX_MVB_DATA    ,
-        TX_VLD     => ETH_TX_MVB_VLD     ,
-        TX_SRC_RDY => ETH_TX_MVB_SRC_RDY ,
-        TX_DST_RDY => ETH_TX_MVB_DST_RDY ,
-
-        STATUS     => open               ,
-        AFULL      => open               ,
-        AEMPTY     => open
-    );
-
-    -- TX MVB FIFO input ----
-    tx_loop_mvb_len_arr      <= slv_array_deser(tx_loop_mvb_len     ,REGIONS);
-    tx_loop_mvb_channel_arr  <= slv_array_deser(tx_loop_mvb_channel ,REGIONS);
-    tx_loop_mvb_hdr_meta_arr <= slv_array_deser(tx_loop_mvb_hdr_meta,REGIONS);
-
-    tx_loop_mvb_data_gen : for i in 0 to REGIONS-1 generate
-        tx_loop_mvb_data_arr(i) <= tx_loop_mvb_len_arr     (i)
-                                  &tx_loop_mvb_channel_arr (i)
-                                  &tx_loop_mvb_hdr_meta_arr(i);
-    end generate;
-
-    tx_loop_mvb_data <= slv_array_ser(tx_loop_mvb_data_arr);
-    -------------------------
-
-    -- TX MVB FIFO output ---
-    ETH_TX_MVB_DATA_arr <= slv_array_deser(ETH_TX_MVB_DATA,REGIONS);
-
-    dma_tx_mvb_data_gen : for i in 0 to REGIONS-1 generate
-    begin
-        ETH_TX_MVB_LEN_arr     (i) <= ETH_TX_MVB_DATA_arr(i)(log2(PKT_MTU+1)+log2(TX_DMA_CHANNELS)+HDR_META_WIDTH-1 downto log2(TX_DMA_CHANNELS)+HDR_META_WIDTH);
-        ETH_TX_MVB_CHANNEL_arr (i) <= ETH_TX_MVB_DATA_arr(i)(                log2(TX_DMA_CHANNELS)+HDR_META_WIDTH-1 downto                       HDR_META_WIDTH);
-        ETH_TX_MVB_HDR_META_arr(i) <= ETH_TX_MVB_DATA_arr(i)(                                      HDR_META_WIDTH-1 downto                                    0);
-    end generate;
-
-    ETH_TX_MVB_LEN      <= slv_array_ser(ETH_TX_MVB_LEN_arr     );
-    ETH_TX_MVB_CHANNEL  <= slv_array_ser(ETH_TX_MVB_CHANNEL_arr );
-    ETH_TX_MVB_HDR_META <= slv_array_ser(ETH_TX_MVB_HDR_META_arr);
-    -------------------------
-
-    tx_mfb_fifo_i : entity work.MFB_FIFOX
-    generic map(
-        REGIONS             => REGIONS    ,
-        REGION_SIZE         => REGION_SIZE,
-        BLOCK_SIZE          => BLOCK_SIZE ,
-        ITEM_WIDTH          => ITEM_WIDTH ,
-        FIFO_DEPTH          => 512        ,
-        RAM_TYPE            => "AUTO"     ,
-        DEVICE              => DEVICE     ,
-        ALMOST_FULL_OFFSET  => 0          ,
-        ALMOST_EMPTY_OFFSET => 0
-    )
-    port map(
-        CLK         => CLK  ,
-        RST         => RESET,
-
-        RX_DATA     => tx_loop_mfb_data   ,
-        RX_SOF      => tx_loop_mfb_sof    ,
-        RX_EOF      => tx_loop_mfb_eof    ,
-        RX_SOF_POS  => tx_loop_mfb_sof_pos,
-        RX_EOF_POS  => tx_loop_mfb_eof_pos,
-        RX_SRC_RDY  => tx_loop_mfb_src_rdy,
-        RX_DST_RDY  => tx_loop_mfb_dst_rdy,
-
-        TX_DATA     => ETH_TX_MFB_DATA    ,
-        TX_SOF      => ETH_TX_MFB_SOF     ,
-        TX_EOF      => ETH_TX_MFB_EOF     ,
-        TX_SOF_POS  => ETH_TX_MFB_SOF_POS ,
-        TX_EOF_POS  => ETH_TX_MFB_EOF_POS ,
-        TX_SRC_RDY  => ETH_TX_MFB_SRC_RDY ,
-        TX_DST_RDY  => ETH_TX_MFB_DST_RDY ,
-
-        FIFO_STATUS => open               ,
-        FIFO_AFULL  => open               ,
-        FIFO_AEMPTY => open
-    );
-
-    -- -------------------------------------------------------------------------
-
-end generate;
 
 end architecture;

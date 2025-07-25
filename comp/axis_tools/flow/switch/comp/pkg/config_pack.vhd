@@ -38,8 +38,8 @@ package config_pack is
         match_num_fields   => 1,
         match_items        => 64,
         match_protocols    => (0 => MATCH_PROTOCOL_MAC, others => 0),
-        match_range_highs  => (0 => MAC_DST_R'high    , others => 0),
-        match_range_lows   => (0 => MAC_DST_R'low     , others => 0)
+        match_range_highs  => (0 => MAC_DST_R'high, others => 0),
+        match_range_lows   => (0 => MAC_DST_R'low, others => 0)
     );
 
     constant MAT_CONFIG_VID : mat_config_t (
@@ -50,27 +50,27 @@ package config_pack is
         match_num_fields   => 1,
         match_items        => 64,
         match_protocols    => (0 => MATCH_PROTOCOL_VLAN_Q, others => 0),
-        match_range_highs  => (0 => VLAN_TCI_VID_R'high  , others => 0),
-        match_range_lows   => (0 => VLAN_TCI_VID_R'low   , others => 0)
+        match_range_highs  => (0 => VLAN_TCI_VID_R'high, others => 0),
+        match_range_lows   => (0 => VLAN_TCI_VID_R'low, others => 0)
     );
 
     -- TODO: add corresponding software support
---    constant MAT_CONFIG_SRC_DST_MAC : mat_config_t (
---        match_protocols(MAX_FIELDS-1 downto 0),
---        match_range_highs(MAX_FIELDS-1 downto 0),
---        match_range_lows(MAX_FIELDS-1 downto 0)
---    ) := (
---        match_num_fields   => 2,
---        match_items        => 64,
---        match_protocols    => (others => MATCH_PROTOCOL_MAC),
---        match_range_highs  => (0 => MAC_DST_R'high, 1 => MAC_SRC_R'high),
---        match_range_lows   => (0 => MAC_DST_R'low,  1 => MAC_SRC_R'low)
---    );
+    --    constant MAT_CONFIG_SRC_DST_MAC : mat_config_t (
+    --        match_protocols(MAX_FIELDS-1 downto 0),
+    --        match_range_highs(MAX_FIELDS-1 downto 0),
+    --        match_range_lows(MAX_FIELDS-1 downto 0)
+    --    ) := (
+    --        match_num_fields   => 2,
+    --        match_items        => 64,
+    --        match_protocols    => (others => MATCH_PROTOCOL_MAC),
+    --        match_range_highs  => (0 => MAC_DST_R'high, 1 => MAC_SRC_R'high),
+    --        match_range_lows   => (0 => MAC_DST_R'low,  1 => MAC_SRC_R'low)
+    --    );
 
     -- lower index also means higher priority
     constant CONFIG : config_array_t := (
         0 => MAT_CONFIG_DST_MAC,
-        1 => MAT_CONFIG_VID --,
+        1 => MAT_CONFIG_VID -- ,
 --        2 => MAT_CONFIG_SRC_DST_MAC
     );
 

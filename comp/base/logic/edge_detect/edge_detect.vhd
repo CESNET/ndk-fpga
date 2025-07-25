@@ -20,31 +20,31 @@ use work.math_pack.all;
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
 entity EDGE_DETECT is
-   port(
-      CLK         : in std_logic;
-      DI          : in std_logic;
-      --* One cycle pulse when rising edge was detected on DI
-      EDGE        : out std_logic
-   );
-end entity EDGE_DETECT;
+    port (
+        CLK         : in std_logic;
+        DI          : in std_logic;
+        -- * One cycle pulse when rising edge was detected on DI
+        EDGE        : out std_logic
+    );
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
-architecture behavioral of EDGE_DETECT is
+architecture BEHAVIORAL of EDGE_DETECT is
 
-signal reg_di : std_logic;
+    signal reg_di : std_logic;
 
 begin
 
-reg_di_p : process(CLK)
-begin
-   if CLK'event and CLK = '1' then
-      reg_di <= DI;
-   end if;
-end process;
+    reg_di_p : process (CLK)
+    begin
+        if rising_edge(CLK) then
+            reg_di <= DI;
+        end if;
+    end process;
 
-EDGE <= DI and not reg_di;
+    EDGE <= DI and not reg_di;
 
-end architecture behavioral;
+end architecture;
 

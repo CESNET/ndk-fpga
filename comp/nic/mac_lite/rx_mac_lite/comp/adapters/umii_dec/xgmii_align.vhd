@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_XGMII_ALIGN is
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -62,7 +62,7 @@ architecture FULL of RX_MAC_LITE_XGMII_ALIGN is
 
 begin
 
-    start_detected(0) <= '1' when (IN_XGMII_RXD(7 downto 0)   = C_XGMII_SOP) else '0';
+    start_detected(0) <= '1' when (IN_XGMII_RXD(7 downto 0) = C_XGMII_SOP) else '0';
     start_detected(1) <= '1' when (IN_XGMII_RXD(39 downto 32) = C_XGMII_SOP) else '0';
 
     start_actived_vec <= start_detected and (IN_XGMII_RXC(4) & IN_XGMII_RXC(0));
@@ -106,7 +106,7 @@ begin
     process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (start_actived = '1') and (start_aligned = '1') then
+            if ((start_actived = '1') and (start_aligned = '1')) then
                 OUT_XGMII_RXD <= rxd_mux_out_masked;
                 OUT_XGMII_RXC <= rxc_mux_out_masked;
             else

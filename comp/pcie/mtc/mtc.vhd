@@ -25,7 +25,7 @@ use work.pcie_meta_pack.all;
 --       :width: 100 %
 --
 entity MTC is
-    generic(
+    generic (
         -- MFB bus: number of regions in word
         MFB_REGIONS       : natural := 2;
         -- MFB bus: number of blocks in region, must be 1
@@ -132,8 +132,8 @@ end entity;
 
 architecture FULL of MTC is
 
-    constant IS_XILINX_DEV   : boolean := DEVICE="ULTRASCALE" or DEVICE="7SERIES";
-    constant IS_INTEL_DEV    : boolean := DEVICE="STRATIX10" or DEVICE="AGILEX";
+    constant IS_XILINX_DEV   : boolean := DEVICE = "ULTRASCALE" or DEVICE = "7SERIES";
+    constant IS_INTEL_DEV    : boolean := DEVICE = "STRATIX10" or DEVICE = "AGILEX";
     constant IS_MFB_META_DEV : boolean := (ENDPOINT_TYPE = "P_TILE" or ENDPOINT_TYPE = "R_TILE") and IS_INTEL_DEV;
     constant RD_INDEX_BEGIN  : natural := tsel(IS_MFB_META_DEV,0,3);
     constant MFB_DATA_W      : natural := MFB_REGIONS*MFB_REGION_WIDTH;
@@ -146,8 +146,8 @@ architecture FULL of MTC is
     constant CC_MAX_MI_WORDS : natural := CC_MAX_SIZE/(MI_DATA_WIDTH/8);
     constant CC_MEM_ITEMS    : natural := CC_MAX_SIZE/(CC_DATA_WIDTH/8);
 
-    type mi_fsm_t is (st_idle, st_write, st_wait_for_data, st_read, st_wait_for_drdy, st_cc_done_mtu, st_error, st_ignore, st_cc_done_last);
-    type cc_fsm_t is (st_idle, st_start_read, st_read, st_error, st_cc_done);
+    type mi_fsm_t is (ST_IDLE, ST_WRITE, ST_WAIT_FOR_DATA, ST_READ, ST_WAIT_FOR_DRDY, ST_CC_DONE_MTU, ST_ERROR, ST_IGNORE, ST_CC_DONE_LAST);
+    type cc_fsm_t is (ST_IDLE, ST_START_READ, ST_READ, ST_ERROR, ST_CC_DONE);
 
     signal reg_mps                   : unsigned(12 downto 0);
     signal reg_mps_mi                : unsigned(13-log2(MI_DATA_WIDTH/8)-1 downto 0);
@@ -335,11 +335,13 @@ architecture FULL of MTC is
     -- attribute mark_debug of cc_fsm_pst : signal is "true";
 begin
 
-    assert (DEVICE = "STRATIX10" OR DEVICE = "AGILEX" OR DEVICE = "ULTRASCALE" OR DEVICE = "7SERIES")
-        report "MTC: unsupported DEVICE!" severity failure;
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+        report "MTC: unsupported DEVICE!"
+        severity failure;
 
-    assert (ENDPOINT_TYPE = "H_TILE" OR ENDPOINT_TYPE = "P_TILE" OR ENDPOINT_TYPE = "R_TILE" OR IS_INTEL_DEV = False)
-        report "MTC: unsupported ENDPOINT_TYPE (Intel FPGA only)!" severity failure;
+    assert (ENDPOINT_TYPE = "H_TILE" or ENDPOINT_TYPE = "P_TILE" or ENDPOINT_TYPE = "R_TILE" or IS_INTEL_DEV = False)
+        report "MTC: unsupported ENDPOINT_TYPE (Intel FPGA only)!"
+        severity failure;
 
     -- =========================================================================
     --  CONFIGURATION LOGIC AND REGISTERS
@@ -376,7 +378,7 @@ begin
 
     --  CQ MFB parser logic
     cq_mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -386,7 +388,7 @@ begin
         USE_DST_RDY => true,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -410,7 +412,7 @@ begin
     );
 
     mfb_transformer_i : entity work.MFB_TRANSFORMER
-    generic map(
+    generic map (
         RX_REGIONS  => MFB_REGIONS,
         TX_REGIONS  => 1,
         REGION_SIZE => MFB_REGION_SIZE,
@@ -418,7 +420,7 @@ begin
         ITEM_WIDTH  => MFB_ITEM_WIDTH,
         META_WIDTH  => PCIE_CQ_META_WIDTH
     )
-    port map(
+    port map (
         CLK         => CLK,
         RESET       => RESET,
 
@@ -457,10 +459,10 @@ begin
     end generate;
 
     pcie_cq_hdr_gen_i : entity work.PCIE_CQ_HDR_DEPARSER
-    generic map(
+    generic map (
         DEVICE => DEVICE
     )
-    port map(
+    port map (
         OUT_DW_CNT        => cq_hdr_gen_dword_count,
         OUT_ATTRIBUTES    => cq_hdr_gen_attr,
         OUT_TAG           => cq_hdr_gen_tag,
@@ -488,9 +490,9 @@ begin
 
     tr_cq_index_begin_p : process (all)
     begin
-        if (IS_MFB_META_DEV) then -- header is not in DATA signal
+        if (IS_MFB_META_DEV) then                      -- header is not in DATA signal
             tr_cq_index_begin <= to_unsigned(0,3);
-        else -- H-Tile - 3 or 4 dword header
+        else                                           -- H-Tile - 3 or 4 dword header
             if (cq_hdr_gen_hdr_type = '1') then
                 tr_cq_index_begin <= to_unsigned(4,3);
             else
@@ -499,7 +501,7 @@ begin
         end if;
     end process;
 
-    process(CLK)
+    process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (cq_ready = '1' and tr_cq_mfb_src_rdy = '1') then
@@ -531,7 +533,7 @@ begin
         end if;
     end process;
 
-    process(CLK)
+    process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
@@ -548,7 +550,7 @@ begin
 
     -- CQ address translation
     addr_trans_i : entity work.PCIE_BAR_ADDR_TRANSLATOR
-    generic map(
+    generic map (
         BAR0_BASE_ADDR    => BAR0_BASE_ADDR,
         BAR1_BASE_ADDR    => BAR1_BASE_ADDR,
         BAR2_BASE_ADDR    => BAR2_BASE_ADDR,
@@ -557,7 +559,7 @@ begin
         BAR5_BASE_ADDR    => BAR5_BASE_ADDR,
         EXP_ROM_BASE_ADDR => EXP_ROM_BASE_ADDR
     )
-    port map(
+    port map (
         CLK             => CLK,
         RESET           => RESET,
         IN_BAR_APERTURE => cq_meta_bar_aperture,
@@ -568,7 +570,7 @@ begin
 
     -- computation of invalid bytes and byte count
     byte_count_i : entity work.PCIE_BYTE_COUNT
-    port map(
+    port map (
         CLK            => CLK,
         RESET          => RESET,
         IN_DW_COUNT    => std_logic_vector(cq_hdr_dword_count),
@@ -699,27 +701,27 @@ begin
     mi_fsm_pst_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            mi_fsm_pst       <= mi_fsm_nst;
-            last_mi_word_reg <= last_mi_word;
-            cc_dwords_reg    <= cc_dwords;
-            cc_low_addr_reg  <= cc_low_addr;
-            cc_byte_send_reg <= cc_byte_send;
+            mi_fsm_pst        <= mi_fsm_nst;
+            last_mi_word_reg  <= last_mi_word;
+            cc_dwords_reg     <= cc_dwords;
+            cc_low_addr_reg   <= cc_low_addr;
+            cc_byte_send_reg  <= cc_byte_send;
             cc_first_resp_reg <= cc_first_resp;
             if (RESET = '1') then
-                mi_fsm_pst <= st_idle;
+                mi_fsm_pst <= ST_IDLE;
             end if;
         end if;
     end process;
 
     mi_fsm_logic_p : process (all)
     begin
-        mi_fsm_nst <= mi_fsm_pst;
-        last_mi_word <= last_mi_word_reg;
-        cq_ready   <= '0';
-        cc_request <= '0';
-        cc_dwords <= cc_dwords_reg;
-        cc_low_addr  <= cc_low_addr_reg;
-        cc_byte_send <= cc_byte_send_reg;
+        mi_fsm_nst    <= mi_fsm_pst;
+        last_mi_word  <= last_mi_word_reg;
+        cq_ready      <= '0';
+        cc_request    <= '0';
+        cc_dwords     <= cc_dwords_reg;
+        cc_low_addr   <= cc_low_addr_reg;
+        cc_byte_send  <= cc_byte_send_reg;
         cc_byte_count <= reg1_cq_byte_count - cc_byte_send_reg;
         cc_first_resp <= cc_first_resp_reg;
 
@@ -734,29 +736,29 @@ begin
         mi_be_out <= (others => '1');
 
         case (mi_fsm_pst) is
-            when st_idle =>
-                cq_ready <= '1';
-                wr_index_rst <= '1';
-                rd_index_rst <= '1';
-                mi_index_rst <= '1';
+            when ST_IDLE =>
+                cq_ready      <= '1';
+                wr_index_rst  <= '1';
+                rd_index_rst  <= '1';
+                mi_index_rst  <= '1';
                 cc_first_resp <= '1';
-                cc_byte_send <= (others => '0');
-                cc_dwords <= to_unsigned(1,cc_dwords'length);
+                cc_byte_send  <= (others => '0');
+                cc_dwords     <= to_unsigned(1,cc_dwords'length);
                 if (cq_valid = '1' and cq_sot = '1') then
                     if (cq_rd_req = '1') then
-                        mi_fsm_nst <= st_read;
+                        mi_fsm_nst <= ST_READ;
                     elsif (cq_wr_req = '1') then
-                        mi_fsm_nst <= st_write;
+                        mi_fsm_nst <= ST_WRITE;
                     else
                         if (cq_ignore = '1') then
-                            mi_fsm_nst <= st_ignore;
+                            mi_fsm_nst <= ST_IGNORE;
                         else
-                            mi_fsm_nst <= st_error;
+                            mi_fsm_nst <= ST_ERROR;
                         end if;
                     end if;
                 end if;
 
-            when st_write =>
+            when ST_WRITE =>
                 mi_wr_out <= '1';
                 if (first_dword = '1') then
                     mi_be_out <= reg1_cq_hdr_first_be;
@@ -767,19 +769,19 @@ begin
                     wr_index_inc <= '1';
                     mi_index_inc <= '1';
                     if (last_dword = '1') then
-                        mi_fsm_nst <= st_idle;
+                        mi_fsm_nst <= ST_IDLE;
                     elsif (wr_index_max = '1') then
-                        mi_fsm_nst <= st_wait_for_data;
+                        mi_fsm_nst <= ST_WAIT_FOR_DATA;
                     end if;
                 end if;
 
-            when st_wait_for_data =>
+            when ST_WAIT_FOR_DATA =>
                 cq_ready <= '1';
                 if (cq_valid = '1') then
-                    mi_fsm_nst <= st_write;
+                    mi_fsm_nst <= ST_WRITE;
                 end if;
 
-            when st_read =>
+            when ST_READ =>
                 mi_rd_out <= '1';
                 if (first_dword = '1') then
                     mi_be_out <= reg1_cq_hdr_first_be;
@@ -790,58 +792,58 @@ begin
                     mi_index_inc <= '1';
                     if (last_dword = '1' or mi_index_is_mtu = '1') then
                         last_mi_word <= last_dword;
-                        cc_low_addr <= resize((reg1_cq_laddr_init + cc_byte_send_reg),7);
-                        cc_dwords <= resize(enlarge_right(mi_index_mtu,log2(MI_DATA_WIDTH/32)),11)+1;
-                        mi_fsm_nst <= st_wait_for_drdy;
+                        cc_low_addr  <= resize((reg1_cq_laddr_init + cc_byte_send_reg),7);
+                        cc_dwords    <= resize(enlarge_right(mi_index_mtu,log2(MI_DATA_WIDTH/32)),11)+1;
+                        mi_fsm_nst   <= ST_WAIT_FOR_DRDY;
                     end if;
                 end if;
 
-            when st_wait_for_drdy =>
+            when ST_WAIT_FOR_DRDY =>
                 if (drdy_status = 0) then
                     cc_request <= '1';
                     if (last_mi_word_reg = '1') then
-                        mi_fsm_nst <= st_cc_done_last;
+                        mi_fsm_nst <= ST_CC_DONE_LAST;
                     else
-                        mi_fsm_nst <= st_cc_done_mtu;
+                        mi_fsm_nst <= ST_CC_DONE_MTU;
                     end if;
                 end if;
 
-            when st_cc_done_mtu =>
+            when ST_CC_DONE_MTU =>
                 last_mi_word <= '0';
                 if (cc_done = '1') then
-                    rd_index_rst <= '1';
+                    rd_index_rst  <= '1';
                     cc_first_resp <= '0';
                     if (cc_first_resp_reg = '1') then
                         cc_byte_send <= cc_byte_send_reg + reg_mps - reg1_cq_first_ib;
                     else
                         cc_byte_send <= cc_byte_send_reg + reg_mps;
                     end if;
-                    mi_fsm_nst <= st_read;
+                    mi_fsm_nst <= ST_READ;
                 end if;
 
-            when st_error =>
-                cc_low_addr <= (others => '0');
+            when ST_ERROR =>
+                cc_low_addr   <= (others => '0');
                 cc_byte_count <= to_unsigned(1,cc_byte_count'length);
                 if (IS_XILINX_DEV) then
                     cc_dwords <= to_unsigned(0,cc_dwords'length);
                 end if;
                 if (reg1_cq_valid = '1' and reg1_cq_eot = '1') then
                     cc_request <= '1';
-                    mi_fsm_nst <= st_cc_done_last;
+                    mi_fsm_nst <= ST_CC_DONE_LAST;
                 else
                     cq_ready <= '1';
                 end if;
 
-            when st_ignore =>
+            when ST_IGNORE =>
                 if (reg1_cq_valid = '1' and reg1_cq_eot = '1') then
-                    mi_fsm_nst <= st_idle;
+                    mi_fsm_nst <= ST_IDLE;
                 else
                     cq_ready <= '1';
                 end if;
 
-            when st_cc_done_last =>
+            when ST_CC_DONE_LAST =>
                 if (cc_done = '1') then
-                    mi_fsm_nst <= st_idle;
+                    mi_fsm_nst <= ST_IDLE;
                 end if;
         end case;
     end process;
@@ -853,14 +855,14 @@ begin
     mi_addrfn_out <= mi_function_out & mi_addr_out;
 
     mi_pipe_i : entity work.MI_PIPE
-    generic map(
+    generic map (
         USE_OUTREG => True,
         FAKE_PIPE  => not MI_PIPE,
         DATA_WIDTH => MI_DATA_WIDTH,
         ADDR_WIDTH => MI_ADDR_WIDTH + 8,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         CLK      => CLK,
         RESET    => RESET,
 
@@ -921,7 +923,7 @@ begin
     end generate;
 
     cc_mem_i : entity work.SDP_BRAM
-    generic map(
+    generic map (
         DATA_WIDTH   => CC_DATA_WIDTH,
         ITEMS        => CC_MEM_ITEMS,
         BLOCK_ENABLE => True,
@@ -930,7 +932,7 @@ begin
         OUTPUT_REG   => False,
         DEVICE       => DEVICE
     )
-    port map(
+    port map (
         WR_CLK      => CLK,
         WR_RST      => RESET,
         WR_EN       => cc_mem_wr,
@@ -966,10 +968,10 @@ begin
     -- -------------------------------------------------------------------------
 
     pcie_cc_hdr_gen_i : entity work.PCIE_CC_HDR_GEN
-    generic map(
+    generic map (
         DEVICE => DEVICE
     )
-    port map(
+    port map (
 
         IN_LOWER_ADDR   => std_logic_vector(cc_low_addr_reg),
         IN_ADDRESS_TYPE => reg1_cq_hdr_addr_type,
@@ -988,13 +990,13 @@ begin
 
     cc_hdr_xilinx_g: if IS_XILINX_DEV generate
         cc_xilinx_error <=
-            "00000000"               & -- RESERVED
-            reg1_cq_meta_tph_st_tag  & -- tph_st_tag
-            "00000"                  & -- RESERVED
-            reg1_cq_meta_tph_type    & -- tph_type
-            reg1_cq_meta_tph_present & -- tph_present
-            reg1_cq_hdr_last_be      & -- last_be
-            reg1_cq_hdr_first_be;      -- first_be
+                           "00000000"               & -- RESERVED
+                           reg1_cq_meta_tph_st_tag  & -- tph_st_tag
+                           "00000"                  & -- RESERVED
+                           reg1_cq_meta_tph_type    & -- tph_type
+                           reg1_cq_meta_tph_present & -- tph_present
+                           reg1_cq_hdr_last_be      & -- last_be
+                           reg1_cq_hdr_first_be;      -- first_be
     end generate;
 
     -- -------------------------------------------------------------------------
@@ -1006,7 +1008,7 @@ begin
         if (rising_edge(CLK)) then
             cc_fsm_pst <= cc_fsm_nst;
             if (RESET = '1') then
-                cc_fsm_pst <= st_idle;
+                cc_fsm_pst <= ST_IDLE;
             end if;
         end if;
     end process;
@@ -1014,37 +1016,37 @@ begin
     cc_fsm_logic_p : process (all)
     begin
         cc_fsm_nst <= cc_fsm_pst;
-        cc_done  <= '0';
+        cc_done    <= '0';
 
-        cc_data  <= cc_mem_rd_data;
-        cc_valid <= '0';
-        cc_sot   <= '0';
-        cc_eot   <= '0';
+        cc_data    <= cc_mem_rd_data;
+        cc_valid   <= '0';
+        cc_sot     <= '0';
+        cc_eot     <= '0';
         cc_eot_pos <= rd_index_pos;
 
-        cc_status <= "000"; -- completion status (successful completion)
+        cc_status <= "000";                                                       -- completion status (successful completion)
 
-        cc_mem_rd <= '0';
+        cc_mem_rd          <= '0';
         cc_mem_rd_addr_rst <= '0';
 
         case (cc_fsm_pst) is
-            when st_idle =>
+            when ST_IDLE =>
                 cc_mem_rd_addr_rst <= '1';
                 if (cc_request = '1') then
                     if (reg1_cq_rd_req = '1') then
-                        cc_fsm_nst <= st_start_read;
+                        cc_fsm_nst <= ST_START_READ;
                     elsif (reg1_cq_wr_req = '0') then
-                        cc_fsm_nst <= st_error;
+                        cc_fsm_nst <= ST_ERROR;
                     end if;
                 end if;
 
-            when st_start_read =>
-                cc_mem_rd <= '1';
-                cc_fsm_nst <= st_read;
+            when ST_START_READ =>
+                cc_mem_rd  <= '1';
+                cc_fsm_nst <= ST_READ;
 
-            when st_read =>
+            when ST_READ =>
                 cc_mem_rd <= cc_ready;
-                cc_valid <= '1';
+                cc_valid  <= '1';
                 if (cc_mem_rd_first = '1') then
                     cc_sot <= '1';
                     if (IS_MFB_META_DEV = False) then
@@ -1054,32 +1056,32 @@ begin
                 if (cc_mem_rd_done = '1') then
                     cc_eot <= '1';
                     if (cc_ready = '1') then
-                        cc_fsm_nst <= st_cc_done;
+                        cc_fsm_nst <= ST_CC_DONE;
                     end if;
                 end if;
 
-            when st_error =>
+            when ST_ERROR =>
                 cc_valid <= '1';
                 cc_sot   <= '1';
                 cc_eot   <= '1';
                 if (IS_XILINX_DEV = True) then
-                    cc_eot_pos <= to_unsigned(7,cc_eot_pos'length);
-                    cc_data <= (others => '0');
+                    cc_eot_pos               <= to_unsigned(7,cc_eot_pos'length);
+                    cc_data                  <= (others => '0');
                     cc_data(128-1 downto 96) <= cc_xilinx_error;
                 else
                     cc_eot_pos <= to_unsigned(2,cc_eot_pos'length);
                 end if;
-                cc_status <= "001"; -- completion status (unsupported request)
+                cc_status <= "001";                                               -- completion status (unsupported request)
                 if (IS_MFB_META_DEV = False) then
                     cc_data(96-1 downto 0) <= cc_hdr;
                 end if;
                 if (cc_ready = '1') then
-                    cc_fsm_nst <= st_cc_done;
+                    cc_fsm_nst <= ST_CC_DONE;
                 end if;
 
-            when st_cc_done =>
-                cc_done <= '1';
-                cc_fsm_nst <= st_idle;
+            when ST_CC_DONE =>
+                cc_done    <= '1';
+                cc_fsm_nst <= ST_IDLE;
         end case;
     end process;
 
@@ -1090,7 +1092,7 @@ begin
     cc_sot_fill_g: if (MFB_REGIONS = 1) generate
         mfb_sof(0) <= cc_sot;
     else generate
-        mfb_sof <= (MFB_REGIONS-1 downto 1 => '0') & cc_sot;
+        mfb_sof    <= (MFB_REGIONS-1 downto 1 => '0') & cc_sot;
     end generate;
 
     process (cc_eot, cc_eot_pos)
@@ -1115,7 +1117,7 @@ begin
 
     cc_pipe_g: if CC_PIPE generate
         cc_mfb_pipe_i : entity work.MFB_PIPE
-        generic map(
+        generic map (
             REGIONS     => MFB_REGIONS,
             REGION_SIZE => MFB_REGION_SIZE,
             BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -1125,7 +1127,7 @@ begin
             USE_DST_RDY => true,
             DEVICE      => DEVICE
         )
-        port map(
+        port map (
             CLK        => CLK,
             RESET      => RESET,
 

@@ -71,7 +71,7 @@ use work.math_pack.all;
 -- - ch_max     : the highest channel number for round-robin distribution. Default 0xFFFF
 --
 entity MFB_GENERATOR_MI32 is
-    generic(
+    generic (
         -- number of regions in a data word
         REGIONS         : natural := 4;
         -- number of blocks in a region
@@ -91,7 +91,7 @@ entity MFB_GENERATOR_MI32 is
         -- FPGA device string
         DEVICE          : string  := "STRATIX10"
     );
-    port(
+    port (
         CLK             : in  std_logic;
         RST             : in  std_logic;
 
@@ -141,13 +141,13 @@ architecture BEHAV of MFB_GENERATOR_MI32 is
     signal chan_inc_reg        : std_logic_vector(31 downto 0);
     signal chan_val_reg        : std_logic_vector(31 downto 0);
     signal len_reg             : std_logic_vector(LENGTH_WIDTH-1 downto 0);
-    signal cnt_reg             : std_logic_vector(PKT_CNT_WIDTH-1 downto 0); -- counter output of the mfb_generator
-    signal cnt_comb_reg_resize : std_logic_vector(63 downto 0); -- resized cnt_reg signal, so that its width is 32 multiplied by 2, larger number then 2^64 is not expected
-    signal dmac_comb_reg       : std_logic_vector(MAC_ADDR_WIDTH-1 downto 0); -- combines dmac_low_reg and dmac_high_reg signals for the mfb_generator input
-    signal dmac_low_reg        : std_logic_vector(31 downto 0); -- low bits of destination mac address
+    signal cnt_reg             : std_logic_vector(PKT_CNT_WIDTH-1 downto 0);   -- counter output of the mfb_generator
+    signal cnt_comb_reg_resize : std_logic_vector(63 downto 0);                -- resized cnt_reg signal, so that its width is 32 multiplied by 2, larger number then 2^64 is not expected
+    signal dmac_comb_reg       : std_logic_vector(MAC_ADDR_WIDTH-1 downto 0);  -- combines dmac_low_reg and dmac_high_reg signals for the mfb_generator input
+    signal dmac_low_reg        : std_logic_vector(31 downto 0);                -- low bits of destination mac address
     signal dmac_high_reg       : std_logic_vector(MAC_ADDR_WIDTH-33 downto 0); -- high bits of destination mac address
-    signal smac_comb_reg       : std_logic_vector(MAC_ADDR_WIDTH-1 downto 0); -- combines smac_low_reg and smac_high_reg signals for the mfb_generator input
-    signal smac_low_reg        : std_logic_vector(31 downto 0); -- low bits of source mac address
+    signal smac_comb_reg       : std_logic_vector(MAC_ADDR_WIDTH-1 downto 0);  -- combines smac_low_reg and smac_high_reg signals for the mfb_generator input
+    signal smac_low_reg        : std_logic_vector(31 downto 0);                -- low bits of source mac address
     signal smac_high_reg       : std_logic_vector(MAC_ADDR_WIDTH-33 downto 0); -- high bits of source mac address
     signal src_ip_mask_reg     : std_logic_vector(31 downto 0);
 
@@ -254,7 +254,7 @@ begin
 
     -- the defaul packet lenght is 60 bytes (+ CRC = 64B)
     len_reg_p : process (CLK)
-        begin
+    begin
         if (rising_edge(CLK)) then
             if (RST = '1') then
                 len_reg <= std_logic_vector(to_unsigned(60, LENGTH_WIDTH));
@@ -334,8 +334,8 @@ begin
             MI_DRD <= (others => '0');
             case (MI_ADDR(6-1 downto 0)) is
                 when "000000"  => MI_DRD(0)                       <= en_reg;
-                                  MI_DRD(1)                       <= TX_MFB_SRC_RDY; -- read only busy bit
-                                  MI_DRD(4)                       <= clr_reg;
+                    MI_DRD(1)                                     <= TX_MFB_SRC_RDY; -- read only busy bit
+                    MI_DRD(4)                                     <= clr_reg;
                 when "000100"  => MI_DRD(LENGTH_WIDTH-1 downto 0) <= len_reg;
                 when "001000"  => MI_DRD                          <= chan_inc_reg;
                 when "001100"  => MI_DRD                          <= chan_val_reg;

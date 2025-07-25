@@ -104,9 +104,9 @@ begin
     s_voq_rx_axi_tkeep_arr <= slv_array_deser(s_voq_rx_axi_tkeep, NUM_PORTS);
 
     virtual_output_queues_g : for i in 0 to NUM_PORTS-1 generate
-        constant VOQ_STATUS_WIDTH : natural := log2(NUM_ITEMS_PER_PORT(i))+1;
-        signal voq_empty          : std_logic;
-        signal voq_status         : std_logic_vector(VOQ_STATUS_WIDTH-1 downto 0);
+        constant VOQ_STATUS_WIDTH   : natural := log2(NUM_ITEMS_PER_PORT(i))+1;
+        signal   voq_empty          : std_logic;
+        signal   voq_status         : std_logic_vector(VOQ_STATUS_WIDTH-1 downto 0);
     begin
 
         -- TODO: optimize using some kind of DP memory?
@@ -138,7 +138,7 @@ begin
             AEMPTY        => open
         );
 
-        DEST_REQ_VEC(i) <= not voq_empty;
+        DEST_REQ_VEC(i)                                                                 <= not voq_empty;
         DEST_REQ_SIZES(i*MAX_STATUS_WIDTH+VOQ_STATUS_WIDTH-1 downto i*MAX_STATUS_WIDTH) <= voq_status;
     end generate;
 

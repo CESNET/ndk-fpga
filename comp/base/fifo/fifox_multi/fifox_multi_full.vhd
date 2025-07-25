@@ -37,10 +37,10 @@ architecture FULL of FIFOX_MULTI is
     -- -------------------------------------------------------------------------
 
     -- function for 2**N ceiling
-    function ceil2N(x : integer) return integer is
+    function ceil2n (x : integer) return integer is
         variable v : integer := 1;
     begin
-        while (v<x) loop
+        while (v < x) loop
             v := v*2;
         end loop;
 
@@ -48,14 +48,14 @@ architecture FULL of FIFOX_MULTI is
     end function;
 
     -- Actual number of items
-    constant ITEMS_ACT      : integer := ceil2N(ITEMS);
-    --Address bus width
+    constant ITEMS_ACT      : integer := ceil2n(ITEMS);
+    -- Address bus width
     constant ADDR_WIDTH     : integer := log2(ITEMS_ACT);
     -- Number of items in memory when almost full is triggered.
     constant AFULL_CAPACITY : integer := ITEMS_ACT - ALMOST_FULL_OFFSET;
 
     -- Actual number of FIFOX instances
-    constant FIFOX_COUNT    : integer := ceil2N(max(WRITE_PORTS,READ_PORTS));
+    constant FIFOX_COUNT    : integer := ceil2n(max(WRITE_PORTS,READ_PORTS));
     -- Number of items in each FIFOX instance
     constant FIFOX_ITEMS    : integer := ITEMS_ACT/FIFOX_COUNT;
 
@@ -156,11 +156,11 @@ architecture FULL of FIFOX_MULTI is
     attribute maxfan of in_reg2_vld    : signal is 64;
 
     -- this function is used in PSL assert assert_write_full_fifo
-    function rd_check(rd : std_logic_vector; empty : std_logic_vector) return boolean is
+    function rd_check (rd : std_logic_vector; empty : std_logic_vector) return boolean is
         variable read_stop : boolean;
     begin
         read_stop := false;
-        for IT in rd'low to rd'high loop
+        for it in rd'low to rd'high loop
             if (rd(IT) = '1' and empty(IT) = '0' and read_stop = true) then
                 return false;
             end if;
@@ -192,419 +192,419 @@ begin
 
     -- -------------------------------------------------------------------------
 
-    single_fifox_gen : if (FIFOX_COUNT=1 and ALLOW_SINGLE_FIFO=true) generate
-    -- =========================================================================
-    -- SINGLE FIFOX VARIANT
-    -- =========================================================================
-
-    fifox_i : entity work.FIFOX
-    generic map (
-        DATA_WIDTH          => DATA_WIDTH,
-        ITEMS               => FIFOX_ITEMS,
-        RAM_TYPE            => RAM_TYPE,
-        ALMOST_FULL_OFFSET  => ALMOST_FULL_OFFSET,
-        ALMOST_EMPTY_OFFSET => ALMOST_EMPTY_OFFSET,
-        DEVICE              => DEVICE
-    )
-    port map (
-        CLK    => CLK,
-        RESET  => RESET,
-
-        DI     => DI,
-        WR     => WR(0),
-        FULL   => FULL,
-        AFULL  => AFULL,
-
-        DO     => DO,
-        RD     => RD(0),
-        EMPTY  => EMPTY(0),
-        AEMPTY => AEMPTY
-    );
-
-    -- =========================================================================
-    end generate;
-
-    multi_fifox_gen : if (FIFOX_COUNT>1 or ALLOW_SINGLE_FIFO=false) generate
-    -- =========================================================================
-    -- TRUE MULTI FIFOX VARIANT
-    -- =========================================================================
-
-    -- -------------------------------------------------------------------------
-    -- Input register 0
-    -- -------------------------------------------------------------------------
-
-    input_reg0_pr : process (CLK)
-    begin
-        if (CLK'event and CLK='1') then
-            if (in_reg0_en='1') then
-                for i in 0 to WRITE_PORTS-1 loop
-                    in_reg0(i)      <= DI(DATA_WIDTH*(i+1)-1 downto DATA_WIDTH*i);
-                end loop;
-                in_reg0_vld    <= WR;
-                in_reg0_vld_or <= (or WR);
-            end if;
-
-            if (RESET='1') then
-                in_reg0_vld    <= (others => '0');
-                in_reg0_vld_or <= '0';
-            end if;
-        end if;
-    end process;
-
-    in_reg0_en <= '1' when in_reg1_en='1' else '0';
-
-    -- FULL propagation
-    FULL <= not in_reg0_en;
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- Input shakedown unit
-    -- -------------------------------------------------------------------------
-
-    in_shak_i : entity work.MERGE_N_TO_M
-    generic map (
-        INPUTS     => WRITE_PORTS,
-        OUTPUTS    => WRITE_PORTS,
-        DATA_WIDTH => DATA_WIDTH+1,
-        OUTPUT_REG => false
-    )
-    port map (
-        CLK         => CLK,
-        RESET       => RESET,
-
-        INPUT_DATA  => in_shake_in_data,
-        OUTPUT_DATA => in_shake_out_data
-    );
-
-    in_shake_input_gen : for i in 0 to WRITE_PORTS-1 generate
-        in_shake_in_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i) <= in_reg0(i) & in_reg0_vld(i);
-    end generate;
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- Input register 1
-    -- -------------------------------------------------------------------------
-
-    input_reg1_pr : process (CLK)
-    begin
-        if (CLK'event and CLK='1') then
-            if (in_reg1_en='1') then
-                for i in 0 to WRITE_PORTS-1 loop
-                    in_reg1(i)     <= in_shake_out_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i+1);
-                    in_reg1_vld(i) <= in_shake_out_data((DATA_WIDTH+1)*i);
-                end loop;
-                in_reg1_vld_or <= in_reg0_vld_or;
-            end if;
-
-            if (RESET='1') then
-                in_reg1_vld    <= (others => '0');
-                in_reg1_vld_or <= '0';
-            end if;
-        end if;
-    end process;
-
-    in_reg1_en <= '1' when (and in_reg2_en)='1' else '0';
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- Input barrel shifter
-    -- -------------------------------------------------------------------------
-
-    in_barsh_i : entity work.BARREL_SHIFTER_GEN
-    generic map (
-        BLOCKS     => FIFOX_COUNT,
-        BLOCK_SIZE => DATA_WIDTH+1,
-        SHIFT_LEFT => true -- rotate in opposite direction
-    )
-    port map(
-        DATA_IN  => in_barsh_in_data,
-        SEL      => in_barsh_in_sel,
-        DATA_OUT => in_barsh_out_data
-    );
-
-    in_barsh_input_low_gen : for i in 0 to WRITE_PORTS-1 generate
-        in_barsh_in_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i) <= in_reg1(i) & in_reg1_vld(i);
-    end generate;
-
-    in_barsh_input_high_gen : for i in WRITE_PORTS to FIFOX_COUNT-1 generate
-        in_barsh_in_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i) <= (others => '0');
-    end generate;
-
-    in_barsh_in_sel <= std_logic_vector(wr_ptr_reg);
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- Input register 2
-    -- -------------------------------------------------------------------------
-
-    input_reg2_pr : process (CLK)
-    begin
-        if (CLK'event and CLK='1') then
-            for i in 0 to FIFOX_COUNT-1 loop
-                if (in_reg2_en(i)='1') then
-                    in_reg2(i)     <= in_barsh_out_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i+1);
-                    in_reg2_vld(i) <= in_barsh_out_data((DATA_WIDTH+1)*i) and in_reg1_en;
-                end if;
-            end loop;
-
-            if (RESET='1') then
-                in_reg2_vld <= (others => '0');
-            end if;
-        end if;
-    end process;
-
-    in_reg2_en_gen : for i in 0 to FIFOX_COUNT-1 generate
-        in_reg2_en(i) <= '1' when fifox_full(i)='0' or in_reg2_vld(i)='0' else '0';
-    end generate;
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- FIFOX instances
-    -- -------------------------------------------------------------------------
-
-    fifox_gen : for i in 0 to FIFOX_COUNT-1 generate
+    single_fifox_gen : if (FIFOX_COUNT = 1 and ALLOW_SINGLE_FIFO = true) generate
+        -- =========================================================================
+        -- SINGLE FIFOX VARIANT
+        -- =========================================================================
 
         fifox_i : entity work.FIFOX
         generic map (
-            DATA_WIDTH => DATA_WIDTH,
-            ITEMS      => FIFOX_ITEMS,
-            RAM_TYPE   => RAM_TYPE,
-            DEVICE     => DEVICE
+            DATA_WIDTH          => DATA_WIDTH,
+            ITEMS               => FIFOX_ITEMS,
+            RAM_TYPE            => RAM_TYPE,
+            ALMOST_FULL_OFFSET  => ALMOST_FULL_OFFSET,
+            ALMOST_EMPTY_OFFSET => ALMOST_EMPTY_OFFSET,
+            DEVICE              => DEVICE
         )
         port map (
-            CLK   => CLK,
-            RESET => RESET,
+            CLK    => CLK,
+            RESET  => RESET,
 
-            DI    => fifox_di(i),
-            WR    => fifox_wr(i),
-            FULL  => fifox_full(i),
+            DI     => DI,
+            WR     => WR(0),
+            FULL   => FULL,
+            AFULL  => AFULL,
 
-            DO    => fifox_do(i),
-            RD    => fifox_rd(i),
-            EMPTY => fifox_empty(i)
+            DO     => DO,
+            RD     => RD(0),
+            EMPTY  => EMPTY(0),
+            AEMPTY => AEMPTY
         );
 
-        fifox_di(i) <= in_reg2(i);
-        fifox_wr(i) <= in_reg2_vld(i);
-        fifox_rd(i) <= out_re_barsh_out_data(i);
-
+        -- =========================================================================
     end generate;
 
-    -- -------------------------------------------------------------------------
+    multi_fifox_gen : if (FIFOX_COUNT > 1 or ALLOW_SINGLE_FIFO = false) generate
+        -- =========================================================================
+        -- TRUE MULTI FIFOX VARIANT
+        -- =========================================================================
 
-    -- -------------------------------------------------------------------------
-    -- Output barrel shifter
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- Input register 0
+        -- -------------------------------------------------------------------------
 
-    out_barsh_i : entity work.BARREL_SHIFTER_GEN
-    generic map (
-        BLOCKS     => FIFOX_COUNT,
-        BLOCK_SIZE => DATA_WIDTH+1,
-        SHIFT_LEFT => false
-    )
-    port map(
-        DATA_IN  => out_barsh_in_data,
-        SEL      => out_barsh_in_sel,
-        DATA_OUT => out_barsh_out_data
-    );
+        input_reg0_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (in_reg0_en = '1') then
+                    for i in 0 to WRITE_PORTS-1 loop
+                        in_reg0(i)      <= DI(DATA_WIDTH*(i+1)-1 downto DATA_WIDTH*i);
+                    end loop;
+                    in_reg0_vld    <= WR;
+                    in_reg0_vld_or <= (or WR);
+                end if;
 
-    out_barsh_input_gen : for i in 0 to FIFOX_COUNT-1 generate
-        out_barsh_in_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i) <= fifox_do(i) & fifox_empty(i);
-    end generate;
+                if (RESET = '1') then
+                    in_reg0_vld    <= (others => '0');
+                    in_reg0_vld_or <= '0';
+                end if;
+            end if;
+        end process;
 
-    out_barsh_in_sel <= std_logic_vector(rd_ptr_reg);
+        in_reg0_en <= '1' when in_reg1_en = '1' else '0';
 
-    -- -------------------------------------------------------------------------
+        -- FULL propagation
+        FULL <= not in_reg0_en;
 
-    -- -------------------------------------------------------------------------
-    -- Output read enable barrel shifter
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    out_re_barsh_i : entity work.BARREL_SHIFTER_GEN
-    generic map (
-        BLOCKS     => FIFOX_COUNT,
-        BLOCK_SIZE => 1,
-        SHIFT_LEFT => true -- rotate in opposite direction
-    )
-    port map(
-        DATA_IN  => out_re_barsh_in_data,
-        SEL      => out_re_barsh_in_sel,
-        DATA_OUT => out_re_barsh_out_data
-    );
+        -- -------------------------------------------------------------------------
+        -- Input shakedown unit
+        -- -------------------------------------------------------------------------
 
-    out_re_barsh_input_low_gen : for i in 0 to READ_PORTS-1 generate
-        out_re_barsh_in_data(i) <= RD(i);
-    end generate;
+        in_shak_i : entity work.MERGE_N_TO_M
+        generic map (
+            INPUTS     => WRITE_PORTS,
+            OUTPUTS    => WRITE_PORTS,
+            DATA_WIDTH => DATA_WIDTH+1,
+            OUTPUT_REG => false
+        )
+        port map (
+            CLK         => CLK,
+            RESET       => RESET,
 
-    out_re_barsh_input_high_gen : for i in READ_PORTS to FIFOX_COUNT-1 generate
-        out_re_barsh_in_data(i) <= '0';
-    end generate;
+            INPUT_DATA  => in_shake_in_data,
+            OUTPUT_DATA => in_shake_out_data
+        );
 
-    out_re_barsh_in_sel <= std_logic_vector(rd_ptr_reg);
+        in_shake_input_gen : for i in 0 to WRITE_PORTS-1 generate
+            in_shake_in_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i) <= in_reg0(i) & in_reg0_vld(i);
+        end generate;
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- Data output
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- Input register 1
+        -- -------------------------------------------------------------------------
 
-    -- an actual safe read from fifo on each port
-    read_act_gen : for i in 0 to READ_PORTS-1 generate
-        read_act(i) <= '1' when (out_barsh_out_data((DATA_WIDTH+1)*i)='0' or SAFE_READ_MODE=false) and RD(i)='1' else '0';
-    end generate;
+        input_reg1_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (in_reg1_en = '1') then
+                    for i in 0 to WRITE_PORTS-1 loop
+                        in_reg1(i)     <= in_shake_out_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i+1);
+                        in_reg1_vld(i) <= in_shake_out_data((DATA_WIDTH+1)*i);
+                    end loop;
+                    in_reg1_vld_or <= in_reg0_vld_or;
+                end if;
 
-    -- data output propagation
-    output_gen : for i in 0 to READ_PORTS-1 generate
-        DO(DATA_WIDTH*(i+1)-1 downto DATA_WIDTH*i) <= out_barsh_out_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i+1);
-    end generate;
+                if (RESET = '1') then
+                    in_reg1_vld    <= (others => '0');
+                    in_reg1_vld_or <= '0';
+                end if;
+            end if;
+        end process;
 
-    -- EMPTY propagation
-    empty_gen : for i in 0 to READ_PORTS-1 generate
-        EMPTY(i) <= out_barsh_out_data((DATA_WIDTH+1)*i);
-    end generate;
+        in_reg1_en <= '1' when (and in_reg2_en) = '1' else '0';
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- Number of writes and reads counting
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- Input barrel shifter
+        -- -------------------------------------------------------------------------
 
-    -- writes number counter register
-    wr_num_reg_pr : process (CLK)
-        variable num : unsigned(log2(WRITE_PORTS+1)-1 downto 0);
-    begin
-        if (CLK'event and CLK='1') then
-            if (in_reg1_en='1') then
-                -- ones counter
-                num := (others => '0');
-                for i in 0 to WRITE_PORTS-1 loop
-                    if (in_reg0_vld(i)='1') then
-                        num := num + 1;
+        in_barsh_i : entity work.BARREL_SHIFTER_GEN
+        generic map (
+            BLOCKS     => FIFOX_COUNT,
+            BLOCK_SIZE => DATA_WIDTH+1,
+            SHIFT_LEFT => true -- rotate in opposite direction
+        )
+        port map (
+            DATA_IN  => in_barsh_in_data,
+            SEL      => in_barsh_in_sel,
+            DATA_OUT => in_barsh_out_data
+        );
+
+        in_barsh_input_low_gen : for i in 0 to WRITE_PORTS-1 generate
+            in_barsh_in_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i) <= in_reg1(i) & in_reg1_vld(i);
+        end generate;
+
+        in_barsh_input_high_gen : for i in WRITE_PORTS to FIFOX_COUNT-1 generate
+            in_barsh_in_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i) <= (others => '0');
+        end generate;
+
+        in_barsh_in_sel <= std_logic_vector(wr_ptr_reg);
+
+        -- -------------------------------------------------------------------------
+
+        -- -------------------------------------------------------------------------
+        -- Input register 2
+        -- -------------------------------------------------------------------------
+
+        input_reg2_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                for i in 0 to FIFOX_COUNT-1 loop
+                    if (in_reg2_en(i) = '1') then
+                        in_reg2(i)     <= in_barsh_out_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i+1);
+                        in_reg2_vld(i) <= in_barsh_out_data((DATA_WIDTH+1)*i) and in_reg1_en;
                     end if;
                 end loop;
 
-                wr_num_reg1 <= num;
+                if (RESET = '1') then
+                    in_reg2_vld <= (others => '0');
+                end if;
             end if;
+        end process;
 
-            -- reset not needed; value in_reg1_vld_or is being reset
-            --if (RESET='1') then
-            --   wr_num_reg <= (others => '0');
-            --end if;
-        end if;
-    end process;
+        in_reg2_en_gen : for i in 0 to FIFOX_COUNT-1 generate
+            in_reg2_en(i) <= '1' when fifox_full(i) = '0' or in_reg2_vld(i) = '0' else '0';
+        end generate;
 
-    -- reads number counter
-    rd_num_pr : process (RD,read_act)
-        variable num : unsigned(log2(READ_PORTS+1)-1 downto 0);
-    begin
-        num := (others => '0');
+        -- -------------------------------------------------------------------------
 
-        -- ones counter
-        for i in 0 to READ_PORTS-1 loop
-            if (read_act(i)='1') then
-                num := num + 1;
+        -- -------------------------------------------------------------------------
+        -- FIFOX instances
+        -- -------------------------------------------------------------------------
+
+        fifox_gen : for i in 0 to FIFOX_COUNT-1 generate
+
+            fifox_i : entity work.FIFOX
+            generic map (
+                DATA_WIDTH => DATA_WIDTH,
+                ITEMS      => FIFOX_ITEMS,
+                RAM_TYPE   => RAM_TYPE,
+                DEVICE     => DEVICE
+            )
+            port map (
+                CLK   => CLK,
+                RESET => RESET,
+
+                DI    => fifox_di(i),
+                WR    => fifox_wr(i),
+                FULL  => fifox_full(i),
+
+                DO    => fifox_do(i),
+                RD    => fifox_rd(i),
+                EMPTY => fifox_empty(i)
+            );
+
+            fifox_di(i) <= in_reg2(i);
+            fifox_wr(i) <= in_reg2_vld(i);
+            fifox_rd(i) <= out_re_barsh_out_data(i);
+
+        end generate;
+
+        -- -------------------------------------------------------------------------
+
+        -- -------------------------------------------------------------------------
+        -- Output barrel shifter
+        -- -------------------------------------------------------------------------
+
+        out_barsh_i : entity work.BARREL_SHIFTER_GEN
+        generic map (
+            BLOCKS     => FIFOX_COUNT,
+            BLOCK_SIZE => DATA_WIDTH+1,
+            SHIFT_LEFT => false
+        )
+        port map (
+            DATA_IN  => out_barsh_in_data,
+            SEL      => out_barsh_in_sel,
+            DATA_OUT => out_barsh_out_data
+        );
+
+        out_barsh_input_gen : for i in 0 to FIFOX_COUNT-1 generate
+            out_barsh_in_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i) <= fifox_do(i) & fifox_empty(i);
+        end generate;
+
+        out_barsh_in_sel <= std_logic_vector(rd_ptr_reg);
+
+        -- -------------------------------------------------------------------------
+
+        -- -------------------------------------------------------------------------
+        -- Output read enable barrel shifter
+        -- -------------------------------------------------------------------------
+
+        out_re_barsh_i : entity work.BARREL_SHIFTER_GEN
+        generic map (
+            BLOCKS     => FIFOX_COUNT,
+            BLOCK_SIZE => 1,
+            SHIFT_LEFT => true -- rotate in opposite direction
+        )
+        port map (
+            DATA_IN  => out_re_barsh_in_data,
+            SEL      => out_re_barsh_in_sel,
+            DATA_OUT => out_re_barsh_out_data
+        );
+
+        out_re_barsh_input_low_gen : for i in 0 to READ_PORTS-1 generate
+            out_re_barsh_in_data(i) <= RD(i);
+        end generate;
+
+        out_re_barsh_input_high_gen : for i in READ_PORTS to FIFOX_COUNT-1 generate
+            out_re_barsh_in_data(i) <= '0';
+        end generate;
+
+        out_re_barsh_in_sel <= std_logic_vector(rd_ptr_reg);
+
+        -- -------------------------------------------------------------------------
+
+        -- -------------------------------------------------------------------------
+        -- Data output
+        -- -------------------------------------------------------------------------
+
+        -- an actual safe read from fifo on each port
+        read_act_gen : for i in 0 to READ_PORTS-1 generate
+            read_act(i) <= '1' when (out_barsh_out_data((DATA_WIDTH+1)*i) = '0' or SAFE_READ_MODE = false) and RD(i) = '1' else '0';
+        end generate;
+
+        -- data output propagation
+        output_gen : for i in 0 to READ_PORTS-1 generate
+            DO(DATA_WIDTH*(i+1)-1 downto DATA_WIDTH*i) <= out_barsh_out_data((DATA_WIDTH+1)*(i+1)-1 downto (DATA_WIDTH+1)*i+1);
+        end generate;
+
+        -- EMPTY propagation
+        empty_gen : for i in 0 to READ_PORTS-1 generate
+            EMPTY(i) <= out_barsh_out_data((DATA_WIDTH+1)*i);
+        end generate;
+
+        -- -------------------------------------------------------------------------
+
+        -- -------------------------------------------------------------------------
+        -- Number of writes and reads counting
+        -- -------------------------------------------------------------------------
+
+        -- writes number counter register
+        wr_num_reg_pr : process (CLK)
+            variable num : unsigned(log2(WRITE_PORTS+1)-1 downto 0);
+        begin
+            if (rising_edge(CLK)) then
+                if (in_reg1_en = '1') then
+                    -- ones counter
+                    num := (others => '0');
+                    for i in 0 to WRITE_PORTS-1 loop
+                        if (in_reg0_vld(i) = '1') then
+                            num := num + 1;
+                        end if;
+                    end loop;
+
+                    wr_num_reg1 <= num;
+                end if;
+
+                -- reset not needed; value in_reg1_vld_or is being reset
+                -- if (RESET='1') then
+                --   wr_num_reg <= (others => '0');
+                -- end if;
             end if;
-        end loop;
+        end process;
 
-        rd_num <= num;
-    end process;
+        -- reads number counter
+        rd_num_pr : process (RD,read_act)
+            variable num : unsigned(log2(READ_PORTS+1)-1 downto 0);
+        begin
+            num := (others => '0');
 
-    rd_num_reg_pr : process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            rd_num_reg <= rd_num;
-            if (RESET='1') then
-                rd_num_reg <= (others => '0');
+            -- ones counter
+            for i in 0 to READ_PORTS-1 loop
+                if (read_act(i) = '1') then
+                    num := num + 1;
+                end if;
+            end loop;
+
+            rd_num <= num;
+        end process;
+
+        rd_num_reg_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                rd_num_reg <= rd_num;
+                if (RESET = '1') then
+                    rd_num_reg <= (others => '0');
+                end if;
             end if;
-        end if;
-    end process;
+        end process;
 
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
 
-    -- -------------------------------------------------------------------------
-    -- WR/RD pointer registers
-    -- -------------------------------------------------------------------------
+        -- -------------------------------------------------------------------------
+        -- WR/RD pointer registers
+        -- -------------------------------------------------------------------------
 
-    -- write pointer register
-    wr_ptr_reg_pr : process (CLK)
-    begin
-        if (CLK'event and CLK='1') then
-            if (in_reg1_en='1') then
-                wr_ptr_reg <= resize(wr_ptr_reg + wr_num_reg1,wr_ptr_reg'high+1);
+        -- write pointer register
+        wr_ptr_reg_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (in_reg1_en = '1') then
+                    wr_ptr_reg <= resize(wr_ptr_reg + wr_num_reg1,wr_ptr_reg'high+1);
+                end if;
+
+                if (RESET = '1') then
+                    wr_ptr_reg <= (others => '0');
+                end if;
             end if;
+        end process;
 
-            if (RESET='1') then
-                wr_ptr_reg <= (others => '0');
+        -- read pointer register
+        rd_ptr_reg_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                rd_ptr_reg <= resize(rd_ptr_reg + rd_num,rd_ptr_reg'high+1);
+
+                if (RESET = '1') then
+                    rd_ptr_reg <= (others => '0');
+                end if;
             end if;
-        end if;
-    end process;
+        end process;
 
-    -- read pointer register
-    rd_ptr_reg_pr : process (CLK)
-    begin
-        if (CLK'event and CLK='1') then
-            rd_ptr_reg <= resize(rd_ptr_reg + rd_num,rd_ptr_reg'high+1);
+        -- -------------------------------------------------------------------------
 
-            if (RESET='1') then
-                rd_ptr_reg <= (others => '0');
+        -- -------------------------------------------------------------------------
+        -- Status register
+        -- -------------------------------------------------------------------------
+
+        -- status register
+        status_reg_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                status_reg1 <= status_reg  - rd_num;
+                status_reg2 <= status_reg1 - rd_num;
+
+                if (in_reg1_en = '1') then
+                    status_reg <= status_reg - rd_num + wr_num_reg1;
+                else
+                    status_reg <= status_reg - rd_num;
+                end if;
+
+                if (RESET = '1') then
+                    status_reg  <= (others => '0');
+                    status_reg1 <= (others => '0');
+                    status_reg2 <= (others => '0');
+                end if;
             end if;
-        end if;
-    end process;
+        end process;
 
-    -- -------------------------------------------------------------------------
+        -- almost full / almost empty
+        almost_reg_pr : process (CLK)
+        begin
 
-    -- -------------------------------------------------------------------------
-    -- Status register
-    -- -------------------------------------------------------------------------
+            if (rising_edge(CLK)) then
 
-    -- status register
-    status_reg_pr : process (CLK)
-    begin
-        if (CLK'event and CLK='1') then
-            status_reg1 <= status_reg  - rd_num;
-            status_reg2 <= status_reg1 - rd_num;
+                al_full_reg  <= '1' when (status_reg  + wr_num_reg1) >= AFULL_CAPACITY      else '0';
+                al_empty_reg <= '1' when (status_reg2 - rd_num     ) <= ALMOST_EMPTY_OFFSET else '0';
 
-            if (in_reg1_en='1') then
-                status_reg <= status_reg - rd_num + wr_num_reg1;
-            else
-                status_reg <= status_reg - rd_num;
+                if (RESET = '1') then
+                    al_full_reg  <= '0';
+                    al_empty_reg <= '1';
+                end if;
             end if;
+        end process;
 
-            if (RESET='1') then
-                status_reg  <= (others => '0');
-                status_reg1 <= (others => '0');
-                status_reg2 <= (others => '0');
-            end if;
-        end if;
-    end process;
+        AFULL  <= al_full_reg;
+        AEMPTY <= al_empty_reg;
 
-    -- almost full / almost empty
-    almost_reg_pr : process (CLK)
-    begin
+        -- -------------------------------------------------------------------------
 
-        if (CLK'event and CLK='1') then
-
-            al_full_reg  <= '1' when (status_reg  + wr_num_reg1)>=AFULL_CAPACITY      else '0';
-            al_empty_reg <= '1' when (status_reg2 - rd_num     )<=ALMOST_EMPTY_OFFSET else '0';
-
-            if (RESET='1') then
-                al_full_reg  <= '0';
-                al_empty_reg <= '1';
-            end if;
-        end if;
-    end process;
-
-    AFULL  <= al_full_reg;
-    AEMPTY <= al_empty_reg;
-
-    -- -------------------------------------------------------------------------
-
-    -- =========================================================================
+        -- =========================================================================
     end generate;
 
 end architecture;

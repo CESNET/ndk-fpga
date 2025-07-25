@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity GEN_REG_ARRAY is
-    generic(
+    generic (
         -- Width of word (item) in bits. Only low width (1 to 8) is effective!!!
         -- If you need a larger data width, this component is not suitable.
         DATA_WIDTH         : natural := 1;
@@ -29,7 +29,7 @@ entity GEN_REG_ARRAY is
         -- This parameter is not currently used.
         DEVICE             : string  := "ULTRASCALE"
     );
-    port(
+    port (
         CLK     : in  std_logic;
         -- If you do not need to reset the registry array, connect to '0'!
         RESET   : in  std_logic;
@@ -92,14 +92,14 @@ begin
         );
 
         reg_mem_in_mux_i : entity work.GEN_MUX_PIPED
-        generic map(
+        generic map (
             DATA_WIDTH     => DATA_WIDTH,
             MUX_WIDTH      => WR_PORTS,
             MUX_LATENCY    => 0,
             INPUT_REG      => False,
             OUTPUT_REG     => False
         )
-        port map(
+        port map (
             CLK     => CLK,
             RESET   => '0',
             RX_DATA => WR_DATA,
@@ -123,14 +123,14 @@ begin
 
     rd_ports_g : for i in 0 to RD_PORTS-1 generate
         rd_port_mux_i : entity work.GEN_MUX_PIPED
-        generic map(
+        generic map (
             DATA_WIDTH     => DATA_WIDTH,
             MUX_WIDTH      => ITEMS,
             MUX_LATENCY    => RD_LATENCY,
             INPUT_REG      => False,
             OUTPUT_REG     => OUTPUT_REG
         )
-        port map(
+        port map (
             CLK     => CLK,
             RESET   => '0',
             RX_DATA => slv_array_ser(reg_mem, ITEMS, DATA_WIDTH),

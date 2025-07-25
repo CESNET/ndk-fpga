@@ -21,93 +21,93 @@ use work.type_pack.all;
 -- The packets read from the RX FIFO are stored in the TX FIFO.
 --
 entity MFB_PACKET_DELAYER is
-generic(
-    -- Number of Regions within a data word, must be power of 2.
-    MFB_REGIONS           : natural := 1;
-    -- Region size (in Blocks).
-    MFB_REGION_SIZE       : natural := 8;
-    -- Block size (in Items), must be 8.
-    MFB_BLOCK_SIZE        : natural := 8;
-    -- Item width (in bits), must be 8.
-    MFB_ITEM_WIDTH        : natural := 8;
-    -- Metadata width (in bits).
-    MFB_META_WIDTH        : natural := 0;
+    generic (
+        -- Number of Regions within a data word, must be power of 2.
+        MFB_REGIONS           : natural := 1;
+        -- Region size (in Blocks).
+        MFB_REGION_SIZE       : natural := 8;
+        -- Block size (in Items), must be 8.
+        MFB_BLOCK_SIZE        : natural := 8;
+        -- Item width (in bits), must be 8.
+        MFB_ITEM_WIDTH        : natural := 8;
+        -- Metadata width (in bits).
+        MFB_META_WIDTH        : natural := 0;
 
-    -- Width of Timestamps (in bits).
-    TS_WIDTH              : natural := 48;
-    -- Format of Timestamps. Options:
-    --
-    -- - ``0`` number of NS between individual packets,
-    -- - ``1`` number of NS from RESET.
-    TS_FORMAT             : natural := 0;
-    -- Number of Items in the Input MFB_FIFOX (main buffer).
-    FIFO_DEPTH            : natural := 2048;
-    -- Almost Full Offset of the Input MFB_FIFOX.
-    -- Pauses the appropriate DMA channel when the amount of stored Items reaches this value.
-    FIFO_AF_OFFSET        : natural := 1000;
-    -- Almost Empty Offset of the input MFB_FIFOX.
-    -- Unpauses (resumes) the appropriate DMA channel when the amount of stored Items drops under this value.
-    FIFO_AE_OFFSET        : natural := 1000;
+        -- Width of Timestamps (in bits).
+        TS_WIDTH              : natural := 48;
+        -- Format of Timestamps. Options:
+        --
+        -- - ``0`` number of NS between individual packets,
+        -- - ``1`` number of NS from RESET.
+        TS_FORMAT             : natural := 0;
+        -- Number of Items in the Input MFB_FIFOX (main buffer).
+        FIFO_DEPTH            : natural := 2048;
+        -- Almost Full Offset of the Input MFB_FIFOX.
+        -- Pauses the appropriate DMA channel when the amount of stored Items reaches this value.
+        FIFO_AF_OFFSET        : natural := 1000;
+        -- Almost Empty Offset of the input MFB_FIFOX.
+        -- Unpauses (resumes) the appropriate DMA channel when the amount of stored Items drops under this value.
+        FIFO_AE_OFFSET        : natural := 1000;
 
-    -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
-    DEVICE                : string := "STRATIX10"
-);
-port(
-    -- =====================================================================
-    --  Clock and Reset
-    -- =====================================================================
+        -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
+        DEVICE                : string := "STRATIX10"
+    );
+    port (
+        -- =====================================================================
+        --  Clock and Reset
+        -- =====================================================================
 
-    CLK            : in  std_logic;
-    RESET          : in  std_logic;
+        CLK            : in  std_logic;
+        RESET          : in  std_logic;
 
-    -- Reset time accumulation (applies only when TS_FORMAT=1).
-    -- Time counter is reset with the next first SOF.
-    TIME_RESET     : in  std_logic;
+        -- Reset time accumulation (applies only when TS_FORMAT=1).
+        -- Time counter is reset with the next first SOF.
+        TIME_RESET     : in  std_logic;
 
-    -- A 64-bit value representing Time, which is used to decide whether a packet's Timestamp is OK and can be transmitted or not.
-    -- It can be a precise time from the TSU, a value from a simple incrementing counter, or anything in between.
-    -- The quality of the time source affects the precision of the packet's transmission but not the component's functionality.
-    CURRENT_TIME   : in  std_logic_vector(64-1 downto 0);
+        -- A 64-bit value representing Time, which is used to decide whether a packet's Timestamp is OK and can be transmitted or not.
+        -- It can be a precise time from the TSU, a value from a simple incrementing counter, or anything in between.
+        -- The quality of the time source affects the precision of the packet's transmission but not the component's functionality.
+        CURRENT_TIME   : in  std_logic_vector(64-1 downto 0);
 
-    -- Used to pause incomming traffic when the buffer is Almost Full.
-    PAUSE_REQUEST  : out std_logic;
+        -- Used to pause incomming traffic when the buffer is Almost Full.
+        PAUSE_REQUEST  : out std_logic;
 
-    -- =====================================================================
-    --  RX inf
-    -- =====================================================================
+        -- =====================================================================
+        --  RX inf
+        -- =====================================================================
 
-    RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- Valid with SOF.
-    RX_MFB_META    : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
-    -- Timestamp valid with each SOF.
-    RX_MFB_TS      : in  std_logic_vector(MFB_REGIONS*TS_WIDTH-1 downto 0) := (others => '0');
-    RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SRC_RDY : in  std_logic;
-    RX_MFB_DST_RDY : out std_logic;
+        RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- Valid with SOF.
+        RX_MFB_META    : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
+        -- Timestamp valid with each SOF.
+        RX_MFB_TS      : in  std_logic_vector(MFB_REGIONS*TS_WIDTH-1 downto 0) := (others => '0');
+        RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SRC_RDY : in  std_logic;
+        RX_MFB_DST_RDY : out std_logic;
 
-    -- =====================================================================
-    --  TX inf
-    -- =====================================================================
+        -- =====================================================================
+        --  TX inf
+        -- =====================================================================
 
-    TX_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- Valid with SOF.
-    TX_MFB_META    : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
-    TX_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    TX_MFB_SOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_EOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_SRC_RDY : out std_logic;
-    TX_MFB_DST_RDY : in  std_logic
-);
+        TX_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- Valid with SOF.
+        TX_MFB_META    : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
+        TX_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        TX_MFB_SOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_EOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_SRC_RDY : out std_logic;
+        TX_MFB_DST_RDY : in  std_logic
+    );
 end entity;
 
 architecture FULL of MFB_PACKET_DELAYER is
 
-    subtype my_integer is integer range MFB_REGION_SIZE-1 downto 0;
-    type my_integer_vector is array(natural range <>) of my_integer;
+    subtype MY_INTEGER is integer range MFB_REGION_SIZE-1 downto 0;
+    type    my_integer_vector is array(natural range <>) of MY_INTEGER;
 
     -- ========================================================================
     --                                CONSTANTS
@@ -186,20 +186,20 @@ begin
 
     -- Pause incomming traffic when RX FIFO is getting full.
     -- Restart it again after some of its contents have been read.
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (rx_fifo_afull = '1') then
                 PAUSE_REQUEST <= '1';
             end if;
-            if (RESET = '1') or (rx_fifo_aempty = '1') then
+            if ((RESET = '1') or (rx_fifo_aempty = '1')) then
                 PAUSE_REQUEST <= '0';
             end if;
         end if;
     end process;
 
     rx_mfb_meta_regions_arr <= slv_array_deser(RX_MFB_META, MFB_REGIONS);
-    rx_mfb_ts_regions_arr   <= slv_array_deser(RX_MFB_TS  , MFB_REGIONS);
+    rx_mfb_ts_regions_arr   <= slv_array_deser(RX_MFB_TS, MFB_REGIONS);
     rx_fifo_meta_g : for r in 0 to MFB_REGIONS-1 generate
         rx_mfb_meta_plus_arr(r) <= rx_mfb_meta_regions_arr(r) & rx_mfb_ts_regions_arr(r);
     end generate;
@@ -210,85 +210,85 @@ begin
     -- ========================================================================
 
     rx_mfb_fifox_i : entity work.MFB_FIFOX
-    generic map(
-        REGIONS             => MFB_REGIONS      ,
-        REGION_SIZE         => MFB_REGION_SIZE  ,
-        BLOCK_SIZE          => MFB_BLOCK_SIZE   ,
-        ITEM_WIDTH          => MFB_ITEM_WIDTH   ,
+    generic map (
+        REGIONS             => MFB_REGIONS,
+        REGION_SIZE         => MFB_REGION_SIZE,
+        BLOCK_SIZE          => MFB_BLOCK_SIZE,
+        ITEM_WIDTH          => MFB_ITEM_WIDTH,
         META_WIDTH          => RX_META_WIDTH_EXT,
-        FIFO_DEPTH          => FIFO_DEPTH       ,
-        RAM_TYPE            => "AUTO"           ,
-        DEVICE              => DEVICE           ,
-        ALMOST_FULL_OFFSET  => FIFO_AF_OFFSET   ,
+        FIFO_DEPTH          => FIFO_DEPTH,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => FIFO_AF_OFFSET,
         ALMOST_EMPTY_OFFSET => FIFO_AE_OFFSET
     )
-    port map(
+    port map (
         CLK => CLK,
         RST => RESET,
 
-        RX_DATA     => RX_MFB_DATA     ,
+        RX_DATA     => RX_MFB_DATA,
         RX_META     => rx_mfb_meta_plus,
-        RX_SOF_POS  => RX_MFB_SOF_POS  ,
-        RX_EOF_POS  => RX_MFB_EOF_POS  ,
-        RX_SOF      => RX_MFB_SOF      ,
-        RX_EOF      => RX_MFB_EOF      ,
-        RX_SRC_RDY  => RX_MFB_SRC_RDY  ,
-        RX_DST_RDY  => RX_MFB_DST_RDY  ,
+        RX_SOF_POS  => RX_MFB_SOF_POS,
+        RX_EOF_POS  => RX_MFB_EOF_POS,
+        RX_SOF      => RX_MFB_SOF,
+        RX_EOF      => RX_MFB_EOF,
+        RX_SRC_RDY  => RX_MFB_SRC_RDY,
+        RX_DST_RDY  => RX_MFB_DST_RDY,
 
-        TX_DATA     => fm_rx_data      ,
-        TX_META     => fm_rx_meta_plus ,
-        TX_SOF_POS  => fm_rx_sof_pos   ,
-        TX_EOF_POS  => fm_rx_eof_pos   ,
-        TX_SOF      => fm_rx_sof       ,
-        TX_EOF      => fm_rx_eof       ,
-        TX_SRC_RDY  => fm_rx_src_rdy   ,
-        TX_DST_RDY  => fm_rx_dst_rdy   ,
+        TX_DATA     => fm_rx_data,
+        TX_META     => fm_rx_meta_plus,
+        TX_SOF_POS  => fm_rx_sof_pos,
+        TX_EOF_POS  => fm_rx_eof_pos,
+        TX_SOF      => fm_rx_sof,
+        TX_EOF      => fm_rx_eof,
+        TX_SRC_RDY  => fm_rx_src_rdy,
+        TX_DST_RDY  => fm_rx_dst_rdy,
 
-        FIFO_STATUS => open            ,
-        FIFO_AFULL  => rx_fifo_afull   ,
+        FIFO_STATUS => open,
+        FIFO_AFULL  => rx_fifo_afull,
         FIFO_AEMPTY => rx_fifo_aempty
     );
 
     frame_masker_i : entity work.MFB_FRAME_MASKER
-    generic map(
-        REGIONS     => MFB_REGIONS      ,
-        REGION_SIZE => MFB_REGION_SIZE  ,
-        BLOCK_SIZE  => MFB_BLOCK_SIZE   ,
-        ITEM_WIDTH  => MFB_ITEM_WIDTH   ,
+    generic map (
+        REGIONS     => MFB_REGIONS,
+        REGION_SIZE => MFB_REGION_SIZE,
+        BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        ITEM_WIDTH  => MFB_ITEM_WIDTH,
         META_WIDTH  => RX_META_WIDTH_EXT,
-        USE_PIPE    => False            ,
-        PIPE_TYPE   => "SHREG"          ,
+        USE_PIPE    => False,
+        PIPE_TYPE   => "SHREG",
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        RX_DATA             => fm_rx_data            ,
-        RX_META             => fm_rx_meta_plus       ,
-        RX_SOF_POS          => fm_rx_sof_pos         ,
-        RX_EOF_POS          => fm_rx_eof_pos         ,
-        RX_SOF              => fm_rx_sof             ,
-        RX_EOF              => fm_rx_eof             ,
-        RX_SRC_RDY          => fm_rx_src_rdy         ,
-        RX_DST_RDY          => fm_rx_dst_rdy         ,
+        RX_DATA             => fm_rx_data,
+        RX_META             => fm_rx_meta_plus,
+        RX_SOF_POS          => fm_rx_sof_pos,
+        RX_EOF_POS          => fm_rx_eof_pos,
+        RX_SOF              => fm_rx_sof,
+        RX_EOF              => fm_rx_eof,
+        RX_SRC_RDY          => fm_rx_src_rdy,
+        RX_DST_RDY          => fm_rx_dst_rdy,
 
-        TX_DATA             => fm_tx_data            ,
-        TX_META             => fm_tx_meta_plus       ,
-        TX_SOF_POS          => fm_tx_sof_pos         ,
-        TX_EOF_POS          => fm_tx_eof_pos         ,
-        TX_SOF_MASKED       => fm_tx_sof             , -- open - can prepare my own
-        TX_EOF_MASKED       => fm_tx_eof             ,
-        TX_SRC_RDY          => fm_tx_src_rdy         ,
-        TX_DST_RDY          => fm_tx_dst_rdy         ,
+        TX_DATA             => fm_tx_data,
+        TX_META             => fm_tx_meta_plus,
+        TX_SOF_POS          => fm_tx_sof_pos,
+        TX_EOF_POS          => fm_tx_eof_pos,
+        TX_SOF_MASKED       => fm_tx_sof, -- open - can prepare my own
+        TX_EOF_MASKED       => fm_tx_eof,
+        TX_SRC_RDY          => fm_tx_src_rdy,
+        TX_DST_RDY          => fm_tx_dst_rdy,
 
-        TX_SOF_UNMASKED     => fm_tx_sof_unmasked    ,
-        TX_EOF_UNMASKED     => open                  ,
+        TX_SOF_UNMASKED     => fm_tx_sof_unmasked,
+        TX_EOF_UNMASKED     => open,
         TX_SRC_RDY_UNMASKED => fm_tx_src_rdy_unmasked,
 
-        TX_SOF_ORIGINAL     => open                  ,
-        TX_EOF_ORIGINAL     => open                  ,
-        TX_SRC_RDY_ORIGINAL => open                  ,
+        TX_SOF_ORIGINAL     => open,
+        TX_EOF_ORIGINAL     => open,
+        TX_SRC_RDY_ORIGINAL => open,
 
         TX_MASK             => fm_tx_mask
     );
@@ -303,7 +303,7 @@ begin
         ts_ok(r) <= '1' when (stored_time_diff_fixed(r) >= unsigned(fm_tx_ts(r))) else '0';
     end generate;
     fm_tx_sof_to_read <= (fm_tx_sof_unmasked and fm_tx_src_rdy_unmasked) and ts_ok;
-    fm_tx_mask <= fm_tx_sof_to_read;
+    fm_tx_mask        <= fm_tx_sof_to_read;
 
     fm_tx_dst_rdy <= mfb_dst_rdy_mid_reg;
 
@@ -313,7 +313,7 @@ begin
 
     sof_read <= fm_tx_sof;
 
-    reset_g : if TS_FORMAT=0 generate
+    reset_g : if TS_FORMAT = 0 generate
         -- Store new value of CURRENT_TIME with each read SOF
         update_stored_time <= or sof_read;
     else generate
@@ -321,10 +321,10 @@ begin
         update_stored_time <= first_sof_read;
 
         first_sof_read <= (or sof_read) and waiting_for_first_sof;
-        process(CLK)
+        process (CLK)
         begin
             if rising_edge(CLK) then
-                if (RESET = '1') or (TIME_RESET = '1') then
+                if ((RESET = '1') or (TIME_RESET = '1')) then
                     waiting_for_first_sof <= '1';
                 end if;
                 if ((or sof_read) = '1') then
@@ -335,7 +335,7 @@ begin
     end generate;
 
     -- Get the duration of a single clock period in [ns]
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             current_time_reg <= unsigned(CURRENT_TIME);
@@ -344,7 +344,7 @@ begin
     one_clk_period_time_diff <= resize(unsigned(CURRENT_TIME)-current_time_reg, TS_WIDTH);
 
     -- Update the time difference that is then used for comparison with the packet's Timestamp
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             -- Accumulate time until update_stored_time='1'
@@ -381,7 +381,7 @@ begin
     -- Middle register
     -- ========================================================================
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (mfb_dst_rdy_mid_reg = '1') then
@@ -404,42 +404,42 @@ begin
     -- ========================================================================
 
     tx_mfb_fifox_i : entity work.MFB_FIFOX
-    generic map(
-        REGIONS             => MFB_REGIONS    ,
+    generic map (
+        REGIONS             => MFB_REGIONS,
         REGION_SIZE         => MFB_REGION_SIZE,
-        BLOCK_SIZE          => MFB_BLOCK_SIZE ,
-        ITEM_WIDTH          => MFB_ITEM_WIDTH ,
-        META_WIDTH          => MFB_META_WIDTH ,
-        FIFO_DEPTH          => 512            ,
-        RAM_TYPE            => "AUTO"         ,
-        DEVICE              => DEVICE         ,
-        ALMOST_FULL_OFFSET  => 0              ,
+        BLOCK_SIZE          => MFB_BLOCK_SIZE,
+        ITEM_WIDTH          => MFB_ITEM_WIDTH,
+        META_WIDTH          => MFB_META_WIDTH,
+        FIFO_DEPTH          => 512,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
         ALMOST_EMPTY_OFFSET => 0
     )
-    port map(
+    port map (
         CLK => CLK,
         RST => RESET,
 
-        RX_DATA     => mfb_data_mid_reg   ,
-        RX_META     => mfb_meta_mid_reg   ,
+        RX_DATA     => mfb_data_mid_reg,
+        RX_META     => mfb_meta_mid_reg,
         RX_SOF_POS  => mfb_sof_pos_mid_reg,
         RX_EOF_POS  => mfb_eof_pos_mid_reg,
-        RX_SOF      => mfb_sof_mid_reg    ,
-        RX_EOF      => mfb_eof_mid_reg    ,
+        RX_SOF      => mfb_sof_mid_reg,
+        RX_EOF      => mfb_eof_mid_reg,
         RX_SRC_RDY  => mfb_src_rdy_mid_reg,
         RX_DST_RDY  => mfb_dst_rdy_mid_reg,
 
-        TX_DATA     => TX_MFB_DATA        ,
-        TX_META     => TX_MFB_META        ,
-        TX_SOF_POS  => TX_MFB_SOF_POS     ,
-        TX_EOF_POS  => TX_MFB_EOF_POS     ,
-        TX_SOF      => TX_MFB_SOF         ,
-        TX_EOF      => TX_MFB_EOF         ,
-        TX_SRC_RDY  => TX_MFB_SRC_RDY     ,
-        TX_DST_RDY  => TX_MFB_DST_RDY     ,
+        TX_DATA     => TX_MFB_DATA,
+        TX_META     => TX_MFB_META,
+        TX_SOF_POS  => TX_MFB_SOF_POS,
+        TX_EOF_POS  => TX_MFB_EOF_POS,
+        TX_SOF      => TX_MFB_SOF,
+        TX_EOF      => TX_MFB_EOF,
+        TX_SRC_RDY  => TX_MFB_SRC_RDY,
+        TX_DST_RDY  => TX_MFB_DST_RDY,
 
-        FIFO_STATUS => open               ,
-        FIFO_AFULL  => open               ,
+        FIFO_STATUS => open,
+        FIFO_AFULL  => open,
         FIFO_AEMPTY => open
     );
 

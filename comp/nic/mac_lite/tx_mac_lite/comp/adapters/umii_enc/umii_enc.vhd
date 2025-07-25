@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity UMII_ENC is
-    generic(
+    generic (
         -- =====================================================================
         -- UNIVERSAL MII ENCODER CONFIGURATION:
         -- =====================================================================
@@ -24,11 +24,11 @@ entity UMII_ENC is
         -- WARNING: The MFB parameters are calculated automatically, they cannot
         -- be changed manually!!!
         REGIONS     : natural := max(MII_DW/512,1);
-        BLOCK_SIZE  : natural := tsel((MII_DW=64),4,8); -- SOF must be aligned by 8 or 4 bytes
-        ITEM_WIDTH  : natural := 8; -- must be 8, one item = one byte
+        BLOCK_SIZE  : natural := tsel((MII_DW = 64),4,8); -- SOF must be aligned by 8 or 4 bytes
+        ITEM_WIDTH  : natural := 8;                       -- must be 8, one item = one byte
         REGION_SIZE : natural := (MII_DW/REGIONS)/(BLOCK_SIZE*ITEM_WIDTH)
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -55,7 +55,7 @@ entity UMII_ENC is
         MII_VLD    : out std_logic;
         -- Ready signal of MII word, set to VCC if this signal is not needed.
         MII_RDY    : in  std_logic := '1'
-   );
+    );
 end entity;
 
 architecture FULL of UMII_ENC is
@@ -153,7 +153,7 @@ begin
 
     sfd_in_prev_region_g : for r in 0 to REGIONS-1 generate
         -- Position of SFD flag, SFD is one byte before SOF.
-        s_sfd_pos_plus_arr(r) <= resize(unsigned(s_rx_sof_pos_arr(r)),(SOF_POS_SIZE+1)) - 1;
+        s_sfd_pos_plus_arr(r)  <= resize(unsigned(s_rx_sof_pos_arr(r)),(SOF_POS_SIZE+1)) - 1;
         -- Detect case when SFD flag underflow to previous region.
         s_sfd_pos_under_bit(r) <= s_sfd_pos_plus_arr(r)(SOF_POS_SIZE) and s_rx_sof_vld(r);
     end generate;
@@ -170,13 +170,13 @@ begin
 
     efd_flag_g : for r in 0 to REGIONS-1 generate
         -- Position of EFD flag, EFD is one byte after EOF.
-        s_efd_pos_plus_arr(r) <= resize(unsigned(s_rx_eof_pos_arr(r)),(EOF_POS_SIZE+1)) + 1;
+        s_efd_pos_plus_arr(r)   <= resize(unsigned(s_rx_eof_pos_arr(r)),(EOF_POS_SIZE+1)) + 1;
         -- Detect case when EFD flag overflow to next region.
         s_efd_pos_over_bit(r+1) <= s_efd_pos_plus_arr(r)(EOF_POS_SIZE) and s_rx_eof_vld(r);
         -- EFD flag of current region.
-        s_efd_vld(r) <= (s_rx_eof_vld(r) and not s_efd_pos_over_bit(r+1)) or s_efd_pos_over_bit(r);
+        s_efd_vld(r)            <= (s_rx_eof_vld(r) and not s_efd_pos_over_bit(r+1)) or s_efd_pos_over_bit(r);
         -- EFD flag position of current region.
-        s_efd_pos(r) <= to_unsigned(0,EOF_POS_SIZE) when (s_efd_pos_over_bit(r) = '1') else
+        s_efd_pos(r)            <= to_unsigned(0,EOF_POS_SIZE) when (s_efd_pos_over_bit(r) = '1') else
                         s_efd_pos_plus_arr(r)(EOF_POS_SIZE-1 downto 0);
     end generate;
 
@@ -253,10 +253,10 @@ begin
     sfd_efd_oh_g : for r in 0 to REGIONS-1 generate
         sfd_oh_g : if REGION_SIZE > 1 generate
             bin2hot_sfd_i : entity work.BIN2HOT
-            generic map(
+            generic map (
                 DATA_WIDTH => LOG2_REGION_SIZE
             )
-            port map(
+            port map (
                 EN     => s_sfd_vld_final(r),
                 INPUT  => std_logic_vector(s_sfd_pos_final(r)),
                 OUTPUT => s_sfd_pos_oh((r+1)*REGION_SIZE-1 downto r*REGION_SIZE)
@@ -266,10 +266,10 @@ begin
         end generate;
 
         bin2hot_efd_i : entity work.BIN2HOT
-        generic map(
+        generic map (
             DATA_WIDTH => LOG2_REGION_SIZE
         )
-        port map(
+        port map (
             EN     => s_efd_vld_reg1(r),
             INPUT  => std_logic_vector(s_efd_pos_reg1(r)(LOG2_REGION_SIZE+LOG2_BLOCK_SIZE-1 downto LOG2_BLOCK_SIZE)),
             OUTPUT => s_efd_pos_oh((r+1)*REGION_SIZE-1 downto r*REGION_SIZE)
@@ -399,12 +399,12 @@ begin
         s_block_state(b) <= s_sfd_next_blk(b) & s_block_vld_reg2(b) & s_sfd_pos_oh_reg2(b) & s_efd_pos_oh_reg2(b);
 
         -- conversion block state to mii mux select
-        with s_block_state(b) select
-        s_mii_mux_sel(b) <= "100" when "1000", -- Start + preamble (only BLOCK_SIZE = 4)
-                            "000" when "0110", -- (Start) + preamble + SFD
-                            "001" when "0100", -- frame data block
-                            "010" when "0101", -- EFD block
-                            "011" when others; -- idle block
+        with s_block_state(b) select s_mii_mux_sel(b) <=
+            "100" when "1000", -- Start + preamble (only BLOCK_SIZE = 4)
+            "000" when "0110", -- (Start) + preamble + SFD
+            "001" when "0100", -- frame data block
+            "010" when "0101", -- EFD block
+            "011" when others; -- idle block
     end generate;
 
     mii_mux_blk8_g : if (BLOCK_SIZE = 8) generate
@@ -412,16 +412,16 @@ begin
             process (s_mii_mux_sel,s_efd_ctrl_wb_reg2,s_data_wb_reg2,s_efd_data_wb_reg2)
             begin
                 case s_mii_mux_sel(b) is
-                    when "000" => -- block with Start + preamble + SFD
+                    when "000" =>                                  -- block with Start + preamble + SFD
                         s_mii_ctrl_wb(b) <= "00000001";
                         s_mii_data_wb(b) <= X"D5555555555555FB";
-                    when "001" => -- frame data block
+                    when "001" =>                                  -- frame data block
                         s_mii_ctrl_wb(b) <= (others => '0');
                         s_mii_data_wb(b) <= s_data_wb_reg2(b);
-                    when "010" => -- EFD block
+                    when "010" =>                                  -- EFD block
                         s_mii_ctrl_wb(b) <= s_efd_ctrl_wb_reg2(b);
                         s_mii_data_wb(b) <= s_efd_data_wb_reg2(b);
-                    when others => -- idle block
+                    when others =>                                 -- idle block
                         s_mii_ctrl_wb(b) <= (others => '1');
                         s_mii_data_wb(b) <= X"0707070707070707";
                 end case;
@@ -435,23 +435,23 @@ begin
             process (s_mii_mux_sel,s_efd_ctrl_wb_reg2,s_data_wb_reg2,s_efd_data_wb_reg2)
             begin
                 case s_mii_mux_sel(b) is
-                    when "100" => -- block with Start + first part of preamble
+                    when "100" =>                                  -- block with Start + first part of preamble
                         s_mii_ctrl_wb(b) <= "0001";
                         s_mii_data_wb(b) <= X"555555FB";
                         s_mii_vld_wb(b)  <= '1';
-                    when "000" => -- block with second part of preamble + SFD
+                    when "000" =>                                  -- block with second part of preamble + SFD
                         s_mii_ctrl_wb(b) <= (others => '0');
                         s_mii_data_wb(b) <= X"D5555555";
                         s_mii_vld_wb(b)  <= '1';
-                    when "001" => -- frame data block
+                    when "001" =>                                  -- frame data block
                         s_mii_ctrl_wb(b) <= (others => '0');
                         s_mii_data_wb(b) <= s_data_wb_reg2(b);
                         s_mii_vld_wb(b)  <= '1';
-                    when "010" => -- EFD block
+                    when "010" =>                                  -- EFD block
                         s_mii_ctrl_wb(b) <= s_efd_ctrl_wb_reg2(b);
                         s_mii_data_wb(b) <= s_efd_data_wb_reg2(b);
                         s_mii_vld_wb(b)  <= '1';
-                    when others => -- idle block
+                    when others =>                                 -- idle block
                         s_mii_ctrl_wb(b) <= (others => '1');
                         s_mii_data_wb(b) <= X"07070707";
                         s_mii_vld_wb(b)  <= '0';

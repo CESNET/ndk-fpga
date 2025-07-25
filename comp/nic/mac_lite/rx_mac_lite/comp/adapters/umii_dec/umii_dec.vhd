@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity UMII_DEC is
-    generic(
+    generic (
         -- =====================================================================
         -- UNIVERSAL MII DECODER CONFIGURATION:
         -- =====================================================================
@@ -22,7 +22,7 @@ entity UMII_DEC is
         CNT_ERROR_LENGTH : natural := 5;
         -- Turns on the start aligner (to 8 bytes), only for XGMII interface,
         -- when is enabled MII_VLD must be set to VCC.
-        XGMII_ALIGN_EN   : boolean := (MII_DW=64);
+        XGMII_ALIGN_EN   : boolean := (MII_DW = 64);
         -- =====================================================================
         -- MFB CONFIGURATION:
         -- =====================================================================
@@ -33,7 +33,7 @@ entity UMII_DEC is
         ITEM_WIDTH       : natural := 8; -- one item = one byte
         REGION_SIZE      : natural := (MII_DW/REGIONS)/(BLOCK_SIZE*ITEM_WIDTH)
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -65,7 +65,7 @@ entity UMII_DEC is
         LINK_UP        : out std_logic;
         -- Active while receiving a frame
         INCOMING_FRAME : out std_logic
-   );
+    );
 end entity;
 
 architecture FULL of UMII_DEC is
@@ -81,152 +81,152 @@ architecture FULL of UMII_DEC is
     signal mii_rxc_in                       : std_logic_vector(MII_CW-1 downto 0);
     signal mii_vld_in                       : std_logic;
 
-   -- logic stage 1
-   signal s_is_locfault                     : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_preamble                     : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_terminate                    : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_error                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_pos_start                       : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
-   signal s_pos_terminate                   : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    -- logic stage 1
+    signal s_is_locfault                     : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_preamble                     : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_terminate                    : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_error                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_pos_start                       : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    signal s_pos_terminate                   : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
 
-   -- register stage 1
-   signal s_mii_rxd_reg1                    : std_logic_vector(MII_DW-1 downto 0);
-   signal s_mii_rxc_reg1                    : std_logic_vector(MII_CW-1 downto 0);
-   signal s_is_locfault_reg1                : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_preamble_reg1                : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_terminate_reg1               : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_error_reg1                   : std_logic_vector(REGIONS-1 downto 0);
-   signal s_pos_start_reg1                  : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
-   signal s_pos_terminate_reg1              : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_valid_reg1                      : std_logic;
+    -- register stage 1
+    signal s_mii_rxd_reg1                    : std_logic_vector(MII_DW-1 downto 0);
+    signal s_mii_rxc_reg1                    : std_logic_vector(MII_CW-1 downto 0);
+    signal s_is_locfault_reg1                : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_preamble_reg1                : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_terminate_reg1               : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_error_reg1                   : std_logic_vector(REGIONS-1 downto 0);
+    signal s_pos_start_reg1                  : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    signal s_pos_terminate_reg1              : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_valid_reg1                      : std_logic;
 
-   -- logic stage 2
-   signal s_link_error                      : std_logic;
-   signal s_pos_first_terminate             : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_pos_last_terminate              : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_pos_last_terminate_after64      : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_pos_last_terminate_after        : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    -- logic stage 2
+    signal s_link_error                      : std_logic;
+    signal s_pos_first_terminate             : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_pos_last_terminate              : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_pos_last_terminate_after64      : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_pos_last_terminate_after        : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
 
-   -- register stage 2
-   signal s_mii_rxd_reg2                    : std_logic_vector(MII_DW-1 downto 0);
-   signal s_mii_rxc_reg2                    : std_logic_vector(MII_CW-1 downto 0);
-   signal s_is_preamble_reg2                : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_terminate_reg2               : std_logic_vector(REGIONS-1 downto 0);
-   signal s_pos_start_reg2                  : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
-   signal s_link_error_reg2                 : std_logic;
-   signal s_pos_first_terminate_reg2        : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_pos_last_terminate_after_reg2   : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
-   signal s_valid_reg2                      : std_logic;
+    -- register stage 2
+    signal s_mii_rxd_reg2                    : std_logic_vector(MII_DW-1 downto 0);
+    signal s_mii_rxc_reg2                    : std_logic_vector(MII_CW-1 downto 0);
+    signal s_is_preamble_reg2                : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_terminate_reg2               : std_logic_vector(REGIONS-1 downto 0);
+    signal s_pos_start_reg2                  : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    signal s_link_error_reg2                 : std_logic;
+    signal s_pos_first_terminate_reg2        : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_pos_last_terminate_after_reg2   : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    signal s_valid_reg2                      : std_logic;
 
-   -- logic stage 3
-   signal s_pos_first_terminate_before      : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_is_some_terminate               : std_logic;
-   signal s_cnt_let_en                      : std_logic;
-   signal s_cnt_let_nxt_uns                 : unsigned(CNT_ERROR_LENGTH-1 downto 0);
-   signal s_pos_start_masked                : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
-   signal s_pos_start_selected              : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
-   signal s_is_first_start                  : std_logic_vector(REGIONS-1 downto 0);
-   signal s_pos_first_start                 : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
-   signal s_pos_first_start_wider           : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_pos_first_start_after           : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    -- logic stage 3
+    signal s_pos_first_terminate_before      : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_is_some_terminate               : std_logic;
+    signal s_cnt_let_en                      : std_logic;
+    signal s_cnt_let_nxt_uns                 : unsigned(CNT_ERROR_LENGTH-1 downto 0);
+    signal s_pos_start_masked                : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    signal s_pos_start_selected              : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    signal s_is_first_start                  : std_logic_vector(REGIONS-1 downto 0);
+    signal s_pos_first_start                 : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    signal s_pos_first_start_wider           : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_pos_first_start_after           : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
 
-   signal s_eof_temp                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_prev                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_pos_temp                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
+    signal s_eof_temp                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_prev                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_pos_temp                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
 
-   -- register stage 3
-   signal s_cnt_let_uns_reg3                : unsigned(CNT_ERROR_LENGTH-1 downto 0);
-   signal s_link_up_reg3                    : std_logic;
-   signal s_mii_rxd_reg3                    : std_logic_vector(MII_DW-1 downto 0);
-   signal s_mii_rxc_reg3                    : std_logic_vector(MII_CW-1 downto 0);
-   signal s_is_preamble_reg3                : std_logic_vector(REGIONS-1 downto 0);
-   signal s_pos_first_terminate_before_reg3 : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_is_first_start_reg3             : std_logic_vector(REGIONS-1 downto 0);
-   signal s_pos_first_start_reg3            : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
-   signal s_pos_first_start_after_reg3      : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_valid_reg3                      : std_logic;
+    -- register stage 3
+    signal s_cnt_let_uns_reg3                : unsigned(CNT_ERROR_LENGTH-1 downto 0);
+    signal s_link_up_reg3                    : std_logic;
+    signal s_mii_rxd_reg3                    : std_logic_vector(MII_DW-1 downto 0);
+    signal s_mii_rxc_reg3                    : std_logic_vector(MII_CW-1 downto 0);
+    signal s_is_preamble_reg3                : std_logic_vector(REGIONS-1 downto 0);
+    signal s_pos_first_terminate_before_reg3 : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_is_first_start_reg3             : std_logic_vector(REGIONS-1 downto 0);
+    signal s_pos_first_start_reg3            : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    signal s_pos_first_start_after_reg3      : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_valid_reg3                      : std_logic;
 
-   signal s_eof_reg3                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_prev_reg3                   : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_pos_reg3                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
+    signal s_eof_reg3                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_prev_reg3                   : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_pos_reg3                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
 
-   -- logic stage 4
-   signal s_mii_rxc_reg3_arr                : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_sof_temp                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_next                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_ctrl                         : std_logic_vector(REGIONS-1 downto 0);
-   signal s_pos_ctrl_after_start            : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_pos_ctrl_before_terminate       : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_is_ctrl_after_start_n           : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_ctrl_before_terminate_n      : std_logic_vector(REGIONS-1 downto 0);
-   signal s_pos_first_start_rol             : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
-   signal s_pos_first_terminate_ror         : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
-   signal s_sof_pos_temp                    : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
-   signal s_sof_ok                          : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_ok                          : std_logic_vector(REGIONS-1 downto 0);
+    -- logic stage 4
+    signal s_mii_rxc_reg3_arr                : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_sof_temp                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_next                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_ctrl                         : std_logic_vector(REGIONS-1 downto 0);
+    signal s_pos_ctrl_after_start            : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_pos_ctrl_before_terminate       : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_is_ctrl_after_start_n           : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_ctrl_before_terminate_n      : std_logic_vector(REGIONS-1 downto 0);
+    signal s_pos_first_start_rol             : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE-1 downto 0);
+    signal s_pos_first_terminate_ror         : slv_array_t(REGIONS-1 downto 0)(REGION_ITEMS-1 downto 0);
+    signal s_sof_pos_temp                    : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
+    signal s_sof_ok                          : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_ok                          : std_logic_vector(REGIONS-1 downto 0);
 
-   -- register stage 4
-   signal s_mii_rxd_reg4                    : std_logic_vector(MII_DW-1 downto 0);
-   signal s_sof_reg4                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_reg4                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_next_reg4                   : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_prev_reg4                   : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_pos_reg4                    : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
-   signal s_eof_pos_reg4                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
-   signal s_sof_ok_reg4                     : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_ok_reg4                     : std_logic_vector(REGIONS-1 downto 0);
-   signal s_is_ctrl_reg4                    : std_logic_vector(REGIONS-1 downto 0);
-   signal s_valid_reg4                      : std_logic;
+    -- register stage 4
+    signal s_mii_rxd_reg4                    : std_logic_vector(MII_DW-1 downto 0);
+    signal s_sof_reg4                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_reg4                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_next_reg4                   : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_prev_reg4                   : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_pos_reg4                    : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
+    signal s_eof_pos_reg4                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
+    signal s_sof_ok_reg4                     : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_ok_reg4                     : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_ctrl_reg4                    : std_logic_vector(REGIONS-1 downto 0);
+    signal s_valid_reg4                      : std_logic;
 
-   -- logic stage 5
-   signal s_sof_mx                          : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_ok_mx                       : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_pos_mx                      : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
-   signal s_eof_sel_old                     : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_mx                          : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_ok_mx                       : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_pos_mx                      : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
-   signal s_data_err                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_err                         : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_err                         : std_logic_vector(REGIONS-1 downto 0);
-   signal s_ctrl_err                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_before_eof                  : std_logic_vector(REGIONS-1 downto 0);
-   signal s_whole_frame                     : std_logic_vector(REGIONS-1 downto 0);
+    -- logic stage 5
+    signal s_sof_mx                          : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_ok_mx                       : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_pos_mx                      : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
+    signal s_eof_sel_old                     : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_mx                          : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_ok_mx                       : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_pos_mx                      : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
+    signal s_data_err                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_err                         : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_err                         : std_logic_vector(REGIONS-1 downto 0);
+    signal s_ctrl_err                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_before_eof                  : std_logic_vector(REGIONS-1 downto 0);
+    signal s_whole_frame                     : std_logic_vector(REGIONS-1 downto 0);
 
-   -- register stage 5
-   signal s_sof_last_reg5                   : std_logic;
-   signal s_sof_pos_last_reg5               : std_logic_vector(SOF_POS_SIZE-1 downto 0);
-   signal s_sof_ok_last_reg5                : std_logic;
-   signal s_sof_next_last_reg5              : std_logic;
-   signal s_mii_rxd_reg5                    : std_logic_vector(MII_DW-1 downto 0);
-   signal s_wf_reg5                         : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_reg5                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_reg5                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_pos_reg5                    : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
-   signal s_eof_pos_reg5                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
-   signal s_sof_err_reg5                    : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_err_reg5                    : std_logic_vector(REGIONS-1 downto 0);
-   signal s_ctrl_err_reg5                   : std_logic_vector(REGIONS-1 downto 0);
-   signal s_data_err_reg5                   : std_logic_vector(REGIONS-1 downto 0);
-   signal s_valid_reg5                      : std_logic;
+    -- register stage 5
+    signal s_sof_last_reg5                   : std_logic;
+    signal s_sof_pos_last_reg5               : std_logic_vector(SOF_POS_SIZE-1 downto 0);
+    signal s_sof_ok_last_reg5                : std_logic;
+    signal s_sof_next_last_reg5              : std_logic;
+    signal s_mii_rxd_reg5                    : std_logic_vector(MII_DW-1 downto 0);
+    signal s_wf_reg5                         : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_reg5                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_reg5                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_pos_reg5                    : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
+    signal s_eof_pos_reg5                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
+    signal s_sof_err_reg5                    : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_err_reg5                    : std_logic_vector(REGIONS-1 downto 0);
+    signal s_ctrl_err_reg5                   : std_logic_vector(REGIONS-1 downto 0);
+    signal s_data_err_reg5                   : std_logic_vector(REGIONS-1 downto 0);
+    signal s_valid_reg5                      : std_logic;
 
-   -- logic stage 6
-   signal s_sof_fsm                         : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_fsm                         : std_logic_vector(REGIONS-1 downto 0);
-   signal s_err_fsm                         : std_logic_vector(REGIONS-1 downto 0);
-   signal s_inc_frame                       : std_logic_vector(REGIONS downto 0);
-   signal s_valid_region                    : std_logic_vector(REGIONS-1 downto 0);
-   signal s_valid_word                      : std_logic;
+    -- logic stage 6
+    signal s_sof_fsm                         : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_fsm                         : std_logic_vector(REGIONS-1 downto 0);
+    signal s_err_fsm                         : std_logic_vector(REGIONS-1 downto 0);
+    signal s_inc_frame                       : std_logic_vector(REGIONS downto 0);
+    signal s_valid_region                    : std_logic_vector(REGIONS-1 downto 0);
+    signal s_valid_word                      : std_logic;
 
-   -- register stage 6
-   signal s_is_frame_reg6                   : std_logic;
-   signal s_data_reg6                       : std_logic_vector(DATA_WIDTH-1 downto 0);
-   signal s_sof_reg6                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_eof_reg6                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_sof_pos_reg6                    : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
-   signal s_eof_pos_reg6                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
-   signal s_err_reg6                        : std_logic_vector(REGIONS-1 downto 0);
-   signal s_valid_reg6                      : std_logic;
+    -- register stage 6
+    signal s_is_frame_reg6                   : std_logic;
+    signal s_data_reg6                       : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal s_sof_reg6                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_eof_reg6                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_sof_pos_reg6                    : slv_array_t(REGIONS-1 downto 0)(SOF_POS_SIZE-1 downto 0);
+    signal s_eof_pos_reg6                    : slv_array_t(REGIONS-1 downto 0)(EOF_POS_SIZE-1 downto 0);
+    signal s_err_reg6                        : std_logic_vector(REGIONS-1 downto 0);
+    signal s_valid_reg6                      : std_logic;
 
 begin
 
@@ -238,7 +238,7 @@ begin
     -- XGMII aligner
     xgmii_align_on_g : if XGMII_ALIGN_EN generate
         xgmii_align_i : entity work.RX_MAC_LITE_XGMII_ALIGN
-        port map(
+        port map (
             CLK           => CLK,
             RESET         => RESET,
             IN_XGMII_RXD  => MII_RXD,
@@ -263,10 +263,10 @@ begin
     umii_ctrl_dec_g : for r in 0 to REGIONS-1 generate
         -- Decoder of controls and sequences positions
         umii_ctrl_dec_i : entity work.UMII_CTRL_DEC
-        generic map(
+        generic map (
             MII_DW => REGION_WIDTH
         )
-        port map(
+        port map (
             MII_RXD       => mii_rxd_in((r+1)*REGION_WIDTH-1 downto r*REGION_WIDTH),
             MII_RXC       => mii_rxc_in((r+1)*REGION_ITEMS-1 downto r*REGION_ITEMS),
 
@@ -446,7 +446,7 @@ begin
         -- Wider start position
         first_start_wider_g : for i in 0 to REGION_SIZE-1 generate
             s_pos_first_start_wider(r)((i+1)*BLOCK_SIZE-1 downto i*BLOCK_SIZE+1) <= (others => '0');
-            s_pos_first_start_wider(r)(i*BLOCK_SIZE) <= s_pos_first_start(r)(i);
+            s_pos_first_start_wider(r)(i*BLOCK_SIZE)                             <= s_pos_first_start(r)(i);
         end generate;
 
         pos_first_start_after_i : entity work.AFTER_ONE
@@ -472,7 +472,7 @@ begin
                                         s_pos_first_terminate_reg2(r)(REGION_ITEMS-1 downto 1);
 
         -- EOP position encoder (REGION_ITEMS possible values)
-        eop_pos_enc_i : entity work.gen_enc
+        eop_pos_enc_i : entity work.GEN_ENC
         generic map (
             ITEMS => REGION_ITEMS
         )
@@ -499,7 +499,7 @@ begin
     end process;
 
     -- link_up register
-    link_up_reg3_p : process(CLK)
+    link_up_reg3_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
@@ -553,10 +553,10 @@ begin
 
         -- Rotate Start position to the left by 1 (jump over the Preamble)
         s_pos_first_start_rol(r) <= s_pos_first_start_reg3(r)(REGION_SIZE-2 downto 0) &
-        s_pos_first_start_reg3(r)(REGION_SIZE-1);
+                                    s_pos_first_start_reg3(r)(REGION_SIZE-1);
 
         -- SOP position encoder (REGION_SIZE possible values)
-        sop_pos_enc_i : entity work.gen_enc
+        sop_pos_enc_i : entity work.GEN_ENC
         generic map (
             ITEMS => REGION_SIZE
         )
@@ -569,7 +569,7 @@ begin
         s_is_ctrl(r) <= or s_mii_rxc_reg3_arr(r);
 
         -- Is control after Start character?
-        s_pos_ctrl_after_start(r) <= s_pos_first_start_after_reg3(r) and s_mii_rxc_reg3_arr(r);
+        s_pos_ctrl_after_start(r)      <= s_pos_first_start_after_reg3(r) and s_mii_rxc_reg3_arr(r);
         -- Is control before Terminate character?
         s_pos_ctrl_before_terminate(r) <= s_pos_first_terminate_before_reg3(r) and s_mii_rxc_reg3_arr(r);
 
@@ -676,11 +676,17 @@ begin
 
     s_eof_sel_old(REGIONS-1) <= s_eof_prev_reg3(0) and s_valid_reg3 and not s_eof_reg4(REGIONS-1);
 
-    s_eof_mx(REGIONS-1) <= '0' when (s_eof_prev_reg4(REGIONS-1) = '1') else s_eof_reg3(0) when (s_eof_sel_old(REGIONS-1) = '1') else s_eof_reg4(REGIONS-1);
+    s_eof_mx(REGIONS-1) <= '0' when (s_eof_prev_reg4(REGIONS-1) = '1') else
+ s_eof_reg3(0) when (s_eof_sel_old(REGIONS-1) = '1') else
+ s_eof_reg4(REGIONS-1);
 
-    s_eof_ok_mx(REGIONS-1) <= '0' when (s_eof_prev_reg4(REGIONS-1) = '1') else s_eof_ok(0) when (s_eof_sel_old(REGIONS-1) = '1') else s_eof_ok_reg4(REGIONS-1);
+    s_eof_ok_mx(REGIONS-1) <= '0' when (s_eof_prev_reg4(REGIONS-1) = '1') else
+ s_eof_ok(0) when (s_eof_sel_old(REGIONS-1) = '1') else
+ s_eof_ok_reg4(REGIONS-1);
 
-    s_eof_pos_mx(REGIONS-1) <= (others => '0') when (s_eof_prev_reg4(REGIONS-1) = '1') else s_eof_pos_reg3(0) when (s_eof_sel_old(REGIONS-1) = '1') else s_eof_pos_reg4(REGIONS-1);
+    s_eof_pos_mx(REGIONS-1) <= (others => '0') when (s_eof_prev_reg4(REGIONS-1) = '1') else
+ s_eof_pos_reg3(0) when (s_eof_sel_old(REGIONS-1) = '1') else
+ s_eof_pos_reg4(REGIONS-1);
 
     -- -------------------------------------------------------------------------
     -- Data error: Active when there are no data between Start and Terminate

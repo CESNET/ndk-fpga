@@ -14,36 +14,36 @@ use work.type_pack.all;
 use work.dtb_pkg.all;
 
 entity PCI_EXT_CAP is
-generic (
-    VSEC_BASE_ADDRESS       : integer := 16#400#;
-    VSEC_NEXT_POINTER       : integer := 16#000#;
-    ENDPOINT_ID             : integer := 0;
-    ENDPOINT_ID_ENABLE      : boolean := false;
-    DEVICE_TREE_ENABLE      : boolean := true;
-    CARD_ID_WIDTH           : integer := 0;
-    CFG_EXT_READ_DV_HOTFIX  : boolean := true
-);
--- Interface description
-port (
-    CLK                     : in  std_logic;
-    CARD_ID                 : in  std_logic_vector(CARD_ID_WIDTH-1 downto 0) := (others => '0');
+    generic (
+        VSEC_BASE_ADDRESS       : integer := 16#400#;
+        VSEC_NEXT_POINTER       : integer := 16#000#;
+        ENDPOINT_ID             : integer := 0;
+        ENDPOINT_ID_ENABLE      : boolean := false;
+        DEVICE_TREE_ENABLE      : boolean := true;
+        CARD_ID_WIDTH           : integer := 0;
+        CFG_EXT_READ_DV_HOTFIX  : boolean := true
+    );
+    -- Interface description
+    port (
+        CLK                     : in  std_logic;
+        CARD_ID                 : in  std_logic_vector(CARD_ID_WIDTH-1 downto 0) := (others => '0');
 
-    CFG_EXT_READ            : in  std_logic;
-    CFG_EXT_WRITE           : in  std_logic;
-    CFG_EXT_REGISTER        : in  std_logic_vector(9 downto 0);
-    CFG_EXT_FUNCTION        : in  std_logic_vector(7 downto 0);
-    CFG_EXT_WRITE_DATA      : in  std_logic_vector(31 downto 0);
-    CFG_EXT_WRITE_BE        : in  std_logic_vector(3 downto 0);
-    CFG_EXT_READ_DATA       : out std_logic_vector(31 downto 0);
-    CFG_EXT_READ_DV         : out std_logic
-);
+        CFG_EXT_READ            : in  std_logic;
+        CFG_EXT_WRITE           : in  std_logic;
+        CFG_EXT_REGISTER        : in  std_logic_vector(9 downto 0);
+        CFG_EXT_FUNCTION        : in  std_logic_vector(7 downto 0);
+        CFG_EXT_WRITE_DATA      : in  std_logic_vector(31 downto 0);
+        CFG_EXT_WRITE_BE        : in  std_logic_vector(3 downto 0);
+        CFG_EXT_READ_DATA       : out std_logic_vector(31 downto 0);
+        CFG_EXT_READ_DV         : out std_logic
+    );
 end entity;
 
-architecture behavioral of PCI_EXT_CAP is
+architecture BEHAVIORAL of PCI_EXT_CAP is
 
     constant VSEC_BASE_REG  : integer := VSEC_BASE_ADDRESS / 4;
 
-    function dtb_words(data : in std_logic_vector) return integer is
+    function dtb_words (data : in std_logic_vector) return integer is
     begin
         return (data'length / 8 + 3) / 4;
     end function;
@@ -67,20 +67,20 @@ architecture behavioral of PCI_EXT_CAP is
     signal dtb_vf0          : slv_array_t(0 to dtb_words(DTB_VF0_DATA)-1)(31 downto 0)  := init_mem_32b(DTB_VF0_DATA);
 
     attribute ram_style     : string;
-    attribute ramstyle      : string; -- for Quartus
+    attribute ramstyle      : string;                   -- for Quartus
     attribute ram_style of dtb_pf0  : signal is "block";
     attribute ram_style of dtb_vf0  : signal is "block";
-    attribute ramstyle  of dtb_pf0  : signal is "M20K"; -- M20K, MLAB
-    attribute ramstyle  of dtb_vf0  : signal is "M20K"; -- M20K, MLAB
+    attribute ramstyle of dtb_pf0   : signal is "M20K"; -- M20K, MLAB
+    attribute ramstyle of dtb_vf0   : signal is "M20K"; -- M20K, MLAB
 
-    signal reg_dv           : std_logic := '0';
-    signal reg_dtb_ext_addr : std_logic_vector(1 downto 0) := (others => '0');
-    signal reg_dtb_pf0_addr : std_logic_vector(log2(dtb_words(DTB_PF0_DATA))-1 downto 0);
-    signal reg_dtb_vf0_addr : std_logic_vector(log2(dtb_words(DTB_VF0_DATA))-1 downto 0);
-    signal reg_dtb_pf0_data : std_logic_vector(31 downto 0) := (others => '0');
-    signal reg_dtb_vf0_data : std_logic_vector(31 downto 0) := (others => '0');
+    signal reg_dv                : std_logic := '0';
+    signal reg_dtb_ext_addr      : std_logic_vector(1 downto 0) := (others => '0');
+    signal reg_dtb_pf0_addr      : std_logic_vector(log2(dtb_words(DTB_PF0_DATA))-1 downto 0);
+    signal reg_dtb_vf0_addr      : std_logic_vector(log2(dtb_words(DTB_VF0_DATA))-1 downto 0);
+    signal reg_dtb_pf0_data      : std_logic_vector(31 downto 0) := (others => '0');
+    signal reg_dtb_vf0_data      : std_logic_vector(31 downto 0) := (others => '0');
     signal reg_cfg_ext_read_data : std_logic_vector(31 downto 0);
-    signal reg_dtb_ext_data : std_logic_vector(31 downto 0);
+    signal reg_dtb_ext_data      : std_logic_vector(31 downto 0);
 
     signal cfg_register     : integer;
     signal cfg_function     : integer;
@@ -114,16 +114,16 @@ begin
 
     card_id_128(CARD_ID_WIDTH-1 downto 0) <= CARD_ID;
 
-    addr_dec: process(all)
+    addr_dec : process (all)
     begin
         if (CFG_EXT_READ = '1') then
-            if    (cfg_register = VSEC_BASE_REG + 0) then
+            if (cfg_register = VSEC_BASE_REG + 0) then
                 CFG_EXT_READ_DATA <= std_logic_vector(to_unsigned(VSEC_NEXT_POINTER, 12)) & X"1" & X"000B";
             elsif (cfg_register = VSEC_BASE_REG + 1) then
                 CFG_EXT_READ_DATA <= X"020" & X"1" & X"0D7B";
             elsif (cfg_register = VSEC_BASE_REG + 2) then
                 if (ENDPOINT_ID_ENABLE) then
-                    CFG_EXT_READ_DATA <= X"8000000" & std_logic_vector(to_unsigned(ENDPOINT_ID, 4));
+                    CFG_EXT_READ_DATA     <= X"8000000" & std_logic_vector(to_unsigned(ENDPOINT_ID, 4));
                     CFG_EXT_READ_DATA(30) <= '1' when CARD_ID_WIDTH /= 0 else '0';
                 else
                     CFG_EXT_READ_DATA <= (others => '0');
@@ -162,7 +162,7 @@ begin
 
     CFG_EXT_READ_DV         <= reg_dv;
 
-    dtb_regp : process(CLK)
+    dtb_regp : process (CLK)
     begin
         if rising_edge(CLK) then
             if (DEVICE_TREE_ENABLE) then
@@ -184,8 +184,8 @@ begin
             reg_cfg_ext_read_data <= CFG_EXT_READ_DATA;
 
             if (CFG_EXT_READ = '1' and reg_dv = '0' and (CFG_EXT_READ_DV_HOTFIX or (cfg_register >= VSEC_BASE_REG and cfg_register < VSEC_BASE_REG + 8))) then
-            -- Here is a bug, with this line the design reboots machine on Virtex 7 (CfgRead without Completion)
-            --if (CFG_EXT_READ = '1' and reg_dv = '0' and cfg_register >= VSEC_BASE_REG and cfg_register < VSEC_BASE_REG + 8) then
+                -- Here is a bug, with this line the design reboots machine on Virtex 7 (CfgRead without Completion)
+                -- if (CFG_EXT_READ = '1' and reg_dv = '0' and cfg_register >= VSEC_BASE_REG and cfg_register < VSEC_BASE_REG + 8) then
                 reg_dv <= '1';
             else
                 reg_dv <= '0';

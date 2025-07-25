@@ -12,100 +12,100 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity APP_BIFLOW_SIMPLE_TOP is
-generic (
-    APP_STREAMS           : natural := 2;  -- must be power of two
-    DMA_STREAMS           : natural := 2;  -- must be power of two
-    -- MFB parameters
-    MFB_REGIONS           : natural := 1;  -- Number of regions in word
-    MFB_REG_SIZE          : natural := 8;  -- Number of blocks in region
-    MFB_BLOCK_SIZE        : natural := 8;  -- Number of items in block
-    MFB_ITEM_WIDTH        : natural := 8;  -- Width of one item in bits
-    -- Maximum size of a DMA RX frame (in bytes)
-    DMA_RX_FRAME_SIZE_MAX : natural := 2**12;
-    -- Maximum size of a DMA TX frame (in bytes)
-    DMA_TX_FRAME_SIZE_MAX : natural := 2**12;
-    -- Number of streams from DMA module
-    DMA_RX_CHANNELS       : natural := 8;
-    DMA_TX_CHANNELS       : natural := 8;
-    -- Width of TX User Header Metadata information extracted from descriptor
-    DMA_HDR_META_WIDTH    : natural := 12;
-    DEVICE                : string  := "AGILEX"
-);
-port (
-    -- =========================================================================
-    -- Clock and Resets inputs
-    -- =========================================================================
-    CLK                     : in  std_logic;
-    RESET                   : in  std_logic;
+    generic (
+        APP_STREAMS           : natural := 2;  -- must be power of two
+        DMA_STREAMS           : natural := 2;  -- must be power of two
+        -- MFB parameters
+        MFB_REGIONS           : natural := 1;  -- Number of regions in word
+        MFB_REG_SIZE          : natural := 8;  -- Number of blocks in region
+        MFB_BLOCK_SIZE        : natural := 8;  -- Number of items in block
+        MFB_ITEM_WIDTH        : natural := 8;  -- Width of one item in bits
+        -- Maximum size of a DMA RX frame (in bytes)
+        DMA_RX_FRAME_SIZE_MAX : natural := 2**12;
+        -- Maximum size of a DMA TX frame (in bytes)
+        DMA_TX_FRAME_SIZE_MAX : natural := 2**12;
+        -- Number of streams from DMA module
+        DMA_RX_CHANNELS       : natural := 8;
+        DMA_TX_CHANNELS       : natural := 8;
+        -- Width of TX User Header Metadata information extracted from descriptor
+        DMA_HDR_META_WIDTH    : natural := 12;
+        DEVICE                : string  := "AGILEX"
+    );
+    port (
+        -- =========================================================================
+        -- Clock and Resets inputs
+        -- =========================================================================
+        CLK                     : in  std_logic;
+        RESET                   : in  std_logic;
 
-    -- =========================================================================
-    -- APP2DMA PATH
-    -- =========================================================================
-    APP_DMA_RX_MVB_LEN      : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0);
-    APP_DMA_RX_MVB_HDR_META : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
-    APP_DMA_RX_MVB_CHANNEL  : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
-    APP_DMA_RX_MVB_DISCARD  : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    APP_DMA_RX_MVB_VLD      : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    APP_DMA_RX_MVB_SRC_RDY  : in  std_logic_vector(APP_STREAMS-1 downto 0);
-    APP_DMA_RX_MVB_DST_RDY  : out std_logic_vector(APP_STREAMS-1 downto 0);
+        -- =========================================================================
+        -- APP2DMA PATH
+        -- =========================================================================
+        APP_DMA_RX_MVB_LEN      : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0);
+        APP_DMA_RX_MVB_HDR_META : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
+        APP_DMA_RX_MVB_CHANNEL  : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
+        APP_DMA_RX_MVB_DISCARD  : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        APP_DMA_RX_MVB_VLD      : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        APP_DMA_RX_MVB_SRC_RDY  : in  std_logic_vector(APP_STREAMS-1 downto 0);
+        APP_DMA_RX_MVB_DST_RDY  : out std_logic_vector(APP_STREAMS-1 downto 0);
 
-    APP_DMA_RX_MFB_DATA     : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    APP_DMA_RX_MFB_SOF      : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    APP_DMA_RX_MFB_EOF      : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    APP_DMA_RX_MFB_SOF_POS  : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-    APP_DMA_RX_MFB_EOF_POS  : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    APP_DMA_RX_MFB_SRC_RDY  : in  std_logic_vector(APP_STREAMS-1 downto 0);
-    APP_DMA_RX_MFB_DST_RDY  : out std_logic_vector(APP_STREAMS-1 downto 0);
+        APP_DMA_RX_MFB_DATA     : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        APP_DMA_RX_MFB_SOF      : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        APP_DMA_RX_MFB_EOF      : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        APP_DMA_RX_MFB_SOF_POS  : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        APP_DMA_RX_MFB_EOF_POS  : in  slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        APP_DMA_RX_MFB_SRC_RDY  : in  std_logic_vector(APP_STREAMS-1 downto 0);
+        APP_DMA_RX_MFB_DST_RDY  : out std_logic_vector(APP_STREAMS-1 downto 0);
 
-    DMA_RX_MVB_LEN          : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0);
-    DMA_RX_MVB_HDR_META     : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
-    DMA_RX_MVB_CHANNEL      : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
-    DMA_RX_MVB_DISCARD      : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    DMA_RX_MVB_VLD          : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    DMA_RX_MVB_SRC_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
-    DMA_RX_MVB_DST_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
+        DMA_RX_MVB_LEN          : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0);
+        DMA_RX_MVB_HDR_META     : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
+        DMA_RX_MVB_CHANNEL      : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
+        DMA_RX_MVB_DISCARD      : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        DMA_RX_MVB_VLD          : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        DMA_RX_MVB_SRC_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
+        DMA_RX_MVB_DST_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
 
-    DMA_RX_MFB_DATA         : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    DMA_RX_MFB_SOF          : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    DMA_RX_MFB_EOF          : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    DMA_RX_MFB_SOF_POS      : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-    DMA_RX_MFB_EOF_POS      : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    DMA_RX_MFB_SRC_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
-    DMA_RX_MFB_DST_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
+        DMA_RX_MFB_DATA         : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        DMA_RX_MFB_SOF          : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        DMA_RX_MFB_EOF          : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        DMA_RX_MFB_SOF_POS      : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        DMA_RX_MFB_EOF_POS      : out slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        DMA_RX_MFB_SRC_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
+        DMA_RX_MFB_DST_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
 
-    -- =========================================================================
-    --  DMA2APP PATH
-    -- =========================================================================
-    DMA_TX_MVB_LEN          : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_FRAME_SIZE_MAX+1)-1 downto 0);
-    DMA_TX_MVB_HDR_META     : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
-    DMA_TX_MVB_CHANNEL      : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
-    DMA_TX_MVB_VLD          : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    DMA_TX_MVB_SRC_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
-    DMA_TX_MVB_DST_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
+        -- =========================================================================
+        --  DMA2APP PATH
+        -- =========================================================================
+        DMA_TX_MVB_LEN          : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_FRAME_SIZE_MAX+1)-1 downto 0);
+        DMA_TX_MVB_HDR_META     : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
+        DMA_TX_MVB_CHANNEL      : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
+        DMA_TX_MVB_VLD          : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        DMA_TX_MVB_SRC_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
+        DMA_TX_MVB_DST_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
 
-    DMA_TX_MFB_DATA         : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    DMA_TX_MFB_SOF          : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    DMA_TX_MFB_EOF          : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    DMA_TX_MFB_SOF_POS      : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-    DMA_TX_MFB_EOF_POS      : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    DMA_TX_MFB_SRC_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
-    DMA_TX_MFB_DST_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
+        DMA_TX_MFB_DATA         : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        DMA_TX_MFB_SOF          : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        DMA_TX_MFB_EOF          : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        DMA_TX_MFB_SOF_POS      : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        DMA_TX_MFB_EOF_POS      : in  slv_array_t(DMA_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        DMA_TX_MFB_SRC_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
+        DMA_TX_MFB_DST_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
 
-    APP_DMA_TX_MVB_LEN      : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_FRAME_SIZE_MAX+1)-1 downto 0);
-    APP_DMA_TX_MVB_HDR_META : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
-    APP_DMA_TX_MVB_CHANNEL  : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
-    APP_DMA_TX_MVB_VLD      : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    APP_DMA_TX_MVB_SRC_RDY  : out std_logic_vector(APP_STREAMS-1 downto 0);
-    APP_DMA_TX_MVB_DST_RDY  : in  std_logic_vector(APP_STREAMS-1 downto 0);
+        APP_DMA_TX_MVB_LEN      : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_FRAME_SIZE_MAX+1)-1 downto 0);
+        APP_DMA_TX_MVB_HDR_META : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
+        APP_DMA_TX_MVB_CHANNEL  : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
+        APP_DMA_TX_MVB_VLD      : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        APP_DMA_TX_MVB_SRC_RDY  : out std_logic_vector(APP_STREAMS-1 downto 0);
+        APP_DMA_TX_MVB_DST_RDY  : in  std_logic_vector(APP_STREAMS-1 downto 0);
 
-    APP_DMA_TX_MFB_DATA     : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    APP_DMA_TX_MFB_SOF      : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    APP_DMA_TX_MFB_EOF      : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    APP_DMA_TX_MFB_SOF_POS  : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-    APP_DMA_TX_MFB_EOF_POS  : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    APP_DMA_TX_MFB_SRC_RDY  : out std_logic_vector(APP_STREAMS-1 downto 0);
-    APP_DMA_TX_MFB_DST_RDY  : in  std_logic_vector(APP_STREAMS-1 downto 0)
-);
+        APP_DMA_TX_MFB_DATA     : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        APP_DMA_TX_MFB_SOF      : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        APP_DMA_TX_MFB_EOF      : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        APP_DMA_TX_MFB_SOF_POS  : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        APP_DMA_TX_MFB_EOF_POS  : out slv_array_t(APP_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        APP_DMA_TX_MFB_SRC_RDY  : out std_logic_vector(APP_STREAMS-1 downto 0);
+        APP_DMA_TX_MFB_DST_RDY  : in  std_logic_vector(APP_STREAMS-1 downto 0)
+    );
 end entity;
 
 architecture FULL of APP_BIFLOW_SIMPLE_TOP is
@@ -140,7 +140,7 @@ begin
     end generate;
 
     app2dma_biflow_i : entity work.APP_BIFLOW_SIMPLE
-    generic map(
+    generic map (
         IN_STREAMS      => APP_STREAMS,
         OUT_STREAMS     => DMA_STREAMS,
         MFB_REGIONS     => MFB_REGIONS,
@@ -148,13 +148,13 @@ begin
         MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
         MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
         MVB_ITEM_WIDTH  => DMA_RX_ALL_META_W,
-        --MVB_FIFO_DEPTH  => MVB_FIFO_DEPTH,
-        --MFB_FIFO_DEPTH  => MFB_FIFO_DEPTH,
-        --MFB_FIFO_ENABLE => MFB_FIFO_ENABLE,
-        --MFB_FIFO_TYPE   => MFB_FIFO_TYPE,
+        -- MVB_FIFO_DEPTH  => MVB_FIFO_DEPTH,
+        -- MFB_FIFO_DEPTH  => MFB_FIFO_DEPTH,
+        -- MFB_FIFO_ENABLE => MFB_FIFO_ENABLE,
+        -- MFB_FIFO_TYPE   => MFB_FIFO_TYPE,
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         CLK             => CLK,
         RESET           => RESET,
 
@@ -212,7 +212,7 @@ begin
     end generate;
 
     dma2app_biflow_i : entity work.APP_BIFLOW_SIMPLE
-    generic map(
+    generic map (
         IN_STREAMS      => DMA_STREAMS,
         OUT_STREAMS     => APP_STREAMS,
         MFB_REGIONS     => MFB_REGIONS,
@@ -220,13 +220,13 @@ begin
         MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
         MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
         MVB_ITEM_WIDTH  => DMA_TX_ALL_META_W,
-        --MVB_FIFO_DEPTH  => MVB_FIFO_DEPTH,
-        --MFB_FIFO_DEPTH  => MFB_FIFO_DEPTH,
-        --MFB_FIFO_ENABLE => MFB_FIFO_ENABLE,
-        --MFB_FIFO_TYPE   => MFB_FIFO_TYPE,
+        -- MVB_FIFO_DEPTH  => MVB_FIFO_DEPTH,
+        -- MFB_FIFO_DEPTH  => MFB_FIFO_DEPTH,
+        -- MFB_FIFO_ENABLE => MFB_FIFO_ENABLE,
+        -- MFB_FIFO_TYPE   => MFB_FIFO_TYPE,
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         CLK             => CLK,
         RESET           => RESET,
 

@@ -13,7 +13,7 @@ use work.type_pack.all;
 use work.pcie_meta_pack.all;
 
 entity PCIE_ADAPTER is
-    generic(
+    generic (
         -- =====================================================================
         -- MFB configuration
         -- =====================================================================
@@ -66,7 +66,7 @@ entity PCIE_ADAPTER is
         AVST_DOWN_SEG      : natural := CQ_MFB_REGIONS;
         AVST_UP_SEG        : natural := CC_MFB_REGIONS
     );
-    port(
+    port (
         -- =====================================================================
         --  CLOCK AND RESET
         -- =====================================================================
@@ -259,8 +259,8 @@ end entity;
 
 architecture FULL of PCIE_ADAPTER is
 
-    constant IS_XILINX_DEVICE : boolean := (DEVICE="ULTRASCALE");
-    constant IS_INTEL_DEVICE  : boolean := (DEVICE="STRATIX10") or (DEVICE="AGILEX");
+    constant IS_XILINX_DEVICE : boolean := (DEVICE = "ULTRASCALE");
+    constant IS_INTEL_DEVICE  : boolean := (DEVICE = "STRATIX10") or (DEVICE = "AGILEX");
 
     signal cq_tph_present       : std_logic_vector(CQ_MFB_REGIONS-1 downto 0);
     signal cq_tph_type          : std_logic_vector(CQ_MFB_REGIONS*2-1 downto 0);

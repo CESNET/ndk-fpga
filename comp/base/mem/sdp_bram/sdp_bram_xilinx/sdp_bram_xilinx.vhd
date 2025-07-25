@@ -31,13 +31,13 @@ begin
 
     xilinx_g : if (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") generate
         dev_be_g : if BLOCK_ENABLE generate
-            xilinx_we <= WR_BE;
+            xilinx_we    <= WR_BE;
         else generate
             xilinx_we(0) <= WR_EN;
         end generate;
 
         -- use Xilinx XPM macro (UG974)
-        bram_i : XPM_MEMORY_SDPRAM
+        bram_i : component xpm_memory_sdpram
         generic map (
             ADDR_WIDTH_A            => ADDR_WIDTH,
             ADDR_WIDTH_B            => ADDR_WIDTH,

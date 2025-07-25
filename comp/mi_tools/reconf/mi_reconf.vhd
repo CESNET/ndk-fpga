@@ -12,52 +12,52 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MI_RECONFIGURATOR is
-generic(
-    -- Input MI configuration
-    RX_DATA_WIDTH : natural := 32;
+    generic (
+        -- Input MI configuration
+        RX_DATA_WIDTH : natural := 32;
 
-    -- Output MI configuration
-    TX_DATA_WIDTH : natural := 64;
+        -- Output MI configuration
+        TX_DATA_WIDTH : natural := 64;
 
-    -- Common configuration
-    ADDR_WIDTH    : natural := 32;
-    META_WIDTH    : natural := 0
-);
-port(
-    -- Common interface -----------------------------------------------------
-    CLK         : in std_logic;
-    RESET       : in std_logic;
+        -- Common configuration
+        ADDR_WIDTH    : natural := 32;
+        META_WIDTH    : natural := 0
+    );
+    port (
+        -- Common interface -----------------------------------------------------
+        CLK         : in std_logic;
+        RESET       : in std_logic;
 
-    -- Input MI interface ---------------------------------------------------
-    RX_DWR      : in  std_logic_vector(RX_DATA_WIDTH-1 downto 0);
-    RX_MWR      : in  std_logic_vector(META_WIDTH-1 downto 0) := (others => '0');
-    RX_ADDR     : in  std_logic_vector(ADDR_WIDTH-1 downto 0);
-    RX_BE       : in  std_logic_vector(RX_DATA_WIDTH/8-1 downto 0);
-    RX_RD       : in  std_logic;
-    RX_WR       : in  std_logic;
-    RX_ARDY     : out std_logic;
-    RX_DRD      : out std_logic_vector(RX_DATA_WIDTH-1 downto 0);
-    RX_DRDY     : out std_logic;
+        -- Input MI interface ---------------------------------------------------
+        RX_DWR      : in  std_logic_vector(RX_DATA_WIDTH-1 downto 0);
+        RX_MWR      : in  std_logic_vector(META_WIDTH-1 downto 0) := (others => '0');
+        RX_ADDR     : in  std_logic_vector(ADDR_WIDTH-1 downto 0);
+        RX_BE       : in  std_logic_vector(RX_DATA_WIDTH/8-1 downto 0);
+        RX_RD       : in  std_logic;
+        RX_WR       : in  std_logic;
+        RX_ARDY     : out std_logic;
+        RX_DRD      : out std_logic_vector(RX_DATA_WIDTH-1 downto 0);
+        RX_DRDY     : out std_logic;
 
-    -- Output MI interface --------------------------------------------------
-    TX_DWR      : out std_logic_vector(TX_DATA_WIDTH-1 downto 0);
-    TX_MWR      : out std_logic_vector(META_WIDTH-1 downto 0);
-    TX_ADDR     : out std_logic_vector(ADDR_WIDTH-1 downto 0);
-    TX_BE       : out std_logic_vector(TX_DATA_WIDTH/8-1 downto 0);
-    TX_RD       : out std_logic;
-    TX_WR       : out std_logic;
-    TX_ARDY     : in  std_logic;
-    TX_DRD      : in  std_logic_vector(TX_DATA_WIDTH-1 downto 0);
-    TX_DRDY     : in  std_logic
-);
-end entity MI_RECONFIGURATOR;
+        -- Output MI interface --------------------------------------------------
+        TX_DWR      : out std_logic_vector(TX_DATA_WIDTH-1 downto 0);
+        TX_MWR      : out std_logic_vector(META_WIDTH-1 downto 0);
+        TX_ADDR     : out std_logic_vector(ADDR_WIDTH-1 downto 0);
+        TX_BE       : out std_logic_vector(TX_DATA_WIDTH/8-1 downto 0);
+        TX_RD       : out std_logic;
+        TX_WR       : out std_logic;
+        TX_ARDY     : in  std_logic;
+        TX_DRD      : in  std_logic_vector(TX_DATA_WIDTH-1 downto 0);
+        TX_DRDY     : in  std_logic
+    );
+end entity;
 
 architecture FULL of MI_RECONFIGURATOR is
 
     -- Resized interface
-    signal RX_DWR_res  : std_logic_vector(TX_DATA_WIDTH-1 downto 0);
-    signal RX_BE_res   : std_logic_vector(TX_DATA_WIDTH/8-1 downto 0);
-    signal RX_DRD_res  : std_logic_vector(TX_DATA_WIDTH-1 downto 0);
+    signal rx_dwr_res  : std_logic_vector(TX_DATA_WIDTH-1 downto 0);
+    signal rx_be_res   : std_logic_vector(TX_DATA_WIDTH/8-1 downto 0);
+    signal rx_drd_res  : std_logic_vector(TX_DATA_WIDTH-1 downto 0);
 
     constant TX_PER_RX : natural := RX_DATA_WIDTH / TX_DATA_WIDTH;
 
@@ -76,7 +76,7 @@ architecture FULL of MI_RECONFIGURATOR is
     signal reg_word_shift_vld : std_logic;
     signal drd_word_shift     : unsigned(log2(TX_DATA_WIDTH/8)-1 downto 0);
 
-    signal RX_BE_arr : slv_array_t(TX_PER_RX-1 downto 0)(TX_DATA_WIDTH/8-1 downto 0);
+    signal rx_be_arr : slv_array_t(TX_PER_RX-1 downto 0)(TX_DATA_WIDTH/8-1 downto 0);
 
     -- Request sending register
     signal reg_req_dwr  : slv_array_t     (TX_PER_RX-1 downto 0)(TX_DATA_WIDTH-1 downto 0);
@@ -91,7 +91,7 @@ architecture FULL of MI_RECONFIGURATOR is
     signal req_part_sel : integer := 0;
     signal req_we_next  : std_logic_vector(TX_PER_RX-1 downto 0);
 
-    constant req_addr_inc : u_array_t(TX_PER_RX-1 downto 0)(ADDR_WIDTH-1 downto 0) := gen_addr_inc;
+    constant REQ_ADDR_INC : u_array_t(TX_PER_RX-1 downto 0)(ADDR_WIDTH-1 downto 0) := gen_addr_inc;
 
     -- Read request order reg array
     signal ord_wr_ptr    : unsigned(log2(TX_PER_RX)-1 downto 0);
@@ -110,13 +110,15 @@ architecture FULL of MI_RECONFIGURATOR is
 begin
 
     assert (RX_DATA_WIDTH/8*8 = RX_DATA_WIDTH)
-        report "ERROR: MI Reconfigurator: RX_DATA_WIDTH (" & to_string(RX_DATA_WIDTH) & ") must be divisible by 8!" severity failure;
+        report "ERROR: MI Reconfigurator: RX_DATA_WIDTH (" & to_string(RX_DATA_WIDTH) & ") must be divisible by 8!"
+        severity failure;
     assert (TX_DATA_WIDTH/8*8 = TX_DATA_WIDTH)
-        report "ERROR: MI Reconfigurator: TX_DATA_WIDTH (" & to_string(TX_DATA_WIDTH) & ") must be divisible by 8!" severity failure;
+        report "ERROR: MI Reconfigurator: TX_DATA_WIDTH (" & to_string(TX_DATA_WIDTH) & ") must be divisible by 8!"
+        severity failure;
 
     -- Resize input signals
-    RX_DWR_res <= std_logic_vector(resize(unsigned(RX_DWR),TX_DATA_WIDTH  ));
-    RX_BE_res  <= std_logic_vector(resize(unsigned(RX_BE ),TX_DATA_WIDTH/8));
+    rx_dwr_res <= std_logic_vector(resize(unsigned(RX_DWR),TX_DATA_WIDTH  ));
+    rx_be_res  <= std_logic_vector(resize(unsigned(RX_BE ),TX_DATA_WIDTH/8));
 
     -- No data resizing
     data_res_none_gen : if (TX_DATA_WIDTH = RX_DATA_WIDTH) generate
@@ -146,8 +148,8 @@ begin
 
         -- Align signals to the new data width
         TX_ADDR <= std_logic_vector(round_down(unsigned(RX_ADDR),log2(TX_DATA_WIDTH/8)));
-        TX_DWR  <= (RX_DWR_res rol to_integer(enlarge_right(dwr_word_shift,log2(8))));
-        TX_BE   <= (RX_BE_res  rol to_integer(              dwr_word_shift         ));
+        TX_DWR  <= (rx_dwr_res rol to_integer(enlarge_right(dwr_word_shift,log2(8))));
+        TX_BE   <= (rx_be_res  rol to_integer(dwr_word_shift         ));
 
         -- Word shift for read request response
         word_shift_reg : process (CLK)
@@ -165,7 +167,7 @@ begin
                     reg_word_shift_vld <= '0';
                 end if;
 
-                if (RESET='1') then
+                if (RESET = '1') then
                     reg_word_shift_vld <= '0';
                 end if;
             end if;
@@ -175,8 +177,8 @@ begin
         drd_word_shift <= reg_word_shift when reg_word_shift_vld = '1' else dwr_word_shift;
 
         -- Propagate read response
-        RX_DRD_res <= (TX_DRD ror to_integer(enlarge_right(drd_word_shift,log2(8))));
-        RX_DRD     <= std_logic_vector(resize(unsigned(RX_DRD_res),RX_DATA_WIDTH));
+        rx_drd_res <= (TX_DRD ror to_integer(enlarge_right(drd_word_shift,log2(8))));
+        RX_DRD     <= std_logic_vector(resize(unsigned(rx_drd_res),RX_DATA_WIDTH));
 
         RX_DRDY    <= TX_DRDY;
 
@@ -185,7 +187,7 @@ begin
     -- Data resize down
     data_res_down_gen : if (TX_DATA_WIDTH < RX_DATA_WIDTH) generate
 
-        RX_BE_arr <= slv_array_deser(RX_BE,TX_PER_RX);
+        rx_be_arr <= slv_array_deser(RX_BE,TX_PER_RX);
 
         -- Request sending register
         req_reg : process (CLK)
@@ -217,12 +219,12 @@ begin
                         reg_req_dwr  <= slv_array_deser(RX_DWR,TX_PER_RX);
                         reg_req_mwr  <= RX_MWR;
                         reg_req_addr <= unsigned(RX_ADDR);
-                        reg_req_be   <= RX_BE_arr;
+                        reg_req_be   <= rx_be_arr;
                         reg_req_rd   <= RX_RD;
                         reg_req_wr   <= RX_WR;
 
                         for i in 0 to TX_PER_RX-1 loop
-                            reg_req_we(i) <= (or RX_BE_arr(i));
+                            reg_req_we(i) <= (or rx_be_arr(i));
                         end loop;
 
                         reg_req_vld <= (or RX_BE) and (RX_RD or RX_WR);
@@ -300,10 +302,10 @@ begin
         -- Value in Order Register has 1 CLK latency
         -- Select req_part_sel directly in case TX_DRDY is directly connected to TX_RD
         res_part_sel <= to_integer(ord_value(to_integer(ord_rd_ptr)))
-                   when ord_vld(to_integer(ord_rd_ptr)) = '1'
-                   else req_part_sel;
+                   when ord_vld(to_integer(ord_rd_ptr)) = '1' else
+                   req_part_sel;
         -- Detect response receiving retrospectively or directly
-        res_waiting <= ord_vld(to_integer(ord_rd_ptr)) or (reg_req_vld and reg_req_rd);
+        res_waiting  <= ord_vld(to_integer(ord_rd_ptr)) or (reg_req_vld and reg_req_rd);
 
         -- Read request response receiving register
         res_reg : process (CLK)

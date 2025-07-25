@@ -30,154 +30,154 @@ use work.type_pack.all;
 -- ----------------------------------------------------------------------------
 
 entity CROSSBARX is
-generic(
-    -- Data transfer direction
-    -- true  -> from A to B
-    -- false -> from B to A
-    DATA_DIR            : boolean := true;
+    generic (
+        -- Data transfer direction
+        -- true  -> from A to B
+        -- false -> from B to A
+        DATA_DIR            : boolean := true;
 
-    -- Transfer data on double frequency Clock
-    USE_CLK2            : boolean := true;
-    -- Transfer data on arbitrary frequency Clock
-    -- (Overrides USE_CLK2 when set to True.)
-    -- In this setting the Planner and Crossbar both run on the CLK_ARB
-    -- and only process one transfer plan per cycle.
-    -- This way the Planner can read more than 100% of Instructions from
-    -- its input in each cycle of CLK and can thus achieve higher burst
-    -- throughput.
-    USE_CLK_ARB         : boolean := false;
+        -- Transfer data on double frequency Clock
+        USE_CLK2            : boolean := true;
+        -- Transfer data on arbitrary frequency Clock
+        -- (Overrides USE_CLK2 when set to True.)
+        -- In this setting the Planner and Crossbar both run on the CLK_ARB
+        -- and only process one transfer plan per cycle.
+        -- This way the Planner can read more than 100% of Instructions from
+        -- its input in each cycle of CLK and can thus achieve higher burst
+        -- throughput.
+        USE_CLK_ARB         : boolean := false;
 
-    -- Number of independent Transaction Streams
-    TRANS_STREAMS       : integer := 1;
+        -- Number of independent Transaction Streams
+        TRANS_STREAMS       : integer := 1;
 
-    -- Buffer A size
-    BUF_A_COLS          : integer := 512;
-    BUF_A_STREAM_ROWS   : integer := 4;
-    -- constant alias, DO NOT CHANGE!
-    BUF_A_ROWS          : integer := BUF_A_STREAM_ROWS*TRANS_STREAMS;
+        -- Buffer A size
+        BUF_A_COLS          : integer := 512;
+        BUF_A_STREAM_ROWS   : integer := 4;
+        -- constant alias, DO NOT CHANGE!
+        BUF_A_ROWS          : integer := BUF_A_STREAM_ROWS*TRANS_STREAMS;
 
-    -- Buffer B size
-    BUF_B_COLS          : integer := 512;
-    BUF_B_ROWS          : integer := 4;
+        -- Buffer B size
+        BUF_B_COLS          : integer := 512;
+        BUF_B_ROWS          : integer := 4;
 
-    -- Number of non-overlapping Sections of Buffer A
-    -- (All Instructions must overflow inside space
-    --  of one Buffer A Section.)
-    BUF_A_SECTIONS      : integer := 1;
+        -- Number of non-overlapping Sections of Buffer A
+        -- (All Instructions must overflow inside space
+        --  of one Buffer A Section.)
+        BUF_A_SECTIONS      : integer := 1;
 
-    -- Number of non-overlapping Sections of Buffer B
-    -- (All Instructions must overflow inside space
-    --  of one Buffer B Section.)
-    BUF_B_SECTIONS      : integer := 1;
+        -- Number of non-overlapping Sections of Buffer B
+        -- (All Instructions must overflow inside space
+        --  of one Buffer B Section.)
+        BUF_B_SECTIONS      : integer := 1;
 
-    -- Number of Items in one buffer row
-    ROW_ITEMS           : integer := 8;
-    -- Width of one Item
-    ITEM_WIDTH          : integer := 8;
+        -- Number of Items in one buffer row
+        ROW_ITEMS           : integer := 8;
+        -- Width of one Item
+        ITEM_WIDTH          : integer := 8;
 
-    -- Number of input Transactions per Transaction Stream
-    TRANSS              : integer := 2;
+        -- Number of input Transactions per Transaction Stream
+        TRANSS              : integer := 2;
 
-    -- Maximum length of one Transaction (in number of Items)
-    TRANS_MTU           : integer := 64;
+        -- Maximum length of one Transaction (in number of Items)
+        TRANS_MTU           : integer := 64;
 
-    -- Width of Transaction user Metadata
-    METADATA_WIDTH      : integer := 0;
+        -- Width of Transaction user Metadata
+        METADATA_WIDTH      : integer := 0;
 
-    -- Size of FIFO for Transaction awaiting completion (for TRANS_COMP interface)
-    -- Defines the maximum number of Transactions inside at any moment! (on each Transaction Stream)
-    -- You should set this, so that the FIFO never fills up.
-    TRANS_FIFO_ITEMS    : integer := TRANSS*16;
+        -- Size of FIFO for Transaction awaiting completion (for TRANS_COMP interface)
+        -- Defines the maximum number of Transactions inside at any moment! (on each Transaction Stream)
+        -- You should set this, so that the FIFO never fills up.
+        TRANS_FIFO_ITEMS    : integer := TRANSS*16;
 
-    -- Width of Color confirmation Timeout counter in Planner
-    -- The resulting timeout takes 2**COLOR_TIMEOUT_WIDTH cycles to expire.
-    -- This affects the maximum latency of TRANS_CONF_ interface.
-    -- WARNING:
-    --     When set too low, the Timeout might expire between the arrival
-    --     of NEW_RX_TRANS signal and the arrival of the corresponding RX_UINSTR_SRC_RDY.
-    --     This could break the entire Color confirmation mechanism!
-    COLOR_TIMEOUT_WIDTH : integer := 6;
+        -- Width of Color confirmation Timeout counter in Planner
+        -- The resulting timeout takes 2**COLOR_TIMEOUT_WIDTH cycles to expire.
+        -- This affects the maximum latency of TRANS_CONF_ interface.
+        -- WARNING:
+        --     When set too low, the Timeout might expire between the arrival
+        --     of NEW_RX_TRANS signal and the arrival of the corresponding RX_UINSTR_SRC_RDY.
+        --     This could break the entire Color confirmation mechanism!
+        COLOR_TIMEOUT_WIDTH : integer := 6;
 
-    -- Delay of Color confirmation signal from Planner
-    -- Setting this value too low will cause frequent changes of Color and thus a slightly
-    -- lower throughput in Planner.
-    -- Setting it too high will cause greater filling of Transaction FIFO
-    -- (see TRANS_FIFO_ITEMS) and increase the average TRANS_CONF_ interface latency.
-    COLOR_CONF_DELAY    : integer := 16;
+        -- Delay of Color confirmation signal from Planner
+        -- Setting this value too low will cause frequent changes of Color and thus a slightly
+        -- lower throughput in Planner.
+        -- Setting it too high will cause greater filling of Transaction FIFO
+        -- (see TRANS_FIFO_ITEMS) and increase the average TRANS_CONF_ interface latency.
+        COLOR_CONF_DELAY    : integer := 16;
 
-    -- Source Buffer read latency
-    RD_LATENCY          : integer := 1;
+        -- Source Buffer read latency
+        RD_LATENCY          : integer := 1;
 
-    -- Data multiplexer's latency (increase for better timing)
-    DATA_MUX_LAT        : integer := 0;
-    -- Data multiplexer's output register enable (set to TRUE for better timing)
-    DATA_MUX_OUTREG_EN  : boolean := true;
+        -- Data multiplexer's latency (increase for better timing)
+        DATA_MUX_LAT        : integer := 0;
+        -- Data multiplexer's output register enable (set to TRUE for better timing)
+        DATA_MUX_OUTREG_EN  : boolean := true;
 
-    -- Data blocks rotation latency (increase for better timing)
-    DATA_ROT_LAT        : integer := 0;
-    -- Data blocks rotation output register enable (set to TRUE for better timing)
-    DATA_ROT_OUTREG_EN  : boolean := true;
+        -- Data blocks rotation latency (increase for better timing)
+        DATA_ROT_LAT        : integer := 0;
+        -- Data blocks rotation output register enable (set to TRUE for better timing)
+        DATA_ROT_OUTREG_EN  : boolean := true;
 
-    -- Target Device
-    -- "ULTRASCALE", "7SERIES", "STRATIX10" ...
-    DEVICE              : string := "ULTRASCALE"
-);
-port(
-    -- ===================================
-    -- Clock and reset
-    -- ===================================
+        -- Target Device
+        -- "ULTRASCALE", "7SERIES", "STRATIX10" ...
+        DEVICE              : string := "ULTRASCALE"
+    );
+    port (
+        -- ===================================
+        -- Clock and reset
+        -- ===================================
 
-    CLK                : in  std_logic;
-    -- Only used when USE_CLK2==True and USE_CLK_ARB==False
-    CLK2               : in  std_logic := '0';
-    RESET              : in  std_logic;
+        CLK                : in  std_logic;
+        -- Only used when USE_CLK2==True and USE_CLK_ARB==False
+        CLK2               : in  std_logic := '0';
+        RESET              : in  std_logic;
 
-    -- Only used when USE_CLK_ARB==True
-    CLK_ARB            : in  std_logic := '0';
-    RESET_ARB          : in  std_logic := '0';
+        -- Only used when USE_CLK_ARB==True
+        CLK_ARB            : in  std_logic := '0';
+        RESET_ARB          : in  std_logic := '0';
 
-    -- ===================================
-    -- Input Transactions
-    -- ===================================
+        -- ===================================
+        -- Input Transactions
+        -- ===================================
 
-    TRANS_A_COL        : in  slv_array_t     (TRANS_STREAMS-1 downto 0)(log2(BUF_A_COLS)-1 downto 0);
-    TRANS_A_ITEM       : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(log2(BUF_A_STREAM_ROWS*ROW_ITEMS)-1 downto 0);
-    TRANS_B_COL        : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(log2(BUF_B_COLS)-1 downto 0);
-    TRANS_B_ITEM       : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(log2(BUF_B_ROWS*ROW_ITEMS)-1 downto 0);
-    TRANS_LEN          : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(log2(TRANS_MTU+1)-1 downto 0);
-    TRANS_META         : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(METADATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
-    TRANS_VLD          : in  slv_array_t     (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0);
-    TRANS_SRC_RDY      : in  std_logic_vector(TRANS_STREAMS-1 downto 0);
-    TRANS_DST_RDY      : out std_logic_vector(TRANS_STREAMS-1 downto 0);
+        TRANS_A_COL        : in  slv_array_t     (TRANS_STREAMS-1 downto 0)(log2(BUF_A_COLS)-1 downto 0);
+        TRANS_A_ITEM       : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(log2(BUF_A_STREAM_ROWS*ROW_ITEMS)-1 downto 0);
+        TRANS_B_COL        : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(log2(BUF_B_COLS)-1 downto 0);
+        TRANS_B_ITEM       : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(log2(BUF_B_ROWS*ROW_ITEMS)-1 downto 0);
+        TRANS_LEN          : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(log2(TRANS_MTU+1)-1 downto 0);
+        TRANS_META         : in  slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(METADATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+        TRANS_VLD          : in  slv_array_t     (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0);
+        TRANS_SRC_RDY      : in  std_logic_vector(TRANS_STREAMS-1 downto 0);
+        TRANS_DST_RDY      : out std_logic_vector(TRANS_STREAMS-1 downto 0);
 
-    -- ===================================
-    -- Source Buffer read interface
-    -- ===================================
+        -- ===================================
+        -- Source Buffer read interface
+        -- ===================================
 
-    SRC_BUF_RD_ADDR    : out slv_array_t(tsel(DATA_DIR,BUF_A_ROWS,BUF_B_ROWS)-1 downto 0)(log2(tsel(DATA_DIR,BUF_A_COLS,BUF_B_COLS))-1 downto 0);
-    SRC_BUF_RD_DATA    : in  slv_array_t(tsel(DATA_DIR,BUF_A_ROWS,BUF_B_ROWS)-1 downto 0)((ROW_ITEMS*ITEM_WIDTH)-1 downto 0);
+        SRC_BUF_RD_ADDR    : out slv_array_t(tsel(DATA_DIR,BUF_A_ROWS,BUF_B_ROWS)-1 downto 0)(log2(tsel(DATA_DIR,BUF_A_COLS,BUF_B_COLS))-1 downto 0);
+        SRC_BUF_RD_DATA    : in  slv_array_t(tsel(DATA_DIR,BUF_A_ROWS,BUF_B_ROWS)-1 downto 0)((ROW_ITEMS*ITEM_WIDTH)-1 downto 0);
 
-    -- ===================================
-    -- Destination Buffer write interface
-    -- ===================================
+        -- ===================================
+        -- Destination Buffer write interface
+        -- ===================================
 
-    DST_BUF_WR_ADDR    : out slv_array_t     (tsel(DATA_DIR,BUF_B_ROWS,BUF_A_ROWS)-1 downto 0)(log2(tsel(DATA_DIR,BUF_B_COLS,BUF_A_COLS))-1 downto 0);
-    DST_BUF_WR_DATA    : out slv_array_t     (tsel(DATA_DIR,BUF_B_ROWS,BUF_A_ROWS)-1 downto 0)((ROW_ITEMS*ITEM_WIDTH)-1 downto 0);
-    -- Item enable
-    DST_BUF_WR_IE      : out slv_array_t     (tsel(DATA_DIR,BUF_B_ROWS,BUF_A_ROWS)-1 downto 0)(ROW_ITEMS-1 downto 0);
-    DST_BUF_WR_EN      : out std_logic_vector(tsel(DATA_DIR,BUF_B_ROWS,BUF_A_ROWS)-1 downto 0);
+        DST_BUF_WR_ADDR    : out slv_array_t     (tsel(DATA_DIR,BUF_B_ROWS,BUF_A_ROWS)-1 downto 0)(log2(tsel(DATA_DIR,BUF_B_COLS,BUF_A_COLS))-1 downto 0);
+        DST_BUF_WR_DATA    : out slv_array_t     (tsel(DATA_DIR,BUF_B_ROWS,BUF_A_ROWS)-1 downto 0)((ROW_ITEMS*ITEM_WIDTH)-1 downto 0);
+        -- Item enable
+        DST_BUF_WR_IE      : out slv_array_t     (tsel(DATA_DIR,BUF_B_ROWS,BUF_A_ROWS)-1 downto 0)(ROW_ITEMS-1 downto 0);
+        DST_BUF_WR_EN      : out std_logic_vector(tsel(DATA_DIR,BUF_B_ROWS,BUF_A_ROWS)-1 downto 0);
 
-    -- ===================================
-    -- Transactions Completed confirmation
-    -- ===================================
+        -- ===================================
+        -- Transactions Completed confirmation
+        -- ===================================
 
-    -- Each index only contains confirmations from the respective Transaction Stream, but there is more of them
-    -- to allow burst confirmations
-    TRANS_COMP_META    : out slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(METADATA_WIDTH-1 downto 0);
-    TRANS_COMP_SRC_RDY : out slv_array_t     (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0);
-    -- Read for FIFOX Multi!
-    TRANS_COMP_DST_RDY : in  slv_array_t     (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)
-);
+        -- Each index only contains confirmations from the respective Transaction Stream, but there is more of them
+        -- to allow burst confirmations
+        TRANS_COMP_META    : out slv_array_2d_t  (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)(METADATA_WIDTH-1 downto 0);
+        TRANS_COMP_SRC_RDY : out slv_array_t     (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0);
+        -- Read for FIFOX Multi!
+        TRANS_COMP_DST_RDY : in  slv_array_t     (TRANS_STREAMS-1 downto 0)(TRANSS-1 downto 0)
+    );
 end entity;
 
 -- ----------------------------------------------------------------------------
@@ -262,11 +262,11 @@ architecture FULL of CROSSBARX is
     -- ---------------------------
 
     constant UGEN_UINSTR_WIDTH   : integer := log2(BUF_A_COLS)
-                                             +log2(ROW_ITEMS)
-                                             +log2(BUF_B_COLS)
-                                             +log2(BUF_B_ROWS*ROW_ITEMS)
-                                             +log2(ROW_ITEMS+1)
-                                             +1;
+                                              +log2(ROW_ITEMS)
+                                              +log2(BUF_B_COLS)
+                                              +log2(BUF_B_ROWS*ROW_ITEMS)
+                                              +log2(ROW_ITEMS+1)
+                                              +1;
     constant UGEN_F_ITEMS        : integer := 32;
     constant UGEN_F_AFULL_OFFSET : integer := 4; -- must be greater then the latency of uInstruction Generator
 
@@ -323,14 +323,14 @@ architecture FULL of CROSSBARX is
     -- Actual Color Confirmation latency must be increased
     -- to prevent TRANS_COMP_ propagation before the actual data transfer.
     -- Total latency = user defined latency + Planner latency + Crossbar latency
-    constant ACT_COLOR_CONF_DELAY    : integer := COLOR_CONF_DELAY+3+(1+(1+RD_LATENCY+1+DATA_MUX_LAT+tsel(DATA_MUX_OUTREG_EN,1,0)+DATA_ROT_LAT+tsel(DATA_ROT_OUTREG_EN,1,0)+1)/tsel(USE_CLK2 and (not USE_CLK_ARB),2,1));
-    signal plan_conf_color_delayed   : std_logic_vector(TRANS_STREAMS-1 downto 0);
-    signal plan_conf_vld_delayed     : std_logic_vector(TRANS_STREAMS-1 downto 0);
-    signal trcg_color_conf_color_reg : std_logic_vector(TRANS_STREAMS-1 downto 0);
-    signal trcg_color_conf_vld_reg0  : std_logic_vector(TRANS_STREAMS-1 downto 0);
-    signal trcg_color_conf_vld_reg1  : std_logic_vector(TRANS_STREAMS-1 downto 0);
-    signal trcg_color_conf_vld_reg2  : std_logic_vector(TRANS_STREAMS-1 downto 0);
-    signal trcg_color_conf           : std_logic_vector(TRANS_STREAMS-1 downto 0);
+    constant ACT_COLOR_CONF_DELAY      : integer := COLOR_CONF_DELAY+3+(1+(1+RD_LATENCY+1+DATA_MUX_LAT+tsel(DATA_MUX_OUTREG_EN,1,0)+DATA_ROT_LAT+tsel(DATA_ROT_OUTREG_EN,1,0)+1)/tsel(USE_CLK2 and (not USE_CLK_ARB),2,1));
+    signal   plan_conf_color_delayed   : std_logic_vector(TRANS_STREAMS-1 downto 0);
+    signal   plan_conf_vld_delayed     : std_logic_vector(TRANS_STREAMS-1 downto 0);
+    signal   trcg_color_conf_color_reg : std_logic_vector(TRANS_STREAMS-1 downto 0);
+    signal   trcg_color_conf_vld_reg0  : std_logic_vector(TRANS_STREAMS-1 downto 0);
+    signal   trcg_color_conf_vld_reg1  : std_logic_vector(TRANS_STREAMS-1 downto 0);
+    signal   trcg_color_conf_vld_reg2  : std_logic_vector(TRANS_STREAMS-1 downto 0);
+    signal   trcg_color_conf           : std_logic_vector(TRANS_STREAMS-1 downto 0);
 
     -- ------------------------------------------------------------------------
 
@@ -342,7 +342,7 @@ architecture FULL of CROSSBARX is
 
 begin
 
-    assert (BUF_A_STREAM_ROWS*TRANS_STREAMS=BUF_A_ROWS)
+    assert (BUF_A_STREAM_ROWS*TRANS_STREAMS = BUF_A_ROWS)
         report "ERROR: CrossbarX: The number of BUF_A_ROWS(" & to_string(BUF_A_ROWS) & ")" &
                " is not divisible by the number of TRANS_STREAMS(" & to_string(TRANS_STREAMS) & ")!"
         severity failure;
@@ -394,20 +394,20 @@ begin
         -- ------------------------------------------------------------------------
 
         trcg_i : entity work.CROSSBARX_TRANS_COLOR_GEN
-        generic map(
-            TRANSS         => TRANSS           ,
-            BUF_A_COLS     => BUF_A_COLS       ,
+        generic map (
+            TRANSS         => TRANSS,
+            BUF_A_COLS     => BUF_A_COLS,
             BUF_A_ROWS     => BUF_A_STREAM_ROWS,
-            BUF_B_COLS     => BUF_B_COLS       ,
-            BUF_B_ROWS     => BUF_B_ROWS       ,
-            ROW_ITEMS      => ROW_ITEMS        ,
-            ITEM_WIDTH     => ITEM_WIDTH       ,
-            TRANS_MTU      => TRANS_MTU        ,
-            METADATA_WIDTH => METADATA_WIDTH   ,
-            SHREG_LATENCY  => 1                ,
+            BUF_B_COLS     => BUF_B_COLS,
+            BUF_B_ROWS     => BUF_B_ROWS,
+            ROW_ITEMS      => ROW_ITEMS,
+            ITEM_WIDTH     => ITEM_WIDTH,
+            TRANS_MTU      => TRANS_MTU,
+            METADATA_WIDTH => METADATA_WIDTH,
+            SHREG_LATENCY  => 1,
             DEVICE         => DEVICE
         )
-        port map(
+        port map (
             CLK   => clk_0,
             RESET => rst_0,
 
@@ -447,20 +447,20 @@ begin
                 trcg_color_conf(s) <= '0';
 
                 -- When no more Transactions with the Confirmed Color are on Transaction Sorter output
-                if (trsr_trans_comp_id(s)(0)(0)/=trcg_color_conf_color_reg(s) or trsr_trans_comp_src_rdy(s)(0)='0') then
+                if (trsr_trans_comp_id(s)(0)(0) /= trcg_color_conf_color_reg(s) or trsr_trans_comp_src_rdy(s)(0) = '0') then
                     -- Propagate Confirmation to Transaction Color Generator and reset waiting register
-                    trcg_color_conf(s) <= trcg_color_conf_vld_reg2(s);
+                    trcg_color_conf(s)          <= trcg_color_conf_vld_reg2(s);
                     trcg_color_conf_vld_reg2(s) <= '0';
                 end if;
 
                 -- Delay waiting register for 2 cycles to give Transaction Sorter time to start generating valid output
                 trcg_color_conf_vld_reg1(s) <= trcg_color_conf_vld_reg0(s);
-                if (trcg_color_conf_vld_reg1(s)='1') then
+                if (trcg_color_conf_vld_reg1(s) = '1') then
                     trcg_color_conf_vld_reg2(s) <= trcg_color_conf_vld_reg1(s);
                 end if;
 
                 -- When new Color Confirmation is generated
-                if (plan_conf_vld_delayed(s)='1') then
+                if (plan_conf_vld_delayed(s) = '1') then
                     -- Set register for waiting to propagate Confirmation
                     trcg_color_conf_color_reg(s) <= plan_conf_color_delayed(s);
                     trcg_color_conf_vld_reg0 (s) <= '1';
@@ -468,7 +468,7 @@ begin
                     trcg_color_conf_vld_reg0(s) <= '0';
                 end if;
 
-                if (rst_0='1') then
+                if (rst_0 = '1') then
                     trcg_color_conf_vld_reg0(s) <= '0';
                     trcg_color_conf_vld_reg1(s) <= '0';
                     trcg_color_conf_vld_reg2(s) <= '0';
@@ -483,17 +483,17 @@ begin
         -- ------------------------------------------------------------------------
 
         trsr_i : entity work.TRANS_SORTER
-        generic map(
-            RX_TRANSS        => TRANSS          ,
-            TX_TRANSS        => TRANSS          ,
-            ID_CONFS         => 1               ,
-            ID_WIDTH         => 1               ,
+        generic map (
+            RX_TRANSS        => TRANSS,
+            TX_TRANSS        => TRANSS,
+            ID_CONFS         => 1,
+            ID_WIDTH         => 1,
             TRANS_FIFO_ITEMS => TRANS_FIFO_ITEMS,
-            METADATA_WIDTH   => METADATA_WIDTH  ,
-            MSIDT_BEHAV      => 0               ,
+            METADATA_WIDTH   => METADATA_WIDTH,
+            MSIDT_BEHAV      => 0,
             DEVICE           => DEVICE
         )
-        port map(
+        port map (
             CLK              => clk_0,
             RESET            => rst_0,
 
@@ -512,11 +512,12 @@ begin
         );
 
         -- synthesis translate_off
-        process(CLK)
+        process (CLK)
         begin
             if (rising_edge(CLK)) then
-                if (not (((or trcg_trans_vld)='1' and trcg_trans_src_rdy='1' and trcg_trans_dst_rdy='1' and trsr_trans_dst_rdy(s)='0')=false)) then
-                    report "WARNING: CROSSBARX: Internal Transaction FIFO is FULL causing a decrease in throughput! Consider increasing value of generic TRANS_FIFO_ITEMS currently (" & to_string(TRANS_FIFO_ITEMS) & ")." severity warning;
+                if (not (((or trcg_trans_vld) = '1' and trcg_trans_src_rdy = '1' and trcg_trans_dst_rdy = '1' and trsr_trans_dst_rdy(s) = '0') = false)) then
+                    report "WARNING: CROSSBARX: Internal Transaction FIFO is FULL causing a decrease in throughput! Consider increasing value of generic TRANS_FIFO_ITEMS currently (" & to_string(TRANS_FIFO_ITEMS) & ")."
+                        severity warning;
                 end if;
             end if;
         end process;
@@ -528,22 +529,22 @@ begin
         -- ------------------------------------------------------------------------
 
         trsh_i : entity work.MVB_SHAKEDOWN
-        generic map(
-            RX_ITEMS    => TRANSS        ,
-            TX_ITEMS    => TRANSS        ,
+        generic map (
+            RX_ITEMS    => TRANSS,
+            TX_ITEMS    => TRANSS,
             ITEM_WIDTH  => METADATA_WIDTH,
             SHAKE_PORTS => 2
         )
-        port map(
+        port map (
             CLK        => clk_0,
             RESET      => rst_0,
 
             RX_DATA    => slv_array_ser(trsr_trans_comp_meta(s)),
-            RX_VLD     => trsr_trans_comp_src_rdy(s)            ,
-            RX_SRC_RDY => (or trsr_trans_comp_src_rdy(s))       ,
-            RX_DST_RDY => trsr_trans_comp_dst_rdy(s)            ,
+            RX_VLD     => trsr_trans_comp_src_rdy(s),
+            RX_SRC_RDY => (or trsr_trans_comp_src_rdy(s)),
+            RX_DST_RDY => trsr_trans_comp_dst_rdy(s),
 
-            TX_DATA    => trsh_do(s)           ,
+            TX_DATA    => trsh_do(s),
             TX_VLD     => TRANS_COMP_SRC_RDY(s),
             TX_NEXT    => TRANS_COMP_DST_RDY(s)
         );
@@ -557,20 +558,20 @@ begin
         -- ------------------------------------------------------------------------
 
         trbr_i : entity work.CROSSBARX_TRANS_BREAKER
-        generic map(
-            TRANSS         => TRANSS           ,
-            BUF_A_COLS     => BUF_A_COLS       ,
+        generic map (
+            TRANSS         => TRANSS,
+            BUF_A_COLS     => BUF_A_COLS,
             BUF_A_ROWS     => BUF_A_STREAM_ROWS,
-            BUF_B_COLS     => BUF_B_COLS       ,
-            BUF_B_ROWS     => BUF_B_ROWS       ,
-            BUF_A_SECTIONS => BUF_A_SECTIONS   ,
-            BUF_B_SECTIONS => BUF_B_SECTIONS   ,
-            ROW_ITEMS      => ROW_ITEMS        ,
-            ITEM_WIDTH     => ITEM_WIDTH       ,
-            TRANS_MTU      => TRANS_MTU        ,
+            BUF_B_COLS     => BUF_B_COLS,
+            BUF_B_ROWS     => BUF_B_ROWS,
+            BUF_A_SECTIONS => BUF_A_SECTIONS,
+            BUF_B_SECTIONS => BUF_B_SECTIONS,
+            ROW_ITEMS      => ROW_ITEMS,
+            ITEM_WIDTH     => ITEM_WIDTH,
+            TRANS_MTU      => TRANS_MTU,
             DEVICE         => DEVICE
         )
-        port map(
+        port map (
             CLK   => clk_0,
             RESET => rst_0,
 
@@ -603,22 +604,22 @@ begin
 
         -- Instructions input must be stop once one of uInstruction Generator FIFOs
         -- reaches almost full.
-        trbr_instr_dst_rdy(s) <= '1' when (or ugen_f_afull(s))='0' else '0';
-        ugen_instr_src_rdy(s) <= '1' when (or ugen_f_afull(s))='0' and trbr_instr_src_rdy(s)='1' else '0';
+        trbr_instr_dst_rdy(s) <= '1' when (or ugen_f_afull(s)) = '0' else '0';
+        ugen_instr_src_rdy(s) <= '1' when (or ugen_f_afull(s)) = '0' and trbr_instr_src_rdy(s) = '1' else '0';
 
         ugen_i : entity work.CROSSBARX_UINSTR_GEN
-        generic map(
-            INSTRS         => INSTRS           ,
-            BUF_A_COLS     => BUF_A_COLS       ,
+        generic map (
+            INSTRS         => INSTRS,
+            BUF_A_COLS     => BUF_A_COLS,
             BUF_A_ROWS     => BUF_A_STREAM_ROWS,
-            BUF_B_COLS     => BUF_B_COLS       ,
-            BUF_B_ROWS     => BUF_B_ROWS       ,
-            BUF_B_SECTIONS => BUF_B_SECTIONS   ,
-            ROW_ITEMS      => ROW_ITEMS        ,
-            ITEM_WIDTH     => ITEM_WIDTH       ,
+            BUF_B_COLS     => BUF_B_COLS,
+            BUF_B_ROWS     => BUF_B_ROWS,
+            BUF_B_SECTIONS => BUF_B_SECTIONS,
+            ROW_ITEMS      => ROW_ITEMS,
+            ITEM_WIDTH     => ITEM_WIDTH,
             DEVICE         => DEVICE
         )
-        port map(
+        port map (
             CLK   => clk_0,
             RESET => rst_0,
 
@@ -660,58 +661,58 @@ begin
             -- (They must NEVER OVERFLOW!)
 
             ugen_f_di(s)(i) <= ugen_uinstr_a_col (s)(i)
-                              &ugen_uinstr_a_item(s)(i)
-                              &ugen_uinstr_b_col (s)(i)
-                              &ugen_uinstr_b_item(s)(i)
-                              &ugen_uinstr_len   (s)(i)
-                              &ugen_uinstr_color (s)(i);
+                               &ugen_uinstr_a_item(s)(i)
+                               &ugen_uinstr_b_col (s)(i)
+                               &ugen_uinstr_b_item(s)(i)
+                               &ugen_uinstr_len   (s)(i)
+                               &ugen_uinstr_color (s)(i);
 
             ugen_f_wr(s)(i) <= ugen_uinstr_vld(s)(i);
 
             ugen_f_gen : if (USE_CLK_ARB) generate
 
                 ugen_f_i : entity work.ASFIFOX
-                generic map(
-                    DATA_WIDTH          => UGEN_UINSTR_WIDTH  ,
-                    ITEMS               => UGEN_F_ITEMS       ,
-                    RAM_TYPE            => "LUT"              ,
-                    FWFT_MODE           => true               ,
-                    OUTPUT_REG          => true               ,
-                    DEVICE              => DEVICE             ,
+                generic map (
+                    DATA_WIDTH          => UGEN_UINSTR_WIDTH,
+                    ITEMS               => UGEN_F_ITEMS,
+                    RAM_TYPE            => "LUT",
+                    FWFT_MODE           => true,
+                    OUTPUT_REG          => true,
+                    DEVICE              => DEVICE,
                     ALMOST_FULL_OFFSET  => UGEN_F_AFULL_OFFSET,
                     ALMOST_EMPTY_OFFSET => 0
                 )
-                port map(
+                port map (
                     WR_CLK    => clk_0,
                     WR_RST    => rst_0,
                     WR_DATA   => ugen_f_di   (s)(i),
                     WR_EN     => ugen_f_wr   (s)(i),
                     WR_FULL   => ugen_f_full (s)(i),
                     WR_AFULL  => ugen_f_afull(s)(i),
-                    WR_STATUS => open              ,
+                    WR_STATUS => open,
 
                     RD_CLK    => clk_1,
                     RD_RST    => rst_1,
                     RD_DATA   => ugen_f_do   (s)(i),
                     RD_EN     => ugen_f_rd   (s)(i),
                     RD_EMPTY  => ugen_f_empty(s)(i),
-                    RD_AEMPTY => open              ,
+                    RD_AEMPTY => open,
                     RD_STATUS => open
                 );
 
             else generate
 
                 ugen_f_i : entity work.FIFOX
-                generic map(
-                    DATA_WIDTH          => UGEN_UINSTR_WIDTH  ,
-                    ITEMS               => UGEN_F_ITEMS       ,
-                    RAM_TYPE            => "AUTO"             ,
-                    DEVICE              => DEVICE             ,
+                generic map (
+                    DATA_WIDTH          => UGEN_UINSTR_WIDTH,
+                    ITEMS               => UGEN_F_ITEMS,
+                    RAM_TYPE            => "AUTO",
+                    DEVICE              => DEVICE,
                     ALMOST_FULL_OFFSET  => UGEN_F_AFULL_OFFSET,
-                    ALMOST_EMPTY_OFFSET => 0                  ,
+                    ALMOST_EMPTY_OFFSET => 0,
                     FAKE_FIFO           => false
                 )
-                port map(
+                port map (
                     CLK    => clk_0,
                     RESET  => rst_0,
 
@@ -719,7 +720,7 @@ begin
                     WR     => ugen_f_wr   (s)(i),
                     FULL   => ugen_f_full (s)(i),
                     AFULL  => ugen_f_afull(s)(i),
-                    STATUS => open              ,
+                    STATUS => open,
 
                     DO     => ugen_f_do   (s)(i),
                     RD     => ugen_f_rd   (s)(i),
@@ -735,11 +736,11 @@ begin
             --      report "ERROR: CrossbarX: uInstruction Generator FIFOX_to_string(s) _ to_string(i) overflow detected! Consider increasing UGEN_F_AFULL_OFFSET.";
 
             (tmp_ugen_f_uinstr_a_col ,
-             tmp_ugen_f_uinstr_a_item,
-             tmp_ugen_f_uinstr_b_col ,
-             tmp_ugen_f_uinstr_b_item,
-             tmp_ugen_f_uinstr_len   ,
-             tmp_ugen_f_uinstr_color  ) <= ugen_f_do(s)(i);
+            tmp_ugen_f_uinstr_a_item,
+            tmp_ugen_f_uinstr_b_col ,
+            tmp_ugen_f_uinstr_b_item,
+            tmp_ugen_f_uinstr_len   ,
+            tmp_ugen_f_uinstr_color  ) <= ugen_f_do(s)(i);
 
             ugen_f_uinstr_a_col  (s)(i) <= tmp_ugen_f_uinstr_a_col;
             ugen_f_uinstr_a_item (s)(i) <= tmp_ugen_f_uinstr_a_item;
@@ -758,18 +759,18 @@ begin
             -- ------------------------------------------------------------------------
 
             uspl_i : entity work.CROSSBARX_UINSTR_SPLITTER
-            generic map(
-                DATA_DIR       => DATA_DIR      ,
-                INSTRS         => INSTRS+1      ,
-                BUF_A_COLS     => BUF_A_COLS    ,
-                BUF_B_COLS     => BUF_B_COLS    ,
+            generic map (
+                DATA_DIR       => DATA_DIR,
+                INSTRS         => INSTRS+1,
+                BUF_A_COLS     => BUF_A_COLS,
+                BUF_B_COLS     => BUF_B_COLS,
                 BUF_B_SECTIONS => BUF_B_SECTIONS,
-                BUF_B_ROWS     => BUF_B_ROWS    ,
-                ROW_ITEMS      => ROW_ITEMS     ,
-                ITEM_WIDTH     => ITEM_WIDTH    ,
+                BUF_B_ROWS     => BUF_B_ROWS,
+                ROW_ITEMS      => ROW_ITEMS,
+                ITEM_WIDTH     => ITEM_WIDTH,
                 DEVICE         => DEVICE
             )
-            port map(
+            port map (
                 CLK   => clk_1,
                 RESET => rst_1,
 
@@ -803,29 +804,29 @@ begin
     -- ------------------------------------------------------------------------
 
     plan_i : entity work.CROSSBARX_PLANNER
-    generic map(
-        DATA_DIR            => DATA_DIR           ,
+    generic map (
+        DATA_DIR            => DATA_DIR,
         USE_CLK2            => USE_CLK2 and (not USE_CLK_ARB),
-        TRANS_STREAMS       => TRANS_STREAMS      ,
-        BUF_A_COLS          => BUF_A_COLS         ,
-        BUF_A_ROWS          => BUF_A_ROWS         ,
-        BUF_B_COLS          => BUF_B_COLS         ,
-        BUF_B_ROWS          => BUF_B_ROWS         ,
-        ROW_ITEMS           => ROW_ITEMS          ,
-        ITEM_WIDTH          => ITEM_WIDTH         ,
+        TRANS_STREAMS       => TRANS_STREAMS,
+        BUF_A_COLS          => BUF_A_COLS,
+        BUF_A_ROWS          => BUF_A_ROWS,
+        BUF_B_COLS          => BUF_B_COLS,
+        BUF_B_ROWS          => BUF_B_ROWS,
+        ROW_ITEMS           => ROW_ITEMS,
+        ITEM_WIDTH          => ITEM_WIDTH,
         COLOR_TIMEOUT_WIDTH => COLOR_TIMEOUT_WIDTH,
         DEVICE              => DEVICE
     )
-    port map(
+    port map (
         CLK   => clk_1,
         RESET => rst_1,
 
-        RX_UINSTR_A_COL   => uspl_uinstr_a_col  ,
-        RX_UINSTR_B_COL   => uspl_uinstr_b_col  ,
-        RX_UINSTR_B_ROW   => uspl_uinstr_b_row  ,
+        RX_UINSTR_A_COL   => uspl_uinstr_a_col,
+        RX_UINSTR_B_COL   => uspl_uinstr_b_col,
+        RX_UINSTR_B_ROW   => uspl_uinstr_b_row,
         RX_UINSTR_ROW_ROT => uspl_uinstr_row_rot,
-        RX_UINSTR_IE      => uspl_uinstr_ie     ,
-        RX_UINSTR_COLOR   => uspl_uinstr_color  ,
+        RX_UINSTR_IE      => uspl_uinstr_ie,
+        RX_UINSTR_COLOR   => uspl_uinstr_color,
         RX_UINSTR_SRC_RDY => uspl_uinstr_src_rdy,
         RX_UINSTR_DST_RDY => uspl_uinstr_dst_rdy,
 
@@ -833,12 +834,12 @@ begin
         TX_UINSTR_SRC_ROW => plan_uinstr_src_row,
         TX_UINSTR_DST_COL => plan_uinstr_dst_col,
         TX_UINSTR_ROW_ROT => plan_uinstr_row_rot,
-        TX_UINSTR_IE      => plan_uinstr_ie     ,
+        TX_UINSTR_IE      => plan_uinstr_ie,
         TX_UINSTR_SRC_RDY => plan_uinstr_src_rdy,
 
-        NEW_RX_TRANS     => plan_new_rx_trans   ,
-        CONF_COLOR       => plan_conf_color     ,
-        CONF_VLD         => plan_conf_vld       ,
+        NEW_RX_TRANS     => plan_new_rx_trans,
+        CONF_COLOR       => plan_conf_color,
+        CONF_VLD         => plan_conf_vld,
         CONF_PROPAGATED  => plan_conf_propagated
     );
 
@@ -849,26 +850,26 @@ begin
     -- ------------------------------------------------------------------------
 
     plan_synch_i : entity work.CROSSBARX_PLANNER_SYNCHRONISATOR
-    generic map(
-        ASYNC_EN         => USE_CLK_ARB         ,
-        TRANS_STREAMS    => TRANS_STREAMS       ,
+    generic map (
+        ASYNC_EN         => USE_CLK_ARB,
+        TRANS_STREAMS    => TRANS_STREAMS,
         COLOR_CONF_DELAY => ACT_COLOR_CONF_DELAY,
         DEVICE           => DEVICE
     )
-    port map(
+    port map (
         CLK_PLAN          => clk_1,
         RESET_PLAN        => rst_1,
         CLK_OTHER         => clk_0,
         RESET_OTHER       => rst_0,
 
-        P_NEW_RX_TRANS    => plan_new_rx_trans   ,
-        P_CONF_COLOR      => plan_conf_color     ,
-        P_CONF_VLD        => plan_conf_vld       ,
+        P_NEW_RX_TRANS    => plan_new_rx_trans,
+        P_CONF_COLOR      => plan_conf_color,
+        P_CONF_VLD        => plan_conf_vld,
         P_CONF_PROPAGATED => plan_conf_propagated,
 
-        O_NEW_RX_TRANS    => trcg_new_rx_trans      ,
+        O_NEW_RX_TRANS    => trcg_new_rx_trans,
         O_CONF_COLOR      => plan_conf_color_delayed,
-        O_CONF_VLD        => plan_conf_vld_delayed  ,
+        O_CONF_VLD        => plan_conf_vld_delayed,
         O_CONF_PROPAGATED => trcg_color_conf
     );
 
@@ -879,22 +880,22 @@ begin
     -- ------------------------------------------------------------------------
 
     cros_i : entity work.CROSSBARX_CROSSBAR
-    generic map(
-        USE_CLK2                    => USE_CLK2 and (not USE_CLK_ARB)      ,
+    generic map (
+        USE_CLK2                    => USE_CLK2 and (not USE_CLK_ARB),
         SRC_BUF_COLS                => tsel(DATA_DIR,BUF_A_COLS,BUF_B_COLS),
         SRC_BUF_ROWS                => tsel(DATA_DIR,BUF_A_ROWS,BUF_B_ROWS),
         DST_BUF_COLS                => tsel(DATA_DIR,BUF_B_COLS,BUF_A_COLS),
         DST_BUF_ROWS                => tsel(DATA_DIR,BUF_B_ROWS,BUF_A_ROWS),
-        ROW_ITEMS                   => ROW_ITEMS                           ,
-        ITEM_WIDTH                  => ITEM_WIDTH                          ,
-        RD_LATENCY                  => RD_LATENCY                          ,
-        DATA_MUX_LATENCY            => DATA_MUX_LAT                        ,
-        DATA_MUX_OUTPUT_REG_EN      => DATA_MUX_OUTREG_EN                  ,
-        DATA_ROTATION_LATENCY       => DATA_ROT_LAT                        ,
-        DATA_ROTATION_OUTPUT_REG_EN => DATA_ROT_OUTREG_EN                  ,
+        ROW_ITEMS                   => ROW_ITEMS,
+        ITEM_WIDTH                  => ITEM_WIDTH,
+        RD_LATENCY                  => RD_LATENCY,
+        DATA_MUX_LATENCY            => DATA_MUX_LAT,
+        DATA_MUX_OUTPUT_REG_EN      => DATA_MUX_OUTREG_EN,
+        DATA_ROTATION_LATENCY       => DATA_ROT_LAT,
+        DATA_ROTATION_OUTPUT_REG_EN => DATA_ROT_OUTREG_EN,
         DEVICE                      => DEVICE
     )
-    port map(
+    port map (
         CLK   => clk_1,
         CLK2  => clk_2,
         RESET => rst_1,
@@ -903,15 +904,15 @@ begin
         RX_UINSTR_SRC_ROW => plan_uinstr_src_row,
         RX_UINSTR_DST_COL => plan_uinstr_dst_col,
         RX_UINSTR_ROW_ROT => plan_uinstr_row_rot,
-        RX_UINSTR_IE      => plan_uinstr_ie     ,
+        RX_UINSTR_IE      => plan_uinstr_ie,
         RX_UINSTR_SRC_RDY => plan_uinstr_src_rdy,
 
-        SRC_BUF_RD_ADDR   => SRC_BUF_RD_ADDR    ,
-        SRC_BUF_RD_DATA   => SRC_BUF_RD_DATA    ,
+        SRC_BUF_RD_ADDR   => SRC_BUF_RD_ADDR,
+        SRC_BUF_RD_DATA   => SRC_BUF_RD_DATA,
 
-        DST_BUF_WR_ADDR   => DST_BUF_WR_ADDR    ,
-        DST_BUF_WR_DATA   => DST_BUF_WR_DATA    ,
-        DST_BUF_WR_IE     => DST_BUF_WR_IE      ,
+        DST_BUF_WR_ADDR   => DST_BUF_WR_ADDR,
+        DST_BUF_WR_DATA   => DST_BUF_WR_DATA,
+        DST_BUF_WR_IE     => DST_BUF_WR_IE,
         DST_BUF_WR_EN     => DST_BUF_WR_EN
     );
 

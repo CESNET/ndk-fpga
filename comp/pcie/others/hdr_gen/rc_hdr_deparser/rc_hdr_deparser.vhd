@@ -20,7 +20,7 @@ entity PCIE_RC_HDR_DEPARSER is
         -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE"
         DEVICE : string  := "STRATIX10"
     );
-    port(
+    port (
         -- ===================================
         -- RC interface
         -- ===================================
@@ -52,20 +52,21 @@ end entity;
 --                             Architecture
 -- ----------------------------------------------------------------------------
 
-architecture full of PCIE_RC_HDR_DEPARSER is
+architecture FULL of PCIE_RC_HDR_DEPARSER is
     constant REMAINING_BYTES_WIDTH : natural := 12;
-    signal rem_bytes_all : unsigned(REMAINING_BYTES_WIDTH-1 downto 0);
-    signal rem_bytes_vld : unsigned(REMAINING_BYTES_WIDTH-1 downto 0);
+    signal   rem_bytes_all         : unsigned(REMAINING_BYTES_WIDTH-1 downto 0);
+    signal   rem_bytes_vld         : unsigned(REMAINING_BYTES_WIDTH-1 downto 0);
 begin
 
-    assert (DEVICE = "STRATIX10" OR DEVICE = "AGILEX" OR DEVICE = "ULTRASCALE" OR DEVICE = "7SERIES")
-        report "PCIE_RC_HDR_DEPARSER: unsupported device!" severity failure;
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+        report "PCIE_RC_HDR_DEPARSER: unsupported device!"
+        severity failure;
 
-   -- -------------------------------------------------------------------------
-   -- RC Header deparsing
-   -- -------------------------------------------------------------------------
+    -- -------------------------------------------------------------------------
+    -- RC Header deparsing
+    -- -------------------------------------------------------------------------
 
-    cc_hdr_xilinx_g: if (DEVICE="ULTRASCALE" or DEVICE="7SERIES") generate
+    cc_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
         OUT_LOW_ADDR   <=        IN_HEADER(12   -1 downto 0);
         OUT_BYTE_CNT   <=        IN_HEADER(29   -1 downto 16);
         OUT_COMPLETE   <=        IN_HEADER(30);
@@ -75,7 +76,7 @@ begin
         OUT_COMP_ST    <=        IN_HEADER(46   -1 downto 43);
     end generate;
 
-    cc_hdr_intel_g: if (DEVICE="STRATIX10" or DEVICE="AGILEX") generate
+    cc_hdr_intel_g: if (DEVICE = "STRATIX10" or DEVICE = "AGILEX") generate
         OUT_LOW_ADDR   <= "00000" & IN_HEADER(7+64                          -1 downto 64);
         OUT_DW_CNT     <= "0"     & IN_HEADER(10                            -1 downto 0);
         OUT_TAG        <=           IN_HEADER(23) & IN_HEADER(19) & IN_HEADER(72+8-1 downto 72);
@@ -87,7 +88,7 @@ begin
         -- Numer of remaining bytes (including those disabled by request BE)
         rem_bytes_all  <= round_up(unsigned(OUT_BYTE_CNT(11 downto 0))+unsigned(OUT_LOW_ADDR(2-1 downto 0)),log2(4));
         --                '1' when (dword count in all remaining completion parts (including bytes disabled by BE))=(dword count in this completion part) else '0';
-        OUT_COMPLETE   <= '1' when (std_logic_vector(rem_bytes_all(REMAINING_BYTES_WIDTH-1 downto 2)) )=(OUT_DW_CNT(10-1 downto 0)) else '0';
+        OUT_COMPLETE   <= '1' when (std_logic_vector(rem_bytes_all(REMAINING_BYTES_WIDTH-1 downto 2)) ) = (OUT_DW_CNT(10-1 downto 0)) else '0';
     end generate;
 
 end architecture;

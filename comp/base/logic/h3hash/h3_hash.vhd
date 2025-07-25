@@ -59,9 +59,9 @@ entity H3_HASH is
     );
 end entity;
 
-architecture behavioral of H3_HASH is
+architecture BEHAVIORAL of H3_HASH is
 
-    constant h3_conf : h3_config := h3_get_type(H3_TYPE, DATA_WIDTH, HASH_WIDTH);
+    constant H3_CONF : h3_config := h3_get_type(H3_TYPE, DATA_WIDTH, HASH_WIDTH);
 
     signal core_data_in     : std_logic_vector(h3_conf.key_width - 1 downto 0);
     signal core_data_out    : std_logic_vector(h3_conf.hash_width - 1 downto 0);
@@ -70,7 +70,7 @@ begin
 
     process (all)
     begin
-        core_data_in <= (others => '0');
+        core_data_in                          <= (others => '0');
         core_data_in(DATA_WIDTH - 1 downto 0) <= DATA_IN;
     end process;
 

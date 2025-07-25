@@ -24,73 +24,73 @@ library ieee;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity am_gen_4 is
-   generic (
-      LANE : natural range 0 to 3
-   );
-   port (
-      RESET : in std_logic;
-      CLK   : in std_logic; -- TX clock, 156.25MHz
-      EN    : in std_logic;
-      D     : in std_logic_vector(65 downto 0);  -- Input data
-      M     : out std_logic_vector(65 downto 0)  -- Generated marker
-   );
-end am_gen_4;
+entity AM_GEN_4 is
+    generic (
+        LANE : natural range 0 to 3
+    );
+    port (
+        RESET : in std_logic;
+        CLK   : in std_logic;                      -- TX clock, 156.25MHz
+        EN    : in std_logic;
+        D     : in std_logic_vector(65 downto 0);  -- Input data
+        M     : out std_logic_vector(65 downto 0)  -- Generated marker
+    );
+end entity;
 
-architecture four_lane of am_gen_4 is
+architecture FOUR_LANE of AM_GEN_4 is
 
-constant M_0 : std_logic_vector(23 downto 0) := X"47" & X"76" & X"90";
-constant M_1 : std_logic_vector(23 downto 0) := X"E6" & X"C4" & X"F0";
-constant M_2 : std_logic_vector(23 downto 0) := X"9B" & X"65" & X"C5";
-constant M_3 : std_logic_vector(23 downto 0) := X"3D" & X"79" & X"A2";
+    constant M_0 : std_logic_vector(23 downto 0) := X"47" & X"76" & X"90";
+    constant M_1 : std_logic_vector(23 downto 0) := X"E6" & X"C4" & X"F0";
+    constant M_2 : std_logic_vector(23 downto 0) := X"9B" & X"65" & X"C5";
+    constant M_3 : std_logic_vector(23 downto 0) := X"3D" & X"79" & X"A2";
 
-signal am       : std_logic_vector(65 downto 0);
-signal bip_prev : std_logic_vector(7 downto 0); -- Previous BIP value
-signal bip      : std_logic_vector(7 downto 0); -- Current BIP value
-signal bip_r    : bit_vector(7 downto 0) := X"00"; -- BIP register
+    signal am       : std_logic_vector(65 downto 0);
+    signal bip_prev : std_logic_vector(7 downto 0);    -- Previous BIP value
+    signal bip      : std_logic_vector(7 downto 0);    -- Current BIP value
+    signal bip_r    : bit_vector(7 downto 0) := X"00"; -- BIP register
 
 begin
-am(1 downto 0) <= "01";
+    am(1 downto 0) <= "01";
 
-LANE0: if LANE = 0 generate
-   am(25 downto 2) <= M_0;
-end generate;
+    lane0: if LANE = 0 generate
+        am(25 downto 2) <= M_0;
+    end generate;
 
-LANE1: if LANE = 1 generate
-   am(25 downto 2) <= M_1;
-end generate;
+    lane1: if LANE = 1 generate
+        am(25 downto 2) <= M_1;
+    end generate;
 
-LANE2: if LANE = 2 generate
-   am(25 downto 2) <= M_2;
-end generate;
+    lane2: if LANE = 2 generate
+        am(25 downto 2) <= M_2;
+    end generate;
 
-LANE3: if LANE = 3 generate
-   am(25 downto 2) <= M_3;
-end generate;
+    lane3: if LANE = 3 generate
+        am(25 downto 2) <= M_3;
+    end generate;
 
-bip_prev <= X"00" when RESET = '1' else to_stdlogicvector(bip_r);
+    bip_prev <= X"00" when RESET = '1' else to_stdlogicvector(bip_r);
 
-bip(0) <= bip_prev(0) xor D(2) xor D(10) xor D(18) xor D(26) xor D(34) xor D(42) xor D(50) xor D(58);
-bip(1) <= bip_prev(1) xor D(3) xor D(11) xor D(19) xor D(27) xor D(35) xor D(43) xor D(51) xor D(59);
-bip(2) <= bip_prev(2) xor D(4) xor D(12) xor D(20) xor D(28) xor D(36) xor D(44) xor D(52) xor D(60);
-bip(3) <= bip_prev(3) xor D(0) xor D( 5) xor D(13) xor D(21) xor D(29) xor D(37) xor D(45) xor D(53) xor D(61);
-bip(4) <= bip_prev(4) xor D(1) xor D( 6) xor D(14) xor D(22) xor D(30) xor D(38) xor D(46) xor D(54) xor D(62);
-bip(5) <= bip_prev(5) xor D(7) xor D(15) xor D(23) xor D(31) xor D(39) xor D(47) xor D(55) xor D(63);
-bip(6) <= bip_prev(6) xor D(8) xor D(16) xor D(24) xor D(32) xor D(40) xor D(48) xor D(56) xor D(64);
-bip(7) <= bip_prev(7) xor D(9) xor D(17) xor D(25) xor D(33) xor D(41) xor D(49) xor D(57) xor D(65);
+    bip(0) <= bip_prev(0) xor D(2) xor D(10) xor D(18) xor D(26) xor D(34) xor D(42) xor D(50) xor D(58);
+    bip(1) <= bip_prev(1) xor D(3) xor D(11) xor D(19) xor D(27) xor D(35) xor D(43) xor D(51) xor D(59);
+    bip(2) <= bip_prev(2) xor D(4) xor D(12) xor D(20) xor D(28) xor D(36) xor D(44) xor D(52) xor D(60);
+    bip(3) <= bip_prev(3) xor D(0) xor D( 5) xor D(13) xor D(21) xor D(29) xor D(37) xor D(45) xor D(53) xor D(61);
+    bip(4) <= bip_prev(4) xor D(1) xor D( 6) xor D(14) xor D(22) xor D(30) xor D(38) xor D(46) xor D(54) xor D(62);
+    bip(5) <= bip_prev(5) xor D(7) xor D(15) xor D(23) xor D(31) xor D(39) xor D(47) xor D(55) xor D(63);
+    bip(6) <= bip_prev(6) xor D(8) xor D(16) xor D(24) xor D(32) xor D(40) xor D(48) xor D(56) xor D(64);
+    bip(7) <= bip_prev(7) xor D(9) xor D(17) xor D(25) xor D(33) xor D(41) xor D(49) xor D(57) xor D(65);
 
-BIP_SEQ: process(CLK, RESET)
-begin
-   if CLK'event and CLK = '1' then
-      if EN = '1' then
-         bip_r <= to_bitvector(bip);
-      end if;
-   end if;
-end process;
+    bip_seq : process (CLK, RESET)
+    begin
+        if rising_edge(CLK) then
+            if (EN = '1') then
+                bip_r <= to_bitvector(bip);
+            end if;
+        end if;
+    end process;
 
-am(33 downto 26) <= to_stdlogicvector(bip_r);
-am(65 downto 34) <= not am(33 downto 2);
+    am(33 downto 26) <= to_stdlogicvector(bip_r);
+    am(65 downto 34) <= not am(33 downto 2);
 
-M <= am;
+    M <= am;
 
-end four_lane;
+end architecture;

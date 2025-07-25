@@ -17,7 +17,7 @@ use work.type_pack.all;
 -- See readme.rst for more information and examples (Section "Component specification").
 
 entity MFB_FRAME_MASKER is
-    generic(
+    generic (
         -- ====================================================================
         -- MFB parameters
         -- ====================================================================
@@ -45,7 +45,7 @@ entity MFB_FRAME_MASKER is
         DEVICE      : string := "7SERIES"
     );
 
-    port(
+    port (
         -- ====================================================================
         -- Clock and Reset
         -- ====================================================================
@@ -194,34 +194,34 @@ begin
 
     mfb_pipe_i : entity work.MFB_PIPE
     generic map (
-        REGIONS     => REGIONS     ,
-        REGION_SIZE => REGION_SIZE ,
-        BLOCK_SIZE  => BLOCK_SIZE  ,
-        ITEM_WIDTH  => ITEM_WIDTH  ,
-        META_WIDTH  => META_WIDTH  ,
+        REGIONS     => REGIONS,
+        REGION_SIZE => REGION_SIZE,
+        BLOCK_SIZE  => BLOCK_SIZE,
+        ITEM_WIDTH  => ITEM_WIDTH,
+        META_WIDTH  => META_WIDTH,
 
         FAKE_PIPE   => not USE_PIPE,
-        USE_DST_RDY => True        ,
-        PIPE_TYPE   => PIPE_TYPE   ,
+        USE_DST_RDY => True,
+        PIPE_TYPE   => PIPE_TYPE,
         DEVICE      => DEVICE
     )
     port map (
         CLK        => CLK,
         RESET      => RESET,
 
-        RX_DATA    => RX_DATA        ,
-        RX_META    => RX_META        ,
-        RX_SOF     => RX_SOF         ,
-        RX_EOF     => RX_EOF         ,
-        RX_SOF_POS => RX_SOF_POS     ,
-        RX_EOF_POS => RX_EOF_POS     ,
-        RX_SRC_RDY => RX_SRC_RDY     ,
-        RX_DST_RDY => RX_DST_RDY     ,
+        RX_DATA    => RX_DATA,
+        RX_META    => RX_META,
+        RX_SOF     => RX_SOF,
+        RX_EOF     => RX_EOF,
+        RX_SOF_POS => RX_SOF_POS,
+        RX_EOF_POS => RX_EOF_POS,
+        RX_SRC_RDY => RX_SRC_RDY,
+        RX_DST_RDY => RX_DST_RDY,
 
-        TX_DATA    => pipe_tx_data   ,
-        TX_META    => pipe_tx_meta   ,
-        TX_SOF     => pipe_tx_sof    ,
-        TX_EOF     => pipe_tx_eof    ,
+        TX_DATA    => pipe_tx_data,
+        TX_META    => pipe_tx_meta,
+        TX_SOF     => pipe_tx_sof,
+        TX_EOF     => pipe_tx_eof,
         TX_SOF_POS => pipe_tx_sof_pos,
         TX_EOF_POS => pipe_tx_eof_pos,
         TX_SRC_RDY => pipe_tx_src_rdy,
@@ -269,8 +269,8 @@ begin
     end process;
 
     -- Logic to signal readiness for the next word
-    some_sof_reg <= '1' when (or sof_reg = '1') and (src_rdy_reg = '1') else '0';
-    masking_done <= '1' when (some_sof_reg = '1') and (valid_mask(highest_sof_reg_index) = '1') else '0';
+    some_sof_reg   <= '1' when (or sof_reg = '1') and (src_rdy_reg = '1') else '0';
+    masking_done   <= '1' when (some_sof_reg = '1') and (valid_mask(highest_sof_reg_index) = '1') else '0';
     load_next_word <= '1' when ((masking_done = '1') or (some_sof_reg = '0')) and (TX_DST_RDY = '1') else '0';
 
     -- --------------------------------------------------------------------------
@@ -278,7 +278,7 @@ begin
     -- --------------------------------------------------------------------------
 
     -- Accumulate SOF mask
-    process(all)
+    process (all)
     begin
         current_accum_mask_sof <= (others => '1');
         for r in REGIONS-1 downto 0 loop
@@ -290,11 +290,11 @@ begin
     end process;
 
     -- Apply the SOF mask
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             current_sof_reg <= current_sof_reg and current_accum_mask_sof;
-            if (RESET = '1') or (load_next_word = '1') then
+            if ((RESET = '1') or (load_next_word = '1')) then
                 current_sof_reg <= pipe_tx_sof;
             end if;
         end if;
@@ -312,32 +312,32 @@ begin
     lv_rx_src_rdy <= src_rdy_reg;
 
     last_vld_i : entity work.MVB_AGGREGATE_LAST_VLD
-    generic map(
-        ITEMS          => REGIONS      ,
-        ITEM_WIDTH     => 1            ,
+    generic map (
+        ITEMS          => REGIONS,
+        ITEM_WIDTH     => 1,
         IMPLEMENTATION => LAST_VLD_IMPL,
         INTERNAL_REG   => true
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        RX_DATA         => lv_rx_data      ,
-        RX_VLD          => lv_rx_vld       ,
-        RX_SRC_RDY      => lv_rx_src_rdy   ,
-        RX_DST_RDY      => open            ,
+        RX_DATA         => lv_rx_data,
+        RX_VLD          => lv_rx_vld,
+        RX_SRC_RDY      => lv_rx_src_rdy,
+        RX_DST_RDY      => open,
 
-        REG_IN_DATA     => (others => '0') ,
-        REG_IN_VLD      => '0'             ,
-        REG_OUT_DATA    => open            ,
-        REG_OUT_VLD     => open            ,
-        REG_OUT_WR      => open            ,
+        REG_IN_DATA     => (others => '0'),
+        REG_IN_VLD      => '0',
+        REG_OUT_DATA    => open,
+        REG_OUT_VLD     => open,
+        REG_OUT_WR      => open,
 
-        TX_DATA         => lv_tx_data      ,
-        TX_VLD          => open            ,
+        TX_DATA         => lv_tx_data,
+        TX_VLD          => open,
         TX_PRESCAN_DATA => lv_tx_data_presc,
-        TX_PRESCAN_VLD  => open            ,
-        TX_SRC_RDY      => open            ,
+        TX_PRESCAN_VLD  => open,
+        TX_SRC_RDY      => open,
         TX_DST_RDY      => lv_tx_dst_rdy
     );
 
@@ -355,21 +355,22 @@ begin
     whole_frame_logic_g : for r in 0 to REGIONS-1 generate
         -- Indicates that the frame starts and ends in the same word
         whole_frame(r) <= '1' when (sof_reg(r) = '1' and eof_reg(r) = '1') and
-                                   (u_array_sof_pos(r) < u_array_eof_pos(r)(EOF_POS_WIDTH-1 downto log2(BLOCK_SIZE))) else '0';
+                                   (u_array_sof_pos(r) < u_array_eof_pos(r)(EOF_POS_WIDTH-1 downto log2(BLOCK_SIZE))) else
+ '0';
     end generate;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             current_eof_reg <= eof_reg and current_accum_mask_eof;
-            if (RESET = '1') or (load_next_word = '1') then
+            if ((RESET = '1') or (load_next_word = '1')) then
                 current_eof_reg <= pipe_tx_eof;
             end if;
         end if;
     end process;
 
     -- EOF Unmasked
-    process(all)
+    process (all)
     begin
         current_accum_mask_eof <= (others => '1');
         for r in REGIONS-1 downto 0 loop
@@ -386,8 +387,8 @@ begin
 
     -- logic for determining if the packet continues from the previous Region or not
     pkt_cont_g : for r in 0 to REGIONS-1 generate
-        pkt_cont(r+1) <= (    masked_sof(r) and not masked_eof(r) and not pkt_cont(r)) or
-                         (    masked_sof(r) and     masked_eof(r) and     pkt_cont(r)) or
+        pkt_cont(r+1) <= (masked_sof(r) and not masked_eof(r) and not pkt_cont(r)) or
+                         (masked_sof(r) and     masked_eof(r) and     pkt_cont(r)) or
                          (not masked_sof(r) and not masked_eof(r) and     pkt_cont(r));
     end generate;
 
@@ -397,7 +398,7 @@ begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
                 pkt_cont(0) <= '0';
-            elsif (TX_DST_RDY = '1') and (src_rdy_reg = '1') then
+            elsif ((TX_DST_RDY = '1') and (src_rdy_reg = '1')) then
                 pkt_cont(0) <= pkt_cont(REGIONS);
             end if;
         end if;

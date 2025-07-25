@@ -19,14 +19,14 @@ use work.type_pack.all;
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
 
-entity testbench is
-end entity testbench;
+entity TESTBENCH is
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
 
-architecture behavioral of testbench is
+architecture BEHAVIORAL of TESTBENCH is
 
     -- Constants declaration ---------------------------------------------------
 
@@ -59,9 +59,9 @@ architecture behavioral of testbench is
     signal tx_dst_rdy  : std_logic;
 
     signal test_ok : std_logic := '1';
--- ----------------------------------------------------------------------------
---                            Architecture body
--- ----------------------------------------------------------------------------
+    -- ----------------------------------------------------------------------------
+    --                            Architecture body
+    -- ----------------------------------------------------------------------------
 
 begin
 
@@ -70,7 +70,7 @@ begin
     -- -------------------------------------------------------------------------
 
     uut: entity work.GEN_MUX_PIPED
-    generic map(
+    generic map (
         DATA_WIDTH     => DATA_WIDTH,
         MUX_WIDTH      => MUX_WIDTH,
         MUX_LATENCY    => LATENCY,
@@ -78,19 +78,19 @@ begin
         INPUT_REG      => INPUT_REG,
         OUTPUT_REG     => OUTPUT_REG
     )
-    port map(
+    port map (
         CLK        => clk,
         RESET      => rst,
 
-        RX_DATA     => rx_data    ,
-        RX_SEL      => rx_sel     ,
+        RX_DATA     => rx_data,
+        RX_SEL      => rx_sel,
         RX_METADATA => rx_metadata,
-        RX_SRC_RDY  => rx_src_rdy ,
-        RX_DST_RDY  => rx_dst_rdy ,
+        RX_SRC_RDY  => rx_src_rdy,
+        RX_DST_RDY  => rx_dst_rdy,
 
-        TX_DATA     => tx_data    ,
+        TX_DATA     => tx_data,
         TX_METADATA => tx_metadata,
-        TX_SRC_RDY  => tx_src_rdy ,
+        TX_SRC_RDY  => tx_src_rdy,
         TX_DST_RDY  => tx_dst_rdy
     );
 
@@ -99,38 +99,38 @@ begin
     -- -------------------------------------------------------------------------
 
     -- generating clk
-    clk_gen: process
+    clk_gen : process
     begin
         clk <= '1';
         wait for C_CLK_PER / 2;
         clk <= '0';
         wait for C_CLK_PER / 2;
-    end process clk_gen;
+    end process;
 
     -- generating reset
-    rst_gen: process
+    rst_gen : process
     begin
         rst <= '1';
         wait for C_RST_TIME;
         rst <= '0';
         wait;
-    end process rst_gen;
+    end process;
 
     -- -------------------------------------------------------------------------
 
-    tb: process
+    tb : process
         variable seed1 : positive := 42;
         variable seed2 : positive := 42;
 
         variable rand  : real;
-        variable X     : integer;
+        variable x     : integer;
 
         variable value : unsigned(DATA_WIDTH-1 downto 0) := (others => '1');
     begin
         wait for 1 ns;
         -- Wait for the reset
-        if (rst='1') then
-            wait until rst='0';
+        if (rst = '1') then
+            wait until rst = '0';
         end if;
 
         -- input gen
@@ -140,22 +140,22 @@ begin
         rx_sel      <= (others => '0');
 
         uniform(seed1,seed2,rand);
-        X := integer(rand*real(100));
-        if (X<80) then
+        x := integer(rand*real(100));
+        if (x < 80) then
             rx_src_rdy <= '1';
 
             uniform(seed1,seed2,rand);
-            X := integer(rand*real(MUX_WIDTH-1));
-            rx_sel  <= std_logic_vector(to_unsigned(X,rx_sel'length));
+            x                                               := integer(rand*real(MUX_WIDTH-1));
+            rx_sel                                          <= std_logic_vector(to_unsigned(x,rx_sel'length));
             rx_data((X+1)*DATA_WIDTH-1 downto X*DATA_WIDTH) <= std_logic_vector(value);
-            rx_metadata <= std_logic_vector(resize_left(value,METADATA_WIDTH));
-            value := value+1;
+            rx_metadata                                     <= std_logic_vector(resize_left(value,METADATA_WIDTH));
+            value                                           := value+1;
         end if;
 
         -- output check
         test_ok <= '1';
-        if (tx_src_rdy='1' and tx_dst_rdy='1') then
-            if (tx_data/=(DATA_WIDTH-1 downto 0 => '1') or tx_metadata/=(METADATA_WIDTH-1 downto 0 => '1')) then
+        if (tx_src_rdy = '1' and tx_dst_rdy = '1') then
+            if (tx_data /= (DATA_WIDTH-1 downto 0 => '1') or tx_metadata /= (METADATA_WIDTH-1 downto 0 => '1')) then
                 test_ok <= '0';
             end if;
         end if;
@@ -164,12 +164,12 @@ begin
         tx_dst_rdy <= '0';
 
         uniform(seed1,seed2,rand);
-        X := integer(rand*real(100));
-        if (X<80) then
+        x := integer(rand*real(100));
+        if (x < 80) then
             tx_dst_rdy <= '1';
         end if;
 
         wait for C_CLK_PER -1 ns;
     end process;
 
-end architecture behavioral;
+end architecture;

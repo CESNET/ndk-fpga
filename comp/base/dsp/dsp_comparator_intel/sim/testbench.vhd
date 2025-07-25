@@ -8,20 +8,20 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use std.env.all;
-use STD.textio.all;
+use std.textio.all;
 
 library work;
 use work.type_pack.all;
 use work.math_pack.all;
 use work.basics_test_pkg.all;
 use std.env.stop;
-use STD.textio.all;
+use std.textio.all;
 
 -- ============================================================================
 --                        Entity declaration
 -- ============================================================================
 entity TESTBENCH is
-end entity TESTBENCH;
+end entity;
 -- ============================================================================
 --                      Architecture declaration
 -- ============================================================================
@@ -77,7 +77,7 @@ architecture BEHAVIORAL of TESTBENCH is
 
     -- signals for verification of a succesful run
     signal stop_at_the_end         : std_logic := '0'; -- is '1' at the end of the simulation, allows for the verdict of the simulation run to be written out
-    signal clk_cycle_count         : natural := 0; -- +1 each rising edge, counts up until the LENGHT_OF_SIM is reached
+    signal clk_cycle_count         : natural := 0;     -- +1 each rising edge, counts up until the LENGHT_OF_SIM is reached
 
     -- result of the comparator: "00" when input values are equal, "01" when the 1st is larger than the 2nd, "10" when the 2nd is larger than the 1st
     -- in modes ">=" or "<=" the result is in form of: '11' when the 1st number is larger or equal to (or smaller or equal to, respectively) the 2nd number, else '00'
@@ -86,10 +86,10 @@ architecture BEHAVIORAL of TESTBENCH is
     -- signals for the simulated comparator
     signal input1_behind_regs_uns  : unsigned(DATA_WIDTH-1 downto 0); -- input 1 for the simulated comparator in unsigned so it can be compared with input 2
     signal input2_behind_regs_uns  : unsigned(DATA_WIDTH-1 downto 0); -- input 2 for the simulated comparator in unsigned so it can be compared with input 1
-    signal sim_result         : std_logic_vector(1 downto 0); -- result from the simulated comparator
+    signal sim_result              : std_logic_vector(1 downto 0);    -- result from the simulated comparator
 
     -- signals for verification of the comparator
-    signal result_ok               : std_logic; -- is '1' when results from the testbench and from the comparator are equal -> the result from the comparator is correct
+    signal result_ok               : std_logic;    -- is '1' when results from the testbench and from the comparator are equal -> the result from the comparator is correct
     signal correct_results         : natural := 1; -- counts the number of iterations when results from the testbench and from the comparator were equal; initialized to 1 to finish at the total number of iterations
     signal incorrect_results       : natural := 1; -- counts the number of iterations when results from the testbench and from the comparator were not equal; initialized to 1 to finish at the total number of iterations
 
@@ -99,18 +99,18 @@ begin
 
     uut : entity work.DSP_COMPARATOR_INTEL
     generic map (
-        INPUT_DATA_WIDTH => DATA_WIDTH   ,
+        INPUT_DATA_WIDTH => DATA_WIDTH,
         INPUT_REGS_EN    => INPUT_REGS_EN,
-        DSP_EN           => DSP_ENABLE   ,
-        MODE             => MODE         ,
+        DSP_EN           => DSP_ENABLE,
+        MODE             => MODE,
         DEVICE           => DEVICE
     )
     port map (
-        CLK      => clk    ,
+        CLK      => clk,
         CLK_EN   => clk_ena,
-        RESET    => rst    ,
-        INPUT_1  => input1 ,
-        INPUT_2  => input2 ,
+        RESET    => rst,
+        INPUT_1  => input1,
+        INPUT_2  => input2,
         RESULT   => cmp_result
     );
 
@@ -146,7 +146,7 @@ begin
     clk_ena_p : process
         variable s0 : integer := 3;
         variable s1 : integer := 7;
-        variable X  : integer := 6;
+        variable x  : integer := 6;
     begin
         clk_ena <= '0';
         wait until rst = '0';
@@ -155,8 +155,8 @@ begin
         clk_ena_rand_gen_l : for i in 0 to LENGHT_OF_SIM loop
             if (stop_at_the_end = '0') then
                 -- generate random times to assert and deassert clk_ena
-                randint(s0, s1, 2, 10, X);
-                wait for (i+1)*CLK_PERIOD*X;
+                randint(s0, s1, 2, 10, x);
+                wait for (i+1)*CLK_PERIOD*x;
                 clk_ena <= '0';
                 wait for 2*CLK_PERIOD;
                 clk_ena <= '1';
@@ -171,7 +171,7 @@ begin
     rst_p : process
         variable s0 : integer := 7;
         variable s1 : integer := 4;
-        variable X  : integer := 2;
+        variable x  : integer := 2;
     begin
         rst <= '1';
         wait for 3*CLK_PERIOD;
@@ -180,8 +180,8 @@ begin
         rst_rand_gen_l : for i in 0 to LENGHT_OF_SIM loop
             if (stop_at_the_end = '0') then
                 -- generate random times to assert rst
-                randint(s0, s1, 5, 15, X);
-                wait for (i+1)*CLK_PERIOD*X*X;
+                randint(s0, s1, 5, 15, x);
+                wait for (i+1)*CLK_PERIOD*x*x;
                 rst <= '1';
                 wait for 3*CLK_PERIOD;
                 rst <= '0';
@@ -251,15 +251,15 @@ begin
     rand_input1_p : process
         variable s0 : integer := 9;
         variable s1 : integer := 6;
-        variable X  : integer := 4;
+        variable x  : integer := 4;
     begin
         if (stop_at_the_end = '0') then
             wait until rising_edge(clk);
             -- generating random integer
-            randint(s0, s1, 1, integer'high, X);
+            randint(s0, s1, 1, integer'high, x);
             wait for 0.1*CLK_PERIOD;
             -- using the randomly generated integer (X) to generate a random std_logic_vector
-            input1 <= random_vector(DATA_WIDTH, X);
+            input1 <= random_vector(DATA_WIDTH, x);
         else
             wait;
         end if;
@@ -268,15 +268,15 @@ begin
     rand_input2_p : process
         variable s0   : integer := 6;
         variable s1   : integer := 3;
-        variable X    : integer := 7;
+        variable x    : integer := 7;
     begin
         if (stop_at_the_end = '0') then
             wait until rising_edge(clk);
             -- generating random integer
-            randint(s0, s1, 1, integer'high, X);
+            randint(s0, s1, 1, integer'high, x);
             wait for 0.1*CLK_PERIOD;
             -- using the randomly generated integer (X) to generate a random std_logic_vector
-            input2 <= random_vector(DATA_WIDTH, X);
+            input2 <= random_vector(DATA_WIDTH, x);
         else
             wait;
         end if;
@@ -312,7 +312,7 @@ begin
     -- comparing logic
     comp_function_g : case MODE generate
 
-        when ">= " =>
+        when ">= "  =>
 
             mode1_comparing_p : process (clk)
             begin
@@ -337,7 +337,7 @@ begin
 
         end;
 
-        when "<= " =>
+        when "<= "  =>
 
             mode2_comparing_p : process (clk)
             begin
@@ -409,7 +409,7 @@ begin
                 else
                     incorrect_results <= incorrect_results + 1;
                 end if;
-                --stop(1); -- stops the simulation after N incorrect results
+            -- stop(1); -- stops the simulation after N incorrect results
             elsif (correct_results mod REPORT_EVERY_NTH = 0) then
                 write(l, string'(integer'image(correct_results) & " results are correct.")); writeline(output, l);
                 correct_results <= correct_results + 1;

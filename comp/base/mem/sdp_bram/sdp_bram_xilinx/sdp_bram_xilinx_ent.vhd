@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity SDP_BRAM_XILINX2 is
-    Generic (
+    generic (
         -- Data word width in bits. If BLOCK_ENABLE is True then DATA_WIDTH must
         -- be N*BLOCK_WIDTH.
         DATA_WIDTH     : integer := 64;
@@ -35,7 +35,7 @@ entity SDP_BRAM_XILINX2 is
         -- "7SERIES", "ULTRASCALE", "STRATIX10", "ARRIA10", "AGILEX"
         DEVICE         : string := "ULTRASCALE"
     );
-    Port (
+    port (
         -- =====================================================================
         --  WRITE PORT
         -- =====================================================================

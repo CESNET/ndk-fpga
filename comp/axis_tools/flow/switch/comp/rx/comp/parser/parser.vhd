@@ -177,7 +177,7 @@ begin
         HDR_WIDTH             => MAC_HDR_W,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK                   => CLK,
         RESET                 => RESET,
         RX_AXI_TDATA          => RX_AXI_TDATA,
@@ -203,7 +203,7 @@ begin
 
     -- TODO: adjust control for < 100GbE
     s_vlan_q_en      <= '1' when s_mac_hdr_vld = '1' and s_mac_hdr(MAC_ETHERTYPE_R) = X"0081" else '0';
-    s_vlan_ad_en     <= '1' when s_mac_hdr_vld = '1' and s_mac_hdr(MAC_ETHERTYPE_R) = X"a888" else '0';
+    s_vlan_ad_en     <= '1' when s_mac_hdr_vld = '1' and s_mac_hdr(MAC_ETHERTYPE_R) = X"A888" else '0';
     s_vlan_ad_en_2   <= '1' when s_vlan1_hdr_vld = '1' and s_vlan1_hdr(VLAN_TCI_VID_R) = X"0081" else '0';
     s_mac_ethertype  <= s_mac_eth1 when s_mac_eth1_vld = '1' else
                         s_mac_eth2 when s_mac_eth2_vld = '1' else
@@ -221,7 +221,7 @@ begin
         HDR_WIDTH             => VLAN_HDR_W,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK                   => CLK,
         RESET                 => RESET,
         RX_AXI_TDATA          => s_mac_tx_axi_tdata,
@@ -253,7 +253,7 @@ begin
         HDR_WIDTH             => MAC_ETHERTYPE_W,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK                   => CLK,
         RESET                 => RESET,
         RX_AXI_TDATA          => s_vlan1_tx_axi_tdata,
@@ -285,7 +285,7 @@ begin
         HDR_WIDTH             => VLAN_HDR_W,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK                   => CLK,
         RESET                 => RESET,
         RX_AXI_TDATA          => s_mac_eth1_tx_axi_tdata,
@@ -317,7 +317,7 @@ begin
         HDR_WIDTH             => MAC_ETHERTYPE_W,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK                   => CLK,
         RESET                 => RESET,
         RX_AXI_TDATA          => s_vlan2_tx_axi_tdata,

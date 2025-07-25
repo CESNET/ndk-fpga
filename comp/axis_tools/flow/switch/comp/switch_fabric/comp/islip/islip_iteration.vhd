@@ -109,7 +109,7 @@ begin
         s_tx_decision_reg(i) <= RX_DECISION_REG(i) or s_accept_vec_arr(i);
     end generate;
 
-    output_regs_p : process(CLK)
+    output_regs_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then

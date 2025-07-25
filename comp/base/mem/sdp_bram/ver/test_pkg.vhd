@@ -28,9 +28,9 @@ package test_pkg is
     -- Verification settings
 
     -- a chance, that a write will be preformed each tick
-    constant WR_CH : integer := 80; -- [%]
+    constant WR_CH      : integer := 80; -- [%]
     -- a chance, that a read will be preformed each tick
-    constant RD_CH : integer := 80; -- [%]
+    constant RD_CH      : integer := 80; -- [%]
     -- a chance for PIPE_EN each tick
     constant PIPE_EN_CH : integer := 80; -- [%]
 

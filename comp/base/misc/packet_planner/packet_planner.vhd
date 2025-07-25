@@ -25,114 +25,114 @@ use work.dma_bus_pack.all;
 -- =========================================================================
 
 entity PACKET_PLANNER is
-generic(
-    -- Target device
-    DEVICE            : string := "STRATIX10";
+    generic (
+        -- Target device
+        DEVICE            : string := "STRATIX10";
 
-    -- Number of parallel interfaces for packets
-    STREAMS           : natural := 4;
-    -- Maximum number of Packet inputs and outputs on each Stream
-    PKTS              : natural := 4;
-    -- Maximum number of Packets actually planned in one CLK cycle
-    -- Setting this value lower than STREAMS*PKTS will decrease
-    -- the planning speed for small packets, but will probably
-    -- greately improve timing.
-    PLANNED_PKTS      : natural := STREAMS*PKTS;
-    -- Width of Metadata passed with each Packet
-    METADATA_WIDTH    : natural := 0;
-    -- Size of address space to which the packets are being
-    -- planned to
-    SPACE_SIZE        : natural := 16;
-    -- Size of one word in destination space
-    -- The planner is only required to plan one word each cycle.
-    -- This prevents blocking from having to plan multiple packets,
-    -- that are together larger than the entire space. (If such case is possible.)
-    -- Set to 'SPACE_SIZE' to eliminate this behavior when the blocking is not actually possible.
-    SPACE_WORD_SIZE   : natural := SPACE_SIZE;
-    -- Maximum size of one Pakcet
-    PKT_SIZE          : natural := 64;
-    -- Size of average gap between two planned packets
-    GAP_SIZE          : natural := 12;
-    -- Size of minimum gap between two planned packets
-    GAP_SIZE_MIN      : integer := GAP_SIZE-4;
-    -- Size of alignment of start of all packets
-    ALIGN             : natural := 8;
+        -- Number of parallel interfaces for packets
+        STREAMS           : natural := 4;
+        -- Maximum number of Packet inputs and outputs on each Stream
+        PKTS              : natural := 4;
+        -- Maximum number of Packets actually planned in one CLK cycle
+        -- Setting this value lower than STREAMS*PKTS will decrease
+        -- the planning speed for small packets, but will probably
+        -- greately improve timing.
+        PLANNED_PKTS      : natural := STREAMS*PKTS;
+        -- Width of Metadata passed with each Packet
+        METADATA_WIDTH    : natural := 0;
+        -- Size of address space to which the packets are being
+        -- planned to
+        SPACE_SIZE        : natural := 16;
+        -- Size of one word in destination space
+        -- The planner is only required to plan one word each cycle.
+        -- This prevents blocking from having to plan multiple packets,
+        -- that are together larger than the entire space. (If such case is possible.)
+        -- Set to 'SPACE_SIZE' to eliminate this behavior when the blocking is not actually possible.
+        SPACE_WORD_SIZE   : natural := SPACE_SIZE;
+        -- Maximum size of one Pakcet
+        PKT_SIZE          : natural := 64;
+        -- Size of average gap between two planned packets
+        GAP_SIZE          : natural := 12;
+        -- Size of minimum gap between two planned packets
+        GAP_SIZE_MIN      : integer := GAP_SIZE-4;
+        -- Size of alignment of start of all packets
+        ALIGN             : natural := 8;
 
-    -- Internal input serialization FIFO size (in number of complete words)
-    FIFO_ITEMS        : natural := 32;
-    -- Internal input serialization FIFO Almost Full offset (in number of complete words)
-    FIFO_AFULL_OFFSET : natural := 8;
+        -- Internal input serialization FIFO size (in number of complete words)
+        FIFO_ITEMS        : natural := 32;
+        -- Internal input serialization FIFO Almost Full offset (in number of complete words)
+        FIFO_AFULL_OFFSET : natural := 8;
 
-    -- Enable for usage of Stream and global packet output
-    -- Setting these parameters to FALSE will remove output FIFOs from
-    -- the respective outputs and will disconnect the output interface
-    STREAM_OUT_EN     : boolean := true;
-    GLOBAL_OUT_EN     : boolean := true;
+        -- Enable for usage of Stream and global packet output
+        -- Setting these parameters to FALSE will remove output FIFOs from
+        -- the respective outputs and will disconnect the output interface
+        STREAM_OUT_EN     : boolean := true;
+        GLOBAL_OUT_EN     : boolean := true;
 
-    -- This option removes output FIFOX Multi's on the respected TX interface
-    -- by using the AFULL signal instead of the DST_RDY signal for flow control.
-    -- The user is then responsible for being able to accept a number of TX
-    -- words even after the raise of the AFULL signal.
-    -- (The specific number depends on the number of registers in this unit
-    -- after the internal input serialization FIFO.)
-    -- Only relevant when the respected OUT_EN generic is True.
-    -- IN STREAM_OUT_AFULL dont forget on MVB_SHAKEDOWN delay
-    STREAM_OUT_AFULL  : boolean := false;
-    GLOBAL_OUT_AFULL  : boolean := false
-);
-port(
+        -- This option removes output FIFOX Multi's on the respected TX interface
+        -- by using the AFULL signal instead of the DST_RDY signal for flow control.
+        -- The user is then responsible for being able to accept a number of TX
+        -- words even after the raise of the AFULL signal.
+        -- (The specific number depends on the number of registers in this unit
+        -- after the internal input serialization FIFO.)
+        -- Only relevant when the respected OUT_EN generic is True.
+        -- IN STREAM_OUT_AFULL dont forget on MVB_SHAKEDOWN delay
+        STREAM_OUT_AFULL  : boolean := false;
+        GLOBAL_OUT_AFULL  : boolean := false
+    );
+    port (
+        -- =====================================================================
+        --  Clock and Reset
+        -- =====================================================================
+
+        CLK   : in  std_logic;
+        RESET : in  std_logic;
+
+        -- =====================================================================
+
+        -- =====================================================================
+        --  Other interfaces
+        -- =====================================================================
+
+        RX_STR_PKT_META    : in  slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(METADATA_WIDTH-1 downto 0);
+        RX_STR_PKT_LEN     : in  slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(log2(PKT_SIZE+1)-1 downto 0);
+        RX_STR_PKT_VLD     : in  slv_array_t     (STREAMS-1 downto 0)(PKTS-1 downto 0);
+        RX_STR_PKT_SRC_RDY : in  std_logic_vector(STREAMS-1 downto 0);
+        -- Packets are stopped a few cycles up front to enable DST_RDY elimination
+        -- (some packets can be accepted even after this signal rises (the number defined by FIFO_AFULL_OFFSET))
+        RX_STR_PKT_AFULL   : out std_logic_vector(STREAMS-1 downto 0);
+
+        -- Current destination space read pointer
+        -- Serves to detect space filling (packet planning stops when the space is full)
+        SPACE_GLB_RD_PTR   : in  std_logic_vector(log2(SPACE_SIZE)-log2(ALIGN)-1 downto 0);
+        -- Current destination space write pointer
+        -- Serves only as possible additional information
+        SPACE_GLB_WR_PTR   : out std_logic_vector(log2(SPACE_SIZE)-log2(ALIGN)-1 downto 0);
+
+        -- Packets with assigned addresses (individual for each Stream)
+        -- Can be disabled by generic STREAM_OUT_EN.
+        TX_STR_PKT_META    : out slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(METADATA_WIDTH-1 downto 0);
+        TX_STR_PKT_LEN     : out slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(log2(PKT_SIZE+1)-1 downto 0);
+        TX_STR_PKT_ADDR    : out slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(log2(SPACE_SIZE)-1 downto 0);
+        TX_STR_PKT_VLD     : out slv_array_t     (STREAMS-1 downto 0)(PKTS-1 downto 0);
+        -- Only used when STREAM_OUT_AFULL==False
+        TX_STR_PKT_DST_RDY : in  slv_array_t     (STREAMS-1 downto 0)(PKTS-1 downto 0) := (others => (others => '1')); -- read signal for FIFOX Multi
+        -- Only used when STREAM_OUT_AFULL==True
+        TX_STR_PKT_AFULL   : in  std_logic_vector(STREAMS-1 downto 0) := (others => '0');
+
+        -- Packets with assigned addresses (globaly serialized over all Streams)
+        -- Can be disabled by generic GLOBAL_OUT_EN.
+        TX_GLB_PKT_META    : out slv_array_t     (PLANNED_PKTS-1 downto 0)(METADATA_WIDTH-1 downto 0);
+        TX_GLB_PKT_LEN     : out slv_array_t     (PLANNED_PKTS-1 downto 0)(log2(PKT_SIZE+1)-1 downto 0);
+        TX_GLB_PKT_ADDR    : out slv_array_t     (PLANNED_PKTS-1 downto 0)(log2(SPACE_SIZE)-1 downto 0);
+        TX_GLB_PKT_VLD     : out std_logic_vector(PLANNED_PKTS-1 downto 0);
+        -- Only used when GLOBAL_OUT_AFULL==False
+        TX_GLB_PKT_DST_RDY : in  std_logic_vector(PLANNED_PKTS-1 downto 0) := (others => '1'); -- read signal for FIFOX Multi
+        -- Only used when GLOBAL_OUT_AFULL==True
+        TX_GLB_PKT_AFULL   : in  std_logic := '0'
+
     -- =====================================================================
-    --  Clock and Reset
-    -- =====================================================================
-
-    CLK   : in  std_logic;
-    RESET : in  std_logic;
-
-    -- =====================================================================
-
-    -- =====================================================================
-    --  Other interfaces
-    -- =====================================================================
-
-    RX_STR_PKT_META    : in  slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(METADATA_WIDTH-1 downto 0);
-    RX_STR_PKT_LEN     : in  slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(log2(PKT_SIZE+1)-1 downto 0);
-    RX_STR_PKT_VLD     : in  slv_array_t     (STREAMS-1 downto 0)(PKTS-1 downto 0);
-    RX_STR_PKT_SRC_RDY : in  std_logic_vector(STREAMS-1 downto 0);
-    -- Packets are stopped a few cycles up front to enable DST_RDY elimination
-    -- (some packets can be accepted even after this signal rises (the number defined by FIFO_AFULL_OFFSET))
-    RX_STR_PKT_AFULL   : out std_logic_vector(STREAMS-1 downto 0);
-
-    -- Current destination space read pointer
-    -- Serves to detect space filling (packet planning stops when the space is full)
-    SPACE_GLB_RD_PTR   : in  std_logic_vector(log2(SPACE_SIZE)-log2(ALIGN)-1 downto 0);
-    -- Current destination space write pointer
-    -- Serves only as possible additional information
-    SPACE_GLB_WR_PTR   : out std_logic_vector(log2(SPACE_SIZE)-log2(ALIGN)-1 downto 0);
-
-    -- Packets with assigned addresses (individual for each Stream)
-    -- Can be disabled by generic STREAM_OUT_EN.
-    TX_STR_PKT_META    : out slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(METADATA_WIDTH-1 downto 0);
-    TX_STR_PKT_LEN     : out slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(log2(PKT_SIZE+1)-1 downto 0);
-    TX_STR_PKT_ADDR    : out slv_array_2d_t  (STREAMS-1 downto 0)(PKTS-1 downto 0)(log2(SPACE_SIZE)-1 downto 0);
-    TX_STR_PKT_VLD     : out slv_array_t     (STREAMS-1 downto 0)(PKTS-1 downto 0);
-    -- Only used when STREAM_OUT_AFULL==False
-    TX_STR_PKT_DST_RDY : in  slv_array_t     (STREAMS-1 downto 0)(PKTS-1 downto 0) := (others => (others => '1')); -- read signal for FIFOX Multi
-    -- Only used when STREAM_OUT_AFULL==True
-    TX_STR_PKT_AFULL   : in  std_logic_vector(STREAMS-1 downto 0) := (others => '0');
-
-    -- Packets with assigned addresses (globaly serialized over all Streams)
-    -- Can be disabled by generic GLOBAL_OUT_EN.
-    TX_GLB_PKT_META    : out slv_array_t     (PLANNED_PKTS-1 downto 0)(METADATA_WIDTH-1 downto 0);
-    TX_GLB_PKT_LEN     : out slv_array_t     (PLANNED_PKTS-1 downto 0)(log2(PKT_SIZE+1)-1 downto 0);
-    TX_GLB_PKT_ADDR    : out slv_array_t     (PLANNED_PKTS-1 downto 0)(log2(SPACE_SIZE)-1 downto 0);
-    TX_GLB_PKT_VLD     : out std_logic_vector(PLANNED_PKTS-1 downto 0);
-    -- Only used when GLOBAL_OUT_AFULL==False
-    TX_GLB_PKT_DST_RDY : in  std_logic_vector(PLANNED_PKTS-1 downto 0) := (others => '1'); -- read signal for FIFOX Multi
-    -- Only used when GLOBAL_OUT_AFULL==True
-    TX_GLB_PKT_AFULL   : in  std_logic := '0'
-
-    -- =====================================================================
-);
+    );
 end entity;
 
 architecture FULL of PACKET_PLANNER is
@@ -142,12 +142,12 @@ architecture FULL of PACKET_PLANNER is
     -- =====================================================================
 
     constant PKT_WIDTH : natural := METADATA_WIDTH
-                                   +log2(PKT_SIZE+1)
-                                   +log2(STREAMS);
+                                    +log2(PKT_SIZE+1)
+                                    +log2(STREAMS);
 
     constant OUT_PKT_WIDTH : natural := METADATA_WIDTH
-                                       +log2(PKT_SIZE+1)
-                                       +log2(SPACE_SIZE);
+                                        +log2(PKT_SIZE+1)
+                                        +log2(SPACE_SIZE);
 
     -- When the FIFO is full and user starts reading TX packets at full speed,
     -- it takes some time for Almost Full signal to drop and new pakcets to start
@@ -214,7 +214,7 @@ architecture FULL of PACKET_PLANNER is
 
     signal reg2_meta    : slv_array_t     (PLANNED_PKTS-1 downto 0)(METADATA_WIDTH-1 downto 0);
     signal reg2_len     : slv_array_t     (PLANNED_PKTS-1 downto 0)(log2(PKT_SIZE+1)-1 downto 0);
-    signal reg2_dg_len  :   u_array_t     (PLANNED_PKTS-1 downto 0)(log2(PKT_SIZE+GAP_SIZE+ALIGN+1)-log2(ALIGN)+1-1 downto 0); -- length of data and gap together
+    signal reg2_dg_len  : u_array_t     (PLANNED_PKTS-1 downto 0)(log2(PKT_SIZE+GAP_SIZE+ALIGN+1)-log2(ALIGN)+1-1 downto 0); -- length of data and gap together
     signal reg2_addr    : slv_array_t     (PLANNED_PKTS-1 downto 0)(log2(SPACE_SIZE)-1 downto 0);
     signal reg2_stream  : slv_array_t     (PLANNED_PKTS-1 downto 0)(log2(STREAMS)-1 downto 0);
     signal reg2_vld     : std_logic_vector(PLANNED_PKTS-1 downto 0);
@@ -307,11 +307,11 @@ architecture FULL of PACKET_PLANNER is
 
 begin
 
-    assert (ALIGN>0)
+    assert (ALIGN > 0)
         report "ERROR: Packet Planner: Packet ALIGN ("&to_string(ALIGN)&") must be higher than 0!"
         severity failure;
 
-    assert (PKT_SIZE<=SPACE_SIZE)
+    assert (PKT_SIZE <= SPACE_SIZE)
         report "ERROR: Packet Planner: Maximum size of packet ("&to_string(PKT_SIZE)&") must not be higher than the total size of the destination space ("&to_string(SPACE_SIZE)&"!"
         severity failure;
 
@@ -323,28 +323,28 @@ begin
     -- The FIFO generates an Almost Full to stop generation of new packets.
 
     pktf_i : entity work.FIFOX_MULTI
-    generic map(
-        DATA_WIDTH          => PKT_WIDTH                     ,
-        ITEMS               => FIFO_ITEMS*STREAMS*PKTS       ,
-        WRITE_PORTS         => STREAMS*PKTS                  ,
-        READ_PORTS          => PLANNED_PKTS                  ,
-        RAM_TYPE            => "AUTO"                        ,
-        DEVICE              => DEVICE                        ,
+    generic map (
+        DATA_WIDTH          => PKT_WIDTH,
+        ITEMS               => FIFO_ITEMS*STREAMS*PKTS,
+        WRITE_PORTS         => STREAMS*PKTS,
+        READ_PORTS          => PLANNED_PKTS,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
         ALMOST_FULL_OFFSET  => FIFO_AFULL_OFFSET*STREAMS*PKTS,
-        ALMOST_EMPTY_OFFSET => 0                             ,
+        ALMOST_EMPTY_OFFSET => 0,
         SAFE_READ_MODE      => true
     )
-    port map(
-        CLK    => CLK  ,
+    port map (
+        CLK    => CLK,
         RESET  => RESET,
 
-        DI     => pktf_di   ,
-        WR     => pktf_wr   ,
-        FULL   => pktf_full ,
+        DI     => pktf_di,
+        WR     => pktf_wr,
+        FULL   => pktf_full,
         AFULL  => pktf_afull,
 
-        DO     => pktf_do   ,
-        RD     => pktf_rd   ,
+        DO     => pktf_do,
+        RD     => pktf_rd,
         EMPTY  => pktf_empty,
         AEMPTY => open
     );
@@ -371,13 +371,13 @@ begin
         pktf_do_meta   (i) <= pktf_do_arr(i)(PKT_WIDTH-1 downto log2(PKT_SIZE+1)+log2(STREAMS));
         pktf_do_len    (i) <= pktf_do_arr(i)(log2(PKT_SIZE+1)+log2(STREAMS)-1 downto log2(STREAMS));
         pktf_do_stream (i) <= pktf_do_arr(i)(log2(STREAMS)-1 downto 0);
-        pktf_do_vld    (i) <= '1' when pktf_empty(i)='0' and ((or pktf_do_len_over_word(i downto 0))='0' or i=0) else '0';
+        pktf_do_vld    (i) <= '1' when pktf_empty(i) = '0' and ((or pktf_do_len_over_word(i downto 0)) = '0' or i = 0) else '0';
 
         -- This results in constant '0' when the space is large enough to contain PLANNED_PKTS maximum-sized packets at once or when space word size can fit a whole maximum-sized packet.
-        pktf_do_len_over_word(i) <= '1' when unsigned(pktf_do_len(i))>SPACE_WORD_SIZE and SPACE_SIZE<(PLANNED_PKTS+1)*PKT_SIZE else '0';
+        pktf_do_len_over_word(i) <= '1' when unsigned(pktf_do_len(i)) > SPACE_WORD_SIZE and SPACE_SIZE < (PLANNED_PKTS+1)*PKT_SIZE else '0';
 
         -- Distribute read signal
-        pktf_rd(i) <= '1' when reg0_dst_rdy='1' and ((or pktf_do_len_over_word(i downto 0))='0' or i=0) else '0';
+        pktf_rd(i) <= '1' when reg0_dst_rdy = '1' and ((or pktf_do_len_over_word(i downto 0)) = '0' or i = 0) else '0';
 
     end generate;
 
@@ -395,7 +395,7 @@ begin
         if (rising_edge(CLK)) then
 
             -- Only overwrite when values can be propagated further
-            if (reg1_dst_rdy='1') then
+            if (reg1_dst_rdy = '1') then
                 reg0_meta   <= pktf_do_meta;
                 reg0_len    <= pktf_do_len;
                 reg0_stream <= pktf_do_stream;
@@ -403,7 +403,7 @@ begin
                 reg0_vld    <= pktf_do_vld and (nor oshk_afull) and (not gshk_afull);
             end if;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 reg0_vld <= (others => '0');
                 -- The length must be reset for space full checking to work after reset
                 reg0_len <= (others => (others => '0'));
@@ -427,7 +427,7 @@ begin
         if (rising_edge(CLK)) then
 
             -- Only overwrite when values can be propagated further
-            if (reg2_dst_rdy='1') then
+            if (reg2_dst_rdy = '1') then
                 reg1_meta    <= reg0_meta;
                 reg1_len     <= reg0_len;
                 reg1_gap_len <= reg0_gap_len;
@@ -435,7 +435,7 @@ begin
                 reg1_vld     <= reg0_vld;
             end if;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 reg1_vld <= (others => '0');
                 -- The length must be reset for space full checking to work after reset
                 reg1_len <= (others => (others => '0'));
@@ -446,25 +446,25 @@ begin
     -- Deficit Idle Count component
     -- Counts gap after every packet according to Ethernet DIC specification
     dic_i : entity work.DEFICIT_IDLE_COUNTER
-    generic map(
+    generic map (
         PKTS         => PLANNED_PKTS,
-        PKT_SIZE     => PKT_SIZE    ,
-        GAP_SIZE     => GAP_SIZE    ,
-        ALIGN        => ALIGN       ,
+        PKT_SIZE     => PKT_SIZE,
+        GAP_SIZE     => GAP_SIZE,
+        ALIGN        => ALIGN,
         MIN_GAP_SIZE => GAP_SIZE_MIN
     )
-    port map(
-        CLK   => CLK  ,
+    port map (
+        CLK   => CLK,
         RESET => RESET,
 
-        RX_PKT_LEN     => reg0_len    ,
-        RX_PKT_VLD     => reg0_vld    ,
+        RX_PKT_LEN     => reg0_len,
+        RX_PKT_VLD     => reg0_vld,
         RX_PKT_SRC_RDY => reg2_dst_rdy,
-        RX_PKT_DST_RDY => open        ,
+        RX_PKT_DST_RDY => open,
 
         TX_PKT_GAP     => reg0_gap_len,
-        TX_PKT_VLD     => open        ,
-        TX_PKT_SRC_RDY => open        ,
+        TX_PKT_VLD     => open,
+        TX_PKT_SRC_RDY => open,
         TX_PKT_DST_RDY => reg2_dst_rdy
     );
 
@@ -484,7 +484,7 @@ begin
         if (rising_edge(CLK)) then
 
             -- Only overwrite when values can be propagated further
-            if (reg3_dst_rdy='1') then
+            if (reg3_dst_rdy = '1') then
                 reg2_meta    <= reg1_meta;
                 reg2_len     <= reg1_len;
                 reg2_stream  <= reg1_stream;
@@ -500,9 +500,9 @@ begin
                     -- Move address to start of next packet (if this packet was valid)
                     -- Make sure the next address is aligned (this round_up is only needed when GAP_SIZE is not aligned)
                     tmp_dg_len     := enlarge_right(round_up(resize_left(unsigned(reg1_len(i)),log2(SPACE_SIZE)) + resize_left(unsigned(reg1_gap_len(i)),log2(SPACE_SIZE)),log2(ALIGN)),-log2(ALIGN));
-                    --tmp_dg_len     := enlarge_right(resize_left(unsigned(reg1_len(i)),log2(SPACE_SIZE)) + resize_left(unsigned(reg1_gap_len(i)),log2(SPACE_SIZE)),-log2(ALIGN));
-                    if (reg1_vld(i)='1') then
-                        tmp_addr := tmp_addr + tmp_dg_len;
+                    -- tmp_dg_len     := enlarge_right(resize_left(unsigned(reg1_len(i)),log2(SPACE_SIZE)) + resize_left(unsigned(reg1_gap_len(i)),log2(SPACE_SIZE)),-log2(ALIGN));
+                    if (reg1_vld(i) = '1') then
+                        tmp_addr       := tmp_addr + tmp_dg_len;
                         reg2_dg_len(i) <= resize_left(tmp_dg_len,reg2_dg_len(i)'length);
                     else
                         reg2_dg_len(i) <= (others => '0');
@@ -512,7 +512,7 @@ begin
                 space_wr_ptr_reg <= tmp_addr;
             end if;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 reg2_vld         <= (others => '0');
                 space_wr_ptr_reg <= (others => '0');
                 -- The length must be reset for space full checking to work after reset
@@ -541,7 +541,7 @@ begin
         if (rising_edge(CLK)) then
 
             -- Only overwrite when values can be propagated further
-            if (reg4_dst_rdy='1') then
+            if (reg4_dst_rdy = '1') then
                 reg3_meta   <= reg2_meta;
                 reg3_len    <= reg2_len;
                 reg3_stream <= reg2_stream;
@@ -550,10 +550,10 @@ begin
 
                 -- Calculate total sum of space taken by the packets
                 -- (and round up to ALIGN size)
-                --tmp_start_addr := resize_left(unsigned(reg2_addr(0)),log2(SPACE_SIZE+1));
-                --tmp_end_addr   := resize_left(unsigned(reg2_addr(PLANNED_PKTS-1)),log2(SPACE_SIZE+1));
-                --tmp_end_addr   := tmp_end_addr + resize_left(enlarge_right(unsigned(reg2_dg_len(PLANNED_PKTS-1)),log2(ALIGN)),log2(SPACE_SIZE+1));
-                --reg3_len_sum   <= enlarge_right(round_up(tmp_end_addr-tmp_start_addr,log2(ALIGN)),-log2(ALIGN));
+                -- tmp_start_addr := resize_left(unsigned(reg2_addr(0)),log2(SPACE_SIZE+1));
+                -- tmp_end_addr   := resize_left(unsigned(reg2_addr(PLANNED_PKTS-1)),log2(SPACE_SIZE+1));
+                -- tmp_end_addr   := tmp_end_addr + resize_left(enlarge_right(unsigned(reg2_dg_len(PLANNED_PKTS-1)),log2(ALIGN)),log2(SPACE_SIZE+1));
+                -- reg3_len_sum   <= enlarge_right(round_up(tmp_end_addr-tmp_start_addr,log2(ALIGN)),-log2(ALIGN));
                 tmp_len_sum := (others => '0');
                 for i in 0 to PLANNED_PKTS-1 loop
                     tmp_len_sum := tmp_len_sum + resize_left(reg2_dg_len(i),log2(SPACE_SIZE+1)-log2(ALIGN));
@@ -561,7 +561,7 @@ begin
                 reg3_len_sum <= tmp_len_sum;
             end if;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 reg3_vld     <= (others => '0');
                 -- The length must be reset for space full checking to work after reset
                 reg3_len_sum <= (others => '0');
@@ -570,7 +570,7 @@ begin
     end process;
 
     -- Check free space
-    reg3_enough_space <= '1' when reg3_len_sum<=free_space_cnt_reg else '0';
+    reg3_enough_space <= '1' when reg3_len_sum <= free_space_cnt_reg else '0';
 
     -- =====================================================================
 
@@ -594,7 +594,7 @@ begin
             -- Only allow propagation when there is enough free space
             reg4_vld  <= reg3_vld and reg3_enough_space;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 reg4_vld <= (others => '0');
             end if;
         end if;
@@ -616,19 +616,19 @@ begin
             out_shake_true_dst_rdy_gen : if (not STREAM_OUT_AFULL) generate
 
                 out_shake_i : entity work.FIFOX_MULTI
-                generic map(
-                    DATA_WIDTH          => OUT_PKT_WIDTH        ,
-                    ITEMS               => OUT_FIFO_ITEMS       ,
-                    WRITE_PORTS         => PLANNED_PKTS         ,
-                    READ_PORTS          => PKTS                 ,
-                    RAM_TYPE            => "AUTO"               ,
-                    DEVICE              => DEVICE               ,
+                generic map (
+                    DATA_WIDTH          => OUT_PKT_WIDTH,
+                    ITEMS               => OUT_FIFO_ITEMS,
+                    WRITE_PORTS         => PLANNED_PKTS,
+                    READ_PORTS          => PKTS,
+                    RAM_TYPE            => "AUTO",
+                    DEVICE              => DEVICE,
                     ALMOST_FULL_OFFSET  => OUT_FIFO_AFULL_OFFSET,
-                    ALMOST_EMPTY_OFFSET => 0                    ,
+                    ALMOST_EMPTY_OFFSET => 0,
                     SAFE_READ_MODE      => true
                 )
-                port map(
-                    CLK    => CLK  ,
+                port map (
+                    CLK    => CLK,
                     RESET  => RESET,
 
                     DI     => oshk_di   (i),
@@ -653,14 +653,14 @@ begin
             else generate
 
                 out_mvb_shake_i : entity work.MVB_SHAKEDOWN
-                generic map(
-                    RX_ITEMS    => PLANNED_PKTS ,
-                    TX_ITEMS    => PKTS         ,
+                generic map (
+                    RX_ITEMS    => PLANNED_PKTS,
+                    TX_ITEMS    => PKTS,
                     ITEM_WIDTH  => OUT_PKT_WIDTH,
                     SHAKE_PORTS => 2
                 )
-                port map(
-                    CLK        => CLK  ,
+                port map (
+                    CLK        => CLK,
                     RESET      => RESET,
 
                     RX_DATA    => oshk_di (i),
@@ -690,7 +690,7 @@ begin
                 -- All Shakedowns get the same input
                 oshk_di_arr(i)(e) <= reg4_meta(e) & reg4_len(e) & reg4_addr(e);
                 -- Only packets belonging to this Stream are valid here
-                oshk_wr(i)(e) <= '1' when reg4_vld(e)='1' and (unsigned(reg4_stream(e))=i or STREAMS=1) else '0';
+                oshk_wr(i)(e)     <= '1' when reg4_vld(e) = '1' and (unsigned(reg4_stream(e)) = i or STREAMS = 1) else '0';
             end generate;
             oshk_di(i) <= slv_array_ser(oshk_di_arr(i));
 
@@ -702,8 +702,8 @@ begin
                 signal tmp_addr : std_logic_vector(log2(SPACE_SIZE)-1 downto 0);
             begin
                 (tmp_meta,
-                 tmp_len ,
-                 tmp_addr ) <= oshk_do_arr(i)(e);
+                tmp_len ,
+                tmp_addr ) <= oshk_do_arr(i)(e);
 
                 TX_STR_PKT_META(i)(e) <= tmp_meta;
                 TX_STR_PKT_LEN (i)(e) <= tmp_len;
@@ -713,7 +713,7 @@ begin
 
     else generate
         TX_STR_PKT_VLD <= (others => (others => '0'));
-        oshk_afull <= (others => '0');
+        oshk_afull     <= (others => '0');
     end generate;
 
     -- =====================================================================
@@ -729,28 +729,28 @@ begin
         out_glb_shake_true_dst_rdy_gen : if (not GLOBAL_OUT_AFULL) generate
 
             out_glb_shake_i : entity work.FIFOX_MULTI
-            generic map(
-                DATA_WIDTH          => OUT_PKT_WIDTH        ,
-                ITEMS               => OUT_FIFO_ITEMS       ,
-                WRITE_PORTS         => PLANNED_PKTS         ,
-                READ_PORTS          => PLANNED_PKTS         ,
-                RAM_TYPE            => "AUTO"               ,
-                DEVICE              => DEVICE               ,
+            generic map (
+                DATA_WIDTH          => OUT_PKT_WIDTH,
+                ITEMS               => OUT_FIFO_ITEMS,
+                WRITE_PORTS         => PLANNED_PKTS,
+                READ_PORTS          => PLANNED_PKTS,
+                RAM_TYPE            => "AUTO",
+                DEVICE              => DEVICE,
                 ALMOST_FULL_OFFSET  => OUT_FIFO_AFULL_OFFSET,
-                ALMOST_EMPTY_OFFSET => 0                    ,
+                ALMOST_EMPTY_OFFSET => 0,
                 SAFE_READ_MODE      => true
             )
-            port map(
-                CLK    => CLK  ,
+            port map (
+                CLK    => CLK,
                 RESET  => RESET,
 
-                DI     => gshk_di   ,
-                WR     => gshk_wr   ,
-                FULL   => gshk_full ,
+                DI     => gshk_di,
+                WR     => gshk_wr,
+                FULL   => gshk_full,
                 AFULL  => gshk_afull,
 
-                DO     => gshk_do   ,
-                RD     => gshk_rd   ,
+                DO     => gshk_do,
+                RD     => gshk_rd,
                 EMPTY  => gshk_empty,
                 AEMPTY => open
             );
@@ -765,7 +765,7 @@ begin
                 -- All Shakedowns get the same input
                 gshk_di_arr(e) <= reg4_meta(e) & reg4_len(e) & reg4_addr(e);
                 -- Accepts packets from all Streams
-                gshk_wr(e) <= '1' when reg4_vld(e)='1' else '0';
+                gshk_wr(e)     <= '1' when reg4_vld(e) = '1' else '0';
             end generate;
             gshk_di <= slv_array_ser(gshk_di_arr);
 
@@ -777,8 +777,8 @@ begin
                 signal tmp_addr : std_logic_vector(log2(SPACE_SIZE)-1 downto 0);
             begin
                 (tmp_meta,
-                 tmp_len ,
-                 tmp_addr ) <= gshk_do_arr(e);
+                tmp_len ,
+                tmp_addr ) <= gshk_do_arr(e);
 
                 TX_GLB_PKT_META(e) <= tmp_meta;
                 TX_GLB_PKT_LEN (e) <= tmp_len;
@@ -799,7 +799,7 @@ begin
             TX_GLB_PKT_ADDR <= reg4_addr;
             -- Accepts packets from all Streams
             glb_vld_gen : for e in 0 to PLANNED_PKTS-1 generate
-                TX_GLB_PKT_VLD(e)  <= '1' when reg4_vld(e)='1' else '0';
+                TX_GLB_PKT_VLD(e)  <= '1' when reg4_vld(e) = '1' else '0';
             end generate;
 
         end generate;
@@ -825,7 +825,7 @@ begin
             tmp_space := free_space_cnt_reg;
 
             -- Decrement when newly planned packets fit in the space
-            if (reg4_dst_rdy='1') then
+            if (reg4_dst_rdy = '1') then
                 tmp_space := tmp_space - reg3_len_sum;
             end if;
 
@@ -837,8 +837,8 @@ begin
             -- Update OLD space register
             old_space_rd_ptr_reg <= unsigned(SPACE_GLB_RD_PTR);
 
-            if (RESET='1') then
-                free_space_cnt_reg   <= (others => '0');
+            if (RESET = '1') then
+                free_space_cnt_reg                          <= (others => '0');
                 free_space_cnt_reg(free_space_cnt_reg'high) <= '1';
 
                 old_space_rd_ptr_reg <= (others => '0');

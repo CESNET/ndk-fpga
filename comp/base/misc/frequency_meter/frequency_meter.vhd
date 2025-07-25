@@ -83,68 +83,68 @@ use work.type_pack.all;
 -- +----------------+---------------------------------------------------------------------------------------+
 --
 entity FREQUENCY_METER is
-generic (
-    MI_DATA_WIDTH        : natural := 32;
-    MI_ADDR_WIDTH        : natural := 32;
+    generic (
+        MI_DATA_WIDTH        : natural := 32;
+        MI_ADDR_WIDTH        : natural := 32;
 
-    -- Maximum width of the Interval length signal => the highest possible value is 2**INTERVAL_LEN_WIDTH-1.
-    -- This value of the Interval length signal can be set over the MI.
-    -- Defines the length of the Interval during which the frequency measurement takes place.
-    -- Counts by 1 to its maximum which is when the "frequency counters" are sampled.
-    -- Values over 32 (=MI_DATA_WIDTH) are currently not supported!
-    INTERVAL_LEN_WIDTH   : natural := 32;
-    -- Width of the "Reference Frequency Counter".
-    -- Watch out for overflow (indicated by a bit in the Status register).
-    -- Must not be over 32!
-    REFERENCE_CNTR_WIDTH : natural := 31;
-    -- Width of the "Measured Frequency Counter" (all of them if there is more than one).
-    -- Watch out for overflow (indicated by a bit in the Status register).
-    -- Must not be over 32!
-    MEASURED_CNTR_WIDTH  : natural := 31;
-    -- Maximum number of measured frequencies.
-    MEASURED_FREQUENCIES : natural := 10;
-    -- Frequency of the reference clock signal in Hz.
-    -- Used in the final calculation when the CALCULATE_FREQ generic is True.
-    -- Recommended to read before the SW calculation (when the CALCULATE_FREQ generic is False).
-    REFERENCE_CLK_FREQ   : natural := 200_000_000;
-    -- Utilize DSPs for both "frequency counters".
-    DSP_CNTR_EN          : boolean := False;
+        -- Maximum width of the Interval length signal => the highest possible value is 2**INTERVAL_LEN_WIDTH-1.
+        -- This value of the Interval length signal can be set over the MI.
+        -- Defines the length of the Interval during which the frequency measurement takes place.
+        -- Counts by 1 to its maximum which is when the "frequency counters" are sampled.
+        -- Values over 32 (=MI_DATA_WIDTH) are currently not supported!
+        INTERVAL_LEN_WIDTH   : natural := 32;
+        -- Width of the "Reference Frequency Counter".
+        -- Watch out for overflow (indicated by a bit in the Status register).
+        -- Must not be over 32!
+        REFERENCE_CNTR_WIDTH : natural := 31;
+        -- Width of the "Measured Frequency Counter" (all of them if there is more than one).
+        -- Watch out for overflow (indicated by a bit in the Status register).
+        -- Must not be over 32!
+        MEASURED_CNTR_WIDTH  : natural := 31;
+        -- Maximum number of measured frequencies.
+        MEASURED_FREQUENCIES : natural := 10;
+        -- Frequency of the reference clock signal in Hz.
+        -- Used in the final calculation when the CALCULATE_FREQ generic is True.
+        -- Recommended to read before the SW calculation (when the CALCULATE_FREQ generic is False).
+        REFERENCE_CLK_FREQ   : natural := 200_000_000;
+        -- Utilize DSPs for both "frequency counters".
+        DSP_CNTR_EN          : boolean := False;
 
-    -- Calculate the unknown frequency in the FPGA.
-    -- Uses extra resources.
-    -- Not supported yet!
-    CALCULATE_FREQ       : boolean := False;
-    -- Store measured data and/or calculated frequencies in a FIFO to read out later.
-    -- Could be useful for further analysis.
-    -- Not supported yet! (Also leads to a generic for FIFO_SIZE)
-    STORE_DATA_EN        : boolean := False;
-    -- Store measured data and/or calculated frequencies in a histogram.
-    -- Could be useful for further analysis.
-    -- Not supported yet!
-    HISTOGRAM_EN         : boolean := False;
-    -- Target device.
-    DEVICE               : string := "AGILEX"
-);
-port (
-    REFERENCE_CLK   : in  std_logic;
-    REFERENCE_RESET : in  std_logic;
+        -- Calculate the unknown frequency in the FPGA.
+        -- Uses extra resources.
+        -- Not supported yet!
+        CALCULATE_FREQ       : boolean := False;
+        -- Store measured data and/or calculated frequencies in a FIFO to read out later.
+        -- Could be useful for further analysis.
+        -- Not supported yet! (Also leads to a generic for FIFO_SIZE)
+        STORE_DATA_EN        : boolean := False;
+        -- Store measured data and/or calculated frequencies in a histogram.
+        -- Could be useful for further analysis.
+        -- Not supported yet!
+        HISTOGRAM_EN         : boolean := False;
+        -- Target device.
+        DEVICE               : string := "AGILEX"
+    );
+    port (
+        REFERENCE_CLK   : in  std_logic;
+        REFERENCE_RESET : in  std_logic;
 
-    MEASURED_CLK    : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
-    MEASURED_RESET  : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
+        MEASURED_CLK    : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
+        MEASURED_RESET  : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
 
-    -- MI interface
-    MI_CLK          : in  std_logic;
-    MI_RESET        : in  std_logic;
+        -- MI interface
+        MI_CLK          : in  std_logic;
+        MI_RESET        : in  std_logic;
 
-    MI_DWR          : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_ADDR         : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
-  --MI_BE           : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0); NOT SUPPORTED
-    MI_RD           : in  std_logic;
-    MI_WR           : in  std_logic;
-    MI_ARDY         : out std_logic;
-    MI_DRD          : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_DRDY         : out std_logic
-);
+        MI_DWR          : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_ADDR         : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
+        -- MI_BE           : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0); NOT SUPPORTED
+        MI_RD           : in  std_logic;
+        MI_WR           : in  std_logic;
+        MI_ARDY         : out std_logic;
+        MI_DRD          : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_DRDY         : out std_logic
+    );
 end entity;
 
 architecture FULL of FREQUENCY_METER is
@@ -234,7 +234,7 @@ begin
     -- Register resolution
     command_reg_wr_en      <= '1' when (mi_wr_en = '1') and (MI_ADDR(4 downto 2) = "000") else '0'; -- 0x00
     interval_len_reg_wr_en <= '1' when (mi_wr_en = '1') and (MI_ADDR(4 downto 2) = "010") else '0'; -- 0x08
-    meas_cntr_reg_rd_en    <= '1' when (MI_RD    = '1') and (MI_ADDR(4 downto 2) = "110") else '0'; -- 0x18
+    meas_cntr_reg_rd_en    <= '1' when (MI_RD = '1') and (MI_ADDR(4 downto 2) = "110") else '0';    -- 0x18
 
     -- Command resolution
     cmd_reg_start_meas    <= '1' when (command_reg_wr_en = '1') and (MI_DWR(0) = '1') else '0';
@@ -244,24 +244,24 @@ begin
 
     -- Extend reset pulse
     pulse_extend_i : entity work.PULSE_EXTEND
-    generic map(
+    generic map (
         N => 20
     )
-    port map(
-        RST => MI_RESET          ,
-        CLK => MI_CLK            ,
+    port map (
+        RST => MI_RESET,
+        CLK => MI_CLK,
         I   => cmd_reg_reset_meas,
         O   => mi_meas_reset
     );
 
     -- Delay ARDY after accepting command to Reset (cmd_reg_reset_meas)
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (cmd_reg_reset_meas = '1') then
                 mi_wait <= '1';
             end if;
-            if (MI_RESET = '1') or ((mi_meas_reset = '1') and (mi_wait = '1')) then
+            if ((MI_RESET = '1') or ((mi_meas_reset = '1') and (mi_wait = '1'))) then
                 mi_wait <= '0';
             end if;
         end if;
@@ -270,26 +270,26 @@ begin
     -- ---------------
     --  MI registers
     -- ---------------
-    measure_enable_reg : process(MI_CLK)
+    measure_enable_reg : process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
-            if (cmd_reg_start_meas = '1') and (ready_to_measure = '1') then
+            if ((cmd_reg_start_meas = '1') and (ready_to_measure = '1')) then
                 measure_enabled <= '1';
             end if;
-            if (MI_RESET = '1') or (cmd_reg_stop_meas = '1') or (interval_finished = '1') then
+            if ((MI_RESET = '1') or (cmd_reg_stop_meas = '1') or (interval_finished = '1')) then
                 measure_enabled <= '0';
             end if;
         end if;
     end process;
 
-    interval_len_reg : process(MI_CLK)
+    interval_len_reg : process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (interval_len_reg_wr_en = '1') then
                 interval_len <= resize(unsigned(MI_DWR), INTERVAL_LEN_WIDTH);
             end if;
             if (MI_RESET = '1') then
-                interval_len <= (others => '0');
+                interval_len                       <= (others => '0');
                 interval_len(INTERVAL_LEN_WIDTH/2) <= '1';
             end if;
         end if;
@@ -314,7 +314,7 @@ begin
                          runtime_rst_ref     or
                          runtime_rst_meas;
 
-    status_reg : process(MI_CLK)
+    status_reg : process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             status(0) <= ready_to_measure;
@@ -340,7 +340,7 @@ begin
                 status(9) <= '1';
             end if;
 
-            if (MI_RESET = '1') or (mi_meas_reset = '1') then
+            if ((MI_RESET = '1') or (mi_meas_reset = '1')) then
                 status <= (others => '0');
             end if;
         end if;
@@ -349,7 +349,7 @@ begin
     -- ---------------
     --  MI Read logic
     -- ---------------
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             -- if (mi_wait = '0') then
@@ -364,16 +364,16 @@ begin
 
     mi_data_ready <= MI_RD and not mi_wait;
 
-    process(all)
+    process (all)
     begin
         case MI_ADDR(4 downto 2) is
             when "001"  => mi_data_read <= std_logic_vector(resize(unsigned(status             ), MI_DATA_WIDTH)); -- 0x04
-            when "010"  => mi_data_read <= std_logic_vector(resize(         interval_len        , MI_DATA_WIDTH)); -- 0x08
-            when "011"  => mi_data_read <= std_logic_vector(to_unsigned(    REFERENCE_CLK_FREQ  , MI_DATA_WIDTH)); -- 0x0C
-            when "100"  => mi_data_read <= std_logic_vector(to_unsigned(    MEASURED_FREQUENCIES, MI_DATA_WIDTH)); -- 0x10
-            when "101"  => mi_data_read <=                                  mi_ref_cntr_val                      ; -- 0x14
-            when "110"  => mi_data_read <=                                  mi_meas_cntr_val(0)                  ; -- 0x18
-            when "111"  => mi_data_read <= std_logic_vector(resize(         mi_meas_cntr_rd_ptr , MI_DATA_WIDTH)); -- 0x1C
+            when "010"  => mi_data_read <= std_logic_vector(resize(interval_len, MI_DATA_WIDTH));                  -- 0x08
+            when "011"  => mi_data_read <= std_logic_vector(to_unsigned(REFERENCE_CLK_FREQ, MI_DATA_WIDTH));       -- 0x0C
+            when "100"  => mi_data_read <= std_logic_vector(to_unsigned(MEASURED_FREQUENCIES, MI_DATA_WIDTH));     -- 0x10
+            when "101"  => mi_data_read <= mi_ref_cntr_val;                                                        -- 0x14
+            when "110"  => mi_data_read <= mi_meas_cntr_val(0);                                                    -- 0x18
+            when "111"  => mi_data_read <= std_logic_vector(resize(mi_meas_cntr_rd_ptr, MI_DATA_WIDTH));           -- 0x1C
             when others => mi_data_read <= X"FEEDBEEF";
         end case;
     end process;
@@ -392,9 +392,9 @@ begin
         OUT_REG  => False,
         REPLICAS => 1
     )
-    port map(
-        CLK        => REFERENCE_CLK       ,
-        ASYNC_RST  => mi_meas_reset       ,
+    port map (
+        CLK        => REFERENCE_CLK,
+        ASYNC_RST  => mi_meas_reset,
         OUT_RST(0) => mi_meas_reset_refclk
     );
     meas_reset_refclk <= mi_meas_reset_refclk or REFERENCE_RESET;
@@ -406,8 +406,8 @@ begin
         OUT_REG  => False,
         REPLICAS => 1
     )
-    port map(
-        CLK        => MI_CLK         ,
+    port map (
+        CLK        => MI_CLK,
         ASYNC_RST  => REFERENCE_RESET,
         OUT_RST(0) => ref_reset_miclk
     );
@@ -423,9 +423,9 @@ begin
             OUT_REG  => False,
             REPLICAS => 1
         )
-        port map(
+        port map (
             CLK        => MEASURED_CLK         (mf),
-            ASYNC_RST  => mi_meas_reset            ,
+            ASYNC_RST  => mi_meas_reset,
             OUT_RST(0) => mi_meas_reset_measclk(mf)
         );
         meas_reset_measclk(mf) <= mi_meas_reset_measclk(mf) or MEASURED_RESET(mf);
@@ -437,8 +437,8 @@ begin
             OUT_REG  => False,
             REPLICAS => 1
         )
-        port map(
-            CLK        => MI_CLK              ,
+        port map (
+            CLK        => MI_CLK,
             ASYNC_RST  => MEASURED_RESET  (mf),
             OUT_RST(0) => meas_reset_miclk(mf)
         );
@@ -449,13 +449,13 @@ begin
     -- ========================================================================
     interval_finished <= '0' when (interval_ticks_cnt < interval_len) else '1';
 
-    process(MI_CLK)
+    process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
-            if (measure_enabled = '1') and (interval_finished = '0') then
+            if ((measure_enabled = '1') and (interval_finished = '0')) then
                 interval_ticks_cnt <= interval_ticks_cnt + 1;
             end if;
-            if (MI_RESET = '1') or (mi_meas_reset = '1') then
+            if ((MI_RESET = '1') or (mi_meas_reset = '1')) then
                 interval_ticks_cnt <= (others => '0');
             end if;
         end if;
@@ -464,53 +464,53 @@ begin
     measuring_core_i : entity work.FREQUENCY_METER_CORE
     generic map (
         REFERENCE_CNTR_WIDTH => REFERENCE_CNTR_WIDTH,
-        MEASURED_CNTR_WIDTH  => MEASURED_CNTR_WIDTH ,
+        MEASURED_CNTR_WIDTH  => MEASURED_CNTR_WIDTH,
         MEASURED_FREQUENCIES => MEASURED_FREQUENCIES,
-        DSP_CNTR_EN          => DSP_CNTR_EN         ,
+        DSP_CNTR_EN          => DSP_CNTR_EN,
         DEVICE               => DEVICE
     )
-    port map(
-        MASTER_CLK         => MI_CLK               ,
-        MASTER_RESET       => MI_RESET             ,
-        MASTER_ENABLE      => measure_enabled      ,
+    port map (
+        MASTER_CLK         => MI_CLK,
+        MASTER_RESET       => MI_RESET,
+        MASTER_ENABLE      => measure_enabled,
         IN_PROGRESS        => not interval_finished,
 
-        REFERENCE_CLK      => REFERENCE_CLK        ,
-        REFERENCE_RESET    => meas_reset_refclk    ,
+        REFERENCE_CLK      => REFERENCE_CLK,
+        REFERENCE_RESET    => meas_reset_refclk,
 
-        MEASURED_CLK       => MEASURED_CLK         ,
-        MEASURED_RESET     => meas_reset_measclk   ,
+        MEASURED_CLK       => MEASURED_CLK,
+        MEASURED_RESET     => meas_reset_measclk,
 
-        REFERENCE_CNTR_RDY => ref_cntr_ready       ,
-        REFERENCE_CNTR     => ref_cntr_val         ,
-        REFERENCE_CNTR_VLD => ref_cntr_val_vld     ,
-        REFERENCE_CNTR_OVF => ref_cntr_overflowed  ,
-        REFERENCE_CNTR_RD  => ref_cntr_read        ,
+        REFERENCE_CNTR_RDY => ref_cntr_ready,
+        REFERENCE_CNTR     => ref_cntr_val,
+        REFERENCE_CNTR_VLD => ref_cntr_val_vld,
+        REFERENCE_CNTR_OVF => ref_cntr_overflowed,
+        REFERENCE_CNTR_RD  => ref_cntr_read,
 
-        MEASURED_CNTR_RDY  => meas_cntr_ready      ,
-        MEASURED_CNTR      => meas_cntr_val        ,
-        MEASURED_CNTR_VLD  => meas_cntr_val_vld    ,
-        MEASURED_CNTR_OVF  => meas_cntr_overflowed ,
+        MEASURED_CNTR_RDY  => meas_cntr_ready,
+        MEASURED_CNTR      => meas_cntr_val,
+        MEASURED_CNTR_VLD  => meas_cntr_val_vld,
+        MEASURED_CNTR_OVF  => meas_cntr_overflowed,
         MEASURED_CNTR_RD   => meas_cntr_read
     );
 
     -- Reference and Measured data reads assert at the same time.
-    ref_cntr_read <= read_results;
+    ref_cntr_read  <= read_results;
     meas_cntr_read <= (others => read_results);
 
     results_ready <= interval_finished and ref_cntr_val_vld and (and meas_cntr_val_vld);
-    read_results <= results_ready and cmd_reg_fetch_results;
+    read_results  <= results_ready and cmd_reg_fetch_results;
 
     -- -----------
     --  Reference
     -- -----------
-    read_ref_data_reg_p : process(MI_CLK)
+    read_ref_data_reg_p : process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (read_results = '1') then
                 mi_ref_cntr_val <= std_logic_vector(resize(unsigned(ref_cntr_val), MI_DATA_WIDTH));
             end if;
-            if (MI_RESET = '1') or (cmd_reg_reset_meas = '1') then
+            if ((MI_RESET = '1') or (cmd_reg_reset_meas = '1')) then
                 mi_ref_cntr_val <= (others => '0');
             end if;
         end if;
@@ -519,7 +519,7 @@ begin
     -- ----------
     --  Measured
     -- ----------
-    read_meas_data_reg_p : process(MI_CLK)
+    read_meas_data_reg_p : process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (read_results = '1') then
@@ -528,19 +528,19 @@ begin
                 mi_meas_cntr_val(MEASURED_FREQUENCIES-2 downto 0) <= mi_meas_cntr_val(MEASURED_FREQUENCIES-1 downto 1);
                 mi_meas_cntr_val(MEASURED_FREQUENCIES-1         ) <= mi_meas_cntr_val(                              0);
             end if;
-            if (MI_RESET = '1') or (cmd_reg_reset_meas = '1') then
+            if ((MI_RESET = '1') or (cmd_reg_reset_meas = '1')) then
                 mi_meas_cntr_val <= (others => (others => '0'));
             end if;
         end if;
     end process;
 
-    read_pointer_reg_p : process(MI_CLK)
+    read_pointer_reg_p : process (MI_CLK)
     begin
         if rising_edge(MI_CLK) then
             if (meas_cntr_reg_rd_en = '1') then
                 mi_meas_cntr_rd_ptr <= mi_meas_cntr_rd_ptr + 1;
             end if;
-            if (MI_RESET = '1') or (cmd_reg_reset_meas = '1') or (read_results = '1') or (mi_meas_cntr_rd_ptr >= MEASURED_FREQUENCIES) then
+            if ((MI_RESET = '1') or (cmd_reg_reset_meas = '1') or (read_results = '1') or (mi_meas_cntr_rd_ptr >= MEASURED_FREQUENCIES)) then
                 mi_meas_cntr_rd_ptr <= (others => '0');
             end if;
         end if;

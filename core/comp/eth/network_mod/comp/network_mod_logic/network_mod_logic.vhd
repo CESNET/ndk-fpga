@@ -14,152 +14,152 @@ use work.type_pack.all;
 use work.eth_hdr_pack.all;
 
 entity NETWORK_MOD_LOGIC is
-generic(
-    -- =====================================================================
-    -- Ethernet configuration:
-    -- =====================================================================
-    -- Number ETH streams per ETH port, must be equal to 1 or ETH_PORT_CHAN!
-    ETH_STREAMS     : natural := 1;
-    -- Select number of channels per Ethernet port.
-    -- Options: 400G1            card: 1, 2, 4, 8;
-    --          DK-DEV-AGI027RES card: 1, 2, 4, 8;
-    --          DK-DEV-1SDX-P    card: 1, 4.
-    ETH_PORT_CHAN   : natural := 4;
-    -- Different port ID for each Ethernet port (for RX MAC Lite identification)
-    ETH_PORT_ID     : natural := 0;
-    -- Maximum allowed size of RX frame in bytes
-    ETH_PORT_RX_MTU : natural := 16383;
-    -- Maximum allowed size of TX frame in bytes
-    ETH_PORT_TX_MTU : natural := 16383;
-    -- Optional option to disable MAC Lite modules. Dangerously!
-    ETH_MAC_BYPASS : boolean := False;
+    generic (
+        -- =====================================================================
+        -- Ethernet configuration:
+        -- =====================================================================
+        -- Number ETH streams per ETH port, must be equal to 1 or ETH_PORT_CHAN!
+        ETH_STREAMS     : natural := 1;
+        -- Select number of channels per Ethernet port.
+        -- Options: 400G1            card: 1, 2, 4, 8;
+        --          DK-DEV-AGI027RES card: 1, 2, 4, 8;
+        --          DK-DEV-1SDX-P    card: 1, 4.
+        ETH_PORT_CHAN   : natural := 4;
+        -- Different port ID for each Ethernet port (for RX MAC Lite identification)
+        ETH_PORT_ID     : natural := 0;
+        -- Maximum allowed size of RX frame in bytes
+        ETH_PORT_RX_MTU : natural := 16383;
+        -- Maximum allowed size of TX frame in bytes
+        ETH_PORT_TX_MTU : natural := 16383;
+        -- Optional option to disable MAC Lite modules. Dangerously!
+        ETH_MAC_BYPASS  : boolean := False;
 
-    -- =====================================================================
-    -- MFB configuration:
-    -- =====================================================================
-    -- USER side (2x wider than CORE side)
-    USER_REGIONS      : natural := 2;
-    USER_REGION_SIZE  : natural := 8;
+        -- =====================================================================
+        -- MFB configuration:
+        -- =====================================================================
+        -- USER side (2x wider than CORE side)
+        USER_REGIONS      : natural := 2;
+        USER_REGION_SIZE  : natural := 8;
 
-    -- CORE side
-    CORE_REGIONS      : natural := 1;
-    CORE_REGION_SIZE  : natural := 8;
+        -- CORE side
+        CORE_REGIONS      : natural := 1;
+        CORE_REGION_SIZE  : natural := 8;
 
-    -- COMMON for both sides
-    BLOCK_SIZE        : natural := 8; -- other values than 8 are not supported
-    ITEM_WIDTH        : natural := 8; -- other values than 8 are not supported
+        -- COMMON for both sides
+        BLOCK_SIZE        : natural := 8; -- other values than 8 are not supported
+        ITEM_WIDTH        : natural := 8; -- other values than 8 are not supported
 
-    -- =====================================================================
-    -- MI configuration:
-    -- =====================================================================
-    MI_DATA_WIDTH     : natural := 32;
-    MI_ADDR_WIDTH     : natural := 32;
+        -- =====================================================================
+        -- MI configuration:
+        -- =====================================================================
+        MI_DATA_WIDTH     : natural := 32;
+        MI_ADDR_WIDTH     : natural := 32;
 
-    -- =====================================================================
-    -- OTHER configuration:
-    -- =====================================================================
-    LL_MODE           : boolean := false;
-    -- Use full MAC features:
-    --  - Generate/Check FCS
-    --  - Generate IPG
-    --  - Do not use resize on TX
-    USE_FULL_MAC      : boolean := false;
-    RESET_USER_WIDTH  : natural := ETH_PORT_CHAN;
-    --                             ETH_PORT_CHAN x (TX MAC lite + RX MAC lite)
-    RESET_CORE_WIDTH  : natural := ETH_PORT_CHAN * (1           + 1          );
-    -- Resize Buffer feature of RX_MAC_LITE.
-    RESIZE_BUFFER     : boolean := True;
-    -- Select FPGA device.
-    DEVICE            : string := "STRATIX10"; -- AGILEX, STRATIX10, ULTRASCALE
-    -- Select target board. Unused, only for back-compatibility.
-    BOARD             : string := "DK-DEV-1SDX-P" -- 400G1, DK-DEV-AGI027RES, DK-DEV-1SDX-P
-);
-port(
-    -- =====================================================================
-    -- CLOCK AND RESET
-    -- =====================================================================
-    CLK_USER        : in std_logic;
-    TX_CLK_CORE     : in std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    RX_CLK_CORE     : in std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        -- =====================================================================
+        -- OTHER configuration:
+        -- =====================================================================
+        LL_MODE           : boolean := false;
+        -- Use full MAC features:
+        --  - Generate/Check FCS
+        --  - Generate IPG
+        --  - Do not use resize on TX
+        USE_FULL_MAC      : boolean := false;
+        RESET_USER_WIDTH  : natural := ETH_PORT_CHAN;
+        --                             ETH_PORT_CHAN x (TX MAC lite + RX MAC lite)
+        RESET_CORE_WIDTH  : natural := ETH_PORT_CHAN * (1           + 1          );
+        -- Resize Buffer feature of RX_MAC_LITE.
+        RESIZE_BUFFER     : boolean := True;
+        -- Select FPGA device.
+        DEVICE            : string := "STRATIX10";    -- AGILEX, STRATIX10, ULTRASCALE
+        -- Select target board. Unused, only for back-compatibility.
+        BOARD             : string := "DK-DEV-1SDX-P" -- 400G1, DK-DEV-AGI027RES, DK-DEV-1SDX-P
+    );
+    port (
+        -- =====================================================================
+        -- CLOCK AND RESET
+        -- =====================================================================
+        CLK_USER        : in std_logic;
+        TX_CLK_CORE     : in std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        RX_CLK_CORE     : in std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
-    RESET_USER      : in std_logic_vector(RESET_USER_WIDTH-1 downto 0);
-    RESET_CORE      : in std_logic_vector(RESET_CORE_WIDTH-1 downto 0);
+        RESET_USER      : in std_logic_vector(RESET_USER_WIDTH-1 downto 0);
+        RESET_CORE      : in std_logic_vector(RESET_CORE_WIDTH-1 downto 0);
 
-    -- Status/control interface
-    ACTIVITY_RX     : out std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    ACTIVITY_TX     : out std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    RX_LINK_UP      : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    TX_LINK_UP      : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        -- Status/control interface
+        ACTIVITY_RX     : out std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        ACTIVITY_TX     : out std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        RX_LINK_UP      : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        TX_LINK_UP      : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
-    -- =====================================================================
-    -- USER interface
-    -- =====================================================================
-    -- from the USER
-    RX_USER_MFB_DATA     : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*USER_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    RX_USER_MFB_HDR      : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0); -- valid with SOF
-    RX_USER_MFB_SOF_POS  : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*max(1,log2(USER_REGION_SIZE))-1 downto 0);
-    RX_USER_MFB_EOF_POS  : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*max(1,log2(USER_REGION_SIZE*BLOCK_SIZE))-1 downto 0);
-    RX_USER_MFB_SOF      : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
-    RX_USER_MFB_EOF      : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
-    RX_USER_MFB_SRC_RDY  : in  std_logic_vector(ETH_STREAMS-1 downto 0);
-    RX_USER_MFB_DST_RDY  : out std_logic_vector(ETH_STREAMS-1 downto 0);
+        -- =====================================================================
+        -- USER interface
+        -- =====================================================================
+        -- from the USER
+        RX_USER_MFB_DATA     : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*USER_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+        RX_USER_MFB_HDR      : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0); -- valid with SOF
+        RX_USER_MFB_SOF_POS  : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*max(1,log2(USER_REGION_SIZE))-1 downto 0);
+        RX_USER_MFB_EOF_POS  : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*max(1,log2(USER_REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+        RX_USER_MFB_SOF      : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
+        RX_USER_MFB_EOF      : in  slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
+        RX_USER_MFB_SRC_RDY  : in  std_logic_vector(ETH_STREAMS-1 downto 0);
+        RX_USER_MFB_DST_RDY  : out std_logic_vector(ETH_STREAMS-1 downto 0);
 
-    -- to the USER
-    TX_USER_MFB_DATA     : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*USER_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    TX_USER_MFB_SOF_POS  : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*max(1,log2(USER_REGION_SIZE))-1 downto 0);
-    TX_USER_MFB_EOF_POS  : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*max(1,log2(USER_REGION_SIZE*BLOCK_SIZE))-1 downto 0);
-    TX_USER_MFB_SOF      : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
-    TX_USER_MFB_EOF      : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
-    TX_USER_MFB_SRC_RDY  : out std_logic_vector(ETH_STREAMS-1 downto 0);
-    TX_USER_MFB_DST_RDY  : in  std_logic_vector(ETH_STREAMS-1 downto 0);
+        -- to the USER
+        TX_USER_MFB_DATA     : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*USER_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+        TX_USER_MFB_SOF_POS  : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*max(1,log2(USER_REGION_SIZE))-1 downto 0);
+        TX_USER_MFB_EOF_POS  : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*max(1,log2(USER_REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+        TX_USER_MFB_SOF      : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
+        TX_USER_MFB_EOF      : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
+        TX_USER_MFB_SRC_RDY  : out std_logic_vector(ETH_STREAMS-1 downto 0);
+        TX_USER_MFB_DST_RDY  : in  std_logic_vector(ETH_STREAMS-1 downto 0);
 
-    TX_USER_MVB_DATA     : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
-    TX_USER_MVB_VLD      : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
-    TX_USER_MVB_SRC_RDY  : out std_logic_vector(ETH_STREAMS-1 downto 0);
-    TX_USER_MVB_DST_RDY  : in  std_logic_vector(ETH_STREAMS-1 downto 0);
+        TX_USER_MVB_DATA     : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
+        TX_USER_MVB_VLD      : out slv_array_t     (ETH_STREAMS-1 downto 0)(USER_REGIONS-1 downto 0);
+        TX_USER_MVB_SRC_RDY  : out std_logic_vector(ETH_STREAMS-1 downto 0);
+        TX_USER_MVB_DST_RDY  : in  std_logic_vector(ETH_STREAMS-1 downto 0);
 
-    -- =====================================================================
-    -- CORE interface
-    -- =====================================================================
-    -- from the CORE
-    RX_CORE_MFB_DATA     : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*CORE_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    RX_CORE_MFB_SOF_POS  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*max(1,log2(CORE_REGION_SIZE))-1 downto 0);
-    RX_CORE_MFB_EOF_POS  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*max(1,log2(CORE_REGION_SIZE*BLOCK_SIZE))-1 downto 0);
-    RX_CORE_MFB_SOF      : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
-    RX_CORE_MFB_EOF      : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
-    RX_CORE_MFB_MII_ERR  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0) := (others => (others => '0'));
-    RX_CORE_MFB_CRC_ERR  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0) := (others => (others => '0'));
-    RX_CORE_MFB_SRC_RDY  : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        -- =====================================================================
+        -- CORE interface
+        -- =====================================================================
+        -- from the CORE
+        RX_CORE_MFB_DATA     : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*CORE_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+        RX_CORE_MFB_SOF_POS  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*max(1,log2(CORE_REGION_SIZE))-1 downto 0);
+        RX_CORE_MFB_EOF_POS  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*max(1,log2(CORE_REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+        RX_CORE_MFB_SOF      : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
+        RX_CORE_MFB_EOF      : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
+        RX_CORE_MFB_MII_ERR  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0) := (others => (others => '0'));
+        RX_CORE_MFB_CRC_ERR  : in  slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0) := (others => (others => '0'));
+        RX_CORE_MFB_SRC_RDY  : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
-    -- to the CORE
-    TX_CORE_MFB_DATA     : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*CORE_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    TX_CORE_MFB_SOF_POS  : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*max(1,log2(CORE_REGION_SIZE))-1 downto 0);
-    TX_CORE_MFB_EOF_POS  : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*max(1,log2(CORE_REGION_SIZE*BLOCK_SIZE))-1 downto 0);
-    TX_CORE_MFB_SOF      : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
-    TX_CORE_MFB_EOF      : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
-    TX_CORE_MFB_SRC_RDY  : out std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    TX_CORE_MFB_DST_RDY  : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        -- to the CORE
+        TX_CORE_MFB_DATA     : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*CORE_REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+        TX_CORE_MFB_SOF_POS  : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*max(1,log2(CORE_REGION_SIZE))-1 downto 0);
+        TX_CORE_MFB_EOF_POS  : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS*max(1,log2(CORE_REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+        TX_CORE_MFB_SOF      : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
+        TX_CORE_MFB_EOF      : out slv_array_t     (ETH_PORT_CHAN-1 downto 0)(CORE_REGIONS-1 downto 0);
+        TX_CORE_MFB_SRC_RDY  : out std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+        TX_CORE_MFB_DST_RDY  : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
-    -- =====================================================================
-    -- MI interface
-    -- =====================================================================
-    MI_CLK          : in  std_logic;
-    MI_RESET        : in  std_logic;
-    MI_DWR          : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_ADDR         : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
-    MI_RD           : in  std_logic;
-    MI_WR           : in  std_logic;
-    MI_BE           : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0);
-    MI_DRD          : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_ARDY         : out std_logic;
-    MI_DRDY         : out std_logic;
+        -- =====================================================================
+        -- MI interface
+        -- =====================================================================
+        MI_CLK          : in  std_logic;
+        MI_RESET        : in  std_logic;
+        MI_DWR          : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_ADDR         : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
+        MI_RD           : in  std_logic;
+        MI_WR           : in  std_logic;
+        MI_BE           : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0);
+        MI_DRD          : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_ARDY         : out std_logic;
+        MI_DRDY         : out std_logic;
 
-    -- =====================================================================
-    -- TSU interface
-    -- =====================================================================
-    TSU_TS_NS       : in  slv_array_t(ETH_PORT_CHAN-1 downto 0)(64-1 downto 0);
-    TSU_TS_DV       : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0)
-);
+        -- =====================================================================
+        -- TSU interface
+        -- =====================================================================
+        TSU_TS_NS       : in  slv_array_t(ETH_PORT_CHAN-1 downto 0)(64-1 downto 0);
+        TSU_TS_DV       : in  std_logic_vector(ETH_PORT_CHAN-1 downto 0)
+    );
 end entity;
 
 architecture FULL of NETWORK_MOD_LOGIC is
@@ -171,7 +171,7 @@ architecture FULL of NETWORK_MOD_LOGIC is
     -- =========================================================================
     --                               CONSTANTS
     -- =========================================================================
-                                        -- MFB splitter + MFB merger + ETH_PORT_CHAN x (TX MAC lite + RX MAC lite)
+    -- MFB splitter + MFB merger + ETH_PORT_CHAN x (TX MAC lite + RX MAC lite)
     -- constant RESET_CORE_WIDTH   : natural := 1            + 1          + ETH_PORT_CHAN * (1           + 1          );
 
     constant TX_RX_MAC_OFF  : std_logic_vector(MI_ADDR_WIDTH-1 downto 0) := X"0000_0200";
@@ -191,7 +191,7 @@ architecture FULL of NETWORK_MOD_LOGIC is
         variable mi_addr_base_var : slv_array_t(MI_ADDR_BASES-1 downto 0)(MI_ADDR_WIDTH-1 downto 0);
     begin
         for ch in 0 to ETH_PORT_CHAN-1 loop
-            for d in 0 to 1 loop -- TX RX direction loop (d=0 -> TX, d=1 -> RX)
+            for d in 0 to 1 loop                                                                                   -- TX RX direction loop (d=0 -> TX, d=1 -> RX)
                 mi_addr_base_var(ch*2 + d) := std_logic_vector(resize(ch*unsigned(CHAN_OFF) +                      -- specify channel
                                                                       d *unsigned(TX_RX_MAC_OFF), MI_ADDR_WIDTH)); -- specify TX/RX
             end loop;
@@ -256,39 +256,39 @@ begin
     mi_splitter_g: if not ETH_MAC_BYPASS generate
         -- MI SPLITTER for MAC lites
         mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
-        generic map(
-            ADDR_WIDTH  => MI_ADDR_WIDTH      ,
-            DATA_WIDTH  => MI_DATA_WIDTH      ,
-            META_WIDTH  => 0                  ,
-            PORTS       => MI_ADDR_BASES      ,
-            PIPE_OUT    => (others => true)   ,
-            PIPE_TYPE   => "REG"              ,
-            ADDR_BASES  => MI_ADDR_BASES      ,
+        generic map (
+            ADDR_WIDTH  => MI_ADDR_WIDTH,
+            DATA_WIDTH  => MI_DATA_WIDTH,
+            META_WIDTH  => 0,
+            PORTS       => MI_ADDR_BASES,
+            PIPE_OUT    => (others => true),
+            PIPE_TYPE   => "REG",
+            ADDR_BASES  => MI_ADDR_BASES,
             ADDR_BASE   => mi_addr_base_init_f,
             DEVICE      => DEVICE
         )
-        port map(
-            CLK         => MI_CLK  ,
+        port map (
+            CLK         => MI_CLK,
             RESET       => MI_RESET,
 
-            RX_DWR      => MI_DWR         ,
+            RX_DWR      => MI_DWR,
             RX_MWR      => (others => '0'),
-            RX_ADDR     => MI_ADDR        ,
-            RX_BE       => MI_BE          ,
-            RX_RD       => MI_RD          ,
-            RX_WR       => MI_WR          ,
-            RX_ARDY     => MI_ARDY        ,
-            RX_DRD      => MI_DRD         ,
-            RX_DRDY     => MI_DRDY        ,
+            RX_ADDR     => MI_ADDR,
+            RX_BE       => MI_BE,
+            RX_RD       => MI_RD,
+            RX_WR       => MI_WR,
+            RX_ARDY     => MI_ARDY,
+            RX_DRD      => MI_DRD,
+            RX_DRDY     => MI_DRDY,
 
-            TX_DWR     => mi_split_dwr    ,
-            TX_MWR     => open            ,
-            TX_ADDR    => mi_split_addr   ,
-            TX_BE      => mi_split_be     ,
-            TX_RD      => mi_split_rd     ,
-            TX_WR      => mi_split_wr     ,
-            TX_ARDY    => mi_split_ardy   ,
-            TX_DRD     => mi_split_drd    ,
+            TX_DWR     => mi_split_dwr,
+            TX_MWR     => open,
+            TX_ADDR    => mi_split_addr,
+            TX_BE      => mi_split_be,
+            TX_RD      => mi_split_rd,
+            TX_WR      => mi_split_wr,
+            TX_ARDY    => mi_split_ardy,
+            TX_DRD     => mi_split_drd,
             TX_DRDY    => mi_split_drdy
         );
     else generate
@@ -311,32 +311,32 @@ begin
 
         -- Split one ETH_STREAM into ETH_CHANNELS for each TX MAC Lite
         mfb_splitter_tree_i : entity work.MFB_SPLITTER_SIMPLE_GEN
-        generic map(
-            SPLITTER_OUTPUTS => ETH_PORT_CHAN   ,
-            REGIONS          => USER_REGIONS    ,
+        generic map (
+            SPLITTER_OUTPUTS => ETH_PORT_CHAN,
+            REGIONS          => USER_REGIONS,
             REGION_SIZE      => USER_REGION_SIZE,
-            BLOCK_SIZE       => BLOCK_SIZE      ,
-            ITEM_WIDTH       => ITEM_WIDTH      ,
+            BLOCK_SIZE       => BLOCK_SIZE,
+            ITEM_WIDTH       => ITEM_WIDTH,
             META_WIDTH       => 0
         )
-        port map(
-            CLK             => CLK_USER     ,
+        port map (
+            CLK             => CLK_USER,
             RESET           => RESET_USER(0),
 
-            RX_MFB_SEL      => split_addr         ,
-            RX_MFB_DATA     => RX_USER_MFB_DATA(0)   ,
-            RX_MFB_META     => (others => '0')    ,
-            RX_MFB_SOF      => RX_USER_MFB_SOF(0)    ,
-            RX_MFB_EOF      => RX_USER_MFB_EOF(0)    ,
+            RX_MFB_SEL      => split_addr,
+            RX_MFB_DATA     => RX_USER_MFB_DATA(0),
+            RX_MFB_META     => (others => '0'),
+            RX_MFB_SOF      => RX_USER_MFB_SOF(0),
+            RX_MFB_EOF      => RX_USER_MFB_EOF(0),
             RX_MFB_SOF_POS  => RX_USER_MFB_SOF_POS(0),
             RX_MFB_EOF_POS  => RX_USER_MFB_EOF_POS(0),
             RX_MFB_SRC_RDY  => RX_USER_MFB_SRC_RDY(0),
             RX_MFB_DST_RDY  => RX_USER_MFB_DST_RDY(0),
 
-            TX_MFB_DATA     => split_mfb_data   ,
-            TX_MFB_META     => open             ,
-            TX_MFB_SOF      => split_mfb_sof    ,
-            TX_MFB_EOF      => split_mfb_eof    ,
+            TX_MFB_DATA     => split_mfb_data,
+            TX_MFB_META     => open,
+            TX_MFB_SOF      => split_mfb_sof,
+            TX_MFB_EOF      => split_mfb_eof,
             TX_MFB_SOF_POS  => split_mfb_sof_pos,
             TX_MFB_EOF_POS  => split_mfb_eof_pos,
             TX_MFB_SRC_RDY  => split_mfb_src_rdy,
@@ -356,27 +356,27 @@ begin
     tx_g : for ch in 0 to ETH_PORT_CHAN-1 generate
         tx_mac_g: if not ETH_MAC_BYPASS generate
             tx_mac_i : entity work.TX_MAC_LITE
-            generic map(
-                RX_REGIONS      => USER_REGIONS    ,
+            generic map (
+                RX_REGIONS      => USER_REGIONS,
                 RX_REGION_SIZE  => USER_REGION_SIZE,
-                RX_BLOCK_SIZE   => BLOCK_SIZE      ,
-                RX_ITEM_WIDTH   => ITEM_WIDTH      ,
-                TX_REGIONS      => CORE_REGIONS    ,
+                RX_BLOCK_SIZE   => BLOCK_SIZE,
+                RX_ITEM_WIDTH   => ITEM_WIDTH,
+                TX_REGIONS      => CORE_REGIONS,
                 TX_REGION_SIZE  => CORE_REGION_SIZE,
-                TX_BLOCK_SIZE   => BLOCK_SIZE      ,
-                TX_ITEM_WIDTH   => ITEM_WIDTH      ,
+                TX_BLOCK_SIZE   => BLOCK_SIZE,
+                TX_ITEM_WIDTH   => ITEM_WIDTH,
                 RESIZE_ON_TX    => not USE_FULL_MAC,
-                PKT_MTU_BYTES   => ETH_PORT_TX_MTU ,
-                RX_INCLUDE_CRC  => false           ,
-                RX_INCLUDE_IPG  => false           ,
-                CRC_INSERT_EN   => USE_FULL_MAC    ,
-                IPG_GENERATE_EN => USE_FULL_MAC    ,
-                USE_DSP_CNT     => true            ,
-                LL_MODE         => LL_MODE         ,
+                PKT_MTU_BYTES   => ETH_PORT_TX_MTU,
+                RX_INCLUDE_CRC  => false,
+                RX_INCLUDE_IPG  => false,
+                CRC_INSERT_EN   => USE_FULL_MAC,
+                IPG_GENERATE_EN => USE_FULL_MAC,
+                USE_DSP_CNT     => true,
+                LL_MODE         => LL_MODE,
                 DEVICE          => DEVICE
             )
-            port map(
-                MI_CLK         => MI_CLK  ,
+            port map (
+                MI_CLK         => MI_CLK,
                 MI_RESET       => MI_RESET,
                 MI_DWR         => mi_split_dwr (ch*2+0),
                 MI_ADDR        => mi_split_addr(ch*2+0),
@@ -387,8 +387,8 @@ begin
                 MI_ARDY        => mi_split_ardy(ch*2+0),
                 MI_DRDY        => mi_split_drdy(ch*2+0),
 
-                RX_CLK         => CLK_USER             ,
-                RX_CLK_X2      => CLK_USER             , -- CX inside is not used, else use CLK_X2
+                RX_CLK         => CLK_USER,
+                RX_CLK_X2      => CLK_USER, -- CX inside is not used, else use CLK_X2
                 RX_RESET       => RESET_USER       (ch),
                 RX_MFB_DATA    => split_mfb_data   (ch),
                 RX_MFB_SOF_POS => split_mfb_sof_pos(ch),
@@ -398,8 +398,8 @@ begin
                 RX_MFB_SRC_RDY => split_mfb_src_rdy(ch),
                 RX_MFB_DST_RDY => split_mfb_dst_rdy(ch),
 
-                TX_CLK         => TX_CLK_CORE(ch)        ,
-                TX_RESET       => RESET_CORE(ch*2)       ,
+                TX_CLK         => TX_CLK_CORE(ch),
+                TX_RESET       => RESET_CORE(ch*2),
                 TX_MFB_DATA    => TX_CORE_MFB_DATA   (ch),
                 TX_MFB_SOF     => TX_CORE_MFB_SOF    (ch),
                 TX_MFB_EOF     => TX_CORE_MFB_EOF    (ch),
@@ -435,7 +435,7 @@ begin
         signal rx_core_mfb_sof_tmp  : std_logic_vector(CORE_REGIONS-1 downto 0);
         signal rx_core_mfb_eof_tmp  : std_logic_vector(CORE_REGIONS-1 downto 0);
     begin
-        process(all)
+        process (all)
         begin
             -- this fix bug in questasim elsewhere it could be connected directly
             rx_core_mfb_sof_tmp <= RX_CORE_MFB_SOF(ch);
@@ -444,30 +444,30 @@ begin
 
         rx_mac_g: if not ETH_MAC_BYPASS generate
             rx_mac_i : entity work.RX_MAC_LITE
-            generic map(
-                RX_REGIONS      => CORE_REGIONS    ,
+            generic map (
+                RX_REGIONS      => CORE_REGIONS,
                 RX_REGION_SIZE  => CORE_REGION_SIZE,
-                RX_BLOCK_SIZE   => BLOCK_SIZE      ,
-                RX_ITEM_WIDTH   => ITEM_WIDTH      ,
-                TX_REGIONS      => USER_REGIONS    ,
+                RX_BLOCK_SIZE   => BLOCK_SIZE,
+                RX_ITEM_WIDTH   => ITEM_WIDTH,
+                TX_REGIONS      => USER_REGIONS,
                 TX_REGION_SIZE  => USER_REGION_SIZE,
-                TX_BLOCK_SIZE   => BLOCK_SIZE      ,
-                TX_ITEM_WIDTH   => ITEM_WIDTH      ,
-                RESIZE_BUFFER   => RESIZE_BUFFER   ,
+                TX_BLOCK_SIZE   => BLOCK_SIZE,
+                TX_ITEM_WIDTH   => ITEM_WIDTH,
+                RESIZE_BUFFER   => RESIZE_BUFFER,
                 NETWORK_PORT_ID => ETH_PORT_ID*ETH_PORT_CHAN+ch, -- no support different number of channels for each port
-                PKT_MTU_BYTES   => ETH_PORT_RX_MTU ,
-                CRC_IS_RECEIVED => USE_FULL_MAC    ,
-                CRC_CHECK_EN    => USE_FULL_MAC    ,
-                CRC_REMOVE_EN   => USE_FULL_MAC    ,
-                MAC_CHECK_EN    => true            ,
-                MAC_COUNT       => 16              ,
-                TIMESTAMP_EN    => true            ,
+                PKT_MTU_BYTES   => ETH_PORT_RX_MTU,
+                CRC_IS_RECEIVED => USE_FULL_MAC,
+                CRC_CHECK_EN    => USE_FULL_MAC,
+                CRC_REMOVE_EN   => USE_FULL_MAC,
+                MAC_CHECK_EN    => true,
+                MAC_COUNT       => 16,
+                TIMESTAMP_EN    => true,
                 DEVICE          => DEVICE
             )
-            port map(
-                RX_CLK          => RX_CLK_CORE(ch)   ,
+            port map (
+                RX_CLK          => RX_CLK_CORE(ch),
                 RX_RESET        => RESET_CORE(ch*2+1), -- todo
-                TX_CLK          => CLK_USER     ,
+                TX_CLK          => CLK_USER,
                 TX_RESET        => RESET_USER(ch),
 
                 RX_MFB_DATA     => RX_CORE_MFB_DATA   (ch),
@@ -499,7 +499,7 @@ begin
                 LINK_UP         => open,
                 INCOMING_FRAME  => ACTIVITY_RX(ch),
 
-                MI_CLK          => MI_CLK  ,
+                MI_CLK          => MI_CLK,
                 MI_RESET        => MI_RESET,
                 MI_DWR          => mi_split_dwr (ch*2+1),
                 MI_ADDR         => mi_split_addr(ch*2+1),
@@ -532,48 +532,48 @@ begin
     mfb_merger_g: if (ETH_STREAMS = 1) generate
         -- Merge all ETH_CHANNELS into one ETH_STREAM from each RX MAC Lite
         mfb_merger_tree_i : entity work.MFB_MERGER_GEN
-        generic map(
-            MERGER_INPUTS   => ETH_PORT_CHAN   ,
-            MVB_ITEMS       => USER_REGIONS    ,
+        generic map (
+            MERGER_INPUTS   => ETH_PORT_CHAN,
+            MVB_ITEMS       => USER_REGIONS,
             MVB_ITEM_WIDTH  => ETH_RX_HDR_WIDTH,
-            MFB_REGIONS     => USER_REGIONS    ,
+            MFB_REGIONS     => USER_REGIONS,
             MFB_REG_SIZE    => USER_REGION_SIZE,
-            MFB_BLOCK_SIZE  => BLOCK_SIZE      ,
-            MFB_ITEM_WIDTH  => ITEM_WIDTH      ,
-            INPUT_FIFO_SIZE => 8               ,
+            MFB_BLOCK_SIZE  => BLOCK_SIZE,
+            MFB_ITEM_WIDTH  => ITEM_WIDTH,
+            INPUT_FIFO_SIZE => 8,
             RX_PAYLOAD_EN   => (others => true),
-            IN_PIPE_EN      => not LL_MODE     ,
-            OUT_PIPE_EN     => not LL_MODE     ,
+            IN_PIPE_EN      => not LL_MODE,
+            OUT_PIPE_EN     => not LL_MODE,
             DEVICE          => DEVICE
         )
-        port map(
-            CLK             => CLK_USER        ,
-            RESET           => RESET_USER(0)   ,
+        port map (
+            CLK             => CLK_USER,
+            RESET           => RESET_USER(0),
 
-            RX_MFB_DATA     => merg_mfb_data   ,
-            RX_MFB_SOF      => merg_mfb_sof    ,
-            RX_MFB_EOF      => merg_mfb_eof    ,
+            RX_MFB_DATA     => merg_mfb_data,
+            RX_MFB_SOF      => merg_mfb_sof,
+            RX_MFB_EOF      => merg_mfb_eof,
             RX_MFB_SOF_POS  => merg_mfb_sof_pos,
             RX_MFB_EOF_POS  => merg_mfb_eof_pos,
             RX_MFB_SRC_RDY  => merg_mfb_src_rdy,
             RX_MFB_DST_RDY  => merg_mfb_dst_rdy,
 
-            RX_MVB_DATA     => merg_mvb_data   ,
+            RX_MVB_DATA     => merg_mvb_data,
             RX_MVB_PAYLOAD  => (others => (others => '1')),
-            RX_MVB_VLD      => merg_mvb_vld    ,
+            RX_MVB_VLD      => merg_mvb_vld,
             RX_MVB_SRC_RDY  => merg_mvb_src_rdy,
             RX_MVB_DST_RDY  => merg_mvb_dst_rdy,
 
-            TX_MFB_DATA     => TX_USER_MFB_DATA(0)   ,
-            TX_MFB_SOF      => TX_USER_MFB_SOF(0)    ,
-            TX_MFB_EOF      => TX_USER_MFB_EOF(0)    ,
+            TX_MFB_DATA     => TX_USER_MFB_DATA(0),
+            TX_MFB_SOF      => TX_USER_MFB_SOF(0),
+            TX_MFB_EOF      => TX_USER_MFB_EOF(0),
             TX_MFB_SOF_POS  => TX_USER_MFB_SOF_POS(0),
             TX_MFB_EOF_POS  => TX_USER_MFB_EOF_POS(0),
             TX_MFB_SRC_RDY  => TX_USER_MFB_SRC_RDY(0),
             TX_MFB_DST_RDY  => TX_USER_MFB_DST_RDY(0),
 
-            TX_MVB_DATA     => TX_USER_MVB_DATA(0)   ,
-            TX_MVB_VLD      => TX_USER_MVB_VLD(0)    ,
+            TX_MVB_DATA     => TX_USER_MVB_DATA(0),
+            TX_MVB_VLD      => TX_USER_MVB_VLD(0),
             TX_MVB_SRC_RDY  => TX_USER_MVB_SRC_RDY(0),
             TX_MVB_DST_RDY  => TX_USER_MVB_DST_RDY(0)
         );

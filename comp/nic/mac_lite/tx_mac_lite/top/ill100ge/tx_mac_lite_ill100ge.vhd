@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_ILL100GE is
-    generic(
+    generic (
         -- =====================================================================
         -- MFB CONFIGURATION:
         -- =====================================================================
@@ -30,7 +30,7 @@ entity TX_MAC_LITE_ILL100GE is
         -- FPGA device name.
         DEVICE          : string := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         --  MI32 INTERFACE (MI_CLK)
         -- =====================================================================
@@ -96,7 +96,7 @@ architecture FULL of TX_MAC_LITE_ILL100GE is
 begin
 
     tx_mac_lite_i : entity work.TX_MAC_LITE
-    generic map(
+    generic map (
         TX_REGIONS      => MFB_REGIONS,
         TX_REGION_SIZE  => MFB_REGION_SIZE,
         TX_BLOCK_SIZE   => MFB_BLOCK_SIZE,
@@ -109,7 +109,7 @@ begin
         USE_DSP_CNT     => USE_DSP_CNT,
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         MI_CLK         => MI_CLK,
         MI_RESET       => MI_RESET,
         MI_DWR         => MI_DWR,

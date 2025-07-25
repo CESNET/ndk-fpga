@@ -12,89 +12,89 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-entity testbench is
+entity TESTBENCH is
 
-end testbench;
+end entity;
 
-architecture behavioral of testbench is
+architecture BEHAVIORAL of TESTBENCH is
 
 
-   constant clkper         : time := 10 ns; --Clock period
-   constant reset_time     : time := 2*clkper + 1 ns; --Reset durati
-   constant A_DATA_WIDTH   : integer := 17;
-   constant B_DATA_WIDTH   : integer := 143;
+    constant CLKPER         : time := 10 ns;           -- Clock period
+    constant RESET_TIME     : time := 2*CLKPER + 1 ns; -- Reset durati
+    constant A_DATA_WIDTH   : integer := 17;
+    constant B_DATA_WIDTH   : integer := 143;
 
-   -- Clock and reset signals
-   signal CLK              : std_logic;
-   signal RESET            : std_logic;
+    -- Clock and reset signals
+    signal clk              : std_logic;
+    signal reset            : std_logic;
 
-   -- input and output
-   signal A                : std_logic_vector(A_DATA_WIDTH-1 downto 0);
-   signal B                : std_logic_vector(B_DATA_WIDTH-1 downto 0);
-   signal CE               : std_logic;
-   signal P                : std_logic_vector(A_DATA_WIDTH+B_DATA_WIDTH-1 downto 0);
+    -- input and output
+    signal a                : std_logic_vector(A_DATA_WIDTH-1 downto 0);
+    signal b                : std_logic_vector(B_DATA_WIDTH-1 downto 0);
+    signal ce               : std_logic;
+    signal p                : std_logic_vector(A_DATA_WIDTH+B_DATA_WIDTH-1 downto 0);
 
 begin
 
-   -- MUL48
-   uut : entity work.MUL_DSP
-   generic map (
-      A_DATA_WIDTH => A_DATA_WIDTH,
-      B_DATA_WIDTH => B_DATA_WIDTH,
-      REG_IN       => 1,
-      REG_OUT      => 1
-   )
-   port map (
-      CLK         => CLK,
-      RESET       => RESET,
-      A           => A,
-      B           => B,
-      CE          => CE,
-      P           => P
-   );
+    -- MUL48
+    uut : entity work.MUL_DSP
+    generic map (
+        A_DATA_WIDTH => A_DATA_WIDTH,
+        B_DATA_WIDTH => B_DATA_WIDTH,
+        REG_IN       => 1,
+        REG_OUT      => 1
+    )
+    port map (
+        CLK         => clk,
+        RESET       => reset,
+        A           => a,
+        B           => b,
+        CE          => ce,
+        P           => p
+    );
 
-   --Generate clock
-   clk_gen_p : process
-   begin
-      CLK <= '1';
-      wait for clkper/2;
-      CLK <= '0';
-      wait for clkper/2;
-   end process clk_gen_p;
+    -- Generate clock
+    clk_gen_p : process
+    begin
+        clk <= '1';
+        wait for CLKPER/2;
+        clk <= '0';
+        wait for CLKPER/2;
+    end process;
 
-   --Generate reset
-   reset_gen : process
-   begin
-      RESET <= '1';
-      wait for reset_time;
-      RESET <= '0';
-   wait;
-   end process;
+    -- Generate reset
+    reset_gen : process
+    begin
+        reset <= '1';
+        wait for RESET_TIME;
+        reset <= '0';
+        wait;
+    end process;
 
-   -- Simulating input flow
-   input_flow : process
-   begin
+    -- Simulating input flow
+    input_flow : process
+    begin
 
-      -- Initialize input interface
-      A <= (others => '0');
-      B <= (others => '0');
-      CE <= '1';
+        -- Initialize input interface
+        a  <= (others => '0');
+        b  <= (others => '0');
+        ce <= '1';
 
-      wait for reset_time;
-      wait for 3*clkper;
-      wait for clkper;
+        wait for RESET_TIME;
+        wait for 3*CLKPER;
+        wait for CLKPER;
 
-      A <= (others => '1');
-      B <= (others => '1');
-      wait for clkper;
-      wait for clkper;
-      wait for clkper;
-      CE <= '0';
-      wait for 20*clkper;
-      CE <= '1';
+        a  <= (others => '1');
+        b  <= (others => '1');
+        wait for CLKPER;
+        wait for CLKPER;
+        wait for CLKPER;
+        ce <= '0';
+        wait for 20*CLKPER;
+        ce <= '1';
 
-      wait;
+        wait;
 
-   end process input_flow;
+    end process;
 
 end architecture;

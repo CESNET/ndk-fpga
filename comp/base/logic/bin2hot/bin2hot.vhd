@@ -17,28 +17,28 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.math_pack.all;
 
-entity bin2hot is
+entity BIN2HOT is
     generic (
         DATA_WIDTH : integer := 4
     );
     port (
-        EN : in std_logic;
-        INPUT : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        EN     : in std_logic;
+        INPUT  : in  std_logic_vector(DATA_WIDTH-1 downto 0);
         OUTPUT : out std_logic_vector(2**DATA_WIDTH-1 downto 0)
     );
-end bin2hot;
+end entity;
 
-architecture full of bin2hot is
+architecture FULL of BIN2HOT is
 begin
     output_fakeg: if DATA_WIDTH = 0 generate
         OUTPUT(0) <= EN;
     end generate;
     outputg: if DATA_WIDTH >= 1 generate
-        process(INPUT, EN)
+        process (INPUT, EN)
         begin
             OUTPUT <= (others => '0');
             if (EN = '1') then
-               OUTPUT(to_integer(unsigned(INPUT))) <= '1';
+                OUTPUT(to_integer(unsigned(INPUT))) <= '1';
             end if;
         end process;
     end generate;

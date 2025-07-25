@@ -13,7 +13,7 @@ use work.type_pack.all;
 
 -- The purpose of this component is to generate auxiliary signals for each packet in the MFB word
 entity FP_AUX_GEN is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
@@ -24,7 +24,7 @@ entity FP_AUX_GEN is
         RX_PKT_SIZE_MAX     : natural := 2**10
 
     );
-    port(
+    port (
         CLK : in std_logic;
         RST : in std_logic;
 
@@ -127,10 +127,10 @@ begin
     ------------------------------------------------------------
     RX_MFB_DST_RDY  <= and (rx_dropper_dst_rdy);
 
-    pkt_cont_reg_msk_p: process(all)
+    pkt_cont_reg_msk_p : process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 rx_pkt_cont_reg_msk  <= '0';
             elsif (RX_MFB_SRC_RDY = '1') then
                 rx_pkt_cont_reg_msk  <= or (tx_dropper_pkt_cont);
@@ -138,7 +138,7 @@ begin
         end if;
     end process;
 
-    dropper_select_p: process(all)
+    dropper_select_p : process (all)
         -- [Packets][Regions]
         variable rx_drop_v      : slv_array_t(MFB_REGIONS downto 0)(MFB_REGIONS - 1 downto 0);
         -- [Packets]
@@ -152,7 +152,7 @@ begin
         rx_drop_lv_v    := (others => '1');
 
         -- Individual operations
-        drop_select_l: for i in 0 to MFB_REGIONS - 1 loop
+        drop_select_l : for i in 0 to MFB_REGIONS - 1 loop
             rx_drop_v(i+1)(i)    := '0';
         end loop;
 
@@ -168,32 +168,32 @@ begin
 
     mfb_dropper_g: for i in 0 to MFB_REGIONS generate
         mfb_dropper_i: entity work.FP_MFB_DROPPER
-            generic map(
-                REGIONS     => MFB_REGIONS,
-                REGION_SIZE => MFB_REGION_SIZE,
-                BLOCK_SIZE  => MFB_BLOCK_SIZE,
-                ITEM_WIDTH  => MFB_ITEM_WIDTH
-            )
-            port map(
-                CLK     => CLK,
-                RESET   => RST,
+        generic map (
+            REGIONS     => MFB_REGIONS,
+            REGION_SIZE => MFB_REGION_SIZE,
+            BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            ITEM_WIDTH  => MFB_ITEM_WIDTH
+        )
+        port map (
+            CLK     => CLK,
+            RESET   => RST,
 
-                RX_SOF_POS  => RX_MFB_SOF_POS,
-                RX_EOF_POS  => RX_MFB_EOF_POS,
-                RX_SOF      => RX_MFB_SOF,
-                RX_EOF      => RX_MFB_EOF,
-                RX_SRC_RDY  => RX_MFB_SRC_RDY,
-                RX_DST_RDY  => rx_dropper_dst_rdy(i),
-                RX_DROP     => rx_drop(i),
-                RX_PKT_CONT => rx_pkt_cont(i),
-                TX_PKT_CONT => tx_dropper_pkt_cont(i),
-                RX_DROP_LV  => rx_drop_lv(i),
-                TX_SOF_POS  => tx_dropper_sof_pos(i),
-                TX_EOF_POS  => tx_dropper_eof_pos(i),
-                TX_SOF      => tx_dropper_sof(i),
-                TX_EOF      => tx_dropper_eof(i),
-                TX_SRC_RDY  => tx_dropper_src_rdy(i),
-                TX_DST_RDY  => '1'
+            RX_SOF_POS  => RX_MFB_SOF_POS,
+            RX_EOF_POS  => RX_MFB_EOF_POS,
+            RX_SOF      => RX_MFB_SOF,
+            RX_EOF      => RX_MFB_EOF,
+            RX_SRC_RDY  => RX_MFB_SRC_RDY,
+            RX_DST_RDY  => rx_dropper_dst_rdy(i),
+            RX_DROP     => rx_drop(i),
+            RX_PKT_CONT => rx_pkt_cont(i),
+            TX_PKT_CONT => tx_dropper_pkt_cont(i),
+            RX_DROP_LV  => rx_drop_lv(i),
+            TX_SOF_POS  => tx_dropper_sof_pos(i),
+            TX_EOF_POS  => tx_dropper_eof_pos(i),
+            TX_SOF      => tx_dropper_sof(i),
+            TX_EOF      => tx_dropper_eof(i),
+            TX_SRC_RDY  => tx_dropper_src_rdy(i),
+            TX_DST_RDY  => '1'
         );
     end generate;
 
@@ -201,13 +201,13 @@ begin
     --                      Channel per BS                    --
     ------------------------------------------------------------
     -- External register for last_vld
-    channel_reg_p: process(all)
+    channel_reg_p : process (all)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
+            if (RST = '1') then
                 lv_channel_per_bs(0)  <= (others => '0');
                 lv_vld_reg_in         <= '0';
-            elsif lv_wr_reg_out = '1' then
+            elsif (lv_wr_reg_out = '1') then
                 lv_channel_per_bs(0)  <= lv_data_reg_out;
                 lv_vld_reg_in         <= lv_vld_reg_out;
             end if;
@@ -216,39 +216,39 @@ begin
 
     -- The first BS handles EOF - Channel from the register
     channel_per_bs_i : entity work.MVB_AGGREGATE_LAST_VLD
-        generic map(
-            ITEMS           => MFB_REGIONS,
-            ITEM_WIDTH      => max(1, log2(RX_CHANNELS)),
-            IMPLEMENTATION  => "serial",
-            INTERNAL_REG    => false
-        )
-        port map(
-            CLK             => CLK,
-            RESET           => RST,
+    generic map (
+        ITEMS           => MFB_REGIONS,
+        ITEM_WIDTH      => max(1, log2(RX_CHANNELS)),
+        IMPLEMENTATION  => "serial",
+        INTERNAL_REG    => false
+    )
+    port map (
+        CLK             => CLK,
+        RESET           => RST,
 
-            RX_DATA         => slv_array_ser(rx_channel_s),
-            RX_VLD          => RX_MFB_SOF,
-            RX_SRC_RDY      => RX_MFB_SRC_RDY,
-            RX_DST_RDY      => open,
+        RX_DATA         => slv_array_ser(rx_channel_s),
+        RX_VLD          => RX_MFB_SOF,
+        RX_SRC_RDY      => RX_MFB_SRC_RDY,
+        RX_DST_RDY      => open,
 
-            REG_IN_DATA     => lv_channel_per_bs(0),
-            REG_IN_VLD      => lv_vld_reg_in,
-            REG_OUT_DATA    => lv_data_reg_out,
-            REG_OUT_VLD     => lv_vld_reg_out,
-            REG_OUT_WR      => lv_wr_reg_out,
+        REG_IN_DATA     => lv_channel_per_bs(0),
+        REG_IN_VLD      => lv_vld_reg_in,
+        REG_OUT_DATA    => lv_data_reg_out,
+        REG_OUT_VLD     => lv_vld_reg_out,
+        REG_OUT_WR      => lv_wr_reg_out,
 
-            TX_DATA         => lv_tx_data,
-            TX_VLD          => open,
-            TX_PRESCAN_DATA => open,
-            TX_PRESCAN_VLD  => open,
-            TX_SRC_RDY      => open,
-            TX_DST_RDY      => '1'
+        TX_DATA         => lv_tx_data,
+        TX_VLD          => open,
+        TX_PRESCAN_DATA => open,
+        TX_PRESCAN_VLD  => open,
+        TX_SRC_RDY      => open,
+        TX_DST_RDY      => '1'
     );
 
     lv_channel_per_bs(lv_channel_per_bs'high downto 1) <= slv_array_deser(lv_tx_data, MFB_REGIONS);
 
     -- Synchronization with the rest of the auxiliary signals
-    channel_sync_p: process(all)
+    channel_sync_p : process (all)
     begin
         if rising_edge(CLK) then
             TX_CHANNEL_BS   <= lv_channel_per_bs;
@@ -259,14 +259,14 @@ begin
     --                    Validator [vld]                     --
     ------------------------------------------------------------
     -- Synchronization
-    pkt_cont_reg_vld_p: process(all)
+    pkt_cont_reg_vld_p : process (all)
     begin
         if rising_edge(CLK) then
-            rx_pkt_cont_reg_vld <=  rx_pkt_cont_reg_msk;
+            rx_pkt_cont_reg_vld <= rx_pkt_cont_reg_msk;
         end if;
     end process;
 
-    vld_pkt_select_p: process(all)
+    vld_pkt_select_p : process (all)
         variable vld_pkt_cont_v : std_logic_vector(MFB_REGIONS downto 0);
     begin
         -- Default state
@@ -278,37 +278,37 @@ begin
 
     block_valid_g: for i in 0 to MFB_REGIONS generate
         block_valid_0_i: entity work.FP_BLOCK_VLD
-            generic map(
-                MFB_REGIONS       => MFB_REGIONS,
-                MFB_REGION_SIZE   => MFB_REGION_SIZE,
-                MFB_BLOCK_SIZE    => MFB_BLOCK_SIZE,
-                MFB_ITEM_WIDTH    => MFB_ITEM_WIDTH
-            )
-            port map(
-                RX_PKT_CONT     => vld_pkt_cont(i),
+        generic map (
+            MFB_REGIONS       => MFB_REGIONS,
+            MFB_REGION_SIZE   => MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE    => MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH    => MFB_ITEM_WIDTH
+        )
+        port map (
+            RX_PKT_CONT     => vld_pkt_cont(i),
 
-                RX_SOF          => tx_dropper_sof(i),
-                RX_EOF          => tx_dropper_eof(i),
-                RX_SOF_POS      => tx_dropper_sof_pos(i),
-                RX_EOF_POS      => tx_dropper_eof_pos(i),
-                RX_SRC_RDY      => tx_dropper_src_rdy(i),
-                RX_DST_RDY      => open,
+            RX_SOF          => tx_dropper_sof(i),
+            RX_EOF          => tx_dropper_eof(i),
+            RX_SOF_POS      => tx_dropper_sof_pos(i),
+            RX_EOF_POS      => tx_dropper_eof_pos(i),
+            RX_SRC_RDY      => tx_dropper_src_rdy(i),
+            RX_DST_RDY      => open,
 
-                TX_SRC_RDY      => tx_src_rdy_vld(i),
-                TX_DST_RDY      => '1',
+            TX_SRC_RDY      => tx_src_rdy_vld(i),
+            TX_DST_RDY      => '1',
 
-                TX_BLOCK_VLD    => tx_block_vld_s(i),
-                TX_SOF_OH       => tx_sof_one_hot_vld(i),
-                TX_EOF_OH       => tx_eof_one_hot_vld(i)
+            TX_BLOCK_VLD    => tx_block_vld_s(i),
+            TX_SOF_OH       => tx_sof_one_hot_vld(i),
+            TX_EOF_OH       => tx_eof_one_hot_vld(i)
         );
     end generate;
 
     -- Round up current packet length
-    process(all)
+    process (all)
         variable pkt_len_rounded_v  : u_array_t(MFB_REGIONS - 1 downto 0)(log2(RX_PKT_SIZE_MAX+ 1)  - 1 downto 0);
     begin
         for r in 0 to MFB_REGIONS - 1 loop
-            if (or(rx_pkt_lng_s(r)(log2(MFB_BLOCK_SIZE) - 1 downto 0))) = '1' then
+            if ((or(rx_pkt_lng_s(r)(log2(MFB_BLOCK_SIZE) - 1 downto 0))) = '1') then
                 pkt_len_rounded_v(r)   := unsigned(rx_pkt_lng_s(r)) + to_unsigned(MFB_BLOCK_SIZE, pkt_len_rounded_v(r)'length);
             else
                 pkt_len_rounded_v(r)   := unsigned(rx_pkt_lng_s(r));
@@ -327,7 +327,7 @@ begin
     end generate;
 
     -- Synchronization of AUX signals with DATA
-    data_reg_p: process(all)
+    data_reg_p : process (all)
     begin
         if rising_edge(CLK) then
             TX_MFB_DATA         <= RX_MFB_DATA;

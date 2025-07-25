@@ -132,8 +132,8 @@ architecture FULL of TX_DMA_CHAN_START_STOP_CTRL is
     -- =============================================================================================
     -- State machines' states
     -- =============================================================================================
-    type channel_active_state_t is (CHANNEL_RUNNING, CHANNEL_START, CHANNEL_STOP_PENDING, CHANNEL_STOPPED);
-    type all_chan_active_states_t is array (CHANNELS -1 downto 0) of channel_active_state_t;
+    type   channel_active_state_t is (CHANNEL_RUNNING, CHANNEL_START, CHANNEL_STOP_PENDING, CHANNEL_STOPPED);
+    type   all_chan_active_states_t is array (CHANNELS -1 downto 0) of channel_active_state_t;
     signal channel_active_pst       : all_chan_active_states_t := (others => CHANNEL_STOPPED);
     signal channel_active_nst       : all_chan_active_states_t := (others => CHANNEL_STOPPED);
 
@@ -141,8 +141,8 @@ architecture FULL of TX_DMA_CHAN_START_STOP_CTRL is
     signal chan_start_req_ack       : std_logic_vector(CHANNELS -1 downto 0);
     signal chan_stop_req_ack        : std_logic_vector(CHANNELS -1 downto 0);
 
-    type pkt_acc_state_t is (S_IDLE, S_PKT_PENDING, S_PKT_DROP);
-    type all_chan_pkt_acc_state_t is array (CHANNELS -1 downto 0) of pkt_acc_state_t;
+    type   pkt_acc_state_t is (S_IDLE, S_PKT_PENDING, S_PKT_DROP);
+    type   all_chan_pkt_acc_state_t is array (CHANNELS -1 downto 0) of pkt_acc_state_t;
     signal pkt_acc_pst              : all_chan_pkt_acc_state_t := (others => S_IDLE);
     signal pkt_acc_nst              : all_chan_pkt_acc_state_t := (others => S_IDLE);
 
@@ -242,7 +242,8 @@ begin
             pkt_acc_pst(j) = S_PKT_PENDING
             and STOP_REQ_VLD = '1'
             and std_logic_vector(to_unsigned(j, log2(CHANNELS))) = STOP_REQ_CHAN
-            ) else '0';
+            ) else
+ '0';
 
         channel_active_state_reg_p : process (CLK) is
         begin
@@ -305,14 +306,14 @@ begin
     -- 8)              1      1      1      0      up to 2 Channels
     -- 9)              1      1      1      1            2 Channels
 
-    channel_sel_p: process(all)
+    channel_sel_p : process (all)
     begin
         is_dma_hdr_by_chan   <= (others => (others => '0'));
         pcie_mfb_sof_by_chan <= (others => (others => '0'));
 
         -- Last assignment
         for i in 0 to MFB_REGIONS - 1 loop
-            if PCIE_MFB_SOF(i) = '1' then
+            if (PCIE_MFB_SOF(i) = '1') then
                 pcie_mfb_sof_by_chan(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_CHAN_NUM))))(i) <= '1';
                 is_dma_hdr_by_chan(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_CHAN_NUM))))(i)   <= pcie_mfb_meta_arr(i)(META_IS_DMA_HDR)(0);
             end if;
@@ -333,7 +334,7 @@ begin
                         pkt_acc_pst(j)        <= S_IDLE;
                         tr_byte_lng_stored(j) <= (others => '0');
                     else
-                        pkt_acc_pst(j) <= pkt_acc_nst(j);
+                        pkt_acc_pst(j)        <= pkt_acc_nst(j);
                         tr_byte_lng_stored(j) <= tr_byte_lng_curr(j);
                     end if;
                 end if;
@@ -344,7 +345,7 @@ begin
                 pkt_acc_nst(j)      <= pkt_acc_pst(j);
                 tr_byte_lng_curr(j) <= tr_byte_lng_stored(j);
 
-                chan_pkt_drop_en(j) <= (others => '0');
+                chan_pkt_drop_en(j)        <= (others => '0');
                 dma_frame_lng_correct(j)   <= '0';
                 dma_frame_lng_incorrect(j) <= '0';
 
@@ -355,10 +356,10 @@ begin
                             and PCIE_MFB_SOF = "1"
                             and PCIE_MFB_META(META_IS_DMA_HDR) = "0"
                             and std_logic_vector(to_unsigned(j, log2(CHANNELS))) = PCIE_MFB_META(META_CHAN_NUM)
-                            ) then
+                        ) then
 
                             if (channel_active_pst(j) = CHANNEL_RUNNING) then
-                                pkt_acc_nst(j) <= S_PKT_PENDING;
+                                pkt_acc_nst(j)      <= S_PKT_PENDING;
                                 tr_byte_lng_curr(j) <= resize(unsigned(PCIE_MFB_META(META_BYTE_CNT)), log2(PKT_SIZE_MAX+1));
                             else
                                 pkt_acc_nst(j)      <= S_PKT_DROP;
@@ -370,7 +371,7 @@ begin
                         if (PCIE_MFB_SRC_RDY = '1'
                             and PCIE_MFB_SOF = "1"
                             and std_logic_vector(to_unsigned(j, log2(CHANNELS))) = PCIE_MFB_META(META_CHAN_NUM)
-                            ) then
+                        ) then
 
                             if (PCIE_MFB_META(META_IS_DMA_HDR) = "1") then
 
@@ -407,7 +408,8 @@ begin
                 and PCIE_MFB_SOF = "1"
                 and PCIE_MFB_META(META_IS_DMA_HDR) = "1"
                 and std_logic_vector(to_unsigned(j, log2(CHANNELS))) = PCIE_MFB_META(META_CHAN_NUM)
-                ) else '0';
+                ) else
+ '0';
 
         end generate;
 
@@ -546,12 +548,13 @@ begin
                 and PCIE_MFB_DST_RDY = '1'
                 and pcie_mfb_sof_by_chan(j)(0) = '1'
                 and is_dma_hdr_by_chan(j)(0) = '1'
-                ) else '0';
+                ) else
+ '0';
 
         end generate;
     end generate;
 
-    dbg_signal_reg_p: process (CLK) is
+    dbg_signal_reg_p : process (CLK) is
     begin
         if (rising_edge(CLK)) then
             ST_SP_DBG_CHAN    <= PCIE_MFB_META(META_CHAN_NUM);
@@ -564,21 +567,21 @@ begin
 
     -- One region debug (The "PCIE_MFB_SOF = "1"" is not that compatible)
     pkt_statistics_g: if MFB_REGIONS = 1 generate
-        PKT_DISC_CHAN  <= PCIE_MFB_META(META_CHAN_NUM);
+        PKT_DISC_CHAN       <= PCIE_MFB_META(META_CHAN_NUM);
         -- choose only packet size from the DMA header
-        PKT_DISC_BYTES <= PCIE_MFB_DATA(log2(PKT_SIZE_MAX+1) -1 downto 0);
-        PKT_DISC_INC   <= '1' when
+        PKT_DISC_BYTES      <= PCIE_MFB_DATA(log2(PKT_SIZE_MAX+1) -1 downto 0);
+        PKT_DISC_INC        <= '1' when
                         (
                             pkt_acc_pst(to_integer(unsigned(PCIE_MFB_META(META_CHAN_NUM)))) = S_PKT_DROP
                             and PCIE_MFB_META(META_IS_DMA_HDR) = "1"
                             and PCIE_MFB_SRC_RDY = '1'
-                            and PCIE_MFB_DST_RDY = '1')
-                        else '0';
+                            and PCIE_MFB_DST_RDY = '1') else
+                        '0';
     else generate
         -- Extract data for statistics
         -- This part should be compatible with one region as well
         pcie_mfb_data_arr   <= slv_array_deser(PCIE_MFB_DATA, MFB_REGIONS);
-        discard_arr_p: process(all)
+        discard_arr_p : process (all)
         begin
             for i in MFB_REGIONS - 1 downto 0 loop
                 pcie_mfb_disc_chan_arr(i)   <= pcie_mfb_meta_arr(i)(META_CHAN_NUM);
@@ -595,7 +598,7 @@ begin
         end process;
 
         -- Concatenate statistical data
-        var_conc_p: process(all)
+        var_conc_p : process (all)
         begin
             for i in MFB_REGIONS - 1 downto 0 loop
                 fifox_mult_di(i) <= pcie_mfb_disc_chan_arr(i) & pcie_mfb_disc_bytes_arr(i) & pcie_mfb_disc_inc_arr(i);
@@ -604,7 +607,7 @@ begin
 
         -- FIFOX MULTI: (2 to 1) or (1 to 1)
         overflow_fifox_i: entity work.FIFOX_MULTI
-        generic map(
+        generic map (
             DATA_WIDTH      => log2(CHANNELS) + log2(PKT_SIZE_MAX+1) + 1,
             ITEMS           => CHANNELS*2,
             WRITE_PORTS     => MFB_REGIONS,
@@ -623,15 +626,16 @@ begin
             DO      => fifox_mult_do,
             RD      => "1",
             EMPTY   => fifox_mult_empty,
-            AEMPTY  => open);
+            AEMPTY  => open
+        );
 
-        disc_out_p: process(all)
+        disc_out_p : process (all)
         begin
-            if fifox_mult_empty = "0" then
+            if (fifox_mult_empty = "0") then
                 (PKT_DISC_CHAN, PKT_DISC_BYTES, PKT_DISC_INC) <= fifox_mult_do;
             else
                 (PKT_DISC_CHAN, PKT_DISC_BYTES, PKT_DISC_INC) <= fifox_mult_do;
-                PKT_DISC_INC    <= '0';
+                PKT_DISC_INC                                  <= '0';
             end if;
         end process;
     end generate;
@@ -653,32 +657,34 @@ begin
     end generate;
 
     pkt_dropper_i : entity work.MFB_DROPPER
-        generic map (
-            REGIONS     => MFB_REGIONS,
-            REGION_SIZE => MFB_REGION_SIZE,
-            BLOCK_SIZE  => MFB_BLOCK_SIZE,
-            ITEM_WIDTH  => MFB_ITEM_WIDTH,
-            META_WIDTH  => ((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1))
-        port map (
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        REGIONS     => MFB_REGIONS,
+        REGION_SIZE => MFB_REGION_SIZE,
+        BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        ITEM_WIDTH  => MFB_ITEM_WIDTH,
+        META_WIDTH  => ((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            RX_DATA    => PCIE_MFB_DATA,
-            RX_META    => slv_array_ser(pcie_mfb_meta_ext),
-            RX_SOF_POS => PCIE_MFB_SOF_POS,
-            RX_EOF_POS => PCIE_MFB_EOF_POS,
-            RX_SOF     => PCIE_MFB_SOF,
-            RX_EOF     => PCIE_MFB_EOF,
-            RX_SRC_RDY => PCIE_MFB_SRC_RDY,
-            RX_DST_RDY => PCIE_MFB_DST_RDY,
-            RX_DROP    => pkt_drop_en,
+        RX_DATA    => PCIE_MFB_DATA,
+        RX_META    => slv_array_ser(pcie_mfb_meta_ext),
+        RX_SOF_POS => PCIE_MFB_SOF_POS,
+        RX_EOF_POS => PCIE_MFB_EOF_POS,
+        RX_SOF     => PCIE_MFB_SOF,
+        RX_EOF     => PCIE_MFB_EOF,
+        RX_SRC_RDY => PCIE_MFB_SRC_RDY,
+        RX_DST_RDY => PCIE_MFB_DST_RDY,
+        RX_DROP    => pkt_drop_en,
 
-            TX_DATA    => USR_MFB_DATA,
-            TX_META    => USR_MFB_META,
-            TX_SOF_POS => USR_MFB_SOF_POS,
-            TX_EOF_POS => USR_MFB_EOF_POS,
-            TX_SOF     => USR_MFB_SOF,
-            TX_EOF     => USR_MFB_EOF,
-            TX_SRC_RDY => USR_MFB_SRC_RDY,
-            TX_DST_RDY => USR_MFB_DST_RDY);
+        TX_DATA    => USR_MFB_DATA,
+        TX_META    => USR_MFB_META,
+        TX_SOF_POS => USR_MFB_SOF_POS,
+        TX_EOF_POS => USR_MFB_EOF_POS,
+        TX_SOF     => USR_MFB_SOF,
+        TX_EOF     => USR_MFB_EOF,
+        TX_SRC_RDY => USR_MFB_SRC_RDY,
+        TX_DST_RDY => USR_MFB_DST_RDY
+    );
 end architecture;

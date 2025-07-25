@@ -29,7 +29,7 @@ entity RX_DMA_CALYPTE_INPUT_BUFFER is
         REGION_SIZE : integer := 4;
         BLOCK_SIZE  : integer := 8;
         ITEM_WIDTH  : integer := 8
-        );
+    );
 
     port (
         CLK : in std_logic;
@@ -50,7 +50,7 @@ entity RX_DMA_CALYPTE_INPUT_BUFFER is
         TX_MFB_EOF_POS : out std_logic_vector(max(1, log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
         TX_MFB_SRC_RDY : out std_logic;
         TX_MFB_DST_RDY : in  std_logic
-        );
+    );
 
 end entity;
 
@@ -63,7 +63,7 @@ architecture FULL of RX_DMA_CALYPTE_INPUT_BUFFER is
     --=============================================================================================================
     -- Packet divider signals
     --=============================================================================================================
-    type pkt_divide_state_type is (PKT_PASS, PKT_DIVIDE);
+    type   pkt_divide_state_type is (PKT_PASS, PKT_DIVIDE);
     signal pkt_divide_state : pkt_divide_state_type := PKT_PASS;
 
     signal div_tx_data    : std_logic_vector(RX_MFB_DATA'range);
@@ -104,7 +104,7 @@ architecture FULL of RX_DMA_CALYPTE_INPUT_BUFFER is
     --=============================================================================================================
     -- Shifting FSM signals
     --=============================================================================================================
-    type pkt_shift_state_type is (PKT_START_DETECT, PKT_NO_SHIFT, PKT_MIDDLE, PKT_END, PKT_START_BREAK);
+    type   pkt_shift_state_type is (PKT_START_DETECT, PKT_NO_SHIFT, PKT_MIDDLE, PKT_END, PKT_START_BREAK);
     signal sh_fsm_pst : pkt_shift_state_type := PKT_START_DETECT;
     signal sh_fsm_nst : pkt_shift_state_type := PKT_START_DETECT;
 
@@ -186,7 +186,7 @@ begin
                             and RX_MFB_EOF = '1'
                             and RX_MFB_SRC_RDY = '1'
                             and sof_pos_un > eof_blk_pos
-                            ) then
+                        ) then
 
                             pkt_divide_state <= PKT_DIVIDE;
                             div_tx_sof       <= '0';
@@ -595,14 +595,16 @@ begin
 
 
     data_out_shifter_i : entity work.BARREL_SHIFTER_GEN
-        generic map (
-            BLOCKS     => 2*REGION_SIZE,
-            BLOCK_SIZE => BLOCK_SIZE*ITEM_WIDTH,
-            SHIFT_LEFT => FALSE)
-        port map (
-            DATA_IN  => sb_rx_data(0) & sb_rx_data(1),
-            DATA_OUT => bshifter_data_out,
-            SEL      => std_logic_vector(shift_sel));
+    generic map (
+        BLOCKS     => 2*REGION_SIZE,
+        BLOCK_SIZE => BLOCK_SIZE*ITEM_WIDTH,
+        SHIFT_LEFT => FALSE
+    )
+    port map (
+        DATA_IN  => sb_rx_data(0) & sb_rx_data(1),
+        DATA_OUT => bshifter_data_out,
+        SEL      => std_logic_vector(shift_sel)
+    );
     --=============================================================================================================
 
     TX_MFB_SOF_POS <= std_logic_vector(to_unsigned(SHIFT_TO_BLOCK, TX_MFB_SOF_POS'length));

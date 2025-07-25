@@ -22,7 +22,7 @@ architecture FULL of ALTDPRAM_WRAP is
 
 begin
 
-    altdpram_i : altdpram
+    altdpram_i : component altdpram
     generic map (
         indata_aclr                        => "OFF",
         indata_reg                         => "INCLOCK",
@@ -46,7 +46,7 @@ begin
         wrcontrol_aclr                     => "OFF",
         wrcontrol_reg                      => "INCLOCK"
     )
-    PORT MAP (
+    port map (
         data           => DATA,
         inclock        => INCLOCK,
         rdaddress      => RDADDRESS,

@@ -15,59 +15,59 @@ use work.type_pack.all;
 -- ----------------------------------------------------------------------------
 
 entity MFB_ITEM_RECONFIGURATOR is
-generic(
-    -- =============================
-    -- MFB Configuration
-    -- =============================
+    generic (
+        -- =============================
+        -- MFB Configuration
+        -- =============================
 
-    REGIONS        : integer := 2;
-    REGION_SIZE    : integer := 1;
-    RX_BLOCK_SIZE  : integer := 8;
-    TX_BLOCK_SIZE  : integer := 8;
-    RX_ITEM_WIDTH  : integer := 32;
-    META_WIDTH     : integer := 0;
+        REGIONS        : integer := 2;
+        REGION_SIZE    : integer := 1;
+        RX_BLOCK_SIZE  : integer := 8;
+        TX_BLOCK_SIZE  : integer := 8;
+        RX_ITEM_WIDTH  : integer := 32;
+        META_WIDTH     : integer := 0;
 
-    -- =============================
-    -- Others
-    -- =============================
+        -- =============================
+        -- Others
+        -- =============================
 
-    -- Target device
-    DEVICE         : string := "ULTRASCALE";
+        -- Target device
+        DEVICE         : string := "ULTRASCALE";
 
-    -- Derived parameters
-    -- DO NOT CHANGE!
-    TX_ITEM_WIDTH  : integer := RX_ITEM_WIDTH*RX_BLOCK_SIZE/TX_BLOCK_SIZE
-);
-port(
-    CLK   : in std_logic;
-    RESET : in std_logic;
+        -- Derived parameters
+        -- DO NOT CHANGE!
+        TX_ITEM_WIDTH  : integer := RX_ITEM_WIDTH*RX_BLOCK_SIZE/TX_BLOCK_SIZE
+    );
+    port (
+        CLK   : in std_logic;
+        RESET : in std_logic;
 
-    -- =============================
-    -- MFB input interface
-    -- =============================
+        -- =============================
+        -- MFB input interface
+        -- =============================
 
-    RX_DATA    : in  std_logic_vector(REGIONS*REGION_SIZE*RX_BLOCK_SIZE*RX_ITEM_WIDTH-1 downto 0);
-    RX_META    : in  std_logic_vector(REGIONS*META_WIDTH-1 downto 0) := (others => '0');
-    RX_SOF     : in  std_logic_vector(REGIONS-1 downto 0);
-    RX_EOF     : in  std_logic_vector(REGIONS-1 downto 0);
-    RX_SOF_POS : in  std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
-    RX_EOF_POS : in  std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*RX_BLOCK_SIZE))-1 downto 0);
-    RX_SRC_RDY : in  std_logic;
-    RX_DST_RDY : out std_logic;
+        RX_DATA    : in  std_logic_vector(REGIONS*REGION_SIZE*RX_BLOCK_SIZE*RX_ITEM_WIDTH-1 downto 0);
+        RX_META    : in  std_logic_vector(REGIONS*META_WIDTH-1 downto 0) := (others => '0');
+        RX_SOF     : in  std_logic_vector(REGIONS-1 downto 0);
+        RX_EOF     : in  std_logic_vector(REGIONS-1 downto 0);
+        RX_SOF_POS : in  std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
+        RX_EOF_POS : in  std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*RX_BLOCK_SIZE))-1 downto 0);
+        RX_SRC_RDY : in  std_logic;
+        RX_DST_RDY : out std_logic;
 
-    -- =============================
-    -- MFB output interface
-    -- =============================
+        -- =============================
+        -- MFB output interface
+        -- =============================
 
-    TX_DATA    : out std_logic_vector(REGIONS*REGION_SIZE*TX_BLOCK_SIZE*TX_ITEM_WIDTH-1 downto 0);
-    TX_META    : out std_logic_vector(REGIONS*META_WIDTH-1 downto 0);
-    TX_SOF     : out std_logic_vector(REGIONS-1 downto 0);
-    TX_EOF     : out std_logic_vector(REGIONS-1 downto 0);
-    TX_SOF_POS : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
-    TX_EOF_POS : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*TX_BLOCK_SIZE))-1 downto 0);
-    TX_SRC_RDY : out std_logic;
-    TX_DST_RDY : in  std_logic
-);
+        TX_DATA    : out std_logic_vector(REGIONS*REGION_SIZE*TX_BLOCK_SIZE*TX_ITEM_WIDTH-1 downto 0);
+        TX_META    : out std_logic_vector(REGIONS*META_WIDTH-1 downto 0);
+        TX_SOF     : out std_logic_vector(REGIONS-1 downto 0);
+        TX_EOF     : out std_logic_vector(REGIONS-1 downto 0);
+        TX_SOF_POS : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
+        TX_EOF_POS : out std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*TX_BLOCK_SIZE))-1 downto 0);
+        TX_SRC_RDY : out std_logic;
+        TX_DST_RDY : in  std_logic
+    );
 end entity;
 
 -- ----------------------------------------------------------------------------
@@ -84,8 +84,8 @@ architecture FULL of MFB_ITEM_RECONFIGURATOR is
     -- All cases covered
     -- ------------------------------------------------------------------------
 
-    signal RX_EOF_POS_arr : slv_array_t(REGIONS-1 downto 0)(RX_EOF_POS_W-1 downto 0);
-    signal TX_EOF_POS_arr : slv_array_t(REGIONS-1 downto 0)(TX_EOF_POS_W-1 downto 0);
+    signal rx_eof_pos_arr : slv_array_t(REGIONS-1 downto 0)(RX_EOF_POS_W-1 downto 0);
+    signal tx_eof_pos_arr : slv_array_t(REGIONS-1 downto 0)(TX_EOF_POS_W-1 downto 0);
 
     -- ------------------------------------------------------------------------
 
@@ -126,16 +126,16 @@ begin
     RX_DST_RDY <= TX_DST_RDY;
 
     -- Simply add or remove bits at the end of each EOF_POS
-    RX_EOF_POS_arr <= slv_array_deser(RX_EOF_POS,REGIONS);
-    xof_resize_pr : process (RX_EOF_POS_arr)
+    rx_eof_pos_arr <= slv_array_deser(RX_EOF_POS,REGIONS);
+    xof_resize_pr : process (rx_eof_pos_arr)
     begin
         for i in 0 to REGIONS-1 loop
-            TX_EOF_POS_arr(i) <= std_logic_vector(resize_right(resize_left(unsigned(RX_EOF_POS_arr(i)),RX_EOF_POS_TRUE_W),TX_EOF_POS_W));
+            tx_eof_pos_arr(i)                                            <= std_logic_vector(resize_right(resize_left(unsigned(rx_eof_pos_arr(i)),RX_EOF_POS_TRUE_W),TX_EOF_POS_W));
             -- When enlarging, fill with '1's NOT '0's!
-            TX_EOF_POS_arr(i)(TX_EOF_POS_W-RX_EOF_POS_TRUE_W-1 downto 0) <= (others => '1');
+            tx_eof_pos_arr(i)(TX_EOF_POS_W-RX_EOF_POS_TRUE_W-1 downto 0) <= (others => '1');
         end loop;
     end process;
-    TX_EOF_POS <= slv_array_ser(TX_EOF_POS_arr);
+    TX_EOF_POS     <= slv_array_ser(tx_eof_pos_arr);
 
     -- ------------------------------------------------------------------------
 

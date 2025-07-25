@@ -13,14 +13,14 @@ use work.type_pack.all;
 
 -- The purpose of this component is to concatenate VLD, SOF_OH, EOF_OH and PKT_LNG with MFB data
 entity FP_META_CONCATENATE is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
         MFB_ITEM_WIDTH      : natural := 8;
         RX_PKT_SIZE_MAX     : natural := 2**14
     );
-    port(
+    port (
         -- RX MFB interface
         RX_MFB_DATA     : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
         -- Valid per packet

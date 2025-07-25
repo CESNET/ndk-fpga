@@ -17,7 +17,7 @@ use work.type_pack.all;
 -- Note: 4 region of this component is not able to send packet by packet
 -- For simplicity, the lowest resolution is MFB word
 entity FP_DATA_SEL is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
@@ -25,7 +25,7 @@ entity FP_DATA_SEL is
 
         RX_PKT_SIZE_MAX     : natural := 2**10
     );
-    port(
+    port (
         CLK : in std_logic;
         RST : in std_logic;
 
@@ -78,22 +78,22 @@ begin
     ---                                OUT_SELECT                                ---
     --------------------------------------------------------------------------------
     -- MUX select based on pointer value
-    sel_one_hot_p: process(all)
+    sel_one_hot_p : process (all)
     begin
         sel_one_hot                         <= (others => '0');
         sel_one_hot(to_integer(RX_TMP_PTR)) <= '1';
     end process;
 
     sel_before_one_i : entity work.BEFORE_ONE
-        generic map(
-            DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE
-        )
-        port map(
-            DI  => sel_one_hot,
-            DO  => sel_out_n
-        );
+    generic map (
+        DATA_WIDTH  => MFB_REGIONS*MFB_REGION_SIZE
+    )
+    port map (
+        DI  => sel_one_hot,
+        DO  => sel_out_n
+    );
 
-    sel_reg_p: process(all)
+    sel_reg_p : process (all)
     begin
         if rising_edge(CLK) then
             sel_out <= not sel_out_n;
@@ -110,15 +110,15 @@ begin
 
     out_mux_g: for i in MFB_REGIONS*MFB_REGION_SIZE - 1 downto 0 generate
         mux_i: entity work.GEN_MUX
-            generic map(
-                DATA_WIDTH  => MFB_BLOCK_SIZE*MFB_ITEM_WIDTH,
-                MUX_WIDTH   => 2
-            )
-            port map(
-                DATA_IN     => cur_data_arr(i) & tmp_data_arr(i),
-                SEL         => mux_select(i),
-                DATA_OUT    => mux_out_arr(i)
-            );
+        generic map (
+            DATA_WIDTH  => MFB_BLOCK_SIZE*MFB_ITEM_WIDTH,
+            MUX_WIDTH   => 2
+        )
+        port map (
+            DATA_IN     => cur_data_arr(i) & tmp_data_arr(i),
+            SEL         => mux_select(i),
+            DATA_OUT    => mux_out_arr(i)
+        );
     end generate;
 
     --------------------------------------------------------------------------------

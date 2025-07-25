@@ -18,7 +18,7 @@ architecture FULL of TX_MAC_LITE_CRC_GEN is
 begin
 
     mfb_crc32_ethernet_i : entity work.MFB_CRC32_ETHERNET
-    generic map(
+    generic map (
         REGIONS        => REGIONS,
         REGION_SIZE    => REGION_SIZE,
         BLOCK_SIZE     => BLOCK_SIZE,
@@ -28,7 +28,7 @@ begin
         CRC_END_IMPL   => CRC_END_IMPL,
         REG_BITMAP     => std_logic_vector(to_unsigned(254,32))
     )
-    port map(
+    port map (
         -- CLOCK AND RESET
         CLK           => CLK,
         RESET         => RESET,

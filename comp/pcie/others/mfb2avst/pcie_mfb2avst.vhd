@@ -13,14 +13,14 @@ use work.type_pack.all;
 use work.math_pack.all;
 
 entity PCIE_MFB2AVST is
-    Generic(
+    generic (
         REGIONS            : natural := 2;
-        REGION_SIZE        : natural := 1; -- not to be changed
-        BLOCK_SIZE         : natural := 8; -- not to be changed
+        REGION_SIZE        : natural := 1;  -- not to be changed
+        BLOCK_SIZE         : natural := 8;  -- not to be changed
         ITEM_WIDTH         : natural := 32; -- not to be changed
         META_WIDTH         : natural := 8
     );
-    Port(
+    port (
         CLK            : in  std_logic;
         RST            : in  std_logic;
         -- rx interface
@@ -42,7 +42,7 @@ entity PCIE_MFB2AVST is
     );
 end entity;
 
-architecture behav of PCIE_MFB2AVST is
+architecture BEHAV of PCIE_MFB2AVST is
 
     constant META_SIGNAL_WIDTH : natural := REGIONS*META_WIDTH;
     constant DATA_WIDTH        : natural := REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
@@ -72,7 +72,7 @@ begin
     -- ===================================================================
     -- once delayed data and twice delayed src_rdy makes ready_latency = 3
     -- ===================================================================
-    data_delay_reg_p :process (CLK)
+    data_delay_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             TX_AVST_DATA  <= RX_MFB_DATA;
@@ -124,7 +124,7 @@ begin
         if (rising_edge(CLK)) then
             if (RST = '1') then
                 pkt_cont(0) <= '0';
-            elsif mfb_src_rdy = '1' then
+            elsif (mfb_src_rdy = '1') then
                 pkt_cont(0) <= next_pkt(REGIONS-1);
             end if;
         end if;
@@ -136,14 +136,14 @@ begin
 
     valid_gen : for i in 0 to REGIONS-1 generate
         next_pkt(i)      <= (not pkt_cont(i) and     avst_sop(i) and not avst_eop(i)) or
-                            (    pkt_cont(i) and not avst_sop(i) and not avst_eop(i)) or
-                            (    pkt_cont(i) and     avst_sop(i) and     avst_eop(i));
+                            (pkt_cont(i) and not avst_sop(i) and not avst_eop(i)) or
+                            (pkt_cont(i) and     avst_sop(i) and     avst_eop(i));
         TX_AVST_VALID(i) <= mfb_src_rdy and (
-                            (not pkt_cont(i) and     avst_sop(i) and not avst_eop(i)) or
-                            (not pkt_cont(i) and     avst_sop(i) and     avst_eop(i)) or
-                            (    pkt_cont(i) and not avst_sop(i) and not avst_eop(i)) or
-                            (    pkt_cont(i) and not avst_sop(i) and     avst_eop(i)) or
-                            (    pkt_cont(i) and     avst_sop(i) and     avst_eop(i)));
+                                             (not pkt_cont(i) and     avst_sop(i) and not avst_eop(i)) or
+                                             (not pkt_cont(i) and     avst_sop(i) and     avst_eop(i)) or
+                                             (pkt_cont(i) and not avst_sop(i) and not avst_eop(i)) or
+                                             (pkt_cont(i) and not avst_sop(i) and     avst_eop(i)) or
+                                             (pkt_cont(i) and     avst_sop(i) and     avst_eop(i)));
     end generate;
 
     -- ===============================================
@@ -153,4 +153,4 @@ begin
     TX_AVST_SOP    <= avst_sop;
     TX_AVST_EOP    <= avst_eop;
 
-end behav;
+end architecture;

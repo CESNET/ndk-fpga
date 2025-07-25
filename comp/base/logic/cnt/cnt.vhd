@@ -16,7 +16,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.std_logic_arith.all;
 
-use WORK.cnt_types.all;
+use work.cnt_types.all;
 
 -- pragma translate_off
 library unisim;
@@ -27,60 +27,60 @@ use unisim.vcomponents.all;
 -- ----------------------------------------------------------------------------
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
-entity cnt is
-   generic (
-      WIDTH : integer := 32;
-      DIR   : TCNT := up;
-      CLEAR : boolean := false
-   );
-   port(
-      RESET     : in  std_logic;
-      CLK       : in  std_logic;
-      CE        : in  std_logic;
-      CLR       : in  std_logic;
-      DO        : out std_logic_vector(WIDTH-1 downto 0)
-   );
-end entity cnt;
+entity CNT is
+    generic (
+        WIDTH : integer := 32;
+        DIR   : TCNT := up;
+        CLEAR : boolean := false
+    );
+    port (
+        RESET     : in  std_logic;
+        CLK       : in  std_logic;
+        CE        : in  std_logic;
+        CLR       : in  std_logic;
+        DO        : out std_logic_vector(WIDTH-1 downto 0)
+    );
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
-architecture full of cnt is
+architecture FULL of CNT is
 
-signal reg_cnt   : std_logic_vector(WIDTH-1 downto 0);
-signal clear_sig : std_logic := '0';
+    signal reg_cnt   : std_logic_vector(WIDTH-1 downto 0);
+    signal clear_sig : std_logic := '0';
 
 begin
-   clear_gen : if CLEAR generate
-      clear_sig <= CLR;
-   end generate;
+    clear_gen : if CLEAR generate
+        clear_sig <= CLR;
+    end generate;
 
-   up_cnt_gen : if DIR=up generate
-      cnt : process(CLK)
-      begin
-         if CLK'event and CLK='1' then
-            if RESET='1' or clear_sig='1' then
-               reg_cnt <= (others => '0');
-            elsif CE='1' then
-               reg_cnt <= reg_cnt+1;
+    up_cnt_gen : if DIR = up generate
+        cnt : process (CLK)
+        begin
+            if rising_edge(CLK) then
+                if (RESET = '1' or clear_sig = '1') then
+                    reg_cnt <= (others => '0');
+                elsif (CE = '1') then
+                    reg_cnt <= reg_cnt+1;
+                end if;
             end if;
-         end if;
-      end process;
-   end generate;
+        end process;
+    end generate;
 
-   down_cnt_gen : if DIR=down generate
-      cnt : process(CLK)
-      begin
-         if CLK'event and CLK='1' then
-            if RESET='1' or clear_sig='1' then
-               reg_cnt <= (others => '0');
-            elsif CE='1' then
-               reg_cnt <= reg_cnt-1;
+    down_cnt_gen : if DIR = down generate
+        cnt : process (CLK)
+        begin
+            if rising_edge(CLK) then
+                if (RESET = '1' or clear_sig = '1') then
+                    reg_cnt <= (others => '0');
+                elsif (CE = '1') then
+                    reg_cnt <= reg_cnt-1;
+                end if;
             end if;
-         end if;
-      end process;
-   end generate;
+        end process;
+    end generate;
 
-   DO <= reg_cnt;
-end architecture full;
+    DO <= reg_cnt;
+end architecture;
 

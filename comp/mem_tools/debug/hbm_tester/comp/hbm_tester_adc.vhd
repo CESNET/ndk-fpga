@@ -13,11 +13,11 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity HBM_TESTER_ADC is
-    generic(
+    generic (
         PORTS     : natural := 16;
         CNT_WIDTH : natural := 16  -- max = 32, min 8
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -73,7 +73,7 @@ entity HBM_TESTER_ADC is
         DB_STAT_CNT0     : in  slv_array_t(PORTS-1 downto 0)(CNT_WIDTH-1 downto 0);
         DB_STAT_CNT1     : in  slv_array_t(PORTS-1 downto 0)(CNT_WIDTH-1 downto 0)
     );
-end HBM_TESTER_ADC;
+end entity;
 
 architecture FULL of HBM_TESTER_ADC is
 
@@ -128,7 +128,7 @@ begin
     --  MI32 READ CONTROL
     -- -------------------------------------------------------------------------
 
-    dbg_reg_common_p : process(all)
+    dbg_reg_common_p : process (all)
     begin
         case (MI_ADDR(7 downto 0)) is
             when X"00" =>
@@ -151,7 +151,7 @@ begin
     s_reg_stat_cnt0_muxed <= s_reg_stat_cnt0(to_integer(unsigned(MI_ADDR(8 downto 4))));
     s_reg_stat_cnt1_muxed <= s_reg_stat_cnt1(to_integer(unsigned(MI_ADDR(8 downto 4))));
 
-    dbg_reg_per_pcc_p : process(all)
+    dbg_reg_per_pcc_p : process (all)
     begin
         case (MI_ADDR(3 downto 0)) is
             when "0000" =>
@@ -163,7 +163,7 @@ begin
         end case;
     end process;
 
-    mi_drd_p : process(all)
+    mi_drd_p : process (all)
     begin
         case (MI_ADDR(11 downto 9)) is
             when "000" =>
@@ -284,7 +284,7 @@ begin
     reg_mon_done_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            s_reg_mon_done <= (others => '0');
+            s_reg_mon_done                   <= (others => '0');
             s_reg_mon_done(PORTS-1 downto 0) <= DB_MON_DONE;
         end if;
     end process;
@@ -298,7 +298,7 @@ begin
         reg_stat_cnt0_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
-                s_reg_stat_cnt0(i) <= (others => '0');
+                s_reg_stat_cnt0(i)                       <= (others => '0');
                 s_reg_stat_cnt0(i)(CNT_WIDTH-1 downto 0) <= DB_STAT_CNT0(i);
             end if;
         end process;
@@ -313,7 +313,7 @@ begin
         reg_stat_cnt1_p : process (CLK)
         begin
             if (rising_edge(CLK)) then
-                s_reg_stat_cnt1(i) <= (others => '0');
+                s_reg_stat_cnt1(i)                       <= (others => '0');
                 s_reg_stat_cnt1(i)(CNT_WIDTH-1 downto 0) <= DB_STAT_CNT1(i);
             end if;
         end process;

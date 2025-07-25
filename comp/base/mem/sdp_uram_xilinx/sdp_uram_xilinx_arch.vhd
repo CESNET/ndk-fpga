@@ -19,76 +19,76 @@ use IEEE.numeric_std.all;
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
-architecture SDP_URAM_XILINX_arch of SDP_URAM_XILINX is
+architecture SDP_URAM_XILINX_ARCH of SDP_URAM_XILINX is
 begin
 
-   -- Generate read first mode entity
-   read_first_gen : if(WRITE_MODE = "READ_FIRST") generate
-      read_first : entity work.DP_URAM_XILINX
-         generic map(
-            DEVICE => DEVICE,
-            DATA_WIDTH => DATA_WIDTH,
-            ADDRESS_WIDTH => ADDRESS_WIDTH,
-            ADDITIONAL_REG => ADDITIONAL_REG,
-            EXTERNAL_OUT_REG => EXTERNAL_OUT_REG,
-            INTERNAL_OUT_REG => INTERNAL_OUT_REG,
+    -- Generate read first mode entity
+    read_first_gen : if(WRITE_MODE = "READ_FIRST") generate
+        read_first : entity work.DP_URAM_XILINX
+        generic map (
+            DEVICE            => DEVICE,
+            DATA_WIDTH        => DATA_WIDTH,
+            ADDRESS_WIDTH     => ADDRESS_WIDTH,
+            ADDITIONAL_REG    => ADDITIONAL_REG,
+            EXTERNAL_OUT_REG  => EXTERNAL_OUT_REG,
+            INTERNAL_OUT_REG  => INTERNAL_OUT_REG,
             PSL_WR_BEFFORE_RD => PSL_WR_BEFFORE_RD
-            )
-         port map(
-            CLK => CLK,
-            RSTA => RSTB,
+        )
+        port map (
+            CLK      => CLK,
+            RSTA     => RSTB,
             PIPE_ENA => PIPE_EN,
-            REA => REB,
-            WEA => '0',
-            ADDRA => ADDRB,
-            DIA => (others => '0'),
-            DOA => DOB,
-            DOA_DV => DOB_DV,
+            REA      => REB,
+            WEA      => '0',
+            ADDRA    => ADDRB,
+            DIA      => (others => '0'),
+            DOA      => DOB,
+            DOA_DV   => DOB_DV,
 
-            RSTB => RSTB,
+            RSTB     => RSTB,
             PIPE_ENB => '1',
-            REB => '0',
-            WEB => WEA,
-            DIB => DIA,
-            ADDRB => ADDRA,
-            DOB => open,
-            DOB_DV => open
-            );
-   end generate;
+            REB      => '0',
+            WEB      => WEA,
+            DIB      => DIA,
+            ADDRB    => ADDRA,
+            DOB      => open,
+            DOB_DV   => open
+        );
+    end generate;
 
-   -- Generate write first mode entity
-   write_first_gen : if(WRITE_MODE = "WRITE_FIRST") generate
-      write_first : entity work.DP_URAM_XILINX
-         generic map(
-            DEVICE => DEVICE,
-            DATA_WIDTH => DATA_WIDTH,
-            ADDRESS_WIDTH => ADDRESS_WIDTH,
-            ADDITIONAL_REG => ADDITIONAL_REG,
-            EXTERNAL_OUT_REG => EXTERNAL_OUT_REG,
-            INTERNAL_OUT_REG => INTERNAL_OUT_REG,
+    -- Generate write first mode entity
+    write_first_gen : if(WRITE_MODE = "WRITE_FIRST") generate
+        write_first : entity work.DP_URAM_XILINX
+        generic map (
+            DEVICE            => DEVICE,
+            DATA_WIDTH        => DATA_WIDTH,
+            ADDRESS_WIDTH     => ADDRESS_WIDTH,
+            ADDITIONAL_REG    => ADDITIONAL_REG,
+            EXTERNAL_OUT_REG  => EXTERNAL_OUT_REG,
+            INTERNAL_OUT_REG  => INTERNAL_OUT_REG,
             PSL_WR_BEFFORE_RD => PSL_WR_BEFFORE_RD
-            )
-         port map(
-            CLK => CLK,
-            RSTA => RSTB,
+        )
+        port map (
+            CLK      => CLK,
+            RSTA     => RSTB,
             PIPE_ENA => '1',
-            REA => '0',
-            WEA => WEA,
-            ADDRA => ADDRA,
-            DIA => DIA,
-            DOA => open,
-            DOA_DV => open,
+            REA      => '0',
+            WEA      => WEA,
+            ADDRA    => ADDRA,
+            DIA      => DIA,
+            DOA      => open,
+            DOA_DV   => open,
 
-            RSTB => RSTB,
+            RSTB     => RSTB,
             PIPE_ENB => PIPE_EN,
-            REB => REB,
-            WEB => '0',
-            DIB => (others => '0'),
-            ADDRB => ADDRB,
-            DOB => DOB,
-            DOB_DV => DOB_DV
-            );
-   end generate;
+            REB      => REB,
+            WEB      => '0',
+            DIB      => (others => '0'),
+            ADDRB    => ADDRB,
+            DOB      => DOB,
+            DOB_DV   => DOB_DV
+        );
+    end generate;
 
 
-end architecture SDP_URAM_XILINX_arch;
+end architecture;

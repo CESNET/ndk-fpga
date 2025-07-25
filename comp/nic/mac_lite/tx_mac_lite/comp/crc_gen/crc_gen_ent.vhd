@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_CRC_GEN is
-    generic(
+    generic (
         REGIONS      : natural := 4; -- any positive value
         REGION_SIZE  : natural := 8; -- any positive value
         BLOCK_SIZE   : natural := 8; -- any positive value
@@ -20,7 +20,7 @@ entity TX_MAC_LITE_CRC_GEN is
         CRC_END_IMPL : string  := "TREE";
         DEVICE       : string  := "STRATIX10"
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK         : in  std_logic;
         RESET       : in  std_logic;

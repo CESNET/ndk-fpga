@@ -23,36 +23,36 @@ use std.textio.all;
 -- ----------------------------------------------------------------------------
 package lb_pkg is
 
-   -- Local 16 bit Bus
-   type t_local_bus16 is record
-      DWR        : std_logic_vector(15 downto 0);
-      BE         : std_logic_vector(1 downto 0);
-      ADS_N      : std_logic;
-      RD_N       : std_logic;
-      WR_N       : std_logic;
-      DRD        : std_logic_vector(15 downto 0);
-      RDY_N      : std_logic;
-      ERR_N      : std_logic;
-      ABORT_N    : std_logic;
-   end record;
+    -- Local 16 bit Bus
+    type t_local_bus16 is record
+        DWR        : std_logic_vector(15 downto 0);
+        BE         : std_logic_vector(1 downto 0);
+        ADS_N      : std_logic;
+        RD_N       : std_logic;
+        WR_N       : std_logic;
+        DRD        : std_logic_vector(15 downto 0);
+        RDY_N      : std_logic;
+        ERR_N      : std_logic;
+        ABORT_N    : std_logic;
+    end record;
 
-   -- Local 8 bit Bus
-   type t_local_bus8 is record
-      DWR        : std_logic_vector(7 downto 0);
-      BE         : std_logic;
-      ADS_N      : std_logic;
-      RD_N       : std_logic;
-      WR_N       : std_logic;
-      DRD        : std_logic_vector(7 downto 0);
-      RDY_N      : std_logic;
-      ERR_N      : std_logic;
-      ABORT_N    : std_logic;
-   end record;
+    -- Local 8 bit Bus
+    type t_local_bus8 is record
+        DWR        : std_logic_vector(7 downto 0);
+        BE         : std_logic;
+        ADS_N      : std_logic;
+        RD_N       : std_logic;
+        WR_N       : std_logic;
+        DRD        : std_logic_vector(7 downto 0);
+        RDY_N      : std_logic;
+        ERR_N      : std_logic;
+        ABORT_N    : std_logic;
+    end record;
 
-   -- Local Bus Frequency
-   constant LOCAL_BUS_FREQUENCY : integer := 100;
+    -- Local Bus Frequency
+    constant LOCAL_BUS_FREQUENCY : integer := 100;
 
-end lb_pkg;
+end package;
 
 
 -- ----------------------------------------------------------------------------
@@ -60,5 +60,5 @@ end lb_pkg;
 -- ----------------------------------------------------------------------------
 package body lb_pkg is
 
-end lb_pkg;
+end package body;
 

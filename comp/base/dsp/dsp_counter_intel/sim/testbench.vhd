@@ -8,7 +8,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use std.env.all;
-use STD.textio.all;
+use std.textio.all;
 
 library work;
 use work.basics_test_pkg.all;
@@ -17,7 +17,7 @@ use work.basics_test_pkg.all;
 --!                        Entity declaration
 --! ----------------------------------------------------------------------------
 entity TESTBENCH is
-end entity TESTBENCH;
+end entity;
 --! ----------------------------------------------------------------------------
 --!                      Architecture declaration
 --! ----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ architecture BEHAVIORAL of TESTBENCH is
     constant CLK_PERIOD       : time    := 10 ns;
 
     -- used to set the value of max signal that will be used in the simulation, at this time, only 2 values of max are possible
-    function get_max_f(down : boolean; out_width : natural) return std_logic_vector is
+    function get_max_f (down : boolean; out_width : natural) return std_logic_vector is
     begin
         if (down = true) then
             return (out_width-1 downto 0 => '0');
@@ -63,22 +63,22 @@ architecture BEHAVIORAL of TESTBENCH is
     signal clk                 : std_logic;
     signal clk_ena             : std_logic;
     signal rst                 : std_logic;
-    signal cnt_by              : std_logic_vector(COUNT_BY_WIDTH-1 downto 0); -- the value of the counter is incremented or decremented by this number
+    signal cnt_by              : std_logic_vector(COUNT_BY_WIDTH-1 downto 0);                                      -- the value of the counter is incremented or decremented by this number
     signal max                 : std_logic_vector(RESULT_WIDTH-1 downto 0) := get_max_f(COUNT_DOWN, RESULT_WIDTH); -- counter's maximum or minimum (depending on COUNT_DOWN)
 
     signal cnt_result          : std_logic_vector(RESULT_WIDTH-1 downto 0); -- the value from the counter (component)
 
     -- other signals
-    signal clk_cycle_count     : natural := 0; -- counts for how many clock cycles this simulation has run
-    signal stop_at_the_end     : std_logic := '0'; -- stops the simulation when LENGHT_OF_SIM is reached
+    signal clk_cycle_count     : natural := 0;                                -- counts for how many clock cycles this simulation has run
+    signal stop_at_the_end     : std_logic := '0';                            -- stops the simulation when LENGHT_OF_SIM is reached
     signal cnt_by_behind_regs  : std_logic_vector(COUNT_BY_WIDTH-1 downto 0); -- if input register is enabled, cnt_by signal is delayed, else is just renamed
-    signal clk_ena_behind_regs : std_logic; -- if input register is enabled, clk_ena signal is delayed, else is just renamed
-    signal incorrect_results   : natural := 1; -- counts the number of incorrect results (results from the counter that match results from the testbench)
+    signal clk_ena_behind_regs : std_logic;                                   -- if input register is enabled, clk_ena signal is delayed, else is just renamed
+    signal incorrect_results   : natural := 1;                                -- counts the number of incorrect results (results from the counter that match results from the testbench)
 
     -- final signals
     signal sim_result          : std_logic_vector(RESULT_WIDTH-1 downto 0); --  result of the simulated counter; to be compared with the result of the real counter (cnt_result)
-    signal correct_results     : natural := 1; -- counts the number of correct results (results from the counter that match results from the testbench)
-    signal result_ok           : std_logic; -- indicates whether the current result from the counter matches the current result from the testbench
+    signal correct_results     : natural := 1;                              -- counts the number of correct results (results from the counter that match results from the testbench)
+    signal result_ok           : std_logic;                                 -- indicates whether the current result from the counter matches the current result from the testbench
 
     shared variable l : line; -- is used to write lines of text into the Transcript window
 
@@ -93,7 +93,7 @@ begin
         COUNT_DOWN     => COUNT_DOWN,
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         CLK        => clk,
         CLK_EN     => clk_ena,
         RESET      => rst,
@@ -131,7 +131,7 @@ begin
     clk_ena_p : process
         variable s0 : integer := 3;
         variable s1 : integer := 7;
-        variable X  : integer := 6;
+        variable x  : integer := 6;
     begin
         clk_ena <= '0';
         wait until rst = '0';
@@ -140,8 +140,8 @@ begin
         clk_ena_rand_gen_l : for i in 0 to 1000 loop
             if (stop_at_the_end = '0') then
                 -- generate random times to assert and deassert clk_ena
-                randint(s0, s1, 2, 10, X);
-                wait for (i+1)*CLK_PERIOD*X;
+                randint(s0, s1, 2, 10, x);
+                wait for (i+1)*CLK_PERIOD*x;
                 clk_ena <= '0';
                 wait for 2*CLK_PERIOD;
                 clk_ena <= '1';
@@ -157,7 +157,7 @@ begin
     rst_p : process
         variable s0 : integer := 7;
         variable s1 : integer := 4;
-        variable X  : integer := 2;
+        variable x  : integer := 2;
     begin
         rst <= '1';
         wait for 3*CLK_PERIOD;
@@ -166,8 +166,8 @@ begin
         rst_rand_gen_l : for i in 0 to 100 loop
             if (stop_at_the_end = '0') then
                 -- generate random times to assert rst
-                randint(s0, s1, 5, 15, X);
-                wait for (i+1)*CLK_PERIOD*X*X;
+                randint(s0, s1, 5, 15, x);
+                wait for (i+1)*CLK_PERIOD*x*x;
                 rst <= '1';
                 wait for 3*CLK_PERIOD;
                 rst <= '0';
@@ -182,15 +182,15 @@ begin
     rand_cnt_by_p : process
         variable s0 : integer := 6;
         variable s1 : integer := 9;
-        variable X  : integer := 4;
+        variable x  : integer := 4;
     begin
         if (stop_at_the_end = '0') then
             wait until rising_edge(clk);
             -- generating random integer
-            randint(s0, s1, 1, integer'high, X);
+            randint(s0, s1, 1, integer'high, x);
             wait for 0.1*CLK_PERIOD;
             -- using the randomly generated integer (X) to generate a random std_logic_vector
-            cnt_by <= random_vector(COUNT_BY_WIDTH, X);
+            cnt_by <= random_vector(COUNT_BY_WIDTH, x);
         else
             wait;
         end if;
@@ -270,11 +270,11 @@ begin
             begin
                 if (rising_edge(clk)) then
                     if (rst = '1') then
-                        sim_result_ext2 <= (others => '0');
+                        sim_result_ext2                                     <= (others => '0');
                         -- the 1st bit is '0' because it must be a positive number after conversion to type signed
                         -- the 2nd bit is '1' to surpass initial overflow that happens with the 1st subtraction after a reset
                         sim_result_ext2(RESULT_WIDTH+1 downto RESULT_WIDTH) <= "01";
-                        freeze_at_max <= '0';
+                        freeze_at_max                                       <= '0';
                     elsif ((clk_ena_behind_regs = '1') and (freeze_at_max = '0')) then
                         if (signed(sim_result_ext2) - signed(cnt_by_behind_regs_ext) >= 0) then
                             sim_result_ext2 <= sim_result_ext2 - unsigned(cnt_by_behind_regs_ext);
@@ -293,7 +293,7 @@ begin
                 if (rising_edge(clk)) then
                     if (rst = '1') then
                         sim_result_ext2 <= (others => '0');
-                        freeze_at_max <= '0';
+                        freeze_at_max   <= '0';
                     elsif ((clk_ena_behind_regs = '1') and (freeze_at_max = '0')) then
                         if (sim_result_ext2 + unsigned(cnt_by_behind_regs) <= unsigned(max)) then
                             sim_result_ext2 <= sim_result_ext2 + unsigned(cnt_by_behind_regs);

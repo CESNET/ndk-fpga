@@ -14,122 +14,122 @@ use work.eth_hdr_pack.all;
 use work.combo_user_const.all;
 
 entity APP_SUBCORE is
-generic (
-    -- MFB parameters
-    MFB_REGIONS        : integer := 1;  -- Number of regions in word
-    MFB_REG_SIZE       : integer := 8;  -- Number of blocks in region
-    MFB_BLOCK_SIZE     : integer := 8;  -- Number of items in block
-    MFB_ITEM_WIDTH     : integer := 8;  -- Width of one item in bits
-    MI_ADDR_WIDTH      : integer := 32;
-    MI_DATA_WIDTH      : integer := 32;
-    -- ID number of this subcore instance
-    SUBCORE_ID         : natural := 0;
-    -- Number of Ethernet channels mapped to this subcore
-    ETH_CHANNELS       : natural := 1;
-    -- Maximum size of a User packet (in bytes)
-    -- Defines width of Packet length signals.
-    USR_PKT_SIZE_MAX   : natural := 2**12;
-    -- Number of streams from DMA module
-    DMA_RX_CHANNELS    : integer;
-    DMA_TX_CHANNELS    : integer;
-    -- Width of TX User Header Metadata information extracted from descriptor
-    DMA_HDR_META_WIDTH : natural := 12;
-    DEVICE             : string
-);
-port (
-    -- =========================================================================
-    -- Clock and Resets inputs
-    -- =========================================================================
-    CLK      : in  std_logic;
-    RESET    : in  std_logic;
+    generic (
+        -- MFB parameters
+        MFB_REGIONS        : integer := 1;  -- Number of regions in word
+        MFB_REG_SIZE       : integer := 8;  -- Number of blocks in region
+        MFB_BLOCK_SIZE     : integer := 8;  -- Number of items in block
+        MFB_ITEM_WIDTH     : integer := 8;  -- Width of one item in bits
+        MI_ADDR_WIDTH      : integer := 32;
+        MI_DATA_WIDTH      : integer := 32;
+        -- ID number of this subcore instance
+        SUBCORE_ID         : natural := 0;
+        -- Number of Ethernet channels mapped to this subcore
+        ETH_CHANNELS       : natural := 1;
+        -- Maximum size of a User packet (in bytes)
+        -- Defines width of Packet length signals.
+        USR_PKT_SIZE_MAX   : natural := 2**12;
+        -- Number of streams from DMA module
+        DMA_RX_CHANNELS    : integer;
+        DMA_TX_CHANNELS    : integer;
+        -- Width of TX User Header Metadata information extracted from descriptor
+        DMA_HDR_META_WIDTH : natural := 12;
+        DEVICE             : string
+    );
+    port (
+        -- =========================================================================
+        -- Clock and Resets inputs
+        -- =========================================================================
+        CLK      : in  std_logic;
+        RESET    : in  std_logic;
 
-    -- =========================================================================
-    --  DMA INTERFACES
-    -- =========================================================================
+        -- =========================================================================
+        --  DMA INTERFACES
+        -- =========================================================================
 
-    -- MFB+MVB interface to DMA module (to software)
-    -- -------------------------------------------------------------------------
-    DMA_RX_MVB_LEN           : out std_logic_vector(MFB_REGIONS*log2(USR_PKT_SIZE_MAX+1)-1 downto 0);
-    DMA_RX_MVB_HDR_META      : out std_logic_vector(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
-    DMA_RX_MVB_CHANNEL       : out std_logic_vector(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
-    DMA_RX_MVB_DISCARD       : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    -- =======================================
-    DMA_RX_MVB_VLD           : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    DMA_RX_MVB_SRC_RDY       : out std_logic;
-    DMA_RX_MVB_DST_RDY       : in  std_logic;
-    -- MFB interface with data packets
-    DMA_RX_MFB_DATA          : out std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    DMA_RX_MFB_SOF           : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    DMA_RX_MFB_EOF           : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    DMA_RX_MFB_SOF_POS       : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-    DMA_RX_MFB_EOF_POS       : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    DMA_RX_MFB_SRC_RDY       : out std_logic;
-    DMA_RX_MFB_DST_RDY       : in  std_logic;
+        -- MFB+MVB interface to DMA module (to software)
+        -- -------------------------------------------------------------------------
+        DMA_RX_MVB_LEN           : out std_logic_vector(MFB_REGIONS*log2(USR_PKT_SIZE_MAX+1)-1 downto 0);
+        DMA_RX_MVB_HDR_META      : out std_logic_vector(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
+        DMA_RX_MVB_CHANNEL       : out std_logic_vector(MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
+        DMA_RX_MVB_DISCARD       : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        -- =======================================
+        DMA_RX_MVB_VLD           : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        DMA_RX_MVB_SRC_RDY       : out std_logic;
+        DMA_RX_MVB_DST_RDY       : in  std_logic;
+        -- MFB interface with data packets
+        DMA_RX_MFB_DATA          : out std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        DMA_RX_MFB_SOF           : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        DMA_RX_MFB_EOF           : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        DMA_RX_MFB_SOF_POS       : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        DMA_RX_MFB_EOF_POS       : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        DMA_RX_MFB_SRC_RDY       : out std_logic;
+        DMA_RX_MFB_DST_RDY       : in  std_logic;
 
-    -- MFB+MVB interface from DMA module (from software)
-    -- -------------------------------------------------------------------------
-    -- MVB interface (aligned to SOF)
-    -- TX_USR_MVB_DATA =======================
-    DMA_TX_MVB_LEN          : in  std_logic_vector(MFB_REGIONS*log2(USR_PKT_SIZE_MAX+1)-1 downto 0);
-    DMA_TX_MVB_HDR_META     : in  std_logic_vector(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
-    DMA_TX_MVB_CHANNEL      : in  std_logic_vector(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
-    -- =======================================
-    DMA_TX_MVB_VLD          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    DMA_TX_MVB_SRC_RDY      : in  std_logic;
-    DMA_TX_MVB_DST_RDY      : out std_logic;
-    -- MFB interface with data packets
-    DMA_TX_MFB_DATA         : in  std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    DMA_TX_MFB_SOF          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    DMA_TX_MFB_EOF          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    DMA_TX_MFB_SOF_POS      : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-    DMA_TX_MFB_EOF_POS      : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    DMA_TX_MFB_SRC_RDY      : in  std_logic;
-    DMA_TX_MFB_DST_RDY      : out std_logic;
+        -- MFB+MVB interface from DMA module (from software)
+        -- -------------------------------------------------------------------------
+        -- MVB interface (aligned to SOF)
+        -- TX_USR_MVB_DATA =======================
+        DMA_TX_MVB_LEN          : in  std_logic_vector(MFB_REGIONS*log2(USR_PKT_SIZE_MAX+1)-1 downto 0);
+        DMA_TX_MVB_HDR_META     : in  std_logic_vector(MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
+        DMA_TX_MVB_CHANNEL      : in  std_logic_vector(MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
+        -- =======================================
+        DMA_TX_MVB_VLD          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        DMA_TX_MVB_SRC_RDY      : in  std_logic;
+        DMA_TX_MVB_DST_RDY      : out std_logic;
+        -- MFB interface with data packets
+        DMA_TX_MFB_DATA         : in  std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        DMA_TX_MFB_SOF          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        DMA_TX_MFB_EOF          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        DMA_TX_MFB_SOF_POS      : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        DMA_TX_MFB_EOF_POS      : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        DMA_TX_MFB_SRC_RDY      : in  std_logic;
+        DMA_TX_MFB_DST_RDY      : out std_logic;
 
-    -- =========================================================================
-    --  ETH INTERFACES
-    -- =========================================================================
+        -- =========================================================================
+        --  ETH INTERFACES
+        -- =========================================================================
 
-    -- MFB+MVB interface with incoming network packets
-    -- -------------------------------------------------------------------------
-    -- MVB interface with packet headers (aligned to EOF)
-    ETH_RX_MVB_DATA         : in  std_logic_vector(MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
-    ETH_RX_MVB_VLD          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    ETH_RX_MVB_SRC_RDY      : in  std_logic;
-    ETH_RX_MVB_DST_RDY      : out std_logic;
-    -- MFB interface with data packets
-    ETH_RX_MFB_DATA         : in  std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    ETH_RX_MFB_SOF          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    ETH_RX_MFB_EOF          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    ETH_RX_MFB_SOF_POS      : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-    ETH_RX_MFB_EOF_POS      : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    ETH_RX_MFB_SRC_RDY      : in  std_logic;
-    ETH_RX_MFB_DST_RDY      : out std_logic;
+        -- MFB+MVB interface with incoming network packets
+        -- -------------------------------------------------------------------------
+        -- MVB interface with packet headers (aligned to EOF)
+        ETH_RX_MVB_DATA         : in  std_logic_vector(MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
+        ETH_RX_MVB_VLD          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        ETH_RX_MVB_SRC_RDY      : in  std_logic;
+        ETH_RX_MVB_DST_RDY      : out std_logic;
+        -- MFB interface with data packets
+        ETH_RX_MFB_DATA         : in  std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        ETH_RX_MFB_SOF          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        ETH_RX_MFB_EOF          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        ETH_RX_MFB_SOF_POS      : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        ETH_RX_MFB_EOF_POS      : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        ETH_RX_MFB_SRC_RDY      : in  std_logic;
+        ETH_RX_MFB_DST_RDY      : out std_logic;
 
-    -- MFB+MVB interface with outgoing network packets
-    -- -------------------------------------------------------------------------
-    -- MFB interface with data packets + header
-    ETH_TX_MFB_DATA         : out std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    ETH_TX_MFB_HDR          : out std_logic_vector(MFB_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0) := (others => '0'); -- valid with SOF
-    ETH_TX_MFB_SOF          : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    ETH_TX_MFB_EOF          : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    ETH_TX_MFB_SOF_POS      : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-    ETH_TX_MFB_EOF_POS      : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    ETH_TX_MFB_SRC_RDY      : out std_logic;
-    ETH_TX_MFB_DST_RDY      : in  std_logic;
+        -- MFB+MVB interface with outgoing network packets
+        -- -------------------------------------------------------------------------
+        -- MFB interface with data packets + header
+        ETH_TX_MFB_DATA         : out std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        ETH_TX_MFB_HDR          : out std_logic_vector(MFB_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0) := (others => '0'); -- valid with SOF
+        ETH_TX_MFB_SOF          : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        ETH_TX_MFB_EOF          : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        ETH_TX_MFB_SOF_POS      : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        ETH_TX_MFB_EOF_POS      : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        ETH_TX_MFB_SRC_RDY      : out std_logic;
+        ETH_TX_MFB_DST_RDY      : in  std_logic;
 
-    -- =========================================================================
-    --  MI INTERFACE
-    -- =========================================================================
-    MI_DWR                  : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_ADDR                 : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
-    MI_BE                   : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0);
-    MI_RD                   : in  std_logic;
-    MI_WR                   : in  std_logic;
-    MI_DRD                  : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    MI_ARDY                 : out std_logic;
-    MI_DRDY                 : out std_logic
-);
+        -- =========================================================================
+        --  MI INTERFACE
+        -- =========================================================================
+        MI_DWR                  : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_ADDR                 : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
+        MI_BE                   : in  std_logic_vector(MI_DATA_WIDTH/8-1 downto 0);
+        MI_RD                   : in  std_logic;
+        MI_WR                   : in  std_logic;
+        MI_DRD                  : out std_logic_vector(MI_DATA_WIDTH-1 downto 0);
+        MI_ARDY                 : out std_logic;
+        MI_DRDY                 : out std_logic
+    );
 end entity;
 
 architecture FULL of APP_SUBCORE is
@@ -194,16 +194,16 @@ begin
         -- ETH_TX_HDR_PORT is global (over all ETH ports) identification number
         -- for each ETH channel, this logic convert local ETH channel number to
         -- global identification number.
-        dma_tx_mvb_ethch2_arr(i) <= resize(unsigned(dma_tx_mvb_ethch_arr(i)),ETH_TX_HDR_PORT_W) + (SUBCORE_ID*ETH_CHANNELS);
-        dma_tx_mvb_data_arr(i)(ETH_TX_HDR_PORT) <= std_logic_vector(dma_tx_mvb_ethch2_arr(i));
+        dma_tx_mvb_ethch2_arr(i)                     <= resize(unsigned(dma_tx_mvb_ethch_arr(i)),ETH_TX_HDR_PORT_W) + (SUBCORE_ID*ETH_CHANNELS);
+        dma_tx_mvb_data_arr(i)(ETH_TX_HDR_PORT)      <= std_logic_vector(dma_tx_mvb_ethch2_arr(i));
         -- Packet length in bytes
-        dma_tx_mvb_data_arr(i)(ETH_TX_HDR_LENGTH) <= std_logic_vector(resize(unsigned(dma_tx_mvb_len_arr(i)),ETH_TX_HDR_LENGTH_W));
+        dma_tx_mvb_data_arr(i)(ETH_TX_HDR_LENGTH)    <= std_logic_vector(resize(unsigned(dma_tx_mvb_len_arr(i)),ETH_TX_HDR_LENGTH_W));
         -- The discard feature is not currently supported in TX MAX Lite.
         dma_tx_mvb_data_arr(i)(ETH_TX_HDR_DISCARD_O) <= '0';
     end generate;
 
     tx_mvb_ins_i : entity work.METADATA_INSERTOR
-    generic map(
+    generic map (
         MVB_ITEMS       => MFB_REGIONS,
         MVB_ITEM_WIDTH  => ETH_TX_HDR_WIDTH,
         MFB_REGIONS     => MFB_REGIONS,
@@ -214,7 +214,7 @@ begin
         MVB_FIFO_SIZE   => 32,
         DEVICE          => DEVICE
     )
-    port map(
+    port map (
         CLK             => CLK,
         RESET           => RESET,
 
@@ -242,7 +242,7 @@ begin
     );
 
     tx_mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REG_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -252,7 +252,7 @@ begin
         USE_DST_RDY => true,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -279,14 +279,14 @@ begin
     -- RX HEADER PATH
     -- ------------------------------------
     rx_mvb_pipe_i : entity work.MVB_PIPE
-    generic map(
+    generic map (
         ITEMS       => MFB_REGIONS,
         ITEM_WIDTH  => ETH_RX_HDR_WIDTH,
         FAKE_PIPE   => false,
         USE_DST_RDY => true,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -312,7 +312,7 @@ begin
 
     -- DMA channel distribution
     chan_dist_i : entity work.MVB_CHANNEL_ROUTER_MI
-    generic map(
+    generic map (
         ITEMS        => MFB_REGIONS,
         ITEM_WIDTH   => ETH_RX_HDR_WIDTH,
         SRC_CHANNELS => ETH_CHANNELS,
@@ -321,7 +321,7 @@ begin
         OPT_MODE     => True,
         DEVICE       => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -365,7 +365,7 @@ begin
     -- ------------------------------------
 
     rx_mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REG_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -375,7 +375,7 @@ begin
         USE_DST_RDY => true,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 

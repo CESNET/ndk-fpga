@@ -12,11 +12,11 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 
 entity UMII_CTRL_DEC is
-    generic(
+    generic (
         -- must be power of two, minimum is 64
         MII_DW : natural := 2048
     );
-    port(
+    port (
         -- =====================================================================
         -- INPUT MII INTERFACE (XGMII, XLGMII, CGMII, CDMII,...)
         -- =====================================================================
@@ -78,32 +78,32 @@ begin
         -- detect local fault sequence starting at each eighth byte (block)
         s_locfault_char_d(i) <= '1' when (MII_RXD((i+1)*64-1 downto i*64) = MII_LOCFAULT_D) else '0';
         s_locfault_char_c(i) <= '1' when (MII_RXC((i+1)*8-1 downto i*8) = MII_LOCFAULT_C) else '0';
-        s_pos_locfault(i) <= s_locfault_char_d(i) and s_locfault_char_c(i);
-        POS_LOCFAULT(i)   <= s_pos_locfault(i);
+        s_pos_locfault(i)    <= s_locfault_char_d(i) and s_locfault_char_c(i);
+        POS_LOCFAULT(i)      <= s_pos_locfault(i);
 
         -- detect start control characters and preamble pattern starting at each eighth byte (block)
         s_preamble_char_d(i) <= '1' when (MII_RXD((i+1)*64-1 downto i*64) = MII_PREAMBLE_D) else '0';
         s_preamble_char_c(i) <= '1' when (MII_RXC((i+1)*8-1 downto i*8) = MII_PREAMBLE_C) else '0';
-        s_pos_preamble(i) <= s_preamble_char_d(i) and s_preamble_char_c(i);
-        POS_PREAMBLE(i)   <= s_pos_preamble(i);
+        s_pos_preamble(i)    <= s_preamble_char_d(i) and s_preamble_char_c(i);
+        POS_PREAMBLE(i)      <= s_pos_preamble(i);
 
         -- detect start control characters starting at each eighth byte (block)
         s_start_char_d(i) <= '1' when (MII_RXD((i*64)+8-1 downto i*64) = MII_START) else '0';
-        s_pos_start(i) <= s_start_char_d(i) and MII_RXC(i*8);
-        POS_START(i)   <= s_pos_start(i);
+        s_pos_start(i)    <= s_start_char_d(i) and MII_RXC(i*8);
+        POS_START(i)      <= s_pos_start(i);
     end generate;
 
     -- detect at each byte
     bytes_detect_g : for i in 0 to BYTES_COUNT-1 generate
         -- detect terminate on each byte
         s_terminate_char_d(i) <= '1' when (MII_RXD((i+1)*8-1 downto i*8) = MII_TERMINATE) else '0';
-        s_pos_terminate(i) <= s_terminate_char_d(i) and MII_RXC(i);
-        POS_TERMINATE(i)   <= s_pos_terminate(i);
+        s_pos_terminate(i)    <= s_terminate_char_d(i) and MII_RXC(i);
+        POS_TERMINATE(i)      <= s_pos_terminate(i);
 
         -- detect error on each byte
         s_error_char_d(i) <= '1' when (MII_RXD((i+1)*8-1 downto i*8) = MII_ERROR) else '0';
-        s_pos_error(i) <= s_error_char_d(i) and MII_RXC(i);
-        POS_ERROR(i)   <= s_pos_error(i);
+        s_pos_error(i)    <= s_error_char_d(i) and MII_RXC(i);
+        POS_ERROR(i)      <= s_pos_error(i);
     end generate;
 
     -- output control occur

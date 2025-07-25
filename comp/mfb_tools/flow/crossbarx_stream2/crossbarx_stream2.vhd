@@ -18,83 +18,83 @@ use work.type_pack.all;
 -- Future features include the support for multiple input streams (merging)
 -- and packet duplication.
 entity MFB_CROSSBARX_STREAM2 is
-generic (
-    -- IN_STREAMS must be 1 for now!!!
-    IN_STREAMS      : natural := 1;
-    -- The number of MFB regions
-    MFB_REGIONS     : natural := 4;
-    -- MFB region size in blocks, must be power of two
-    MFB_REGION_SIZE : natural := 8;
-    -- MFB block size in items, must be 8
-    MFB_BLOCK_SIZE  : natural := 8;
-    -- MFB item size in bits, must be 8
-    MFB_ITEM_WIDTH  : natural := 8;
-    -- Maximum size of a MFB frame (in bytes)
-    PKT_MTU         : natural := 2**14;
-    -- The width determines the total number of packet IDs
-    -- that the component can handle simultaneously
-    PKT_ID_WIDTH    : natural := 10;
-    -- The width determines the maximum size of packet modifications
-    MOD_WIDTH       : natural := 7;
-    -- Width of User Metadata information
-    USERMETA_WIDTH  : natural := 32;
-    -- Target device: AGILEX, STRATIX10, ULTRASCALE,...
-    DEVICE          : string  := "AGILEX"
-);
-port (
-    -- =========================================================================
-    -- Clock and Resets inputs
-    -- =========================================================================
-    CLK                    : in  std_logic;
-    CLK_X2                 : in  std_logic;
-    RESET                  : in  std_logic;
+    generic (
+        -- IN_STREAMS must be 1 for now!!!
+        IN_STREAMS      : natural := 1;
+        -- The number of MFB regions
+        MFB_REGIONS     : natural := 4;
+        -- MFB region size in blocks, must be power of two
+        MFB_REGION_SIZE : natural := 8;
+        -- MFB block size in items, must be 8
+        MFB_BLOCK_SIZE  : natural := 8;
+        -- MFB item size in bits, must be 8
+        MFB_ITEM_WIDTH  : natural := 8;
+        -- Maximum size of a MFB frame (in bytes)
+        PKT_MTU         : natural := 2**14;
+        -- The width determines the total number of packet IDs
+        -- that the component can handle simultaneously
+        PKT_ID_WIDTH    : natural := 10;
+        -- The width determines the maximum size of packet modifications
+        MOD_WIDTH       : natural := 7;
+        -- Width of User Metadata information
+        USERMETA_WIDTH  : natural := 32;
+        -- Target device: AGILEX, STRATIX10, ULTRASCALE,...
+        DEVICE          : string  := "AGILEX"
+    );
+    port (
+        -- =========================================================================
+        -- Clock and Resets inputs
+        -- =========================================================================
+        CLK                    : in  std_logic;
+        CLK_X2                 : in  std_logic;
+        RESET                  : in  std_logic;
 
-    -- =========================================================================
-    -- RX MFB+MVB interface
-    -- =========================================================================
-    RX_MVB_USERMETA        : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
-    -- Flag specifying packets to drop
-    RX_MVB_DISCARD         : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
-    -- Size of packet SOF expansion/truncation in MFB items, valid with ``RX_MVB_MOD_SOF_EN``
-    RX_MVB_MOD_SOF_SIZE    : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MOD_WIDTH-1 downto 0);
-    -- SOF packet modification type: 0 = expansion, 1 = truncation, valid with ``RX_MVB_MOD_SOF_EN``
-    RX_MVB_MOD_SOF_TYPE    : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
-    -- Enable modification of Start of Packet (SOF)
-    RX_MVB_MOD_SOF_EN      : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
-    -- Size of packet EOF expansion/truncation in MFB items, valid with ``RX_MVB_MOD_EOF_EN``
-    RX_MVB_MOD_EOF_SIZE    : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MOD_WIDTH-1 downto 0);
-    -- EOF packet modification type: 0 = expansion, 1 = truncation, valid with ``RX_MVB_MOD_EOF_EN``
-    RX_MVB_MOD_EOF_TYPE    : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
-    -- Enable modification of End of Packet (EOF)
-    RX_MVB_MOD_EOF_EN      : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
-    RX_MVB_VLD             : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    RX_MVB_SRC_RDY         : in  std_logic_vector(IN_STREAMS-1 downto 0);
-    RX_MVB_DST_RDY         : out std_logic_vector(IN_STREAMS-1 downto 0);
+        -- =========================================================================
+        -- RX MFB+MVB interface
+        -- =========================================================================
+        RX_MVB_USERMETA        : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
+        -- Flag specifying packets to drop
+        RX_MVB_DISCARD         : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
+        -- Size of packet SOF expansion/truncation in MFB items, valid with ``RX_MVB_MOD_SOF_EN``
+        RX_MVB_MOD_SOF_SIZE    : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MOD_WIDTH-1 downto 0);
+        -- SOF packet modification type: 0 = expansion, 1 = truncation, valid with ``RX_MVB_MOD_SOF_EN``
+        RX_MVB_MOD_SOF_TYPE    : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
+        -- Enable modification of Start of Packet (SOF)
+        RX_MVB_MOD_SOF_EN      : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
+        -- Size of packet EOF expansion/truncation in MFB items, valid with ``RX_MVB_MOD_EOF_EN``
+        RX_MVB_MOD_EOF_SIZE    : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MOD_WIDTH-1 downto 0);
+        -- EOF packet modification type: 0 = expansion, 1 = truncation, valid with ``RX_MVB_MOD_EOF_EN``
+        RX_MVB_MOD_EOF_TYPE    : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
+        -- Enable modification of End of Packet (EOF)
+        RX_MVB_MOD_EOF_EN      : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0) := (others => (others => '0'));
+        RX_MVB_VLD             : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        RX_MVB_SRC_RDY         : in  std_logic_vector(IN_STREAMS-1 downto 0);
+        RX_MVB_DST_RDY         : out std_logic_vector(IN_STREAMS-1 downto 0);
 
-    RX_MFB_DATA            : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    RX_MFB_SOF             : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF             : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
-    RX_MFB_SOF_POS         : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS         : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SRC_RDY         : in  std_logic_vector(IN_STREAMS-1 downto 0);
-    RX_MFB_DST_RDY         : out std_logic_vector(IN_STREAMS-1 downto 0);
+        RX_MFB_DATA            : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        RX_MFB_SOF             : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF             : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        RX_MFB_SOF_POS         : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS         : in  slv_array_t(IN_STREAMS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SRC_RDY         : in  std_logic_vector(IN_STREAMS-1 downto 0);
+        RX_MFB_DST_RDY         : out std_logic_vector(IN_STREAMS-1 downto 0);
 
-    -- =========================================================================
-    --  TX MFB+MVB interface
-    -- =========================================================================
-    TX_MVB_USERMETA        : out std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
-    TX_MVB_VLD             : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MVB_SRC_RDY         : out std_logic;
-    TX_MVB_DST_RDY         : in  std_logic;
+        -- =========================================================================
+        --  TX MFB+MVB interface
+        -- =========================================================================
+        TX_MVB_USERMETA        : out std_logic_vector(MFB_REGIONS*USERMETA_WIDTH-1 downto 0);
+        TX_MVB_VLD             : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MVB_SRC_RDY         : out std_logic;
+        TX_MVB_DST_RDY         : in  std_logic;
 
-    TX_MFB_DATA            : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    TX_MFB_SOF             : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_EOF             : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_SOF_POS         : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    TX_MFB_EOF_POS         : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    TX_MFB_SRC_RDY         : out std_logic;
-    TX_MFB_DST_RDY         : in  std_logic
-);
+        TX_MFB_DATA            : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        TX_MFB_SOF             : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_EOF             : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_SOF_POS         : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        TX_MFB_EOF_POS         : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        TX_MFB_SRC_RDY         : out std_logic;
+        TX_MFB_DST_RDY         : in  std_logic
+    );
 end entity;
 
 architecture FULL of MFB_CROSSBARX_STREAM2 is
@@ -232,7 +232,7 @@ begin
     rx_stream_g: for s in 0 to IN_STREAMS-1 generate
 
         rx_buf_i : entity work.MFB_CROSSBARX_STREAM2_RX_BUF
-        generic map(
+        generic map (
             MFB_REGIONS     => MFB_REGIONS,
             MFB_REGION_SIZE => MFB_REGION_SIZE,
             MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -245,7 +245,7 @@ begin
             PKT_ID_W        => PKT_ID_WIDTH,
             DEVICE          => DEVICE
         )
-        port map(
+        port map (
             CLK              => CLK,
             CLK_X2           => CLK_X2,
             RESET            => RESET,
@@ -277,7 +277,7 @@ begin
         rx_mvb_mod_eof_size_arr(s) <= slv_array_deser(RX_MVB_MOD_EOF_SIZE(s), MFB_REGIONS);
 
         tr_gen_i : entity work.MFB_CROSSBARX_STREAM2_TR_GEN
-        generic map(
+        generic map (
             MFB_REGIONS => MFB_REGIONS,
             PKT_MTU     => PKT_MTU,
             USERMETA_W  => USERMETA_WIDTH,
@@ -289,7 +289,7 @@ begin
             PLAN_META_W => PLAN_META_W,
             DEVICE      => DEVICE
         )
-        port map(
+        port map (
             CLK                    => CLK,
             RESET                  => RESET,
 
@@ -333,7 +333,7 @@ begin
     txbuf_rd_pointer_blk <= std_logic_vector(resize_right(unsigned(txbuf_rd_pointer), txbuf_rd_pointer_blk'length));
 
     pkt_planner_i : entity work.PACKET_PLANNER
-    generic map(
+    generic map (
         DEVICE            => DEVICE,
         STREAMS           => IN_STREAMS,
         PKTS              => MFB_REGIONS,
@@ -349,7 +349,7 @@ begin
         STREAM_OUT_EN     => true,
         GLOBAL_OUT_EN     => true
     )
-    port map(
+    port map (
         CLK                   => CLK,
         RESET                 => RESET,
 
@@ -381,17 +381,17 @@ begin
 
     crox_instr_g: for s in 0 to IN_STREAMS-1 generate
         crox_instr_g2: for i in 0 to MFB_REGIONS-1 generate
-            plan_str_mvb_rxbuf_addr(s)(i) <= plan_str_mvb_meta(s)(i)(log2(RXBUF_BYTES)+USERMETA_WIDTH-1 downto USERMETA_WIDTH);
-            plan_str_mvb_pkt_id(s)(i)     <= plan_str_mvb_meta(s)(i)(PKT_ID_WIDTH+IN_STREAMS+log2(RXBUF_BYTES)+USERMETA_WIDTH-1 downto IN_STREAMS+log2(RXBUF_BYTES)+USERMETA_WIDTH);
+            plan_str_mvb_rxbuf_addr(s)(i)   <= plan_str_mvb_meta(s)(i)(log2(RXBUF_BYTES)+USERMETA_WIDTH-1 downto USERMETA_WIDTH);
+            plan_str_mvb_pkt_id(s)(i)       <= plan_str_mvb_meta(s)(i)(PKT_ID_WIDTH+IN_STREAMS+log2(RXBUF_BYTES)+USERMETA_WIDTH-1 downto IN_STREAMS+log2(RXBUF_BYTES)+USERMETA_WIDTH);
             plan_str_mvb_mod_sof_type(s)(i) <= plan_str_mvb_meta(s)(i)(PKT_ID_WIDTH+IN_STREAMS+log2(RXBUF_BYTES)+USERMETA_WIDTH);
             plan_str_mvb_mod_sof_size(s)(i) <= plan_str_mvb_meta(s)(i)(MOD_WIDTH+1+PKT_ID_WIDTH+IN_STREAMS+log2(RXBUF_BYTES)+USERMETA_WIDTH-1 downto 1+PKT_ID_WIDTH+IN_STREAMS+log2(RXBUF_BYTES)+USERMETA_WIDTH);
 
             process (all)
             begin
-                if (plan_str_mvb_mod_sof_type(s)(i) = '1') then -- trim sof part 2
+                if (plan_str_mvb_mod_sof_type(s)(i) = '1') then                                                                                              -- trim sof part 2
                     plan_str_mvb_txbuf_addr2(s)(i) <= plan_str_mvb_txbuf_addr(s)(i);
                     plan_str_mvb_len2(s)(i)        <= plan_str_mvb_len(s)(i);
-                else -- extend sof part 2
+                else                                                                                                                                         -- extend sof part 2
                     plan_str_mvb_txbuf_addr2(s)(i) <= std_logic_vector(unsigned(plan_str_mvb_txbuf_addr(s)(i)) + unsigned(plan_str_mvb_mod_sof_size(s)(i)));
                     plan_str_mvb_len2(s)(i)        <= std_logic_vector(unsigned(plan_str_mvb_len(s)(i)) - unsigned(plan_str_mvb_mod_sof_size(s)(i)));
                 end if;
@@ -418,7 +418,7 @@ begin
         process (all)
         begin
             plan_str_mvb_dst_rdy(s) <= (others => '0');
-            crox_instr_vld(s) <= (others => '0');
+            crox_instr_vld(s)       <= (others => '0');
             for i in 0 to MFB_REGIONS-1 loop
                 if (plan_str_mvb_a_col(s)(i) = crox_instr_a_col(s)) then
                     plan_str_mvb_dst_rdy(s)(i) <= crox_instr_dst_rdy(s);
@@ -444,7 +444,7 @@ begin
     end generate;
 
     crossbarx_i : entity work.CROSSBARX
-    generic map(
+    generic map (
         DATA_DIR            => CROSSBARX_DIR,
         USE_CLK2            => true,
         USE_CLK_ARB         => False,
@@ -460,8 +460,8 @@ begin
         METADATA_WIDTH      => PKT_ID_WIDTH,
         TRANSS              => MFB_REGIONS,
         TRANS_FIFO_ITEMS    => 256,
-        --COLOR_TIMEOUT_WIDTH => 3,
-        --COLOR_CONF_DELAY    => 5,
+        -- COLOR_TIMEOUT_WIDTH => 3,
+        -- COLOR_CONF_DELAY    => 5,
         RD_LATENCY          => 1,
         TRANS_STREAMS       => IN_STREAMS,
         DATA_MUX_LAT        => 0,
@@ -470,7 +470,7 @@ begin
         DATA_ROT_OUTREG_EN  => true,
         DEVICE              => DEVICE
     )
-    port map(
+    port map (
         CLK                => CLK,
         CLK2               => CLK_X2,
         RESET              => RESET,
@@ -504,13 +504,13 @@ begin
         crox_done_src_rdy(s) <= (or crox_done_vld(s));
 
         dis_fifo_i : entity work.MVB_FIFOX
-        generic map(
+        generic map (
             ITEMS      => MFB_REGIONS,
             ITEM_WIDTH => PKT_ID_WIDTH,
             FIFO_DEPTH => 2**PKT_ID_WIDTH,
             RAM_TYPE   => "AUTO",
             DEVICE     => DEVICE
-        ) port map(
+        ) port map (
             CLK        => CLK,
             RESET      => RESET,
 
@@ -542,7 +542,7 @@ begin
     -- =========================================================================
 
     tr_fifo_i : entity work.MFB_CROSSBARX_STREAM2_TR_FIFO
-    generic map(
+    generic map (
         MFB_REGIONS => MFB_REGIONS,
         STREAMS     => IN_STREAMS,
         PKT_MTU     => PKT_MTU,
@@ -551,7 +551,7 @@ begin
         TXBUF_BYTES => TXBUF_BYTES,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK                  => CLK,
         RESET                => RESET,
 
@@ -578,7 +578,7 @@ begin
     -- =========================================================================
 
     tx_buf_i : entity work.MFB_CROSSBARX_OUTPUT_BUFFER
-    generic map(
+    generic map (
         DEVICE            => DEVICE,
         HDR_META_WIDTH    => USERMETA_WIDTH,
         MVB_ITEMS         => MFB_REGIONS,
@@ -597,7 +597,7 @@ begin
         META_EQ_OUTPUT    => True,
         INPUT_EQ_OUTPUT   => False
     )
-    port map(
+    port map (
         CLK_META         => CLK,
         RESET_META       => RESET,
         CLK_IN           => CLK_X2,
@@ -647,7 +647,7 @@ begin
     -- DEBUG LOGIC
     -- =========================================================================
 
-    --pragma synthesis_off
+    -- pragma synthesis_off
     process (CLK)
         variable dbg_pkt_cnt_v : unsigned(63 downto 0);
     begin
@@ -675,7 +675,7 @@ begin
                 for i in 0 to MFB_REGIONS-1 loop
                     dbg_pkt_cnt_v := dbg_pkt_cnt_v + TX_MVB_VLD(i);
                 end loop;
-                    dbg_tx_mvb_pkt_cnt <= dbg_tx_mvb_pkt_cnt + dbg_pkt_cnt_v;
+                dbg_tx_mvb_pkt_cnt <= dbg_tx_mvb_pkt_cnt + dbg_pkt_cnt_v;
             end if;
         end if;
     end process;
@@ -707,7 +707,7 @@ begin
                 for i in 0 to MFB_REGIONS-1 loop
                     dbg_pkt_cnt_v := dbg_pkt_cnt_v + TX_MFB_EOF(i);
                 end loop;
-                    dbg_tx_mfb_pkt_cnt <= dbg_tx_mfb_pkt_cnt + dbg_pkt_cnt_v;
+                dbg_tx_mfb_pkt_cnt <= dbg_tx_mfb_pkt_cnt + dbg_pkt_cnt_v;
             end if;
         end if;
     end process;
@@ -723,7 +723,7 @@ begin
                 for i in 0 to MFB_REGIONS-1 loop
                     dbg_pkt_cnt_v := dbg_pkt_cnt_v + txbuf_instr_vld(i);
                 end loop;
-                    dbg_txbuf_instr_cnt <= dbg_txbuf_instr_cnt + dbg_pkt_cnt_v;
+                dbg_txbuf_instr_cnt <= dbg_txbuf_instr_cnt + dbg_pkt_cnt_v;
             end if;
         end if;
     end process;
@@ -776,6 +776,6 @@ begin
         end if;
     end process;
 
-    --pragma synthesis_on
+    -- pragma synthesis_on
 
 end architecture;

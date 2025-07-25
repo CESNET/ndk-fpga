@@ -71,43 +71,43 @@ use work.type_pack.all;
 --                            Entity declaration
 -- ----------------------------------------------------------------------------
 entity GEN_MUX_PIPED is
-generic(
-    -- Width of multiplexed data blocks
-    DATA_WIDTH     : integer := 64;
-    -- Number of input data blocks
-    MUX_WIDTH      : integer := 15;
-    -- Latency of the multiplexer pipeline
-    MUX_LATENCY    : integer := 0;
-    -- Input register enable (adds additional 1 CLK latency)
-    INPUT_REG      : boolean := false;
-    -- Output register enable (adds additional 1 CLK latency)
-    OUTPUT_REG     : boolean := false;
+    generic (
+        -- Width of multiplexed data blocks
+        DATA_WIDTH     : integer := 64;
+        -- Number of input data blocks
+        MUX_WIDTH      : integer := 15;
+        -- Latency of the multiplexer pipeline
+        MUX_LATENCY    : integer := 0;
+        -- Input register enable (adds additional 1 CLK latency)
+        INPUT_REG      : boolean := false;
+        -- Output register enable (adds additional 1 CLK latency)
+        OUTPUT_REG     : boolean := false;
 
-    -- Metadata can be useful when you want to send additional info to the TX side
-    -- along with the multiplexed value. (for example the value of the RX_SEL signal)
-    METADATA_WIDTH : integer := 0
-);
-port(
-    CLK         : in  std_logic := '0'; -- unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false
-    RESET       : in  std_logic := '0'; -- unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false
+        -- Metadata can be useful when you want to send additional info to the TX side
+        -- along with the multiplexed value. (for example the value of the RX_SEL signal)
+        METADATA_WIDTH : integer := 0
+    );
+    port (
+        CLK         : in  std_logic := '0'; -- unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false
+        RESET       : in  std_logic := '0'; -- unused when MUX_LATENCY==0 and OUTPUT_REG==INPUT_REG==false
 
-    RX_DATA     : in  std_logic_vector(DATA_WIDTH*MUX_WIDTH-1 downto 0);
-    RX_SEL      : in  std_logic_vector(log2(MUX_WIDTH)-1 downto 0);
-    RX_METADATA : in  std_logic_vector(METADATA_WIDTH-1 downto 0) := (others => '0');
-    RX_SRC_RDY  : in  std_logic := '1';
-    RX_DST_RDY  : out std_logic;
+        RX_DATA     : in  std_logic_vector(DATA_WIDTH*MUX_WIDTH-1 downto 0);
+        RX_SEL      : in  std_logic_vector(log2(MUX_WIDTH)-1 downto 0);
+        RX_METADATA : in  std_logic_vector(METADATA_WIDTH-1 downto 0) := (others => '0');
+        RX_SRC_RDY  : in  std_logic := '1';
+        RX_DST_RDY  : out std_logic;
 
-    TX_DATA     : out std_logic_vector(DATA_WIDTH-1 downto 0);
-    TX_METADATA : out std_logic_vector(METADATA_WIDTH-1 downto 0);
-    TX_SRC_RDY  : out std_logic;
-    TX_DST_RDY  : in  std_logic := '1'
-);
-end entity GEN_MUX_PIPED;
+        TX_DATA     : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        TX_METADATA : out std_logic_vector(METADATA_WIDTH-1 downto 0);
+        TX_SRC_RDY  : out std_logic;
+        TX_DST_RDY  : in  std_logic := '1'
+    );
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
-architecture full of GEN_MUX_PIPED is
+architecture FULL of GEN_MUX_PIPED is
     constant MUX_WIDTH_EXT : integer := 2**log2(MUX_WIDTH);
 
     -- optimalizations can be turned off for experimantation
@@ -115,19 +115,19 @@ architecture full of GEN_MUX_PIPED is
     constant OPTIMALIZATION_2 : boolean := true;
 
     -- function for computing widths of multiplexers in different levels when latency is not 0
-    function getMuxWidthsLog(width, latency : integer) return i_array_t is
+    function getmuxwidthslog (width, latency : integer) return i_array_t is
         variable mux_widths_log     : i_array_t(latency+1-1 downto 0);
         variable tmp                : integer;
         variable muxes              : integer := latency+1; -- number of multiplexer levels
         variable mux_widths_log_tmp : i_array_t(latency+1-1 downto 0);
         variable non_zeros_index    : integer;
     begin
-        mux_widths_log := (others => 0); -- set all multiplexers to minimum width
+        mux_widths_log := (others => 0);                    -- set all multiplexers to minimum width
 
         ----
         -- OPTIMALIZATION 1 (see unit Description)
         if (OPTIMALIZATION_1) then
-            if (width=2) then
+            if (width = 2) then
                 mux_widths_log(0) := 1;
                 return mux_widths_log;
             end if;
@@ -135,59 +135,59 @@ architecture full of GEN_MUX_PIPED is
         ----
 
         tmp := 1;
-        for l in 0 to width*2-1 loop -- should actually always break by the return inside (this is just a safer "while true")
+        for l in 0 to width*2-1 loop       -- should actually always break by the return inside (this is just a safer "while true")
             for i in muxes-1 downto 0 loop -- start widening multiplexers from the last level to the first
-                 if (tmp=width) then -- check reaching the final width
-                     ----
-                     -- OPTIMALIZATION 2 (see unit Description)
-                     if (OPTIMALIZATION_2) then
-                         non_zeros_index := 0;
-                         for e in 0 to muxes-1 loop
-                             exit when (mux_widths_log(e)/=0);
-                             non_zeros_index := non_zeros_index+1;
-                         end loop;
+                if (tmp = width) then      -- check reaching the final width
+                    ----
+                    -- OPTIMALIZATION 2 (see unit Description)
+                    if (OPTIMALIZATION_2) then
+                        non_zeros_index := 0;
+                        for e in 0 to muxes-1 loop
+                            exit when (mux_widths_log(e) /= 0);
+                            non_zeros_index := non_zeros_index+1;
+                        end loop;
 
-                         -- put all zero-sized multiplexers to the end of the pipeline
-                         mux_widths_log := mux_widths_log(non_zeros_index-1 downto 0) & mux_widths_log(muxes-1 downto non_zeros_index);
-                         ----
-                     end if;
+                        -- put all zero-sized multiplexers to the end of the pipeline
+                        mux_widths_log := mux_widths_log(non_zeros_index-1 downto 0) & mux_widths_log(muxes-1 downto non_zeros_index);
+                        ----
+                    end if;
 
-                     return mux_widths_log;
-                 end if;
+                    return mux_widths_log;
+                end if;
 
-                 -- else enlarge the multiplexer to double
+                -- else enlarge the multiplexer to double
 
-                 ----
-                 -- OPTIMALIZATION 1 (see unit Description)
-                 if (OPTIMALIZATION_1) then
-                    if (mux_widths_log(i)=0) then
+                ----
+                -- OPTIMALIZATION 1 (see unit Description)
+                if (OPTIMALIZATION_1) then
+                    if (mux_widths_log(i) = 0) then
                         -- don't create MUX 2:1
                         -- jump right to MUX 4:1
                         mux_widths_log(i) := mux_widths_log(i)+2;
-                        tmp := tmp*4;
-                        if (tmp>width) then -- if this is too much
+                        tmp               := tmp*4;
+                        if (tmp > width) then -- if this is too much
                             -- start enlarging back from the begining
                             mux_widths_log(i) := mux_widths_log(i)-2;
-                            tmp := tmp/4;
+                            tmp               := tmp/4;
                             exit;
                         end if;
                     else
                         -- double the size of this mux
                         mux_widths_log(i) := mux_widths_log(i)+1;
-                        tmp := tmp*2;
+                        tmp               := tmp*2;
                     end if;
                 ----
                 else
                     -- double the size of this mux
                     mux_widths_log(i) := mux_widths_log(i)+1;
-                    tmp := tmp*2;
+                    tmp               := tmp*2;
                 end if;
             end loop;
         end loop;
         return mux_widths_log;
     end function;
 
-    function getMuxWidths(mux_widths_log : i_array_t; latency : integer) return i_array_t is
+    function getmuxwidths (mux_widths_log : i_array_t; latency : integer) return i_array_t is
         variable mux_widths : i_array_t(latency+1-1 downto 0);
         variable muxes      : integer := latency+1; -- number of multiplexer levels
     begin
@@ -197,7 +197,7 @@ architecture full of GEN_MUX_PIPED is
         return mux_widths;
     end function;
 
-    function getMuxSelHighs(mux_widths_log : i_array_t; width, latency : integer) return i_array_t is
+    function getmuxselhighs (mux_widths_log : i_array_t; width, latency : integer) return i_array_t is
         variable mux_sel_highs : i_array_t(latency+1-1 downto 0);
         variable muxes         : integer := latency+1; -- number of multiplexer levels
     begin
@@ -208,7 +208,7 @@ architecture full of GEN_MUX_PIPED is
         return mux_sel_highs;
     end function;
 
-    function getMuxCnts(mux_widths_log : i_array_t; width, latency : integer) return i_array_t is
+    function getmuxcnts (mux_widths_log : i_array_t; width, latency : integer) return i_array_t is
         variable mux_cnts : i_array_t(latency+1-1 downto 0);
         variable muxes    : integer := latency+1; -- number of multiplexer levels
     begin
@@ -219,7 +219,7 @@ architecture full of GEN_MUX_PIPED is
         return mux_cnts;
     end function;
 
-    function getOutRegInt(out_reg : boolean) return integer is
+    function getoutregint (out_reg : boolean) return integer is
     begin
         if (out_reg) then
             return 1;
@@ -228,12 +228,12 @@ architecture full of GEN_MUX_PIPED is
         end if;
     end function;
 
-    constant MUX_WIDTHS_LOG : i_array_t(MUX_LATENCY+1-1 downto 0) := getMuxWidthsLog(MUX_WIDTH_EXT,MUX_LATENCY);
-    constant MUX_WIDTHS     : i_array_t(MUX_LATENCY+1-1 downto 0) := getMuxWIdths(MUX_WIDTHS_LOG,MUX_LATENCY);
-    constant MUX_SEL_HIGHS  : i_array_t(MUX_LATENCY+1-1 downto 0) := getMuxSelHighs(MUX_WIDTHS_LOG,MUX_WIDTH_EXT,MUX_LATENCY);
-    constant MUX_CNTS       : i_array_t(MUX_LATENCY+1-1 downto 0) := getMuxCnts(MUX_WIDTHS_LOG,MUX_WIDTH_EXT,MUX_LATENCY);
+    constant MUX_WIDTHS_LOG : i_array_t(MUX_LATENCY+1-1 downto 0) := getmuxwidthslog(MUX_WIDTH_EXT,MUX_LATENCY);
+    constant MUX_WIDTHS     : i_array_t(MUX_LATENCY+1-1 downto 0) := getmuxwidths(MUX_WIDTHS_LOG,MUX_LATENCY);
+    constant MUX_SEL_HIGHS  : i_array_t(MUX_LATENCY+1-1 downto 0) := getmuxselhighs(MUX_WIDTHS_LOG,MUX_WIDTH_EXT,MUX_LATENCY);
+    constant MUX_CNTS       : i_array_t(MUX_LATENCY+1-1 downto 0) := getmuxcnts(MUX_WIDTHS_LOG,MUX_WIDTH_EXT,MUX_LATENCY);
 
-    constant OUTPUT_REG_INT : integer := getOutRegInt(OUTPUT_REG);
+    constant OUTPUT_REG_INT : integer := getoutregint(OUTPUT_REG);
 
     -- input register
     signal in_reg_rx_data     : std_logic_vector(DATA_WIDTH*MUX_WIDTH-1 downto 0);
@@ -257,33 +257,33 @@ begin
         in_reg_pr : process (CLK)
         begin
             if (rising_edge(CLK)) then
-                if (RX_DST_RDY='1') then
+                if (RX_DST_RDY = '1') then
                     in_reg_rx_data     <= RX_DATA;
                     in_reg_rx_sel      <= RX_SEL;
                     in_reg_rx_metadata <= RX_METADATA;
                     in_reg_rx_src_rdy  <= RX_SRC_RDY;
                 end if;
 
-                if (RESET='1') then
+                if (RESET = '1') then
                     in_reg_rx_src_rdy <= '0';
                 end if;
             end if;
         end process;
-        RX_DST_RDY <= '1' when in_reg_rx_dst_rdy='1' or in_reg_rx_src_rdy='0' else '0';
+        RX_DST_RDY         <= '1' when in_reg_rx_dst_rdy = '1' or in_reg_rx_src_rdy = '0' else '0';
     else generate
         in_reg_rx_data     <= RX_DATA;
         in_reg_rx_sel      <= RX_SEL;
         in_reg_rx_metadata <= RX_METADATA;
         in_reg_rx_src_rdy  <= RX_SRC_RDY;
-        RX_DST_RDY <= in_reg_rx_dst_rdy;
+        RX_DST_RDY         <= in_reg_rx_dst_rdy;
     end generate;
 
     data_in_arr(0)(MUX_WIDTH-1 downto 0) <= slv_array_downto_deser(in_reg_rx_data, MUX_WIDTH, DATA_WIDTH);
-    sel_in(0)         <= in_reg_rx_sel;
-    metadata_in(0)    <= in_reg_rx_metadata;
-    src_rdy_in(0)     <= in_reg_rx_src_rdy;
-    in_reg_rx_dst_rdy <= dst_rdy_in(0);
-    dst_rdy_in(0)     <= dst_rdy_in(1);
+    sel_in(0)                            <= in_reg_rx_sel;
+    metadata_in(0)                       <= in_reg_rx_metadata;
+    src_rdy_in(0)                        <= in_reg_rx_src_rdy;
+    in_reg_rx_dst_rdy                    <= dst_rdy_in(0);
+    dst_rdy_in(0)                        <= dst_rdy_in(1);
 
     mux_levels_gen : for i in 0 to MUX_LATENCY+1-1 generate
 
@@ -314,14 +314,14 @@ begin
         next_level_reg_pr : process (CLK)
         begin
             if (rising_edge(CLK)) then
-                if (dst_rdy_in(i+1)='1') then
+                if (dst_rdy_in(i+1) = '1') then
                     data_in_arr(i+1) <= data_out(i);
                     sel_in(i+1)      <= sel_in(i);
                     metadata_in(i+1) <= metadata_in(i);
                     src_rdy_in(i+1)  <= src_rdy_in(i);
                 end if;
 
-                if (RESET='1') then
+                if (RESET = '1') then
                     src_rdy_in(i+1)  <= '0';
                 end if;
             end if;
@@ -330,12 +330,12 @@ begin
     end generate;
 
     dst_rdy_gen : for i in 1 to MUX_LATENCY+OUTPUT_REG_INT+1-1 generate
-        dst_rdy_in(i) <= '1' when dst_rdy_in(i+1)='1' or src_rdy_in(i)='0' else '0';
+        dst_rdy_in(i) <= '1' when dst_rdy_in(i+1) = '1' or src_rdy_in(i) = '0' else '0';
     end generate;
 
     dst_rdy_in(MUX_LATENCY+OUTPUT_REG_INT+1+1-1) <= TX_DST_RDY;
-    TX_SRC_RDY                      <= src_rdy_in(MUX_LATENCY+OUTPUT_REG_INT+1-1);
-    TX_DATA                         <= data_out(MUX_LATENCY+1-1)(0) when OUTPUT_REG=false else data_in_arr(MUX_LATENCY+OUTPUT_REG_INT+1-1)(0);
-    TX_METADATA                     <= metadata_in(MUX_LATENCY+OUTPUT_REG_INT+1-1);
+    TX_SRC_RDY                                   <= src_rdy_in(MUX_LATENCY+OUTPUT_REG_INT+1-1);
+    TX_DATA                                      <= data_out(MUX_LATENCY+1-1)(0) when OUTPUT_REG = false else data_in_arr(MUX_LATENCY+OUTPUT_REG_INT+1-1)(0);
+    TX_METADATA                                  <= metadata_in(MUX_LATENCY+OUTPUT_REG_INT+1-1);
 
-end architecture full;
+end architecture;

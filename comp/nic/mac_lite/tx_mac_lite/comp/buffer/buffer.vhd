@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_BUFFER is
-    generic(
+    generic (
         -- Number of regions within a data word, must be power of 2.
         MFB_REGIONS        : natural := 4;
         -- Region size (in blocks).
@@ -30,7 +30,7 @@ entity TX_MAC_LITE_BUFFER is
         -- FPGA device name.
         DEVICE             : string := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         --  CLOCK AND RESET
         -- =====================================================================
@@ -101,7 +101,7 @@ architecture FULL of TX_MAC_LITE_BUFFER is
 begin
 
     mfb_frame_len_i : entity work.MFB_FRAME_LNG
-    generic map(
+    generic map (
         REGIONS         => MFB_REGIONS,
         REGION_SIZE     => MFB_REGION_SIZE,
         BLOCK_SIZE      => MFB_BLOCK_SIZE,
@@ -112,7 +112,7 @@ begin
         REG_BITMAP      => "111",
         IMPLEMENTATION  => "parallel"
     )
-    port map(
+    port map (
         CLK          => RX_CLK,
         RESET        => RX_RESET,
 
@@ -150,7 +150,7 @@ begin
     -- =========================================================================
 
     pd_asfifo_i : entity work.MFB_PD_ASFIFO
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -158,7 +158,7 @@ begin
         ITEMS       => FIFO_ITEMS,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         RX_CLK           => RX_CLK,
         RX_RESET         => RX_RESET,
 
@@ -198,7 +198,7 @@ begin
     --      report "TX_MAC_LITE_BUFFER: Write to full ST_ASFIFO!";
 
     st_asfifo_i : entity work.ASFIFOX
-    generic map(
+    generic map (
         DATA_WIDTH => ST_ASFIFO_WIDTH,
         ITEMS      => FIFO_ITEMS,
         RAM_TYPE   => "BRAM",
@@ -206,7 +206,7 @@ begin
         OUTPUT_REG => True,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         WR_CLK    => RX_CLK,
         WR_RST    => RX_RESET,
         WR_DATA   => st_asfifo_di,

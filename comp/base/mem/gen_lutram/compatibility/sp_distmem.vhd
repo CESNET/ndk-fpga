@@ -15,12 +15,12 @@ use work.math_pack.all;
 -- This is just a wrapper for backward compatibility.
 
 entity SP_DISTMEM is
-    generic(
+    generic (
         DATA_WIDTH : integer := 21; -- any possitive value
         ITEMS      : integer := 64; -- any possitive value
         DEVICE     : string  := "7SERIES"
     );
-    port(
+    port (
         DI   : in std_logic_vector(DATA_WIDTH-1 downto 0);
         WE   : in std_logic;
         WCLK : in std_logic;

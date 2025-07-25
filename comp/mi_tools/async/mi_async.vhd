@@ -16,7 +16,7 @@ use work.math_pack.all;
 -- behavior of the MI bus in the event of an unexpected reset in only one clock
 -- domain (see RESET_LOGIC generic).
 entity MI_ASYNC is
-    generic(
+    generic (
         -- Data word width in bits, must be power of 2.
         DATA_WIDTH  : natural := 32;
         -- Address word width in bits.
@@ -32,7 +32,7 @@ entity MI_ASYNC is
         -- implementation according to the FPGA used.
         DEVICE      : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- Master interface: Clock
         CLK_M     : in  std_logic;
         -- Master interface: Reset
@@ -85,7 +85,7 @@ architecture FULL of MI_ASYNC is
 
     constant FIFO_ITEMS    : natural := 16;
     constant FIFO_IN_WIDTH : natural := META_WIDTH+ADDR_WIDTH+DATA_WIDTH+(DATA_WIDTH/8)+1;
-    constant RESET_MSG     : unsigned(32-1 downto 0) := x"DEADFEED";
+    constant RESET_MSG     : unsigned(32-1 downto 0) := X"DEADFEED";
 
     signal fifo_in_di     : std_logic_vector(FIFO_IN_WIDTH-1 downto 0);
     signal fifo_in_wr     : std_logic;
@@ -101,7 +101,7 @@ architecture FULL of MI_ASYNC is
     signal drdy_status    : unsigned(log2(FIFO_ITEMS+1)-1 downto 0) := (others => '0');
     signal drdy_rdy       : std_logic;
 
-    type reset_state is (NO_RESET, MASTER_RESET, SLAVE_RESET, COMP_RESET);
+    type   reset_state is (NO_RESET, MASTER_RESET, SLAVE_RESET, COMP_RESET);
     signal p_state        : reset_state := NO_RESET;
     signal n_state        : reset_state;
     signal reset_s_sync   : std_logic_vector(1-1 downto 0);
@@ -118,7 +118,7 @@ begin
     MI_M_ARDY  <= fifo_in_wr;
 
     fifo_in_i : entity work.ASFIFOX
-    generic map(
+    generic map (
         DATA_WIDTH => FIFO_IN_WIDTH,
         ITEMS      => FIFO_ITEMS,
         RAM_TYPE   => RAM_TYPE,
@@ -126,7 +126,7 @@ begin
         OUTPUT_REG => True,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         WR_CLK    => CLK_M,
         WR_RST    => reset_s_sync(0),
         WR_DATA   => fifo_in_di,
@@ -157,7 +157,7 @@ begin
     -----------------------------------------------------------------------------
 
     fifo_out_i : entity work.ASFIFOX
-    generic map(
+    generic map (
         DATA_WIDTH => DATA_WIDTH,
         ITEMS      => FIFO_ITEMS,
         RAM_TYPE   => RAM_TYPE,
@@ -165,7 +165,7 @@ begin
         OUTPUT_REG => True,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         WR_CLK    => CLK_S,
         WR_RST    => RESET_S,
         WR_DATA   => MI_S_DRD,
@@ -185,7 +185,7 @@ begin
 
     m_drd_rdy <= '1' when ((fifo_out_empty = '0' and no_reset_sig = '1') or (p_state = SLAVE_RESET and drdy_status /= 0)) else '0';
 
-    mi_m_drd_reg_p : process(CLK_M)
+    mi_m_drd_reg_p : process (CLK_M)
     begin
         if rising_edge(CLK_M) then
             if (p_state = SLAVE_RESET) then
@@ -210,7 +210,7 @@ begin
         if (rising_edge(CLK_M)) then
             if (p_state = COMP_RESET or (RESET_M = '1' and not RESET_LOGIC)) then
                 drdy_status <= (others => '0');
-            elsif (fifo_out_empty = '1' and drdy_req = '1') then -- only read request
+            elsif (fifo_out_empty = '1' and drdy_req = '1') then                                                   -- only read request
                 drdy_status <= drdy_status + 1;
             elsif ((fifo_out_empty = '0' and drdy_req = '0') or (p_state = SLAVE_RESET and drdy_status /= 0)) then -- only read response
                 drdy_status <= drdy_status - 1;
@@ -226,20 +226,20 @@ begin
     -- logic for correct reset of MI_ASYNC
 
     sync_reset_s_i : entity work.ASYNC_RESET
-    generic map(
+    generic map (
         TWO_REG   => False,
         OUT_REG   => False
     )
-    port map(
+    port map (
         CLK       => CLK_M,
         ASYNC_RST => RESET_S,
         OUT_RST   => reset_s_sync
     );
 
     -- INFO: obsolete, generates warning in simulation
-    --no_reset_logic_g : if not RESET_LOGIC generate
+    -- no_reset_logic_g : if not RESET_LOGIC generate
     --    p_state <= NO_RESET;
-    --end generate;
+    -- end generate;
 
     reset_logic_g : if RESET_LOGIC generate
         fsm_state_p : process (CLK_M)

@@ -143,98 +143,98 @@ use work.math_pack.all;
 -- -----------------------------------------------------------------------------
 
 entity N_LOOP_OP is
-generic (
-    -- Data width
-    DATA_WIDTH         : integer := 16;
-    -- Number of items to select from
-    ITEMS              : integer := 32;
-    -- Enable immediate reset of all data in the memory to RESET_VAL by the RESET signal.
-    -- Warning: Leads to worse timing!
-    QUICK_RESET_EN     : boolean := false;
-    -- Items value after reset (only when QUICK_RESET is enabled)
-    RESET_VAL          : integer := 0;
+    generic (
+        -- Data width
+        DATA_WIDTH         : integer := 16;
+        -- Number of items to select from
+        ITEMS              : integer := 32;
+        -- Enable immediate reset of all data in the memory to RESET_VAL by the RESET signal.
+        -- Warning: Leads to worse timing!
+        QUICK_RESET_EN     : boolean := false;
+        -- Items value after reset (only when QUICK_RESET is enabled)
+        RESET_VAL          : integer := 0;
 
-    -- Number of independent read interfaces
-    READ_PORTS         : integer := 2;
+        -- Number of independent read interfaces
+        READ_PORTS         : integer := 2;
 
-    -- Number of intependent user-defined operator units
-    OPERATORS          : integer := 4;
-    -- Number of different operations
-    OPERATIONS         : integer := 5;
+        -- Number of intependent user-defined operator units
+        OPERATORS          : integer := 4;
+        -- Number of different operations
+        OPERATIONS         : integer := 5;
 
-    -- Metadata width
-    META_WIDTH         : integer := 1;
+        -- Metadata width
+        META_WIDTH         : integer := 1;
 
-    -- Use register array
-    -- With this option set to True the GEN_REG_ARRAY is used to implement
-    -- the inner memory instead of the NP_LUTRAM.
-    -- This is effective when DATA_WIDTH is very low (8 bits or less).
-    USE_REG_ARRAY      : boolean := false;
+        -- Use register array
+        -- With this option set to True the GEN_REG_ARRAY is used to implement
+        -- the inner memory instead of the NP_LUTRAM.
+        -- This is effective when DATA_WIDTH is very low (8 bits or less).
+        USE_REG_ARRAY      : boolean := false;
 
-    -- Target device
-    -- "7SERIES", "ULTRASCALE"
-    DEVICE             : string  := "7SERIES"
-);
-port (
+        -- Target device
+        -- "7SERIES", "ULTRASCALE"
+        DEVICE             : string  := "7SERIES"
+    );
+    port (
 
-    -- =====================================================
-    -- clock & reset
-    -- =====================================================
-    CLK            : in  std_logic;
-    RESET          : in  std_logic;
+        -- =====================================================
+        -- clock & reset
+        -- =====================================================
+        CLK            : in  std_logic;
+        RESET          : in  std_logic;
 
-    -- =====================================================
-    -- Interface for operations ordering per operator
-    -- =====================================================
+        -- =====================================================
+        -- Interface for operations ordering per operator
+        -- =====================================================
 
-    -- desired item address for each operator unit
-    OP_ITEM_SEL    : in  slv_array_t(OPERATORS-1 downto 0)(log2(ITEMS)-1 downto 0);
-    -- desired operations for each operator unit (can be used for operation metadata informations)
-    OP_OPERATIONS  : in  slv_array_t(OPERATORS-1 downto 0)(OPERATIONS-1 downto 0);
-    -- operator metadata
-    OP_META        : in  slv_array_t(OPERATORS-1 downto 0)(META_WIDTH-1 downto 0) := (others => (others => '0'));
+        -- desired item address for each operator unit
+        OP_ITEM_SEL    : in  slv_array_t(OPERATORS-1 downto 0)(log2(ITEMS)-1 downto 0);
+        -- desired operations for each operator unit (can be used for operation metadata informations)
+        OP_OPERATIONS  : in  slv_array_t(OPERATORS-1 downto 0)(OPERATIONS-1 downto 0);
+        -- operator metadata
+        OP_META        : in  slv_array_t(OPERATORS-1 downto 0)(META_WIDTH-1 downto 0) := (others => (others => '0'));
 
-    -- =====================================================
-    -- Input interface for user operator units
-    --
-    -- (1 CLK latency from )
-    -- =====================================================
+        -- =====================================================
+        -- Input interface for user operator units
+        --
+        -- (1 CLK latency from )
+        -- =====================================================
 
-    -- chosen item's address
-    OP_IN_SEL      : out slv_array_t(OPERATORS-1 downto 0)(log2(ITEMS)-1 downto 0);
-    -- mask of OP_IN interfaces with the same OP_IN_SEL (helps to identify the source interfaces of this operator unit)
-    OP_IN_SRC      : out slv_array_t(OPERATORS-1 downto 0)(OPERATORS-1 downto 0);
-    -- chosen operations
-    -- (  if multiple UP_IN_SEL have the same value, than the OP_IN_OPS of the first of them is equal to OR )
-    -- (                  of OP_OPERATIONS on these interfaces, while the other OP_IN_OPS are 0             )
-    OP_IN_OPS      : out slv_array_t(OPERATORS-1 downto 0)(OPERATIONS-1 downto 0);
-    -- selected input data for operation
-    OP_IN_DATA     : out slv_array_t(OPERATORS-1 downto 0)(DATA_WIDTH-1 downto 0);
-    -- operator metadata
-    OP_IN_META     : out slv_array_t(OPERATORS-1 downto 0)(META_WIDTH-1 downto 0);
+        -- chosen item's address
+        OP_IN_SEL      : out slv_array_t(OPERATORS-1 downto 0)(log2(ITEMS)-1 downto 0);
+        -- mask of OP_IN interfaces with the same OP_IN_SEL (helps to identify the source interfaces of this operator unit)
+        OP_IN_SRC      : out slv_array_t(OPERATORS-1 downto 0)(OPERATORS-1 downto 0);
+        -- chosen operations
+        -- (  if multiple UP_IN_SEL have the same value, than the OP_IN_OPS of the first of them is equal to OR )
+        -- (                  of OP_OPERATIONS on these interfaces, while the other OP_IN_OPS are 0             )
+        OP_IN_OPS      : out slv_array_t(OPERATORS-1 downto 0)(OPERATIONS-1 downto 0);
+        -- selected input data for operation
+        OP_IN_DATA     : out slv_array_t(OPERATORS-1 downto 0)(DATA_WIDTH-1 downto 0);
+        -- operator metadata
+        OP_IN_META     : out slv_array_t(OPERATORS-1 downto 0)(META_WIDTH-1 downto 0);
 
-    -- =====================================================
-    -- Output interface for user operator units
-    --
-    -- (0 latency, operators must be combination logic only)
-    -- =====================================================
+        -- =====================================================
+        -- Output interface for user operator units
+        --
+        -- (0 latency, operators must be combination logic only)
+        -- =====================================================
 
-    -- data after operations execution
-    OP_OUT_DATA    : in  slv_array_t(OPERATORS-1 downto 0)(DATA_WIDTH-1 downto 0);
+        -- data after operations execution
+        OP_OUT_DATA    : in  slv_array_t(OPERATORS-1 downto 0)(DATA_WIDTH-1 downto 0);
 
-    -- =====================================================
-    -- Interface for independent data reading
-    -- =====================================================
+        -- =====================================================
+        -- Interface for independent data reading
+        -- =====================================================
 
-    -- item select
-    READ_ADDR      : in  slv_array_t(READ_PORTS-1 downto 0)(log2(ITEMS)-1 downto 0);
-    -- read item (1 CLK latency from READ_ADDR)
-    READ_DATA      : out slv_array_t(READ_PORTS-1 downto 0)(DATA_WIDTH-1 downto 0)
+        -- item select
+        READ_ADDR      : in  slv_array_t(READ_PORTS-1 downto 0)(log2(ITEMS)-1 downto 0);
+        -- read item (1 CLK latency from READ_ADDR)
+        READ_DATA      : out slv_array_t(READ_PORTS-1 downto 0)(DATA_WIDTH-1 downto 0)
 
-);
-end entity N_LOOP_OP;
+    );
+end entity;
 
-architecture full of N_LOOP_OP is
+architecture FULL of N_LOOP_OP is
 
     ---------------------------------------------------
     -- constants
@@ -267,13 +267,13 @@ architecture full of N_LOOP_OP is
     -- data registers
     ---------------------------------------------------
 
-    signal reg0_data   : slv_array_t(0 to OPERATORS-1)(DATA_WIDTH-1 downto 0);
-    signal reg0_vld    : std_logic_vector(0 to OPERATORS-1);
-    signal reg0_d_sel  : slv_array_t(0 to OPERATORS-1)(2-1 downto 0); -- data input select ("00" - reg0; "01" - reg1; "10" - reg2; "11" - invalid)
-    signal reg0_d_sel_a: slv_array_t(0 to OPERATORS-1)(log2(OPERATORS)-1 downto 0);
-    signal reg0_addr   : slv_array_t(0 to OPERATORS-1)(log2(ITEMS)-1 downto 0);
-    signal reg0_op     : slv_array_t(0 to OPERATORS-1)(0 to OPERATIONS-1);
-    signal reg0_meta   : slv_array_t(0 to OPERATORS-1)(META_WIDTH-1 downto 0);
+    signal reg0_data    : slv_array_t(0 to OPERATORS-1)(DATA_WIDTH-1 downto 0);
+    signal reg0_vld     : std_logic_vector(0 to OPERATORS-1);
+    signal reg0_d_sel   : slv_array_t(0 to OPERATORS-1)(2-1 downto 0); -- data input select ("00" - reg0; "01" - reg1; "10" - reg2; "11" - invalid)
+    signal reg0_d_sel_a : slv_array_t(0 to OPERATORS-1)(log2(OPERATORS)-1 downto 0);
+    signal reg0_addr    : slv_array_t(0 to OPERATORS-1)(log2(ITEMS)-1 downto 0);
+    signal reg0_op      : slv_array_t(0 to OPERATORS-1)(0 to OPERATIONS-1);
+    signal reg0_meta    : slv_array_t(0 to OPERATORS-1)(META_WIDTH-1 downto 0);
 
     signal reg1_data   : slv_array_t(0 to OPERATORS-1)(DATA_WIDTH-1 downto 0);
     signal reg1_addr   : slv_array_t(0 to OPERATORS-1)(log2(ITEMS)-1 downto 0);
@@ -301,14 +301,14 @@ begin
 
     data_init_pr : process (RESET,CLK)
     begin
-        if (CLK'event and CLK='1') then
+        if (rising_edge(CLK)) then
             for i in 0 to OPERATORS-1 loop
-                if (reg0_vld(i)='1') then
+                if (reg0_vld(i) = '1') then
                     init_val(to_integer(unsigned(reg0_addr(i)))) <= '0';
                 end if;
             end loop;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 init_val <= (others => '1');
             end if;
         end if;
@@ -316,7 +316,7 @@ begin
 
     ---------------------------------------------------
 
-    np_lutram_gen : if (USE_REG_ARRAY=false) generate
+    np_lutram_gen : if (USE_REG_ARRAY = false) generate
 
         ---------------------------------------------------
         -- MULTIPORT MEMORY FOR DATA
@@ -324,11 +324,11 @@ begin
 
         mem_i : entity work.NP_LUTRAM
         generic map (
-            DATA_WIDTH => DATA_WIDTH,
-            ITEMS      => ITEMS,
-            WRITE_PORTS=> OPERATORS,
-            READ_PORTS => READ_PORTS+OPERATORS,
-            DEVICE     => DEVICE
+            DATA_WIDTH  => DATA_WIDTH,
+            ITEMS       => ITEMS,
+            WRITE_PORTS => OPERATORS,
+            READ_PORTS  => READ_PORTS+OPERATORS,
+            DEVICE      => DEVICE
         )
         port map (
             WCLK       => CLK,
@@ -345,7 +345,7 @@ begin
 
     end generate;
 
-    reg_array_gen : if (USE_REG_ARRAY=true) generate
+    reg_array_gen : if (USE_REG_ARRAY = true) generate
         signal tmp_mem_out_data_vec : std_logic_vector((READ_PORTS+OPERATORS)*DATA_WIDTH-1 downto 0);
     begin
 
@@ -387,12 +387,12 @@ begin
 
     read_reg_pr : process (RESET,CLK)
     begin
-        if (CLK'event and CLK='1') then
+        if (rising_edge(CLK)) then
             for i in 0 to READ_PORTS-1 loop
                 read_addr_reg(i) <= READ_ADDR(i);
                 read_data_reg(i) <= mem_out_data(i);
             end loop;
-            if (QUICK_RESET_EN and RESET='1') then
+            if (QUICK_RESET_EN and RESET = '1') then
                 read_data_reg <= (others => RESET_VAL_VEC);
             end if;
         end if;
@@ -400,11 +400,11 @@ begin
 
     read_addr_comp_reg : process (CLK)
     begin
-        if (CLK'event and CLK='1') then
+        if (rising_edge(CLK)) then
             for i in 0 to READ_PORTS-1 loop
                 for e in 0 to OPERATORS-1 loop
-                    read_addr_eq_reg1_reg(i)(e) <= '1' when READ_ADDR(i)=reg0_addr(e) else '0';
-                    read_addr_eq_reg2_reg(i)(e) <= '1' when READ_ADDR(i)=reg1_addr(e) else '0';
+                    read_addr_eq_reg1_reg(i)(e) <= '1' when READ_ADDR(i) = reg0_addr(e) else '0';
+                    read_addr_eq_reg2_reg(i)(e) <= '1' when READ_ADDR(i) = reg1_addr(e) else '0';
                 end loop;
             end loop;
         end if;
@@ -424,18 +424,18 @@ begin
             READ_DATA(i)    <= read_data_reg(i);
 
             for e in OPERATORS-1 downto 0 loop
-                if (read_addr_eq_reg2_reg(i)(e)='1' and reg2_vld(e)='1') then
+                if (read_addr_eq_reg2_reg(i)(e) = '1' and reg2_vld(e) = '1') then
                     READ_DATA(i) <= reg2_data(e);
                 end if;
             end loop;
 
             for e in OPERATORS-1 downto 0 loop
-                if (read_addr_eq_reg1_reg(i)(e)='1' and reg1_vld(e)='1') then
+                if (read_addr_eq_reg1_reg(i)(e) = '1' and reg1_vld(e) = '1') then
                     READ_DATA(i) <= reg1_data(e);
                 end if;
             end loop;
 
-            if (QUICK_RESET_EN=true and init_val(to_integer(unsigned(read_addr_reg(i))))='1') then
+            if (QUICK_RESET_EN = true and init_val(to_integer(unsigned(read_addr_reg(i)))) = '1') then
                 READ_DATA(i) <= RESET_VAL_VEC;
             end if;
 
@@ -452,10 +452,10 @@ begin
     reg0_pr : process (RESET,CLK)
         variable ops : slv_array_t(0 to OPERATORS-1)(0 to OPERATIONS-1);
     begin
-        if (CLK'event and CLK='1') then
+        if (rising_edge(CLK)) then
             for i in 0 to OPERATORS-1 loop
                 -- save data
-                reg0_data(i) <= mem_out_data(i+READ_PORTS) when QUICK_RESET_EN=false or init_val(to_integer(unsigned(OP_ITEM_SEL(i))))='0' else RESET_VAL_VEC;
+                reg0_data(i) <= mem_out_data(i+READ_PORTS) when QUICK_RESET_EN = false or init_val(to_integer(unsigned(OP_ITEM_SEL(i)))) = '0' else RESET_VAL_VEC;
                 reg0_addr(i) <= OP_ITEM_SEL(i);
                 reg0_meta(i) <= OP_META(i);
 
@@ -464,14 +464,14 @@ begin
 
                 -- join operations
                 for e in i+1 to OPERATORS-1 loop
-                    if (OP_ITEM_SEL(i)=OP_ITEM_SEL(e)) then
+                    if (OP_ITEM_SEL(i) = OP_ITEM_SEL(e)) then
                         ops(i) := ops(i) or OP_OPERATIONS(e);
                     end if;
                 end loop;
 
                 -- zero out operations
                 for e in 0 to i-1 loop
-                    if (OP_ITEM_SEL(i)=OP_ITEM_SEL(e)) then
+                    if (OP_ITEM_SEL(i) = OP_ITEM_SEL(e)) then
                         ops(i) := (others => '0');
                     end if;
                 end loop;
@@ -486,7 +486,7 @@ begin
 
                 -- overwrite with reg2
                 for e in OPERATORS-1 downto 0 loop
-                    if (OP_ITEM_SEL(i)=reg1_addr(e) and reg1_vld(e)='1') then
+                    if (OP_ITEM_SEL(i) = reg1_addr(e) and reg1_vld(e) = '1') then
                         reg0_d_sel(i)   <= "10";
                         reg0_d_sel_a(i) <= std_logic_vector(to_unsigned(e,log2(OPERATORS)));
                     end if;
@@ -494,7 +494,7 @@ begin
 
                 -- overwrite with reg1
                 for e in OPERATORS-1 downto 0 loop
-                    if (OP_ITEM_SEL(i)=reg0_addr(e) and reg0_vld(e)='1') then
+                    if (OP_ITEM_SEL(i) = reg0_addr(e) and reg0_vld(e) = '1') then
                         reg0_d_sel(i)   <= "01";
                         reg0_d_sel_a(i) <= std_logic_vector(to_unsigned(e,log2(OPERATORS)));
                     end if;
@@ -502,7 +502,7 @@ begin
 
             end loop;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 reg0_op  <= (others => (others => '0'));
                 reg0_vld <= (others => '0');
             end if;
@@ -524,11 +524,11 @@ begin
     op_in_data_pr : process (reg0_data,reg0_addr,reg1_data,reg1_addr,reg2_data,reg2_addr,reg0_d_sel,reg0_d_sel_a)
     begin
         for i in 0 to OPERATORS-1 loop
-            if    (reg0_d_sel(i)="00") then
+            if (reg0_d_sel(i) = "00") then
                 OP_IN_DATA(i) <= reg0_data(i);
-            elsif (reg0_d_sel(i)="01") then
+            elsif (reg0_d_sel(i) = "01") then
                 OP_IN_DATA(i) <= reg1_data(to_integer(unsigned(reg0_d_sel_a(i))));
-            elsif (reg0_d_sel(i)="10") then
+            elsif (reg0_d_sel(i) = "10") then
                 OP_IN_DATA(i) <= reg2_data(to_integer(unsigned(reg0_d_sel_a(i))));
             else
                 OP_IN_DATA(i) <= (others => '0'); -- invalid option
@@ -544,21 +544,21 @@ begin
 
     reg1_pr : process (RESET,CLK)
     begin
-        if (CLK'event and CLK='1') then
+        if (rising_edge(CLK)) then
             for i in 0 to OPERATORS-1 loop
                 -- save data
                 reg1_data(i) <= OP_OUT_DATA(i);
                 reg1_vld(i)  <= '0';
                 for e in i to OPERATORS-1 loop
-                     if (reg0_vld(e)='1' and reg0_addr(i)=reg0_addr(e)) then
-                           reg1_vld(i) <= '1';
-                     end if;
+                    if (reg0_vld(e) = '1' and reg0_addr(i) = reg0_addr(e)) then
+                        reg1_vld(i) <= '1';
+                    end if;
                 end loop;
                 reg1_addr(i) <= reg0_addr(i);
             end loop;
 
-            if (RESET='1') then
-                reg1_vld <= (others =>'0');
+            if (RESET = '1') then
+                reg1_vld <= (others => '0');
             end if;
         end if;
     end process;
@@ -571,7 +571,7 @@ begin
 
     reg2_pr : process (RESET,CLK)
     begin
-        if (CLK'event and CLK='1') then
+        if (rising_edge(CLK)) then
             for i in 0 to OPERATORS-1 loop
                 -- save data
                 reg2_data(i) <= reg1_data(i);
@@ -579,8 +579,8 @@ begin
                 reg2_addr(i) <= reg1_addr(i);
             end loop;
 
-            if (RESET='1') then
-                reg2_vld <= (others =>'0');
+            if (RESET = '1') then
+                reg2_vld <= (others => '0');
             end if;
         end if;
     end process;
@@ -605,7 +605,7 @@ begin
 
     op_in_src_reg_pr : process (CLK)
     begin
-        if (CLK'event and CLK='1') then
+        if (rising_edge(CLK)) then
 
             OP_IN_SRC <= (others => (others => '0'));
             for i in OPERATORS-1 downto 0 loop
@@ -613,8 +613,8 @@ begin
                 -- on any port with index higher
                 -- or equal to this one.
                 for e in OPERATORS-1 downto i loop
-                    if (OP_ITEM_SEL(i)=OP_ITEM_SEL(e)) then
-                        if ((or OP_OPERATIONS(e))='1') then
+                    if (OP_ITEM_SEL(i) = OP_ITEM_SEL(e)) then
+                        if ((or OP_OPERATIONS(e)) = '1') then
                             OP_IN_SRC(i)(e) <= '1';
                         end if;
                     end if;
@@ -622,13 +622,13 @@ begin
                 -- Reset when the operations will actually be
                 -- propagated to a port with lower index (higher priority).
                 for e in i-1 downto 0 loop
-                    if (OP_ITEM_SEL(i)=OP_ITEM_SEL(e)) then
+                    if (OP_ITEM_SEL(i) = OP_ITEM_SEL(e)) then
                         OP_IN_SRC(i) <= (others => '0');
                     end if;
                 end loop;
             end loop;
 
-            if (RESET='1') then
+            if (RESET = '1') then
                 OP_IN_SRC <= (others => (others => '0'));
             end if;
         end if;
@@ -636,4 +636,4 @@ begin
 
     ---------------------------------------------------
 
-end full;
+end architecture;

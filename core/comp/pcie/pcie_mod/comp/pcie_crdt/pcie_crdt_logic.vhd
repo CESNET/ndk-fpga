@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity PCIE_CRDT_LOGIC is
-    generic(
+    generic (
         -- Total PCIe credits for down stream
         CRDT_TOTAL_PH   : natural := 128;
         CRDT_TOTAL_NPH  : natural := 128;
@@ -21,7 +21,7 @@ entity PCIE_CRDT_LOGIC is
         CRDT_TOTAL_NPD  : natural := 32;
         CRDT_TOTAL_CPLD : natural := 32
     );
-    port(
+    port (
         CLK                      : in  std_logic;
         RESET                    : in  std_logic;
 
@@ -107,7 +107,7 @@ begin
 
     crdt_up_g : for j in 0 to 3-1 generate
         hcrdt_up_fsm_i: entity work.PCIE_CRDT_UP_FSM
-        port map(
+        port map (
             CLK                => CLK,
             RESET              => RESET,
             CRDT_UP_INIT       => PCIE_HCRDT_UP_INIT(j),
@@ -116,7 +116,7 @@ begin
         );
 
         dcrdt_up_fsm_i: entity work.PCIE_CRDT_UP_FSM
-        port map(
+        port map (
             CLK                => CLK,
             RESET              => RESET,
             CRDT_UP_INIT       => PCIE_DCRDT_UP_INIT(j),
@@ -128,15 +128,15 @@ begin
     process (CLK)
     begin
         if (rising_edge(CLK)) then
-            CRDT_UP_INIT_DONE <= (and hcrdt_up_init_done) and (and dcrdt_up_init_done);
+            CRDT_UP_INIT_DONE          <= (and hcrdt_up_init_done) and (and dcrdt_up_init_done);
             CRDT_UP_UPDATE(2 downto 0) <= PCIE_HCRDT_UP_UPDATE;
             CRDT_UP_UPDATE(5 downto 3) <= PCIE_DCRDT_UP_UPDATE;
-            CRDT_UP_CNT_PH   <= PCIE_HCRDT_UP_UPDATE_CNT(1 downto 0);
-            CRDT_UP_CNT_NPH  <= PCIE_HCRDT_UP_UPDATE_CNT(3 downto 2);
-            CRDT_UP_CNT_CPLH <= PCIE_HCRDT_UP_UPDATE_CNT(5 downto 4);
-            CRDT_UP_CNT_PD   <= PCIE_DCRDT_UP_UPDATE_CNT(3 downto 0);
-            CRDT_UP_CNT_NPD  <= PCIE_DCRDT_UP_UPDATE_CNT(7 downto 4);
-            CRDT_UP_CNT_CPLD <= PCIE_DCRDT_UP_UPDATE_CNT(11 downto 8);
+            CRDT_UP_CNT_PH             <= PCIE_HCRDT_UP_UPDATE_CNT(1 downto 0);
+            CRDT_UP_CNT_NPH            <= PCIE_HCRDT_UP_UPDATE_CNT(3 downto 2);
+            CRDT_UP_CNT_CPLH           <= PCIE_HCRDT_UP_UPDATE_CNT(5 downto 4);
+            CRDT_UP_CNT_PD             <= PCIE_DCRDT_UP_UPDATE_CNT(3 downto 0);
+            CRDT_UP_CNT_NPD            <= PCIE_DCRDT_UP_UPDATE_CNT(7 downto 4);
+            CRDT_UP_CNT_CPLD           <= PCIE_DCRDT_UP_UPDATE_CNT(11 downto 8);
         end if;
     end process;
 
@@ -146,7 +146,7 @@ begin
 
     crdt_dw_g : for i in 0 to 3-1 generate
         hcrdt_dw_fsm_i: entity work.PCIE_CRDT_DW_FSM
-        port map(
+        port map (
             CLK               => CLK,
             RESET             => RESET,
             CRDT_DW_INIT      => PCIE_HCRDT_DW_INIT(i),
@@ -158,10 +158,11 @@ begin
 
         hcrdt_dw_init_cnt_last(i) <= nor hcrdt_dw_init_cnt(i)(CRDT_XPH_CNT_W-1 downto 2);
         hcrdt_dw_init_cnt_dec(i)  <= (others => '0') when (hcrdt_dw_init_cnt_en(i) = '0') else
-            hcrdt_dw_init_cnt(i)(2-1 downto 0) when (hcrdt_dw_init_cnt_last(i) = '1') else (others => '1');
+            hcrdt_dw_init_cnt(i)(2-1 downto 0) when (hcrdt_dw_init_cnt_last(i) = '1') else
+ (others => '1');
 
         dcrdt_dw_fsm_i: entity work.PCIE_CRDT_DW_FSM
-        port map(
+        port map (
             CLK               => CLK,
             RESET             => RESET,
             CRDT_DW_INIT      => PCIE_DCRDT_DW_INIT(i),
@@ -173,7 +174,8 @@ begin
 
         dcrdt_dw_init_cnt_last(i) <= nor dcrdt_dw_init_cnt(i)(CRDT_XPD_CNT_W-1 downto 4);
         dcrdt_dw_init_cnt_dec(i)  <= (others => '0') when (dcrdt_dw_init_cnt_en(i) = '0') else
-            dcrdt_dw_init_cnt(i)(4-1 downto 0) when (dcrdt_dw_init_cnt_last(i) = '1') else (others => '1');
+            dcrdt_dw_init_cnt(i)(4-1 downto 0) when (dcrdt_dw_init_cnt_last(i) = '1') else
+ (others => '1');
     end generate;
 
     process (CLK)
@@ -197,8 +199,8 @@ begin
     process (CLK)
     begin
         if (rising_edge(CLK)) then
-            PCIE_HCRDT_DW_UPDATE <= CRDT_DOWN_UPDATE(2 downto 0);
-            PCIE_DCRDT_DW_UPDATE <= CRDT_DOWN_UPDATE(5 downto 3);
+            PCIE_HCRDT_DW_UPDATE                    <= CRDT_DOWN_UPDATE(2 downto 0);
+            PCIE_DCRDT_DW_UPDATE                    <= CRDT_DOWN_UPDATE(5 downto 3);
             PCIE_HCRDT_DW_UPDATE_CNT(2-1 downto 0)  <= CRDT_DOWN_CNT_PH;
             PCIE_HCRDT_DW_UPDATE_CNT(4-1 downto 2)  <= CRDT_DOWN_CNT_NPH;
             PCIE_HCRDT_DW_UPDATE_CNT(6-1 downto 4)  <= CRDT_DOWN_CNT_CPLH;
@@ -207,11 +209,11 @@ begin
             PCIE_DCRDT_DW_UPDATE_CNT(12-1 downto 8) <= CRDT_DOWN_CNT_CPLD;
             for i in 0 to 3-1 loop
                 if (hcrdt_dw_init_done(i) = '0') then
-                    PCIE_HCRDT_DW_UPDATE(i) <= hcrdt_dw_init_cnt_en(i);
+                    PCIE_HCRDT_DW_UPDATE(i)                        <= hcrdt_dw_init_cnt_en(i);
                     PCIE_HCRDT_DW_UPDATE_CNT((i+1)*2-1 downto i*2) <= std_logic_vector(hcrdt_dw_init_cnt_dec(i));
                 end if;
                 if (dcrdt_dw_init_done(i) = '0') then
-                    PCIE_DCRDT_DW_UPDATE(i) <= dcrdt_dw_init_cnt_en(i);
+                    PCIE_DCRDT_DW_UPDATE(i)                        <= dcrdt_dw_init_cnt_en(i);
                     PCIE_DCRDT_DW_UPDATE_CNT((i+1)*4-1 downto i*4) <= std_logic_vector(dcrdt_dw_init_cnt_dec(i));
                 end if;
             end loop;

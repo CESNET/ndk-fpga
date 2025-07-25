@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity CB_RTILE_CRDT_UP is
-    generic(
+    generic (
         REGIONS        : natural := 2;
         -- Maximum write request (payload) size (in DWORDs)
         PCIE_MPS_DW    : natural := 512/4;
@@ -27,7 +27,7 @@ entity CB_RTILE_CRDT_UP is
         CRDT_MAX_NPD   : natural := 4096;
         CRDT_MAX_CPLD  : natural := 4096
     );
-    port(
+    port (
         CLK            : in  std_logic;
         RESET          : in  std_logic;
 

@@ -37,7 +37,7 @@ entity RX_DMA_CALYPTE_HDR_MANAGER is
         -- - "AGILEX"
         -- - "ULTRASCALE"
         DEVICE        : string  := "ULTRASCALE"
-        );
+    );
     port (
         CLK   : in std_logic;
         RESET : in std_logic;
@@ -141,7 +141,7 @@ entity RX_DMA_CALYPTE_HDR_MANAGER is
         DMA_HDR_ADDR_REQ_CNTR_INC : out std_logic;
         DATA_ADDR_STALL_INC       : out std_logic;
         DMA_HDR_ADDR_STALL_INC    : out std_logic
-        );
+    );
 end entity;
 
 architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
@@ -149,7 +149,7 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     -- Byte length of a segment, e.g. the length of a PCIe transaction with data
     constant DATA_SEGMENT_SIZE : natural := 128;
     -- Subrange of packet length that determines how much segments a packet consists from
-    subtype BLK_CNT is natural range log2(PKT_MTU+1)-1 downto log2(DATA_SEGMENT_SIZE);
+    subtype  BLK_CNT is natural range log2(PKT_MTU+1)-1 downto log2(DATA_SEGMENT_SIZE);
 
     -- =============================================================================================
     -- Start/stop logic
@@ -158,7 +158,7 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     signal channel_status_reg : std_logic_vector(CHANNELS-1 downto 0);
     signal channel_status_new : std_logic_vector(CHANNELS-1 downto 0);
 
-    type chan_state_change_t is (S_IDLE, S_WAIT_FOR_PKT_END);
+    type   chan_state_change_t is (S_IDLE, S_WAIT_FOR_PKT_END);
     signal chan_state_change_pst : chan_state_change_t := S_IDLE;
     signal chan_state_change_nst : chan_state_change_t := S_IDLE;
 
@@ -246,26 +246,26 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     -- =============================================================================================
     -- FSM that tracks the current state of the packet reception
     -- =============================================================================================
-    type packet_process_fsm_t is (S_IDLE, S_PACKET_PROCESS, S_PACKET_DISCARD);
+    type   packet_process_fsm_t is (S_IDLE, S_PACKET_PROCESS, S_PACKET_DISCARD);
     signal pkt_process_pst : packet_process_fsm_t := S_IDLE;
     signal pkt_process_nst : packet_process_fsm_t := S_IDLE;
 
-    constant DATA_ADDR_NEXT_FIFO_W    : positive := 1 + log2(CHANNELS);
-    constant DATA_ADDR_NEXT_FIFO_SIZE : positive := 8;
+    constant DATA_ADDR_NEXT_FIFO_W      : positive := 1 + log2(CHANNELS);
+    constant DATA_ADDR_NEXT_FIFO_SIZE   : positive := 8;
     -- Asserts if the request of either a next address for a data transaction or a DMA header
     -- transaction is issued
-    signal data_addr_chan             : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    signal data_addr_next             : std_logic;
-    signal data_addr_next_n           : std_logic;
-    signal data_addr_next_wr          : std_logic;
-    signal data_addr_next_fifo_do     : std_logic_vector(DATA_ADDR_NEXT_FIFO_W -1 downto 0);
+    signal   data_addr_chan             : std_logic_vector(log2(CHANNELS) -1 downto 0);
+    signal   data_addr_next             : std_logic;
+    signal   data_addr_next_n           : std_logic;
+    signal   data_addr_next_wr          : std_logic;
+    signal   data_addr_next_fifo_do     : std_logic_vector(DATA_ADDR_NEXT_FIFO_W -1 downto 0);
 
-    constant DMA_HDR_ADDR_NEXT_FIFO_W    : positive := log2(CHANNELS);
-    constant DMA_HDR_ADDR_NEXT_FIFO_SIZE : positive := 8;
-    signal dma_hdr_addr_chan             : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    signal dma_hdr_addr_next             : std_logic;
-    signal dma_hdr_addr_next_n           : std_logic;
-    signal dma_hdr_addr_next_wr          : std_logic;
+    constant DMA_HDR_ADDR_NEXT_FIFO_W      : positive := log2(CHANNELS);
+    constant DMA_HDR_ADDR_NEXT_FIFO_SIZE   : positive := 8;
+    signal   dma_hdr_addr_chan             : std_logic_vector(log2(CHANNELS) -1 downto 0);
+    signal   dma_hdr_addr_next             : std_logic;
+    signal   dma_hdr_addr_next_n           : std_logic;
+    signal   dma_hdr_addr_next_wr          : std_logic;
 
     signal pkt_chan_reg : std_logic_vector(log2(CHANNELS) -1 downto 0);
     signal pkt_chan_new : std_logic_vector(log2(CHANNELS) -1 downto 0);
@@ -412,25 +412,27 @@ begin
     INF_DST_RDY   <= not input_fifo_full;
 
     input_mvb_fifo_i : entity work.FIFOX
-        generic map (
-            DATA_WIDTH          => INP_FIFO_W,
-            ITEMS               => INP_FIFO_SIZE,
-            RAM_TYPE            => "LUT",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            FAKE_FIFO           => FALSE)
-        port map(
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH          => INP_FIFO_W,
+        ITEMS               => INP_FIFO_SIZE,
+        RAM_TYPE            => "LUT",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        FAKE_FIFO           => FALSE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            DI   => input_fifo_in,
-            WR   => input_fifo_wr,
-            FULL => input_fifo_full,
+        DI   => input_fifo_in,
+        WR   => input_fifo_wr,
+        FULL => input_fifo_full,
 
-            DO    => input_fifo_do,
-            RD    => input_fifo_rd,
-            EMPTY => input_fifo_empty);
+        DO    => input_fifo_do,
+        RD    => input_fifo_rd,
+        EMPTY => input_fifo_empty
+    );
 
     (input_meta, input_channel) <= input_fifo_do;
 
@@ -682,54 +684,58 @@ begin
     end process;
 
     data_addr_next_fifo_i : entity work.FIFOX
-        generic map (
-            DATA_WIDTH          => DATA_ADDR_NEXT_FIFO_W,
-            ITEMS               => DATA_ADDR_NEXT_FIFO_SIZE,
-            RAM_TYPE            => "LUT",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            FAKE_FIFO           => FALSE)
-        port map(
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH          => DATA_ADDR_NEXT_FIFO_W,
+        ITEMS               => DATA_ADDR_NEXT_FIFO_SIZE,
+        RAM_TYPE            => "LUT",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        FAKE_FIFO           => FALSE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            DI     => store_data_ptr_wr & input_channel,
-            WR     => data_addr_next_wr,
-            FULL   => data_addr_next_fifo_full,
-            AFULL  => open,
-            STATUS => open,
+        DI     => store_data_ptr_wr & input_channel,
+        WR     => data_addr_next_wr,
+        FULL   => data_addr_next_fifo_full,
+        AFULL  => open,
+        STATUS => open,
 
-            DO     => data_addr_next_fifo_do,
-            RD     => data_pcie_addr_vld,
-            EMPTY  => data_addr_next_n,
-            AEMPTY => open);
+        DO     => data_addr_next_fifo_do,
+        RD     => data_pcie_addr_vld,
+        EMPTY  => data_addr_next_n,
+        AEMPTY => open
+    );
 
     (store_data_ptr, data_addr_chan) <= data_addr_next_fifo_do;
 
     dma_hdr_addr_next_fifo_i : entity work.FIFOX
-        generic map (
-            DATA_WIDTH          => DMA_HDR_ADDR_NEXT_FIFO_W,
-            ITEMS               => DMA_HDR_ADDR_NEXT_FIFO_SIZE,
-            RAM_TYPE            => "LUT",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            FAKE_FIFO           => FALSE)
-        port map(
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH          => DMA_HDR_ADDR_NEXT_FIFO_W,
+        ITEMS               => DMA_HDR_ADDR_NEXT_FIFO_SIZE,
+        RAM_TYPE            => "LUT",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        FAKE_FIFO           => FALSE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            DI     => input_channel,
-            WR     => dma_hdr_addr_next_wr,
-            FULL   => dma_hdr_addr_next_fifo_full,
-            AFULL  => open,
-            STATUS => open,
+        DI     => input_channel,
+        WR     => dma_hdr_addr_next_wr,
+        FULL   => dma_hdr_addr_next_fifo_full,
+        AFULL  => open,
+        STATUS => open,
 
-            DO     => dma_hdr_addr_chan,
-            RD     => dma_hdr_pcie_addr_vld,
-            EMPTY  => dma_hdr_addr_next_n,
-            AEMPTY => open);
+        DO     => dma_hdr_addr_chan,
+        RD     => dma_hdr_pcie_addr_vld,
+        EMPTY  => dma_hdr_addr_next_n,
+        AEMPTY => open
+    );
 
     data_addr_next    <= (not data_addr_next_n) and (not data_pcie_addr_vld);
     dma_hdr_addr_next <= (not dma_hdr_addr_next_n) and (not dma_hdr_pcie_addr_vld);
@@ -738,100 +744,108 @@ begin
     -- PCIe header generation
     -- =============================================================================================
     data_pcie_addr_mgr_i : entity work.RX_DMA_CALYPTE_ADDR_MANAGER
-        generic map (
-            CHANNELS      => CHANNELS,
-            BLOCK_SIZE    => DATA_SEGMENT_SIZE,
-            ADDR_WIDTH    => ADDR_WIDTH,
-            POINTER_WIDTH => POINTER_WIDTH,
-            PTR_OUT_REG   => True,
-            --RSP_OUT_REG   => True,
-            DEVICE        => DEVICE)
-        port map (
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        CHANNELS      => CHANNELS,
+        BLOCK_SIZE    => DATA_SEGMENT_SIZE,
+        ADDR_WIDTH    => ADDR_WIDTH,
+        POINTER_WIDTH => POINTER_WIDTH,
+        PTR_OUT_REG   => True,
+        -- RSP_OUT_REG   => True,
+        DEVICE        => DEVICE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            ADDR_CHANNEL    => ADDR_DATA_CHANNEL,
-            ADDR_BASE       => ADDR_DATA_BASE,
-            ADDR_MASK       => ADDR_DATA_MASK,
-            ADDR_SW_POINTER => ADDR_DATA_SW_POINTER,
+        ADDR_CHANNEL    => ADDR_DATA_CHANNEL,
+        ADDR_BASE       => ADDR_DATA_BASE,
+        ADDR_MASK       => ADDR_DATA_MASK,
+        ADDR_SW_POINTER => ADDR_DATA_SW_POINTER,
 
-            POINTER_UPDATE_CHAN => HDP_UPDATE_CHAN,
-            POINTER_UPDATE_DATA => HDP_UPDATE_DATA,
-            POINTER_UPDATE_EN   => HDP_UPDATE_EN,
+        POINTER_UPDATE_CHAN => HDP_UPDATE_CHAN,
+        POINTER_UPDATE_DATA => HDP_UPDATE_DATA,
+        POINTER_UPDATE_EN   => HDP_UPDATE_EN,
 
-            CHANNEL     => data_addr_chan,
-            CHANNEL_VLD => data_addr_next,
+        CHANNEL     => data_addr_chan,
+        CHANNEL_VLD => data_addr_next,
 
-            START_REQ_VLD     => START_REQ_VLD,
-            START_REQ_CHANNEL => START_REQ_CHANNEL,
+        START_REQ_VLD     => START_REQ_VLD,
+        START_REQ_CHANNEL => START_REQ_CHANNEL,
 
-            ADDR     => data_pcie_addr,
-            OFFSET   => data_ptr,
-            ADDR_VLD => data_pcie_addr_vld);
+        ADDR     => data_pcie_addr,
+        OFFSET   => data_ptr,
+        ADDR_VLD => data_pcie_addr_vld
+    );
 
     pcie_hdr_gen_data_i : entity work.PCIE_RQ_HDR_GEN
-        generic map (
-            DEVICE => DEVICE)
-        port map (
-            IN_ADDRESS    => data_pcie_addr_reg(63 downto 2),
-            IN_VFID       => (others => '0'),
-            IN_TAG        => (others => '0'),
-            IN_DW_CNT     => std_logic_vector(to_unsigned(DATA_SEGMENT_SIZE/4, 11)),
-            IN_ATTRIBUTES => "000",     -- NOTE: Do not activate Relaxed ordering (bit 1) ever again
-            IN_FBE        => "1111",
-            IN_LBE        => "1111",
-            IN_ADDR_LEN   => pcie_addr_len_data_tran,
-            IN_REQ_TYPE   => '1',       -- only memory writes
+    generic map (
+        DEVICE => DEVICE
+    )
+    port map (
+        IN_ADDRESS    => data_pcie_addr_reg(63 downto 2),
+        IN_VFID       => (others => '0'),
+        IN_TAG        => (others => '0'),
+        IN_DW_CNT     => std_logic_vector(to_unsigned(DATA_SEGMENT_SIZE/4, 11)),
+        IN_ATTRIBUTES => "000",     -- NOTE: Do not activate Relaxed ordering (bit 1) ever again
+        IN_FBE        => "1111",
+        IN_LBE        => "1111",
+        IN_ADDR_LEN   => pcie_addr_len_data_tran,
+        IN_REQ_TYPE   => '1',       -- only memory writes
 
-            OUT_HEADER => pcie_hdr_data_tran);
+        OUT_HEADER => pcie_hdr_data_tran
+    );
 
     dma_hdr_pcie_addr_mgr_i : entity work.RX_DMA_CALYPTE_ADDR_MANAGER
-        generic map (
-            CHANNELS      => CHANNELS,
-            BLOCK_SIZE    => 8,
-            ADDR_WIDTH    => ADDR_WIDTH,
-            POINTER_WIDTH => POINTER_WIDTH,
-            PTR_OUT_REG   => True,
-            --RSP_OUT_REG   => True,
-            DEVICE        => DEVICE)
-        port map (
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        CHANNELS      => CHANNELS,
+        BLOCK_SIZE    => 8,
+        ADDR_WIDTH    => ADDR_WIDTH,
+        POINTER_WIDTH => POINTER_WIDTH,
+        PTR_OUT_REG   => True,
+        -- RSP_OUT_REG   => True,
+        DEVICE        => DEVICE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            ADDR_CHANNEL    => ADDR_HEADER_CHANNEL,
-            ADDR_BASE       => ADDR_HEADER_BASE,
-            ADDR_MASK       => ADDR_HEADER_MASK,
-            ADDR_SW_POINTER => ADDR_HEADER_SW_POINTER,
+        ADDR_CHANNEL    => ADDR_HEADER_CHANNEL,
+        ADDR_BASE       => ADDR_HEADER_BASE,
+        ADDR_MASK       => ADDR_HEADER_MASK,
+        ADDR_SW_POINTER => ADDR_HEADER_SW_POINTER,
 
-            POINTER_UPDATE_CHAN => HHP_UPDATE_CHAN,
-            POINTER_UPDATE_DATA => HHP_UPDATE_DATA,
-            POINTER_UPDATE_EN   => HHP_UPDATE_EN,
+        POINTER_UPDATE_CHAN => HHP_UPDATE_CHAN,
+        POINTER_UPDATE_DATA => HHP_UPDATE_DATA,
+        POINTER_UPDATE_EN   => HHP_UPDATE_EN,
 
-            CHANNEL     => dma_hdr_addr_chan,
-            CHANNEL_VLD => dma_hdr_addr_next,
+        CHANNEL     => dma_hdr_addr_chan,
+        CHANNEL_VLD => dma_hdr_addr_next,
 
-            START_REQ_VLD     => START_REQ_VLD,
-            START_REQ_CHANNEL => START_REQ_CHANNEL,
+        START_REQ_VLD     => START_REQ_VLD,
+        START_REQ_CHANNEL => START_REQ_CHANNEL,
 
-            ADDR     => dma_hdr_pcie_addr,
-            OFFSET   => open,
-            ADDR_VLD => dma_hdr_pcie_addr_vld);
+        ADDR     => dma_hdr_pcie_addr,
+        OFFSET   => open,
+        ADDR_VLD => dma_hdr_pcie_addr_vld
+    );
 
     pcie_hdr_gen_dma_i : entity work.PCIE_RQ_HDR_GEN
-        generic map (
-            DEVICE => DEVICE)
-        port map (
-            IN_ADDRESS    => dma_hdr_pcie_addr_reg(63 downto 2),
-            IN_VFID       => (others => '0'),
-            IN_TAG        => (others => '0'),
-            IN_DW_CNT     => std_logic_vector(to_unsigned(8/4, 11)),
-            IN_ATTRIBUTES => "000",     -- NOTE: Do not activate Relaxed ordering (bit 1) ever again
-            IN_FBE        => "1111",
-            IN_LBE        => "1111",
-            IN_ADDR_LEN   => pcie_addr_len_dma_hdr_tran,
-            IN_REQ_TYPE   => '1',       -- only memory writes
+    generic map (
+        DEVICE => DEVICE
+    )
+    port map (
+        IN_ADDRESS    => dma_hdr_pcie_addr_reg(63 downto 2),
+        IN_VFID       => (others => '0'),
+        IN_TAG        => (others => '0'),
+        IN_DW_CNT     => std_logic_vector(to_unsigned(8/4, 11)),
+        IN_ATTRIBUTES => "000",     -- NOTE: Do not activate Relaxed ordering (bit 1) ever again
+        IN_FBE        => "1111",
+        IN_LBE        => "1111",
+        IN_ADDR_LEN   => pcie_addr_len_dma_hdr_tran,
+        IN_REQ_TYPE   => '1',       -- only memory writes
 
-            OUT_HEADER => pcie_hdr_dma_hdr_tran);
+        OUT_HEADER => pcie_hdr_dma_hdr_tran
+    );
 
     -- =============================================================================================
     -- FIFOs for PCIe headers of the data and the DMA header
@@ -848,28 +862,30 @@ begin
     pcie_hdr_dma_hdr_tran_fifo_in <= pcie_hdr_dma_hdr_tran;
 
     pcie_hdr_dma_hdr_tran_fifo_i : entity work.FIFOX
-        generic map (
-            DATA_WIDTH          => PCIE_HDR_DMA_TRAN_FIFO_W,
-            ITEMS               => PCIE_HDR_DMA_TRAN_FIFO_SIZE,
-            RAM_TYPE            => "LUT",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            FAKE_FIFO           => FALSE)
-        port map(
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH          => PCIE_HDR_DMA_TRAN_FIFO_W,
+        ITEMS               => PCIE_HDR_DMA_TRAN_FIFO_SIZE,
+        RAM_TYPE            => "LUT",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        FAKE_FIFO           => FALSE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            DI     => pcie_hdr_dma_hdr_tran_fifo_in,
-            WR     => pcie_hdr_dma_hdr_tran_fifo_wr,
-            FULL   => pcie_hdr_dma_hdr_tran_fifo_full,
-            AFULL  => open,
-            STATUS => open,
+        DI     => pcie_hdr_dma_hdr_tran_fifo_in,
+        WR     => pcie_hdr_dma_hdr_tran_fifo_wr,
+        FULL   => pcie_hdr_dma_hdr_tran_fifo_full,
+        AFULL  => open,
+        STATUS => open,
 
-            DO     => pcie_hdr_dma_hdr_tran_fifo_do,
-            RD     => pcie_hdr_dma_hdr_tran_fifo_rd,
-            EMPTY  => pcie_hdr_dma_hdr_tran_fifo_empty,
-            AEMPTY => open);
+        DO     => pcie_hdr_dma_hdr_tran_fifo_do,
+        RD     => pcie_hdr_dma_hdr_tran_fifo_rd,
+        EMPTY  => pcie_hdr_dma_hdr_tran_fifo_empty,
+        AEMPTY => open
+    );
 
     DMA_PCIE_HDR                  <= pcie_hdr_dma_hdr_tran_fifo_do;
     DMA_PCIE_HDR_SRC_RDY          <= not pcie_hdr_dma_hdr_tran_fifo_empty;
@@ -878,37 +894,39 @@ begin
     pcie_hdr_data_tran_reg_p : process (CLK) is
     begin
         if (rising_edge(CLK)) then
-            data_pcie_addr_reg <= data_pcie_addr;
+            data_pcie_addr_reg         <= data_pcie_addr;
             pcie_hdr_data_tran_fifo_wr <= data_pcie_addr_vld;
-            pcie_addr_len_data_tran <= '1' when (DEVICE = "ULTRASCALE" or data_pcie_addr(64-1 downto 32) /= (32-1 downto 0 => '0')) else '0';
+            pcie_addr_len_data_tran    <= '1' when (DEVICE = "ULTRASCALE" or data_pcie_addr(64-1 downto 32) /= (32-1 downto 0 => '0')) else '0';
         end if;
     end process;
 
     pcie_hdr_data_tran_fifo_in <= pcie_hdr_data_tran;
 
     pcie_hdr_data_tran_fifo_i : entity work.FIFOX
-        generic map (
-            DATA_WIDTH          => PCIE_HDR_DATA_TRAN_FIFO_W,
-            ITEMS               => PCIE_HDR_DATA_TRAN_FIFO_SIZE,
-            RAM_TYPE            => "LUT",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            FAKE_FIFO           => FALSE)
-        port map(
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH          => PCIE_HDR_DATA_TRAN_FIFO_W,
+        ITEMS               => PCIE_HDR_DATA_TRAN_FIFO_SIZE,
+        RAM_TYPE            => "LUT",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        FAKE_FIFO           => FALSE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            DI     => pcie_hdr_data_tran_fifo_in,
-            WR     => pcie_hdr_data_tran_fifo_wr,
-            FULL   => pcie_hdr_data_tran_fifo_full,
-            AFULL  => open,
-            STATUS => open,
+        DI     => pcie_hdr_data_tran_fifo_in,
+        WR     => pcie_hdr_data_tran_fifo_wr,
+        FULL   => pcie_hdr_data_tran_fifo_full,
+        AFULL  => open,
+        STATUS => open,
 
-            DO     => pcie_hdr_data_tran_fifo_do,
-            RD     => pcie_hdr_data_tran_fifo_rd,
-            EMPTY  => pcie_hdr_data_tran_fifo_empty,
-            AEMPTY => open);
+        DO     => pcie_hdr_data_tran_fifo_do,
+        RD     => pcie_hdr_data_tran_fifo_rd,
+        EMPTY  => pcie_hdr_data_tran_fifo_empty,
+        AEMPTY => open
+    );
 
     DATA_PCIE_HDR              <= pcie_hdr_data_tran_fifo_do;
     DATA_PCIE_HDR_SRC_RDY      <= not pcie_hdr_data_tran_fifo_empty;
@@ -918,28 +936,30 @@ begin
     -- FIFOs for DMA header parts
     -- =============================================================================================
     dma_discard_fifo_i : entity work.FIFOX
-        generic map (
-            DATA_WIDTH          => 1,
-            ITEMS               => DMA_HDR_FIFO_SIZE,
-            RAM_TYPE            => "LUT",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            FAKE_FIFO           => FALSE)
-        port map(
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH          => 1,
+        ITEMS               => DMA_HDR_FIFO_SIZE,
+        RAM_TYPE            => "LUT",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        FAKE_FIFO           => FALSE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            DI     => (others => pkt_discard_vld),
-            WR     => discard_fifo_wr,
-            FULL   => discard_fifo_full,
-            AFULL  => open,
-            STATUS => open,
+        DI     => (others => pkt_discard_vld),
+        WR     => discard_fifo_wr,
+        FULL   => discard_fifo_full,
+        AFULL  => open,
+        STATUS => open,
 
-            DO     => discard_fifo_do,
-            RD     => discard_fifo_rd,
-            EMPTY  => discard_fifo_empty,
-            AEMPTY => open);
+        DO     => discard_fifo_do,
+        RD     => discard_fifo_rd,
+        EMPTY  => discard_fifo_empty,
+        AEMPTY => open
+    );
 
     -- The discard signal is simply read to the output since it is always with generated with every
     -- packet. (The metadata like packet size, DMA metadata and packet pointer are read only if the
@@ -947,82 +967,88 @@ begin
     discard_fifo_rd <= DMA_HDR_DST_RDY;
 
     pkt_size_fifo_i : entity work.FIFOX
-        generic map (
-            DATA_WIDTH          => log2(PKT_MTU+1),
-            ITEMS               => DMA_HDR_FIFO_SIZE,
-            RAM_TYPE            => "LUT",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            FAKE_FIFO           => FALSE)
-        port map(
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH          => log2(PKT_MTU+1),
+        ITEMS               => DMA_HDR_FIFO_SIZE,
+        RAM_TYPE            => "LUT",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        FAKE_FIFO           => FALSE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            DI     => STAT_PKT_LNG,
-            WR     => pkt_size_fifo_wr,
-            FULL   => pkt_size_fifo_full,
-            AFULL  => open,
-            STATUS => open,
+        DI     => STAT_PKT_LNG,
+        WR     => pkt_size_fifo_wr,
+        FULL   => pkt_size_fifo_full,
+        AFULL  => open,
+        STATUS => open,
 
-            DO     => pkt_size_fifo_do,
-            RD     => pkt_size_fifo_rd,
-            EMPTY  => pkt_size_fifo_empty,
-            AEMPTY => open);
+        DO     => pkt_size_fifo_do,
+        RD     => pkt_size_fifo_rd,
+        EMPTY  => pkt_size_fifo_empty,
+        AEMPTY => open
+    );
 
     -- Read from the FIFO only if the discard signal is 0 and all other metadata are valid
     pkt_size_fifo_rd <= DMA_HDR_DST_RDY and (not hdr_meta_fifo_empty) and (not ptr_fifo_empty) and (not discard_fifo_empty) and (not discard_fifo_do(0));
 
     hdr_meta_fifo_i : entity work.FIFOX
-        generic map (
-            DATA_WIDTH          => METADATA_SIZE,
-            ITEMS               => DMA_HDR_FIFO_SIZE,
-            RAM_TYPE            => "LUT",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            FAKE_FIFO           => FALSE)
-        port map(
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH          => METADATA_SIZE,
+        ITEMS               => DMA_HDR_FIFO_SIZE,
+        RAM_TYPE            => "LUT",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        FAKE_FIFO           => FALSE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            DI     => input_meta,
-            WR     => hdr_meta_fifo_wr,
-            FULL   => hdr_meta_fifo_full,
-            AFULL  => open,
-            STATUS => open,
+        DI     => input_meta,
+        WR     => hdr_meta_fifo_wr,
+        FULL   => hdr_meta_fifo_full,
+        AFULL  => open,
+        STATUS => open,
 
-            DO     => hdr_meta_fifo_do,
-            RD     => hdr_meta_fifo_rd,
-            EMPTY  => hdr_meta_fifo_empty,
-            AEMPTY => open);
+        DO     => hdr_meta_fifo_do,
+        RD     => hdr_meta_fifo_rd,
+        EMPTY  => hdr_meta_fifo_empty,
+        AEMPTY => open
+    );
 
     -- Read from the FIFO only if the discard signal is 0 and all other metadata are valid
     hdr_meta_fifo_rd <= DMA_HDR_DST_RDY and (not pkt_size_fifo_empty) and (not ptr_fifo_empty) and (not discard_fifo_empty) and (not discard_fifo_do(0));
 
     ptr_fifo_i : entity work.FIFOX
-        generic map (
-            DATA_WIDTH          => POINTER_WIDTH,
-            ITEMS               => DMA_HDR_FIFO_SIZE,
-            RAM_TYPE            => "LUT",
-            DEVICE              => DEVICE,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            FAKE_FIFO           => FALSE)
-        port map(
-            CLK   => CLK,
-            RESET => RESET,
+    generic map (
+        DATA_WIDTH          => POINTER_WIDTH,
+        ITEMS               => DMA_HDR_FIFO_SIZE,
+        RAM_TYPE            => "LUT",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        FAKE_FIFO           => FALSE
+    )
+    port map (
+        CLK   => CLK,
+        RESET => RESET,
 
-            DI     => data_ptr,
-            WR     => store_data_ptr and data_pcie_addr_vld,
-            FULL   => ptr_fifo_full,
-            AFULL  => open,
-            STATUS => open,
+        DI     => data_ptr,
+        WR     => store_data_ptr and data_pcie_addr_vld,
+        FULL   => ptr_fifo_full,
+        AFULL  => open,
+        STATUS => open,
 
-            DO     => ptr_fifo_do,
-            RD     => ptr_fifo_rd,
-            EMPTY  => ptr_fifo_empty,
-            AEMPTY => open);
+        DO     => ptr_fifo_do,
+        RD     => ptr_fifo_rd,
+        EMPTY  => ptr_fifo_empty,
+        AEMPTY => open
+    );
 
     -- Read from the FIFO only if the discard signal is 0 and all other metadata are valid
     ptr_fifo_rd <= DMA_HDR_DST_RDY and (not pkt_size_fifo_empty) and (not hdr_meta_fifo_empty) and (not discard_fifo_empty) and (not discard_fifo_do(0));
@@ -1047,7 +1073,7 @@ begin
     -- =============================================================================================
     -- Performance counter logic
     -- =============================================================================================
-    addr_next_reg_p: process (CLK) is
+    addr_next_reg_p : process (CLK) is
     begin
         if (rising_edge(CLK)) then
             data_addr_next_reg    <= data_addr_next;
@@ -1056,7 +1082,7 @@ begin
     end process;
 
     -- debug registers for better timing only
-    dbg_regs_p: process (CLK) is
+    dbg_regs_p : process (CLK) is
     begin
         if (rising_edge(CLK)) then
             dbg_data_addr_next_reg    <= data_addr_next_reg;

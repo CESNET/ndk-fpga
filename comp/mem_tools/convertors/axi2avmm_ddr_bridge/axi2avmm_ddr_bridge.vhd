@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity AXI2AVMM_BRIDGE is
-    generic(
+    generic (
         AMM_BURST_COUNT_WIDTH : natural := 8;
         AMM_ADDR_WIDTH        : natural := 26;
         AMM_DATA_WIDTH        : natural := 512;
@@ -24,7 +24,7 @@ entity AXI2AVMM_BRIDGE is
         AXI_RESP_WIDTH        : natural := 2;
         AXI_LEN_WIDTH         : natural := 8
     );
-    port(
+    port (
         MEM_CLK                 : in std_logic;
         MEM_RST                 : in std_logic;
 
@@ -40,7 +40,7 @@ entity AXI2AVMM_BRIDGE is
         AMM_READ_DATA_VALID     : out std_logic;
 
         ----Xilinx interface----
-        --Address Write Channel
+        -- Address Write Channel
         DDR_S_AXI_AWID          : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
         DDR_S_AXI_AWADDR        : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0) := (others => '0');
         DDR_S_AXI_AWLEN         : out std_logic_vector(AXI_LEN_WIDTH-1 downto 0);
@@ -59,7 +59,7 @@ entity AXI2AVMM_BRIDGE is
         DDR_S_AXI_BID           : in  std_logic_vector(AXI_ID_WIDTH-1 downto 0);
         DDR_S_AXI_BRESP         : in  std_logic_vector(AXI_RESP_WIDTH-1 downto 0);
         DDR_S_AXI_BVALID        : in  std_logic;
-        --Address Read Channel
+        -- Address Read Channel
         DDR_S_AXI_ARID          : out std_logic_vector(AXI_ID_WIDTH-1 downto 0);
         DDR_S_AXI_ARADDR        : out std_logic_vector(AXI_ADDR_WIDTH-1 downto 0) := (others => '0');
         DDR_S_AXI_ARLEN         : out std_logic_vector(AXI_LEN_WIDTH-1 downto 0);
@@ -79,17 +79,18 @@ end entity;
 
 architecture FULL of AXI2AVMM_BRIDGE is
 
-    --FSM declaration
+    -- FSM declaration
     type t_fsm_ddr is (
-        st_idle,
-        st_write_single_word,
-        st_waddr,
-        st_write,
-        st_read
+        ST_IDLE,
+        ST_WRITE_SINGLE_WORD,
+        ST_WADDR,
+        ST_WRITE,
+        ST_READ
     );
 
     -- Control logic (FSM)
-    signal state, next_state: t_fsm_ddr := st_idle;
+    signal state      : t_fsm_ddr := ST_IDLE;
+    signal next_state : t_fsm_ddr := ST_IDLE;
 
     -- Transactions in burst
     signal word_cnt_d : unsigned(AMM_BURST_COUNT_WIDTH -1 downto 0);
@@ -114,19 +115,19 @@ begin
     DDR_S_AXI_AWID      <= (others => '0');
     DDR_S_AXI_ARID      <= (others => '0');
 
-    --TODO:
-    --Transactions from the same master, but with different ID values, have no ordering restrictions. They can complete in any order.
-    --This can improve system performance, because it enables parallel processing of transactions.
+    -- TODO:
+    -- Transactions from the same master, but with different ID values, have no ordering restrictions. They can complete in any order.
+    -- This can improve system performance, because it enables parallel processing of transactions.
 
     -- Burst type: INCR (Incrementing base address with each transaction)
     DDR_S_AXI_AWBURST   <= "01";
     DDR_S_AXI_ARBURST   <= "01";
 
-    mem_p: process (all)
+    mem_p : process (all)
     begin
         if rising_edge(MEM_CLK) then
-            if MEM_RST = '1' then
-                state           <= st_idle;
+            if (MEM_RST = '1') then
+                state           <= ST_IDLE;
                 word_cnt_q      <= (others => '0');
             else
                 state           <= next_state;
@@ -135,7 +136,7 @@ begin
         end if;
     end process;
 
-    fsm_p: process(all)
+    fsm_p : process (all)
     begin
         next_state          <= state;
         word_cnt_d          <= word_cnt_q;
@@ -146,110 +147,110 @@ begin
         DDR_S_AXI_AWVALID   <= '0';
         DDR_S_AXI_WLAST     <= '0';
 
-        case(state) is
-            when st_idle        =>
+        case (state) is
+            when ST_IDLE        =>
                 word_cnt_d          <= (others => '0');
 
-                if AMM_WRITE = '1' then
+                if (AMM_WRITE = '1') then
                     AMM_READY   <= '0';
-                    next_state  <= st_waddr;
+                    next_state  <= ST_WADDR;
                     -- One transaction in burst:
-                    if unsigned(AMM_BURST_COUNT) = 1 then
-                        next_state  <= st_write_single_word;
+                    if (unsigned(AMM_BURST_COUNT) = 1) then
+                        next_state  <= ST_WRITE_SINGLE_WORD;
                     end if;
                 end if;
 
-                if AMM_READ = '1' then
+                if (AMM_READ = '1') then
                     DDR_S_AXI_ARVALID   <= '1';
-                    if DDR_S_AXI_ARREADY = '1' then
-                        next_state          <= st_read;
+                    if (DDR_S_AXI_ARREADY = '1') then
+                        next_state          <= ST_READ;
                     end if;
                 end if;
 
-            when st_write_single_word =>
-                if (AMM_WRITE = '1') and (unsigned(AMM_BURST_COUNT) = 1) then
+            when ST_WRITE_SINGLE_WORD =>
+                if ((AMM_WRITE = '1') and (unsigned(AMM_BURST_COUNT) = 1)) then
                     AMM_READY           <= '0';
                     DDR_S_AXI_AWVALID   <= '1';
                     DDR_S_AXI_WVALID    <= '1';
-                    if DDR_S_AXI_WREADY = '1' then
+                    if (DDR_S_AXI_WREADY = '1') then
                         AMM_READY   <= '1';
-                        next_state  <= st_write_single_word;
+                        next_state  <= ST_WRITE_SINGLE_WORD;
                     end if;
                 else
                     AMM_READY           <= '0';
-                    next_state          <= st_idle;
+                    next_state          <= ST_IDLE;
                 end if;
 
 
-            when st_waddr       =>
-                if AMM_WRITE = '1' then
+            when ST_WADDR       =>
+                if (AMM_WRITE = '1') then
                     -- This state is sending first transaction in burst
                     AMM_READY           <= '0';
                     DDR_S_AXI_AWVALID   <= '1';
                     -- A deadlock condition can occur if the slave is waiting for WVALID before asserting AWREADY.
                     DDR_S_AXI_WVALID    <= '1';
-                    if DDR_S_AXI_AWREADY = '1' then
+                    if (DDR_S_AXI_AWREADY = '1') then
                         AMM_READY           <= '1';
                         word_cnt_d          <= word_cnt_q + 1;
-                        next_state          <= st_write;
+                        next_state          <= ST_WRITE;
                     end if;
                 else
                     AMM_READY           <= '0';
-                    next_state          <= st_idle;
+                    next_state          <= ST_IDLE;
                 end if;
 
-            when st_write       =>
+            when ST_WRITE       =>
                 DDR_S_AXI_WVALID    <= '1';
                 word_cnt_d          <= word_cnt_q + 1;
 
-                if word_cnt_q = unsigned(AMM_BURST_COUNT) - 1  then
+                if (word_cnt_q = unsigned(AMM_BURST_COUNT) - 1) then
                     DDR_S_AXI_WLAST     <= '1';
                     word_cnt_d          <= (others => '0');
-                    next_state          <= st_waddr;
+                    next_state          <= ST_WADDR;
                 end if;
 
-                if DDR_S_AXI_WREADY = '0' then
+                if (DDR_S_AXI_WREADY = '0') then
                     AMM_READY           <= '0';
                     DDR_S_AXI_WLAST     <= '0';
                     word_cnt_d          <= word_cnt_q;
-                    next_state          <= st_write;
+                    next_state          <= ST_WRITE;
                 end if;
 
-            when st_read        =>
+            when ST_READ        =>
                 AMM_READY           <= '0';
                 DDR_S_AXI_RREADY    <= '1';
                 word_cnt_d          <= word_cnt_q + 1;
 
                 -- Reading last transaction in burst
-                if word_cnt_q = unsigned(AMM_BURST_COUNT) - 1  then
-                    next_state          <= st_idle;
+                if (word_cnt_q = unsigned(AMM_BURST_COUNT) - 1) then
+                    next_state          <= ST_IDLE;
                 end if;
 
-                if DDR_S_AXI_RVALID = '0' then
+                if (DDR_S_AXI_RVALID = '0') then
                     word_cnt_d          <= word_cnt_q;
-                    next_state          <= st_read;
+                    next_state          <= ST_READ;
                 end if;
 
             when others         =>
                 AMM_READY   <= '0';
-                next_state  <= st_idle;
+                next_state  <= ST_IDLE;
 
         end case;
     end process;
 
-    --Write address
+    -- Write address
     DDR_S_AXI_AWADDR((AMM_ADDR_WIDTH+log2(AMM_DATA_WIDTH/8))-1 downto log2(AMM_DATA_WIDTH/8)) <= AMM_ADDRESS;
 
-    --Write data
+    -- Write data
     DDR_S_AXI_WDATA                 <= AMM_WRITE_DATA;
 
-    --Response
+    -- Response
     DDR_S_AXI_BREADY                <= '1';
 
-    --Read address
+    -- Read address
     DDR_S_AXI_ARADDR((AMM_ADDR_WIDTH+log2(AMM_DATA_WIDTH/8))-1 downto log2(AMM_DATA_WIDTH/8)) <= AMM_ADDRESS;
 
-    --Read data
+    -- Read data
     AMM_READ_DATA_VALID             <= DDR_S_AXI_RVALID;
     AMM_READ_DATA                   <= DDR_S_AXI_RDATA;
 

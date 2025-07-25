@@ -14,7 +14,7 @@ use work.dma_bus_pack.all;
 use work.pcie_meta_pack.all;
 
 entity PCIE is
-    generic(
+    generic (
         -- =====================================================================
         -- BAR base address configuration
         -- =====================================================================
@@ -50,38 +50,38 @@ entity PCIE is
         -- Other configuration
         -- =====================================================================
         -- Total number of DMA_EP, DMA_EP=PCIE_EP or 2*DMA_EP=PCIE_EP
-        DMA_PORTS          : natural := 2;
+        DMA_PORTS           : natural := 2;
         -- Connected PCIe endpoint type
-        PCIE_ENDPOINT_TYPE : string  := "P_TILE";
+        PCIE_ENDPOINT_TYPE  : string  := "P_TILE";
         -- Connected PCIe endpoint mode: 0=x16, 1=x8x8, 2=x8
-        PCIE_ENDPOINT_MODE : natural := 0;
+        PCIE_ENDPOINT_MODE  : natural := 0;
         -- Number of PCIe endpoints
-        PCIE_ENDPOINTS     : natural := 1;
+        PCIE_ENDPOINTS      : natural := 1;
         -- Number of PCIe clocks per PCIe connector
-        PCIE_CLKS          : natural := 2;
+        PCIE_CLKS           : natural := 2;
         -- Number of PCIe connectors
-        PCIE_CONS          : natural := 1;
+        PCIE_CONS           : natural := 1;
         -- Number of PCIe lanes in each PCIe connector
-        PCIE_LANES         : natural := 16;
+        PCIE_LANES          : natural := 16;
         -- PCIe generation number
-        PCIE_GEN           : natural := 4;
+        PCIE_GEN            : natural := 4;
         -- Width of CARD/FPGA ID number
-        CARD_ID_WIDTH      : natural := 0;
+        CARD_ID_WIDTH       : natural := 0;
         -- Disable PTC module and allows direct connection of the DMA module to
         -- the PCIe IP RQ and RC interfaces.
-        PTC_DISABLE        : boolean := false;
+        PTC_DISABLE         : boolean := false;
         -- Enable CQ/CC interface for DMA-BAR, condition DMA_PORTS=PCIE_ENDPOINTS
-        DMA_BAR_ENABLE     : boolean := false;
+        DMA_BAR_ENABLE      : boolean := false;
         -- Enable of XCV IP, for Xilinx only
-        XVC_ENABLE         : boolean := false;
+        XVC_ENABLE          : boolean := false;
         -- Width of MISC signal between Top-Level FPGA design and PCIE core logic
         MISC_TOP2PCIE_WIDTH : natural := 1;
         -- Width of MISC signal between PCIE core logic and Top-Level FPGA design
         MISC_PCIE2TOP_WIDTH : natural := 1;
         -- FPGA device
-        DEVICE             : string  := "STRATIX10"
+        DEVICE              : string  := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCKS AND RESETS
         -- =====================================================================
@@ -253,18 +253,18 @@ architecture FULL of PCIE is
 
     function mi_addr_base_f return slv_array_t;
 
-    function core_regions_f(MFB_REGIONS : natural) return natural is
+    function core_regions_f (MFB_REGIONS : natural) return natural is
         variable pcie_mfb_regions : natural;
     begin
         pcie_mfb_regions := MFB_REGIONS;
 
         -- PTC conversion
         if ((not PTC_DISABLE)) then
-            if (PCIE_ENDPOINT_TYPE="P_TILE" and PCIE_ENDPOINT_MODE = 1) then
+            if (PCIE_ENDPOINT_TYPE = "P_TILE" and PCIE_ENDPOINT_MODE = 1) then
                 -- 256b PTC-DMA stream to 512b PCIe stream
                 pcie_mfb_regions := pcie_mfb_regions/2;
             end if;
-            if (PCIE_ENDPOINT_TYPE="R_TILE" and PCIE_ENDPOINT_MODE = 0) then
+            if (PCIE_ENDPOINT_TYPE = "R_TILE" and PCIE_ENDPOINT_MODE = 0) then
                 -- 512b PTC-DMA stream to 1024b PCIe stream
                 pcie_mfb_regions := pcie_mfb_regions*2;
             end if;
@@ -352,10 +352,12 @@ architecture FULL of PCIE is
 
 begin
 
-    assert (CORE_RQ_MFB_REGIONS /= 0) report "PCIE: Unsupported CORE_RQ_MFB_REGIONS configuration!"
+    assert (CORE_RQ_MFB_REGIONS /= 0)
+        report "PCIE: Unsupported CORE_RQ_MFB_REGIONS configuration!"
         severity failure;
 
-    assert (CORE_RC_MFB_REGIONS /= 0) report "PCIE: Unsupported CORE_RC_MFB_REGIONS configuration!"
+    assert (CORE_RC_MFB_REGIONS /= 0)
+        report "PCIE: Unsupported CORE_RC_MFB_REGIONS configuration!"
         severity failure;
 
     -- =========================================================================
@@ -366,36 +368,36 @@ begin
     -- see Modules.tcl of PCIE_CORE.
     pcie_core_i : entity work.PCIE_CORE
     generic map (
-        CQ_MFB_REGIONS     => CQ_MFB_REGIONS,
-        CQ_MFB_REGION_SIZE => CQ_MFB_REGION_SIZE,
-        CQ_MFB_BLOCK_SIZE  => CQ_MFB_BLOCK_SIZE,
-        CQ_MFB_ITEM_WIDTH  => CQ_MFB_ITEM_WIDTH,
-        RC_MFB_REGIONS     => CORE_RC_MFB_REGIONS,
-        RC_MFB_REGION_SIZE => RC_MFB_REGION_SIZE,
-        RC_MFB_BLOCK_SIZE  => RC_MFB_BLOCK_SIZE,
-        RC_MFB_ITEM_WIDTH  => RC_MFB_ITEM_WIDTH,
-        CC_MFB_REGIONS     => CC_MFB_REGIONS,
-        CC_MFB_REGION_SIZE => CC_MFB_REGION_SIZE,
-        CC_MFB_BLOCK_SIZE  => CC_MFB_BLOCK_SIZE,
-        CC_MFB_ITEM_WIDTH  => CC_MFB_ITEM_WIDTH,
-        RQ_MFB_REGIONS     => CORE_RQ_MFB_REGIONS,
-        RQ_MFB_REGION_SIZE => RQ_MFB_REGION_SIZE,
-        RQ_MFB_BLOCK_SIZE  => RQ_MFB_BLOCK_SIZE,
-        RQ_MFB_ITEM_WIDTH  => RQ_MFB_ITEM_WIDTH,
-        ENDPOINT_TYPE      => PCIE_ENDPOINT_TYPE,
-        ENDPOINT_MODE      => PCIE_ENDPOINT_MODE,
-        PCIE_ENDPOINTS     => PCIE_ENDPOINTS,
-        PCIE_CLKS          => PCIE_CLKS,
-        PCIE_CONS          => PCIE_CONS,
-        PCIE_LANES         => PCIE_LANES,
-        PCIE_GEN           => PCIE_GEN,
-        MI_WIDTH           => 32,
-        XVC_ENABLE         => XVC_ENABLE,
-        CARD_ID_WIDTH      => CARD_ID_WIDTH,
-        RESET_WIDTH        => RESET_WIDTH,
+        CQ_MFB_REGIONS      => CQ_MFB_REGIONS,
+        CQ_MFB_REGION_SIZE  => CQ_MFB_REGION_SIZE,
+        CQ_MFB_BLOCK_SIZE   => CQ_MFB_BLOCK_SIZE,
+        CQ_MFB_ITEM_WIDTH   => CQ_MFB_ITEM_WIDTH,
+        RC_MFB_REGIONS      => CORE_RC_MFB_REGIONS,
+        RC_MFB_REGION_SIZE  => RC_MFB_REGION_SIZE,
+        RC_MFB_BLOCK_SIZE   => RC_MFB_BLOCK_SIZE,
+        RC_MFB_ITEM_WIDTH   => RC_MFB_ITEM_WIDTH,
+        CC_MFB_REGIONS      => CC_MFB_REGIONS,
+        CC_MFB_REGION_SIZE  => CC_MFB_REGION_SIZE,
+        CC_MFB_BLOCK_SIZE   => CC_MFB_BLOCK_SIZE,
+        CC_MFB_ITEM_WIDTH   => CC_MFB_ITEM_WIDTH,
+        RQ_MFB_REGIONS      => CORE_RQ_MFB_REGIONS,
+        RQ_MFB_REGION_SIZE  => RQ_MFB_REGION_SIZE,
+        RQ_MFB_BLOCK_SIZE   => RQ_MFB_BLOCK_SIZE,
+        RQ_MFB_ITEM_WIDTH   => RQ_MFB_ITEM_WIDTH,
+        ENDPOINT_TYPE       => PCIE_ENDPOINT_TYPE,
+        ENDPOINT_MODE       => PCIE_ENDPOINT_MODE,
+        PCIE_ENDPOINTS      => PCIE_ENDPOINTS,
+        PCIE_CLKS           => PCIE_CLKS,
+        PCIE_CONS           => PCIE_CONS,
+        PCIE_LANES          => PCIE_LANES,
+        PCIE_GEN            => PCIE_GEN,
+        MI_WIDTH            => 32,
+        XVC_ENABLE          => XVC_ENABLE,
+        CARD_ID_WIDTH       => CARD_ID_WIDTH,
+        RESET_WIDTH         => RESET_WIDTH,
         MISC_TOP2PCIE_WIDTH => MISC_TOP2PCIE_WIDTH,
         MISC_PCIE2TOP_WIDTH => MISC_PCIE2TOP_WIDTH,
-        DEVICE             => DEVICE
+        DEVICE              => DEVICE
     )
     port map (
         PCIE_SYSCLK_P       => PCIE_SYSCLK_P,
@@ -643,34 +645,34 @@ begin
     end generate;
 
     mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
-    generic map(
-        ADDR_WIDTH => 32               ,
-        DATA_WIDTH => 32               ,
-        PORTS      => MI_SPLIT_PORTS   ,
-        ADDR_BASE  => mi_addr_base_f   ,
+    generic map (
+        ADDR_WIDTH => 32,
+        DATA_WIDTH => 32,
+        PORTS      => MI_SPLIT_PORTS,
+        ADDR_BASE  => mi_addr_base_f,
         PIPE_OUT   => (others => false),
         DEVICE     => DEVICE
     )
-    port map(
-        CLK     => MI_CLK           ,
-        RESET   => MI_RESET         ,
+    port map (
+        CLK     => MI_CLK,
+        RESET   => MI_RESET,
 
-        RX_DWR  => MI_DBG_DWR       ,
-        RX_ADDR => MI_DBG_ADDR      ,
-        RX_BE   => MI_DBG_BE        ,
-        RX_RD   => MI_DBG_RD        ,
-        RX_WR   => MI_DBG_WR        ,
-        RX_ARDY => MI_DBG_ARDY      ,
-        RX_DRD  => MI_DBG_DRD       ,
-        RX_DRDY => MI_DBG_DRDY      ,
+        RX_DWR  => MI_DBG_DWR,
+        RX_ADDR => MI_DBG_ADDR,
+        RX_BE   => MI_DBG_BE,
+        RX_RD   => MI_DBG_RD,
+        RX_WR   => MI_DBG_WR,
+        RX_ARDY => MI_DBG_ARDY,
+        RX_DRD  => MI_DBG_DRD,
+        RX_DRDY => MI_DBG_DRDY,
 
-        TX_DWR  => mi_dbg_split_dwr ,
+        TX_DWR  => mi_dbg_split_dwr,
         TX_ADDR => mi_dbg_split_addr,
-        TX_BE   => mi_dbg_split_be  ,
-        TX_RD   => mi_dbg_split_rd  ,
-        TX_WR   => mi_dbg_split_wr  ,
+        TX_BE   => mi_dbg_split_be,
+        TX_RD   => mi_dbg_split_rd,
+        TX_WR   => mi_dbg_split_wr,
         TX_ARDY => mi_dbg_split_ardy,
-        TX_DRD  => mi_dbg_split_drd ,
+        TX_DRD  => mi_dbg_split_drd,
         TX_DRDY => mi_dbg_split_drdy
     );
 

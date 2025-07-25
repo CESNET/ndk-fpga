@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MFB_FRAME_EXTENDER_DM_CTRL is
-    generic(
+    generic (
         REGIONS        : natural := 4;
         REGION_SIZE    : natural := 8;
         BLOCK_SIZE     : natural := 8;
@@ -21,7 +21,7 @@ entity MFB_FRAME_EXTENDER_DM_CTRL is
         LEN_WIDTH      : natural := 14;
         DEVICE         : string  := "AGILEX"
     );
-    port(
+    port (
         CLK            : in  std_logic;
         RESET          : in  std_logic;
 
@@ -189,19 +189,19 @@ begin
     end process;
 
     pl_offset_g : for r in 0 to REGIONS-1 generate
-        s_rx_sof_pos_ext(r) <= unsigned(s_rx_sof_pos(r)) & to_unsigned(0,log2(BLOCK_SIZE));
-        s_rx_eof_pos_blk(r) <= s_rx_eof_pos(r)(EOF_POS_WIDTH-1 downto log2(BLOCK_SIZE));
-        s_rx_sof_after_eof(r) <= '1' when (unsigned(s_rx_sof_pos(r)) > unsigned(s_rx_eof_pos_blk(r))) else '0';
+        s_rx_sof_pos_ext(r)        <= unsigned(s_rx_sof_pos(r)) & to_unsigned(0,log2(BLOCK_SIZE));
+        s_rx_eof_pos_blk(r)        <= s_rx_eof_pos(r)(EOF_POS_WIDTH-1 downto log2(BLOCK_SIZE));
+        s_rx_sof_after_eof(r)      <= '1' when (unsigned(s_rx_sof_pos(r)) > unsigned(s_rx_eof_pos_blk(r))) else '0';
         s_rx_sof_after_eof_vld(r)  <= s_rx_sof_after_eof(r) and RX_SOF(r) and RX_EOF(r);
         s_rx_sof_before_eof_vld(r) <= not s_rx_sof_after_eof(r) and RX_SOF(r) and RX_EOF(r);
 
         s_rx_pl_offset_ext_curr(r) <= unsigned(s_rx_pl_offset(r)) + (r*REGION_SIZE*BLOCK_SIZE) + s_rx_sof_pos_ext(r);
-        s_rx_pl_offset_ext(r+1) <= s_rx_pl_offset_ext_curr(r) when (RX_SOF(r) = '1') else s_rx_pl_offset_ext(r);
+        s_rx_pl_offset_ext(r+1)    <= s_rx_pl_offset_ext_curr(r) when (RX_SOF(r) = '1') else s_rx_pl_offset_ext(r);
 
         -- last valid of payload valid
         s_insert_lvld(r+1) <= RX_INSERT(r) when (RX_SOF(r) = '1') else s_insert_lvld(r);
         -- payload valid of first packet in region
-        s_insert_fpir(r) <= RX_INSERT(r) when (s_rx_sof_before_eof_vld(r) = '1') else s_insert_lvld(r);
+        s_insert_fpir(r)   <= RX_INSERT(r) when (s_rx_sof_before_eof_vld(r) = '1') else s_insert_lvld(r);
 
         s_rx_pl_word_off(r)        <= s_rx_pl_offset_ext(r+1)(LEN_WIDTH-1 downto log2(REGIONS*REGION_ITEMS));
         s_rx_pl_region_off(r)      <= s_rx_pl_offset_ext(r+1)(log2(REGIONS*REGION_ITEMS)-1 downto log2(REGION_ITEMS));
@@ -225,20 +225,20 @@ begin
 
     pl_onehot_g : for r in 0 to REGIONS-1 generate
         pl_onehot_i : entity work.BIN2HOT
-        generic map(
+        generic map (
             DATA_WIDTH => log2(REGION_SIZE)
         )
-        port map(
+        port map (
             EN     => s_rx_pl_ok(r),
             INPUT  => std_logic_vector(s_rx_pl_block_off(r)),
             OUTPUT => s_rx_pl_block_en((r+1)*REGION_SIZE-1 downto r*REGION_SIZE)
         );
 
         pl_prev_onehot_i : entity work.BIN2HOT
-        generic map(
+        generic map (
             DATA_WIDTH => log2(REGION_SIZE)
         )
-        port map(
+        port map (
             EN     => s_rx_pl_prev_ok(r),
             INPUT  => std_logic_vector(s_rx_pl_block_off_prev(r)),
             OUTPUT => s_rx_pl_block_prev_en((r+1)*REGION_SIZE-1 downto r*REGION_SIZE)
@@ -255,10 +255,10 @@ begin
         s_rx_eof_masked(r) <= RX_EOF(r) and s_insert_fpir(r);
 
         sof_pos_onehot_i : entity work.BIN2HOT
-        generic map(
+        generic map (
             DATA_WIDTH => log2(REGION_SIZE)
         )
-        port map(
+        port map (
             EN     => s_rx_eof_masked(r),
             INPUT  => s_rx_eof_pos_blk(r),
             OUTPUT => s_eof_per_wb((r+1)*REGION_SIZE-1 downto r*REGION_SIZE)
@@ -368,12 +368,12 @@ begin
     -- --------------------------------------------------------------------------
 
     insert_mask_i : entity work.SHAKEDOWN
-    generic map(
+    generic map (
         INPUTS     => REGIONS*REGION_SIZE,
         OUTPUTS    => REGIONS*REGION_SIZE,
         DATA_WIDTH => 1
     )
-    port map(
+    port map (
         CLK      => CLK,
         RESET    => RESET,
         DIN      => (others => '0'),
@@ -394,7 +394,7 @@ begin
             v_count := 0;
             block_l : for j in 0 to i loop
                 if (s_pl_valid_reg1(j) = '1') then
-                v_count := v_count + 1;
+                    v_count := v_count + 1;
                 end if;
             end loop;
 

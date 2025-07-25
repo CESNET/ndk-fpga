@@ -51,7 +51,7 @@ entity MVB_MUX2 is
     );
 end entity;
 
-architecture behavioral of MVB_MUX2 is
+architecture BEHAVIORAL of MVB_MUX2 is
     signal rx_dst_rdies : std_logic_vector(2 - 1 downto 0);
 begin
 

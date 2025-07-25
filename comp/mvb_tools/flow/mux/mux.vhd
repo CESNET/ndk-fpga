@@ -53,7 +53,7 @@ entity GEN_MVB_MUX is
     );
 end entity;
 
-architecture behavioral of GEN_MVB_MUX is
+architecture BEHAVIORAL of GEN_MVB_MUX is
 
     constant SEL_WIDTH      : natural := max(1, log2(MUX_WIDTH));
 
@@ -70,12 +70,12 @@ architecture behavioral of GEN_MVB_MUX is
 
 begin  -- architecture behavioral
 
-    TX_SRC_RDY <= tx_src_rdy_int(0) and sel_fifo_src_rdy;
-    RX_DST_RDY <= rx_dst_rdies_int;
+    TX_SRC_RDY       <= tx_src_rdy_int(0) and sel_fifo_src_rdy;
+    RX_DST_RDY       <= rx_dst_rdies_int;
     sel_fifo_dst_rdy <= tx_src_rdy_int(0) and TX_DST_RDY;
 
     rx_data_arr <= slv_array_deser(RX_DATA, MUX_WIDTH);
-    rx_vld_arr <= slv_array_deser(RX_VLD, MUX_WIDTH);
+    rx_vld_arr  <= slv_array_deser(RX_VLD, MUX_WIDTH);
 
     data_mux_e : entity work.GEN_MUX
     generic map (
@@ -141,4 +141,4 @@ begin  -- architecture behavioral
         AFULL       => open,
         AEMPTY      => open
     );
-end architecture behavioral;
+end architecture;

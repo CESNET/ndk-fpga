@@ -23,16 +23,16 @@ use work.math_pack.all;
 --! -----------------------------------------------------------------------------
 
 entity GEN_NOR_FIXED is
-   generic(
-      --! \brief Width of input signal, number of bits to NOR.
-      --! \details Must be greater than 0.
-      DATA_WIDTH    : integer := 288;  -- or width (number of inputs)
-      DEVICE        : string := "none" --! "VIRTEX6", "7SERIES", "ULTRASCALE", "none" (behavioral)
-   );
-   port(
-      --! Input data, vector of bits to OR.
-      DI  : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-      --! Output data, result of OR.
-      DO  : out std_logic
-   );
+    generic (
+        --! \brief Width of input signal, number of bits to NOR.
+        --! \details Must be greater than 0.
+        DATA_WIDTH    : integer := 288;  -- or width (number of inputs)
+        DEVICE        : string := "none" --! "VIRTEX6", "7SERIES", "ULTRASCALE", "none" (behavioral)
+    );
+    port (
+        --! Input data, vector of bits to OR.
+        DI  : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        --! Output data, result of OR.
+        DO  : out std_logic
+    );
 end entity;

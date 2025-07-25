@@ -15,7 +15,7 @@ use work.type_pack.all;
 --                            Entity declaration
 -- =====================================================================
 entity TCAM2 is
-    Generic (
+    generic (
         -- TCAM2 item width in bits
         DATA_WIDTH         : integer := 36;
 
@@ -69,7 +69,7 @@ entity TCAM2 is
         ITEMS_ALIGNED      : integer := tsel(USE_FRAGMENTED_MEM, div_roundup(ITEMS,MEMORY_DATA_WIDTH)*ALIGNED_DATA_WIDTH, ITEMS);
         ADDR_WIDTH         : integer := max(1, log2(ITEMS_ALIGNED))
     );
-    Port (
+    port (
         -- CLOCK AND RESET
         CLK            : in  std_logic;
         RST            : in  std_logic;
@@ -257,7 +257,7 @@ begin
     end generate;
 
     -- match enable register
-    mem_match_en_reg_p : process(CLK)
+    mem_match_en_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (RST = '1') then
@@ -378,7 +378,7 @@ begin
     -- --------------------------------------------------------------------------
 
     -- write inputs registers
-    write_reg_p : process(CLK)
+    write_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (RST = '1') then
@@ -398,8 +398,8 @@ begin
     input_wr_data_reg_aug(input_wr_data_reg'range) <= input_wr_data_reg;
     input_wr_mask_reg_aug(input_wr_mask_reg'range) <= input_wr_mask_reg;
     -- write data and mask registers arrays
-    input_wr_data_reg_aug_arr <= slv_array_deser(input_wr_data_reg_aug,COLUMNS);
-    input_wr_mask_reg_aug_arr <= slv_array_deser(input_wr_mask_reg_aug,COLUMNS);
+    input_wr_data_reg_aug_arr                      <= slv_array_deser(input_wr_data_reg_aug,COLUMNS);
+    input_wr_mask_reg_aug_arr                      <= slv_array_deser(input_wr_mask_reg_aug,COLUMNS);
 
     -- write counter
     wr_cnt_p : process (CLK)
@@ -426,7 +426,7 @@ begin
 
     -- memory row address we decoder
     row_we_g : if ROWS > 1 generate
-        row_we_decoder_i : entity work.dec1fn_enable
+        row_we_decoder_i : entity work.DEC1FN_ENABLE
         generic map (
             ITEMS => ROWS
         )
@@ -450,7 +450,7 @@ begin
 
     -- memory element bit enable
     bit_en_g : if ALIGNED_DATA_WIDTH > 1 generate
-        bit_en_decoder_i : entity work.dec1fn
+        bit_en_decoder_i : entity work.DEC1FN
         generic map (
             ITEMS => ALIGNED_DATA_WIDTH
         )
@@ -485,7 +485,7 @@ begin
     -- --------------------------------------------------------------------------
 
     -- match inputs registers
-    match_regs_p : process(CLK)
+    match_regs_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (RST = '1') then
@@ -502,7 +502,7 @@ begin
     -- match data register padding
     input_m_data_reg_aug(input_m_data_reg'range) <= input_m_data_reg;
     -- match data register array
-    input_m_data_reg_aug_arr <= slv_array_deser(input_m_data_reg_aug,COLUMNS);
+    input_m_data_reg_aug_arr                     <= slv_array_deser(input_m_data_reg_aug,COLUMNS);
 
     -- cell height address counter
     sf_cnt_g : if CELL_HEIGHT_RATIO > 1 generate
@@ -565,7 +565,7 @@ begin
     mem_match_en <= sf_cnt_en;
 
     -- output match register write enable decoder
-    m_reg_we_dec_i : entity work.dec1fn_enable
+    m_reg_we_dec_i : entity work.DEC1FN_ENABLE
     generic map (
         ITEMS => CELL_HEIGHT_RATIO
     )

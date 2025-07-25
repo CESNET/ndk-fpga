@@ -10,9 +10,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity MULT_1E9 is
-port (
-   CLK   : in std_logic;
-   DIN   : in std_logic_vector(31 downto 0);
-   DOUT  : out std_logic_vector(31 downto 0)
-);
+    port (
+        CLK   : in std_logic;
+        DIN   : in std_logic_vector(31 downto 0);
+        DOUT  : out std_logic_vector(31 downto 0)
+    );
 end entity;

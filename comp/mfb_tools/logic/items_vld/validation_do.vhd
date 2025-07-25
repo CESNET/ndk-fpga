@@ -20,41 +20,41 @@ use work.math_pack.all;
 -- Then the final output is the OR of both these results.
 -- The two input interfaces (and the ORing of results) are necessary because there can be a part of valid data from the previous packet as well as from the new packet in each Region.
 entity VALIDATION_DO is
-generic(
-    -- Number of Regions within a data word, must be power of 2.
-    MFB_REGIONS     : natural := 4;
-    -- Region size (in Blocks).
-    MFB_REGION_SIZE : natural := 8;
-    -- Block size (in Items).
-    MFB_BLOCK_SIZE  : natural := 8
-);
-port(
-    -- ========================================================================
-    -- First input inf
-    --
-    -- The new data (arriving with SOF).
-    -- ========================================================================
+    generic (
+        -- Number of Regions within a data word, must be power of 2.
+        MFB_REGIONS     : natural := 4;
+        -- Region size (in Blocks).
+        MFB_REGION_SIZE : natural := 8;
+        -- Block size (in Items).
+        MFB_BLOCK_SIZE  : natural := 8
+    );
+    port (
+        -- ========================================================================
+        -- First input inf
+        --
+        -- The new data (arriving with SOF).
+        -- ========================================================================
 
-    OFFSET1_LOW  : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    OFFSET1_HIGH : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    VALID1       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        OFFSET1_LOW  : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        OFFSET1_HIGH : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        VALID1       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    -- ========================================================================
-    -- Second input inf
-    --
-    -- The older data (with SOF in some of the previous Regions/Words)
-    -- ========================================================================
+        -- ========================================================================
+        -- Second input inf
+        --
+        -- The older data (with SOF in some of the previous Regions/Words)
+        -- ========================================================================
 
-    OFFSET2_LOW  : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    OFFSET2_HIGH : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
-    VALID2       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        OFFSET2_LOW  : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        OFFSET2_HIGH : in  u_array_t       (MFB_REGIONS-1 downto 0)(log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)-1 downto 0);
+        VALID2       : in  std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    -- ========================================================================
-    -- Output inf
-    -- ========================================================================
+        -- ========================================================================
+        -- Output inf
+        -- ========================================================================
 
-    VALID_VECTOR : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE-1 downto 0)
-);
+        VALID_VECTOR : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE-1 downto 0)
+    );
 end entity;
 
 architecture FULL of VALIDATION_DO is
@@ -72,10 +72,10 @@ begin
         --  Ones Insertor for the first input
         -- ----------------------------------------
         ones_insertor1_i : entity work.ONES_INSERTOR
-        generic map(
+        generic map (
             OFFSET_WIDTH => log2(REGION_ITEMS)
         )
-        port map(
+        port map (
             OFFSET_LOW  => OFFSET1_LOW (r),
             OFFSET_HIGH => OFFSET1_HIGH(r),
             VALID       => VALID1      (r),
@@ -87,10 +87,10 @@ begin
         --  Ones Insertor for the second input
         -- -----------------------------------------
         ones_insertor2_i : entity work.ONES_INSERTOR
-        generic map(
+        generic map (
             OFFSET_WIDTH => log2(REGION_ITEMS)
         )
-        port map(
+        port map (
             OFFSET_LOW  => OFFSET2_LOW (r),
             OFFSET_HIGH => OFFSET2_HIGH(r),
             VALID       => VALID2      (r),

@@ -13,7 +13,7 @@ use work.type_pack.all;
 use work.eth_hdr_pack.all;
 
 entity RX_MAC_LITE is
-    generic(
+    generic (
         -- =====================================================================
         -- MFB CONFIGURATION:
         --
@@ -76,7 +76,7 @@ entity RX_MAC_LITE is
         -- ULTRASCALE
         DEVICE          : string := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -442,7 +442,7 @@ begin
         end if;
     end process;
 
-    process(all)
+    process (all)
     begin
         for r in 0 to RX_REGIONS-1 loop
             s_rx_inc_frame(r+1) <= (s_in_sof(r) and not s_in_eof(r) and not s_rx_inc_frame(r)) or
@@ -475,7 +475,7 @@ begin
 
     crc_cutter_g : if (CRC_IS_RECEIVED and CRC_REMOVE_EN) generate
         crc_cutter_i : entity work.RX_MAC_LITE_CRC_CUTTER
-        generic map(
+        generic map (
             REGIONS     => RX_REGIONS,
             REGION_SIZE => RX_REGION_SIZE,
             BLOCK_SIZE  => RX_BLOCK_SIZE,
@@ -483,7 +483,7 @@ begin
             META_WIDTH  => 2,
             OUTPUT_REG  => true
         )
-        port map(
+        port map (
             CLK            => RX_CLK,
             RESET          => RX_RESET,
 
@@ -533,7 +533,7 @@ begin
 
     -- frame lenght check -- latency 4 cycles
     frame_lng_check_i : entity work.MFB_FRAME_LNG_CHECK
-    generic map(
+    generic map (
         REGIONS     => RX_REGIONS,
         REGION_SIZE => RX_REGION_SIZE,
         BLOCK_SIZE  => RX_BLOCK_SIZE,
@@ -541,7 +541,7 @@ begin
         META_WIDTH  => 3,
         LNG_WIDTH   => LEN_WIDTH
     )
-    port map(
+    port map (
         CLK            => RX_CLK,
         RESET          => RX_RESET,
 
@@ -572,25 +572,25 @@ begin
     );
 
     flc_metadata_unpack_g : for r in 0 to RX_REGIONS-1 generate
-        s_flc_crc_err(r)    <= s_flc_metadata(r*3+0) or s_flc_metadata(r*3+2);
-        s_flc_mii_err(r)    <= s_flc_metadata(r*3+1);
+        s_flc_crc_err(r)     <= s_flc_metadata(r*3+0) or s_flc_metadata(r*3+2);
+        s_flc_mii_err(r)     <= s_flc_metadata(r*3+1);
         s_flc_crc_cut_err(r) <= s_flc_metadata(r*3+2);
     end generate;
 
     s_flc_len_min_err_fixed <= s_flc_len_min_err or s_flc_crc_cut_err;
 
     s_flc_sync_in <= s_flc_src_rdy & s_flc_eof & s_flc_sof & s_flc_eof_pos &
-        s_flc_sof_pos & s_flc_data & s_flc_frame_len & s_flc_len_min_err_fixed &
-        s_flc_len_max_err & s_flc_mii_err & s_flc_crc_err;
+                     s_flc_sof_pos & s_flc_data & s_flc_frame_len & s_flc_len_min_err_fixed &
+                     s_flc_len_max_err & s_flc_mii_err & s_flc_crc_err;
 
     -- If RESET has 5 or more cycles, then it is enough SH_REG without reset.
     flc_sync_shreg_i : entity work.SH_REG_BASE_STATIC
-    generic map(
+    generic map (
         NUM_BITS   => 5,
         DATA_WIDTH => FLC_SYNC_WIDTH,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         CLK        => RX_CLK,
         DIN        => s_flc_sync_in,
         CE         => '1',
@@ -618,7 +618,7 @@ begin
     crc_check_en_g : if (CRC_IS_RECEIVED and CRC_CHECK_EN) generate
         -- check CRC -- latency 9 cycles
         crc_check_i : entity work.RX_MAC_LITE_CRC_CHECK
-        generic map(
+        generic map (
             REGIONS     => RX_REGIONS,
             REGION_SIZE => RX_REGION_SIZE,
             BLOCK_SIZE  => RX_BLOCK_SIZE,
@@ -626,7 +626,7 @@ begin
             INBANDFCS   => INBANDCRC,
             DEVICE      => DEVICE
         )
-        port map(
+        port map (
             -- CLOCK AND RESET
             CLK             => RX_CLK,
             RESET           => RX_RESET,
@@ -653,7 +653,7 @@ begin
     mac_check_en_g : if MAC_CHECK_EN generate
         -- check MAC - latency 5 cycles
         mac_check_i : entity work.RX_MAC_LITE_MAC_CHECK
-        generic map(
+        generic map (
             REGIONS     => RX_REGIONS,
             REGION_SIZE => RX_REGION_SIZE,
             BLOCK_SIZE  => RX_BLOCK_SIZE,
@@ -661,7 +661,7 @@ begin
             MAC_COUNT   => MAC_COUNT,
             DEVICE      => DEVICE
         )
-        port map(
+        port map (
             -- CLOCK AND RESET
             CLK                => RX_CLK,
             RESET              => RX_RESET,
@@ -686,12 +686,12 @@ begin
         );
 
         sh_reg_mac_i : entity work.SH_REG_BASE_STATIC
-        generic map(
+        generic map (
             NUM_BITS   => 4,
             DATA_WIDTH => RX_REGIONS*MAC_STATUS_WIDTH,
             DEVICE     => DEVICE
         )
-        port map(
+        port map (
             CLK        => RX_CLK,
             DIN        => s_mac_status,
             CE         => '1',
@@ -723,10 +723,10 @@ begin
     timestamp_g : if TIMESTAMP_EN generate
         -- timestamping - latency 1 cycle
         timestamp_i : entity work.RX_MAC_LITE_TIMESTAMP
-        generic map(
+        generic map (
             REGIONS => RX_REGIONS
         )
-        port map(
+        port map (
             -- CLOCK AND RESET
             CLK        => RX_CLK,
             RESET      => RX_RESET,
@@ -743,12 +743,12 @@ begin
         );
 
         sh_reg_time_i : entity work.SH_REG_BASE_STATIC
-        generic map(
+        generic map (
             NUM_BITS   => 8,
             DATA_WIDTH => RX_REGIONS*65,
             DEVICE     => DEVICE
         )
-        port map(
+        port map (
             CLK        => RX_CLK,
             DIN        => s_ts_data,
             CE         => '1',
@@ -767,7 +767,7 @@ begin
     -- =========================================================================
 
     s_sync_error <= s_sync_mii_err or s_sync_crc_err or s_sync_crc_check_err or
-        s_sync_len_min_err or s_sync_len_max_err or s_sync_mac_err;
+                    s_sync_len_min_err or s_sync_len_max_err or s_sync_mac_err;
 
     sync_metadata_g : for r in 0 to RX_REGIONS-1 generate
         s_sync_metadata(r)(ETH_RX_HDR_LENGTH)         <= std_logic_vector(resize(unsigned(s_sync_frame_len(r)),ETH_RX_HDR_LENGTH_W));
@@ -791,7 +791,7 @@ begin
     -- =========================================================================
 
     speed_meter_i : entity work.MFB_SPEED_METER
-    generic map(
+    generic map (
         REGIONS         => RX_REGIONS,
         REGION_SIZE     => RX_REGION_SIZE,
         BLOCK_SIZE      => RX_BLOCK_SIZE,
@@ -802,7 +802,7 @@ begin
         DISABLE_ON_CLR  => True,
         COUNT_PACKETS   => True
     )
-    port map(
+    port map (
         CLK           => RX_CLK,
         RST           => RX_RESET,
 
@@ -825,7 +825,7 @@ begin
     -- =========================================================================
 
     mfb_reconf_buf_i : entity work.MFB_RECONFIGURATOR
-    generic map(
+    generic map (
         RX_REGIONS            => RX_REGIONS,
         RX_REGION_SIZE        => RX_REGION_SIZE,
         RX_BLOCK_SIZE         => RX_BLOCK_SIZE,
@@ -840,7 +840,7 @@ begin
         FRAMES_OVER_TX_REGION => 0,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK        => RX_CLK,
         RESET      => RX_RESET,
 
@@ -851,7 +851,7 @@ begin
         RX_SOF_POS => s_sync_sof_pos,
         RX_EOF_POS => s_sync_eof_pos,
         RX_SRC_RDY => s_sync_src_rdy,
-        RX_DST_RDY => s_sync_dst_rdy_dbg,-- debug only
+        RX_DST_RDY => s_sync_dst_rdy_dbg, -- debug only
 
         TX_DATA    => s_bfin_data,
         TX_META    => s_bfin_metadata_ser,
@@ -882,20 +882,20 @@ begin
     s_bfin_metactrl <= s_ctl_error_mask & s_ctl_enable;
 
     buffer_i : entity work.RX_MAC_LITE_BUFFER
-    generic map(
+    generic map (
         REGIONS        => BF_REGIONS,
         REGION_SIZE    => BF_REGION_SIZE,
         BLOCK_SIZE     => BF_BLOCK_SIZE,
         ITEM_WIDTH     => BF_ITEM_WIDTH,
         META_WIDTH     => ETH_RX_HDR_WIDTH,
-        METACTRL_WIDTH => 6, -- error_mask + enable
-        META_ALIGN2SOF => false,--(BF_REGIONS>1),
+        METACTRL_WIDTH => 6,     -- error_mask + enable
+        META_ALIGN2SOF => false, -- (BF_REGIONS>1),
         DFIFO_ITEMS    => DFIFO_ITEMS,
         MFIFO_ITEMS    => MFIFO_ITEMS,
         MFIFO_RAM_TYPE => "BRAM",
         DEVICE         => DEVICE
     )
-    port map(
+    port map (
         RX_CLK          => RX_CLK,
         RX_RESET        => RX_RESET,
 
@@ -941,7 +941,7 @@ begin
     -- =========================================================================
 
     mfb_reconf_i : entity work.MFB_RECONFIGURATOR
-    generic map(
+    generic map (
         RX_REGIONS            => BF_REGIONS,
         RX_REGION_SIZE        => BF_REGION_SIZE,
         RX_BLOCK_SIZE         => BF_BLOCK_SIZE,
@@ -955,7 +955,7 @@ begin
         FRAMES_OVER_TX_REGION => 1,
         DEVICE                => DEVICE
     )
-    port map(
+    port map (
         CLK        => TX_CLK,
         RESET      => TX_RESET,
 
@@ -985,13 +985,13 @@ begin
 
     mvb_shake_g : if (BF_REGIONS > TX_REGIONS) generate
         mvb_shake_i : entity work.MVB_SHAKEDOWN
-        generic map(
+        generic map (
             RX_ITEMS    => BF_REGIONS,
             TX_ITEMS    => TX_REGIONS,
             ITEM_WIDTH  => ETH_RX_HDR_WIDTH,
             SHAKE_PORTS => 1
         )
-        port map(
+        port map (
             CLK        => TX_CLK,
             RESET      => TX_RESET,
 
@@ -1008,9 +1008,9 @@ begin
     end generate;
 
     mvb_resize_g : if (BF_REGIONS < TX_REGIONS) generate
-        TX_MVB_DATA <= std_logic_vector(resize(unsigned(s_buf_mvb_data),TX_MVB_DATA'length));
-        TX_MVB_VLD <= std_logic_vector(resize(unsigned(s_buf_mvb_vld),TX_MVB_VLD'length));
-        TX_MVB_SRC_RDY <= s_buf_mvb_src_rdy;
+        TX_MVB_DATA       <= std_logic_vector(resize(unsigned(s_buf_mvb_data),TX_MVB_DATA'length));
+        TX_MVB_VLD        <= std_logic_vector(resize(unsigned(s_buf_mvb_vld),TX_MVB_VLD'length));
+        TX_MVB_SRC_RDY    <= s_buf_mvb_src_rdy;
         s_buf_mvb_dst_rdy <= TX_MVB_DST_RDY;
     end generate;
 
@@ -1035,7 +1035,7 @@ begin
     end generate;
 
     stat_unit_i : entity work.RX_MAC_LITE_STAT_UNIT
-    generic map(
+    generic map (
         REGIONS            => BF_REGIONS,
         REGION_SIZE        => BF_REGION_SIZE,
         BLOCK_SIZE         => BF_BLOCK_SIZE,
@@ -1049,7 +1049,7 @@ begin
         SIZE_EN            => true,
         LEN_HISTOGRAM_EN   => true
     )
-    port map(
+    port map (
         CLK                    => RX_CLK,
         RESET                  => RX_RESET,
         -- CONTROL INTERFACE
@@ -1115,7 +1115,7 @@ begin
     -- =========================================================================
 
     ctrl_unit_i : entity work.RX_MAC_LITE_CTRL_UNIT
-    generic map(
+    generic map (
         LEN_WIDTH          => LEN_WIDTH,
         INBANDFCS          => INBANDCRC,
         MAC_COUNT          => MAC_COUNT,
@@ -1123,7 +1123,7 @@ begin
         SM_CNT_BYTES_WIDTH => SM_CNT_BYTES_WIDTH,
         DEVICE             => DEVICE
     )
-    port map(
+    port map (
         CLK                     => RX_CLK,
         RESET                   => RX_RESET,
         -- MI32 INTERFACE

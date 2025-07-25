@@ -23,16 +23,16 @@ use work.type_pack.all;
 --          Also, reading DRD register without sending a read request first may result in reading old/invalid data.
 
 entity MI_INDIRECT_ACCESS is
-    generic(
-	-- Width of MI data
+    generic (
+        -- Width of MI data
         DATA_WIDTH        : natural := 32;
-	-- Width of MI address
+        -- Width of MI address
         ADDR_WIDTH        : natural := 32;
 
-	-- Number of output interfaces
+        -- Number of output interfaces
         OUTPUT_INTERFACES : natural := 3
     );
-    port(
+    port (
         -- =================
         -- Common interface
         -- =================
@@ -115,7 +115,7 @@ architecture FULL of MI_INDIRECT_ACCESS is
     signal stat_reg          : std_logic_vector(STATUSES  -1 downto 0);
 
     -- state signals for FSM
-    type state is (IDLE, WR, RD, DRD);
+    type   state is (IDLE, WR, RD, DRD);
     signal present_st        : state := IDLE;
     signal next_st           : state := IDLE;
 
@@ -123,8 +123,8 @@ begin
 
     -- Writing ------------------------------------------------------------
     cmd <= RX_DWR(COMMANDS-1 downto 0) when ((RX_WR = '1') and
-                                             (RX_ADDR(7 downto UNNECESSARY_BITS) = COMMAND_REG_ADDR))
-      else (others => '0');
+                                             (RX_ADDR(7 downto UNNECESSARY_BITS) = COMMAND_REG_ADDR)) else
+      (others => '0');
 
     write_regs_p : process (CLK)
     begin
@@ -187,7 +187,7 @@ begin
                 end if;
 
             when RD =>
-                if (TX_ARDY(inf_reg) = '1') and (TX_DRDY(inf_reg) = '1') then
+                if ((TX_ARDY(inf_reg) = '1') and (TX_DRDY(inf_reg) = '1')) then
                     next_st <= IDLE;
                 elsif (TX_ARDY(inf_reg) = '1') then
                     next_st <= DRD;
@@ -220,10 +220,10 @@ begin
             when IDLE   => stat_reg(0) <= '0';
 
             when WR     => stat_reg(0)    <= '1';
-                           TX_WR(inf_reg) <= cmd_reg(0);
+                TX_WR(inf_reg)            <= cmd_reg(0);
 
             when RD     => stat_reg(0)    <= '1';
-                           TX_RD(inf_reg) <= cmd_reg(1);
+                TX_RD(inf_reg)            <= cmd_reg(1);
 
             when DRD    => stat_reg(0) <= '1';
 
@@ -234,7 +234,7 @@ begin
     TX_ADDR <= (others => addr_reg);
     TX_DWR  <= (others => dwr_reg);
 
-    drd_reg_p: process(CLK)
+    drd_reg_p : process (CLK)
     begin
         if rising_edge(CLK) then
             if (TX_DRDY(inf_reg) = '1') then

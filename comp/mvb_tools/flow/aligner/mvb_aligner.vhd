@@ -12,12 +12,12 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity MVB_ALIGNER is
-    generic(
+    generic (
         ITEMS      : natural := 4;
         ITEM_WIDTH : natural := 32;
         DEVICE     : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -90,7 +90,7 @@ begin
     RX_DST_RDY  <= not s_fifoxm_full;
 
     fifoxm_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH     => FIFO_PORT_WIDTH,
         ITEMS          => FIFO_DEPTH,
         WRITE_PORTS    => ITEMS,
@@ -99,7 +99,7 @@ begin
         DEVICE         => DEVICE,
         SAFE_READ_MODE => false
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RESET,
 

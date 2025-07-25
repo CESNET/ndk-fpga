@@ -14,22 +14,22 @@ use work.type_pack.all;
 architecture INTEL of COMMON_CLK_GEN is
 
     component iopll_ip is
-    port (
-        rst      : in  std_logic := 'X';
-        refclk   : in  std_logic := 'X';
-        locked   : out std_logic;
-        outclk_0 : out std_logic;
-        outclk_1 : out std_logic;
-        outclk_2 : out std_logic;
-        outclk_3 : out std_logic
-    );
-    end component iopll_ip;
+        port (
+            RST      : in  std_logic := 'X';
+            REFCLK   : in  std_logic := 'X';
+            LOCKED   : out std_logic;
+            OUTCLK_0 : out std_logic;
+            OUTCLK_1 : out std_logic;
+            OUTCLK_2 : out std_logic;
+            OUTCLK_3 : out std_logic
+        );
+    end component;
 
     component reset_release_ip is
-    port (
-        ninit_done : out std_logic
-    );
-    end component reset_release_ip;
+        port (
+            NINIT_DONE : out std_logic
+        );
+    end component;
 
     signal ninit_done : std_logic;
     signal pll_reset  : std_logic;

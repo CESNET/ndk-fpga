@@ -33,7 +33,7 @@ entity H3_CORE is
     );
 end entity;
 
-architecture behavioral of H3_CORE is
+architecture BEHAVIORAL of H3_CORE is
 
     constant MATRIX_DESER   : slv_array_t(CONFIG.key_width - 1 downto 0)(CONFIG.hash_width - 1 downto 0) := slv_array_deser(CONFIG.matrix, CONFIG.key_width);
 
@@ -54,7 +54,7 @@ begin
         process (CLK)
         begin
             if rising_edge(CLK) then
-                if DATA_OUT_RDY = '1' then
+                if (DATA_OUT_RDY = '1') then
                     anded_mtx_reg <= anded_mtx;
                 end if;
             end if;
@@ -63,10 +63,10 @@ begin
         process (CLK)
         begin
             if rising_edge(CLK) then
-                if RESET = '1' then
+                if (RESET = '1') then
                     anded_mtx_vld <= '0';
                 else
-                    if DATA_OUT_RDY = '1' then
+                    if (DATA_OUT_RDY = '1') then
                         anded_mtx_vld <= DATA_IN_VLD;
                     end if;
                 end if;
@@ -96,7 +96,7 @@ begin
         process (CLK)
         begin
             if rising_edge(CLK) then
-                if DATA_OUT_RDY = '1' then
+                if (DATA_OUT_RDY = '1') then
                     DATA_OUT <= do_int;
                 end if;
             end if;
@@ -105,10 +105,10 @@ begin
         process (CLK)
         begin
             if rising_edge(CLK) then
-                if RESET = '1' then
+                if (RESET = '1') then
                     DATA_OUT_VLD <= '0';
                 else
-                    if DATA_OUT_RDY = '1' then
+                    if (DATA_OUT_RDY = '1') then
                         DATA_OUT_VLD <= anded_mtx_vld;
                     end if;
                 end if;

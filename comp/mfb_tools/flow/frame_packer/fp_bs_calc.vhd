@@ -13,7 +13,7 @@ use work.type_pack.all;
 
 -- The purpose of this component is to generate select signal for each Barrel Shifter
 entity FP_BS_CALC is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
@@ -22,7 +22,7 @@ entity FP_BS_CALC is
         BS_NUM              : natural := 0;
         RX_CHANNELS         : natural := 16
     );
-    port(
+    port (
         RX_SOF_POS_UNS  : in  unsigned(max(1,log2(MFB_REGION_SIZE)) - 1 downto 0);
 
         -- Select correct channel pointer based on current channel
@@ -61,14 +61,14 @@ begin
 
     -- Channel MUX
     bs_mux_i: entity work.GEN_MUX
-        generic map(
-           DATA_WIDTH  => max(1,log2(MFB_REGIONS*MFB_REGION_SIZE)) + 1,
-           MUX_WIDTH   => RX_CHANNELS
-        )
-        port map(
-           DATA_IN     => sum_prev_std,
-           SEL         => RX_BS_CHANNEL,
-           DATA_OUT    => sum_mux_std
+    generic map (
+        DATA_WIDTH  => max(1,log2(MFB_REGIONS*MFB_REGION_SIZE)) + 1,
+        MUX_WIDTH   => RX_CHANNELS
+    )
+    port map (
+        DATA_IN     => sum_prev_std,
+        SEL         => RX_BS_CHANNEL,
+        DATA_OUT    => sum_mux_std
     );
 
     -- u_array_t   => slv_array_t
@@ -80,14 +80,14 @@ begin
 
     -- Pointer MUX
     ch_ptr_mux_i: entity work.GEN_MUX
-        generic map(
-            DATA_WIDTH  => max(1,log2(MFB_REGIONS*MFB_REGION_SIZE)),
-            MUX_WIDTH   => RX_CHANNELS
-        )
-        port map(
-            DATA_IN     => ch_ptr_std,
-            SEL         => RX_BS_CHANNEL,
-            DATA_OUT    => ch_ptr_mux
+    generic map (
+        DATA_WIDTH  => max(1,log2(MFB_REGIONS*MFB_REGION_SIZE)),
+        MUX_WIDTH   => RX_CHANNELS
+    )
+    port map (
+        DATA_IN     => ch_ptr_std,
+        SEL         => RX_BS_CHANNEL,
+        DATA_OUT    => ch_ptr_mux
     );
 
     sum     <= to_unsigned(BS_NUM*MFB_REGION_SIZE, sum'length) + RX_SOF_POS_UNS - unsigned(ch_ptr_mux) - unsigned(sum_mux_std);

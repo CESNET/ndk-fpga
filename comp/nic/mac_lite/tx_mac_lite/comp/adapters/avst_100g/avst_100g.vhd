@@ -11,12 +11,12 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 
 entity TX_MAC_LITE_ADAPTER_AVST_100G is
-    generic(
+    generic (
         DATA_WIDTH : natural := 512;
         FIFO_DEPTH : natural := 512;
         DEVICE     : string  := "STRATIX10"
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK            : in  std_logic;
         RESET          : in  std_logic;
@@ -91,7 +91,7 @@ architecture FULL of TX_MAC_LITE_ADAPTER_AVST_100G is
 
 begin
 
-    flu2fl : entity work.flu2fl
+    flu2fl : entity work.FLU2FL
     generic map (
         DATA_WIDTH      => DATA_WIDTH,
         SOP_POS_WIDTH   => SOP_POS_WIDTH,
@@ -126,10 +126,10 @@ begin
     mfb_aligned_sof(0)  <= not fl_sof_n;
     mfb_aligned_eof(0)  <= not fl_eof_n;
     mfb_aligned_src_rdy <= not fl_src_rdy_n;
-    fl_dst_rdy_n <= not mfb_aligned_dst_rdy;
+    fl_dst_rdy_n        <= not mfb_aligned_dst_rdy;
 
     mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => 1,
         REGION_SIZE => 1,
         BLOCK_SIZE  => DATA_WIDTH/8,
@@ -140,7 +140,7 @@ begin
         PIPE_TYPE   => "REG",
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 
@@ -167,7 +167,7 @@ begin
     mfb_pipe_dst_rdy_fix <= mfb_pipe_dst_rdy and not pkt_cnt_stop_flag;
 
     fifo_i : entity work.MFB_FIFOX
-    generic map(
+    generic map (
         REGIONS     => 1,
         REGION_SIZE => 1,
         BLOCK_SIZE  => DATA_WIDTH/8,
@@ -176,7 +176,7 @@ begin
         RAM_TYPE    => "AUTO",
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK => CLK,
         RST => RESET,
 
@@ -214,7 +214,7 @@ begin
         end if;
     end process;
 
-    pkt_cnt_inc <= pkt_cnt_inc_dly(PKT_CNT_INC_DLY_WIDTH-1);
+    pkt_cnt_inc       <= pkt_cnt_inc_dly(PKT_CNT_INC_DLY_WIDTH-1);
     pkt_cnt_stop_flag <= pkt_cnt_reg(PKT_CNT_WIDTH-1);
 
     pkt_cnt_next_p : process (all)
@@ -238,7 +238,7 @@ begin
         end if;
     end process;
 
-    pkt_cnt_dec <= mfb_fifo_src_rdy and mfb_fifo_dst_rdy and mfb_fifo_eof(0);
+    pkt_cnt_dec        <= mfb_fifo_src_rdy and mfb_fifo_dst_rdy and mfb_fifo_eof(0);
     pkt_cnt_ready_flag <= '1' when (pkt_cnt_reg > 0) else '0';
 
     -- rotate bytes
@@ -246,12 +246,12 @@ begin
         mfb_fifo_data_rotated((i+1)*8-1 downto i*8) <= mfb_fifo_data((DATA_BYTES-i)*8-1 downto (DATA_BYTES-1-i)*8);
     end generate;
 
-    TX_AVST_DATA  <= mfb_fifo_data_rotated;
-    TX_AVST_SOP   <= mfb_fifo_sof(0);
-    TX_AVST_EOP   <= mfb_fifo_eof(0);
-    TX_AVST_EMPTY <= std_logic_vector((DATA_BYTES-1) - unsigned(mfb_fifo_eof_pos));
-    TX_AVST_ERROR <= '0';
-    TX_AVST_VALID <= mfb_fifo_src_rdy and pkt_cnt_ready_flag;
+    TX_AVST_DATA     <= mfb_fifo_data_rotated;
+    TX_AVST_SOP      <= mfb_fifo_sof(0);
+    TX_AVST_EOP      <= mfb_fifo_eof(0);
+    TX_AVST_EMPTY    <= std_logic_vector((DATA_BYTES-1) - unsigned(mfb_fifo_eof_pos));
+    TX_AVST_ERROR    <= '0';
+    TX_AVST_VALID    <= mfb_fifo_src_rdy and pkt_cnt_ready_flag;
     mfb_fifo_dst_rdy <= TX_AVST_READY and pkt_cnt_ready_flag;
 
 end architecture;

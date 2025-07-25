@@ -26,7 +26,7 @@ begin
     INIT_DONE_N <= '0';
 
     -- NOTE: CLKOUT 0-3 are High-Performance Clocks (UG472), the rest is not!
-    mmcm_i : MMCME4_BASE
+    mmcm_i : component mmcme4_base
     generic map (
         BANDWIDTH        => "OPTIMIZED",
         DIVCLK_DIVIDE    => PLL_MASTER_DIV,
@@ -60,28 +60,28 @@ begin
         RST       => ASYNC_RESET
     );
 
-    clkout0_buf_i : BUFG
+    clkout0_buf_i : component bufg
     port map (
-       O => OUTCLK_0,
-       I => clkout0
+        O => OUTCLK_0,
+        I => clkout0
     );
 
-    clkout1_buf_i : BUFG
+    clkout1_buf_i : component bufg
     port map (
-       O => OUTCLK_1,
-       I => clkout1
+        O => OUTCLK_1,
+        I => clkout1
     );
 
-    clkout2_buf_i : BUFG
+    clkout2_buf_i : component bufg
     port map (
-       O => OUTCLK_2,
-       I => clkout2
+        O => OUTCLK_2,
+        I => clkout2
     );
 
-    clkout3_buf_i : BUFG
+    clkout3_buf_i : component bufg
     port map (
-       O => OUTCLK_3,
-       I => clkout3
+        O => OUTCLK_3,
+        I => clkout3
     );
 
 end architecture;

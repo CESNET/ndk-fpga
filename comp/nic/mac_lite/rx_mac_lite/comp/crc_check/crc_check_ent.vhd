@@ -12,15 +12,15 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity RX_MAC_LITE_CRC_CHECK is
-    generic(
-        REGIONS     : natural := 4; -- any positive value
-        REGION_SIZE : natural := 8; -- any positive value
-        BLOCK_SIZE  : natural := 8; -- any positive value
-        ITEM_WIDTH  : natural := 8; -- must be 8
+    generic (
+        REGIONS     : natural := 4;    -- any positive value
+        REGION_SIZE : natural := 8;    -- any positive value
+        BLOCK_SIZE  : natural := 8;    -- any positive value
+        ITEM_WIDTH  : natural := 8;    -- must be 8
         INBANDFCS   : boolean := True; -- True = CRC is not removed, False = CRC is removed
         DEVICE      : string  := "STRATIX10"
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK             : in  std_logic;
         RESET           : in  std_logic;

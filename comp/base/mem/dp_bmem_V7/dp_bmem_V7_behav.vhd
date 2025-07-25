@@ -21,36 +21,36 @@ architecture BEHAV of DP_BRAM_V7 is
 
 begin
 
-   --! \brief Instantion of behavioral BRAM
-   BRAM_BEHAV_I:entity work.DP_BMEM(behavioral)
-   generic map (
-      DATA_WIDTH   => DATA_WIDTH,
-      ITEMS        => 2**ADDRESS_WIDTH,
-      WRITE_MODE_A => WRITE_MODE_A,
-      WRITE_MODE_B => WRITE_MODE_B,
-      OUTPUT_REG   => ENABLE_OUT_REG
-   )
-   port map(
-      -- Interface A
-      CLKA        => CLKA,       -- Clock A
-      RSTA        => RSTA,       -- Clock A sync reset
-      PIPE_ENA    => PIPE_ENA,   -- Pipe Enable
-      REA         => REA,        -- Read Enable
-      WEA         => WEA,        -- Write Enable
-      ADDRA       => ADDRA,      -- Address A
-      DIA         => DIA,        -- Data A In
-      DOA_DV      => DOA_DV,     -- Data A Valid
-      DOA         => DOA,        -- Data A Out
+    --! \brief Instantion of behavioral BRAM
+    bram_behav_i: entity work.DP_BMEM(behavioral)
+    generic map (
+        DATA_WIDTH   => DATA_WIDTH,
+        ITEMS        => 2**ADDRESS_WIDTH,
+        WRITE_MODE_A => WRITE_MODE_A,
+        WRITE_MODE_B => WRITE_MODE_B,
+        OUTPUT_REG   => ENABLE_OUT_REG
+    )
+    port map (
+        -- Interface A
+        CLKA        => CLKA,       -- Clock A
+        RSTA        => RSTA,       -- Clock A sync reset
+        PIPE_ENA    => PIPE_ENA,   -- Pipe Enable
+        REA         => REA,        -- Read Enable
+        WEA         => WEA,        -- Write Enable
+        ADDRA       => ADDRA,      -- Address A
+        DIA         => DIA,        -- Data A In
+        DOA_DV      => DOA_DV,     -- Data A Valid
+        DOA         => DOA,        -- Data A Out
 
-      -- Interface B
-      CLKB        => CLKB,       -- Clock B
-      RSTB        => RSTB,       -- Clock B sync reset
-      PIPE_ENB    => PIPE_ENB,   -- Pipe Enable
-      REB         => REB,        -- Read Enable
-      WEB         => WEB,        -- Write Enable
-      ADDRB       => ADDRB,      -- Address B
-      DIB         => DIB,        -- Data B In
-      DOB_DV      => DOB_DV,     -- Data B Valid
-      DOB         => DOB         -- Data B Out
-   );
-end architecture BEHAV;
+        -- Interface B
+        CLKB        => CLKB,       -- Clock B
+        RSTB        => RSTB,       -- Clock B sync reset
+        PIPE_ENB    => PIPE_ENB,   -- Pipe Enable
+        REB         => REB,        -- Read Enable
+        WEB         => WEB,        -- Write Enable
+        ADDRB       => ADDRB,      -- Address B
+        DIB         => DIB,        -- Data B In
+        DOB_DV      => DOB_DV,     -- Data B Valid
+        DOB         => DOB         -- Data B Out
+    );
+end architecture;

@@ -12,7 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity TX_MAC_LITE_SHIFTER is
-    generic(
+    generic (
         -- Number of regions within a data word, must be power of 2.
         MFB_REGIONS        : natural := 4;
         -- Region size (in blocks).
@@ -24,7 +24,7 @@ entity TX_MAC_LITE_SHIFTER is
         -- FPGA device name.
         DEVICE             : string := "STRATIX10"
     );
-    port(
+    port (
         -- =====================================================================
         --  CLOCK AND RESET
         -- =====================================================================

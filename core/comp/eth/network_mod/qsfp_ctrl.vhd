@@ -10,59 +10,59 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
---use ieee.std_logic_arith.all;
---use ieee.std_logic_unsigned.all;
---use ieee.std_logic_misc.all;
+-- use ieee.std_logic_arith.all;
+-- use ieee.std_logic_unsigned.all;
+-- use ieee.std_logic_misc.all;
 use ieee.numeric_std.all;
 
 use work.math_pack.all;
 use work.type_pack.all;
 
-entity qsfp_ctrl is
-generic (
-    QSFP_PORTS          : integer := 1;
-    QSFP_I2C_PORTS      : integer := 1;
-    I2C_TRISTATE        : boolean := true;
-    FPC202_INIT_EN      : boolean := false
-);
-port (
-    RST                  : in  std_logic;
-    --
-    TX_READY             : in  std_logic_vector(QSFP_PORTS-1 downto 0);
-    -- QSFP control/status
-    QSFP_MODSEL_N       : out   std_logic_vector(QSFP_PORTS-1 downto 0);
-    QSFP_LPMODE         : out   std_logic_vector(QSFP_PORTS-1 downto 0);
-    QSFP_RESET_N        : out   std_logic_vector(QSFP_PORTS-1 downto 0);
-    QSFP_MODPRS_N       : in    std_logic_vector(QSFP_PORTS-1 downto 0);
-    QSFP_INT_N          : in    std_logic_vector(QSFP_PORTS-1 downto 0);
-    -- I2C - bidirectional, tristate buffers
-    QSFP_I2C_SCL        : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
-    QSFP_I2C_SDA        : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
-    QSFP_I2C_DIR        : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    -- Optional non-bidirectional I2C interface (tristate buffers in the top-level)
-    QSFP_I2C_SDA_I      : in    std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => '1');
-    QSFP_I2C_SCL_I      : in    std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => '1');
-    QSFP_I2C_SCL_O      : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    QSFP_I2C_SCL_OE     : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    QSFP_I2C_SDA_O      : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    QSFP_I2C_SDA_OE     : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    -- Select which QSFP port is targetting during MI read/writes
-    MI_QSFP_SEL           : in  std_logic_vector(max(log2(QSFP_PORTS)-1, 0) downto 0);
-    -- MI32 interface -
-    MI_CLK_PHY            : in  std_logic;
-    MI_RESET_PHY          : in  std_logic;
-    MI_DWR_PHY            : in  std_logic_vector(31 downto 0);
-    MI_ADDR_PHY           : in  std_logic_vector(31 downto 0);
-    MI_RD_PHY             : in  std_logic;
-    MI_WR_PHY             : in  std_logic;
-    MI_BE_PHY             : in  std_logic_vector( 3 downto 0);
-    MI_DRD_PHY            : out std_logic_vector(31 downto 0);
-    MI_ARDY_PHY           : out std_logic;
-    MI_DRDY_PHY           : out std_logic
-);
+entity QSFP_CTRL is
+    generic (
+        QSFP_PORTS          : integer := 1;
+        QSFP_I2C_PORTS      : integer := 1;
+        I2C_TRISTATE        : boolean := true;
+        FPC202_INIT_EN      : boolean := false
+    );
+    port (
+        RST                   : in  std_logic;
+        --
+        TX_READY              : in  std_logic_vector(QSFP_PORTS-1 downto 0);
+        -- QSFP control/status
+        QSFP_MODSEL_N         : out   std_logic_vector(QSFP_PORTS-1 downto 0);
+        QSFP_LPMODE           : out   std_logic_vector(QSFP_PORTS-1 downto 0);
+        QSFP_RESET_N          : out   std_logic_vector(QSFP_PORTS-1 downto 0);
+        QSFP_MODPRS_N         : in    std_logic_vector(QSFP_PORTS-1 downto 0);
+        QSFP_INT_N            : in    std_logic_vector(QSFP_PORTS-1 downto 0);
+        -- I2C - bidirectional, tristate buffers
+        QSFP_I2C_SCL          : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
+        QSFP_I2C_SDA          : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
+        QSFP_I2C_DIR          : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        -- Optional non-bidirectional I2C interface (tristate buffers in the top-level)
+        QSFP_I2C_SDA_I        : in    std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => '1');
+        QSFP_I2C_SCL_I        : in    std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => '1');
+        QSFP_I2C_SCL_O        : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        QSFP_I2C_SCL_OE       : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        QSFP_I2C_SDA_O        : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        QSFP_I2C_SDA_OE       : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        -- Select which QSFP port is targetting during MI read/writes
+        MI_QSFP_SEL           : in  std_logic_vector(max(log2(QSFP_PORTS)-1, 0) downto 0);
+        -- MI32 interface -
+        MI_CLK_PHY            : in  std_logic;
+        MI_RESET_PHY          : in  std_logic;
+        MI_DWR_PHY            : in  std_logic_vector(31 downto 0);
+        MI_ADDR_PHY           : in  std_logic_vector(31 downto 0);
+        MI_RD_PHY             : in  std_logic;
+        MI_WR_PHY             : in  std_logic;
+        MI_BE_PHY             : in  std_logic_vector( 3 downto 0);
+        MI_DRD_PHY            : out std_logic_vector(31 downto 0);
+        MI_ARDY_PHY           : out std_logic;
+        MI_DRDY_PHY           : out std_logic
+    );
 end entity;
 
-architecture full of qsfp_ctrl is
+architecture FULL of QSFP_CTRL is
 
     constant QSFP_RST_W    : natural := 20;
     constant QSFP_STATUS_W : natural := 8;
@@ -83,9 +83,11 @@ architecture full of qsfp_ctrl is
     signal i2c_qsfp_dwr_fsm      : std_logic_vector(63 downto 0);
     signal i2c_qsfp_wen_fsm      : std_logic;
 
-    type fpc_fsm_st_t is (st_reset, st_enable, st_wr_dev, st_wr_dev_wait_tip,
-        st_wr_dev_wait, st_wr_reg, st_wr_reg_wait_tip, st_wr_reg_wait, st_sleep,
-        st_wr_data, st_wr_data_wait_tip, st_wr_data_wait, st_wr_disable, st_done);
+    type   fpc_fsm_st_t is (
+        ST_RESET, ST_ENABLE, ST_WR_DEV, ST_WR_DEV_WAIT_TIP,
+        ST_WR_DEV_WAIT, ST_WR_REG, ST_WR_REG_WAIT_TIP, ST_WR_REG_WAIT, ST_SLEEP,
+        ST_WR_DATA, ST_WR_DATA_WAIT_TIP, ST_WR_DATA_WAIT, ST_WR_DISABLE, ST_DONE
+    );
     signal fpc_fsm_pst           : fpc_fsm_st_t;
     signal fpc_fsm_nst           : fpc_fsm_st_t;
     signal fpc_fsm_done          : std_logic;
@@ -119,7 +121,7 @@ begin
     end generate;
 
     -- Read I2C controller registers + QSFP status registers
-    mi_regs_rd_p : process(MI_CLK_PHY)
+    mi_regs_rd_p : process (MI_CLK_PHY)
     begin
         if (rising_edge(MI_CLK_PHY)) then
             MI_DRDY_PHY <= '0';
@@ -127,57 +129,57 @@ begin
             -- Read from I2C controller or from QSFP status reg
             if (MI_RD_PHY = '1') then
                 MI_DRDY_PHY <= '1';
-                if (MI_ADDR_PHY(3 downto 2) = "00") then    -- I2C reg 0x00
+                if (MI_ADDR_PHY(3 downto 2) = "00") then                                                                                       -- I2C reg 0x00
                     MI_DRD_PHY  <= i2c_qsfp_drd(31 downto 0);
-                elsif (MI_ADDR_PHY(3 downto 2) = "01") then -- I2C reg 0x04
+                elsif (MI_ADDR_PHY(3 downto 2) = "01") then                                                                                    -- I2C reg 0x04
                     MI_DRD_PHY <= i2c_qsfp_drd(63 downto 32);
                 else
                     MI_DRD_PHY(QSFP_STATUS_W-1 downto 0) <= qsfp_status((qsfp_mi_sel_i+1)*QSFP_STATUS_W-1 downto qsfp_mi_sel_i*QSFP_STATUS_W);
                 end if;
             end if;
         end if;
-    end process mi_regs_rd_p;
+    end process;
 
-   MI_ARDY_PHY <= (MI_RD_PHY or MI_WR_PHY) and fpc_fsm_done;
+    MI_ARDY_PHY <= (MI_RD_PHY or MI_WR_PHY) and fpc_fsm_done;
 
-   -- ----------------------------------------------------------------------------
-   -- QSFP I2C control and management
-   -------------------------------------------------------------------------------
-   --   NOTE: Single I2C controller is shared for all QSFP interfaces, MI_QSFP_SEL
-   --   select which interface is targeted
+    -- ----------------------------------------------------------------------------
+    -- QSFP I2C control and management
+    -------------------------------------------------------------------------------
+    --   NOTE: Single I2C controller is shared for all QSFP interfaces, MI_QSFP_SEL
+    --   select which interface is targeted
 
-   -- Write enable signals
-   i2c_mi_wr  <= MI_WR_PHY when (MI_ADDR_PHY(4) = '1') else '0';
+    -- Write enable signals
+    i2c_mi_wr  <= MI_WR_PHY when (MI_ADDR_PHY(4) = '1') else '0';
 
-   i2c_qsfp_dwr(31 downto   0) <= MI_DWR_PHY;
-   i2c_qsfp_dwr(63 downto  32) <= MI_DWR_PHY;
-   i2c_qsfp_be                 <= "0000" & MI_BE_PHY when MI_ADDR_PHY(2) = '0' else
+    i2c_qsfp_dwr(31 downto   0) <= MI_DWR_PHY;
+    i2c_qsfp_dwr(63 downto  32) <= MI_DWR_PHY;
+    i2c_qsfp_be                 <= "0000" & MI_BE_PHY when MI_ADDR_PHY(2) = '0' else
                                    MI_BE_PHY & "0000";
-   i2c_qsfp_wen                <= i2c_mi_wr and (not MI_ADDR_PHY(3));
+    i2c_qsfp_wen                <= i2c_mi_wr and (not MI_ADDR_PHY(3));
 
-   -- Writing data to registers
-   i2c_regs_wr_p : process(MI_CLK_PHY)
-   begin
-      if (rising_edge(MI_CLK_PHY)) then
-         i2c_qsfp_sel <= MI_ADDR_PHY(8);
-         if (i2c_mi_wr = '1') then
-            if (MI_ADDR_PHY(3 downto 2) = "11") then -- 0x1C - QSFP control reg
-               trans_ctrl(qsfp_mi_sel_i*3+2 downto qsfp_mi_sel_i*3) <= MI_DWR_PHY(3 downto 1);
+    -- Writing data to registers
+    i2c_regs_wr_p : process (MI_CLK_PHY)
+    begin
+        if (rising_edge(MI_CLK_PHY)) then
+            i2c_qsfp_sel <= MI_ADDR_PHY(8);
+            if (i2c_mi_wr = '1') then
+                if (MI_ADDR_PHY(3 downto 2) = "11") then -- 0x1C - QSFP control reg
+                    trans_ctrl(qsfp_mi_sel_i*3+2 downto qsfp_mi_sel_i*3) <= MI_DWR_PHY(3 downto 1);
+                end if;
+
+                -- Turn on module select on targeted QSFP
+                qsfp_modsel_r                <= (others => '0');
+                qsfp_modsel_r(qsfp_mi_sel_i) <= '1';
             end if;
 
-            -- Turn on module select on targeted QSFP
-            qsfp_modsel_r <= (others => '0');
-            qsfp_modsel_r(qsfp_mi_sel_i) <= '1';
-         end if;
+            if (RST = '1') then
+                for i in 0 to QSFP_PORTS-1 loop
+                    trans_ctrl(3*i+2 downto 3*i) <= "001";
+                end loop;
+            end if;
 
-         if RST = '1' then
-             for i in 0 to QSFP_PORTS-1 loop
-                 trans_ctrl(3*i+2 downto 3*i) <= "001";
-             end loop;
-         end if;
-
-      end if;
-   end process i2c_regs_wr_p;
+        end if;
+    end process;
 
     -- On Intel Stratix 10 DX Dev Kit is FPC202 controller which by default
     -- keeps the QSFP cages turned off and must be configured first.
@@ -187,7 +189,7 @@ begin
         begin
             if (rising_edge(MI_CLK_PHY)) then
                 if (MI_RESET_PHY = '1') then
-                    fpc_fsm_pst     <= st_reset;
+                    fpc_fsm_pst     <= ST_RESET;
                     fpc_conf_st_reg <= (others => '0');
                 else
                     fpc_fsm_pst     <= fpc_fsm_nst;
@@ -208,32 +210,32 @@ begin
             fpc_fsm_timer_en <= '0';
 
             case (fpc_fsm_pst) is
-                when st_reset =>
-                    fpc_fsm_nst <= st_enable;
+                when ST_RESET =>
+                    fpc_fsm_nst <= ST_ENABLE;
 
-                when st_enable =>
+                when ST_ENABLE =>
                     i2c_qsfp_be_fsm  <= "00001111";
-                    i2c_qsfp_dwr_fsm <= X"00000000008000c7";
+                    i2c_qsfp_dwr_fsm <= X"00000000008000C7";
                     i2c_qsfp_wen_fsm <= '1';
-                    fpc_fsm_nst      <= st_wr_dev;
+                    fpc_fsm_nst      <= ST_WR_DEV;
 
-                when st_wr_dev =>
+                when ST_WR_DEV =>
                     i2c_qsfp_be_fsm  <= "11110000";
-                    i2c_qsfp_dwr_fsm <= X"00001e9000000000";
+                    i2c_qsfp_dwr_fsm <= X"00001E9000000000";
                     i2c_qsfp_wen_fsm <= '1';
-                    fpc_fsm_nst      <= st_wr_dev_wait_tip;
+                    fpc_fsm_nst      <= ST_WR_DEV_WAIT_TIP;
 
-                when st_wr_dev_wait_tip =>
+                when ST_WR_DEV_WAIT_TIP =>
                     if (i2c_qsfp_drd(33) = '1') then
-                        fpc_fsm_nst <= st_wr_dev_wait;
+                        fpc_fsm_nst <= ST_WR_DEV_WAIT;
                     end if;
 
-                when st_wr_dev_wait =>
+                when ST_WR_DEV_WAIT =>
                     if (i2c_qsfp_drd(33) = '0' and i2c_qsfp_drd(39) = '0') then
-                        fpc_fsm_nst <= st_wr_reg;
+                        fpc_fsm_nst <= ST_WR_REG;
                     end if;
 
-                when st_wr_reg =>
+                when ST_WR_REG =>
                     if (fpc_conf_st_reg = "00") then
                         -- Enable Output register (FPC202 - 0x08)
                         i2c_qsfp_dwr_fsm <= X"0000081000000000";
@@ -243,19 +245,19 @@ begin
                     end if;
                     i2c_qsfp_be_fsm  <= "11110000";
                     i2c_qsfp_wen_fsm <= '1';
-                    fpc_fsm_nst      <= st_wr_reg_wait_tip;
+                    fpc_fsm_nst      <= ST_WR_REG_WAIT_TIP;
 
-                when st_wr_reg_wait_tip =>
+                when ST_WR_REG_WAIT_TIP =>
                     if (i2c_qsfp_drd(33) = '1') then
-                        fpc_fsm_nst <= st_wr_reg_wait;
+                        fpc_fsm_nst <= ST_WR_REG_WAIT;
                     end if;
 
-                when st_wr_reg_wait =>
+                when ST_WR_REG_WAIT =>
                     if (i2c_qsfp_drd(33) = '0' and i2c_qsfp_drd(39) = '0') then
-                        fpc_fsm_nst <= st_wr_data;
+                        fpc_fsm_nst <= ST_WR_DATA;
                     end if;
 
-                when st_wr_data =>
+                when ST_WR_DATA =>
                     if (fpc_conf_st_reg = "01") then
                         -- Enable QSFP reset
                         i2c_qsfp_dwr_fsm <= X"0000005000000000";
@@ -268,36 +270,36 @@ begin
                     end if;
                     i2c_qsfp_be_fsm  <= "11110000";
                     i2c_qsfp_wen_fsm <= '1';
-                    fpc_fsm_nst      <= st_wr_data_wait_tip;
+                    fpc_fsm_nst      <= ST_WR_DATA_WAIT_TIP;
 
-                when st_wr_data_wait_tip =>
+                when ST_WR_DATA_WAIT_TIP =>
                     if (i2c_qsfp_drd(33) = '1') then
-                        fpc_fsm_nst <= st_wr_data_wait;
+                        fpc_fsm_nst <= ST_WR_DATA_WAIT;
                     end if;
 
-                when st_wr_data_wait =>
+                when ST_WR_DATA_WAIT =>
                     if (i2c_qsfp_drd(33) = '0' and i2c_qsfp_drd(39) = '0') then
                         fpc_conf_st <= fpc_conf_st_reg + 1;
-                        fpc_fsm_nst <= st_sleep;
+                        fpc_fsm_nst <= ST_SLEEP;
                     end if;
 
-                when st_sleep =>
+                when ST_SLEEP =>
                     fpc_fsm_timer_en <= '1';
                     if (sleep_timer(24) = '1') then
                         if (fpc_conf_st_reg = "11") then
-                            fpc_fsm_nst <= st_wr_disable;
+                            fpc_fsm_nst <= ST_WR_DISABLE;
                         else
-                            fpc_fsm_nst <= st_wr_dev;
+                            fpc_fsm_nst <= ST_WR_DEV;
                         end if;
                     end if;
 
-                when st_wr_disable =>
+                when ST_WR_DISABLE =>
                     i2c_qsfp_be_fsm  <= "00001111";
-                    i2c_qsfp_dwr_fsm <= X"00000000000000c7";
+                    i2c_qsfp_dwr_fsm <= X"00000000000000C7";
                     i2c_qsfp_wen_fsm <= '1';
-                    fpc_fsm_nst      <= st_done;
+                    fpc_fsm_nst      <= ST_DONE;
 
-                when st_done =>
+                when ST_DONE =>
                     i2c_qsfp_be_fsm  <= i2c_qsfp_be;
                     i2c_qsfp_dwr_fsm <= i2c_qsfp_dwr;
                     i2c_qsfp_wen_fsm <= i2c_qsfp_wen;
@@ -325,29 +327,29 @@ begin
         fpc_fsm_done     <= '1';
     end generate;
 
-   -- QSFP28 I2C controller
-   i2c_qsfp_i : entity work.i2c_master_top
-   generic map (
-      PRER_INIT    => X"0271"  -- 250MHz CLK -> 100KHz SCL
-   )
-   port map (
-      CLK          => MI_CLK_PHY,
-      RST_SYNC     => '0',
-      RST_ASYNC    => MI_RESET_PHY,
-      -- I2C interfaces
-      SCL_PAD_I    => qsfp_i2c_scl_int,
-      SCL_PAD_O    => i2c_qsfp_scl_o,
-      SCL_PADOEN_O => i2c_qsfp_scl_oen,
-      SDA_PAD_I    => qsfp_i2c_sda_int,
-      SDA_PAD_O    => i2c_qsfp_sda_o,
-      SDA_PADOEN_O => i2c_qsfp_sda_oen,
-      -- control interface
-      BE           => i2c_qsfp_be_fsm,
-      DWR          => i2c_qsfp_dwr_fsm,
-      DRD          => i2c_qsfp_drd,
-      WEN          => i2c_qsfp_wen_fsm,
-      INT          => open
-   );
+    -- QSFP28 I2C controller
+    i2c_qsfp_i : entity work.I2C_MASTER_TOP
+    generic map (
+        PRER_INIT    => X"0271"  -- 250MHz CLK -> 100KHz SCL
+    )
+    port map (
+        CLK          => MI_CLK_PHY,
+        RST_SYNC     => '0',
+        RST_ASYNC    => MI_RESET_PHY,
+        -- I2C interfaces
+        SCL_PAD_I    => qsfp_i2c_scl_int,
+        SCL_PAD_O    => i2c_qsfp_scl_o,
+        SCL_PADOEN_O => i2c_qsfp_scl_oen,
+        SDA_PAD_I    => qsfp_i2c_sda_int,
+        SDA_PAD_O    => i2c_qsfp_sda_o,
+        SDA_PADOEN_O => i2c_qsfp_sda_oen,
+        -- control interface
+        BE           => i2c_qsfp_be_fsm,
+        DWR          => i2c_qsfp_dwr_fsm,
+        DRD          => i2c_qsfp_drd,
+        WEN          => i2c_qsfp_wen_fsm,
+        INT          => open
+    );
 
     i2c_tri_g: if I2C_TRISTATE generate
         qsfp_i2c_sda_in <= QSFP_I2C_SDA;
@@ -358,10 +360,10 @@ begin
     end generate;
 
     i2c_mux_g : if QSFP_I2C_PORTS = 1 generate
-        qsfp_i2c_sda_int <= qsfp_i2c_sda_in(0);
-        qsfp_i2c_scl_int <= qsfp_i2c_scl_in(0);
-        QSFP_I2C_SCL(0)  <= i2c_qsfp_scl_o when (i2c_qsfp_scl_oen = '0') else 'Z';
-        QSFP_I2C_SDA(0)  <= i2c_qsfp_sda_o when (i2c_qsfp_sda_oen = '0') else 'Z';
+        qsfp_i2c_sda_int   <= qsfp_i2c_sda_in(0);
+        qsfp_i2c_scl_int   <= qsfp_i2c_scl_in(0);
+        QSFP_I2C_SCL(0)    <= i2c_qsfp_scl_o when (i2c_qsfp_scl_oen = '0') else 'Z';
+        QSFP_I2C_SDA(0)    <= i2c_qsfp_sda_o when (i2c_qsfp_sda_oen = '0') else 'Z';
         -- Non-bidirectional i2c outputs
         QSFP_I2C_SCL_O(0)  <= i2c_qsfp_scl_o;
         QSFP_I2C_SCL_OE(0) <= not i2c_qsfp_scl_oen;
@@ -369,9 +371,9 @@ begin
         QSFP_I2C_SDA_OE(0) <= not i2c_qsfp_sda_oen;
     else generate
         qsfp_i2c_omux_g : for i in 0 to QSFP_I2C_PORTS-1 generate
-            QSFP_I2C_SCL(i) <= i2c_qsfp_scl_o when (i2c_qsfp_scl_oen = '0') and (qsfp_modsel_r(i) = '1') else 'Z';
-            QSFP_I2C_SDA(i) <= i2c_qsfp_sda_o when (i2c_qsfp_sda_oen = '0') and (qsfp_modsel_r(i) = '1') else 'Z';
-				-- Non-bidirectional i2c outputs
+            QSFP_I2C_SCL(i)    <= i2c_qsfp_scl_o when (i2c_qsfp_scl_oen = '0') and (qsfp_modsel_r(i) = '1') else 'Z';
+            QSFP_I2C_SDA(i)    <= i2c_qsfp_sda_o when (i2c_qsfp_sda_oen = '0') and (qsfp_modsel_r(i) = '1') else 'Z';
+            -- Non-bidirectional i2c outputs
             QSFP_I2C_SCL_O(i)  <= i2c_qsfp_scl_o        when (qsfp_modsel_r(i) = '1') else '1';
             QSFP_I2C_SCL_OE(i) <= not i2c_qsfp_scl_oen  when (qsfp_modsel_r(i) = '1') else '0';
             QSFP_I2C_SDA_O(i)  <= i2c_qsfp_sda_o        when (qsfp_modsel_r(i) = '1') else '1';
@@ -452,8 +454,8 @@ begin
 
     qsfp_outs_g: for i in 0 to QSFP_PORTS-1 generate
         -- SW reset via MI or automatic reset (see above)
-        QSFP_RESET_N(i) <= trans_ctrl(i*3+0) and qsfp_rst_timer(i)(QSFP_RST_W-1);
-        QSFP_LPMODE(i)  <= trans_ctrl(i*3+1);
+        QSFP_RESET_N(i)  <= trans_ctrl(i*3+0) and qsfp_rst_timer(i)(QSFP_RST_W-1);
+        QSFP_LPMODE(i)   <= trans_ctrl(i*3+1);
         QSFP_MODSEL_N(i) <= not qsfp_modsel_r(i);
     end generate;
     QSFP_I2C_DIR   <= (others => not i2c_qsfp_sda_oen); -- I2C bus direction: 0 = QSFP -> FPGA, 1 = FPGA -> QSFP

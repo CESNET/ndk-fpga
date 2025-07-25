@@ -29,7 +29,7 @@ use work.type_pack.all;
 --    0x050501: Send all frames to DMA channel 5 only
 
 entity MVB_CHANNEL_ROUTER is
-    generic(
+    generic (
         -- MVB parameters: number of items in word
         ITEMS         : natural := 4;
         -- MVB parameters: width of item in bits
@@ -45,7 +45,7 @@ entity MVB_CHANNEL_ROUTER is
         -- Name of FPGA device
         DEVICE        : string  := "ULTRASCALE"
     );
-    port(
+    port (
         -- =====================================================================
         -- CLOCK AND RESET
         -- =====================================================================
@@ -111,9 +111,9 @@ begin
     s_ctrl_regs_arr <= slv_array_deser(CTRL_REGS,SRC_CHANNELS,32);
 
     ctrl_regs_decode_g : for i in 0 to SRC_CHANNELS-1 generate
-        s_chan_max(i) <= unsigned(s_ctrl_regs_arr(i)(24-1 downto 16));
-        s_chan_min(i) <= unsigned(s_ctrl_regs_arr(i)(16-1 downto 8));
-        s_chan_inc(i) <= unsigned(s_ctrl_regs_arr(i)(8-1 downto 0));
+        s_chan_max(i)  <= unsigned(s_ctrl_regs_arr(i)(24-1 downto 16));
+        s_chan_min(i)  <= unsigned(s_ctrl_regs_arr(i)(16-1 downto 8));
+        s_chan_inc(i)  <= unsigned(s_ctrl_regs_arr(i)(8-1 downto 0));
         s_chan_diff(i) <= s_chan_max(i) - s_chan_min(i);
     end generate;
 
@@ -175,7 +175,7 @@ begin
                 for j in 0 to ITEMS-1 loop
                     s_chan_cnt_inc(i)(j) <= resize(s_chan_cnt_items(i)(j),(DST_CHANNELS_W+1)) + resize(s_chan_inc(i),(minimum(DST_CHANNELS_W,8)));
                     if (RX_VLD(j) = '1' and s_src_chan(j) = i) then
-                        if (s_chan_cnt_inc(i)(j) <= s_chan_max(i)) and (s_chan_cnt_inc(i)(j) <= (DST_CHANNELS-1)) and (s_chan_cnt_inc(i)(j) >= s_chan_min(i)) then
+                        if ((s_chan_cnt_inc(i)(j) <= s_chan_max(i)) and (s_chan_cnt_inc(i)(j) <= (DST_CHANNELS-1)) and (s_chan_cnt_inc(i)(j) >= s_chan_min(i))) then
                             -- Increment the counter
                             s_chan_cnt_items(i)(j+1) <= s_chan_cnt_inc(i)(j)(DST_CHANNELS_W-1 downto 0);
                         else -- Reset the counter to min value

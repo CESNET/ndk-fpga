@@ -20,7 +20,7 @@ use fourteennm.fourteennm_components.all;
 -- NOTE: default latency of this comparator is 2 clock cycles (with input registers enabled), to achieve latency of 1 clock cycle, disable input registers
 
 entity DSP_COMPARATOR_STRATIX_10_ATOM is
-    Generic (
+    generic (
         -- the width of the input data; maximum width of 25 bits applies only in modes ">= " or "<= " when using DSP blocks, unlimited in other cases
         -- INPUT_DATA_WIDTH+1 is used to accomodate the sign bit
         INPUT_DATA_WIDTH : natural := 25;
@@ -32,8 +32,8 @@ entity DSP_COMPARATOR_STRATIX_10_ATOM is
         -- "<=" outputs result in form of '11' if the 1st number is smaller or equal than the 2nd number, else '00' - 25 is the maximum input data width !! NOTE: only one DSP block is used in this mode
         -- options: "><=", ">= ", "<= " - NOTE: the space after ">= " or "<= " is necessary !!
         MODE             : string  := "><="
-        );
-    Port (
+    );
+    port (
         CLK0       :  in std_logic;
         -- enables registers
         CLK0_EN    :  in std_logic;
@@ -72,7 +72,7 @@ architecture FULL of DSP_COMPARATOR_STRATIX_10_ATOM is
     -- number of used DSP blocks (fully or partially)
     constant TOTAL_NUM_OF_COMPARATORS : natural := tsel(LEFTOVER_BITS = 0, NUM_OF_FULL_COMPARATORS, NUM_OF_FULL_COMPARATORS+1);
 
-    signal clr0                 : std_logic; -- this is the reset signal for input registers, is '0' when they are disabled
+    signal clr0                 : std_logic;                                   -- this is the reset signal for input registers, is '0' when they are disabled
     signal input_1_sig          : std_logic_vector(INPUT_DATA_WIDTH downto 0); -- INPUT1 concatenated with '0' at MSB position to represent a positive number (conversion to the signed type occurs in the DSP block)
     signal input_2_sig          : std_logic_vector(INPUT_DATA_WIDTH downto 0); -- INPUT2 concatenated with '0' at MSB position to represent a positive number (conversion to the signed type occurs in the DSP block)
 
@@ -87,11 +87,12 @@ begin
 
     -- assert for wrong input data width in certain modes
     assert (((MODE = "><=") and (INPUT_DATA_WIDTH > 0)) or (((MODE = ">= ") or (MODE = "<= ")) and ((INPUT_DATA_WIDTH <= 25) and (INPUT_DATA_WIDTH > 0))))
-    report "Wrong width of input data for the chosen mode or mode option is entered incorrectly." severity failure;
+        report "Wrong width of input data for the chosen mode or mode option is entered incorrectly."
+        severity failure;
 
     dsp_comparator_function_g : case MODE generate
 
-        when ">= " =>
+        when ">= "  =>
 
             signal dout_dsp_1 : std_logic_vector(INPUT_DATA_WIDTH downto 0); -- result after subtraction in the DSP block
 
@@ -141,7 +142,7 @@ begin
 
         end;
 
-        when "<= " =>
+        when "<= "  =>
 
             signal dout_dsp_2 : std_logic_vector(INPUT_DATA_WIDTH downto 0); -- result after subtraction in the DSP block
 
@@ -226,13 +227,13 @@ begin
                 )
                 port map (
                     clk(0)  => CLK0,
-                    clk(1)  => '0',              -- not used
-                    clk(2)  => '0',              -- not used
-                    ena(0)  => CLK0_EN or RESET, -- enable for clock 0, ORed with RESET because enable has the priority (registers will not reset when CLK0_EN = '0' even if RESET = '1')
-                    ena(1)  => '0',              -- enable for clock 1; not used
-                    ena(2)  => '0',              -- enable for clock 2; not used
-                    clr(0)  => clr0,             -- resets input registers
-                    clr(1)  => RESET,            -- resets output registers (and pipeline registers, which are not used)
+                    clk(1)  => '0',                                   -- not used
+                    clk(2)  => '0',                                   -- not used
+                    ena(0)  => CLK0_EN or RESET,                      -- enable for clock 0, ORed with RESET because enable has the priority (registers will not reset when CLK0_EN = '0' even if RESET = '1')
+                    ena(1)  => '0',                                   -- enable for clock 1; not used
+                    ena(2)  => '0',                                   -- enable for clock 2; not used
+                    clr(0)  => clr0,                                  -- resets input registers
+                    clr(1)  => RESET,                                 -- resets output registers (and pipeline registers, which are not used)
                     ay      => '0' & INPUT_1(i*25-1 downto (i-1)*25), -- the input from which cerain part of INPUT_2 is subtracted
                     az      => '0' & INPUT_2(i*25-1 downto (i-1)*25), -- the input that is subtracted from INPUT_1
                     ax      => (others => '1'),                       -- this is the other input of the multiplier, must be 1 (in decimal) at all times so the result of subtraction stays the same
@@ -259,13 +260,13 @@ begin
                 )
                 port map (
                     clk(0)  => CLK0,
-                    clk(1)  => '0',              -- not used
-                    clk(2)  => '0',              -- not used
-                    ena(0)  => CLK0_EN or RESET, -- enable for clock 0, ORed with RESET because enable has the priority (registers will not reset when CLK0_EN = '0' even if RESET = '1')
-                    ena(1)  => '0',              -- enable for clock 1; not used
-                    ena(2)  => '0',              -- enable for clock 2; not used
-                    clr(0)  => clr0,             -- resets input registers
-                    clr(1)  => RESET,            -- resets output registers (and pipeline registers, which are not used)
+                    clk(1)  => '0',                                   -- not used
+                    clk(2)  => '0',                                   -- not used
+                    ena(0)  => CLK0_EN or RESET,                      -- enable for clock 0, ORed with RESET because enable has the priority (registers will not reset when CLK0_EN = '0' even if RESET = '1')
+                    ena(1)  => '0',                                   -- enable for clock 1; not used
+                    ena(2)  => '0',                                   -- enable for clock 2; not used
+                    clr(0)  => clr0,                                  -- resets input registers
+                    clr(1)  => RESET,                                 -- resets output registers (and pipeline registers, which are not used)
                     ay      => '0' & INPUT_2(i*25-1 downto (i-1)*25), -- the input from which INPUT_1 is subtracted
                     az      => '0' & INPUT_1(i*25-1 downto (i-1)*25), -- the input that is subtracted from INPUT_2
                     ax      => (others => '1'),                       -- this is the other input of the multiplier, must be 1 (in decimal) at all times so the result of subtraction stays the same

@@ -37,96 +37,96 @@ use work.type_pack.all;
 -- generic! (Or more precisely, with the MAX_PREPEND_REGIONS constant, which depends on this generic.)
 --
 entity MFB_MVB_PREPENDER is
-generic(
-    -- Number of Regions within a data word, must be power of 2.
-    -- In this version, only one MFB Region is supported.
-    MFB_REGIONS           : natural := 1;
-    -- Region size (in Blocks).
-    -- Values under 2 might cause unwanted behaviour.
-    MFB_REGION_SIZE       : natural := 8;
-    -- Block size (in Items), must be 8.
-    MFB_BLOCK_SIZE        : natural := 8;
-    -- Item width (in bits), must be 8.
-    MFB_ITEM_WIDTH        : natural := 8;
-    -- Metadata width (in bits).
-    -- Currently not supported!
-    -- MFB Frame Extender doesn't support standard MFB metadata, only metadata on its
-    -- MVB interface (RX_MVB_USERMETA port). Metadata Extractor could be used to extract
-    -- metadata on to MVB. These could be then merged with the MVB Items (from
-    -- MFB Frame Length's output) going to MFB Frame Extender's RX_MVB_* interface.
-    MFB_META_WIDTH        : natural := 0;
+    generic (
+        -- Number of Regions within a data word, must be power of 2.
+        -- In this version, only one MFB Region is supported.
+        MFB_REGIONS           : natural := 1;
+        -- Region size (in Blocks).
+        -- Values under 2 might cause unwanted behaviour.
+        MFB_REGION_SIZE       : natural := 8;
+        -- Block size (in Items), must be 8.
+        MFB_BLOCK_SIZE        : natural := 8;
+        -- Item width (in bits), must be 8.
+        MFB_ITEM_WIDTH        : natural := 8;
+        -- Metadata width (in bits).
+        -- Currently not supported!
+        -- MFB Frame Extender doesn't support standard MFB metadata, only metadata on its
+        -- MVB interface (RX_MVB_USERMETA port). Metadata Extractor could be used to extract
+        -- metadata on to MVB. These could be then merged with the MVB Items (from
+        -- MFB Frame Length's output) going to MFB Frame Extender's RX_MVB_* interface.
+        MFB_META_WIDTH        : natural := 0;
 
-    -- Maximum size of input packets (in Items).
-    -- Output packets' MTU is PKT_MTU_IN + MVB_ITEM_SIZE*MFB_BLOCK_SIZE.
-    PKT_MTU_IN            : natural := 2**14;
+        -- Maximum size of input packets (in Items).
+        -- Output packets' MTU is PKT_MTU_IN + MVB_ITEM_SIZE*MFB_BLOCK_SIZE.
+        PKT_MTU_IN            : natural := 2**14;
 
-    -- Number of MVB Items in a single word.
-    MVB_ITEMS             : natural := 1;
-    -- Size of each MVB Item (in MFB Blocks!).
-    -- MVB Items cannot be wider than the MFB word, hence:
-    -- MVB_ITEMS*MVB_ITEM_SIZE must not be greater than
-    -- the number of MFB Blocks in a word (MFB_REGIONS*MFB_REGION_SIZE).
-    MVB_ITEM_SIZE         : natural := 2;
+        -- Number of MVB Items in a single word.
+        MVB_ITEMS             : natural := 1;
+        -- Size of each MVB Item (in MFB Blocks!).
+        -- MVB Items cannot be wider than the MFB word, hence:
+        -- MVB_ITEMS*MVB_ITEM_SIZE must not be greater than
+        -- the number of MFB Blocks in a word (MFB_REGIONS*MFB_REGION_SIZE).
+        MVB_ITEM_SIZE         : natural := 2;
 
-    -- Number of Items (MFB words) in the Input MFB_FIFOX.
-    MFB_FIFO_DEPTH        : natural := 1024;
-    -- Number of Items (MVB words) in the Input MVB FIFOX.
-    MVB_FIFO_DEPTH        : natural := 512;
+        -- Number of Items (MFB words) in the Input MFB_FIFOX.
+        MFB_FIFO_DEPTH        : natural := 1024;
+        -- Number of Items (MVB words) in the Input MVB FIFOX.
+        MVB_FIFO_DEPTH        : natural := 512;
 
-    -- Enables generation of shared regions (end of old frame and start of new
-    -- one in one region) on TX MFB. Disabling shared regions allows work with
-    -- frames from 1B in size. Otherwise, the minimum frame size is 57B.
-    -- Disabling this generic may reduce throughput.
-    SHARED_REGIONS        : boolean := True;
+        -- Enables generation of shared regions (end of old frame and start of new
+        -- one in one region) on TX MFB. Disabling shared regions allows work with
+        -- frames from 1B in size. Otherwise, the minimum frame size is 57B.
+        -- Disabling this generic may reduce throughput.
+        SHARED_REGIONS        : boolean := True;
 
-    -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
-    DEVICE                : string := "AGILEX"
-);
-port(
-    -- =======================================================================
-    --  Clock and Reset
-    -- =======================================================================
+        -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
+        DEVICE                : string := "AGILEX"
+    );
+    port (
+        -- =======================================================================
+        --  Clock and Reset
+        -- =======================================================================
 
-    CLK            : in  std_logic;
-    RESET          : in  std_logic;
+        CLK            : in  std_logic;
+        RESET          : in  std_logic;
 
-    -- =======================================================================
-    --  RX MFB inf
-    -- =======================================================================
+        -- =======================================================================
+        --  RX MFB inf
+        -- =======================================================================
 
-    RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- Valid with SOF.
-    RX_MFB_META    : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
-    RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SRC_RDY : in  std_logic;
-    RX_MFB_DST_RDY : out std_logic;
+        RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- Valid with SOF.
+        RX_MFB_META    : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => '0');
+        RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SRC_RDY : in  std_logic;
+        RX_MFB_DST_RDY : out std_logic;
 
-    -- =======================================================================
-    --  RX MVB inf (prepend data)
-    -- =======================================================================
+        -- =======================================================================
+        --  RX MVB inf (prepend data)
+        -- =======================================================================
 
-    RX_MVB_DATA     : in  std_logic_vector(MVB_ITEMS*MVB_ITEM_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    RX_MVB_VLD      : in  std_logic_vector(MVB_ITEMS-1 downto 0);
-    RX_MVB_SRC_RDY  : in  std_logic;
-    RX_MVB_DST_RDY  : out std_logic;
+        RX_MVB_DATA     : in  std_logic_vector(MVB_ITEMS*MVB_ITEM_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        RX_MVB_VLD      : in  std_logic_vector(MVB_ITEMS-1 downto 0);
+        RX_MVB_SRC_RDY  : in  std_logic;
+        RX_MVB_DST_RDY  : out std_logic;
 
-    -- =======================================================================
-    --  TX MFB inf (frames with prepended MVB data)
-    -- =======================================================================
+        -- =======================================================================
+        --  TX MFB inf (frames with prepended MVB data)
+        -- =======================================================================
 
-    TX_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    -- Valid with SOF.
-    TX_MFB_META    : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
-    TX_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    TX_MFB_SOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_EOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MFB_SRC_RDY : out std_logic;
-    TX_MFB_DST_RDY : in  std_logic
-);
+        TX_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        -- Valid with SOF.
+        TX_MFB_META    : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
+        TX_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        TX_MFB_SOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_EOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MFB_SRC_RDY : out std_logic;
+        TX_MFB_DST_RDY : in  std_logic
+    );
 end entity;
 
 architecture FULL of MFB_MVB_PREPENDER is
@@ -138,13 +138,13 @@ architecture FULL of MFB_MVB_PREPENDER is
     -- Width of a single MVB Item in a number of bits.
     constant MVB_ITEM_WIDTH     : natural := MVB_ITEM_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
     -- MFB constants:
-    constant WORD_WIDTH     : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
-    constant WORD_ITEMS     : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE;
-    constant WORD_BLOCKS    : natural := MFB_REGIONS*MFB_REGION_SIZE;
-    constant BLOCK_WIDTH    : natural := MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
-    constant REGION_WIDTH   : natural :=             MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
-    constant SOF_POS_WIDTH  : natural := max(1,log2(MFB_REGION_SIZE));
-    constant EOF_POS_WIDTH  : natural := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
+    constant WORD_WIDTH         : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
+    constant WORD_ITEMS         : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE;
+    constant WORD_BLOCKS        : natural := MFB_REGIONS*MFB_REGION_SIZE;
+    constant BLOCK_WIDTH        : natural := MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
+    constant REGION_WIDTH       : natural :=             MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
+    constant SOF_POS_WIDTH      : natural := max(1,log2(MFB_REGION_SIZE));
+    constant EOF_POS_WIDTH      : natural := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
 
     -- Max number of Regions a prepended Item can stretch over, no matter how shifted it is.
     -- E.g.: MFB Item with MVB_ITEM_SIZE=1 (one MFB Block) can always be only in one Region;
@@ -175,7 +175,7 @@ architecture FULL of MFB_MVB_PREPENDER is
     signal frlen_tx_dst_rdy             : std_logic;
     signal frlen_tx_frlen               : std_logic_vector(MFB_REGIONS*log2(PKT_MTU_IN+1)-1 downto 0);
 
-    signal MVB_ITEM_SIZE_items_arr      : u_array_t       (MFB_REGIONS-1 downto 0)(log2(PKT_MTU_IN+1)-1 downto 0);
+    signal mvb_item_size_items_arr      : u_array_t       (MFB_REGIONS-1 downto 0)(log2(PKT_MTU_IN+1)-1 downto 0);
     signal extd_rx_mvb_meta             : std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
     signal extd_rx_mvb_frlen            : std_logic_vector(MFB_REGIONS*log2(PKT_MTU_IN+1)-1 downto 0);
     signal extd_rx_mvb_ext_size         : std_logic_vector(MFB_REGIONS*log2(PKT_MTU_IN+1)-1 downto 0);
@@ -289,29 +289,29 @@ begin
     RX_MVB_DST_RDY   <= not mvb_fifoxm_full;
 
     mvb_fifoxm_i : entity work.FIFOX_MULTI
-    generic map(
+    generic map (
         DATA_WIDTH          => MVB_ITEM_WIDTH,
         ITEMS               => MVB_FIFO_DEPTH,
-        WRITE_PORTS         => MVB_ITEMS     ,
-        READ_PORTS          => MFB_REGIONS   ,
-        RAM_TYPE            => "AUTO"        ,
-        DEVICE              => DEVICE        ,
-        ALMOST_FULL_OFFSET  => 0             ,
-        ALMOST_EMPTY_OFFSET => 0             ,
-        ALLOW_SINGLE_FIFO   => True          ,
+        WRITE_PORTS         => MVB_ITEMS,
+        READ_PORTS          => MFB_REGIONS,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        ALLOW_SINGLE_FIFO   => True,
         SAFE_READ_MODE      => True
     )
-    port map(
+    port map (
         CLK    => CLK,
         RESET  => RESET,
 
-        DI     => mvb_fifoxm_din  ,
+        DI     => mvb_fifoxm_din,
         WR     => mvb_fifoxm_write,
-        FULL   => mvb_fifoxm_full ,
-        AFULL  => open            ,
+        FULL   => mvb_fifoxm_full,
+        AFULL  => open,
 
-        DO     => mvb_fifoxm_dout ,
-        RD     => mvb_fifoxm_read ,
+        DO     => mvb_fifoxm_dout,
+        RD     => mvb_fifoxm_read,
         EMPTY  => mvb_fifoxm_empty,
         AEMPTY => open
     );
@@ -322,34 +322,34 @@ begin
 
     -- Frame extender expects the length of each frame
     mfb_frame_length_i : entity work.MFB_FRAME_LNG
-    generic map(
-        REGIONS        => MFB_REGIONS       ,
-        REGION_SIZE    => MFB_REGION_SIZE   ,
-        BLOCK_SIZE     => MFB_BLOCK_SIZE    ,
-        ITEM_WIDTH     => MFB_ITEM_WIDTH    ,
-        META_WIDTH     => MFB_META_WIDTH    ,
+    generic map (
+        REGIONS        => MFB_REGIONS,
+        REGION_SIZE    => MFB_REGION_SIZE,
+        BLOCK_SIZE     => MFB_BLOCK_SIZE,
+        ITEM_WIDTH     => MFB_ITEM_WIDTH,
+        META_WIDTH     => MFB_META_WIDTH,
         LNG_WIDTH      => log2(PKT_MTU_IN+1),
-        REG_BITMAP     => "111"             ,
-        SATURATION     => False             ,
+        REG_BITMAP     => "111",
+        SATURATION     => False,
         IMPLEMENTATION => "parallel"
     )
-    port map(
-        CLK                => CLK             ,
-        RESET              => RESET           ,
+    port map (
+        CLK                => CLK,
+        RESET              => RESET,
 
-        RX_DATA            => RX_MFB_DATA     ,
-        RX_META            => (others => '0') ,
-        RX_SOF             => RX_MFB_SOF      ,
-        RX_EOF             => RX_MFB_EOF      ,
-        RX_SOF_POS         => RX_MFB_SOF_POS  ,
-        RX_EOF_POS         => RX_MFB_EOF_POS  ,
-        RX_SRC_RDY         => RX_MFB_SRC_RDY  ,
-        RX_DST_RDY         => RX_MFB_DST_RDY  ,
+        RX_DATA            => RX_MFB_DATA,
+        RX_META            => (others => '0'),
+        RX_SOF             => RX_MFB_SOF,
+        RX_EOF             => RX_MFB_EOF,
+        RX_SOF_POS         => RX_MFB_SOF_POS,
+        RX_EOF_POS         => RX_MFB_EOF_POS,
+        RX_SRC_RDY         => RX_MFB_SRC_RDY,
+        RX_DST_RDY         => RX_MFB_DST_RDY,
 
-        TX_DATA            => frlen_tx_data   ,
-        TX_META            => open            ,
-        TX_SOF             => frlen_tx_sof    ,
-        TX_EOF             => frlen_tx_eof    ,
+        TX_DATA            => frlen_tx_data,
+        TX_META            => open,
+        TX_SOF             => frlen_tx_sof,
+        TX_EOF             => frlen_tx_eof,
         TX_SOF_POS         => frlen_tx_sof_pos,
         TX_EOF_POS         => frlen_tx_eof_pos,
         TX_SRC_RDY         => frlen_tx_src_rdy,
@@ -361,11 +361,11 @@ begin
     frlen_tx_dst_rdy <= extd_rx_mvb_dst_rdy and extd_rx_mfb_dst_rdy;
 
     -- Frame Extender's RX_MVB_EXT_SIZE generic must be in Items
-    MVB_ITEM_SIZE_items_arr <= (others => to_unsigned(MVB_ITEM_SIZE*MFB_BLOCK_SIZE, log2(PKT_MTU_IN+1)));
+    mvb_item_size_items_arr <= (others => to_unsigned(MVB_ITEM_SIZE*MFB_BLOCK_SIZE, log2(PKT_MTU_IN+1)));
 
     extd_rx_mvb_meta     <= (others => '0'); -- MFB metadata could be added here (must update src_ and dst_rdy)
     extd_rx_mvb_frlen    <= frlen_tx_frlen;
-    extd_rx_mvb_ext_size <= slv_array_ser(u_arr_to_slv_arr(MVB_ITEM_SIZE_items_arr));
+    extd_rx_mvb_ext_size <= slv_array_ser(u_arr_to_slv_arr(mvb_item_size_items_arr));
     extd_rx_mvb_vld      <= frlen_tx_eof;
     extd_rx_mvb_src_rdy  <= frlen_tx_src_rdy and extd_rx_mfb_dst_rdy;
 
@@ -378,51 +378,51 @@ begin
     extd_rx_mfb_src_rdy <= frlen_tx_src_rdy and extd_rx_mvb_dst_rdy;
 
     mfb_frame_extender_i : entity work.MFB_FRAME_EXTENDER
-    generic map(
-        MFB_REGIONS     => MFB_REGIONS    ,
+    generic map (
+        MFB_REGIONS     => MFB_REGIONS,
         MFB_REGION_SIZE => MFB_REGION_SIZE,
-        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE ,
-        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH ,
-        PKT_MTU         => PKT_MTU_IN     ,
-        MVB_FIFO_DEPTH  => 512            ,
-        MFB_FIFO_DEPTH  => MFB_FIFO_DEPTH ,
+        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+        PKT_MTU         => PKT_MTU_IN,
+        MVB_FIFO_DEPTH  => 512,
+        MFB_FIFO_DEPTH  => MFB_FIFO_DEPTH,
         USERMETA_WIDTH  => 0,
         SHARED_REGIONS  => SHARED_REGIONS,
         DEVICE          => DEVICE
     )
-    port map(
-        CLK                   => CLK  ,
+    port map (
+        CLK                   => CLK,
         RESET                 => RESET,
 
-        RX_MVB_USERMETA       => extd_rx_mvb_meta    ,
-        RX_MVB_FRAME_LENGTH   => extd_rx_mvb_frlen   ,
+        RX_MVB_USERMETA       => extd_rx_mvb_meta,
+        RX_MVB_FRAME_LENGTH   => extd_rx_mvb_frlen,
         RX_MVB_EXT_SIZE       => extd_rx_mvb_ext_size,
-        RX_MVB_EXT_ONLY       => (others => '0')     ,
-        RX_MVB_EXT_EN         => (others => '1')     ,
-        RX_MVB_VLD            => extd_rx_mvb_vld     ,
-        RX_MVB_SRC_RDY        => extd_rx_mvb_src_rdy ,
-        RX_MVB_DST_RDY        => extd_rx_mvb_dst_rdy ,
+        RX_MVB_EXT_ONLY       => (others => '0'),
+        RX_MVB_EXT_EN         => (others => '1'),
+        RX_MVB_VLD            => extd_rx_mvb_vld,
+        RX_MVB_SRC_RDY        => extd_rx_mvb_src_rdy,
+        RX_MVB_DST_RDY        => extd_rx_mvb_dst_rdy,
 
-        RX_MFB_DATA           => extd_rx_mfb_data    ,
-        RX_MFB_SOF            => extd_rx_mfb_sof     ,
-        RX_MFB_EOF            => extd_rx_mfb_eof     ,
-        RX_MFB_SOF_POS        => extd_rx_mfb_sof_pos ,
-        RX_MFB_EOF_POS        => extd_rx_mfb_eof_pos ,
-        RX_MFB_SRC_RDY        => extd_rx_mfb_src_rdy ,
-        RX_MFB_DST_RDY        => extd_rx_mfb_dst_rdy ,
+        RX_MFB_DATA           => extd_rx_mfb_data,
+        RX_MFB_SOF            => extd_rx_mfb_sof,
+        RX_MFB_EOF            => extd_rx_mfb_eof,
+        RX_MFB_SOF_POS        => extd_rx_mfb_sof_pos,
+        RX_MFB_EOF_POS        => extd_rx_mfb_eof_pos,
+        RX_MFB_SRC_RDY        => extd_rx_mfb_src_rdy,
+        RX_MFB_DST_RDY        => extd_rx_mfb_dst_rdy,
 
-        TX_MVB_USERMETA       => open                ,
-        TX_MVB_VLD            => open                ,
-        TX_MVB_SRC_RDY        => open                ,
-        TX_MVB_DST_RDY        => '1'                 ,
+        TX_MVB_USERMETA       => open,
+        TX_MVB_VLD            => open,
+        TX_MVB_SRC_RDY        => open,
+        TX_MVB_DST_RDY        => '1',
 
-        TX_MFB_DATA           => extd_tx_mfb_data    ,
-        TX_MFB_USERMETA       => extd_tx_mfb_meta    , -- valid with SOF
-        TX_MFB_SOF            => extd_tx_mfb_sof     ,
-        TX_MFB_EOF            => extd_tx_mfb_eof     ,
-        TX_MFB_SOF_POS        => extd_tx_mfb_sof_pos ,
-        TX_MFB_EOF_POS        => extd_tx_mfb_eof_pos ,
-        TX_MFB_SRC_RDY        => extd_tx_mfb_src_rdy ,
+        TX_MFB_DATA           => extd_tx_mfb_data,
+        TX_MFB_USERMETA       => extd_tx_mfb_meta, -- valid with SOF
+        TX_MFB_SOF            => extd_tx_mfb_sof,
+        TX_MFB_EOF            => extd_tx_mfb_eof,
+        TX_MFB_SOF_POS        => extd_tx_mfb_sof_pos,
+        TX_MFB_EOF_POS        => extd_tx_mfb_eof_pos,
+        TX_MFB_SRC_RDY        => extd_tx_mfb_src_rdy,
         TX_MFB_DST_RDY        => extd_tx_mfb_dst_rdy
     );
 
@@ -451,14 +451,14 @@ begin
 
     extd_tx_sof_vld <= extd_tx_mfb_sof and extd_tx_mfb_src_rdy;
 
-    process(all)
+    process (all)
     begin
         -- Index of the last Region that contains a valid SOF
-        last_sof_idx <= 0;
+        last_sof_idx               <= 0;
         -- Original sofpos is somewhere in the THIS word.
-        ends_in_this_word <= (others => '0');
+        ends_in_this_word          <= (others => '0');
         -- Original sofpos is somewhere in the NEXT word.
-        conts_to_next_word <= '0';
+        conts_to_next_word         <= '0';
         -- Original sofpos is in the next word on Block 0.
         conts_to_next_word_block_0 <= (others => '0');
         -- Original sofpos is in the next word on Block N (N /= 0).
@@ -477,13 +477,13 @@ begin
                     else
                         conts_to_next_word_block_n(r) <= '1';
                     end if;
-                    --exit; -- not needed because the next SOF should be moved to one of the following words by the frame_extender
+                    -- exit; -- not needed because the next SOF should be moved to one of the following words by the frame_extender
                 end if;
             end if;
         end loop;
     end process;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (tx_dst_rdy = '1') then
@@ -510,10 +510,10 @@ begin
 
     prepend_vector_g : for r in 0 to MFB_REGIONS-1 generate
         ones_insertor_i : entity work.ONES_INSERTOR
-        generic map(
+        generic map (
             OFFSET_WIDTH => log2(WORD_BLOCKS)
         )
-        port map(
+        port map (
             OFFSET_LOW  => prepend_start_idx(r),
             OFFSET_HIGH => prepend_stop_idx (r),
             VALID       => prepend_valid    (r),
@@ -526,7 +526,7 @@ begin
     -- ----------------------------------
     prepend_finish_g : for r in 0 to MFB_REGIONS-1 generate
         -- Indicate if the Prepend part ends here (og sofpos is in this word or the next word on Block 0).
-        prepend_finish(r) <= (ends_in_this_word(r) or conts_to_next_word_block_0(r)) or conts_from_prev_word when (r=0) else
+        prepend_finish(r) <= (ends_in_this_word(r) or conts_to_next_word_block_0(r)) or conts_from_prev_word when (r = 0) else
                              (ends_in_this_word(r) or conts_to_next_word_block_0(r));
     end generate;
 
@@ -551,7 +551,7 @@ begin
     -- -------------------------------
     --  First (middle) stage register
     -- -------------------------------
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (tx_dst_rdy = '1') then
@@ -592,7 +592,7 @@ begin
     mvb_fifoxm_dout_arr <= slv_arr_to_u_arr(slv_array_deser(mvb_fifoxm_dout, MFB_REGIONS));
 
     -- Mapping MVB Items to SOFs
-    process(all)
+    process (all)
         variable cnt : natural := 0;
     begin
         prepend_item_remapped     <= (others => (others => '0'));
@@ -602,7 +602,7 @@ begin
             if (prepend_valid_reg1(r) = '1') then
                 prepend_item_remapped    (r) <= resize(mvb_fifoxm_dout_arr(cnt),PREPEND_ITEM_WIDTH);
                 prepend_item_remapped_vld(r) <= not mvb_fifoxm_empty(cnt);
-                cnt := cnt + 1;
+                cnt                          := cnt + 1;
             end if;
         end loop;
     end process;
@@ -615,27 +615,27 @@ begin
         bs_rx_src_rdy(r) <= prepend_item_remapped_vld(r);
 
         barrel_shifter_gen_piped_i : entity work.BARREL_SHIFTER_GEN_PIPED
-        generic map(
+        generic map (
             BLOCKS            => PREPEND_ITEM_SIZE,
-            BLOCK_WIDTH       => BLOCK_WIDTH      ,
-            BAR_SHIFT_LATENCY => 0                ,
-            INPUT_REG         => False            ,
-            OUTPUT_REG        => False            ,
-            SHIFT_LEFT        => True             ,
+            BLOCK_WIDTH       => BLOCK_WIDTH,
+            BAR_SHIFT_LATENCY => 0,
+            INPUT_REG         => False,
+            OUTPUT_REG        => False,
+            SHIFT_LEFT        => True,
             METADATA_WIDTH    => 0
         )
-        port map(
-            CLK         => CLK               ,
-            RESET       => RESET             ,
+        port map (
+            CLK         => CLK,
+            RESET       => RESET,
 
             RX_DATA     => bs_rx_data     (r),
             RX_SEL      => bs_rx_sel      (r),
-            RX_METADATA => (others => '0')   ,
+            RX_METADATA => (others => '0'),
             RX_SRC_RDY  => bs_rx_src_rdy  (r),
-            RX_DST_RDY  => open              ,
+            RX_DST_RDY  => open,
 
             TX_DATA     => bs_tx_data     (r),
-            TX_METADATA => open              ,
+            TX_METADATA => open,
             TX_SRC_RDY  => bs_tx_src_rdy  (r),
             TX_DST_RDY  => bs_tx_dst_rdy  (r)
         );
@@ -650,7 +650,7 @@ begin
     --  - due to this, we can insert MVB Items into the final mvb_prepend_word "over each other" but they will never collide;
     --
     -- This insertion might not be very effective and could be optimized (perhaps by ORing the Items?).
-    process(all)
+    process (all)
     begin
         mvb_prepend_region_arr <= (others => (others => '0'));
         -- Select a new Prepend Item or use the leftovers from the previous word for Region 0.
@@ -671,7 +671,7 @@ begin
     mvb_prepend_word <= slv_array_ser(mvb_prepend_region_arr(MFB_REGIONS-1 downto 0));
 
     -- Store overflowed Regions to be (potentionally) used in the next word.
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (tx_dst_rdy = '1') then
@@ -699,7 +699,7 @@ begin
 
     tx_dst_rdy <= TX_MFB_DST_RDY and enough_prepends;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (TX_MFB_DST_RDY = '1') then

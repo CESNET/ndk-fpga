@@ -53,14 +53,14 @@ begin
 
     -- extraction of CRC32 from Ethernet frames (latency = 2 cycles)
     get_crc32_i : entity work.RX_MAC_LITE_GET_CRC32
-    generic map(
+    generic map (
         REGIONS     => REGIONS,
         REGION_SIZE => REGION_SIZE,
         BLOCK_SIZE  => BLOCK_SIZE,
         ITEM_WIDTH  => ITEM_WIDTH,
         INBANDFCS   => INBANDFCS
     )
-    port map(
+    port map (
         -- CLOCK AND RESET
         CLK          => CLK,
         RESET        => RESET,
@@ -78,12 +78,12 @@ begin
     s_shreg_din <= s_ext_crc32 & s_ext_crc32_vld;
 
     sh_reg_meta_i : entity work.SH_REG_BASE_STATIC
-    generic map(
+    generic map (
         DATA_WIDTH => REGIONS*33,
         NUM_BITS   => 6,
         DEVICE     => DEVICE
     )
-    port map(
+    port map (
         CLK  => CLK,
         CE   => '1',
         DIN  => s_shreg_din,
@@ -99,14 +99,14 @@ begin
     crc_cutter_g : if INBANDFCS generate
         -- CRC CUTTER (MFB_CRC32_ETHERNET expected frame without CRC)
         crc_cutter_i : entity work.RX_MAC_LITE_CRC_CUTTER
-        generic map(
+        generic map (
             REGIONS        => REGIONS,
             REGION_SIZE    => REGION_SIZE,
             BLOCK_SIZE     => BLOCK_SIZE,
             ITEM_WIDTH     => ITEM_WIDTH,
-            OUTPUT_REG     => False --> latency = 1 cycle
+            OUTPUT_REG     => False -- > latency = 1 cycle
         )
-        port map(
+        port map (
             CLK            => CLK,
             RESET          => RESET,
 
@@ -140,17 +140,17 @@ begin
 
     -- calculation of CRCs from Ethernet frames
     mfb_crc32_ethernet_i : entity work.MFB_CRC32_ETHERNET
-    generic map(
+    generic map (
         REGIONS        => REGIONS,
         REGION_SIZE    => REGION_SIZE,
         BLOCK_SIZE     => BLOCK_SIZE,
         ITEM_WIDTH     => ITEM_WIDTH,
         USE_DST_RDY    => False,
-        IMPLEMENTATION => "PARALLEL", -- best value, don't edit!
-        CRC_END_IMPL   => "TREE", -- best value, don't edit!
+        IMPLEMENTATION => "PARALLEL",                                    -- best value, don't edit!
+        CRC_END_IMPL   => "TREE",                                        -- best value, don't edit!
         REG_BITMAP     => std_logic_vector(to_unsigned(CRC_REG_CONF,32)) -- latency = 8 or 7 cycles
     )
-    port map(
+    port map (
         -- CLOCK AND RESET
         CLK           => CLK,
         RESET         => RESET,
@@ -171,7 +171,7 @@ begin
 
     -- unpack calculated CRCs to array
     calc_crc_arr_g : for r in 0 to REGIONS-1 generate
-        s_calc_crc_arr(r) <= not s_calc_crc_n((r+1)*32-1 downto r*32);
+        s_calc_crc_arr(r)     <= not s_calc_crc_n((r+1)*32-1 downto r*32);
         s_calc_crc_arr_vld(r) <= s_calc_crc_src_rdy and s_calc_crc_vld(r);
     end generate;
 
@@ -193,7 +193,7 @@ begin
 
     crc_err_g : for r in 0 to REGIONS-1 generate
         -- compare CRCs
-        s_crc_error(r) <= '0' when (s_calc_crc_lva(r) = s_ext_crc32_dly_arr(r)) else '1';
+        s_crc_error(r)     <= '0' when (s_calc_crc_lva(r) = s_ext_crc32_dly_arr(r)) else '1';
         -- valid flag of CRCs error
         s_crc_error_vld(r) <= s_ext_crc32_dly_vld(r);
     end generate;

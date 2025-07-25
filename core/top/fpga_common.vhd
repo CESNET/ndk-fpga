@@ -22,256 +22,256 @@ use work.eth_hdr_pack.all;
 use work.mi_addr_space_pack.all;
 
 entity FPGA_COMMON is
-generic (
-    -- System clock period in ns
-    -- PCIE clock period in ns if USE_PCIE_CLK is used
-    SYSCLK_PERIOD   : real    := 10.0;
-    -- Settings of the MMCM
-    -- Multiply factor of main clock (Xilinx: 2-64)
-    PLL_MULT_F      : real    := 12.0;
-    -- Division factor of main clock (Xilinx: 1-106)
-    PLL_MASTER_DIV  : natural := 3;
-    -- Output clock dividers (Xilinx: 1-128)
-    PLL_OUT0_DIV_F  : real    := 3.0;
-    PLL_OUT1_DIV    : natural := 4;
-    PLL_OUT2_DIV    : natural := 6;
-    PLL_OUT3_DIV    : natural := 12;
+    generic (
+        -- System clock period in ns
+        -- PCIE clock period in ns if USE_PCIE_CLK is used
+        SYSCLK_PERIOD   : real    := 10.0;
+        -- Settings of the MMCM
+        -- Multiply factor of main clock (Xilinx: 2-64)
+        PLL_MULT_F      : real    := 12.0;
+        -- Division factor of main clock (Xilinx: 1-106)
+        PLL_MASTER_DIV  : natural := 3;
+        -- Output clock dividers (Xilinx: 1-128)
+        PLL_OUT0_DIV_F  : real    := 3.0;
+        PLL_OUT1_DIV    : natural := 4;
+        PLL_OUT2_DIV    : natural := 6;
+        PLL_OUT3_DIV    : natural := 12;
 
-    -- Switch CLK_GEN ref clock to clk_pci, default SYSCLK
-    USE_PCIE_CLK            : boolean := false;
+        -- Switch CLK_GEN ref clock to clk_pci, default SYSCLK
+        USE_PCIE_CLK            : boolean := false;
 
-    -- Number of PCIe connectors present on board
-    PCIE_CONS               : natural := 1;
-    -- Number of PCIe lanes per connector
-    PCIE_LANES              : natural := 16;
-    -- Number of PCIe clocks per connector (useful for bifurcation)
-    PCIE_CLKS               : natural := 1;
-    -- Number of instantiated PCIe endpoints
-    PCIE_ENDPOINTS          : natural := 1;
-    -- Connected PCIe endpoint type: P_TILE, R_TILE, USP
-    PCIE_ENDPOINT_TYPE      : string  := "R_TILE";
-    -- Connected PCIe endpoint mode: 0 = 1x16 lanes, 1 = 2x8 lanes
-    PCIE_ENDPOINT_MODE      : natural := 0;
+        -- Number of PCIe connectors present on board
+        PCIE_CONS               : natural := 1;
+        -- Number of PCIe lanes per connector
+        PCIE_LANES              : natural := 16;
+        -- Number of PCIe clocks per connector (useful for bifurcation)
+        PCIE_CLKS               : natural := 1;
+        -- Number of instantiated PCIe endpoints
+        PCIE_ENDPOINTS          : natural := 1;
+        -- Connected PCIe endpoint type: P_TILE, R_TILE, USP
+        PCIE_ENDPOINT_TYPE      : string  := "R_TILE";
+        -- Connected PCIe endpoint mode: 0 = 1x16 lanes, 1 = 2x8 lanes
+        PCIE_ENDPOINT_MODE      : natural := 0;
 
-    -- Number of instantiated DMA modules
-    DMA_MODULES             : natural := 1;
-    -- Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
-    DMA_ENDPOINTS           : natural := 1;
-    -- Number of DMA channels per DMA module
-    DMA_RX_CHANNELS         : natural := 4;
-    DMA_TX_CHANNELS         : natural := 4;
+        -- Number of instantiated DMA modules
+        DMA_MODULES             : natural := 1;
+        -- Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+        DMA_ENDPOINTS           : natural := 1;
+        -- Number of DMA channels per DMA module
+        DMA_RX_CHANNELS         : natural := 4;
+        DMA_TX_CHANNELS         : natural := 4;
 
-    -- Ethernet core architecture: E_TILE, F_TILE, CMAC
-    ETH_CORE_ARCH           : string := "F_TILE";
-    -- Number of Ethernet ports present on board
-    ETH_PORTS               : natural := 1;
-    -- Speed for all Ethernet ports
-    ETH_PORT_SPEED          : integer_vector(ETH_PORTS-1 downto 0) := (others => 0);
-    -- Number of channels for all Ethernet ports
-    ETH_PORT_CHAN           : integer_vector(ETH_PORTS-1 downto 0) := (others => 0);
-    -- Number of lanes per Ethernet port
-    ETH_LANES               : natural := 8;
-    -- Logical indexes and polarities of Ethernet lanes
-    ETH_LANE_MAP            : integer_vector(ETH_PORTS*ETH_LANES-1 downto 0) := (others => 0);
-    ETH_LANE_RXPOLARITY     : std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0) := (others => '0');
-    ETH_LANE_TXPOLARITY     : std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0) := (others => '0');
-    ETH_PORT_LEDS           : natural := 2;
-    QSFP_PORTS              : natural := 2;
-    QSFP_I2C_PORTS          : natural := 1;
-    QSFP_I2C_TRISTATE       : boolean := true;
-    QSFP_I2C_CTRL_EN        : boolean := true;
+        -- Ethernet core architecture: E_TILE, F_TILE, CMAC
+        ETH_CORE_ARCH           : string := "F_TILE";
+        -- Number of Ethernet ports present on board
+        ETH_PORTS               : natural := 1;
+        -- Speed for all Ethernet ports
+        ETH_PORT_SPEED          : integer_vector(ETH_PORTS-1 downto 0) := (others => 0);
+        -- Number of channels for all Ethernet ports
+        ETH_PORT_CHAN           : integer_vector(ETH_PORTS-1 downto 0) := (others => 0);
+        -- Number of lanes per Ethernet port
+        ETH_LANES               : natural := 8;
+        -- Logical indexes and polarities of Ethernet lanes
+        ETH_LANE_MAP            : integer_vector(ETH_PORTS*ETH_LANES-1 downto 0) := (others => 0);
+        ETH_LANE_RXPOLARITY     : std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0) := (others => '0');
+        ETH_LANE_TXPOLARITY     : std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0) := (others => '0');
+        ETH_PORT_LEDS           : natural := 2;
+        QSFP_PORTS              : natural := 2;
+        QSFP_I2C_PORTS          : natural := 1;
+        QSFP_I2C_TRISTATE       : boolean := true;
+        QSFP_I2C_CTRL_EN        : boolean := true;
 
-    HBM_PORTS               : natural := 1;
-    HBM_ADDR_WIDTH          : natural := 32;
-    HBM_DATA_WIDTH          : natural := 256;
-    HBM_BURST_WIDTH         : natural := 2;
-    HBM_ID_WIDTH            : natural := 6;
-    HBM_LEN_WIDTH           : natural := 4;
-    HBM_SIZE_WIDTH          : natural := 3;
-    HBM_RESP_WIDTH          : natural := 2;
-    HBM_PROT_WIDTH          : natural := 3;
-    HBM_QOS_WIDTH           : natural := 4;
-    HBM_USER_WIDTH          : natural := 1;
+        HBM_PORTS               : natural := 1;
+        HBM_ADDR_WIDTH          : natural := 32;
+        HBM_DATA_WIDTH          : natural := 256;
+        HBM_BURST_WIDTH         : natural := 2;
+        HBM_ID_WIDTH            : natural := 6;
+        HBM_LEN_WIDTH           : natural := 4;
+        HBM_SIZE_WIDTH          : natural := 3;
+        HBM_RESP_WIDTH          : natural := 2;
+        HBM_PROT_WIDTH          : natural := 3;
+        HBM_QOS_WIDTH           : natural := 4;
+        HBM_USER_WIDTH          : natural := 1;
 
-    MEM_PORTS               : natural := 2;
-    MEM_ADDR_WIDTH          : natural := 27;
-    MEM_DATA_WIDTH          : natural := 512;
-    MEM_BURST_WIDTH         : natural := 7;
-    MEM_REFR_PERIOD_WIDTH   : natural := 32;
-    MEM_DEF_REFR_PERIOD     : integer := 0;
-    AMM_FREQ_KHZ            : natural := 0;
+        MEM_PORTS               : natural := 2;
+        MEM_ADDR_WIDTH          : natural := 27;
+        MEM_DATA_WIDTH          : natural := 512;
+        MEM_BURST_WIDTH         : natural := 7;
+        MEM_REFR_PERIOD_WIDTH   : natural := 32;
+        MEM_DEF_REFR_PERIOD     : integer := 0;
+        AMM_FREQ_KHZ            : natural := 0;
 
-    STATUS_LEDS             : natural := 2;
-    -- Width of MISC signal between Top-Level FPGA design and FPGA_COMMON
-    MISC_IN_WIDTH           : natural := 0;
-    -- Width of MISC signal between FPGA_COMMON and Top-Level FPGA design
-    MISC_OUT_WIDTH          : natural := 0;
-    -- Width of MISC signal between Top-Level FPGA design and APP core logic
-    MISC_TOP2APP_WIDTH      : natural := 1;
-    -- Width of MISC signal between APP core logic and Top-Level FPGA design
-    MISC_APP2TOP_WIDTH      : natural := 1;
-    -- Width of MISC signal between Top-Level FPGA design and PCIE core logic
-    MISC_TOP2PCIE_WIDTH     : natural := 1;
-    -- Width of MISC signal between PCIE core logic and Top-Level FPGA design
-    MISC_PCIE2TOP_WIDTH     : natural := 1;
-    -- Width of MISC signal between Top-Level FPGA design and NET_MOD core logic
-    MISC_TOP2NET_WIDTH      : natural := 1;
-    -- Width of MISC signal between NET_MOD core logic and Top-Level FPGA design
-    MISC_NET2TOP_WIDTH      : natural := 1;
+        STATUS_LEDS             : natural := 2;
+        -- Width of MISC signal between Top-Level FPGA design and FPGA_COMMON
+        MISC_IN_WIDTH           : natural := 0;
+        -- Width of MISC signal between FPGA_COMMON and Top-Level FPGA design
+        MISC_OUT_WIDTH          : natural := 0;
+        -- Width of MISC signal between Top-Level FPGA design and APP core logic
+        MISC_TOP2APP_WIDTH      : natural := 1;
+        -- Width of MISC signal between APP core logic and Top-Level FPGA design
+        MISC_APP2TOP_WIDTH      : natural := 1;
+        -- Width of MISC signal between Top-Level FPGA design and PCIE core logic
+        MISC_TOP2PCIE_WIDTH     : natural := 1;
+        -- Width of MISC signal between PCIE core logic and Top-Level FPGA design
+        MISC_PCIE2TOP_WIDTH     : natural := 1;
+        -- Width of MISC signal between Top-Level FPGA design and NET_MOD core logic
+        MISC_TOP2NET_WIDTH      : natural := 1;
+        -- Width of MISC signal between NET_MOD core logic and Top-Level FPGA design
+        MISC_NET2TOP_WIDTH      : natural := 1;
 
-    DEVICE                  : string := "AGILEX";
-    BOARD                   : string := "400G1"
-);
-port (
-    SYSCLK                  : in    std_logic;
-    SYSRST                  : in    std_logic;
+        DEVICE                  : string := "AGILEX";
+        BOARD                   : string := "400G1"
+    );
+    port (
+        SYSCLK                  : in    std_logic;
+        SYSRST                  : in    std_logic;
 
-    -- PCIe interface
-    PCIE_SYSCLK_P           : in    std_logic_vector(PCIE_CONS*PCIE_CLKS-1 downto 0);
-    PCIE_SYSCLK_N           : in    std_logic_vector(PCIE_CONS*PCIE_CLKS-1 downto 0);
-    PCIE_SYSRST_N           : in    std_logic_vector(PCIE_CONS-1 downto 0);
-    PCIE_RX_P               : in    std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0);
-    PCIE_RX_N               : in    std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0);
-    PCIE_TX_P               : out   std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0);
-    PCIE_TX_N               : out   std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0);
+        -- PCIe interface
+        PCIE_SYSCLK_P           : in    std_logic_vector(PCIE_CONS*PCIE_CLKS-1 downto 0);
+        PCIE_SYSCLK_N           : in    std_logic_vector(PCIE_CONS*PCIE_CLKS-1 downto 0);
+        PCIE_SYSRST_N           : in    std_logic_vector(PCIE_CONS-1 downto 0);
+        PCIE_RX_P               : in    std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0);
+        PCIE_RX_N               : in    std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0);
+        PCIE_TX_P               : out   std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0);
+        PCIE_TX_N               : out   std_logic_vector(PCIE_CONS*PCIE_LANES-1 downto 0);
 
-    -- ETH port interface
-    ETH_REFCLK_P            : in    std_logic_vector(ETH_PORTS-1 downto 0);
-    ETH_REFCLK_N            : in    std_logic_vector(ETH_PORTS-1 downto 0);
-    ETH_RX_P                : in    std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
-    ETH_RX_N                : in    std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
-    ETH_TX_P                : out   std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
-    ETH_TX_N                : out   std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
+        -- ETH port interface
+        ETH_REFCLK_P            : in    std_logic_vector(ETH_PORTS-1 downto 0);
+        ETH_REFCLK_N            : in    std_logic_vector(ETH_PORTS-1 downto 0);
+        ETH_RX_P                : in    std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
+        ETH_RX_N                : in    std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
+        ETH_TX_P                : out   std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
+        ETH_TX_N                : out   std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
 
-    ETH_LED_G               : out   std_logic_vector(ETH_PORTS*ETH_PORT_LEDS-1 downto 0);
-    ETH_LED_R               : out   std_logic_vector(ETH_PORTS*ETH_PORT_LEDS-1 downto 0);
+        ETH_LED_G               : out   std_logic_vector(ETH_PORTS*ETH_PORT_LEDS-1 downto 0);
+        ETH_LED_R               : out   std_logic_vector(ETH_PORTS*ETH_PORT_LEDS-1 downto 0);
 
-    -- QSFP management interface
-    QSFP_I2C_SCL            : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
-    QSFP_I2C_SDA            : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
-    QSFP_I2C_SDA_I          : in    std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => '1');
-    QSFP_I2C_SCL_I          : in    std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => '1');
-    QSFP_I2C_SCL_O          : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    QSFP_I2C_SCL_OE         : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    QSFP_I2C_SDA_O          : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    QSFP_I2C_SDA_OE         : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    QSFP_I2C_DIR            : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
-    QSFP_MODSEL_N           : out   std_logic_vector(QSFP_PORTS-1 downto 0);
-    QSFP_LPMODE             : out   std_logic_vector(QSFP_PORTS-1 downto 0);
-    QSFP_RESET_N            : out   std_logic_vector(QSFP_PORTS-1 downto 0);
-    QSFP_MODPRS_N           : in    std_logic_vector(QSFP_PORTS-1 downto 0);
-    QSFP_INT_N              : in    std_logic_vector(QSFP_PORTS-1 downto 0);
+        -- QSFP management interface
+        QSFP_I2C_SCL            : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
+        QSFP_I2C_SDA            : inout std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => 'Z');
+        QSFP_I2C_SDA_I          : in    std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => '1');
+        QSFP_I2C_SCL_I          : in    std_logic_vector(QSFP_I2C_PORTS-1 downto 0) := (others => '1');
+        QSFP_I2C_SCL_O          : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        QSFP_I2C_SCL_OE         : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        QSFP_I2C_SDA_O          : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        QSFP_I2C_SDA_OE         : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        QSFP_I2C_DIR            : out   std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
+        QSFP_MODSEL_N           : out   std_logic_vector(QSFP_PORTS-1 downto 0);
+        QSFP_LPMODE             : out   std_logic_vector(QSFP_PORTS-1 downto 0);
+        QSFP_RESET_N            : out   std_logic_vector(QSFP_PORTS-1 downto 0);
+        QSFP_MODPRS_N           : in    std_logic_vector(QSFP_PORTS-1 downto 0);
+        QSFP_INT_N              : in    std_logic_vector(QSFP_PORTS-1 downto 0);
 
-    -- =========================================================================
-    -- HBM AXI interfaces (clocked at HBM_CLK)
-    -- =========================================================================
-    HBM_CLK                 : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_RESET               : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_INIT_DONE           : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        -- =========================================================================
+        -- HBM AXI interfaces (clocked at HBM_CLK)
+        -- =========================================================================
+        HBM_CLK                 : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_RESET               : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_INIT_DONE           : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
 
-    HBM_AXI_ARADDR          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0);
-    HBM_AXI_ARBURST         : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0);
-    HBM_AXI_ARID            : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
-    HBM_AXI_ARLEN           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0);
-    HBM_AXI_ARSIZE          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0);
-    HBM_AXI_ARVALID         : out std_logic_vector(HBM_PORTS-1 downto 0);
-    HBM_AXI_ARREADY         : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_AXI_ARPROT          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0);
-    HBM_AXI_ARQOS           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0);
-    HBM_AXI_ARUSER          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0);
+        HBM_AXI_ARADDR          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0);
+        HBM_AXI_ARBURST         : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0);
+        HBM_AXI_ARID            : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
+        HBM_AXI_ARLEN           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0);
+        HBM_AXI_ARSIZE          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0);
+        HBM_AXI_ARVALID         : out std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_ARREADY         : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_ARPROT          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0);
+        HBM_AXI_ARQOS           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0);
+        HBM_AXI_ARUSER          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0);
 
-    HBM_AXI_RDATA           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_RDATA_PARITY    : in  slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_RID             : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_RLAST           : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_AXI_RRESP           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_RVALID          : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_AXI_RREADY          : out std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_RDATA           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_RDATA_PARITY    : in  slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_RID             : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_RLAST           : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_RRESP           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_RVALID          : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_RREADY          : out std_logic_vector(HBM_PORTS-1 downto 0);
 
-    HBM_AXI_AWADDR          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0);
-    HBM_AXI_AWBURST         : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0);
-    HBM_AXI_AWID            : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
-    HBM_AXI_AWLEN           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0);
-    HBM_AXI_AWSIZE          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0);
-    HBM_AXI_AWVALID         : out std_logic_vector(HBM_PORTS-1 downto 0);
-    HBM_AXI_AWREADY         : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_AXI_AWPROT          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0);
-    HBM_AXI_AWQOS           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0);
-    HBM_AXI_AWUSER          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0);
+        HBM_AXI_AWADDR          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0);
+        HBM_AXI_AWBURST         : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0);
+        HBM_AXI_AWID            : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
+        HBM_AXI_AWLEN           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0);
+        HBM_AXI_AWSIZE          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0);
+        HBM_AXI_AWVALID         : out std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_AWREADY         : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_AWPROT          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0);
+        HBM_AXI_AWQOS           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0);
+        HBM_AXI_AWUSER          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0);
 
-    HBM_AXI_WDATA           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0);
-    HBM_AXI_WDATA_PARITY    : out slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0);
-    HBM_AXI_WLAST           : out std_logic_vector(HBM_PORTS-1 downto 0);
-    HBM_AXI_WSTRB           : out slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0);
-    HBM_AXI_WVALID          : out std_logic_vector(HBM_PORTS-1 downto 0);
-    HBM_AXI_WREADY          : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_WDATA           : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0);
+        HBM_AXI_WDATA_PARITY    : out slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0);
+        HBM_AXI_WLAST           : out std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_WSTRB           : out slv_array_t(HBM_PORTS-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0);
+        HBM_AXI_WVALID          : out std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_WREADY          : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
 
-    HBM_AXI_BID             : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_BRESP           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0) := (others => (others => '0'));
-    HBM_AXI_BVALID          : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
-    HBM_AXI_BREADY          : out std_logic_vector(HBM_PORTS-1 downto 0);
+        HBM_AXI_BID             : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_BRESP           : in  slv_array_t(HBM_PORTS-1 downto 0)(HBM_RESP_WIDTH-1 downto 0) := (others => (others => '0'));
+        HBM_AXI_BVALID          : in  std_logic_vector(HBM_PORTS-1 downto 0) := (others => '0');
+        HBM_AXI_BREADY          : out std_logic_vector(HBM_PORTS-1 downto 0);
 
-    -- External memory interfaces (clocked at MEM_CLK)
-    MEM_CLK                 : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
-    MEM_RST                 : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
+        -- External memory interfaces (clocked at MEM_CLK)
+        MEM_CLK                 : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
+        MEM_RST                 : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
 
-    MEM_AVMM_READY          : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
-    MEM_AVMM_READ           : out std_logic_vector(MEM_PORTS-1 downto 0);
-    MEM_AVMM_WRITE          : out std_logic_vector(MEM_PORTS-1 downto 0);
-    MEM_AVMM_ADDRESS        : out slv_array_t(MEM_PORTS-1 downto 0)(MEM_ADDR_WIDTH-1 downto 0);
-    MEM_AVMM_BURSTCOUNT     : out slv_array_t(MEM_PORTS-1 downto 0)(MEM_BURST_WIDTH-1 downto 0);
-    MEM_AVMM_WRITEDATA      : out slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0);
-    MEM_AVMM_READDATA       : in  slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
-    MEM_AVMM_READDATAVALID  : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
+        MEM_AVMM_READY          : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
+        MEM_AVMM_READ           : out std_logic_vector(MEM_PORTS-1 downto 0);
+        MEM_AVMM_WRITE          : out std_logic_vector(MEM_PORTS-1 downto 0);
+        MEM_AVMM_ADDRESS        : out slv_array_t(MEM_PORTS-1 downto 0)(MEM_ADDR_WIDTH-1 downto 0);
+        MEM_AVMM_BURSTCOUNT     : out slv_array_t(MEM_PORTS-1 downto 0)(MEM_BURST_WIDTH-1 downto 0);
+        MEM_AVMM_WRITEDATA      : out slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0);
+        MEM_AVMM_READDATA       : in  slv_array_t(MEM_PORTS-1 downto 0)(MEM_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
+        MEM_AVMM_READDATAVALID  : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
 
-    MEM_REFR_PERIOD         : out slv_array_t(MEM_PORTS-1 downto 0)(MEM_REFR_PERIOD_WIDTH - 1 downto 0) := (others => std_logic_vector(to_unsigned(MEM_DEF_REFR_PERIOD, MEM_REFR_PERIOD_WIDTH)));
-    MEM_REFR_REQ            : out std_logic_vector(MEM_PORTS - 1 downto 0);
-    MEM_REFR_ACK            : in std_logic_vector(MEM_PORTS - 1 downto 0) := (others => '0');
+        MEM_REFR_PERIOD         : out slv_array_t(MEM_PORTS-1 downto 0)(MEM_REFR_PERIOD_WIDTH - 1 downto 0) := (others => std_logic_vector(to_unsigned(MEM_DEF_REFR_PERIOD, MEM_REFR_PERIOD_WIDTH)));
+        MEM_REFR_REQ            : out std_logic_vector(MEM_PORTS - 1 downto 0);
+        MEM_REFR_ACK            : in std_logic_vector(MEM_PORTS - 1 downto 0) := (others => '0');
 
-    EMIF_RST_REQ            : out std_logic_vector(MEM_PORTS-1 downto 0);
-    EMIF_RST_DONE           : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
-    EMIF_ECC_USR_INT        : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
-    EMIF_CAL_SUCCESS        : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
-    EMIF_CAL_FAIL           : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
-    EMIF_AUTO_PRECHARGE     : out std_logic_vector(MEM_PORTS-1 downto 0);
+        EMIF_RST_REQ            : out std_logic_vector(MEM_PORTS-1 downto 0);
+        EMIF_RST_DONE           : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
+        EMIF_ECC_USR_INT        : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
+        EMIF_CAL_SUCCESS        : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
+        EMIF_CAL_FAIL           : in  std_logic_vector(MEM_PORTS-1 downto 0) := (others => '0');
+        EMIF_AUTO_PRECHARGE     : out std_logic_vector(MEM_PORTS-1 downto 0);
 
-    STATUS_LED_G            : out   std_logic_vector(STATUS_LEDS-1 downto 0);
-    STATUS_LED_R            : out   std_logic_vector(STATUS_LEDS-1 downto 0);
+        STATUS_LED_G            : out   std_logic_vector(STATUS_LEDS-1 downto 0);
+        STATUS_LED_R            : out   std_logic_vector(STATUS_LEDS-1 downto 0);
 
-    PCIE_CLK                : out std_logic;
-    PCIE_RESET              : out std_logic;
+        PCIE_CLK                : out std_logic;
+        PCIE_RESET              : out std_logic;
 
-    BOOT_MI_CLK             : out std_logic;
-    BOOT_MI_RESET           : out std_logic;
-    BOOT_MI_DWR             : out std_logic_vector(31 downto 0);
-    BOOT_MI_ADDR            : out std_logic_vector(31 downto 0);
-    BOOT_MI_RD              : out std_logic;
-    BOOT_MI_WR              : out std_logic;
-    BOOT_MI_BE              : out std_logic_vector(3 downto 0);
-    BOOT_MI_DRD             : in  std_logic_vector(31 downto 0) := (others => '0');
-    BOOT_MI_ARDY            : in  std_logic := '0';
-    BOOT_MI_DRDY            : in  std_logic := '0';
+        BOOT_MI_CLK             : out std_logic;
+        BOOT_MI_RESET           : out std_logic;
+        BOOT_MI_DWR             : out std_logic_vector(31 downto 0);
+        BOOT_MI_ADDR            : out std_logic_vector(31 downto 0);
+        BOOT_MI_RD              : out std_logic;
+        BOOT_MI_WR              : out std_logic;
+        BOOT_MI_BE              : out std_logic_vector(3 downto 0);
+        BOOT_MI_DRD             : in  std_logic_vector(31 downto 0) := (others => '0');
+        BOOT_MI_ARDY            : in  std_logic := '0';
+        BOOT_MI_DRDY            : in  std_logic := '0';
 
-    -- =========================================================================
-    -- MISC SIGNALS (the clock signal is not defined)
-    -- =========================================================================
-    -- Optional signal for MISC connection from Top-Level FPGA design to APP core.
-    MISC_TOP2APP            : in    std_logic_vector(MISC_TOP2APP_WIDTH-1 downto 0) := (others => '0');
-    -- Optional signal for MISC connection from APP core to Top-Level FPGA design.
-    MISC_APP2TOP            : out   std_logic_vector(MISC_APP2TOP_WIDTH-1 downto 0);
-    -- Optional signal for MISC connection from Top-Level FPGA design to PCIE core.
-    MISC_TOP2PCIE           : in    slv_array_t(PCIE_ENDPOINTS-1 downto 0)(MISC_TOP2PCIE_WIDTH-1 downto 0) := (others => (others => '0'));
-    -- Optional signal for MISC connection from PCIE core to Top-Level FPGA design.
-    MISC_PCIE2TOP           : out   slv_array_t(PCIE_ENDPOINTS-1 downto 0)(MISC_PCIE2TOP_WIDTH-1 downto 0);
-    -- Optional signal for MISC connection from Top-Level FPGA design to NET_MOD core.
-    MISC_TOP2NET            : in    slv_array_t(ETH_PORTS-1 downto 0)(MISC_TOP2NET_WIDTH-1 downto 0) := (others => (others => '0'));
-    -- Optional signal for MISC connection from NET_MOD core to Top-Level FPGA design.
-    MISC_NET2TOP            : out   slv_array_t(ETH_PORTS-1 downto 0)(MISC_NET2TOP_WIDTH-1 downto 0);
-    -- Optional signal for MISC connection from Top-Level FPGA design to FPGA_COMMON.
-    MISC_IN                 : in    std_logic_vector(MISC_IN_WIDTH-1 downto 0) := (others => '0');
-    -- Optional signal for MISC connection from FPGA_COMMON to Top-Level FPGA design.
-    MISC_OUT                : out   std_logic_vector(MISC_OUT_WIDTH-1 downto 0)
-);
+        -- =========================================================================
+        -- MISC SIGNALS (the clock signal is not defined)
+        -- =========================================================================
+        -- Optional signal for MISC connection from Top-Level FPGA design to APP core.
+        MISC_TOP2APP            : in    std_logic_vector(MISC_TOP2APP_WIDTH-1 downto 0) := (others => '0');
+        -- Optional signal for MISC connection from APP core to Top-Level FPGA design.
+        MISC_APP2TOP            : out   std_logic_vector(MISC_APP2TOP_WIDTH-1 downto 0);
+        -- Optional signal for MISC connection from Top-Level FPGA design to PCIE core.
+        MISC_TOP2PCIE           : in    slv_array_t(PCIE_ENDPOINTS-1 downto 0)(MISC_TOP2PCIE_WIDTH-1 downto 0) := (others => (others => '0'));
+        -- Optional signal for MISC connection from PCIE core to Top-Level FPGA design.
+        MISC_PCIE2TOP           : out   slv_array_t(PCIE_ENDPOINTS-1 downto 0)(MISC_PCIE2TOP_WIDTH-1 downto 0);
+        -- Optional signal for MISC connection from Top-Level FPGA design to NET_MOD core.
+        MISC_TOP2NET            : in    slv_array_t(ETH_PORTS-1 downto 0)(MISC_TOP2NET_WIDTH-1 downto 0) := (others => (others => '0'));
+        -- Optional signal for MISC connection from NET_MOD core to Top-Level FPGA design.
+        MISC_NET2TOP            : out   slv_array_t(ETH_PORTS-1 downto 0)(MISC_NET2TOP_WIDTH-1 downto 0);
+        -- Optional signal for MISC connection from Top-Level FPGA design to FPGA_COMMON.
+        MISC_IN                 : in    std_logic_vector(MISC_IN_WIDTH-1 downto 0) := (others => '0');
+        -- Optional signal for MISC connection from FPGA_COMMON to Top-Level FPGA design.
+        MISC_OUT                : out   std_logic_vector(MISC_OUT_WIDTH-1 downto 0)
+    );
 end entity;
 
 -- ----------------------------------------------------------------------------
@@ -292,7 +292,7 @@ architecture FULL of FPGA_COMMON is
     -- Number of DMA streams
     constant DMA_STREAMS         : natural := DMA_MODULES;
 
-    function f_get_eth_mfb_regions(P_ETH_STREAMS_MODE : natural) return natural is
+    function f_get_eth_mfb_regions (P_ETH_STREAMS_MODE : natural) return natural is
     begin
         if (P_ETH_STREAMS_MODE = 1) then
             -- ETH stream = ETH channel
@@ -311,7 +311,7 @@ architecture FULL of FPGA_COMMON is
         end if;
     end function;
 
-    function f_get_eth_mfb_region_size(P_ETH_STREAMS_MODE : natural) return natural is
+    function f_get_eth_mfb_region_size (P_ETH_STREAMS_MODE : natural) return natural is
     begin
         if (P_ETH_STREAMS_MODE = 1) then
             -- ETH stream = ETH channel
@@ -338,13 +338,13 @@ architecture FULL of FPGA_COMMON is
     constant PCIE_MPS     : natural := 256;
     constant PCIE_MRRS    : natural := 512;
 
-    constant IS_USP_PCIE_EP : boolean := (PCIE_ENDPOINT_TYPE="USP" or PCIE_ENDPOINT_TYPE="USP_PCIE4" or PCIE_ENDPOINT_TYPE="USP_PCIE4C");
+    constant IS_USP_PCIE_EP : boolean := (PCIE_ENDPOINT_TYPE = "USP" or PCIE_ENDPOINT_TYPE = "USP_PCIE4" or PCIE_ENDPOINT_TYPE = "USP_PCIE4C");
 
-    constant RESET_WIDTH  : natural := 10;
-    constant TS_MULT_SMART_DSP : boolean := (DEVICE="ULTRASCALE");
-    constant TS_MULT_USE_DSP   : boolean := (DEVICE="AGILEX" or DEVICE="STRATIX10");
+    constant RESET_WIDTH       : natural := 10;
+    constant TS_MULT_SMART_DSP : boolean := (DEVICE = "ULTRASCALE");
+    constant TS_MULT_USE_DSP   : boolean := (DEVICE = "AGILEX" or DEVICE = "STRATIX10");
 
-    constant FPGA_ID_WIDTH : natural := tsel(DEVICE="ULTRASCALE", 96, 64);
+    constant FPGA_ID_WIDTH : natural := tsel(DEVICE = "ULTRASCALE", 96, 64);
 
     constant MI_DATA_WIDTH      : integer := 32;
     constant MI_ADDR_WIDTH      : integer := 32;
@@ -367,55 +367,55 @@ architecture FULL of FPGA_COMMON is
         return 8;
     end function;
 
-    function pcie_mfb_regions_calc_f(PCIE_DIR : string) return natural is
+    function pcie_mfb_regions_calc_f (PCIE_DIR : string) return natural is
         variable pcie_mfb_regions : natural;
     begin
         pcie_mfb_regions := 0;
 
-        if (PCIE_ENDPOINT_TYPE="P_TILE") then -- Gen4 mode only
-            if (PCIE_ENDPOINT_MODE = 0) then -- x16
-                pcie_mfb_regions := 2; --2x256b AVST
-            elsif (PCIE_ENDPOINT_MODE = 1) then --x8x8
-                pcie_mfb_regions := 1; --1x256b AVST
-            end if;
-        end if;
-
-        if (PCIE_ENDPOINT_TYPE="R_TILE") then -- Gen4/Gen5 mode only
-            if (PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 4) then -- x16
-                pcie_mfb_regions := 2; --2x256b AVST
-            elsif (PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 5) then -- x16
-                pcie_mfb_regions := 4; --4x256b AVST
-            elsif (PCIE_ENDPOINT_MODE = 1 and PCIE_GEN = 5) then --x8x8
-                pcie_mfb_regions := 2; --2x256b AVST
-            end if;
-        end if;
-
-        if (PCIE_ENDPOINT_TYPE="H_TILE") then -- Gen3 mode only
-            if (PCIE_ENDPOINT_MODE = 0) then -- x16
-                pcie_mfb_regions := 2; --2x256b AVST
-            end if;
-        end if;
-
-        if (IS_USP_PCIE_EP = True) then -- Gen3/4 mode only
-            if (PCIE_ENDPOINT_MODE = 0) then -- x16
-                pcie_mfb_regions := 2; --2x256b AXI
+        if (PCIE_ENDPOINT_TYPE = "P_TILE") then -- Gen4 mode only
+            if (PCIE_ENDPOINT_MODE = 0) then    -- x16
+                pcie_mfb_regions := 2;          -- 2x256b AVST
             elsif (PCIE_ENDPOINT_MODE = 1) then -- x8x8
-                pcie_mfb_regions := 2; --2x256b AXI
-            elsif (PCIE_ENDPOINT_MODE = 2) then --x8
-                pcie_mfb_regions := 1; --1x256b AXI
+                pcie_mfb_regions := 1;          -- 1x256b AVST
             end if;
-            if (PCIE_DIR="RC") then -- USP RC support up to 4 TLP in word
+        end if;
+
+        if (PCIE_ENDPOINT_TYPE = "R_TILE") then                  -- Gen4/Gen5 mode only
+            if (PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 4) then    -- x16
+                pcie_mfb_regions := 2;                           -- 2x256b AVST
+            elsif (PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 5) then -- x16
+                pcie_mfb_regions := 4;                           -- 4x256b AVST
+            elsif (PCIE_ENDPOINT_MODE = 1 and PCIE_GEN = 5) then -- x8x8
+                pcie_mfb_regions := 2;                           -- 2x256b AVST
+            end if;
+        end if;
+
+        if (PCIE_ENDPOINT_TYPE = "H_TILE") then -- Gen3 mode only
+            if (PCIE_ENDPOINT_MODE = 0) then    -- x16
+                pcie_mfb_regions := 2;          -- 2x256b AVST
+            end if;
+        end if;
+
+        if (IS_USP_PCIE_EP = True) then         -- Gen3/4 mode only
+            if (PCIE_ENDPOINT_MODE = 0) then    -- x16
+                pcie_mfb_regions := 2;          -- 2x256b AXI
+            elsif (PCIE_ENDPOINT_MODE = 1) then -- x8x8
+                pcie_mfb_regions := 2;          -- 2x256b AXI
+            elsif (PCIE_ENDPOINT_MODE = 2) then -- x8
+                pcie_mfb_regions := 1;          -- 1x256b AXI
+            end if;
+            if (PCIE_DIR = "RC") then           -- USP RC support up to 4 TLP in word
                 pcie_mfb_regions := pcie_mfb_regions*2;
             end if;
         end if;
 
         -- PTC conversion to DMA streams for DMA_TYPE=3
-        if ((PCIE_DIR="RQ" or PCIE_DIR="RC") and PTC_ENABLE) then
-            if (PCIE_ENDPOINT_TYPE="P_TILE" and PCIE_ENDPOINT_MODE = 1) then
+        if ((PCIE_DIR = "RQ" or PCIE_DIR = "RC") and PTC_ENABLE) then
+            if (PCIE_ENDPOINT_TYPE = "P_TILE" and PCIE_ENDPOINT_MODE = 1) then
                 -- 256b@~500MHz PCIe stream to 512b@200MHz PTC-DMA stream
                 pcie_mfb_regions := pcie_mfb_regions*2;
             end if;
-            if (PCIE_ENDPOINT_TYPE="R_TILE" and PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 5) then --TODO
+            if (PCIE_ENDPOINT_TYPE = "R_TILE" and PCIE_ENDPOINT_MODE = 0 and PCIE_GEN = 5) then -- TODO
                 -- 1024b@~250MHz PCIe stream to 512b@200MHz PTC-DMA stream
                 pcie_mfb_regions := pcie_mfb_regions/2;
             end if;
@@ -461,8 +461,8 @@ architecture FULL of FPGA_COMMON is
     -- DMA CrossbarX clock selection
     constant DMA_CROX_CLK_SEL    : integer := 0;
     constant DMA_USR_EQ_DMA      : boolean := false;
-    constant DMA_CROX_EQ_DMA     : boolean := (DMA_CROX_CLK_SEL=1);
-    constant DMA_CROX_DOUBLE_DMA : boolean := (DMA_CROX_CLK_SEL=0);
+    constant DMA_CROX_EQ_DMA     : boolean := (DMA_CROX_CLK_SEL = 1);
+    constant DMA_CROX_DOUBLE_DMA : boolean := (DMA_CROX_CLK_SEL = 0);
 
     constant MEASURED_FREQUENCIES   : natural := 7;
 
@@ -632,7 +632,7 @@ architecture FULL of FPGA_COMMON is
     signal eth_rx_mfb_dst_rdy            : std_logic_vector(ETH_STREAMS-1 downto 0);
 
     signal eth_tx_mfb_data               : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*ETH_MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    signal eth_tx_mfb_hdr                : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0); --valid with sof
+    signal eth_tx_mfb_hdr                : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0); -- valid with sof
     signal eth_tx_mfb_sof                : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS-1 downto 0);
     signal eth_tx_mfb_eof                : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS-1 downto 0);
     signal eth_tx_mfb_sof_pos            : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*max(1,log2(ETH_MFB_REGION_SIZE))-1 downto 0);
@@ -707,7 +707,7 @@ begin
     end generate;
 
     clk_gen_i : entity work.COMMON_CLK_GEN
-    generic map(
+    generic map (
         REFCLK_PERIOD   => SYSCLK_PERIOD,
         PLL_MULT_F      => PLL_MULT_F,
         PLL_MASTER_DIV  => PLL_MASTER_DIV,
@@ -749,7 +749,7 @@ begin
                                  rst_eth_phy(0);
 
         frequency_meter_i : entity work.FREQUENCY_METER
-        generic map(
+        generic map (
             MI_DATA_WIDTH        => 32,
             MI_ADDR_WIDTH        => 32,
             INTERVAL_LEN_WIDTH   => 32,
@@ -794,7 +794,7 @@ begin
     );
 
     reset_tree_gen_i : entity work.RESET_TREE_GEN
-    generic map(
+    generic map (
         CLK_COUNT    => CLK_COUNT,
         RST_REPLICAS => RESET_WIDTH
     )
@@ -977,7 +977,7 @@ begin
             IN_REG  => true,
             TWO_REG => false
         )
-        port map(
+        port map (
             ACLK     => clk_pci(i),
             BCLK     => clk_dma,
             ARST     => '0',
@@ -991,7 +991,7 @@ begin
             IN_REG  => true,
             TWO_REG => false
         )
-        port map(
+        port map (
             ACLK     => clk_pci(i),
             BCLK     => clk_app,
             ARST     => '0',
@@ -1001,10 +1001,10 @@ begin
         );
 
         cdc_pcie_fpga_id_i: entity work.ASYNC_OPEN_LOOP_SMD
-        generic map(
+        generic map (
             DATA_WIDTH => FPGA_ID_WIDTH
         )
-        port map(
+        port map (
             ACLK     => clk_mi,
             BCLK     => clk_pci(i),
             ARST     => '0',
@@ -1019,19 +1019,19 @@ begin
     -- =========================================================================
 
     mi_adc_i : entity work.MI_SPLITTER_PLUS_GEN
-    generic map(
+    generic map (
         ADDR_WIDTH    => 32,
         DATA_WIDTH    => 32,
         -- defined in mi_addr_space_pack
         PORTS         => MI_ADC_PORTS,
-        --PIPE_OUT      => MI_ADC_PIPE_EN,
-        --ADDR_BASES    => MI_ADC_ADDR_BASES,
+        -- PIPE_OUT      => MI_ADC_PIPE_EN,
+        -- ADDR_BASES    => MI_ADC_ADDR_BASES,
         ADDR_BASE     => MI_ADC_ADDR_BASE,
-        --ADDR_MASK     => get_addr_mask(MI_ADC_ADDR_BASE),
-        --PORT_MAPPING  => MI_ADC_PORT_MAPPING(0),
+        -- ADDR_MASK     => get_addr_mask(MI_ADC_ADDR_BASE),
+        -- PORT_MAPPING  => MI_ADC_PORT_MAPPING(0),
         DEVICE        => DEVICE
     )
-    port map(
+    port map (
         CLK        => clk_mi,
         RESET      => rst_mi(1),
 
@@ -1044,24 +1044,24 @@ begin
         RX_DRD     => mi_drd (0),
         RX_DRDY    => mi_drdy(0),
 
-        TX_DWR     => mi_adc_dwr ,
+        TX_DWR     => mi_adc_dwr,
         TX_ADDR    => mi_adc_addr,
-        TX_BE      => mi_adc_be  ,
-        TX_RD      => mi_adc_rd  ,
-        TX_WR      => mi_adc_wr  ,
+        TX_BE      => mi_adc_be,
+        TX_RD      => mi_adc_rd,
+        TX_WR      => mi_adc_wr,
         TX_ARDY    => mi_adc_ardy,
-        TX_DRD     => mi_adc_drd ,
+        TX_DRD     => mi_adc_drd,
         TX_DRDY    => mi_adc_drdy
     );
 
     -- boot control module is in top-level
-    BOOT_MI_CLK   <= clk_mi;
-    BOOT_MI_RESET <= rst_mi(1);
-    BOOT_MI_DWR   <= mi_adc_dwr (MI_ADC_PORT_BOOT);
-    BOOT_MI_ADDR  <= mi_adc_addr(MI_ADC_PORT_BOOT);
-    BOOT_MI_BE    <= mi_adc_be  (MI_ADC_PORT_BOOT);
-    BOOT_MI_RD    <= mi_adc_rd  (MI_ADC_PORT_BOOT);
-    BOOT_MI_WR    <= mi_adc_wr  (MI_ADC_PORT_BOOT);
+    BOOT_MI_CLK                   <= clk_mi;
+    BOOT_MI_RESET                 <= rst_mi(1);
+    BOOT_MI_DWR                   <= mi_adc_dwr (MI_ADC_PORT_BOOT);
+    BOOT_MI_ADDR                  <= mi_adc_addr(MI_ADC_PORT_BOOT);
+    BOOT_MI_BE                    <= mi_adc_be  (MI_ADC_PORT_BOOT);
+    BOOT_MI_RD                    <= mi_adc_rd  (MI_ADC_PORT_BOOT);
+    BOOT_MI_WR                    <= mi_adc_wr  (MI_ADC_PORT_BOOT);
     mi_adc_ardy(MI_ADC_PORT_BOOT) <= BOOT_MI_ARDY;
     mi_adc_drd (MI_ADC_PORT_BOOT) <= BOOT_MI_DRD;
     mi_adc_drdy(MI_ADC_PORT_BOOT) <= BOOT_MI_DRDY;
@@ -1088,12 +1088,12 @@ begin
     );
 
     sdm_ctrl_i: entity work.SDM_CTRL
-    Generic map (
+    generic map (
         DATA_WIDTH => 32,
         ADDR_WIDTH => 32,
         DEVICE     => DEVICE
     )
-    Port map (
+    port map (
         CLK     => clk_mi,
         RESET   => rst_mi(2),
         MI_DWR  => mi_adc_dwr(MI_ADC_PORT_SENSOR),
@@ -1113,7 +1113,7 @@ begin
     -- FPGA ID LOGIC
     -- =========================================================================
 
-    hwid_i : entity work.hwid
+    hwid_i : entity work.HWID
     generic map (
         DEVICE          => DEVICE
     )
@@ -1139,78 +1139,78 @@ begin
 
     dma_i : entity work.DMA
     generic map (
-        DEVICE               => DEVICE                    ,
-        DMA_STREAMS          => DMA_MODULES               ,
+        DEVICE               => DEVICE,
+        DMA_STREAMS          => DMA_MODULES,
 
-        USR_MVB_ITEMS        => DMA_MFB_REGIONS           ,
-        USR_MFB_REGIONS      => DMA_MFB_REGIONS           ,
-        USR_MFB_REGION_SIZE  => DMA_MFB_REGION_SIZE       ,
-        USR_MFB_BLOCK_SIZE   => MFB_BLOCK_SIZE            ,
-        USR_MFB_ITEM_WIDTH   => MFB_ITEM_WIDTH            ,
+        USR_MVB_ITEMS        => DMA_MFB_REGIONS,
+        USR_MFB_REGIONS      => DMA_MFB_REGIONS,
+        USR_MFB_REGION_SIZE  => DMA_MFB_REGION_SIZE,
+        USR_MFB_BLOCK_SIZE   => MFB_BLOCK_SIZE,
+        USR_MFB_ITEM_WIDTH   => MFB_ITEM_WIDTH,
 
-        USR_RX_PKT_SIZE_MAX  => DMA_RX_FRAME_SIZE_MAX     ,
-        USR_TX_PKT_SIZE_MAX  => DMA_TX_FRAME_SIZE_MAX     ,
+        USR_RX_PKT_SIZE_MAX  => DMA_RX_FRAME_SIZE_MAX,
+        USR_TX_PKT_SIZE_MAX  => DMA_TX_FRAME_SIZE_MAX,
 
-        DMA_ENDPOINTS        => DMA_ENDPOINTS             ,
-        PCIE_MPS             => PCIE_MPS                  ,
-        PCIE_MRRS            => PCIE_MRRS                 ,
-        DMA_TAG_WIDTH        => 8                         ,
+        DMA_ENDPOINTS        => DMA_ENDPOINTS,
+        PCIE_MPS             => PCIE_MPS,
+        PCIE_MRRS            => PCIE_MRRS,
+        DMA_TAG_WIDTH        => 8,
 
-        PCIE_RQ_MFB_REGIONS     => DMA_RQ_MFB_REGIONS     ,
-        PCIE_RQ_MFB_REGION_SIZE => DMA_RQ_MFB_REGION_SIZE ,
-        PCIE_RQ_MFB_BLOCK_SIZE  => DMA_RQ_MFB_BLOCK_SIZE  ,
-        PCIE_RQ_MFB_ITEM_WIDTH  => DMA_RQ_MFB_ITEM_WIDTH  ,
+        PCIE_RQ_MFB_REGIONS     => DMA_RQ_MFB_REGIONS,
+        PCIE_RQ_MFB_REGION_SIZE => DMA_RQ_MFB_REGION_SIZE,
+        PCIE_RQ_MFB_BLOCK_SIZE  => DMA_RQ_MFB_BLOCK_SIZE,
+        PCIE_RQ_MFB_ITEM_WIDTH  => DMA_RQ_MFB_ITEM_WIDTH,
 
-        PCIE_RC_MFB_REGIONS     => DMA_RC_MFB_REGIONS     ,
-        PCIE_RC_MFB_REGION_SIZE => DMA_RC_MFB_REGION_SIZE ,
-        PCIE_RC_MFB_BLOCK_SIZE  => DMA_RC_MFB_BLOCK_SIZE  ,
-        PCIE_RC_MFB_ITEM_WIDTH  => DMA_RC_MFB_ITEM_WIDTH  ,
+        PCIE_RC_MFB_REGIONS     => DMA_RC_MFB_REGIONS,
+        PCIE_RC_MFB_REGION_SIZE => DMA_RC_MFB_REGION_SIZE,
+        PCIE_RC_MFB_BLOCK_SIZE  => DMA_RC_MFB_BLOCK_SIZE,
+        PCIE_RC_MFB_ITEM_WIDTH  => DMA_RC_MFB_ITEM_WIDTH,
 
-        PCIE_CQ_MFB_REGIONS     => DMA_CQ_MFB_REGIONS     ,
-        PCIE_CQ_MFB_REGION_SIZE => DMA_CQ_MFB_REGION_SIZE ,
-        PCIE_CQ_MFB_BLOCK_SIZE  => DMA_CQ_MFB_BLOCK_SIZE  ,
-        PCIE_CQ_MFB_ITEM_WIDTH  => DMA_CQ_MFB_ITEM_WIDTH  ,
+        PCIE_CQ_MFB_REGIONS     => DMA_CQ_MFB_REGIONS,
+        PCIE_CQ_MFB_REGION_SIZE => DMA_CQ_MFB_REGION_SIZE,
+        PCIE_CQ_MFB_BLOCK_SIZE  => DMA_CQ_MFB_BLOCK_SIZE,
+        PCIE_CQ_MFB_ITEM_WIDTH  => DMA_CQ_MFB_ITEM_WIDTH,
 
-        PCIE_CC_MFB_REGIONS     => DMA_CC_MFB_REGIONS     ,
-        PCIE_CC_MFB_REGION_SIZE => DMA_CC_MFB_REGION_SIZE ,
-        PCIE_CC_MFB_BLOCK_SIZE  => DMA_CC_MFB_BLOCK_SIZE  ,
-        PCIE_CC_MFB_ITEM_WIDTH  => DMA_CC_MFB_ITEM_WIDTH  ,
+        PCIE_CC_MFB_REGIONS     => DMA_CC_MFB_REGIONS,
+        PCIE_CC_MFB_REGION_SIZE => DMA_CC_MFB_REGION_SIZE,
+        PCIE_CC_MFB_BLOCK_SIZE  => DMA_CC_MFB_BLOCK_SIZE,
+        PCIE_CC_MFB_ITEM_WIDTH  => DMA_CC_MFB_ITEM_WIDTH,
 
-        HDR_META_WIDTH       => HDR_META_WIDTH            ,
+        HDR_META_WIDTH       => HDR_META_WIDTH,
 
-        RX_CHANNELS          => DMA_RX_CHANNELS           ,
-        RX_DP_WIDTH          => DMA_RX_DATA_PTR_W         ,
-        RX_HP_WIDTH          => DMA_RX_HDR_PTR_W          ,
-        RX_BLOCKING_MODE     => DMA_RX_BLOCKING_MODE      ,
+        RX_CHANNELS          => DMA_RX_CHANNELS,
+        RX_DP_WIDTH          => DMA_RX_DATA_PTR_W,
+        RX_HP_WIDTH          => DMA_RX_HDR_PTR_W,
+        RX_BLOCKING_MODE     => DMA_RX_BLOCKING_MODE,
 
-        TX_CHANNELS          => DMA_TX_CHANNELS           ,
+        TX_CHANNELS          => DMA_TX_CHANNELS,
         TX_SEL_CHANNELS      => minimum(8,DMA_TX_CHANNELS),
-        TX_DP_WIDTH          => DMA_TX_DATA_PTR_W         ,
+        TX_DP_WIDTH          => DMA_TX_DATA_PTR_W,
 
-        RX_GEN_EN            => RX_GEN_EN                 ,
-        TX_GEN_EN            => TX_GEN_EN                 ,
+        RX_GEN_EN            => RX_GEN_EN,
+        TX_GEN_EN            => TX_GEN_EN,
 
-        DBG_CNTR_EN          => DMA_DBG_CNTR_EN           ,
-        USR_EQ_DMA           => DMA_USR_EQ_DMA            ,
-        CROX_EQ_DMA          => DMA_CROX_EQ_DMA           ,
-        CROX_DOUBLE_DMA      => DMA_CROX_DOUBLE_DMA       ,
+        DBG_CNTR_EN          => DMA_DBG_CNTR_EN,
+        USR_EQ_DMA           => DMA_USR_EQ_DMA,
+        CROX_EQ_DMA          => DMA_CROX_EQ_DMA,
+        CROX_DOUBLE_DMA      => DMA_CROX_DOUBLE_DMA,
 
-        GEN_LOOP_EN          => DMA_GEN_LOOP_EN           ,
+        GEN_LOOP_EN          => DMA_GEN_LOOP_EN,
 
         PCIE_ENDPOINTS       => PCIE_ENDPOINTS
     )
     port map (
-        DMA_CLK             => clk_dma   ,
+        DMA_CLK             => clk_dma,
         DMA_RESET           => rst_dma(1),
 
-        CROX_CLK            => clk_dma_x2   ,
+        CROX_CLK            => clk_dma_x2,
         CROX_RESET          => rst_dma_x2(1),
 
-        USR_CLK             => clk_app   ,
+        USR_CLK             => clk_app,
         USR_RESET           => rst_app(1),
 
-        MI_CLK              => clk_mi    ,
-        MI_RESET            => rst_mi(4) ,
+        MI_CLK              => clk_mi,
+        MI_RESET            => rst_mi(4),
 
         PCIE_USR_CLK        => clk_pci,
         PCIE_USR_RESET      => rst_pci,
@@ -1316,21 +1316,21 @@ begin
     dma_mi_pr : process (all)
     begin
         -- Connect directly to MTC by default
-        dma_mi_dwr  <= mi_dwr;
-        dma_mi_addr <= mi_addr;
-        dma_mi_rd   <= mi_rd;
-        dma_mi_wr   <= mi_wr;
-        dma_mi_be   <= mi_be;
+        dma_mi_dwr                         <= mi_dwr;
+        dma_mi_addr                        <= mi_addr;
+        dma_mi_rd                          <= mi_rd;
+        dma_mi_wr                          <= mi_wr;
+        dma_mi_be                          <= mi_be;
         mi_drd (PCIE_ENDPOINTS-1 downto 1) <= dma_mi_drd (PCIE_ENDPOINTS-1 downto 1);
         mi_ardy(PCIE_ENDPOINTS-1 downto 1) <= dma_mi_ardy(PCIE_ENDPOINTS-1 downto 1);
         mi_drdy(PCIE_ENDPOINTS-1 downto 1) <= dma_mi_drdy(PCIE_ENDPOINTS-1 downto 1);
 
         -- Connect to MI ADC for PCIe Endpoint 0
-        dma_mi_dwr (0) <= mi_adc_dwr(MI_ADC_PORT_DMA);
-        dma_mi_addr(0) <= mi_adc_addr(MI_ADC_PORT_DMA);
-        dma_mi_rd  (0) <= mi_adc_rd(MI_ADC_PORT_DMA);
-        dma_mi_wr  (0) <= mi_adc_wr(MI_ADC_PORT_DMA);
-        dma_mi_be  (0) <= mi_adc_be(MI_ADC_PORT_DMA);
+        dma_mi_dwr (0)               <= mi_adc_dwr(MI_ADC_PORT_DMA);
+        dma_mi_addr(0)               <= mi_adc_addr(MI_ADC_PORT_DMA);
+        dma_mi_rd  (0)               <= mi_adc_rd(MI_ADC_PORT_DMA);
+        dma_mi_wr  (0)               <= mi_adc_wr(MI_ADC_PORT_DMA);
+        dma_mi_be  (0)               <= mi_adc_be(MI_ADC_PORT_DMA);
         mi_adc_drd(MI_ADC_PORT_DMA)  <= dma_mi_drd (0);
         mi_adc_ardy(MI_ADC_PORT_DMA) <= dma_mi_ardy(0);
         mi_adc_drdy(MI_ADC_PORT_DMA) <= dma_mi_drdy(0);
@@ -1471,7 +1471,7 @@ begin
         DMA_TX_MFB_DATA     => slv_array_ser(app_dma_tx_mfb_data),
         -- FIXME: questasim have problem with this construstion. Problem is with optimalizer.
         -- which probublly change svl(N downto 0)(1-1 downto 0) to std_logic_vector. This lead to
-	-- sigsegv in some corner cases.
+        -- sigsegv in some corner cases.
         -- DMA_TX_MFB_SOF      => slv_array_ser(app_dma_tx_mfb_sof),
         -- DMA_TX_MFB_EOF      => slv_array_ser(app_dma_tx_mfb_eof),
         DMA_TX_MFB_SOF      => slv_array_ser(app_dma_tx_mfb_sof, DMA_STREAMS, DMA_MFB_REGIONS),
@@ -1571,42 +1571,42 @@ begin
 
     network_mod_i : entity work.NETWORK_MOD
     generic map (
-        ETH_CORE_ARCH     => ETH_CORE_ARCH  ,
-        ETH_PORTS         => ETH_PORTS      ,
-        ETH_STREAMS       => ETH_STREAMS    ,
-        ETH_PORT_SPEED    => ETH_PORT_SPEED ,
-        ETH_PORT_CHAN     => ETH_PORT_CHAN  ,
+        ETH_CORE_ARCH     => ETH_CORE_ARCH,
+        ETH_PORTS         => ETH_PORTS,
+        ETH_STREAMS       => ETH_STREAMS,
+        ETH_PORT_SPEED    => ETH_PORT_SPEED,
+        ETH_PORT_CHAN     => ETH_PORT_CHAN,
         ETH_PORT_RX_MTU   => ETH_PORT_RX_MTU,
         ETH_PORT_TX_MTU   => ETH_PORT_TX_MTU,
-        ETH_MAC_BYPASS    => ETH_MAC_BYPASS ,
+        ETH_MAC_BYPASS    => ETH_MAC_BYPASS,
         ETH_CHAN_MAP      => ETH_CHAN_MAP,
-        LANES             => ETH_LANES      ,
-        QSFP_PORTS        => QSFP_PORTS     ,
-        QSFP_I2C_PORTS    => QSFP_I2C_PORTS ,
+        LANES             => ETH_LANES,
+        QSFP_PORTS        => QSFP_PORTS,
+        QSFP_I2C_PORTS    => QSFP_I2C_PORTS,
         QSFP_I2C_TRISTATE => QSFP_I2C_TRISTATE,
 
         REGIONS           => ETH_MFB_REGIONS,
         REGION_SIZE       => ETH_MFB_REGION_SIZE,
-        BLOCK_SIZE        => MFB_BLOCK_SIZE ,
-        ITEM_WIDTH        => MFB_ITEM_WIDTH ,
+        BLOCK_SIZE        => MFB_BLOCK_SIZE,
+        ITEM_WIDTH        => MFB_ITEM_WIDTH,
 
-        MI_DATA_WIDTH     => 32             ,
-        MI_ADDR_WIDTH     => 32             ,
+        MI_DATA_WIDTH     => 32,
+        MI_ADDR_WIDTH     => 32,
 
-        MI_DATA_WIDTH_PHY => 32             ,
-        MI_ADDR_WIDTH_PHY => 32             ,
+        MI_DATA_WIDTH_PHY => 32,
+        MI_ADDR_WIDTH_PHY => 32,
 
-        LL_MODE           => LL_MODE        ,
-        TS_DEMO_EN        => TS_DEMO_EN     ,
+        LL_MODE           => LL_MODE,
+        TS_DEMO_EN        => TS_DEMO_EN,
         TX_DMA_CHANNELS   => DMA_TX_CHANNELS/(ETH_STREAMS/DMA_STREAMS),
 
-        LANE_RX_POLARITY  => ETH_LANE_RXPOLARITY,
-        LANE_TX_POLARITY  => ETH_LANE_TXPOLARITY,
-        RESET_WIDTH       => 1              ,
+        LANE_RX_POLARITY   => ETH_LANE_RXPOLARITY,
+        LANE_TX_POLARITY   => ETH_LANE_TXPOLARITY,
+        RESET_WIDTH        => 1,
         MISC_TOP2NET_WIDTH => MISC_TOP2NET_WIDTH,
         MISC_NET2TOP_WIDTH => MISC_NET2TOP_WIDTH,
-        DEVICE            => DEVICE         ,
-        BOARD             => BOARD          ,
+        DEVICE             => DEVICE,
+        BOARD              => BOARD,
 
         EHIP_PORT_TYPE    => EHIP_PORT_TYPE
     )
@@ -1638,8 +1638,8 @@ begin
         QSFP_MODPRS_N   => QSFP_MODPRS_N,
         QSFP_INT_N      => QSFP_INT_N,
 
-        --REPEATER_CTRL   => (others => '0'), --TBD
-        --PORT_ENABLED    => open, --TBD
+        -- REPEATER_CTRL   => (others => '0'), --TBD
+        -- PORT_ENABLED    => open, --TBD
         ACTIVITY_RX     => eth_rx_activity_ser,
         ACTIVITY_TX     => eth_tx_activity_ser,
         RX_LINK_UP      => eth_rx_link_up_ser,
@@ -1720,7 +1720,7 @@ begin
         SYS_CLK_PERIOD => 5, -- 200 MHz
         LED_ON_VAL     => '1'
     )
-    port map(
+    port map (
         ETH_CLK          => clk_eth_phy,
         SYS_CLK          => clk_usr_x2,
         SYS_RESET        => rst_usr_x2(0),
@@ -1747,7 +1747,7 @@ begin
     tsu_gen_g: if (TSU_ENABLE) generate
         tsu_freq <= std_logic_vector(to_unsigned(TSU_FREQUENCY-1, 32)); -- input frequency is from only a single source
 
-        tsu_gen_i: entity work.tsu_gen
+        tsu_gen_i: entity work.TSU_GEN
         generic map (
             TS_MULT_SMART_DSP => TS_MULT_SMART_DSP,
             TS_MULT_USE_DSP   => TS_MULT_USE_DSP,
@@ -1755,14 +1755,14 @@ begin
             CLK_SEL_WIDTH     => 0
         )
         port map (
-            MI_CLK            => clk_mi   ,
+            MI_CLK            => clk_mi,
             MI_RESET          => rst_mi(7),
-            MI_DWR            => mi_adc_dwr(MI_ADC_PORT_TSU) ,
+            MI_DWR            => mi_adc_dwr(MI_ADC_PORT_TSU),
             MI_ADDR           => mi_adc_addr(MI_ADC_PORT_TSU),
-            MI_RD             => mi_adc_rd(MI_ADC_PORT_TSU)  ,
-            MI_WR             => mi_adc_wr(MI_ADC_PORT_TSU)  ,
-            MI_BE             => mi_adc_be(MI_ADC_PORT_TSU)  ,
-            MI_DRD            => mi_adc_drd(MI_ADC_PORT_TSU) ,
+            MI_RD             => mi_adc_rd(MI_ADC_PORT_TSU),
+            MI_WR             => mi_adc_wr(MI_ADC_PORT_TSU),
+            MI_BE             => mi_adc_be(MI_ADC_PORT_TSU),
+            MI_DRD            => mi_adc_drd(MI_ADC_PORT_TSU),
             MI_ARDY           => mi_adc_ardy(MI_ADC_PORT_TSU),
             MI_DRDY           => mi_adc_drdy(MI_ADC_PORT_TSU),
             PPS_N             => '0',
@@ -1779,7 +1779,7 @@ begin
         );
     else generate
         mi_adc_ardy(MI_ADC_PORT_TSU) <= mi_adc_rd(MI_ADC_PORT_TSU) or mi_adc_wr(MI_ADC_PORT_TSU);
-        mi_adc_drd(MI_ADC_PORT_TSU) <= (others => '0');
+        mi_adc_drd(MI_ADC_PORT_TSU)  <= (others => '0');
         mi_adc_drdy(MI_ADC_PORT_TSU) <= mi_adc_rd(MI_ADC_PORT_TSU);
 
         tsu_ns <= (others => '0');

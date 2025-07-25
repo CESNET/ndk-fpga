@@ -19,23 +19,23 @@ use work.lb_pkg.all; -- Local Bus package
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
 entity LB_ROOT is
-   generic(
-      BASE_ADDR        : std_logic_vector(31 downto 0):=X"00000000";
-      LIMIT            : std_logic_vector(31 downto 0):=X"00000100";
+    generic (
+        BASE_ADDR        : std_logic_vector(31 downto 0) := X"00000000";
+        LIMIT            : std_logic_vector(31 downto 0) := X"00000100";
 
-      -- Abort timeout counter width
-      -- TIMEOUT and TIME will be 2**WIDTH cycles
-      ABORT_CNT_WIDTH  : integer := 6
-   );
-   port(
-      -- Common Interface
-      IB_CLK        : in std_logic;
-      RESET         : in std_logic;
+        -- Abort timeout counter width
+        -- TIMEOUT and TIME will be 2**WIDTH cycles
+        ABORT_CNT_WIDTH  : integer := 6
+    );
+    port (
+        -- Common Interface
+        IB_CLK        : in std_logic;
+        RESET         : in std_logic;
 
-      -- Local Bus Interface
-      INTERNAL_BUS  : inout t_internal_bus64;
+        -- Local Bus Interface
+        INTERNAL_BUS  : inout t_internal_bus64;
 
-      -- Local Bus Interface
-      LOCAL_BUS     : inout t_local_bus16
-  );
-end entity LB_ROOT;
+        -- Local Bus Interface
+        LOCAL_BUS     : inout t_local_bus16
+    );
+end entity;

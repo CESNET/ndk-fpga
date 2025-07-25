@@ -51,11 +51,11 @@ architecture SHAKEDOWN of FIFOX_MULTI is
     -- -------------------------------------------------------------------------
 
     constant FIFOX_DATA_WIDTH : integer := DATA_WIDTH*WRITE_PORTS+WRITE_PORTS; -- data + valid bits
-    signal fifox_rd      : std_logic;
-    signal fifox_empty   : std_logic;
-    signal fifox_do      : std_logic_vector(FIFOX_DATA_WIDTH-1 downto 0);
-    signal fifox_do_data : std_logic_vector(WRITE_PORTS*DATA_WIDTH-1 downto 0);
-    signal fifox_do_vld  : std_logic_vector(WRITE_PORTS-1 downto 0);
+    signal   fifox_rd         : std_logic;
+    signal   fifox_empty      : std_logic;
+    signal   fifox_do         : std_logic_vector(FIFOX_DATA_WIDTH-1 downto 0);
+    signal   fifox_do_data    : std_logic_vector(WRITE_PORTS*DATA_WIDTH-1 downto 0);
+    signal   fifox_do_vld     : std_logic_vector(WRITE_PORTS-1 downto 0);
 
     -- -------------------------------------------------------------------------
 
@@ -68,11 +68,11 @@ architecture SHAKEDOWN of FIFOX_MULTI is
     signal sh_next : std_logic_vector(READ_PORTS-1 downto 0);
 
     -- -------------------------------------------------------------------------
-    function rd_check(rd : std_logic_vector; empty : std_logic_vector) return boolean is
+    function rd_check (rd : std_logic_vector; empty : std_logic_vector) return boolean is
         variable read_stop : boolean;
     begin
         read_stop := false;
-        for IT in rd'low to rd'high loop
+        for it in rd'low to rd'high loop
             if (rd(IT) = '1' and empty(IT) = '0' and read_stop = true) then
                 return false;
             end if;
@@ -107,26 +107,26 @@ begin
     -- -------------------------------------------------------------------------
 
     fifox_i : entity work.FIFOX
-    generic map(
-        DATA_WIDTH          => FIFOX_DATA_WIDTH   ,
-        ITEMS               => ITEMS/WRITE_PORTS  ,
-        RAM_TYPE            => RAM_TYPE           ,
-        DEVICE              => DEVICE             ,
-        ALMOST_FULL_OFFSET  => FIFOX_AFULL_OFFSET ,
+    generic map (
+        DATA_WIDTH          => FIFOX_DATA_WIDTH,
+        ITEMS               => ITEMS/WRITE_PORTS,
+        RAM_TYPE            => RAM_TYPE,
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => FIFOX_AFULL_OFFSET,
         ALMOST_EMPTY_OFFSET => FIFOX_AEMPTY_OFFSET,
         FAKE_FIFO           => false
     )
-    port map(
-        CLK    => CLK  ,
+    port map (
+        CLK    => CLK,
         RESET  => RESET,
 
         DI     => DI & WR,
         WR     => (or WR),
-        FULL   => FULL   ,
-        AFULL  => AFULL  ,
+        FULL   => FULL,
+        AFULL  => AFULL,
 
-        DO     => fifox_do   ,
-        RD     => fifox_rd   ,
+        DO     => fifox_do,
+        RD     => fifox_rd,
         EMPTY  => fifox_empty,
         AEMPTY => AEMPTY
     );
@@ -141,23 +141,23 @@ begin
     -- -------------------------------------------------------------------------
 
     shakedown_i : entity work.MVB_SHAKEDOWN
-    generic map(
-        RX_ITEMS    => WRITE_PORTS   ,
-        TX_ITEMS    => READ_PORTS    ,
-        ITEM_WIDTH  => DATA_WIDTH    ,
+    generic map (
+        RX_ITEMS    => WRITE_PORTS,
+        TX_ITEMS    => READ_PORTS,
+        ITEM_WIDTH  => DATA_WIDTH,
         SHAKE_PORTS => SHAKEDOWN_REGS
     )
-    port map(
-        CLK        => CLK  ,
+    port map (
+        CLK        => CLK,
         RESET      => RESET,
 
-        RX_DATA    => fifox_do_data  ,
-        RX_VLD     => fifox_do_vld   ,
+        RX_DATA    => fifox_do_data,
+        RX_VLD     => fifox_do_vld,
         RX_SRC_RDY => not fifox_empty,
-        RX_DST_RDY => fifox_rd       ,
+        RX_DST_RDY => fifox_rd,
 
         TX_DATA    => sh_data,
-        TX_VLD     => sh_vld ,
+        TX_VLD     => sh_vld,
         TX_NEXT    => sh_next
     );
 

@@ -88,27 +88,27 @@ begin
         OUTPUT_INTERFACES => OUTPUT_INTERFACES
     )
     port map (
-        CLK   => clk  ,
+        CLK   => clk,
         RESET => reset,
 
         RX_ADDR => rx_mi_addr,
-        RX_DWR  => rx_mi_dwr ,
-        RX_WR   => rx_mi_wr  ,
-        RX_RD   => rx_mi_rd  ,
+        RX_DWR  => rx_mi_dwr,
+        RX_WR   => rx_mi_wr,
+        RX_RD   => rx_mi_rd,
         RX_ARDY => rx_mi_ardy,
-        RX_DRD  => rx_mi_drd ,
+        RX_DRD  => rx_mi_drd,
         RX_DRDY => rx_mi_drdy,
 
         TX_ADDR => tx_mi_addr,
-        TX_DWR  => tx_mi_dwr ,
-        TX_WR   => tx_mi_wr  ,
-        TX_RD   => tx_mi_rd  ,
+        TX_DWR  => tx_mi_dwr,
+        TX_WR   => tx_mi_wr,
+        TX_RD   => tx_mi_rd,
         TX_ARDY => tx_mi_ardy,
-        TX_DRD  => tx_mi_drd ,
+        TX_DRD  => tx_mi_drd,
         TX_DRDY => tx_mi_drdy
     );
 
-    CLK <= not CLK after CLK_PERIOD/2;
+    clk <= not clk after CLK_PERIOD/2;
 
     stim_p : process
     begin
@@ -120,27 +120,27 @@ begin
         -- ==================================================
         -- indirect WRITE request to INF 0
         -- ==================================================
-        inf <= 0; -- could be generated randomly
+        inf        <= 0;                                               -- could be generated randomly
         -- 1) set interface
-        wait until rising_edge(CLK);
+        wait until rising_edge(clk);
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => INF_REG_ADDR, others => '0');
-        rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH)); -- (log2(OUTPUT_INTERFACES)-1 downto 0 => "00", others => '0');
+        rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH));  -- (log2(OUTPUT_INTERFACES)-1 downto 0 => "00", others => '0');
         rx_mi_wr   <= '1';
         -- 2) set ADDR
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => ADDR_REG_ADDR, others => '0');
         rx_mi_dwr  <= (2-1 downto 0 => "11", others => '0');
         rx_mi_wr   <= '1';
         -- 3) set DWR
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => DWR_REG_ADDR, others => '0');
         rx_mi_dwr  <= (32-1 downto 29 => "111", others => '0');
         rx_mi_wr   <= '1';
         -- 4) set command to Write
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => COMMAND_REG_ADDR, others => '0');
         rx_mi_dwr  <= (1-1 downto 0 => '1', others => '0');
@@ -159,27 +159,27 @@ begin
         -- ==================================================
         -- indirect WRITE request to INF 1
         -- ==================================================
-        inf <= 1; -- could be generated randomly
+        inf        <= 1;                                               -- could be generated randomly
         -- 1) set interface
-        wait until rising_edge(CLK);
+        wait until rising_edge(clk);
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => INF_REG_ADDR, others => '0');
         rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH));
         rx_mi_wr   <= '1';
         -- 2) set ADDR
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => ADDR_REG_ADDR, others => '0');
         rx_mi_dwr  <= (3-1 downto 0 => "100", others => '0');
         rx_mi_wr   <= '1';
         -- 3) set DWR
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => DWR_REG_ADDR, others => '0');
         rx_mi_dwr  <= (32-1 downto 29 => "110", others => '0');
         rx_mi_wr   <= '1';
         -- 4) set command to Write
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => COMMAND_REG_ADDR, others => '0');
         rx_mi_dwr  <= (1-1 downto 0 => '1', others => '0');
@@ -198,27 +198,27 @@ begin
         -- ==================================================
         -- indirect WRITE request to INF 2
         -- ==================================================
-        inf <= 2; -- could be generated randomly
+        inf        <= 2;                                               -- could be generated randomly
         -- 1) set interface
-        wait until rising_edge(CLK);
+        wait until rising_edge(clk);
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => INF_REG_ADDR, others => '0');
         rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH));
         rx_mi_wr   <= '1';
         -- 2) set ADDR
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => ADDR_REG_ADDR, others => '0');
         rx_mi_dwr  <= (3-1 downto 0 => "101", others => '0');
         rx_mi_wr   <= '1';
         -- 3) set DWR
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => DWR_REG_ADDR, others => '0');
         rx_mi_dwr  <= (32-1 downto 29 => "101", others => '0');
         rx_mi_wr   <= '1';
         -- 4) set command to Write
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => COMMAND_REG_ADDR, others => '0');
         rx_mi_dwr  <= (1-1 downto 0 => '1', others => '0');
@@ -240,21 +240,21 @@ begin
         -- ==================================================
         -- indirect READ request to INF 0
         -- ==================================================
-        inf <= 0; -- could be generated randomly
+        inf        <= 0;                                               -- could be generated randomly
         -- 1) set interface
-        wait until rising_edge(CLK);
+        wait until rising_edge(clk);
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => INF_REG_ADDR, others => '0');
-        rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH)); -- (log2(OUTPUT_INTERFACES)-1 downto 0 => "00", others => '0');
+        rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH));  -- (log2(OUTPUT_INTERFACES)-1 downto 0 => "00", others => '0');
         rx_mi_wr   <= '1';
         -- 2) set ADDR
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => ADDR_REG_ADDR, others => '0');
         rx_mi_dwr  <= (2-1 downto 0 => "11", others => '0');
         rx_mi_wr   <= '1';
         -- 3) set command to Read
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => COMMAND_REG_ADDR, others => '0');
         rx_mi_dwr  <= (2-1 downto 1 => '1', others => '0');
@@ -282,21 +282,21 @@ begin
         -- ==================================================
         -- indirect READ request to INF 1
         -- ==================================================
-        inf <= 1; -- could be generated randomly
+        inf        <= 1;                                               -- could be generated randomly
         -- 1) set interface
-        wait until rising_edge(CLK);
+        wait until rising_edge(clk);
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => INF_REG_ADDR, others => '0');
-        rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH)); -- (log2(OUTPUT_INTERFACES)-1 downto 0 => "00", others => '0');
+        rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH));  -- (log2(OUTPUT_INTERFACES)-1 downto 0 => "00", others => '0');
         rx_mi_wr   <= '1';
         -- 2) set ADDR
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => ADDR_REG_ADDR, others => '0');
         rx_mi_dwr  <= (2-1 downto 0 => "11", others => '0');
         rx_mi_wr   <= '1';
         -- 3) set command to Read
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => COMMAND_REG_ADDR, others => '0');
         rx_mi_dwr  <= (2-1 downto 1 => '1', others => '0');
@@ -322,21 +322,21 @@ begin
         -- ==================================================
         -- indirect READ request to INF 2
         -- ==================================================
-        inf <= 2; -- could be generated randomly
+        inf        <= 2;                                               -- could be generated randomly
         -- 1) set interface
-        wait until rising_edge(CLK);
+        wait until rising_edge(clk);
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => INF_REG_ADDR, others => '0');
-        rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH)); -- (log2(OUTPUT_INTERFACES)-1 downto 0 => "00", others => '0');
+        rx_mi_dwr  <= std_logic_vector(to_unsigned(inf, DATA_WIDTH));  -- (log2(OUTPUT_INTERFACES)-1 downto 0 => "00", others => '0');
         rx_mi_wr   <= '1';
         -- 2) set ADDR
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => ADDR_REG_ADDR, others => '0');
         rx_mi_dwr  <= (2-1 downto 0 => "11", others => '0');
         rx_mi_wr   <= '1';
         -- 3) set command to Read
-        wait until rising_edge(CLK) and rx_mi_ardy = '1';
+        wait until rising_edge(clk) and rx_mi_ardy = '1';
         wait for 0.16*CLK_PERIOD;
         rx_mi_addr <= (7 downto 2 => COMMAND_REG_ADDR, others => '0');
         rx_mi_dwr  <= (2-1 downto 1 => '1', others => '0');
@@ -363,9 +363,9 @@ begin
 
     end process;
 
-    ardy_p : process (CLK)
+    ardy_p : process (clk)
     begin
-        if (rising_edge(CLK)) then
+        if (rising_edge(clk)) then
             tx_mi_ardy(0) <= tx_mi_wr(0) or tx_mi_rd(0);
             tx_mi_ardy(1) <= tx_mi_wr(1) or tx_mi_rd(1);
             tx_mi_ardy(2) <= tx_mi_wr(2) or tx_mi_rd(2);

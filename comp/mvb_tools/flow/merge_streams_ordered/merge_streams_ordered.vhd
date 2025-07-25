@@ -22,16 +22,16 @@ use work.type_pack.all;
 -- There are no constraints on RX_SEL interface - all selects can
 -- be from same RX interface.
 entity MVB_MERGE_STREAMS_ORDERED is
-    generic(
+    generic (
         -- Number of MVB items
-        MVB_ITEMS       : natural := 1;
+        MVB_ITEMS           : natural := 1;
         -- MVB item width in bits
-        MVB_ITEM_WIDTH  : natural := 32;
+        MVB_ITEM_WIDTH      : natural := 32;
         -- Number of input MVB streams, must be power of two
-        RX_STREAMS      : natural := 4;
+        RX_STREAMS          : natural := 4;
         -- Use FIFOX multi instead of shakedown to improve
         -- on efficiency and buffering. Costs more resources.
-        USE_FIFOX_MULTI : boolean := true;
+        USE_FIFOX_MULTI     : boolean := true;
         -- Fifox multi items multiplier, should be power of 2.
         -- Defines total capacity of FIFOX MULTI by expression:
         -- `MVB_ITEMS * RX_STREAMS * FIFOX_ITEMS_MULT`.
@@ -42,9 +42,9 @@ entity MVB_MERGE_STREAMS_ORDERED is
         -- to dense ones. More effective with FIFOX MULTI enabled.
         SEL_SHAKEDOWN_EN    : boolean := true;
         -- FPGA device string
-        DEVICE          : string := "AGILEX"
+        DEVICE              : string := "AGILEX"
     );
-    port(
+    port (
         -- Clock input
         CLK        : in  std_logic;
         -- Reset input synchronized with CLK
@@ -141,7 +141,7 @@ begin
             TX_VLD          => sel_shake_tx_vld,
             TX_NEXT         => (others => sel_shake_tx_dst_rdy)
         );
-        sel_shake_tx_src_rdy <= or (sel_shake_tx_vld);
+        sel_shake_tx_src_rdy    <= or (sel_shake_tx_vld);
     else generate
         sel_shake_tx_data       <= RX_SEL_IF;
         sel_shake_tx_vld        <= RX_SEL_VLD;
@@ -160,7 +160,7 @@ begin
 
         vld_g : for x in 0 to TX_ITEMS - 1 generate
             rx_sel_pos(i)((x+1)*POS_WIDTH-1 downto x*POS_WIDTH) <= std_logic_vector(to_unsigned(x, POS_WIDTH));
-            rx_sel_strm_vld(i)(x) <= '1' when rx_sel_arr(i)((x+1)*SEL_WIDTH-1 downto x*SEL_WIDTH) = std_logic_vector(to_unsigned(i, SEL_WIDTH)) and sel_shake_tx_vld(x) = '1' and sel_shake_tx_src_rdy = '1' else '0';
+            rx_sel_strm_vld(i)(x)                               <= '1' when rx_sel_arr(i)((x+1)*SEL_WIDTH-1 downto x*SEL_WIDTH) = std_logic_vector(to_unsigned(i, SEL_WIDTH)) and sel_shake_tx_vld(x) = '1' and sel_shake_tx_src_rdy = '1' else '0';
         end generate;
 
         sel_shakedown_i : entity work.SHAKEDOWN
@@ -183,16 +183,16 @@ begin
         -- Word requested => word ready
         rx_strm_word_rdy <= not rx_sel_strm_pos_vld(i) or fifox_multi_src_rdy(i);
         -- All words ready
-        rx_strm_rdy(i) <= and (rx_strm_word_rdy);
+        rx_strm_rdy(i)   <= and (rx_strm_word_rdy);
 
         fifox_multi_rd(i) <= rx_sel_strm_pos_vld(i) when (and rx_strm_rdy) = '1' and TX_DST_RDY = '1' else (others => '0');
 
         process (CLK)
         begin
             if rising_edge(CLK) then
-                if RESET = '1' then
+                if (RESET = '1') then
                     strm_rd_vld(i) <= (others => '0');
-                elsif TX_DST_RDY = '1' then
+                elsif (TX_DST_RDY = '1') then
                     strm_rd_vld(i)  <= rx_sel_strm_pos_vld(i) and (and rx_strm_rdy);
                     strm_rd_data(i) <= fifox_multi_do(i);
                     strm_rd_pos(i)  <= rx_sel_strm_pos(i);
@@ -203,11 +203,11 @@ begin
         process (all)
         begin
             strm_rd_data_repos(i) <= slv_array_deser(strm_rd_data(i), TX_ITEMS);
-            strm_rd_vld_repos(i) <= (others => '0');
+            strm_rd_vld_repos(i)  <= (others => '0');
             for x in 0 to TX_ITEMS-1 loop
-                if strm_rd_vld(i)(x) = '1' then
+                if (strm_rd_vld(i)(x) = '1') then
                     strm_rd_data_repos(i)(to_integer(unsigned(strm_rd_pos(i)((x+1)*POS_WIDTH-1 downto x*POS_WIDTH)))) <= strm_rd_data(i)((x+1)*MVB_ITEM_WIDTH-1 downto x*MVB_ITEM_WIDTH);
-                    strm_rd_vld_repos(i)(to_integer(unsigned(strm_rd_pos(i)((x+1)*POS_WIDTH-1 downto x*POS_WIDTH)))) <= strm_rd_vld(i)(x);
+                    strm_rd_vld_repos(i)(to_integer(unsigned(strm_rd_pos(i)((x+1)*POS_WIDTH-1 downto x*POS_WIDTH))))  <= strm_rd_vld(i)(x);
                 end if;
             end loop;
         end process;
@@ -268,9 +268,9 @@ begin
         TX_DATA <= slv_array_ser(strm_rd_data_repos(0));
         for it in 0 to TX_ITEMS-1 loop
             for strm_i in 0 to RX_STREAMS-1 loop
-                if strm_rd_vld_repos(strm_i)(it) = '1' then
+                if (strm_rd_vld_repos(strm_i)(it) = '1') then
                     TX_DATA((it+1)*MVB_ITEM_WIDTH-1 downto it*MVB_ITEM_WIDTH) <= strm_rd_data_repos(strm_i)(it);
-                    TX_VLD(it) <= '1';
+                    TX_VLD(it)                                                <= '1';
                 end if;
             end loop;
         end loop;

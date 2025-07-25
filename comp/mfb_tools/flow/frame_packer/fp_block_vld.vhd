@@ -15,14 +15,14 @@ use work.type_pack.all;
 
 -- This unit is based on mfb_auxiliary_signals.vhd and is adjusted for frame_packer purposes
 entity FP_BLOCK_VLD is
-    generic(
+    generic (
         MFB_REGIONS         : natural := 1;
         MFB_REGION_SIZE     : natural := 8;
         MFB_BLOCK_SIZE      : natural := 8;
         MFB_ITEM_WIDTH      : natural := 8
 
     );
-    port(
+    port (
         -- This port helps to control auxiliary signals in this application
         RX_PKT_CONT  : in  std_logic;
 
@@ -53,7 +53,7 @@ architecture FULL of FP_BLOCK_VLD is
     constant LOG2_REGION_ITEMS   : natural := log2(REGION_ITEMS);
     constant LOG2_BLOCK_SIZE     : natural := log2(MFB_BLOCK_SIZE);
 
-     -- Constants
+    -- Constants
     signal s_rx_sof_block_arr    : slv_array_t(MFB_REGIONS-1 downto 0)(LOG2_REGION_BLOCKS-1 downto 0);
     signal s_rx_eof_block_arr    : slv_array_t(MFB_REGIONS-1 downto 0)(LOG2_REGION_BLOCKS-1 downto 0);
 
@@ -73,7 +73,7 @@ begin
     RX_DST_RDY              <= '1';
     TX_SRC_RDY              <= RX_SRC_RDY;
 
-   --  CREATE MFB SOF_POS AND EOF_POS ARRAYS
+    --  CREATE MFB SOF_POS AND EOF_POS ARRAYS
     item_rx_sof_block_arr_g : if REGION_BLOCKS > 1 generate
         s_rx_sof_block_arr <= slv_array_downto_deser(RX_SOF_POS,MFB_REGIONS,LOG2_REGION_BLOCKS);
     else generate
@@ -90,41 +90,41 @@ begin
         s_rx_eof_block_arr(r) <= s_rx_eof_item_arr(r)(LOG2_REGION_ITEMS-1 downto LOG2_BLOCK_SIZE);
     end generate;
 
-   -- --------------------------------------------------------------------------
-   --  VALID FOR EACH BLOCK
-   -- --------------------------------------------------------------------------
+    -- --------------------------------------------------------------------------
+    --  VALID FOR EACH BLOCK
+    -- --------------------------------------------------------------------------
 
     block_onehot_g : for r in 0 to MFB_REGIONS-1 generate
         sof_block_onehot_i : entity work.BIN2HOT
-            generic map(
-                DATA_WIDTH => LOG2_REGION_BLOCKS
-            )
-            port map(
-                EN     => RX_SOF(r),
-                INPUT  => s_rx_sof_block_arr(r),
-                OUTPUT => s_rx_sof_block_onehot((r+1)*REGION_BLOCKS-1 downto r*REGION_BLOCKS)
+        generic map (
+            DATA_WIDTH => LOG2_REGION_BLOCKS
+        )
+        port map (
+            EN     => RX_SOF(r),
+            INPUT  => s_rx_sof_block_arr(r),
+            OUTPUT => s_rx_sof_block_onehot((r+1)*REGION_BLOCKS-1 downto r*REGION_BLOCKS)
         );
 
         eof_block_onehot_i : entity work.BIN2HOT
-            generic map(
-                DATA_WIDTH => LOG2_REGION_BLOCKS
-            )
-            port map(
-                EN     => RX_EOF(r),
-                INPUT  => s_rx_eof_block_arr(r),
-                OUTPUT => s_rx_eof_block_onehot((r+1)*REGION_BLOCKS-1 downto r*REGION_BLOCKS)
+        generic map (
+            DATA_WIDTH => LOG2_REGION_BLOCKS
+        )
+        port map (
+            EN     => RX_EOF(r),
+            INPUT  => s_rx_eof_block_arr(r),
+            OUTPUT => s_rx_eof_block_onehot((r+1)*REGION_BLOCKS-1 downto r*REGION_BLOCKS)
         );
     end generate;
 
     incomplete_block_g : for r in 0 to WORD_BLOCKS-1 generate
         incomplete_block_p : process (all)
-                variable v_inc_blk : std_logic;
+            variable v_inc_blk : std_logic;
         begin
-                v_inc_blk              := RX_PKT_CONT;
-                inc_blk_l : for i in 0 to r loop
-                    v_inc_blk := (s_rx_sof_block_onehot(i) or v_inc_blk) and not s_rx_eof_block_onehot(i);
-                end loop;
-                s_incomplete_block(r+1) <= v_inc_blk;
+            v_inc_blk              := RX_PKT_CONT;
+            inc_blk_l : for i in 0 to r loop
+                v_inc_blk := (s_rx_sof_block_onehot(i) or v_inc_blk) and not s_rx_eof_block_onehot(i);
+            end loop;
+            s_incomplete_block(r+1) <= v_inc_blk;
         end process;
     end generate;
 
@@ -133,13 +133,13 @@ begin
         tx_block_vld_s(i) <= s_rx_sof_block_onehot(i) or s_rx_eof_block_onehot(i) or s_incomplete_block(i);
     end generate;
 
-        tx_sof_oh_s   <= s_rx_sof_block_onehot;
-        tx_eof_oh_s   <= s_rx_eof_block_onehot;
+    tx_sof_oh_s   <= s_rx_sof_block_onehot;
+    tx_eof_oh_s   <= s_rx_eof_block_onehot;
 
     -- Respect to SRC_RDY
-    process(all)
+    process (all)
     begin
-        if RX_SRC_RDY = '1' then
+        if (RX_SRC_RDY = '1') then
             TX_BLOCK_VLD    <= tx_block_vld_s;
             TX_SOF_OH       <= tx_sof_oh_s;
             TX_EOF_OH       <= tx_eof_oh_s;

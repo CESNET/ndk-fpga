@@ -9,7 +9,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity PCIE_CRDT_DW_FSM is
-    port(
+    port (
         CLK                : in  std_logic;
         RESET              : in  std_logic;
 
@@ -23,7 +23,7 @@ end entity;
 
 architecture FULL of PCIE_CRDT_DW_FSM is
 
-    type crdt_dw_fsm_t is (st_idle, st_init_start, st_init_ack, st_init_en, st_init_gap, st_init_gap2, st_init_gap3, st_init_done);
+    type   crdt_dw_fsm_t is (ST_IDLE, ST_INIT_START, ST_INIT_ACK, ST_INIT_EN, ST_INIT_GAP, ST_INIT_GAP2, ST_INIT_GAP3, ST_INIT_DONE);
     signal crdt_dw_fsm_pst : crdt_dw_fsm_t;
     signal crdt_dw_fsm_nst : crdt_dw_fsm_t;
 
@@ -33,7 +33,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                crdt_dw_fsm_pst <= st_idle;
+                crdt_dw_fsm_pst <= ST_IDLE;
             else
                 crdt_dw_fsm_pst <= crdt_dw_fsm_nst;
             end if;
@@ -48,39 +48,39 @@ begin
         CRDT_DW_INIT_DONE <= '0';
 
         case (crdt_dw_fsm_pst) is
-            when st_idle =>
-                crdt_dw_fsm_nst <= st_init_start;
+            when ST_IDLE =>
+                crdt_dw_fsm_nst <= ST_INIT_START;
 
-            when st_init_start =>
-                crdt_dw_fsm_nst <= st_init_ack;
-                CRDT_DW_INIT <= '1';
+            when ST_INIT_START =>
+                crdt_dw_fsm_nst <= ST_INIT_ACK;
+                CRDT_DW_INIT    <= '1';
 
-            when st_init_ack =>
+            when ST_INIT_ACK =>
                 CRDT_DW_INIT <= '1';
                 if (CRDT_DW_INIT_ACK = '1') then
-                    crdt_dw_fsm_nst <= st_init_en;
+                    crdt_dw_fsm_nst <= ST_INIT_EN;
                 end if;
 
-            when st_init_en =>
+            when ST_INIT_EN =>
                 CRDT_DW_INIT    <= '1';
                 CRDT_DW_INIT_EN <= '1';
                 if (CRDT_DW_INIT_LAST = '1') then
-                    crdt_dw_fsm_nst <= st_init_gap;
+                    crdt_dw_fsm_nst <= ST_INIT_GAP;
                 end if;
 
-            when st_init_gap =>
-                crdt_dw_fsm_nst <= st_init_gap2;
-                CRDT_DW_INIT <= '1';
+            when ST_INIT_GAP =>
+                crdt_dw_fsm_nst <= ST_INIT_GAP2;
+                CRDT_DW_INIT    <= '1';
 
-            when st_init_gap2 =>
-                crdt_dw_fsm_nst <= st_init_gap3;
-                CRDT_DW_INIT <= '1';
+            when ST_INIT_GAP2 =>
+                crdt_dw_fsm_nst <= ST_INIT_GAP3;
+                CRDT_DW_INIT    <= '1';
 
-            when st_init_gap3 =>
-                crdt_dw_fsm_nst <= st_init_done;
-                CRDT_DW_INIT <= '1';
+            when ST_INIT_GAP3 =>
+                crdt_dw_fsm_nst <= ST_INIT_DONE;
+                CRDT_DW_INIT    <= '1';
 
-            when st_init_done =>
+            when ST_INIT_DONE =>
                 CRDT_DW_INIT_DONE <= '1';
         end case;
     end process;

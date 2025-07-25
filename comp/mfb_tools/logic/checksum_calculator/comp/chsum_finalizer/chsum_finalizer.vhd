@@ -18,43 +18,43 @@ use work.type_pack.all;
 
 --
 entity CHSUM_FINALIZER is
-generic(
-    -- Number of Regions within a data word, must be power of 2.
-    REGIONS           : natural := 4;
-    -- Width of an Item (in bits).
-    CHECKSUM_WIDTH    : natural := 16
-);
-port(
-    -- ========================================================================
-    -- Clock and Reset
-    -- ========================================================================
+    generic (
+        -- Number of Regions within a data word, must be power of 2.
+        REGIONS           : natural := 4;
+        -- Width of an Item (in bits).
+        CHECKSUM_WIDTH    : natural := 16
+    );
+    port (
+        -- ========================================================================
+        -- Clock and Reset
+        -- ========================================================================
 
-    CLK           : in  std_logic;
-    RESET         : in  std_logic;
+        CLK           : in  std_logic;
+        RESET         : in  std_logic;
 
-    -- ========================================================================
-    -- RX INTERFACE
-    --
-    -- Checksums calculated per Region.
-    -- ========================================================================
+        -- ========================================================================
+        -- RX INTERFACE
+        --
+        -- Checksums calculated per Region.
+        -- ========================================================================
 
-    RX_CHSUM_REGION : in  std_logic_vector(REGIONS*2*CHECKSUM_WIDTH-1 downto 0);
-    RX_CHSUM_END    : in  std_logic_vector(REGIONS*2-1 downto 0);
-    RX_CHSUM_VLD    : in  std_logic_vector(REGIONS*2-1 downto 0);
-    RX_SRC_RDY      : in  std_logic;
-    RX_DST_RDY      : out std_logic;
+        RX_CHSUM_REGION : in  std_logic_vector(REGIONS*2*CHECKSUM_WIDTH-1 downto 0);
+        RX_CHSUM_END    : in  std_logic_vector(REGIONS*2-1 downto 0);
+        RX_CHSUM_VLD    : in  std_logic_vector(REGIONS*2-1 downto 0);
+        RX_SRC_RDY      : in  std_logic;
+        RX_DST_RDY      : out std_logic;
 
-    -- ========================================================================
-    -- TX INTERFACE
-    --
-    -- Final checksums (per packet).
-    -- ========================================================================
+        -- ========================================================================
+        -- TX INTERFACE
+        --
+        -- Final checksums (per packet).
+        -- ========================================================================
 
-    TX_CHECKSUM    : out std_logic_vector(REGIONS*2*CHECKSUM_WIDTH-1 downto 0);
-    TX_VALID       : out std_logic_vector(REGIONS*2-1 downto 0);
-    TX_SRC_RDY     : out std_logic;
-    TX_DST_RDY     : in  std_logic
-);
+        TX_CHECKSUM    : out std_logic_vector(REGIONS*2*CHECKSUM_WIDTH-1 downto 0);
+        TX_VALID       : out std_logic_vector(REGIONS*2-1 downto 0);
+        TX_SRC_RDY     : out std_logic;
+        TX_DST_RDY     : in  std_logic
+    );
 end entity;
 
 architecture FULL of CHSUM_FINALIZER is
@@ -96,8 +96,8 @@ begin
     RX_DST_RDY <= TX_DST_RDY;
 
     chsum_region_16  <= slv_array_2d_deser(RX_CHSUM_REGION, REGIONS, 2);
-    chsum_region_end <= slv_array_deser   (RX_CHSUM_END   , REGIONS   );
-    chsum_region_vld <= slv_array_deser   (RX_CHSUM_VLD   , REGIONS   );
+    chsum_region_end <= slv_array_deser   (RX_CHSUM_END, REGIONS   );
+    chsum_region_vld <= slv_array_deser   (RX_CHSUM_VLD, REGIONS   );
 
     -- ========================================================================
     -- Checksum validation
@@ -133,10 +133,10 @@ begin
     -- Register with previous checksum
     -- ========================================================================
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
-            if (RX_SRC_RDY = '1') and (TX_DST_RDY = '1') then
+            if ((RX_SRC_RDY = '1') and (TX_DST_RDY = '1')) then
                 if (add_port0(REGIONS) = '1') then
                     chsum_32_prev <= chsum_32(REGIONS-1)(0);
                 elsif (add_port1(REGIONS) = '1') then
@@ -159,7 +159,7 @@ begin
         src_rdy(r) <= or chsum_vld(r);
     end generate;
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (TX_DST_RDY = '1') then

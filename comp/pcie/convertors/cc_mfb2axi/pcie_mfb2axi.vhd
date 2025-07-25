@@ -15,16 +15,16 @@ use work.type_pack.all;
 -- The Purpose of this component is to convert MFB to AXI bus.
 -- Supported is only 512b variant without straddling
 entity PCIE_CC_MFB2AXI is
-    generic(
+    generic (
         -- =======================================================================
         -- MFB BUS CONFIGURATION:
         --
         -- Supported configuration is: (2,1,8,32), (1,1,8,32)
         -- =======================================================================
-        MFB_REGIONS      : natural := 2;
-        MFB_REGION_SIZE  : natural := 1;
-        MFB_BLOCK_SIZE   : natural := 8;
-        MFB_ITEM_WIDTH   : natural := 32;
+        MFB_REGIONS       : natural := 2;
+        MFB_REGION_SIZE   : natural := 1;
+        MFB_BLOCK_SIZE    : natural := 8;
+        MFB_ITEM_WIDTH    : natural := 32;
         -- MFB bus: width of single data region in bits, auxiliary parameter, do not change value!
         MFB_REGION_WIDTH  : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
         -- =======================================================================
@@ -33,13 +33,13 @@ entity PCIE_CC_MFB2AXI is
         -- CC_USER_WIDTH = 81 for Gen3x16 PCIe - without straddling!
         -- CC_USER_WIDTH = 33 for Gen3x8 PCIe - without straddling!
         -- =======================================================================
-        AXI_CCUSER_WIDTH : natural := 81;
-        AXI_DATA_WIDTH   : natural := 512;
+        AXI_CCUSER_WIDTH  : natural := 81;
+        AXI_DATA_WIDTH    : natural := 512;
         -- Not supported
-        STRADDLING       : boolean := false
+        STRADDLING        : boolean := false
 
-        );
-    port(
+    );
+    port (
 
         -- =====================================================================
         -- MFB Completer Request Interface (CC) - Intel FPGA Only
@@ -84,56 +84,56 @@ entity PCIE_CC_MFB2AXI is
         -- For detailed specifications, see Xilinx PG213.
         CC_AXI_READY      : in std_logic
 
-        );
+    );
 end entity;
 
 -- ----------------------------------------------------------------------------
 --                             Architecture
 -- ----------------------------------------------------------------------------
-architecture full of PCIE_CC_MFB2AXI is
-    constant EOP_POS_WIDTH : integer := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
-    signal cc_keep         : std_logic_vector(AXI_DATA_WIDTH/32-1 downto 0);
+architecture FULL of PCIE_CC_MFB2AXI is
+    constant EOP_POS_WIDTH   : integer := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
+    signal   cc_keep         : std_logic_vector(AXI_DATA_WIDTH/32-1 downto 0);
 begin
     assert (AXI_CCUSER_WIDTH = 33 or AXI_CCUSER_WIDTH = 81)
-    report "PCIE_CC_MFB2AXI: Unsupported AXI CC USER port width, the supported are: 33, 81"
+        report "PCIE_CC_MFB2AXI: Unsupported AXI CC USER port width, the supported are: 33, 81"
         severity FAILURE;
 
-        -- No straddling supported!
-        -- keep signal serves as valid for each DWORD of CC_AXI_DATA signal
-        axi_512b_g: if (MFB_REGIONS = 2) generate
-        s_cc_keep_pr : process (all)
-            begin
-                if (CC_MFB_EOF(0) = '1') then -- end of data in first region
-                    cc_keep <= (others => '0');
-
-                    for i in 0 to AXI_DATA_WIDTH/32-1 loop
-                        cc_keep(i) <= '1';
-                        exit when (i = to_integer(unsigned(CC_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0))));
-                    end loop;
-
-                elsif (CC_MFB_EOF(1) = '1') then -- end of data in second region
-                    cc_keep <= (others => '0');
-
-                    for i in 0 to AXI_DATA_WIDTH/32-1 loop
-                        cc_keep(i) <= '1';
-                        exit when (i = ((AXI_DATA_WIDTH/32)/2) + to_integer(unsigned(CC_MFB_EOF_POS(2*EOP_POS_WIDTH-1 downto EOP_POS_WIDTH))));
-                    end loop;
-
-                else -- start or middle of data
-                    cc_keep <= (others => '1');
-                end if;
-            end process;
-    else generate
+    -- No straddling supported!
+    -- keep signal serves as valid for each DWORD of CC_AXI_DATA signal
+    axi_512b_g: if (MFB_REGIONS = 2) generate
         s_cc_keep_pr : process (all)
         begin
-            if (CC_MFB_EOF(0) = '1') then -- end of data in first region
+            if (CC_MFB_EOF(0) = '1') then                                                                                                   -- end of data in first region
                 cc_keep <= (others => '0');
 
                 for i in 0 to AXI_DATA_WIDTH/32-1 loop
                     cc_keep(i) <= '1';
                     exit when (i = to_integer(unsigned(CC_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0))));
                 end loop;
-            else -- start or middle of data
+
+            elsif (CC_MFB_EOF(1) = '1') then                                                                                                -- end of data in second region
+                cc_keep <= (others => '0');
+
+                for i in 0 to AXI_DATA_WIDTH/32-1 loop
+                    cc_keep(i) <= '1';
+                    exit when (i = ((AXI_DATA_WIDTH/32)/2) + to_integer(unsigned(CC_MFB_EOF_POS(2*EOP_POS_WIDTH-1 downto EOP_POS_WIDTH))));
+                end loop;
+
+            else                                                                                                                            -- start or middle of data
+                cc_keep <= (others => '1');
+            end if;
+        end process;
+    else generate
+        s_cc_keep_pr : process (all)
+        begin
+            if (CC_MFB_EOF(0) = '1') then                                                           -- end of data in first region
+                cc_keep <= (others => '0');
+
+                for i in 0 to AXI_DATA_WIDTH/32-1 loop
+                    cc_keep(i) <= '1';
+                    exit when (i = to_integer(unsigned(CC_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0))));
+                end loop;
+            else                                                                                    -- start or middle of data
                 cc_keep <= (others => '1');
             end if;
         end process;

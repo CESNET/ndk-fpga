@@ -20,19 +20,19 @@ use work.type_pack.all;
 -- This is a 1:N MFB splitter.
 -- It consists of numerous 1:2 MFB splitters in ``log2(SPLITTER_OUTPUTS)`` stages.
 entity MFB_SPLITTER_SIMPLE_GEN is
-    generic(
+    generic (
         -- Number of splitter outputs.
         SPLITTER_OUTPUTS   : integer := 8;
         -- Number of Regions in a word.
-        REGIONS     : integer := 4;
+        REGIONS            : integer := 4;
         -- Number of Blocks in a Region.
-        REGION_SIZE : integer := 8;
+        REGION_SIZE        : integer := 8;
         -- Number of Items in a Block.
-        BLOCK_SIZE  : integer := 8;
+        BLOCK_SIZE         : integer := 8;
         -- Width  of one Item (in bits).
-        ITEM_WIDTH  : integer := 8;
+        ITEM_WIDTH         : integer := 8;
         -- Width of MFB metadata (in bits).
-        META_WIDTH  : integer := 1;
+        META_WIDTH         : integer := 1;
 
         -- Input PIPEs enable for all 1:2 Splitters.
         -- Input registers are created when this is set to false.
@@ -45,7 +45,7 @@ entity MFB_SPLITTER_SIMPLE_GEN is
         -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
         DEVICE : string := "AGILEX"
     );
-    port(
+    port (
         -- =====================================================================
         -- Clock and Reset
         -- =====================================================================
@@ -112,7 +112,7 @@ architecture FULL of MFB_SPLITTER_SIMPLE_GEN is
 begin
 
     rx_mfb_meta_arr <= slv_array_downto_deser(RX_MFB_META, REGIONS);
-    rx_mfb_sel_arr  <= slv_array_downto_deser(RX_MFB_SEL , REGIONS);
+    rx_mfb_sel_arr  <= slv_array_downto_deser(RX_MFB_SEL, REGIONS);
     splitter_meta_g : for i in REGIONS-1 downto 0 generate
         splitter_meta_st0  (i) <= rx_mfb_meta_arr(i) & rx_mfb_sel_arr(i);
     end generate;
@@ -131,14 +131,14 @@ begin
         splitter_g : for i in 0 to (2**s)-1 generate
             splitter_i: entity work.MFB_SPLITTER_SIMPLE
             generic map (
-                REGIONS         => REGIONS     ,
-                REGION_SIZE     => REGION_SIZE ,
-                BLOCK_SIZE      => BLOCK_SIZE  ,
-                ITEM_WIDTH      => ITEM_WIDTH  ,
+                REGIONS         => REGIONS,
+                REGION_SIZE     => REGION_SIZE,
+                BLOCK_SIZE      => BLOCK_SIZE,
+                ITEM_WIDTH      => ITEM_WIDTH,
                 META_WIDTH      => SPLIT_META_W
             )
             port map (
-                CLK             => CLK  ,
+                CLK             => CLK,
                 RST             => RESET,
 
                 RX_MFB_SEL      => splitter_sel    (s)(i),

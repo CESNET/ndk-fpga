@@ -70,8 +70,8 @@ architecture MEDUSA of DMA_WRAPPER is
     -- =====================================================================
 
     signal dma_rq_mvb_data      : slv_array_t(DMA_ENDPOINTS-1 downto 0)(PCIE_RQ_MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0);
-    signal PCIE_RQ_MVB_DATA_arr : slv_array_2d_t(DMA_ENDPOINTS-1 downto 0)(PCIE_RQ_MFB_REGIONS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
-    signal PCIE_RQ_MVB_DATA_vec : std_logic_vector(DMA_ENDPOINTS*PCIE_RQ_MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0);
+    signal pcie_rq_mvb_data_arr : slv_array_2d_t(DMA_ENDPOINTS-1 downto 0)(PCIE_RQ_MFB_REGIONS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
+    signal pcie_rq_mvb_data_vec : std_logic_vector(DMA_ENDPOINTS*PCIE_RQ_MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0);
 
     -- =====================================================================
 
@@ -108,14 +108,14 @@ begin
     mi_asynch_gen : for i in 0 to PCIE_ENDPOINTS-1 generate
 
         mi_asynch_i : entity work.MI_ASYNC
-        generic map(
+        generic map (
             ADDR_WIDTH => MI_WIDTH,
             DATA_WIDTH => MI_WIDTH,
             DEVICE     => DEVICE
         )
-        port map(
-            CLK_M     => MI_CLK             ,
-            RESET_M   => MI_RESET           ,
+        port map (
+            CLK_M     => MI_CLK,
+            RESET_M   => MI_RESET,
             MI_M_ADDR => MI_ADDR         (i),
             MI_M_DWR  => MI_DWR          (i),
             MI_M_BE   => MI_BE           (i),
@@ -125,8 +125,8 @@ begin
             MI_M_DRDY => MI_DRDY         (i),
             MI_M_DRD  => MI_DRD          (i),
 
-            CLK_S     => DMA_CLK            ,
-            RESET_S   => dma_rst_dup(i)     ,
+            CLK_S     => DMA_CLK,
+            RESET_S   => dma_rst_dup(i),
             MI_S_ADDR => dma_sync_mi_addr(i),
             MI_S_DWR  => dma_sync_mi_dwr (i),
             MI_S_BE   => dma_sync_mi_be  (i),
@@ -149,14 +149,14 @@ begin
         dma_end_mi_spl_end_gen : for i in 0 to PCIE_ENDPOINTS-1 generate
 
             mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
-            generic map(
+            generic map (
                 ADDR_WIDTH  => 32,
                 DATA_WIDTH  => 32,
                 PORTS       => DMA_PER_PCIE,
                 ADDR_BASE   => dma_mi_addr_base_f,
                 DEVICE      => DEVICE
             )
-            port map(
+            port map (
                 CLK     => DMA_CLK,
                 RESET   => dma_rst_dup(i),
 
@@ -210,14 +210,14 @@ begin
         if (DMA_PER_PCIE > 1) then
             for i in 0 to PCIE_ENDPOINTS-1 loop
                 for e in 0 to DMA_PER_PCIE-1 loop
-                    PCIE_RQ_MVB_DATA_arr(i*DMA_PER_PCIE+e) <= slv_array_deser(dma_rq_mvb_data(i*DMA_PER_PCIE+e),PCIE_RQ_MFB_REGIONS);
+                    pcie_rq_mvb_data_arr(i*DMA_PER_PCIE+e) <= slv_array_deser(dma_rq_mvb_data(i*DMA_PER_PCIE+e),PCIE_RQ_MFB_REGIONS);
                     for g in 0 to PCIE_RQ_MFB_REGIONS-1 loop
-                        PCIE_RQ_MVB_DATA_arr(i*DMA_PER_PCIE+e)(g)(DMA_REQUEST_TAG'high downto DMA_REQUEST_TAG'high-log2(DMA_PER_PCIE)+1) <= std_logic_vector(to_unsigned(e,log2(DMA_PER_PCIE)));
+                        pcie_rq_mvb_data_arr(i*DMA_PER_PCIE+e)(g)(DMA_REQUEST_TAG'high downto DMA_REQUEST_TAG'high-log2(DMA_PER_PCIE)+1) <= std_logic_vector(to_unsigned(e,log2(DMA_PER_PCIE)));
                     end loop;
                 end loop;
             end loop;
-            PCIE_RQ_MVB_DATA_vec <= slv_array_2d_ser(PCIE_RQ_MVB_DATA_arr);
-            PCIE_RQ_MVB_DATA     <= slv_array_deser(PCIE_RQ_MVB_DATA_vec,DMA_ENDPOINTS);
+            pcie_rq_mvb_data_vec <= slv_array_2d_ser(pcie_rq_mvb_data_arr);
+            PCIE_RQ_MVB_DATA     <= slv_array_deser(pcie_rq_mvb_data_vec,DMA_ENDPOINTS);
         end if;
     end process;
 
@@ -231,99 +231,99 @@ begin
         subtype DPE is natural range (i+1)*DMA_EP_PER_DMA-1 downto i*DMA_EP_PER_DMA;
     begin
         dma_medusa_i : entity work.DMA_MEDUSA
-        generic map(
-            DEVICE               => DEVICE                          ,
+        generic map (
+            DEVICE               => DEVICE,
 
-            USR_MVB_ITEMS        => USR_MVB_ITEMS                   ,
-            USR_MFB_REGIONS      => USR_MFB_REGIONS                 ,
-            USR_MFB_REGION_SIZE  => USR_MFB_REGION_SIZE             ,
-            USR_MFB_BLOCK_SIZE   => USR_MFB_BLOCK_SIZE              ,
-            USR_MFB_ITEM_WIDTH   => USR_MFB_ITEM_WIDTH              ,
+            USR_MVB_ITEMS        => USR_MVB_ITEMS,
+            USR_MFB_REGIONS      => USR_MFB_REGIONS,
+            USR_MFB_REGION_SIZE  => USR_MFB_REGION_SIZE,
+            USR_MFB_BLOCK_SIZE   => USR_MFB_BLOCK_SIZE,
+            USR_MFB_ITEM_WIDTH   => USR_MFB_ITEM_WIDTH,
 
-            USR_RX_PKT_SIZE_MAX  => USR_RX_PKT_SIZE_MAX             ,
-            USR_TX_PKT_SIZE_MAX  => USR_TX_PKT_SIZE_MAX             ,
-            DMA_ENDPOINTS        => DMA_EP_PER_DMA                  ,
+            USR_RX_PKT_SIZE_MAX  => USR_RX_PKT_SIZE_MAX,
+            USR_TX_PKT_SIZE_MAX  => USR_TX_PKT_SIZE_MAX,
+            DMA_ENDPOINTS        => DMA_EP_PER_DMA,
 
-            PCIE_MPS             => PCIE_MPS                        ,
-            PCIE_MRRS            => PCIE_MRRS                       ,
+            PCIE_MPS             => PCIE_MPS,
+            PCIE_MRRS            => PCIE_MRRS,
             DMA_TAG_WIDTH        => DMA_TAG_WIDTH-log2(DMA_PER_PCIE),
 
-            UP_MFB_REGIONS       => PCIE_RQ_MFB_REGIONS                  ,
-            UP_MFB_REGION_SIZE   => PCIE_RQ_MFB_REGION_SIZE              ,
-            UP_MFB_BLOCK_SIZE    => PCIE_RQ_MFB_BLOCK_SIZE               ,
-            UP_MFB_ITEM_WIDTH    => PCIE_RQ_MFB_ITEM_WIDTH               ,
+            UP_MFB_REGIONS       => PCIE_RQ_MFB_REGIONS,
+            UP_MFB_REGION_SIZE   => PCIE_RQ_MFB_REGION_SIZE,
+            UP_MFB_BLOCK_SIZE    => PCIE_RQ_MFB_BLOCK_SIZE,
+            UP_MFB_ITEM_WIDTH    => PCIE_RQ_MFB_ITEM_WIDTH,
 
-            DOWN_MFB_REGIONS     => PCIE_RC_MFB_REGIONS                ,
-            DOWN_MFB_REGION_SIZE => PCIE_RC_MFB_REGION_SIZE            ,
-            DOWN_MFB_BLOCK_SIZE  => PCIE_RC_MFB_BLOCK_SIZE             ,
-            DOWN_MFB_ITEM_WIDTH  => PCIE_RC_MFB_ITEM_WIDTH             ,
+            DOWN_MFB_REGIONS     => PCIE_RC_MFB_REGIONS,
+            DOWN_MFB_REGION_SIZE => PCIE_RC_MFB_REGION_SIZE,
+            DOWN_MFB_BLOCK_SIZE  => PCIE_RC_MFB_BLOCK_SIZE,
+            DOWN_MFB_ITEM_WIDTH  => PCIE_RC_MFB_ITEM_WIDTH,
 
-            HDR_META_WIDTH       => HDR_META_WIDTH                  ,
+            HDR_META_WIDTH       => HDR_META_WIDTH,
 
-            RX_CHANNELS          => RX_CHANNELS                     ,
-            RX_DP_WIDTH          => RX_DP_WIDTH                     ,
-            RX_HP_WIDTH          => RX_HP_WIDTH                     ,
+            RX_CHANNELS          => RX_CHANNELS,
+            RX_DP_WIDTH          => RX_DP_WIDTH,
+            RX_HP_WIDTH          => RX_HP_WIDTH,
             RX_BLOCKING_MODE     => RX_BLOCKING_MODE,
 
-            TX_CHANNELS          => TX_CHANNELS                     ,
-            TX_SEL_CHANNELS      => TX_SEL_CHANNELS                 ,
-            TX_DP_WIDTH          => TX_DP_WIDTH                     ,
+            TX_CHANNELS          => TX_CHANNELS,
+            TX_SEL_CHANNELS      => TX_SEL_CHANNELS,
+            TX_DP_WIDTH          => TX_DP_WIDTH,
 
-            DSP_CNT_WIDTH        => DSP_CNT_WIDTH                   ,
+            DSP_CNT_WIDTH        => DSP_CNT_WIDTH,
 
-            RX_GEN_EN            => RX_GEN_EN                       ,
-            TX_GEN_EN            => TX_GEN_EN                       ,
+            RX_GEN_EN            => RX_GEN_EN,
+            TX_GEN_EN            => TX_GEN_EN,
 
-            SPEED_METER_EN       => SPEED_METER_EN                  ,
-            DBG_CNTR_EN          => DBG_CNTR_EN                     ,
-            USR_EQ_DMA           => USR_EQ_DMA                      ,
-            CROX_EQ_DMA          => CROX_EQ_DMA                     ,
-            CROX_DOUBLE_DMA      => CROX_DOUBLE_DMA                 ,
+            SPEED_METER_EN       => SPEED_METER_EN,
+            DBG_CNTR_EN          => DBG_CNTR_EN,
+            USR_EQ_DMA           => USR_EQ_DMA,
+            CROX_EQ_DMA          => CROX_EQ_DMA,
+            CROX_DOUBLE_DMA      => CROX_DOUBLE_DMA,
 
             MI_WIDTH             => MI_WIDTH
         )
-        port map(
-            DMA_CLK              => DMA_CLK                ,
+        port map (
+            DMA_CLK              => DMA_CLK,
             DMA_RESET            => dma_rst_dup(PCIE_ENDPOINTS+i),
 
-            CROX_CLK             => CROX_CLK               ,
-            CROX_RESET           => crox_rst_dup(i)        ,
+            CROX_CLK             => CROX_CLK,
+            CROX_RESET           => crox_rst_dup(i),
 
-            USR_CLK              => USR_CLK                ,
-            USR_RESET            => USR_RESET              ,
+            USR_CLK              => USR_CLK,
+            USR_RESET            => USR_RESET,
 
-            RX_USR_MVB_LEN       => RX_USR_MVB_LEN(i)     ,
+            RX_USR_MVB_LEN       => RX_USR_MVB_LEN(i),
             RX_USR_MVB_HDR_META  => RX_USR_MVB_HDR_META(i),
-            RX_USR_MVB_CHANNEL   => RX_USR_MVB_CHANNEL(i) ,
-            RX_USR_MVB_DISCARD   => RX_USR_MVB_DISCARD(i) ,
-            RX_USR_MVB_VLD       => RX_USR_MVB_VLD(i)     ,
-            RX_USR_MVB_SRC_RDY   => RX_USR_MVB_SRC_RDY(i) ,
-            RX_USR_MVB_DST_RDY   => RX_USR_MVB_DST_RDY(i) ,
+            RX_USR_MVB_CHANNEL   => RX_USR_MVB_CHANNEL(i),
+            RX_USR_MVB_DISCARD   => RX_USR_MVB_DISCARD(i),
+            RX_USR_MVB_VLD       => RX_USR_MVB_VLD(i),
+            RX_USR_MVB_SRC_RDY   => RX_USR_MVB_SRC_RDY(i),
+            RX_USR_MVB_DST_RDY   => RX_USR_MVB_DST_RDY(i),
 
-            RX_USR_MFB_DATA      => RX_USR_MFB_DATA(i)    ,
-            RX_USR_MFB_SOF       => RX_USR_MFB_SOF(i)     ,
-            RX_USR_MFB_EOF       => RX_USR_MFB_EOF(i)     ,
-            RX_USR_MFB_SOF_POS   => RX_USR_MFB_SOF_POS(i) ,
-            RX_USR_MFB_EOF_POS   => RX_USR_MFB_EOF_POS(i) ,
-            RX_USR_MFB_SRC_RDY   => RX_USR_MFB_SRC_RDY(i) ,
-            RX_USR_MFB_DST_RDY   => RX_USR_MFB_DST_RDY(i) ,
+            RX_USR_MFB_DATA      => RX_USR_MFB_DATA(i),
+            RX_USR_MFB_SOF       => RX_USR_MFB_SOF(i),
+            RX_USR_MFB_EOF       => RX_USR_MFB_EOF(i),
+            RX_USR_MFB_SOF_POS   => RX_USR_MFB_SOF_POS(i),
+            RX_USR_MFB_EOF_POS   => RX_USR_MFB_EOF_POS(i),
+            RX_USR_MFB_SRC_RDY   => RX_USR_MFB_SRC_RDY(i),
+            RX_USR_MFB_DST_RDY   => RX_USR_MFB_DST_RDY(i),
 
-            TX_USR_MVB_LEN       => TX_USR_MVB_LEN(i)     ,
+            TX_USR_MVB_LEN       => TX_USR_MVB_LEN(i),
             TX_USR_MVB_HDR_META  => TX_USR_MVB_HDR_META(i),
-            TX_USR_MVB_CHANNEL   => TX_USR_MVB_CHANNEL(i) ,
-            TX_USR_MVB_VLD       => TX_USR_MVB_VLD(i)     ,
-            TX_USR_MVB_SRC_RDY   => TX_USR_MVB_SRC_RDY(i) ,
-            TX_USR_MVB_DST_RDY   => TX_USR_MVB_DST_RDY(i) ,
+            TX_USR_MVB_CHANNEL   => TX_USR_MVB_CHANNEL(i),
+            TX_USR_MVB_VLD       => TX_USR_MVB_VLD(i),
+            TX_USR_MVB_SRC_RDY   => TX_USR_MVB_SRC_RDY(i),
+            TX_USR_MVB_DST_RDY   => TX_USR_MVB_DST_RDY(i),
 
-            TX_USR_MFB_DATA      => TX_USR_MFB_DATA(i)    ,
-            TX_USR_MFB_SOF       => TX_USR_MFB_SOF(i)     ,
-            TX_USR_MFB_EOF       => TX_USR_MFB_EOF(i)     ,
-            TX_USR_MFB_SOF_POS   => TX_USR_MFB_SOF_POS(i) ,
-            TX_USR_MFB_EOF_POS   => TX_USR_MFB_EOF_POS(i) ,
-            TX_USR_MFB_SRC_RDY   => TX_USR_MFB_SRC_RDY(i) ,
-            TX_USR_MFB_DST_RDY   => TX_USR_MFB_DST_RDY(i) ,
+            TX_USR_MFB_DATA      => TX_USR_MFB_DATA(i),
+            TX_USR_MFB_SOF       => TX_USR_MFB_SOF(i),
+            TX_USR_MFB_EOF       => TX_USR_MFB_EOF(i),
+            TX_USR_MFB_SOF_POS   => TX_USR_MFB_SOF_POS(i),
+            TX_USR_MFB_EOF_POS   => TX_USR_MFB_EOF_POS(i),
+            TX_USR_MFB_SRC_RDY   => TX_USR_MFB_SRC_RDY(i),
+            TX_USR_MFB_DST_RDY   => TX_USR_MFB_DST_RDY(i),
 
-            TX_USR_CHOKE_CHANS   => TX_USR_CHOKE_CHANS(i) ,
+            TX_USR_CHOKE_CHANS   => TX_USR_CHOKE_CHANS(i),
 
             UP_MVB_DATA          => dma_rq_mvb_data(DPE),
             UP_MVB_VLD           => PCIE_RQ_MVB_VLD(DPE),

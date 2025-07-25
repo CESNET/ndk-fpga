@@ -13,14 +13,14 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity ETH_AVST_ADAPTER is
-    generic(
+    generic (
         DATA_WIDTH     : natural := 512;
         TX_REGION_SIZE : natural := DATA_WIDTH/64;
         -- Enable simple but inefficient mode
         -- Timing issues may occur when set to false
         SIMPLE_MODE_EN : boolean := false
     );
-    port(
+    port (
         -- CLOCK AND RESET
         CLK              : in  std_logic;
         RESET            : in  std_logic;
@@ -126,11 +126,11 @@ begin
     else generate
 
         eth_avst_adapter_shakedown_i : entity work.ETH_AVST_ADAPTER_SHAKEDOWN
-        generic map(
+        generic map (
             DATA_WIDTH     => DATA_WIDTH,
             TX_REGION_SIZE => TX_REGION_SIZE
         )
-        port map(
+        port map (
             CLK   => CLK,
             RESET => RESET,
 

@@ -92,9 +92,9 @@ architecture FULL of AXIS_SWITCH is
     signal s_tx_switch_tvalid        : std_logic_vector(NUM_PORTS-1 downto 0);
     signal s_tx_switch_tready        : std_logic_vector(NUM_PORTS-1 downto 0);
 
-    constant MAX_STATUS_WIDTH        : integer := log2(max(NUM_ITEMS_PER_IP))+1;
-    signal s_switch_dst_req_arr      : slv_array_t(NUM_PORTS-1 downto 0)(NUM_PORTS-1 downto 0);
-    signal s_switch_dst_req_size_arr : slv_array_t(NUM_PORTS-1 downto 0)(NUM_PORTS*MAX_STATUS_WIDTH-1 downto 0);
+    constant MAX_STATUS_WIDTH          : integer := log2(max(NUM_ITEMS_PER_IP))+1;
+    signal   s_switch_dst_req_arr      : slv_array_t(NUM_PORTS-1 downto 0)(NUM_PORTS-1 downto 0);
+    signal   s_switch_dst_req_size_arr : slv_array_t(NUM_PORTS-1 downto 0)(NUM_PORTS*MAX_STATUS_WIDTH-1 downto 0);
 
     signal s_switch_ip_conn_vld      : std_logic_vector(NUM_PORTS-1 downto 0);
     signal s_switch_ip_conn_sel      : std_logic_vector(NUM_PORTS*log2(NUM_PORTS)-1 downto 0);
@@ -124,9 +124,9 @@ architecture FULL of AXIS_SWITCH is
 begin
 
     rx_pipelines_g : for i in 0 to NUM_PORTS-1 generate
-        constant MATS_READ_DATA_WIDTH   : natural := NUM_MATS*MAT_MAX_DATA_WIDTH;
-        constant MATS_READ_ACTION_WIDTH : natural := NUM_MATS*log2(NUM_ACTIONS);
-        signal s_rx_tready              : std_logic;
+        constant MATS_READ_DATA_WIDTH     : natural := NUM_MATS*MAT_MAX_DATA_WIDTH;
+        constant MATS_READ_ACTION_WIDTH   : natural := NUM_MATS*log2(NUM_ACTIONS);
+        signal   s_rx_tready              : std_logic;
     begin
         rx_pipeline_i : entity work.AXIS_RX_PIPELINE
         generic map (

@@ -9,7 +9,7 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
-entity FTILE_8x50g1 is
+entity FTILE_8X50G1 is
     port (
         -- ===================================================================
         -- MGMT Interface
@@ -56,7 +56,7 @@ entity FTILE_8x50g1 is
         -- ===================================================================
         -- Netvork_MOD_CONE_ENT interface
         -- ===================================================================
-        --different for each ftile (vector)
+        -- different for each ftile (vector)
         CLK_ETH_OUT              : out std_logic;
         RESET_ETH                : in  std_logic;
         -- ===================================================================
@@ -72,77 +72,77 @@ entity FTILE_8x50g1 is
     );
 end entity;
 
-architecture FULL of FTILE_8x50g1 is
+architecture FULL of FTILE_8X50G1 is
 
     component ftile_eth_8x50g is
-    port (
-        i_clk_tx                        : in  std_logic                      := 'X';             -- clk
-        i_clk_rx                        : in  std_logic                      := 'X';             -- clk
-        o_clk_pll                       : out std_logic;                                         -- clk
-        o_clk_tx_div                    : out std_logic;                                         -- clk
-        o_clk_rec_div64                 : out std_logic;                                         -- clk
-        o_clk_rec_div                   : out std_logic;                                         -- clk
-        i_tx_rst_n                      : in  std_logic                      := 'X';             -- reset
-        i_rx_rst_n                      : in  std_logic                      := 'X';             -- reset
-        i_rst_n                         : in  std_logic                      := 'X';             -- reset
-        o_rst_ack_n                     : out std_logic;                                         -- reset
-        o_tx_rst_ack_n                  : out std_logic;                                         -- reset
-        o_rx_rst_ack_n                  : out std_logic;                                         -- reset
-        i_reconfig_clk                  : in  std_logic                      := 'X';             -- clk
-        i_reconfig_reset                : in  std_logic                      := 'X';             -- reset
-        o_cdr_lock                      : out std_logic;                                         -- o_cdr_lock
-        o_tx_pll_locked                 : out std_logic;                                         -- o_tx_pll_locked
-        o_tx_lanes_stable               : out std_logic;                                         -- o_tx_lanes_stable
-        o_rx_pcs_ready                  : out std_logic;                                         -- o_rx_pcs_ready
-        o_tx_serial                     : out std_logic_vector(0 downto 0);                      -- o_tx_serial
-        i_rx_serial                     : in  std_logic_vector(0 downto 0)   := (others => 'X'); -- i_rx_serial
-        o_tx_serial_n                   : out std_logic_vector(0 downto 0);                      -- o_tx_serial_n
-        i_rx_serial_n                   : in  std_logic_vector(0 downto 0)   := (others => 'X'); -- i_rx_serial_n
-        i_clk_ref                       : in  std_logic                      := 'X';             -- clk
-        i_clk_sys                       : in  std_logic                      := 'X';             -- clk
-        i_reconfig_eth_addr             : in  std_logic_vector(13 downto 0)  := (others => 'X'); -- address
-        i_reconfig_eth_byteenable       : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- byteenable
-        o_reconfig_eth_readdata_valid   : out std_logic;                                         -- readdatavalid
-        i_reconfig_eth_read             : in  std_logic                      := 'X';             -- read
-        i_reconfig_eth_write            : in  std_logic                      := 'X';             -- write
-        o_reconfig_eth_readdata         : out std_logic_vector(31 downto 0);                     -- readdata
-        i_reconfig_eth_writedata        : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- writedata
-        o_reconfig_eth_waitrequest      : out std_logic;                                         -- waitrequest
-        i_reconfig_xcvr0_addr           : in  std_logic_vector(17 downto 0)  := (others => 'X'); -- address
-        i_reconfig_xcvr0_byteenable     : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- byteenable
-        o_reconfig_xcvr0_readdata_valid : out std_logic;                                         -- readdatavalid
-        i_reconfig_xcvr0_read           : in  std_logic                      := 'X';             -- read
-        i_reconfig_xcvr0_write          : in  std_logic                      := 'X';             -- write
-        o_reconfig_xcvr0_readdata       : out std_logic_vector(31 downto 0);                     -- readdata
-        i_reconfig_xcvr0_writedata      : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- writedata
-        o_reconfig_xcvr0_waitrequest    : out std_logic;                                         -- waitrequest
-        o_rx_block_lock                 : out std_logic;                                         -- o_rx_block_lock
-        o_rx_am_lock                    : out std_logic;                                         -- o_rx_am_lock
-        o_local_fault_status            : out std_logic;                                         -- o_local_fault_status
-        o_remote_fault_status           : out std_logic;                                         -- o_remote_fault_status
-        i_stats_snapshot                : in  std_logic                      := 'X';             -- i_stats_snapshot
-        o_rx_hi_ber                     : out std_logic;                                         -- o_rx_hi_ber
-        o_rx_pcs_fully_aligned          : out std_logic;                                         -- o_rx_pcs_fully_aligned
-        i_tx_mac_data                   : in  std_logic_vector(127 downto 0) := (others => 'X'); -- i_tx_mac_data
-        i_tx_mac_valid                  : in  std_logic                      := 'X';             -- i_tx_mac_valid
-        i_tx_mac_inframe                : in  std_logic_vector(1 downto 0)   := (others => 'X'); -- i_tx_mac_inframe
-        i_tx_mac_eop_empty              : in  std_logic_vector(5 downto 0)   := (others => 'X'); -- i_tx_mac_eop_empty
-        o_tx_mac_ready                  : out std_logic;                                         -- o_tx_mac_ready
-        i_tx_mac_error                  : in  std_logic_vector(1 downto 0)   := (others => 'X'); -- i_tx_mac_error
-        i_tx_mac_skip_crc               : in  std_logic_vector(1 downto 0)   := (others => 'X'); -- i_tx_mac_skip_crc
-        o_rx_mac_data                   : out std_logic_vector(127 downto 0);                    -- o_rx_mac_data
-        o_rx_mac_valid                  : out std_logic;                                         -- o_rx_mac_valid
-        o_rx_mac_inframe                : out std_logic_vector(1 downto 0);                      -- o_rx_mac_inframe
-        o_rx_mac_eop_empty              : out std_logic_vector(5 downto 0);                      -- o_rx_mac_eop_empty
-        o_rx_mac_fcs_error              : out std_logic_vector(1 downto 0);                      -- o_rx_mac_fcs_error
-        o_rx_mac_error                  : out std_logic_vector(3 downto 0);                      -- o_rx_mac_error
-        o_rx_mac_status                 : out std_logic_vector(5 downto 0);                      -- o_rx_mac_status
-        i_tx_pfc                        : in  std_logic_vector(7 downto 0)   := (others => 'X'); -- i_tx_pfc
-        o_rx_pfc                        : out std_logic_vector(7 downto 0);                      -- o_rx_pfc
-        i_tx_pause                      : in  std_logic                      := 'X';             -- i_tx_pause
-        o_rx_pause                      : out std_logic                                          -- o_rx_pause
-    );
-    end component ftile_eth_8x50g;
+        port (
+            I_CLK_TX                        : in  std_logic                      := 'X';
+            I_CLK_RX                        : in  std_logic                      := 'X';
+            O_CLK_PLL                       : out std_logic;
+            O_CLK_TX_DIV                    : out std_logic;
+            O_CLK_REC_DIV64                 : out std_logic;
+            O_CLK_REC_DIV                   : out std_logic;
+            I_TX_RST_N                      : in  std_logic                      := 'X';
+            I_RX_RST_N                      : in  std_logic                      := 'X';
+            I_RST_N                         : in  std_logic                      := 'X';
+            O_RST_ACK_N                     : out std_logic;
+            O_TX_RST_ACK_N                  : out std_logic;
+            O_RX_RST_ACK_N                  : out std_logic;
+            I_RECONFIG_CLK                  : in  std_logic                      := 'X';
+            I_RECONFIG_RESET                : in  std_logic                      := 'X';
+            O_CDR_LOCK                      : out std_logic;
+            O_TX_PLL_LOCKED                 : out std_logic;
+            O_TX_LANES_STABLE               : out std_logic;
+            O_RX_PCS_READY                  : out std_logic;
+            O_TX_SERIAL                     : out std_logic_vector(0 downto 0);
+            I_RX_SERIAL                     : in  std_logic_vector(0 downto 0)   := (others => 'X');
+            O_TX_SERIAL_N                   : out std_logic_vector(0 downto 0);
+            I_RX_SERIAL_N                   : in  std_logic_vector(0 downto 0)   := (others => 'X');
+            I_CLK_REF                       : in  std_logic                      := 'X';
+            I_CLK_SYS                       : in  std_logic                      := 'X';
+            I_RECONFIG_ETH_ADDR             : in  std_logic_vector(13 downto 0)  := (others => 'X');
+            I_RECONFIG_ETH_BYTEENABLE       : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_RECONFIG_ETH_READDATA_VALID   : out std_logic;
+            I_RECONFIG_ETH_READ             : in  std_logic                      := 'X';
+            I_RECONFIG_ETH_WRITE            : in  std_logic                      := 'X';
+            O_RECONFIG_ETH_READDATA         : out std_logic_vector(31 downto 0);
+            I_RECONFIG_ETH_WRITEDATA        : in  std_logic_vector(31 downto 0)  := (others => 'X');
+            O_RECONFIG_ETH_WAITREQUEST      : out std_logic;
+            I_RECONFIG_XCVR0_ADDR           : in  std_logic_vector(17 downto 0)  := (others => 'X');
+            I_RECONFIG_XCVR0_BYTEENABLE     : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_RECONFIG_XCVR0_READDATA_VALID : out std_logic;
+            I_RECONFIG_XCVR0_READ           : in  std_logic                      := 'X';
+            I_RECONFIG_XCVR0_WRITE          : in  std_logic                      := 'X';
+            O_RECONFIG_XCVR0_READDATA       : out std_logic_vector(31 downto 0);
+            I_RECONFIG_XCVR0_WRITEDATA      : in  std_logic_vector(31 downto 0)  := (others => 'X');
+            O_RECONFIG_XCVR0_WAITREQUEST    : out std_logic;
+            O_RX_BLOCK_LOCK                 : out std_logic;
+            O_RX_AM_LOCK                    : out std_logic;
+            O_LOCAL_FAULT_STATUS            : out std_logic;
+            O_REMOTE_FAULT_STATUS           : out std_logic;
+            I_STATS_SNAPSHOT                : in  std_logic                      := 'X';
+            O_RX_HI_BER                     : out std_logic;
+            O_RX_PCS_FULLY_ALIGNED          : out std_logic;
+            I_TX_MAC_DATA                   : in  std_logic_vector(127 downto 0) := (others => 'X');
+            I_TX_MAC_VALID                  : in  std_logic                      := 'X';
+            I_TX_MAC_INFRAME                : in  std_logic_vector(1 downto 0)   := (others => 'X');
+            I_TX_MAC_EOP_EMPTY              : in  std_logic_vector(5 downto 0)   := (others => 'X');
+            O_TX_MAC_READY                  : out std_logic;
+            I_TX_MAC_ERROR                  : in  std_logic_vector(1 downto 0)   := (others => 'X');
+            I_TX_MAC_SKIP_CRC               : in  std_logic_vector(1 downto 0)   := (others => 'X');
+            O_RX_MAC_DATA                   : out std_logic_vector(127 downto 0);
+            O_RX_MAC_VALID                  : out std_logic;
+            O_RX_MAC_INFRAME                : out std_logic_vector(1 downto 0);
+            O_RX_MAC_EOP_EMPTY              : out std_logic_vector(5 downto 0);
+            O_RX_MAC_FCS_ERROR              : out std_logic_vector(1 downto 0);
+            O_RX_MAC_ERROR                  : out std_logic_vector(3 downto 0);
+            O_RX_MAC_STATUS                 : out std_logic_vector(5 downto 0);
+            I_TX_PFC                        : in  std_logic_vector(7 downto 0)   := (others => 'X');
+            O_RX_PFC                        : out std_logic_vector(7 downto 0);
+            I_TX_PAUSE                      : in  std_logic                      := 'X';
+            O_RX_PAUSE                      : out std_logic
+        );
+    end component;
 
     -- ===================================================================
     -- Constants
@@ -193,19 +193,19 @@ architecture FULL of FTILE_8x50g1 is
     signal drpsel   : std_logic_vector(4-1 downto 0);
 
     -- signals for mi_sel => IP core interface
-    signal reconfig_addr           :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
-    signal reconfig_readdata_valid :  std_logic_vector(MI_SEL_RANGE-1 downto 0);
-    signal reconfig_read           :  std_logic_vector(MI_SEL_RANGE-1 downto 0);
-    signal reconfig_write          :  std_logic_vector(MI_SEL_RANGE-1 downto 0);
-    signal reconfig_readdata       :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal reconfig_writedata      :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal reconfig_waitrequest    :  std_logic_vector(MI_SEL_RANGE-1 downto 0);
+    signal reconfig_addr           : slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
+    signal reconfig_readdata_valid : std_logic_vector(MI_SEL_RANGE-1 downto 0);
+    signal reconfig_read           : std_logic_vector(MI_SEL_RANGE-1 downto 0);
+    signal reconfig_write          : std_logic_vector(MI_SEL_RANGE-1 downto 0);
+    signal reconfig_readdata       : slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
+    signal reconfig_writedata      : slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
+    signal reconfig_waitrequest    : std_logic_vector(MI_SEL_RANGE-1 downto 0);
 
     -- signals for multiplexor
-    signal reconfig_write_drp      :  std_logic_vector(MI_SEL_RANGE-1 downto 0);
-    signal reconfig_read_drp       :  std_logic_vector(MI_SEL_RANGE-1 downto 0);
-    signal reconfig_addr_drp       :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
-    signal reconfig_writedata_drp  :  slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
+    signal reconfig_write_drp      : std_logic_vector(MI_SEL_RANGE-1 downto 0);
+    signal reconfig_read_drp       : std_logic_vector(MI_SEL_RANGE-1 downto 0);
+    signal reconfig_addr_drp       : slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
+    signal reconfig_writedata_drp  : slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
 
     -- signal for Ftile interface
     signal ftile_rx_rst_n             : std_logic;
@@ -258,7 +258,7 @@ architecture FULL of FTILE_8x50g1 is
     -- signal sync_repeater_ctrl : std_logic_vector(REPEATER_CTRL'range);
     signal sync_repeater_ctrl : std_logic;
 
-    signal mi_ardy_phy : std_logic_vector(MI_SEL_RANGE-1 downto 0) := (others => '0');
+    signal mi_ardy_phy    : std_logic_vector(MI_SEL_RANGE-1 downto 0) := (others => '0');
     signal init_done      : std_logic_vector(PMA_LANES   -1 downto 0);
     signal init_ready     : std_logic_vector(PMA_LANES   -1 downto 0);
 
@@ -268,7 +268,7 @@ architecture FULL of FTILE_8x50g1 is
     signal ftile_clk_out  : std_logic;
 
 begin
-    mgmt_i : entity work.mgmt
+    mgmt_i : entity work.MGMT
     generic map (
         NUM_LANES  => NUM_LANES,
         PMA_LANES  => PMA_LANES,
@@ -300,7 +300,7 @@ begin
         BLK_ERR_CNTR             => (others => '0'),
         BLK_ERR_CLR              => open,
         SCR_BYPASS               => open,
-        PCS_RESET                => mgmt_pcs_reset, --TODO
+        PCS_RESET                => mgmt_pcs_reset,                 -- TODO
         PCS_LPBCK                => open,
         PCS_CONTROL(0)           => mgmt_mac_loop,
         PCS_CONTROL(15 downto 1) => mgmt_pcs_control_dummy,
@@ -316,21 +316,21 @@ begin
         PMA_LOPWR                => open,
         PMA_LPBCK                => open,
         PMA_REM_LPBCK            => open,
-        PMA_RESET                => mgmt_pma_reset, --TODO
+        PMA_RESET                => mgmt_pma_reset,                 -- TODO
         PMA_RETUNE               => open,
         PMA_CONTROL              => open,
         PMA_STATUS               => (others => '0'),
         PMA_PTRN_EN              => open,
         PMA_TX_DIS               => open,
-        PMA_RX_OK                => (others => ftile_rx_pcs_ready), --TODO
-        PMD_SIG_DET              => (others => ftile_rx_pcs_ready), --TODO
+        PMA_RX_OK                => (others => ftile_rx_pcs_ready), -- TODO
+        PMD_SIG_DET              => (others => ftile_rx_pcs_ready), -- TODO
         PMA_PRECURSOR            => open,
         PMA_POSTCURSOR           => open,
         PMA_DRIVE                => open,
         -- Dynamic reconfiguration interface
         DRPCLK                   => MI_CLK_PHY,
         DRPDO                    => drpdo,
-        DRPRDY                   => drp_drdy, -- DRDY is set during JTAG operations, therefore using ia_rd as mask
+        DRPRDY                   => drp_drdy,                       -- DRDY is set during JTAG operations, therefore using ia_rd as mask
         DRPEN                    => drpen,
         DRPWE                    => drpwe,
         DRPADDR                  => drpaddr,
@@ -343,10 +343,10 @@ begin
     mgmt_pcs_control(15 downto 1) <= (others => '0');
     mgmt_pcs_control(0)           <= sync_repeater_ctrl; -- MAC loopback active
     -- MDIO reg 3.4001 (vendor specific PCS status/abilities)
-    mgmt_pcs_status(15 downto 1) <= (others => '0');
-    mgmt_pcs_status(0)           <= '1';        -- MAC loopback ability supported
+    mgmt_pcs_status(15 downto 1)  <= (others => '0');
+    mgmt_pcs_status(0)            <= '1';        -- MAC loopback ability supported
 
-    drp_bridge_i : entity work.bridge_drp
+    drp_bridge_i : entity work.BRIDGE_DRP
     generic map (
         MI_DATA_WIDTH_PHY => MI_DATA_WIDTH_PHY,
         MI_ADDR_WIDTH_PHY => MI_ADDR_WIDTH_PHY,
@@ -372,17 +372,17 @@ begin
         RECONFIG_WRITEDATA      => reconfig_writedata_drp,
         RECONFIG_WAITREQUEST    => mi_ardy_phy
     );
-   -- selection of unused input signals from bridge_drp whoch have to be conected to '0'
-   -- (16:2)
+    -- selection of unused input signals from bridge_drp whoch have to be conected to '0'
+    -- (16:2)
     reconfig_readdata_valid (MI_SEL_RANGE-1 downto PMA_LANES+1) <= (others => '0');
     reconfig_waitrequest    (MI_SEL_RANGE-1 downto PMA_LANES+1) <= (others => '0');
     reconfig_readdata       (MI_SEL_RANGE-1 downto PMA_LANES+1) <= (others => (others => '0'));
 
     -- monitoring RX link state
-    process(ftile_clk_out)
+    process (ftile_clk_out)
     begin
         if rising_edge(ftile_clk_out) then
-            if (ftile_rx_pcs_ready = '1') or (rx_link_rst = '1') then
+            if ((ftile_rx_pcs_ready = '1') or (rx_link_rst = '1')) then
                 -- link is up, clear the counter
                 rx_link_cnt <= (others => '0');
             else
@@ -419,15 +419,15 @@ begin
     begin
 
         -- Generate AVMM signals for XCVR blocks
-        reconfig_write  (IA_INDEX) <=
+        reconfig_write  (IA_INDEX)    <=
             init_write                   when init_busy = '1'                                      else
             reconfig_write_drp(IA_INDEX) when drpsel = std_logic_vector(to_unsigned(xcvr+1,4))     else
             '0';
-        reconfig_read  (IA_INDEX) <=
+        reconfig_read  (IA_INDEX)     <=
             init_read                    when init_busy = '1'                                     else
             reconfig_read_drp (IA_INDEX) when drpsel = std_logic_vector(to_unsigned(xcvr+1,4))    else
             '0';
-        reconfig_addr(IA_INDEX) <=
+        reconfig_addr(IA_INDEX)       <=
              X"000" & "00" & init_addr   when init_busy = '1'  else
              reconfig_addr_drp(IA_INDEX)(reconfig_addr(0)'range);
         reconfig_writedata (IA_INDEX) <=
@@ -435,13 +435,13 @@ begin
             reconfig_writedata_drp (IA_INDEX);
 
         init_done_g: if (xcvr = 0) generate
-            init_ready(0) <= ftile_tx_lanes_stable;
+            init_ready(0)    <= ftile_tx_lanes_stable;
         else generate
             init_ready(xcvr) <= init_done(xcvr-1);
         end generate;
 
         -- Component ftile_xcvr_init perform set_media_mode() operation to bring the link up on optical media types
-        xcvr_init: entity work.ftile_xcvr_init
+        xcvr_init: entity work.FTILE_XCVR_INIT
         generic map (
             PHY_LANE => (3 - (xcvr mod 4)) -- XCVR 0 maps to -> PHY lane 3, XCVR1 -> 2, XCVR2 -> 1 and XCVR3 -> 0
         )
@@ -461,7 +461,7 @@ begin
             WRITEDATA        => init_writedata,
             WAITREQUEST      => reconfig_waitrequest(IA_INDEX),
             STATE            => open -- debug purposes only. Can be left open in the future
-         );
+        );
 
     end generate;
 
@@ -503,7 +503,7 @@ begin
         i_clk_sys                       => FTILE_PLL_CLK,
         -- Eth (+ RSFEC + transciever) reconfig inf (0x0)
         i_reconfig_eth_addr             => reconfig_addr_drp       (0)(14-1 downto 0),
-        i_reconfig_eth_byteenable       => (others => '1')            , -- not supported in MI IA yet
+        i_reconfig_eth_byteenable       => (others => '1'), -- not supported in MI IA yet
         o_reconfig_eth_readdata_valid   => reconfig_readdata_valid (0),
         i_reconfig_eth_read             => reconfig_read_drp       (0),
         i_reconfig_eth_write            => reconfig_write_drp      (0),
@@ -512,7 +512,7 @@ begin
         o_reconfig_eth_waitrequest      => reconfig_waitrequest    (0),
         -- XCVR reconfig inf (0x1)
         i_reconfig_xcvr0_addr           => reconfig_addr           (1)(18-1 downto 0),
-        i_reconfig_xcvr0_byteenable     => (others => '1')            , -- not supported in MI IA yet
+        i_reconfig_xcvr0_byteenable     => (others => '1'), -- not supported in MI IA yet
         o_reconfig_xcvr0_readdata_valid => reconfig_readdata_valid (1),
         i_reconfig_xcvr0_read           => reconfig_read_drp       (1),
         i_reconfig_xcvr0_write          => reconfig_write_drp      (1),
@@ -559,7 +559,7 @@ begin
     RX_MACSI_MAC_ERROR     <= ftile_rx_mac_error;
     RX_MACSI_MAC_STATUS    <= ftile_rx_mac_status;
 
-    process(ftile_clk_out)
+    process (ftile_clk_out)
     begin
         if rising_edge(ftile_clk_out) then
             if (MI_RESET_PHY = '1') then
@@ -589,30 +589,30 @@ begin
         BVALID      => open
     );
 
-    mac_loopback_i: entity work.macseg_loop
-        generic map (
-            SEGMENTS => SEGMENTS_LOOP
-        )
-        port map (
-            RST               => RESET_ETH,
-            CLK               => ftile_clk_out,
+    mac_loopback_i: entity work.MACSEG_LOOP
+    generic map (
+        SEGMENTS => SEGMENTS_LOOP
+    )
+    port map (
+        RST               => RESET_ETH,
+        CLK               => ftile_clk_out,
 
-            IN_MAC_DATA       => ftile_rx_mac_data,
-            IN_MAC_INFRAME    => ftile_rx_mac_inframe,
-            IN_MAC_EOP_EMPTY  => ftile_rx_mac_eop_empty,
-            IN_MAC_VALID      => ftile_rx_mac_valid,
+        IN_MAC_DATA       => ftile_rx_mac_data,
+        IN_MAC_INFRAME    => ftile_rx_mac_inframe,
+        IN_MAC_EOP_EMPTY  => ftile_rx_mac_eop_empty,
+        IN_MAC_VALID      => ftile_rx_mac_valid,
 
-            OUT_MAC_DATA      => ftile_tx_loop_data,
-            OUT_MAC_INFRAME   => ftile_tx_loop_inframe,
-            OUT_MAC_EOP_EMPTY => ftile_tx_loop_eop_empty,
-            OUT_MAC_ERROR     => ftile_tx_loop_error,
-            OUT_MAC_VALID     => ftile_tx_loop_valid,
-            OUT_MAC_READY     => ftile_tx_mac_ready
-        );
+        OUT_MAC_DATA      => ftile_tx_loop_data,
+        OUT_MAC_INFRAME   => ftile_tx_loop_inframe,
+        OUT_MAC_EOP_EMPTY => ftile_tx_loop_eop_empty,
+        OUT_MAC_ERROR     => ftile_tx_loop_error,
+        OUT_MAC_VALID     => ftile_tx_loop_valid,
+        OUT_MAC_READY     => ftile_tx_mac_ready
+    );
 
-    ftile_tx_mux: process(all)
+    ftile_tx_mux : process (all)
     begin
-        if sync_repeater_ctrl = '1' then
+        if (sync_repeater_ctrl = '1') then
             -- MAC loopback on
             ftile_tx_mac_data      <= ftile_tx_loop_data;
             ftile_tx_mac_inframe   <= ftile_tx_loop_inframe;

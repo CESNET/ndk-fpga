@@ -19,67 +19,67 @@ use work.type_pack.all;
 -- (delayed for a couple of clock cycles).
 --
 entity FREQUENCY_METER_CORE is
-generic (
-    -- Width of the "reference frequency counter".
-    -- Watch out for overflow (indicated by a bit in an MI register).
-    REFERENCE_CNTR_WIDTH : natural := 32;
-    -- Width of the "measured frequency counter".
-    -- Watch out for overflow (indicated by a bit in an MI register).
-    MEASURED_CNTR_WIDTH  : natural := 32;
-    -- Maximum number of measured frequencies.
-    MEASURED_FREQUENCIES : natural := 10;
-    -- Utilize DSPs for the "frequency counters".
-    DSP_CNTR_EN          : boolean := False;
-    -- Target device.
-    DEVICE               : string := "AGILEX"
-);
-port (
-    MASTER_CLK         : in  std_logic;
-    MASTER_RESET       : in  std_logic;
-    -- Enables both "frequency counters" when high.
-    MASTER_ENABLE      : in  std_logic;
-    IN_PROGRESS        : in  std_logic;
+    generic (
+        -- Width of the "reference frequency counter".
+        -- Watch out for overflow (indicated by a bit in an MI register).
+        REFERENCE_CNTR_WIDTH : natural := 32;
+        -- Width of the "measured frequency counter".
+        -- Watch out for overflow (indicated by a bit in an MI register).
+        MEASURED_CNTR_WIDTH  : natural := 32;
+        -- Maximum number of measured frequencies.
+        MEASURED_FREQUENCIES : natural := 10;
+        -- Utilize DSPs for the "frequency counters".
+        DSP_CNTR_EN          : boolean := False;
+        -- Target device.
+        DEVICE               : string := "AGILEX"
+    );
+    port (
+        MASTER_CLK         : in  std_logic;
+        MASTER_RESET       : in  std_logic;
+        -- Enables both "frequency counters" when high.
+        MASTER_ENABLE      : in  std_logic;
+        IN_PROGRESS        : in  std_logic;
 
-    REFERENCE_CLK      : in  std_logic;
-    REFERENCE_RESET    : in  std_logic;
+        REFERENCE_CLK      : in  std_logic;
+        REFERENCE_RESET    : in  std_logic;
 
-    MEASURED_CLK       : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
-    MEASURED_RESET     : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
+        MEASURED_CLK       : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
+        MEASURED_RESET     : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
 
-    -- ========================================================================
-    -- Reference data output interface
-    --
-    -- Runs on the MASTER_CLK
-    -- ========================================================================
-    -- Signal the components readiness to start another measurement.
-    REFERENCE_CNTR_RDY : out std_logic;
-    -- Output of the "reference frequency counter".
-    REFERENCE_CNTR     : out std_logic_vector(REFERENCE_CNTR_WIDTH-1 downto 0);
-    -- Signals valid output of the "reference frequency counter"
-    -- Asserts for a single clock cycle after the MASTER_ENABLE drops.
-    REFERENCE_CNTR_VLD : out std_logic;
-    -- Reference counter overflowed. Always valid.
-    REFERENCE_CNTR_OVF : out std_logic;
-    -- Read request from the outside.
-    REFERENCE_CNTR_RD  : in  std_logic;
+        -- ========================================================================
+        -- Reference data output interface
+        --
+        -- Runs on the MASTER_CLK
+        -- ========================================================================
+        -- Signal the components readiness to start another measurement.
+        REFERENCE_CNTR_RDY : out std_logic;
+        -- Output of the "reference frequency counter".
+        REFERENCE_CNTR     : out std_logic_vector(REFERENCE_CNTR_WIDTH-1 downto 0);
+        -- Signals valid output of the "reference frequency counter"
+        -- Asserts for a single clock cycle after the MASTER_ENABLE drops.
+        REFERENCE_CNTR_VLD : out std_logic;
+        -- Reference counter overflowed. Always valid.
+        REFERENCE_CNTR_OVF : out std_logic;
+        -- Read request from the outside.
+        REFERENCE_CNTR_RD  : in  std_logic;
 
-    -- ========================================================================
-    -- Measured data output interface
-    --
-    -- Runs on the MASTER_CLK
-    -- ========================================================================
-    -- Signal the components readiness to start another measurement.
-    MEASURED_CNTR_RDY  : out std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
-    -- Output of the "measured frequency counter".
-    MEASURED_CNTR      : out slv_array_t(MEASURED_FREQUENCIES-1 downto 0)(MEASURED_CNTR_WIDTH -1 downto 0);
-    -- Signals valid output of the "measured frequency counter"
-    -- Asserts for a single clock cycle after the MASTER_ENABLE drops.
-    MEASURED_CNTR_VLD  : out std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
-    -- Measured counter overflowed. Always valid.
-    MEASURED_CNTR_OVF  : out std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
-    -- Read request from the outside.
-    MEASURED_CNTR_RD   : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0)
-);
+        -- ========================================================================
+        -- Measured data output interface
+        --
+        -- Runs on the MASTER_CLK
+        -- ========================================================================
+        -- Signal the components readiness to start another measurement.
+        MEASURED_CNTR_RDY  : out std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
+        -- Output of the "measured frequency counter".
+        MEASURED_CNTR      : out slv_array_t(MEASURED_FREQUENCIES-1 downto 0)(MEASURED_CNTR_WIDTH -1 downto 0);
+        -- Signals valid output of the "measured frequency counter"
+        -- Asserts for a single clock cycle after the MASTER_ENABLE drops.
+        MEASURED_CNTR_VLD  : out std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
+        -- Measured counter overflowed. Always valid.
+        MEASURED_CNTR_OVF  : out std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
+        -- Read request from the outside.
+        MEASURED_CNTR_RD   : in  std_logic_vector(MEASURED_FREQUENCIES-1 downto 0)
+    );
 end entity;
 
 architecture FULL of FREQUENCY_METER_CORE is
@@ -137,32 +137,32 @@ begin
     --  Reference
     -- -----------
     ref_clk_enable_sync_i : entity work.ASYNC_OPEN_LOOP
-    generic map(
+    generic map (
         IN_REG   => False,
         TWO_REG  => False
     )
-    port map(
-        ACLK     => MASTER_CLK     ,
-        ARST     => MASTER_RESET   ,
-        ADATAIN  => MASTER_ENABLE  ,
+    port map (
+        ACLK     => MASTER_CLK,
+        ARST     => MASTER_RESET,
+        ADATAIN  => MASTER_ENABLE,
 
-        BCLK     => REFERENCE_CLK  ,
+        BCLK     => REFERENCE_CLK,
         BRST     => REFERENCE_RESET,
         BDATAOUT => enable_ref_cntr
     );
 
     ref_clk_inprogress_sync_i : entity work.ASYNC_OPEN_LOOP
-    generic map(
+    generic map (
         IN_REG   => False,
         TWO_REG  => False
     )
-    port map(
-        ACLK     => MASTER_CLK        ,
-        ARST     => MASTER_RESET      ,
-        ADATAIN  => IN_PROGRESS       ,
+    port map (
+        ACLK     => MASTER_CLK,
+        ARST     => MASTER_RESET,
+        ADATAIN  => IN_PROGRESS,
 
-        BCLK     => REFERENCE_CLK     ,
-        BRST     => REFERENCE_RESET   ,
+        BCLK     => REFERENCE_CLK,
+        BRST     => REFERENCE_RESET,
         BDATAOUT => in_progress_refclk
     );
 
@@ -171,14 +171,14 @@ begin
     -- ----------
     sync_enables_g : for mf in 0 to MEASURED_FREQUENCIES-1 generate
         meas_clk_enable_sync_i : entity work.ASYNC_OPEN_LOOP
-        generic map(
+        generic map (
             IN_REG   => False,
             TWO_REG  => False
         )
-        port map(
-            ACLK     => MASTER_CLK          ,
-            ARST     => MASTER_RESET        ,
-            ADATAIN  => MASTER_ENABLE       ,
+        port map (
+            ACLK     => MASTER_CLK,
+            ARST     => MASTER_RESET,
+            ADATAIN  => MASTER_ENABLE,
 
             BCLK     => MEASURED_CLK    (mf),
             BRST     => MEASURED_RESET  (mf),
@@ -186,14 +186,14 @@ begin
         );
 
         meas_clk_inprogress_sync_i : entity work.ASYNC_OPEN_LOOP
-        generic map(
+        generic map (
             IN_REG   => False,
             TWO_REG  => False
         )
-        port map(
-            ACLK     => MASTER_CLK             ,
-            ARST     => MASTER_RESET           ,
-            ADATAIN  => IN_PROGRESS            ,
+        port map (
+            ACLK     => MASTER_CLK,
+            ARST     => MASTER_RESET,
+            ADATAIN  => IN_PROGRESS,
 
             BCLK     => MEASURED_CLK       (mf),
             BRST     => MEASURED_RESET     (mf),
@@ -212,18 +212,18 @@ begin
     -- Runs on the "Reference" frequency.
     -- MSB of the output indicates overflow.
     reference_freq_counter_i : entity work.DSP_COUNTER
-    generic map(
-        DEVICE       => DEVICE                ,
-        INPUT_REGS   => True                  ,
-        INPUT_WIDTH  => 1                     ,
+    generic map (
+        DEVICE       => DEVICE,
+        INPUT_REGS   => True,
+        INPUT_WIDTH  => 1,
         OUTPUT_WIDTH => REFERENCE_CNTR_WIDTH+1,
         DSP_ENABLE   => DSP_CNTR_EN
     )
-    port map(
-        CLK        => REFERENCE_CLK  ,
+    port map (
+        CLK        => REFERENCE_CLK,
         CLK_EN     => enable_ref_cntr,
         RESET      => REFERENCE_RESET,
-        INCREMENT  => "1"            ,
+        INCREMENT  => "1",
         MAX_VAL    => (others => '1'),
         RESULT     => ref_cnt_result
     );
@@ -235,21 +235,21 @@ begin
         IN_REG   => False,
         TWO_REG  => False
     )
-    port map(
-        ACLK     => REFERENCE_CLK      ,
-        ARST     => REFERENCE_RESET    ,
-        ADATAIN  => ref_cnt_result_msb ,
+    port map (
+        ACLK     => REFERENCE_CLK,
+        ARST     => REFERENCE_RESET,
+        ADATAIN  => ref_cnt_result_msb,
 
-        BCLK     => MASTER_CLK         ,
-        BRST     => MASTER_RESET       ,
+        BCLK     => MASTER_CLK,
+        BRST     => MASTER_RESET,
         BDATAOUT => ref_cntr_overflowed
     );
 
     -- Rises the overflow signal only for a single clock cycle.
     -- Using only the MSB could lead to multiple overflows, which could avoid detection in some cases.
     ref_cnt_edge_detect_i : entity work.EDGE_DETECT
-    port map(
-        CLK  => MASTER_CLK         ,
+    port map (
+        CLK  => MASTER_CLK,
         DI   => ref_cntr_overflowed,
         EDGE => ref_cntr_ovf_edge
     );
@@ -263,19 +263,19 @@ begin
         -- Runs on the "Measured" frequencies.
         -- MSB of each counter output indicates overflow.
         measured_freq_counter_i : entity work.DSP_COUNTER
-        generic map(
-            DEVICE       => DEVICE               ,
-            INPUT_REGS   => True                 ,
-            INPUT_WIDTH  => 1                    ,
+        generic map (
+            DEVICE       => DEVICE,
+            INPUT_REGS   => True,
+            INPUT_WIDTH  => 1,
             OUTPUT_WIDTH => MEASURED_CNTR_WIDTH+1,
             DSP_ENABLE   => DSP_CNTR_EN
         )
-        port map(
+        port map (
             CLK        => MEASURED_CLK    (mf),
             CLK_EN     => enable_meas_cntr(mf),
             RESET      => MEASURED_RESET  (mf),
-            INCREMENT  => "1"                 ,
-            MAX_VAL    => (others => '1')     ,
+            INCREMENT  => "1",
+            MAX_VAL    => (others => '1'),
             RESULT     => meas_cnt_result (mf)
         );
 
@@ -287,21 +287,21 @@ begin
             IN_REG   => False,
             TWO_REG  => False
         )
-        port map(
+        port map (
             ACLK     => MEASURED_CLK        (mf),
             ARST     => MEASURED_RESET      (mf),
             ADATAIN  => meas_cnt_result_msb (mf),
 
-            BCLK     => MASTER_CLK              ,
-            BRST     => MASTER_RESET            ,
+            BCLK     => MASTER_CLK,
+            BRST     => MASTER_RESET,
             BDATAOUT => meas_cntr_overflowed(mf)
         );
 
         -- Rises the overflow signal only for a single clock cycle.
         -- Using only the MSB could lead to multiple overflows, which could avoid detection in some cases.
         meas_cnt_edge_detect_i : entity work.EDGE_DETECT
-        port map(
-            CLK  => MASTER_CLK              ,
+        port map (
+            CLK  => MASTER_CLK,
             DI   => meas_cntr_overflowed(mf),
             EDGE => meas_cntr_ovf_edge  (mf)
         );
@@ -317,7 +317,7 @@ begin
     -- -----------
     in_progress_refclk_dly(0) <= in_progress_refclk;
     ref_enable_shreg_g: for s in 0 to CNTR_DLY_STAGES-1 generate
-        process(REFERENCE_CLK)
+        process (REFERENCE_CLK)
         begin
             if rising_edge(REFERENCE_CLK) then
                 in_progress_refclk_dly(s+1) <= in_progress_refclk_dly(s);
@@ -339,7 +339,7 @@ begin
         in_progress_measclk_dly(mf)(0) <= in_progress_measclk(mf);
 
         meas_enable_shreg_g: for s in 0 to CNTR_DLY_STAGES-1 generate
-            process(MEASURED_CLK(mf))
+            process (MEASURED_CLK(mf))
             begin
                 if rising_edge(MEASURED_CLK(mf)) then
                     in_progress_measclk_dly(mf)(s+1) <= in_progress_measclk_dly(mf)(s);
@@ -373,42 +373,42 @@ begin
         IN_REG   => False,
         TWO_REG  => False
     )
-    port map(
-        ACLK     => REFERENCE_CLK       ,
-        ARST     => REFERENCE_RESET     ,
+    port map (
+        ACLK     => REFERENCE_CLK,
+        ARST     => REFERENCE_RESET,
         ADATAIN  => not ref_asfifox_full,
 
-        BCLK     => MASTER_CLK          ,
-        BRST     => MASTER_RESET        ,
+        BCLK     => MASTER_CLK,
+        BRST     => MASTER_RESET,
         BDATAOUT => REFERENCE_CNTR_RDY
     );
 
     ref_asfifox_i : entity work.ASFIFOX
     generic map (
         DATA_WIDTH          => REFERENCE_CNTR_WIDTH,
-        ITEMS               => 4                   ,
-        RAM_TYPE            => "AUTO"              ,
-        FWFT_MODE           => True                ,
-        OUTPUT_REG          => True                ,
-        DEVICE              => DEVICE              ,
-        ALMOST_FULL_OFFSET  => 0                   ,
+        ITEMS               => 4,
+        RAM_TYPE            => "AUTO",
+        FWFT_MODE           => True,
+        OUTPUT_REG          => True,
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
         ALMOST_EMPTY_OFFSET => 0
     )
-    port map(
-        WR_CLK    => REFERENCE_CLK    ,
-        WR_RST    => REFERENCE_RESET  ,
-        WR_DATA   => ref_asfifox_din  ,
-        WR_EN     => ref_asfifox_wr   ,
-        WR_FULL   => ref_asfifox_full ,
-        WR_AFULL  => open             ,
-        WR_STATUS => open             ,
+    port map (
+        WR_CLK    => REFERENCE_CLK,
+        WR_RST    => REFERENCE_RESET,
+        WR_DATA   => ref_asfifox_din,
+        WR_EN     => ref_asfifox_wr,
+        WR_FULL   => ref_asfifox_full,
+        WR_AFULL  => open,
+        WR_STATUS => open,
 
-        RD_CLK    => MASTER_CLK       ,
-        RD_RST    => MASTER_RESET     ,
-        RD_DATA   => ref_asfifox_dout ,
-        RD_EN     => ref_asfifox_rd   ,
+        RD_CLK    => MASTER_CLK,
+        RD_RST    => MASTER_RESET,
+        RD_DATA   => ref_asfifox_dout,
+        RD_EN     => ref_asfifox_rd,
         RD_EMPTY  => ref_asfifox_empty,
-        RD_AEMPTY => open             ,
+        RD_AEMPTY => open,
         RD_STATUS => open
     );
 
@@ -430,42 +430,42 @@ begin
             IN_REG   => False,
             TWO_REG  => False
         )
-        port map(
+        port map (
             ACLK     => MEASURED_CLK         (mf),
             ARST     => MEASURED_RESET       (mf),
             ADATAIN  => not meas_asfifox_full(mf),
 
-            BCLK     => MASTER_CLK               ,
-            BRST     => MASTER_RESET             ,
+            BCLK     => MASTER_CLK,
+            BRST     => MASTER_RESET,
             BDATAOUT => MEASURED_CNTR_RDY    (mf)
         );
 
         meas_asfifox_i : entity work.ASFIFOX
         generic map (
             DATA_WIDTH          => MEASURED_CNTR_WIDTH,
-            ITEMS               => 4                  ,
-            RAM_TYPE            => "AUTO"             ,
-            FWFT_MODE           => True               ,
-            OUTPUT_REG          => True               ,
-            DEVICE              => DEVICE             ,
-            ALMOST_FULL_OFFSET  => 0                  ,
+            ITEMS               => 4,
+            RAM_TYPE            => "AUTO",
+            FWFT_MODE           => True,
+            OUTPUT_REG          => True,
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
             ALMOST_EMPTY_OFFSET => 0
         )
-        port map(
+        port map (
             WR_CLK    => MEASURED_CLK      (mf),
             WR_RST    => MEASURED_RESET    (mf),
             WR_DATA   => meas_asfifox_din  (mf),
             WR_EN     => meas_asfifox_wr   (mf),
             WR_FULL   => meas_asfifox_full (mf),
-            WR_AFULL  => open                  ,
-            WR_STATUS => open                  ,
+            WR_AFULL  => open,
+            WR_STATUS => open,
 
-            RD_CLK    => MASTER_CLK            ,
-            RD_RST    => MASTER_RESET          ,
+            RD_CLK    => MASTER_CLK,
+            RD_RST    => MASTER_RESET,
             RD_DATA   => meas_asfifox_dout (mf),
             RD_EN     => meas_asfifox_rd   (mf),
             RD_EMPTY  => meas_asfifox_empty(mf),
-            RD_AEMPTY => open                  ,
+            RD_AEMPTY => open,
             RD_STATUS => open
         );
 

@@ -17,47 +17,47 @@ use IEEE.std_logic_arith.all;
 -- ----------------------------------------------------------------------------
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
-entity sh_reg_bus is
-   generic(
-      NUM_BITS    : integer := 16;
-      -- INIT        : std_logic_vector(15 downto 0) := X"0000";
-      -- INIT_EXT00  : std_logic_vector(63 downto 0) := X"0000000000000000";
-      INIT        : std_logic_vector := x"0000";
-      INIT_EXT00  : std_logic_vector := X"0000000000000000";
-      DATA_WIDTH  : integer := 1
-   );
-   port(
-      CLK      : in  std_logic;
+entity SH_REG_BUS is
+    generic (
+        NUM_BITS    : integer := 16;
+        -- INIT        : std_logic_vector(15 downto 0) := X"0000";
+        -- INIT_EXT00  : std_logic_vector(63 downto 0) := X"0000000000000000";
+        INIT        : std_logic_vector := X"0000";
+        INIT_EXT00  : std_logic_vector := X"0000000000000000";
+        DATA_WIDTH  : integer := 1
+    );
+    port (
+        CLK      : in  std_logic;
 
-      DIN      : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-      CE       : in  std_logic;
-      DOUT     : out std_logic_vector(DATA_WIDTH-1 downto 0)
-   );
-end entity sh_reg_bus;
+        DIN      : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        CE       : in  std_logic;
+        DOUT     : out std_logic_vector(DATA_WIDTH-1 downto 0)
+    );
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
-architecture behavioral of sh_reg_bus is
+architecture BEHAVIORAL of SH_REG_BUS is
 
 begin
 
 
- SH_REG_BUS : entity work.SH_REG_BASE_STATIC
-   generic map(
-     DATA_WIDTH => DATA_WIDTH,
-     NUM_BITS   => NUM_BITS,
-     INIT_TYPE  => 1,
-     INIT       => INIT & INIT_EXT00,
-     IS_CLK_INVERTED => '0'
-   )
-   port map(
-     CLK => CLK,
-     CE  => CE,
+    sh_reg_bus : entity work.SH_REG_BASE_STATIC
+    generic map (
+        DATA_WIDTH      => DATA_WIDTH,
+        NUM_BITS        => NUM_BITS,
+        INIT_TYPE       => 1,
+        INIT            => INIT & INIT_EXT00,
+        IS_CLK_INVERTED => '0'
+    )
+    port map (
+        CLK => CLK,
+        CE  => CE,
 
-     DIN  => DIN,
-     DOUT => DOUT
-   );
+        DIN  => DIN,
+        DOUT => DOUT
+    );
 
-end architecture behavioral;
+end architecture;
 

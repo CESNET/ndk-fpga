@@ -52,33 +52,33 @@ begin
     --  40GE version
     -- =========================================================================
 
-     ETH_PHY_40: entity work.phy_40ge
-     generic map (
-         DEVICE    => "ULTRASCALE",
-         CLK_SLAVE => false
-     )
-     port map (
-        RESET      => MI_RESET_PHY, --RESET_ETH cannot be used, because it is eth_clk synchronous
-        DRPCLK     => MI_CLK_PHY,
-        CLK_STABLE => ethclk_stable,
+    eth_phy_40: entity work.PHY_40GE
+    generic map (
+        DEVICE    => "ULTRASCALE",
+        CLK_SLAVE => false
+    )
+    port map (
+        RESET        => MI_RESET_PHY, -- RESET_ETH cannot be used, because it is eth_clk synchronous
+        DRPCLK       => MI_CLK_PHY,
+        CLK_STABLE   => ethclk_stable,
         -- XLGMII interface
-        XLGMII_CLK => eth_clk_156m,
-        XLGMII_TXD => eth_txd(255 downto 0),
-        XLGMII_TXC => eth_txc(31 downto 0),
-        XLGMII_RXD => eth_rxd(255 downto 0),
-        XLGMII_RXC => eth_rxc(31 downto 0),
+        XLGMII_CLK   => eth_clk_156m,
+        XLGMII_TXD   => eth_txd(255 downto 0),
+        XLGMII_TXC   => eth_txc(31 downto 0),
+        XLGMII_RXD   => eth_rxd(255 downto 0),
+        XLGMII_RXC   => eth_rxc(31 downto 0),
         -- Transceiver reference clocks
-        REFCLK_P   => QSFP_REFCLK_P,
-        REFCLK_N   => QSFP_REFCLK_N,
-        REFCLK_OUT => open,
+        REFCLK_P     => QSFP_REFCLK_P,
+        REFCLK_N     => QSFP_REFCLK_N,
+        REFCLK_OUT   => open,
         -- Serial ports - receive
-        RXN        => QSFP_RX_N(3 downto 0),
-        RXP        => QSFP_RX_P(3 downto 0),
-        TXN        => QSFP_TX_N(3 downto 0),
-        TXP        => QSFP_TX_P(3 downto 0),
+        RXN          => QSFP_RX_N(3 downto 0),
+        RXP          => QSFP_RX_P(3 downto 0),
+        TXN          => QSFP_TX_N(3 downto 0),
+        TXP          => QSFP_TX_P(3 downto 0),
         --
-        RXPOLARITY => LANE_RX_POLARITY,
-        TXPOLARITY => LANE_TX_POLARITY,
+        RXPOLARITY   => LANE_RX_POLARITY,
+        TXPOLARITY   => LANE_TX_POLARITY,
         -- Management (MI32)
         MI_RESET     => MI_RESET_PHY,
         MI_CLK       => MI_CLK_PHY,
@@ -167,6 +167,6 @@ begin
         MII_TXC    => eth_txc,
         MII_VLD    => open,
         MII_RDY    => '1'
-   );
+    );
 
 end architecture;

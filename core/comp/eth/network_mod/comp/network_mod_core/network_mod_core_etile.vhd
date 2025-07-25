@@ -34,375 +34,375 @@ architecture ETILE of NETWORK_MOD_CORE is
     -- =========================================================================
     -- 100g1
     component etile_eth_1x100g is
-    generic (
-        am_encoding40g_0              : integer := 9467463;
-        am_encoding40g_1              : integer := 15779046;
-        am_encoding40g_2              : integer := 12936603;
-        am_encoding40g_3              : integer := 10647869;
-        enforce_max_frame_size        : string  := "disable";
-        flow_control                  : string  := "both_no_xoff";
-        flow_control_holdoff_mode     : string  := "uniform";
-        forward_rx_pause_requests     : string  := "disable";
-        hi_ber_monitor                : string  := "enable";
-        holdoff_quanta                : integer := 65535;
-        ipg_removed_per_am_period     : integer := 20;
-        link_fault_mode               : string  := "lf_bidir";
-        pause_quanta                  : integer := 65535;
-        pfc_holdoff_quanta_0          : integer := 65535;
-        pfc_holdoff_quanta_1          : integer := 65535;
-        pfc_holdoff_quanta_2          : integer := 65535;
-        pfc_holdoff_quanta_3          : integer := 65535;
-        pfc_holdoff_quanta_4          : integer := 65535;
-        pfc_holdoff_quanta_5          : integer := 65535;
-        pfc_holdoff_quanta_6          : integer := 65535;
-        pfc_holdoff_quanta_7          : integer := 65535;
-        pfc_pause_quanta_0            : integer := 65535;
-        pfc_pause_quanta_1            : integer := 65535;
-        pfc_pause_quanta_2            : integer := 65535;
-        pfc_pause_quanta_3            : integer := 65535;
-        pfc_pause_quanta_4            : integer := 65535;
-        pfc_pause_quanta_5            : integer := 65535;
-        pfc_pause_quanta_6            : integer := 65535;
-        pfc_pause_quanta_7            : integer := 65535;
-        remove_pads                   : string  := "disable";
-        rx_length_checking            : string  := "disable";
-        rx_max_frame_size             : integer := 16383;
-        rx_pause_daddr                : string  := "17483607389996";
-        rx_pcs_max_skew               : integer := 47;
-        rx_vlan_detection             : string  := "disable";
-        rxcrc_covers_preamble         : string  := "disable";
-        sim_mode                      : string  := "enable";
-        source_address_insertion      : string  := "disable";
-        strict_preamble_checking      : string  := "disable";
-        strict_sfd_checking           : string  := "disable";
-        tx_ipg_size                   : string  := "ipg_12";
-        tx_max_frame_size             : integer := 16383;
-        tx_pause_daddr                : string  := "1652522221569";
-        tx_pause_saddr                : string  := "247393538562781";
-        tx_pld_fifo_almost_full_level : integer := 16;
-        tx_vlan_detection             : string  := "disable";
-        txcrc_covers_preamble         : string  := "disable";
-        txmac_saddr                   : string  := "73588229205";
-        uniform_holdoff_quanta        : integer := 51090;
-        flow_control_sl_0             : string  := "both_no_xoff"
-    );
-    port (
-        i_stats_snapshot              : in  std_logic                      := 'X';             -- i_stats_snapshot
-        o_cdr_lock                    : out std_logic_vector(0 downto 0);                      -- o_cdr_lock
-        o_tx_pll_locked               : out std_logic_vector(0 downto 0);                      -- o_tx_pll_locked
-        i_eth_reconfig_addr           : in  std_logic_vector(20 downto 0)  := (others => 'X'); -- i_eth_reconfig_addr
-        i_eth_reconfig_read           : in  std_logic                      := 'X';             -- i_eth_reconfig_read
-        i_eth_reconfig_write          : in  std_logic                      := 'X';             -- i_eth_reconfig_write
-        o_eth_reconfig_readdata       : out std_logic_vector(31 downto 0);                     -- o_eth_reconfig_readdata
-        o_eth_reconfig_readdata_valid : out std_logic;                                         -- o_eth_reconfig_readdata_valid
-        i_eth_reconfig_writedata      : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- i_eth_reconfig_writedata
-        o_eth_reconfig_waitrequest    : out std_logic;                                         -- o_eth_reconfig_waitrequest
-        i_rsfec_reconfig_addr         : in  std_logic_vector(10 downto 0)  := (others => 'X'); -- i_rsfec_reconfig_addr
-        i_rsfec_reconfig_read         : in  std_logic                      := 'X';             -- i_rsfec_reconfig_read
-        i_rsfec_reconfig_write        : in  std_logic                      := 'X';             -- i_rsfec_reconfig_write
-        o_rsfec_reconfig_readdata     : out std_logic_vector(7 downto 0);                      -- o_rsfec_reconfig_readdata
-        i_rsfec_reconfig_writedata    : in  std_logic_vector(7 downto 0)   := (others => 'X'); -- i_rsfec_reconfig_writedata
-        o_rsfec_reconfig_waitrequest  : out std_logic;                                         -- o_rsfec_reconfig_waitrequest
-        o_tx_lanes_stable             : out std_logic;                                         -- o_tx_lanes_stable
-        o_rx_pcs_ready                : out std_logic;                                         -- o_rx_pcs_ready
-        o_ehip_ready                  : out std_logic;                                         -- o_ehip_ready
-        o_rx_block_lock               : out std_logic;                                         -- o_rx_block_lock
-        o_rx_am_lock                  : out std_logic;                                         -- o_rx_am_lock
-        o_rx_hi_ber                   : out std_logic;                                         -- o_rx_hi_ber
-        o_local_fault_status          : out std_logic;                                         -- o_local_fault_status
-        o_remote_fault_status         : out std_logic;                                         -- o_remote_fault_status
-        i_clk_ref                     : in  std_logic_vector(0 downto 0)   := (others => 'X'); -- i_clk_ref
-        i_clk_tx                      : in  std_logic                      := 'X';             -- clk
-        i_clk_rx                      : in  std_logic                      := 'X';             -- clk
-        o_clk_pll_div64               : out std_logic_vector(0 downto 0);                      -- o_clk_pll_div64
-        o_clk_pll_div66               : out std_logic_vector(0 downto 0);                      -- o_clk_pll_div66
-        o_clk_rec_div64               : out std_logic_vector(0 downto 0);                      -- o_clk_rec_div64
-        o_clk_rec_div66               : out std_logic_vector(0 downto 0);                      -- o_clk_rec_div66
-        i_csr_rst_n                   : in  std_logic                      := 'X';             -- reset
-        i_tx_rst_n                    : in  std_logic                      := 'X';             -- i_tx_rst_n
-        i_rx_rst_n                    : in  std_logic                      := 'X';             -- i_rx_rst_n
-        o_tx_serial                   : out std_logic_vector(3 downto 0);                      -- o_tx_serial
-        i_rx_serial                   : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_rx_serial
-        o_tx_serial_n                 : out std_logic_vector(3 downto 0);                      -- o_tx_serial_n
-        i_rx_serial_n                 : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_rx_serial_n
-        i_reconfig_clk                : in  std_logic                      := 'X';             -- clk
-        i_reconfig_reset              : in  std_logic                      := 'X';             -- i_reconfig_reset
-        i_xcvr_reconfig_address       : in  std_logic_vector(75 downto 0)  := (others => 'X'); -- i_xcvr_reconfig_address
-        i_xcvr_reconfig_read          : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_xcvr_reconfig_read
-        i_xcvr_reconfig_write         : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_xcvr_reconfig_write
-        o_xcvr_reconfig_readdata      : out std_logic_vector(31 downto 0);                     -- o_xcvr_reconfig_readdata
-        i_xcvr_reconfig_writedata     : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- i_xcvr_reconfig_writedata
-        o_xcvr_reconfig_waitrequest   : out std_logic_vector(3 downto 0);                      -- o_xcvr_reconfig_waitrequest
-        o_tx_ready                    : out std_logic;                                         -- o_tx_ready
-        i_tx_valid                    : in  std_logic                      := 'X';             -- i_tx_valid
-        i_tx_data                     : in  std_logic_vector(511 downto 0) := (others => 'X'); -- i_tx_data
-        i_tx_error                    : in  std_logic                      := 'X';             -- i_tx_error
-        i_tx_startofpacket            : in  std_logic                      := 'X';             -- i_tx_startofpacket
-        i_tx_endofpacket              : in  std_logic                      := 'X';             -- i_tx_endofpacket
-        i_tx_empty                    : in  std_logic_vector(5 downto 0)   := (others => 'X'); -- i_tx_empty
-        i_tx_skip_crc                 : in  std_logic                      := 'X';             -- i_tx_skip_crc
-        o_rx_valid                    : out std_logic;                                         -- o_rx_valid
-        o_rx_data                     : out std_logic_vector(511 downto 0);                    -- o_rx_data
-        o_rx_startofpacket            : out std_logic;                                         -- o_rx_startofpacket
-        o_rx_endofpacket              : out std_logic;                                         -- o_rx_endofpacket
-        o_rx_empty                    : out std_logic_vector(5 downto 0);                      -- o_rx_empty
-        o_rx_error                    : out std_logic_vector(5 downto 0);                      -- o_rx_error
-        o_rxstatus_data               : out std_logic_vector(39 downto 0);                     -- o_rxstatus_data
-        o_rxstatus_valid              : out std_logic;                                         -- o_rxstatus_valid
-        i_tx_pfc                      : in  std_logic_vector(7 downto 0)   := (others => 'X'); -- i_tx_pfc
-        o_rx_pfc                      : out std_logic_vector(7 downto 0);                      -- o_rx_pfc
-        i_tx_pause                    : in  std_logic                      := 'X';             -- i_tx_pause
-        o_rx_pause                    : out std_logic                                          -- o_rx_pause
-    );
-    end component etile_eth_1x100g;
+        generic (
+            AM_ENCODING40G_0              : integer := 9467463;
+            AM_ENCODING40G_1              : integer := 15779046;
+            AM_ENCODING40G_2              : integer := 12936603;
+            AM_ENCODING40G_3              : integer := 10647869;
+            ENFORCE_MAX_FRAME_SIZE        : string  := "disable";
+            FLOW_CONTROL                  : string  := "both_no_xoff";
+            FLOW_CONTROL_HOLDOFF_MODE     : string  := "uniform";
+            FORWARD_RX_PAUSE_REQUESTS     : string  := "disable";
+            HI_BER_MONITOR                : string  := "enable";
+            HOLDOFF_QUANTA                : integer := 65535;
+            IPG_REMOVED_PER_AM_PERIOD     : integer := 20;
+            LINK_FAULT_MODE               : string  := "lf_bidir";
+            PAUSE_QUANTA                  : integer := 65535;
+            PFC_HOLDOFF_QUANTA_0          : integer := 65535;
+            PFC_HOLDOFF_QUANTA_1          : integer := 65535;
+            PFC_HOLDOFF_QUANTA_2          : integer := 65535;
+            PFC_HOLDOFF_QUANTA_3          : integer := 65535;
+            PFC_HOLDOFF_QUANTA_4          : integer := 65535;
+            PFC_HOLDOFF_QUANTA_5          : integer := 65535;
+            PFC_HOLDOFF_QUANTA_6          : integer := 65535;
+            PFC_HOLDOFF_QUANTA_7          : integer := 65535;
+            PFC_PAUSE_QUANTA_0            : integer := 65535;
+            PFC_PAUSE_QUANTA_1            : integer := 65535;
+            PFC_PAUSE_QUANTA_2            : integer := 65535;
+            PFC_PAUSE_QUANTA_3            : integer := 65535;
+            PFC_PAUSE_QUANTA_4            : integer := 65535;
+            PFC_PAUSE_QUANTA_5            : integer := 65535;
+            PFC_PAUSE_QUANTA_6            : integer := 65535;
+            PFC_PAUSE_QUANTA_7            : integer := 65535;
+            REMOVE_PADS                   : string  := "disable";
+            RX_LENGTH_CHECKING            : string  := "disable";
+            RX_MAX_FRAME_SIZE             : integer := 16383;
+            RX_PAUSE_DADDR                : string  := "17483607389996";
+            RX_PCS_MAX_SKEW               : integer := 47;
+            RX_VLAN_DETECTION             : string  := "disable";
+            RXCRC_COVERS_PREAMBLE         : string  := "disable";
+            SIM_MODE                      : string  := "enable";
+            SOURCE_ADDRESS_INSERTION      : string  := "disable";
+            STRICT_PREAMBLE_CHECKING      : string  := "disable";
+            STRICT_SFD_CHECKING           : string  := "disable";
+            TX_IPG_SIZE                   : string  := "ipg_12";
+            TX_MAX_FRAME_SIZE             : integer := 16383;
+            TX_PAUSE_DADDR                : string  := "1652522221569";
+            TX_PAUSE_SADDR                : string  := "247393538562781";
+            TX_PLD_FIFO_ALMOST_FULL_LEVEL : integer := 16;
+            TX_VLAN_DETECTION             : string  := "disable";
+            TXCRC_COVERS_PREAMBLE         : string  := "disable";
+            TXMAC_SADDR                   : string  := "73588229205";
+            UNIFORM_HOLDOFF_QUANTA        : integer := 51090;
+            FLOW_CONTROL_SL_0             : string  := "both_no_xoff"
+        );
+        port (
+            I_STATS_SNAPSHOT              : in  std_logic                      := 'X';
+            O_CDR_LOCK                    : out std_logic_vector(0 downto 0);
+            O_TX_PLL_LOCKED               : out std_logic_vector(0 downto 0);
+            I_ETH_RECONFIG_ADDR           : in  std_logic_vector(20 downto 0)  := (others => 'X');
+            I_ETH_RECONFIG_READ           : in  std_logic                      := 'X';
+            I_ETH_RECONFIG_WRITE          : in  std_logic                      := 'X';
+            O_ETH_RECONFIG_READDATA       : out std_logic_vector(31 downto 0);
+            O_ETH_RECONFIG_READDATA_VALID : out std_logic;
+            I_ETH_RECONFIG_WRITEDATA      : in  std_logic_vector(31 downto 0)  := (others => 'X');
+            O_ETH_RECONFIG_WAITREQUEST    : out std_logic;
+            I_RSFEC_RECONFIG_ADDR         : in  std_logic_vector(10 downto 0)  := (others => 'X');
+            I_RSFEC_RECONFIG_READ         : in  std_logic                      := 'X';
+            I_RSFEC_RECONFIG_WRITE        : in  std_logic                      := 'X';
+            O_RSFEC_RECONFIG_READDATA     : out std_logic_vector(7 downto 0);
+            I_RSFEC_RECONFIG_WRITEDATA    : in  std_logic_vector(7 downto 0)   := (others => 'X');
+            O_RSFEC_RECONFIG_WAITREQUEST  : out std_logic;
+            O_TX_LANES_STABLE             : out std_logic;
+            O_RX_PCS_READY                : out std_logic;
+            O_EHIP_READY                  : out std_logic;
+            O_RX_BLOCK_LOCK               : out std_logic;
+            O_RX_AM_LOCK                  : out std_logic;
+            O_RX_HI_BER                   : out std_logic;
+            O_LOCAL_FAULT_STATUS          : out std_logic;
+            O_REMOTE_FAULT_STATUS         : out std_logic;
+            I_CLK_REF                     : in  std_logic_vector(0 downto 0)   := (others => 'X');
+            I_CLK_TX                      : in  std_logic                      := 'X';
+            I_CLK_RX                      : in  std_logic                      := 'X';
+            O_CLK_PLL_DIV64               : out std_logic_vector(0 downto 0);
+            O_CLK_PLL_DIV66               : out std_logic_vector(0 downto 0);
+            O_CLK_REC_DIV64               : out std_logic_vector(0 downto 0);
+            O_CLK_REC_DIV66               : out std_logic_vector(0 downto 0);
+            I_CSR_RST_N                   : in  std_logic                      := 'X';
+            I_TX_RST_N                    : in  std_logic                      := 'X';
+            I_RX_RST_N                    : in  std_logic                      := 'X';
+            O_TX_SERIAL                   : out std_logic_vector(3 downto 0);
+            I_RX_SERIAL                   : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_TX_SERIAL_N                 : out std_logic_vector(3 downto 0);
+            I_RX_SERIAL_N                 : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_RECONFIG_CLK                : in  std_logic                      := 'X';
+            I_RECONFIG_RESET              : in  std_logic                      := 'X';
+            I_XCVR_RECONFIG_ADDRESS       : in  std_logic_vector(75 downto 0)  := (others => 'X');
+            I_XCVR_RECONFIG_READ          : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_XCVR_RECONFIG_WRITE         : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_XCVR_RECONFIG_READDATA      : out std_logic_vector(31 downto 0);
+            I_XCVR_RECONFIG_WRITEDATA     : in  std_logic_vector(31 downto 0)  := (others => 'X');
+            O_XCVR_RECONFIG_WAITREQUEST   : out std_logic_vector(3 downto 0);
+            O_TX_READY                    : out std_logic;
+            I_TX_VALID                    : in  std_logic                      := 'X';
+            I_TX_DATA                     : in  std_logic_vector(511 downto 0) := (others => 'X');
+            I_TX_ERROR                    : in  std_logic                      := 'X';
+            I_TX_STARTOFPACKET            : in  std_logic                      := 'X';
+            I_TX_ENDOFPACKET              : in  std_logic                      := 'X';
+            I_TX_EMPTY                    : in  std_logic_vector(5 downto 0)   := (others => 'X');
+            I_TX_SKIP_CRC                 : in  std_logic                      := 'X';
+            O_RX_VALID                    : out std_logic;
+            O_RX_DATA                     : out std_logic_vector(511 downto 0);
+            O_RX_STARTOFPACKET            : out std_logic;
+            O_RX_ENDOFPACKET              : out std_logic;
+            O_RX_EMPTY                    : out std_logic_vector(5 downto 0);
+            O_RX_ERROR                    : out std_logic_vector(5 downto 0);
+            O_RXSTATUS_DATA               : out std_logic_vector(39 downto 0);
+            O_RXSTATUS_VALID              : out std_logic;
+            I_TX_PFC                      : in  std_logic_vector(7 downto 0)   := (others => 'X');
+            O_RX_PFC                      : out std_logic_vector(7 downto 0);
+            I_TX_PAUSE                    : in  std_logic                      := 'X';
+            O_RX_PAUSE                    : out std_logic
+        );
+    end component;
 
     -- 25g4
     component etile_eth_4x25g is
-    generic (
-        am_encoding40g_0              : integer := 9467463;
-        am_encoding40g_1              : integer := 15779046;
-        am_encoding40g_2              : integer := 12936603;
-        am_encoding40g_3              : integer := 10647869;
-        enforce_max_frame_size        : string  := "disable";
-        flow_control                  : string  := "both_no_xoff";
-        flow_control_holdoff_mode     : string  := "uniform";
-        forward_rx_pause_requests     : string  := "disable";
-        hi_ber_monitor                : string  := "enable";
-        holdoff_quanta                : integer := 65535;
-        ipg_removed_per_am_period     : integer := 20;
-        link_fault_mode               : string  := "lf_bidir";
-        pause_quanta                  : integer := 65535;
-        pfc_holdoff_quanta_0          : integer := 32768;
-        pfc_holdoff_quanta_1          : integer := 32768;
-        pfc_holdoff_quanta_2          : integer := 32768;
-        pfc_holdoff_quanta_3          : integer := 32768;
-        pfc_holdoff_quanta_4          : integer := 32768;
-        pfc_holdoff_quanta_5          : integer := 32768;
-        pfc_holdoff_quanta_6          : integer := 32768;
-        pfc_holdoff_quanta_7          : integer := 32768;
-        pfc_pause_quanta_0            : integer := 65535;
-        pfc_pause_quanta_1            : integer := 65535;
-        pfc_pause_quanta_2            : integer := 65535;
-        pfc_pause_quanta_3            : integer := 65535;
-        pfc_pause_quanta_4            : integer := 65535;
-        pfc_pause_quanta_5            : integer := 65535;
-        pfc_pause_quanta_6            : integer := 65535;
-        pfc_pause_quanta_7            : integer := 65535;
-        remove_pads                   : string  := "disable";
-        rx_length_checking            : string  := "disable";
-        rx_max_frame_size             : integer := 16383;
-        rx_pause_daddr                : string  := "17483607389996";
-        rx_pcs_max_skew               : integer := 47;
-        rx_vlan_detection             : string  := "disable";
-        rxcrc_covers_preamble         : string  := "disable";
-        sim_mode                      : string  := "enable";
-        source_address_insertion      : string  := "disable";
-        strict_preamble_checking      : string  := "disable";
-        strict_sfd_checking           : string  := "disable";
-        tx_ipg_size                   : string  := "ipg_12";
-        tx_max_frame_size             : integer := 16383;
-        tx_pause_daddr                : string  := "1652522221569";
-        tx_pause_saddr                : string  := "73588229205";
-        tx_pld_fifo_almost_full_level : integer := 16;
-        tx_vlan_detection             : string  := "disable";
-        txcrc_covers_preamble         : string  := "disable";
-        txmac_saddr                   : string  := "73588229205";
-        uniform_holdoff_quanta        : integer := 51090;
-        flow_control_sl_0             : string  := "both_no_xoff"
-    );
-    port (
-        o_cdr_lock                       : out std_logic_vector(3 downto 0);                      -- o_cdr_lock
-        o_tx_pll_locked                  : out std_logic_vector(3 downto 0);                      -- o_tx_pll_locked
-        i_rsfec_reconfig_addr            : in  std_logic_vector(10 downto 0)  := (others => 'X'); -- i_rsfec_reconfig_addr
-        i_rsfec_reconfig_read            : in  std_logic                      := 'X';             -- i_rsfec_reconfig_read
-        i_rsfec_reconfig_write           : in  std_logic                      := 'X';             -- i_rsfec_reconfig_write
-        o_rsfec_reconfig_readdata        : out std_logic_vector(7 downto 0);                      -- o_rsfec_reconfig_readdata
-        i_rsfec_reconfig_writedata       : in  std_logic_vector(7 downto 0)   := (others => 'X'); -- i_rsfec_reconfig_writedata
-        o_rsfec_reconfig_waitrequest     : out std_logic;                                         -- o_rsfec_reconfig_waitrequest
-        i_clk_ref                        : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_clk_ref
-        o_clk_pll_div64                  : out std_logic_vector(3 downto 0);                      -- o_clk_pll_div64
-        o_clk_pll_div66                  : out std_logic_vector(3 downto 0);                      -- o_clk_pll_div66
-        o_clk_rec_div64                  : out std_logic_vector(3 downto 0);                      -- o_clk_rec_div64
-        o_clk_rec_div66                  : out std_logic_vector(3 downto 0);                      -- o_clk_rec_div66
-        o_tx_serial                      : out std_logic_vector(3 downto 0);                      -- o_tx_serial
-        i_rx_serial                      : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_rx_serial
-        o_tx_serial_n                    : out std_logic_vector(3 downto 0);                      -- o_tx_serial_n
-        i_rx_serial_n                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_rx_serial_n
-        i_reconfig_clk                   : in  std_logic                      := 'X';             -- clk
-        i_reconfig_reset                 : in  std_logic                      := 'X';             -- i_reconfig_reset
-        i_xcvr_reconfig_address          : in  std_logic_vector(75 downto 0)  := (others => 'X'); -- i_xcvr_reconfig_address
-        i_xcvr_reconfig_read             : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_xcvr_reconfig_read
-        i_xcvr_reconfig_write            : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_xcvr_reconfig_write
-        o_xcvr_reconfig_readdata         : out std_logic_vector(31 downto 0);                     -- o_xcvr_reconfig_readdata
-        i_xcvr_reconfig_writedata        : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- i_xcvr_reconfig_writedata
-        o_xcvr_reconfig_waitrequest      : out std_logic_vector(3 downto 0);                      -- o_xcvr_reconfig_waitrequest
-        i_sl_stats_snapshot              : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_stats_snapshot
-        o_sl_rx_hi_ber                   : out std_logic_vector(3 downto 0);                      -- o_sl_rx_hi_ber
-        i_sl_eth_reconfig_addr           : in  std_logic_vector(75 downto 0)  := (others => 'X'); -- i_sl_eth_reconfig_addr
-        i_sl_eth_reconfig_read           : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_eth_reconfig_read
-        i_sl_eth_reconfig_write          : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_eth_reconfig_write
-        o_sl_eth_reconfig_readdata       : out std_logic_vector(127 downto 0);                    -- o_sl_eth_reconfig_readdata
-        o_sl_eth_reconfig_readdata_valid : out std_logic_vector(3 downto 0);                      -- o_sl_eth_reconfig_readdata_valid
-        i_sl_eth_reconfig_writedata      : in  std_logic_vector(127 downto 0) := (others => 'X'); -- i_sl_eth_reconfig_writedata
-        o_sl_eth_reconfig_waitrequest    : out std_logic_vector(3 downto 0);                      -- o_sl_eth_reconfig_waitrequest
-        o_sl_tx_lanes_stable             : out std_logic_vector(3 downto 0);                      -- o_sl_tx_lanes_stable
-        o_sl_rx_pcs_ready                : out std_logic_vector(3 downto 0);                      -- o_sl_rx_pcs_ready
-        o_sl_ehip_ready                  : out std_logic_vector(3 downto 0);                      -- o_sl_ehip_ready
-        o_sl_rx_block_lock               : out std_logic_vector(3 downto 0);                      -- o_sl_rx_block_lock
-        o_sl_local_fault_status          : out std_logic_vector(3 downto 0);                      -- o_sl_local_fault_status
-        o_sl_remote_fault_status         : out std_logic_vector(3 downto 0);                      -- o_sl_remote_fault_status
-        i_sl_clk_tx                      : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_clk_tx
-        i_sl_clk_rx                      : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_clk_rx
-        i_sl_csr_rst_n                   : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_csr_rst_n
-        i_sl_tx_rst_n                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_rst_n
-        i_sl_rx_rst_n                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_rx_rst_n
-        o_sl_txfifo_pfull                : out std_logic_vector(3 downto 0);                      -- o_sl_txfifo_pfull
-        o_sl_txfifo_pempty               : out std_logic_vector(3 downto 0);                      -- o_sl_txfifo_pempty
-        o_sl_txfifo_overflow             : out std_logic_vector(3 downto 0);                      -- o_sl_txfifo_overflow
-        o_sl_txfifo_underflow            : out std_logic_vector(3 downto 0);                      -- o_sl_txfifo_underflow
-        o_sl_tx_ready                    : out std_logic_vector(3 downto 0);                      -- o_sl_tx_ready
-        o_sl_rx_valid                    : out std_logic_vector(3 downto 0);                      -- o_sl_rx_valid
-        i_sl_tx_valid                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_valid
-        i_sl_tx_data                     : in  std_logic_vector(255 downto 0) := (others => 'X'); -- i_sl_tx_data
-        o_sl_rx_data                     : out std_logic_vector(255 downto 0);                    -- o_sl_rx_data
-        i_sl_tx_error                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_error
-        i_sl_tx_startofpacket            : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_startofpacket
-        i_sl_tx_endofpacket              : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_endofpacket
-        i_sl_tx_empty                    : in  std_logic_vector(11 downto 0)  := (others => 'X'); -- i_sl_tx_empty
-        i_sl_tx_skip_crc                 : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_skip_crc
-        o_sl_rx_startofpacket            : out std_logic_vector(3 downto 0);                      -- o_sl_rx_startofpacket
-        o_sl_rx_endofpacket              : out std_logic_vector(3 downto 0);                      -- o_sl_rx_endofpacket
-        o_sl_rx_empty                    : out std_logic_vector(11 downto 0);                     -- o_sl_rx_empty
-        o_sl_rx_error                    : out std_logic_vector(23 downto 0);                     -- o_sl_rx_error
-        o_sl_rxstatus_data               : out std_logic_vector(159 downto 0);                    -- o_sl_rxstatus_data
-        o_sl_rxstatus_valid              : out std_logic_vector(3 downto 0);                      -- o_sl_rxstatus_valid
-        i_sl_tx_pfc                      : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- i_sl_tx_pfc
-        o_sl_rx_pfc                      : out std_logic_vector(31 downto 0);                     -- o_sl_rx_pfc
-        i_sl_tx_pause                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_pause
-        o_sl_rx_pause                    : out std_logic_vector(3 downto 0)                       -- o_sl_rx_pause
-    );
-    end component etile_eth_4x25g;
+        generic (
+            AM_ENCODING40G_0              : integer := 9467463;
+            AM_ENCODING40G_1              : integer := 15779046;
+            AM_ENCODING40G_2              : integer := 12936603;
+            AM_ENCODING40G_3              : integer := 10647869;
+            ENFORCE_MAX_FRAME_SIZE        : string  := "disable";
+            FLOW_CONTROL                  : string  := "both_no_xoff";
+            FLOW_CONTROL_HOLDOFF_MODE     : string  := "uniform";
+            FORWARD_RX_PAUSE_REQUESTS     : string  := "disable";
+            HI_BER_MONITOR                : string  := "enable";
+            HOLDOFF_QUANTA                : integer := 65535;
+            IPG_REMOVED_PER_AM_PERIOD     : integer := 20;
+            LINK_FAULT_MODE               : string  := "lf_bidir";
+            PAUSE_QUANTA                  : integer := 65535;
+            PFC_HOLDOFF_QUANTA_0          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_1          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_2          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_3          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_4          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_5          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_6          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_7          : integer := 32768;
+            PFC_PAUSE_QUANTA_0            : integer := 65535;
+            PFC_PAUSE_QUANTA_1            : integer := 65535;
+            PFC_PAUSE_QUANTA_2            : integer := 65535;
+            PFC_PAUSE_QUANTA_3            : integer := 65535;
+            PFC_PAUSE_QUANTA_4            : integer := 65535;
+            PFC_PAUSE_QUANTA_5            : integer := 65535;
+            PFC_PAUSE_QUANTA_6            : integer := 65535;
+            PFC_PAUSE_QUANTA_7            : integer := 65535;
+            REMOVE_PADS                   : string  := "disable";
+            RX_LENGTH_CHECKING            : string  := "disable";
+            RX_MAX_FRAME_SIZE             : integer := 16383;
+            RX_PAUSE_DADDR                : string  := "17483607389996";
+            RX_PCS_MAX_SKEW               : integer := 47;
+            RX_VLAN_DETECTION             : string  := "disable";
+            RXCRC_COVERS_PREAMBLE         : string  := "disable";
+            SIM_MODE                      : string  := "enable";
+            SOURCE_ADDRESS_INSERTION      : string  := "disable";
+            STRICT_PREAMBLE_CHECKING      : string  := "disable";
+            STRICT_SFD_CHECKING           : string  := "disable";
+            TX_IPG_SIZE                   : string  := "ipg_12";
+            TX_MAX_FRAME_SIZE             : integer := 16383;
+            TX_PAUSE_DADDR                : string  := "1652522221569";
+            TX_PAUSE_SADDR                : string  := "73588229205";
+            TX_PLD_FIFO_ALMOST_FULL_LEVEL : integer := 16;
+            TX_VLAN_DETECTION             : string  := "disable";
+            TXCRC_COVERS_PREAMBLE         : string  := "disable";
+            TXMAC_SADDR                   : string  := "73588229205";
+            UNIFORM_HOLDOFF_QUANTA        : integer := 51090;
+            FLOW_CONTROL_SL_0             : string  := "both_no_xoff"
+        );
+        port (
+            O_CDR_LOCK                       : out std_logic_vector(3 downto 0);
+            O_TX_PLL_LOCKED                  : out std_logic_vector(3 downto 0);
+            I_RSFEC_RECONFIG_ADDR            : in  std_logic_vector(10 downto 0)  := (others => 'X');
+            I_RSFEC_RECONFIG_READ            : in  std_logic                      := 'X';
+            I_RSFEC_RECONFIG_WRITE           : in  std_logic                      := 'X';
+            O_RSFEC_RECONFIG_READDATA        : out std_logic_vector(7 downto 0);
+            I_RSFEC_RECONFIG_WRITEDATA       : in  std_logic_vector(7 downto 0)   := (others => 'X');
+            O_RSFEC_RECONFIG_WAITREQUEST     : out std_logic;
+            I_CLK_REF                        : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_CLK_PLL_DIV64                  : out std_logic_vector(3 downto 0);
+            O_CLK_PLL_DIV66                  : out std_logic_vector(3 downto 0);
+            O_CLK_REC_DIV64                  : out std_logic_vector(3 downto 0);
+            O_CLK_REC_DIV66                  : out std_logic_vector(3 downto 0);
+            O_TX_SERIAL                      : out std_logic_vector(3 downto 0);
+            I_RX_SERIAL                      : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_TX_SERIAL_N                    : out std_logic_vector(3 downto 0);
+            I_RX_SERIAL_N                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_RECONFIG_CLK                   : in  std_logic                      := 'X';
+            I_RECONFIG_RESET                 : in  std_logic                      := 'X';
+            I_XCVR_RECONFIG_ADDRESS          : in  std_logic_vector(75 downto 0)  := (others => 'X');
+            I_XCVR_RECONFIG_READ             : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_XCVR_RECONFIG_WRITE            : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_XCVR_RECONFIG_READDATA         : out std_logic_vector(31 downto 0);
+            I_XCVR_RECONFIG_WRITEDATA        : in  std_logic_vector(31 downto 0)  := (others => 'X');
+            O_XCVR_RECONFIG_WAITREQUEST      : out std_logic_vector(3 downto 0);
+            I_SL_STATS_SNAPSHOT              : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_RX_HI_BER                   : out std_logic_vector(3 downto 0);
+            I_SL_ETH_RECONFIG_ADDR           : in  std_logic_vector(75 downto 0)  := (others => 'X');
+            I_SL_ETH_RECONFIG_READ           : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_ETH_RECONFIG_WRITE          : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_ETH_RECONFIG_READDATA       : out std_logic_vector(127 downto 0);
+            O_SL_ETH_RECONFIG_READDATA_VALID : out std_logic_vector(3 downto 0);
+            I_SL_ETH_RECONFIG_WRITEDATA      : in  std_logic_vector(127 downto 0) := (others => 'X');
+            O_SL_ETH_RECONFIG_WAITREQUEST    : out std_logic_vector(3 downto 0);
+            O_SL_TX_LANES_STABLE             : out std_logic_vector(3 downto 0);
+            O_SL_RX_PCS_READY                : out std_logic_vector(3 downto 0);
+            O_SL_EHIP_READY                  : out std_logic_vector(3 downto 0);
+            O_SL_RX_BLOCK_LOCK               : out std_logic_vector(3 downto 0);
+            O_SL_LOCAL_FAULT_STATUS          : out std_logic_vector(3 downto 0);
+            O_SL_REMOTE_FAULT_STATUS         : out std_logic_vector(3 downto 0);
+            I_SL_CLK_TX                      : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_CLK_RX                      : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_CSR_RST_N                   : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_RST_N                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_RX_RST_N                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_TXFIFO_PFULL                : out std_logic_vector(3 downto 0);
+            O_SL_TXFIFO_PEMPTY               : out std_logic_vector(3 downto 0);
+            O_SL_TXFIFO_OVERFLOW             : out std_logic_vector(3 downto 0);
+            O_SL_TXFIFO_UNDERFLOW            : out std_logic_vector(3 downto 0);
+            O_SL_TX_READY                    : out std_logic_vector(3 downto 0);
+            O_SL_RX_VALID                    : out std_logic_vector(3 downto 0);
+            I_SL_TX_VALID                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_DATA                     : in  std_logic_vector(255 downto 0) := (others => 'X');
+            O_SL_RX_DATA                     : out std_logic_vector(255 downto 0);
+            I_SL_TX_ERROR                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_STARTOFPACKET            : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_ENDOFPACKET              : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_EMPTY                    : in  std_logic_vector(11 downto 0)  := (others => 'X');
+            I_SL_TX_SKIP_CRC                 : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_RX_STARTOFPACKET            : out std_logic_vector(3 downto 0);
+            O_SL_RX_ENDOFPACKET              : out std_logic_vector(3 downto 0);
+            O_SL_RX_EMPTY                    : out std_logic_vector(11 downto 0);
+            O_SL_RX_ERROR                    : out std_logic_vector(23 downto 0);
+            O_SL_RXSTATUS_DATA               : out std_logic_vector(159 downto 0);
+            O_SL_RXSTATUS_VALID              : out std_logic_vector(3 downto 0);
+            I_SL_TX_PFC                      : in  std_logic_vector(31 downto 0)  := (others => 'X');
+            O_SL_RX_PFC                      : out std_logic_vector(31 downto 0);
+            I_SL_TX_PAUSE                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_RX_PAUSE                    : out std_logic_vector(3 downto 0)
+        );
+    end component;
 
     -- 10g4
     component etile_eth_4x10g is
-    generic (
-        am_encoding40g_0              : integer := 9467463;
-        am_encoding40g_1              : integer := 15779046;
-        am_encoding40g_2              : integer := 12936603;
-        am_encoding40g_3              : integer := 10647869;
-        enforce_max_frame_size        : string  := "disable";
-        flow_control                  : string  := "both_no_xoff";
-        flow_control_holdoff_mode     : string  := "per_queue";
-        forward_rx_pause_requests     : string  := "disable";
-        hi_ber_monitor                : string  := "enable";
-        holdoff_quanta                : integer := 65535;
-        ipg_removed_per_am_period     : integer := 20;
-        link_fault_mode               : string  := "lf_bidir";
-        pause_quanta                  : integer := 65535;
-        pfc_holdoff_quanta_0          : integer := 32768;
-        pfc_holdoff_quanta_1          : integer := 32768;
-        pfc_holdoff_quanta_2          : integer := 32768;
-        pfc_holdoff_quanta_3          : integer := 32768;
-        pfc_holdoff_quanta_4          : integer := 32768;
-        pfc_holdoff_quanta_5          : integer := 32768;
-        pfc_holdoff_quanta_6          : integer := 32768;
-        pfc_holdoff_quanta_7          : integer := 32768;
-        pfc_pause_quanta_0            : integer := 65535;
-        pfc_pause_quanta_1            : integer := 65535;
-        pfc_pause_quanta_2            : integer := 65535;
-        pfc_pause_quanta_3            : integer := 65535;
-        pfc_pause_quanta_4            : integer := 65535;
-        pfc_pause_quanta_5            : integer := 65535;
-        pfc_pause_quanta_6            : integer := 65535;
-        pfc_pause_quanta_7            : integer := 65535;
-        remove_pads                   : string  := "disable";
-        rx_length_checking            : string  := "enable";
-        rx_max_frame_size             : integer := 16383;
-        rx_pause_daddr                : string  := "1652522221569";
-        rx_pcs_max_skew               : integer := 47;
-        rx_vlan_detection             : string  := "disable";
-        rxcrc_covers_preamble         : string  := "disable";
-        sim_mode                      : string  := "enable";
-        source_address_insertion      : string  := "disable";
-        strict_preamble_checking      : string  := "disable";
-        strict_sfd_checking           : string  := "disable";
-        tx_ipg_size                   : string  := "ipg_12";
-        tx_max_frame_size             : integer := 16383;
-        tx_pause_daddr                : string  := "1652522221569";
-        tx_pause_saddr                : string  := "73588229205";
-        tx_pld_fifo_almost_full_level : integer := 16;
-        tx_vlan_detection             : string  := "disable";
-        txcrc_covers_preamble         : string  := "disable";
-        txmac_saddr                   : string  := "73588229205";
-        uniform_holdoff_quanta        : integer := 65535;
-        flow_control_sl_0             : string  := "both_no_xoff"
-    );
-    port (
-        o_cdr_lock                       : out std_logic_vector(3 downto 0);                      -- o_cdr_lock
-        o_tx_pll_locked                  : out std_logic_vector(3 downto 0);                      -- o_tx_pll_locked
-        i_clk_ref                        : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_clk_ref
-        o_clk_pll_div64                  : out std_logic_vector(3 downto 0);                      -- o_clk_pll_div64
-        o_clk_pll_div66                  : out std_logic_vector(3 downto 0);                      -- o_clk_pll_div66
-        o_clk_rec_div64                  : out std_logic_vector(3 downto 0);                      -- o_clk_rec_div64
-        o_clk_rec_div66                  : out std_logic_vector(3 downto 0);                      -- o_clk_rec_div66
-        o_tx_serial                      : out std_logic_vector(3 downto 0);                      -- o_tx_serial
-        i_rx_serial                      : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_rx_serial
-        o_tx_serial_n                    : out std_logic_vector(3 downto 0);                      -- o_tx_serial_n
-        i_rx_serial_n                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_rx_serial_n
-        i_reconfig_clk                   : in  std_logic                      := 'X';             -- clk
-        i_reconfig_reset                 : in  std_logic                      := 'X';             -- i_reconfig_reset
-        i_xcvr_reconfig_address          : in  std_logic_vector(75 downto 0)  := (others => 'X'); -- i_xcvr_reconfig_address
-        i_xcvr_reconfig_read             : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_xcvr_reconfig_read
-        i_xcvr_reconfig_write            : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_xcvr_reconfig_write
-        o_xcvr_reconfig_readdata         : out std_logic_vector(31 downto 0);                     -- o_xcvr_reconfig_readdata
-        i_xcvr_reconfig_writedata        : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- i_xcvr_reconfig_writedata
-        o_xcvr_reconfig_waitrequest      : out std_logic_vector(3 downto 0);                      -- o_xcvr_reconfig_waitrequest
-        i_sl_stats_snapshot              : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_stats_snapshot
-        o_sl_rx_hi_ber                   : out std_logic_vector(3 downto 0);                      -- o_sl_rx_hi_ber
-        i_sl_eth_reconfig_addr           : in  std_logic_vector(75 downto 0)  := (others => 'X'); -- i_sl_eth_reconfig_addr
-        i_sl_eth_reconfig_read           : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_eth_reconfig_read
-        i_sl_eth_reconfig_write          : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_eth_reconfig_write
-        o_sl_eth_reconfig_readdata       : out std_logic_vector(127 downto 0);                    -- o_sl_eth_reconfig_readdata
-        o_sl_eth_reconfig_readdata_valid : out std_logic_vector(3 downto 0);                      -- o_sl_eth_reconfig_readdata_valid
-        i_sl_eth_reconfig_writedata      : in  std_logic_vector(127 downto 0) := (others => 'X'); -- i_sl_eth_reconfig_writedata
-        o_sl_eth_reconfig_waitrequest    : out std_logic_vector(3 downto 0);                      -- o_sl_eth_reconfig_waitrequest
-        o_sl_tx_lanes_stable             : out std_logic_vector(3 downto 0);                      -- o_sl_tx_lanes_stable
-        o_sl_rx_pcs_ready                : out std_logic_vector(3 downto 0);                      -- o_sl_rx_pcs_ready
-        o_sl_ehip_ready                  : out std_logic_vector(3 downto 0);                      -- o_sl_ehip_ready
-        o_sl_rx_block_lock               : out std_logic_vector(3 downto 0);                      -- o_sl_rx_block_lock
-        o_sl_local_fault_status          : out std_logic_vector(3 downto 0);                      -- o_sl_local_fault_status
-        o_sl_remote_fault_status         : out std_logic_vector(3 downto 0);                      -- o_sl_remote_fault_status
-        i_sl_clk_tx                      : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_clk_tx
-        i_sl_clk_rx                      : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_clk_rx
-        i_sl_csr_rst_n                   : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_csr_rst_n
-        i_sl_tx_rst_n                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_rst_n
-        i_sl_rx_rst_n                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_rx_rst_n
-        o_sl_txfifo_pfull                : out std_logic_vector(3 downto 0);                      -- o_sl_txfifo_pfull
-        o_sl_txfifo_pempty               : out std_logic_vector(3 downto 0);                      -- o_sl_txfifo_pempty
-        o_sl_txfifo_overflow             : out std_logic_vector(3 downto 0);                      -- o_sl_txfifo_overflow
-        o_sl_txfifo_underflow            : out std_logic_vector(3 downto 0);                      -- o_sl_txfifo_underflow
-        o_sl_tx_ready                    : out std_logic_vector(3 downto 0);                      -- o_sl_tx_ready
-        o_sl_rx_valid                    : out std_logic_vector(3 downto 0);                      -- o_sl_rx_valid
-        i_sl_tx_valid                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_valid
-        i_sl_tx_data                     : in  std_logic_vector(255 downto 0) := (others => 'X'); -- i_sl_tx_data
-        o_sl_rx_data                     : out std_logic_vector(255 downto 0);                    -- o_sl_rx_data
-        i_sl_tx_error                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_error
-        i_sl_tx_startofpacket            : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_startofpacket
-        i_sl_tx_endofpacket              : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_endofpacket
-        i_sl_tx_empty                    : in  std_logic_vector(11 downto 0)  := (others => 'X'); -- i_sl_tx_empty
-        i_sl_tx_skip_crc                 : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_skip_crc
-        o_sl_rx_startofpacket            : out std_logic_vector(3 downto 0);                      -- o_sl_rx_startofpacket
-        o_sl_rx_endofpacket              : out std_logic_vector(3 downto 0);                      -- o_sl_rx_endofpacket
-        o_sl_rx_empty                    : out std_logic_vector(11 downto 0);                     -- o_sl_rx_empty
-        o_sl_rx_error                    : out std_logic_vector(23 downto 0);                     -- o_sl_rx_error
-        o_sl_rxstatus_data               : out std_logic_vector(159 downto 0);                    -- o_sl_rxstatus_data
-        o_sl_rxstatus_valid              : out std_logic_vector(3 downto 0);                      -- o_sl_rxstatus_valid
-        i_sl_tx_pfc                      : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- i_sl_tx_pfc
-        o_sl_rx_pfc                      : out std_logic_vector(31 downto 0);                     -- o_sl_rx_pfc
-        i_sl_tx_pause                    : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- i_sl_tx_pause
-        o_sl_rx_pause                    : out std_logic_vector(3 downto 0)                       -- o_sl_rx_pause
-    );
-    end component etile_eth_4x10g;
+        generic (
+            AM_ENCODING40G_0              : integer := 9467463;
+            AM_ENCODING40G_1              : integer := 15779046;
+            AM_ENCODING40G_2              : integer := 12936603;
+            AM_ENCODING40G_3              : integer := 10647869;
+            ENFORCE_MAX_FRAME_SIZE        : string  := "disable";
+            FLOW_CONTROL                  : string  := "both_no_xoff";
+            FLOW_CONTROL_HOLDOFF_MODE     : string  := "per_queue";
+            FORWARD_RX_PAUSE_REQUESTS     : string  := "disable";
+            HI_BER_MONITOR                : string  := "enable";
+            HOLDOFF_QUANTA                : integer := 65535;
+            IPG_REMOVED_PER_AM_PERIOD     : integer := 20;
+            LINK_FAULT_MODE               : string  := "lf_bidir";
+            PAUSE_QUANTA                  : integer := 65535;
+            PFC_HOLDOFF_QUANTA_0          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_1          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_2          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_3          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_4          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_5          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_6          : integer := 32768;
+            PFC_HOLDOFF_QUANTA_7          : integer := 32768;
+            PFC_PAUSE_QUANTA_0            : integer := 65535;
+            PFC_PAUSE_QUANTA_1            : integer := 65535;
+            PFC_PAUSE_QUANTA_2            : integer := 65535;
+            PFC_PAUSE_QUANTA_3            : integer := 65535;
+            PFC_PAUSE_QUANTA_4            : integer := 65535;
+            PFC_PAUSE_QUANTA_5            : integer := 65535;
+            PFC_PAUSE_QUANTA_6            : integer := 65535;
+            PFC_PAUSE_QUANTA_7            : integer := 65535;
+            REMOVE_PADS                   : string  := "disable";
+            RX_LENGTH_CHECKING            : string  := "enable";
+            RX_MAX_FRAME_SIZE             : integer := 16383;
+            RX_PAUSE_DADDR                : string  := "1652522221569";
+            RX_PCS_MAX_SKEW               : integer := 47;
+            RX_VLAN_DETECTION             : string  := "disable";
+            RXCRC_COVERS_PREAMBLE         : string  := "disable";
+            SIM_MODE                      : string  := "enable";
+            SOURCE_ADDRESS_INSERTION      : string  := "disable";
+            STRICT_PREAMBLE_CHECKING      : string  := "disable";
+            STRICT_SFD_CHECKING           : string  := "disable";
+            TX_IPG_SIZE                   : string  := "ipg_12";
+            TX_MAX_FRAME_SIZE             : integer := 16383;
+            TX_PAUSE_DADDR                : string  := "1652522221569";
+            TX_PAUSE_SADDR                : string  := "73588229205";
+            TX_PLD_FIFO_ALMOST_FULL_LEVEL : integer := 16;
+            TX_VLAN_DETECTION             : string  := "disable";
+            TXCRC_COVERS_PREAMBLE         : string  := "disable";
+            TXMAC_SADDR                   : string  := "73588229205";
+            UNIFORM_HOLDOFF_QUANTA        : integer := 65535;
+            FLOW_CONTROL_SL_0             : string  := "both_no_xoff"
+        );
+        port (
+            O_CDR_LOCK                       : out std_logic_vector(3 downto 0);
+            O_TX_PLL_LOCKED                  : out std_logic_vector(3 downto 0);
+            I_CLK_REF                        : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_CLK_PLL_DIV64                  : out std_logic_vector(3 downto 0);
+            O_CLK_PLL_DIV66                  : out std_logic_vector(3 downto 0);
+            O_CLK_REC_DIV64                  : out std_logic_vector(3 downto 0);
+            O_CLK_REC_DIV66                  : out std_logic_vector(3 downto 0);
+            O_TX_SERIAL                      : out std_logic_vector(3 downto 0);
+            I_RX_SERIAL                      : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_TX_SERIAL_N                    : out std_logic_vector(3 downto 0);
+            I_RX_SERIAL_N                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_RECONFIG_CLK                   : in  std_logic                      := 'X';
+            I_RECONFIG_RESET                 : in  std_logic                      := 'X';
+            I_XCVR_RECONFIG_ADDRESS          : in  std_logic_vector(75 downto 0)  := (others => 'X');
+            I_XCVR_RECONFIG_READ             : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_XCVR_RECONFIG_WRITE            : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_XCVR_RECONFIG_READDATA         : out std_logic_vector(31 downto 0);
+            I_XCVR_RECONFIG_WRITEDATA        : in  std_logic_vector(31 downto 0)  := (others => 'X');
+            O_XCVR_RECONFIG_WAITREQUEST      : out std_logic_vector(3 downto 0);
+            I_SL_STATS_SNAPSHOT              : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_RX_HI_BER                   : out std_logic_vector(3 downto 0);
+            I_SL_ETH_RECONFIG_ADDR           : in  std_logic_vector(75 downto 0)  := (others => 'X');
+            I_SL_ETH_RECONFIG_READ           : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_ETH_RECONFIG_WRITE          : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_ETH_RECONFIG_READDATA       : out std_logic_vector(127 downto 0);
+            O_SL_ETH_RECONFIG_READDATA_VALID : out std_logic_vector(3 downto 0);
+            I_SL_ETH_RECONFIG_WRITEDATA      : in  std_logic_vector(127 downto 0) := (others => 'X');
+            O_SL_ETH_RECONFIG_WAITREQUEST    : out std_logic_vector(3 downto 0);
+            O_SL_TX_LANES_STABLE             : out std_logic_vector(3 downto 0);
+            O_SL_RX_PCS_READY                : out std_logic_vector(3 downto 0);
+            O_SL_EHIP_READY                  : out std_logic_vector(3 downto 0);
+            O_SL_RX_BLOCK_LOCK               : out std_logic_vector(3 downto 0);
+            O_SL_LOCAL_FAULT_STATUS          : out std_logic_vector(3 downto 0);
+            O_SL_REMOTE_FAULT_STATUS         : out std_logic_vector(3 downto 0);
+            I_SL_CLK_TX                      : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_CLK_RX                      : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_CSR_RST_N                   : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_RST_N                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_RX_RST_N                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_TXFIFO_PFULL                : out std_logic_vector(3 downto 0);
+            O_SL_TXFIFO_PEMPTY               : out std_logic_vector(3 downto 0);
+            O_SL_TXFIFO_OVERFLOW             : out std_logic_vector(3 downto 0);
+            O_SL_TXFIFO_UNDERFLOW            : out std_logic_vector(3 downto 0);
+            O_SL_TX_READY                    : out std_logic_vector(3 downto 0);
+            O_SL_RX_VALID                    : out std_logic_vector(3 downto 0);
+            I_SL_TX_VALID                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_DATA                     : in  std_logic_vector(255 downto 0) := (others => 'X');
+            O_SL_RX_DATA                     : out std_logic_vector(255 downto 0);
+            I_SL_TX_ERROR                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_STARTOFPACKET            : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_ENDOFPACKET              : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            I_SL_TX_EMPTY                    : in  std_logic_vector(11 downto 0)  := (others => 'X');
+            I_SL_TX_SKIP_CRC                 : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_RX_STARTOFPACKET            : out std_logic_vector(3 downto 0);
+            O_SL_RX_ENDOFPACKET              : out std_logic_vector(3 downto 0);
+            O_SL_RX_EMPTY                    : out std_logic_vector(11 downto 0);
+            O_SL_RX_ERROR                    : out std_logic_vector(23 downto 0);
+            O_SL_RXSTATUS_DATA               : out std_logic_vector(159 downto 0);
+            O_SL_RXSTATUS_VALID              : out std_logic_vector(3 downto 0);
+            I_SL_TX_PFC                      : in  std_logic_vector(31 downto 0)  := (others => 'X');
+            O_SL_RX_PFC                      : out std_logic_vector(31 downto 0);
+            I_SL_TX_PAUSE                    : in  std_logic_vector(3 downto 0)   := (others => 'X');
+            O_SL_RX_PAUSE                    : out std_logic_vector(3 downto 0)
+        );
+    end component;
 
     -- =========================================================================
     --                               CONSTANTS
@@ -413,7 +413,7 @@ architecture ETILE of NETWORK_MOD_CORE is
 
     -- AVST interface:
     constant AVST_DATA_WIDTH        : natural := tsel(ETH_PORT_SPEED = 100, 512, 64); -- 512 bits for "100g1" mode (one channel), 64 bits per channel for modes "25g4" and "10g4"
-    constant AVST_EMPTY_WIDTH       : natural := tsel(ETH_PORT_SPEED = 100, 6  , 3 ); -- 6   bits for "100g1" mode (one channel), 3  bits per channel for modes "25g4" and "10g4"
+    constant AVST_EMPTY_WIDTH       : natural := tsel(ETH_PORT_SPEED = 100, 6, 3 );   -- 6   bits for "100g1" mode (one channel), 3  bits per channel for modes "25g4" and "10g4"
     -- 6 bits per channel, it is not ETH_PORT_SPEED dependent
     constant RX_AVST_ERROR_WIDTH    : natural := 6;
 
@@ -499,7 +499,7 @@ architecture ETILE of NETWORK_MOD_CORE is
     signal split_mi_drdy_phy : std_logic_vector(MI_ADDR_BASES_PHY-1 downto 0);
 
     signal etile_clk_out_vec      : std_logic_vector(ETH_PORT_CHAN-1 downto 0); -- in case of multiple IP cores, only one is chosen
-    signal etile_clk_out          : std_logic; -- drives i_clk_rx and i_clk_tx of one or more other IP cores
+    signal etile_clk_out          : std_logic;                                  -- drives i_clk_rx and i_clk_tx of one or more other IP cores
 
     signal tx_avst_data      : std_logic_vector(ETH_PORT_CHAN*AVST_DATA_WIDTH -1 downto 0);
     signal tx_avst_sop       : std_logic_vector(ETH_PORT_CHAN                 -1 downto 0);
@@ -544,26 +544,26 @@ architecture ETILE of NETWORK_MOD_CORE is
 
     -- MI_PHY for E-tile reconfiguration interfaces (Ethernet, Transceiver (XCVR), RS-FEC)
     -- from MI Indirect Access (-> mi_ia_)
-    signal mi_ia_dwr_phy  : slv_array_t     (IA_OUTPUT_INFS-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal mi_ia_addr_phy : slv_array_t     (IA_OUTPUT_INFS-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
-    signal mi_ia_rd_phy   : std_logic_vector(IA_OUTPUT_INFS-1 downto 0);
-    signal mi_ia_wr_phy   : std_logic_vector(IA_OUTPUT_INFS-1 downto 0);
-    signal mi_ia_ardy_phy : std_logic_vector(IA_OUTPUT_INFS-1 downto 0);
-    signal mi_ia_drd_phy  : slv_array_t     (IA_OUTPUT_INFS-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal mi_ia_drdy_phy : std_logic_vector(IA_OUTPUT_INFS-1 downto 0);
-    signal ia_ardy_vld    : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+    signal mi_ia_dwr_phy             : slv_array_t     (IA_OUTPUT_INFS-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
+    signal mi_ia_addr_phy            : slv_array_t     (IA_OUTPUT_INFS-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
+    signal mi_ia_rd_phy              : std_logic_vector(IA_OUTPUT_INFS-1 downto 0);
+    signal mi_ia_wr_phy              : std_logic_vector(IA_OUTPUT_INFS-1 downto 0);
+    signal mi_ia_ardy_phy            : std_logic_vector(IA_OUTPUT_INFS-1 downto 0);
+    signal mi_ia_drd_phy             : slv_array_t     (IA_OUTPUT_INFS-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
+    signal mi_ia_drdy_phy            : std_logic_vector(IA_OUTPUT_INFS-1 downto 0);
+    signal ia_ardy_vld               : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
     -- eth reconfig interface
-    signal eth_inf_dwr_phy          : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal eth_inf_dwr_phy_ser      : std_logic_vector(ETH_PORT_CHAN*            MI_DATA_WIDTH_PHY-1 downto 0);
-    signal eth_inf_addr_phy         : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
-    signal eth_inf_addr_phy_res     : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(tsel(ETH_PORT_SPEED = 100, 21, 19)-1 downto 0);
-    signal eth_inf_addr_phy_res_ser : std_logic_vector(ETH_PORT_CHAN*            tsel(ETH_PORT_SPEED = 100, 21, 19)-1 downto 0);
-    signal eth_inf_rd_phy           : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    signal eth_inf_wr_phy           : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    signal eth_inf_ardy_phy_n       : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    signal eth_inf_drd_phy          : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal eth_inf_drd_phy_ser      : std_logic_vector(ETH_PORT_CHAN*            MI_DATA_WIDTH_PHY-1 downto 0);
-    signal eth_inf_drdy_phy         : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+    signal eth_inf_dwr_phy           : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
+    signal eth_inf_dwr_phy_ser       : std_logic_vector(ETH_PORT_CHAN*            MI_DATA_WIDTH_PHY-1 downto 0);
+    signal eth_inf_addr_phy          : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
+    signal eth_inf_addr_phy_res      : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(tsel(ETH_PORT_SPEED = 100, 21, 19)-1 downto 0);
+    signal eth_inf_addr_phy_res_ser  : std_logic_vector(ETH_PORT_CHAN*            tsel(ETH_PORT_SPEED = 100, 21, 19)-1 downto 0);
+    signal eth_inf_rd_phy            : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+    signal eth_inf_wr_phy            : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+    signal eth_inf_ardy_phy_n        : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+    signal eth_inf_drd_phy           : slv_array_t     (ETH_PORT_CHAN-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
+    signal eth_inf_drd_phy_ser       : std_logic_vector(ETH_PORT_CHAN*            MI_DATA_WIDTH_PHY-1 downto 0);
+    signal eth_inf_drdy_phy          : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
     -- xcvr reconfig interface
     signal xcvr_inf_dwr_phy          : slv_array_t     (LANES-1 downto 0)(8                -1 downto 0);
     signal xcvr_inf_dwr_phy_res_ser  : std_logic_vector(LANES*            8                -1 downto 0);
@@ -577,26 +577,26 @@ architecture ETILE of NETWORK_MOD_CORE is
     signal xcvr_inf_drd_phy_res_ser  : std_logic_vector(LANES*            8                -1 downto 0);
     signal init_lane_status          : slv_array_t(LANES-1 downto 0)(32-1 downto 0);
     -- rsfec reconfig interface
-    signal rsfec_inf_dwr_phy      : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal rsfec_inf_dwr_phy_res  : std_logic_vector(8                -1 downto 0);
-    signal rsfec_inf_addr_phy     : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0);
-    signal rsfec_inf_addr_phy_res : std_logic_vector(11               -1 downto 0);
-    signal rsfec_inf_rd_phy       : std_logic;
-    signal rsfec_inf_wr_phy       : std_logic;
-    signal rsfec_inf_ardy_phy_n   : std_logic;
-    signal rsfec_inf_drd_phy      : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-    signal rsfec_inf_drd_phy_res  : std_logic_vector(8                -1 downto 0);
+    signal rsfec_inf_dwr_phy         : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
+    signal rsfec_inf_dwr_phy_res     : std_logic_vector(8                -1 downto 0);
+    signal rsfec_inf_addr_phy        : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0);
+    signal rsfec_inf_addr_phy_res    : std_logic_vector(11               -1 downto 0);
+    signal rsfec_inf_rd_phy          : std_logic;
+    signal rsfec_inf_wr_phy          : std_logic;
+    signal rsfec_inf_ardy_phy_n      : std_logic;
+    signal rsfec_inf_drd_phy         : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
+    signal rsfec_inf_drd_phy_res     : std_logic_vector(8                -1 downto 0);
 
-    signal mgmt_pcs_reset : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    signal mgmt_pma_reset : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
-    signal mgmt_mac_loop  : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+    signal mgmt_pcs_reset     : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+    signal mgmt_pma_reset     : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+    signal mgmt_mac_loop      : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
     -- Synchronization of REPEATER_CTRL
     signal sync_repeater_ctrl : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
 begin
 
     mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
-    generic map(
+    generic map (
         ADDR_WIDTH  => MI_ADDR_WIDTH_PHY,
         DATA_WIDTH  => MI_DATA_WIDTH_PHY,
         META_WIDTH  => 0,
@@ -607,7 +607,7 @@ begin
         ADDR_BASE   => mi_addr_base_init_phy_f,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK     => MI_CLK_PHY,
         RESET   => MI_RESET_PHY,
 
@@ -634,23 +634,23 @@ begin
 
     mgmt_g : for i in ETH_PORT_CHAN-1 downto 0 generate
         signal mgmt_pcs_control_i : std_logic_vector(16-1 downto 0);
-        signal mgmt_pcs_status  : std_logic_vector(16-1 downto 0);
-        signal mi_ia_drd    : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-        signal mi_ia_drdy   : std_logic;
-        signal mi_ia_en     : std_logic;
-        signal mi_ia_we_phy : std_logic;
-        signal mi_ia_sel    : std_logic_vector(4-1 downto 0);
-        signal mi_ia_addr   : std_logic_vector(32-1 downto 0);
-        signal mi_ia_dwr    : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
-        signal mi_ia_ardy   : std_logic;
-        signal ia_rd_sel    : std_logic_vector(mi_ia_sel'range);
-        signal ia_rd_sel_r  : std_logic_vector(mi_ia_sel'range);
-        signal mgmt_pcs_control : std_logic_vector(16-1 downto 0);
+        signal mgmt_pcs_status    : std_logic_vector(16-1 downto 0);
+        signal mi_ia_drd          : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
+        signal mi_ia_drdy         : std_logic;
+        signal mi_ia_en           : std_logic;
+        signal mi_ia_we_phy       : std_logic;
+        signal mi_ia_sel          : std_logic_vector(4-1 downto 0);
+        signal mi_ia_addr         : std_logic_vector(32-1 downto 0);
+        signal mi_ia_dwr          : std_logic_vector(MI_DATA_WIDTH_PHY-1 downto 0);
+        signal mi_ia_ardy         : std_logic;
+        signal ia_rd_sel          : std_logic_vector(mi_ia_sel'range);
+        signal ia_rd_sel_r        : std_logic_vector(mi_ia_sel'range);
+        signal mgmt_pcs_control   : std_logic_vector(16-1 downto 0);
 
         signal xcvr_init_status          : std_logic_vector(32-1 downto 0);
     begin
 
-        mgmt_i : entity work.mgmt
+        mgmt_i : entity work.MGMT
         generic map (
             NUM_LANES     => PCS_LANES,
             PMA_LANES     => LANES_PER_CHANNEL,
@@ -664,79 +664,79 @@ begin
             DRP_AWIDTH    => 32
         )
         port map (
-            RESET         => MI_RESET_PHY,
-            MI_CLK        => MI_CLK_PHY,
-            MI_DWR        => split_mi_dwr_phy(i),
-            MI_ADDR       => split_mi_addr_phy(i),
-            MI_RD         => split_mi_rd_phy(i),
-            MI_WR         => split_mi_wr_phy(i),
-            MI_BE         => split_mi_be_phy(i),
-            MI_DRD        => split_mi_drd_phy(i),
-            MI_ARDY       => split_mi_ardy_phy(i),
-            MI_DRDY       => split_mi_drdy_phy(i),
+            RESET          => MI_RESET_PHY,
+            MI_CLK         => MI_CLK_PHY,
+            MI_DWR         => split_mi_dwr_phy(i),
+            MI_ADDR        => split_mi_addr_phy(i),
+            MI_RD          => split_mi_rd_phy(i),
+            MI_WR          => split_mi_wr_phy(i),
+            MI_BE          => split_mi_be_phy(i),
+            MI_DRD         => split_mi_drd_phy(i),
+            MI_ARDY        => split_mi_ardy_phy(i),
+            MI_DRDY        => split_mi_drdy_phy(i),
             -- PCS status
-            HI_BER        => rx_hi_ber(i),
-            BLK_LOCK      => (others => rx_block_lock(i)),
-            LINKSTATUS    => rx_pcs_ready(i) and not rx_hi_ber(i),
-            BER_COUNT     => (others => '0'),
-            BER_COUNT_CLR => open,
-            BLK_ERR_CNTR  => (others => '0'),
-            BLK_ERR_CLR   => open,
-            SCR_BYPASS    => open,
-            PCS_RESET     => mgmt_pcs_reset(i), --TODO
-            PCS_LPBCK     => open,
-            PCS_CONTROL   => mgmt_pcs_control,
-            PCS_CONTROL_I => mgmt_pcs_control_i,
-            PCS_STATUS    => mgmt_pcs_status,
+            HI_BER         => rx_hi_ber(i),
+            BLK_LOCK       => (others => rx_block_lock(i)),
+            LINKSTATUS     => rx_pcs_ready(i) and not rx_hi_ber(i),
+            BER_COUNT      => (others => '0'),
+            BER_COUNT_CLR  => open,
+            BLK_ERR_CNTR   => (others => '0'),
+            BLK_ERR_CLR    => open,
+            SCR_BYPASS     => open,
+            PCS_RESET      => mgmt_pcs_reset(i),           -- TODO
+            PCS_LPBCK      => open,
+            PCS_CONTROL    => mgmt_pcs_control,
+            PCS_CONTROL_I  => mgmt_pcs_control_i,
+            PCS_STATUS     => mgmt_pcs_status,
             -- PCS Lane align
-            ALGN_LOCKED   => rx_am_lock(i),
-            BIP_ERR_CNTRS => (others => '0'),
-            BIP_ERR_CLR   => open,
-            LANE_MAP      => (others => '0'),
-            LANE_ALIGN    => (others => rx_pcs_ready(i)),
+            ALGN_LOCKED    => rx_am_lock(i),
+            BIP_ERR_CNTRS  => (others => '0'),
+            BIP_ERR_CLR    => open,
+            LANE_MAP       => (others => '0'),
+            LANE_ALIGN     => (others => rx_pcs_ready(i)),
             -- PMA & PMD status/control
-            PMA_LOPWR     => open,
-            PMA_LPBCK     => open,
-            PMA_REM_LPBCK => open,
-            PMA_RESET     => mgmt_pma_reset(i), --TODO
-            PMA_RETUNE    => open,
-            PMA_CONTROL   => open,
-            PMA_STATUS    => xcvr_init_status,
-            PMA_PTRN_EN   => open,
-            PMA_TX_DIS    => open,
-            PMA_RX_OK     => (others => rx_pcs_ready(i)), --TODO
-            PMD_SIG_DET   => (others => rx_pcs_ready(i)), --TODO
-            PMA_PRECURSOR => open,
-            PMA_POSTCURSOR=> open,
-            PMA_DRIVE     => open,
+            PMA_LOPWR      => open,
+            PMA_LPBCK      => open,
+            PMA_REM_LPBCK  => open,
+            PMA_RESET      => mgmt_pma_reset(i),           -- TODO
+            PMA_RETUNE     => open,
+            PMA_CONTROL    => open,
+            PMA_STATUS     => xcvr_init_status,
+            PMA_PTRN_EN    => open,
+            PMA_TX_DIS     => open,
+            PMA_RX_OK      => (others => rx_pcs_ready(i)), -- TODO
+            PMD_SIG_DET    => (others => rx_pcs_ready(i)), -- TODO
+            PMA_PRECURSOR  => open,
+            PMA_POSTCURSOR => open,
+            PMA_DRIVE      => open,
             -- Dynamic reconfiguration interface
-            DRPCLK        => MI_CLK_PHY,
-            DRPDO         => mi_ia_drd,
-            DRPRDY        => mi_ia_drdy,
-            DRPEN         => mi_ia_en,
-            DRPWE         => mi_ia_we_phy,
-            DRPADDR       => mi_ia_addr,
-            DRPARDY       => mi_ia_ardy, --  and ia_ardy_vld, -- not working
-            DRPDI         => mi_ia_dwr,
-            DRPSEL        => mi_ia_sel
+            DRPCLK         => MI_CLK_PHY,
+            DRPDO          => mi_ia_drd,
+            DRPRDY         => mi_ia_drdy,
+            DRPEN          => mi_ia_en,
+            DRPWE          => mi_ia_we_phy,
+            DRPADDR        => mi_ia_addr,
+            DRPARDY        => mi_ia_ardy,                  --  and ia_ardy_vld, -- not working
+            DRPDI          => mi_ia_dwr,
+            DRPSEL         => mi_ia_sel
         );
-        mgmt_mac_loop(i) <= mgmt_pcs_control(0);
+        mgmt_mac_loop(i)                <= mgmt_pcs_control(0);
         -- MDIO reg 3.4000 (vendor specific PCS control readout)
         mgmt_pcs_control_i(15 downto 1) <= (others => '0');
         mgmt_pcs_control_i(0)           <= sync_repeater_ctrl(i); -- MAC loopback active
         -- MDIO reg 3.4001 (vendor specific PCS status/abilities)
-        mgmt_pcs_status(15 downto 1) <= (others => '0');
-        mgmt_pcs_status(0)           <= '1';        -- MAC loopback ability supported
+        mgmt_pcs_status(15 downto 1)    <= (others => '0');
+        mgmt_pcs_status(0)              <= '1';        -- MAC loopback ability supported
 
         -- Store mi_ia_sel for read operations
-        sel_reg_p: process(MI_CLK_PHY)
+        sel_reg_p : process (MI_CLK_PHY)
         begin
             if rising_edge(MI_CLK_PHY) then
                 ia_ardy_vld(i) <= mi_ia_en;
-                if mi_ia_en = '1' then
+                if (mi_ia_en = '1') then
                     ia_rd_sel_r <= mi_ia_sel;
                 end if;
-           end if;
+            end if;
         end process;
         ia_rd_sel <= mi_ia_sel when mi_ia_en = '1' else ia_rd_sel_r;
 
@@ -762,37 +762,37 @@ begin
         end generate;
 
         -- Mux read data from Eth/xvcr to mgmt
-        drd_mux_p: process(all)
-            variable mi_index     : integer range 0 to IA_OUTPUT_INFS-1;
-            variable mi_index_vld : boolean;
+        drd_mux_p : process (all)
+            variable mi_index            : integer range 0 to IA_OUTPUT_INFS-1;
+            variable mi_index_vld        : boolean;
             variable init_lane_index     : integer range 0 to LANES-1;
             variable init_lane_index_vld : boolean;
         begin
             mi_index_vld := False;
 
             case ia_rd_sel is
-                when "0001" => -- XCVR0
+                when "0001" =>                                                   -- XCVR0
                     mi_index_vld := True;
                     mi_index     := 0 + i*LANES_PER_CHANNEL + ETH_PORT_CHAN;
-                when "0010" => -- XCVR1
+                when "0010" =>                                                   -- XCVR1
                     if (LANES_PER_CHANNEL > 1) then
                         mi_index_vld := True;
                         mi_index     := 1 + i*LANES_PER_CHANNEL + ETH_PORT_CHAN;
                     end if;
-                when "0011" => -- XCVR2
+                when "0011" =>                                                   -- XCVR2
                     if (LANES_PER_CHANNEL > 2) then
                         mi_index_vld := True;
                         mi_index     := 2 + i*LANES_PER_CHANNEL + ETH_PORT_CHAN;
                     end if;
-                when "0100" => -- XCVR3
+                when "0100" =>                                                   -- XCVR3
                     if (LANES_PER_CHANNEL > 3) then
                         mi_index_vld := True;
                         mi_index     := 3 + i*LANES_PER_CHANNEL + ETH_PORT_CHAN;
                     end if;
-                when "1001" => -- RS-FEC
+                when "1001" =>                                                   -- RS-FEC
                     mi_index_vld := True;
                     mi_index     := IA_OUTPUT_INFS-1;
-                when others => -- "0000": Ethernet core
+                when others =>                                                   -- "0000": Ethernet core
                     mi_index_vld := True;
                     mi_index     := i;
             end case;
@@ -811,17 +811,17 @@ begin
             init_lane_index_vld := False;
             case mi_ia_sel is
                 when "0010" =>
-                    if (LANES_PER_CHANNEL > 1) then -- XCVR1
+                    if (LANES_PER_CHANNEL > 1) then                              -- XCVR1
                         init_lane_index_vld := True;
                         init_lane_index     := 1 + i*LANES_PER_CHANNEL;
                     end if;
                 when "0011" =>
-                    if (LANES_PER_CHANNEL > 2) then -- XCVR2
+                    if (LANES_PER_CHANNEL > 2) then                              -- XCVR2
                         init_lane_index_vld := True;
                         init_lane_index     := 2+ i*LANES_PER_CHANNEL;
                     end if;
                 when "0100" =>
-                    if (LANES_PER_CHANNEL > 3) then -- XCVR3
+                    if (LANES_PER_CHANNEL > 3) then                              -- XCVR3
                         init_lane_index_vld := True;
                         init_lane_index     := 3 + i*LANES_PER_CHANNEL;
                     end if;
@@ -841,12 +841,12 @@ begin
     end generate;
 
     -- eth ---------------------------------------------------------------------
-    eth_inf_dwr_phy  <= mi_ia_dwr_phy (ETH_PORT_CHAN-1 downto 0);
-    eth_inf_addr_phy <= mi_ia_addr_phy(ETH_PORT_CHAN-1 downto 0);
-    eth_inf_rd_phy   <= mi_ia_rd_phy  (ETH_PORT_CHAN-1 downto 0);
-    eth_inf_wr_phy   <= mi_ia_wr_phy  (ETH_PORT_CHAN-1 downto 0);
+    eth_inf_dwr_phy                          <= mi_ia_dwr_phy (ETH_PORT_CHAN-1 downto 0);
+    eth_inf_addr_phy                         <= mi_ia_addr_phy(ETH_PORT_CHAN-1 downto 0);
+    eth_inf_rd_phy                           <= mi_ia_rd_phy  (ETH_PORT_CHAN-1 downto 0);
+    eth_inf_wr_phy                           <= mi_ia_wr_phy  (ETH_PORT_CHAN-1 downto 0);
     mi_ia_ardy_phy(ETH_PORT_CHAN-1 downto 0) <= not eth_inf_ardy_phy_n;
-    mi_ia_drd_phy (ETH_PORT_CHAN-1 downto 0) <= eth_inf_drd_phy ;
+    mi_ia_drd_phy (ETH_PORT_CHAN-1 downto 0) <= eth_inf_drd_phy;
     mi_ia_drdy_phy(ETH_PORT_CHAN-1 downto 0) <= eth_inf_drdy_phy;
 
     eth_inf_res_g: for i in ETH_PORT_CHAN-1 downto 0 generate
@@ -855,7 +855,7 @@ begin
 
     eth_inf_dwr_phy_ser      <= slv_array_ser(eth_inf_dwr_phy);
     eth_inf_addr_phy_res_ser <= slv_array_ser(eth_inf_addr_phy_res);
-    eth_inf_drd_phy <= slv_array_deser(eth_inf_drd_phy_ser, ETH_PORT_CHAN);
+    eth_inf_drd_phy          <= slv_array_deser(eth_inf_drd_phy_ser, ETH_PORT_CHAN);
 
     -- xcvr --------------------------------------------------------------------
     xcvr_reconfig_inf_res_g: for i in LANES-1 downto 0 generate
@@ -873,31 +873,31 @@ begin
         -- After power up or reset, the xcvr_inf bus is driven by the xcvr_init component to perform
         -- initialization of the e-tile transceivers. After the initialization finishes, the software is
         -- allowed to access this interface (via the MGMT)
-        xcvr_inf_mux: process(all)
+        xcvr_inf_mux : process (all)
         begin
-            if init_busy = '0' then
+            if (init_busy = '0') then
                 mi_ia_drdy_phy(i + ETH_PORT_CHAN) <= xcvr_inf_rd_phy(i) and not xcvr_inf_ardy_phy_n(i);
                 mi_ia_ardy_phy(i + ETH_PORT_CHAN) <= not xcvr_inf_ardy_phy_n(i);
                 mi_ia_drd_phy (i + ETH_PORT_CHAN) <= xcvr_inf_drd_phy(i);
-                xcvr_inf_rd_phy  (i) <= mi_ia_rd_phy(ETH_PORT_CHAN+i);
-                xcvr_inf_wr_phy  (i) <= mi_ia_wr_phy(ETH_PORT_CHAN+i);
-                xcvr_inf_dwr_phy (i) <= mi_ia_dwr_phy(ETH_PORT_CHAN+i)(8 -1 downto 0);
-                xcvr_inf_addr_phy(i) <= mi_ia_addr_phy(ETH_PORT_CHAN+i)(19-1 downto 0);
+                xcvr_inf_rd_phy  (i)              <= mi_ia_rd_phy(ETH_PORT_CHAN+i);
+                xcvr_inf_wr_phy  (i)              <= mi_ia_wr_phy(ETH_PORT_CHAN+i);
+                xcvr_inf_dwr_phy (i)              <= mi_ia_dwr_phy(ETH_PORT_CHAN+i)(8 -1 downto 0);
+                xcvr_inf_addr_phy(i)              <= mi_ia_addr_phy(ETH_PORT_CHAN+i)(19-1 downto 0);
             else
                 mi_ia_drdy_phy(i + ETH_PORT_CHAN) <= '0';
                 mi_ia_ardy_phy(i + ETH_PORT_CHAN) <= '0';
                 mi_ia_drd_phy (i + ETH_PORT_CHAN) <= xcvr_inf_drd_phy(i);
-                xcvr_inf_rd_phy  (i) <= init_read;
-                xcvr_inf_wr_phy  (i) <= init_write;
-                xcvr_inf_dwr_phy (i) <= init_writedata(8 -1 downto 0);
-                xcvr_inf_addr_phy(i) <= init_addr;
+                xcvr_inf_rd_phy  (i)              <= init_read;
+                xcvr_inf_wr_phy  (i)              <= init_write;
+                xcvr_inf_dwr_phy (i)              <= init_writedata(8 -1 downto 0);
+                xcvr_inf_addr_phy(i)              <= init_addr;
             end if;
         end process;
 
         xcvr_inf_drd_phy(i)(MI_DATA_WIDTH_PHY-1 downto 8) <= (others => '0');
         xcvr_inf_drd_phy(i)(8-1 downto 0)                 <= xcvr_inf_drd_phy_res(i);
 
-        xcvr_init: entity work.etile_xcvr_init
+        xcvr_init: entity work.ETILE_XCVR_INIT
         port map (
             RST              => RESET_ETH or mgmt_pma_reset(ETH_CHAN),
             XCVR_RDY         => ehip_ready(i),
@@ -913,27 +913,27 @@ begin
             WAITREQUEST      => xcvr_inf_ardy_phy_n(i),
             --
             STATE            => init_lane_status(i) -- TBD: debug purposes only. Can be left open in the future
-         );
+        );
 
     end generate;
 
     xcvr_inf_dwr_phy_res_ser  <= slv_array_ser(xcvr_inf_dwr_phy);
     xcvr_inf_addr_phy_res_ser <= slv_array_ser(xcvr_inf_addr_phy);
-    xcvr_inf_drd_phy_res <= slv_array_deser(xcvr_inf_drd_phy_res_ser, LANES);
+    xcvr_inf_drd_phy_res      <= slv_array_deser(xcvr_inf_drd_phy_res_ser, LANES);
 
     -- rsfec -------------------------------------------------------------------
     rsfec_inf_g: if (ETH_PORT_SPEED /= 10) generate
         -- rsfec inf is on the last Output port of MI IA
-        rsfec_inf_dwr_phy  <= mi_ia_dwr_phy (IA_OUTPUT_INFS-1);
-        rsfec_inf_addr_phy <= mi_ia_addr_phy(IA_OUTPUT_INFS-1);
-        rsfec_inf_rd_phy   <= mi_ia_rd_phy  (IA_OUTPUT_INFS-1);
-        rsfec_inf_wr_phy   <= mi_ia_wr_phy  (IA_OUTPUT_INFS-1);
+        rsfec_inf_dwr_phy                <= mi_ia_dwr_phy (IA_OUTPUT_INFS-1);
+        rsfec_inf_addr_phy               <= mi_ia_addr_phy(IA_OUTPUT_INFS-1);
+        rsfec_inf_rd_phy                 <= mi_ia_rd_phy  (IA_OUTPUT_INFS-1);
+        rsfec_inf_wr_phy                 <= mi_ia_wr_phy  (IA_OUTPUT_INFS-1);
         mi_ia_ardy_phy(IA_OUTPUT_INFS-1) <= not rsfec_inf_ardy_phy_n;
         mi_ia_drd_phy (IA_OUTPUT_INFS-1) <= rsfec_inf_drd_phy;
         mi_ia_drdy_phy(IA_OUTPUT_INFS-1) <= rsfec_inf_rd_phy and not rsfec_inf_ardy_phy_n; -- DRDY not used on the rsfec inf
 
-        rsfec_inf_dwr_phy_res  <= rsfec_inf_dwr_phy (8 -1 downto 0);
-        rsfec_inf_addr_phy_res <= rsfec_inf_addr_phy(11-1 downto 0);
+        rsfec_inf_dwr_phy_res                           <= rsfec_inf_dwr_phy (8 -1 downto 0);
+        rsfec_inf_addr_phy_res                          <= rsfec_inf_addr_phy(11-1 downto 0);
         rsfec_inf_drd_phy(MI_DATA_WIDTH_PHY-1 downto 8) <= (others => '0');
         rsfec_inf_drd_phy(8-1 downto 0)                 <= rsfec_inf_drd_phy_res;
     end generate;
@@ -943,7 +943,7 @@ begin
     -- =========================================================================
     eth_port_speed_sel_g : case ETH_PORT_SPEED generate
 
-        when 100 =>
+        when 100    =>
             -- =========================================================================
             -- E-TILE Ethernet
             -- =========================================================================
@@ -960,7 +960,7 @@ begin
                 hi_ber_monitor                => "enable",
                 holdoff_quanta                => 65535,
                 ipg_removed_per_am_period     => 20,
-                link_fault_mode               => "lf_bidir", --"lf_off",
+                link_fault_mode               => "lf_bidir", -- "lf_off",
                 pause_quanta                  => 65535,
                 pfc_holdoff_quanta_0          => 65535,
                 pfc_holdoff_quanta_1          => 65535,
@@ -1074,7 +1074,7 @@ begin
 
             ehip_ready(LANES-1 downto 1) <= (others => ehip_ready(0));
 
-        when 25 =>
+        when 25     =>
 
             -- =========================================================================
             -- E-TILE Ethernet
@@ -1208,7 +1208,7 @@ begin
             );
 
 
-        when 10 =>
+        when 10     =>
 
             -- =========================================================================
             -- E-TILE Ethernet
@@ -1335,26 +1335,28 @@ begin
             );
 
         when others =>
-            assert (True) report "Unsupported case" severity failure;
+            assert (True)
+                report "Unsupported case"
+                severity failure;
 
     end generate;
 
-     -- =========================================================================
-     -- ADAPTERS
-     -- =========================================================================
-     etile_clk_out <= etile_clk_out_vec(0);
-     CLK_ETH       <= etile_clk_out;
+    -- =========================================================================
+    -- ADAPTERS
+    -- =========================================================================
+    etile_clk_out <= etile_clk_out_vec(0);
+    CLK_ETH       <= etile_clk_out;
 
-     -- TX adaption -------------------------------------------------------------
-     tx_avst_data  <= slv_array_ser(tx_avst_data_arr);
-     tx_avst_empty <= slv_array_ser(tx_avst_empty_arr);
+    -- TX adaption -------------------------------------------------------------
+    tx_avst_data  <= slv_array_ser(tx_avst_data_arr);
+    tx_avst_empty <= slv_array_ser(tx_avst_empty_arr);
 
     -- RX adaption -------------------------------------------------------------
-    rx_avst_data_arr  <= slv_array_deser(rx_avst_data , ETH_PORT_CHAN);
+    rx_avst_data_arr  <= slv_array_deser(rx_avst_data, ETH_PORT_CHAN);
     rx_avst_empty_arr <= slv_array_deser(rx_avst_empty, ETH_PORT_CHAN);
     rx_avst_error_arr <= slv_array_deser(rx_avst_error, ETH_PORT_CHAN);
 
-    adapter_g : for IT in ETH_PORT_CHAN-1 downto 0 generate
+    adapter_g : for it in ETH_PORT_CHAN-1 downto 0 generate
         signal mfb2avst_rx_mfb_sof : std_logic_vector(1-1 downto 0);
         signal mfb2avst_rx_mfb_eof : std_logic_vector(1-1 downto 0);
 
@@ -1373,7 +1375,7 @@ begin
         signal tx_loop_avst_valid  : std_logic;
     begin
 
-        process(RX_MFB_SOF, RX_MFB_EOF)
+        process (RX_MFB_SOF, RX_MFB_EOF)
         begin
             mfb2avst_rx_mfb_sof <= RX_MFB_SOF(IT);
             mfb2avst_rx_mfb_eof <= RX_MFB_EOF(IT);
@@ -1385,14 +1387,14 @@ begin
 
         -- TX adaption
         mfb2avst_i : entity work.TX_MAC_LITE_ADAPTER_AVST_100G
-        generic map(
+        generic map (
             DATA_WIDTH => AVST_DATA_WIDTH,
             FIFO_DEPTH => MFB2AVST_FIFO_DEPTH,
             DEVICE     => DEVICE
         )
-        port map(
+        port map (
             CLK            => etile_clk_out,
-            RESET          => RESET_ETH    ,
+            RESET          => RESET_ETH,
 
             RX_MFB_DATA    => RX_MFB_DATA   (IT),
             RX_MFB_SOF     => mfb2avst_rx_mfb_sof,
@@ -1413,13 +1415,13 @@ begin
 
         -- RX adaption
         avst2mfb_i : entity work.ETH_AVST_ADAPTER
-        generic map(
+        generic map (
             DATA_WIDTH     => AVST_DATA_WIDTH,
             TX_REGION_SIZE => AVST_DATA_WIDTH/64
         )
-        port map(
+        port map (
             CLK              => etile_clk_out,
-            RESET            => RESET_ETH    ,
+            RESET            => RESET_ETH,
 
             IN_AVST_DATA     => rx_avst_data_arr (IT),
             IN_AVST_SOP      => rx_avst_sop      (IT),
@@ -1452,7 +1454,7 @@ begin
         TX_MFB_SRC_RDY(IT) <= tx_adap_mfb_src_rdy(IT);
         TX_MFB_MII_ERR(IT) <= (others => '0');
 
-        repeater_i: entity work.avst_loop
+        repeater_i: entity work.AVST_LOOP
         generic map (
             SEGMENTS => AVST_DATA_WIDTH/64
         )
@@ -1475,9 +1477,9 @@ begin
         );
         tx_loop_avst_error <= '0';
 
-        eth_tx_mux: process(all)
+        eth_tx_mux : process (all)
         begin
-            if sync_repeater_ctrl(IT) = '1' then
+            if (sync_repeater_ctrl(IT) = '1') then
                 -- MAC loopback on
                 tx_avst_data_arr(IT)  <= tx_loop_avst_data;
                 tx_avst_sop(IT)       <= tx_loop_avst_sop;
@@ -1497,7 +1499,7 @@ begin
         end process;
     end generate;
 
-    process(etile_clk_out)
+    process (etile_clk_out)
     begin
         if rising_edge(etile_clk_out) then
             if (RESET_ETH = '1') then
@@ -1536,30 +1538,30 @@ begin
 
         ts_demo_logic_i: entity work.TS_DEMO_LOGIC
         generic map (
-            REGIONS         => REGIONS          ,
-            ETH_PORT_CHAN   => ETH_PORT_CHAN    ,
+            REGIONS         => REGIONS,
+            ETH_PORT_CHAN   => ETH_PORT_CHAN,
             MI_DATA_WIDTH   => MI_DATA_WIDTH_PHY,
             MI_ADDR_WIDTH   => MI_ADDR_WIDTH_PHY,
-            TX_DMA_CHANNELS => TX_DMA_CHANNELS  ,
+            TX_DMA_CHANNELS => TX_DMA_CHANNELS,
             DEVICE          => DEVICE
         )
         port map (
-            CLK_ETH       => CLK_ETH                               ,
-            RESET_ETH     => RESET_ETH                             ,
+            CLK_ETH       => CLK_ETH,
+            RESET_ETH     => RESET_ETH,
 
-            CORE_SOP      => tx_avst_sop                           ,
-            CORE_SRC_RDY  => tx_avst_valid                         ,
-            CORE_DST_RDY  => tx_avst_ready                         ,
+            CORE_SOP      => tx_avst_sop,
+            CORE_SRC_RDY  => tx_avst_valid,
+            CORE_DST_RDY  => tx_avst_ready,
 
-            APP_CHANNEL   => RX_MVB_CHANNEL                        ,
-            APP_TIMESTAMP => RX_MVB_TIMESTAMP                      ,
-            APP_VLD       => RX_MVB_VLD                            ,
+            APP_CHANNEL   => RX_MVB_CHANNEL,
+            APP_TIMESTAMP => RX_MVB_TIMESTAMP,
+            APP_VLD       => RX_MVB_VLD,
 
-            TSU_TS_NS     => TSU_TS_NS                             ,
-            TSU_TS_DV     => TSU_TS_DV                             ,
+            TSU_TS_NS     => TSU_TS_NS,
+            TSU_TS_DV     => TSU_TS_DV,
 
-            MI_CLK        => MI_CLK_PHY                            ,
-            MI_RESET      => MI_RESET_PHY                          ,
+            MI_CLK        => MI_CLK_PHY,
+            MI_RESET      => MI_RESET_PHY,
 
             MI_DWR        => split_mi_dwr_phy (MI_ADDR_BASES_PHY-1),
             MI_ADDR       => split_mi_addr_phy(MI_ADDR_BASES_PHY-1),

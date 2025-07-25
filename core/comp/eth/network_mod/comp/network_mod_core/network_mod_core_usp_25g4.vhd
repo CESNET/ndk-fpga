@@ -75,31 +75,31 @@ begin
     -- =========================================================================
     --  4x10GE version
     -- =========================================================================
-    ETH_PHY_4x25g_i: entity work.USP_PCS_PMA_WRAPPER
+    eth_phy_4x25g_i: entity work.USP_PCS_PMA_WRAPPER
     generic map (
-        CH0_MAP   => 0,
-        CH1_MAP   => 1,
-        CH2_MAP   => 2,
-        CH3_MAP   => 3,
-        ETH_25G   => true,
-        GTY_TX_EQ => GTY_TX_EQ,
+        CH0_MAP           => 0,
+        CH1_MAP           => 1,
+        CH2_MAP           => 2,
+        CH3_MAP           => 3,
+        ETH_25G           => true,
+        GTY_TX_EQ         => GTY_TX_EQ,
         MI_DATA_WIDTH_PHY => MI_DATA_WIDTH_PHY,
         MI_ADDR_WIDTH_PHY => MI_ADDR_WIDTH_PHY
     )
     port map (
         --! \name Clock and reset signals
-        RESET          => MI_RESET_PHY,
-        SYSCLK         => MI_CLK_PHY, -- Stable clock, 100 MHz
+        RESET           => MI_RESET_PHY,
+        SYSCLK          => MI_CLK_PHY, -- Stable clock, 100 MHz
         --! \name Transceiver reference clock
-        REFCLK_P       => QSFP_REFCLK_P,
-        REFCLK_N       => QSFP_REFCLK_N,
+        REFCLK_P        => QSFP_REFCLK_P,
+        REFCLK_N        => QSFP_REFCLK_N,
         --! \name Transceivers 0-3 - serial data
-        TX_P           => QSFP_TX_P,
-        TX_N           => QSFP_TX_N,
-        RX_P           => QSFP_RX_P,
-        RX_N           => QSFP_RX_N,
-        RXPOLARITY     => LANE_RX_POLARITY,
-        TXPOLARITY     => LANE_TX_POLARITY,
+        TX_P            => QSFP_TX_P,
+        TX_N            => QSFP_TX_N,
+        RX_P            => QSFP_RX_P,
+        RX_N            => QSFP_RX_N,
+        RXPOLARITY      => LANE_RX_POLARITY,
+        TXPOLARITY      => LANE_TX_POLARITY,
         --! \name XGMII interfaces
         TXRESET         => tx_reset,
         XGCLK           => eth_clk_mii,
@@ -137,10 +137,10 @@ begin
         eth_reset_tx_i(i) <= reset_eth_int(i) or tx_reset(i);
 
         -- XLGMII Pipeline registers to improve timing
-        rx_xlgmii_pipeline_regs_p: process(eth_clk_mii(i))
+        rx_xlgmii_pipeline_regs_p : process (eth_clk_mii(i))
         begin
-            if eth_clk_mii(i)'event and eth_clk_mii(i) = '1' then
-                if eth_reset_rx_i(i) = '1' then
+            if (eth_clk_mii(i)'event and eth_clk_mii(i) = '1') then
+                if (eth_reset_rx_i(i) = '1') then
                     eth_rxd_reg0((i+1)*64-1 downto i*64) <= X"0100009C0100009C";
                     eth_rxc_reg0((i+1)*8-1 downto  i*8)  <= "00010001";
 
@@ -155,10 +155,10 @@ begin
                 end if;
             end if;
         end process;
-        tx_xlgmii_pipeline_regs_p: process(eth_clk_mii(i))
+        tx_xlgmii_pipeline_regs_p : process (eth_clk_mii(i))
         begin
-            if eth_clk_mii(i)'event and eth_clk_mii(i) = '1' then
-                if eth_reset_tx_i(i) = '1' then
+            if (eth_clk_mii(i)'event and eth_clk_mii(i) = '1') then
+                if (eth_reset_tx_i(i) = '1') then
                     eth_txd_reg0((i+1)*64-1 downto i*64) <= X"0707070707070707";
                     eth_txc_reg0((i+1)*8-1 downto  i*8)  <= (others => '1');
 
@@ -242,33 +242,33 @@ begin
     gen_async_cross: for i in 0 to ETH_PORT_CHAN - 1 generate
         -- synchronize TX_LINK_UP
         tx_link_up_sync_i : entity work.ASYNC_OPEN_LOOP
-        generic map(
+        generic map (
             IN_REG  => false,
             TWO_REG => true
         )
-        port map(
+        port map (
             ADATAIN  => tx_local_fault(i),
-            BCLK => eth_clk_mii(i),
-            BRST => '0',
+            BCLK     => eth_clk_mii(i),
+            BRST     => '0',
             BDATAOUT => tx_local_fault_sync(i)
         );
         TX_LINK_UP(i) <= not tx_local_fault_sync(i);
 
         -- Synchronize reset
         eth_reset_sync_i: entity work.ASYNC_RESET
-        generic map(
+        generic map (
             TWO_REG  => false,
             OUT_REG  => true,
             REPLICAS => 1
         )
-        port map(
+        port map (
             --! A clock domain
             CLK        => eth_clk_mii(i),
             ASYNC_RST  => RESET_ETH,
             OUT_RST    => reset_eth_int(i downto i)
         );
 
-     end generate;
+    end generate;
 
     TX_MFB_DATA    <= tx_int_mfb_data;
     TX_MFB_MII_ERR <= tx_int_mfb_error;

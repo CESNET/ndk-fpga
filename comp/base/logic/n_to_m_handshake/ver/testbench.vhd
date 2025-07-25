@@ -17,20 +17,20 @@ use work.math_pack.all;
 use work.dma_bus_pack.all;
 use work.basics_test_pkg.all;
 use std.env.stop;
-use STD.textio.all;
+use std.textio.all;
 
 -- ----------------------------------------------------------------------------
 --                        Entity declaration
 -- ----------------------------------------------------------------------------
 
-entity testbench is
-end entity testbench;
+entity TESTBENCH is
+end entity;
 
 -- ----------------------------------------------------------------------------
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
 
-architecture behavioral of testbench is
+architecture BEHAVIORAL of TESTBENCH is
 
     -- Constants declaration ---------------------------------------------------
 
@@ -65,11 +65,11 @@ architecture behavioral of testbench is
 
     signal test_out_data     : slv_array_2d_t(DESTINATIONS-1 downto 0)(SOURCES-1 downto 0)(MAX_DATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
     signal test_out_data_reg : slv_array_2d_t(DESTINATIONS-1 downto 0)(SOURCES-1 downto 0)(MAX_DATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
-    signal test_ok : std_logic := '1';
+    signal test_ok           : std_logic := '1';
 
--- ----------------------------------------------------------------------------
---                            Architecture body
--- ----------------------------------------------------------------------------
+    -- ----------------------------------------------------------------------------
+    --                            Architecture body
+    -- ----------------------------------------------------------------------------
 
 begin
 
@@ -78,25 +78,25 @@ begin
     -- -------------------------------------------------------------------------
 
     uut : entity work.N_TO_M_HANDSHAKE
-    generic map(
-        SOURCES        => SOURCES       ,
+    generic map (
+        SOURCES        => SOURCES,
         MAX_DATA_WIDTH => MAX_DATA_WIDTH,
-        DESTINATIONS   => DESTINATIONS  ,
+        DESTINATIONS   => DESTINATIONS,
         OUTPUT_REG_EN  => OUTPUT_REG_EN
     )
-    port map(
+    port map (
         CLK         => clk,
         RESET       => rst,
 
-        IN_DATA     => IN_DATA     ,
-        IN_SRC_RDY  => IN_SRC_RDY  ,
-        IN_DST_RDY  => IN_DST_RDY  ,
+        IN_DATA     => in_data,
+        IN_SRC_RDY  => in_src_rdy,
+        IN_DST_RDY  => in_dst_rdy,
 
-        OUT_DATA    => OUT_DATA    ,
-        OUT_SRC_RDY => OUT_SRC_RDY ,
-        OUT_DST_RDY => OUT_DST_RDY ,
+        OUT_DATA    => out_data,
+        OUT_SRC_RDY => out_src_rdy,
+        OUT_DST_RDY => out_dst_rdy,
 
-        ALL_RDY     => ALL_RDY
+        ALL_RDY     => all_rdy
 
     );
 
@@ -105,22 +105,22 @@ begin
     -- -------------------------------------------------------------------------
 
     -- generating clk
-    clk_gen: process
+    clk_gen : process
     begin
         clk <= '1';
         wait for C_CLK_PER / 2;
         clk <= '0';
         wait for C_CLK_PER / 2;
-    end process clk_gen;
+    end process;
 
     -- generating reset
-    rst_gen: process
+    rst_gen : process
     begin
         rst <= '1';
         wait for C_RST_TIME;
         rst <= '0';
         wait;
-    end process rst_gen;
+    end process;
 
     -- -------------------------------------------------------------------------
 
@@ -129,26 +129,26 @@ begin
         variable seed2 : positive := 42;
 
         variable rand  : real;
-        variable X     : integer;
+        variable x     : integer;
     begin
         wait for 1 ns;
         -- Wait for the reset
-        if (rst='1') then
-            wait until rst='0';
+        if (rst = '1') then
+            wait until rst = '0';
         end if;
 
         -- input gen
         for i in 0 to SOURCES-1 loop
             for e in 0 to DESTINATIONS-1 loop
                 in_data(i)(e) <= random_vector(MAX_DATA_WIDTH,seed1);
-                seed1 := seed1+1;
+                seed1         := seed1+1;
             end loop;
         end loop;
         in_src_rdy  <= random_vector(SOURCES,seed1);
         out_dst_rdy <= random_vector(DESTINATIONS,seed2);
 
-        randint(seed1,seed2,0,99,X);
-        if (X<ALL_RDY_CHANCE) then
+        randint(seed1,seed2,0,99,x);
+        if (x < ALL_RDY_CHANCE) then
             in_src_rdy  <= (others => '1');
             out_dst_rdy <= (others => '1');
         end if;
@@ -161,7 +161,7 @@ begin
     begin
         test_out_data <= (others => (others => (others => 'X')));
         for i in 0 to SOURCES-1 loop
-            if (in_src_rdy(i)='1' and in_dst_rdy(i)='1') then
+            if (in_src_rdy(i) = '1' and in_dst_rdy(i) = '1') then
                 for e in 0 to DESTINATIONS-1 loop
                     test_out_data(e)(i) <= in_data(i)(e);
                 end loop;
@@ -169,11 +169,11 @@ begin
         end loop;
     end process;
 
-    reg_pr : process (CLK)
+    reg_pr : process (clk)
     begin
-        if (rising_edge(CLK)) then
+        if (rising_edge(clk)) then
             for i in 0 to SOURCES-1 loop
-                if (in_dst_rdy(i)='1') then
+                if (in_dst_rdy(i) = '1') then
                     for e in 0 to DESTINATIONS-1 loop
                         test_out_data_reg(e)(i) <= test_out_data(e)(i);
                     end loop;
@@ -183,19 +183,19 @@ begin
     end process;
 
     -- output monitor
-    output_monitor_pr : process (CLK)
+    output_monitor_pr : process (clk)
         variable v_test_out_data : slv_array_2d_t(DESTINATIONS-1 downto 0)(SOURCES-1 downto 0)(MAX_DATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
     begin
-        if (rising_edge(CLK)) then
-            test_ok <= '1';
+        if (rising_edge(clk)) then
+            test_ok         <= '1';
             v_test_out_data := test_out_data;
             if (OUTPUT_REG_EN) then
                 v_test_out_data := test_out_data_reg;
             end if;
             for i in 0 to DESTINATIONS-1 loop
-                if (out_src_rdy(i)='1' and out_dst_rdy(i)='1') then
+                if (out_src_rdy(i) = '1' and out_dst_rdy(i) = '1') then
                     for e in 0 to SOURCES-1 loop
-                        if (v_test_out_data(i)(e)/=out_data(i)(e)) then
+                        if (v_test_out_data(i)(e) /= out_data(i)(e)) then
                             test_ok <= '0';
                         end if;
                     end loop;
@@ -209,8 +209,9 @@ begin
     begin
         for i in 0 to TEST_TIME-1 loop
             wait for C_CLK_PER;
-            if (test_ok='0') then
-                report "ERROR" severity failure;
+            if (test_ok = '0') then
+                report "ERROR"
+                    severity failure;
                 stop(1);
             end if;
         end loop;
@@ -218,4 +219,4 @@ begin
         stop(0);
     end process;
 
-end architecture behavioral;
+end architecture;

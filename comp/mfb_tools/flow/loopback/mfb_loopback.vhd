@@ -43,7 +43,7 @@ entity MFB_LOOPBACK is
         -- When true, the MI bus and the internal logic use the same clock, otherwise the
         -- asynchronous crossing is inserted
         SAME_CLK      : boolean := TRUE
-        );
+    );
     port (
         -- =========================================================================================
         -- MI32 interface
@@ -112,12 +112,12 @@ entity MFB_LOOPBACK is
         TX_EOF_POS_IN : in  std_logic_vector(REGIONS*max(1, log2(REGION_SIZE*BLOCK_SIZE)) -1 downto 0);
         TX_SRC_RDY_IN : in  std_logic;
         TX_DST_RDY_IN : out std_logic
-        );
+    );
 end entity;
 
 architecture FULL of MFB_LOOPBACK is
 
-    constant mi_split_addr_base : slv_array_t(2-1 downto 0)(32-1 downto 0) :=
+    constant MI_SPLIT_ADDR_BASE : slv_array_t(2-1 downto 0)(32-1 downto 0) :=
         (X"00000040", X"00000000");
 
     signal mi_sync_dwr  : std_logic_vector(32-1 downto 0);
@@ -224,34 +224,34 @@ begin
         mi_clk_diff_g : if (not SAME_CLK) generate
 
             mi_async_i : entity work.MI_ASYNC
-                generic map(
-                    DEVICE => DEVICE
-                    )
-                port map(
-                    -- Master interface
-                    CLK_M     => MI_CLK,
-                    RESET_M   => MI_RESET,
-                    MI_M_DWR  => MI_DWR,
-                    MI_M_ADDR => MI_ADDR,
-                    MI_M_RD   => MI_RD,
-                    MI_M_WR   => MI_WR,
-                    MI_M_BE   => (others => '1'),
-                    MI_M_DRD  => MI_DRD,
-                    MI_M_ARDY => MI_ARDY,
-                    MI_M_DRDY => MI_DRDY,
+            generic map (
+                DEVICE => DEVICE
+            )
+            port map (
+                -- Master interface
+                CLK_M     => MI_CLK,
+                RESET_M   => MI_RESET,
+                MI_M_DWR  => MI_DWR,
+                MI_M_ADDR => MI_ADDR,
+                MI_M_RD   => MI_RD,
+                MI_M_WR   => MI_WR,
+                MI_M_BE   => (others => '1'),
+                MI_M_DRD  => MI_DRD,
+                MI_M_ARDY => MI_ARDY,
+                MI_M_DRDY => MI_DRDY,
 
-                    -- Slave interface
-                    CLK_S     => CLK,
-                    RESET_S   => RESET,
-                    MI_S_DWR  => mi_sync_dwr,
-                    MI_S_ADDR => mi_sync_addr,
-                    MI_S_RD   => mi_sync_rd,
-                    MI_S_WR   => mi_sync_wr,
-                    MI_S_BE   => open,
-                    MI_S_DRD  => mi_sync_drd,
-                    MI_S_ARDY => mi_sync_ardy,
-                    MI_S_DRDY => mi_sync_drdy
-                    );
+                -- Slave interface
+                CLK_S     => CLK,
+                RESET_S   => RESET,
+                MI_S_DWR  => mi_sync_dwr,
+                MI_S_ADDR => mi_sync_addr,
+                MI_S_RD   => mi_sync_rd,
+                MI_S_WR   => mi_sync_wr,
+                MI_S_BE   => open,
+                MI_S_DRD  => mi_sync_drd,
+                MI_S_ARDY => mi_sync_ardy,
+                MI_S_DRDY => mi_sync_drdy
+            );
 
         else generate
 
@@ -348,138 +348,146 @@ begin
     end generate;
 
     rx_in_mfb_pipe_i : entity work.MFB_PIPE
-        generic map (
-            REGIONS     => REGIONS,
-            REGION_SIZE => REGION_SIZE,
-            BLOCK_SIZE  => BLOCK_SIZE,
-            ITEM_WIDTH  => ITEM_WIDTH,
-            META_WIDTH  => META_WIDTH,
+    generic map (
+        REGIONS     => REGIONS,
+        REGION_SIZE => REGION_SIZE,
+        BLOCK_SIZE  => BLOCK_SIZE,
+        ITEM_WIDTH  => ITEM_WIDTH,
+        META_WIDTH  => META_WIDTH,
 
-            FAKE_PIPE   => (not PIPED_PORTS) or FAKE_LOOPBACK,
-            USE_DST_RDY => true,
-            PIPE_TYPE   => "REG",
-            DEVICE      => DEVICE)
-        port map (
-            CLK        => CLK,
-            RESET      => RESET,
+        FAKE_PIPE   => (not PIPED_PORTS) or FAKE_LOOPBACK,
+        USE_DST_RDY => true,
+        PIPE_TYPE   => "REG",
+        DEVICE      => DEVICE
+    )
+    port map (
+        CLK        => CLK,
+        RESET      => RESET,
 
-            RX_DATA    => RX_DATA_IN,
-            RX_META    => RX_META_IN,
-            RX_SOF_POS => RX_SOF_POS_IN,
-            RX_EOF_POS => RX_EOF_POS_IN,
-            RX_SOF     => RX_SOF_IN,
-            RX_EOF     => RX_EOF_IN,
-            RX_SRC_RDY => RX_SRC_RDY_IN,
-            RX_DST_RDY => RX_DST_RDY_IN,
+        RX_DATA    => RX_DATA_IN,
+        RX_META    => RX_META_IN,
+        RX_SOF_POS => RX_SOF_POS_IN,
+        RX_EOF_POS => RX_EOF_POS_IN,
+        RX_SOF     => RX_SOF_IN,
+        RX_EOF     => RX_EOF_IN,
+        RX_SRC_RDY => RX_SRC_RDY_IN,
+        RX_DST_RDY => RX_DST_RDY_IN,
 
-            TX_DATA    => rx_data_in_pipe,
-            TX_META    => rx_meta_in_pipe,
-            TX_SOF_POS => rx_sof_pos_in_pipe,
-            TX_EOF_POS => rx_eof_pos_in_pipe,
-            TX_SOF     => rx_sof_in_pipe,
-            TX_EOF     => rx_eof_in_pipe,
-            TX_SRC_RDY => rx_src_rdy_in_pipe,
-            TX_DST_RDY => rx_dst_rdy_in_pipe);
+        TX_DATA    => rx_data_in_pipe,
+        TX_META    => rx_meta_in_pipe,
+        TX_SOF_POS => rx_sof_pos_in_pipe,
+        TX_EOF_POS => rx_eof_pos_in_pipe,
+        TX_SOF     => rx_sof_in_pipe,
+        TX_EOF     => rx_eof_in_pipe,
+        TX_SRC_RDY => rx_src_rdy_in_pipe,
+        TX_DST_RDY => rx_dst_rdy_in_pipe
+    );
 
     rx_out_mfb_pipe_i : entity work.MFB_PIPE
-        generic map (
-            REGIONS     => REGIONS,
-            REGION_SIZE => REGION_SIZE,
-            BLOCK_SIZE  => BLOCK_SIZE,
-            ITEM_WIDTH  => ITEM_WIDTH,
-            META_WIDTH  => META_WIDTH,
+    generic map (
+        REGIONS     => REGIONS,
+        REGION_SIZE => REGION_SIZE,
+        BLOCK_SIZE  => BLOCK_SIZE,
+        ITEM_WIDTH  => ITEM_WIDTH,
+        META_WIDTH  => META_WIDTH,
 
-            FAKE_PIPE   => (not PIPED_PORTS) or FAKE_LOOPBACK,
-            USE_DST_RDY => true,
-            PIPE_TYPE   => "REG",
-            DEVICE      => DEVICE)
-        port map (
-            CLK        => CLK,
-            RESET      => RESET,
+        FAKE_PIPE   => (not PIPED_PORTS) or FAKE_LOOPBACK,
+        USE_DST_RDY => true,
+        PIPE_TYPE   => "REG",
+        DEVICE      => DEVICE
+    )
+    port map (
+        CLK        => CLK,
+        RESET      => RESET,
 
-            RX_DATA    => rx_data_out_pipe,
-            RX_META    => rx_meta_out_pipe,
-            RX_SOF_POS => rx_sof_pos_out_pipe,
-            RX_EOF_POS => rx_eof_pos_out_pipe,
-            RX_SOF     => rx_sof_out_pipe,
-            RX_EOF     => rx_eof_out_pipe,
-            RX_SRC_RDY => rx_src_rdy_out_pipe,
-            RX_DST_RDY => rx_dst_rdy_out_pipe,
+        RX_DATA    => rx_data_out_pipe,
+        RX_META    => rx_meta_out_pipe,
+        RX_SOF_POS => rx_sof_pos_out_pipe,
+        RX_EOF_POS => rx_eof_pos_out_pipe,
+        RX_SOF     => rx_sof_out_pipe,
+        RX_EOF     => rx_eof_out_pipe,
+        RX_SRC_RDY => rx_src_rdy_out_pipe,
+        RX_DST_RDY => rx_dst_rdy_out_pipe,
 
-            TX_DATA    => RX_DATA_OUT,
-            TX_META    => RX_META_OUT,
-            TX_SOF_POS => RX_SOF_POS_OUT,
-            TX_EOF_POS => RX_EOF_POS_OUT,
-            TX_SOF     => RX_SOF_OUT,
-            TX_EOF     => RX_EOF_OUT,
-            TX_SRC_RDY => RX_SRC_RDY_OUT,
-            TX_DST_RDY => RX_DST_RDY_OUT);
+        TX_DATA    => RX_DATA_OUT,
+        TX_META    => RX_META_OUT,
+        TX_SOF_POS => RX_SOF_POS_OUT,
+        TX_EOF_POS => RX_EOF_POS_OUT,
+        TX_SOF     => RX_SOF_OUT,
+        TX_EOF     => RX_EOF_OUT,
+        TX_SRC_RDY => RX_SRC_RDY_OUT,
+        TX_DST_RDY => RX_DST_RDY_OUT
+    );
 
     tx_in_mfb_pipe_i : entity work.MFB_PIPE
-        generic map (
-            REGIONS     => REGIONS,
-            REGION_SIZE => REGION_SIZE,
-            BLOCK_SIZE  => BLOCK_SIZE,
-            ITEM_WIDTH  => ITEM_WIDTH,
-            META_WIDTH  => META_WIDTH,
+    generic map (
+        REGIONS     => REGIONS,
+        REGION_SIZE => REGION_SIZE,
+        BLOCK_SIZE  => BLOCK_SIZE,
+        ITEM_WIDTH  => ITEM_WIDTH,
+        META_WIDTH  => META_WIDTH,
 
-            FAKE_PIPE   => (not PIPED_PORTS) or FAKE_LOOPBACK,
-            USE_DST_RDY => true,
-            PIPE_TYPE   => "REG",
-            DEVICE      => DEVICE)
-        port map (
-            CLK        => CLK,
-            RESET      => RESET,
+        FAKE_PIPE   => (not PIPED_PORTS) or FAKE_LOOPBACK,
+        USE_DST_RDY => true,
+        PIPE_TYPE   => "REG",
+        DEVICE      => DEVICE
+    )
+    port map (
+        CLK        => CLK,
+        RESET      => RESET,
 
-            RX_DATA    => TX_DATA_IN,
-            RX_META    => TX_META_IN,
-            RX_SOF_POS => TX_SOF_POS_IN,
-            RX_EOF_POS => TX_EOF_POS_IN,
-            RX_SOF     => TX_SOF_IN,
-            RX_EOF     => TX_EOF_IN,
-            RX_SRC_RDY => TX_SRC_RDY_IN,
-            RX_DST_RDY => TX_DST_RDY_IN,
+        RX_DATA    => TX_DATA_IN,
+        RX_META    => TX_META_IN,
+        RX_SOF_POS => TX_SOF_POS_IN,
+        RX_EOF_POS => TX_EOF_POS_IN,
+        RX_SOF     => TX_SOF_IN,
+        RX_EOF     => TX_EOF_IN,
+        RX_SRC_RDY => TX_SRC_RDY_IN,
+        RX_DST_RDY => TX_DST_RDY_IN,
 
-            TX_DATA    => tx_data_in_pipe,
-            TX_META    => tx_meta_in_pipe,
-            TX_SOF_POS => tx_sof_pos_in_pipe,
-            TX_EOF_POS => tx_eof_pos_in_pipe,
-            TX_SOF     => tx_sof_in_pipe,
-            TX_EOF     => tx_eof_in_pipe,
-            TX_SRC_RDY => tx_src_rdy_in_pipe,
-            TX_DST_RDY => tx_dst_rdy_in_pipe);
+        TX_DATA    => tx_data_in_pipe,
+        TX_META    => tx_meta_in_pipe,
+        TX_SOF_POS => tx_sof_pos_in_pipe,
+        TX_EOF_POS => tx_eof_pos_in_pipe,
+        TX_SOF     => tx_sof_in_pipe,
+        TX_EOF     => tx_eof_in_pipe,
+        TX_SRC_RDY => tx_src_rdy_in_pipe,
+        TX_DST_RDY => tx_dst_rdy_in_pipe
+    );
 
     tx_out_mfb_pipe_i : entity work.MFB_PIPE
-        generic map (
-            REGIONS     => REGIONS,
-            REGION_SIZE => REGION_SIZE,
-            BLOCK_SIZE  => BLOCK_SIZE,
-            ITEM_WIDTH  => ITEM_WIDTH,
-            META_WIDTH  => META_WIDTH,
+    generic map (
+        REGIONS     => REGIONS,
+        REGION_SIZE => REGION_SIZE,
+        BLOCK_SIZE  => BLOCK_SIZE,
+        ITEM_WIDTH  => ITEM_WIDTH,
+        META_WIDTH  => META_WIDTH,
 
-            FAKE_PIPE   => (not PIPED_PORTS) or FAKE_LOOPBACK,
-            USE_DST_RDY => true,
-            PIPE_TYPE   => "REG",
-            DEVICE      => DEVICE)
-        port map (
-            CLK        => CLK,
-            RESET      => RESET,
+        FAKE_PIPE   => (not PIPED_PORTS) or FAKE_LOOPBACK,
+        USE_DST_RDY => true,
+        PIPE_TYPE   => "REG",
+        DEVICE      => DEVICE
+    )
+    port map (
+        CLK        => CLK,
+        RESET      => RESET,
 
-            RX_DATA    => tx_data_out_pipe,
-            RX_META    => tx_meta_out_pipe,
-            RX_SOF_POS => tx_sof_pos_out_pipe,
-            RX_EOF_POS => tx_eof_pos_out_pipe,
-            RX_SOF     => tx_sof_out_pipe,
-            RX_EOF     => tx_eof_out_pipe,
-            RX_SRC_RDY => tx_src_rdy_out_pipe,
-            RX_DST_RDY => tx_dst_rdy_out_pipe,
+        RX_DATA    => tx_data_out_pipe,
+        RX_META    => tx_meta_out_pipe,
+        RX_SOF_POS => tx_sof_pos_out_pipe,
+        RX_EOF_POS => tx_eof_pos_out_pipe,
+        RX_SOF     => tx_sof_out_pipe,
+        RX_EOF     => tx_eof_out_pipe,
+        RX_SRC_RDY => tx_src_rdy_out_pipe,
+        RX_DST_RDY => tx_dst_rdy_out_pipe,
 
-            TX_DATA    => TX_DATA_OUT,
-            TX_META    => TX_META_OUT,
-            TX_SOF_POS => TX_SOF_POS_OUT,
-            TX_EOF_POS => TX_EOF_POS_OUT,
-            TX_SOF     => TX_SOF_OUT,
-            TX_EOF     => TX_EOF_OUT,
-            TX_SRC_RDY => TX_SRC_RDY_OUT,
-            TX_DST_RDY => TX_DST_RDY_OUT);
+        TX_DATA    => TX_DATA_OUT,
+        TX_META    => TX_META_OUT,
+        TX_SOF_POS => TX_SOF_POS_OUT,
+        TX_EOF_POS => TX_EOF_POS_OUT,
+        TX_SOF     => TX_SOF_OUT,
+        TX_EOF     => TX_EOF_OUT,
+        TX_SRC_RDY => TX_SRC_RDY_OUT,
+        TX_DST_RDY => TX_DST_RDY_OUT
+    );
 end architecture;

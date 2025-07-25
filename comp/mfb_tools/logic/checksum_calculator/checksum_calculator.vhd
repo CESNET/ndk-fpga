@@ -21,78 +21,78 @@ use work.type_pack.all;
 -- The calculation can be "disabled" per each frame by setting the RX_CHSUM_EN to 0.
 -- This dis/enabling of the checksum results in propagating the inverted value of the RX_CHSUM_EN to the TX_CHSUM_BYPASS output (to be reworked).
 entity CHECKSUM_CALCULATOR is
-generic(
-    -- Number of Regions within a data word, must be power of 2.
-    MFB_REGIONS     : natural := 4;
-    -- Region size (in Blocks).
-    MFB_REGION_SIZE : natural := 8;
-    -- Block size (in Items).
-    MFB_BLOCK_SIZE  : natural := 8;
-    -- Item width (in bits), must be 8.
-    MFB_ITEM_WIDTH  : natural := 8;
-    -- Metadata width (in bits), valid with SOF.
-    MFB_META_WIDTH  : natural := 0;
+    generic (
+        -- Number of Regions within a data word, must be power of 2.
+        MFB_REGIONS     : natural := 4;
+        -- Region size (in Blocks).
+        MFB_REGION_SIZE : natural := 8;
+        -- Block size (in Items).
+        MFB_BLOCK_SIZE  : natural := 8;
+        -- Item width (in bits), must be 8.
+        MFB_ITEM_WIDTH  : natural := 8;
+        -- Metadata width (in bits), valid with SOF.
+        MFB_META_WIDTH  : natural := 0;
 
-    -- Maximum size of a packet (in Items).
-    PKT_MTU         : natural := 2**14;
+        -- Maximum size of a packet (in Items).
+        PKT_MTU         : natural := 2**14;
 
-    -- Width of each Offset signal in the in the RX_OFFSET vector.
-    OFFSET_WIDTH    : integer := 7;
-    -- Width of each Length signal in the in the RX_LENGTH vector.
-    LENGTH_WIDTH    : integer := 9;
+        -- Width of each Offset signal in the in the RX_OFFSET vector.
+        OFFSET_WIDTH    : integer := 7;
+        -- Width of each Length signal in the in the RX_LENGTH vector.
+        LENGTH_WIDTH    : integer := 9;
 
-    -- Select Network order (checksum bytes are swapped at the output).
-    NETWORK_ORDER   : boolean := False;
-    -- FPGA device name.
-    -- Options: ULTRASCALE, STRATIX10, AGILEX, ...
-    DEVICE          : string := "STRATIX10"
-);
-port(
-    -- ========================================================================
-    -- Clock and Reset
-    -- ========================================================================
+        -- Select Network order (checksum bytes are swapped at the output).
+        NETWORK_ORDER   : boolean := False;
+        -- FPGA device name.
+        -- Options: ULTRASCALE, STRATIX10, AGILEX, ...
+        DEVICE          : string := "STRATIX10"
+    );
+    port (
+        -- ========================================================================
+        -- Clock and Reset
+        -- ========================================================================
 
-    CLK   : in  std_logic;
-    RESET : in  std_logic;
+        CLK   : in  std_logic;
+        RESET : in  std_logic;
 
-    -- ========================================================================
-    -- RX STREAM
-    --
-    -- #. Input packets (MFB),
-    -- #. Meta information (header offsets and lengths).
-    -- ========================================================================
+        -- ========================================================================
+        -- RX STREAM
+        --
+        -- #. Input packets (MFB),
+        -- #. Meta information (header offsets and lengths).
+        -- ========================================================================
 
-    RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    RX_MFB_META    : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
-    RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
-    RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
-    RX_MFB_SRC_RDY : in  std_logic;
-    RX_MFB_DST_RDY : out std_logic;
+        RX_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        RX_MFB_META    : in  std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
+        RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+        RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        RX_MFB_SOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        RX_MFB_SRC_RDY : in  std_logic;
+        RX_MFB_DST_RDY : out std_logic;
 
-    -- Header offset from SOF POS, valid with SOF.
-    RX_OFFSET      : in  std_logic_vector(MFB_REGIONS*OFFSET_WIDTH-1 downto 0);
-    -- Header length, valid with SOF.
-    RX_LENGTH      : in  std_logic_vector(MFB_REGIONS*LENGTH_WIDTH-1 downto 0);
-    -- Enable checksum calculation, valid with SOF.
-    RX_CHSUM_EN    : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        -- Header offset from SOF POS, valid with SOF.
+        RX_OFFSET      : in  std_logic_vector(MFB_REGIONS*OFFSET_WIDTH-1 downto 0);
+        -- Header length, valid with SOF.
+        RX_LENGTH      : in  std_logic_vector(MFB_REGIONS*LENGTH_WIDTH-1 downto 0);
+        -- Enable checksum calculation, valid with SOF.
+        RX_CHSUM_EN    : in  std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    -- ========================================================================
-    -- TX MVB STREAM
-    --
-    -- Calculated checksums.
-    -- ========================================================================
+        -- ========================================================================
+        -- TX MVB STREAM
+        --
+        -- Calculated checksums.
+        -- ========================================================================
 
-    -- The calculated checksum.
-    TX_MVB_DATA     : out std_logic_vector(MFB_REGIONS*16-1 downto 0);
-    TX_MVB_META     : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
-    -- Bypass checksum insertion (=> checksum caluculation is not desired).
-    TX_CHSUM_BYPASS : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MVB_VLD      : out std_logic_vector(MFB_REGIONS-1 downto 0);
-    TX_MVB_SRC_RDY  : out std_logic := '0';
-    TX_MVB_DST_RDY  : in  std_logic := '1'
-);
+        -- The calculated checksum.
+        TX_MVB_DATA     : out std_logic_vector(MFB_REGIONS*16-1 downto 0);
+        TX_MVB_META     : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
+        -- Bypass checksum insertion (=> checksum caluculation is not desired).
+        TX_CHSUM_BYPASS : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MVB_VLD      : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        TX_MVB_SRC_RDY  : out std_logic := '0';
+        TX_MVB_DST_RDY  : in  std_logic := '1'
+    );
 end entity;
 
 architecture FULL of CHECKSUM_CALCULATOR is
@@ -114,14 +114,14 @@ architecture FULL of CHECKSUM_CALCULATOR is
     --                                FUNCTIONS
     -- ========================================================================
 
-    function int_is_odd(int : integer) return std_logic is
+    function int_is_odd (int : integer) return std_logic is
         variable slv : std_logic_vector(32-1 downto 0);
         variable odd : std_logic;
     begin
         slv := std_logic_vector(to_unsigned(int, 32));
         odd := slv(0);
         return odd;
-    end;
+    end function;
 
     -- ========================================================================
     --                                 SIGNALS
@@ -209,7 +209,7 @@ architecture FULL of CHECKSUM_CALCULATOR is
 
 begin
 
-    assert MFB_ITEM_WIDTH=8
+    assert MFB_ITEM_WIDTH = 8
         report "CHECKSUM CALCULATOR: MFB_ITEM_WIDTH must be 8!" &
                "MFB_ITEM_WIDTH is currently " & integer'image(MFB_ITEM_WIDTH)
         severity Failure;
@@ -228,29 +228,29 @@ begin
     meta_fifoxm_wr  <= (RX_MFB_SOF and RX_MFB_SRC_RDY) and RX_MFB_DST_RDY;
 
     meta_fifoxm_i : entity work.FIFOX_MULTI(shakedown)
-    generic map(
+    generic map (
         DATA_WIDTH          => MFB_META_WIDTH+1,
-        ITEMS               => 512             ,
-        WRITE_PORTS         => MFB_REGIONS     ,
-        READ_PORTS          => MFB_REGIONS     ,
-        RAM_TYPE            => "AUTO"          ,
-        DEVICE              => DEVICE          ,
-        ALMOST_FULL_OFFSET  => 0               ,
-        ALMOST_EMPTY_OFFSET => 0               ,
-        ALLOW_SINGLE_FIFO   => True            ,
+        ITEMS               => 512,
+        WRITE_PORTS         => MFB_REGIONS,
+        READ_PORTS          => MFB_REGIONS,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        ALLOW_SINGLE_FIFO   => True,
         SAFE_READ_MODE      => False
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        DI    => meta_fifoxm_din   ,
-        WR    => meta_fifoxm_wr    ,
-        FULL  => meta_fifoxm_full  ,
-        AFULL => open              ,
+        DI    => meta_fifoxm_din,
+        WR    => meta_fifoxm_wr,
+        FULL  => meta_fifoxm_full,
+        AFULL => open,
 
-        DO     => meta_fifoxm_dout ,
-        RD     => meta_fifoxm_rd   ,
+        DO     => meta_fifoxm_dout,
+        RD     => meta_fifoxm_rd,
         EMPTY  => meta_fifoxm_empty,
         AEMPTY => open
     );
@@ -272,7 +272,7 @@ begin
     --  Input register
     -- ========================================================================
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (rx_ext_dst_rdy = '1') then
@@ -299,43 +299,43 @@ begin
     -- ========================================================================
 
     mfb_items_vld_i : entity work.MFB_ITEMS_VLD
-    generic map(
-        MFB_REGIONS     => MFB_REGIONS    ,
+    generic map (
+        MFB_REGIONS     => MFB_REGIONS,
         MFB_REGION_SIZE => MFB_REGION_SIZE,
-        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE ,
-        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH ,
-        PKT_MTU         => PKT_MTU        ,
-        OFFSET_WIDTH    => OFFSET_WIDTH   ,
+        MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+        PKT_MTU         => PKT_MTU,
+        OFFSET_WIDTH    => OFFSET_WIDTH,
         LENGTH_WIDTH    => LENGTH_WIDTH
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        RX_MFB_DATA    => rx_ext_data   ,
+        RX_MFB_DATA    => rx_ext_data,
         RX_MFB_SOF_POS => rx_ext_sof_pos,
         RX_MFB_EOF_POS => rx_ext_eof_pos,
-        RX_MFB_SOF     => rx_ext_sof    ,
-        RX_MFB_EOF     => rx_ext_eof    ,
+        RX_MFB_SOF     => rx_ext_sof,
+        RX_MFB_EOF     => rx_ext_eof,
         RX_MFB_SRC_RDY => rx_ext_src_rdy,
         RX_MFB_DST_RDY => rx_ext_dst_rdy,
 
-        RX_OFFSET      => rx_ext_off    ,
-        RX_LENGTH      => rx_ext_len    ,
+        RX_OFFSET      => rx_ext_off,
+        RX_LENGTH      => rx_ext_len,
         RX_ENABLE      => (others => '1'),
 
-        TX_DATA        => tx_ext_data   ,
-        TX_END         => tx_ext_end    ,
-        TX_VLD         => tx_ext_vld    ,
+        TX_DATA        => tx_ext_data,
+        TX_END         => tx_ext_end,
+        TX_VLD         => tx_ext_vld,
         TX_SRC_RDY     => tx_ext_src_rdy,
         TX_DST_RDY     => tx_ext_dst_rdy
     );
 
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
-            if (tx_ext_src_rdy = '1') and (tx_ext_dst_rdy = '1') then
+            if ((tx_ext_src_rdy = '1') and (tx_ext_dst_rdy = '1')) then
                 tx_ext_end_reg <= tx_ext_end(MFB_DATA_ITEMS-1);
             end if;
             if (RESET = '1') then
@@ -344,29 +344,29 @@ begin
         end if;
     end process;
 
-    odd_start(0) <= '0'; -- not needed tho
+    odd_start(0)    <= '0'; -- not needed tho
     last_vld_din(0) <= '0';
     last_vld_vld(0) <= tx_ext_end_reg;
     odd_sig_g : for i in 1 to MFB_DATA_ITEMS-1 generate
         odd_start   (i) <= not tx_ext_vld(i-1) and tx_ext_vld(i) and int_is_odd(i); -- automatically '0' for all even "i"s
-        last_vld_din(i) <= '0' when tx_ext_end(i-1) = '1' else odd_start(i); -- End always overwrites the Odd signal to '0'
+        last_vld_din(i) <= '0' when tx_ext_end(i-1) = '1' else odd_start(i);        -- End always overwrites the Odd signal to '0'
         last_vld_vld(i) <= odd_start(i) or tx_ext_end(i-1);
     end generate;
 
     last_vld_i : entity work.MVB_AGGREGATE_LAST_VLD
-    generic map(
+    generic map (
         ITEMS          => MFB_DATA_ITEMS,
-        ITEM_WIDTH     => 1             ,
+        ITEM_WIDTH     => 1,
         IMPLEMENTATION => AGGREGATE_IMPL,
-        INTERNAL_REG   => true          ,
+        INTERNAL_REG   => true,
         RESET_DATA     => true
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        RX_DATA    => last_vld_din  ,
-        RX_VLD     => last_vld_vld  ,
+        RX_DATA    => last_vld_din,
+        RX_VLD     => last_vld_vld,
         RX_SRC_RDY => tx_ext_src_rdy,
         RX_DST_RDY => tx_ext_dst_rdy,
 
@@ -388,14 +388,14 @@ begin
     --  Checksum calculation
     -- ========================================================================
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (and rx_rchsum_dst_rdy) then
                 rx_rchsum_data    <= slv_array_deser(tx_ext_data, MFB_REGIONS);
-                rx_rchsum_odd     <= slv_array_deser(tx_ext_odd , MFB_REGIONS);
-                rx_rchsum_end     <= slv_array_deser(tx_ext_end , MFB_REGIONS);
-                rx_rchsum_vld     <= slv_array_deser(tx_ext_vld , MFB_REGIONS);
+                rx_rchsum_odd     <= slv_array_deser(tx_ext_odd, MFB_REGIONS);
+                rx_rchsum_end     <= slv_array_deser(tx_ext_end, MFB_REGIONS);
+                rx_rchsum_vld     <= slv_array_deser(tx_ext_vld, MFB_REGIONS);
                 rx_rchsum_src_rdy <= (others => tx_ext_src_rdy);
             end if;
             if (RESET = '1') then
@@ -412,12 +412,12 @@ begin
     chsum_regional_g : for r in 0 to MFB_REGIONS-1 generate
 
         chsum_regional_i : entity work.CHSUM_REGIONAL
-        generic map(
+        generic map (
             ITEMS          => MFB_REGION_ITEMS,
-            ITEM_WIDTH     => MFB_ITEM_WIDTH  ,
+            ITEM_WIDTH     => MFB_ITEM_WIDTH,
             CHECKSUM_WIDTH => CHECKSUM_W
         )
-        port map(
+        port map (
             CLK   => CLK,
             RESET => RESET,
 
@@ -443,7 +443,7 @@ begin
     --  Checksum calculation finalization
     -- -----------------------------------
 
-    process(CLK)
+    process (CLK)
     begin
         if rising_edge(CLK) then
             if (rx_fchsum_dst_rdy = '1') then
@@ -460,22 +460,22 @@ begin
     end process;
 
     chsum_finalizer_i : entity work.CHSUM_FINALIZER
-    generic map(
+    generic map (
         REGIONS        => MFB_REGIONS,
         CHECKSUM_WIDTH => CHECKSUM_W
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        RX_CHSUM_REGION => rx_fchsum_data   ,
-        RX_CHSUM_END    => rx_fchsum_end    ,
-        RX_CHSUM_VLD    => rx_fchsum_vld    ,
+        RX_CHSUM_REGION => rx_fchsum_data,
+        RX_CHSUM_END    => rx_fchsum_end,
+        RX_CHSUM_VLD    => rx_fchsum_vld,
         RX_SRC_RDY      => rx_fchsum_src_rdy,
         RX_DST_RDY      => rx_fchsum_dst_rdy,
 
-        TX_CHECKSUM     => tx_fchsum_data   ,
-        TX_VALID        => tx_fchsum_vld    ,
+        TX_CHECKSUM     => tx_fchsum_data,
+        TX_VALID        => tx_fchsum_vld,
         TX_SRC_RDY      => tx_fchsum_src_rdy,
         TX_DST_RDY      => tx_fchsum_dst_rdy
     );
@@ -484,35 +484,35 @@ begin
     -- Output FIFOX MULTI (shakedown)
     -- --------------------------------
 
-    fifoxm_datain <= tx_fchsum_data;
-    fifoxm_wr     <= tx_fchsum_vld and not fifoxm_full;
+    fifoxm_datain     <= tx_fchsum_data;
+    fifoxm_wr         <= tx_fchsum_vld and not fifoxm_full;
     tx_fchsum_dst_rdy <= not fifoxm_full;
 
     fifoxm_i : entity work.FIFOX_MULTI
-    generic map(
-        DATA_WIDTH          => CHECKSUM_W   ,
-        ITEMS               => 512          ,
+    generic map (
+        DATA_WIDTH          => CHECKSUM_W,
+        ITEMS               => 512,
         WRITE_PORTS         => MFB_REGIONS*2,
-        READ_PORTS          => MFB_REGIONS  ,
-        RAM_TYPE            => "AUTO"       ,
-        DEVICE              => DEVICE       ,
-        ALMOST_FULL_OFFSET  => 0            ,
-        ALMOST_EMPTY_OFFSET => 0            ,
-        ALLOW_SINGLE_FIFO   => True         ,
+        READ_PORTS          => MFB_REGIONS,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => 0,
+        ALMOST_EMPTY_OFFSET => 0,
+        ALLOW_SINGLE_FIFO   => True,
         SAFE_READ_MODE      => False
     )
-    port map(
+    port map (
         CLK   => CLK,
         RESET => RESET,
 
-        DI     => fifoxm_datain ,
-        WR     => fifoxm_wr     ,
-        FULL   => fifoxm_full   ,
-        AFULL  => open          ,
+        DI     => fifoxm_datain,
+        WR     => fifoxm_wr,
+        FULL   => fifoxm_full,
+        AFULL  => open,
 
         DO     => fifoxm_dataout,
-        RD     => fifoxm_rd     ,
-        EMPTY  => fifoxm_empty  ,
+        RD     => fifoxm_rd,
+        EMPTY  => fifoxm_empty,
         AEMPTY => open
     );
 
@@ -520,7 +520,7 @@ begin
     fifoxm_vo <= not fifoxm_empty;
     fifoxm_dout_g : for r in 0 to MFB_REGIONS-1 generate
         fifoxm_out_rdy(r) <= and fifoxm_vo(r downto 0);
-        fifoxm_rd(r) <= meta_fifoxm_out_rdy(r) and fifoxm_out_rdy(r) and TX_MVB_DST_RDY;
+        fifoxm_rd(r)      <= meta_fifoxm_out_rdy(r) and fifoxm_out_rdy(r) and TX_MVB_DST_RDY;
     end generate;
 
     -- ========================================================================

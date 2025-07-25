@@ -14,10 +14,10 @@ use work.math_pack.all;
 -- OUTPUT - MFB for Gen3x16 PCIe (Stratix10)
 
 entity PCIE_AXICC2MFB is
-    generic(
+    generic (
         DEVICE : string  := "STRATIX10"
     );
-    port(
+    port (
         CLK             : in  std_logic;
         RESET           : in  std_logic;
         -- =====================================================================
@@ -120,38 +120,38 @@ begin
         end if;
     end process;
 
-    s_mfb_sof <= "01" when (s_word_cnt = 0) else "00";
-    s_mfb_eof(0) <= s_reg_axi_cc_last and s_reg_axi_cc_keep(0) and not s_reg_axi_cc_keep(8);
-    s_mfb_eof(1) <= s_reg_axi_cc_last and s_reg_axi_cc_keep(8);
+    s_mfb_sof     <= "01" when (s_word_cnt = 0) else "00";
+    s_mfb_eof(0)  <= s_reg_axi_cc_last and s_reg_axi_cc_keep(0) and not s_reg_axi_cc_keep(8);
+    s_mfb_eof(1)  <= s_reg_axi_cc_last and s_reg_axi_cc_keep(8);
     s_mfb_src_rdy <= s_reg_axi_cc_vld;
 
     s_avst_data_p : process (s_reg_axi_cc_data, s_mfb_sof)
     begin
-        if (s_mfb_sof(0) = '1') then -- header and data
+        if (s_mfb_sof(0) = '1') then                                     -- header and data
             -- copy Intel header and data
-            s_mfb_data <= s_reg_axi_cc_data;
+            s_mfb_data               <= s_reg_axi_cc_data;
             -- header modifications (Xilinx to Intel)
             s_mfb_data(95 downto 80) <= s_reg_axi_cc_data(63 downto 48); -- Requester ID
             s_mfb_data(79 downto 72) <= s_reg_axi_cc_data(71 downto 64); -- Tag
-            s_mfb_data(71) <= '0'; -- reserved bit
-            s_mfb_data(70 downto 64) <= s_reg_axi_cc_data(6 downto 0); -- Lower Address
+            s_mfb_data(71)           <= '0';                             -- reserved bit
+            s_mfb_data(70 downto 64) <= s_reg_axi_cc_data(6 downto 0);   -- Lower Address
             s_mfb_data(63 downto 48) <= s_reg_axi_cc_data(87 downto 72); -- completer ID
             s_mfb_data(47 downto 45) <= s_reg_axi_cc_data(45 downto 43); -- status
-            s_mfb_data(44) <= '0'; -- BCM (force GND, this is only for PCI-X)
+            s_mfb_data(44)           <= '0';                             -- BCM (force GND, this is only for PCI-X)
             s_mfb_data(43 downto 32) <= s_reg_axi_cc_data(27 downto 16); -- byte count
-            s_mfb_data(31 downto 24) <= "01001010"; -- fmt & type (only Completion with Data is supported)
-            s_mfb_data(23) <= '0'; -- reserved bit
+            s_mfb_data(31 downto 24) <= "01001010";                      -- fmt & type (only Completion with Data is supported)
+            s_mfb_data(23)           <= '0';                             -- reserved bit
             s_mfb_data(22 downto 20) <= s_reg_axi_cc_data(91 downto 89); -- TC
-            s_mfb_data(19) <= '0'; -- reserved bit
-            s_mfb_data(18) <= s_reg_axi_cc_data(94); -- attr[2]
-            s_mfb_data(17) <= '0'; -- reserved bit
-            s_mfb_data(16) <= '0'; -- TH (reserved bit for completions)
-            s_mfb_data(15) <= s_reg_axi_cc_data(95); -- TD
-            s_mfb_data(14) <= s_reg_axi_cc_data(46); -- EP
+            s_mfb_data(19)           <= '0';                             -- reserved bit
+            s_mfb_data(18)           <= s_reg_axi_cc_data(94);           -- attr[2]
+            s_mfb_data(17)           <= '0';                             -- reserved bit
+            s_mfb_data(16)           <= '0';                             -- TH (reserved bit for completions)
+            s_mfb_data(15)           <= s_reg_axi_cc_data(95);           -- TD
+            s_mfb_data(14)           <= s_reg_axi_cc_data(46);           -- EP
             s_mfb_data(13 downto 12) <= s_reg_axi_cc_data(93 downto 92); -- attr[1:0]
-            s_mfb_data(11 downto 10) <= s_reg_axi_cc_data(9 downto 8); -- AT
-            s_mfb_data(9 downto 0) <= s_reg_axi_cc_data(41 downto 32); -- dword count
-        else -- only data
+            s_mfb_data(11 downto 10) <= s_reg_axi_cc_data(9 downto 8);   -- AT
+            s_mfb_data(9 downto 0)   <= s_reg_axi_cc_data(41 downto 32); -- dword count
+        else                                                             -- only data
             s_mfb_data <= s_reg_axi_cc_data;
         end if;
     end process;
@@ -163,7 +163,7 @@ begin
     -- =========================================================================
 
     mfb_pipe_i : entity work.MFB_PIPE
-    generic map(
+    generic map (
         REGIONS     => MFB_REGIONS,
         REGION_SIZE => MFB_REGION_SIZE,
         BLOCK_SIZE  => MFB_BLOCK_SIZE,
@@ -172,7 +172,7 @@ begin
         USE_DST_RDY => true,
         DEVICE      => DEVICE
     )
-    port map(
+    port map (
         CLK        => CLK,
         RESET      => RESET,
 

@@ -17,104 +17,104 @@ use IEEE.std_logic_arith.all;
 --!                        Entity declaration
 --! ----------------------------------------------------------------------------
 
-entity testbench is
-end entity testbench;
+entity TESTBENCH is
+end entity;
 
 --! ----------------------------------------------------------------------------
 --!                      Architecture declaration
 --! ----------------------------------------------------------------------------
 
-architecture behavioral of testbench is
+architecture BEHAVIORAL of TESTBENCH is
 
-   signal aclk        : std_logic;
-   signal bclk        : std_logic;
-   signal arst        : std_logic;
-   signal brst        : std_logic;
-   signal data_in     : std_logic;
-   signal data_out    : std_logic;
+    signal aclk        : std_logic;
+    signal bclk        : std_logic;
+    signal arst        : std_logic;
+    signal brst        : std_logic;
+    signal data_in     : std_logic;
+    signal data_out    : std_logic;
 
-   begin
+begin
 
-   uut : entity work.ASYNC_OPEN_LOOP
-   generic map(
-      IN_REG  => false,  --! For one register on input = true
-      TWO_REG => false   --! For two reg = true, for three reg = false
-   )
-   port map(
-      --! A clock domain
-      ACLK     => aclk,         --! Source clock
-      ARST     => arst,         --! Source reset
-      ADATAIN  => data_in,      --! Data input
+    uut : entity work.ASYNC_OPEN_LOOP
+    generic map (
+        IN_REG  => false,  --! For one register on input = true
+        TWO_REG => false   --! For two reg = true, for three reg = false
+    )
+    port map (
+        --! A clock domain
+        ACLK     => aclk,         --! Source clock
+        ARST     => arst,         --! Source reset
+        ADATAIN  => data_in,      --! Data input
 
-      --! B clock domain
-      BCLK     => bclk,         --! Target clock
-      BRST     => brst,         --! Target reset
-      BDATAOUT => data_out      --! Data output
-   );
+        --! B clock domain
+        BCLK     => bclk,         --! Target clock
+        BRST     => brst,         --! Target reset
+        BDATAOUT => data_out      --! Data output
+    );
 
-   clk_A : process
-   begin
-      aclk <= '1';
-      wait for 6.3 ns;
-      aclk <= '0';
-      wait for 6.3 ns;
-   end process;
+    clk_a : process
+    begin
+        aclk <= '1';
+        wait for 6.3 ns;
+        aclk <= '0';
+        wait for 6.3 ns;
+    end process;
 
-   clk_B : process
-   begin
-      bclk <= '1';
-      wait for 3 ns;
-      bclk <= '0';
-      wait for 3 ns;
-   end process;
+    clk_b : process
+    begin
+        bclk <= '1';
+        wait for 3 ns;
+        bclk <= '0';
+        wait for 3 ns;
+    end process;
 
-   --! main testbench process
-   sim : process
-   begin
+    --! main testbench process
+    sim : process
+    begin
 
-      data_in <= '0';
+        data_in <= '0';
 
-      arst <= '1';
-      brst <= '1';
-      wait for 20 ns;
-      arst <= '0';
-      brst <= '0';
+        arst <= '1';
+        brst <= '1';
+        wait for 20 ns;
+        arst <= '0';
+        brst <= '0';
 
-      wait until rising_edge(aclk);
-      data_in <= '1';
+        wait until rising_edge(aclk);
+        data_in <= '1';
 
-      wait until rising_edge(aclk);
-      data_in <= '0';
+        wait until rising_edge(aclk);
+        data_in <= '0';
 
-      wait until rising_edge(aclk);
-      data_in <= '1';
+        wait until rising_edge(aclk);
+        data_in <= '1';
 
-      wait until rising_edge(aclk);
-      data_in <= '1';
+        wait until rising_edge(aclk);
+        data_in <= '1';
 
-      wait until rising_edge(aclk);
-      data_in <= '1';
+        wait until rising_edge(aclk);
+        data_in <= '1';
 
-      wait until rising_edge(aclk);
-      data_in <= '0';
+        wait until rising_edge(aclk);
+        data_in <= '0';
 
-      wait until rising_edge(aclk);
-      data_in <= '1';
+        wait until rising_edge(aclk);
+        data_in <= '1';
 
-      wait until rising_edge(aclk);
-      data_in <= '0';
+        wait until rising_edge(aclk);
+        data_in <= '0';
 
-      wait until rising_edge(aclk);
-      data_in <= '0';
+        wait until rising_edge(aclk);
+        data_in <= '0';
 
-      wait until rising_edge(aclk);
-      data_in <= '1';
+        wait until rising_edge(aclk);
+        data_in <= '1';
 
-      wait until rising_edge(aclk);
-      data_in <= '0';
+        wait until rising_edge(aclk);
+        data_in <= '0';
 
-      wait;
+        wait;
 
-   end process;
+    end process;
 
-end architecture behavioral;
+end architecture;

@@ -9,7 +9,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity JTAG_OP_CTRL is
-    generic(
+    generic (
         -- MI Address word width in bits.
         MI_ADDR_WIDTH : natural := 32;
         -- MI Data word width in bits.
@@ -21,7 +21,7 @@ entity JTAG_OP_CTRL is
         -- Target device (Intel only).
         DEVICE        : string  := "AGILEX"
     );
-    port(
+    port (
         -- =================
         --  Clock and Reset
         -- =================

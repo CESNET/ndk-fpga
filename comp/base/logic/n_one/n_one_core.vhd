@@ -26,11 +26,11 @@ architecture FULL of N_ONE_CORE is
 
 begin
 
-    A <= '1' when((D(1) = '1' and D(0) = '0' and N = '0') or (D(1) = '1' and D(0) = '1' and N = '1')) else
-         '0' when((D(1) = '0' and D(0) = '1' and N = '0') or (D(1) = '1' and D(0) = '1' and N = '0')) else
+    A <= '1' when ((D(1) = '1' and D(0) = '0' and N = '0') or (D(1) = '1' and D(0) = '1' and N = '1')) else
+         '0' when ((D(1) = '0' and D(0) = '1' and N = '0') or (D(1) = '1' and D(0) = '1' and N = '0')) else
          '0';
 
-    VLD  <= '1' when((D(1) = '0' and D(0) = '1' and N = '0') or (D(1) = '1' and D(0) = '0' and N = '0') or
+    VLD  <= '1' when ((D(1) = '0' and D(0) = '1' and N = '0') or (D(1) = '1' and D(0) = '0' and N = '0') or
                      (D(1) = '1' and D(0) = '1' and N = '0') or (D(1) = '1' and D(0) = '1' and N = '1')) else
             '0';
 

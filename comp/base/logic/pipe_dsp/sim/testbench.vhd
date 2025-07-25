@@ -12,83 +12,83 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-entity testbench is
+entity TESTBENCH is
 
-end testbench;
+end entity;
 
-architecture behavioral of testbench is
+architecture BEHAVIORAL of TESTBENCH is
 
 
-   constant clkper         : time := 10 ns; --Clock period
-   constant reset_time     : time := 2*clkper + 1 ns; --Reset durati
-   --! generic parameters
-   constant DATA_WIDTH     : integer := 20;
-   constant NUM_REGS       : integer := 1;
-   --! Clock and reset signals
-   signal CLK              : std_logic;
-   signal RESET            : std_logic;
-   --! input and output
-   signal DATA_IN          : std_logic_vector(DATA_WIDTH-1 downto 0);
-   signal DATA_OUT         : std_logic_vector(DATA_WIDTH-1 downto 0);
-   signal CE               : std_logic;
+    constant CLKPER           : time := 10 ns;           -- Clock period
+    constant RESET_TIME       : time := 2*CLKPER + 1 ns; -- Reset durati
+    --! generic parameters
+    constant DATA_WIDTH       : integer := 20;
+    constant NUM_REGS         : integer := 1;
+    --! Clock and reset signals
+    signal   clk              : std_logic;
+    signal   reset            : std_logic;
+    --! input and output
+    signal   data_in          : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal   data_out         : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal   ce               : std_logic;
 
 begin
 
-   uut: entity work.PIPE_DSP
-   generic map(
-      DATA_WIDTH => DATA_WIDTH,
-      NUM_REGS => NUM_REGS,
-      ENABLE_DSP => true,
-      PIPE_EN => false
-   )
-   port map (
-      CLK => CLK,
-      RESET => RESET,
-      DATA_IN => DATA_IN,
-      DATA_OUT => DATA_OUT,
-      CE => CE
-   );
+    uut: entity work.PIPE_DSP
+    generic map (
+        DATA_WIDTH => DATA_WIDTH,
+        NUM_REGS   => NUM_REGS,
+        ENABLE_DSP => true,
+        PIPE_EN    => false
+    )
+    port map (
+        CLK      => clk,
+        RESET    => reset,
+        DATA_IN  => data_in,
+        DATA_OUT => data_out,
+        CE       => ce
+    );
 
-   --Generate clock
-   clk_gen_p : process
-   begin
-      CLK <= '1';
-      wait for clkper/2;
-      CLK <= '0';
-      wait for clkper/2;
-   end process clk_gen_p;
+    -- Generate clock
+    clk_gen_p : process
+    begin
+        clk <= '1';
+        wait for CLKPER/2;
+        clk <= '0';
+        wait for CLKPER/2;
+    end process;
 
-   --Generate reset
-   reset_gen : process
-   begin
-      RESET <= '1';
-      wait for reset_time;
-      RESET <= '0';
-   wait;
-   end process;
+    -- Generate reset
+    reset_gen : process
+    begin
+        reset <= '1';
+        wait for RESET_TIME;
+        reset <= '0';
+        wait;
+    end process;
 
-   --! Simulating input flow
-   input_flow : process
-   begin
+    --! Simulating input flow
+    input_flow : process
+    begin
 
-      --! Initialize input interface
-      DATA_IN <= (others => '0');
-      CE <= '1';
+        --! Initialize input interface
+        data_in <= (others => '0');
+        ce      <= '1';
 
-      wait for reset_time;
-      wait for 3*clkper;
-      wait for clkper;
+        wait for RESET_TIME;
+        wait for 3*CLKPER;
+        wait for CLKPER;
 
-      DATA_IN <= conv_std_logic_vector(1, DATA_IN'LENGTH);
-      wait for clkper;
+        data_in <= conv_std_logic_vector(1, data_in'LENGTH);
+        wait for CLKPER;
 
-      DATA_IN <= conv_std_logic_vector(2, DATA_IN'LENGTH);
-      wait for clkper;
+        data_in <= conv_std_logic_vector(2, data_in'LENGTH);
+        wait for CLKPER;
 
-      DATA_IN <= conv_std_logic_vector(3, DATA_IN'LENGTH);
-      wait for clkper;
+        data_in <= conv_std_logic_vector(3, data_in'LENGTH);
+        wait for CLKPER;
 
-      wait;
+        wait;
 
-   end process input_flow;
+    end process;
 end architecture;

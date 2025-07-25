@@ -19,10 +19,10 @@ use altera_lnsim.altera_lnsim_components.all;
 architecture ALTERA of COMMON_CLK_GEN is
 
     component reset_release_ip is
-    port (
-        ninit_done : out std_logic
-    );
-    end component reset_release_ip;
+        port (
+            NINIT_DONE : out std_logic
+        );
+    end component;
 
     -- Clock frequency of the reference clock signal in MHz
     constant REF_CLK_FREQUENCY : real := 1.0/REFCLK_PERIOD * real(10**3);
@@ -32,13 +32,13 @@ architecture ALTERA of COMMON_CLK_GEN is
     -- "Agilex 7 F-Series", "Agilex 7 (F-Series)",
     -- "Agilex 7 I-Series", "Agilex 7 (I-Series)",
     -- "Agilex 7 M-Series", "Agilex 7 (M-Series)"
-    constant PLL_SIM_MODEL : string := tsel(DEVICE="STRATIX10", "Stratix 10", "Agilex 7 F-Series");
+    constant PLL_SIM_MODEL     : string := tsel(DEVICE = "STRATIX10", "Stratix 10", "Agilex 7 F-Series");
 
     -- Convert REAL to STRING and append units ("MHz")
     function ref_clk_freq_str_f (num: real; decimals: natural) return string is
-        constant str_len : natural := integer'image(integer(num))'length + 1 + decimals;
-        variable ln: line;
-        variable str : string(1 to str_len);
+        constant STR_LEN : natural := integer'image(integer(num))'length + 1 + decimals;
+        variable ln      : line;
+        variable str     : string(1 to STR_LEN);
     begin
         -- Write the frequency to a line
         write(ln, num, RIGHT, 0, decimals); -- shows frequency with <decimals> decimal points
@@ -65,7 +65,7 @@ begin
         pll_reset <= ASYNC_RESET;
     end generate;
 
-    ipm_iopll_i : IPM_IOPLL
+    ipm_iopll_i : component ipm_iopll
     generic map (
         REFERENCE_CLOCK_FREQUENCY => ref_clk_freq_str_f(REF_CLK_FREQUENCY, 1), -- "100.0 MHz",
         N_CNT                     => PLL_MASTER_DIV,
@@ -89,20 +89,20 @@ begin
         PLL_SIM_MODEL             => PLL_SIM_MODEL
     )
     port map (
-        refclk     => REFCLK   , -- input,  width = 1
+        refclk     => REFCLK,    -- input,  width = 1
         reset      => pll_reset, -- input,  width = 1
-        outclk0    => OUTCLK_0 , -- output, width = 1, 400 MHz
-        outclk1    => OUTCLK_1 , -- output, width = 1, 300 MHz
-        outclk2    => OUTCLK_2 , -- output, width = 1, 200 MHz
-        outclk3    => OUTCLK_3 , -- output, width = 1, 100 MHz
-        outclk4    => open     , -- output, width = 1
-        outclk5    => open     , -- output, width = 1
-        outclk6    => open     , -- output, width = 1
-        locked     => LOCKED   , -- output, width = 1
-        fbclk      => '0'      , -- input,  width = 1
-        fbclkout   => open     , -- output, width = 1
+        outclk0    => OUTCLK_0,  -- output, width = 1, 400 MHz
+        outclk1    => OUTCLK_1,  -- output, width = 1, 300 MHz
+        outclk2    => OUTCLK_2,  -- output, width = 1, 200 MHz
+        outclk3    => OUTCLK_3,  -- output, width = 1, 100 MHz
+        outclk4    => open,      -- output, width = 1
+        outclk5    => open,      -- output, width = 1
+        outclk6    => open,      -- output, width = 1
+        locked     => LOCKED,    -- output, width = 1
+        fbclk      => '0',       -- input,  width = 1
+        fbclkout   => open,      -- output, width = 1
         extclk_out => open       -- output, width = 1
-        -- zdbfbclk   => 'Z'        -- inout,  width = 1
+    -- zdbfbclk   => 'Z'        -- inout,  width = 1
     );
 
 end architecture;
