@@ -168,44 +168,44 @@ proc dts_ndp_core_main_mi {DTS} {
 proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_ENDPOINTS DMA_TX_CHANNELS} {
     upvar 1 $DTS ret
 
-        # -------------------------------------------------
-        # These two widths are changeable
-        # -------------------------------------------------
-        global DMA_TX_DATA_PTR_W
-        set DATA_PTR_W   $DMA_TX_DATA_PTR_W
-        set HDR_PTR_W    [expr $DATA_PTR_W - 3]
+    # -------------------------------------------------
+    # These two widths are changeable
+    # -------------------------------------------------
+    global DMA_TX_DATA_PTR_W
+    set DATA_PTR_W   $DMA_TX_DATA_PTR_W
+    set HDR_PTR_W    [expr $DATA_PTR_W - 3]
 
-        # -------------------------------------------------
-        # The following parts should not be changed
-        # -------------------------------------------------
+    # -------------------------------------------------
+    # The following parts should not be changed
+    # -------------------------------------------------
 
-        if {$DATA_PTR_W < $HDR_PTR_W} {
-            error "Header pointer width ($HDR_PTR_W) is greater that the width of the data pointer ($DATA_PTR_W)!
-            This does not make sense since there would be more packets possible than there are bytes available
-            in the data buffer"
-        }
-        set DATA_ADDR_W $DATA_PTR_W
-        set HDR_ADDR_W  [expr $HDR_PTR_W + 3]
+    if {$DATA_PTR_W < $HDR_PTR_W} {
+        error "Header pointer width ($HDR_PTR_W) is greater that the width of the data pointer ($DATA_PTR_W)!
+        This does not make sense since there would be more packets possible than there are bytes available
+        in the data buffer"
+    }
+    set DATA_ADDR_W $DATA_PTR_W
+    set HDR_ADDR_W  [expr $HDR_PTR_W + 3]
 
-        set CHAN_PER_EP [expr $DMA_TX_CHANNELS / $PCIE_ENDPOINTS]
+    set CHAN_PER_EP [expr $DMA_TX_CHANNELS / $PCIE_ENDPOINTS]
 
-        # Calculation of the addres range reserved for single channel
-        set TX_DATA_BUFF_BASE       "0x00000000"
-        set TX_BUFF_SIZE       [expr int(pow(2,max($DATA_ADDR_W, $HDR_ADDR_W))) * 2]
-        set TX_BUFF_SIZE_HEX   [format "0x%x" $TX_BUFF_SIZE]
+    # Calculation of the addres range reserved for single channel
+    set TX_DATA_BUFF_BASE       "0x00000000"
+    set TX_BUFF_SIZE       [expr int(pow(2,max($DATA_ADDR_W, $HDR_ADDR_W))) * 2]
+    set TX_BUFF_SIZE_HEX   [format "0x%x" $TX_BUFF_SIZE]
 
-        for {set i 0} {$i < $CHAN_PER_EP} {incr i} {
-            set    var_buff_base [expr $TX_DATA_BUFF_BASE + $i * $TX_BUFF_SIZE_HEX]
-            dts_dma_calypte_tx_buffer ret "data" $i $var_buff_base $TX_BUFF_SIZE_HEX "0"
-        }
+    for {set i 0} {$i < $CHAN_PER_EP} {incr i} {
+        set    var_buff_base [expr $TX_DATA_BUFF_BASE + $i * $TX_BUFF_SIZE_HEX]
+        dts_dma_calypte_tx_buffer ret "data" $i $var_buff_base $TX_BUFF_SIZE_HEX "0"
+    }
 
-        set TX_HDR_BUFF_BASE   [expr $TX_DATA_BUFF_BASE + $CHAN_PER_EP*$TX_BUFF_SIZE]
-        set TX_BUFF_SIZE_HEX   [format "0x%x" $TX_BUFF_SIZE]
+    set TX_HDR_BUFF_BASE   [expr $TX_DATA_BUFF_BASE + $CHAN_PER_EP*$TX_BUFF_SIZE]
+    set TX_BUFF_SIZE_HEX   [format "0x%x" $TX_BUFF_SIZE]
 
-        for {set i 0} {$i < $CHAN_PER_EP} {incr i} {
-            set    var_buff_base [expr $TX_HDR_BUFF_BASE + $i * $TX_BUFF_SIZE_HEX]
-            dts_dma_calypte_tx_buffer ret "hdr" $i $var_buff_base $TX_BUFF_SIZE_HEX "0"
-        }
+    for {set i 0} {$i < $CHAN_PER_EP} {incr i} {
+        set    var_buff_base [expr $TX_HDR_BUFF_BASE + $i * $TX_BUFF_SIZE_HEX]
+        dts_dma_calypte_tx_buffer ret "hdr" $i $var_buff_base $TX_BUFF_SIZE_HEX "0"
+    }
 }
 
 proc dts_build_netcope {} {
