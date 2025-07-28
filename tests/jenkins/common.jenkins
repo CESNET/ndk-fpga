@@ -270,11 +270,11 @@ def commonPrekladHarpRun(COMPONENTS, ofm_path = pwd()) {
     }
 }
 
-def isInCategory(path, category) {
+def isInPath(path, keyword) {
     def result = false
 
-    if (category.contains("&")) {
-        def symbList = category.split("&")
+    if (keyword.contains("&")) {
+        def symbList = keyword.split("&")
 
         result = true
 
@@ -283,8 +283,8 @@ def isInCategory(path, category) {
                 result = false
             }
         }
-    } else if (category.contains("|")) {
-        def symbList = category.split("\\|")
+    } else if (keyword.contains("|")) {
+        def symbList = keyword.split("\\|")
 
         symbList.each { symbol ->
             if (path.contains(symbol)) {
@@ -292,21 +292,21 @@ def isInCategory(path, category) {
             }
         }
     } else {
-        result = path.contains(category)
+        result = path.contains(keyword)
     }
 
     return result
 }
 
-def fetchCocotbCompsVer(category = "") {
+def fetchCocotbCompsVer(include = "", exclude = []) {
     def test_paths = sh(script: "find . -name 'cocotb_test.py' -exec dirname {} + | cut -c3-", returnStdout: true).trim()
     def comps_ver = []
 
     test_paths.readLines().each { path ->
-        if (isInCategory(path, category)) {
+        if (isInPath(path, include)) {
             def comp_name = sh(script: "grep '^TOP_LEVEL_ENT=' $path/Makefile | cut -d'=' -f2", returnStdout: true).trim()
 
-            if (comp_name.length() > 0) {
+            if (comp_name.length() > 0 && !exclude.contains(comp_name)) {
                 comps_ver.add([comp_name, path])
             }
         }
@@ -315,8 +315,8 @@ def fetchCocotbCompsVer(category = "") {
     return comps_ver
 }
 
-def fetchCocotbCompsMultiVer(category = "") {
-    def comps_ver = fetchCocotbCompsVer(category)
+def fetchCocotbCompsMultiVer(include = "", exclude = []) {
+    def comps_ver = fetchCocotbCompsVer(include, exclude)
     def comps_multiver = []
 
     comps_ver.each { comp ->
@@ -357,6 +357,10 @@ def commonPrekladCocotbVerRun(COMPONENTS) {
     // every midnight check for new commits and run pipeline if they exist
     properties([pipelineTriggers([pollSCM('H H(0-2) * * *')])])
 
+    // get info about the server and name of the last commit
+    def print_info = "hostname;"
+        print_info += "git --no-pager log -n 1;"
+
     def failed = []
 
     // run verification of every component
@@ -380,6 +384,7 @@ def commonPrekladCocotbVerRun(COMPONENTS) {
 
                             // run verification
                             command += "make TARGET=cocotb SIM_FLAGS=\"-c -do quit\""
+                            sh "${print_info}"
                             sh "$command"
 
                         } catch (err) {
@@ -445,6 +450,10 @@ def commonPrekladCocotbMultiVerRun(COMPONENTS, ofm_path = pwd()) {
     // every midnight check for new commits and run pipeline if they exist
     properties([pipelineTriggers([pollSCM('H H(0-2) * * *')])])
 
+    // get info about the server and name of the last commit
+    def print_info = "hostname;"
+        print_info += "git --no-pager log -n 1;"
+
     def failed = []
 
     // run verification of every component
@@ -464,6 +473,7 @@ def commonPrekladCocotbMultiVerRun(COMPONENTS, ofm_path = pwd()) {
                         try {
                             // run multi ver script for cocotb
                             def command = "python3 $multi_ver $settings"
+                            sh "${print_info}"
                             sh "$command"
 
                         } catch (err) {
