@@ -20,7 +20,7 @@ set_clock_groups -asynchronous -group [get_clocks altera_reserved_tck]
 set MI_CLK [get_clocks cm_i|clk_gen_i|iopll_i|iopll_0_outclk3]
 
 # the only supported configuration so far!
-set FHIP_400G_CLK [get_clocks cm_i|network_mod_i|eth_core_g[0].network_mod_core_i|ftile_1x400g8_g.eth_ip_g[0].FTILE_1x400g8_i|ftile_eth_ip_i|eth_f_0|tx_clkout|ch23]
+set FHIP_400G_CLK [get_clocks cm_i|network_mod_i|eth_core_g[0].network_mod_core_i|ftile_1x400g8_g.eth_ip_g[0].ftile_1x400g8_i|ftile_eth_ip_i|eth_f_0|tx_clkout|ch23]
 
 # Fix hold timing issues on FHIP
 set_clock_groups -asynchronous -group $MI_CLK -group $FHIP_400G_CLK

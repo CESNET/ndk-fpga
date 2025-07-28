@@ -31,8 +31,8 @@ set MI_CLK_CH3  [get_clocks ag_i|clk_gen_i|iopll_i|iopll_0_outclk3]
 # ============
 # 400G2 design
 # ============
-set FHIP_400G2_P0_CLK_CH23 [get_clocks ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|ftile_1x400g8_g.eth_ip_g[0].FTILE_1x400g8_i|ftile_eth_ip_i|eth_f_0|tx_clkout|ch23]
-set FHIP_400G2_P1_CLK_CH23 [get_clocks ag_i|network_mod_i|eth_core_g[1].network_mod_core_i|ftile_1x400g8_g.eth_ip_g[0].FTILE_1x400g8_i|ftile_eth_ip_i|eth_f_0|tx_clkout|ch23]
+set FHIP_400G2_P0_CLK_CH23 [get_clocks ag_i|network_mod_i|eth_core_g[0].network_mod_core_i|ftile_1x400g8_g.eth_ip_g[0].ftile_1x400g8_i|ftile_eth_ip_i|eth_f_0|tx_clkout|ch23]
+set FHIP_400G2_P1_CLK_CH23 [get_clocks ag_i|network_mod_i|eth_core_g[1].network_mod_core_i|ftile_1x400g8_g.eth_ip_g[0].ftile_1x400g8_i|ftile_eth_ip_i|eth_f_0|tx_clkout|ch23]
 
 # Fix hold timing issues for 400G2 design
 set_clock_groups -asynchronous -group $MI_CLK_CH3          -group $FHIP_400G2_P0_CLK_CH23
