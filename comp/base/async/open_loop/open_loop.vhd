@@ -59,21 +59,21 @@ architecture FULL of ASYNC_OPEN_LOOP is
     signal signal_q1   : std_logic := '0';
     signal signal_q2   : std_logic := '0';
 
-    --! Attributes for signal_Q1_reg and signal_Q2_reg
+    --! Attributes for signal_q1_reg and signal_q2_reg
     attribute shreg_extract                : string;
     attribute async_reg                    : string;
 
-    attribute shreg_extract of signal_Q1   : signal is "no";
-    attribute async_reg of signal_Q1       : signal is "true";
+    attribute shreg_extract of signal_q1   : signal is "no";
+    attribute async_reg of signal_q1       : signal is "true";
 
-    attribute shreg_extract of signal_Q2   : signal is "no";
-    attribute async_reg of signal_Q2       : signal is "true";
+    attribute shreg_extract of signal_q2   : signal is "no";
+    attribute async_reg of signal_q2       : signal is "true";
 
     --! Attributes for Intel FPGA
     attribute altera_attribute  : string;
 
-    attribute altera_attribute of signal_Q1 : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON; -name SYNCHRONIZER_IDENTIFICATION FORCED";
-    attribute altera_attribute of signal_Q2 : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON";
+    attribute altera_attribute of signal_q1 : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON; -name SYNCHRONIZER_IDENTIFICATION FORCED";
+    attribute altera_attribute of signal_q2 : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON";
 
     --! -------------------------------------------------------------------------
 
@@ -137,10 +137,10 @@ begin
         --! Signals
         signal signal_q3                       : std_logic := '0';
 
-        --! Attributes  for signal_Q3_reg
-        attribute shreg_extract of signal_Q3    : signal is "no";
-        attribute async_reg of signal_Q3        : signal is "true";
-        attribute altera_attribute of signal_Q3 : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON";
+        --! Attributes  for signal_q3_reg
+        attribute shreg_extract of signal_q3    : signal is "no";
+        attribute async_reg of signal_q3        : signal is "true";
+        attribute altera_attribute of signal_q3 : signal is "-name ADV_NETLIST_OPT_ALLOWED NEVER_ALLOW; -name DONT_MERGE_REGISTER ON; -name PRESERVE_REGISTER ON";
 
     begin
 

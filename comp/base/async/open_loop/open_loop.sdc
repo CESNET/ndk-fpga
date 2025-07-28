@@ -4,6 +4,6 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-set_false_path -to [get_registers {signal_Q1}]
+set_false_path -to [get_registers {signal_q1}]
 
 # Some other constraints are applied as attributes directly in VHDL code.

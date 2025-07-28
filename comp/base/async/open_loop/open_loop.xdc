@@ -7,6 +7,6 @@
 # $Id$
 #
 
-set_false_path -to [get_cells signal_Q1_reg]
+set_false_path -to [get_cells signal_q1_reg]
 
 # Some other constraints are applied as attributes directly in VHDL code.
