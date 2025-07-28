@@ -52,12 +52,12 @@ class MAC_Segmented_RX_Driver(BusDriver):
         """Sends value of control signals to the bus."""
 
         # data on the MAC Segmented bus is sent in reverse order
-        self.bus.data.value = self._data.flipped_endian().int
-        self.bus.inframe.value = self._in_frame.reversed().int
-        self.bus.eop_empty.value = self._eop_empty.vreversed().int
-        self.bus.fcs_error.value = self._fcs_error.reversed().int
-        self.bus.error.value = self._mac_error.vreversed().int
-        self.bus.status.value = self._status_data.vreversed().int
+        self.bus.data.value = self._data.int
+        self.bus.inframe.value = self._in_frame.int
+        self.bus.eop_empty.value = self._eop_empty.int
+        self.bus.fcs_error.value = self._fcs_error.int
+        self.bus.error.value = self._mac_error.int
+        self.bus.status.value = self._status_data.int
 
     async def _move_frame(self) -> None:
         # deasserting vld signal if the bus is not ready
@@ -96,6 +96,7 @@ class MAC_Segmented_RX_Driver(BusDriver):
             if len(data) <= width:
                 # setting _eop_empty of the current segment to number of unused bytes
                 self._eop_empty[offset] = width - len(data)
+
                 # appending empty bytes to a transaction slice shorter than a segment
                 data += b'\0' * (width - len(data))
                 # EOP is in this segment, deasserting _in_frame
