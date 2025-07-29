@@ -3,7 +3,7 @@
 # Author(states): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 from cocotbext.ofm.base.drivers import BusDriver
-from cocotbext.ofm.utils.binary import Binary, BinaryVector, BinarySignals
+from cocotbext.ofm.utils.binary import Binary, BinaryVector
 from copy import copy
 from enum import Enum
 from cocotbext.ofm.avst_pcie.drivers import AvstPcieDriverMaster
@@ -56,8 +56,8 @@ class AvstCreditorTX(BusDriver):
 
     def __init__(self, entity, name, clock, credits: list[int], array_idx=None) -> None:
         super().__init__(entity, name, clock, array_idx=array_idx)
-        self.__segments: int = len(self.bus.init)
-        self.__data_len: int = len(self.bus.update_cnt) // self.__segments
+        self._segments: int = len(self.bus.init)
+        self._data_len: int = len(self.bus.update_cnt) // self._segments
 
         """
         This variable works a little different then might be expected. It indicates number
@@ -67,7 +67,7 @@ class AvstCreditorTX(BusDriver):
         or b) a transaction has gone through and the credits haven't been returned to
         the RX component yet.
         """
-        self.__credits: list[int] = copy(credits)
+        self._credits: list[int] = copy(credits)
 
         """
         This variable indicates the maximum amount of credits the creaditor can give out.
@@ -75,14 +75,8 @@ class AvstCreditorTX(BusDriver):
         If a value of a item is equal to zero, it means that number of credits for this
         specific type of transaction is infinite.
         """
-        self.__max_credits: list[int] = copy(credits)
-
-        # setting up BinarySignals interface
-        self.__signal = BinarySignals(parent=self, params={
-            "init_ack": Binary(bits=self.__segments)
-        })
-
-        self.__states: list[AvstCreditorStatesTX] = [AvstCreditorStatesTX.START_INIT] * self.__segments
+        self._max_credits: list[int] = copy(credits)
+        self._states: list[AvstCreditorStatesTX] = [AvstCreditorStatesTX.START_INIT] * self._segments
 
         self._init_control_signals()
         self._propagate_control_signals()
@@ -99,10 +93,10 @@ class AvstCreditorTX(BusDriver):
         Returns:
             Number of available credits.
         """
-        if self.__max_credits[tlp_type] == 0:
+        if self._max_credits[tlp_type] == 0:
             return maxsize*2 + 1
         else:
-            return self.__max_credits[tlp_type] - self.__credits[tlp_type]
+            return self._max_credits[tlp_type] - self._credits[tlp_type]
 
     def update_credits(self, tlp_type: int, credits: int) -> None:
         """
@@ -113,22 +107,21 @@ class AvstCreditorTX(BusDriver):
             tlp_type: type of the transaction. It is advised to use the AvstTransactionTypes enum.
             credits: number of credits used by the transaction.
         """
-        self.__credits[tlp_type] += credits
+        self._credits[tlp_type] += credits
 
     def _init_control_signals(self):
-        self.__init: Binary = Binary(bits=self.__segments)
-        self.__update: Binary = Binary(bits=self.__segments)
-        self.__update_cnt: BinaryVector = BinaryVector(item_count=self.__segments, item_bits=self.__data_len)
-
-    def _clear_control_signals(self):
-        self.__init.value = 0
-        self.__update.value = 0
-        self.__update_cntm_count.value = 0
+        self._init: Binary = Binary(bits=self._segments)
+        self._update: Binary = Binary(bits=self._segments)
+        self._update_cnt: BinaryVector = BinaryVector(item_count=self._segments, item_bits=self._data_len)
+        self._init_ack: Binary = Binary(bits=self._segments)
 
     def _propagate_control_signals(self):
-        self.bus.init.value = self.__init.int
-        self.bus.update.value = self.__update.int
-        self.bus.update_cnt.value = self.__update_cnt.int
+        self.bus.init.value = self._init.int
+        self.bus.update.value = self._update.int
+        self.bus.update_cnt.value = self._update_cnt.int
+
+    def _read_control_signals(self):
+        self._init_ack.value = self.bus.init_ack.value.integer
 
     def _set_update_cnt(self, segment: int, next_state: AvstCreditorStatesTX):
         """
@@ -139,21 +132,21 @@ class AvstCreditorTX(BusDriver):
             next_state: to which state should the FSM transition to after this function
         """
 
-        max_credits_per_trans: int = self.__update_cnt[0].maxint
+        max_credits_per_trans: int = self._update_cnt[0].maxint
 
-        if self.__credits[segment] > 0:
-            self.__update[segment] = 1
+        if self._credits[segment] > 0:
+            self._update[segment] = 1
 
-            if self.__credits[segment] >= max_credits_per_trans:
-                self.__update_cnt[segment] = max_credits_per_trans
-                self.__credits[segment] -= max_credits_per_trans
+            if self._credits[segment] >= max_credits_per_trans:
+                self._update_cnt[segment] = max_credits_per_trans
+                self._credits[segment] -= max_credits_per_trans
             else:
-                self.__update_cnt[segment] = self.__credits[segment]
-                self.__credits[segment] = 0
+                self._update_cnt[segment] = self._credits[segment]
+                self._credits[segment] = 0
 
         else:
-            self.__update[segment] = 0
-            self.__states[segment] = next_state
+            self._update[segment] = 0
+            self._states[segment] = next_state
 
     async def _send_thread(self):
         """
@@ -164,23 +157,24 @@ class AvstCreditorTX(BusDriver):
         while True:
             await self._clk_re
 
-            for i in range(self.__segments):
-                match self.__states[i]:
+            for i in range(self._segments):
+                match self._states[i]:
                     case states.START_INIT:
-                        self.__init[i] = 1
-                        self.__states[i] = states.WAITING_FOR_ACK
+                        self._init[i] = 1
+                        self._states[i] = states.WAITING_FOR_ACK
                     case states.WAITING_FOR_ACK:
-                        self.__states[i] = states.DECLARE_CREDITS if self.__signal.init_ack[i] else states.WAITING_FOR_ACK
+                        self._read_control_signals()
+                        self._states[i] = states.DECLARE_CREDITS if self._init_ack[i] else states.WAITING_FOR_ACK
                     case states.DECLARE_CREDITS:
-                        self.__update[i] = 1
+                        self._update[i] = 1
                         self._set_update_cnt(i, states.WAITING_1)
                     case states.WAITING_1:
-                        self.__states[i] = states.WAITING_2
+                        self._states[i] = states.WAITING_2
                     case states.WAITING_2:
-                        self.__states[i] = states.END_INIT
+                        self._states[i] = states.END_INIT
                     case states.END_INIT:
-                        self.__init[i] = 0
-                        self.__states[i] = states.UPDATE_CREDITS
+                        self._init[i] = 0
+                        self._states[i] = states.UPDATE_CREDITS
                     case states.UPDATE_CREDITS:
                         self._set_update_cnt(i, states.UPDATE_CREDITS)
 
@@ -194,19 +188,12 @@ class AvstCreditorRX(BusDriver):
 
     def __init__(self, entity, name, clock, array_idx=None) -> None:
         super().__init__(entity, name, clock, array_idx=array_idx)
-        self.__segments: int = len(self.bus.init)
-        self.__data_len: int = len(self.bus.update_cnt) // self.__segments
+        self._segments: int = len(self.bus.init)
+        self._data_len: int = len(self.bus.update_cnt) // self._segments
 
-        self.__credits: list[int] = [0] * self.__segments
-        self.__init_credits: list[int] = [0] * self.__segments
-
-        self.__signal = BinarySignals(parent=self, params={
-            "init"       : Binary(bits=self.__segments),
-            "update"     : Binary(bits=self.__segments),
-            "update_cnt" : BinaryVector(item_count=self.__segments, item_bits=self.__data_len),
-        })
-
-        self.__states: list[AvstCreditorStatesRX] = [AvstCreditorStatesRX.WAITING_FOR_INIT] * self.__segments
+        self._credits: list[int] = [0] * self._segments
+        self._init_credits: list[int] = [0] * self._segments
+        self._states: list[AvstCreditorStatesRX] = [AvstCreditorStatesRX.WAITING_FOR_INIT] * self._segments
 
         self._init_control_signals()
         self._propagate_control_signals()
@@ -223,10 +210,10 @@ class AvstCreditorRX(BusDriver):
         Returns:
             Number of available credits.
         """
-        if self.__init_credits[tlp_type] == 0:
+        if self._init_credits[tlp_type] == 0:
             return maxsize*2 + 1
         else:
-            return self.__credits[tlp_type]
+            return self._credits[tlp_type]
 
     def update_credits(self, tlp_type: int, credits: int) -> None:
         """
@@ -237,19 +224,24 @@ class AvstCreditorRX(BusDriver):
             tlp_type: type of the transaction. It is advised to use the AvstTransactionTypes enum.
             credits: number of credits used by the transaction.
         """
-        if self.__credits[tlp_type] - credits < 0:
-            self.__credits[tlp_type] = 0
+        if self._credits[tlp_type] - credits < 0:
+            self._credits[tlp_type] = 0
         else:
-            self.__credits[tlp_type] -= credits
+            self._credits[tlp_type] -= credits
 
     def _init_control_signals(self):
-        self.__init_ack: Binary = Binary(bits=self.__segments)
-
-    def _clear_control_signals(self):
-        self.__init_ack.value = 0
+        self._init: Binary = Binary(bits=self._segments)
+        self._update: Binary = Binary(bits=self._segments)
+        self._update_cnt: BinaryVector = BinaryVector(item_count=self._segments, item_bits=self._data_len)
+        self._init_ack: Binary = Binary(bits=self._segments)
 
     def _propagate_control_signals(self):
-        self.bus.init_ack.value = self.__init_ack.int
+        self.bus.init_ack.value = self._init_ack.int
+
+    def _read_control_signals(self):
+        self._init.value       = self.bus.init.value.integer
+        self._update.value     = self.bus.update.value.integer
+        self._update_cnt.value = self.bus.update_cnt.value.integer
 
     async def _send_thread(self):
         """
@@ -260,22 +252,24 @@ class AvstCreditorRX(BusDriver):
         while True:
             await self._clk_re
 
-            for i in range(self.__segments):
-                match self.__states[i]:
+            self._read_control_signals()
+
+            for i in range(self._segments):
+                match self._states[i]:
                     case states.WAITING_FOR_INIT:
-                        if self.__signal.init[i]:
-                            self.__states[i] = states.RESPOND_WITH_ACK
+                        if self._init[i]:
+                            self._states[i] = states.RESPOND_WITH_ACK
                     case states.RESPOND_WITH_ACK:
-                        self.__init_ack[i] = 1
-                        self.__states[i] = states.UPDATE
+                        self._init_ack[i] = 1
+                        self._states[i] = states.UPDATE
                     case states.UPDATE:
-                        self.__init_ack[i] = 0
+                        self._init_ack[i] = 0
 
-                        if self.__signal.update[i]:
-                            self.__credits[i] += self.__signal.update_cnt[i].int
+                        if self._update[i]:
+                            self._credits[i] += self._update_cnt[i].int
 
-                            if self.__signal.init[i]:
-                                self.__init_credits[i] += self.__signal.update_cnt[i].int
+                            if self._init[i]:
+                                self._init_credits[i] += self._update_cnt[i].int
 
             self._propagate_control_signals()
 
@@ -292,22 +286,22 @@ class AvstCreditRequester(BusDriver):
         super().__init__(rx_driver.entity, rx_driver.name, rx_driver.clock)
         self.bus = rx_driver.bus
 
-        self.__driver: AvstPcieDriverMaster = rx_driver
-        self.__header_creditor: AvstCreditorRX = rx_header_creditor
-        self.__data_creditor: AvstCreditorRX = rx_data_creditor
-        self.__rc_queue: PriorityQueue = PriorityQueue()
-        self.__cq_queue: PriorityQueue = PriorityQueue()
-        self.__min_hcrdt = params["min_hcrdt"]
-        self.__min_dcrdt = params["min_dcrdt"]
-        self.__bytes_per_credit = params["bytes_per_crdt"]
-        self.__frame_cnt = 0
+        self._driver: AvstPcieDriverMaster = rx_driver
+        self._header_creditor: AvstCreditorRX = rx_header_creditor
+        self._data_creditor: AvstCreditorRX = rx_data_creditor
+        self._rc_queue: PriorityQueue = PriorityQueue()
+        self._cq_queue: PriorityQueue = PriorityQueue()
+        self._min_hcrdt = params["min_hcrdt"]
+        self._min_dcrdt = params["min_dcrdt"]
+        self._bytes_per_credit = params["bytes_per_crdt"]
+        self._frame_cnt = 0
 
     async def write_rc(self, data: dict):
         """
         Catches completion request transaction sent by AvstRequester.
         """
-        self.__rc_queue.put_nowait((self.__frame_cnt, AvstTransactionTypes.Completion, data))
-        self.__frame_cnt += 1
+        self._rc_queue.put_nowait((self._frame_cnt, AvstTransactionTypes.Completion, data))
+        self._frame_cnt += 1
 
     async def write_cq(self, data: dict):
         """
@@ -323,8 +317,8 @@ class AvstCreditRequester(BusDriver):
         else:
             raise NotImplementedError(f"Pcie transaction of type {pcie_trans_type} is not supported.")
 
-        self.__cq_queue.put_nowait((self.__frame_cnt, avst_trans_type, data))
-        self.__frame_cnt += 1
+        self._cq_queue.put_nowait((self._frame_cnt, avst_trans_type, data))
+        self._frame_cnt += 1
 
     async def _send_thread(self):
         """
@@ -338,20 +332,20 @@ class AvstCreditRequester(BusDriver):
         while True:
             await self._clk_re
 
-            for queue, callback in [(self.__rc_queue, self.__driver.write_rc), (self.__cq_queue, self.__driver.write_cq)]:
+            for queue, callback in [(self._rc_queue, self._driver.write_rc), (self._cq_queue, self._driver.write_cq)]:
                 while (queue.qsize() > 0):
                     priority, trans_type, data = queue.get_nowait()
 
-                    hcrdt = self.__header_creditor.get_credits(trans_type.value)
-                    dcrdt = self.__data_creditor.get_credits(trans_type.value)
+                    hcrdt = self._header_creditor.get_credits(trans_type.value)
+                    dcrdt = self._data_creditor.get_credits(trans_type.value)
 
-                    if (hcrdt > self.__min_hcrdt) and (dcrdt > self.__min_dcrdt):
+                    if (hcrdt > self._min_hcrdt) and (dcrdt > self._min_dcrdt):
                         data_len = (data["DATA"].bit_length() + 7) // 8
 
-                        self.__header_creditor.update_credits(trans_type.value, 1)
+                        self._header_creditor.update_credits(trans_type.value, 1)
 
-                        consumed_data_credits = ceildiv(self.__bytes_per_credit, data_len)
-                        self.__data_creditor.update_credits(trans_type.value, consumed_data_credits)
+                        consumed_data_credits = ceildiv(self._bytes_per_credit, data_len)
+                        self._data_creditor.update_credits(trans_type.value, consumed_data_credits)
 
                         await callback(data)
 
@@ -367,11 +361,11 @@ class AvstCreditReceiver(ProxyMonitor):
     """
     def __init__(self, monitor: AvstPcieMonitor, tx_header_creditor: AvstCreditorTX, tx_data_creditor: AvstCreditorTX, *, min_hcrdt: int = 0, min_dcrdt: int = 32, bytes_per_credit: int = 16):
         super().__init__(monitor)
-        self.__header_creditor = tx_header_creditor
-        self.__data_creditor = tx_data_creditor
-        self.__min_hcrdt = min_hcrdt
-        self.__min_dcrdt = min_dcrdt
-        self.__bytes_per_credit = bytes_per_credit
+        self._header_creditor = tx_header_creditor
+        self._data_creditor = tx_data_creditor
+        self._min_hcrdt = min_hcrdt
+        self._min_dcrdt = min_dcrdt
+        self._bytes_per_credit = bytes_per_credit
 
     def _filter_transaction(self, transaction):
         ct  = AvstTransactionTypes
@@ -391,17 +385,17 @@ class AvstCreditReceiver(ProxyMonitor):
         else:
             raise NotImplementedError(f"Pcie transaction of type {pcie_trans_type} is not supported.")
 
-        hcrdt = self.__header_creditor.get_credits(index)
-        dcrdt = self.__data_creditor.get_credits(index)
+        hcrdt = self._header_creditor.get_credits(index)
+        dcrdt = self._data_creditor.get_credits(index)
 
-        if hcrdt < self.__min_hcrdt or dcrdt < self.__min_dcrdt:
+        if hcrdt < self._min_hcrdt or dcrdt < self._min_dcrdt:
             trans_type_str = ["Completion", "Non-posted", "Posted"][index]
             raise RuntimeWarning(f"Transaction of type {trans_type_str} was received even though credits are too low ({hcrdt=}, {dcrdt=}).")
 
         # giving credits back to creditor
-        self.__header_creditor.update_credits(index, 1)
+        self._header_creditor.update_credits(index, 1)
 
-        consumed_credits = ceildiv(self.__bytes_per_credit, len(data))
-        self.__data_creditor.update_credits(index, consumed_credits)
+        consumed_credits = ceildiv(self._bytes_per_credit, len(data))
+        self._data_creditor.update_credits(index, consumed_credits)
 
         self._recv(transaction)

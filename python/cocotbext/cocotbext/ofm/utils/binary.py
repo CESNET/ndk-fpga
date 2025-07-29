@@ -50,7 +50,7 @@ class BinaryConvertions:
         num = BinaryConvertions.bin_to_int(binary) + 1
         return BinaryConvertions.int_to_bin(num, bits=len(binary))
 
-    def reorder_bytes(binary: list, in_endian: str, out_endian: str) -> list:
+    def reorder_bytes(value: int, in_endian: str, out_endian: str) -> int:
         """
         Changes endian from big to little and vice versa.
         """
@@ -58,11 +58,11 @@ class BinaryConvertions:
         assert in_endian in ["little", "big"] and out_endian in ["little", "big"]
 
         if in_endian == out_endian:
-            return binary
+            return value
 
-        buff = BinaryConvertions.bin_to_bytes(binary, endian=in_endian)
+        buff = value.to_bytes(mathext.ceildiv(8, value.bit_length()), in_endian)
 
-        return BinaryConvertions.bytes_to_bin(buff[::-1])
+        return int.from_bytes(buff, out_endian)
 
     def reverse_bits(binary: list):
         """
@@ -204,28 +204,28 @@ class Binary:
     Class for easier storing of and working with binary numbers.
 
     Attributes:
-        value: list of ones and zeros representing a binary number.
+        value: integer value of the object.
         bits: number or bits of the binary representation.
         base: base of the stored number, can be 2, 8, 10 or 16.
         endian: how should be the data interpreted, (None, 'big', 'little').
         signed: if the stored number is signed or unsigned.
     """
 
-    def __init__(self, value: Any = None, *, bits: Optional[int] = None, base: Optional[int] = 2, endian: Optional[str] = None, signed: Optional[bool] = False):
+    def __init__(self, value: Any = None, *, bits: Optional[int] = None, base: Optional[int] = 2, endian: Optional[str] = "little", signed: Optional[bool] = False):
         # setting value and endian to default values
-        self.__value = [0]
-        self.__endian = None
+        self._value = 0
+        self._endian = "little"
 
         # setting up main attributes. Order should be kept, or else it might break
         self.base: int = base
         self.signed: bool = signed
         self.bits: int = bits
         self.endian: Optional[str] = endian
-        self.value: list = value
+        self.value: int = value
 
     @property
-    def value(self) -> list:
-        return self.__value
+    def value(self) -> int:
+        return self._value
 
     @value.setter
     def value(self, value) -> None:
@@ -251,31 +251,27 @@ class Binary:
         """
 
         if value is None:
-            self.__value = [0] * self.bits
+            self._value = 0
 
         elif type(value) is type(self):
-            self.__value = value.value
+            self.bits  = value.bits if self._bits is None else self.bits
+            self._value = value.value
 
         elif isinstance(value, list):
-            self.bits = len(value) if self.__bits is None else self.bits
-            self.__value = value
-            self.value = self.int
+            self.bits  = len(value) if self._bits is None else self.bits
+            self._value = BinaryConvertions.bin_to_int(value, signed=self.signed)
 
         elif isinstance(value, int):
-            self.__value = BinaryConvertions.int_to_bin(value, bits=None if self.__bits is None else self.bits)
-
-            if self.endian is not None:
-                self.__value = BinaryConvertions.reorder_bytes(self.__value, "big", self.endian)
+            self._value = BinaryConvertions.reorder_bytes(value, "little", self.endian)
 
         elif isinstance(value, str):
-            self.bits = len(value) * int(log2(self.__base)) if self.__bits is None else self.bits
-            self.__value = BinaryConvertions.str_to_bin(value, base=self.__base)
-            self.value = self.int
+            self.bits = len(value) * int(log2(self._base)) if self._bits is None else self.bits
+            bin = BinaryConvertions.str_to_bin(value, base=self._base)
+            self._value = BinaryConvertions.bin_to_int(bin, self.signed)
 
         elif isinstance(value, bytes):
-            self.__value = BinaryConvertions.bytes_to_bin(value)
             self.bits = len(value) * 8 # implicit alligning
-            self.value = self.int
+            self._value = int.from_bytes(value, self.endian)
 
         else:
             raise TypeError(f"Incompatible type ({type(value)}) passed to Binary.value. Supported types are: list, int, str, bytes, Binary, None.")
@@ -285,10 +281,10 @@ class Binary:
         """
         Returns number of bits of the stored number.
         """
-        if self.__bits is None:
-            return len(self.value)
+        if self._bits is None:
+            return 1 if self._value.bit_length() == 0 else self._value.bit_length()
         else:
-            return self.__bits
+            return self._bits
 
     @bits.setter
     def bits(self, value) -> None:
@@ -296,7 +292,7 @@ class Binary:
         Sets number of bits of the stored number. The binary number will be extended or shortened accordingly.
         """
         assert type(value) is int or value is None
-        self.__bits = value
+        self._bits = value
         self.value = self.int
 
     @property
@@ -304,7 +300,7 @@ class Binary:
         """
         Returns set endian.
         """
-        return self.__endian
+        return self._endian
 
     @endian.setter
     def endian(self, value: str):
@@ -314,19 +310,16 @@ class Binary:
         If big, the number has big endian and number of bits is extended.
         If little, the number has little endian and number of bits is extended.
         """
-        assert value in [None, 'big', 'little']
-
-        if value is not None:
-            self.value = BinaryConvertions.reorder_bytes(self.value, "big" if self.__endian is None else self.__endian, value)
-
-        self.__endian = value
+        assert value in ['big', 'little']
+        self.value = BinaryConvertions.reorder_bytes(self.value, self._endian, value)
+        self._endian = value
 
     @property
     def signed(self):
         """
         Returns if the stored number is signed (True) or unsigned (False)
         """
-        return self.__signed
+        return self._signed
 
     @signed.setter
     def signed(self, value: bool):
@@ -334,14 +327,14 @@ class Binary:
         Sets if the stored number is signed (True) or unsigned (False).
         """
         assert type(value) is bool
-        self.__signed = value
+        self._signed = value
 
     @property
     def base(self):
         """
         Returns the base of the stored number (2, 8, 10 or 16).
         """
-        return self.__base
+        return self._base
 
     @base.setter
     def base(self, value):
@@ -351,7 +344,7 @@ class Binary:
         if value not in (2, 8, 10, 16):
             raise ValueError(f"Unsupported base {value}.")
 
-        self.__base = value
+        self._base = value
 
     @property
     def bin(self) -> list:
@@ -359,14 +352,14 @@ class Binary:
         Returns binary representation of the stored number as list of ones and zeros.
         This is also how the number is stored internally.
         """
-        return self.value
+        return BinaryConvertions.int_to_bin(self._value, bits=self.bits)
 
     @property
     def int(self) -> int:
         """
         Returns the stored number as decimal integer.
         """
-        return BinaryConvertions.bin_to_int(self.value, signed=self.signed)
+        return self._value
 
     @property
     def hex(self) -> str:
@@ -387,14 +380,14 @@ class Binary:
         """
         Returns the stored number as a binary string.
         """
-        return BinaryConvertions.bin_to_string(self.value)
+        return bin(self.value)
 
     @property
     def stored(self) -> Any:
         """
         Returns the number that was originally stored (taking into account numbers original base and endian).
         """
-        if self.endian != "little":
+        if self.endian == "little":
             return {2: self.binstr, 8: self.octal, 10: self.int, 16: self.hex}.get(self.base, None)
         else:
             return type(self)(BinaryConvertions.reorder_bytes(self.value, "little", "big"), bits=self.bits, base=self.base, signed=self.signed).stored
@@ -404,56 +397,59 @@ class Binary:
         """
         Returns the stored number as bytes.
         """
-        return BinaryConvertions.bin_to_bytes(self.value, nbytes=mathext.ceildiv(8, len(self.value)), endian=self.endian)
+        return self.value.to_bytes(mathext.ceildiv(8, self.bits), self.endian, signed=self.signed)
 
     @property
     def maxint(self) -> int:
         """
         Returns maximum value as int.
         """
-        return BinaryConvertions.bin_to_int([1] * self.bits, signed=self.signed)
+        return mathext.bitmask(self.bits) if not self.signed else mathext.bitmask(self.bits - 1)
 
     def flipped(self):
         """
         Returns a copy of this Binary object with inverted bits (for each bit in binary => [0 -> 1, 1 -> 0]).
         """
-        return Binary(BinaryConvertions.invert_bits(self.value), bits=self.__bits, endian=self.endian, signed=self.signed)
+        value = mathext.bitmask(self._bits) & (~self._value)
+        return Binary(value, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def flip(self):
         """
         Inverts bits of this Binary object (for each bit in binary => [0 -> 1, 1 -> 0]).
         """
-        self.value = (self.flipped()).value
+        self._value = self.flipped().value
         return self
 
     def reversed(self):
         """
         Returns a copy of this Binary object with a reversed bit order (for example "1011" -> "1101").
         """
-        return Binary(BinaryConvertions.reverse_bits(self.value), bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(BinaryConvertions.reverse_bits(self.bin), bits=self._bits, endian=self.endian, signed=self.signed)
 
     def reverse(self):
         """
         Reverses bit order of this Binary object (for example "1011" -> "1101").
         """
-        self.value = self.reversed()
+        self.value = self.reversed().value
         return self
 
     def flipped_endian(self):
-        return Binary(self.value, bits=self.__bits, endian="big" if self.endian == "little" else "little", signed=self.signed)
-        #return Binary(self.bytes[::-1], bits=self.__bits, endian=self.endian, signed=self.signed) # TODO temporary solution
+        """
+        Changes endian from little to big and vice versa.
+        """
+        return Binary(self.bytes[::-1], bits=self._bits, endian=self.endian, signed=self.signed)
 
     def negated(self):
         """
         Returns a copy of this Binary object with negated bits (for each bit in binary => [0 -> 1, 1 -> 0] && binary += 1).
         """
-        return Binary(BinaryConvertions.negate_bits(self.value), bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(~self._value, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def negate(self):
         """
         Negates bits of this Binary object (for each bit in binary => [0 -> 1, 1 -> 0] && binary += 1).
         """
-        self.value = (self.negated()).value
+        self.value = ~self._value
         return self
 
     def joined(self, other: Any):
@@ -483,56 +479,83 @@ class Binary:
         """
         Returns slice of this Binary object wrapped in a new Binary object.
         """
-        return Binary(self.value[index])
+        if isinstance(index, slice):
+            bitmask = mathext.bitmask(abs(index.stop - index.start))
+            value   = (self._value >> index.start) & bitmask
+        elif isinstance(index, int):
+            value   = (self._value >> index) & 1
+        else:
+            raise ValueError("Invalid index type passed to __getitem__ of Binary object.")
+
+        return Binary(value) # tady by jeste asi melo byt predani signed atd.
 
     def __setitem__(self, index, value):
         """
         Sets slice of this Binary object to the passed value.
         """
-        slice = self.value[index]
-
-        if type(slice) is list:
-            self.value[index] = Binary(value, bits=len(slice)).bin
+        if isinstance(value, bytes):
+            value = int.from_bytes(value, self.endian)
+        elif isinstance(value, str):
+            value = int(value, 2)
+        elif isinstance(value, list):
+            value = BinaryConvertions.bin_to_int(value, signed=self.signed)
+        elif isinstance(value, Binary):
+            value = value.int
         else:
-            assert int(value) in [0, 1]
-            self.value[index] = value
+            if not isinstance(value, int):
+                raise ValueError("Unsupported value passed to __setitem__ of Binary object.")
+
+        if isinstance(index, slice):
+            slc_len = abs(index.stop - index.start)
+
+            if (bc := value.bit_length()) > slc_len:
+                raise ValueError(f"Value {value} of length {bc} bits doesn't fit into slice of {slc_len} bits.")
+
+            bitmask = mathext.bitmask(slc_len)
+            self.value = (self._value & (~(bitmask << index.start))) + (value << index.start)
+
+        elif isinstance(index, int):
+            assert value in [0, 1]
+            self.value = (self._value & (~(1 << index))) + (value << index)
+        else:
+            raise ValueError("Invalid index type passed to __getitem__ of Binary object.")
 
     # math operators - result is always BinaryValue
     def __add__(self, other: Any):
-        return Binary(self.int + Binary(other).int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(self.int + Binary(other).int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __radd__(self, other: Any):
         return self.__add__(other)
 
     def __sub__(self, other: Any):
-        return Binary(self.int - Binary(other).int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(self.int - Binary(other).int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __rsub__(self, other: Any):
-        return Binary(Binary(other).int - self.int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(Binary(other).int - self.int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __mul__(self, other: Any):
-        return Binary(Binary(other).int * self.int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(Binary(other).int * self.int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __rmul__(self, other: Any):
         return self.__mul__(other)
 
     def __floordiv__(self, other: Any):
-        return Binary(self.int // Binary(other).int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(self.int // Binary(other).int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __rfloordiv__(self, other: Any):
-        return Binary(Binary(other).int // self.int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(Binary(other).int // self.int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __mod__(self, other: Any):
-        return Binary(Binary(other).int % self.int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(Binary(other).int % self.int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __rmod__(self, other: Any):
-        return Binary(self.int % Binary(other).int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(self.int % Binary(other).int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __pow__(self, other: Any):
-        return Binary(Binary(other).int ** self.int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(Binary(other).int ** self.int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __rpow__(self, other: Any):
-        return Binary(self.int ** Binary(other).int, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(self.int ** Binary(other).int, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __truediv__(self, other: Any):
         raise SyntaxError("Cannot use truediv (/) with binary value. Use floordiv (//) instead.")
@@ -542,42 +565,42 @@ class Binary:
 
     # bitwise operators - result is always BinaryValue
     def __invert__(self):
-        return Binary(BinaryConvertions.invert_bits(self.value), bits=self.__bits, endian=self.endian, signed=self.signed)
+        return self.flipped()
 
     def __neg__(self):
-        return Binary(BinaryConvertions.negate_bits(self.value), bits=self.__bits, endian=self.endian, signed=self.signed)
+        return self.negated()
 
     def __and__(self, other):
-        other = Binary(other, bits=self.__bits)
-        return Binary([self.value[i] & other.value[i] for i in range(len(self.value))], bits=self.__bits, endian=self.endian, signed=self.signed)
+        other = Binary(other, bits=self._bits)
+        return Binary([self[i] & other[i] for i in range(self.bits)], bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __rand__(self, other):
-        other = Binary(other, bits=self.__bits)
-        return Binary([other.value[i] & self.value[i] for i in range(len(self.other))], bits=self.__bits, endian=self.endian, signed=self.signed)
+        other = Binary(other, bits=self._bits)
+        return Binary([other[i] & self[i] for i in range(other.bits)], bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __or__(self, other):
-        other = Binary(other, bits=self.__bits)
-        return Binary([self.value[i] | other.value[i] for i in range(len(self.value))], bits=self.__bits, endian=self.endian, signed=self.signed)
+        other = Binary(other, bits=self._bits)
+        return Binary([self[i] | other[i] for i in range(self.bits)], bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __ror__(self, other):
-        other = Binary(other, bits=self.__bits)
-        return Binary([other.value[i] | self.value[i] for i in range(len(other.value))], bits=self.__bits, endian=self.endian, signed=self.signed)
+        other = Binary(other, bits=self._bits)
+        return Binary([other[i] | self[i] for i in range(other.bits)], bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __xor__(self, other):
-        other = Binary(other, bits=self.__bits)
-        return Binary([self.value[i] ^ other.value[i] for i in range(len(self.value))], bits=self.__bits, endian=self.endian, signed=self.signed)
+        other = Binary(other, bits=self._bits)
+        return Binary([self[i] ^ other[i] for i in range(self.bits)], bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __rxor__(self, other):
-        other = Binary(other, bits=self.__bits)
-        return Binary([other.value[i] ^ self.value[i] for i in range(len(other.value))], bits=self.__bits, endian=self.endian, signed=self.signed)
+        other = Binary(other, bits=self._bits)
+        return Binary([other[i] ^ self[i] for i in range(other.bits)], bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __lshift__(self, other: int):
         assert type(other) is int
-        return Binary(self.bin[other :] + [0] * other, bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(self.value << other, bits=self._bits, endian=self.endian, signed=self.signed)
 
     def __rshift__(self, other: int):
         assert type(other) is int
-        return Binary(self.bin[: len(self.bin) - other], bits=self.__bits, endian=self.endian, signed=self.signed)
+        return Binary(self.value >> other, bits=self._bits, endian=self.endian, signed=self.signed)
 
     # conditional
     def __bool__(self):
@@ -594,51 +617,51 @@ class BinaryVector(Binary):
 
     def __init__(self, item_count: int, item_bits: int, items: list = None, **kwargs):
         super().__init__(bits=item_count * item_bits, **kwargs)
-        self.__item_bits = item_bits
+        self._item_bits = item_bits
 
         if items is not None:
-            self.__item_count = len(items[:item_count])
+            self._item_count = len(items[:item_count])
             for i in range(self.item_count):
                 self[i] = items[i]
         else:
-            self.__item_count = item_count
-            self.value = [0] * (item_count * item_bits) if self.value is None else self.value
+            self._item_count = item_count
+            self.value = 0 if self.value is None else self.value
 
         self.item_count = item_count
 
     @property
     def item_count(self):
-        return self.__item_count
+        return self._item_count
 
     @item_count.setter
     def item_count(self, new_item_count):
         assert type(new_item_count) is int
         assert new_item_count > 0
 
-        if new_item_count == self.__item_count:
+        if new_item_count == self._item_count:
             return
-        elif new_item_count > self.__item_count:
-            self.join(Binary(0, bits=(new_item_count - self.__item_count) * self.__item_bits))
+        elif new_item_count > self._item_count:
+            self.join(Binary(0, bits=(new_item_count - self._item_count) * self._item_bits))
         else:
-            self.value = Binary(self.value[: new_item_count * self.__item_bits]).int
+            self.value = Binary(self[: new_item_count * self._item_bits]).int
 
-        self.__item_count = new_item_count
+        self._item_count = new_item_count
         self.bits = self.item_count * self.item_bits
 
     @property
     def item_bits(self):
-        return self.__item_bits
+        return self._item_bits
 
     @item_bits.setter
     def item_bits(self, new_item_bits):
         assert type(new_item_bits) is int
         assert new_item_bits > 0
 
-        if new_item_bits == self.__item_bits:
+        if new_item_bits == self._item_bits:
             return
 
         new_vector: BinaryVector = BinaryVector(self.item_count, new_item_bits, self.vint)
-        self.__item_bits = new_item_bits
+        self._item_bits = new_item_bits
         self.value = 0
         self.bits = self.item_count * self.item_bits
         self.value = new_vector.value
@@ -648,49 +671,49 @@ class BinaryVector(Binary):
         """
         Returns list of stored items, items are represented by list of ones and zeros.
         """
-        return [self[i].bin for i in range(len(self.bin) // self.__item_bits)]
+        return [self[i].bin for i in range(len(self.bin) // self._item_bits)]
 
     @property
     def vint(self):
         """
         Returns list of stored items, items are represented by decimal integers.
         """
-        return [self[i].int for i in range(len(self.bin) // self.__item_bits)]
+        return [self[i].int for i in range(len(self.bin) // self._item_bits)]
 
     @property
     def vhex(self):
         """
         Returns list of stored items, items are represented by hexadecimal strings.
         """
-        return [self[i].hex for i in range(len(self.bin) // self.__item_bits)]
+        return [self[i].hex for i in range(len(self.bin) // self._item_bits)]
 
     @property
     def voctal(self):
         """
         Returns list of stored items, items are represented by octal strings.
         """
-        return [self[i].octal for i in range(len(self.bin) // self.__item_bits)]
+        return [self[i].octal for i in range(len(self.bin) // self._item_bits)]
 
     @property
     def vbinstr(self):
         """
         Returns list of stored items, items are represented by binary strings.
         """
-        return [self[i].binstr for i in range(len(self.bin) // self.__item_bits)]
+        return [self[i].binstr for i in range(len(self.bin) // self._item_bits)]
 
     @property
     def vstored(self):
         """
         Returns list of stored items, items are returned in the form they were stored in (see Binary.stored for more info).
         """
-        return [self[i].stored for i in range(len(self.bin) // self.__item_bits)]
+        return [self[i].stored for i in range(len(self.bin) // self._item_bits)]
 
     @property
     def vbytes(self):
         """
         Returns list of stored items, items are represented by bytes.
         """
-        return [self[i].bytes for i in range(len(self.bin) // self.__item_bits)]
+        return [self[i].bytes for i in range(len(self.bin) // self._item_bits)]
 
     def vreversed(self):
         return BinaryVector(self.item_count, self.item_bits, [self[self.item_count-i-1].int for i in range(self.item_count)])
@@ -760,19 +783,24 @@ class BinaryVector(Binary):
         """
         Returns indexed item. Multi-item slices don't work at this time.
         """
-        if index >= self.item_count:
-            raise IndexError("Index out of range.")
 
-        return Binary(self.value[index * self.__item_bits : (index + 1) * self.__item_bits], bits=self.__item_bits, endian=None, signed=self.signed)
+        if isinstance(index, int):
+            slc = slice(index * self._item_bits, (index + 1) * self._item_bits)
+        elif isinstance(index, slice):
+            slc = slice(index.start * self._item_bits, abs(index.stop - index.start) * self._item_bits)
+
+        return super().__getitem__(slc)
 
     def __setitem__(self, index, value):
         """
         Modifies indexed item. Multi-item slices don't work at this time.
         """
-        if index >= self.item_count:
-            raise IndexError("Index out of range.")
+        if isinstance(index, int):
+            slc = slice(index * self._item_bits, (index + 1) * self._item_bits)
+        elif isinstance(index, slice):
+            slc = slice(index.start * self._item_bits, abs(index.stop - index.start) * self._item_bits)
 
-        self.value[index * self.__item_bits : (index + 1) * self.__item_bits] = Binary(value, bits=self.__item_bits, endian=None, signed=self.signed).bin
+        super().__setitem__(slc, value)
 
 
 class BinarySignals:

@@ -46,7 +46,7 @@ class testbench():
 
 
 @cocotb.test()
-async def run_test(dut, pkt_count=1000, frame_size_min=60, frame_size_max=2048):
+async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=2048):
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 2482, units="ps").start())
     tb = testbench(dut, debug=False)
