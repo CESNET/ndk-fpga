@@ -66,6 +66,10 @@ class Linter:
 
 
 def main():
+    # Hotfix: Don't run outside of merge request
+    if os.environ.get('CI_PIPELINE_SOURCE') != 'merge_request_event':
+        sys.exit(0)
+
     server = Server()
     linter = Linter()
 
