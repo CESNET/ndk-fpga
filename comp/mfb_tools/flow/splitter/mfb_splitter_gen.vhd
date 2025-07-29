@@ -53,6 +53,12 @@ entity MFB_SPLITTER_GEN is
         -- Minimum value is 2!
         OUTPUT_FIFO_SIZE : integer := 8;
 
+        -- To enable optional MFB FIFOs at middle stages
+        MID_MFB_FIFOS_EN : boolean := False;
+
+        -- Size of MFB FIFOs (in words)
+        MFB_FIFO_DEPTH   : natural := 512;
+
         -- Output PIPE enable for all 2:1 splitters
         OUT_PIPE_EN     : boolean := true;
 
@@ -161,6 +167,8 @@ begin
                 MFB_ITEM_WIDTH       => MFB_ITEM_WIDTH,
                 HDR_WIDTH            => MVB_ITEM_WIDTH,
                 MVB_OUTPUT_FIFO_SIZE => OUTPUT_FIFO_SIZE,
+                IN_MFB_FIFO_EN       => (s /= 0 and MID_MFB_FIFOS_EN),
+                MFB_FIFO_DEPTH       => MFB_FIFO_DEPTH,
                 USE_OUTREG           => OUT_PIPE_EN,
                 DEVICE               => DEVICE
             )

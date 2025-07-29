@@ -40,18 +40,16 @@ if { $BOARD_REV != 0 && $BOARD_REV != 1 && $BOARD_REV != 2} {
 }
 
 if {!(($PCIE_ENDPOINTS == 1 && $PCIE_GEN == 4 && $PCIE_ENDPOINT_MODE == 0) ||
+      ($PCIE_ENDPOINTS == 1 && $PCIE_GEN == 5 && $PCIE_ENDPOINT_MODE == 0) ||
       ($PCIE_ENDPOINTS == 4 && $PCIE_GEN == 5 && $PCIE_ENDPOINT_MODE == 1) ||
       ($PCIE_ENDPOINTS == 2 && $PCIE_GEN == 5 && $PCIE_ENDPOINT_MODE == 1) )} {
     error "Incompatible PCIe configuration: PCIE_ENDPOINTS = $PCIE_ENDPOINTS, PCIE_GEN = $PCIE_GEN, PCIE_ENDPOINT_MODE = $PCIE_ENDPOINT_MODE!
 Allowed PCIe configurations:
 - 2xGen5x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=4, PCIE_ENDPOINT_MODE=1 (for DMA Medusa only)
 - 1xGen5x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1 (for DMA Medusa only)
+- 1xGen5x16  -- PCIE_GEN=5, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0 (for DMA Medusa only, experimental!)
 - 1xGen4x16  -- PCIE_GEN=4, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0 (for DMA Calypte only)"
 }
-
-# Enable/add PCIe Gen5 x16 for experiments only!
-#($PCIE_ENDPOINTS == 1 && $PCIE_GEN == 5 && $PCIE_ENDPOINT_MODE == 0) ||
-#- 1xGen5x16  -- PCIE_GEN=5, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0"
 
 # ------------------------------------------------------------------------------
 # Other parameters:

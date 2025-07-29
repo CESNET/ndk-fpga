@@ -54,6 +54,12 @@ entity MFB_SPLITTER is
         -- The minimum value is 2
         MVB_OUTPUT_FIFO_SIZE : integer := 8;
 
+        -- To enable optional MFB FIFOs at input
+        IN_MFB_FIFO_EN  : boolean := false;
+
+        -- Size of MFB FIFOs (in words)
+        MFB_FIFO_DEPTH  : natural := 512;
+
         -- Create output register PIPEs
         USE_OUTREG      : boolean := true;
 
@@ -149,6 +155,14 @@ architecture FULL of MFB_SPLITTER is
     -- Signals
     ---------------------------------------------------------------------------
 
+    signal rx_fifo_mfb_data     : std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+    signal rx_fifo_mfb_sof      : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal rx_fifo_mfb_eof      : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal rx_fifo_mfb_sof_pos  : std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+    signal rx_fifo_mfb_eof_pos  : std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+    signal rx_fifo_mfb_src_rdy  : std_logic;
+    signal rx_fifo_mfb_dst_rdy  : std_logic;
+
     -- Valid for input MVB separated by its switch
     signal rx0_mvb_vld : std_logic_vector(MVB_ITEMS-1 downto 0);
     signal rx1_mvb_vld : std_logic_vector(MVB_ITEMS-1 downto 0);
@@ -224,7 +238,7 @@ begin
     );
 
     switch_fifoxm_rd_gen : for i in 0 to MFB_REGIONS-1 generate
-        switch_fifoxm_rd(i) <= '1' when can_send_whole = '1' and i < rx_mfb_sof_cnt(MFB_REGIONS) and RX_MFB_SRC_RDY = '1' and mfb_spl_rx_dst_rdy = '1' else '0';
+        switch_fifoxm_rd(i) <= '1' when can_send_whole = '1' and i < rx_mfb_sof_cnt(MFB_REGIONS) and rx_fifo_mfb_src_rdy = '1' and mfb_spl_rx_dst_rdy = '1' else '0';
     end generate;
 
     -- shift empty signal
@@ -236,15 +250,56 @@ begin
     -- MFB sending
     -- -------------------------------------------------------------------------
 
-    -- Distribute switch info according to current RX_MFB_SOF positions
-    switch_dist_pr : process (switch_fifoxm_do,RX_MFB_SOF,rx_mfb_sof_cnt)
+    in_mfb_fifo_g : if (IN_MFB_FIFO_EN = True) generate
+        mfb_fifo_i : entity work.MFB_FIFOX
+        generic map (
+            REGIONS     => MFB_REGIONS,
+            REGION_SIZE => MFB_REG_SIZE,
+            BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            ITEM_WIDTH  => MFB_ITEM_WIDTH,
+            FIFO_DEPTH  => MFB_FIFO_DEPTH,
+            RAM_TYPE    => "AUTO",
+            DEVICE      => DEVICE
+        )
+        port map (
+            CLK         => CLK,
+            RST         => RESET,
+
+            RX_DATA     => RX_MFB_DATA,
+            RX_SOF_POS  => RX_MFB_SOF_POS,
+            RX_EOF_POS  => RX_MFB_EOF_POS,
+            RX_SOF      => RX_MFB_SOF,
+            RX_EOF      => RX_MFB_EOF,
+            RX_SRC_RDY  => RX_MFB_SRC_RDY,
+            RX_DST_RDY  => RX_MFB_DST_RDY,
+
+            TX_DATA     => rx_fifo_mfb_data,
+            TX_SOF_POS  => rx_fifo_mfb_sof_pos,
+            TX_EOF_POS  => rx_fifo_mfb_eof_pos,
+            TX_SOF      => rx_fifo_mfb_sof,
+            TX_EOF      => rx_fifo_mfb_eof,
+            TX_SRC_RDY  => rx_fifo_mfb_src_rdy,
+            TX_DST_RDY  => rx_fifo_mfb_dst_rdy
+        );
+    else generate
+        rx_fifo_mfb_data    <= RX_MFB_DATA;
+        rx_fifo_mfb_sof_pos <= RX_MFB_SOF_POS;
+        rx_fifo_mfb_eof_pos <= RX_MFB_EOF_POS;
+        rx_fifo_mfb_sof     <= RX_MFB_SOF;
+        rx_fifo_mfb_eof     <= RX_MFB_EOF;
+        rx_fifo_mfb_src_rdy <= RX_MFB_SRC_RDY;
+        RX_MFB_DST_RDY      <= rx_fifo_mfb_dst_rdy;
+    end generate;
+
+    -- Distribute switch info according to current rx_fifo_mfb_sof positions
+    switch_dist_pr : process (switch_fifoxm_do,rx_fifo_mfb_sof,rx_mfb_sof_cnt)
         variable cnt : integer;
     begin
         -- count number of SOFs before each region
         for i in 0 to MFB_REGIONS+1-1 loop
             cnt := 0;
             for e in 0 to i-1 loop
-                if (RX_MFB_SOF(e) = '1') then
+                if (rx_fifo_mfb_sof(e) = '1') then
                     cnt := cnt+1;
                 end if;
             end loop;
@@ -261,9 +316,9 @@ begin
     -- RX MFB can be passed when there is at least as much switch info on switch fifoxm output as there is SOFs in the RX MFB
     can_send_whole <= '1' when switch_fifoxm_empty_sh(to_integer(rx_mfb_sof_cnt(MFB_REGIONS))) = '0' else '0';
 
-    mfb_spl_rx_src_rdy <= '1' when can_send_whole = '1' and RX_MFB_SRC_RDY = '1' else '0';
+    mfb_spl_rx_src_rdy <= '1' when can_send_whole = '1' and rx_fifo_mfb_src_rdy = '1' else '0';
 
-    RX_MFB_DST_RDY <= '1' when can_send_whole = '1' and mfb_spl_rx_dst_rdy = '1' else '0';
+    rx_fifo_mfb_dst_rdy <= '1' when can_send_whole = '1' and mfb_spl_rx_dst_rdy = '1' else '0';
 
     mfb_splitter_i : entity work.MFB_SPLITTER_SIMPLE
     generic map (
@@ -279,11 +334,11 @@ begin
 
         RX_MFB_META     => (others => '0'),
         RX_MFB_SEL      => switch_fifoxm_do_dist,
-        RX_MFB_DATA     => RX_MFB_DATA,
-        RX_MFB_SOF      => RX_MFB_SOF,
-        RX_MFB_EOF      => RX_MFB_EOF,
-        RX_MFB_SOF_POS  => RX_MFB_SOF_POS,
-        RX_MFB_EOF_POS  => RX_MFB_EOF_POS,
+        RX_MFB_DATA     => rx_fifo_mfb_data,
+        RX_MFB_SOF      => rx_fifo_mfb_sof,
+        RX_MFB_EOF      => rx_fifo_mfb_eof,
+        RX_MFB_SOF_POS  => rx_fifo_mfb_sof_pos,
+        RX_MFB_EOF_POS  => rx_fifo_mfb_eof_pos,
         RX_MFB_SRC_RDY  => mfb_spl_rx_src_rdy,
         RX_MFB_DST_RDY  => mfb_spl_rx_dst_rdy,
 
