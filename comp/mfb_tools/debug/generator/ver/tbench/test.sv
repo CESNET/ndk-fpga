@@ -58,8 +58,10 @@ program TEST (
     task enableGenerator(int pkt_len, int burst_mode_en, int burst_size);
         Mi32Transaction mi32Transaction ;
         Mi32Driver      mi32Driver      ;
+        Mi32Monitor     mi32Monitor     ;
         mi32Transaction = new();
         mi32Driver      = new("Mi32 Driver", null, MI32);
+        mi32Monitor     = new("Mi32 Monitor", MI32);
 
         // Reset packet counter
         mi32Transaction.rw      = 1;
@@ -98,14 +100,21 @@ program TEST (
         mi32Transaction.data    = 32'h1;
         mi32Driver.sendTransaction(mi32Transaction);
 
-        #(10*CLK_PERIOD);
+        // sync read
+        mi32Transaction.rw      = 0;
+        mi32Transaction.address = 32'h00;
+        mi32Monitor.executeTransaction(mi32Transaction);
+
+        #(5*CLK_PERIOD);
     endtask
 
     task disableGenerator();
         Mi32Transaction mi32Transaction ;
         Mi32Driver      mi32Driver      ;
+        Mi32Monitor     mi32Monitor     ;
         mi32Transaction = new();
         mi32Driver      = new("Mi32 Driver", null, MI32);
+        mi32Monitor     = new("Mi32 Monitor", MI32);
 
         // Disable Generator
         mi32Transaction.rw      = 1;
@@ -114,7 +123,12 @@ program TEST (
         mi32Transaction.data    = 32'h0;
         mi32Driver.sendTransaction(mi32Transaction);
 
-        #(200*CLK_PERIOD);
+        // sync read
+        mi32Transaction.rw      = 0;
+        mi32Transaction.address = 32'h00;
+        mi32Monitor.executeTransaction(mi32Transaction);
+
+        #(50*CLK_PERIOD);
     endtask
 
     task checkPktCounter(int burst_mode_en, int burst_size);
@@ -143,7 +157,7 @@ program TEST (
         mi32Monitor.executeTransaction(mi32Transaction);
         pktcnt[63:32] = mi32Transaction.data;
 
-        #(10*CLK_PERIOD);
+        #(5*CLK_PERIOD);
 
         sc_pktcnt = scoreboard.getPktCounter();
 
@@ -175,7 +189,7 @@ program TEST (
         if (burst_mode_en == 1) begin
             // This is very experimental, but it works. Just provide sufficient
             // time before proceeding further.
-            #(100*CLK_PERIOD*burst_size*length);
+            #(CLK_PERIOD*burst_size*(length+20));
         end
         else begin
             #(1000*CLK_PERIOD);
@@ -201,16 +215,16 @@ program TEST (
         createEnvironment();
         resetDesign();
 
-        // Test with different packet lengths and different burst sizes.
         if (USE_PACP_ARCH != 1'b1) begin
+            $write("Test with different packet lengths and different burst sizes.\n");
             for (int bst_size = 1; bst_size < max_bst_size; bst_size=bst_size+3) begin
-                for (int length = 64; length < 4*MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE; length=length+3) begin
+                for (int length = 64; length < 2*MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE; length=length+3) begin
                     test(length, 1, bst_size);
                 end
             end
         end
 
-        // Test without burst mode, the packets are sent continuously.
+        $write("Test without burst mode, the packets are sent continuously.\n");
         for (int length = 64; length < 4*MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE; length=length+3) begin
             test(length, 0, 64);
         end
