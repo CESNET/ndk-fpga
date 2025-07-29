@@ -8,7 +8,6 @@ from math import log2
 
 
 # TODO
-# BinaryVector slicing
 # add undefined value, like U and X
 # comparing of Binary and different classes, for example int -> Binary should before comparison return int representation
 
@@ -50,17 +49,20 @@ class BinaryConvertions:
         num = BinaryConvertions.bin_to_int(binary) + 1
         return BinaryConvertions.int_to_bin(num, bits=len(binary))
 
-    def reorder_bytes(value: int, in_endian: str, out_endian: str) -> int:
+    def reorder_bytes(value: int, in_endian: str, out_endian: str, bits: Optional[int] = None) -> int:
         """
         Changes endian from big to little and vice versa.
         """
 
         assert in_endian in ["little", "big"] and out_endian in ["little", "big"]
 
+        if bits is None:
+            bits = value.bit_length()
+
         if in_endian == out_endian:
             return value
 
-        buff = value.to_bytes(mathext.ceildiv(8, value.bit_length()), in_endian)
+        buff = value.to_bytes(mathext.ceildiv(8, bits), in_endian)
 
         return int.from_bytes(buff, out_endian)
 
@@ -83,6 +85,8 @@ class BinaryConvertions:
         Returns:
             value of binary number as integer.
         """
+        assert all(item in [0, 1] for item in binary)
+
         sign: int = 1
 
         if len(binary) == 0:
@@ -188,7 +192,7 @@ class BinaryConvertions:
         """
         return BinaryConvertions.int_to_bin(int(string, base=base))
 
-    def bytes_to_bin(buff: bytes) -> list: # tady by ještě měla být nějaká kontrola endianity
+    def bytes_to_bin(buff: bytes) -> list:
         binary = list()
 
         assert len(buff) > 0
@@ -262,7 +266,7 @@ class Binary:
             self._value = BinaryConvertions.bin_to_int(value, signed=self.signed)
 
         elif isinstance(value, int):
-            self._value = BinaryConvertions.reorder_bytes(value, "little", self.endian)
+            self._value = BinaryConvertions.reorder_bytes(value, "little", self.endian, bits=self.bits)
 
         elif isinstance(value, str):
             self.bits = len(value) * int(log2(self._base)) if self._bits is None else self.bits
@@ -311,7 +315,7 @@ class Binary:
         If little, the number has little endian and number of bits is extended.
         """
         assert value in ['big', 'little']
-        self.value = BinaryConvertions.reorder_bytes(self.value, self._endian, value)
+        self.value = BinaryConvertions.reorder_bytes(self.value, self._endian, value, bits=self.bits)
         self._endian = value
 
     @property
@@ -390,7 +394,7 @@ class Binary:
         if self.endian == "little":
             return {2: self.binstr, 8: self.octal, 10: self.int, 16: self.hex}.get(self.base, None)
         else:
-            return type(self)(BinaryConvertions.reorder_bytes(self.value, "little", "big"), bits=self.bits, base=self.base, signed=self.signed).stored
+            return type(self)(BinaryConvertions.reorder_bytes(self.value, "little", "big", bits=self.bits), bits=self.bits, base=self.base, signed=self.signed).stored
 
     @property
     def bytes(self) -> bytes:
@@ -480,14 +484,18 @@ class Binary:
         Returns slice of this Binary object wrapped in a new Binary object.
         """
         if isinstance(index, slice):
-            bitmask = mathext.bitmask(abs(index.stop - index.start))
-            value   = (self._value >> index.start) & bitmask
+            start = index.start if index.start is not None else 0
+            stop  = index.stop if index.stop is not None else self.bits
+            bits  = abs(stop - start)
+            bitmask = mathext.bitmask(bits)
+            value   = (self._value >> start) & bitmask
         elif isinstance(index, int):
+            bits = 1
             value   = (self._value >> index) & 1
         else:
             raise ValueError("Invalid index type passed to __getitem__ of Binary object.")
 
-        return Binary(value) # tady by jeste asi melo byt predani signed atd.
+        return Binary(value, bits=bits, signed=self.signed)
 
     def __setitem__(self, index, value):
         """
@@ -506,13 +514,15 @@ class Binary:
                 raise ValueError("Unsupported value passed to __setitem__ of Binary object.")
 
         if isinstance(index, slice):
-            slc_len = abs(index.stop - index.start)
+            start   = index.start if index.start is not None else 0
+            stop    = index.stop if index.stop is not None else self.bits
+            slc_len = abs(stop - start)
 
             if (bc := value.bit_length()) > slc_len:
                 raise ValueError(f"Value {value} of length {bc} bits doesn't fit into slice of {slc_len} bits.")
 
             bitmask = mathext.bitmask(slc_len)
-            self.value = (self._value & (~(bitmask << index.start))) + (value << index.start)
+            self.value = (self._value & (~(bitmask << start))) + (value << start)
 
         elif isinstance(index, int):
             assert value in [0, 1]
@@ -520,7 +530,7 @@ class Binary:
         else:
             raise ValueError("Invalid index type passed to __getitem__ of Binary object.")
 
-    # math operators - result is always BinaryValue
+    # math operators - result is always Binary
     def __add__(self, other: Any):
         return Binary(self.int + Binary(other).int, bits=self._bits, endian=self.endian, signed=self.signed)
 
@@ -563,7 +573,7 @@ class Binary:
     def __rtruediv__(self, other: Any):
         raise SyntaxError("Cannot use truediv (/) with binary value. Use floordiv (//) instead.")
 
-    # bitwise operators - result is always BinaryValue
+    # bitwise operators - result is always Binary
     def __invert__(self):
         return self.flipped()
 
@@ -612,8 +622,6 @@ class BinaryVector(Binary):
     Vector of binary numbers.
     In reality it's just Binary devided into smaller sections of fixed lenght that can be indexed (aka 'items').
     """
-
-    # value by měl brát i třeba BinaryVector = [1,2,3,4]
 
     def __init__(self, item_count: int, item_bits: int, items: list = None, **kwargs):
         super().__init__(bits=item_count * item_bits, **kwargs)
@@ -787,7 +795,9 @@ class BinaryVector(Binary):
         if isinstance(index, int):
             slc = slice(index * self._item_bits, (index + 1) * self._item_bits)
         elif isinstance(index, slice):
-            slc = slice(index.start * self._item_bits, abs(index.stop - index.start) * self._item_bits)
+            start = index.start if index.start is not None else 0
+            stop  = index.stop if index.stop is not None else self.bits
+            slc   = slice(start * self._item_bits, abs(stop - start) * self._item_bits)
 
         return super().__getitem__(slc)
 
@@ -798,7 +808,9 @@ class BinaryVector(Binary):
         if isinstance(index, int):
             slc = slice(index * self._item_bits, (index + 1) * self._item_bits)
         elif isinstance(index, slice):
-            slc = slice(index.start * self._item_bits, abs(index.stop - index.start) * self._item_bits)
+            start = index.start if index.start is not None else 0
+            stop  = index.stop if index.stop is not None else self.bits
+            slc   = slice(start * self._item_bits, abs(stop - start) * self._item_bits)
 
         super().__setitem__(slc, value)
 
