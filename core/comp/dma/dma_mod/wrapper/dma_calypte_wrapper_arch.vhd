@@ -211,8 +211,8 @@ architecture CALYPTE of DMA_WRAPPER is
 
 begin
 
-    assert (DMA_STREAMS = PCIE_ENDPOINTS)
-        report "DMA_WRAPPER(CALYPTE): This DMA core does not support multiple DMA endpoints. Only one DMA Module is allowed per PCIE endpoint"
+    assert (DMA_STREAMS = PCIE_ENDPOINTS) and (DMA_ENDPOINTS = PCIE_ENDPOINTS)
+        report "DMA_WRAPPER(CALYPTE): This DMA core supports only one module/stream per PCIe endpoint"
         severity FAILURE;
 
     dma_pcie_endp_g : for i in 0 to PCIE_ENDPOINTS-1 generate

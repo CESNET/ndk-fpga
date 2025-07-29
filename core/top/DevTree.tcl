@@ -165,7 +165,7 @@ proc dts_ndp_core_main_mi {DTS} {
     }
 }
 
-proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_ENDPOINTS DMA_TX_CHANNELS} {
+proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_EP_IDX CHAN_PER_EP} {
     upvar 1 $DTS ret
 
     # -------------------------------------------------
@@ -187,8 +187,6 @@ proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_ENDPOINTS DMA_TX_CHANNELS} {
     set DATA_ADDR_W $DATA_PTR_W
     set HDR_ADDR_W  [expr $HDR_PTR_W + 3]
 
-    set CHAN_PER_EP [expr $DMA_TX_CHANNELS / $PCIE_ENDPOINTS]
-
     # Calculation of the addres range reserved for single channel
     set TX_DATA_BUFF_BASE       "0x00000000"
     set TX_BUFF_SIZE       [expr int(pow(2,max($DATA_ADDR_W, $HDR_ADDR_W))) * 2]
@@ -196,7 +194,7 @@ proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_ENDPOINTS DMA_TX_CHANNELS} {
 
     for {set i 0} {$i < $CHAN_PER_EP} {incr i} {
         set    var_buff_base [expr $TX_DATA_BUFF_BASE + $i * $TX_BUFF_SIZE_HEX]
-        dts_dma_calypte_tx_buffer ret "data" $i $var_buff_base $TX_BUFF_SIZE_HEX "0"
+        dts_dma_calypte_tx_buffer ret "data" $i $var_buff_base $TX_BUFF_SIZE_HEX $PCIE_EP_IDX
     }
 
     set TX_HDR_BUFF_BASE   [expr $TX_DATA_BUFF_BASE + $CHAN_PER_EP*$TX_BUFF_SIZE]
@@ -204,7 +202,7 @@ proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_ENDPOINTS DMA_TX_CHANNELS} {
 
     for {set i 0} {$i < $CHAN_PER_EP} {incr i} {
         set    var_buff_base [expr $TX_HDR_BUFF_BASE + $i * $TX_BUFF_SIZE_HEX]
-        dts_dma_calypte_tx_buffer ret "hdr" $i $var_buff_base $TX_BUFF_SIZE_HEX "0"
+        dts_dma_calypte_tx_buffer ret "hdr" $i $var_buff_base $TX_BUFF_SIZE_HEX $PCIE_EP_IDX
     }
 }
 
@@ -236,7 +234,7 @@ proc dts_build_netcope {} {
             append ret "map-as-wc;"
             # Creating separate space for MI bus when DMA Calypte are used, the core uses additional BAR for its function
             if {$DMA_TYPE == 4} {
-                dts_ndk_core_dma_calypte_tx_buffers ret $PCIE_ENDPOINTS $DMA_TX_CHANNELS
+                dts_ndk_core_dma_calypte_tx_buffers ret $pcie [expr $DMA_RX_CHANNELS / $PCIE_ENDPOINTS]
             }
         }
     }
