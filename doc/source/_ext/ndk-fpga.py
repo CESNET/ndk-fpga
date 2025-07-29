@@ -13,6 +13,7 @@ def build_init(app):
     os.symlink(app.srcdir + '/../../cards', app.srcdir + '/ndk_cards')
     os.symlink(app.srcdir + '/../../extra', app.srcdir + '/ndk_extra')
     os.symlink(app.srcdir + '/../../comp', app.srcdir + '/comp')
+    os.symlink(app.srcdir + '/../../tests', app.srcdir + '/tests')
 
 
 def build_finish(app, exception):
@@ -22,6 +23,7 @@ def build_finish(app, exception):
     os.remove(app.srcdir + '/ndk_cards')
     os.remove(app.srcdir + '/ndk_extra')
     os.remove(app.srcdir + '/comp')
+    os.remove(app.srcdir + '/tests')
 
 
 def setup(app):

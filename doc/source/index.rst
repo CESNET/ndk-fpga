@@ -98,6 +98,12 @@ it also provides converters:
     basic_cocotb_test
 
 
+.. toctree::
+    :caption: GitLab CI/CD Tools
+    :maxdepth: 1
+
+    tests/verible/readme
+
 --------
 
 The NDK-FPGA supports a wide range of FPGA cards, providing access to features such as DDR and HBM

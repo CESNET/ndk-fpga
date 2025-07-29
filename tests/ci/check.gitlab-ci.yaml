@@ -55,3 +55,14 @@ vhdlcodestyle:
         - PATHS=("apps" "core" "comp/axis_tools" "comp/base"  "comp/dma" "comp/mem_tools" "comp/mfb_tools" "comp/mvb_tools" "comp/mi_tools" "comp/nic" "comp/pcie" "comp/tsu")
         - readarray -d '' VHDL_FILES < <(find "${PATHS[@]}" -name "*.vhd" -print0)
         - vsg -of syntastic --all_phases -c "${VSG_CONFIG_PATH}" -f "${VHDL_FILES[@]}"
+
+veriblelint:
+  stage: check
+  needs: []
+  image:
+    name: registry.gitlab.com/python-gitlab/python-gitlab:v3.11.0-alpine
+    entrypoint: [""]
+  before_script:
+    - sh tests/verible/install.sh
+  script:
+    - python3 tests/verible/gitlab_runner.py
