@@ -8,7 +8,6 @@ forbid-line-continuations
 forbid-negative-array-dim
 forbidden-macro
 generate-label
-instance-shadowing
 interface-name-style
 invalid-system-task-function
 line-length=length:120
