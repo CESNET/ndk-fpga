@@ -29,6 +29,14 @@ if {$env(DMA_TYPE) == 4} {
 set DMA_RX_BLOCKING_MODE true
 
 # ------------------------------------------------------------------------------
+# Select debug parameters:
+# ------------------------------------------------------------------------------
+# Enables debug probes and counters in the DMA Module (Medusa)
+set DMA_DEBUG_ENABLE       false
+# Enables debug probes in the PCIe Module (PCIe Ctrl)
+set PCIE_CTRL_DEBUG_ENABLE false
+
+# ------------------------------------------------------------------------------
 # Other parameters:
 # ------------------------------------------------------------------------------
 set PROJECT_NAME "NDK_MINIMAL"
