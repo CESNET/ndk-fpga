@@ -8,7 +8,8 @@ proc dts_pcie_ctrl_dbg {base endpoints mode arch} {
     set probes_ptc 6
     set dma_ports_per_ep 1
     set pcie_ep_off 0x1000
-    if {$mode == 0 && ($arch == "P_TILE" || $arch == "R_TILE")} {set dma_ports_per_ep [expr 2*$endpoints]}
+    if {($mode == 0 && $arch == "P_TILE") || ($mode == 1 && $arch == "R_TILE")} {set dma_ports_per_ep [expr 2*$endpoints]}
+    if {($mode == 0 && $arch == "R_TILE")} {set dma_ports_per_ep [expr 4*$endpoints]}
     set ret ""
     for {set ep 0} {$ep < $endpoints} {incr ep} {
         for {set dp 0} {$dp < $dma_ports_per_ep} {incr dp} {
