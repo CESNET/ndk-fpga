@@ -36,9 +36,13 @@ class sequence_simple_rx_base #(
         this.name = name;
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_simple_rx_base #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
 
     // Generates transactions
     task body;
+
         // Create a request for sequence item
         if(!uvm_config_db #(uvm_logic_vector::sequencer #(ITEM_WIDTH))::get(p_sequencer, "", "hi_sqr", hi_sqr)) begin
             `uvm_fatal(get_type_name(), "Unable to get configuration object")
@@ -115,6 +119,10 @@ class sequence_rand_rx #(
     function new(string name = "sequence_rand_rx");
         super.new(name);
         rdy = uvm_common::rand_length_rand::new();
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_rand_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
@@ -195,6 +203,10 @@ class sequence_burst_rx #(
         burst_mode         = MODE_BURST;
    endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_burst_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     virtual task create_sequence_item();
         logic [ITEMS-1 : 0] vld;
 
@@ -273,6 +285,10 @@ class sequence_full_speed_rx #(
         super.new(name);
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_full_speed_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     virtual task create_sequence_item();
         logic [ITEMS-1 : 0] vld;
 
@@ -321,6 +337,10 @@ class sequence_stop_rx #(
         super.new(name);
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_stop_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     virtual task create_sequence_item();
         if (!gen.randomize() with {src_rdy == 0;}) `uvm_fatal(this.get_full_name(), "\n\tfailed to radnomize");
         if (hl_transactions != 0) begin
@@ -364,6 +384,10 @@ class sequence_const_space_rx #(
 
     function new(string name = "sequence_full_speed_rx");
         super.new(name);
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_const_space_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
@@ -422,6 +446,10 @@ class sequence_const_possition_rx #(
         super.new(name);
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_const_possition_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     virtual task create_sequence_item();
         logic [ITEMS-1 : 0] vld;
 
@@ -473,6 +501,10 @@ class sequence_lib_rx #(
         init_sequence_library();
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_lib_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     // subclass can redefine and change run sequences
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
@@ -499,6 +531,10 @@ class sequence_lib_speed_rx #(
         init_sequence_library();
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_lib_speed_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     // subclass can redefine and change run sequences
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
@@ -523,6 +559,10 @@ class sequence_simple_rx #(
     // Constructor - creates new instance of this class
     function new(string name = "sequence_simple_rx");
         super.new(name);
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_simple_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
