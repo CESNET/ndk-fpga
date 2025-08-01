@@ -5,7 +5,10 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-class sequence_simple_rx_base #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_common::sequence_base #(config_sequence, uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
+class sequence_simple_rx_base #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
     `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_simple_rx_base #(ITEMS, ITEM_WIDTH))
     `uvm_declare_p_sequencer(uvm_mvb::sequencer #(ITEMS, ITEM_WIDTH))
 
@@ -23,7 +26,7 @@ class sequence_simple_rx_base #(int unsigned ITEMS, int unsigned ITEM_WIDTH) ext
     int unsigned hl_transactions_min =  20;
     int unsigned hl_transactions_max = 300;
 
-    constraint c_hl_transactions{
+    constraint hl_transactions_c{
         hl_transactions inside {[hl_transactions_min:hl_transactions_max]};
     };
 
@@ -33,9 +36,13 @@ class sequence_simple_rx_base #(int unsigned ITEMS, int unsigned ITEM_WIDTH) ext
         this.name = name;
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_simple_rx_base #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
 
     // Generates transactions
     task body;
+
         // Create a request for sequence item
         if(!uvm_config_db #(uvm_logic_vector::sequencer #(ITEM_WIDTH))::get(p_sequencer, "", "hi_sqr", hi_sqr)) begin
             `uvm_fatal(get_type_name(), "Unable to get configuration object")
@@ -86,7 +93,7 @@ class sequence_simple_rx_base #(int unsigned ITEMS, int unsigned ITEM_WIDTH) ext
 
     virtual task send_empty();
         start_item(req);
-        void'(req.randomize() with {src_rdy == '0;});
+        assert(req.randomize() with {src_rdy == '0;});
         finish_item(req);
     endtask
 
@@ -96,7 +103,10 @@ class sequence_simple_rx_base #(int unsigned ITEMS, int unsigned ITEM_WIDTH) ext
 
 endclass
 
-class sequence_rand_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
+class sequence_rand_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
     `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_rand_rx #(ITEMS, ITEM_WIDTH))
 
     // coeficient is used because we want to use more random distributors
@@ -111,10 +121,16 @@ class sequence_rand_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends se
         rdy = uvm_common::rand_length_rand::new();
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_rand_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     virtual task create_sequence_item();
+        logic [ITEMS-1 : 0] vld;
+
         if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
 
-        gen.vld     = 0;
+        vld         = 0;
         gen.src_rdy = 1'b0;
 
         for (int i = 0; i < ITEMS; i++) begin
@@ -122,9 +138,11 @@ class sequence_rand_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends se
                 if (space == 0) begin
                     hi_sqr.try_next_item(frame);
                     if (frame != null) begin
-                        gen.src_rdy = 1'b1;
-                        gen.vld[i]  = 1'b1;
+                        vld[i]  = 1'b1;
+
                         gen.data[i] = frame.data;
+                        gen.vld = vld;
+                        gen.src_rdy = 1'b1;
                         hi_sqr.item_done();
                         frame = null;
                         hl_transactions--;
@@ -146,7 +164,10 @@ class sequence_rand_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends se
 endclass
 
 
-class sequence_burst_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
+class sequence_burst_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
     `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_burst_rx #(ITEMS, ITEM_WIDTH))
 
     uvm_common::rand_length   rand_burst_length;
@@ -162,7 +183,7 @@ class sequence_burst_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends s
     rand int unsigned burst_length_min;
     rand int unsigned burst_length_max;
 
-    constraint c_probability {
+    constraint probability_c {
         burst_length_min inside {[10:100]};
         burst_length_max inside {[10:100]};
         burst_length_min <= burst_length_max;
@@ -182,14 +203,20 @@ class sequence_burst_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends s
         burst_mode         = MODE_BURST;
    endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_burst_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     virtual task create_sequence_item();
+        logic [ITEMS-1 : 0] vld;
+
         if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
 
-        gen.vld     = 0;
+        vld = 0;
         gen.src_rdy = 1'b0;
 
         if (burst_length == 0) begin
-            case (burst_mode)
+            unique case (burst_mode)
                 MODE_SPACE : begin
                     assert(rand_burst_length.randomize());
                     burst_length = rand_burst_length.m_value;
@@ -212,9 +239,12 @@ class sequence_burst_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends s
                     if (space == 0) begin
                         hi_sqr.try_next_item(frame);
                         if (frame != null) begin
-                            gen.src_rdy = 1'b1;
-                            gen.vld[i]  = 1'b1;
+                            vld[i] = 1'b1;
+
                             gen.data[i] = frame.data;
+                            gen.vld     = vld;
+                            gen.src_rdy = 1'b1;
+
                             hi_sqr.item_done();
                             frame = null;
                             hl_transactions--;
@@ -242,7 +272,10 @@ class sequence_burst_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends s
 endclass
 
 
-class sequence_full_speed_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
+class sequence_full_speed_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
 
     `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_full_speed_rx #(ITEMS, ITEM_WIDTH))
 
@@ -252,9 +285,15 @@ class sequence_full_speed_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) exte
         super.new(name);
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_full_speed_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     virtual task create_sequence_item();
+        logic [ITEMS-1 : 0] vld;
+
         if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
-        gen.vld     = 0;
+        vld = 0;
         gen.src_rdy = 1'b0;
 
         for (int i = 0; i < ITEMS; i++) begin
@@ -262,9 +301,12 @@ class sequence_full_speed_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) exte
                 if (space == 0) begin
                     hi_sqr.try_next_item(frame);
                     if (frame != null) begin
-                        gen.src_rdy = 1'b1;
-                        gen.vld[i]  = 1'b1;
+                        vld[i] = 1'b1;
+
                         gen.data[i] = frame.data;
+                        gen.vld     = vld;
+                        gen.src_rdy = 1'b1;
+
                         hi_sqr.item_done();
                         hl_transactions--;
                         space = cfg.space_size_min;
@@ -283,13 +325,20 @@ class sequence_full_speed_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) exte
 endclass
 
 
-class sequence_stop_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
+class sequence_stop_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
 
     `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_stop_rx #(ITEMS, ITEM_WIDTH))
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_stop_rx");
         super.new(name);
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_stop_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
@@ -301,39 +350,52 @@ class sequence_stop_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends se
 
 
     virtual function void config_set(config_sequence cfg);
+        logic tmp;
+
         this.cfg = cfg;
-        hl_transactions_min = (cfg.space_size_min + 100) > cfg.space_size_max ? cfg.space_size_min : (cfg.space_size_max - 100);
+        tmp = (cfg.space_size_min + 100) > cfg.space_size_max;
+        hl_transactions_min = tmp == 1'b1  ? cfg.space_size_min : (cfg.space_size_max - 100);
         hl_transactions_max = cfg.space_size_max;
     endfunction
 endclass
 
 
-class sequence_const_space_rx #(ITEMS, ITEM_WIDTH) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
+class sequence_const_space_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
     `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_const_space_rx #(ITEMS, ITEM_WIDTH))
 
     rand int unsigned space_size = 10;
-    int unsigned  space_size_min = 0;
-    int unsigned  space_size_max = 30;
 
     int unsigned space = 0;
     // Constructor - creates new instance of this class
+    local int unsigned space_size_coef;
 
-    constraint c_space_size{
-        space_size dist {[space_size_min:(space_size_min + (space_size_max - space_size_min)/10)]                                              :/ 40,
-                         [(space_size_min + (space_size_max - space_size_min)/10):(space_size_min + (space_size_max - space_size_min)/10*2)]   :/ 30,
-                         [(space_size_min + (space_size_max - space_size_min)/10*2):(space_size_max - (space_size_max - space_size_min)/10*2)] :/ 20,
-                         [(space_size_max - (space_size_max - space_size_min)/10*2):(space_size_max - (space_size_max - space_size_min)/10)]   :/ 5,
-                         [(space_size_max - (space_size_max - space_size_min)/10):space_size_max]                                              :/ 5
-                     };
+    constraint space_size_c {
+        space_size dist  {
+            [cfg.space_size_min:(cfg.space_size_min + space_size_coef/10)]                            :/ 40,
+            [(cfg.space_size_min + space_size_coef/10):(cfg.space_size_min   + space_size_coef/10*2)] :/ 30,
+            [(cfg.space_size_min + space_size_coef/10*2):(cfg.space_size_max - space_size_coef/10*2)] :/ 20,
+            [(cfg.space_size_max - space_size_coef/10*2):(cfg.space_size_max - space_size_coef/10)]   :/ 5,
+            [(cfg.space_size_max - space_size_coef/10):cfg.space_size_max]                            :/ 5
+        };
     };
 
     function new(string name = "sequence_full_speed_rx");
         super.new(name);
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_const_space_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     virtual task create_sequence_item();
+        logic [ITEMS-1 : 0] vld;
+
         if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
-        gen.vld     = 0;
+
+        vld     = 0;
         gen.src_rdy = 1'b0;
 
         for (int i = 0; i < ITEMS; i++) begin
@@ -341,9 +403,12 @@ class sequence_const_space_rx #(ITEMS, ITEM_WIDTH) extends sequence_simple_rx_ba
                 if (space == 0) begin
                     hi_sqr.try_next_item(frame);
                     if (frame != null) begin
-                        gen.src_rdy = 1'b1;
-                        gen.vld[i]  = 1'b1;
+                        vld[i] = 1'b1;
+
                         gen.data[i] = frame.data;
+                        gen.vld     = vld;
+                        gen.src_rdy = 1'b1;
+
                         hi_sqr.item_done();
                         hl_transactions--;
                         space = space_size;
@@ -357,20 +422,23 @@ class sequence_const_space_rx #(ITEMS, ITEM_WIDTH) extends sequence_simple_rx_ba
 
     virtual function void config_set(config_sequence cfg);
         this.cfg = cfg;
-        space_size_min = cfg.space_size_min;
-        space_size_max = cfg.space_size_max;
+        space_size_coef = cfg.space_size_max - cfg.space_size_min;
     endfunction
+
 endclass
 
 
-class sequence_const_possition_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
+class sequence_const_possition_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
     `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_const_possition_rx #(ITEMS, ITEM_WIDTH))
 
     rand logic [ITEMS-1:0] pos_valid = 1'b1;
     int unsigned space = 0;
     // Constructor - creates new instance of this class
 
-    constraint c_pos_valid{
+    constraint pos_valid_c {
         $countones(pos_valid) >= 1;
     };
 
@@ -378,9 +446,16 @@ class sequence_const_possition_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH)
         super.new(name);
     endfunction
 
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_const_possition_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
+    endfunction
+
     virtual task create_sequence_item();
+        logic [ITEMS-1 : 0] vld;
+
         if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
-        gen.vld     = 0;
+
+        vld     = 0;
         gen.src_rdy = 1'b0;
 
         for (int i = 0; i < ITEMS; i++) begin
@@ -389,9 +464,12 @@ class sequence_const_possition_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH)
                     if (pos_valid[i]) begin
                         hi_sqr.try_next_item(frame);
                         if (frame != null) begin
-                            gen.src_rdy = 1'b1;
-                            gen.vld[i]  = 1'b1;
+                            vld[i] = 1'b1;
+
                             gen.data[i] = frame.data;
+                            gen.vld     = vld;
+                            gen.src_rdy = 1'b1;
+
                             hi_sqr.item_done();
                             hl_transactions--;
                             space = cfg.space_size_min;
@@ -411,13 +489,20 @@ endclass
 
 //////////////////////////////////////
 // TX LIBRARY
-class sequence_lib_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_common::sequence_library#(config_sequence, uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH));
+class sequence_lib_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_library#(config_sequence, uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH));
   `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_lib_rx#(ITEMS, ITEM_WIDTH))
   `uvm_sequence_library_utils(uvm_logic_vector_mvb::sequence_lib_rx#(ITEMS, ITEM_WIDTH))
 
     function new(string name = "");
         super.new(name);
         init_sequence_library();
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_lib_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     // subclass can redefine and change run sequences
@@ -434,13 +519,20 @@ class sequence_lib_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm
 endclass
 
 // Used for full speed tests
-class sequence_lib_speed_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends sequence_lib_rx#(ITEMS, ITEM_WIDTH);
+class sequence_lib_speed_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends sequence_lib_rx#(ITEMS, ITEM_WIDTH);
     `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_lib_speed_rx#(ITEMS, ITEM_WIDTH))
     `uvm_sequence_library_utils(uvm_logic_vector_mvb::sequence_lib_speed_rx#(ITEMS, ITEM_WIDTH))
 
     function new(string name = "");
         super.new(name);
         init_sequence_library();
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_lib_speed_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     // subclass can redefine and change run sequences
@@ -457,13 +549,20 @@ class sequence_lib_speed_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) exten
 
 //////////////////////////////////////
 // PLS DONT PUT IT INTO SEQUENCE LIBRARY.
-class sequence_simple_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
+class sequence_simple_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends sequence_simple_rx_base #(ITEMS, ITEM_WIDTH);
 
     `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_simple_rx #(ITEMS, ITEM_WIDTH))
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_simple_rx");
         super.new(name);
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_mvb::sequence_simple_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
