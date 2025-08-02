@@ -24,7 +24,7 @@ if {[string is integer -strict $last_part]} {
     set endpoint_idx 0
 }
 
-puts "The index of an endpoint is $endpoint_idx"
+puts "Creating PCIe endpoint with index $endpoint_idx"
 
 set IP [get_ips $IP_COMP_NAME]
 
