@@ -51,8 +51,6 @@ set config_list [list \
     CONFIG.MSI_X_OPTIONS {None} \
     CONFIG.mode_selection {Advanced} \
     CONFIG.pf0_msix_enabled {false} \
-    CONFIG.pf1_msi_enabled {false} \
-    CONFIG.pf1_msix_enabled {false} \
     CONFIG.pf0_bar0_64bit {true} \
     CONFIG.pf0_bar0_prefetchable {false} \
     CONFIG.pf0_bar0_scale {Megabytes} \
