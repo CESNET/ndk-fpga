@@ -42,6 +42,12 @@ set_location_assignment PIN_CV20 -to "SYS_CLK_100M(n)"
 set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to SYS_CLK_100M
 set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to SYS_CLK_100M
 
+set_location_assignment PIN_CT24 -to EXT_1PPS
+set_instance_assignment -name IO_STANDARD "1.2 V" -to EXT_1PPS
+
+set_location_assignment PIN_CC23 -to EXT_CLK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to EXT_CLK
+
 # ==============================================================================
 # LEDs
 # ==============================================================================
