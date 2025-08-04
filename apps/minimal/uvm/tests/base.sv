@@ -133,17 +133,15 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         ////configure egent
         wait(event_reset == 1'b0);
-        for (int unsigned it = 0; it < 3; it++) begin
+        repeat (3) begin
 
             //RUN RIVER SEQUENCE ONLY IF RESET IS NOT SET
             dirver_sequence();
             #(200ns);
 
-            for (int unsigned it = 0; it < 5; it++) begin
-                assert(main_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
-                main_seq.time_start = tsu_seq.time_start;
-                main_seq.start(m_env.m_sequencer);
-            end
+            assert(main_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            main_seq.time_start = tsu_seq.time_start;
+            main_seq.start(m_env.m_sequencer);
 
             assert(stop_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
 

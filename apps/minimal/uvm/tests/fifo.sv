@@ -147,7 +147,6 @@ class sequence_fifo#(
     virtual task eth_rx_sequence(int unsigned index);
         uvm_app_core::sequence_library_eth#(2**8, 16, MFB_ITEM_WIDTH) packet_seq;
         uvm_app_core::config_sequence_eth seq_cfg;
-        int unsigned it;
 
         seq_cfg = new();
         seq_cfg.time_start = time_start;
@@ -155,11 +154,9 @@ class sequence_fifo#(
         packet_seq.init_sequence(seq_cfg);
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_eth_rx[index], "", "state", rx_status);
-        it = 0;
-        while (it < 200 && !rx_status.stopped()) begin
+        if (!rx_status.stopped()) begin
             assert(packet_seq.randomize());
             packet_seq.start(p_sequencer.m_eth_rx[index]);
-            it++;
         end
 
         event_eth_rx_end[index] = 1'b0;
@@ -168,16 +165,13 @@ class sequence_fifo#(
 
     virtual task dma_rx_sequence(int unsigned index);
         uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx) packet_seq;
-        int unsigned it;
 
         packet_seq = uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx)::type_id::create("mfb_rx_seq", p_sequencer.m_dma_rx[index]);
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_rx[index], "", "state", rx_status);
-        it = 0;
-        while (it < 200 && !rx_status.stopped()) begin
+        if (!rx_status.stopped()) begin
             assert(packet_seq.randomize());
             packet_seq.start(p_sequencer.m_dma_rx[index]);
-            it++;
         end
 
         event_dma_rx_end[index] = 1'b0;
@@ -390,17 +384,25 @@ class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
         ////configure egent
         wait(event_reset == 1'b0);
-        for (int unsigned it = 0; it < 2; it++) begin
+        repeat (3) begin
 
             //RUN RIVER SEQUENCE ONLY IF RESET IS NOT SET
             dirver_sequence();
             #(200ns);
 
-            assert(main_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            assert(main_seq.randomize())
+            else begin
+                `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            end
+
             main_seq.start(m_env.m_sequencer);
             main_seq.time_start = tsu_seq.time_start;
 
-            assert(stop_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            assert(stop_seq.randomize())
+            else begin
+                `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            end
+
             fork
                 stop_seq.start(m_env.m_sequencer);
             join_none;

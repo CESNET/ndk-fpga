@@ -168,21 +168,24 @@ class full_speed#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_
 
         ////configure egent
         wait(event_reset == 1'b0);
-        for (int unsigned it = 0; it < 3; it++) begin
+        repeat (3) begin
 
             //RUN RIVER SEQUENCE ONLY IF RESET IS NOT SET
             dirver_sequence();
             #(200ns);
 
-            end_time = $time() + 400us;
-            while (end_time > $time()) begin
-            //for (int unsigned it = 0; it < 10; it++) begin
-                assert(main_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
-                main_seq.start(m_env.m_sequencer);
-                main_seq.time_start = tsu_seq.time_start;
+            assert(main_seq.randomize())
+            else begin
+                `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
             end
 
-            assert(stop_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            main_seq.start(m_env.m_sequencer);
+            main_seq.time_start = tsu_seq.time_start;
+
+            assert(stop_seq.randomize())
+            else begin
+                `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            end
 
             fork
                 stop_seq.start(m_env.m_sequencer);

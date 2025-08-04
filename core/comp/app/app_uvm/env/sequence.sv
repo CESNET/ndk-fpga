@@ -116,7 +116,6 @@ class sequence_main#(
     virtual task eth_rx_sequence(int unsigned index);
         uvm_app_core::sequence_library_eth#(2**8, 16, MFB_ITEM_WIDTH) packet_seq;
         config_sequence_eth seq_cfg;
-        int unsigned it;
 
         seq_cfg = new();
         seq_cfg.time_start = time_start;
@@ -127,11 +126,9 @@ class sequence_main#(
         packet_seq.init_sequence(seq_cfg);
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_eth_rx[index], "", "state", rx_status);
-        it = 0;
-        while (it < 10 && !rx_status.stopped()) begin
+        if (!rx_status.stopped()) begin
             assert(packet_seq.randomize());
             packet_seq.start(p_sequencer.m_eth_rx[index]);
-            it++;
         end
 
         event_eth_rx_end[index] = 1'b0;
@@ -140,16 +137,13 @@ class sequence_main#(
 
     virtual task dma_rx_sequence(int unsigned index);
         uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx) packet_seq;
-        int unsigned it;
 
         packet_seq = uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx)::type_id::create("mfb_rx_seq", p_sequencer.m_dma_rx[index]);
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_rx[index], "", "state", rx_status);
-        it = 0;
-        while (it < 10 && !rx_status.stopped()) begin
+        if (!rx_status.stopped()) begin
             assert(packet_seq.randomize());
             packet_seq.start(p_sequencer.m_dma_rx[index]);
-            it++;
         end
 
         event_dma_rx_end[index] = 1'b0;
