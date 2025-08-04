@@ -8,22 +8,93 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
-class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
-            REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_test;
-    typedef uvm_component_registry#(test::base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
-                                                REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH),
-                                               "test::base") type_id;
-    localparam DMA_RX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_TX_CHANNELS);
-    localparam DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS) + 1;
+class base #(
+    int unsigned ETH_STREAMS,
+    int unsigned ETH_CHANNELS,
+    int unsigned ETH_PKT_MTU,
+    int unsigned ETH_RX_HDR_WIDTH,
+    int unsigned ETH_TX_HDR_WIDTH,
+    int unsigned DMA_STREAMS,
+    int unsigned DMA_RX_CHANNELS,
+    int unsigned DMA_TX_CHANNELS,
+    int unsigned DMA_HDR_META_WIDTH,
+    int unsigned DMA_PKT_MTU,
+    int unsigned REGIONS,
+    int unsigned MFB_REG_SIZE,
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned MEM_PORTS,
+    int unsigned MEM_ADDR_WIDTH,
+    int unsigned MEM_BURST_WIDTH,
+    int unsigned MEM_DATA_WIDTH,
+    int unsigned MI_DATA_WIDTH,
+    int unsigned MI_ADDR_WIDTH
+) extends uvm_test;
+    typedef uvm_component_registry #(
+        test::base #(
+            ETH_STREAMS,
+            ETH_CHANNELS,
+            ETH_PKT_MTU,
+            ETH_RX_HDR_WIDTH,
+            ETH_TX_HDR_WIDTH,
+            DMA_STREAMS,
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_HDR_META_WIDTH,
+            DMA_PKT_MTU,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_BURST_WIDTH,
+            MEM_DATA_WIDTH,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ),
+        "test::base"
+    ) type_id;
+    localparam int unsigned DMA_RX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_TX_CHANNELS);
+    localparam int unsigned DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS) + 1;
 
     //top env for sychnronization
     //uvm_app_core_top_agent::agent#(TR_TYPE, ITEM_WIDTH, META_WIDTH)
 
-    typedef uvm_app_core_top_agent::sequence_eth_item#(2**8, 16, MFB_ITEM_WIDTH)                                                   sequence_item_eth_rx;
-    typedef uvm_app_core_top_agent::sequence_dma_item#(DMA_TX_CHANNELS, $clog2(DMA_PKT_MTU+1), DMA_HDR_META_WIDTH, MFB_ITEM_WIDTH) sequence_item_dma_rx;
+    typedef uvm_app_core_top_agent::sequence_eth_item #(
+        2**8,
+        16,
+        MFB_ITEM_WIDTH
+    ) sequence_item_eth_rx;
+    typedef uvm_app_core_top_agent::sequence_dma_item #(
+        DMA_TX_CHANNELS,
+        $clog2(DMA_PKT_MTU+1),
+        DMA_HDR_META_WIDTH,
+        MFB_ITEM_WIDTH
+    ) sequence_item_dma_rx;
 
-    uvm_app_core_minimal::env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
-            REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_env;
+    uvm_app_core_minimal::env #(
+        ETH_STREAMS,
+        ETH_CHANNELS,
+        ETH_PKT_MTU,
+        ETH_RX_HDR_WIDTH,
+        ETH_TX_HDR_WIDTH,
+        DMA_STREAMS,
+        DMA_RX_CHANNELS,
+        DMA_TX_CHANNELS,
+        DMA_HDR_META_WIDTH,
+        DMA_PKT_MTU,
+        REGIONS,
+        MFB_REG_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        MEM_PORTS,
+        MEM_ADDR_WIDTH,
+        MEM_BURST_WIDTH,
+        MEM_DATA_WIDTH,
+        MI_DATA_WIDTH,
+        MI_ADDR_WIDTH
+    ) m_env;
 
     logic event_reset;
 
@@ -40,8 +111,28 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_app_core_minimal::env #(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
-            REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_env", this);
+        m_env = uvm_app_core_minimal::env #(
+            ETH_STREAMS,
+            ETH_CHANNELS,
+            ETH_PKT_MTU,
+            ETH_RX_HDR_WIDTH,
+            ETH_TX_HDR_WIDTH,
+            DMA_STREAMS,
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_HDR_META_WIDTH,
+            DMA_PKT_MTU,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_BURST_WIDTH,
+            MEM_DATA_WIDTH,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        )::type_id::create("m_env", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -52,8 +143,8 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         uvm_reset::sequence_reset reset;
         uvm_reset::sequence_run   run;
 
-        reset = uvm_reset::sequence_reset::type_id::create("reset_reset");
-        run   = uvm_reset::sequence_run::type_id::create("reset_run");
+        reset = uvm_reset::sequence_reset::type_id::create("reset");
+        run   = uvm_reset::sequence_run::type_id::create("run");
         run.length_min = 1000;
         run.length_max = 2000;
 
@@ -79,14 +170,21 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
         uvm_avmm::sequence_library_master #(MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH) mem_seq[MEM_PORTS];
 
         for (int unsigned it = 0; it < MEM_PORTS; it ++) begin
-            mem_seq[it] = uvm_avmm::sequence_library_master #(MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create($sformatf("mem_seq_%0d", it), this);;
+            mem_seq[it] = uvm_avmm::sequence_library_master #(
+                MEM_ADDR_WIDTH,
+                MEM_DATA_WIDTH,
+                MEM_BURST_WIDTH
+            )::type_id::create($sformatf("mem_seq_%0d", it), this);
         end
 
         for (int unsigned it = 0; it < MEM_PORTS; it ++) begin
             fork
                 automatic int unsigned index = it;
                 forever begin
-                    assert(mem_seq[index].randomize()) else begin `uvm_fatal(this.get_full_name(), $sfomratf("Cannot randomize memory sequence %0d", index)) end
+                    assert(mem_seq[index].randomize())
+                    else begin
+                        `uvm_fatal(this.get_full_name(), $sfomratf("Cannot randomize memory sequence %0d", index))
+                    end
                     mem_seq[index].start(m_env.m_sequencer.m_memory[index]);
                 end
             join_none
@@ -94,9 +192,14 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
     endtask
 
     virtual task dirver_sequence();
-        uvm_app_core_minimal::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) seq;
+        uvm_app_core_minimal::reg_sequence #(ETH_STREAMS, ETH_CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) seq;
 
-        seq = uvm_app_core_minimal::reg_sequence#(ETH_STREAMS, ETH_CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS)::type_id::create("seq", this);
+        seq = uvm_app_core_minimal::reg_sequence #(
+            ETH_STREAMS,
+            ETH_CHANNELS,
+            DMA_STREAMS,
+            DMA_RX_CHANNELS
+        )::type_id::create("seq", this);
 
         seq.m_regmodel = m_env.m_regmodel.m_regmodel;
         seq.start(null);
@@ -104,17 +207,77 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
     virtual task run_phase(uvm_phase phase);
         uvm_app_core::sequence_tsu  tsu_seq;
-        uvm_app_core::sequence_main#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                        ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH) main_seq;
-        uvm_app_core::sequence_stop#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                        ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH) stop_seq;
+        uvm_app_core::sequence_main #(
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        ) main_seq;
+        uvm_app_core::sequence_stop #(
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        ) stop_seq;
         time end_time;
         int rdy2end;
 
-        main_seq = uvm_app_core::sequence_main#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                       ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create("main_seq", m_env.m_sequencer);
-        stop_seq = uvm_app_core::sequence_stop#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                       ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create("stop_seq", m_env.m_sequencer);
+        main_seq = uvm_app_core::sequence_main #(
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        )::type_id::create("main_seq", m_env.m_sequencer);
+        stop_seq = uvm_app_core::sequence_stop #(
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        )::type_id::create("stop_seq", m_env.m_sequencer);
 
         phase.raise_objection(this);
 
@@ -139,11 +302,18 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             dirver_sequence();
             #(200ns);
 
-            assert(main_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            assert(main_seq.randomize())
+            else begin
+                `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            end
+
             main_seq.time_start = tsu_seq.time_start;
             main_seq.start(m_env.m_sequencer);
 
-            assert(stop_seq.randomize()) else `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            assert(stop_seq.randomize())
+            else begin
+                `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
+            end
 
             fork
                 stop_seq.start(m_env.m_sequencer);
@@ -161,7 +331,13 @@ class base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
                 #(1us);
             end
             if (m_env.used() != 0) begin
-                `uvm_warning(this.get_full_name(), $sformatf("\n\tUSED(%0d) sould be zero.\n\tDuring reconfiguration, There is some data in design", m_env.used()));
+                `uvm_warning(
+                    this.get_full_name(),
+                    $sformatf(
+                        "\n\tUSED(%0d) sould be zero.\n\tDuring reconfiguration, There is some data in design",
+                        m_env.used()
+                    )
+                );
             end
 
             stop_seq.done_set();

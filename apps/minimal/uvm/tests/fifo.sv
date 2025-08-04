@@ -15,8 +15,16 @@ class sequence_mfb_full_speed_rx #(
     int unsigned BLOCK_SIZE,
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
-) extends uvm_logic_vector_array_mfb::sequence_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(test::sequence_mfb_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+) extends uvm_logic_vector_array_mfb::sequence_full_speed_rx #(
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    ITEM_WIDTH,
+    META_WIDTH
+);
+    `uvm_object_param_utils(
+        test::sequence_mfb_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     function new(string name = "test::sequence_mfb_full_speed_rx");
         super.new(name);
@@ -50,8 +58,12 @@ class sequence_lib__mfb_rx_fifo #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-  `uvm_object_param_utils(    test::sequence_lib__mfb_rx_fifo#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-  `uvm_sequence_library_utils(test::sequence_lib__mfb_rx_fifo#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `uvm_object_param_utils(
+        test::sequence_lib__mfb_rx_fifo #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
+    `uvm_sequence_library_utils(
+        test::sequence_lib__mfb_rx_fifo #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
   function new(string name = "test::sequence_lib__mfb_rx_fifo");
     super.new(name);
@@ -62,8 +74,12 @@ class sequence_lib__mfb_rx_fifo #(
     // can be useful in specific tests
     virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(test::sequence_mfb_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(test::sequence_mfb_stop_rx       #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            test::sequence_mfb_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type()
+        );
+        this.add_sequence(
+            test::sequence_mfb_stop_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type()
+        );
     endfunction
 endclass
 
@@ -118,7 +134,7 @@ endclass
 
 
 
-class sequence_fifo#(
+class sequence_fifo #(
     int unsigned DMA_TX_CHANNELS,
     int unsigned DMA_RX_CHANNELS,
     int unsigned DMA_PKT_MTU,
@@ -134,10 +150,42 @@ class sequence_fifo#(
     int unsigned MEM_ADDR_WIDTH,
     int unsigned MEM_DATA_WIDTH,
     int unsigned MEM_BURST_WIDTH
-) extends uvm_app_core::sequence_main#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH);
-    `uvm_object_param_utils(test::sequence_fifo#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH))
+) extends uvm_app_core::sequence_main #(
+    DMA_TX_CHANNELS,
+    DMA_RX_CHANNELS,
+    DMA_PKT_MTU,
+    DMA_HDR_META_WIDTH,
+    DMA_STREAMS,
+    ETH_TX_HDR_WIDTH,
+    MFB_ITEM_WIDTH,
+    ETH_STREAMS,
+    REGIONS,
+    MFB_REG_SIZE,
+    MFB_BLOCK_SIZE,
+    MEM_PORTS,
+    MEM_ADDR_WIDTH,
+    MEM_DATA_WIDTH,
+    MEM_BURST_WIDTH
+);
+    `uvm_object_param_utils(
+        test::sequence_fifo #(
+            DMA_TX_CHANNELS,
+            DMA_RX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        )
+    )
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence");
@@ -150,7 +198,11 @@ class sequence_fifo#(
 
         seq_cfg = new();
         seq_cfg.time_start = time_start;
-        packet_seq = uvm_app_core::sequence_library_eth#(2**8, 16, MFB_ITEM_WIDTH)::type_id::create("mfb_rx_seq", p_sequencer.m_eth_rx[index]);
+        packet_seq = uvm_app_core::sequence_library_eth #(
+            2**8,
+            16,
+            MFB_ITEM_WIDTH
+        )::type_id::create("packet_seq", p_sequencer.m_eth_rx[index]);
         packet_seq.init_sequence(seq_cfg);
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_eth_rx[index], "", "state", rx_status);
@@ -166,7 +218,10 @@ class sequence_fifo#(
     virtual task dma_rx_sequence(int unsigned index);
         uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx) packet_seq;
 
-        packet_seq = uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx)::type_id::create("mfb_rx_seq", p_sequencer.m_dma_rx[index]);
+        packet_seq = uvm_app_core_top_agent::sequence_base #(sequence_item_dma_rx)::type_id::create(
+            "packet_seq",
+            p_sequencer.m_dma_rx[index]
+        );
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_rx[index], "", "state", rx_status);
         if (!rx_status.stopped()) begin
@@ -179,13 +234,44 @@ class sequence_fifo#(
 
 
     virtual task eth_tx_sequence(int unsigned index);
-        uvm_mfb::sequence_full_speed_tx #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) seq_mfb_one;
-        uvm_mfb::sequence_stop_tx       #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) seq_mfb_zero;
+        uvm_mfb::sequence_full_speed_tx #(
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            ETH_TX_HDR_WIDTH
+        ) seq_mfb_one;
+        uvm_mfb::sequence_stop_tx #(
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            ETH_TX_HDR_WIDTH
+        ) seq_mfb_zero;
 
-        seq_mfb_one  = uvm_mfb::sequence_full_speed_tx #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("seq_mfb_one",  p_sequencer.m_eth_tx[index]);
+        seq_mfb_one = uvm_mfb::sequence_full_speed_tx #(
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            ETH_TX_HDR_WIDTH
+        )::type_id::create(
+            "seq_mfb_one",
+            p_sequencer.m_eth_tx[index]
+        );
         seq_mfb_one.min_transaction_count =  1000;
         seq_mfb_one.max_transaction_count = 20000;
-        seq_mfb_zero = uvm_mfb::sequence_stop_tx       #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("seq_mfb_zero", p_sequencer.m_eth_tx[index]);
+
+        seq_mfb_zero = uvm_mfb::sequence_stop_tx #(
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            ETH_TX_HDR_WIDTH
+        )::type_id::create(
+            "seq_mfb_zero",
+            p_sequencer.m_eth_tx[index]
+        );
         seq_mfb_zero.min_transaction_count =  1000;
         seq_mfb_zero.max_transaction_count = 20000;
 
@@ -207,18 +293,50 @@ class sequence_fifo#(
         uvm_mvb::sequence_stop_tx       #(REGIONS, DMA_TX_MVB_WIDTH) seq_mvb_zero;
 
 
-        seq_mfb_one  = uvm_mfb::sequence_full_speed_tx #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("seq_mfb_one",  p_sequencer.m_dma_mfb_tx[index]);
+        seq_mfb_one = uvm_mfb::sequence_full_speed_tx #(
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            0
+        )::type_id::create(
+            "seq_mfb_one",
+            p_sequencer.m_dma_mfb_tx[index]
+        );
         seq_mfb_one.min_transaction_count =  1000;
         seq_mfb_one.max_transaction_count = 20000;
-        seq_mfb_zero = uvm_mfb::sequence_stop_tx       #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("seq_mfb_zero", p_sequencer.m_dma_mfb_tx[index]);
+
+        seq_mfb_zero = uvm_mfb::sequence_stop_tx #(
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            0
+        )::type_id::create(
+            "seq_mfb_zero",
+            p_sequencer.m_dma_mfb_tx[index]
+        );
         seq_mfb_zero.min_transaction_count =  1000;
         seq_mfb_zero.max_transaction_count = 20000;
 
 
-        seq_mvb_one  = uvm_mvb::sequence_full_speed_tx #(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("seq_mvb_one",  p_sequencer.m_dma_mvb_tx[index]);
+        seq_mvb_one = uvm_mvb::sequence_full_speed_tx #(
+            REGIONS,
+            DMA_TX_MVB_WIDTH
+        )::type_id::create(
+            "seq_mvb_one",
+            p_sequencer.m_dma_mvb_tx[index]
+        );
         seq_mvb_one.min_transaction_count =  1000;
         seq_mvb_one.max_transaction_count = 20000;
-        seq_mvb_zero = uvm_mvb::sequence_stop_tx       #(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("seq_mvb_zero", p_sequencer.m_dma_mvb_tx[index]);
+
+        seq_mvb_zero = uvm_mvb::sequence_stop_tx #(
+            REGIONS,
+            DMA_TX_MVB_WIDTH
+        )::type_id::create(
+            "seq_mvb_zero",
+            p_sequencer.m_dma_mvb_tx[index]
+        );
         seq_mvb_zero.min_transaction_count =  1000;
         seq_mvb_zero.max_transaction_count = 20000;
 
@@ -262,10 +380,42 @@ class sequence_fifo_stop#(
     int unsigned MEM_ADDR_WIDTH,
     int unsigned MEM_DATA_WIDTH,
     int unsigned MEM_BURST_WIDTH
-) extends sequence_fifo#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH);
-    `uvm_object_param_utils(test::sequence_fifo_stop#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH))
+) extends sequence_fifo #(
+    DMA_TX_CHANNELS,
+    DMA_RX_CHANNELS,
+    DMA_PKT_MTU,
+    DMA_HDR_META_WIDTH,
+    DMA_STREAMS,
+    ETH_TX_HDR_WIDTH,
+    MFB_ITEM_WIDTH,
+    ETH_STREAMS,
+    REGIONS,
+    MFB_REG_SIZE,
+    MFB_BLOCK_SIZE,
+    MEM_PORTS,
+    MEM_ADDR_WIDTH,
+    MEM_DATA_WIDTH,
+    MEM_BURST_WIDTH
+);
+    `uvm_object_param_utils(
+        test::sequence_fifo_stop #(
+            DMA_TX_CHANNELS,
+            DMA_RX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        )
+    )
 
 
     // Constructor - creates new instance of this class
@@ -301,14 +451,75 @@ class sequence_fifo_stop#(
 endclass
 
 
-class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
-            REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends
-      base#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
-            REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH);
+class fifo #(
+    int unsigned ETH_STREAMS,
+    int unsigned ETH_CHANNELS,
+    int unsigned ETH_PKT_MTU,
+    int unsigned ETH_RX_HDR_WIDTH,
+    int unsigned ETH_TX_HDR_WIDTH,
+    int unsigned DMA_STREAMS,
+    int unsigned DMA_RX_CHANNELS,
+    int unsigned DMA_TX_CHANNELS,
+    int unsigned DMA_HDR_META_WIDTH,
+    int unsigned DMA_PKT_MTU,
+    int unsigned REGIONS,
+    int unsigned MFB_REG_SIZE,
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned MEM_PORTS,
+    int unsigned MEM_ADDR_WIDTH,
+    int unsigned MEM_BURST_WIDTH,
+    int unsigned MEM_DATA_WIDTH,
+    int unsigned MI_DATA_WIDTH,
+    int unsigned MI_ADDR_WIDTH
+) extends base #(
+    ETH_STREAMS,
+    ETH_CHANNELS,
+    ETH_PKT_MTU,
+    ETH_RX_HDR_WIDTH,
+    ETH_TX_HDR_WIDTH,
+    DMA_STREAMS,
+    DMA_RX_CHANNELS,
+    DMA_TX_CHANNELS,
+    DMA_HDR_META_WIDTH,
+    DMA_PKT_MTU,
+    REGIONS,
+    MFB_REG_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    MEM_PORTS,
+    MEM_ADDR_WIDTH,
+    MEM_BURST_WIDTH,
+    MEM_DATA_WIDTH,
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+);
 
-    typedef uvm_component_registry#(test::fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
-                                                REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH),
-                                               "test::fifo") type_id;
+    typedef uvm_component_registry#(
+        test::fifo #(
+            ETH_STREAMS,
+            ETH_CHANNELS,
+            ETH_PKT_MTU,
+            ETH_RX_HDR_WIDTH,
+            ETH_TX_HDR_WIDTH,
+            DMA_STREAMS,
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_HDR_META_WIDTH,
+            DMA_PKT_MTU,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_BURST_WIDTH,
+            MEM_DATA_WIDTH,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ),
+        "test::fifo"
+    ) type_id;
 
     function new (string name, uvm_component parent = null);
         super.new(name, parent);
@@ -327,24 +538,58 @@ class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
             string it_num;
             it_num.itoa(it);
 
-            uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(test::sequence_lib__mfb_rx_fifo#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
-             {this.get_full_name(), ".m_env.m_eth_mfb_rx_", it_num ,".*"});
+            uvm_logic_vector_array_mfb::sequence_lib_rx #(
+                REGIONS,
+                MFB_REG_SIZE,
+                MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH,
+                0
+            )::type_id::set_inst_override(
+                test::sequence_lib__mfb_rx_fifo #(
+                    REGIONS,
+                    MFB_REG_SIZE,
+                    MFB_BLOCK_SIZE,
+                    MFB_ITEM_WIDTH,
+                    0
+                )::get_type(),
+                {"m_env.m_eth_mfb_rx_", it_num, ".*"},
+                this
+            );
 
-             uvm_logic_vector_mvb::sequence_lib_rx#(REGIONS, ETH_RX_HDR_WIDTH)::type_id::set_inst_override(test::sequence_lib__mvb_rx_fifo#(REGIONS, ETH_RX_HDR_WIDTH)::get_type(),
-             {this.get_full_name(), ".m_env.m_eth_mvb_rx_", it_num,".*"});
+             uvm_logic_vector_mvb::sequence_lib_rx #(REGIONS, ETH_RX_HDR_WIDTH)::type_id::set_inst_override(
+                test::sequence_lib__mvb_rx_fifo #(REGIONS, ETH_RX_HDR_WIDTH)::get_type(),
+                {"m_env.m_eth_mvb_rx_", it_num, ".*"},
+                this
+            );
         end
 
         for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
             string it_num;
             it_num.itoa(it);
 
-            uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(test::sequence_lib__mfb_rx_fifo#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
-             {this.get_full_name(), ".m_env.m_dma_mfb_rx_", it_num,".*"});
+            uvm_logic_vector_array_mfb::sequence_lib_rx #(
+                REGIONS,
+                MFB_REG_SIZE,
+                MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH,
+                0
+            )::type_id::set_inst_override(
+                test::sequence_lib__mfb_rx_fifo #(
+                    REGIONS,
+                    MFB_REG_SIZE,
+                    MFB_BLOCK_SIZE,
+                    MFB_ITEM_WIDTH,
+                    0
+                )::get_type(),
+                {"m_env.m_dma_mfb_rx_", it_num, ".*"},
+                this
+            );
 
-            uvm_logic_vector_mvb::sequence_lib_rx#(REGIONS, DMA_RX_MVB_WIDTH)::type_id::set_inst_override(test::sequence_lib__mvb_rx_fifo#(REGIONS, DMA_RX_MVB_WIDTH)::get_type(),
-             {this.get_full_name(), ".m_env.m_dma_mvb_rx_", it_num,".*"});
-
-            //.mfb_seq
+            uvm_logic_vector_mvb::sequence_lib_rx #(REGIONS, DMA_RX_MVB_WIDTH)::type_id::set_inst_override(
+                test::sequence_lib__mvb_rx_fifo #(REGIONS, DMA_RX_MVB_WIDTH)::get_type(),
+                {"m_env.m_dma_mvb_rx_", it_num, ".*"},
+                this
+            );
         end
 
         super.build_phase(phase);
@@ -357,17 +602,77 @@ class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
 
     virtual task run_phase(uvm_phase phase);
         uvm_app_core::sequence_tsu  tsu_seq;
-        test::sequence_fifo#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                            ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH) main_seq;
-        test::sequence_fifo_stop#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                            ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH) stop_seq;
+        test::sequence_fifo #(
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        ) main_seq;
+        test::sequence_fifo_stop #(
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+            ) stop_seq;
         time end_time;
         int rdy2end;
 
-        main_seq = test::sequence_fifo#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                            ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create("main_seq", m_env.m_sequencer);
-        stop_seq = test::sequence_fifo_stop#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                            ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create("stop_seq", m_env.m_sequencer);
+        main_seq = test::sequence_fifo #(
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        )::type_id::create("main_seq", m_env.m_sequencer);
+        stop_seq = test::sequence_fifo_stop #(
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        )::type_id::create("stop_seq", m_env.m_sequencer);
         phase.raise_objection(this);
 
         // RUN RESET
@@ -419,7 +724,13 @@ class fifo#(ETH_STREAMS, ETH_CHANNELS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR
                 #(1us);
             end
             if (m_env.used() != 0) begin
-                `uvm_warning(this.get_full_name(), $sformatf("\n\tUSED(%0d) sould be zero.\n\tDuring reconfiguration, There is some data in design", m_env.used()));
+                `uvm_warning(
+                    this.get_full_name(),
+                    $sformatf(
+                        "\n\tUSED(%0d) sould be zero.\n\tDuring reconfiguration, There is some data in design",
+                        m_env.used()
+                    )
+                );
             end
 
             stop_seq.done_set();

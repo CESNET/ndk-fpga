@@ -9,7 +9,7 @@
 */
 
 
-class sequence_main#(
+class sequence_main #(
     int unsigned DMA_TX_CHANNELS,
     int unsigned DMA_RX_CHANNELS,
     int unsigned DMA_PKT_MTU,
@@ -26,16 +26,59 @@ class sequence_main#(
     int unsigned MEM_DATA_WIDTH,
     int unsigned MEM_BURST_WIDTH
 ) extends uvm_sequence;
-    `uvm_object_param_utils(uvm_app_core::sequence_main#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,
-    MFB_ITEM_WIDTH, ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH))
+    `uvm_object_param_utils(
+        uvm_app_core::sequence_main #(
+            DMA_TX_CHANNELS,
+            DMA_RX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        )
+    )
 
-    localparam DMA_RX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS);
-    localparam DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_TX_CHANNELS) + 1;
-    typedef uvm_app_core_top_agent::sequence_eth_item#(2**8, 16, MFB_ITEM_WIDTH)                                                   sequence_item_eth_rx;
-    typedef uvm_app_core_top_agent::sequence_dma_item#(DMA_RX_CHANNELS, $clog2(DMA_PKT_MTU+1), DMA_HDR_META_WIDTH, MFB_ITEM_WIDTH) sequence_item_dma_rx;
+    localparam int unsigned DMA_RX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS);
+    localparam int unsigned DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_TX_CHANNELS) + 1;
+    typedef uvm_app_core_top_agent::sequence_eth_item #(
+        2**8,
+        16,
+        MFB_ITEM_WIDTH
+    ) sequence_item_eth_rx;
+    typedef uvm_app_core_top_agent::sequence_dma_item #(
+        DMA_RX_CHANNELS,
+        $clog2(DMA_PKT_MTU+1),
+        DMA_HDR_META_WIDTH,
+        MFB_ITEM_WIDTH
+    ) sequence_item_dma_rx;
 
-    `uvm_declare_p_sequencer(uvm_app_core::sequencer#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                                ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH))
+    `uvm_declare_p_sequencer(
+        uvm_app_core::sequencer #(
+            DMA_TX_CHANNELS,
+            DMA_RX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        )
+    )
 
     protected uvm_common::sequence_cfg_signal rx_status;
     protected uvm_common::sequence_cfg_signal tx_status;
@@ -65,7 +108,13 @@ class sequence_main#(
     virtual task eth_tx_sequence(int unsigned index);
         uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq;
 
-        mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create("mfb_eth_tx_seq", p_sequencer.m_eth_tx[index]);
+        mfb_seq = uvm_mfb::sequence_lib_tx #(
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            ETH_TX_HDR_WIDTH
+        )::type_id::create("mfb_seq", p_sequencer.m_eth_tx[index]);
         mfb_seq.init_sequence();
         mfb_seq.min_random_count = min_random_count;
         mfb_seq.max_random_count = max_random_count;
@@ -83,12 +132,21 @@ class sequence_main#(
         uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_seq;
         uvm_mvb::sequence_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)                                mvb_seq;
 
-        mvb_seq = uvm_mvb::sequence_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create("mvb_dma_tx_seq", p_sequencer.m_dma_mvb_tx[index]);
+        mvb_seq = uvm_mvb::sequence_lib_tx #(
+            REGIONS,
+            DMA_TX_MVB_WIDTH
+        )::type_id::create("mvb_seq", p_sequencer.m_dma_mvb_tx[index]);
         mvb_seq.min_random_count = min_random_count;
         mvb_seq.max_random_count = max_random_count;
         mvb_seq.init_sequence();
 
-        mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_dma_tx_seq", p_sequencer.m_dma_mfb_tx[index]);
+        mfb_seq = uvm_mfb::sequence_lib_tx #(
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            0
+        )::type_id::create("mfb_seq", p_sequencer.m_dma_mfb_tx[index]);
         mfb_seq.min_random_count = min_random_count;
         mfb_seq.max_random_count = max_random_count;
         mfb_seq.init_sequence();
@@ -122,7 +180,11 @@ class sequence_main#(
         seq_cfg.ipv4_addresses = conf_ipv4;
         seq_cfg.ipv6_addresses = conf_ipv6;
         seq_cfg.array_size_set(pkt_size_min, pkt_size_max);
-        packet_seq = uvm_app_core::sequence_library_eth#(2**8, 16, MFB_ITEM_WIDTH)::type_id::create("mfb_rx_seq", p_sequencer.m_eth_rx[index]);
+        packet_seq = uvm_app_core::sequence_library_eth #(
+            2**8,
+            16,
+            MFB_ITEM_WIDTH
+        )::type_id::create("packet_seq", p_sequencer.m_eth_rx[index]);
         packet_seq.init_sequence(seq_cfg);
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_eth_rx[index], "", "state", rx_status);
@@ -138,7 +200,10 @@ class sequence_main#(
     virtual task dma_rx_sequence(int unsigned index);
         uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx) packet_seq;
 
-        packet_seq = uvm_app_core_top_agent::sequence_base#(sequence_item_dma_rx)::type_id::create("mfb_rx_seq", p_sequencer.m_dma_rx[index]);
+        packet_seq = uvm_app_core_top_agent::sequence_base #(sequence_item_dma_rx)::type_id::create(
+            "packet_seq",
+            p_sequencer.m_dma_rx[index]
+        );
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_rx[index], "", "state", rx_status);
         if (!rx_status.stopped()) begin
@@ -183,7 +248,7 @@ class sequence_main#(
 endclass
 
 
-class sequence_stop#(
+class sequence_stop #(
     int unsigned DMA_TX_CHANNELS,
     int unsigned DMA_RX_CHANNELS,
     int unsigned DMA_PKT_MTU,
@@ -199,10 +264,42 @@ class sequence_stop#(
     int unsigned MEM_ADDR_WIDTH,
     int unsigned MEM_DATA_WIDTH,
     int unsigned MEM_BURST_WIDTH
-) extends uvm_app_core::sequence_main#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                    ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH);
-    `uvm_object_param_utils(uvm_app_core::sequence_stop#(DMA_TX_CHANNELS, DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH, MFB_ITEM_WIDTH,
-                    ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH))
+) extends uvm_app_core::sequence_main #(
+    DMA_TX_CHANNELS,
+    DMA_RX_CHANNELS,
+    DMA_PKT_MTU,
+    DMA_HDR_META_WIDTH,
+    DMA_STREAMS,
+    ETH_TX_HDR_WIDTH,
+    MFB_ITEM_WIDTH,
+    ETH_STREAMS,
+    REGIONS,
+    MFB_REG_SIZE,
+    MFB_BLOCK_SIZE,
+    MEM_PORTS,
+    MEM_ADDR_WIDTH,
+    MEM_DATA_WIDTH,
+    MEM_BURST_WIDTH
+);
+    `uvm_object_param_utils(
+        uvm_app_core::sequence_stop #(
+            DMA_TX_CHANNELS,
+            DMA_RX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        )
+    )
 
 
     // Constructor - creates new instance of this class
