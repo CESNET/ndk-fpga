@@ -39,6 +39,8 @@ entity FPGA_COMMON is
 
         -- Switch CLK_GEN ref clock to clk_pci, default SYSCLK
         USE_PCIE_CLK            : boolean := false;
+        -- Enable of EXT_1PPS signal
+        EXT_1PPS_EN             : boolean := false;
 
         -- Number of PCIe connectors present on board
         PCIE_CONS               : natural := 1;
@@ -125,6 +127,9 @@ entity FPGA_COMMON is
     port (
         SYSCLK                  : in    std_logic;
         SYSRST                  : in    std_logic;
+
+        -- External 1PPS input for TSU, must be enabled by EXT_1PPS_EN
+        EXT_1PPS_N              : in    std_logic := '0';
 
         -- PCIe interface
         PCIE_SYSCLK_P           : in    std_logic_vector(PCIE_CONS*PCIE_CLKS-1 downto 0);
@@ -1765,8 +1770,8 @@ begin
             MI_DRD            => mi_adc_drd(MI_ADC_PORT_TSU),
             MI_ARDY           => mi_adc_ardy(MI_ADC_PORT_TSU),
             MI_DRDY           => mi_adc_drdy(MI_ADC_PORT_TSU),
-            PPS_N             => '0',
-            PPS_SRC           => (others => '0'),
+            PPS_N             => EXT_1PPS_N,
+            PPS_SRC           => tsel(EXT_1PPS_EN, X"0001", X"0000"),
             PPS_SEL           => open,
             CLK               => tsu_clk,
             RESET             => tsu_rst,

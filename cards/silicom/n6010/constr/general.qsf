@@ -55,6 +55,30 @@ set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to SYS_
 set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to SYS_CLK_100M
 
 # ==============================================================================
+# SMA 1PPS/10MHZ
+# ==============================================================================
+
+set_location_assignment PIN_CE24 -to "TOD_CLK_156M25(n)"
+set_location_assignment PIN_CG24 -to TOD_CLK_156M25
+set_location_assignment PIN_CH25 -to SMA_1PPS_CLK
+set_location_assignment PIN_V19  -to SMA_1PPS_DIR
+set_location_assignment PIN_CH27 -to SMA_CLK_OUT_1PPS
+set_location_assignment PIN_CG28 -to SMA_CLK_DIR
+set_location_assignment PIN_CH29 -to SMA_CLK_OUT_10MHZ
+
+set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to TOD_CLK_156M25
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SMA_1PPS_CLK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SMA_1PPS_DIR
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SMA_CLK_OUT_1PPS
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SMA_CLK_DIR
+set_instance_assignment -name IO_STANDARD "1.2 V" -to SMA_CLK_OUT_10MHZ
+
+set_instance_assignment -name SLEW_RATE 0 -to SMA_1PPS_DIR
+set_instance_assignment -name SLEW_RATE 0 -to SMA_CLK_OUT_1PPS
+set_instance_assignment -name SLEW_RATE 0 -to SMA_CLK_DIR
+set_instance_assignment -name SLEW_RATE 0 -to SMA_CLK_OUT_10MHZ
+
+# ==============================================================================
 # LEDs
 # ==============================================================================
 

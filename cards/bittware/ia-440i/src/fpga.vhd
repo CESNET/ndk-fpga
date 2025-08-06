@@ -22,6 +22,10 @@ port (
     -- User LEDs
     USER_LED_G         : out   std_logic;
     USER_LED_R         : out   std_logic;
+    -- External 1PPS signal
+    EXT_1PPS           : in    std_logic;
+    -- External clock signal, typically 10MHz
+    EXT_CLK            : in    std_logic;
 
     -- =========================================================================
     -- PCIe
@@ -329,6 +333,7 @@ begin
     generic map (
         SYSCLK_PERIOD           => 10.0,
         USE_PCIE_CLK            => false,
+        EXT_1PPS_EN             => true,
 
         PCIE_LANES              => PCIE_LANES,
         PCIE_CLKS               => PCIE_CLKS,
@@ -371,6 +376,8 @@ begin
     port map(
         SYSCLK                 => SYS_CLK_100M,
         SYSRST                 => '0',
+
+        EXT_1PPS_N             => EXT_1PPS,
 
         PCIE_SYSCLK_P          => PCIE_REFCLK1 & PCIE_REFCLK0,
         PCIE_SYSCLK_N          => (others => '0'),

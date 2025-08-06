@@ -491,6 +491,8 @@ begin
         PLL_OUT2_DIV            => 6,
         PLL_OUT3_DIV            => 12,
 
+        EXT_1PPS_EN             => true,
+
         PCIE_CONS               => PCIE_CONS,
         PCIE_LANES              => PCIE_LANES,
         PCIE_CLKS               => PCIE_CLKS,
@@ -531,6 +533,8 @@ begin
     port map(
         SYSCLK                  => AG_SYSCLK1_P,
         SYSRST                  => '0',
+
+        EXT_1PPS_N              => AG_EXT_SYNC_1HZ,
 
         PCIE_SYSCLK_P           => pcie_ext_clk1_p & pcie_ext_clk0_p & PCIE0_CLK1_P & PCIE0_CLK0_P,
         PCIE_SYSCLK_N           => (others => '0'),

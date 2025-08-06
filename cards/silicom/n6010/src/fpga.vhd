@@ -19,6 +19,20 @@ entity FPGA is
 port (
     -- FPGA system clock
     SYS_CLK_100M       : in    std_logic;
+    -- ToD 156.25MHz FPGA clock
+    TOD_CLK_156M25     : in    std_logic;
+    -- Input signal from 1PPS SMA connector
+    SMA_1PPS_CLK       : in    std_logic;
+    -- Select direction of 1PPS SMA connector (0=IN, 1=OUT)
+    SMA_1PPS_DIR       : out   std_logic;
+    -- Select direction of Clock SMA connector (0=IN, 1=OUT)
+    SMA_CLK_DIR        : out   std_logic;
+    -- Source of signal for Clock SMA connector output (0=NO CLOCK, 1=1PPS CLOCK)
+    -- If SMA_CLK_DIR=0 then SMA_CLK_OUT_1PPS must be 0.
+    SMA_CLK_OUT_1PPS   : out   std_logic;
+    -- Source of signal for Clock SMA connector output (0=NO CLOCK, 1=10MHz CLOCK)
+    -- If SMA_CLK_DIR=0 then SMA_CLK_OUT_10MHZ must be 0.
+    SMA_CLK_OUT_10MHZ  : out   std_logic;
 
     -- =========================================================================
     -- PCIe
@@ -315,6 +329,13 @@ architecture FULL of FPGA is
 
 begin
 
+    -- 1PPS SMA connector set as input
+    SMA_1PPS_DIR      <= '0';
+    -- 10MHZ SMA connector set as input
+    SMA_CLK_DIR       <= '0';
+    SMA_CLK_OUT_1PPS  <= '0';
+    SMA_CLK_OUT_10MHZ <= '0';
+
     cm_i : entity work.FPGA_COMMON
     generic map (
         SYSCLK_PERIOD           => 10.0,
@@ -326,6 +347,7 @@ begin
         PLL_OUT3_DIV            => 12,
 
         USE_PCIE_CLK            => false,
+        EXT_1PPS_EN             => true,
 
         PCIE_LANES              => PCIE_LANES,
         PCIE_CLKS               => PCIE_CLKS,
@@ -367,6 +389,8 @@ begin
     port map(
         SYSCLK                 => SYS_CLK_100M,
         SYSRST                 => '0',
+
+        EXT_1PPS_N             => SMA_1PPS_CLK,
 
         PCIE_SYSCLK_P          => PCIE_REFCLK1 & PCIE_REFCLK0,
         PCIE_SYSCLK_N          => (others => '0'),
