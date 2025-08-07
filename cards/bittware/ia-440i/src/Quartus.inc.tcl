@@ -25,7 +25,16 @@ set CARD_ARCHGRP(ETH_PORT_CHAN,0)    $ETH_PORT_CHAN(0)
 set CARD_ARCHGRP(EHIP_PORT_TYPE,0)   $EHIP_PORT_TYPE(0)
 
 # select fpga name
-set CARD_FPGA                        "AGIB023R18A1E1V"
+if {$BOARD_VARIANT == 0} {
+    set CARD_FPGA "AGIB023R18A1E1V"
+} elseif {$BOARD_VARIANT == 1} {
+    set CARD_FPGA "AGIB023R18A1E1VC"
+} else {
+    error "Unsupported BOARD_VARIANT=$BOARD_VARIANT! Supported values are:
+- 0 for board with AGIB023R18A1E1V,
+- 1 for board with AGIB023R18A1E1VC."
+}
+
 set CARD_ARCHGRP(FPGA)               $CARD_FPGA
 
 # make lists from associative arrays
@@ -48,6 +57,12 @@ set SYNTH_FLAGS(BITSTREAM) "RBF"
 set SYNTH_FLAGS(QUARTUS_TLG) 1
 
 # QSF constraints for specific parts of the design
+if {$BOARD_VARIANT == 0} {
+    lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/device_var0.qsf"
+}
+if {$BOARD_VARIANT == 1} {
+    lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/device_var1.qsf"
+}
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/general.qsf"
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/bmc.qsf"
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/pcie.qsf"

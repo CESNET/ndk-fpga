@@ -10,7 +10,6 @@
 # ==============================================================================
 
 set_global_assignment -name FAMILY "Agilex 7"
-set_global_assignment -name DEVICE AGIB023R18A1E1V
 set_global_assignment -name BOARD default
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100

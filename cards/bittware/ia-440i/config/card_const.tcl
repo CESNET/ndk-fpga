@@ -9,7 +9,7 @@
 # the description of this file, visit the Parametrization section in the
 # documentation of the NDK-CORE repostiory
 
-set CARD_NAME "IA-440I"
+set CARD_NAME "IA-440I-VAR$BOARD_VARIANT"
 # Achitecture of Clock generator (INTEL or USP)
 set CLOCK_GEN_ARCH "INTEL"
 # Achitecture of PCIe module (P_TILE, R_TILE or USP)
