@@ -19,6 +19,7 @@ class MAC_Segmented_TX_Monitor(BusMonitor):
         self._segments = len(self.bus.inframe)
         self._segment_width = self._bus_width // self._segments  # segment width in bytes
 
+        self._data      = BinaryVector(item_count=self._segments, item_bits=self._segment_width*8, endian="little")
         self._eop_empty = BinaryVector(item_count=self._segments, item_bits=3)
         self._inframe   = Binary(bits=self._segments)
         self._error     = Binary(bits=self._segments)
@@ -28,6 +29,7 @@ class MAC_Segmented_TX_Monitor(BusMonitor):
         self.item_cnt  = 0
 
     def _read_control_signals(self):
+        self._data.value      = self.bus.data.value.integer
         self._eop_empty.value = self.bus.eop_empty.value.integer
         self._inframe.value   = self.bus.inframe.value.integer
         self._error.value     = self.bus.error.value.integer
@@ -48,18 +50,17 @@ class MAC_Segmented_TX_Monitor(BusMonitor):
                 continue
 
             self._read_control_signals()
-            data_bytes = self.bus.data.value.buff[::-1]
 
             if self._valid:
                 for i in range(self._segments):
                     # data on the MAC Segmented bus is sent in reverse order
                     if self._inframe[i]:
-                        data += data_bytes[i*self._segment_width : (i+1)*self._segment_width]
+                        data += self._data[i].bytes
                         in_frame = True
 
                     else:
                         if in_frame:
-                            data += data_bytes[i*self._segment_width : (i+1)*self._segment_width - self._eop_empty[i].int]
+                            data += self._data[i].bytes[: self._segment_width - self._eop_empty[i].int]
                             self._recv(data)
                             data = b""
                             in_frame = False
