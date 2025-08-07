@@ -18,7 +18,9 @@ proc    VhdlPkgIntArr {name size} {
 			set type [concat "integer_vector(" [expr $size - 1] "downto 0)"]
 			upvar $name array
 			set value "("
-			if {$size == 1} {
+			if {$size == 0} {
+				append value "others => 0"
+			} elseif {$size == 1} {
 				append value "others => " $array(0)
 			} else {
 				for {set index [expr $size-1]} {$index >= 0} {incr index -1} {
