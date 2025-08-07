@@ -255,7 +255,7 @@ class GenLoopSwitch(nfb.BaseComp):
         return sm.measure(to, freq)
 
 
-def main():
+def _main():
     help_dict = {
         "device"   : "set the target device",
         "index"    : "select index (instance) of the GLS in the Device Tree",
@@ -380,6 +380,26 @@ def main():
             if "c" in args.generate:
                 print("MFB Generator configuration:")
                 print(tabulate(s.gen.get_fconfiguration()))
+
+
+def main():
+    EXIT_ERROR = 1
+
+    try:
+        _main()
+    except IndexError as exc:
+        print("Index error:", exc)
+        exit(EXIT_ERROR)
+    except NotImplementedError as exc:
+        print("Error, feature not yet implemented:", exc)
+        exit(EXIT_ERROR)
+    except ValueError as exc:
+        print("Invalid input:", exc)
+        print("Maybe a wrong combination of arguments or unknown configuration attribute?")
+        exit(EXIT_ERROR)
+    except Exception as exc:
+        print("Unexpected error: ", exc)
+        exit(EXIT_ERROR)
 
 
 if __name__ == "__main__":
