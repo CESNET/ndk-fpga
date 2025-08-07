@@ -1,0 +1,10 @@
+[project]
+name = "cocotb-mfb_speed_meter_mi"
+version = "0.1.0"
+dependencies = [
+    "cocotb",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"

@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /MFB_SPEED_METER_MI/*
+
+config wave -signalnamewidth 1
