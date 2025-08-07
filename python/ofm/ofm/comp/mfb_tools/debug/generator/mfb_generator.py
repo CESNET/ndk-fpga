@@ -48,6 +48,10 @@ class MfbGenerator(nfb.BaseComp):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._logger = logging.getLogger("MfbGenerator")
+        self._cfg_type_d = {
+            f.name : f.type for f in fields(GeneratorConfig)
+            if "Optional" not in str(f.type) # filter out read only values
+        }
 
     # ################
     # Command register
@@ -346,6 +350,57 @@ class MfbGenerator(nfb.BaseComp):
         self.src_mac_address = conf.src_mac_address
         self.src_ip_address_mask = conf.src_ip_address_mask
         self.enabled = conf.enabled
+
+    def _convert_attr(self, attr_name: str, attr_value: str) -> Any:
+        if "mac" in attr_name:
+            return MfbGenerator.convert_mac2bytes(attr_value)
+
+        if "mask" in attr_name:
+            return int(attr_value, 16)
+
+        prop_type = self._cfg_type_d[attr_name]
+        return prop_type(attr_value)
+
+    def configure_attr(self, attr_name: str, str_value: str):
+        """Configure a config attribute.
+
+        This method aims to enable dynamic configuration using string names of data class
+        arguments and string values, that are going to be converted to int/bytes/bool.
+        For other usages, property setters are recommended.
+
+        Args:
+            attr_name: Attribute name of GeneratorConfig data class.
+                       NOTE that read-only attributes are not allowed.
+            str_value: Value to be set for given attribute.
+
+        Raises:
+            ValueError: If an invalid attribute name is passed.
+            AttributeError: If there is an inconsistency between this class's properties and
+                            GeneratorConfig attributes.
+            IOError: If the given attribute cannot be configured.
+        """
+
+        if attr_name not in self._cfg_type_d.keys():
+            attrs_str = ",\n\t".join(self._cfg_type_d.keys())
+            raise ValueError(
+                f"Cannot configure {attr_name},"
+                f" not in supported list of attributes:\n\t{attrs_str}"
+            )
+
+        if attr_name not in dir(self):
+            raise AttributeError("Internal error!")
+
+        if attr_name == "src_ip_address_mask":
+            version = self._node.get_property("version").value
+            if version < 2:
+                raise IOError(
+                    f"Cannot set src_ip_address_mask, version of MFB generator is {version},"
+                    f" but minimal version 2 is required"
+                )
+
+        prop_obj = getattr(type(self), attr_name)
+        value = self._convert_attr(attr_name, str_value)
+        prop_obj.fset(self, value)
 
     def get_fconfiguration(self) -> List:
         """Returns formatted configuration of the generator as a list of [item, value] lists."""
