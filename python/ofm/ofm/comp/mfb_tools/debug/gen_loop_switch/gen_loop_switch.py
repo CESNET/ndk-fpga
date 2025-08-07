@@ -262,10 +262,12 @@ def _main():
         "right"    : "select the RIGHT side of the GLS to use the MFB Generator or set loopback",
         "left"     : "select the LEFT side of the GLS to use the MFB Generator or set loopback",
         "loopback" : "enable (1) or disable (0) loopback (on the '-R' or '-L' side)",
-        "generate" : "start (1) or stop (0) generating (to the '-R' or '-L' side), 'c' to print its config",
+        "generate" : "start (1) or stop (0) generating (to the '-R' or '-L' side)",
         "size"     : "set frame size for the ('-R' or '-L') MFB Generator",
         "measure"  : "measure the throughput using selected Speed Meter (SM), 'a' for all, '0,1' by default",
         "config"   : "print full configuration and exit",
+        "gen-config" : "generator config - either print full configuration (no args) or set a value"
+                     " with two extra args"
     }
 
     gls_desc = """
@@ -307,10 +309,11 @@ def _main():
     arg_parser.add_argument("-R", "--right", action="store_true", help=help_dict["right"])
     arg_parser.add_argument("-L", "--left", action="store_true", help=help_dict["left"])
     arg_parser.add_argument("-l", "--loopback", type=int, choices=[0, 1], help=help_dict["loopback"])
-    arg_parser.add_argument("-g", "--generate", nargs="?", choices=["0", "1", "c"], help=help_dict["generate"])
+    arg_parser.add_argument("-g", "--generate", nargs="?", choices=["0", "1"], help=help_dict["generate"])
     arg_parser.add_argument("-s", "--size", type=int, help=help_dict["size"])
     arg_parser.add_argument("-m", "--measure", nargs='?', const="default", choices=["default", "0", "1", "2", "3", "a"], help=help_dict["measure"])
     arg_parser.add_argument("-c", "--config", action="store_true", help=help_dict["config"])
+    arg_parser.add_argument("-C", "--gen-config", nargs="*", help=help_dict["gen-config"])
     args = arg_parser.parse_args()
 
     try:
@@ -377,9 +380,15 @@ def _main():
             elif "0" in args.generate:
                 s.gen_stop()
 
-            if "c" in args.generate:
+        if args.gen_config is not None:
+            if len(args.gen_config) == 0:
                 print("MFB Generator configuration:")
                 print(tabulate(s.gen.get_fconfiguration()))
+            elif len(args.gen_config) == 2:
+                attr, value = args.gen_config
+                s.gen.configure_attr(attr, value)
+            else:
+                raise ValueError("Invalid number of arguments")
 
 
 def main():
