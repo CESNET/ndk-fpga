@@ -6,7 +6,6 @@ explicit-task-lifetime
 forbid-consecutive-null-statements
 forbid-line-continuations
 forbid-negative-array-dim
-forbidden-macro
 generate-label
 interface-name-style
 invalid-system-task-function
