@@ -222,7 +222,7 @@ class MfbGenerator(nfb.BaseComp):
 
     @staticmethod
     def convert_bytes2mac(mac: bytes, sep: str = "") -> Any:
-        """Conver a 6-byte little-endian MAC address into big-endian with an optional formatting.
+        """Convert a 6-byte little-endian MAC address into big-endian with an optional formatting.
 
         Args:
             mac: The MAC Address as six little-endian bytes.
