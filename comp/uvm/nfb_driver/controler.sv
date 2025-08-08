@@ -39,7 +39,10 @@ class controler extends uvm_sequence;
         mq_id   = nfb_sv_create(ip_addr, port);
         $fflush();
         if (mq_id == null) begin
-            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "null" , {"\n\tCannot create grpc server ",  ip_addr, "\n\t\texample of address: \"0.0.0.0:0\""})
+            `uvm_fatal(
+                m_sequencer != null ? m_sequencer.get_full_name() : "null" ,
+                {"\n\tCannot create grpc server ",  ip_addr, "\n\t\texample of address: \"0.0.0.0:0\""}
+            )
         end
 
         nfb_sv_set_fdt(mq_id, devtree.data);
@@ -54,7 +57,8 @@ class controler extends uvm_sequence;
         chandle      cmd_ptr;
 
         if (mq_id == null) begin
-            `uvm_fatal(m_sequencer.get_full_name(), "\n\tBefore you call server function you have to create grpc server");
+            const string msg = "\n\tBefore you call server function you have to create grpc server";
+            `uvm_fatal(m_sequencer.get_full_name(), msg);
         end
 
         do begin
@@ -83,6 +87,7 @@ class controler extends uvm_sequence;
                     `uvm_error(/*this.get_full_name()*/ "NULL", $sformatf("\n\tUnknown mi command type %0d", cmd));
                 end
             endcase
+        // verilog_lint: waive explicit-begin
         end while (!stop);
 
         nfb_sv_close(mq_id);
