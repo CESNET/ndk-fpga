@@ -34,12 +34,12 @@ class controler extends uvm_sequence;
     endfunction
 
     function void open();
-        const string ip_addr = "0.0.0.0:";
+        const string ip_addr = "0.0.0.0:0";
         stop    = 0;
         mq_id   = nfb_sv_create(ip_addr, port);
         $fflush();
         if (mq_id == null) begin
-            `uvm_fatal(m_sequencer.get_full_name(), {"\n\tCannot create grpc server ",  ip_addr, "\n\t\texample of address: \"0.0.0.0:\""})
+            `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "null" , {"\n\tCannot create grpc server ",  ip_addr, "\n\t\texample of address: \"0.0.0.0:0\""})
         end
 
         nfb_sv_set_fdt(mq_id, devtree.data);
