@@ -11,7 +11,7 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 
 set IP [get_ips $IP_COMP_NAME]
 
-set_property -dict [list \
+set config_list [list \
     CONFIG.C0.BANK_GROUP_WIDTH {1} \
     CONFIG.C0.DDR4_AxiDataWidth {512} \
     CONFIG.C0.DDR4_AxiSelection {true} \
@@ -24,4 +24,6 @@ set_property -dict [list \
     CONFIG.C0.DDR4_Mem_Add_Map {BANK_ROW_COLUMN} \
     CONFIG.C0.DDR4_MemoryPart {MT40A512M16HA-083E} \
     CONFIG.C0.DDR4_TimePeriod {833} \
-] $IP
+]
+
+set_property -dict $config_list $IP

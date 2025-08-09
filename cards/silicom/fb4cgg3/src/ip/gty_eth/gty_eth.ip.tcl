@@ -12,7 +12,7 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 set IP [get_ips $IP_COMP_NAME]
 
 if {$PARAMS(NET_MOD_ARCH) eq "40GE"} {
-    set_property -dict [list \
+    set config_list [list \
         CONFIG.CHANNEL_ENABLE {X0Y27 X0Y26 X0Y25 X0Y24} \
         CONFIG.ENABLE_OPTIONAL_PORTS {loopback_in rxpcsreset_in rxpd_in rxpmareset_in rxpolarity_in txpcsreset_in txpd_in txpmareset_in txpolarity_in rxresetdone_out txresetdone_out} \
         CONFIG.FREERUN_FREQUENCY {156.25} \
@@ -34,9 +34,9 @@ if {$PARAMS(NET_MOD_ARCH) eq "40GE"} {
         CONFIG.TX_OUTCLK_SOURCE {TXPROGDIVCLK} \
         CONFIG.TX_REFCLK_FREQUENCY {161.1328125} \
         CONFIG.TX_USER_DATA_WIDTH {64} \
-    ] $IP
+    ]
 } elseif {$PARAMS(NET_MOD_ARCH) eq "CESNET_LL10GE"} {
-    set_property -dict [list \
+    set config_list [list \
         CONFIG.CHANNEL_ENABLE {X0Y39} \
         CONFIG.ENABLE_OPTIONAL_PORTS {loopback_in rxpolarity_in txpolarity_in} \
         CONFIG.FREERUN_FREQUENCY {250} \
@@ -57,9 +57,9 @@ if {$PARAMS(NET_MOD_ARCH) eq "40GE"} {
         CONFIG.TX_OUTCLK_SOURCE {TXPROGDIVCLK} \
         CONFIG.TX_REFCLK_FREQUENCY {161.1328125} \
         CONFIG.TX_USER_DATA_WIDTH {32} \
-    ] $IP
+    ]
 } elseif {$PARAMS(NET_MOD_ARCH) eq "CESNET_LL40GE"} {
-    set_property -dict [list \
+    set config_list [list \
         CONFIG.CHANNEL_ENABLE {X0Y27 X0Y26 X0Y25 X0Y24} \
         CONFIG.ENABLE_OPTIONAL_PORTS {loopback_in rxpcsreset_in rxpd_in rxpmareset_in rxpolarity_in txpcsreset_in txpd_in txpmareset_in txpolarity_in rxresetdone_out txresetdone_out} \
         CONFIG.FREERUN_FREQUENCY {250} \
@@ -83,5 +83,7 @@ if {$PARAMS(NET_MOD_ARCH) eq "40GE"} {
         CONFIG.TX_OUTCLK_SOURCE {TXPROGDIVCLK} \
         CONFIG.TX_REFCLK_FREQUENCY {161.1328125} \
         CONFIG.TX_USER_DATA_WIDTH {32} \
-    ] $IP
+    ]
 }
+
+set_property -dict $config_list $IP

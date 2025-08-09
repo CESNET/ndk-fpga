@@ -17,10 +17,12 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 
 set IP [get_ips $IP_COMP_NAME]
 
-set_property -dict [list \
+set config_list [list \
     CONFIG.USER_APB_EN {false} \
     CONFIG.USER_HBM_DENSITY {16GB} \
     CONFIG.USER_SWITCH_ENABLE_00 {FALSE} \
     CONFIG.USER_SWITCH_ENABLE_01 {FALSE} \
     CONFIG.USER_XSDB_INTF_EN {FALSE} \
-] $IP
+]
+
+set_property -dict $config_list $IP

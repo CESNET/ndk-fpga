@@ -17,7 +17,9 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 
 set IP [get_ips $IP_COMP_NAME]
 
-set_property -dict [list \
+set config_list [list \
     CONFIG.C_DEBUG_MODE {5} \
     CONFIG.C_PCIE_EXT_CFG_BASE_ADDR {0x4A0} \
-] $IP
+]
+
+set_property -dict $config_list $IP

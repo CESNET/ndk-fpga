@@ -11,7 +11,7 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 
 set IP [get_ips $IP_COMP_NAME]
 
-set_property -dict [list \
+set config_list [list \
     CONFIG.Async_Clk {1} \
     CONFIG.C_FIFO_DEPTH {256} \
     CONFIG.C_SCK_RATIO {2} \
@@ -19,4 +19,6 @@ set_property -dict [list \
     CONFIG.C_SPI_MODE {2} \
     CONFIG.C_USE_STARTUP {1} \
     CONFIG.C_USE_STARTUP_INT {1} \
-] $IP
+]
+
+set_property -dict $config_list $IP

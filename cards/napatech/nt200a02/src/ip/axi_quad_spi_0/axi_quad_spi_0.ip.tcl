@@ -11,11 +11,13 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 
 set IP [get_ips $IP_COMP_NAME]
 
-set_property -dict [list \
+set config_list [list \
     CONFIG.Async_Clk {1} \
     CONFIG.C_FIFO_DEPTH {256} \
     CONFIG.C_SCK_RATIO {2} \
     CONFIG.C_SPI_MEMORY {2} \
     CONFIG.C_SPI_MODE {2} \
     CONFIG.C_USE_STARTUP {0} \
-] $IP
+]
+
+set_property -dict $config_list $IP
