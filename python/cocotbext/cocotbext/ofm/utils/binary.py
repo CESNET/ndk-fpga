@@ -280,6 +280,9 @@ class Binary:
         else:
             raise TypeError(f"Incompatible type ({type(value)}) passed to Binary.value. Supported types are: list, int, str, bytes, Binary, None.")
 
+        # truncating to fit if overflow
+        self._value = self._value & mathext.bitmask(self.bits)
+
     @property
     def bits(self) -> int:
         """
