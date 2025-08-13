@@ -1,12 +1,17 @@
-# monitors.py: MFBMonitor
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Jakub Cabal <cabal@cesnet.cz>
-#
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 from cocotb_bus.monitors import BusMonitor
 from cocotb.triggers import RisingEdge
-from cocotbext.ofm.mfb.utils import get_mfb_params, signal_unpack
+from cocotbext.ofm.utils.binary import Binary, BinaryVector
+from cocotbext.ofm.mfb.utils import get_mfb_params
+from cocotbext.ofm.mfb.transaction import MfbTransaction
+from math import log2
+from copy import copy
+
+# NOTE remove line 46 while/after reimplementing MFB driver !!!
 
 
 class MFBProtocolError(Exception):
@@ -14,20 +19,51 @@ class MFBProtocolError(Exception):
 
 
 class MFBMonitor(BusMonitor):
-    _signals = ["data", "sof_pos", "eof_pos", "sof", "eof", "src_rdy", "dst_rdy"]
+    """
+    Monitor for the MFB bus.
 
-    def __init__(self, entity, name, clock, array_idx=None, mfb_params=None):
-        BusMonitor.__init__(self, entity, name, clock, array_idx=array_idx)
-        self.frame_cnt = 0
-        self.item_cnt = 0
-        self._regions, self._region_size, self._block_size, self._item_width = get_mfb_params(
-            self.bus.data, self.bus.sof_pos, self.bus.eof_pos, self.bus.sof, mfb_params
+    Args:
+        trans_type: The desired type for the transactions returned by the monitor.
+                    Defaults to `bytes` for backward compatibility.
+                    Consider using a child class of `MfbTransaction` for more structured data.
+
+        meta_valid_with: Specifies which signal indicates the validity of metadata
+                         if the 'meta' signal is present. Must be either "sof" (start of frame)
+                         or "eof" (end of frame).
+    """
+
+    _signals = ["data", "sof_pos", "eof_pos", "sof", "eof", "src_rdy", "dst_rdy"]
+    _optional_signals = ["meta"]
+
+    def __init__(self, entity, name, clock, array_idx=None, mfb_params=None, trans_type: MfbTransaction | bytes = bytes, meta_vld_with: str = "sof"):
+        super().__init__(entity, name, clock, array_idx=array_idx)
+
+        self._regions, self._region_size, self._block_size, self._item_width, self._meta_width = get_mfb_params(
+            self.bus, mfb_params
         )
         self._region_items = self._region_size * self._block_size
-        self._sof_arr = [0] * self._regions
-        self._eof_arr = [0] * self._regions
-        self._sof_pos_arr = [0] * self._regions
-        self._eof_pos_arr = [0] * self._regions
+
+        self._item_width = 8 # remove this line while/after reimplementing MFB driver!!!
+
+        self._trans_type  = trans_type
+        self._transaction = MfbTransaction() if self._trans_type is bytes else trans_type()
+
+        self._data    = BinaryVector(item_count=self._regions, item_bits=self._region_items*self._item_width, endian="little")
+        self._sof_pos = BinaryVector(item_count=self._regions, item_bits=int(log2(self._region_size)))
+        self._eof_pos = BinaryVector(item_count=self._regions, item_bits=int(log2(self._region_size*self._block_size)))
+        self._sof     = Binary(bits=self._regions)
+        self._eof     = Binary(bits=self._regions)
+
+        if self._meta_width > 0:
+            self._meta = BinaryVector(item_count=self._regions, item_bits=self._meta_width)
+
+            if meta_vld_with not in ["sof", "eof"]:
+                raise ValueError(f"Invalid value of {meta_vld_with} of 'meta_vld_with'. Supported values are: \"sof\", \"eof\".")
+
+            self._meta_vld_with = meta_vld_with
+
+        self.frame_cnt = 0
+        self.item_cnt  = 0
 
     def _is_valid_word(self, signal_src_rdy, signal_dst_rdy):
         if signal_dst_rdy is None:
@@ -35,91 +71,100 @@ class MFBMonitor(BusMonitor):
         else:
             return (signal_src_rdy.value == 1) and (signal_dst_rdy.value == 1)
 
+    def _read_control_signals(self):
+        self._data.value    = self.bus.data.value.integer
+        self._sof_pos.value = self.bus.sof_pos.value.integer
+        self._eof_pos.value = self.bus.eof_pos.value.integer
+        self._sof.value     = self.bus.sof.value.integer
+        self._eof.value     = self.bus.eof.value.integer
+
+        if self._meta_width > 0:
+            self._meta.value = self.bus.meta.value.integer
+
+    def _recv_trans(self):
+        self.log.debug(f"received transaction: {self._transaction}")
+
+        if self._trans_type is bytes:
+            self._recv(self._transaction.data)
+        else:
+            self._recv(copy(self._transaction))
+
     async def _monitor_recv(self):
-        """Watch the pins and reconstruct transactions."""
-        # Avoid spurious object creation by recycling
-        clkedge = RisingEdge(self.clock)
-        frame = b""
+        clk_re = RisingEdge(self.clock)
+
         in_frame = False
 
         while True:
-            await clkedge
+            await clk_re
 
             if self.in_reset:
                 continue
 
             if self._is_valid_word(self.bus.src_rdy, self.bus.dst_rdy):
-                self.log.debug("valid MFB word")
+                self._read_control_signals()
 
-                data_val = self.bus.data.value
-                data_val.big_endian = False
-                data_bytes = data_val.buff
+                for r in range(self._regions):
+                    sof = self._sof[r].int
+                    eof = self._eof[r].int
 
-                self._sof_arr = signal_unpack(self._regions, self.bus.sof)
-                self._eof_arr = signal_unpack(self._regions, self.bus.eof)
-                self._sof_pos_arr = signal_unpack(self._regions, self.bus.sof_pos)
-                self._eof_pos_arr = signal_unpack(self._regions, self.bus.eof_pos)
+                    sof_pos = self._sof_pos[r].int if sof else 0
+                    eof_pos = self._eof_pos[r].int if eof else 0
 
-                self.log.debug(f"sof_arr {str(self._sof_arr)}")
-                self.log.debug(f"eof_arr {str(self._eof_arr)}")
-                self.log.debug(f"sof_pos_arr {str(self._sof_pos_arr)}")
-                self.log.debug(f"eof_pos_arr {str(self._eof_pos_arr)}")
+                    pkt_start = sof_pos * self._block_size * self._item_width
+                    pkt_end   = (eof_pos + 1) * self._item_width
 
-                for rr in range(self._regions):
-                    # Iterating through the regions.
-                    eof_done = False
-                    rs_inx = (rr * self._region_items)
-                    re_inx = (rr * self._region_items + self._region_items)
-                    ee_idx = (rr * self._region_items + self._eof_pos_arr[rr] + 1)
-                    ss_idx = (rr * self._region_items + (self._sof_pos_arr[rr] * self._block_size))
-
-                    self.log.debug(f"rs_inx {str(rs_inx)}")
-                    self.log.debug(f"re_inx {str(re_inx)}")
-                    self.log.debug(f"ee_idx {str(ee_idx)}")
-                    self.log.debug(f"ss_idx {str(ss_idx)}")
-
-                    if self._eof_arr[rr] == 1:
-                        if in_frame:
-                            # Checks if there is a packet that is being processed and if it ends in this region.
-                            self.log.debug("Frame End")
-                            in_frame = False
-                            eof_done = True
-                            frame += data_bytes[rs_inx:ee_idx]
-                            self.item_cnt += len(data_bytes[rs_inx:ee_idx])*8 // self._item_width
-                            self.log.debug(f"frame done {frame.hex()}")
-                            self._recv(frame)
-                            self.frame_cnt += 1
-                        elif self._sof_arr[rr] == 1 and (self._eof_pos_arr[rr] < self._sof_pos_arr[rr]):
-                            raise MFBProtocolError("MFB error: an end-of-frame received before a start-of-frame!")
+                    # receive metadata (if present)
+                    if self._meta_width > 0 and hasattr(self._transaction, "meta"):
+                        if sof and self._meta_vld_with == "sof":
+                            self._transaction.meta = self._meta[r].int
+                        elif eof and self._meta_vld_with == "eof":
+                            self._transaction.meta = self._meta[r].int
 
                     if in_frame:
-                        # Region with a valid 'middle of packet'.
-                        frame += data_bytes[rs_inx:re_inx]
-                        self.item_cnt += len(data_bytes[rs_inx:re_inx])*8 // self._item_width
-                        self.log.debug(f"frame middle {frame.hex()}")
+                        if sof and eof:
+                            # if sof appears before eof
+                            if self._region_size > 1:
+                                if pkt_end > pkt_start:
+                                    raise MFBProtocolError(f"MFB error: a start-of-frame received without an end-of-frame! ({sof_pos=}, {eof_pos=})")
 
-                    if self._sof_arr[rr] == 1:
-                        # Checking for beginning of a packet.
-                        self.log.debug("Frame Start")
-                        if in_frame:
-                            raise MFBProtocolError("MFB error: a start-of-frame received without an end-of-frame!")
-                        in_frame = True
-                        frame = b""
-
-                        if (self._eof_arr[rr] == 1) and (not eof_done):
-                            # Checking if the packet ends in the same regions where it began.
-                            self.log.debug("Frame End in single region")
-                            if not in_frame:
-                                raise MFBProtocolError("MFB error: an end-of-frame received without a start-of-frame!")
-                            in_frame = False
-                            frame += data_bytes[ss_idx:ee_idx]
-                            self.item_cnt += len(data_bytes[ss_idx:ee_idx])*8 // self._item_width
-                            self.log.debug(f"frame done single {frame.hex()}")
-                            self._recv(frame)
+                            # end of one packet
+                            self._transaction.data += self._data[r][:pkt_end].bytes
+                            self._recv_trans()
                             self.frame_cnt += 1
+                            self.item_cnt += len(self._transaction.data) * 8 // self._item_width
+
+                            # start of another packet, in_frame stays True
+                            self._transaction.data = self._data[r][pkt_start:].bytes
+
+                        elif sof:
+                            # sof when the previous packet hasn't ended
+                            raise MFBProtocolError(f"MFB error: a start-of-frame received without an end-of-frame! ({sof_pos=})")
+
+                        elif eof:
+                            # packet ends in this region and new one doesn't start
+                            self._transaction.data += self._data[r][:pkt_end].bytes
+                            self._recv_trans()
+                            in_frame = False
+                            self.frame_cnt += 1
+                            self.item_cnt += len(self._transaction.data) * 8 // self._item_width
 
                         else:
-                            # Packet continues into another region.
-                            frame += data_bytes[ss_idx:re_inx]
-                            self.item_cnt += len(data_bytes[ss_idx:re_inx])*8 // self._item_width
-                            self.log.debug(f"frame start {frame.hex()}")
+                            # packet starts and ends in another region, in_frame stays True
+                            self._transaction.data += self._data[r].bytes
+
+                    else:
+                        if sof and eof:
+                            # packet starts and ends in this region, in_frame stays False
+                            self._transaction.data = self._data[r][pkt_start : pkt_end].bytes
+                            self._recv_trans()
+                            self.frame_cnt += 1
+                            self.item_cnt += len(self._transaction.data) * 8 // self._item_width
+
+                        elif sof:
+                            # packet starts in this regions and ends in another one
+                            self._transaction.data = self._data[r][pkt_start:].bytes
+                            in_frame = True
+
+                        elif eof:
+                            # eof when not in frame
+                            raise MFBProtocolError("MFB error: an end-of-frame received before a start-of-frame!")

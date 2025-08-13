@@ -1,61 +1,58 @@
-# utils.py: MFB utils
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Jakub Cabal <cabal@cesnet.cz>
-#
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#            Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
 
-def get_mfb_params(signal_data, signal_sof_pos, signal_eof_pos, signal_sof, params_dic):
+from random import randint
+
+
+def get_mfb_params(signal_bus, params_dic):
     if params_dic is None:
-        regions = len(signal_sof)
-        dw = len(signal_data)
+        regions = len(signal_bus.sof)
+        dw = len(signal_bus.data)
+        sof_pos_len = len(signal_bus.sof_pos)
 
-        if signal_sof_pos is None:
+        if (signal_bus.sof_pos is None) or (sof_pos_len == regions):
             sps = 0
         else:
-            sps = len(signal_sof_pos) // regions
+            sps = len(signal_bus.sof_pos) // regions
 
-        if signal_eof_pos is None:
+        if signal_bus.eof_pos is None:
             eps = 0
         else:
-            eps = len(signal_eof_pos) // regions
+            eps = len(signal_bus.eof_pos) // regions
 
         region_size = 2**sps
         block_size = 2**(eps - sps)
         item_width = dw // (regions * region_size * block_size)
+
+        if hasattr(signal_bus, "meta"):
+            meta_width = len(signal_bus.meta) // regions
+        else:
+            meta_width = 0
     else:
         regions = params_dic["regions"]
         region_size = params_dic["region_size"]
         block_size = params_dic["block_size"]
         item_width = params_dic["item_width"]
+        if "meta_width" in params_dic.keys():
+            meta_width = params_dic["meta_width"]
+        else:
+            meta_width = 0
 
         dw = regions * region_size * block_size * item_width
 
-        if regions != len(signal_sof):
-            signal_sof.log.error("MFB parameters do not correspond to signals length!")
+        if regions != len(signal_bus.sof):
+            signal_bus.sof.log.error("MFB parameters do not correspond to signals length!")
             raise Exception()
 
-        if dw != len(signal_data):
-            signal_data.log.error("MFB parameters do not correspond to signals length!")
+        if dw != len(signal_bus.data):
+            signal_bus.data.log.error("MFB parameters do not correspond to signals length!")
             raise Exception()
 
-    #print(regions)
-    #print(region_size)
-    #print(block_size)
-    #print(item_width)
-
-    return regions, region_size, block_size, item_width
+    return regions, region_size, block_size, item_width, meta_width
 
 
-def signal_unpack(items, signal):
-    signal_arr = [0] * items
-
-    if signal is None:
-        return signal_arr
-
-    size = len(signal) // items
-
-    for ii in range(items):
-        bi = (items - ii - 1) * size
-        signal_arr[ii] = signal.value[bi:(bi + size - 1)].integer
-
-    return signal_arr
+def random_tuple_iterator(min1, max1, min2, max2):
+    while True:
+        yield (randint(min1, max1), randint(min2, max2))
