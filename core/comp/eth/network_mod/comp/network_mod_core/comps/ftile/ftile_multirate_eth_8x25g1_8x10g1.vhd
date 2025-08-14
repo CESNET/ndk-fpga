@@ -108,8 +108,6 @@ architecture FULL of FTILE_MULTIRATE_ETH_8X25G1_8X10G1 is
             O_P0_CDR_LOCK                    : out std_logic;
             O_P0_TX_LANES_STABLE             : out std_logic;
             O_P0_RX_PCS_READY                : out std_logic;
-            I_P0_TX_PFC                      : in  std_logic_vector(7 downto 0)  := (others => 'X');
-            O_P0_RX_PFC                      : out std_logic_vector(7 downto 0);
             I_P0_TX_PAUSE                    : in  std_logic                     := 'X';
             O_P0_RX_PAUSE                    : out std_logic;
             O_P0_RX_BLOCK_LOCK               : out std_logic;
@@ -577,8 +575,6 @@ begin
         o_p0_cdr_lock                    => open,
         o_p0_tx_lanes_stable             => ftile_tx_lanes_stable,
         o_p0_rx_pcs_ready                => ftile_rx_pcs_ready,
-        i_p0_tx_pfc                      => (others => '0'),
-        o_p0_rx_pfc                      => open,
         i_p0_tx_pause                    => '0',
         o_p0_rx_pause                    => open,
         o_p0_rx_block_lock               => ftile_rx_block_lock,

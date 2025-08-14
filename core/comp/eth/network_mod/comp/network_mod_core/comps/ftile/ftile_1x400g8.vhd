@@ -130,8 +130,6 @@ architecture FULL of FTILE_1X400G8 is
             O_RX_MAC_FCS_ERROR              : out std_logic_vector(15 downto 0);
             O_RX_MAC_ERROR                  : out std_logic_vector(31 downto 0);
             O_RX_MAC_STATUS                 : out std_logic_vector(47 downto 0);
-            I_TX_PFC                        : in  std_logic_vector(7 downto 0)    := (others => 'X');
-            O_RX_PFC                        : out std_logic_vector(7 downto 0);
             I_TX_PAUSE                      : in  std_logic                       := 'X';
             O_RX_PAUSE                      : out std_logic;
             I_RECONFIG_XCVR0_ADDR           : in  std_logic_vector(17 downto 0)   := (others => 'X');
@@ -662,8 +660,6 @@ begin
         o_rx_mac_fcs_error              => ftile_rx_mac_fcs_error,
         o_rx_mac_error                  => ftile_rx_mac_error,
         o_rx_mac_status                 => ftile_rx_mac_status,
-        i_tx_pfc                        => (others => '0'),
-        o_rx_pfc                        => open,
         i_tx_pause                      => '0',
         o_rx_pause                      => open
     );
