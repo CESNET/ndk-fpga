@@ -77,6 +77,7 @@ begin
     -- This error is manifested by the message: "has unconnected port CLK[1] -- port must be connected because corresponding register is used"
     count_by_fix <= std_logic_vector(resize(unsigned(COUNT_BY), COUNT_BY_WIDTH_FIX));
 
+    -- NOTE: Quartus 24.3.1: Removed the disable_chainout feature of tennm_mac that is not supported in Agilex 5/7.
     dsp_i: component tennm_mac
     generic map (
         ax_width         => 1,                        -- the value is always 1, so signal ax is 1-bit wide and by assigning value (others => '1') it then has value of 1 in dec
@@ -104,7 +105,6 @@ begin
         dy               => (others => '0'),
         dx               => (others => '0'),
         disable_scanin   => '0',
-        disable_chainout => '0',
         resulta          => RESULT
     );
 

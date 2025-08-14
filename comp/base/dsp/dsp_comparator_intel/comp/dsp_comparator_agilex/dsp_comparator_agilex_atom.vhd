@@ -18,6 +18,7 @@ library tennm;
 use tennm.tennm_components.all;
 
 -- NOTE: default latency of this comparator is 2 clock cycles (with input registers enabled), to achieve latency of 1 clock cycle, disable input registers
+-- NOTE: Quartus 24.3.1: Removed the disable_chainout feature of tennm_mac that is not supported in Agilex 5/7.
 
 entity DSP_COMPARATOR_AGILEX_ATOM is
     generic (
@@ -135,7 +136,6 @@ begin
                 dy               => (others => '0'),
                 dx               => (others => '0'),
                 disable_scanin   => '0',
-                disable_chainout => '0',
                 negate           => '1',              -- inverting the result so that MSB is in the right format
                 resulta          => dout_dsp_1        -- dout_dsp_1 = input_1_sig - input_2_sig
             );
@@ -190,7 +190,6 @@ begin
                 dy               => (others => '0'),
                 dx               => (others => '0'),
                 disable_scanin   => '0',
-                disable_chainout => '0',
                 negate           => '1',              -- inverting the result so that MSB is in the right format
                 resulta          => dout_dsp_2        -- dout_dsp_2 = input_2_sig - input_1_sig
             );
@@ -249,7 +248,6 @@ begin
                     dy               => (others => '0'),
                     dx               => (others => '0'),
                     disable_scanin   => '0',
-                    disable_chainout => '0',
                     resulta          => dout_dsp_1(i*26-1 downto (i-1)*26)     -- dout_dsp_1 = INPUT_1 - INPUT_2
                 );
 
@@ -287,7 +285,6 @@ begin
                     dy               => (others => '0'),
                     dx               => (others => '0'),
                     disable_scanin   => '0',
-                    disable_chainout => '0',
                     resulta          => dout_dsp_2(i*26-1 downto (i-1)*26)     -- dout_dsp_2 = INPUT_2 - INPUT_1
                 );
 
@@ -340,7 +337,6 @@ begin
                     dy               => (others => '0'),
                     dx               => (others => '0'),
                     disable_scanin   => '0',
-                    disable_chainout => '0',
                     resulta          => dout_dsp_1_leftover   -- dout_dsp_1_leftover = input_1_sig_leftover - input_2_sig_leftover
                 );
 
@@ -378,7 +374,6 @@ begin
                     dy               => (others => '0'),
                     dx               => (others => '0'),
                     disable_scanin   => '0',
-                    disable_chainout => '0',
                     resulta          => dout_dsp_2_leftover   -- dout_dsp_2_leftover = input_2_sig_leftover - input_1_sig_leftover
                 );
 
