@@ -49,8 +49,8 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
     -- Width of 'lower address' field in PCIE completion header
     constant PCIE_LOW_ADDR_WIDTH      : integer := getpcielowaddrwidth;
 
-    -- HDM (Header Data Merge) MFB FIFO is ready for 16 MPS transaction
-    constant HDM_MFB_FIFO_DEPTH       : integer := (16*MPS*32)/MFB_UP_WIDTH;
+    -- HDM (Header Data Merge) MFB FIFO is ready for 64 MPS transaction
+    constant HDM_MFB_FIFO_DEPTH       : integer := (64*MPS*32)/MFB_UP_WIDTH;
     -- CODAPA counter must hold all transaction (1 transaction per region) in HDM MFB FIFO
     constant CODAPA_CNT_WIDTH         : integer := log2(MFB_UP_REGIONS*HDM_MFB_FIFO_DEPTH)+1;
 
