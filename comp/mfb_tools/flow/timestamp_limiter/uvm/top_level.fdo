@@ -47,6 +47,3 @@ if {$SIM_FLAGS(CODE_COVERAGE)} {
     vcover merge final.ucdb final.ucdb actual.ucdb
     vcover report -html -output cov_html -details -threshL 50 -threshH 90 final.ucdb
 }
-
-
-quit
