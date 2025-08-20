@@ -106,3 +106,6 @@ set_instance_assignment -name SLEW_RATE 0 -to QSFP1_LPMODE
 set_instance_assignment -name SLEW_RATE 0 -to QSFP1_MODESEL_N
 set_instance_assignment -name SLEW_RATE 0 -to QSFP1_I2C_SCL
 set_instance_assignment -name SLEW_RATE 0 -to QSFP1_I2C_SDA
+
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to QSFP0_MODPRS_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to QSFP1_MODPRS_N
