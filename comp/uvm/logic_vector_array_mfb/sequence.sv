@@ -54,6 +54,37 @@ class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, 
         meta = null;
     endfunction
 
+    function void tr_init(ref uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) tr);
+        case (cfg.generate_invalid)
+            config_sequence::INVALID_ZERO  :
+                begin
+                    for (int unsigned it = 0; it < REGIONS; it++) begin
+                        tr.data[it]    = '0;
+                        tr.meta[it]    = '0;
+                        tr.sof_pos[it] = '0;
+                        tr.eof_pos[it] = '0;
+                    end
+                    tr.sof     = '0;
+                    tr.eof     = '0;
+                    tr.src_rdy = 0;
+                end
+            config_sequence::INVALID_UNDEF :
+                begin
+                    for (int unsigned it = 0; it < REGIONS; it++) begin
+                        tr.data[it]    = 'x;
+                        tr.meta[it]    = 'x;
+                        tr.sof_pos[it] = 'x;
+                        tr.eof_pos[it] = 'x;
+                    end
+                    tr.sof     = 'x;
+                    tr.eof     = 'x;
+                    tr.src_rdy = 0;
+                end
+            config_sequence::INVALID_RAND  :
+                assert(tr.randomize() with {tr.src_rdy == 0;});
+        endcase
+    endfunction
+
     task try_get();
         if (data == null && hl_transactions != 0) begin
             hl_sqr.m_data.try_next_item(data);
@@ -207,17 +238,20 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
         int unsigned rdy;
-        gen.randomize();
+        logic src_rdy;
+        logic [REGIONS-1 : 0] sof;
+        logic [REGIONS-1 : 0] eof;
+
+        tr_init(gen);
+        src_rdy = 0;
+        sof     = '0;
+        eof     = '0;
 
         assert(std::randomize(rdy) with { rdy dist {0 :/ (100 -rdy_probability), 1 :/ rdy_probability}; } );
         if (rdy == 0) begin
-            gen.src_rdy = 0;
             return;
         end
 
-        gen.src_rdy = 0;
-        gen.sof     = '0;
-        gen.eof     = '0;
 
         for (int unsigned it = 0; it < REGIONS; it++) begin
             int unsigned index = 0;
@@ -242,11 +276,11 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
 
                 if (state_packet == state_packet_new) begin
                     // Check SOF and EOF position if we can insert packet into this region
-                    if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                    if (sof[it] == 1 || (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
                         break;
                     end
 
-                    gen.sof[it]     = 1'b1;
+                    sof[it]     = 1'b1;
                     gen.sof_pos[it] = index;
                     if (hl_sqr.meta_behav == config_item::META_SOF && META_WIDTH != 0) begin
                         gen.meta[it] = meta.data;
@@ -256,7 +290,7 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
 
                 if (state_packet == state_packet_data) begin
                     int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
-                    gen.src_rdy = 1;
+                    src_rdy = 1;
 
                     for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
                         gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
@@ -268,7 +302,7 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
                         if (hl_sqr.meta_behav == config_item::META_EOF && META_WIDTH != 0) begin
                             gen.meta[it] = meta.data;
                         end
-                        gen.eof[it]     = 1'b1;
+                        eof[it]     = 1'b1;
                         gen.eof_pos[it] = index*BLOCK_SIZE + loop_end-1;
                         item_done();
                         state_packet = state_packet_space_new;
@@ -277,6 +311,12 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
 
                 index++;
             end
+        end
+
+        if (src_rdy == 1) begin
+            gen.src_rdy = 1;
+            gen.sof     = sof;
+            gen.eof     = eof;
         end
     endtask
 
@@ -345,11 +385,14 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
     /////////
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
-        gen.randomize();
+        logic src_rdy;
+        logic [REGIONS-1 : 0] sof;
+        logic [REGIONS-1 : 0] eof;
 
-        gen.src_rdy = 0;
-        gen.sof     = '0;
-        gen.eof     = '0;
+        tr_init(gen);
+        src_rdy = 0;
+        sof     = '0;
+        eof     = '0;
 
         if (size == 0) begin
             case (burst_state)
@@ -399,11 +442,11 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
 
                     if (state_packet == state_packet_new) begin
                         // Check SOF and EOF position if we can insert packet into this region
-                        if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                        if (sof[it] == 1 || (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
                             break;
                         end
 
-                        gen.sof[it]     = 1'b1;
+                        sof[it]     = 1'b1;
                         gen.sof_pos[it] = index;
                         if (hl_sqr.meta_behav == config_item::META_SOF && META_WIDTH != 0) begin
                             gen.meta[it] = meta.data;
@@ -413,7 +456,7 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
 
                     if (state_packet == state_packet_data) begin
                         int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
-                        gen.src_rdy = 1;
+                        src_rdy = 1;
 
                         for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
                             gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
@@ -425,7 +468,7 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
                             if (hl_sqr.meta_behav == config_item::META_EOF && META_WIDTH != 0) begin
                                 gen.meta[it] = meta.data;
                             end
-                            gen.eof[it]     = 1'b1;
+                            eof[it]     = 1'b1;
                             gen.eof_pos[it] = index*BLOCK_SIZE + loop_end-1;
                             item_done();
                             state_packet = state_packet_space_new;
@@ -436,6 +479,12 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
                 end
             //end if burst_packet == PACKET
             end
+        end
+
+        if (src_rdy == 1) begin
+            gen.src_rdy = 1;
+            gen.sof     = sof;
+            gen.eof     = eof;
         end
     endtask
 
@@ -513,17 +562,19 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
     /////////
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
-        gen.randomize();
+        logic src_rdy;
+        logic [REGIONS-1 : 0] sof;
+        logic [REGIONS-1 : 0] eof;
+
+        tr_init(gen);
+        src_rdy = 0;
+        sof     = '0;
+        eof     = '0;
 
         //randomization of rdy
         if ($urandom_range(0,100) > rdy_probability) begin
-            gen.src_rdy = 0;
             return;
         end
-
-        gen.src_rdy = 0;
-        gen.sof     = '0;
-        gen.eof     = '0;
 
         for (int unsigned it = 0; it < REGIONS; it++) begin
             int unsigned index = 0;
@@ -550,11 +601,11 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
 
                 if (state_packet == state_packet_new) begin
                     // Check SOF and EOF position if we can insert packet into this region
-                    if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                    if (sof[it] == 1 || (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
                         break;
                     end
 
-                    gen.sof[it]     = 1'b1;
+                    sof[it]     = 1'b1;
                     gen.sof_pos[it] = index;
                     if (hl_sqr.meta_behav ==  config_item::META_SOF && META_WIDTH != 0) begin
                         gen.meta[it] = meta.data;
@@ -564,7 +615,7 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
 
                 if (state_packet == state_packet_data) begin
                     int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
-                    gen.src_rdy = 1;
+                    src_rdy = 1;
 
                     for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
                         gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
@@ -576,7 +627,7 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
                         if (hl_sqr.meta_behav ==  config_item::META_EOF && META_WIDTH != 0) begin
                             gen.meta[it] = meta.data;
                         end
-                        gen.eof[it]     = 1'b1;
+                        eof[it]     = 1'b1;
                         gen.eof_pos[it] = index*BLOCK_SIZE + loop_end-1;
                         item_done();
                         state_packet = state_packet_space_new;
@@ -585,6 +636,12 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
 
                 index++;
             end
+        end
+
+        if (src_rdy == 1) begin
+            gen.src_rdy = 1;
+            gen.sof     = sof;
+            gen.eof     = eof;
         end
     endtask
 endclass
@@ -605,11 +662,15 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
         int unsigned index = 0;
-        gen.randomize();
+        logic src_rdy;
+        logic [REGIONS-1 : 0] sof;
+        logic [REGIONS-1 : 0] eof;
 
-        gen.src_rdy = 0;
-        gen.sof     = '0;
-        gen.eof     = '0;
+        tr_init(gen);
+        src_rdy = 0;
+        sof     = '0;
+        eof     = '0;
+
         for (int unsigned it = 0; it < REGIONS; it++) begin
             int unsigned index = 0;
             while (index < REGION_SIZE) begin
@@ -633,11 +694,11 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
 
                 if (state_packet == state_packet_new) begin
                     // Check SOF and EOF position if we can insert packet into this region
-                    if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                    if (sof[it] == 1 || (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
                         break;
                     end
 
-                    gen.sof[it]     = 1'b1;
+                    sof[it]     = 1'b1;
                     gen.sof_pos[it] = index;
                     if (hl_sqr.meta_behav ==  config_item::META_SOF && META_WIDTH != 0) begin
                         gen.meta[it] = meta.data;
@@ -647,7 +708,7 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
 
                 if (state_packet == state_packet_data) begin
                     int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
-                    gen.src_rdy = 1;
+                    src_rdy = 1;
 
                     for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
                         gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
@@ -659,7 +720,7 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                         if (hl_sqr.meta_behav ==  config_item::META_EOF && META_WIDTH != 0) begin
                             gen.meta[it] = meta.data;
                         end
-                        gen.eof[it]     = 1'b1;
+                        eof[it]     = 1'b1;
                         gen.eof_pos[it] = index*BLOCK_SIZE + loop_end-1;
                         item_done();
                         state_packet = state_packet_space_new;
@@ -667,6 +728,12 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                 end
                 index++;
             end
+        end
+
+        if (src_rdy == 1) begin
+            gen.src_rdy = 1;
+            gen.sof     = sof;
+            gen.eof     = eof;
         end
     endtask
 endclass
@@ -688,11 +755,7 @@ class sequence_stop_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int uns
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
         int unsigned index = 0;
-        gen.randomize();
-
-        gen.src_rdy = 0;
-        gen.sof     = '0;
-        gen.eof     = '0;
+        tr_init(gen);
 
         if (hl_transactions != 0) begin
             hl_transactions--;

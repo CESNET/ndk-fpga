@@ -18,9 +18,13 @@ class config_sequence extends uvm_object;
     // Straddling is used only with seq_type == "PCIE"
     logic straddling                 = 0;
 
+    typedef enum {INVALID_ZERO, INVALID_UNDEF, INVALID_RAND} invalid_val_t;
+    invalid_val_t generate_invalid;
+
     function new(string name = "uvm_logic_vector_array_mfb::config_sequence");
         super.new(name);
         state = null;
+        generate_invalid = INVALID_RAND;
     endfunction
 
     function void probability_set(int unsigned min, int unsigned max);
