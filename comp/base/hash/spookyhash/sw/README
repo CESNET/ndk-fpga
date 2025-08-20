@@ -1,0 +1,2 @@
+This folder contains open source implementation of spooky hash function sourced from: https://burtleburtle.net/bob/hash/spooky.html.
+It served as a reference implementation for the VHDL component and SystemVerilog function.

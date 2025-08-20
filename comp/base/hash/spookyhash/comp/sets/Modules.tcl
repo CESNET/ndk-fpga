@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2025 CESNET z. s. p. o
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
+
+# Component paths
+
+# Packages
+lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
+lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
+
+# Components
+lappend COMPONENTS [list "SPOOKY_SHORTMIX"  "$ENTITY_BASE/../shortmix"  "FULL"]
+
+# Files
+lappend MOD "$ENTITY_BASE/sets.vhd"
