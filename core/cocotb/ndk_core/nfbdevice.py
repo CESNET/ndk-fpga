@@ -62,6 +62,8 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
         self._core = NFBDevice.core_instance_from_top(self._dut)
         if self._card_name == "FB2CGHH":
             await cocotb.start(Clock(self._dut.REFCLK, 20, 'ns').start())
+        elif self._card_name == "FB2CDG1":
+            await cocotb.start(Clock(self._dut.SYSCLK_100_P, 10, 'ns').start())
         elif self._card_name in ["FB2CGG3", "FB4CGG3"]:
             await cocotb.start(Clock(self._dut.REFCLK, 20, 'ns').start())
             await cocotb.start(Clock(self._dut.QSFP0_REFCLK_P, 6.206, 'ns').start())
@@ -69,7 +71,6 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
         elif self._card_name == "NFB-200G2QL":
             await cocotb.start(Clock(self._dut.SYSCLK_P, 8, 'ns').start())
             await cocotb.start(Clock(self._dut.SYSCLK_N, 8, 'ns').start(start_high=False))
-
         elif "AGI-FH400G" in self._card_name:
             await cocotb.start(Clock(self._dut.AG_SYSCLK0_P, 8, 'ns').start())
             await cocotb.start(Clock(self._dut.AG_SYSCLK1_P, 10, 'ns').start())
@@ -120,7 +121,7 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
             await cocotb.start(Clock(self._dut.SYSCLK, 10, 'ns').start())
 
         # Workaround for all Intel PLL/CLOCKGEN
-        if any([(name in self._card_name) for name in ["IA-420F", "N6010", "DK-DEV-1SDX-P", "AGI-FH400G", "IA-440I", "A2700"]]):
+        if any([(name in self._card_name) for name in ["IA-420F", "N6010", "DK-DEV-1SDX-P", "AGI-FH400G", "IA-440I", "A2700", "FB2CDG1"]]):
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_0, 2.5, 'ns').start())
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_1, get_sim_steps(10/3 / 2, 'ns', round_mode='round')*2).start())
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_2, 5, 'ns').start())
@@ -193,6 +194,8 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
 
         self._eth_rx_driver = []
         self._eth_tx_monitor = []
+
+        # iterating over ports
         for i, eth_core in enumerate(self._core.network_mod_i.eth_core_g if hasattr(self._core.network_mod_i, 'eth_core_g') else []):
             if hasattr(eth_core.network_mod_core_i, 'cmac_tx_lbus_rdy'):
                 eth_core.network_mod_core_i.cmac_tx_lbus_rdy.value = 1
@@ -215,10 +218,13 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
             if hasattr(eth_core.network_mod_core_i, 'ftile_tx_mac_ready'):
                 eth_core.network_mod_core_i.ftile_tx_mac_ready.value = 1
 
-                tx_monitor = MAC_Segmented_TX_Monitor(eth_core.network_mod_core_i, "ftile_tx_adapt", eth_core.network_mod_core_i.ftile_clk_out, array_idx=i)
-                rx_driver = MAC_Segmented_RX_Driver(eth_core.network_mod_core_i, "ftile_rx_mac", eth_core.network_mod_core_i.ftile_clk_out, array_idx=i)
-                self._eth_tx_monitor.append(tx_monitor)
-                self._eth_rx_driver.append(rx_driver)
+                # iterating over channels
+                for j in range(len(eth_core.network_mod_core_i.ftile_tx_adapt_valid)):
+                    tx_monitor = MAC_Segmented_TX_Monitor(eth_core.network_mod_core_i, "ftile_tx_adapt", eth_core.network_mod_core_i.ftile_clk_out, array_idx=j)
+                    self._eth_tx_monitor.append(tx_monitor)
+                for j in range(len(eth_core.network_mod_core_i.ftile_rx_mac_valid)):
+                    rx_driver = MAC_Segmented_RX_Driver(eth_core.network_mod_core_i, "ftile_rx_mac", eth_core.network_mod_core_i.ftile_clk_out, array_idx=j)
+                    self._eth_rx_driver.append(rx_driver)
 
         self.dtb = None
 
