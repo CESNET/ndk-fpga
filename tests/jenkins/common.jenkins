@@ -378,8 +378,8 @@ def commonPrekladCocotbVerRun(COMPONENTS) {
                             def command = ""
 
                             // activate virtual environment if present
-                            if (fileExists('prepare.sh')) {
-                                command += ". ./prepare.sh\n"
+                            if (fileExists('pyproject.toml')) {
+                                command += "make cocotb-venv\nsource venv-$name/bin/activate\n"
                             }
 
                             // run verification
