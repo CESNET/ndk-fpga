@@ -23,7 +23,7 @@ def common_card_test_run(CARD_NAME) {
     }
 }
 
-def CARDS = ["alveo-u200", "alveo-u55c", "vcu118", "ia-420f", "n6010", "fb2cghh", "fb4cgg3", "nfb-200g2ql", "dk-dev-1sdx-p", "g35p", "nt200a02", "agi-fh400g", "a2700"]
+def CARDS = ["alveo-u200", "alveo-u55c", "vcu118", "ia-420f", "n6010", "fb2cghh", "fb4cgg3", "fb2cdg1", "nfb-200g2ql", "dk-dev-1sdx-p", "g35p", "nt200a02", "agi-fh400g", "a2700"]
 
 node("preklad") {
     cleanWs()
