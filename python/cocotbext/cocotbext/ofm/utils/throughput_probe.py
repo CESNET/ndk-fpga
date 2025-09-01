@@ -94,11 +94,12 @@ class ThroughputProbe(Probe):
         - It's also possible to start and end the intervals manually with the start_log and stop_log functions from
           the parent class.
 
-        - To get the average throughput and efficiency, call the log_average_throughput class.
+        - To get the average throughput and efficiency, call the log_average_throughput method.
           This is usually done at the end of the test.
     """
-    def __init__(self, interface: ThroughputProbeInterface = None, period: int = 0, throughput_units: str = "items", time_units: str = "us", log_intervals: list = [], callback=None):
-        super().__init__(interface, period, time_units, log_intervals, callback)
+    def __init__(self, interface: ThroughputProbeInterface = None, period: int = 0, throughput_units: str = "items", time_units: str = "us", log_intervals: list | None = None,
+                 name: str | None = None, callback=None):
+        super().__init__(interface, period, time_units, log_intervals, name, callback)
         self._total_item_cnt = 0
         self._clear_log_values()
         self._throughput_units = throughput_units.lower()

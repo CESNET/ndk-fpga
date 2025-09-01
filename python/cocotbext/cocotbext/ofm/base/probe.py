@@ -47,16 +47,19 @@ class Probe(ABC):
                       printed out at the end of the time interval.
         _units(str): general units to be used in the class.
         _thread: cocotb thread for running the persistant probing function.
+        _name: name displayed when logging.
     """
-    def __init__(self, interface: ProbeInterface, period: int = 0, time_units: str = "us", log_intervals: list = [], callback=None) -> None:
+    def __init__(self, interface: ProbeInterface, period: int = 0, time_units: str = "us", log_intervals: list | None = None,
+                 name: str = None, callback=None) -> None:
         self._interface = interface
         self._clk_re = RisingEdge(self._interface.clock)
-        self._log_intervals = log_intervals
+        self._log_intervals = log_intervals if log_intervals is not None else list()
         self._period = period
         self._time_units = time_units
+        self._name = f"cocotb.{name}" if name is not None else f"cocotb.probe.{self.__class__.__name__}"
 
         if not hasattr(self, "log"):
-            self.log = SimLog("cocotb.probe.%s" % (self.__class__.__name__))
+            self.log = SimLog(self._name)
 
         if callback is not None:
             self.add_callback(callback)
