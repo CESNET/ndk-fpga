@@ -1207,6 +1207,8 @@ begin
                 o_sl_rx_pause                    => open
             );
 
+            rx_am_lock <= (others => '1');
+
 
         when 10     =>
 
@@ -1333,6 +1335,8 @@ begin
                 i_sl_tx_pause                    => (others => '0'),
                 o_sl_rx_pause                    => open
             );
+
+            rx_am_lock <= (others => '1');
 
         when others =>
             assert (True)
