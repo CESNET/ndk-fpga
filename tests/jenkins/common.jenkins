@@ -306,7 +306,7 @@ def fetchCocotbCompsVer(include = "", exclude = []) {
         if (isInPath(path, include)) {
             def comp_name = sh(script: "grep '^TOP_LEVEL_ENT=' $path/Makefile | cut -d'=' -f2", returnStdout: true).trim()
 
-            if (comp_name.length() > 0 && !exclude.contains(comp_name)) {
+            if (comp_name.length() > 0 && !exclude.contains(comp_name) && comp_name != '%s') {
                 comps_ver.add([comp_name, path])
             }
         }
