@@ -30,8 +30,9 @@ entity PCIE_CC_MFB2AXI is
         -- =======================================================================
         -- AXI BUS CONFIGURATION:
         --
-        -- CC_USER_WIDTH = 81 for Gen3x16 PCIe - without straddling!
-        -- CC_USER_WIDTH = 33 for Gen3x8 PCIe - without straddling!
+        -- CC_USER_WIDTH = 81 for Gen3x16 PCIe - without straddling
+        -- CC_USER_WIDTH = 81 for Gen3x16 PCIe - with straddling
+        -- CC_USER_WIDTH = 33 for Gen3x8 PCIe - without straddling
         -- =======================================================================
         AXI_CCUSER_WIDTH  : natural := 81;
         AXI_DATA_WIDTH    : natural := 512;
@@ -91,43 +92,108 @@ end entity;
 --                             Architecture
 -- ----------------------------------------------------------------------------
 architecture FULL of PCIE_CC_MFB2AXI is
-    constant EOP_POS_WIDTH   : integer := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
-    signal   cc_keep         : std_logic_vector(AXI_DATA_WIDTH/32-1 downto 0);
+    constant EOP_POS_WIDTH : integer := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
+
+    signal cc_keep         : std_logic_vector(AXI_DATA_WIDTH/32-1 downto 0);
+    signal cc_user         : std_logic_vector(AXI_CCUSER_WIDTH -1 downto 0);
+
+    signal cc_usr_sop     : std_logic_vector(1 downto 0);
+    signal cc_usr_eop     : std_logic_vector(1 downto 0);
+    signal cc_usr_sop_ptr : slv_array_t(1 downto 0)(1 downto 0);
+    signal cc_usr_eop_ptr : slv_array_t(1 downto 0)(3 downto 0);
 begin
-    assert (AXI_CCUSER_WIDTH = 33 or AXI_CCUSER_WIDTH = 81)
-        report "PCIE_CC_MFB2AXI: Unsupported AXI CC USER port width, the supported are: 33, 81"
+    assert ((MFB_REGIONS = 1 and AXI_CCUSER_WIDTH = 33 and not STRADDLING)
+            or (MFB_REGIONS = 2 and AXI_CCUSER_WIDTH = 81 and STRADDLING)
+            or (MFB_REGIONS = 2 and AXI_CCUSER_WIDTH = 81 and not STRADDLING))
+        report "PCIE_CC_MFB2AXI: Unsupported AXI CC USER port width, the supported are: 33 (when MFB_REGIONS = 1), 81 (when MFB_REGIONS = 2)"
         severity FAILURE;
 
-    -- No straddling supported!
-    -- keep signal serves as valid for each DWORD of CC_AXI_DATA signal
-    axi_512b_g: if (MFB_REGIONS = 2) generate
-        s_cc_keep_signal_assignment : process (all) is
-        begin
-            -- end of data in first region
-            if (CC_MFB_EOF(0) = '1') then
-                cc_keep <= (others => '0');
+    axi_512b_g: if (MFB_REGIONS = 2 and AXI_CCUSER_WIDTH = 81) generate
+        straddling_en_g : if (STRADDLING) generate
+            cc_keep <= (others => '0');
 
-                for i in 0 to AXI_DATA_WIDTH/32-1 loop
-                    cc_keep(i) <= '1';
-                    exit when (i = to_integer(unsigned(CC_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0))));
-                end loop;
+            s_cc_user_signal_assign_p : process (all) is
+            begin
+                cc_usr_sop     <= (others => '0');
+                cc_usr_sop_ptr <= (others => (others => '0'));
+                cc_usr_eop     <= (others => '0');
+                cc_usr_eop_ptr <= (others => (others => '0'));
 
-            -- end of data in second region
-            elsif (CC_MFB_EOF(1) = '1') then
-                cc_keep <= (others => '0');
+                -- Only one TLP starts in this beat
+                if (CC_MFB_SOF = "01") then
+                    cc_usr_sop        <= "01";
+                    cc_usr_sop_ptr(0) <= "00";
 
-                for i in 0 to AXI_DATA_WIDTH/32-1 loop
-                    cc_keep(i) <= '1';
-                    exit when (i = ((AXI_DATA_WIDTH/32)/2) + to_integer(unsigned(CC_MFB_EOF_POS(2*EOP_POS_WIDTH-1 downto EOP_POS_WIDTH))));
-                end loop;
+                -- This is an unallowed combination and is only there for the completeness
+                elsif (CC_MFB_SOF = "10") then
+                    cc_usr_sop        <= "01";
+                    cc_usr_sop_ptr(0) <= "10";
 
-            -- start or middle of data
-            else
-                cc_keep <= (others => '1');
-            end if;
-        end process;
+                -- Two TLPs start in this beat
+                elsif (CC_MFB_SOF = "11") then
+                    cc_usr_sop        <= "11";
+                    cc_usr_sop_ptr(0) <= "00";
+                    cc_usr_sop_ptr(1) <= "10";
+                end if;
+
+                -- One TLP ends in this beat and in the first region
+                if (CC_MFB_EOF = "01") then
+                    cc_usr_eop        <= "01";
+                    cc_usr_eop_ptr(0) <= "0" & CC_MFB_EOF_POS(2 downto 0);
+
+                -- One TLP ends in this beat and in the second region
+                elsif (CC_MFB_EOF = "10") then
+                    cc_usr_eop        <= "01";
+                    cc_usr_eop_ptr(0) <= "1" & CC_MFB_EOF_POS(5 downto 3);
+
+                -- Two TLPs end in this beat
+                elsif (CC_MFB_EOF = "11") then
+                    cc_usr_eop        <= "11";
+                    cc_usr_eop_ptr(0) <= "0" & CC_MFB_EOF_POS(2 downto 0);
+                    cc_usr_eop_ptr(1) <= "1" & CC_MFB_EOF_POS(5 downto 3);
+                end if;
+            end process;
+
+            cc_user <= (64 downto 0 => '0')
+                       & cc_usr_eop_ptr(1)
+                       & cc_usr_eop_ptr(0)
+                       & cc_usr_eop
+                       & cc_usr_sop_ptr(1)
+                       & cc_usr_sop_ptr(0)
+                       & cc_usr_sop;
+
+        else generate
+            cc_user <= (others => '0');
+
+            s_cc_keep_signal_assignment : process (all) is
+            begin
+                -- end of data in first region
+                if (CC_MFB_EOF(0) = '1') then
+                    cc_keep <= (others => '0');
+
+                    for i in 0 to AXI_DATA_WIDTH/32-1 loop
+                        cc_keep(i) <= '1';
+                        exit when (i = to_integer(unsigned(CC_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0))));
+                    end loop;
+
+                -- end of data in second region
+                elsif (CC_MFB_EOF(1) = '1') then
+                    cc_keep <= (others => '0');
+
+                    for i in 0 to AXI_DATA_WIDTH/32-1 loop
+                        cc_keep(i) <= '1';
+                        exit when (i = ((AXI_DATA_WIDTH/32)/2) + to_integer(unsigned(CC_MFB_EOF_POS(2*EOP_POS_WIDTH-1 downto EOP_POS_WIDTH))));
+                    end loop;
+                -- start or middle of data
+                else
+                    cc_keep <= (others => '1');
+                end if;
+            end process;
+        end generate;
     else generate
-        s_cc_keep_pr : process (all)
+        cc_user <= (others => '0');
+
+        s_cc_keep_pr : process (all) is
         begin
             -- end of data in first region
             if (CC_MFB_EOF(0) = '1') then
@@ -147,7 +213,7 @@ begin
 
     CC_AXI_DATA    <= CC_MFB_DATA;
     CC_AXI_KEEP    <= cc_keep;
-    CC_AXI_USER    <= (others => '0');
+    CC_AXI_USER    <= cc_user;
     CC_AXI_LAST    <= or CC_MFB_EOF;
     CC_AXI_VALID   <= CC_MFB_SRC_RDY;
     CC_MFB_DST_RDY <= CC_AXI_READY;
