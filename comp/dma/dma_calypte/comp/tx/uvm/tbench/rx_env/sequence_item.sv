@@ -57,7 +57,8 @@ class sequence_item extends uvm_sequence_item;
     function string convert2block(int unsigned region_width);
         string ret;
 
-        ret = $sformatf("%s\n\tdma_rx_ll_rx::sequence_item meta %h size %0d", super.convert2string(), m_meta, m_packet.size());
+        ret = $sformatf("%s\n\tdma_rx_ll_rx::sequence_item meta %h size %0d", super.convert2string(),
+                        m_meta, m_packet.size());
         for (int unsigned it = 0; it < m_packet.size(); it++) begin
             if (it % (region_width*4) == 0) begin
                 ret = {ret, $sformatf("\n\t\t%x", m_packet[it])};

@@ -98,18 +98,18 @@ class pointer_mask_register #(int unsigned POINTER_WIDTH)  extends uvm_reg;
 
     virtual function void build();
         //Create fields
-        pointer = uvm_reg_field::type_id::create("pointer_mask");
+        pointer_mask = uvm_reg_field::type_id::create("pointer_mask");
         //Configure
-        pointer.configure(this, // Parent
-                         POINTER_WIDTH, // Number of bits
-                         0  , // LSB
-                         "RO", // Access
-                         0   , // Volatility
-                         0   , // Value on reset
-                         0   , // Can the value be reset?
-                         0   , // Can the value be randomized?
-                         0     // Does the field occupy an entire byte lane?
-                         );
+        pointer_mask.configure(this, // Parent
+                               POINTER_WIDTH, // Number of bits
+                               0  , // LSB
+                               "RO", // Access
+                               0   , // Volatility
+                               0   , // Value on reset
+                               0   , // Can the value be reset?
+                               0   , // Can the value be randomized?
+                               0     // Does the field occupy an entire byte lane?
+                               );
     endfunction
 endclass
 

@@ -34,8 +34,9 @@ class start_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
             #(300ns)
             m_regmodel_channel.status_reg.read(status, data, .parent(this));
 
-            assert (start_attempts < 100) else
+            assert (start_attempts < 100) else begin
                 `uvm_warning(this.get_type_name(), "\n\nThe start of a channel takes suspiciously long time!\n")
+            end
 
         end while ((data & 32'h1) != 1);
     endtask
@@ -79,8 +80,12 @@ class stop_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
             m_regmodel_channel.status_reg.read(status, data, .parent(this));
             stop_attempts++;
 
-            assert (stop_attempts < 500) else
-                `uvm_warning(m_regmodel_channel.get_full_name(), $sformatf("\nThe stop of a channel takes suspiciously long time!\n\tDATA SW(%0d) HW(%0d)\n\tHDR SW(%0d) HW(%0d)\n\tSTATUS %0d\n-----------------------\n", sw_data, hw_data, sw_hdr, hw_hdr, (data & 32'h1)));
+            assert (stop_attempts < 500) else begin
+                `uvm_warning(m_regmodel_channel.get_full_name(),
+                             $sformatf( {"\nThe stop of a channel takes suspiciously long time!\n\tDATA SW(%0d) HW(%0d) ",
+                                         "\n\tHDR SW(%0d) HW(%0d)\n\tSTATUS %0d\n-----------------------\n"},
+                                         sw_data, hw_data, sw_hdr, hw_hdr, (data & 32'h1)));
+            end
 
         end while (sw_data != hw_data || sw_hdr != hw_hdr || (data & 32'h1) != 0);
     endtask

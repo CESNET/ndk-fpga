@@ -31,16 +31,18 @@ class model #(
     string DEVICE
 ) extends uvm_component;
 
-    `uvm_component_param_utils(uvm_tx_dma_calypte::model #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE))
+    `uvm_component_param_utils(uvm_tx_dma_calypte::model #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS,
+                                                           DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE))
 
     localparam DATA_ADDR_MASK = 2**DATA_POINTER_WIDTH-1;
 
-    uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(PCIE_CQ_MFB_ITEM_WIDTH))                m_cq_data_analysis_fifo;
-    uvm_tlm_analysis_fifo #(uvm_logic_vector      ::sequence_item #(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)) m_cq_meta_analysis_fifo;
-    uvm_analysis_port     #(uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH))                    m_usr_data_analysis_port;
-    uvm_analysis_port     #(uvm_logic_vector      ::sequence_item #(USR_MFB_META_WIDTH))                    m_usr_meta_analysis_port;
+    uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(PCIE_CQ_MFB_ITEM_WIDTH))  m_cq_data_analysis_fifo;
+    uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item
+                            #(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH))                         m_cq_meta_analysis_fifo;
+    uvm_analysis_port     #(uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH))      m_usr_data_analysis_port;
+    uvm_analysis_port     #(uvm_logic_vector::sequence_item #(USR_MFB_META_WIDTH))            m_usr_meta_analysis_port;
 
-    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH) m_regmodel_top;
+    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH)               m_regmodel_top;
 
     protected int unsigned m_discard_wait;
     discard #(CHANNELS) m_discard_comp;
@@ -177,10 +179,11 @@ class model #(
                 dword_cnt  = cq_meta_tr.data[10-1 : 0];
                 is_4dw_tlp = cq_meta_tr.data[29];
 
-                if (is_4dw_tlp == 1)
+                if (is_4dw_tlp == 1) begin
                     pcie_addr = {cq_meta_tr.data[95:64], cq_meta_tr.data[127:96]};
-                else
+                end else begin
                     pcie_addr = cq_meta_tr.data[95:64];
+                end
 
                 fbe_ext            = cq_meta_tr.data[35:32];
                 lbe_ext            = dword_cnt > 1 ? cq_meta_tr.data[39:36] : cq_meta_tr.data[35:32];
@@ -199,9 +202,11 @@ class model #(
             m_channel_info[channel].pcie_transactions++;
 
             debug_msg = "\n";
-            debug_msg = { debug_msg, $sformatf("================================================================================= \n")};
+            debug_msg = { debug_msg,
+                    $sformatf("================================================================================= \n")};
             debug_msg = { debug_msg, $sformatf("MODEL INPUT PCIe TRANSACTION %0d\n", m_pcie_transactions)};
-            debug_msg = { debug_msg, $sformatf("================================================================================= \n")};
+            debug_msg = { debug_msg,
+                    $sformatf("================================================================================= \n")};
             debug_msg = { debug_msg, $sformatf("CHANNEL     : %0d\n", channel)};
             debug_msg = { debug_msg, $sformatf("TRANSACTION : %0d\n", m_channel_info[channel].pcie_transactions)};
             debug_msg = { debug_msg, $sformatf("DROP        : %0d\n", drop)};
@@ -211,7 +216,8 @@ class model #(
             debug_msg = { debug_msg, $sformatf("FBE         : %b\n", fbe_ext)};
             debug_msg = { debug_msg, $sformatf("LBE         : %b\n", lbe_ext)};
             debug_msg = { debug_msg, $sformatf("DATA        : %s\n", cq_data_tr.convert2string())};
-            debug_msg = { debug_msg, $sformatf("================================================================================= \n")};
+            debug_msg = { debug_msg,
+                    $sformatf("================================================================================= \n")};
             `uvm_info(this.get_full_name(), debug_msg, UVM_MEDIUM);
 
             //if PCIE transaction is not DMA HEADER
@@ -221,24 +227,28 @@ class model #(
                 if (dword_cnt <= 1) begin
                     lbe = encode_lbe(lbe_ext);
                     for (int unsigned it = fbe; it < lbe; it++) begin
-                         m_channel_info[channel].memory[{addr, 2'b00} + it] = cq_data_tr.data[usr_data_begin_idx][(it+1)*8-1 -: 8];
+                         m_channel_info[channel].memory[{addr, 2'b00} + it]
+                             = cq_data_tr.data[usr_data_begin_idx][(it+1)*8-1 -: 8];
                     end
                 end else begin
                     logic [DATA_POINTER_WIDTH-1:0] addr_act = {addr, 2'b00};
                     lbe = encode_lbe(lbe_ext);
                     //peeling start
                     for (int unsigned it = fbe; it < 4; it++) begin
-                         m_channel_info[channel].memory[addr_act + it] = cq_data_tr.data[usr_data_begin_idx][(it+1)*8-1 -: 8];
+                         m_channel_info[channel].memory[addr_act + it]
+                             = cq_data_tr.data[usr_data_begin_idx][(it+1)*8-1 -: 8];
                     end
                     addr_act = (addr_act + 4) & DATA_ADDR_MASK;
                     //Main loop
                     for (int unsigned it = 1; (it+1) < dword_cnt; it++) begin
-                         {<<8{m_channel_info[channel].memory[addr_act +: 4]}} = cq_data_tr.data[usr_data_begin_idx + it];
+                         {<<8{m_channel_info[channel].memory[addr_act +: 4]}}
+                             = cq_data_tr.data[usr_data_begin_idx + it];
                          addr_act = (addr_act + 4) & DATA_ADDR_MASK;
                     end
                     //peeling end
                     for (int unsigned it = 0; it < lbe; it++) begin
-                         m_channel_info[channel].memory[addr_act + it] = cq_data_tr.data[usr_data_begin_idx + dword_cnt-1][(it+1)*8-1 -: 8];
+                         m_channel_info[channel].memory[addr_act + it]
+                             = cq_data_tr.data[usr_data_begin_idx + dword_cnt-1][(it+1)*8-1 -: 8];
                     end
                 end
 
@@ -256,8 +266,10 @@ class model #(
                 dma_meta      = cq_data_tr.data[usr_data_begin_idx+1][32-1 : 8];
 
                 if (drop == 1'b0) begin
-                    usr_tx_data_tr      = uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH)::type_id::create("usr_tx_data_tr", this);
-                    usr_tx_meta_tr      = uvm_logic_vector::sequence_item #(USR_MFB_META_WIDTH)::type_id::create("usr_tx_meta_tr", this);
+                    usr_tx_data_tr      = uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH)::type_id
+                                          ::create("usr_tx_data_tr", this);
+                    usr_tx_meta_tr      = uvm_logic_vector::sequence_item #(USR_MFB_META_WIDTH)::type_id
+                                          ::create("usr_tx_meta_tr", this);
 
                     usr_tx_data_tr.start = m_channel_info[channel].infs;
                     usr_tx_data_tr.time_array_add(cq_data_tr.start);
@@ -278,17 +290,22 @@ class model #(
                     m_channel_info[channel].dma_transactions_bytes += packet_size;
 
                     debug_msg = "\n";
-                    debug_msg = {debug_msg, $sformatf("================================================================================= \n")};
+                    debug_msg = {debug_msg, $sformatf(
+                        "================================================================================= \n")};
                     debug_msg = {debug_msg, $sformatf("MODEL OUTPUT DMA TRANSACTION %0d\n", m_dma_transactions)};
-                    debug_msg = {debug_msg, $sformatf("================================================================================= \n")};
+                    debug_msg = {debug_msg, $sformatf(
+                        "================================================================================= \n")};
                     debug_msg = {debug_msg, $sformatf("CHANNEL              : %0d\n", channel)};
-                    debug_msg = {debug_msg, $sformatf("TRANSACTION          : %0d\n", m_channel_info[channel].dma_transactions)};
+                    debug_msg = {debug_msg, $sformatf("TRANSACTION          : %0d\n",
+                                                      m_channel_info[channel].dma_transactions)};
                     debug_msg = {debug_msg, $sformatf("FRAME POINTER        : %0d\n", frame_pointer)};
                     debug_msg = {debug_msg, $sformatf("SIZE IN BYTES        : %0d\n", packet_size)};
-                    debug_msg = {debug_msg, $sformatf("================================================================================= \n")};
+                    debug_msg = {debug_msg, $sformatf(
+                        "================================================================================= \n")};
                     debug_msg = {debug_msg, $sformatf("OUT META: %s\n", usr_tx_meta_tr.convert2string())};
                     debug_msg = {debug_msg, $sformatf("OUT DATA: %s\n", usr_tx_data_tr.convert2string())};
-                    debug_msg = {debug_msg, $sformatf("================================================================================= \n")};
+                    debug_msg = {debug_msg, $sformatf(
+                        "================================================================================= \n")};
                     `uvm_info(this.get_full_name(), debug_msg, UVM_MEDIUM)
 
                     m_usr_data_analysis_port.write(usr_tx_data_tr);
@@ -299,17 +316,22 @@ class model #(
                     m_channel_info[channel].drop_transactions_bytes += packet_size;
 
                     debug_msg = "\n";
-                    debug_msg = {debug_msg, $sformatf("================================================================================= \n")};
+                    debug_msg = {debug_msg, $sformatf(
+                        "================================================================================= \n")};
                     debug_msg = {debug_msg, $sformatf("MODEL DROP %0d\n", m_drop_transactions)};
-                    debug_msg = {debug_msg, $sformatf("================================================================================= \n")};
+                    debug_msg = {debug_msg, $sformatf(
+                        "================================================================================= \n")};
                     debug_msg = {debug_msg, $sformatf("CHANNEL              : %0d\n", channel)};
-                    debug_msg = {debug_msg, $sformatf("TRANSACTION          : %0d\n", m_channel_info[channel].drop_transactions)};
+                    debug_msg = {debug_msg, $sformatf("TRANSACTION          : %0d\n",
+                                                      m_channel_info[channel].drop_transactions)};
                     debug_msg = {debug_msg, $sformatf("FRAME POINTER        : %0d\n", frame_pointer)};
                     debug_msg = {debug_msg, $sformatf("SIZE IN BYTES        : %0d\n", packet_size)};
-                    debug_msg = {debug_msg, $sformatf("================================================================================= \n")};
+                    debug_msg = {debug_msg, $sformatf(
+                        "================================================================================= \n")};
                     debug_msg = {debug_msg, $sformatf("OUT META: %s\n", usr_tx_meta_tr.convert2string())};
                     debug_msg = {debug_msg, $sformatf("OUT DATA: %s\n", usr_tx_data_tr.convert2string())};
-                    debug_msg = {debug_msg, $sformatf("================================================================================= \n")};
+                    debug_msg = {debug_msg, $sformatf(
+                        "================================================================================= \n")};
                     `uvm_info(this.get_full_name(), debug_msg, UVM_MEDIUM)
                 end
 

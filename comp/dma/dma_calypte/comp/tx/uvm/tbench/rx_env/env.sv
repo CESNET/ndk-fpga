@@ -16,17 +16,19 @@ class env #(
     int unsigned PCIE_LEN_MAX
 ) extends uvm_env;
 
-    `uvm_component_param_utils(uvm_tx_dma_calypte_cq::env #(DEVICE, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX));
+    `uvm_component_param_utils(uvm_tx_dma_calypte_cq::env #(DEVICE, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE,
+                                                            MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX));
 
     sequencer #(DATA_POINTER_WIDTH)                                              m_sequencer [CHANNELS];
     driver #(DEVICE, MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX) m_driver    [CHANNELS];
 
-    uvm_reset::sync_cbs                                                                                                                       m_reset_sync;
-    uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) m_rx_mfb_env;
+    uvm_reset::sync_cbs                                                          m_reset_sync;
+    uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                         sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)  m_rx_mfb_env;
 
-    local driver_sync #(MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) m_data_export;
-    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH) m_regmodel_top;
-    local config_item                                                          m_config;
+    local driver_sync #(MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)   m_data_export;
+    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH)  m_regmodel_top;
+    local config_item                                                            m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -59,15 +61,20 @@ class env #(
         m_rx_mfb_env_cfg.seq_cfg = new();
         m_rx_mfb_env_cfg.seq_cfg.straddling = 1;
 
-        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_rx_mfb_env", "m_config", m_rx_mfb_env_cfg);
-        m_rx_mfb_env  = uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)::type_id::create("m_rx_mfb_env", this);
+        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_rx_mfb_env", "m_config",
+                                                                      m_rx_mfb_env_cfg);
+        m_rx_mfb_env  = uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE,
+                                                             MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
+                      ::type_id::create("m_rx_mfb_env", this);
 
         for (int unsigned chan = 0; chan < CHANNELS; chan++) begin
             string i_string = $sformatf("%0d", chan);
 
             if (m_config.active == UVM_ACTIVE) begin
-                m_sequencer[chan]        = sequencer #(DATA_POINTER_WIDTH)::type_id::create({"m_sequencer_", i_string}, this);
-                m_driver[chan]           = driver #(DEVICE, MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX)::type_id::create({"m_driver_", i_string}, this);
+                m_sequencer[chan]        = sequencer #(DATA_POINTER_WIDTH)::type_id
+                                           ::create({"m_sequencer_", i_string}, this);
+                m_driver[chan]           = driver #(DEVICE, MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX)
+                                           ::type_id::create({"m_driver_", i_string}, this);
                 m_driver[chan].m_channel = chan;
             end else begin
                 m_sequencer[chan] = null;
@@ -98,8 +105,10 @@ class env #(
             base_send_sequence #(uvm_logic_vector::sequence_item #(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)) meta_seq;
             base_send_sequence #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))                  data_seq;
 
-            meta_seq = base_send_sequence #(uvm_logic_vector::sequence_item #(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH))::type_id::create("meta_seq", this);
-            data_seq = base_send_sequence #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))                 ::type_id::create("data_seq", this);
+            meta_seq = base_send_sequence #(uvm_logic_vector::sequence_item #(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH))
+                       ::type_id::create("meta_seq", this);
+            data_seq = base_send_sequence #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))
+                       ::type_id::create("data_seq", this);
 
             meta_seq.m_tr_export = m_data_export.pcie_meta;
             data_seq.m_tr_export = m_data_export.pcie_data;
