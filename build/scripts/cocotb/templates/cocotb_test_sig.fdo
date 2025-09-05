@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: %s
+# Copyright (C) %i %s
+# Author(s): %s <%s>
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /%s/*
+
+config wave -signalnamewidth 1

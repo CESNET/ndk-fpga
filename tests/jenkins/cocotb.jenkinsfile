@@ -15,7 +15,13 @@ node('preklad') {
         checkout scm
         def common_run = load "tests/jenkins/common.jenkins"
 
-        def CATEGORY = ""
+        // INCLUDE and EXCLUDE act as a filters of automatically detected cocotb tests.
+        // INCLUDE filtering is done by names of folders in the path to the tests.
+        // Operations 'and' (&) and 'or' (|) are also supported, however
+        // you use only ands or only ors.
+        def INCLUDE = "" // "" for include all
+        // EXCLUDE filtering is done by the names of the components.
+        def EXCLUDE = ["fpga"] // [] for exclude none
 
         // /////////////////////////////////////////////////////////////////////////////
         // BASIC-VERIFICATION
@@ -24,7 +30,7 @@ node('preklad') {
         // FORMAT:
         //  [ 'name', 'path_to_ver'],
         // /////////////////////////////////////////////////////////////////////////////
-        def COMPONENTS_VER = common_run.fetchCocotbCompsVer(CATEGORY)
+        def COMPONENTS_VER = common_run.fetchCocotbCompsVer(INCLUDE, EXCLUDE)
         // /////////////////////////////////////////////////////////////////////////////
 
         // /////////////////////////////////////////////////////////////////////////////
@@ -33,7 +39,7 @@ node('preklad') {
         // Add engines for automatic Jenkins verifications into the following list
         // FORMAT:
         //  [ 'name', 'path_to_ver', 'settings.py']
-        def COMPONENTS_MULTIVER = common_run.fetchCocotbCompsMultiVer(CATEGORY)
+        def COMPONENTS_MULTIVER = common_run.fetchCocotbCompsMultiVer(INCLUDE, EXCLUDE)
         // /////////////////////////////////////////////////////////////////////////////
 
         common_run.commonPrekladCocotbVerRun(COMPONENTS_VER)

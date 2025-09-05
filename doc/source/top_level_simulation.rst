@@ -32,13 +32,13 @@ Use the **prepare.sh** script which automatically creates a **Python virtual env
 
 .. code-block:: bash
 
-    ./prepare.sh
+    make cocotb-venv
 
 After the script is finished, enter the newly created virtual environment:
 
 .. code-block:: bash
 
-    source venv-cocotb/bin/activate
+    source venv-fpga/bin/activate
 
 Then run the simulation using the included **Makefile**. You can also specify the card that shall be simulated.
 Selection of the simulated card is performed with the environment variable **CARD**:

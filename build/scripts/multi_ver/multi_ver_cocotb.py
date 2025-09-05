@@ -146,8 +146,8 @@ test_name_prefix = ""
 if args.prefix_name is not None and args.prefix_name != "":
     test_name_prefix = args.prefix_name.replace(" ", "_") + "_"
 
-if (op.isfile("prepare.sh")):
-    system("./prepare.sh")
+if (op.isfile("pyproject.toml")):
+    system("make cocotb-venv")
 
 venv = find_venv()
 

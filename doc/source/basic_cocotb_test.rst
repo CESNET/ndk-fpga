@@ -9,6 +9,9 @@ To get started, first create a ``cocotb`` folder in the directory where the test
 and put all the scripts implemented in this tutorial into it.
 
 
+.. note:: For automatic generation of a test template use the ``generate_test_template`` script in ``ndk-fpga/build/scripts/cocotb``.
+
+
 Creating a Test
 ===============
 
@@ -67,15 +70,6 @@ First, it is necessary to implement a ``pyproject.toml`` with all test dependenc
    :linenos:
    :encoding: utf-8
 
-Then, a ``prepare.sh`` script is required. This script should create a Python virtual environment and use
-the ``pyproject.toml`` file created in the previous step to install all the dependencies into the environment.
-It usually looks something like this:
-
-.. literalinclude:: ../../comp/mvb_tools/storage/fifox/cocotb/prepare.sh
-   :language: bash
-   :linenos:
-   :encoding: utf-8
-
 Use a special ``cocotb_test_sig.fdo`` file to define the signals that will be displayed in the simulator's waveform.
 
 .. literalinclude:: ../../comp/mvb_tools/storage/fifox/cocotb/cocotb_test_sig.fdo
@@ -92,9 +86,11 @@ Finally, create a ``Makefile`` that will run the simulation:
 
 .. note:: Don't forget to adjust the values that are component-specific and the relative paths if needed.
 
-You can run the simulation by executing the ``prepare.sh`` script, entering the created virtual environment,
-and running the ``Makefile``. All of this can be achieved with this one-liner:
+You can run the simulation by creating a python virtual environment using make cocotb-venv, entering the created virtual environment,
+and running the ``Makefile``:
 
 .. code-block:: bash
 
-    . ./prepare && make
+    make cocotb-venv
+    source venv-xxx/bin/activate
+    make

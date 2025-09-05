@@ -25,6 +25,10 @@ else
 	$(error "Unknown synth tool '$(SYNTH)', please update common Makefile")
 endif
 
+ifeq ($(TARGET),cocotb)
+include $(OFM_PATH)build/cocotb.mk
+endif
+
 include $(OFM_PATH)$(SYNTH_MAKEFILE)
 
 # For lazy users

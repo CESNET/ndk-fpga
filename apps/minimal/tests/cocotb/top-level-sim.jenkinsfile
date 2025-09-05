@@ -1,7 +1,7 @@
 def common_card_test_run(CARD_NAME) {
     try {
         sh """
-        source venv-cocotb/bin/activate
+        source venv-fpga/bin/activate
         make -C apps/minimal/tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\"
         """
     } catch (err) {
@@ -39,7 +39,7 @@ node("preklad") {
     stage("Prepare environment") {
         sh """
             source ./env.sh
-            ndk_fpga_venv_prepare "venv-cocotb"
+            ndk_fpga_venv_prepare "venv-fpga"
             pip install apps/minimal/tests/cocotb
         """
     }
@@ -60,7 +60,7 @@ node("preklad") {
         }
     }
 
-    sh "rm -rf venv-cocotb"
+    sh "rm -rf venv-fpga"
 
     // send out emails if failure is detected
     if(currentBuild.result == "FAILURE") {
