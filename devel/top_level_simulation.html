@@ -158,11 +158,11 @@ the <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</
 </pre></div>
 </div>
 <p>Use the <strong>prepare.sh</strong> script which automatically creates a <strong>Python virtual environment</strong> with all the dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./prepare.sh
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>cocotb-venv
 </pre></div>
 </div>
 <p>After the script is finished, enter the newly created virtual environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>venv-cocotb/bin/activate
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>venv-fpga/bin/activate
 </pre></div>
 </div>
 <p>Then run the simulation using the included <strong>Makefile</strong>. You can also specify the card that shall be simulated.

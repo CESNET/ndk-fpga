@@ -139,6 +139,10 @@
 FIFO, etc.).</p>
 <p>To get started, first create a <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> folder in the directory where the tested component is located,
 and put all the scripts implemented in this tutorial into it.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For automatic generation of a test template use the <code class="docutils literal notranslate"><span class="pre">generate_test_template</span></code> script in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/build/scripts/cocotb</span></code>.</p>
+</div>
 <section id="creating-a-test">
 <h2>Creating a Test<a class="headerlink" href="#creating-a-test" title="Link to this heading"></a></h2>
 <p>As an example, a simple test of an MVB FIFOX component will be used.
@@ -323,26 +327,6 @@ folder.</p>
 <span class="linenos">11</span><span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pdm.backend&quot;</span>
 </pre></div>
 </div>
-<p>Then, a <code class="docutils literal notranslate"><span class="pre">prepare.sh</span></code> script is required. This script should create a Python virtual environment and use
-the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file created in the previous step to install all the dependencies into the environment.
-It usually looks something like this:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/bin/sh</span>
-<span class="linenos"> 2</span><span class="c1"># SPDX-License-Identifier: BSD-3-Clause</span>
-<span class="linenos"> 3</span><span class="c1"># Copyright (C) 2025 CESNET z. s. p. o.</span>
-<span class="linenos"> 4</span><span class="c1"># Author(s): Ondřej Schwarz &lt;ondrejschwarz@cesnet.cz&gt;</span>
-<span class="linenos"> 5</span>
-<span class="linenos"> 6</span><span class="nv">NDK_FPGA_PATH</span><span class="o">=</span>../../../../..
-<span class="linenos"> 7</span><span class="nb">source</span><span class="w"> </span><span class="nv">$NDK_FPGA_PATH</span>/env.sh
-<span class="linenos"> 8</span>
-<span class="linenos"> 9</span>ndk_fpga_venv_prepare<span class="w"> </span><span class="s2">&quot;venv-fifox&quot;</span>
-<span class="linenos">10</span>
-<span class="linenos">11</span>pip<span class="w"> </span>install<span class="w"> </span>.
-<span class="linenos">12</span>
-<span class="linenos">13</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="linenos">14</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Now activate environment with:&quot;</span>
-<span class="linenos">15</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source venv-fifox/bin/activate&quot;</span>
-</pre></div>
-</div>
 <p>Use a special <code class="docutils literal notranslate"><span class="pre">cocotb_test_sig.fdo</span></code> file to define the signals that will be displayed in the simulator’s waveform.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># coctb_test_sig.fdo : Include file with signals</span>
 <span class="linenos"> 2</span><span class="c1"># Copyright (C) 2024 CESNET z. s. p. o.</span>
@@ -378,9 +362,11 @@ It usually looks something like this:</p>
 <p class="admonition-title">Note</p>
 <p>Don’t forget to adjust the values that are component-specific and the relative paths if needed.</p>
 </div>
-<p>You can run the simulation by executing the <code class="docutils literal notranslate"><span class="pre">prepare.sh</span></code> script, entering the created virtual environment,
-and running the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>. All of this can be achieved with this one-liner:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.<span class="w"> </span>./prepare<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>make
+<p>You can run the simulation by creating a python virtual environment using make cocotb-venv, entering the created virtual environment,
+and running the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>cocotb-venv
+<span class="nb">source</span><span class="w"> </span>venv-xxx/bin/activate
+make
 </pre></div>
 </div>
 </section>
