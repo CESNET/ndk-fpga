@@ -79,6 +79,7 @@ set DMA_RX_BLOCKING_MODE true
 # Other parameters:
 # ------------------------------------------------------------------------------
 set TSU_ENABLE true
+set BOARD_VARIANT $env(BOARD_VARIANT)
 
 # ------------------------------------------------------------------------------
 # DDR4 parameters:

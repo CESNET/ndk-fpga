@@ -13,10 +13,13 @@ COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/bittware/ia-440i
 APP_CONF = app_conf.tcl
 
+BOARD_VARIANT ?= 0
+export BOARD_VARIANT
+
 PCIE_CONF ?= 1xgen5x8x8
 export PCIE_CONF
 
-OUTPUT_NAME = ia-440i-minimal-pcie$(PCIE_CONF)
+OUTPUT_NAME = ia-440i-var$(BOARD_VARIANT)-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 400g1 # 100g2 25g8 10g8
 
