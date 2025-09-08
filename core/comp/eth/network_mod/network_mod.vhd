@@ -84,6 +84,7 @@ architecture FULL of NETWORK_MOD is
     constant RESIZE_BUFFER  : boolean := (ETH_CORE_ARCH = "F_TILE" or (ETH_CORE_ARCH = "E_TILE" and ETH_CHANNELS = 4));
 
     constant IS_USP_10G4_25G4 : boolean := ETH_CORE_ARCH = "10G4" or ETH_CORE_ARCH = "25G4";
+    constant IS_USP_40G2      : boolean := ETH_CORE_ARCH = "40GE";
 
     constant TS_TIMEOUT_W : natural := 3; -- last TS is unvalided after 4 cycles
     constant TS_REPLICAS  : natural := tsel(LL_MODE or IS_USP_10G4_25G4, ETH_CHANNELS, 1);
@@ -403,7 +404,7 @@ begin
             MI_ADDR_WIDTH    => MI_ADDR_WIDTH,
             -- Other
             LL_MODE          => LL_MODE,
-            USE_FULL_MAC     => IS_USP_10G4_25G4,
+            USE_FULL_MAC     => IS_USP_10G4_25G4 or IS_USP_40G2,
             RESET_USER_WIDTH => ETH_CHANNELS,
             RESET_CORE_WIDTH => logic_rst_arr(p)'length,
             RESIZE_BUFFER    => RESIZE_BUFFER,
