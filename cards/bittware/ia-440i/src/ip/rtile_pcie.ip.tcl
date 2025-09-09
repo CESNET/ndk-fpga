@@ -26,6 +26,7 @@ do_rtile_pcie_common
 if {$PARAMS(PCIE_ENDPOINT_MODE) == 0 && $PARAMS(PCIE_GEN) == 4} {
     do_rtile_pcie_gen4_1x16 $PCI_VENDOR_ID $PCI_DEVICE_ID $USR_CLKFREQ
 } elseif {$PARAMS(PCIE_ENDPOINT_MODE) == 0 && $PARAMS(PCIE_GEN) == 5} {
+    set USR_CLKFREQ 400MHz
     do_rtile_pcie_gen5_1x16 $PCI_VENDOR_ID $PCI_DEVICE_ID $USR_CLKFREQ
 } elseif {$PARAMS(PCIE_ENDPOINT_MODE) == 1 && $PARAMS(PCIE_GEN) == 5} {
     do_rtile_pcie_gen5_2x8 $PCI_VENDOR_ID $PCI_DEVICE_ID $USR_CLKFREQ
