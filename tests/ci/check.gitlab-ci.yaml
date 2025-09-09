@@ -49,7 +49,7 @@ vhdlcodestyle:
     variables:
       VSG_CONFIG_PATH: "tests/ci/vsg_config.yaml"
     before_script:
-        - pip install -U vsg
+        - pip install -U vsg==3.34.0
     script:
         # Find all VHDL files in selected folders
         - PATHS=("apps" "core" "comp/axis_tools" "comp/base"  "comp/dma" "comp/mem_tools" "comp/mfb_tools" "comp/mvb_tools" "comp/mi_tools" "comp/nic" "comp/pcie" "comp/tsu")
