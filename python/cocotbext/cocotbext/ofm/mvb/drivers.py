@@ -32,8 +32,8 @@ class MVBDriver(BusDriver):
         self.__os = [s for s in MVBDriver._optional_signals if hasattr(self.bus, s)]
         self.__item_cnt = 0
         self.__items = len(self.bus.vld)
-        self.__item_widths = self._get_item_widths()
         self.__bus_isarray = not isinstance(getattr(self.bus, self.__os[0]), ModifiableObject)
+        self.__item_widths = self._get_item_widths()
         self.__data = self._init_data()
 
         self._clear_control_signals()
@@ -67,7 +67,10 @@ class MVBDriver(BusDriver):
     def _get_item_widths(self) -> dict:
         """Make a dictionary of all optional signals on the bus and the width of each one's item."""
 
-        return {s: len(getattr(self.bus, s)) // self.__items for s in self.__os}
+        if self.__bus_isarray:
+            return {s: len(getattr(self.bus, s)[0]) for s in self.__os}
+        else:
+            return {s: len(getattr(self.bus, s)) // self.__items for s in self.__os}
 
     def _init_data(self) -> dict:
         """Make a dictionary of all optional signals on the bus and initialize their values."""
@@ -106,7 +109,7 @@ class MVBDriver(BusDriver):
 
         if self.__bus_isarray:
             for signal in self.__data:
-                item_ptr = self.__items-1 - self.__item_cnt
+                item_ptr = self.__item_cnt
                 self.__data[signal][item_ptr] = kwargs.get(signal)
         else:
             for signal, value in self.__data.items():
