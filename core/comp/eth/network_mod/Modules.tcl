@@ -59,7 +59,7 @@ if {$NET_MOD_ARCH == "EMPTY"} {
 } elseif {$NET_MOD_ARCH == "EXTERNAL"} {
     lappend COMPONENTS [list "NETWORK_MOD"          $EXTERNAL_BASE         "FULL"           ]
 } else {
-    if { $NET_MOD_ARCH == "10G4" || $NET_MOD_ARCH == "25G4" } {
+    if { $NET_MOD_ARCH == "10G4" || $NET_MOD_ARCH == "25G4" || $NET_MOD_ARCH == "40GE"} {
         set NM_LOGIC_ARCHGRP "FULL"
     }
     lappend COMPONENTS [list "ASYNC_OPENLOOP"       $ASYNC_OPENLOOP_BASE   "FULL"           ]
