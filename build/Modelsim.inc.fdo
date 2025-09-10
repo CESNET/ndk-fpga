@@ -122,17 +122,14 @@ proc CompileMod {FNAME OPT} {
         regsub "/\[^/\]+\$" $FNAME "/" DIR
         set CMD [list vlog -vmake {*}$COVER_PARAMS_SV -sv -timescale "1ps/1ps" {*}$VLOG_PARAM -work $LIB +incdir+$DIR {*}$SIM_FLAGS(VLOG_SV_FLAGS) {*}$opt(VLOG_SV_FLAGS)]
     } else {
-        set CMD [list vcom -vmake -2008 -explicit {*}$COVER_PARAMS {*}$VCOM_PARAM  -work $LIB]
+        set CMD [list vcom -vmake -2008 -explicit {*}$COVER_PARAMS {*}$VCOM_PARAM -work $LIB]
     }
 
     if {$SIM_FLAGS(BATCH_COMPILE)} {
-        #TODO: Thing about better way haw to add psl files
-        if { $FEXT in [list .psl] } {
-            nb_batch_add $CMD "-pslfile"
-            nb_batch_add $CMD $FNAME
-        } else {
-           nb_batch_add $CMD $FNAME
+        if {[info exists opt(PSLFILE)]} {
+            lappend CMD "-pslfile" $opt(PSLFILE)
         }
+        nb_batch_add $CMD $FNAME
     } else {
         eval {*}$CMD $FNAME
     }
