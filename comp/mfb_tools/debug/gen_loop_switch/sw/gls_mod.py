@@ -27,6 +27,10 @@ class GracefulExiter():
         return self.state
 
 
+def get_gls_path(n):
+    return subprocess.Popen(f"nfb-bus -l | grep cesnet,ofm,gen_loop_switch -m{n+1} | tail -n1", shell=True, stdout=subprocess.PIPE).stdout.read().strip().decode("utf-8").split()[2]
+
+
 def nfb_bus(path, addr, value=None):
     pcie_index = 0
     if value is None: # read
@@ -104,7 +108,7 @@ def run_test(mode, min_fr_size, max_fr_size, fr_size_step, gls_clk_freq, log_en,
 
     for p in dma_streams:
         # Prepare DT paths
-        dt_path_gls[p] = "/firmware/mi_bus0/dbg_gls" + str(p)
+        dt_path_gls[p] = get_gls_path(int(p))
         dt_path_gen2eth[p] = dt_path_gls[p] + "/mfb_gen2eth"
         dt_path_gen2dma[p] = dt_path_gls[p] + "/mfb_gen2dma"
         # Set GLS muxes back to default
