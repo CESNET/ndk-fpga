@@ -30,9 +30,9 @@ class MVBMonitor(BusMonitor):
         self.__os = [s for s in MVBMonitor._optional_signals if hasattr(self.bus, s)]
         self.__item_cnt = 0
         self.__items = len(self.bus.vld)
+        self.__bus_isarray = not isinstance(getattr(self.bus, self.__os[0]), ModifiableObject)
         self.__item_widths = self._get_item_widths()
         self.__item_width = sum(self.__item_widths.values())
-        self.__bus_isarray = not isinstance(getattr(self.bus, self.__os[0]), ModifiableObject)
         self.__tr_type = tr_type
 
         if self.__tr_type == bytes:
@@ -80,7 +80,10 @@ class MVBMonitor(BusMonitor):
 
     def _get_item_widths(self) -> dict:
         """Make a dictionary of all optional signals on the bus and the width of each one's item."""
-        return {s: len(getattr(self.bus, s)) // self.items for s in self.__os}
+        if self.__bus_isarray:
+            return {s: len(getattr(self.bus, s)[0]) for s in self.__os}
+        else:
+            return {s: len(getattr(self.bus, s)) // self.__items for s in self.__os}
 
     def _is_valid_word(self, signal_src_rdy, signal_dst_rdy) -> bool:
         """Checks if the received word is valid transaction."""
@@ -111,7 +114,7 @@ class MVBMonitor(BusMonitor):
         for s in self.__os:
             data_dict_word[s] = getattr(self.bus, s).value
             if self.__bus_isarray:
-                data_dict_items[s] = data_dict_word[s]
+                data_dict_items[s] = [val.value for val in data_dict_word[s]]
             else: # Splitting the word into a list of items by masking and shifting
                 data_mask = 2**self.__item_widths[s] - 1
                 data_dict_items[s] = []
@@ -125,6 +128,7 @@ class MVBMonitor(BusMonitor):
                 for s in self.__os:
                     if hasattr(mvb_tr, s):
                         setattr(mvb_tr, s, data_dict_items[s][i])
+
                 self._recv(mvb_tr)
             vld >>= 1
 
