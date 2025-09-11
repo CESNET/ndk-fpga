@@ -101,9 +101,10 @@ begin
     -- No straddling supported!
     -- keep signal serves as valid for each DWORD of CC_AXI_DATA signal
     axi_512b_g: if (MFB_REGIONS = 2) generate
-        s_cc_keep_pr : process (all)
+        s_cc_keep_signal_assignment : process (all) is
         begin
-            if (CC_MFB_EOF(0) = '1') then                                                                                                   -- end of data in first region
+            -- end of data in first region
+            if (CC_MFB_EOF(0) = '1') then
                 cc_keep <= (others => '0');
 
                 for i in 0 to AXI_DATA_WIDTH/32-1 loop
@@ -111,7 +112,8 @@ begin
                     exit when (i = to_integer(unsigned(CC_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0))));
                 end loop;
 
-            elsif (CC_MFB_EOF(1) = '1') then                                                                                                -- end of data in second region
+            -- end of data in second region
+            elsif (CC_MFB_EOF(1) = '1') then
                 cc_keep <= (others => '0');
 
                 for i in 0 to AXI_DATA_WIDTH/32-1 loop
@@ -119,21 +121,25 @@ begin
                     exit when (i = ((AXI_DATA_WIDTH/32)/2) + to_integer(unsigned(CC_MFB_EOF_POS(2*EOP_POS_WIDTH-1 downto EOP_POS_WIDTH))));
                 end loop;
 
-            else                                                                                                                            -- start or middle of data
+            -- start or middle of data
+            else
                 cc_keep <= (others => '1');
             end if;
         end process;
     else generate
         s_cc_keep_pr : process (all)
         begin
-            if (CC_MFB_EOF(0) = '1') then                                                           -- end of data in first region
+            -- end of data in first region
+            if (CC_MFB_EOF(0) = '1') then
                 cc_keep <= (others => '0');
 
                 for i in 0 to AXI_DATA_WIDTH/32-1 loop
                     cc_keep(i) <= '1';
                     exit when (i = to_integer(unsigned(CC_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0))));
                 end loop;
-            else                                                                                    -- start or middle of data
+
+            -- start or middle of data
+            else
                 cc_keep <= (others => '1');
             end if;
         end process;
