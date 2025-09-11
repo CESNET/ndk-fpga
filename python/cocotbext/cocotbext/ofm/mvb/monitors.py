@@ -112,10 +112,12 @@ class MVBMonitor(BusMonitor):
         data_dict_word = {}
         data_dict_items = {}
         for s in self.__os:
-            data_dict_word[s] = getattr(self.bus, s).value
             if self.__bus_isarray:
-                data_dict_items[s] = [val.value for val in data_dict_word[s]]
+                data_dict_word[s] = getattr(self.bus, s)
+                data_dict_items[s] = [data_dict_word[s][i].value.integer for i in range(len(data_dict_word[s]))]
+
             else: # Splitting the word into a list of items by masking and shifting
+                data_dict_word[s] = getattr(self.bus, s).value
                 data_mask = 2**self.__item_widths[s] - 1
                 data_dict_items[s] = []
                 for i in range(self.__items):
