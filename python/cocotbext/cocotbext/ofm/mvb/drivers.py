@@ -100,7 +100,14 @@ class MVBDriver(BusDriver):
         """Sends value of control signals to the MVB bus."""
 
         for sig, val in self.__data.items():
-            getattr(self.bus, sig).value = val
+            sig_obj = getattr(self.bus, sig)
+
+            if isinstance(sig_obj, ModifiableObject):
+                sig_obj.value = val
+            else:
+                for i in range(len(sig_obj)):
+                    sig_obj[i].value = val[i]
+
         self.bus.vld.value = self._vld
         self.bus.src_rdy.value = self._src_rdy
 
