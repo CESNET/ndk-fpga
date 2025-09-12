@@ -195,7 +195,7 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     -- PCIe header FIFOs
     -- =============================================================================================
     -- Width of data in the FIFO for PCIe headers of transactions carrying DMA header
-    constant PCIE_HDR_DMA_TRAN_FIFO_W     : natural := 128;
+    constant PCIE_HDR_DMA_TRAN_FIFO_W     : natural := 128 + 1;
     constant PCIE_HDR_DMA_TRAN_FIFO_SIZE  : natural := 8;
     -- Width of data in the FIFO for PCIe headers of transactions carrying user data
     constant PCIE_HDR_DATA_TRAN_FIFO_W    : natural := 128;
@@ -237,6 +237,7 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     -- Address for a DMA header PCIe transaction
     signal dma_hdr_pcie_addr          : std_logic_vector(ADDR_WIDTH -1 downto 0);
     signal dma_hdr_pcie_addr_reg      : std_logic_vector(ADDR_WIDTH -1 downto 0);
+    signal dma_hdr_ptr                : std_logic_vector(POINTER_WIDTH -1 downto 0);
     signal dma_hdr_pcie_addr_vld      : std_logic;
     -- determines if the PCIe header is the size of 3 or 4 DWs
     signal pcie_addr_len_dma_hdr_tran : std_logic;
@@ -266,6 +267,9 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     signal   dma_hdr_addr_next             : std_logic;
     signal   dma_hdr_addr_next_n           : std_logic;
     signal   dma_hdr_addr_next_wr          : std_logic;
+    signal   vld_bits_per_ch               : std_logic_vector(CHANNELS -1 downto 0);
+    signal   vld_bit_sel                   : std_logic;
+    signal   vld_bit_out                   : std_logic;
 
     signal pkt_chan_reg : std_logic_vector(log2(CHANNELS) -1 downto 0);
     signal pkt_chan_new : std_logic_vector(log2(CHANNELS) -1 downto 0);
@@ -825,7 +829,7 @@ begin
         START_REQ_CHANNEL => START_REQ_CHANNEL,
 
         ADDR     => dma_hdr_pcie_addr,
-        OFFSET   => open,
+        OFFSET   => dma_hdr_ptr,
         ADDR_VLD => dma_hdr_pcie_addr_vld
     );
 
@@ -856,10 +860,28 @@ begin
             dma_hdr_pcie_addr_reg         <= dma_hdr_pcie_addr;
             pcie_hdr_dma_hdr_tran_fifo_wr <= dma_hdr_pcie_addr_vld;
             pcie_addr_len_dma_hdr_tran    <= '1' when (DEVICE = "ULTRASCALE" or dma_hdr_pcie_addr(64-1 downto 32) /= (32-1 downto 0 => '0')) else '0';
+            vld_bit_sel                   <= vld_bits_per_ch(to_integer(unsigned(dma_hdr_addr_chan)));
         end if;
     end process;
 
-    pcie_hdr_dma_hdr_tran_fifo_in <= pcie_hdr_dma_hdr_tran;
+    vld_bit_flip_p : process (CLK) is
+    begin
+        if (rising_edge(CLK)) then
+            if (RESET = '1') then
+                vld_bits_per_ch <= (others => '1');
+            else
+                if (dma_hdr_pcie_addr_vld = '1' and dma_hdr_ptr = ADDR_HEADER_MASK) then
+                    vld_bits_per_ch(to_integer(unsigned(dma_hdr_addr_chan))) <= not vld_bits_per_ch(to_integer(unsigned(dma_hdr_addr_chan)));
+                end if;
+
+                if (START_REQ_VLD = '1') then
+                    vld_bits_per_ch(to_integer(unsigned(START_REQ_CHANNEL))) <= '1';
+                end if;
+            end if;
+        end if;
+    end process;
+
+    pcie_hdr_dma_hdr_tran_fifo_in <= pcie_hdr_dma_hdr_tran & vld_bit_sel;
 
     pcie_hdr_dma_hdr_tran_fifo_i : entity work.FIFOX
     generic map (
@@ -887,7 +909,7 @@ begin
         AEMPTY => open
     );
 
-    DMA_PCIE_HDR                  <= pcie_hdr_dma_hdr_tran_fifo_do;
+    (DMA_PCIE_HDR, vld_bit_out)   <= pcie_hdr_dma_hdr_tran_fifo_do;
     DMA_PCIE_HDR_SRC_RDY          <= not pcie_hdr_dma_hdr_tran_fifo_empty;
     pcie_hdr_dma_hdr_tran_fifo_rd <= DMA_PCIE_HDR_DST_RDY;
 
@@ -1060,7 +1082,7 @@ begin
     DMA_HDR     <= (24-1 downto METADATA_SIZE => '0')
                & hdr_meta_fifo_do
                & (7-1 downto 0                => '0')
-               & '1'
+               & vld_bit_out
                & std_logic_vector(resize(unsigned(ptr_fifo_do), 16))
                & (16-1 downto log2(PKT_MTU+1) => '0')
                & pkt_size_fifo_do;

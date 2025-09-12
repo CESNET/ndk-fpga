@@ -24,6 +24,7 @@ endclass
 class model_data;
     int unsigned data_ptr;
     int unsigned hdr_ptr;
+    bit          vld_bit;
 endclass
 
 
@@ -38,6 +39,7 @@ class status_cbs extends uvm_reg_cbs;
         if(rw.value[0][0] == 1'b1) begin
             data.data_ptr = 0;
             data.hdr_ptr = 0;
+            data.vld_bit = 1;
         end
     endtask
 endclass
@@ -212,10 +214,10 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         return rq;
     endfunction
 
-    function void get_dma_header(logic [16-1:0] frame_pointer, logic[16-1:0] frame_length, logic [24-1:0] meta, output logic[32-1 : 0] header[2]);
+    function void get_dma_header(logic [16-1:0] frame_pointer, logic[16-1:0] frame_length, logic [24-1:0] meta, bit valid_bit, output logic[32-1 : 0] header[2]);
         logic [64-1:0] out_hdr;
 
-        out_hdr = {meta, 7'b0, 1'b1, frame_pointer, frame_length};
+        out_hdr = {meta, 7'b0, valid_bit, frame_pointer, frame_length};
         header = {<<32{out_hdr}};
     endfunction
 
@@ -282,7 +284,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         addr = m_regmodel.channel[channel].hdr_base.get() + (m_data[channel].hdr_ptr*8);
         m_data[channel].hdr_ptr = (m_data[channel].hdr_ptr + 1) & m_regmodel.channel[channel].hdr_mask.get();
 
-        get_dma_header(packet_pointer_start, packet.size(), meta, packet_hdr);
+        get_dma_header(packet_pointer_start, packet.size(), meta, m_data[channel].vld_bit, packet_hdr);
         packet_output = get_pcie_transaction(addr, 8, packet_hdr);
         packet_output.packet_num   = pkt_cntr_total_chan[channel];
         packet_output.data_packet  = 0;
@@ -291,6 +293,11 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         packet_output.part         = 1;
         packet_output.start[this.get_full_name()]  = start_time;
         analysis_port_tx.write(packet_output);
+
+        // It the header pointer overflows, flip the valid bit
+        if (m_data[channel].hdr_ptr == 0) begin
+            m_data[channel].vld_bit = ~m_data[channel].vld_bit;
+        end
     endtask
 
     task get_input();
