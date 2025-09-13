@@ -118,7 +118,7 @@ end entity;
 architecture FULL of MFB_SPLITTER_GEN is
 
     constant TREE_STAGES : natural := log2(SPLITTER_OUTPUTS);
-    constant SO_2_POW    : natural := 2**SPLITTER_OUTPUTS;
+    constant SO_2_POW    : natural := 2**log2(SPLITTER_OUTPUTS);
 
     signal s_rx_mvb_data    : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0);
     signal s_rx_mvb_switch  : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MVB_ITEMS*log2(SPLITTER_OUTPUTS)-1 downto 0);
