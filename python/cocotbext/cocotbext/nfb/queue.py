@@ -68,6 +68,8 @@ class QueueNdp:
         desc = self._ctrl.desc0(ba)
         if self._ctrl.last_upper_addr == desc:
             return False
+
+        self._ctrl.last_upper_addr = desc
         self._push_one_desc(desc)
         return True
 
