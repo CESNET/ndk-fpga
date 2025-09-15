@@ -142,7 +142,7 @@ class QueueNdpTx(QueueNdp):
         pass
 
     async def send(self, pkt, flush=True):
-        return self.sendmsg((pkt, [], flush))
+        return await self.sendmsg((pkt, [], flush))
 
     async def sendmsg(self, pkt, flush=True):
         pkt, hdr, flags = pkt
