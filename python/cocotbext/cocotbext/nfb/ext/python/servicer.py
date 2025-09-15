@@ -10,9 +10,8 @@ import nfb.ext.python as ext
 
 class Servicer(ext.AbstractNfb):
     class NdpQueue(ext.AbstractNdpQueue):
-        _burst_temp = []
-
         def __init__(self, q):
+            self._burst_temp = []
             self._q = q
 
         def start(self):
