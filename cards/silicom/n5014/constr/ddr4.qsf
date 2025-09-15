@@ -1,0 +1,295 @@
+# ddr4.qsf: DDR4 modules constraint
+# Copyright (C) BrnoLogic, Ltd. - All Rights Reserved
+# Author: Tomas Fukac<fukac@brnologic.com>, 2023
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# DDR4 channel 0
+# ==============================================================================
+
+set_location_assignment PIN_E38 -to DDR4_CH0_REF_CLK
+set_instance_assignment -name IO_STANDARD "LVDS" -to DDR4_CH0_REF_CLK
+#set_location_assignment PIN_E39 -to DDR4_CH0_REF_CLK(n)
+#set_instance_assignment -name IO_STANDARD "LVDS" -to DDR4_CH0_REF_CLK(n)
+
+set_location_assignment PIN_D36 -to DDR4_CH0_RZQ
+
+set_location_assignment PIN_P33 -to DDR4_CH0_CS_N
+set_location_assignment PIN_K33 -to DDR4_CH0_CKE
+set_location_assignment PIN_L34 -to DDR4_CH0_ODT
+set_location_assignment PIN_E40 -to DDR4_CH0_BA[0]
+set_location_assignment PIN_F37 -to DDR4_CH0_BA[1]
+set_location_assignment PIN_F38 -to DDR4_CH0_BG[0]
+set_location_assignment PIN_M35 -to DDR4_CH0_BG[1]
+set_location_assignment PIN_P35 -to DDR4_CH0_CK_P
+set_location_assignment PIN_R35 -to DDR4_CH0_CK_N
+set_location_assignment PIN_R33 -to DDR4_CH0_ACT_N
+set_location_assignment PIN_A36 -to DDR4_CH0_ALERT_N
+set_location_assignment PIN_N34 -to DDR4_CH0_PAR
+set_location_assignment PIN_N35 -to DDR4_CH0_RESET_N
+#
+set_location_assignment PIN_J36 -to DDR4_CH0_A[0]
+set_location_assignment PIN_J35 -to DDR4_CH0_A[1]
+set_location_assignment PIN_H33 -to DDR4_CH0_A[2]
+set_location_assignment PIN_J33 -to DDR4_CH0_A[3]
+set_location_assignment PIN_G37 -to DDR4_CH0_A[4]
+set_location_assignment PIN_H37 -to DDR4_CH0_A[5]
+set_location_assignment PIN_H35 -to DDR4_CH0_A[6]
+set_location_assignment PIN_H34 -to DDR4_CH0_A[7]
+set_location_assignment PIN_J37 -to DDR4_CH0_A[8]
+set_location_assignment PIN_K36 -to DDR4_CH0_A[9]
+set_location_assignment PIN_K35 -to DDR4_CH0_A[10]
+set_location_assignment PIN_K34 -to DDR4_CH0_A[11]
+set_location_assignment PIN_E36 -to DDR4_CH0_A[12]
+set_location_assignment PIN_F39 -to DDR4_CH0_A[13]
+set_location_assignment PIN_G39 -to DDR4_CH0_A[14]
+set_location_assignment PIN_F36 -to DDR4_CH0_A[15]
+set_location_assignment PIN_G36 -to DDR4_CH0_A[16]
+#
+set_location_assignment PIN_M37 -to {DDR4_CH0_DQS_P[0]}
+set_location_assignment PIN_L37 -to {DDR4_CH0_DQS_N[0]}
+set_location_assignment PIN_L38 -to {DDR4_CH0_DQS_P[1]}
+set_location_assignment PIN_K38 -to {DDR4_CH0_DQS_N[1]}
+set_location_assignment PIN_F42 -to {DDR4_CH0_DQS_P[2]}
+set_location_assignment PIN_G42 -to {DDR4_CH0_DQS_N[2]}
+set_location_assignment PIN_B42 -to {DDR4_CH0_DQS_P[3]}
+set_location_assignment PIN_C42 -to {DDR4_CH0_DQS_N[3]}
+set_location_assignment PIN_C39 -to {DDR4_CH0_DQS_P[4]}
+set_location_assignment PIN_B39 -to {DDR4_CH0_DQS_N[4]}
+set_location_assignment PIN_G32 -to {DDR4_CH0_DQS_P[5]}
+set_location_assignment PIN_H32 -to {DDR4_CH0_DQS_N[5]}
+set_location_assignment PIN_F34 -to {DDR4_CH0_DQS_P[6]}
+set_location_assignment PIN_E34 -to {DDR4_CH0_DQS_N[6]}
+set_location_assignment PIN_C34 -to {DDR4_CH0_DQS_P[7]}
+set_location_assignment PIN_B34 -to {DDR4_CH0_DQS_N[7]}
+set_location_assignment PIN_C35 -to {DDR4_CH0_DQS_P[8]}
+set_location_assignment PIN_B35 -to {DDR4_CH0_DQS_N[8]}
+#
+set_location_assignment PIN_B36 -to {DDR4_CH0_DBI_N[8]}
+set_location_assignment PIN_E35 -to {DDR4_CH0_DBI_N[7]}
+set_location_assignment PIN_G35 -to {DDR4_CH0_DBI_N[6]}
+set_location_assignment PIN_L32 -to {DDR4_CH0_DBI_N[5]}
+set_location_assignment PIN_C40 -to {DDR4_CH0_DBI_N[4]}
+set_location_assignment PIN_D43 -to {DDR4_CH0_DBI_N[3]}
+set_location_assignment PIN_F41 -to {DDR4_CH0_DBI_N[2]}
+set_location_assignment PIN_J38 -to {DDR4_CH0_DBI_N[1]}
+set_location_assignment PIN_N37 -to {DDR4_CH0_DBI_N[0]}
+#
+set_location_assignment PIN_M36 -to DDR4_CH0_DQ[0]
+set_location_assignment PIN_L39 -to DDR4_CH0_DQ[1]
+set_location_assignment PIN_N38 -to DDR4_CH0_DQ[2]
+set_location_assignment PIN_P37 -to DDR4_CH0_DQ[3]
+set_location_assignment PIN_K39 -to DDR4_CH0_DQ[4]
+set_location_assignment PIN_L36 -to DDR4_CH0_DQ[5]
+set_location_assignment PIN_M39 -to DDR4_CH0_DQ[6]
+set_location_assignment PIN_N39 -to DDR4_CH0_DQ[7]
+set_location_assignment PIN_H40 -to DDR4_CH0_DQ[8]
+set_location_assignment PIN_G40 -to DDR4_CH0_DQ[9]
+set_location_assignment PIN_J40 -to DDR4_CH0_DQ[10]
+set_location_assignment PIN_K40 -to DDR4_CH0_DQ[11]
+set_location_assignment PIN_H42 -to DDR4_CH0_DQ[12]
+set_location_assignment PIN_H43 -to DDR4_CH0_DQ[13]
+set_location_assignment PIN_J41 -to DDR4_CH0_DQ[14]
+set_location_assignment PIN_H39 -to DDR4_CH0_DQ[15]
+set_location_assignment PIN_H44 -to DDR4_CH0_DQ[16]
+set_location_assignment PIN_G44 -to DDR4_CH0_DQ[17]
+set_location_assignment PIN_E41 -to DDR4_CH0_DQ[18]
+set_location_assignment PIN_D41 -to DDR4_CH0_DQ[19]
+set_location_assignment PIN_F43 -to DDR4_CH0_DQ[20]
+set_location_assignment PIN_F44 -to DDR4_CH0_DQ[21]
+set_location_assignment PIN_E43 -to DDR4_CH0_DQ[22]
+set_location_assignment PIN_E44 -to DDR4_CH0_DQ[23]
+set_location_assignment PIN_C44 -to DDR4_CH0_DQ[24]
+set_location_assignment PIN_B41 -to DDR4_CH0_DQ[25]
+set_location_assignment PIN_C43 -to DDR4_CH0_DQ[26]
+set_location_assignment PIN_A43 -to DDR4_CH0_DQ[27]
+set_location_assignment PIN_A42 -to DDR4_CH0_DQ[28]
+set_location_assignment PIN_A41 -to DDR4_CH0_DQ[29]
+set_location_assignment PIN_B44 -to DDR4_CH0_DQ[30]
+set_location_assignment PIN_A44 -to DDR4_CH0_DQ[31]
+set_location_assignment PIN_A37 -to DDR4_CH0_DQ[32]
+set_location_assignment PIN_D37 -to DDR4_CH0_DQ[33]
+set_location_assignment PIN_B37 -to DDR4_CH0_DQ[34]
+set_location_assignment PIN_D38 -to DDR4_CH0_DQ[35]
+set_location_assignment PIN_A39 -to DDR4_CH0_DQ[36]
+set_location_assignment PIN_C37 -to DDR4_CH0_DQ[37]
+set_location_assignment PIN_C38 -to DDR4_CH0_DQ[38]
+set_location_assignment PIN_A38 -to DDR4_CH0_DQ[39]
+set_location_assignment PIN_L31 -to DDR4_CH0_DQ[40]
+set_location_assignment PIN_M30 -to DDR4_CH0_DQ[41]
+set_location_assignment PIN_J31 -to DDR4_CH0_DQ[42]
+set_location_assignment PIN_K30 -to DDR4_CH0_DQ[43]
+set_location_assignment PIN_J32 -to DDR4_CH0_DQ[44]
+set_location_assignment PIN_K31 -to DDR4_CH0_DQ[45]
+set_location_assignment PIN_N32 -to DDR4_CH0_DQ[46]
+set_location_assignment PIN_M31 -to DDR4_CH0_DQ[47]
+set_location_assignment PIN_G31 -to DDR4_CH0_DQ[48]
+set_location_assignment PIN_F32 -to DDR4_CH0_DQ[49]
+set_location_assignment PIN_F33 -to DDR4_CH0_DQ[50]
+set_location_assignment PIN_J30 -to DDR4_CH0_DQ[51]
+set_location_assignment PIN_H30 -to DDR4_CH0_DQ[52]
+set_location_assignment PIN_G29 -to DDR4_CH0_DQ[53]
+set_location_assignment PIN_H29 -to DDR4_CH0_DQ[54]
+set_location_assignment PIN_G30 -to DDR4_CH0_DQ[55]
+set_location_assignment PIN_F29 -to DDR4_CH0_DQ[56]
+set_location_assignment PIN_E33 -to DDR4_CH0_DQ[57]
+set_location_assignment PIN_F31 -to DDR4_CH0_DQ[58]
+set_location_assignment PIN_E31 -to DDR4_CH0_DQ[59]
+set_location_assignment PIN_E30 -to DDR4_CH0_DQ[60]
+set_location_assignment PIN_D31 -to DDR4_CH0_DQ[61]
+set_location_assignment PIN_D33 -to DDR4_CH0_DQ[62]
+set_location_assignment PIN_D32 -to DDR4_CH0_DQ[63]
+set_location_assignment PIN_B31 -to DDR4_CH0_DQ[64]
+set_location_assignment PIN_A31 -to DDR4_CH0_DQ[65]
+set_location_assignment PIN_C32 -to DDR4_CH0_DQ[66]
+set_location_assignment PIN_A32 -to DDR4_CH0_DQ[67]
+set_location_assignment PIN_A33 -to DDR4_CH0_DQ[68]
+set_location_assignment PIN_A34 -to DDR4_CH0_DQ[69]
+set_location_assignment PIN_B32 -to DDR4_CH0_DQ[70]
+set_location_assignment PIN_C33 -to DDR4_CH0_DQ[71]
+
+# ==============================================================================
+# DDR4 channel 1
+# ==============================================================================
+
+set_location_assignment PIN_D20 -to DDR4_CH1_REF_CLK
+set_instance_assignment -name IO_STANDARD "LVDS" -to DDR4_CH1_REF_CLK
+#set_location_assignment PIN_D21 -to DDR4_CH1_REF_CLK(n)
+#set_instance_assignment -name IO_STANDARD "LVDS" -to DDR4_CH1_REF_CLK(n)
+
+set_location_assignment PIN_D18 -to DDR4_CH1_RZQ
+
+set_location_assignment PIN_L18 -to DDR4_CH1_CS_N
+set_location_assignment PIN_J18 -to DDR4_CH1_CKE
+set_location_assignment PIN_G19 -to DDR4_CH1_ODT
+set_location_assignment PIN_C23 -to DDR4_CH1_BA[0]
+set_location_assignment PIN_B20 -to DDR4_CH1_BA[1]
+set_location_assignment PIN_C20 -to DDR4_CH1_BG[0]
+set_location_assignment PIN_N18 -to DDR4_CH1_BG[1]
+set_location_assignment PIN_K19 -to DDR4_CH1_CK_P
+set_location_assignment PIN_L19 -to DDR4_CH1_CK_N
+set_location_assignment PIN_K18 -to DDR4_CH1_ACT_N
+set_location_assignment PIN_A23 -to DDR4_CH1_ALERT_N
+set_location_assignment PIN_G17 -to DDR4_CH1_PAR
+set_location_assignment PIN_M19 -to DDR4_CH1_RESET_N
+#
+set_location_assignment PIN_F21 -to DDR4_CH1_A[0]
+set_location_assignment PIN_E21 -to DDR4_CH1_A[1]
+set_location_assignment PIN_F18 -to DDR4_CH1_A[2]
+set_location_assignment PIN_F17 -to DDR4_CH1_A[3]
+set_location_assignment PIN_G22 -to DDR4_CH1_A[4]
+set_location_assignment PIN_F22 -to DDR4_CH1_A[5]
+set_location_assignment PIN_E19 -to DDR4_CH1_A[6]
+set_location_assignment PIN_E18 -to DDR4_CH1_A[7]
+set_location_assignment PIN_G20 -to DDR4_CH1_A[8]
+set_location_assignment PIN_G21 -to DDR4_CH1_A[9]
+set_location_assignment PIN_F19 -to DDR4_CH1_A[10]
+set_location_assignment PIN_E20 -to DDR4_CH1_A[11]
+set_location_assignment PIN_C18 -to DDR4_CH1_A[12]
+set_location_assignment PIN_D23 -to DDR4_CH1_A[13]
+set_location_assignment PIN_E23 -to DDR4_CH1_A[14]
+set_location_assignment PIN_C19 -to DDR4_CH1_A[15]
+set_location_assignment PIN_B19 -to DDR4_CH1_A[16]
+#
+set_location_assignment PIN_M20 -to {DDR4_CH1_DQS_P[0]}
+set_location_assignment PIN_N20 -to {DDR4_CH1_DQS_N[0]}
+set_location_assignment PIN_H24 -to {DDR4_CH1_DQS_P[1]}
+set_location_assignment PIN_G24 -to {DDR4_CH1_DQS_N[1]}
+set_location_assignment PIN_F26 -to {DDR4_CH1_DQS_P[2]}
+set_location_assignment PIN_G26 -to {DDR4_CH1_DQS_N[2]}
+set_location_assignment PIN_B25 -to {DDR4_CH1_DQS_P[3]}
+set_location_assignment PIN_C25 -to {DDR4_CH1_DQS_N[3]}
+set_location_assignment PIN_C22 -to {DDR4_CH1_DQS_P[4]}
+set_location_assignment PIN_B22 -to {DDR4_CH1_DQS_N[4]}
+set_location_assignment PIN_M16 -to {DDR4_CH1_DQS_P[5]}
+set_location_assignment PIN_L16 -to {DDR4_CH1_DQS_N[5]}
+set_location_assignment PIN_H15 -to {DDR4_CH1_DQS_P[6]}
+set_location_assignment PIN_J15 -to {DDR4_CH1_DQS_N[6]}
+set_location_assignment PIN_D15 -to {DDR4_CH1_DQS_P[7]}
+set_location_assignment PIN_C15 -to {DDR4_CH1_DQS_N[7]}
+set_location_assignment PIN_B14 -to {DDR4_CH1_DQS_P[8]}
+set_location_assignment PIN_A14 -to {DDR4_CH1_DQS_N[8]}
+#
+set_location_assignment PIN_B16 -to {DDR4_CH1_DBI_N[8]}
+set_location_assignment PIN_E16 -to {DDR4_CH1_DBI_N[7]}
+set_location_assignment PIN_G16 -to {DDR4_CH1_DBI_N[6]}
+set_location_assignment PIN_L17 -to {DDR4_CH1_DBI_N[5]}
+set_location_assignment PIN_A22 -to {DDR4_CH1_DBI_N[4]}
+set_location_assignment PIN_D25 -to {DDR4_CH1_DBI_N[3]}
+set_location_assignment PIN_F24 -to {DDR4_CH1_DBI_N[2]}
+set_location_assignment PIN_H23 -to {DDR4_CH1_DBI_N[1]}
+set_location_assignment PIN_N19 -to {DDR4_CH1_DBI_N[0]}
+
+set_location_assignment PIN_J20 -to DDR4_CH1_DQ[0]
+set_location_assignment PIN_H22 -to DDR4_CH1_DQ[1]
+set_location_assignment PIN_J22 -to DDR4_CH1_DQ[2]
+set_location_assignment PIN_K21 -to DDR4_CH1_DQ[3]
+set_location_assignment PIN_K20 -to DDR4_CH1_DQ[4]
+set_location_assignment PIN_J21 -to DDR4_CH1_DQ[5]
+set_location_assignment PIN_H20 -to DDR4_CH1_DQ[6]
+set_location_assignment PIN_L21 -to DDR4_CH1_DQ[7]
+set_location_assignment PIN_K24 -to DDR4_CH1_DQ[8]
+set_location_assignment PIN_K25 -to DDR4_CH1_DQ[9]
+set_location_assignment PIN_J27 -to DDR4_CH1_DQ[10]
+set_location_assignment PIN_J26 -to DDR4_CH1_DQ[11]
+set_location_assignment PIN_H25 -to DDR4_CH1_DQ[12]
+set_location_assignment PIN_K26 -to DDR4_CH1_DQ[13]
+set_location_assignment PIN_J25 -to DDR4_CH1_DQ[14]
+set_location_assignment PIN_K23 -to DDR4_CH1_DQ[15]
+set_location_assignment PIN_E25 -to DDR4_CH1_DQ[16]
+set_location_assignment PIN_E26 -to DDR4_CH1_DQ[17]
+set_location_assignment PIN_G27 -to DDR4_CH1_DQ[18]
+set_location_assignment PIN_D26 -to DDR4_CH1_DQ[19]
+set_location_assignment PIN_H27 -to DDR4_CH1_DQ[20]
+set_location_assignment PIN_F27 -to DDR4_CH1_DQ[21]
+set_location_assignment PIN_F23 -to DDR4_CH1_DQ[22]
+set_location_assignment PIN_E24 -to DDR4_CH1_DQ[23]
+set_location_assignment PIN_A24 -to DDR4_CH1_DQ[24]
+set_location_assignment PIN_A27 -to DDR4_CH1_DQ[25]
+set_location_assignment PIN_C27 -to DDR4_CH1_DQ[26]
+set_location_assignment PIN_B27 -to DDR4_CH1_DQ[27]
+set_location_assignment PIN_B24 -to DDR4_CH1_DQ[28]
+set_location_assignment PIN_A26 -to DDR4_CH1_DQ[29]
+set_location_assignment PIN_D27 -to DDR4_CH1_DQ[30]
+set_location_assignment PIN_B26 -to DDR4_CH1_DQ[31]
+set_location_assignment PIN_A19 -to DDR4_CH1_DQ[32]
+set_location_assignment PIN_C17 -to DDR4_CH1_DQ[33]
+set_location_assignment PIN_B17 -to DDR4_CH1_DQ[34]
+set_location_assignment PIN_A17 -to DDR4_CH1_DQ[35]
+set_location_assignment PIN_D17 -to DDR4_CH1_DQ[36]
+set_location_assignment PIN_A18 -to DDR4_CH1_DQ[37]
+set_location_assignment PIN_B21 -to DDR4_CH1_DQ[38]
+set_location_assignment PIN_A21 -to DDR4_CH1_DQ[39]
+set_location_assignment PIN_M15 -to DDR4_CH1_DQ[40]
+set_location_assignment PIN_P17 -to DDR4_CH1_DQ[41]
+set_location_assignment PIN_N17 -to DDR4_CH1_DQ[42]
+set_location_assignment PIN_L14 -to DDR4_CH1_DQ[43]
+set_location_assignment PIN_K15 -to DDR4_CH1_DQ[44]
+set_location_assignment PIN_K13 -to DDR4_CH1_DQ[45]
+set_location_assignment PIN_K16 -to DDR4_CH1_DQ[46]
+set_location_assignment PIN_K14 -to DDR4_CH1_DQ[47]
+set_location_assignment PIN_H14 -to DDR4_CH1_DQ[48]
+set_location_assignment PIN_G12 -to DDR4_CH1_DQ[49]
+set_location_assignment PIN_H12 -to DDR4_CH1_DQ[50]
+set_location_assignment PIN_J13 -to DDR4_CH1_DQ[51]
+set_location_assignment PIN_J17 -to DDR4_CH1_DQ[52]
+set_location_assignment PIN_J16 -to DDR4_CH1_DQ[53]
+set_location_assignment PIN_H13 -to DDR4_CH1_DQ[54]
+set_location_assignment PIN_G14 -to DDR4_CH1_DQ[55]
+set_location_assignment PIN_E13 -to DDR4_CH1_DQ[56]
+set_location_assignment PIN_F12 -to DDR4_CH1_DQ[57]
+set_location_assignment PIN_F16 -to DDR4_CH1_DQ[58]
+set_location_assignment PIN_E15 -to DDR4_CH1_DQ[59]
+set_location_assignment PIN_E14 -to DDR4_CH1_DQ[60]
+set_location_assignment PIN_F14 -to DDR4_CH1_DQ[61]
+set_location_assignment PIN_D13 -to DDR4_CH1_DQ[62]
+set_location_assignment PIN_F13 -to DDR4_CH1_DQ[63]
+set_location_assignment PIN_C13 -to DDR4_CH1_DQ[64]
+set_location_assignment PIN_C12 -to DDR4_CH1_DQ[65]
+set_location_assignment PIN_B12 -to DDR4_CH1_DQ[66]
+set_location_assignment PIN_A12 -to DDR4_CH1_DQ[67]
+set_location_assignment PIN_B15 -to DDR4_CH1_DQ[68]
+set_location_assignment PIN_A13 -to DDR4_CH1_DQ[69]
+set_location_assignment PIN_C14 -to DDR4_CH1_DQ[70]
+set_location_assignment PIN_D12 -to DDR4_CH1_DQ[71]

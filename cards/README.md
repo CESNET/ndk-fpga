@@ -12,6 +12,7 @@ Unless otherwise noted, the content of this repository is available under the BS
 - The .ip files located in the `<VENDOR>/<CARD_NAME>/src/ip/` folder were generated in the Intel Quartus Prime Pro, and their use may be subject to additional license agreements.
 - The .xci files located in the `<VENDOR>/<CARD_NAME>/src/ip/` folder were generated in the Xilinx Vivado, and their use may be subject to additional license agreements.
 - The files located in the `silicom/n6010/src/comp/pmci/pmci_ip` and `silicom/n6010/scripts` folders were taken from the [ofs-n6001 repository](https://github.com/OFS/ofs-n6001) and are subject to the MIT license. Please read [LICENSE.txt file](silicom/n6010/scripts/LICENSE.txt).
+- The files located in the `silicom/n5014/src/comp/hbm` folder were taken from the [ofs-fim-common repository](https://github.com/OFS/ofs-fim-common) and are subject to the MIT license. Please read [LICENSE.txt file](silicom/n5014/src/comp/hbm/LICENSE.txt).
 
 ## Repository Maintainer
 
