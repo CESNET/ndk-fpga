@@ -35,8 +35,13 @@ class Servicer(ext.AbstractNfb):
             self._burst_temp.clear()
 
     class NdpQueueTx(NdpQueue, ext.AbstractNdpQueueTx):
+        @cocotb.function
         def burst_get(self, pkts):
             p = [(bytes(pkts[i][0]), bytes(pkts[i][1]), pkts[i][2]) for i in range(len(pkts))]
+            n = yield self._q.wait_sendable(p)
+            if n != len(p):
+                return []
+
             self._burst_temp.extend(p)
             return p
 

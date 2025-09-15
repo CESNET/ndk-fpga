@@ -43,9 +43,11 @@ class QueueManager:
 
 class QueueNdp:
     def __init__(self, dev, node, buf_index):
+        self._wait_timer = Timer(10, units="ns")
         self._ctrl = nfb.libnetcope.DmaCtrlNdp(dev.nfb, node)
         self._ram = dev.ram
         self._state = 0
+        self._dsc_free = 0
 
         bs = self._buffer_size = 1048576
         self._packet_length_max = 4096
@@ -108,7 +110,7 @@ class QueueNdpRx(QueueNdp):
 
         while self._dsc_free < 2:
             # TODO: check if can be flushed
-            await Timer(10, units="ns")
+            await self._wait_timer
 
         ba = self._buffer_base + self._ctrl.sdp * self._packet_length_max
         self.update_desc_upper_address(ba)
@@ -134,6 +136,7 @@ class QueueNdpRx(QueueNdp):
 
         ba = self._buffer_base + self._ctrl.shp * self._packet_length_max
         self._ctrl.shp += 1
+        self._dsc_free += 1  # FIXME: classical computation?
         return (bytes(self._ram.r(ba, length)), bytes(), 0)
 
 
@@ -142,11 +145,23 @@ class QueueNdpTx(QueueNdp):
         self._dir = 1
         QueueNdp.__init__(self, nfb, node, buf_index)
 
+    def _get_free_descs(self, sdp):
+        hdp = self._ctrl.update_hdp()
+        return (hdp - sdp - 1) & self._ctrl.mhp
+
     async def write(self, pkt):
         pass
 
     async def send(self, pkt, flush=True):
         return await self.sendmsg((pkt, [], flush))
+
+    async def wait_sendable(self, msgs):
+        ret = min(max(0, self._get_free_descs(self._ctrl.sdp) - 2), len(msgs))
+        if ret != len(msgs):
+            # The pynfb sendmsg function (API) doesn't returns until all messages are sent
+            # If there is no space in NDP buffer, wait some time to let the HDP to update
+            await self._wait_timer
+        return ret
 
     async def sendmsg(self, pkt, flush=True):
         pkt, hdr, flags = pkt
@@ -154,15 +169,8 @@ class QueueNdpTx(QueueNdp):
         assert self._ctrl.mtu[0] <= len(pkt_hdr) <= min(self._packet_length_max, self._ctrl.mtu[1])
         assert self._state != 0, "Queue not started yet"
 
-        while self._dsc_free < 2:
-            hdp = self._ctrl.update_hdp()
-            #prev = self._dsc_free
-            self._dsc_free = (hdp - (self._ctrl.sdp + 1)) & self._ctrl.mdp
-            if self._dsc_free < 2:
-                # FIXME: when flush = False, assure that sdp is flushed when
-                #if ((self._sdp_hw - (self._ctrl.sdp + 1))) & self._ctrl.mdp) < 2:
-                #    self.flush()
-                await Timer(5, units="us")
+        while self._get_free_descs(self._ctrl.sdp) < 2:
+            await self._wait_timer
 
         ba = self._buffer_base + self._npi * self._packet_length_max
         self.update_desc_upper_address(ba)
